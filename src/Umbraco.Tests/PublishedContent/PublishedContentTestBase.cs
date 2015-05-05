@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.LightInject;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
@@ -41,7 +42,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             if (PropertyValueConvertersResolver.HasCurrent == false)
                 PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(
-                    new ActivatorServiceProvider(), Logger,
+                    Container, Logger,
                     new[]
                         {
                             typeof(DatePickerValueConverter),

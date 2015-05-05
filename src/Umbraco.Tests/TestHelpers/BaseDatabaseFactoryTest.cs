@@ -239,7 +239,7 @@ namespace Umbraco.Tests.TestHelpers
                      new ManifestParser(Logger, new DirectoryInfo(IOHelper.MapPath("~/App_Plugins")), new NullCacheProvider())));
 
             if (PropertyValueConvertersResolver.HasCurrent == false)
-                PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(new ActivatorServiceProvider(), Logger);
+                PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(Container, Logger);
 
             if (PublishedContentModelFactoryResolver.HasCurrent == false)
                 PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver();

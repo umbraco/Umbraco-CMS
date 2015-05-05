@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,7 @@ using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using umbraco;
+using Umbraco.Core.LightInject;
 
 namespace Umbraco.Tests
 {
@@ -26,12 +28,9 @@ namespace Umbraco.Tests
 	public class LibraryTests : BaseRoutingTest
 	{
         public override void Initialize()
-		{
-            // required so we can access property.Value
-            PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(new ActivatorServiceProvider(), Logger);
-            
+        {
             base.Initialize();
-
+            
             // need to specify a custom callback for unit tests
             // AutoPublishedContentTypes generates properties automatically
             // when they are requested, but we must declare those that we
@@ -52,7 +51,20 @@ namespace Umbraco.Tests
 			UmbracoContext.Current = routingContext.UmbracoContext;
 		}
 
-		public override void TearDown()
+	    /// <summary>
+	    /// sets up resolvers before resolution is frozen
+	    /// </summary>
+	    protected override void FreezeResolution()
+	    {
+            // required so we can access property.Value
+            PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(
+                Container,
+                Logger);
+
+	        base.FreezeResolution();
+	    }
+
+	    public override void TearDown()
 		{
 			base.TearDown();
 			UmbracoContext.Current = null;

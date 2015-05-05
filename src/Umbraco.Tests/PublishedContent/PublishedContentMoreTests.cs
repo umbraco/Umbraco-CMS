@@ -11,6 +11,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Web;
 using Umbraco.Tests.TestHelpers;
 using umbraco.BusinessLogic;
+using Umbraco.Core.LightInject;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Security;
 
@@ -44,7 +45,7 @@ namespace Umbraco.Tests.PublishedContent
         protected override void FreezeResolution()
         {
             PropertyValueConvertersResolver.Current =
-                new PropertyValueConvertersResolver(new ActivatorServiceProvider(), Logger);
+                new PropertyValueConvertersResolver(Container, Logger);
             var types = PluginManager.Current.ResolveTypes<PublishedContentModel>();
             PublishedContentModelFactoryResolver.Current =
                 new PublishedContentModelFactoryResolver(new PublishedContentModelFactory(types));

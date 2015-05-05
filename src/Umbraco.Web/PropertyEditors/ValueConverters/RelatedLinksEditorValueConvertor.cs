@@ -19,6 +19,13 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     [DefaultPropertyValueConverter(typeof(JsonValueConverter))] //this shadows the JsonValueConverter
     public class RelatedLinksEditorValueConvertor : PropertyValueConverterBase
     {
+        private readonly UmbracoContext _umbracoContext;
+
+        public RelatedLinksEditorValueConvertor(UmbracoContext umbracoContext)
+        {
+            _umbracoContext = umbracoContext;
+        }
+
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
             return Constants.PropertyEditors.RelatedLinksAlias.Equals(propertyType.PropertyEditorAlias);
@@ -35,23 +42,20 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 {
                     var obj = JsonConvert.DeserializeObject<JArray>(sourceString);
                     //update the internal links if we have a context
-                    if (UmbracoContext.Current != null)
+                    var helper = new UmbracoHelper(_umbracoContext);
+                    foreach (var a in obj)
                     {
-                        var helper = new UmbracoHelper(UmbracoContext.Current);
-                        foreach (var a in obj)
+                        var type = a.Value<string>("type");
+                        if (type.IsNullOrWhiteSpace() == false)
                         {
-                            var type = a.Value<string>("type");
-                            if (type.IsNullOrWhiteSpace() == false)
+                            if (type == "internal")
                             {
-                                if (type == "internal")
-                                {
-                                    var linkId = a.Value<int>("link");
-                                    var link = helper.NiceUrl(linkId);
-                                    a["link"] = link;
-                                }
+                                var linkId = a.Value<int>("link");
+                                var link = helper.NiceUrl(linkId);
+                                a["link"] = link;
                             }
-                        }    
-                    }
+                        }
+                    }    
                     return obj;
                 }
                 catch (Exception ex)

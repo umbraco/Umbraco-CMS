@@ -24,21 +24,28 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Request)]
     public class RteMacroRenderingValueConverter : TinyMceValueConverter
 	{
+        private readonly UmbracoContext _umbracoContext;
+
+        public RteMacroRenderingValueConverter(UmbracoContext umbracoContext)
+        {
+            _umbracoContext = umbracoContext;
+        }
+
         // NOT thread-safe over a request because it modifies the
         // global UmbracoContext.Current.InPreviewMode status. So it
         // should never execute in // over the same UmbracoContext with
         // different preview modes.
-	    static string RenderRteMacros(string source, bool preview)
+	    string RenderRteMacros(string source, bool preview)
         {
             // save and set for macro rendering
-            var inPreviewMode = UmbracoContext.Current.InPreviewMode;
-	        UmbracoContext.Current.InPreviewMode = preview;
+            var inPreviewMode = _umbracoContext.InPreviewMode;
+            _umbracoContext.InPreviewMode = preview;
 
             var sb = new StringBuilder();
             
             try
 	        {
-	            var umbracoHelper = new UmbracoHelper(UmbracoContext.Current);
+                var umbracoHelper = new UmbracoHelper(_umbracoContext);
 	            MacroTagParser.ParseMacros(
 	                source,
 	                //callback for when text block is found
@@ -52,7 +59,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 	        finally
 	        {
                 // restore
-                UmbracoContext.Current.InPreviewMode = inPreviewMode;	            
+                _umbracoContext.InPreviewMode = inPreviewMode;	            
 	        }
 
             return sb.ToString();

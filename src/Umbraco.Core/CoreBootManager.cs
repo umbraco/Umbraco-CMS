@@ -372,7 +372,7 @@ namespace Umbraco.Core
 
             // need to filter out the ones we dont want!!
             PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(
-                ServiceProvider, ProfilingLogger.Logger,
+                Container, ProfilingLogger.Logger,
                 PluginManager.ResolveTypes<IPropertyValueConverter>());
 
             // use the new DefaultShortStringHelper
