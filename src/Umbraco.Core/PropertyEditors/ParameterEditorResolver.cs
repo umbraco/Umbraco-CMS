@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.LightInject;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.ObjectResolution;
@@ -14,12 +15,12 @@ namespace Umbraco.Core.PropertyEditors
     /// This resolver will contain any parameter editors defined in manifests as well as any property editors defined in manifests
     /// that have the IsParameterEditorFlag = true and any PropertyEditors found in c# that have this flag as well. 
     /// </remarks>
-    internal class ParameterEditorResolver : LazyManyObjectsResolverBase<ParameterEditorResolver, IParameterEditor>
+    internal class ParameterEditorResolver : ContainerLazyManyObjectsResolver<ParameterEditorResolver, IParameterEditor>
     {
         private readonly ManifestBuilder _builder;
-        
-        public ParameterEditorResolver(IServiceProvider serviceProvider, ILogger logger, Func<IEnumerable<Type>> typeListProducerList, ManifestBuilder builder)
-            : base(serviceProvider, logger, typeListProducerList, ObjectLifetimeScope.Application)
+
+        public ParameterEditorResolver(IServiceContainer container, ILogger logger, Func<IEnumerable<Type>> typeListProducerList, ManifestBuilder builder)
+            : base(container, logger, typeListProducerList, ObjectLifetimeScope.Application)
         {
             _builder = builder;
         }

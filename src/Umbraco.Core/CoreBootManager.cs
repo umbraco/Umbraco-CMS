@@ -322,7 +322,7 @@ namespace Umbraco.Core
                 Container, ProfilingLogger.Logger, () => PluginManager.ResolvePropertyEditors(),
                 manifestBuilder);
             ParameterEditorResolver.Current = new ParameterEditorResolver(
-                ServiceProvider, ProfilingLogger.Logger, () => PluginManager.ResolveParameterEditors(),
+                Container, ProfilingLogger.Logger, () => PluginManager.ResolveParameterEditors(),
                 manifestBuilder);
 
             //setup the validators resolver with our predefined validators
