@@ -28,36 +28,8 @@ namespace Umbraco.Tests.Migrations.Upgrades
             TestHelper.InitializeContentDirectories();
 
             Path = TestHelper.CurrentAssemblyDirectory;
-            AppDomain.CurrentDomain.SetData("DataDirectory", Path);
-           
-			MigrationResolver.Current = new MigrationResolver(
-                Mock.Of<ILogger>(),
-                () => new List<Type>
-				{
-					typeof (Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero.RemoveUmbracoAppConstraints),
-					typeof (DeleteAppTables),
-					typeof (EnsureAppsTreesUpdated),
-					typeof (MoveMasterContentTypeData),
-					typeof (NewCmsContentType2ContentTypeTable),
-					typeof (RemoveMasterContentTypeColumn),
-					typeof (RenameCmsTabTable),
-					typeof (RenameTabIdColumn),
-					typeof (UpdateCmsContentTypeAllowedContentTypeTable),
-					typeof (UpdateCmsContentTypeTable),
-					typeof (UpdateCmsContentVersionTable),
-					typeof (UpdateCmsPropertyTypeGroupTable)
-				});
-
-            LoggerResolver.Current = new LoggerResolver(Mock.Of<ILogger>())
-            {
-                CanResolveBeforeFrozen = true
-            };
-
-			Resolution.Freeze();
-
+            AppDomain.CurrentDomain.SetData("DataDirectory", Path);         
             DatabaseSpecificSetUp();
-
-            SqlSyntaxContext.SqlSyntaxProvider = GetSyntaxProvider();
         }
 
         [Test]
@@ -80,8 +52,29 @@ namespace Umbraco.Tests.Migrations.Upgrades
                     db.Execute(new Sql(rawStatement));
             }
 
+            var logger = Mock.Of<ILogger>();
+            var sql = GetSyntaxProvider();
+
             //Setup the MigrationRunner
-            var migrationRunner = new MigrationRunner(Mock.Of<ILogger>(), configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
+            var migrationRunner = new MigrationRunner(
+                logger,
+                configuredVersion,
+                targetVersion,
+                GlobalSettings.UmbracoMigrationName,
+                //pass in explicit migrations
+                new Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero.RemoveUmbracoAppConstraints(sql, logger),
+                new DeleteAppTables(sql, logger),
+                new EnsureAppsTreesUpdated(sql, logger),
+                new MoveMasterContentTypeData(sql, logger),
+                new NewCmsContentType2ContentTypeTable(sql, logger),
+                new RemoveMasterContentTypeColumn(sql, logger),
+                new RenameCmsTabTable(sql, logger),
+                new RenameTabIdColumn(sql, logger),
+                new UpdateCmsContentTypeAllowedContentTypeTable(sql, logger),
+                new UpdateCmsContentTypeTable(sql, logger),
+                new UpdateCmsContentVersionTable(sql, logger),
+                new UpdateCmsPropertyTypeGroupTable(sql, logger));
+
             bool upgraded = migrationRunner.Execute(db, provider, true);
 
             Assert.That(upgraded, Is.True);

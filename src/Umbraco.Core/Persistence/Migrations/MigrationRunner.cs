@@ -17,6 +17,7 @@ namespace Umbraco.Core.Persistence.Migrations
         private readonly Version _currentVersion;
         private readonly Version _targetVersion;
         private readonly string _productName;
+        private readonly IMigration[] _migrations;
 
         [Obsolete("Use the ctor that specifies all dependencies instead")]
         public MigrationRunner(Version currentVersion, Version targetVersion, string productName)
@@ -35,6 +36,20 @@ namespace Umbraco.Core.Persistence.Migrations
             _currentVersion = currentVersion;
             _targetVersion = targetVersion;
             _productName = productName;
+        }
+        
+        public MigrationRunner(ILogger logger, Version currentVersion, Version targetVersion, string productName, params IMigration[] migrations)
+        {
+            if (logger == null) throw new ArgumentNullException("logger");
+            if (currentVersion == null) throw new ArgumentNullException("currentVersion");
+            if (targetVersion == null) throw new ArgumentNullException("targetVersion");
+            Mandate.ParameterNotNullOrEmpty(productName, "productName");
+
+            _logger = logger;
+            _currentVersion = currentVersion;
+            _targetVersion = targetVersion;
+            _productName = productName;
+            _migrations = migrations;
         }
 
         /// <summary>
@@ -149,7 +164,7 @@ namespace Umbraco.Core.Persistence.Migrations
         protected virtual IMigration[] FindMigrations()
         {
             //MCH NOTE: Consider adding the ProductName filter to the Resolver so we don't get a bunch of irrelevant migrations
-            return MigrationResolver.Current.Migrations.ToArray();
+            return _migrations ?? MigrationResolver.Current.Migrations.ToArray();
         }
 
         internal MigrationContext InitializeMigrations(List<IMigration> migrations, Database database, DatabaseProviders databaseProvider, bool isUpgrade = true)
