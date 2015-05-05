@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using System.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero
@@ -8,6 +9,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionFourNineZero
     [MigrationAttribute("4.9.0", 0, GlobalSettings.UmbracoMigrationName)]
     public class RemoveUmbracoAppConstraints : MigrationBase
     {
+        public RemoveUmbracoAppConstraints(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
+        {
+        }
+
         public override void Up()
         {
             //This will work on mysql and should work on mssql however the old keys were not named consistently with how the keys are 

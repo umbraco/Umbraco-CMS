@@ -1,6 +1,7 @@
 using System.Linq;
 using AutoMapper;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -11,6 +12,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwoZero
     [Migration("7.2.0", 0, GlobalSettings.UmbracoMigrationName)]
     public class AlterDataTypePreValueTable : MigrationBase
     {
+        public AlterDataTypePreValueTable(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
+        {
+        }
+
         public override void Up()
         {
             var columns = SqlSyntax.GetColumnsInSchema(Context.Database).Distinct().ToArray();

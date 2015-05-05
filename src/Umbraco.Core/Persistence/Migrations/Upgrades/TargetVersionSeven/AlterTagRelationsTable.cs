@@ -12,6 +12,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     [Migration("7.0.0", 8, GlobalSettings.UmbracoMigrationName)]
     public class AlterTagRelationsTable : MigrationBase
     {
+        public AlterTagRelationsTable(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
+        {
+        }
+
         public override void Up()
         {
             if (Context == null || Context.Database == null) return;

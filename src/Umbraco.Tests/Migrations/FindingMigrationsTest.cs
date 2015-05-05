@@ -9,6 +9,8 @@ using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Profiling;
+using Umbraco.Core.Services;
 using Umbraco.Tests.Migrations.Stubs;
 
 namespace Umbraco.Tests.Migrations
@@ -31,7 +33,16 @@ namespace Umbraco.Tests.Migrations
                     typeof (FiveZeroMigration)                   
 				});
 
-            //This is needed because the PluginManager is creating the migration instances with their default ctors
+            //This is needed because the Migration resolver is creating migratoni instances with their full ctors
+            ApplicationContext.EnsureContext(
+                new ApplicationContext(
+                    new DatabaseContext(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test"),
+                    new ServiceContext(), 
+                    CacheHelper.CreateDisabledCacheHelper(),
+                    new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())),  
+                true);
+
+            //This is needed because the Migration resolver is creating the migration instances with their full ctors
             LoggerResolver.Current = new LoggerResolver(Mock.Of<ILogger>())
             {
                 CanResolveBeforeFrozen = true

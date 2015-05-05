@@ -191,7 +191,6 @@
     <Compile Include="Migrations\Stubs\FiveZeroMigration.cs" />
     <Compile Include="Migrations\Stubs\FourElevenMigration.cs" />
     <Compile Include="Migrations\Stubs\SixZeroMigration2.cs" />
-    <Compile Include="Migrations\Upgrades\ValidateV7TagsUpgradeTest.cs" />
     <Compile Include="MockTests.cs" />
     <Compile Include="Models\MacroTests.cs" />
     <Compile Include="Models\Mapping\AutoMapperTests.cs" />

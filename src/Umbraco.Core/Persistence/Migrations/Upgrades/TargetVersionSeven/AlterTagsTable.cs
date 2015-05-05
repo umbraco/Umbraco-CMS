@@ -2,6 +2,7 @@
 using System.Data;
 using System.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -10,6 +11,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     [Migration("7.0.0", 9, GlobalSettings.UmbracoMigrationName)]
     public class AlterTagsTable : MigrationBase
     {
+        public AlterTagsTable(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
+        {
+        }
+
         public override void Up()
         {
             var dbIndexes = SqlSyntax.GetDefinedIndexes(Context.Database)

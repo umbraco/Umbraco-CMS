@@ -1,6 +1,7 @@
 using System.Data;
 using System.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -10,6 +11,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwoZero
     [Migration("7.2.0", 1, GlobalSettings.UmbracoMigrationName)]
     public class AddMissingForeignKeyForContentType : MigrationBase
     {
+        public AddMissingForeignKeyForContentType(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
+        {
+        }
+
         public override void Up()
         {
 

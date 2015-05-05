@@ -8,10 +8,6 @@ namespace Umbraco.Tests.Migrations.Stubs
     public class AlterUserTableMigrationStub : MigrationBase
     {
 
-        public AlterUserTableMigrationStub()
-        {
-            
-        }
         public AlterUserTableMigrationStub(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
         {
         }
@@ -33,10 +29,6 @@ namespace Umbraco.Tests.Migrations.Stubs
     [MigrationAttribute("1.0.0", 0, "Test")]
     public class DropForeignKeyMigrationStub : MigrationBase
     {
-        public DropForeignKeyMigrationStub()
-        {
-            
-        }
         public DropForeignKeyMigrationStub(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
         {
         }
