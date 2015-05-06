@@ -46,10 +46,17 @@ app.run(['userService', '$log', '$rootScope', '$location', 'navigationService', 
         $rootScope.$on('$routeChangeError', function(event, current, previous, rejection) {
             event.preventDefault();
 
-            //Set the current path before redirecting so we know where to redirect back to
-            var returnPath = encodeURIComponent($location.url());
+            var returnPath = null;
+            if (rejection.path == "/login" || rejection.path.startsWith("/login/")) {
+                //Set the current path before redirecting so we know where to redirect back to
+                returnPath = encodeURIComponent($location.url());                                
+            }
 
-            $location.path(rejection.path).search("returnPath", returnPath);
+            $location.path(rejection.path)
+            if (returnPath) {
+                $location.search("returnPath", returnPath);
+            }
+            
         });
 
 
