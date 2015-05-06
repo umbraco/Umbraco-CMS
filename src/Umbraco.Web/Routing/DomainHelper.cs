@@ -142,7 +142,7 @@ namespace Umbraco.Web.Routing
                 // ie current is www.example.com/foo/bar, look for domain www.example.com
                 var currentWithSlash = current.EndPathWithSlash();
                 domainAndUri = domainsAndUris
-                    .FirstOrDefault(d => d.Uri.EndPathWithSlash().IsBaseOf(currentWithSlash));
+                    .FirstOrDefault(d => d.Uri.Authority.InvariantEquals(currentWithSlash.Authority));
                 if (domainAndUri != null) return domainAndUri;
 
                 // if none matches, try again without the port
