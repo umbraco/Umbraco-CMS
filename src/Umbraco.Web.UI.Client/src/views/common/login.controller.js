@@ -3,8 +3,22 @@ angular.module('umbraco').controller("Umbraco.LoginController", function (events
 
     userService._showLoginDialog(); 
        
-    eventsService.on("app.ready", function(){
-    	$scope.avatar = "assets/img/application/logo.png";
-    	$location.path($rootScope.returnToPath || "/").search($rootScope.returnToSearch || "");
+    var evtOn = eventsService.on("app.ready", function(evt, data){
+        $scope.avatar = "assets/img/application/logo.png";
+
+        var path = "/";
+
+        //check if there's a returnPath query string, if so redirect to it
+        var locationObj = $location.search();
+        if (locationObj.returnPath) {
+            path = decodeURIComponent(locationObj.returnPath);
+        }
+
+        $location.url(path);
     });
+
+    $scope.$on('$destroy', function () {
+        eventsService.unsubscribe(evtOn);
+    });
+
 });
