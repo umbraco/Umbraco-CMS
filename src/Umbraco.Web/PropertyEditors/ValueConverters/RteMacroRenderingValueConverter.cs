@@ -8,12 +8,11 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Web.Templates;
+using System.Linq;
+using HtmlAgilityPack;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
-    using System.Linq;
-
-    using HtmlAgilityPack;
 
     /// <summary>
 	/// A value converter for TinyMCE that will ensure any macro content is rendered properly even when 
@@ -82,7 +81,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             var doc = new HtmlDocument();
             doc.LoadHtml(sourceString);
 
-            if (!doc.ParseErrors.Any() && doc.DocumentNode != null)
+            if (doc.ParseErrors.Any() == false && doc.DocumentNode != null)
             {
                 // Find all images with rel attribute
                 var imgNodes = doc.DocumentNode.SelectNodes("//img[@rel]");
