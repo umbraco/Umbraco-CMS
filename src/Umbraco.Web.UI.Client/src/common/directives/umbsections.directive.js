@@ -49,26 +49,35 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 					}
 				});
 			}
-            
-            //Listen for global state changes
-            eventsService.on("appState.globalState.changed", function (e, args) {
-			    if (args.key === "showTray") {
-			        scope.showTray = args.value;
-			    }
-			    if (args.key === "stickyNavigation") {
-			        scope.stickyNavigation = args.value;
-			    }
-			});
 
-			eventsService.on("appState.sectionState.changed", function (e, args) {
-			    if (args.key === "currentSection") {
-			        scope.currentSection = args.value;
-			    }
-			});
-            
-			eventsService.on("app.reInitialize", function (e, args) {
+			var evts = [];
+
+            //Listen for global state changes
+            evts.push(eventsService.on("appState.globalState.changed", function(e, args) {
+                if (args.key === "showTray") {
+                    scope.showTray = args.value;
+                }
+                if (args.key === "stickyNavigation") {
+                    scope.stickyNavigation = args.value;
+                }
+            }));
+
+            evts.push(eventsService.on("appState.sectionState.changed", function(e, args) {
+                if (args.key === "currentSection") {
+                    scope.currentSection = args.value;
+                }
+            }));
+
+            evts.push(eventsService.on("app.reInitialize", function(e, args) {
                 //re-load the sections if we're re-initializing (i.e. package installed)
-			    loadSections();
+                loadSections();
+            }));
+
+            //ensure to unregister from all events!
+			scope.$on('$destroy', function () {
+			    for (var e in evts) {
+			        eventsService.unsubscribe(evts[e]);
+			    }
 			});
 
 			//on page resize
