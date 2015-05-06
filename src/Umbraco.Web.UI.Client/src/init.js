@@ -44,6 +44,8 @@ app.run(['userService', '$log', '$rootScope', '$location', 'navigationService', 
             wiring up it's controller, etc... and then redirect to the rejected URL.   */
         $rootScope.$on('$routeChangeError', function(event, current, previous, rejection) {
             event.preventDefault();
+            $rootScope.returnToPath = $location.$$path;
+            $rootScope.returnToSearch = $location.$$search;
             $location.path(rejection.path).search(rejection.search);
         });
 
