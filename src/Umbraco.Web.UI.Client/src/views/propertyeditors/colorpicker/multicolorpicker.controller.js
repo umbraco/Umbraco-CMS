@@ -2,15 +2,18 @@
     function ($scope, $timeout, assetsService, angularHelper, $element) {
         //NOTE: We need to make each color an object, not just a string because you cannot 2-way bind to a primitive.
         var defaultColor = "000000";
+        var defaultLabel = null;
         
         $scope.newColor = defaultColor;
+        $scope.newLabel = defaultLabel;
         $scope.hasError = false;
+        $scope.newColorId = randomId("newColor");
 
         assetsService.load([
             //"lib/spectrum/tinycolor.js",
             "lib/spectrum/spectrum.js"          
         ]).then(function () {
-            var elem = $element.find("input");
+            var elem = $element.find("input[name=\"newColor\"]");
             elem.spectrum({
                 color: null,
                 showInitial: false,
@@ -20,7 +23,7 @@
                 showInput: true,
                 clickoutFiresChange: true,
                 hide: function (color) {
-                    //show the add butotn
+                    //show the add button
                     $element.find(".btn.add").show();                    
                 },
                 change: function (color) {
@@ -39,13 +42,33 @@
             //make an array from the dictionary
             var items = [];
             for (var i in $scope.model.value) {
-                items.push({
-                    value: $scope.model.value[i],
-                    id: i
-                });
+                var oldValue = $scope.model.value[i];
+                if(oldValue.hasOwnProperty("value")) {
+                    items.push({
+                        value: oldValue.value,
+                        id: i,
+                        label: oldValue.label
+                    });
+                } else {
+                    items.push({
+                        value: oldValue,
+                        id: i,
+                        label: oldValue
+                    });
+                }
             }
             //now make the editor model the array
             $scope.model.value = items;
+        }
+
+        // Ensure labels.
+        for (var i = 0; i < $scope.model.value.length; i++){
+            var item = $scope.model.value[i];
+            item.label = item.hasOwnProperty("label") ? item.label : item.value;
+        }
+
+        function validLabel(label) {
+            return label !== null && typeof label !== "undefined" && label !== '' && label.length && label.length > 0;
         }
 
         $scope.remove = function (item, evt) {
@@ -53,7 +76,7 @@
             evt.preventDefault();
 
             $scope.model.value = _.reject($scope.model.value, function (x) {
-                return x.value === item.value;
+                return x.value === item.value && x.label === item.label;
             });
 
         };
@@ -63,15 +86,15 @@
             evt.preventDefault();
 
             if ($scope.newColor) {
+                var chosenLabel = validLabel($scope.newLabel) ? $scope.newLabel : $scope.newColor;
                 var exists = _.find($scope.model.value, function(item) {
-                    return item.value.toUpperCase() == $scope.newColor.toUpperCase();
+                    return item.value.toUpperCase() === $scope.newColor.toUpperCase() || item.label.toUpperCase() === chosenLabel.toUpperCase();
                 });
                 if (!exists) {
-                    $scope.model.value.push({ value: $scope.newColor });
-                    //$scope.newColor = defaultColor;
-                    // set colorpicker to default color
-                    //var elem = $element.find("input");
-                    //elem.spectrum("set", $scope.newColor);
+                    $scope.model.value.push({
+                        value: $scope.newColor,
+                        label: chosenLabel
+                    });
                     $scope.hasError = false;
                     return;
                 }
@@ -84,4 +107,9 @@
 
         //load the separate css for the editor to avoid it blocking our js loading
         assetsService.loadCss("lib/spectrum/spectrum.css");
+
+        function randomId(base) {
+            return base + Math.round(Math.random() * 100000).toString();
+        }
+
     });
