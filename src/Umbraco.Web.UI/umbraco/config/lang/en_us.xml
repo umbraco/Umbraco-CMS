@@ -44,16 +44,16 @@
     <key alias="invalidNode">Invalid node.</key>
     <key alias="invalidDomain">Invalid domain format.</key>
     <key alias="duplicateDomain">Domain has already been assigned.</key>
-    <key alias="domain">Domain</key>
     <key alias="language">Language</key>
+    <key alias="domain">Domain</key>
     <key alias="domainCreated">New domain '%0%' has been created</key>
     <key alias="domainDeleted">Domain '%0%' is deleted</key>
     <key alias="domainExists">Domain '%0%' has already been assigned</key>
+    <key alias="domainUpdated">Domain '%0%' has been updated</key>
+    <key alias="orEdit">Edit Current Domains</key>
     <key alias="domainHelp"><![CDATA[Valid domain names are: "example.com", "www.example.com", "example.com:8080" or
         "https://www.example.com/".<br /><br />One-level paths in domains are supported, eg. "example.com/en". However, they
         should be avoided. Better use the culture setting above.]]></key>
-    <key alias="domainUpdated">Domain '%0%' has been updated</key>
-    <key alias="orEdit">Edit Current Domains</key>
     <key alias="inherit">Inherit</key>
     <key alias="setLanguage">Culture</key>
     <key alias="setLanguageHelp"><![CDATA[Set the culture for nodes below the current node,<br /> or inherit culture from parent nodes. Will also apply<br />
@@ -63,8 +63,6 @@
   <area alias="auditTrails">
     <key alias="atViewingFor">Viewing for</key>
   </area>
-
-  
   <area alias="buttons">
     <key alias="select">Select</key>
     <key alias="selectCurrentFolder">Select current folder</key>
@@ -134,7 +132,7 @@
     <key alias="itemChanged">This item has been changed after publication</key>
     <key alias="itemNotPublished">This item is not published</key>
     <key alias="lastPublished">Last published</key>
-    <key alias="listViewNoItems" version="7.1.5">There are no items show in the list.</key>
+    <key alias="listViewNoItems" version="7.1.5">There are no items to show in the list.</key>
     <key alias="mediatype">Media Type</key>
     <key alias="mediaLinks">Link to media item(s)</key>
     <key alias="membergroup">Member Group</key>
@@ -162,8 +160,7 @@
     <key alias="uploadClear">Remove file(s)</key>
     <key alias="urls">Link to document</key>
     <key alias="memberof">Member of group(s)</key>
-    <key alias="notmemberof">Not a member of group(s)</key>
-    
+    <key alias="notmemberof">Not a member of group(s)</key> 
     <key alias="childItems" version="7.0">Child items</key>
     <key alias="target" version="7.0">Target</key>
   </area>
@@ -175,9 +172,7 @@
     <key alias="chooseNode">Where do you want to create the new %0%</key>
     <key alias="createUnder">Create an item under</key>
     <key alias="updateData">Choose a type and a title</key>
-
     <key alias="noDocumentTypes" version="7.0"><![CDATA[There are no allowed document types available. You must enable these in the settings section under <strong>"document types"</strong>.]]></key>
-
     <key alias="noMediaTypes" version="7.0"><![CDATA[There are no allowed media types available. You must enable these in the settings section under <strong>"media types"</strong>.]]></key>
   </area>
   <area alias="dashboard">
@@ -250,6 +245,7 @@
     <key alias="entername">Enter a name...</key>
     <key alias="search">Type to search...</key>
     <key alias="filter">Type to filter...</key>
+    <key alias="enterTags">Type to add tags (press enter after each tag)...</key>
   </area>
 
   <area alias="editcontenttype">
@@ -412,7 +408,6 @@
     <key alias="width">Width</key>
     <key alias="yes">Yes</key>
     <key alias="folder">Folder</key>
-
     <key alias="searchResults">Search results</key>
   </area>
   <area alias="graphicheadline">
@@ -560,11 +555,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="greeting4">Happy thunderous Thursday</key>
     <key alias="greeting5">Happy funky Friday</key>
     <key alias="greeting6">Happy Caturday</key>
-    
-    <key alias="instruction">log in below</key>
+    <key alias="instruction">Log in below</key>
     <key alias="timeout">Session timed out</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com</a></p> ]]></key>
-   
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com</a></p> ]]></key>  
   </area>
   <area alias="main">
     <key alias="dashboard">Dashboard</key>
@@ -715,16 +708,16 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="noColors">You have not configured any approved colors</key>
   </area>
   <area alias="relatedlinks">
-    <key alias="addExternal">Add external link</key>
-    <key alias="addInternal">Add internal link</key>
-    <key alias="addlink">Add</key>
+    <key alias="enterExternal">enter external link</key>
+    <key alias="chooseInternal">choose internal page</key>
     <key alias="caption">Caption</key>
-    <key alias="internalPage">Internal page</key>
-    <key alias="linkurl">URL</key>
-    <key alias="modeDown">Move Down</key>
-    <key alias="modeUp">Move Up</key>
+    <key alias="link">Link</key>
     <key alias="newWindow">Open in new window</key>
-    <key alias="removeLink">Remove link</key>
+    <key alias="captionPlaceholder">enter the display caption</key>
+    <key alias="externalLinkPlaceholder">Enter the link</key>
+  </area>
+  <area alias="imagecropper">
+    <key alias="reset">Reset</key>
   </area>
   <area alias="rollback">
     <key alias="currentVersion">Current version</key>
@@ -751,8 +744,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="statistics">Statistics</key>
     <key alias="translation">Translation</key>
     <key alias="users">Users</key>
-
     <key alias="help" version="7.0">Help</key>
+    <key alias="forms">Forms</key>
     <key alias="analytics">Analytics</key>
   </area>
   <area alias="settings">
@@ -859,6 +852,10 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="addRows">Add rows to your layout</key>
     <key alias="addElement"><![CDATA[To start, click the <i class="icon icon-add blue"></i> below and add your first element]]></key>
 
+    <key alias="clickToEmbed">Click to embed</key>
+    <key alias="clickToInsertImage">Click to insert image</key>
+    <key alias="placeholderImageCaption">Image caption...</key>
+    <key alias="placeholderWriteHere">Write here...</key>
     <key alias="gridLayouts">Grid layouts</key>
     <key alias="gridLayoutsDetail">Layouts are the overall work area for the grid editor, usually you only need one or two different layouts</key>
     <key alias="addGridLayout">Add grid layout</key>
@@ -1032,12 +1029,11 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="permissionSelectPages">Select pages to modify their permissions</key>
     <key alias="searchAllChildren">Search all children</key>
     <key alias="startnode">Start Node in Content</key>
-    <key alias="username">Username</key>
+    <key alias="username">Name</key>
     <key alias="userPermissions">User permissions</key>
     <key alias="usertype">User type</key>
     <key alias="userTypes">User types</key>
     <key alias="writer">Writer</key>
-
     <key alias="yourProfile" version="7.0">Your profile</key>
     <key alias="yourHistory" version="7.0">Your recent history</key>
     <key alias="sessionExpires" version="7.0">Session expires in</key>
