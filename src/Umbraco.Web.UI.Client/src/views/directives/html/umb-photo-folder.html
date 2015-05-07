@@ -13,11 +13,13 @@
                     <i class="icon large {{img.icon}}"></i>
                     {{img.name}}
                 </div>
-            
-                <div ng-if="img.thumbnail" class="umb-photo" ng-style="img.thumbStyle" alt="{{img.name}}"></div>
+
+                <div ng-if="img.thumbnail" class="umb-photo" ng-style="img.thumbStyle" alt="{{img.name}}">
+                  <span class="selector-overlay umb-photo-img-name">{{img.name}}</span>
+                </div>
             </a>
 
-            <a href ng-click="clickHandler(img, $event, true)" 
+            <a href ng-click="clickHandler(img, $event, true)"
                 ng-if="img.isFolder" class="selector-overlay">
                 <localize key="buttons_select">Select</localize>
 			</a>
