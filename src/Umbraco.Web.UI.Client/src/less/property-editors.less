@@ -309,7 +309,7 @@ ul.color-picker li a  {
 }
 
 .umb-folderbrowser .selector-overlay{
-  display: none !important;
+  display: none;
 }
 
 .umb-upload-drop-zone{
@@ -379,16 +379,10 @@ ul.color-picker li a  {
     background-color: @grayLighter;
 }
 
-.umb-photo-folder .picrow div.umb-photo .umb-photo-img-name{
-    overflow: hidden;
-    text-overlow: ellipsis;
-    white-space: no-wrap;
-}
-
 .umb-photo-folder a:hover{text-decoration: none}
 .umb-photo-folder .umb-non-thumbnail{
   text-align: center;
-  vertical-align: center;
+  vertical-align: middle;
   font-size: 12px;
   background: @grayLighter;
   color: @black;
@@ -396,8 +390,7 @@ ul.color-picker li a  {
 }
 
 //this is a temp hack, to provide selectors in the dialog:
-.umb-photo-folder .pic:hover .selector-overlay,
-.umb-photo-folder .picrow div.umb-photo .umb-photo-img-name{
+.umb-photo-folder .pic:hover .selector-overlay {
   position: absolute;
   bottom: 0px;
   left: 0px;
@@ -409,6 +402,11 @@ ul.color-picker li a  {
   text-align: center;
   color: white;
   opacity: 0.4;
+  text-decoration:none;
+
+    overflow: hidden;
+    text-overlow: ellipsis;
+    white-space: nowrap;
 }
 
 .umb-photo-folder .umb-non-thumbnail i{
@@ -417,7 +415,10 @@ ul.color-picker li a  {
   line-height: 60px;
   display: block;
   margin: auto;
-  padding-top: 20px;
+  /*vertically aligns */
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .umb-photo-folder .selected{
