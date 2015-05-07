@@ -22,6 +22,9 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
                 if (scope.showTray) {
                     return 'slide';
                 }
+                else if (scope.showTray === false) {
+                    return 'slide';
+                }
                 else {
                     return '';
                 }
@@ -92,6 +95,13 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 			};
 
 			scope.sectionClick = function (section) {
+			    if (navigationService.userDialog) {
+			        navigationService.userDialog.close();
+			    }
+			    if (navigationService.helpDialog) {
+			        navigationService.helpDialog.close();
+			    }
+			    
 			    navigationService.hideSearch();
 			    navigationService.showTree(section.alias);
 			    $location.path("/" + section.alias);
@@ -101,8 +111,20 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 				navigationService.reloadSection(section.alias);
 			};
 
-			scope.trayClick = function(){
-				navigationService.showTray();
+			scope.trayClick = function () {
+                // close dialogs
+			    if (navigationService.userDialog) {
+			        navigationService.userDialog.close();
+			    }
+			    if (navigationService.helpDialog) {
+			        navigationService.helpDialog.close();
+			    }
+
+			    if (appState.getGlobalState("showTray") === true) {
+			        navigationService.hideTray();
+			    } else {
+			        navigationService.showTray();
+			    }
 			};
             
 			loadSections();
