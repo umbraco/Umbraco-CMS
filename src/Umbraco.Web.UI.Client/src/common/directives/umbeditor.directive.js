@@ -28,6 +28,10 @@ angular.module("umbraco.directives")
                 }
 
                 scope.propertyEditorView = umbPropEditorHelper.getViewPath(scope.model.view, scope.isPreValue);
+				
+				 if(scope.model.view == 'textbox'){
+                    scope.model.value = scope.model.value || '';
+                }
             }
         };
     });
