@@ -16,7 +16,7 @@ namespace umbraco.uicontrols
             get { return _text; }
             set { _text = value; }
         }
-
+            
         protected override void OnLoad(EventArgs eventArguments)
         {
         }
