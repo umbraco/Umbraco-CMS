@@ -77,10 +77,9 @@ namespace Umbraco.Core.Models
         /// </remarks>
         internal static bool RequiresSaving(this IContent entity, PublishedState publishedState)
         {
-            var dirtyEntity = (ICanBeDirty)entity;
-            var publishedChanged = dirtyEntity.IsPropertyDirty("Published") && publishedState != PublishedState.Unpublished;
+            var publishedChanged = entity.IsPropertyDirty("Published") && publishedState != PublishedState.Unpublished;
             //check if any user prop has changed
-            var propertyValueChanged = ((Content)entity).IsAnyUserPropertyDirty();
+            var propertyValueChanged = entity.IsAnyUserPropertyDirty();
             
             //We need to know if any other property apart from Published was changed here
             //don't create a new version if the published state has changed to 'Save' but no data has actually been changed
@@ -115,6 +114,25 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Returns a list of all dirty user defined properties
+        /// </summary>
+        /// <returns></returns>
+        public static IEnumerable<string> GetDirtyUserProperties(this IContentBase entity)
+        {
+            return entity.Properties.Where(x => x.IsDirty()).Select(x => x.Alias);
+        }
+
+        public static bool IsAnyUserPropertyDirty(this IContentBase entity)
+        {
+            return entity.Properties.Any(x => x.IsDirty());
+        }
+
+        public static bool WasAnyUserPropertyDirty(this IContentBase entity)
+        {
+            return entity.Properties.Any(x => x.WasDirty());
+        }
+
+        /// <summary>
         /// Determines if a new version should be created
         /// </summary>
         /// <param name="entity"></param>
@@ -128,15 +146,13 @@ namespace Umbraco.Core.Models
         /// </remarks>
         internal static bool ShouldCreateNewVersion(this IContent entity, PublishedState publishedState)
         {
-            var dirtyEntity = (ICanBeDirty)entity;
-
             //check if the published state has changed or the language
-            var publishedChanged = dirtyEntity.IsPropertyDirty("Published") && publishedState != PublishedState.Unpublished;
-            var langChanged = dirtyEntity.IsPropertyDirty("Language");
+            var publishedChanged = entity.IsPropertyDirty("Published") && publishedState != PublishedState.Unpublished;
+            var langChanged = entity.IsPropertyDirty("Language");
             var contentChanged = publishedChanged || langChanged;
 
             //check if any user prop has changed
-            var propertyValueChanged = ((Content)entity).IsAnyUserPropertyDirty();            
+            var propertyValueChanged = entity.IsAnyUserPropertyDirty();
 
             //return true if published or language has changed
             if (contentChanged)
