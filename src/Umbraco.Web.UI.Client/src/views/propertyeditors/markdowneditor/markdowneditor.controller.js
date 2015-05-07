@@ -18,7 +18,9 @@ function ($scope, assetsService, dialogService, $timeout) {
         ])
 		.then(function () {
             
-		    //this function will execute when all dependencies have loaded
+		    // we need a short delay to wait for the textbox to appear.
+		    setTimeout(function() {
+		        //this function will execute when all dependencies have loaded
 		    // but in the case that they've been previously loaded, we can only 
 		    // init the md editor after this digest because the DOM needs to be ready first
 		    // so run the init on a timeout
@@ -38,7 +40,7 @@ function ($scope, assetsService, dialogService, $timeout) {
 
                     return true; // tell the editor that we'll take care of getting the image url
                 });
-            });
+		    }, 200);
 		});
 
     //load the seperat css for the editor to avoid it blocking our js loading TEMP HACK

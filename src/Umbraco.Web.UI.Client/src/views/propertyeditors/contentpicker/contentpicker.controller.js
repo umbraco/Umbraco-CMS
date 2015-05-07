@@ -53,7 +53,7 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
         startNode: {
             query: "",
             type: "content",
-            id: -1
+	            id: $scope.model.config.startNodeId ? $scope.model.config.startNodeId : -1 // get start node for simple Content Picker
         }
     };
 
