@@ -42,14 +42,16 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
         eventsService.emit("app.closeDialogs", event);
     };
 
+    var evts = [];
+
     //when a user logs out or timesout
-    eventsService.on("app.notAuthenticated", function() {
+    evts.push(eventsService.on("app.notAuthenticated", function() {
         $scope.authenticated = null;
         $scope.user = null;
-    });
+    }));
     
     //when the app is read/user is logged in, setup the data
-    eventsService.on("app.ready", function (evt, data) {
+    evts.push(eventsService.on("app.ready", function (evt, data) {
         
         $scope.authenticated = data.authenticated;
         $scope.user = data.user;
@@ -67,7 +69,7 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
                     notificationsService.add(notification);
                 }
             }
-        });
+        })
 
         //if the user has changed we need to redirect to the root so they don't try to continue editing the
         //last item in the URL (NOTE: the user id can equal zero, so we cannot just do !data.lastUserId since that will resolve to true)
@@ -98,6 +100,13 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
               }, 3000);  
         }
 
+    }));
+
+    //ensure to unregister from all events!
+    $scope.$on('$destroy', function () {
+        for (var e in evts) {
+            eventsService.unsubscribe(evts[e]);
+        }
     });
 
 }
