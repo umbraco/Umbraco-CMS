@@ -313,6 +313,7 @@
     <Compile Include="Events\SendToPublishEventArgs.cs" />
     <Compile Include="Exceptions\InvalidCompositionException.cs" />
     <Compile Include="HideFromTypeFinderAttribute.cs" />
+    <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="IApplicationEventHandler.cs" />
     <Compile Include="IDisposeOnRequestEnd.cs" />
     <Compile Include="Manifest\GridEditorConverter.cs" />

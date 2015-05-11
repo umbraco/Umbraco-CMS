@@ -107,8 +107,6 @@ namespace Umbraco.Web.Editors
             if (http.Success == false)
                 throw new InvalidOperationException("This method requires that an HttpContext be active");
 
-            var ipAddress = GetIPAddress(http.Result);
-
             if (UmbracoContext.Security.ValidateBackOfficeCredentials(loginModel.Username, loginModel.Password))
             {
                 var user = Security.GetBackOfficeUser(loginModel.Username);
@@ -121,16 +119,13 @@ namespace Umbraco.Web.Editors
                 //set their remaining seconds
                 result.SecondsUntilTimeout = ticket.GetRemainingAuthSeconds();
                 
-                LogHelper.Info<AuthenticationController>(string.Format("Login attempt succeeded for username {0} from IP address {1}", loginModel.Username, ipAddress));
                 return result;
             }
 
             //return BadRequest (400), we don't want to return a 401 because that get's intercepted 
             // by our angular helper because it thinks that we need to re-perform the request once we are
             // authorized and we don't want to return a 403 because angular will show a warning msg indicating 
-            // that the user doesn't have access to perform this function, we just want to return a normal invalid msg.
-            
-            LogHelper.Info<AuthenticationController>(string.Format("Login attempt failed for username {0} from IP address {1}", loginModel.Username, ipAddress));
+            // that the user doesn't have access to perform this function, we just want to return a normal invalid msg.            
             throw new HttpResponseException(HttpStatusCode.BadRequest);
         }
 
@@ -147,19 +142,5 @@ namespace Umbraco.Web.Editors
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
-        // From: http://stackoverflow.com/a/740431/5018
-        protected string GetIPAddress(HttpContextBase httpContext)
-        {
-            var ipAddress = httpContext.Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
-
-            if (string.IsNullOrEmpty(ipAddress)) 
-                return httpContext.Request.ServerVariables["REMOTE_ADDR"];
-
-            var addresses = ipAddress.Split(',');
-            if (addresses.Length != 0)
-                return addresses[0];
-
-            return httpContext.Request.ServerVariables["REMOTE_ADDR"];
-        }
     }
 }
