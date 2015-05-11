@@ -9,6 +9,8 @@ using umbraco.BusinessLogic;
 using System.Web.Util;
 using System.Configuration.Provider;
 using System.Linq;
+using Umbraco.Core.Logging;
+
 #endregion
 
 namespace umbraco.providers
@@ -491,10 +493,33 @@ namespace umbraco.providers
                 {
                     if (user.Disabled)
                     {
+                        LogHelper.Info<UsersMembershipProvider>(
+                            string.Format(
+                                "Login attempt failed for username {0} from IP address {1}, the user is locked",
+                                username,
+                                GetCurrentRequestIpAddress()));
+
                         return false;
                     }
 
-                    return CheckPassword(password, user.Password);
+                    var result = CheckPassword(password, user.Password);
+                    if (result == false)
+                    {
+                        LogHelper.Info<UsersMembershipProvider>(
+                            string.Format(
+                                "Login attempt failed for username {0} from IP address {1}",
+                                username,
+                                GetCurrentRequestIpAddress()));
+                    }
+                    else
+                    {
+                        LogHelper.Info<UsersMembershipProvider>(
+                        string.Format(
+                            "Login attempt succeeded for username {0} from IP address {1}",
+                            username,
+                            GetCurrentRequestIpAddress()));
+                    }
+                    return result;
                 }
             }
             return false;

@@ -28,6 +28,7 @@ using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using umbraco.providers;
 using Microsoft.AspNet.Identity.Owin;
+using Umbraco.Core.Logging;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Models.Identity;
 using IUser = Umbraco.Core.Models.Membership.IUser;
@@ -161,6 +162,10 @@ namespace Umbraco.Web.Editors
         [SetAngularAntiForgeryTokens]
         public async Task<HttpResponseMessage> PostLogin(LoginModel loginModel)
         {
+            var http = this.TryGetHttpContext();
+            if (http.Success == false)
+                throw new InvalidOperationException("This method requires that an HttpContext be active");
+
             if (UmbracoContext.Security.ValidateBackOfficeCredentials(loginModel.Username, loginModel.Password))
             {
                 //get the user
@@ -177,12 +182,6 @@ namespace Umbraco.Web.Editors
                 //Identity does some of it's own checks as well so we need to use it's sign in process too... this will essentially re-create the
                 // ticket/cookie above but we need to create the ticket now so we can assign the Current Thread User/IPrinciple below                
                 await SignInAsync(Mapper.Map<IUser, BackOfficeIdentityUser>(user), isPersistent: true);
-
-                var http = this.TryGetHttpContext();
-                if (http.Success == false)
-                {
-                    throw new InvalidOperationException("This method requires that an HttpContext be active");
-                }
                 //This ensure the current principal is set, otherwise any logic executing after this wouldn't actually be authenticated
                 http.Result.AuthenticateCurrentRequest(ticket, false);
                 
@@ -195,7 +194,7 @@ namespace Umbraco.Web.Editors
             //return BadRequest (400), we don't want to return a 401 because that get's intercepted 
             // by our angular helper because it thinks that we need to re-perform the request once we are
             // authorized and we don't want to return a 403 because angular will show a warning msg indicating 
-            // that the user doesn't have access to perform this function, we just want to return a normal invalid msg.
+            // that the user doesn't have access to perform this function, we just want to return a normal invalid msg.            
             throw new HttpResponseException(HttpStatusCode.BadRequest);
         }
 

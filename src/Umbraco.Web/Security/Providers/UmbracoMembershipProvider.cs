@@ -511,16 +511,35 @@ namespace Umbraco.Web.Security.Providers
         {
             var member = MemberService.GetByUsername(username);
 
-            if (member == null) return false;
+            if (member == null)
+            {
+                LogHelper.Info<UmbracoMembershipProviderBase>(
+                    string.Format(
+                        "Login attempt failed for username {0} from IP address {1}, the user does not exist",
+                        username,
+                        GetCurrentRequestIpAddress()));
+
+                return false;
+            }
 
             if (member.IsApproved == false)
             {
-                LogHelper.Info<UmbracoMembershipProvider<T, TEntity>>("Cannot validate member " + username + " because they are not approved");
+                LogHelper.Info<UmbracoMembershipProviderBase>(
+                    string.Format(
+                        "Login attempt failed for username {0} from IP address {1}, the user is not approved",
+                        username,
+                        GetCurrentRequestIpAddress()));
+
                 return false;
             }
             if (member.IsLockedOut)
             {
-                LogHelper.Info<UmbracoMembershipProvider<T, TEntity>>("Cannot validate member " + username + " because they are currently locked out");
+                LogHelper.Info<UmbracoMembershipProviderBase>(
+                    string.Format(
+                        "Login attempt failed for username {0} from IP address {1}, the user is locked",
+                        username,
+                        GetCurrentRequestIpAddress()));
+
                 return false;
             }
 
@@ -538,18 +557,39 @@ namespace Umbraco.Web.Security.Providers
                 {
                     member.IsLockedOut = true;
                     member.LastLockoutDate = DateTime.Now;
-                    LogHelper.Info<UmbracoMembershipProvider<T, TEntity>>("Member " + username + " is now locked out, max invalid password attempts exceeded");
+
+                    LogHelper.Info<UmbracoMembershipProviderBase>(
+                        string.Format(
+                            "Login attempt failed for username {0} from IP address {1}, the user is now locked out, max invalid password attempts exceeded",
+                            username,
+                            GetCurrentRequestIpAddress()));
+                }
+                else
+                {
+                    LogHelper.Info<UmbracoMembershipProviderBase>(
+                        string.Format(
+                            "Login attempt failed for username {0} from IP address {1}",
+                            username,
+                            GetCurrentRequestIpAddress()));
                 }
             }
             else
             {
                 member.FailedPasswordAttempts = 0;
                 member.LastLoginDate = DateTime.Now;
+
+                LogHelper.Info<UmbracoMembershipProviderBase>(
+                        string.Format(
+                            "Login attempt succeeded for username {0} from IP address {1}",
+                            username,
+                            GetCurrentRequestIpAddress()));
             }
 
             //don't raise events for this! It just sets the member dates, if we do raise events this will
             // cause all distributed cache to execute - which will clear out some caches we don't want.
             // http://issues.umbraco.org/issue/U4-3451
+            //TODO: In v8 we aren't going to have an overload to disable events, so we'll need to make a different method
+            // for this type of thing (i.e. UpdateLastLogin or similar).
             MemberService.Save(member, false);
 
             return authenticated;
