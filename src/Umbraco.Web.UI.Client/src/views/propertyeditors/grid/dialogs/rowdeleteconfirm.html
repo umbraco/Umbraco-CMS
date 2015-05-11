@@ -1,0 +1,31 @@
+﻿<div>
+    <div class="umb-panel-body no-header with-footer compact">
+
+        <umb-pane>
+            <umb-control-group>
+
+                <h3 class="alert alert-warn ng-scope">Warning!</h3>
+
+                <p>
+                    You are deleting the row configuration '<strong>{{dialogData.rowName}}</strong>'
+                </p>
+
+                <p>
+                    If there is existing content with the row configuration '<strong>{{dialogData.rowName}}</strong>' then
+                    the content in that row will be lost.
+                </p>
+
+                <p>
+                    Do you want to continue?
+                </p>
+
+
+            </umb-control-group>
+        </umb-pane>
+    </div>
+
+    <div class="umb-panel-footer">
+        <umb-confirm on-confirm="submit" on-cancel="close">
+        </umb-confirm>
+    </div>
+</div>
