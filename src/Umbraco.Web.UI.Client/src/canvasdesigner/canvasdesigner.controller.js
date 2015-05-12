@@ -180,7 +180,7 @@ var app = angular.module("Umbraco.canvasdesigner", ['colorpicker', 'ui.slider', 
                         // TODO: special init for font family picker
                         if (item.type == "googlefontpicker" && item.values.fontFamily) {
                             var variant = item.values.fontWeight != "" || item.values.fontStyle != "" ? ":" + item.values.fontWeight + item.values.fontStyle : "";
-                            var gimport = "@import url('http://fonts.googleapis.com/css?family=" + item.values.fontFamily + variant + "');";
+                            var gimport = "@import url('https://fonts.googleapis.com/css?family=" + item.values.fontFamily + variant + "');";
                             if ($.inArray(gimport, parameters) < 0) {
                                 parameters.splice(0, 0, gimport);
                             }
@@ -412,7 +412,7 @@ var app = angular.module("Umbraco.canvasdesigner", ['colorpicker', 'ui.slider', 
     var webFontScriptLoaded = false;
     var loadGoogleFont = function (font) {
         if (!webFontScriptLoaded) {
-            $.getScript('http://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js')
+            $.getScript('https://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js')
             .done(function () {
                 webFontScriptLoaded = true;
                 // Recursively call once webfont script is available.
