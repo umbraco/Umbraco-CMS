@@ -1909,52 +1909,7 @@ namespace umbraco
             return cms.helpers.xhtml.TidyHtml(StringToTidy);
         }
 
-        internal static string GetCurrentNotFoundPageId()
-        {
-            //XmlNode error404Node = UmbracoSettings.GetKeyAsNode("/settings/content/errors/error404");
-            if (UmbracoConfig.For.UmbracoSettings().Content.Error404Collection.Count() > 1)
-            {
-                // try to get the 404 based on current culture (via domain)
-                IContentErrorPage cultureErr;
-                if (Domain.Exists(HttpContext.Current.Request.ServerVariables["SERVER_NAME"]))
-                {
-                    var d = Domain.GetDomain(HttpContext.Current.Request.ServerVariables["SERVER_NAME"]);
-
-                    // test if a 404 page exists with current culture
-                    cultureErr = UmbracoConfig.For.UmbracoSettings().Content.Error404Collection
-                                                     .FirstOrDefault(x => x.Culture == d.Language.CultureAlias);
-
-                    if (cultureErr != null)
-                    {
-                        return cultureErr.ContentId.ToInvariantString();
-                    }
-
-                }
-
-                // test if a 404 page exists with current culture thread
-                cultureErr = UmbracoConfig.For.UmbracoSettings().Content.Error404Collection
-                                                 .FirstOrDefault(x => x.Culture == System.Threading.Thread.CurrentThread.CurrentUICulture.Name);
-                if (cultureErr != null)
-                {
-                    return cultureErr.ContentId.ToInvariantString();
-                }
-
-                // there should be a default one!
-                cultureErr = UmbracoConfig.For.UmbracoSettings().Content.Error404Collection
-                                                 .FirstOrDefault(x => x.Culture == "default");
-                if (cultureErr != null)
-                {
-                    return cultureErr.ContentId.ToInvariantString();
-                }
-            }
-            else
-            {
-
-                return UmbracoConfig.For.UmbracoSettings().Content.Error404Collection.First().ContentId.ToInvariantString();                
-            }
-
-            return "";
-        }
+        
 
         #endregion
 
