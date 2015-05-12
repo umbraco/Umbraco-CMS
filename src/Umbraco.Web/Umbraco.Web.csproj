@@ -2012,7 +2012,6 @@
     </Content>
     <Content Include="umbraco.presentation\umbraco\translation\default.aspx" />
     <Content Include="umbraco.presentation\umbraco\translation\preview.aspx" />
-    <Content Include="umbraco.presentation\umbraco\translation\translationTasks.dtd" />
     <Content Include="umbraco.presentation\umbraco\translation\xml.aspx" />
     <Content Include="umbraco.presentation\umbraco\create\content.ascx">
       <SubType>ASPXCodeBehind</SubType>
