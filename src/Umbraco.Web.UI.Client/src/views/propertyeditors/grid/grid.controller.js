@@ -14,6 +14,8 @@ angular.module("umbraco")
         // Sortable options
         // *********************************************
 
+        var draggedRteSettings;
+
         $scope.sortableOptions = {
             distance: 10,
             cursor: "move",
@@ -40,15 +42,22 @@ angular.module("umbraco")
             },
 
             start: function (e, ui) {
+                draggedRteSettings = {};
                 ui.item.find('.mceNoEditor').each(function () {
-                    tinyMCE.execCommand('mceRemoveEditor', false, $(this).attr('id'));
+                    // remove all RTEs in the dragged row and save their settings
+                    var id = $(this).attr('id');
+                    draggedRteSettings[id] = _.findWhere(tinyMCE.editors, { id: id }).settings;
+                    tinyMCE.execCommand('mceRemoveEditor', false, id);
                 });
             },
 
             stop: function (e, ui) {
+                // reset all RTEs affected by the dragging
                 ui.item.parents(".usky-column").find('.mceNoEditor').each(function () {
-                    tinyMCE.execCommand('mceRemoveEditor', false, $(this).attr('id'));
-                    tinyMCE.execCommand('mceAddEditor', false, $(this).attr('id'));
+                    var id = $(this).attr('id');
+                    draggedRteSettings[id] = draggedRteSettings[id] || _.findWhere(tinyMCE.editors, { id: id }).settings;
+                    tinyMCE.execCommand('mceRemoveEditor', false, id);
+                    tinyMCE.init(draggedRteSettings[id]);
                 });
             }
         };
@@ -98,6 +107,7 @@ angular.module("umbraco")
             },
 
             update: function (event, ui) {
+                // add all RTEs which are affected by the dragging
                 if (!ui.sender) {
                     if (cancelMove) {
                         ui.item.sortable.cancel();
@@ -121,6 +131,11 @@ angular.module("umbraco")
             start: function (e, ui) {
                 ui.item.find('.mceNoEditor').each(function () {
                     notIncludedRte = [];
+
+                    // save the dragged RTE settings
+                    draggedRteSettings = _.findWhere(tinyMCE.editors, { id: $(this).attr('id') }).settings;
+
+                    // remove the dragged RTE
                     tinyMCE.execCommand('mceRemoveEditor', false, $(this).attr('id'));
                 });
             },
@@ -128,14 +143,21 @@ angular.module("umbraco")
             stop: function (e, ui) {
                 ui.item.parents(".usky-cell").find('.mceNoEditor').each(function () {
                     if ($.inArray($(this).attr('id'), notIncludedRte) < 0) {
+                        // add all dragged's neighbouring RTEs in the new cell
                         notIncludedRte.splice(0, 0, $(this).attr('id'));
                     }
                 });
                 $timeout(function () {
+                    // reconstruct the dragged RTE
+                    tinyMCE.init(draggedRteSettings);
+
                     _.forEach(notIncludedRte, function (id) {
-                        tinyMCE.execCommand('mceRemoveEditor', false, id);
-                        tinyMCE.execCommand('mceAddEditor', false, id);
-                        console.info("stop " + id);
+                        // reset all the other RTEs
+                        if (id != draggedRteSettings.id) {
+                            var rteSettings = _.findWhere(tinyMCE.editors, { id: id }).settings;
+                            tinyMCE.execCommand('mceRemoveEditor', false, id);
+                            tinyMCE.init(rteSettings);
+                        }
                     });
                 }, 500, false);
             }

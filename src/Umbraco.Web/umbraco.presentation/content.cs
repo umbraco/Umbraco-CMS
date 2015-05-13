@@ -665,7 +665,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
             }
 
             // get it from the database, and register
-            LoadContentFromDatabase();
+            safeXml.Xml = LoadContentFromDatabase();
             registerXmlChange = true;
         }
 

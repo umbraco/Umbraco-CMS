@@ -1,17 +1,20 @@
 ﻿<div class="umb-editor umb-multiple-textbox" ng-controller="Umbraco.PropertyEditors.MultipleTextBoxController">
 
-    <div class="control-group" ng-repeat="item in model.value">
-        <input type="text" name="item_{{$index}}" ng-model="item.value" class="umb-editor" />
-        <a prevent-default href="" title="Remove this text box"
-            ng-show="model.value.length > model.config.min"
-            ng-click="remove($index)">
-            <i class="icon icon-remove"></i>
-        </a>
+    <div ui-sortable="sortableOptions" ng-model="model.value">
+        <div class="control-group" ng-repeat="item in model.value">
+            <i class="icon icon-navigation handle"></i>
+            <input type="text" name="item_{{$index}}" ng-model="item.value" class="umb-editor" />
+            <a prevent-default href="" title="Remove this text box"
+               ng-show="model.value.length > model.config.min"
+               ng-click="remove($index)">
+                <i class="icon icon-remove"></i>
+            </a>
+        </div>
     </div>
     <a prevent-default href="" title="Add another text box"
-        ng-show="model.config.max <= 0 || model.value.length < model.config.max"
-        ng-click="add()">
+       ng-show="model.config.max <= 0 || model.value.length < model.config.max"
+       ng-click="add()">
         <i class="icon icon-add"></i>
     </a>
-    
+
 </div>

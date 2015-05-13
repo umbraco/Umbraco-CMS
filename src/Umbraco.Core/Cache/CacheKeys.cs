@@ -60,5 +60,8 @@ namespace Umbraco.Core.Cache
 
         public const string DataTypeCacheKey = "UmbracoDataTypeDefinition";
         public const string DataTypePreValuesCacheKey = "UmbracoPreVal";
+
+        public const string IdToKeyCacheKey = "UI2K";
+        public const string KeyToIdCacheKey = "UK2I";
     }
 }

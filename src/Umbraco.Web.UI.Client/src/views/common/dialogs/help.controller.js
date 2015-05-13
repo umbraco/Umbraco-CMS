@@ -35,7 +35,7 @@ angular.module("umbraco")
     	    });
 
     	    helpService.findVideos(rq).then(function(videos){
-    	    	$scope.videos = videos;
+    	        $scope.videos = videos;
     	    });
 
         });

@@ -28,10 +28,16 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
             Assert.IsTrue(SettingsSection.Content.Error404Collection.Count() == 3);
             Assert.IsTrue(SettingsSection.Content.Error404Collection.ElementAt(0).Culture == "default");
             Assert.IsTrue(SettingsSection.Content.Error404Collection.ElementAt(0).ContentId == 1047);
+            Assert.IsTrue(SettingsSection.Content.Error404Collection.ElementAt(0).HasContentId);
+            Assert.IsFalse(SettingsSection.Content.Error404Collection.ElementAt(0).HasContentKey);
             Assert.IsTrue(SettingsSection.Content.Error404Collection.ElementAt(1).Culture == "en-US");
-            Assert.IsTrue(SettingsSection.Content.Error404Collection.ElementAt(1).ContentId == 1048);
+            Assert.IsTrue(SettingsSection.Content.Error404Collection.ElementAt(1).ContentXPath == "$site/error [@name = 'error']");
+            Assert.IsFalse(SettingsSection.Content.Error404Collection.ElementAt(1).HasContentId);
+            Assert.IsFalse(SettingsSection.Content.Error404Collection.ElementAt(1).HasContentKey);
             Assert.IsTrue(SettingsSection.Content.Error404Collection.ElementAt(2).Culture == "en-UK");
-            Assert.IsTrue(SettingsSection.Content.Error404Collection.ElementAt(2).ContentId == 1049);
+            Assert.IsTrue(SettingsSection.Content.Error404Collection.ElementAt(2).ContentKey == new Guid("8560867F-B88F-4C74-A9A4-679D8E5B3BFC"));
+            Assert.IsTrue(SettingsSection.Content.Error404Collection.ElementAt(2).HasContentKey);
+            Assert.IsFalse(SettingsSection.Content.Error404Collection.ElementAt(2).HasContentId);
         }    
 
         [Test]

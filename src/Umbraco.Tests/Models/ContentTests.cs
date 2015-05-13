@@ -702,6 +702,37 @@ namespace Umbraco.Tests.Models
         }
 
         [Test]
+        public void After_Committing_Changes_Was_Dirty_Is_True_On_Changed_Property()
+        {
+            // Arrange
+            var contentType = MockedContentTypes.CreateTextpageContentType();
+            contentType.ResetDirtyProperties(); //reset
+            var content = MockedContent.CreateTextpageContent(contentType, "test", -1);
+            content.ResetDirtyProperties();
+
+            // Act
+            content.SetPropertyValue("title", "new title");
+            Assert.That(content.IsEntityDirty(), Is.False);
+            Assert.That(content.IsDirty(), Is.True);
+            Assert.That(content.IsPropertyDirty("title"), Is.True);
+            Assert.That(content.IsAnyUserPropertyDirty(), Is.True);
+            Assert.That(content.GetDirtyUserProperties().Count(), Is.EqualTo(1));
+            Assert.That(content.Properties[0].IsDirty(), Is.True);
+            Assert.That(content.Properties["title"].IsDirty(), Is.True);
+            
+            content.ResetDirtyProperties(); //this would be like committing the entity
+
+            // Assert
+            Assert.That(content.WasDirty(), Is.True);
+            Assert.That(content.Properties[0].WasDirty(), Is.True);
+
+
+            Assert.That(content.WasPropertyDirty("title"), Is.True);
+            Assert.That(content.Properties["title"].IsDirty(), Is.False);
+            Assert.That(content.Properties["title"].WasDirty(), Is.True);
+        }
+
+        [Test]
         public void If_Not_Committed_Was_Dirty_Is_False()
         {
             // Arrange

@@ -11,15 +11,17 @@
 
                 <div ng-style="img.style" class="umb-non-thumbnail" ng-if="!img.thumbnail">
                     <i class="icon large {{img.icon}}"></i>
-                    {{img.name}}
+                    <span>{{img.name}}</span>
                 </div>
-            
-                <div ng-if="img.thumbnail" class="umb-photo" ng-style="img.thumbStyle" alt="{{img.name}}"></div>
+
+                <div ng-if="img.thumbnail" class="umb-photo" ng-style="img.thumbStyle" alt="{{img.name}}">
+                  
+                </div>
             </a>
 
-            <a href ng-click="clickHandler(img, $event, true)" 
-                ng-if="img.isFolder" class="selector-overlay">
-                <localize key="buttons_select">Select</localize>
+            <a href ng-click="clickHandler(img, $event, true)" class="selector-overlay">
+                <localize key="buttons_select" ng-if="img.isFolder">Select</localize>
+                <span ng-if="!img.isFolder">{{img.name}}</span>
 			</a>
         </div>
     </div>

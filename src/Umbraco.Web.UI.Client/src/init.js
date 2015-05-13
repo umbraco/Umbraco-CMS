@@ -2,7 +2,6 @@
 app.run(['userService', '$log', '$rootScope', '$location', 'navigationService', 'appState', 'editorState', 'fileManager', 'assetsService', 'eventsService', '$cookies', '$templateCache',
     function (userService, $log, $rootScope, $location, navigationService, appState, editorState, fileManager, assetsService, eventsService, $cookies, $templateCache) {
 
-
         //This sets the default jquery ajax headers to include our csrf token, we
         // need to user the beforeSend method because our token changes per user/login so
         // it cannot be static
@@ -16,8 +15,10 @@ app.run(['userService', '$log', '$rootScope', '$location', 'navigationService', 
         eventsService.on("app.authenticated", function(evt, data) {
             assetsService._loadInitAssets().then(function() {
                 appState.setGlobalState("isReady", true);
-                //send the ready event
+
+                //send the ready event with the included returnToPath,returnToSearch data
                 eventsService.emit("app.ready", data);
+                returnToPath = null, returnToSearch = null;
             });
         });
 
@@ -44,7 +45,18 @@ app.run(['userService', '$log', '$rootScope', '$location', 'navigationService', 
             wiring up it's controller, etc... and then redirect to the rejected URL.   */
         $rootScope.$on('$routeChangeError', function(event, current, previous, rejection) {
             event.preventDefault();
-            $location.path(rejection.path).search(rejection.search);
+
+            var returnPath = null;
+            if (rejection.path == "/login" || rejection.path.startsWith("/login/")) {
+                //Set the current path before redirecting so we know where to redirect back to
+                returnPath = encodeURIComponent($location.url());                                
+            }
+
+            $location.path(rejection.path)
+            if (returnPath) {
+                $location.search("returnPath", returnPath);
+            }
+            
         });
 
 
