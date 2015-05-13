@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.Cache;
 using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -19,12 +20,13 @@ namespace Umbraco.Core.Services
         private readonly IMediaService _mediaService;
         private readonly IMemberService _memberService;
         private readonly IMemberTypeService _memberTypeService;
+        private readonly IRuntimeCacheProvider _runtimeCache;
         private readonly IDataTypeService _dataTypeService;
         private readonly Dictionary<string, Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>> _supportedObjectTypes;
 
         public EntityService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, 
             IContentService contentService, IContentTypeService contentTypeService, IMediaService mediaService, IDataTypeService dataTypeService,
-            IMemberService memberService, IMemberTypeService memberTypeService)
+            IMemberService memberService, IMemberTypeService memberTypeService, IRuntimeCacheProvider runtimeCache)
         {
             _uowProvider = provider;
             _repositoryFactory = repositoryFactory;
@@ -34,6 +36,7 @@ namespace Umbraco.Core.Services
             _dataTypeService = dataTypeService;
             _memberService = memberService;
             _memberTypeService = memberTypeService;
+            _runtimeCache = runtimeCache;
 
             _supportedObjectTypes = new Dictionary<string, Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>>
             {
@@ -45,6 +48,83 @@ namespace Umbraco.Core.Services
                 {typeof (IMember).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.Member, _memberService.GetById)},
                 {typeof (IMemberType).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.MemberType, _memberTypeService.Get)}
             };
+
+        }
+
+        /// <summary>
+        /// Returns the integer id for a given GUID
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="umbracoObjectType"></param>
+        /// <returns></returns>
+        public Attempt<int> GetIdForKey(Guid key, UmbracoObjectTypes umbracoObjectType)
+        {
+            var result = _runtimeCache.GetCacheItem<int?>(CacheKeys.IdToKeyCacheKey + key, () =>
+            {
+                using (var uow = _uowProvider.GetUnitOfWork())
+                {
+                    switch (umbracoObjectType)
+                    {
+                        case UmbracoObjectTypes.Document:
+                        case UmbracoObjectTypes.MemberType:
+                        case UmbracoObjectTypes.Media:
+                        case UmbracoObjectTypes.Template:
+                        case UmbracoObjectTypes.MediaType:
+                        case UmbracoObjectTypes.DocumentType:
+                        case UmbracoObjectTypes.Member:
+                        case UmbracoObjectTypes.DataType:
+                            return uow.Database.ExecuteScalar<int?>(new Sql().Select("id").From<NodeDto>().Where<NodeDto>(dto => dto.UniqueId == key));
+                        case UmbracoObjectTypes.RecycleBin:
+                        case UmbracoObjectTypes.Stylesheet:
+                        case UmbracoObjectTypes.MemberGroup:
+                        case UmbracoObjectTypes.ContentItem:
+                        case UmbracoObjectTypes.ContentItemType:
+                        case UmbracoObjectTypes.ROOT:
+                        case UmbracoObjectTypes.Unknown:
+                        default:
+                            throw new NotSupportedException();
+                    }
+                }                
+            });
+            return result.HasValue ? Attempt.Succeed(result.Value) : Attempt<int>.Fail();
+        }
+
+        /// <summary>
+        /// Returns the GUID for a given integer id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="umbracoObjectType"></param>
+        /// <returns></returns>
+        public Attempt<Guid> GetKeyForId(int id, UmbracoObjectTypes umbracoObjectType)
+        {
+            var result = _runtimeCache.GetCacheItem<Guid?>(CacheKeys.KeyToIdCacheKey + id, () =>
+            {
+                using (var uow = _uowProvider.GetUnitOfWork())
+                {
+                    switch (umbracoObjectType)
+                    {
+                        case UmbracoObjectTypes.Document:
+                        case UmbracoObjectTypes.MemberType:
+                        case UmbracoObjectTypes.Media:
+                        case UmbracoObjectTypes.Template:
+                        case UmbracoObjectTypes.MediaType:
+                        case UmbracoObjectTypes.DocumentType:
+                        case UmbracoObjectTypes.Member:
+                        case UmbracoObjectTypes.DataType:
+                            return uow.Database.ExecuteScalar<Guid?>(new Sql().Select("uniqueID").From<NodeDto>().Where<NodeDto>(dto => dto.NodeId == id));
+                        case UmbracoObjectTypes.RecycleBin:
+                        case UmbracoObjectTypes.Stylesheet:
+                        case UmbracoObjectTypes.MemberGroup:
+                        case UmbracoObjectTypes.ContentItem:
+                        case UmbracoObjectTypes.ContentItemType:
+                        case UmbracoObjectTypes.ROOT:
+                        case UmbracoObjectTypes.Unknown:
+                        default:
+                            throw new NotSupportedException();
+                    }
+                }
+            });
+            return result.HasValue ? Attempt.Succeed(result.Value) : Attempt<Guid>.Fail();
         }
 
         public IUmbracoEntity GetByKey(Guid key, bool loadBaseType = true)

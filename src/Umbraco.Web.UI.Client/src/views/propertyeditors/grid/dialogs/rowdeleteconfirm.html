@@ -1,0 +1,26 @@
+﻿<div>
+    <div class="umb-panel-body no-header with-footer compact">
+
+        <umb-pane>
+            <h3 class="alert alert-warn ng-scope">Warning!</h3>
+
+            <p>
+                You are deleting the row configuration '<strong>{{dialogData.rowName}}</strong>'
+            </p>
+
+            <p>
+                Modifying a row configuration name will result in loss of
+                data for any existing content that is based on this configuration.
+            </p>
+
+            <p>
+                <localize key="general_areyousure">Are you sure?</localize>
+            </p>
+        </umb-pane>
+    </div>
+
+    <div class="umb-panel-footer">
+        <umb-confirm on-confirm="submit" on-cancel="close">
+        </umb-confirm>
+    </div>
+</div>

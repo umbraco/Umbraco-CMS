@@ -1,8 +1,8 @@
 ﻿<div class="umb-editor">
-    <input name="integerField" type="number" class="umb-editor umb-number"
+    <input name="integerField" type="number" class="umb-editor umb-number "
         ng-model="model.value"
         val-server="value"
-        fix-number />
+        fix-number min="{{model.config.min}}" max="{{model.config.max}}" step="{{model.config.step}}" />
     
     <span class="help-inline" val-msg-for="integerField" val-toggle-msg="number">Not a number</span>
     <span class="help-inline" val-msg-for="integerField" val-toggle-msg="valServer">{{propertyForm.requiredField.errorMsg}}</span>

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Events;
@@ -207,6 +208,9 @@ namespace Umbraco.Core.Services
             }
         }
 
+        //TODO: Remove this in 7.3, we need to track this in a db column!
+        private readonly ConcurrentDictionary<int, int> _failedLoginAttempts = new ConcurrentDictionary<int, int>();
+
         /// <summary>
         /// Get an <see cref="IUser"/> by username
         /// </summary>
@@ -217,7 +221,18 @@ namespace Umbraco.Core.Services
             using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
             {
                 var query = Query<IUser>.Builder.Where(x => x.Username.Equals(username));
-                return repository.GetByQuery(query).FirstOrDefault();
+                var user = repository.GetByQuery(query).FirstOrDefault();
+
+                if (user != null)
+                {
+                    //check if they have any failed logins and merge
+                    int failedAttempts;
+                    if (_failedLoginAttempts.TryGetValue(user.Id, out failedAttempts))
+                    {
+                        user.FailedPasswordAttempts = failedAttempts;
+                    }    
+                }
+                return user;
             }
         }
 
@@ -284,6 +299,9 @@ namespace Umbraco.Core.Services
             }
             else
             {
+                int failedAttempts;
+                _failedLoginAttempts.TryRemove(user.Id, out failedAttempts);
+
                 if (DeletingUser.IsRaisedEventCancelled(new DeleteEventArgs<IUser>(user), this))
                     return;
 
@@ -317,6 +335,8 @@ namespace Umbraco.Core.Services
             {
                 repository.AddOrUpdate(entity);
                 uow.Commit();
+
+                _failedLoginAttempts.AddOrUpdate(entity.Id, i => entity.FailedPasswordAttempts, (i, i1) => entity.FailedPasswordAttempts);
             }
 
             if (raiseEvents)
@@ -342,10 +362,15 @@ namespace Umbraco.Core.Services
             {
                 foreach (var member in entities)
                 {
-                    repository.AddOrUpdate(member);                 
+                    repository.AddOrUpdate(member);
                 }
                 //commit the whole lot in one go
                 uow.Commit();
+                foreach (var member in entities)
+                {
+                    _failedLoginAttempts.AddOrUpdate(member.Id, i => member.FailedPasswordAttempts, (i, i1) => member.FailedPasswordAttempts);
+                }
+                
             }
 
             if (raiseEvents)

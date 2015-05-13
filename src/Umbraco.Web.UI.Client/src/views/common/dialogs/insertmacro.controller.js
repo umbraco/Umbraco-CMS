@@ -73,7 +73,7 @@ function InsertMacroController($scope, entityResource, macroResource, umbPropEdi
 
             var val = item.value;
 
-            if (!_.isString(item.value)) {
+            if (item.value != null && item.value != undefined && !_.isString(item.value)) {
                 try {
                     val = angular.toJson(val);
                 }

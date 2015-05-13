@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
@@ -529,24 +530,8 @@ namespace Umbraco.Web
             urlRouting.PostResolveRequestCache(context);
         }
 
-        /// <summary>
-        /// Checks if the xml cache file needs to be updated/persisted
-        /// </summary>
-        /// <param name="httpContext"></param>
-        /// <remarks>
-        /// TODO: This needs an overhaul, see the error report created here:
-        ///   https://docs.google.com/document/d/1neGE3q3grB4lVJfgID1keWY2v9JYqf-pw75sxUUJiyo/edit		
-        /// </remarks>
-        static void PersistXmlCache(HttpContextBase httpContext)
-        {
-            if (content.Instance.IsXmlQueuedForPersistenceToFile)
-            {
-                content.Instance.RemoveXmlFilePersistenceQueue();
-                content.Instance.PersistXmlToFile();
-            }
-        }
-
-        /// <summary>
+       
+	    /// <summary>
         /// Any object that is in the HttpContext.Items collection that is IDisposable will get disposed on the end of the request
         /// </summary>
         /// <param name="http"></param>
@@ -611,13 +596,6 @@ namespace Umbraco.Web
 				{
 					var httpContext = ((HttpApplication)sender).Context;
 					ProcessRequest(new HttpContextWrapper(httpContext));
-				};
-
-			// used to check if the xml cache file needs to be updated/persisted
-			app.PostRequestHandlerExecute += (sender, e) =>
-				{
-					var httpContext = ((HttpApplication)sender).Context;
-					PersistXmlCache(new HttpContextWrapper(httpContext));
 				};
 
 			app.EndRequest += (sender, args) =>

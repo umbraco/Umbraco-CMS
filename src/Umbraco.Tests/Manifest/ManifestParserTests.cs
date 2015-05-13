@@ -77,7 +77,7 @@ namespace Umbraco.Tests.Manifest
         alias: 'Test.Test2',
         name: 'Test 2',        
         config: { key1: 'some default val' },
-        view: '/hello/world.cshtml',
+        view: '~/hello/world.cshtml',
         icon: 'helloworld'
     },
     {
@@ -85,7 +85,7 @@ namespace Umbraco.Tests.Manifest
         name: 'Test 3',        
         config: { key1: 'some default val' },
         view: '/hello/world.html',
-        render: '/hello/world.cshtml',
+        render: '~/hello/world.cshtml',
         icon: 'helloworld'
     }
 ]");
@@ -313,6 +313,105 @@ namespace Umbraco.Tests.Manifest
         //{
 
         //}
+
+        [Test]
+        public void Create_Manifests_Editors()
+        {
+            var package1 = @"{
+propertyEditors: [], 
+javascript: ['~/test.js', '~/test2.js']}";
+            
+            var package2 = "{css: ['~/style.css', '~/folder-name/sdsdsd/stylesheet.css']}";
+
+            var package3 = @"{
+    'javascript': [    ],
+    'css': [     ],
+    'gridEditors': [
+        {
+            'name': 'Small Hero',
+            'alias': 'small-hero',
+            'view': '/App_Plugins/MyPlugin/small-hero/editortemplate.html',
+            'render': '/Views/Partials/Grid/Editors/SmallHero.cshtml',
+            'icon': 'icon-presentation',
+            'config': {
+                'image': {
+                    'size': {
+                        'width': 1200,
+                        'height': 185
+                    }
+                },
+                'link': {
+                    'maxNumberOfItems': 1,
+                    'minNumberOfItems': 0
+                }
+            }
+        },
+        {
+            'name': 'Document Links By Category',
+            'alias': 'document-links-by-category',
+            'view': '/App_Plugins/MyPlugin/document-links-by-category/editortemplate.html',
+            'render': '/Views/Partials/Grid/Editors/DocumentLinksByCategory.cshtml',
+            'icon': 'icon-umb-members'
+        }
+    ]
+}";
+            var package4 = @"{'propertyEditors': [
+    {
+        alias: 'Test.Test1',
+        name: 'Test 1',        
+        editor: {
+            view: '~/App_Plugins/MyPackage/PropertyEditors/MyEditor.html',
+            valueType: 'int',
+            validation: {
+                'required': true,               
+                'Regex': '\\d*'
+            }
+        },
+        prevalues: {
+				fields: [
+					{
+                        label: 'Some config 1',
+						key: 'key1',
+						view: '~/App_Plugins/MyPackage/PropertyEditors/Views/pre-val1.html',
+						validation: {
+                            required: true
+                        }
+					},
+                    {
+                        label: 'Some config 2',
+						key: 'key2',
+						view: '~/App_Plugins/MyPackage/PropertyEditors/Views/pre-val2.html'
+					}
+				]
+			}
+    }
+]}";
+
+            var package5 = @"{'parameterEditors': [
+    {
+        alias: 'parameter1',
+        name: 'My Parameter',        
+        view: '~/App_Plugins/MyPackage/PropertyEditors/MyEditor.html'
+    },
+    {
+        alias: 'parameter2',
+        name: 'Another parameter',
+        config: { key1: 'some config val' },
+        view: '~/App_Plugins/MyPackage/PropertyEditors/CsvEditor.html'
+    }
+]}";
+
+            var result = ManifestParser.CreateManifests(package1, package2, package3, package4, package5).ToArray();
+            
+            var paramEditors = result.SelectMany(x => ManifestParser.GetParameterEditors(x.ParameterEditors)).ToArray();
+            var propEditors = result.SelectMany(x => ManifestParser.GetPropertyEditors(x.PropertyEditors)).ToArray();
+            var gridEditors = result.SelectMany(x => ManifestParser.GetGridEditors(x.GridEditors)).ToArray();
+            
+            Assert.AreEqual(2, gridEditors.Count());
+            Assert.AreEqual(2, paramEditors.Count());
+            Assert.AreEqual(1, propEditors.Count()); 
+
+        }
 
         [Test]
         public void Create_Manifest_With_Line_Comments()

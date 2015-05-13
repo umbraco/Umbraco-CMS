@@ -105,9 +105,9 @@ namespace Umbraco.Core.Persistence.Factories
                         propDbType.Result,
                         //This flag tells the property type that it has an explicit dbtype and that it cannot be changed
                         // which is what we want for the built-in properties.
-                        propDbType.Success)
+                        propDbType.Success,
+                        typeDto.Alias)
                     {
-                        Alias = typeDto.Alias,
                         DataTypeDefinitionId = typeDto.DataTypeId,
                         Description = typeDto.Description,
                         Id = typeDto.Id.Value,
@@ -158,9 +158,9 @@ namespace Umbraco.Core.Persistence.Factories
                     propDbType.Result,
                     //This flag tells the property type that it has an explicit dbtype and that it cannot be changed
                     // which is what we want for the built-in properties.
-                    propDbType.Success)
+                    propDbType.Success,
+                    typeDto.Alias)
                 {
-                    Alias = typeDto.Alias,
                     DataTypeDefinitionId = typeDto.DataTypeId,
                     Description = typeDto.Description,
                     HelpText = typeDto.HelpText,

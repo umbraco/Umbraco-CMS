@@ -21,6 +21,7 @@ using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using umbraco.providers;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Editors
 {
@@ -102,30 +103,29 @@ namespace Umbraco.Web.Editors
         [SetAngularAntiForgeryTokens]
         public UserDetail PostLogin(LoginModel loginModel)
         {
+            var http = this.TryGetHttpContext();
+            if (http.Success == false)
+                throw new InvalidOperationException("This method requires that an HttpContext be active");
+
             if (UmbracoContext.Security.ValidateBackOfficeCredentials(loginModel.Username, loginModel.Password))
             {
                 var user = Security.GetBackOfficeUser(loginModel.Username);
 
                 //TODO: Clean up the int cast!
                 var ticket = UmbracoContext.Security.PerformLogin(user);
-
-                var http = this.TryGetHttpContext();
-                if (http.Success == false)
-                {
-                    throw new InvalidOperationException("This method requires that an HttpContext be active");
-                }
                 http.Result.AuthenticateCurrentRequest(ticket, false);
 
                 var result = Mapper.Map<UserDetail>(user);
                 //set their remaining seconds
                 result.SecondsUntilTimeout = ticket.GetRemainingAuthSeconds();
+                
                 return result;
             }
 
             //return BadRequest (400), we don't want to return a 401 because that get's intercepted 
             // by our angular helper because it thinks that we need to re-perform the request once we are
             // authorized and we don't want to return a 403 because angular will show a warning msg indicating 
-            // that the user doesn't have access to perform this function, we just want to return a normal invalid msg.
+            // that the user doesn't have access to perform this function, we just want to return a normal invalid msg.            
             throw new HttpResponseException(HttpStatusCode.BadRequest);
         }
 
@@ -141,5 +141,6 @@ namespace Umbraco.Web.Editors
         {           
             return Request.CreateResponse(HttpStatusCode.OK);
         }
+
     }
 }

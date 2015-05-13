@@ -58,9 +58,9 @@
     <Reference Include="AutoMapper.Net4">
       <HintPath>..\packages\AutoMapper.3.0.0\lib\net40\AutoMapper.Net4.dll</HintPath>
     </Reference>
-    <Reference Include="Examine, Version=0.1.61.2941, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Examine, Version=0.1.63.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Examine.0.1.61.2941\lib\Examine.dll</HintPath>
+      <HintPath>..\packages\Examine.0.1.63.0\lib\Examine.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -170,6 +170,7 @@
     <Compile Include="Cache\CacheRefresherTests.cs" />
     <Compile Include="CoreStrings\StringValidationTests.cs" />
     <Compile Include="FrontEnd\UmbracoHelperTests.cs" />
+    <Compile Include="Integration\GetCultureTests.cs" />
     <Compile Include="Membership\DynamicMemberContentTests.cs" />
     <Compile Include="Membership\MembershipProviderBaseTests.cs" />
     <Compile Include="Membership\UmbracoServiceMembershipProviderTests.cs" />
@@ -509,7 +510,6 @@
     <Compile Include="UmbracoExamine\ExamineBaseTest.cs" />
     <Compile Include="UmbracoExamine\IndexInitializer.cs" />
     <Compile Include="UmbracoExamine\IndexTest.cs" />
-    <Compile Include="UmbracoExamine\PdfIndexerTests.cs" />
     <Compile Include="UmbracoExamine\SearchTests.cs" />
     <Compile Include="UmbracoExamine\TestDataService.cs" />
     <Compile Include="UmbracoExamine\TestFiles.Designer.cs">
@@ -568,14 +568,10 @@
     <EmbeddedResource Include="TreesAndSections\applications.config" />
     <EmbeddedResource Include="TreesAndSections\trees.config" />
     <None Include="Packaging\Packages\Document_Type_Picker_1.1.umb" />
-    <None Include="UmbracoExamine\TestFiles\Converting_file_to_PDF.pdf" />
-    <None Include="UmbracoExamine\TestFiles\PDFStandards.PDF" />
-    <None Include="UmbracoExamine\TestFiles\SurviorFlipCup.pdf" />
     <None Include="UmbracoExamine\TestFiles\umbraco-sort.config">
       <SubType>Designer</SubType>
     </None>
     <None Include="UmbracoExamine\TestFiles\umbraco.config" />
-    <None Include="UmbracoExamine\TestFiles\windows-vista.pdf" />
     <None Include="unit-test-log4net.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -624,10 +620,6 @@
     <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj">
       <Project>{651E1350-91B6-44B7-BD60-7207006D7003}</Project>
       <Name>Umbraco.Web</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\UmbracoExamine.PDF\UmbracoExamine.PDF.csproj">
-      <Project>{f30dddb8-3994-4673-82ae-057123c6e1a8}</Project>
-      <Name>UmbracoExamine.PDF</Name>
     </ProjectReference>
     <ProjectReference Include="..\UmbracoExamine\UmbracoExamine.csproj">
       <Project>{07fbc26b-2927-4a22-8d96-d644c667fecc}</Project>

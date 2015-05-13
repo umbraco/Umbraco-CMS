@@ -1,11 +1,17 @@
 <div class="umb-panel usky-grid usky-grid-configuration" 
 ng-controller="Umbraco.PropertyEditors.GridPrevalueEditor.RowConfigController">
     <div class="umb-panel-body no-header with-footer">
+        
         <div class="umb-forms-settings">
 
             <h5><localize key="grid_addRowConfiguration" /></h5>
             <p><localize key="grid_addRowConfigurationDetail" /></p>
             
+            <div class="alert alert-warn ng-scope" ng-show="nameChanged">
+                Modifying a row configuration name will result in loss of
+                data for any existing content that is based on this configuration.
+            </div>
+
             <umb-control-group label="@general_name">
                 <input type="text" ng-model="currentRow.name" />
             </umb-control-group>
@@ -83,7 +89,11 @@ ng-controller="Umbraco.PropertyEditors.GridPrevalueEditor.RowConfigController">
     <div class="umb-panel-footer">
         <div class="umb-el-wrap umb-panel-buttons">
             <div class="btn-toolbar umb-btn-toolbar pull-right">
-                <a href="" ng-click="close()" class="btn btn-primary">
+                <a href ng-click="close()" class="btn btn-link">
+                    <localize key="general_cancel">Cancel</localize>
+                </a>
+                
+                <a href ng-click="complete()" class="btn btn-primary">
                     <localize key="general_ok" class="ng-isolate-scope ng-scope">Done</localize>
                 </a>
             </div>

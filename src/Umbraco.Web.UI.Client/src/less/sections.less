@@ -7,6 +7,7 @@ ul.sections {
 	background: @blackLight;
 	height: 100%;
 	width: 80px;
+    border-right: 1px solid @grayDark;
 }
 
 ul.sections li {
@@ -42,6 +43,7 @@ ul.sections li a {
 	width: 100%;
 	height: 100%;
 	margin: 0 0 0 -4px;
+    cursor: pointer; // make sure IE10 displays pointer cursor for expand and help sections. 
 }
 
 ul.sections a span {
@@ -63,7 +65,7 @@ ul.sections:hover a span {
 // -------------------------
 
 ul.sections li.avatar {
-	height: 69px;
+	height: 67px;
 	padding: 30px 0 2px 0;
 	text-align: center;
 	margin: 0 0 0 -4px;
@@ -116,7 +118,38 @@ ul.sections li.help a {
 // -------------------------
 li.expand a, li.expand{border: none !Important;}
 
+li.expand {
+
+    &.open > a > i.icon {
+        -webkit-transition: all 1s !important;
+        -o-transition: all 1s !important;
+        -moz-transition: all 1s !important;
+        transition: all 1s !important;
+        
+        &:before {
+            -ms-transform: rotate(180deg) !important; /* IE 9 */
+            -webkit-transform: rotate(180deg) !important; /* Chrome, Safari, Opera */
+            -o-transform: rotate(180deg) !important;
+            -moz-transform: rotate(180deg) !important;
+            transform: rotate(180deg) !important;
+        }
+    }
+}
+
 ul.sections-tray {
-	padding-top: 102px;
+	padding-top: 99px;
 	width: 80px;
+
+    & > li:first-child > a {
+        border-top: 1px solid #343434;
+    }
+
+    & > li {
+        // 5px (instead of 4px) because of vertical border
+        border-left-width: 5px;
+        
+        &.current, &:hover {
+            border-left-width: 5px;
+        }
+    }
 }

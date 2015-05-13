@@ -58,8 +58,13 @@ angular.module('umbraco')
 		};
 
 
-	    $scope.$on("formSubmitting", function (ev, args) {
+	    var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
 			$scope.model.value = trim($scope.ids.join(), ",");
+	    });
+
+	    //when the scope is destroyed we need to unsubscribe
+	    $scope.$on('$destroy', function () {
+	        unsubscribe();
 	    });
 
 		function trim(str, chr) {

@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2849E9D4
 		..\build\BuildBelle.bat = ..\build\BuildBelle.bat
 		..\build\RevertToCleanInstall.bat = ..\build\RevertToCleanInstall.bat
 		..\build\RevertToEmptyInstall.bat = ..\build\RevertToEmptyInstall.bat
+		SolutionInfo.cs = SolutionInfo.cs
 		umbraco.presentation.targets = umbraco.presentation.targets
 		..\build\UmbracoVersion.txt = ..\build\UmbracoVersion.txt
 		..\build\webpihash.txt = ..\build\webpihash.txt
@@ -18,13 +19,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2849E9D4
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{FD962632-184C-4005-A5F3-E705D92FC645}"
 	ProjectSection(SolutionItems) = preProject
-		..\docs\License.txt = ..\docs\License.txt
-		..\docs\README.txt = ..\docs\README.txt
+		..\LICENSE.md = ..\LICENSE.md
+		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{B5BD12C1-A454-435E-8A46-FF4A364C0382}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UmbracoExamine Libraries", "UmbracoExamine Libraries", "{DD32977B-EF54-475B-9A1B-B97A502C6E58}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B5BD12C1-A454-435E-8A46-FF4A364C0382}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuSpecs", "NuSpecs", "{227C3B55-80E5-4E7E-A802-BE16C5128B9D}"
 	ProjectSection(SolutionItems) = preProject
@@ -32,7 +31,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuSpecs", "NuSpecs", "{227C
 		..\build\NuSpecs\UmbracoCms.Core.nuspec = ..\build\NuSpecs\UmbracoCms.Core.nuspec
 		..\build\NuSpecs\UmbracoCms.Core.Symbols.nuspec = ..\build\NuSpecs\UmbracoCms.Core.Symbols.nuspec
 		..\build\NuSpecs\UmbracoCms.nuspec = ..\build\NuSpecs\UmbracoCms.nuspec
-		..\build\NuSpecs\UmbracoExamine.PDF.nuspec = ..\build\NuSpecs\UmbracoExamine.PDF.nuspec
 	EndProjectSection
 EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Web.UI.Client", "http://localhost:3961", "{3819A550-DCEC-4153-91B4-8BA9F7F0B9B4}"
@@ -83,8 +81,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Tests", "Umbraco.Tests\Umbraco.Tests.csproj", "{5D3B8245-ADA6-453F-A008-50ED04BFE770}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbracoExamine", "UmbracoExamine\UmbracoExamine.csproj", "{07FBC26B-2927-4A22-8D96-D644C667FECC}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmbracoExamine.PDF", "UmbracoExamine.PDF\UmbracoExamine.PDF.csproj", "{F30DDDB8-3994-4673-82AE-057123C6E1A8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{D24664A0-49B7-44A8-B2A5-5E5B1CCB7A58}"
 	ProjectSection(SolutionItems) = preProject
@@ -169,10 +165,6 @@ Global
 		{07FBC26B-2927-4A22-8D96-D644C667FECC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{07FBC26B-2927-4A22-8D96-D644C667FECC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{07FBC26B-2927-4A22-8D96-D644C667FECC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F30DDDB8-3994-4673-82AE-057123C6E1A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F30DDDB8-3994-4673-82AE-057123C6E1A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F30DDDB8-3994-4673-82AE-057123C6E1A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F30DDDB8-3994-4673-82AE-057123C6E1A8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -180,8 +172,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{227C3B55-80E5-4E7E-A802-BE16C5128B9D} = {2849E9D4-3B4E-40A3-A309-F3CB4F0E125F}
 		{5D3B8245-ADA6-453F-A008-50ED04BFE770} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
-		{07FBC26B-2927-4A22-8D96-D644C667FECC} = {DD32977B-EF54-475B-9A1B-B97A502C6E58}
-		{F30DDDB8-3994-4673-82AE-057123C6E1A8} = {DD32977B-EF54-475B-9A1B-B97A502C6E58}
 		{E3F9F378-AFE1-40A5-90BD-82833375DBFE} = {227C3B55-80E5-4E7E-A802-BE16C5128B9D}
 	EndGlobalSection
 EndGlobal

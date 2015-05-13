@@ -78,7 +78,7 @@ namespace Umbraco.Core.Models.EntityBase
         /// Indicates that the entity had been changed and the changes were committed
         /// </summary>
         /// <returns></returns>
-        public bool WasDirty()
+        public virtual bool WasDirty()
         {
             return _lastPropertyChangedInfo != null && _lastPropertyChangedInfo.Any();
         }

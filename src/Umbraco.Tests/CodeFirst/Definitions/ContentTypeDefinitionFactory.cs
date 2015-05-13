@@ -108,12 +108,11 @@ namespace Umbraco.Tests.CodeFirst.Definitions
                 //Check if a PropertyType with the same alias already exists, as we don't want to override existing ones
                 if(group.PropertyTypes.Contains(definition.Alias)) continue;
 
-                var propertyType = new PropertyType(definition.DataTypeDefinition)
+                var propertyType = new PropertyType(definition.DataTypeDefinition, definition.Alias)
                                        {
                                            Mandatory = definition.Mandatory,
                                            ValidationRegExp = definition.ValidationRegExp,
                                            SortOrder = definition.Order,
-                                           Alias = definition.Alias,
                                            Name = definition.Name
                                        };
 

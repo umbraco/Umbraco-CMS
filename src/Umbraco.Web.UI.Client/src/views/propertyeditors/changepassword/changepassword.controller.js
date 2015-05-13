@@ -91,15 +91,17 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.ChangePasswordCont
             //set model to null
             $scope.model.value = null;
         };
-        
+
+        var unsubscribe = [];
+
         //listen for the saved event, when that occurs we'll 
         //change to changing = false;
-        $scope.$on("formSubmitted", function () {
+        unsubscribe.push($scope.$on("formSubmitted", function() {
             if ($scope.model.config.disableToggle === false) {
                 $scope.changing = false;
-            }            
-        });
-        $scope.$on("formSubmitting", function() {
+            }
+        }));
+        unsubscribe.push($scope.$on("formSubmitting", function() {
             //if there was a previously generated password displaying, clear it
             if ($scope.changing && $scope.model.value) {
                 $scope.model.value.generatedPassword = null;
@@ -107,6 +109,13 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.ChangePasswordCont
             else if (!$scope.changing) {
                 //we are not changing, so the model needs to be null
                 $scope.model.value = null;
+            }
+        }));
+
+        //when the scope is destroyed we need to unsubscribe
+        $scope.$on('$destroy', function () {
+            for (var u in unsubscribe) {
+                unsubscribe[u]();
             }
         });
 

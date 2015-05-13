@@ -39,7 +39,8 @@ namespace Umbraco.Core.Manifest
         internal static IEnumerable<GridEditor> GetGridEditors(JArray jsonEditors)
         {
             return JsonConvert.DeserializeObject<IEnumerable<GridEditor>>(
-                jsonEditors.ToString());
+                jsonEditors.ToString(),
+                new GridEditorConverter());
         }
 
         /// <summary>
@@ -209,14 +210,30 @@ namespace Umbraco.Core.Manifest
                         }
                     }
                 }
+
+                //replace virtual paths for each property editor
+                if (deserialized["gridEditors"] != null)
+                {
+                    foreach (JObject p in deserialized["gridEditors"])
+                    {
+                        if (p["view"] != null)
+                        {
+                            ReplaceVirtualPaths(p["view"]);
+                        }
+                        if (p["render"] != null)
+                        {
+                            ReplaceVirtualPaths(p["render"]);
+                        }
+                    }
+                }
                 
                 var manifest = new PackageManifest()
                     {
                         JavaScriptInitialize = jConfig,
                         StylesheetInitialize = cssConfig,
                         PropertyEditors = propEditors.Any() ? (JArray)deserialized["propertyEditors"] : new JArray(),
-                        ParameterEditors = propEditors.Any() ? (JArray)deserialized["parameterEditors"] : new JArray(),
-                        GridEditors = propEditors.Any() ? (JArray)deserialized["gridEditors"] : new JArray()
+                        ParameterEditors = paramEditors.Any() ? (JArray)deserialized["parameterEditors"] : new JArray(),
+                        GridEditors = gridEditors.Any() ? (JArray)deserialized["gridEditors"] : new JArray()
                     };
                 result.Add(manifest);
             }
