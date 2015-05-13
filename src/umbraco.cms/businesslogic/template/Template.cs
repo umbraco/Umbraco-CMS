@@ -352,6 +352,9 @@ namespace umbraco.cms.businesslogic.template
 
             if (!e.Cancel)
             {
+                //remove refs from documents
+                SqlHelper.ExecuteNonQuery("UPDATE cmsDocument SET templateId = NULL WHERE templateId = " + this.Id);
+
                 
                 ApplicationContext.Current.Services.FileService.DeleteTemplate(TemplateEntity.Alias);
 

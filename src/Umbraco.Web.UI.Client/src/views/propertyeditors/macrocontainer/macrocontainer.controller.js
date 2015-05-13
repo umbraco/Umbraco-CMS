@@ -85,13 +85,18 @@ angular.module('umbraco')
 	        $scope.renderModel = [];
 	    };
 
-	    $scope.$on("formSubmitting", function (ev, args) {	
+	    var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {	
 			var syntax = [];
 	    	angular.forEach($scope.renderModel, function(value, key){
 	    		syntax.push(value.syntax);
 	    	});
 
 			$scope.model.value = syntax.join("");
+	    });
+
+	    //when the scope is destroyed we need to unsubscribe
+	    $scope.$on('$destroy', function () {
+	        unsubscribe();
 	    });
 
 

@@ -204,7 +204,8 @@ namespace Umbraco.Core.Services
             if (_entityService == null)
                 _entityService = new Lazy<IEntityService>(() => new EntityService(
                     provider, repositoryFactory, logger, 
-                    _contentService.Value, _contentTypeService.Value, _mediaService.Value, _dataTypeService.Value, _memberService.Value, _memberTypeService.Value));
+                    _contentService.Value, _contentTypeService.Value, _mediaService.Value, _dataTypeService.Value, _memberService.Value, _memberTypeService.Value,
+                    cache.RuntimeCache));
 
             if (_relationService == null)
                 _relationService = new Lazy<IRelationService>(() => new RelationService(provider, repositoryFactory, logger, _entityService.Value));

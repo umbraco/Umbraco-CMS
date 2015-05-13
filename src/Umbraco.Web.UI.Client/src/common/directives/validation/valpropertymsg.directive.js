@@ -96,8 +96,10 @@ function valPropertyMsg(serverValidationManager) {
             //create properties on our custom scope so we can use it in our template
             scope.errorMsg = "";
 
+            var unsubscribe = [];
+
             //listen for form error changes
-            scope.$on("valStatusChanged", function (evt, args) {
+            unsubscribe.push(scope.$on("valStatusChanged", function(evt, args) {
                 if (args.form.$invalid) {
 
                     //first we need to check if the valPropertyMsg validity is invalid
@@ -123,10 +125,10 @@ function valPropertyMsg(serverValidationManager) {
                     hasError = false;
                     scope.errorMsg = "";
                 }
-            }, true);
+            }, true));
 
             //listen for the forms saving event
-            scope.$on("formSubmitting", function (ev, args) {
+            unsubscribe.push(scope.$on("formSubmitting", function(ev, args) {
                 showValidation = true;
                 if (hasError && scope.errorMsg === "") {
                     scope.errorMsg = getErrorMsg();
@@ -135,15 +137,15 @@ function valPropertyMsg(serverValidationManager) {
                     scope.errorMsg = "";
                     stopWatch();
                 }
-            });
+            }));
 
             //listen for the forms saved event
-            scope.$on("formSubmitted", function (ev, args) {
+            unsubscribe.push(scope.$on("formSubmitted", function(ev, args) {
                 showValidation = false;
                 scope.errorMsg = "";
                 formCtrl.$setValidity('valPropertyMsg', true);
                 stopWatch();
-            });
+            }));
 
             //listen for server validation changes
             // NOTE: we pass in "" in order to listen for all validation changes to the content property, not for
@@ -179,7 +181,16 @@ function valPropertyMsg(serverValidationManager) {
                     serverValidationManager.unsubscribe(scope.property.alias, "");
                 });
             }
+
+            //when the scope is disposed we need to unsubscribe
+            scope.$on('$destroy', function () {
+                for (var u in unsubscribe) {
+                    unsubscribe[u]();
+                }
+            });
         }
+
+
     };
 }
 angular.module('umbraco.directives.validation').directive("valPropertyMsg", valPropertyMsg);

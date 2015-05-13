@@ -158,11 +158,16 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
         $scope.renderModel = [];
     };
         
-    $scope.$on("formSubmitting", function (ev, args) {
+    var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
         var currIds = _.map($scope.renderModel, function (i) {
             return i.id;
         });
         $scope.model.value = trim(currIds.join(), ",");
+    });
+
+    //when the scope is destroyed we need to unsubscribe
+    $scope.$on('$destroy', function () {
+        unsubscribe();
     });
 
     //load current data

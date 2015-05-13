@@ -182,7 +182,10 @@ namespace Umbraco.Web.Cache
         private static void ClearContentTypeCache(JsonPayload[] payloads)
         {
             var needsContentRefresh = false;
-            
+
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
+
             payloads.ForEach(payload =>
                 {
                     //clear the cache for each item
@@ -270,7 +273,7 @@ namespace Umbraco.Web.Cache
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(string.Format("{0}{1}", CacheKeys.ContentTypeCacheKey, payload.Id));
             //clears the cache associated with the content type properties collection
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(CacheKeys.ContentTypePropertiesCacheKey + payload.Id);
-            
+
             //clears the dictionary object cache of the legacy ContentType
             global::umbraco.cms.businesslogic.ContentType.RemoveFromDataTypeCache(payload.Alias);
 

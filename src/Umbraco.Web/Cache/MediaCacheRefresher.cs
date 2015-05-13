@@ -153,6 +153,8 @@ namespace Umbraco.Web.Cache
         {
             if (payloads == null) return;
 
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
             ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
 
             payloads.ForEach(payload =>
