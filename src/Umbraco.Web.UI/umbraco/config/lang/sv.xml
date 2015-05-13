@@ -724,6 +724,32 @@
     <key alias="quickGuide">Snabbguide för taggar i Umbracos sidmallar</key>
     <key alias="template">Sidmall</key>
   </area>
+  <area alias="grid">
+    <key alias="insertControl">Lägg till</key>
+    <key alias="addRows">Lägg till rad</key>
+    <key alias="addElement"><![CDATA[Klicka på <i class="icon icon-add blue"></i> nedan för att lägga till ditt första element]]></key>
+    <key alias="clickToEmbed">Klicka för att lägga in</key>
+    <key alias="clickToInsertImage">Klicka för att lägga till bild</key>
+    <key alias="placeholderImageCaption">Bildtext...</key>
+    <key alias="placeholderWriteHere">Skriv här...</key>
+    <key alias="gridLayouts">Rutnätslayouter</key>
+    <key alias="gridLayoutsDetail">Layouter är arbetsytan för rutnätet, oftast så behöver du bara en eller två layouter</key>
+    <key alias="addGridLayout">Lägg till layout</key>
+    <key alias="addGridLayoutDetail">Redigera layouten genom att sätta kolumnbredd och lägg till fler sektioner</key>
+    <key alias="rowConfigurations">Radkonfigureringar</key>
+    <key alias="rowConfigurationsDetail">Rader är fördefinierade celler, arrangerade horisontellt</key>
+    <key alias="addRowConfiguration">Lägg till radkonfiguration</key>
+    <key alias="addRowConfigurationDetail">Justera rad genom att ställa in cellbredder och lägga till ytterligare celler</key>
+    <key alias="columns">Kolumner</key>
+    <key alias="columnsDetails">Sammanlagda antalet kolumner i rutnätslayout</key>
+    <key alias="settings">Inställningar</key>
+    <key alias="settingsDetails">Konfigurera vilka inställningar redaktörer kan ändra</key>
+    <key alias="styles">Stilar</key>
+    <key alias="stylesDetails">Konfigurera vilken styling redaktörer kan ändra</key>
+    <key alias="settingDialogDetails">Inställningarna kommer bara att sparas om det inmatade json-konfigurationen är giltig</key>
+    <key alias="allowAllEditors">Tillåt alla editors</key>
+    <key alias="allowAllRowConfigurations">Tillåt alla rad- konfigurationer</key>
+  </area>
   <area alias="templateEditor">
     <key alias="alternativeField">Alternativt fält</key>
     <key alias="alternativeText">Alternativ text</key>
