@@ -136,6 +136,13 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override void PersistNewItem(IUser entity)
         {
             var userFactory = new UserFactory(entity.UserType);
+
+            //ensure security stamp if non
+            if (entity.SecurityStamp.IsNullOrWhiteSpace())
+            {
+                entity.SecurityStamp = Guid.NewGuid().ToString();
+            }
+            
             var userDto = userFactory.BuildDto(entity);
 
             var id = Convert.ToInt32(Database.Insert(userDto));
@@ -154,6 +161,13 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override void PersistUpdatedItem(IUser entity)
         {
             var userFactory = new UserFactory(entity.UserType);
+
+            //ensure security stamp if non
+            if (entity.SecurityStamp.IsNullOrWhiteSpace())
+            {
+                entity.SecurityStamp = Guid.NewGuid().ToString();
+            }
+
             var userDto = userFactory.BuildDto(entity);
 
             var dirtyEntity = (ICanBeDirty)entity;
@@ -171,7 +185,11 @@ namespace Umbraco.Core.Persistence.Repositories
                 {"userLogin", "Username"},                
                 {"userEmail", "Email"},                
                 {"userLanguage", "Language"},
-                {"securityStampToken", "SecurityStamp"}
+                {"securityStampToken", "SecurityStamp"},
+                {"lastLockoutDate", "LastLockoutDate"},
+                {"lastPasswordChangeDate", "LastPasswordChangeDate"},
+                {"lastLoginDate", "LastLoginDate"},
+                {"failedLoginAttempts", "FailedPasswordAttempts"},
             };
 
             //create list of properties that have changed

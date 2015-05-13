@@ -2,9 +2,6 @@
 using System.Linq;
 using System.Web;
 using System.Web.Hosting;
-using System.Web.Mvc;
-using StackExchange.Profiling;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.LightInject;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;

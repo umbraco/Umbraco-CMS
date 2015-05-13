@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Web.Mvc;
 
 namespace Umbraco.Core.Profiling

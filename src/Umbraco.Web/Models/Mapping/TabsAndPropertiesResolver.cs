@@ -65,7 +65,7 @@ namespace Umbraco.Web.Models.Mapping
                         {
                             Alias = string.Format("{0}id", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                             Label = "Id",
-                            Value = Convert.ToInt32(display.Id).ToInvariantString(),
+                            Value = Convert.ToInt32(display.Id).ToInvariantString() + "<br/><small class='muted'>" + display.Key + "</small>",
                             View = labelEditor
                         },
                     new ContentPropertyDisplay
