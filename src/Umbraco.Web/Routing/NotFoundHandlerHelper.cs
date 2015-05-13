@@ -229,12 +229,14 @@ namespace Umbraco.Web.Routing
         /// </param>
         /// <param name="entityService"></param>
         /// <param name="publishedContentQuery"></param>
+        /// <param name="domainService"></param>
         /// <returns></returns>
         internal static int? GetCurrentNotFoundPageId(
             IContentErrorPage[] error404Collection, 
             string requestServerName, 
-            IEntityService entityService, 
-            PublishedContentQuery publishedContentQuery)
+            IEntityService entityService,
+            ITypedPublishedContentQuery publishedContentQuery,
+            IDomainService domainService)
         {
             if (error404Collection.Count() > 1)
             {
@@ -243,13 +245,13 @@ namespace Umbraco.Web.Routing
 
                 //TODO: Remove the dependency on this legacy Domain service, 
                 // in 7.3 the real domain service should be passed in as a parameter.
-                if (Domain.Exists(requestServerName))
+                if (domainService.Exists(requestServerName))
                 {
-                    var d = Domain.GetDomain(requestServerName);
+                    var d = domainService.GetByName(requestServerName);
 
                     // test if a 404 page exists with current culture
                     cultureErr = error404Collection
-                        .FirstOrDefault(x => x.Culture == d.Language.CultureAlias);
+                        .FirstOrDefault(x => x.Culture == d.Language.IsoCode);
 
                     if (cultureErr != null)
                     {
@@ -289,7 +291,7 @@ namespace Umbraco.Web.Routing
         /// <param name="entityService"></param>
         /// <param name="publishedContentQuery"></param>
         /// <returns></returns>
-        internal static int? GetContentIdFromErrorPageConfig(IContentErrorPage errorPage, IEntityService entityService, PublishedContentQuery publishedContentQuery)
+        internal static int? GetContentIdFromErrorPageConfig(IContentErrorPage errorPage, IEntityService entityService, ITypedPublishedContentQuery publishedContentQuery)
         {
             if (errorPage.HasContentId) return errorPage.ContentId;
 

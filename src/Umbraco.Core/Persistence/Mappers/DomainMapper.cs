@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Repositories;
 
@@ -24,6 +25,7 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<DomainRepository.CacheableDomain, DomainDto>(src => src.Id, dto => dto.Id);
             CacheMap<DomainRepository.CacheableDomain, DomainDto>(src => src.RootContentId, dto => dto.RootStructureId);
             CacheMap<DomainRepository.CacheableDomain, DomainDto>(src => src.DefaultLanguageId, dto => dto.DefaultLanguage);
+            CacheMap<DomainRepository.CacheableDomain, DomainDto>(src => src.DomainName, dto => dto.DomainName);
         }
     }
 }

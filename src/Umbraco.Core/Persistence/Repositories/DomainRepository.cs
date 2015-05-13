@@ -115,6 +115,17 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
+        public IDomain GetByName(string domainName)
+        {
+            using (var repo = new CachedDomainRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax))
+            {
+                var factory = new DomainModelFactory();
+                return factory.BuildDomainEntity(
+                    repo.GetByQuery(new Query<CacheableDomain>().Where(x => x.DomainName.InvariantEquals(domainName))).FirstOrDefault(),
+                    _contentRepository, _languageRepository);
+            }
+        }
+
         public bool Exists(string domainName)
         {
             using (var repo = new CachedDomainRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax))
@@ -245,7 +256,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             protected override void PersistNewItem(CacheableDomain entity)
             {
-                var exists = Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoDomains WHERE domainName = @domainName", new {domainName = entity.DomainName});
+                var exists = Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoDomains WHERE domainName = @domainName", new { domainName = entity.DomainName });
                 if (exists > 0) throw new DuplicateNameException(string.Format("The domain name {0} is already assigned", entity.DomainName));
 
                 entity.AddingEntity();

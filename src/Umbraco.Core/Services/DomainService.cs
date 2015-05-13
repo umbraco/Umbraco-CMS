@@ -47,7 +47,7 @@ namespace Umbraco.Core.Services
             var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateDomainRepository(uow))
             {
-                return repository.GetByQuery(new Query<IDomain>().Where(x => x.DomainName.InvariantEquals(name))).FirstOrDefault();
+                return repository.GetByName(name);
             }
         }
 
