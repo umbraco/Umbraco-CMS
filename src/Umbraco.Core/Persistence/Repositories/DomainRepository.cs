@@ -120,11 +120,11 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IDomain GetByName(string domainName)
         {
-            using (var repo = new CachedDomainRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax))
+            using (var repo = new CachedDomainRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax, _mappingResolver))
             {
                 var factory = new DomainModelFactory();
                 return factory.BuildDomainEntity(
-                    repo.GetByQuery(new Query<CacheableDomain>().Where(x => x.DomainName.InvariantEquals(domainName))).FirstOrDefault(),
+                    repo.GetByQuery(repo.Query.Where(x => x.DomainName.InvariantEquals(domainName))).FirstOrDefault(),
                     _contentRepository, _languageRepository);
             }
         }
