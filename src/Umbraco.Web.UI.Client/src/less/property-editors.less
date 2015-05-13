@@ -308,10 +308,6 @@ ul.color-picker li a  {
   line-height: 120px
 }
 
-.umb-folderbrowser .selector-overlay{
-  display: none;
-}
-
 .umb-upload-drop-zone{
     margin-bottom:5px;
 }
@@ -369,7 +365,7 @@ ul.color-picker li a  {
 
 
 .umb-photo-folder .picrow div a:first-child {
-    width:100%;
+     width:100%;
     height:100%;
 }
 
@@ -387,6 +383,10 @@ ul.color-picker li a  {
   background: @grayLighter;
   color: @black;
   text-decoration: none;
+}
+
+.umb-photo-folder .selector-overlay{
+  display: none;
 }
 
 //this is a temp hack, to provide selectors in the dialog:
@@ -417,6 +417,15 @@ ul.color-picker li a  {
   margin: auto;
   /*vertically aligns */
   position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.umb-photo-folder .umb-non-thumbnail span{
+  display: block;
+  margin: auto;
+  /*vertically aligns */
+  position: static;
   top: 50%;
   transform: translateY(-50%);
 }
