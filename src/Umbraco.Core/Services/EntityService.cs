@@ -16,22 +16,14 @@ namespace Umbraco.Core.Services
     {
         private readonly IRuntimeCacheProvider _runtimeCache;
         private readonly Dictionary<string, Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>> _supportedObjectTypes;
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public EntityService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, 
-            IContentService contentService, IContentTypeService contentTypeService, IMediaService mediaService, IDataTypeService dataTypeService,
-            IMemberService memberService, IMemberTypeService memberTypeService, IRuntimeCacheProvider runtimeCache)
-            : this(provider, repositoryFactory, LoggerResolver.Current.Logger, contentService, contentTypeService, mediaService,
-            dataTypeService, memberService, memberTypeService)
-        {
-            
-        }
+        
 
         public EntityService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger,
            IContentService contentService, IContentTypeService contentTypeService, IMediaService mediaService, IDataTypeService dataTypeService,
-           IMemberService memberService, IMemberTypeService memberTypeService)
+           IMemberService memberService, IMemberTypeService memberTypeService, IRuntimeCacheProvider runtimeCache)
             : base(provider, repositoryFactory, logger)
         {
+            _runtimeCache = runtimeCache;
             IContentTypeService contentTypeService1 = contentTypeService;
 
             _supportedObjectTypes = new Dictionary<string, Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>>
@@ -57,7 +49,7 @@ namespace Umbraco.Core.Services
         {
             var result = _runtimeCache.GetCacheItem<int?>(CacheKeys.IdToKeyCacheKey + key, () =>
             {
-                using (var uow = _uowProvider.GetUnitOfWork())
+                using (var uow = UowProvider.GetUnitOfWork())
                 {
                     switch (umbracoObjectType)
                     {
@@ -95,7 +87,7 @@ namespace Umbraco.Core.Services
         {
             var result = _runtimeCache.GetCacheItem<Guid?>(CacheKeys.KeyToIdCacheKey + id, () =>
             {
-                using (var uow = _uowProvider.GetUnitOfWork())
+                using (var uow = UowProvider.GetUnitOfWork())
                 {
                     switch (umbracoObjectType)
                     {
