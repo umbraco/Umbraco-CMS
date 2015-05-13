@@ -81,6 +81,16 @@
             public const string Stylesheets = "stylesheets";
 
             /// <summary>
+            /// alias for the document type tree.
+            /// </summary>
+            public const string DocumentTypes = "documenttype";
+
+            /// <summary>
+            /// alias for the media type tree.
+            /// </summary>
+            public const string MediaTypes = "mediatype";
+
+            /// <summary>
             /// alias for the template tree.
             /// </summary>
             public const string Templates = "templates";

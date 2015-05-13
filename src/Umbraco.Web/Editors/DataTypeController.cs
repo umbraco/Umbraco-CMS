@@ -60,6 +60,22 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Gets the content json for all data types
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Permission is granted to this method if the user has access to any of these trees: DataTypes, Content or Media
+        /// </remarks>
+        [UmbracoTreeAuthorize(Constants.Trees.DataTypes, Constants.Trees.Content, Constants.Trees.Media)]
+        public IEnumerable<DataTypeBasic> GetAll()
+        {
+            return Services.DataTypeService
+                     .GetAllDataTypeDefinitions()
+                     .Select(x => Mapper.Map<IDataTypeDefinition, DataTypeBasic>(x)).Where(x => x.IsSystemDataType == false);
+        }
+
+        /// <summary>
         /// Deletes a data type wth a given ID
         /// </summary>
         /// <param name="id"></param>

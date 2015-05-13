@@ -1,0 +1,19 @@
+﻿<div class="umb-panel-header">
+    <div class="row-fluid">
+        <div class="span5">                
+                <umb-content-name
+                    ng-disabled="content.isSystem == 1"
+                    placeholder="@placeholders_entername"
+                    ng-model="name"/>
+        </div>
+        
+        <div class="span7">
+            <div class="pull-right" ng-if="actions" style="padding: 20px 20px 0px 0px">
+                <umb-editor-actions actions="actions"></umb-editor-actions>
+                <umb-editor-menu ng-if="menu" menu="menu"></umb-editor-menu>
+            </div>
+        </div>
+
+	    <div ng-transclude></div>
+    </div>
+</div>

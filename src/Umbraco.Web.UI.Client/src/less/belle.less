@@ -7,6 +7,7 @@
  *
  */
 
+
 // Core variables and mixins
 @import "fonts.less"; // Loading fonts
 @import "variables.less"; // Modify this for custom colors, font-sizes, etc
@@ -43,7 +44,6 @@
 @import "../../lib/bootstrap/less/pagination.less";
 @import "../../lib/bootstrap/less/pager.less";
 
-
 // Components: Popovers
 @import "../../lib/bootstrap/less/modals.less";
 @import "../../lib/bootstrap/less/tooltip.less";
@@ -59,12 +59,17 @@
 @import "../../lib/bootstrap/less/carousel.less";
 @import "../../lib/bootstrap/less/hero-unit.less";
 
+
 // Utility classes
 @import "../../lib/bootstrap/less/utilities.less"; // Has to be last to override when necessary
 
+
+// Application wide styles (refactor is WIP)
+@import "application/grid.less";
+@import "application/shadows.less";
+@import "application/animations.less";
+
 // Belle styles
-@import "grid.less";
-@import "login.less";
 @import "buttons.less";
 @import "forms.less";
 @import "modals.less";
@@ -76,12 +81,24 @@
 @import "listview.less";
 @import "gridview.less";
 @import "footer.less";
-@import "animations.less";
 @import "dragdrop.less";
 @import "dashboards.less"; 
 
+
+// Umbraco Components
+@import "components/editor.less"; 
+@import "components/overlays.less"; 
+@import "components/card.less"; 
+
+
+//page specific styles
+@import "pages/documentTypeEditor.less"; 
+@import "login.less";
+
+
 //used for property editors
 @import "property-editors.less";
+
 
 @import "typeahead.less";
 @import "hacks.less";

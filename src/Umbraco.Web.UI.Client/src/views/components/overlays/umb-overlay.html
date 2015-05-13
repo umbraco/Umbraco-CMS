@@ -1,0 +1,16 @@
+<div class="umb-overlay {{overlayCssClass}}" on-outside-click="closeOverLay()">
+
+	<div class="umb-overlay-header" ng-if="model.title">
+	    <h4>{{model.title}} <a href ng-click="closeOverLay()" class="pull-right"> <i class="icon-delete"></i> </a> </h4>
+	</div>
+
+	<div class="umb-overlay-container">
+	    <div ng-if="view" ng-include="view"></div>
+	    <div ng-if="!view" ng-transclude></div>
+    </div>
+
+    <div class="umb-overlay-drawer" ng-if="model.close || model.submit">
+    	<button  ng-if="model.close" ng-click="model.close(model)" class="btn btn-link">Cancel</button> 
+    	<button ng-click="model.submit(model)" ng-if="model.submit" class="btn btn-success">Submit</button>
+    </div>
+</div>

@@ -68,6 +68,27 @@ function contentTypeResource($q, $http, umbRequestHelper) {
                        "contentTypeApiBaseUrl",
                        "GetAllPropertyTypeAliases")),
                'Failed to retrieve property type aliases');
+        },
+        
+        getPropertyTypeScaffold : function (id) {
+              return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "contentTypeApiBaseUrl",
+                       "GetPropertyTypeScaffold",
+                       [{ id: id }])),
+               'Failed to retrieve property type scaffold');
+        },
+        
+        getById: function (id) {
+
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "contentTypeApiBaseUrl",
+                       "GetById",
+                       [{ id: id }])),
+               'Failed to retrieve content type');
         }
 
     };

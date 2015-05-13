@@ -13,6 +13,7 @@ using System.Linq;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 using Newtonsoft.Json;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.Editors
 {
@@ -54,6 +55,41 @@ namespace Umbraco.Web.Editors
         public IEnumerable<string> GetAllPropertyTypeAliases()
         {
             return ApplicationContext.Services.ContentTypeService.GetAllPropertyTypeAliases();
+        }
+
+
+        public Umbraco.Web.Models.ContentEditing.ContentTypeDisplay GetById(int id)
+        {
+            var ct = Services.ContentTypeService.GetContentType(id);
+            if (ct == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var dto = Mapper.Map<IContentType, Umbraco.Web.Models.ContentEditing.ContentTypeDisplay>(ct);
+            return dto;
+        }
+
+
+        public ContentPropertyDisplay GetPropertyTypeScaffold(int id)
+        {
+            var dataTypeDiff = Services.DataTypeService.GetDataTypeDefinitionById(id);
+
+            if (dataTypeDiff == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var preVals = UmbracoContext.Current.Application.Services.DataTypeService.GetPreValuesCollectionByDataTypeId(id);
+            var editor = PropertyEditorResolver.Current.GetByAlias(dataTypeDiff.PropertyEditorAlias);
+
+            return new ContentPropertyDisplay()
+            {
+                Editor = dataTypeDiff.PropertyEditorAlias,
+                Validation = new PropertyTypeValidation() { },
+                View = editor.ValueEditor.View,
+                Config = editor.PreValueEditor.ConvertDbToEditor(editor.DefaultPreValues, preVals)
+            };
         }
 
         /// <summary>

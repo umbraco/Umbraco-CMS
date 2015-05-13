@@ -16,6 +16,13 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IMediaType, ContentTypeBasic>();
             config.CreateMap<IContentType, ContentTypeBasic>();
             config.CreateMap<IMemberType, ContentTypeBasic>();
+
+            config.CreateMap<IContentType, Umbraco.Web.Models.ContentEditing.ContentTypeDisplay>()
+                    .ForMember(
+                        dto => dto.Groups,
+                        expression => expression.ResolveUsing<PropertyTypeGroupResolver>());
         }
+
+        
     }
 }

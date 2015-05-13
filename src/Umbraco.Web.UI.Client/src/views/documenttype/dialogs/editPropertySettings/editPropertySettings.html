@@ -1,0 +1,83 @@
+<div ng-controller="Umbraco.Editors.DocumentType.EditPropertySettingsController">
+    <div class="umb-overlay-body">
+
+        <form>
+
+            <div class="control-group umb-control-group">
+
+                <h5>Property settings</h5>
+
+                <div class="umb-el-wrap">
+                    <label class="control-label">Name</label>
+                    <div class="controls controls-row">
+                        <input type="text" ng-model="model.property.label" />
+                    </div>
+                </div>
+
+                <div class="umb-el-wrap">
+                    <label class="control-label">Alias</label>
+                    <div class="controls controls-row">
+                        <input type="text" ng-model="model.property.alias" />
+                    </div>
+                </div>
+
+                <div class="umb-el-wrap">
+                    <label class="control-label">Description</label>
+                    <div class="controls controls-row">
+                        <textarea ng-model="model.property.description"></textarea>
+                    </div>
+                </div>
+
+                <h5>Validation</h5>
+
+                <div class="umb-el-wrap">
+                    <label class="control-label">Mandatory</label>
+                    <label class="checkbox">
+                        <input type="checkbox" ng-model="model.property.validation.mandatory">
+                        <small>Lorem ipsum dolor</small>
+                    </label>
+                </div>
+
+                <div class="umb-el-wrap">
+                    <label class="control-label">Validation</label>
+                    <div class="controls controls-row">
+                        <select class="umb-editor umb-dropdown">
+                            <option>Email</option>
+                            <option>Number</option>
+                            <option>Tekst</option>
+                            <option>Etc...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <h5>Property type</h5>
+
+                <div class="umb-el-wrap">
+                    <div class="" ng-click="changePropertyEditor(model.property)">
+                        <i class="icon" ng-class="model.property.dataType.icon"></i>
+                        <span>{{ model.property.dataType.name }}</span>
+                        <span>{{ model.property.view }}</span>
+                    </div>
+                    <button class="btn" ng-click="editDataType(model.property)">Change editor settings</button>
+                </div>
+
+                <pre>{{ model | json }}</pre>
+
+            </div>
+
+        </form>
+
+    </div>
+
+    <!-- overlay for change data type -->
+    <umb-overlay
+            ng-style="{'width': '500px'}"
+            ng-if="showDialog"
+            model="dialogModel"
+            animation="slide-in-right"
+            position="right"
+            view="dialogModel.view">
+    </umb-overlay>
+
+</div>
+

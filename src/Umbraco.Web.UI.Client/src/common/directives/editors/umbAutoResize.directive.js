@@ -7,11 +7,17 @@ angular.module("umbraco.directives")
 
                 if(force === true){
                     element.height(0);
+                    element.width(0);
                 }
 
                 if(domEl.scrollHeight !== domEl.clientHeight){
                     element.height(domEl.scrollHeight);
                 }
+
+                if(domEl.scrollWidth !== domEl.clientWidth) {
+                    element.width(domEl.scrollWidth);
+                }
+
             };
 
             element.bind('keyup keydown keypress change', update);

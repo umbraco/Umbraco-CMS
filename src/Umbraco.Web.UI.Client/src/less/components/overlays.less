@@ -1,0 +1,65 @@
+
+// CENTERED OVERLAY
+.umb-overlay-center{
+     position: absolute;
+     width: 460px;
+     height: 400px;
+     overflow: hidden;
+     border: 1px solid #ccc;
+     margin-top: -200px;
+     margin-left: -230px;
+     background: white;
+     padding: 7px;
+     top: 50%;
+     left: 50%;
+     z-index: 996660;
+     
+     .umb-overlay-header{
+          border-bottom: 1px solid #d9d9d9;
+          color: #999;
+          padding: 10px;
+          margin-top: 0;
+     }
+
+     .umb-overlay-container{
+          top: 50px; left: 7px; right: 7px; bottom: 7px; position: absolute; overflow: auto;
+     }
+ }
+
+ 
+
+
+// RIGHT SIDE OVERLAY
+.umb-overlay-right{
+     position: fixed;
+     width: 460px;
+     overflow: hidden;
+     background: white;
+     top: 0;
+     right: 0;
+     bottom: 0;
+     z-index: 996660;
+
+     .umb-overlay-header{
+          height: 64px;
+          background: @grayLighter;
+          border-bottom: 1px solid @grayLight;
+          padding: 15px 10px 20px 20px;
+     }
+
+     .umb-overlay-container{
+          top: 100px; left: 0px; right: 0px; bottom: 50px; position: absolute; overflow: auto;
+     }
+
+     .umb-overlay-drawer{
+          height: 50px; left: 0px; right: 0px; bottom: 0px; position: absolute; overflow: auto;
+          padding: 10px;
+          text-align: right;   
+     }
+
+     .umb-overlay-body{
+          padding: 20px;
+     }
+}
+
+
