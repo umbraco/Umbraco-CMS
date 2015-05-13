@@ -34,8 +34,11 @@ namespace Umbraco.Core.Persistence.Factories
                     IsApproved = dto.Disabled == false,
                     Email = dto.Email,
                     Language = dto.UserLanguage,
-                    //make it a GUID if it's empty
-                    SecurityStamp = dto.SecurityStampToken.IsNullOrWhiteSpace() ? Guid.NewGuid().ToString() : dto.SecurityStampToken
+                    SecurityStamp = dto.SecurityStampToken,
+                    FailedPasswordAttempts = dto.FailedLoginAttempts ?? 0,
+                    LastLockoutDate = dto.LastLockoutDate ?? DateTime.MinValue,
+                    LastLoginDate = dto.LastLoginDate ?? DateTime.MinValue,
+                    LastPasswordChangeDate = dto.LastPasswordChangeDate ?? DateTime.MinValue
                 };
 
             foreach (var app in dto.User2AppDtos)
@@ -65,7 +68,11 @@ namespace Umbraco.Core.Persistence.Factories
                               UserName = entity.Name,
                               Type = short.Parse(entity.UserType.Id.ToString(CultureInfo.InvariantCulture)),
                               User2AppDtos = new List<User2AppDto>(),
-                              SecurityStampToken = entity.SecurityStamp
+                              SecurityStampToken = entity.SecurityStamp,
+                              FailedLoginAttempts = entity.FailedPasswordAttempts,
+                              LastLockoutDate = entity.LastLockoutDate == DateTime.MinValue ? (DateTime?)null : entity.LastLockoutDate,
+                              LastLoginDate = entity.LastLoginDate == DateTime.MinValue ? (DateTime?)null : entity.LastLoginDate,
+                              LastPasswordChangeDate = entity.LastPasswordChangeDate == DateTime.MinValue ? (DateTime?)null : entity.LastPasswordChangeDate,
                           };
 
             foreach (var app in entity.AllowedSections)

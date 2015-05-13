@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
@@ -56,6 +57,22 @@ namespace Umbraco.Core.Models.Rdbms
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(255)]
         public string SecurityStampToken { get; set; }
+
+        [Column("failedLoginAttempts")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public int? FailedLoginAttempts { get; set; }
+
+        [Column("lastLockoutDate")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public DateTime? LastLockoutDate { get; set; }
+
+        [Column("lastPasswordChangeDate")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public DateTime? LastPasswordChangeDate { get; set; }
+
+        [Column("lastLoginDate")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public DateTime? LastLoginDate { get; set; }
         
         [ResultColumn]
         public List<User2AppDto> User2AppDtos { get; set; }
