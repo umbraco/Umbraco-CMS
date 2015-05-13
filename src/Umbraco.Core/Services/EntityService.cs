@@ -61,7 +61,7 @@ namespace Umbraco.Core.Services
                         case UmbracoObjectTypes.DocumentType:
                         case UmbracoObjectTypes.Member:
                         case UmbracoObjectTypes.DataType:
-                            return uow.Database.ExecuteScalar<int?>(new Sql().Select("id").From<NodeDto>().Where<NodeDto>(dto => dto.UniqueId == key));
+                            return uow.Database.ExecuteScalar<int?>("SELECT id FROM umbracoNode WHERE uniqueID = @uniqueId", new {uniqueId = key});
                         case UmbracoObjectTypes.RecycleBin:
                         case UmbracoObjectTypes.Stylesheet:
                         case UmbracoObjectTypes.MemberGroup:
@@ -99,7 +99,7 @@ namespace Umbraco.Core.Services
                         case UmbracoObjectTypes.DocumentType:
                         case UmbracoObjectTypes.Member:
                         case UmbracoObjectTypes.DataType:
-                            return uow.Database.ExecuteScalar<Guid?>(new Sql().Select("uniqueID").From<NodeDto>().Where<NodeDto>(dto => dto.NodeId == id));
+                            return uow.Database.ExecuteScalar<Guid?>("SELECT uniqueID FROM umbracoNode WHERE id = @id", new { id = id });
                         case UmbracoObjectTypes.RecycleBin:
                         case UmbracoObjectTypes.Stylesheet:
                         case UmbracoObjectTypes.MemberGroup:
