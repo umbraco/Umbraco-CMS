@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.Serialization;
+using System.Threading;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
@@ -77,7 +78,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Tabs, expression => expression.ResolveUsing<TabsAndPropertiesResolver>())
                 .ForMember(display => display.AllowedActions, expression => expression.ResolveUsing(
                     new ActionButtonsResolver(new Lazy<IUserService>(() => applicationContext.Services.UserService))))
-                .AfterMap((media, display) => AfterMap(media, display, applicationContext.Services.DataTypeService));
+                .AfterMap((media, display) => AfterMap(media, display, applicationContext.Services.DataTypeService, applicationContext.Services.TextService));
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
             config.CreateMap<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>()
@@ -116,7 +117,9 @@ namespace Umbraco.Web.Models.Mapping
         /// </summary>
         /// <param name="content"></param>
         /// <param name="display"></param>
-        private static void AfterMap(IContent content, ContentItemDisplay display, IDataTypeService dataTypeService)
+        /// <param name="dataTypeService"></param>
+        /// <param name="localizedText"></param>
+        private static void AfterMap(IContent content, ContentItemDisplay display, IDataTypeService dataTypeService, ILocalizedTextService localizedText)
         {
             //map the tree node url
             if (HttpContext.Current != null)
@@ -125,7 +128,7 @@ namespace Umbraco.Web.Models.Mapping
                 var url = urlHelper.GetUmbracoApiService<ContentTreeController>(controller => controller.GetTreeNode(display.Id.ToString(), null));
                 display.TreeNodeUrl = url;
             }
-
+            
             //fill in the template config to be passed to the template drop down.
             var templateItemConfig = new Dictionary<string, string> { { "", "Choose..." } };
             foreach (var t in content.ContentType.AllowedTemplates
@@ -144,14 +147,14 @@ namespace Umbraco.Web.Models.Mapping
                 new ContentPropertyDisplay
                     {
                         Alias = string.Format("{0}releasedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                        Label = ui.Text("content", "releaseDate"),
+                        Label = localizedText.Localize("content/releaseDate"),
                         Value = display.ReleaseDate.HasValue ? display.ReleaseDate.Value.ToIsoString() : null,
                         View = "datepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
                     },
                 new ContentPropertyDisplay
                     {
                         Alias = string.Format("{0}expiredate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                        Label = ui.Text("content", "unpublishDate"),
+                        Label = localizedText.Localize("content/unpublishDate"),
                         Value = display.ExpireDate.HasValue ? display.ExpireDate.Value.ToIsoString() : null,
                         View = "datepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
                     },
@@ -169,7 +172,7 @@ namespace Umbraco.Web.Models.Mapping
                 new ContentPropertyDisplay
                     {
                         Alias = string.Format("{0}urls", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                        Label = ui.Text("content", "urls"),
+                        Label = localizedText.Localize("content/urls"),
                         Value = string.Join(",", display.Urls),
                         View = "urllist" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
                     });
