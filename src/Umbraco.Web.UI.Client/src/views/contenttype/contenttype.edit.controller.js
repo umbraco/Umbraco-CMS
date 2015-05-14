@@ -7,7 +7,7 @@
  * The controller for the content type editor
  */
 function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, contentTypeResource, dataTypeResource) {
-    $scope.page = {action: [], menu: [] };
+    $scope.page = {actions: [], menu: [] };
     //$rootScope.emptySection = true; 
 
     contentTypeResource.getById($routeParams.id).then(function(dt){
