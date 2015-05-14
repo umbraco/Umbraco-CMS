@@ -33,6 +33,7 @@ using System.Security;
 [assembly: InternalsVisibleTo("Umbraco.Courier.Persistence")]
 [assembly: InternalsVisibleTo("umbraco.webservices")]
 [assembly: InternalsVisibleTo("Concorde.Sync")]
+[assembly: InternalsVisibleTo("Concorde.Courier.Core")]
 [assembly: InternalsVisibleTo("Umbraco.Belle")]
 
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
