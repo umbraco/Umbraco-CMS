@@ -531,7 +531,7 @@ namespace Umbraco.Web.Scheduling
                 // processing, call the UnregisterObject method, and then return or it can return immediately and complete
                 // processing asynchronously before calling the UnregisterObject method.
 
-                LogHelper.Debug<BackgroundTaskRunner<T>>("Shutting down, waiting for tasks to complete.");
+                LogHelper.Info<BackgroundTaskRunner<T>>("Shutting down, waiting for tasks to complete.");
                 Shutdown(false, false); // do not accept any more tasks, flush the queue, do not wait
 
                 lock (_locker)
