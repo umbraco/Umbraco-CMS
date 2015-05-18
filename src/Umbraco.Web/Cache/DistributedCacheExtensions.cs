@@ -125,19 +125,7 @@ namespace Umbraco.Web.Cache
 
         #endregion
         
-        #region Data type cache
-
-        public static void RefreshDataTypeCache(this DistributedCache dc, global::umbraco.cms.businesslogic.datatype.DataTypeDefinition dataType)
-        {
-            if (dataType == null) return;
-            dc.RefreshByJson(DistributedCache.DataTypeCacheRefresherGuid, DataTypeCacheRefresher.SerializeToJsonPayload(dataType));
-        }
-
-        public static void RemoveDataTypeCache(this DistributedCache dc, global::umbraco.cms.businesslogic.datatype.DataTypeDefinition dataType)
-        {
-            if (dataType == null) return;
-            dc.RefreshByJson(DistributedCache.DataTypeCacheRefresherGuid, DataTypeCacheRefresher.SerializeToJsonPayload(dataType));
-        }
+        #region Data type cache     
 
         public static void RefreshDataTypeCache(this DistributedCache dc, IDataTypeDefinition dataType)
         {
