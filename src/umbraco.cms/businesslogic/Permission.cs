@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Specialized;
 using System.Data;
-using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Umbraco.Core;
@@ -10,13 +9,12 @@ using Umbraco.Core.Events;
 using umbraco.DataLayer;
 using umbraco.cms.businesslogic;
 using System.Collections.Generic;
+using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Services;
 using DeleteEventArgs = umbraco.cms.businesslogic.DeleteEventArgs;
 
 namespace umbraco.BusinessLogic
 {
-
-    //TODO: Wrap this in the new services/repo layer!
-
     /// <summary>
     /// Summary description for Permission.
     /// </summary>
@@ -31,39 +29,17 @@ namespace umbraco.BusinessLogic
         /// Private constructor, this class cannot be directly instantiated
         /// </summary>
         private Permission() { }
-
-        private static ISqlHelper SqlHelper
-        {
-            get { return Application.SqlHelper; }
-        }
-
-
+        
         public static void MakeNew(User User, CMSNode Node, char PermissionKey)
         {
             MakeNew(User, Node, PermissionKey, true);
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        internal static void MakeNew(User user, IEnumerable<CMSNode> nodes, char permissionKey, bool raiseEvents)
+        private static void MakeNew(User user, IEnumerable<CMSNode> nodes, char permissionKey, bool raiseEvents)
         {
             var asArray = nodes.ToArray();
-            foreach (var node in asArray)
-            {
-                var parameters = new[] { SqlHelper.CreateParameter("@userId", user.Id),
-                                                         SqlHelper.CreateParameter("@nodeId", node.Id),
-                                                         SqlHelper.CreateParameter("@permission", permissionKey.ToString()) };
 
-                // Method is synchronized so exists remains consistent (avoiding race condition)
-                var exists = SqlHelper.ExecuteScalar<int>(
-                    "SELECT COUNT(userId) FROM umbracoUser2nodePermission WHERE userId = @userId AND nodeId = @nodeId AND permission = @permission",
-                    parameters) > 0;
-
-                if (exists) return;
-
-                SqlHelper.ExecuteNonQuery(
-                    "INSERT INTO umbracoUser2nodePermission (userId, nodeId, permission) VALUES (@userId, @nodeId, @permission)",
-                    parameters);
-            }
+            ApplicationContext.Current.Services.UserService.AssignUserPermission(user.Id, permissionKey, asArray.Select(x => x.Id).ToArray());
 
             if (raiseEvents)
             {
@@ -83,20 +59,17 @@ namespace umbraco.BusinessLogic
         /// <returns></returns>
         public static IEnumerable<Permission> GetUserPermissions(User user)
         {
-            var items = new List<Permission>();
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("select * from umbracoUser2NodePermission where userId = @userId order by nodeId", SqlHelper.CreateParameter("@userId", user.Id)))
-            {
-                while (dr.Read())
+            var permissions = ApplicationContext.Current.Services.UserService.GetPermissions(user.UserEntity);
+
+            return permissions.SelectMany(
+                entityPermission => entityPermission.AssignedPermissions,
+                (entityPermission, assignedPermission) => new Permission
                 {
-                    items.Add(new Permission()
-                    {
-                        NodeId = dr.GetInt("nodeId"),
-                        PermissionId = Convert.ToChar(dr.GetString("permission")),
-                        UserId = dr.GetInt("userId")
-                    });
-                }
-            }
-            return items;
+                    NodeId = entityPermission.EntityId,
+                    PermissionId = assignedPermission[0],
+                    UserId = entityPermission.UserId
+                });
+
         }
 
         /// <summary>
@@ -106,20 +79,19 @@ namespace umbraco.BusinessLogic
         /// <returns></returns>
         public static IEnumerable<Permission> GetNodePermissions(CMSNode node)
         {
-            var items = new List<Permission>();
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("select * from umbracoUser2NodePermission where nodeId = @nodeId order by nodeId", SqlHelper.CreateParameter("@nodeId", node.Id)))
-            {
-                while (dr.Read())
+            var content = ApplicationContext.Current.Services.ContentService.GetById(node.Id);
+            if (content == null) return Enumerable.Empty<Permission>();
+
+            var permissions = ApplicationContext.Current.Services.ContentService.GetPermissionsForEntity(content);
+
+            return permissions.SelectMany(
+                entityPermission => entityPermission.AssignedPermissions,
+                (entityPermission, assignedPermission) => new Permission
                 {
-                    items.Add(new Permission()
-                    {
-                        NodeId = dr.GetInt("nodeId"),
-                        PermissionId = Convert.ToChar(dr.GetString("permission")),
-                        UserId = dr.GetInt("userId")
-                    });
-                }
-            }
-            return items;
+                    NodeId = entityPermission.EntityId,
+                    PermissionId = assignedPermission[0],
+                    UserId = entityPermission.UserId
+                });
         }
 
         /// <summary>
@@ -134,10 +106,7 @@ namespace umbraco.BusinessLogic
 
         internal static void DeletePermissions(User user, CMSNode node, bool raiseEvents)
         {
-            // delete all settings on the node for this user
-            SqlHelper.ExecuteNonQuery("delete from umbracoUser2NodePermission where userId = @userId and nodeId = @nodeId",
-                SqlHelper.CreateParameter("@userId", user.Id), SqlHelper.CreateParameter("@nodeId", node.Id));
-
+            ApplicationContext.Current.Services.UserService.RemoveUserPermissions(user.Id, node.Id);
             if (raiseEvents)
             {
                 OnDeleted(new UserPermission(user, node, null), new DeleteEventArgs());
@@ -150,29 +119,20 @@ namespace umbraco.BusinessLogic
         /// <param name="user"></param>
         public static void DeletePermissions(User user)
         {
-            // delete all settings on the node for this user
-            SqlHelper.ExecuteNonQuery("delete from umbracoUser2NodePermission where userId = @userId",
-                SqlHelper.CreateParameter("@userId", user.Id));
+            ApplicationContext.Current.Services.UserService.RemoveUserPermissions(user.Id);
 
             OnDeleted(new UserPermission(user, Enumerable.Empty<CMSNode>(), null), new DeleteEventArgs());
         }
 
         public static void DeletePermissions(int iUserID, int[] iNodeIDs)
         {
-            var sql = "DELETE FROM umbracoUser2NodePermission WHERE nodeID IN ({0}) AND userID=@userID";
-            var nodeIDs = string.Join(",", Array.ConvertAll(iNodeIDs, Converter));
-            sql = string.Format(sql, nodeIDs);
-            SqlHelper.ExecuteNonQuery(sql, new[] { SqlHelper.CreateParameter("@userID", iUserID) });
+            ApplicationContext.Current.Services.UserService.RemoveUserPermissions(iUserID, iNodeIDs);
 
             OnDeleted(new UserPermission(iUserID, iNodeIDs), new DeleteEventArgs());
         }
         public static void DeletePermissions(int iUserID, int iNodeID)
         {
             DeletePermissions(iUserID, new[] { iNodeID });
-        }
-        private static string Converter(int from)
-        {
-            return from.ToString(CultureInfo.InvariantCulture);
         }
 
         /// <summary>
@@ -181,14 +141,11 @@ namespace umbraco.BusinessLogic
         /// <param name="node"></param>
         public static void DeletePermissions(CMSNode node)
         {
-            SqlHelper.ExecuteNonQuery(
-                "delete from umbracoUser2NodePermission where nodeId = @nodeId",
-                SqlHelper.CreateParameter("@nodeId", node.Id));
-
+            ApplicationContext.Current.Services.ContentService.RemoveContentPermissions(node.Id);
+            
             OnDeleted(new UserPermission(null, node, null), new DeleteEventArgs());
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public static void UpdateCruds(User user, CMSNode node, string permissions)
         {
             ApplicationContext.Current.Services.UserService.ReplaceUserPermissions(
