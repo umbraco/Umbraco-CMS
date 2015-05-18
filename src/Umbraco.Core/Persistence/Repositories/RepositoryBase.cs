@@ -22,7 +22,11 @@ namespace Umbraco.Core.Persistence.Repositories
             if (logger == null) throw new ArgumentNullException("logger");
             Logger = logger;
             _work = work;
-            _cache = cache;
+
+            //IMPORTANT: We will force the DeepCloneRuntimeCacheProvider to be used here which is a wrapper for the underlying
+            // runtime cache to ensure that anything that can be deep cloned in/out is done so, this also ensures that our tracks
+            // changes entities are reset.
+            _cache = new CacheHelper(new DeepCloneRuntimeCacheProvider(cache.RuntimeCache), cache.StaticCache, cache.RequestCache);
         }
 
         /// <summary>
