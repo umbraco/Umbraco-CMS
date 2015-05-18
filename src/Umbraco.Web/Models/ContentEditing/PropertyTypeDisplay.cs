@@ -33,5 +33,9 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "value")]
         public string Value { get; set; }
+
+        //indicates if this property was inherited
+        [DataMember(Name = "inherited")]
+        public bool Inherited { get; set; }
     }
 }

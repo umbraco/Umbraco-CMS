@@ -27,5 +27,10 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "groups")]
         public IEnumerable<PropertyTypeGroupDisplay> Groups { get; set; }
+        
+        //Indicate if this tab was inherited
+        [DataMember(Name = "inherited")]
+        public bool Inherited { get; set; }
+
     }
 }
