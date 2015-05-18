@@ -76,6 +76,45 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Gets the content json for all data types added by the user
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Permission is granted to this method if the user has access to any of these trees: DataTypes, Content or Media
+        /// </remarks>
+        [UmbracoTreeAuthorize(Constants.Trees.DataTypes, Constants.Trees.Content, Constants.Trees.Media)]
+        public IEnumerable<DataTypeBasic> GetAllUserConfigured()
+        {
+            //find all user configured for re-reference
+            return Services.DataTypeService
+                     .GetAllDataTypeDefinitions()
+                     .Where(x => x.Id > 1045)
+                     .Select(x => Mapper.Map<IDataTypeDefinition, DataTypeBasic>(x)).Where(x => x.IsSystemDataType == false);
+
+            //find all custom editors added by non-core manifests
+
+            //find the rest
+        }
+
+        /// <summary>
+        /// Gets the content json for all user added property editors
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Permission is granted to this method if the user has access to any of these trees: DataTypes, Content or Media
+        /// </remarks>
+        [UmbracoTreeAuthorize(Constants.Trees.DataTypes, Constants.Trees.Content, Constants.Trees.Media)]
+        public IEnumerable<PropertyEditorBasic> GetAllUserPropertyEditors()
+        {
+            return PropertyEditorResolver.Current.PropertyEditors
+                .OrderBy(x => x.Name)
+                .Where(x => x.ValueEditor.View.IndexOf("app_plugins", StringComparison.InvariantCultureIgnoreCase) >= 0) 
+                .Select(Mapper.Map<PropertyEditorBasic>);
+        }
+
+        /// <summary>
         /// Deletes a data type wth a given ID
         /// </summary>
         /// <param name="id"></param>
