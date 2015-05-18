@@ -802,6 +802,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         private void LoadXmlLocked(SafeXmlReaderWriter safeXml, out bool registerXmlChange)
         {
             LogHelper.Debug<content>("Loading Xml...");
+            EnsureFileLock(); // get the lock asap
 
             // try to get it from the file
             if (XmlFileEnabled && (safeXml.Xml = LoadXmlFromFile()) != null)
@@ -1061,12 +1062,14 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         internal void SaveXmlToFile()
         {
             LogHelper.Info<content>("Save Xml to file...");
-            EnsureFileLock();
-
-            var xml = _xmlContent; // capture (atomic + volatile), immutable anyway
 
             try
             {
+                var xml = _xmlContent; // capture (atomic + volatile), immutable anyway
+                if (xml == null) return;
+
+                EnsureFileLock();
+
                 // delete existing file, if any
                 DeleteXmlFile();
 
@@ -1084,7 +1087,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                     fs.Write(bytes, 0, bytes.Length);
                 }
 
-                LogHelper.Debug<content>("Saved Xml to file.");
+                LogHelper.Info<content>("Saved Xml to file.");
             }
             catch (Exception e)
             {
@@ -1099,12 +1102,14 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         internal async System.Threading.Tasks.Task SaveXmlToFileAsync()
         {
             LogHelper.Info<content>("Save Xml to file...");
-            EnsureFileLock();
-
-            var xml = _xmlContent; // capture (atomic + volatile), immutable anyway
 
             try
             {
+                var xml = _xmlContent; // capture (atomic + volatile), immutable anyway
+                if (xml == null) return;
+
+                EnsureFileLock();
+
                 // delete existing file, if any
                 DeleteXmlFile();
 
@@ -1122,7 +1127,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                     await fs.WriteAsync(bytes, 0, bytes.Length);
                 }
 
-                LogHelper.Debug<content>("Saved Xml to file.");
+                LogHelper.Info<content>("Saved Xml to file.");
             }
             catch (Exception e)
             {
@@ -1165,18 +1170,24 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         private XmlDocument LoadXmlFromFile()
         {
             LogHelper.Info<content>("Load Xml from file...");
-            EnsureFileLock();
 
             try
             {
+                EnsureFileLock();
+
                 var xml = new XmlDocument();
                 using (var fs = new FileStream(_xmlFileName, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
                     xml.Load(fs);
                 }
                 _lastFileRead = DateTime.UtcNow;
-                LogHelper.Info<content>("Successfully loaded Xml from file.");
+                LogHelper.Info<content>("Loaded Xml from file.");
                 return xml;
+            }
+            catch (FileNotFoundException)
+            {
+                LogHelper.Warn<content>("Failed to load Xml, file does not exist.");
+                return null;
             }
             catch (Exception e)
             {

@@ -372,15 +372,23 @@ namespace Umbraco.Web
 			return false;
 		}
 
+	    private bool _notConfiguredReported;
+
 		// ensures Umbraco is configured
 		// if not, redirect to install and return false
 		// if yes, return true
-	    private static bool EnsureIsConfigured(HttpContextBase httpContext, Uri uri)
+	    private bool EnsureIsConfigured(HttpContextBase httpContext, Uri uri)
 	    {
 	        if (ApplicationContext.Current.IsConfigured)
 	            return true;
 
-            LogHelper.Warn<UmbracoModule>("Umbraco is not configured");
+	        if (_notConfiguredReported)
+	        {
+                // remember it's been reported so we don't flood the log
+                // no thread-safety so there may be a few log entries, doesn't matter
+                _notConfiguredReported = true;
+                LogHelper.Warn<UmbracoModule>("Umbraco is not configured");
+            }
 
 			var installPath = UriUtility.ToAbsolute(SystemDirectories.Install);
 			var installUrl = string.Format("{0}/?redir=true&url={1}", installPath, HttpUtility.UrlEncode(uri.ToString()));
