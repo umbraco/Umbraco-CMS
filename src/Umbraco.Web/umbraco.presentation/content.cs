@@ -40,20 +40,24 @@ namespace umbraco
 
         private content()
         {
-            if (SyncToXmlFile == false) return;
-
-            // there's always be one task keeping a ref to the runner
-            // so it's safe to just create it as a local var here
-            var runner = new BackgroundTaskRunner<XmlCacheFilePersister>(new BackgroundTaskRunnerOptions
+            if (XmlFileEnabled)
             {
-                LongRunning = true,
-                KeepAlive = true
-            });
+                InitializeFileLock();
+            }
 
-            // create (and add to runner)
-            _persisterTask = new XmlCacheFilePersister(runner, this);
+            if (SyncToXmlFile)
+            {
+                // there's always be one task keeping a ref to the runner
+                // so it's safe to just create it as a local var here
+                var runner = new BackgroundTaskRunner<XmlCacheFilePersister>(new BackgroundTaskRunnerOptions
+                {
+                    LongRunning = true,
+                    KeepAlive = true
+                });
 
-            InitializeFileLock();
+                // create (and add to runner)
+                _persisterTask = new XmlCacheFilePersister(runner, this);
+            }
 
             // initialize content - populate the cache
             using (var safeXml = GetSafeXmlWriter(false))
@@ -797,7 +801,6 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         private void LoadXmlLocked(SafeXmlReaderWriter safeXml, out bool registerXmlChange)
         {
             LogHelper.Debug<content>("Loading Xml...");
-            EnsureFileLock(); // get the lock asap
 
             // try to get it from the file
             if (XmlFileEnabled && (safeXml.Xml = LoadXmlFromFile()) != null)
