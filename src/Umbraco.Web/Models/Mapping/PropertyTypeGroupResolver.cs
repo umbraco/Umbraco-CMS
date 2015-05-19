@@ -31,13 +31,13 @@ namespace Umbraco.Web.Models.Mapping
                 
             var genericGroup = new PropertyTypeGroupDisplay() { Name = "properties", Id = 0, ParentGroupId = 0 };
             genericGroup.Properties = MapProperties(source.PropertyTypes);
-            genericGroup.Groups = new List<PropertyTypeGroupDisplay>();
+            //genericGroup.Groups = new List<PropertyTypeGroupDisplay>();
 
             foreach (var group in propGroups.Where(pg => pg.ParentId.HasValue == false))
             {
                 var mapped = new PropertyTypeGroupDisplay() {  Id = group.Id, ParentGroupId = 0, Name = group.Name, SortOrder = group.SortOrder };
                 mapped.Properties = MapProperties(group.PropertyTypes);
-                mapped.Groups = MapChildGroups(mapped, propGroups);
+                //mapped.Groups = MapChildGroups(mapped, propGroups);
                 groups.Add(mapped);
             }
 
@@ -54,7 +54,7 @@ namespace Umbraco.Web.Models.Mapping
                 var mapped = new PropertyTypeGroupDisplay() { Id = child.Id, ParentGroupId = child.ParentId.Value, Name = child.Name, SortOrder = child.SortOrder };
                 mapped.Name += child.PropertyTypes.Count.ToString();
                 mapped.Properties = MapProperties(child.PropertyTypes);               
-                mapped.Groups = MapChildGroups(mapped, groups);
+                //mapped.Groups = MapChildGroups(mapped, groups);
                 mappedGroups.Add(mapped);
             }
 

@@ -139,6 +139,8 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(contentType.AllowedAsRoot, result.AllowedAsRoot);
             Assert.AreEqual(contentType.IsContainer, result.EnableListView);
 
+            Assert.AreEqual(contentType.DefaultTemplate.Alias, result.DefaultTemplate.Alias);
+
             //TODO: Now we need to assert all of the more complicated parts
             Assert.AreEqual(2, result.Groups.Count());
             Assert.AreEqual(2, result.Groups.ElementAt(0).Properties.Count());
@@ -154,7 +156,7 @@ namespace Umbraco.Tests.Models.Mapping
                 AllowedTemplates = new List<EntityBasic>(),
                 AvailableContentTypes = new List<EntityBasic>(),
                 AvailableTemplates = new List<EntityBasic>(),
-                DefaultTemplate = "template1",
+                DefaultTemplate = new EntityBasic(){ Alias = "test" },
                 Description = "hello world",
                 Icon = "tree-icon",
                 Id = 1234,

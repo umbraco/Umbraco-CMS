@@ -32,8 +32,8 @@ namespace Umbraco.Web.Models.ContentEditing
         // indicating where they've come from. These models don't have to be an exact representation
         // of their data structures, they should be structured in the simplest format in order for
         // us to pass data to and from the editor, and that's it.
-        [DataMember(Name = "groups")]
-        public IEnumerable<PropertyTypeGroupDisplay> Groups { get; set; }
+       // [DataMember(Name = "groups")]
+       // public IEnumerable<PropertyTypeGroupDisplay> Groups { get; set; }
         
         //Indicate if this tab was inherited
         [DataMember(Name = "inherited")]

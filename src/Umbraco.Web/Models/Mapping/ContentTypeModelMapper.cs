@@ -57,12 +57,15 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IContentType, ContentTypeDisplay>()
                 //Ignore because this is not actually used for content types
                 .ForMember(display => display.Trashed, expression => expression.Ignore())
+
                 //Ignore for now, this will need to be manually mapped or mapped with a resolver
                 // since there is no source property to map from
                 .ForMember(display => display.AvailableContentTypes, expression => expression.Ignore())
+                
                 //Ignore for now, this will need to be manually mapped or mapped with a resolver
                 // since there is no source property to map from
                 .ForMember(display => display.AvailableTemplates, expression => expression.Ignore())
+                
                 .ForMember(display => display.EnableListView, expression => expression.MapFrom(type => type.IsContainer))
                 .ForMember(
                     dto => dto.Groups,

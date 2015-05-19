@@ -32,7 +32,7 @@ namespace Umbraco.Web.Models.ContentEditing
         public IEnumerable<EntityBasic> AvailableTemplates { get; set; }
 
         [DataMember(Name = "defaultTemplate")]
-        public string DefaultTemplate { get; set; }
+        public EntityBasic DefaultTemplate { get; set; }
 
 
         // Allowed parent node types (can include root)

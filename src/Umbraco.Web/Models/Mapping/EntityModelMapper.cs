@@ -45,6 +45,13 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.Trashed, expression => expression.Ignore())
                 .ForMember(x => x.AdditionalData, expression => expression.Ignore());
 
+            config.CreateMap<ITemplate, EntityBasic>()
+               .ForMember(basic => basic.Icon, expression => expression.UseValue("icon-layout"))
+               .ForMember(basic => basic.Path, expression => expression.UseValue(""))
+               .ForMember(basic => basic.ParentId, expression => expression.UseValue(-1))
+               .ForMember(dto => dto.Trashed, expression => expression.Ignore())
+               .ForMember(x => x.AdditionalData, expression => expression.Ignore());
+
             config.CreateMap<SearchResult, EntityBasic>()
                 //default to document icon
                   .ForMember(x => x.Icon, expression => expression.Ignore())
