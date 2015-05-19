@@ -8,7 +8,8 @@
         <umb-editor-header
                 name="contentType.name"
                 menu="page.menu"
-                actions="actions">
+                actions="page.actions">
+
         </umb-editor-header>
 
         <umb-editor-container class="editors-document-type-container">
@@ -19,8 +20,25 @@
 
                     <li ng-repeat="tab in contentType.groups">
 
-                        <div class="edt-tab umb-card" ng-class="{'tab-is-active':tab.tabIsActive, 'tab-is-inactive': !tab.tabIsActive}" ng-click="activateTab(tab)">
-                            
+                        <!-- TAB INIT STATE -->
+                        <!-- ng-if="tab.tabState=='init'" -->
+                        <div class="edt-tab umb-card edt-tab-placeholder" ng-click="addTab(tab)" ng-show="tab.tabState=='init'" ng-class="{'tab-state-init animated fadeIn': tab.tabState=='init'}">
+
+                            <div class="tab-title">
+                                <span class="tab-title-text">Tab</span>
+                            </div>
+
+                            <div class="edt-tab-center-text">
+                                <span ng-if="contentType.groups.length === 0">Add first tab</span>
+                                <span ng-if="contentType.groups.length !== 0">Add new tab</span>
+                            </div>
+
+                        </div>
+
+
+                        <!-- TAB ACTIVE OR INACTIVE STATE -->
+                        <div class="edt-tab umb-card" ng-class="{'tab-state-active':tab.tabState=='active', 'tab-state-inactive': tab.tabState=='inActive'}" ng-click="activateTab(tab)" ng-if="tab.tabState=='active' || tab.tabState=='inActive'">
+
                             <div class="tab-title">
 
                                 <!-- tab drag and drop handle
@@ -28,25 +46,25 @@
                                 -->
 
                                 <!-- show input when tab is active -->
-                                <input class="tab-title-input" type="text" ng-model="tab.name" ng-if="tab.tabIsActive" umb-auto-focus umb-auto-resize />
+                                <input class="tab-title-input" type="text" ng-model="tab.name" ng-if="tab.tabState=='active'" ng-change="updateTabTitle(tab)" umb-blur="updateTabTitle(tab)" umb-auto-focus umb-auto-resize />
 
                                 <!-- show text when tab is inactive -->
-                                <span class="tab-title-text" ng-if="!tab.tabIsActive">{{ tab.name }}</span>
+                                <span class="tab-title-text" ng-if="tab.tabState=='inActive'">{{ tab.name }}</span>
 
                             </div>
 
-                            <div class="edt-tab-actions">
+                            <div tabindex="-1" class="edt-tab-actions">
 
                                 <div class="tab-action">
-                                    <a href="" class="umb-btn-round" ng-click="deleteTab($index)">
+                                    <div href="" class="umb-btn-round umb-btn-round-small" ng-click="deleteTab($index)">
                                         <i class="icon icon-trash"></i>
-                                    </a>
+                                    </div>
                                 </div>
 
                                 <div class="tab-action edt-tab-handle" ng-if="contentType.groups.length > 1">
-                                    <a href="" class="umb-btn-round">
+                                    <div href="" class="umb-btn-round umb-btn-round-small">
                                         <i class="icon icon-navigation"></i>
-                                    </a>
+                                    </div>
                                 </div>
 
                             </div>
@@ -57,13 +75,33 @@
                             </a>
                             -->
 
-
-                            <div class="properties-placeholder" ng-if="tab.properties.length == 0 && tab.groups.length == 0 && tab.tabIsActive">
+                            <!--
+                            <div class="properties-placeholder" ng-if="tab.properties.length == 0 && tab.groups.length == 0 && tab.tabState=='active' && tab.name !== undefined">
                                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis lectus arcu.<br>
                                 <a href class="umb-btn-round" ng-click="addItems(tab)">
                                     <i class="icon-add"></i>
                                 </a>
                             </div>
+                            -->
+
+                            <!--
+                            <div class="edt-property properties-placeholder" ng-if="tab.properties.length == 0 && tab.groups.length == 0 && tab.tabState=='active' && tab.name !== undefined" ng-click="addItems(tab)">
+                                <div class="edt-property-meta">
+                                    <div class="property-meta-group">
+                                        <label><small>Label</small></label>
+                                        <input type="text" />
+                                    </div>
+                                    <div class="property-meta-group">
+                                        <label><small>Alias</small></label>
+                                        <input type="text" />
+                                    </div>
+                                </div>
+                                <div class="edt-property-inner">
+                                    <span class="edt-property-label">Preview</span>
+                                </div>
+                                <div class="edt-property-actions"></div>
+                            </div>
+                            -->
 
 
                             <div class="edt-property-group">
@@ -71,7 +109,30 @@
                                     ng-model="tab.properties" class="no-style-list">
                                     <li ng-repeat="property in tab.properties">
 
-                                        <div class="edt-property" ng-class="{'active': property.dialogIsOpen}">
+                                        <!-- Init property / Property placeholder / add new property -->
+                                        <div class="edt-property" ng-show="property.propertyState=='init'" ng-class="{'property-state-init animated fadeIn': property.propertyState=='init'}" ng-click="choosePropertyType(property, tab)">
+
+                                            <div class="edt-property-meta">
+                                                <div class="placeholder-input-small"></div>
+                                                <div class="placeholder-input"></div>
+                                            </div>
+
+                                            <div class="edt-property-inner">
+
+                                                <div class="placeholder">
+                                                    <span class="edt-property-label">
+                                                        <span>Preview</span>
+                                                    </span>
+                                                    <span>Click to add property</span>
+                                                </div>
+
+                                            </div>
+
+                                            <div class="edt-property-actions"></div>
+
+                                        </div>
+
+                                        <div class="edt-property" ng-show="property.propertyState!=='init'" ng-class="{'active': property.dialogIsOpen, 'property-state-active animated fadeIn': property.propertyState=='active'}">
 
                                             <!-- property drag and drop
                                             <i class="icon icon-navigation edt-property-handle"></i>
@@ -81,11 +142,11 @@
                                             <div class="edt-property-meta">
 
                                                 <!-- if tab is active -->
-                                                <div ng-if="tab.tabIsActive">
+                                                <div ng-if="tab.tabState=='active'">
 
                                                     <div class="property-meta-group">
                                                         <label><small>Label <span ng-if="property.validation.mandatory">(required)<span>*</span></span></small></label>
-                                                        <input type="text" ng-model="property.label" ng-change="changePropertyName(property)" />
+                                                        <input type="text" ng-model="property.label" ng-change="changePropertyName(property)" umb-focus="choosePropertyType(property)" />
                                                     </div>
 
                                                     <div class="property-meta-group">
@@ -96,7 +157,7 @@
                                                 </div>
 
                                                 <!-- if tab is inactive -->
-                                                <div ng-if="!tab.tabIsActive">
+                                                <div ng-if="tab.tabState=='inActive'">
                                                     <span>{{ property.label }}</span>:
                                                     <span class="item-alias">{{ property.alias }}</span>
                                                 </div>
@@ -104,28 +165,29 @@
                                             </div>
 
                                             <!-- property preview -->
-                                            <div tabindex="-1" class="edt-property-inner" ng-click="editPropertyTypeSettings(property)" ng-if="tab.tabIsActive">
+                                            <div tabindex="-1" class="edt-property-inner" ng-if="tab.tabState=='active'" ng-click="choosePropertyType(property)">
 
                                                 <span class="edt-property-inner-overlay">
-                                                    <span class="overlay-text">Edit property</span>
+                                                    <span class="overlay-text">Choose property type</span>
                                                 </span>
 
-                                                <span class="edt-property-label">{{property.dataType.name}}</span>
+                                                <span class="edt-property-label">
+                                                    <span ng-if="property.dataType.name !== undefined">{{property.dataType.name}}</span>
+                                                    <span ng-if="property.dataType.name == undefined">Preview</span>
+                                                </span>
 
-                                                <umb-property-editor
-                                                        model="property">
-                                                </umb-property-editor>
+                                                <umb-property-editor model="property" ng-if="property.view !== undefined"></umb-property-editor>
 
                                             </div>
 
                                             <!-- row tools -->
-                                            <div class="edt-property-actions" ng-animate="'fade'">
+                                            <div tabindex="-1" class="edt-property-actions">
 
                                                 <!-- delete row -->
                                                 <div class="property-action property-action-delete">
-                                                    <a href="" class="umb-btn-round">
+                                                    <div href="" class="umb-btn-round umb-btn-round-small" ng-click="deleteProperty(tab, $index)">
                                                         <i class="icon icon-trash"></i>
-                                                    </a>
+                                                    </div>
 
                                                     <!--
                                                     <div class="iconBox"
@@ -142,17 +204,17 @@
                                                 </div>
 
                                                 <div class="property-action property-action-move edt-property-handle">
-                                                    <a class="umb-btn-round"
-                                                       href="">
+                                                    <div class="umb-btn-round umb-btn-round-small"
+                                                         href="">
                                                         <i class="icon icon-navigation"></i>
-                                                    </a>
+                                                    </div>
                                                 </div>
 
-                                                <div class="property-action property-action-edit">
-                                                    <a class="umb-btn-round"
-                                                       ng-click="editPropertyTypeSettings(property)"
-                                                       href=""><i class="icon icon-settings"></i>
-                                                    </a>
+                                                <div class="property-action property-action-edit" ng-if="property.propertyState !== 'init'">
+                                                    <div class="umb-btn-round umb-btn-round-small"
+                                                         ng-click="editPropertyTypeSettings(property)"
+                                                         href=""><i class="icon icon-settings"></i>
+                                                    </div>
                                                 </div>
 
                                             </div>
@@ -161,11 +223,14 @@
 
                                     </li>
 
-                                    <li ng-if="tab.groups.length > 0 && tab.tabIsActive || tab.properties.length > 0 && tab.tabIsActive">
+                                    <!--
+                                    <li ng-if="tab.groups.length > 0 && tab.tabState=='active' || tab.properties.length > 0 && tab.tabState=='active'">
                                         <div>
                                             <button class="btn" ng-click="addItems(tab)"><i class="icon icon-add"></i> Add...</button>
                                         </div>
                                     </li>
+                                    -->
+
                                 </ul>
                             </div>
 
@@ -216,23 +281,6 @@
                             -->
 
                             <br style="clear: both;" />
-                        </div>
-
-                    </li>
-
-
-                    <li ng-click="addTab()">
-                        <div class="edt-tab umb-card edt-tab-placeholder">
-
-                            <div class="tab-title">
-                                <span class="tab-title-text">Tab</span>
-                            </div>
-
-                            <div class="edt-tab-center-text">
-                                <span ng-if="contentType.groups.length === 0">Add first tab</span>
-                                <span ng-if="contentType.groups.length !== 0">Add new tab</span>
-                            </div>
-
                         </div>
 
                     </li>
