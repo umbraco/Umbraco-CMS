@@ -207,10 +207,14 @@ namespace Umbraco.Core.Cache
                 result = MemoryCache.Get(cacheKey) as Lazy<object>;
                 if (result == null || GetSafeLazyValue(result, true) == null) // get non-created as NonCreatedValue & exceptions as null
                 {
-                    result = new Lazy<object>(getCacheItem);
                     var policy = GetPolicy(timeout, isSliding, removedCallback, dependentFiles);
 
                     lck.UpgradeToWriteLock();
+                    result = new Lazy<object>(getCacheItem, 
+                        //NOTE: This is required to not cache any exceptions that throw when the callback is executed.
+                        // we want to ensure the callback is re-executed and not cached in the case that it might no
+                        // longer throw an exception if runtime circumstances have changed.
+                        LazyThreadSafetyMode.PublicationOnly);
                     MemoryCache.Set(cacheKey, result, policy);
                 }
             }
@@ -227,7 +231,11 @@ namespace Umbraco.Core.Cache
             // NOTE - here also we must insert a Lazy<object> but we can evaluate it right now
             // and make sure we don't store a null value.
 
-            var result = new Lazy<object>(getCacheItem);
+            var result = new Lazy<object>(getCacheItem,
+                //NOTE: This is required to not cache any exceptions that throw when the callback is executed.
+                // we want to ensure the callback is re-executed and not cached in the case that it might no
+                // longer throw an exception if runtime circumstances have changed.
+                LazyThreadSafetyMode.PublicationOnly);
             var value = result.Value; // force evaluation now
             if (value == null) return; // do not store null values (backward compat)
 

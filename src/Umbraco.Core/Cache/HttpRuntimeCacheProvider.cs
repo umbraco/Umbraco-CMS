@@ -134,7 +134,11 @@ namespace Umbraco.Core.Cache
 
                     lck.UpgradeToWriteLock();
 
-                    result = new Lazy<object>(getCacheItem, LazyThreadSafetyMode.PublicationOnly);
+                    result = new Lazy<object>(getCacheItem,
+                        //NOTE: This is required to not cache any exceptions that throw when the callback is executed.
+                        // we want to ensure the callback is re-executed and not cached in the case that it might no
+                        // longer throw an exception if runtime circumstances have changed.
+                        LazyThreadSafetyMode.PublicationOnly);
                     
                     _cache.Insert(cacheKey, result, dependency, absolute, sliding, priority, removedCallback);
                 }
@@ -175,7 +179,12 @@ namespace Umbraco.Core.Cache
             // NOTE - here also we must insert a Lazy<object> but we can evaluate it right now
             // and make sure we don't store a null value.
 
-            var result = new Lazy<object>(getCacheItem, LazyThreadSafetyMode.PublicationOnly);
+            var result = new Lazy<object>(getCacheItem,
+                //NOTE: This is required to not cache any exceptions that throw when the callback is executed.
+                // we want to ensure the callback is re-executed and not cached in the case that it might no
+                // longer throw an exception if runtime circumstances have changed.
+                LazyThreadSafetyMode.PublicationOnly);
+
             var value = result.Value; // force evaluation now - this may throw if cacheItem throws, and then nothing goes into cache
             if (value == null) return; // do not store null values (backward compat)
 
