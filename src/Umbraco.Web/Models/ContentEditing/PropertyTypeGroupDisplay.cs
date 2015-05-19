@@ -25,6 +25,13 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "properties")]
         public IEnumerable<PropertyTypeDisplay> Properties { get; set; }
 
+        //TODO: Why is there recursive list of PropertyTypeGroupDisplay? Not sure how this
+        // is intended to work but seems like it will become very complicated. This will also 
+        // mean that serialization won't work very well because you cannot serialize a recursive 
+        // property. These models should just be flat lists of properties and groups with properties
+        // indicating where they've come from. These models don't have to be an exact representation
+        // of their data structures, they should be structured in the simplest format in order for
+        // us to pass data to and from the editor, and that's it.
         [DataMember(Name = "groups")]
         public IEnumerable<PropertyTypeGroupDisplay> Groups { get; set; }
         

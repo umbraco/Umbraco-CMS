@@ -34,8 +34,14 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "value")]
         public string Value { get; set; }
 
+        [DataMember(Name = "sortOrder")]
+        public int SortOrder { get; set; }
+
         //indicates if this property was inherited
         [DataMember(Name = "inherited")]
         public bool Inherited { get; set; }
+
+        [DataMember(Name = "dataTypeId")]
+        public int DataTypeId { get; set; }
     }
 }

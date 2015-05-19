@@ -10,6 +10,17 @@ namespace Umbraco.Web.Models.ContentEditing
     [DataContract(Name = "contentType", Namespace = "")]
     public class ContentTypeDisplay : ContentTypeBasic
     {
+        public ContentTypeDisplay()
+        {
+            //initialize collections so at least their never null
+            AllowedTemplates = new List<EntityBasic>();
+            AvailableTemplates = new List<EntityBasic>();
+            AvailableContentTypes = new List<EntityBasic>();
+            AllowedParentNodeTypes = new List<EntityBasic>();
+            CompositeContentTypes = new List<EntityBasic>();
+            Groups = new List<PropertyTypeGroupDisplay>();
+        }
+
         //name, alias, icon, thumb, desc, inherited from basic
 
 
@@ -30,13 +41,15 @@ namespace Umbraco.Web.Models.ContentEditing
 
 
         //List view
-         [DataMember(Name = "enableListView")]
+        [DataMember(Name = "enableListView")]
         public bool EnableListView { get; set; }
 
+        [DataMember(Name = "allowedAtRoot")]
+        public bool AllowedAsRoot { get; set; }
 
         //Compositions
-        [DataMember(Name = "compositedContentTypes")]
-        public IEnumerable<EntityBasic> CompositedContentTypes { get; set; }
+        [DataMember(Name = "compositeContentTypes")]
+        public IEnumerable<EntityBasic> CompositeContentTypes { get; set; }
 
         [DataMember(Name = "availableContentTypes")]
         public IEnumerable<EntityBasic> AvailableContentTypes { get; set; }

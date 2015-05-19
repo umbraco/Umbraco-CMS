@@ -4,19 +4,31 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
+   
     internal class PropertyTypeGroupResolver : ValueResolver<IContentType, IEnumerable<PropertyTypeGroupDisplay>>
     {
+        private readonly ApplicationContext _applicationContext;
+        private readonly Lazy<PropertyEditorResolver> _propertyEditorResolver;
+
+        public PropertyTypeGroupResolver(ApplicationContext applicationContext, Lazy<PropertyEditorResolver> propertyEditorResolver)
+        {
+            _applicationContext = applicationContext;
+            _propertyEditorResolver = propertyEditorResolver;
+        }
+
         protected override IEnumerable<PropertyTypeGroupDisplay> ResolveCore(IContentType source)
         {
             var groups = new List<PropertyTypeGroupDisplay>();
 
-            var propGroups = source.CompositionPropertyGroups;
+            var propGroups = source.CompositionPropertyGroups.ToArray();
+                
             var genericGroup = new PropertyTypeGroupDisplay() { Name = "properties", Id = 0, ParentGroupId = 0 };
             genericGroup.Properties = MapProperties(source.PropertyTypes);
             genericGroup.Groups = new List<PropertyTypeGroupDisplay>();
@@ -54,8 +66,8 @@ namespace Umbraco.Web.Models.Mapping
             var mappedProperties = new List<PropertyTypeDisplay>();
             foreach (var p in properties)
             {
-                var editor = PropertyEditorResolver.Current.GetByAlias(p.PropertyEditorAlias);
-                var preVals = UmbracoContext.Current.Application.Services.DataTypeService.GetPreValuesCollectionByDataTypeId(p.DataTypeDefinitionId);
+                var editor = _propertyEditorResolver.Value.GetByAlias(p.PropertyEditorAlias);
+                var preVals = _applicationContext.Services.DataTypeService.GetPreValuesCollectionByDataTypeId(p.DataTypeDefinitionId);
 
                 mappedProperties.Add(
                     new PropertyTypeDisplay()
