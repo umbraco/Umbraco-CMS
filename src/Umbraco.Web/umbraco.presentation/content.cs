@@ -40,16 +40,13 @@ namespace umbraco
 
         private content()
         {
-            if (XmlFileEnabled)
-            {
-                // if we use the file, prepare the lock
-                InitializeFileLock();
-            }
-
             if (SyncToXmlFile)
             {
-                // if we write to file, prepare the persister task
+                // if we write to file, prepare the lock
+                // (if we don't use the file, or just read from it, no need to lock)
+                InitializeFileLock();
 
+                // and prepare the persister task
                 // there's always be one task keeping a ref to the runner
                 // so it's safe to just create it as a local var here
                 var runner = new BackgroundTaskRunner<XmlCacheFilePersister>(new BackgroundTaskRunnerOptions
@@ -57,6 +54,28 @@ namespace umbraco
                     LongRunning = true,
                     KeepAlive = true
                 });
+
+                // when the runner has stopped we know we will not be writing
+                // to the file anymore, so we can release the lock now - and
+                // not wait for the AppDomain unload
+                runner.Stopped += (sender, args) =>
+                {
+                    if (_fileLock == null) return; // not locking (testing?)
+                    if (_fileLocked == null) return; // not locked
+
+                    // thread-safety
+                    // lock something that's readonly and not null..
+                    lock (_xmlFileName)
+                    {
+                        // double-check
+                        if (_fileLocked == null) return;
+
+                        LogHelper.Debug<content>("Release file lock.");
+                        _fileLocked.Dispose();
+                        _fileLocked = null;
+                        _fileLock = null; // ensure we don't lock again
+                    }
+                };
 
                 // create (and add to runner)
                 _persisterTask = new XmlCacheFilePersister(runner, this);
@@ -1019,8 +1038,8 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         private void OnDomainUnloadReleaseFileLock(object sender, EventArgs args)
         {
             // the unload event triggers AFTER all hosted objects (eg the file persister
-            // background task runner) have been stopped, so we should NOT be accessing
-            // the file from now one - release the lock
+            // background task runner) have been stopped, so we should have released the
+            // lock already - this is for safety - might be possible to get rid of it
 
             // NOTE
             // trying to write to the log via LogHelper at that point is a BAD idea
@@ -1179,7 +1198,9 @@ order by umbracoNode.level, umbracoNode.sortOrder";
 
             try
             {
-                EnsureFileLock();
+                // if we're not writing back to the file, no need to lock
+                if (SyncToXmlFile)
+                    EnsureFileLock();
 
                 var xml = new XmlDocument();
                 using (var fs = new FileStream(_xmlFileName, FileMode.Open, FileAccess.Read, FileShare.Read))
