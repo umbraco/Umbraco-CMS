@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Web;
 
 namespace Umbraco.Core.Cache
@@ -105,7 +106,7 @@ namespace Umbraco.Core.Cache
                 
                 if (result == null || GetSafeLazyValue(result, true) == null) // get non-created as NonCreatedValue & exceptions as null
                 {
-                    result = new Lazy<object>(getCacheItem);
+                    result = new Lazy<object>(getCacheItem, LazyThreadSafetyMode.PublicationOnly);
                     ContextItems[cacheKey] = result;
                 }
             }
