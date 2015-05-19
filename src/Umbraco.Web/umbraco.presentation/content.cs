@@ -42,11 +42,14 @@ namespace umbraco
         {
             if (XmlFileEnabled)
             {
+                // if we use the file, prepare the lock
                 InitializeFileLock();
             }
 
             if (SyncToXmlFile)
             {
+                // if we write to file, prepare the persister task
+
                 // there's always be one task keeping a ref to the runner
                 // so it's safe to just create it as a local var here
                 var runner = new BackgroundTaskRunner<XmlCacheFilePersister>(new BackgroundTaskRunnerOptions
@@ -63,7 +66,12 @@ namespace umbraco
             using (var safeXml = GetSafeXmlWriter(false))
             {
                 bool registerXmlChange;
+
+                // if we don't use the file then LoadXmlLocked will not even
+                // read from the file and will go straight to database
                 LoadXmlLocked(safeXml, out registerXmlChange);
+                // if we use the file and registerXmlChange is true this will
+                // write to file, else it will not
                 safeXml.Commit(registerXmlChange);
             }
         }
