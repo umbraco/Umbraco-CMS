@@ -129,11 +129,13 @@ namespace Umbraco.Core.Cache
 
                 if (result == null || GetSafeLazyValue(result, true) == null) // get non-created as NonCreatedValue & exceptions as null
                 {
-                    result = new Lazy<object>(getCacheItem);
                     var absolute = isSliding ? System.Web.Caching.Cache.NoAbsoluteExpiration : (timeout == null ? System.Web.Caching.Cache.NoAbsoluteExpiration : DateTime.Now.Add(timeout.Value));
                     var sliding = isSliding == false ? System.Web.Caching.Cache.NoSlidingExpiration : (timeout ?? System.Web.Caching.Cache.NoSlidingExpiration);
 
                     lck.UpgradeToWriteLock();
+
+                    result = new Lazy<object>(getCacheItem, LazyThreadSafetyMode.PublicationOnly);
+                    
                     _cache.Insert(cacheKey, result, dependency, absolute, sliding, priority, removedCallback);
                 }
             }
@@ -173,7 +175,7 @@ namespace Umbraco.Core.Cache
             // NOTE - here also we must insert a Lazy<object> but we can evaluate it right now
             // and make sure we don't store a null value.
 
-            var result = new Lazy<object>(getCacheItem);
+            var result = new Lazy<object>(getCacheItem, LazyThreadSafetyMode.PublicationOnly);
             var value = result.Value; // force evaluation now - this may throw if cacheItem throws, and then nothing goes into cache
             if (value == null) return; // do not store null values (backward compat)
 
