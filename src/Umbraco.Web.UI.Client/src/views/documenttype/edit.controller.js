@@ -7,7 +7,9 @@
  * The controller for the content type editor
  */
 function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, contentTypeResource, dataTypeResource) {
+
 	$scope.page = {actions: [], menu: [] };
+	
 
 	contentTypeResource.getById($routeParams.id).then(function(dt){
 
@@ -22,38 +24,6 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 
 		addInitTab();
 
-	});
-
-	//hacking datatypes and their icons
-	dataTypeResource.getAll().then(function(data){
-
-		data = _.groupBy(data, function(dt){
-			dt.icon = "icon-autofill";
-
-			if(dt.name.indexOf("Dropdown") > -1 || dt.name.indexOf("Checkbox") > -1){
-				dt.icon = "icon-bulleted-list";
-				return "Lists";
-			}
-
-			if(dt.name.indexOf("Grid") > -1 || dt.name.indexOf("List View") > -1){
-				dt.icon = "icon-item-arrangement";
-				return "Collections";
-			}
-
-			if(dt.name.indexOf("picker") > -1){
-				dt.icon ="icon-hand-pointer-alt";
-				return "Pickers";
-			}
-
-			if(dt.name.indexOf("media") > -1 || dt.name.indexOf("Upload") > -1 || dt.name.indexOf("Crop") > -1){
-				dt.icon ="icon-picture";
-				return "Media";
-			}
-
-			return "Fields";
-		});
-
-		$scope.dataTypes = data;
 	});
 
 	$scope.actions = [{name: "Structure", cssClass: "list"},{name: "Structure", cssClass: "list"},{name: "Structure", cssClass: "list"}];
@@ -196,8 +166,6 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 
 	$scope.choosePropertyType = function(property, tab) {
 
-		console.log(tab);
-
 		$scope.showDialog = true;
 		$scope.dialogModel = {};
 		$scope.dialogModel.title = "Choose property type";
@@ -209,13 +177,14 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 			$scope.showDialog = false;
 		};
 
-		$scope.dialogModel.submit = function(dt){
-			contentTypeResource.getPropertyTypeScaffold(dt.id).then(function(pt){
+		$scope.dialogModel.selectDataType = function(selectedDataType) {
 
-				property.config = pt.config;
-				property.editor = pt.editor;
-				property.view = pt.view;
-				property.dataType = dt;
+			contentTypeResource.getPropertyTypeScaffold(selectedDataType.id).then(function(propertyType){
+
+				property.config = propertyType.config;
+				property.editor = propertyType.editor;
+				property.view = propertyType.view;
+				property.dataType = selectedDataType;
 
 				property.propertyState = "active";
 
@@ -223,12 +192,13 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 				$scope.editPropertyTypeSettings(property);
 
 				// push new init property to scope
-				//addInitProperty(tab);
+				addInitProperty(tab);
 
 				// push new init tab to scope
 				addInitTab();
 
 			});
+
 		};
 
 	};
