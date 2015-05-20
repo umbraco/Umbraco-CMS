@@ -37,11 +37,6 @@
     bottom: 31px !important;
 }
 
-/*
-.umb-tab-buttons.umb-bottom-bar {
-    bottom: 50px !important;
-}*/
-
 .umb-panel-header .umb-headline, .umb-panel-header h1 {
   font-size: 16px;
   border: none;
@@ -153,27 +148,27 @@
 /* tab buttons */
 .umb-bottom-bar{
     background: white;
-
     -webkit-box-shadow: 0px -18px 20px rgba(255, 255, 255, 1);
     -moz-box-shadow:    0px -18px 20px rgba(255, 255, 255, 1);
     box-shadow:         0px -18px 20px rgba(255, 255, 255, 1);
-
     border-top: 1px solid @grayLighter;
-
     padding: 10px 0 10px 0;
-
     position: fixed;
     bottom: 0px;
     left: 100px;
-    right: 20px;
     z-index: 6010;
-};
-
-@media (min-width: 1101px) {
-    .umb-bottom-bar {left: 460px;}
 }
 
-.umb-tab-buttons{padding-left: 240px;}
+.umb-tab-buttons{
+    padding-left: 0px;
+}
+
+@media (min-width: 1101px) {
+    .umb-bottom-bar {
+        left: 460px;
+    }    
+}
+
 .umb-tab-pane{padding-bottom: 90px}
 
 .tab-content{overflow: visible; }

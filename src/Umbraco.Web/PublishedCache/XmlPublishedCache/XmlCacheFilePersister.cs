@@ -132,7 +132,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             }
 
             if (runNow)
-                Run();
+                //Run();
+                LogHelper.Warn<XmlCacheFilePersister>("Cannot write now because we are going down, changes may be lost.");
 
             return ret; // this, by default, unless we created a new one
         }

@@ -545,11 +545,13 @@ namespace Umbraco.Web.Scheduling
                         {
                             HostingEnvironment.UnregisterObject(this);
                             _logger.Info<BackgroundTaskRunner<T>>("Down, tasks completed.");
+                            Stopped.RaiseEvent(new StoppedEventArgs(false), this);
                         });
                     else
                     {
                         HostingEnvironment.UnregisterObject(this);
                         _logger.Info<BackgroundTaskRunner<T>>("Down, tasks completed.");
+                        Stopped.RaiseEvent(new StoppedEventArgs(false), this);
                     }
                 }
             }
@@ -564,9 +566,20 @@ namespace Umbraco.Web.Scheduling
                 Shutdown(true, true); // cancel all tasks, wait for the current one to end
                 HostingEnvironment.UnregisterObject(this);
                 _logger.Info<BackgroundTaskRunner<T>>("Down.");
+                Stopped.RaiseEvent(new StoppedEventArgs(true), this);
             }
         }
 
-        
+        public class StoppedEventArgs : EventArgs
+        {
+            public StoppedEventArgs(bool immediate)
+            {
+                Immediate = immediate;
+            }
+
+            public bool Immediate { get; private set; }
+        }
+
+        public event TypedEventHandler<BackgroundTaskRunner<T>, StoppedEventArgs> Stopped;
     }
 }
