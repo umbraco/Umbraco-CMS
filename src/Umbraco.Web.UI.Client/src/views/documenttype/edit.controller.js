@@ -9,7 +9,9 @@
 function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, contentTypeResource, dataTypeResource) {
 
 	$scope.page = {actions: [], menu: [] };
-	
+	$scope.actions = [{name: "Structure", cssClass: "list"},{name: "Structure", cssClass: "list"},{name: "Structure", cssClass: "list"}];
+	$scope.sortingMode = false;
+
 
 	contentTypeResource.getById($routeParams.id).then(function(dt){
 
@@ -18,7 +20,7 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 		// set all tab to active
 		if( $scope.contentType.groups.length !== 0 ) {
 			angular.forEach($scope.contentType.groups, function(group){
-				group.tabState = "active";
+				group.tabState = "inActive";
 			});
 		}
 
@@ -26,7 +28,11 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 
 	});
 
-	$scope.actions = [{name: "Structure", cssClass: "list"},{name: "Structure", cssClass: "list"},{name: "Structure", cssClass: "list"}];
+	/* ---------- TOOLBAR ---------- */
+
+	$scope.toggleSortingMode = function() {
+		$scope.sortingMode = !$scope.sortingMode;
+	};
 
 
 	/* ---------- TABS ---------- */
@@ -93,20 +99,6 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 
 	/* ---------- PROPERTIES ---------- */
 
-	/*
-	 $scope.addProperty = function(properties){
-	 $scope.dialogModel = {};
-	 $scope.dialogModel.title = "Add property type";
-	 $scope.dialogModel.datatypes = $scope.dataTypes;
-	 $scope.dialogModel.addNew = true;
-	 $scope.dialogModel.view = "views/documentType/dialogs/property.html";
-
-	 $scope.dialogModel.close = function(model){
-	 properties.push(model.property);
-	 $scope.dialogModel = null;
-	 };
-	 };
-	 */
 
 	$scope.changePropertyLabel = function(property) {
 
@@ -143,30 +135,11 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 
 		$scope.dialogModel.submit = function(dt){
 
-			/*
-			 contentTypeResource.getPropertyTypeScaffold(dt.id)
-			 .then(function(pt){
-			 property.config = pt.config;
-			 property.editor = pt.editor;
-			 property.view = pt.view;
-			 $scope.dialogModel = null;
-			 $scope.showDialog = false;
-			 });
-			 */
-
 			property.dialogIsOpen = false;
-
 			$scope.showDialog = false;
 			$scope.dialogModel = null;
 
 		};
-
-		/*
-		 $scope.dialogModel.submit = function(){
-		 $scope.showDialog = false;
-		 $scope.dialogModel = null;
-		 };
-		 */
 
 		$scope.dialogModel.close = function(model){
 			$scope.showDialog = false;
@@ -252,99 +225,42 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 		tab.properties.splice(propertyIndex, 1);
 	};
 
-	/*
-	 $scope.addProperty = function(group){
-	 $log.log("open dialog");
-
-	 $scope.dialogModel = {};
-	 $scope.dialogModel.title = "Add property type";
-	 $scope.dialogModel.dataTypes = $scope.dataTypes;
-	 $scope.dialogModel.view = "views/documentType/dialogs/property.html";
-
-	 $scope.dialogModel.close = function(model){
-	 $scope.dialogModel = null;
-	 };
-	 };
-	 */
-
-
-
-
-
-	$scope.sortableOptionsFieldset = {
-		distance: 10,
-		revert: true,
-		tolerance: "pointer",
-		opacity: 0.7,
-		scroll:true,
-		cursor:"move",
-		placeholder: "ui-sortable-placeholder",
-		connectWith: ".edt-tabs",
-		handle: ".handle",
-		zIndex: 6000,
-		start: function (e, ui) {
-			ui.placeholder.addClass( ui.item.attr("class") );
-		},
-		stop: function(e, ui){
-			ui.placeholder.remove();
-		}
-	};
-
-
-	$scope.sortableOptionsEditor = {
-		distance: 10,
-		revert: true,
-		tolerance: "pointer",
-		connectWith: ".edt-props-sortable",
-		opacity: 0.7,
-		scroll: true,
-		cursor: "move",
-		handle: ".edt-property-handle",
-		placeholder: "ui-sortable-placeholder",
-		zIndex: 6000,
-		start: function (e, ui) {
-
-			// set all tabs to inactive to collapse all content
-			angular.forEach($scope.contentType.groups, function(tab){
-				$scope.$apply(function () {
-
-					tab.tabIsActive = false;
-
-				});
-			});
-
-		},
-		stop: function(e, ui){
-			console.log(e);
-			console.log(ui);
-		}
-	};
+	/* ---------- SORTING OPTIONS ---------- */
 
 	$scope.sortableOptionsTab = {
 		distance: 10,
 		revert: true,
 		tolerance: "pointer",
 		opacity: 0.7,
-		scroll:true,
-		cursor:"move",
-		placeholder: "ui-sortable-placeholder",
+		scroll: true,
+		cursor: "move",
+		placeholder: "ui-sortable-tabs-placeholder",
 		zIndex: 6000,
 		handle: ".edt-tab-handle",
 		start: function (e, ui) {
-
-			// set all tabs to inactive to collapse all content
-			angular.forEach($scope.contentType.groups, function(tab){
-				$scope.$apply(function () {
-
-					tab.tabIsActive = false;
-
-				});
-			});
-
+			ui.placeholder.height(ui.item.height());
 		},
 		stop: function(e, ui){
-			console.log(e);
-			console.log(ui);
+
+		}
+	};
+
+	$scope.sortableOptionsEditor = {
+		distance: 10,
+		revert: true,
+		tolerance: "pointer",
+		connectWith: ".edt-property-list",
+		opacity: 0.7,
+		scroll: true,
+		cursor: "move",
+		placeholder: "ui-sortable-properties-placeholder",
+		zIndex: 6000,
+		handle: ".edt-property-handle",
+		start: function (e, ui) {
+			ui.placeholder.height(ui.item.height());
+		},
+		stop: function(e, ui){
+
 		}
 	};
 

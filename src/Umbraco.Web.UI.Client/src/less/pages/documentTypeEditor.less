@@ -1,8 +1,10 @@
 .editors-document-type-container{
 
+  /*
   .handle{visibility: hidden;}
   .item-title{color: @blackLight; text-transform: none; font-size: 16px; padding-right: 30px;}
   .item-alias{color: @grayLight; font-weight: 400; font-size: 14px;}
+  */
 
   li{list-style: none}
 
@@ -48,17 +50,17 @@
   /* ---------- TOOLBAR ---------- */
 
   .toolbar {
-    padding: 20px;
     width: 100%;
     list-style: none;
     box-sizing: border-box;
-    margin-bottom: 20px;
+    margin-bottom: 70px;
     .toolbar-tools {
       float: right;
       .toolbar-tool {
         display: inline-block;
         padding: 10px 15px;
-        &:hover {
+        &:hover,
+        &.is-active {
           text-decoration: none;
           background: @grayLighter;
         }
@@ -76,12 +78,14 @@
   /* ---------- TABS ---------- */
 
   .edt-tab{
-    margin: 50px 20px 70px 20px;
+    margin: 0 0 70px 0;
     min-height: 145px;
     border: 2px solid #454A52;
     padding: 0;
-    box-shadow: 0 3px 0px 0 rgba(0,0,0,0.1);
+    box-shadow: 0 3px 0 0 rgba(0,0,0,0.1);
     border-radius: 0 10px 10px 10px;
+    -webkit-transition: all 0.5s;
+    transition: all 0.5s;
     &:hover {
       .edt-tab-actions {
         visibility: visible;
@@ -114,6 +118,8 @@
     border-bottom: none;
     border-radius: 10px 10px 0 0;
     font-weight: bold;
+    -webkit-transition: all 0.5s;
+    transition: all 0.5s;
     .tab-title-input {
       border-color: #ffffff;
       min-width: 80px;
@@ -127,6 +133,12 @@
       &.tab-title-placeholder {
         border: 1px dashed #979797 !important;
       }
+    }
+    .icon {
+      position: absolute;
+      left: -40px;
+      font-size: 25px;
+      top: 18px;
     }
     .tab-title-text {
       position: relative;
@@ -150,8 +162,6 @@
     cursor: pointer;
     border: 2px dashed @grayLight;
     box-shadow: none !important;
-    -webkit-transition: all 0.5s;
-    transition: all 0.5s;
     .tab-title{
       border: 2px dashed @grayLight;
       border-bottom: none;
@@ -169,17 +179,8 @@
   // tab is active
   .edt-tab.tab-state-active {
     border-color: @blue;
-
     .tab-title{
       border-color: @blue;
-    }
-
-    .edt-property-group{
-      padding-top: 60px;
-    }
-
-    .edt-property {
-      margin-bottom: 20px
     }
   }
 
@@ -187,54 +188,19 @@
   // tab is inactive
   .edt-tab.tab-state-inactive {
 
-    cursor: pointer;
-
-    .edt-property-group{
-      padding-top: 20px;
-    }
-
-    .edt-property {
-      height: 50px;
-      margin-bottom: 10px;
-      background: @grayLighter;
-      color: @grayDarker;
-      border-radius: @baseBorderRadius;
-      padding-top: 0;
-      padding-bottom: 0;
-    }
-
-    .edt-property-meta {
-      margin: 15px 0 0 10px;
-    }
-
-    .edt-property-actions {
-      width: 150px;
-      text-align: right;
-      margin: 7px 10px 0 0;
-      .property-action {
-        display: inline-block;
-      }
-    }
-
-    .ui-sortable-placeholder {
-      height: 50px !important;
-      padding: 0 !important;
-      margin-bottom: 10px;
-    }
-
-    .edt-property-actions {
-      .property-action {
-        display: inline-block;
-      }
-    }
-
   }
 
   /* ---------- PROPERTY ---------- */
 
   .edt-property-group{
     position: relative;
-    padding: 60px 20px 0 20px;
+    padding: 40px 20px 30px 20px;
+    -webkit-transition: all 0.5s;
+    transition: all 0.5s;
+  }
+
+  .edt-property-list {
+    min-height: 50px;
   }
 
   .edt-property{
@@ -242,6 +208,8 @@
     display: flex;
     flex-flow: row;
     padding: 20px 30px;
+    -webkit-transition: all 0.5s;
+    transition: all 0.5s;
   }
 
   .edt-property-meta {
@@ -250,6 +218,8 @@
     .property-meta-group {
       display: inline-block;
     }
+    -webkit-transition: all 0.5s;
+    transition: all 0.5s;
   }
 
   .edt-property-preview{
@@ -257,6 +227,12 @@
     max-height: 100px;
     overflow: hidden;
     position: relative;
+    &:hover {
+      cursor: pointer;
+    }
+    &:focus {
+      outline: none;
+    }
   }
 
   .edt-property-preview:after {
@@ -327,6 +303,74 @@
     &:hover {
       border-color: @blueLight;
     }
+  }
+
+
+  /* ---------- SORTING ---------- */
+
+  // sorting tabs
+  .editors-document-type-canvas.is-in-sorting-mode {
+    .edt-tab {
+      min-height: 0;
+      cursor: move;
+    }
+  }
+
+  // sorting properties
+
+  .editors-document-type-canvas.is-in-sorting-mode {
+
+    .edt-property-group{
+      padding: 20px 20px 10px 20px;
+    }
+
+    .edt-property {
+      height: 50px;
+      margin-bottom: 10px;
+      background: #E9E9E9;
+      color: @grayDarker;
+      border-radius: @baseBorderRadius;
+      padding: 0;
+      cursor: move;
+    }
+
+    .edt-property-meta {
+      padding: 15px 0 0 10px;
+      width: auto;
+      flex: 1;
+      .icon {
+        font-size: 25px;
+        vertical-align: middle;
+        margin-right: 10px;
+      }
+    }
+
+    .edt-property-preview {
+      display: none;
+    }
+
+    .edt-property-actions {
+      display: none;
+    }
+
+    .edt-property.property-state-init {
+      display: none;
+    }
+
+  }
+
+  // sorting placeholders
+  .ui-sortable-tabs-placeholder {
+    background: transparent;
+    border: 2px solid #E9E9E9;
+    margin: 0 0 70px 0;
+    border-radius: 10px;
+  }
+
+  .ui-sortable-properties-placeholder {
+    background: transparent;
+    border: 2px solid #E9E9E9;
+    margin-bottom: 10px;
   }
 
 
