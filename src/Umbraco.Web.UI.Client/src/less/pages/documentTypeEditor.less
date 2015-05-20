@@ -20,10 +20,9 @@
   }
 
   .editors-document-type-canvas{
-    padding: 40px 80px;
+    padding: 0 80px;
     @media screen and (max-width: 1500px) {
-      padding-left: 0;
-      padding-right: 0;
+      padding: 0;
     }
   }
 
@@ -40,10 +39,38 @@
 	display: none;
   }
 
-  .no-style-list{
+  .no-style-list {
 	padding: 0;
 	margin: 0;
 	list-style: none;
+  }
+
+  /* ---------- TOOLBAR ---------- */
+
+  .toolbar {
+    padding: 20px;
+    width: 100%;
+    list-style: none;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+    .toolbar-tools {
+      float: right;
+      .toolbar-tool {
+        display: inline-block;
+        padding: 10px 15px;
+        &:hover {
+          text-decoration: none;
+          background: @grayLighter;
+        }
+        &:focus {
+          text-decoration: none;
+        }
+        .icon {
+          font-size: 25px;
+          vertical-align: middle;
+        }
+      }
+    }
   }
 
   /* ---------- TABS ---------- */

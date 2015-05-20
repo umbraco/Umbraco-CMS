@@ -9,13 +9,30 @@
                 name="contentType.name"
                 menu="page.menu"
                 actions="page.actions">
-
         </umb-editor-header>
 
         <umb-editor-container class="editors-document-type-container">
 
             <div class="editors-document-type-canvas">
 
+                <!-- TOOLBAR -->
+                <div class="toolbar clearfix">
+                    <div class="toolbar-tools">
+
+                        <a href="" class="toolbar-tool">
+                            <i class="icon icon-merge"></i>
+                            <span>Compositions</span>
+                        </a>
+
+                        <a href="" class="toolbar-tool">
+                            <i class="icon icon-navigation"></i>
+                            <span>Reorder</span>
+                        </a>
+
+                    </div>
+                </div>
+
+                <!-- TABS -->
                 <ul ui-sortable="sortableOptionsTab" ng-model="contentType.groups" class="no-style-list">
 
                     <li ng-repeat="tab in contentType.groups">
