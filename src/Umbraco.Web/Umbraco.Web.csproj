@@ -307,6 +307,7 @@
     <Compile Include="Models\ContentEditing\ContentTypeDisplay.cs" />
     <Compile Include="Models\ContentEditing\PropertyTypeDisplay.cs" />
     <Compile Include="Models\ContentEditing\PropertyTypeGroupDisplay.cs" />
+    <Compile Include="Models\Mapping\AvailableCompositeContentTypesResolver.cs" />
     <Compile Include="Models\Mapping\PropertyTypeGroupResolver.cs" />
     <Compile Include="Trees\DocumentTypeTreeController.cs" />
     <Compile Include="UmbracoDefaultOwinStartup.cs" />

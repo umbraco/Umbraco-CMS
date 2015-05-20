@@ -54,6 +54,8 @@ namespace Umbraco.Tests.TestHelpers.Entities
             //ensure that nothing is marked as dirty
             contentType.ResetDirtyProperties(false);
 
+            contentType.SetDefaultTemplate(new Template("Textpage", "textpage"));
+
             return contentType;
         }
 

@@ -30,6 +30,8 @@ namespace Umbraco.Tests.Models.Mapping
         private Mock<IDataTypeService> _dataTypeService = new Mock<IDataTypeService>();
         private Mock<PropertyEditorResolver> _propertyEditorResolver;
 
+        private Mock<IEntityService> _entityService = new Mock<IEntityService>();
+
         [SetUp]
         public void Setup()
         {
@@ -77,6 +79,7 @@ namespace Umbraco.Tests.Models.Mapping
                         && definition.PropertyEditorAlias == "myPropertyType"
                         && definition.DatabaseType == DataTypeDatabaseType.Nvarchar));
 
+            
             var display = CreateSimpleContentTypeDisplay();
 
             //Act
@@ -152,10 +155,8 @@ namespace Umbraco.Tests.Models.Mapping
             return new ContentTypeDisplay
             {
                 Alias = "test",                
-                AllowedParentNodeTypes = new List<EntityBasic>(),
                 AllowedTemplates = new List<EntityBasic>(),
-                AvailableContentTypes = new List<EntityBasic>(),
-                AvailableTemplates = new List<EntityBasic>(),
+                AvailableCompositeContentTypes = new List<EntityBasic>(),
                 DefaultTemplate = new EntityBasic(){ Alias = "test" },
                 Description = "hello world",
                 Icon = "tree-icon",

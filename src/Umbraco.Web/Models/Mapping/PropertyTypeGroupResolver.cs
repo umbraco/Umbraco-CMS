@@ -26,7 +26,6 @@ namespace Umbraco.Web.Models.Mapping
         protected override IEnumerable<PropertyTypeGroupDisplay> ResolveCore(IContentType source)
         {
             var groups = new List<PropertyTypeGroupDisplay>();
-
             var propGroups = source.CompositionPropertyGroups.ToArray();
                 
             var genericGroup = new PropertyTypeGroupDisplay() { Name = "properties", Id = 0, ParentGroupId = 0 };
