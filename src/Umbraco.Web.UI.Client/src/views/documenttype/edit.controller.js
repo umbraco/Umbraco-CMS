@@ -33,7 +33,7 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 
 	$scope.addTab = function(tab){
 
-		tab.tabState = "active";
+		$scope.activateTab(tab);
 
 		// push new init tab to the scope
 		addInitTab;
@@ -45,7 +45,17 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 	};
 
 	$scope.activateTab = function(tab) {
+
+		// set all other tabs that are inactive to active
+		angular.forEach($scope.contentType.groups, function(group){
+			// skip init tab
+			if(group.tabState !== "init") {
+				group.tabState = "inActive";
+			}
+		});
+
 		tab.tabState = "active";
+
 	};
 
 	$scope.updateTabTitle = function(tab) {
@@ -69,6 +79,7 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 			$scope.contentType.groups.push({
 				groups: [],
 				properties:[],
+				name: "",
 				tabState: "init"
 			});
 		}
@@ -97,7 +108,7 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 	 };
 	 */
 
-	$scope.changePropertyName = function(property) {
+	$scope.changePropertyLabel = function(property) {
 
 		var str = property.label;
 
@@ -172,10 +183,7 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 		$scope.dialogModel.dataTypes = $scope.dataTypes;
 		$scope.dialogModel.view = "views/documentType/dialogs/property.html";
 
-		$scope.dialogModel.close = function(model){
-			$scope.dialogModel = null;
-			$scope.showDialog = false;
-		};
+		property.dialogIsOpen = true;
 
 		$scope.dialogModel.selectDataType = function(selectedDataType) {
 
@@ -199,6 +207,11 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 
 			});
 
+		};
+
+		$scope.dialogModel.close = function(model){
+			$scope.dialogModel = null;
+			$scope.showDialog = false;
 		};
 
 	};
