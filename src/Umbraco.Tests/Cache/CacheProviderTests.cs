@@ -25,6 +25,30 @@ namespace Umbraco.Tests.Cache
         } 
 
         [Test]
+        public void Throws_On_Reentry()
+        {
+            // don't run for StaticCacheProvider - not making sense
+            if (GetType() == typeof (StaticCacheProviderTests))
+                Assert.Ignore("Do not run for StaticCacheProvider.");
+
+            Exception exception = null;
+            var result = Provider.GetCacheItem("blah", () =>
+            {
+                try
+                {
+                    var result2 = Provider.GetCacheItem("blah");
+                }
+                catch (Exception e)
+                {
+                    exception = e;
+                }
+                return "value";
+            });
+            Assert.IsNotNull(exception);
+            Assert.IsAssignableFrom<InvalidOperationException>(exception);
+        }
+
+        [Test]
         public void Does_Not_Cache_Exceptions()
         {
             var counter = 0;

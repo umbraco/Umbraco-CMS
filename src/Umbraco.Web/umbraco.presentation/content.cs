@@ -60,10 +60,19 @@ namespace umbraco
                     KeepAlive = true
             }, logger);
 
-                // when the runner has stopped we know we will not be writing
-                // to the file anymore, so we can release the lock now - and
-                // not wait for the AppDomain unload
-                runner.Completed += (sender, args) =>
+                // when the runner is terminating we need to ensure that no modifications
+                // to content are possible anymore, as they would not be written out to
+                // the xml file - unfortunately that is not possible in 7.x because we
+                // cannot lock the content service... and so we do nothing...
+                //runner.Terminating += (sender, args) =>
+                //{
+                //};
+
+                // when the runner has terminated we know we will not be writing to the file
+                // anymore, so we can release the lock now - no need to wait for the AppDomain
+                // unload - which means any "last minute" saves will be lost - but waiting for
+                // the AppDomain to unload has issues...
+                runner.Terminated += (sender, args) =>
                 {
                     if (_fileLock == null) return; // not locking (testing?)
                     if (_fileLocked == null) return; // not locked

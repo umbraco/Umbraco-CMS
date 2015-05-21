@@ -321,7 +321,7 @@
     <Compile Include="Models\UnLinkLoginModel.cs" />
     <Compile Include="Mvc\MvcVersionCheck.cs" />
     <Compile Include="Mvc\ReflectedFixedRazorViewEngine.cs" />
-    <Compile Include="Scheduling\ThreadingTaskAwaiter.cs" />
+    <Compile Include="Scheduling\ThreadingTaskImmutable.cs" />
     <Compile Include="Mvc\ProfilingView.cs" />
     <Compile Include="Mvc\ProfilingViewEngine.cs" />
     <Compile Include="Mvc\UrlHelperExtensions.cs" />	
@@ -551,7 +551,6 @@
     <Compile Include="Mvc\UmbracoVirtualNodeRouteHandler.cs" />
     <Compile Include="Routing\CustomRouteUrlProvider.cs" />
     <Compile Include="Routing\UrlProviderExtensions.cs" />
-    <Compile Include="Scheduling\BackgroundTaskRunnerAwaiter.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunnerOptions.cs" />
     <Compile Include="Scheduling\DelayedRecurringTaskBase.cs" />
     <Compile Include="Scheduling\IBackgroundTaskRunner.cs" />
