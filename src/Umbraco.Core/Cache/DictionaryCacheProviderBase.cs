@@ -61,8 +61,15 @@ namespace Umbraco.Core.Cache
             if (lazy.Value is ExceptionHolder) return null;
 
             // we have a value and execution has not thrown so returning
-            // here does not throw
-            return lazy.Value;
+            // here does not throw - unless we're re-entering, take care of it
+            try
+            {
+                return lazy.Value;
+            }
+            catch (InvalidOperationException e)
+            {
+                throw new InvalidOperationException("The method that computes a value for the cache has tried to read that value from the cache.", e);
+            }
         }
 
         internal class ExceptionHolder
