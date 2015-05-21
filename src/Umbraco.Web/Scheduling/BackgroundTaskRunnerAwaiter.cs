@@ -17,7 +17,8 @@ namespace Umbraco.Web.Scheduling
     /// A custom awaiter requires implementing INotifyCompletion as well as IsCompleted, OnCompleted and GetResult
     /// see: http://blogs.msdn.com/b/pfxteam/archive/2011/01/13/10115642.aspx
     /// </remarks>
-    internal class BackgroundTaskRunnerAwaiter<T> : INotifyCompletion where T : class, IBackgroundTask
+    internal class BackgroundTaskRunnerAwaiter<T> : INotifyCompletion
+        where T : class, IBackgroundTask
     {
         private readonly BackgroundTaskRunner<T> _runner;
         private readonly ILogger _logger;
@@ -32,21 +33,20 @@ namespace Umbraco.Web.Scheduling
             _logger = logger;
 
             _tcs = new TaskCompletionSource<int>();
-
             _awaiter = _tcs.Task.GetAwaiter();
 
             if (_runner.IsRunning)
             {
-                _runner.Completed += (s, e) =>
+                _runner.Stopped += (s, e) =>
                 {
-                    _logger.Debug<BackgroundTaskRunnerAwaiter<T>>("Setting result");
-
+                    _logger.Debug<BackgroundTaskRunnerAwaiter<T>>("Runner has stopped.");
                     _tcs.SetResult(0);
                 };                    
             }
             else
             {
                 //not running, just set the result
+                LogHelper.Debug<BackgroundTaskRunnerAwaiter<T>>("Runner is stopped.");
                 _tcs.SetResult(0);
             }
             
@@ -64,6 +64,7 @@ namespace Umbraco.Web.Scheduling
         {
             get
             {
+                // FIXME I DONT UNDERSTAND
                 _logger.Debug<BackgroundTaskRunnerAwaiter<T>>("IsCompleted :: " + _tcs.Task.IsCompleted + ", " + (_runner.IsRunning == false));
 
                 //Need to check if the task is completed because it might already be done on the ctor and the runner never runs

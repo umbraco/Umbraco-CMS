@@ -22,7 +22,7 @@ namespace Umbraco.Tests.Cache
         public virtual void TearDown()
         {
             Provider.ClearAllCache();
-        }
+        } 
 
         [Test]
         public void Does_Not_Cache_Exceptions()

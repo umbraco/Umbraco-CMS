@@ -129,7 +129,7 @@ namespace Umbraco.Tests.Scheduling
             }
         }
 
-        [Ignore]
+        
         [Test]
         public async void Create_AutoStart_IsRunning()
         {
@@ -228,7 +228,7 @@ namespace Umbraco.Tests.Scheduling
             }
         }
 
-        [Ignore]
+        
         [Test]
         public async void WaitOnRunner_Tasks()
         {
@@ -385,7 +385,7 @@ namespace Umbraco.Tests.Scheduling
             }
         }
 
-        [Ignore]
+        
         [Test]
         public void RecurringTaskTest()
         {
@@ -455,7 +455,7 @@ namespace Umbraco.Tests.Scheduling
             }
         }
 
-        [Ignore]
+        
         [Test]
         public void DelayedRecurring()
         {

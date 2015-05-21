@@ -54,7 +54,7 @@ namespace umbraco
 
                 // there's always be one task keeping a ref to the runner
                 // so it's safe to just create it as a local var here
-                var runner = new BackgroundTaskRunner<XmlCacheFilePersister>(new BackgroundTaskRunnerOptions
+                var runner = new BackgroundTaskRunner<XmlCacheFilePersister>("XmlCacheFilePersister", new BackgroundTaskRunnerOptions
                 {
                     LongRunning = true,
                     KeepAlive = true
@@ -63,7 +63,7 @@ namespace umbraco
                 // when the runner has stopped we know we will not be writing
                 // to the file anymore, so we can release the lock now - and
                 // not wait for the AppDomain unload
-                runner.Stopped += (sender, args) =>
+                runner.Completed += (sender, args) =>
                 {
                     if (_fileLock == null) return; // not locking (testing?)
                     if (_fileLocked == null) return; // not locked
