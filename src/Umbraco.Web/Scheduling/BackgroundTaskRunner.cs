@@ -290,11 +290,14 @@ namespace Umbraco.Web.Scheduling
                         _isRunning = false; // done
                         if (_options.PreserveRunningTask == false)
                             _runningTask = null;
+
+                        OnStopped();
+
                         return;
                     }
                 }
 
-                OnStopped();
+               
 
                 // if _runningTask is taskSource.Task then we must keep continuing it,
                 // not starting a new taskSource, else _runningTask would complete and
