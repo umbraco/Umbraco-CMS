@@ -286,7 +286,7 @@ module.exports = function (grunt) {
             canvasdesigner: {
                 files: {
                     '<%= distdir %>/assets/css/canvasdesigner.css':
-                    ['src/less/canvasdesigner.less', 'src/less/helveticons.less']
+                    ['src/less/canvas-designer.less', 'src/less/helveticons.less']
                 },
                 options: {
                     compile: true
