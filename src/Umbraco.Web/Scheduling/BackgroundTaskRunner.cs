@@ -57,8 +57,9 @@ namespace Umbraco.Web.Scheduling
         /// Initializes a new instance of the <see cref="BackgroundTaskRunner{T}"/> class.
         /// </summary>
         /// <param name="name">The name of the runner.</param>
-        public BackgroundTaskRunner(string name)
-            : this(name, new BackgroundTaskRunnerOptions())
+        /// <param name="logger"></param>
+        public BackgroundTaskRunner(string name, ILogger logger)
+            : this(name, new BackgroundTaskRunnerOptions(), logger)
         { }
 
         /// <summary>
@@ -75,6 +76,7 @@ namespace Umbraco.Web.Scheduling
         /// </summary>
         /// <param name="name">The name of the runner.</param>
         /// <param name="options">The set of options.</param>
+        /// <param name="logger"></param>
         public BackgroundTaskRunner(string name, BackgroundTaskRunnerOptions options, ILogger logger)
         {
             if (options == null) throw new ArgumentNullException("options");
