@@ -24,6 +24,22 @@ namespace Umbraco.Tests.Cache
             Provider.ClearAllCache();
         }
 
+    [Test]
+    public void Can_Store_Value_With_Recursive_Inner_Lookup_Of_Same_Key()
+    {
+        var result = Provider.GetCacheItem("single1",
+            () =>
+            {
+                //will be null
+                var a = Provider.GetCacheItem("nothere");
+                //should be null - but this will throw!
+                var b = Provider.GetCacheItem("single1");
+
+                return "value1";
+            });
+        Assert.AreEqual("value1", result);
+    }
+
         [Test]
         public void Does_Not_Cache_Exceptions()
         {
