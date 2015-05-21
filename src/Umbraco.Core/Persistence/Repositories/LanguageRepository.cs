@@ -131,8 +131,8 @@ namespace Umbraco.Core.Persistence.Repositories
             entity.ResetDirtyProperties();
 
             //Clear the cache entries that exist by key/iso
-            RepositoryCache.RuntimeCache.ClearCacheItem(GetCacheIdKey<ILanguage>(entity.IsoCode));
-            RepositoryCache.RuntimeCache.ClearCacheItem(GetCacheIdKey<ILanguage>(entity.CultureName));
+            RuntimeCache.ClearCacheItem(GetCacheIdKey<ILanguage>(entity.IsoCode));
+            RuntimeCache.ClearCacheItem(GetCacheIdKey<ILanguage>(entity.CultureName));
         }
 
         protected override void PersistDeletedItem(ILanguage entity)
@@ -140,8 +140,8 @@ namespace Umbraco.Core.Persistence.Repositories
             base.PersistDeletedItem(entity);
 
             //Clear the cache entries that exist by key/iso
-            RepositoryCache.RuntimeCache.ClearCacheItem(GetCacheIdKey<ILanguage>(entity.IsoCode));
-            RepositoryCache.RuntimeCache.ClearCacheItem(GetCacheIdKey<ILanguage>(entity.CultureName));
+            RuntimeCache.ClearCacheItem(GetCacheIdKey<ILanguage>(entity.IsoCode));
+            RuntimeCache.ClearCacheItem(GetCacheIdKey<ILanguage>(entity.CultureName));
         }
 
         #endregion

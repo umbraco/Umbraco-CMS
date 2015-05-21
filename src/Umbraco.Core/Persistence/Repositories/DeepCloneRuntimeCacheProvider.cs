@@ -9,118 +9,128 @@ using Umbraco.Core.Models.EntityBase;
 namespace Umbraco.Core.Persistence.Repositories
 {
     /// <summary>
-    /// Ensures that all inserts and returns are a deep cloned copy of the item when
-    /// the item is IDeepCloneable
+    /// A wrapper for any IRuntimeCacheProvider that ensures that all inserts and returns 
+    /// are a deep cloned copy of the item when the item is IDeepCloneable and that tracks changes are
+    /// reset if the object is TracksChangesEntityBase
     /// </summary>
     internal class DeepCloneRuntimeCacheProvider : IRuntimeCacheProvider
     {
-        private readonly IRuntimeCacheProvider _innerProvider;
+        internal IRuntimeCacheProvider InnerProvider { get; private set; }
 
         public DeepCloneRuntimeCacheProvider(IRuntimeCacheProvider innerProvider)
         {
-            _innerProvider = innerProvider;
+            InnerProvider = innerProvider;
         }
 
         #region Clear - doesn't require any changes
         public void ClearAllCache()
         {
-            _innerProvider.ClearAllCache();
+            InnerProvider.ClearAllCache();
         }
 
         public void ClearCacheItem(string key)
         {
-            _innerProvider.ClearCacheItem(key);
+            InnerProvider.ClearCacheItem(key);
         }
 
         public void ClearCacheObjectTypes(string typeName)
         {
-            _innerProvider.ClearCacheObjectTypes(typeName);
+            InnerProvider.ClearCacheObjectTypes(typeName);
         }
 
         public void ClearCacheObjectTypes<T>()
         {
-            _innerProvider.ClearCacheObjectTypes<T>();
+            InnerProvider.ClearCacheObjectTypes<T>();
         }
 
         public void ClearCacheObjectTypes<T>(Func<string, T, bool> predicate)
         {
-            _innerProvider.ClearCacheObjectTypes<T>(predicate);
+            InnerProvider.ClearCacheObjectTypes<T>(predicate);
         }
 
         public void ClearCacheByKeySearch(string keyStartsWith)
         {
-            _innerProvider.ClearCacheByKeySearch(keyStartsWith);
+            InnerProvider.ClearCacheByKeySearch(keyStartsWith);
         }
 
         public void ClearCacheByKeyExpression(string regexString)
         {
-            _innerProvider.ClearCacheByKeyExpression(regexString);
+            InnerProvider.ClearCacheByKeyExpression(regexString);
         } 
         #endregion
 
         public IEnumerable<object> GetCacheItemsByKeySearch(string keyStartsWith)
         {
-            return _innerProvider.GetCacheItemsByKeySearch(keyStartsWith)
+            return InnerProvider.GetCacheItemsByKeySearch(keyStartsWith)
                 .Select(CheckCloneableAndTracksChanges);
         }
 
         public IEnumerable<object> GetCacheItemsByKeyExpression(string regexString)
         {
-            return _innerProvider.GetCacheItemsByKeyExpression(regexString)
+            return InnerProvider.GetCacheItemsByKeyExpression(regexString)
                 .Select(CheckCloneableAndTracksChanges);
         }
         
         public object GetCacheItem(string cacheKey)
         {
-            var item = _innerProvider.GetCacheItem(cacheKey);
+            var item = InnerProvider.GetCacheItem(cacheKey);
             return CheckCloneableAndTracksChanges(item);
         }
 
         public object GetCacheItem(string cacheKey, Func<object> getCacheItem)
         {
-            return  _innerProvider.GetCacheItem(cacheKey, () =>
+            return  InnerProvider.GetCacheItem(cacheKey, () =>
             {
-                //Resolve the item but returned the cloned/reset item
-                var item = getCacheItem();
-                return CheckCloneableAndTracksChanges(item);
+                var result = DictionaryCacheProviderBase.GetSafeLazy(getCacheItem);
+                var value = result.Value; // force evaluation now - this may throw if cacheItem throws, and then nothing goes into cache
+                if (value == null) return null; // do not store null values (backward compat)
+
+                return CheckCloneableAndTracksChanges(value);
             });
         }
 
         public object GetCacheItem(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
         {
-            return _innerProvider.GetCacheItem(cacheKey, () =>
+            return InnerProvider.GetCacheItem(cacheKey, () =>
             {
-                //Resolve the item but returned the cloned/reset item
-                var item = getCacheItem();
-                return CheckCloneableAndTracksChanges(item);
+                var result = DictionaryCacheProviderBase.GetSafeLazy(getCacheItem);
+                var value = result.Value; // force evaluation now - this may throw if cacheItem throws, and then nothing goes into cache
+                if (value == null) return null; // do not store null values (backward compat)
+
+                return CheckCloneableAndTracksChanges(value);
             }, timeout, isSliding, priority, removedCallback, dependentFiles);         
         }
 
         public void InsertCacheItem(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
         {
-            _innerProvider.InsertCacheItem(cacheKey, () =>
+            InnerProvider.InsertCacheItem(cacheKey, () =>
             {
-                //Resolve the item but returned the cloned/reset item
-                var item = getCacheItem();
-                return CheckCloneableAndTracksChanges(item);
+                var result = DictionaryCacheProviderBase.GetSafeLazy(getCacheItem);
+                var value = result.Value; // force evaluation now - this may throw if cacheItem throws, and then nothing goes into cache
+                if (value == null) return null; // do not store null values (backward compat)
+
+                return CheckCloneableAndTracksChanges(value);
             }, timeout, isSliding, priority, removedCallback, dependentFiles);   
         }
 
         private static object CheckCloneableAndTracksChanges(object input)
         {
-            var entity = input as IDeepCloneable;
-            if (entity == null) return input;
+            var cloneable = input as IDeepCloneable;
+            if (cloneable != null)
+            {
+                input = cloneable.DeepClone();    
+            }
 
-            var cloned = entity.DeepClone();
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946
-            var tracksChanges = cloned as TracksChangesEntityBase;
+            var tracksChanges = input as IRememberBeingDirty;
             if (tracksChanges != null)
             {
                 tracksChanges.ResetDirtyProperties(false);
-                return tracksChanges;
+                input =  tracksChanges;
             }
-            return cloned;
+
+            return input;
         }
     }
 }

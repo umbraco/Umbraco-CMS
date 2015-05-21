@@ -216,6 +216,7 @@ namespace Umbraco.Core.Cache
                     var policy = GetPolicy(timeout, isSliding, removedCallback, dependentFiles);
 
                     lck.UpgradeToWriteLock();
+                    //NOTE: This does an add or update
                     MemoryCache.Set(cacheKey, result, policy);
                 }
             }
@@ -242,6 +243,7 @@ namespace Umbraco.Core.Cache
             if (value == null) return; // do not store null values (backward compat)
 
             var policy = GetPolicy(timeout, isSliding, removedCallback, dependentFiles);
+            //NOTE: This does an add or update
             MemoryCache.Set(cacheKey, result, policy);
         }
 

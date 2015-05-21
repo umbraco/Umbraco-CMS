@@ -169,8 +169,8 @@ namespace Umbraco.Core.Persistence.Repositories
             entity.ResetDirtyProperties();
 
             //Clear the cache entries that exist by uniqueid/item key
-            RepositoryCache.RuntimeCache.ClearCacheItem(GetCacheIdKey<IDictionaryItem>(entity.ItemKey));
-            RepositoryCache.RuntimeCache.ClearCacheItem(GetCacheIdKey<IDictionaryItem>(entity.Key));
+            RuntimeCache.ClearCacheItem(GetCacheIdKey<IDictionaryItem>(entity.ItemKey));
+            RuntimeCache.ClearCacheItem(GetCacheIdKey<IDictionaryItem>(entity.Key));
         }
 
         protected override void PersistDeletedItem(IDictionaryItem entity)
@@ -181,8 +181,8 @@ namespace Umbraco.Core.Persistence.Repositories
             Database.Delete<DictionaryDto>("WHERE id = @Id", new { Id = entity.Key });
 
             //Clear the cache entries that exist by uniqueid/item key
-            RepositoryCache.RuntimeCache.ClearCacheItem(GetCacheIdKey<IDictionaryItem>(entity.ItemKey));
-            RepositoryCache.RuntimeCache.ClearCacheItem(GetCacheIdKey<IDictionaryItem>(entity.Key));
+            RuntimeCache.ClearCacheItem(GetCacheIdKey<IDictionaryItem>(entity.ItemKey));
+            RuntimeCache.ClearCacheItem(GetCacheIdKey<IDictionaryItem>(entity.Key));
         }
 
         private void RecursiveDelete(Guid parentId)
@@ -196,8 +196,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Delete<DictionaryDto>("WHERE id = @Id", new { Id = dto.UniqueId });
 
                 //Clear the cache entries that exist by uniqueid/item key
-                RepositoryCache.RuntimeCache.ClearCacheItem(GetCacheIdKey<IDictionaryItem>(dto.Key));
-                RepositoryCache.RuntimeCache.ClearCacheItem(GetCacheIdKey<IDictionaryItem>(dto.UniqueId));
+                RuntimeCache.ClearCacheItem(GetCacheIdKey<IDictionaryItem>(dto.Key));
+                RuntimeCache.ClearCacheItem(GetCacheIdKey<IDictionaryItem>(dto.UniqueId));
             }
         }
 

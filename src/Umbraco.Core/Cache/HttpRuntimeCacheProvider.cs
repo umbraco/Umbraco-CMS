@@ -140,6 +140,7 @@ namespace Umbraco.Core.Cache
                     var sliding = isSliding == false ? System.Web.Caching.Cache.NoSlidingExpiration : (timeout ?? System.Web.Caching.Cache.NoSlidingExpiration);
 
                     lck.UpgradeToWriteLock();
+                    //NOTE: 'Insert' on System.Web.Caching.Cache actually does an add or update!
                     _cache.Insert(cacheKey, result, dependency, absolute, sliding, priority, removedCallback);
                 }
             }
@@ -197,6 +198,7 @@ namespace Umbraco.Core.Cache
 
             using (new WriteLock(_locker))
             {
+                //NOTE: 'Insert' on System.Web.Caching.Cache actually does an add or update!
                 _cache.Insert(cacheKey, result, dependency, absolute, sliding, priority, removedCallback);
             }
         }
