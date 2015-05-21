@@ -15,19 +15,16 @@
 
             <div class="editors-document-type-canvas" ng-class="{'is-in-sorting-mode': sortingMode}">
 
-                <!-- TOOLBAR -->
-                <div class="toolbar clearfix">
-                    <div class="toolbar-tools">
+                <div class="umb-sub-header clearfix">
+                    <div class="header-content-right">
 
-                        <a href="" class="toolbar-tool">
-                            <i class="icon icon-merge"></i>
-                            <span>Compositions</span>
-                        </a>
+                        <button class="btn" prevent-default="" ng-click="openCompositionsDialog()">
+                            <i class="icon-merge"></i> Compositions
+                        </button>
 
-                        <a href="" class="toolbar-tool" ng-click="toggleSortingMode()" ng-class="{'is-active': sortingMode}">
-                            <i class="icon icon-navigation"></i>
-                            <span>Reorder</span>
-                        </a>
+                        <button class="btn" prevent-default="" ng-click="toggleSortingMode()">
+                            <i class="icon-navigation"></i> Reorder
+                        </button>
 
                     </div>
                 </div>
@@ -54,11 +51,13 @@
 
 
                         <!-- TAB ACTIVE OR INACTIVE STATE -->
-                        <div class="edt-tab umb-card edt-tab-handle" ng-class="{'tab-state-active':tab.tabState=='active', 'tab-state-inactive': tab.tabState=='inActive'}" ng-click="activateTab(tab)" ng-if="tab.tabState !== 'init'">
+                        <div class="edt-tab-inherited-from" ng-if="tab.inherited"><i class="icon icon-merge"></i> Inherited from {{ tab.inheritedFromName }}</div>
+
+                        <div class="edt-tab umb-card edt-tab-handle" ng-class="{'tab-state-active':tab.tabState=='active', 'tab-state-inactive': tab.tabState=='inActive', 'tab-is-inherited': tab.inherited}" ng-click="activateTab(tab)" ng-if="tab.tabState !== 'init'">
 
                             <div class="tab-title">
                                 <i class="icon icon-navigation" ng-if="sortingMode"></i>
-                                <input class="tab-title-input" type="text" ng-model="tab.name" ng-class="{'tab-title-placeholder': tab.name == ''}" ng-change="updateTabTitle(tab)" umb-blur="updateTabTitle(tab)" umb-auto-focus umb-auto-resize />
+                                <input class="tab-title-input" type="text" ng-model="tab.name" ng-class="{'tab-title-placeholder': tab.name == ''}" ng-change="updateTabTitle(tab)" umb-blur="updateTabTitle(tab)" ng-disabled="tab.inherited" umb-auto-focus umb-auto-resize />
                             </div>
 
                             <!--
@@ -99,9 +98,7 @@
                                             </div>
 
                                             <div class="edt-property-preview">
-                                                <div class="placeholder">
-                                                    <span class="placeholder-text">Add property</span>
-                                                </div>
+                                                <span class="placeholder-text">Add property</span>
                                             </div>
 
                                             <div class="edt-property-actions"></div>
@@ -116,15 +113,15 @@
 
                                                 <div ng-if="!sortingMode">
                                                     <div class="edt-property-meta-alias invisible-field">
-                                                        <input type="text" placeholder="Alias.." ng-model="property.alias">
+                                                        <input type="text" placeholder="Alias.." ng-model="property.alias" ng-disabled="tab.inherited">
                                                     </div>
 
                                                     <div class="edt-property-meta-label invisible-field">
-                                                        <input type="text" placeholder="Label.." ng-model="property.label" ng-change="changePropertyLabel(property)" />
+                                                        <input type="text" placeholder="Label.." ng-model="property.label" ng-change="changePropertyLabel(property)" ng-disabled="tab.inherited" />
                                                     </div>
 
                                                     <div class="edt-property-meta-description invisible-field">
-                                                        <textarea ng-model="property.description" placeholder="Enter your description..."></textarea>
+                                                        <textarea ng-model="property.description" placeholder="Enter your description..." ng-disabled="tab.inherited"></textarea>
                                                     </div>
                                                 </div>
 
@@ -176,6 +173,8 @@
                             </div>
 
                         </div>
+
+                        <br>
 
                     </li>
 

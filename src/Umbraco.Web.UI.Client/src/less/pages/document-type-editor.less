@@ -47,40 +47,12 @@
 	list-style: none;
   }
 
-  /* ---------- TOOLBAR ---------- */
-
-  .toolbar {
-    width: 100%;
-    list-style: none;
-    box-sizing: border-box;
-    margin-bottom: 70px;
-    .toolbar-tools {
-      float: right;
-      .toolbar-tool {
-        display: inline-block;
-        padding: 10px 15px;
-        &:hover,
-        &.is-active {
-          text-decoration: none;
-          background: @grayLighter;
-        }
-        &:focus {
-          text-decoration: none;
-        }
-        .icon {
-          font-size: 25px;
-          vertical-align: middle;
-        }
-      }
-    }
-  }
-
   /* ---------- TABS ---------- */
 
   .edt-tab{
-    margin: 0 0 70px 0;
+    margin: 50px 0 0 0;
     min-height: 145px;
-    border: 2px solid #454A52;
+    border: 2px solid #CCCCCC;
     padding: 0;
     box-shadow: 0 3px 0 0 rgba(0,0,0,0.1);
     border-radius: 0 10px 10px 10px;
@@ -108,20 +80,21 @@
   }
 
   .tab-title{
-    padding: 10px 25px 0 25px;
+    padding: 10px 20px 0 20px;
     position: absolute;
     left: -2px;
     top: -50px;
     height: 38px;
     background: white;
-    border: 2px solid #454A52;
+    border: 2px solid #CCCCCC;
     border-bottom: none;
     border-radius: 10px 10px 0 0;
     font-weight: bold;
     -webkit-transition: all 0.5s;
     transition: all 0.5s;
     .tab-title-input {
-      border-color: #ffffff;
+      border-color: transparent;
+      background: transparent;
       min-width: 80px;
       font-weight: bold;
       color: #515151;
@@ -133,12 +106,6 @@
       &.tab-title-placeholder {
         border: 1px dashed #979797 !important;
       }
-    }
-    .icon {
-      position: absolute;
-      left: -40px;
-      font-size: 25px;
-      top: 18px;
     }
     .tab-title-text {
       position: relative;
@@ -190,6 +157,26 @@
 
   }
 
+  // tab is inherited from compositions
+
+  .edt-tab.tab-is-inherited {
+    background: #F2F2F2;
+    border-color: #F2F2F2;
+    box-shadow: none;
+    .tab-title{
+      border-color: #F2F2F2;
+      background: #F2F2F2;
+    }
+  }
+
+  .edt-tab-inherited-from {
+    font-size: 13px;
+    color: @grayLight;
+    .icon {
+      font-size: 15px;
+    }
+  }
+
   /* ---------- PROPERTY ---------- */
 
   .edt-property-group{
@@ -197,6 +184,9 @@
     padding: 40px 20px 30px 20px;
     -webkit-transition: all 0.5s;
     transition: all 0.5s;
+    @media screen and (max-width: 1500px) {
+      padding: 20px 20px 10px 20px;
+    }
   }
 
   .edt-property-list {
@@ -207,26 +197,35 @@
     position: relative;
     display: flex;
     flex-flow: row;
-    padding: 20px 30px;
     -webkit-transition: all 0.5s;
     transition: all 0.5s;
+    margin-bottom: 10px;
+    padding: 10px 0;
+    border: 1px solid transparent;
+    &:hover {
+      border: 1px solid @inputBorder;
+    }
   }
 
   .edt-property-meta {
     width: 300px;
     margin-right: 50px;
+    -webkit-transition: all 0.5s;
+    transition: all 0.5s;
     .property-meta-group {
       display: inline-block;
     }
-    -webkit-transition: all 0.5s;
-    transition: all 0.5s;
+    @media screen and (max-width: 1500px) {
+      width: 200px;
+    }
   }
 
   .edt-property-preview{
     flex: 2;
-    max-height: 100px;
+    height: 50px;
     overflow: hidden;
     position: relative;
+    padding: 25px 10px;
     &:hover {
       cursor: pointer;
     }
@@ -253,7 +252,9 @@
     width: 100%;
     height: 100%;
     z-index: 10;
-    background: rgba(0,0,0,0.1);
+    border-radius: 10px;
+    background: url("../img/checkered-background.png");
+    opacity: 0.2;
     .overlay-text {
       position: absolute;
       top: 50%;
@@ -289,7 +290,7 @@
         text-decoration: none;
       }
       .icon {
-        font-size: 25px;
+        font-size: 15px;
         color: @gray;
       }
     }
@@ -303,6 +304,15 @@
     &:hover {
       border-color: @blueLight;
     }
+
+    .edt-property-meta {
+      padding: 0 0 0 10px;
+    }
+
+    .edt-property-preview {
+      background: @grayLight;
+    }
+
   }
 
 
@@ -339,9 +349,17 @@
       width: auto;
       flex: 1;
       .icon {
-        font-size: 25px;
+        font-size: 15px;
         vertical-align: middle;
-        margin-right: 10px;
+        margin-right: 5px;
+      }
+    }
+
+    .tab-title{
+      .icon {
+        font-size: 15px;
+        position: relative;
+        top: 4px;
       }
     }
 
@@ -388,7 +406,6 @@
     input {
       font-size: 12px;
       color: @gray;
-      border-color: #fff;
       margin-bottom: 0;
       height: 10px;
     }
@@ -398,7 +415,6 @@
     input {
       font-size: 16px;
       font-weight: bold;
-      border-color: #fff;
       margin-bottom: 0;
       color: @grayDarker;
     }
@@ -413,14 +429,6 @@
 
 
   /* ---------- PLACEHOLDERS ----------- */
-
-  .placeholder {
-    background: @grayLight;
-    display: block;
-    width: 100%;
-    margin-bottom: 5px;
-    height: 60px;
-  }
 
   .placeholder-text {
     color: @gray;

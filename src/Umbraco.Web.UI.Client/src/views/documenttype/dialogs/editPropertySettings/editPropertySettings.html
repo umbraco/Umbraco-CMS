@@ -3,67 +3,43 @@
 
         <form>
 
-            <div class="control-group umb-control-group">
+            <h5>Property settings</h5>
 
-                <h5>Property settings</h5>
+            <label>Name</label>
+            <input type="text" class="input-full-width" ng-model="model.property.label" />
 
-                <div class="umb-el-wrap">
-                    <label class="control-label">Name</label>
-                    <div class="controls controls-row">
-                        <input type="text" ng-model="model.property.label" />
-                    </div>
-                </div>
+            <label>Alias</label>
+            <input type="text" class="input-full-width" ng-model="model.property.alias" />
 
-                <div class="umb-el-wrap">
-                    <label class="control-label">Alias</label>
-                    <div class="controls controls-row">
-                        <input type="text" ng-model="model.property.alias" />
-                    </div>
-                </div>
+            <label>Description</label>
+            <textarea class="input-full-width" ng-model="model.property.description"></textarea>
 
-                <div class="umb-el-wrap">
-                    <label class="control-label">Description</label>
-                    <div class="controls controls-row">
-                        <textarea ng-model="model.property.description"></textarea>
-                    </div>
-                </div>
+            <h5>Validation</h5>
 
-                <h5>Validation</h5>
+            <label>Mandatory</label>
+            <input type="checkbox" ng-model="model.property.validation.mandatory">
+            <small>Lorem ipsum dolor</small>
 
-                <div class="umb-el-wrap">
-                    <label class="control-label">Mandatory</label>
-                    <label class="checkbox">
-                        <input type="checkbox" ng-model="model.property.validation.mandatory">
-                        <small>Lorem ipsum dolor</small>
-                    </label>
-                </div>
-
-                <div class="umb-el-wrap">
-                    <label class="control-label">Validation</label>
-                    <div class="controls controls-row">
-                        <select class="umb-editor umb-dropdown">
-                            <option>Email</option>
-                            <option>Number</option>
-                            <option>Tekst</option>
-                            <option>Etc...</option>
-                        </select>
-                    </div>
-                </div>
-
-                <h5>Property type</h5>
-
-                <div class="umb-el-wrap">
-                    <div class="" ng-click="changePropertyEditor(model.property)">
-                        <i class="icon" ng-class="model.property.dataType.icon"></i>
-                        <span>{{ model.property.dataType.name }}</span>
-                        <span>{{ model.property.view }}</span>
-                    </div>
-                    <button class="btn" ng-click="editDataType(model.property)">Change editor settings</button>
-                </div>
-
-                <pre>{{ model | json }}</pre>
-
+            <label>Validation</label>
+            <div>
+                <select class="umb-editor umb-dropdown">
+                    <option>Email</option>
+                    <option>Number</option>
+                    <option>Tekst</option>
+                    <option>Etc...</option>
+                </select>
             </div>
+
+            <h5>Property type</h5>
+
+            <div class="" ng-click="changePropertyEditor(model.property)">
+                <i class="icon" ng-class="model.property.dataType.icon"></i>
+                <span>{{ model.property.dataType.name }}</span>
+                <span>{{ model.property.view }}</span>
+            </div>
+            <button class="btn" ng-click="editDataType(model.property)">Change editor settings</button>
+
+            <pre>{{ model | json }}</pre>
 
         </form>
 
