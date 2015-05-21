@@ -31,11 +31,11 @@ namespace Umbraco.Web.Scheduling
         // and the completed event
         private readonly ManualResetEventSlim _completedEvent = new ManualResetEventSlim(false);
 
-        // fixme explain volatile here
+        // in various places we are testing these vars outside a lock, so make them volatile
         private volatile bool _isRunning; // is running
         private volatile bool _isCompleted; // does not accept tasks anymore, may still be running
-        private Task _runningTask;
 
+        private Task _runningTask;
         private CancellationTokenSource _tokenSource;
 
         private bool _terminating; // ensures we raise that event only once
@@ -133,9 +133,12 @@ namespace Umbraco.Web.Scheduling
         {
             get
             {
-                if (_runningTask == null)
-                    throw new InvalidOperationException("There is no current Threading.Task.");
-                return new ThreadingTaskImmutable(_runningTask);
+                lock (_locker)
+                {
+                    if (_runningTask == null)
+                        throw new InvalidOperationException("There is no current Threading.Task.");
+                    return new ThreadingTaskImmutable(_runningTask);
+                }
             }
         }
 
