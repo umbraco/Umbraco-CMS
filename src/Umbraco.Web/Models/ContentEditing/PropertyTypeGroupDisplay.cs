@@ -39,5 +39,9 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "inherited")]
         public bool Inherited { get; set; }
 
+
+        [DataMember(Name = "parent")]
+        public EntityBasic Parent { get; set; }
+
     }
 }

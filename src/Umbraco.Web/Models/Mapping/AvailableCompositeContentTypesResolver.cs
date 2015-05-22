@@ -22,7 +22,7 @@ namespace Umbraco.Web.Models.Mapping
 
         protected override IEnumerable<EntityBasic> ResolveCore(IContentType source)
         {
-            //below is all ported from the old doc type editor and comes with the same weaknesses /insanity
+            //below is all ported from the old doc type editor and comes with the same weaknesses /insanity / magic
 
             //get all types
             var allContentTypes = _mediaType

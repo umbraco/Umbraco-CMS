@@ -61,9 +61,15 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(
                     dto => dto.AvailableCompositeContentTypes,
                     expression => expression.ResolveUsing(new AvailableCompositeContentTypesResolver(applicationContext)))
+
+                .ForMember(
+                    dto => dto.CompositeContentTypes,
+                    expression => expression.MapFrom(dto => dto.ContentTypeComposition) )
                 
-              
-                .ForMember(display => display.EnableListView, expression => expression.MapFrom(type => type.IsContainer))
+
+                .ForMember(
+                    display => display.EnableListView, 
+                    expression => expression.MapFrom(type => type.IsContainer))
 
                 .ForMember(
                     dto => dto.Groups,

@@ -41,7 +41,7 @@ namespace Umbraco.Web.Models.ContentEditing
 
         //we might not need this... 
         [DataMember(Name = "allowedAtRoot")]
-        public bool AllowedAsRoot { get; set; }
+        public bool AllowedAtRoot { get; set; }
 
         //Compositions
         [DataMember(Name = "compositeContentTypes")]
