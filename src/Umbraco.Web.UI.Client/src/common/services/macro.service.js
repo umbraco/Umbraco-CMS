@@ -15,7 +15,7 @@ function macroService() {
             
             //This regex will match an alias of anything except characters that are quotes or new lines (for legacy reasons, when new macros are created
             // their aliases are cleaned an invalid chars are stripped)
-            var expression = /(<\?UMBRACO_MACRO macroAlias=["']([^\"\'\n\r]+?)["'][\s\S]+?)(\/>|>.*?<\/\?UMBRACO_MACRO>)/i;
+            var expression = /(<\?UMBRACO_MACRO (?:.+)?macroAlias=["']([^\"\'\n\r]+?)["'][\s\S]+?)(\/>|>.*?<\/\?UMBRACO_MACRO>)/i;
             var match = expression.exec(syntax);
             if (!match || match.length < 3) {
                 return null;

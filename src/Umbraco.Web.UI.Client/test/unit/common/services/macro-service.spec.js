@@ -40,6 +40,18 @@ describe('macro service tests', function () {
             expect(result.macroParamsDictionary.test2).toBe("hello");
         });
 
+        it('can parse syntax for macros when macroAlias is not the first parameter', function () {
+
+            var result = macroService.parseMacroSyntax("<?UMBRACO_MACRO test=\"asdf\" test2='hello' macroAlias='Map.Test' />");
+
+            expect(result).not.toBeNull();
+            expect(result.macroAlias).toBe("Map.Test");
+            expect(result.macroParamsDictionary.test).not.toBeUndefined();
+            expect(result.macroParamsDictionary.test).toBe("asdf");
+            expect(result.macroParamsDictionary.test2).not.toBeUndefined();
+            expect(result.macroParamsDictionary.test2).toBe("hello");
+        });
+
         it('can parse syntax for macros with aliases containing whitespace and other chars', function () {
 
             var result = macroService.parseMacroSyntax("<?UMBRACO_MACRO macroAlias='Map Test [Hello\\World]' test=\"asdf\" test2='hello' />");
