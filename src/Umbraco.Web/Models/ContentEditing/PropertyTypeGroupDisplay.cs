@@ -10,6 +10,11 @@ namespace Umbraco.Web.Models.ContentEditing
     [DataContract(Name = "propertyTypeGroup", Namespace = "")]
     public class PropertyTypeGroupDisplay
     {
+        public PropertyTypeGroupDisplay()
+        {
+            Properties = new List<PropertyTypeDisplay>();
+        }
+
         [DataMember(Name = "id")]
         public int Id { get; set; }
 
@@ -39,9 +44,8 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "inherited")]
         public bool Inherited { get; set; }
 
-
-        [DataMember(Name = "parent")]
-        public EntityBasic Parent { get; set; }
+        [DataMember(Name = "contentTypeId")]
+        public int ContentTypeId { get; set; }
 
     }
 }

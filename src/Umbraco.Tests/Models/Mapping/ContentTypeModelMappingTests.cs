@@ -96,7 +96,6 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(display.ParentId, result.ParentId);
             Assert.AreEqual(display.Path, result.Path);
             Assert.AreEqual(display.Thumbnail, result.Thumbnail);
-            Assert.AreEqual(display.AllowedAsRoot, result.AllowedAsRoot);
             Assert.AreEqual(display.EnableListView, result.IsContainer);
             
             //TODO: Now we need to assert all of the more complicated parts
@@ -139,7 +138,6 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(contentType.ParentId, result.ParentId);
             Assert.AreEqual(contentType.Path, result.Path);
             Assert.AreEqual(contentType.Thumbnail, result.Thumbnail);
-            Assert.AreEqual(contentType.AllowedAsRoot, result.AllowedAsRoot);
             Assert.AreEqual(contentType.IsContainer, result.EnableListView);
 
             Assert.AreEqual(contentType.DefaultTemplate.Alias, result.DefaultTemplate.Alias);

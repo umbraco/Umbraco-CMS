@@ -10,6 +10,9 @@ namespace Umbraco.Web.Models.ContentEditing
     [DataContract(Name = "propertyType")]
     public class PropertyTypeDisplay
     {
+        [DataMember(Name = "id")]
+        public int Id { get; set; }
+
         [DataMember(Name = "alias")]
         public string Alias { get; set; }
 
@@ -43,5 +46,8 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "dataTypeId")]
         public int DataTypeId { get; set; }
+
+        [DataMember(Name = "contentTypeId")]
+        public int ContentTypeId { get; set; }
     }
 }
