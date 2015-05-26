@@ -105,23 +105,25 @@
 
                                         </div>
 
-                                        <div class="edt-property" ng-show="property.propertyState!=='init'" ng-class="{'active': property.dialogIsOpen, 'property-state-active animated fadeIn': property.propertyState=='active'}">
+                                        <div class="edt-property" ng-show="property.propertyState!=='init'" ng-class="{'active': property.dialogIsOpen, 'property-state-active animated fadeIn': property.propertyState=='active', 'property-is-inherited': property.inherited}">
 
 
                                             <!-- property meta text -->
                                             <div class="edt-property-meta" ng-class="{'edt-property-handle': sortingMode}">
 
+                                                <div class="edt-property-inherited-from" ng-if="property.inherited"><i class="icon icon-merge"></i> Inherited from {{property.inheritedFromName}}</div>
+
                                                 <div ng-if="!sortingMode">
                                                     <div class="edt-property-meta-alias invisible-field">
-                                                        <input type="text" placeholder="Alias.." ng-model="property.alias" ng-disabled="tab.inherited">
+                                                        <input type="text" placeholder="Alias.." ng-model="property.alias" ng-disabled="property.inherited">
                                                     </div>
 
                                                     <div class="edt-property-meta-label invisible-field">
-                                                        <input type="text" placeholder="Label.." ng-model="property.label" ng-change="changePropertyLabel(property)" ng-disabled="tab.inherited" />
+                                                        <input type="text" placeholder="Label.." ng-model="property.label" ng-change="changePropertyLabel(property)" ng-disabled="property.inherited" />
                                                     </div>
 
                                                     <div class="edt-property-meta-description invisible-field">
-                                                        <textarea ng-model="property.description" placeholder="Enter your description..." ng-disabled="tab.inherited"></textarea>
+                                                        <textarea ng-model="property.description" placeholder="Enter your description..." ng-disabled="property.inherited"></textarea>
                                                     </div>
                                                 </div>
 
@@ -153,15 +155,19 @@
                                             <!-- row tools -->
                                             <div tabindex="-1" class="edt-property-actions">
 
-                                                <!-- delete property -->
-                                                <a href="" class="property-action property-action-delete" ng-click="deleteProperty(tab, $index)">
-                                                    <i class="icon icon-trash"></i>
-                                                </a>
+                                                <div ng-if="!property.inherited">
 
-                                                <!-- settings for property -->
-                                                <a href="" class="property-action property-action-edit" ng-click="editPropertyTypeSettings(property)">
-                                                    <i class="icon icon-settings"></i>
-                                                </a>
+                                                    <!-- delete property -->
+                                                    <a href="" class="property-action property-action-delete" ng-click="deleteProperty(tab, $index)">
+                                                        <i class="icon icon-trash"></i>
+                                                    </a>
+
+                                                    <!-- settings for property -->
+                                                    <a href="" class="property-action property-action-edit" ng-click="editPropertyTypeSettings(property)">
+                                                        <i class="icon icon-settings"></i>
+                                                    </a>
+
+                                                </div>
 
                                             </div>
 

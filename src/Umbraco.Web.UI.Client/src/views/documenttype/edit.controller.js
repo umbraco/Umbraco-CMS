@@ -63,32 +63,48 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 
 					case true:
 
-						var test = $scope.contentType.groups.length;
-						var positionToPush = test - 1;
+						var groupsArrayLength = $scope.contentType.groups.length;
+						var positionToPush = groupsArrayLength - 1;
 
-						console.log(test);
-						console.log(positionToPush);
+						//console.log(groupsArrayLength);
+						//console.log(positionToPush);
 
-						angular.forEach(compositeContentType.contentType.groups, function(group){
+						angular.forEach(compositeContentType.contentType.groups, function(compositionGroup){
 
 							// set inherited state on tab
-							group.inherited = true;
-							group.inheritedFromId = compositeContentType.id;
-							group.inheritedFromName = compositeContentType.name;
+							compositionGroup.inherited = true;
+							compositionGroup.inheritedFromId = compositeContentType.id;
+							compositionGroup.inheritedFromName = compositeContentType.name;
 
 							// set inherited state on properties
-							angular.forEach(group.properties, function(property){
+							angular.forEach(compositionGroup.properties, function(property){
 								property.inherited = true;
 								property.inheritedFromId = compositeContentType.id;
 								property.inheritedFromName = compositeContentType.name;
 							});
 
 							// set tab state
-							group.tabState = "inActive";
+							compositionGroup.tabState = "inActive";
 
-							// push groups to content type
-							$scope.contentType.groups.splice(positionToPush,0,group);
-							//$scope.contentType.groups.push(group);
+							// if groups are named the same - merge the groups
+							angular.forEach($scope.contentType.groups, function(contentTypeGroup){
+
+								if( contentTypeGroup.name === compositionGroup.name ) {
+
+									// set flag to show if properties has been merged into a tab
+									compositionGroup.groupIsMerged = true;
+
+									// add properties to the top of the array
+									contentTypeGroup.properties = compositionGroup.properties.concat(contentTypeGroup.properties);
+
+								}
+
+							});
+
+							// if group is not merged - push it to the end of the array - before init tab
+							if( compositionGroup.groupIsMerged === false || compositionGroup.groupIsMerged == undefined ) {
+								$scope.contentType.groups.splice(positionToPush,0,compositionGroup);
+							}
 
 						});
 
@@ -98,14 +114,15 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 
 						var newGroupsArray = [];
 
-						angular.forEach($scope.contentType.groups, function(group){
+						angular.forEach($scope.contentType.groups, function(contentTypeGroup){
 
-							if( group.inheritedFromId === compositeContentType.id ) {
+							// remove inherited tabs
+							if( contentTypeGroup.inheritedFromId === compositeContentType.id ) {
 
 								var newProperties = false;
 
 								// check if group contains properties that are not inherited
-								angular.forEach(group.properties, function(property){
+								angular.forEach(contentTypeGroup.properties, function(property){
 									if(property.inherited === false) {
 										newProperties = true;
 									}
@@ -113,12 +130,23 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 
 								// if new properties keep tab in array
 								if(newProperties) {
-									newGroupsArray.push(group);
+									newGroupsArray.push(contentTypeGroup);
 								}
 
+							// remove inherited properties in merged tabs
 							} else {
 
-								newGroupsArray.push(group);
+								var newPropertiesArray = [];
+
+								// create new array of properties which are not inherited
+								angular.forEach(contentTypeGroup.properties, function(property){
+									if(property.inheritedFromId !== compositeContentType.id) {
+										newPropertiesArray.push(property);
+									}
+								});
+
+								contentTypeGroup.properties = newPropertiesArray;
+								newGroupsArray.push(contentTypeGroup);
 
 							}
 

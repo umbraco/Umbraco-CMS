@@ -158,7 +158,6 @@
   }
 
   // tab is inherited from compositions
-
   .edt-tab.tab-is-inherited {
     background: #F2F2F2;
     border-color: #F2F2F2;
@@ -315,6 +314,13 @@
 
   }
 
+  .edt-property.property-is-inherited {
+    background: #F2F2F2;
+    &:hover {
+      border-color: transparent;
+    }
+  }
+
 
   /* ---------- SORTING ---------- */
 
@@ -324,6 +330,11 @@
       min-height: 0;
       cursor: move;
     }
+
+    .edt-tab.tab-is-inherited {
+      cursor: auto;
+    }
+
   }
 
   // sorting properties
@@ -373,6 +384,17 @@
 
     .edt-property.property-state-init {
       display: none;
+    }
+
+    .edt-property.property-is-inherited {
+      cursor: auto;
+      .icon-navigation {
+        visibility: hidden;
+      }
+      .edt-property-inherited-from {
+        text-align: right;
+        float: right;
+      }
     }
 
   }
