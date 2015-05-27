@@ -1,16 +1,19 @@
 <div ng-controller="Umbraco.Editors.DocumentType.EditDataTypeController">
     <div class="umb-overlay-body">
-        <div>Change configuration for data types here</div>
 
-        <umb-property
-                property="preValue"
-                ng-repeat="preValue in preValues">
+        <h5>Details</h5>
 
+        <label>Name</label>
+        <input type="text" ng-model="model.dataType.name" />
+
+        <h5>Configuration</h5>
+
+        <umb-property property="preValue" ng-repeat="preValue in model.dataType.preValues">
             <umb-editor model="preValue" is-pre-value="true"></umb-editor>
         </umb-property>
 
+        <pre>{{ model.dataType | json }}</pre>
 
-        <pre>{{ model | json }}</pre>
     </div>
 </div>
 

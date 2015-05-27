@@ -66,9 +66,6 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 						var groupsArrayLength = $scope.contentType.groups.length;
 						var positionToPush = groupsArrayLength - 1;
 
-						//console.log(groupsArrayLength);
-						//console.log(positionToPush);
-
 						angular.forEach(compositeContentType.contentType.groups, function(compositionGroup){
 
 							// set inherited state on tab
@@ -238,6 +235,31 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 
 	}
 
+	function addInitPropertyOnActiveTab() {
+
+		var addInitProperty = true;
+
+		angular.forEach($scope.contentType.groups, function(group){
+
+			if(group.tabState === 'active') {
+
+				angular.forEach(group.properties, function(property){
+					if(property.propertyState === "init") {
+						addInitProperty = false;
+					}
+				});
+
+				if(addInitProperty) {
+					group.properties.push({
+						propertyState: "init"
+					});
+				}
+
+			}
+		});
+
+	}
+
 	/* ---------- PROPERTIES ---------- */
 
 
@@ -267,19 +289,24 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 		$scope.dialogModel = {};
 		$scope.dialogModel.title = "Edit property type settings";
 		$scope.dialogModel.property = property;
-		$scope.dialogModel.dataTypes = $scope.dataTypes;
 		$scope.dialogModel.view = "views/documentType/dialogs/editPropertySettings/editPropertySettings.html";
 		$scope.showDialog = true;
 
 		// set indicator on property to tell the dialog is open - is used to set focus on the element
 		property.dialogIsOpen = true;
 
-		$scope.dialogModel.submit = function(dt){
+		$scope.dialogModel.changePropertyEditor = function(property) {
+			$scope.choosePropertyType(property);
+		};
 
+		$scope.dialogModel.editDataType = function(property) {
+			$scope.configDataType(property);
+		};
+
+		$scope.dialogModel.submit = function(model){
 			property.dialogIsOpen = false;
 			$scope.showDialog = false;
 			$scope.dialogModel = null;
-
 		};
 
 		$scope.dialogModel.close = function(model){
@@ -289,12 +316,11 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 
 	};
 
-	$scope.choosePropertyType = function(property, tab) {
+	$scope.choosePropertyType = function(property) {
 
 		$scope.showDialog = true;
 		$scope.dialogModel = {};
 		$scope.dialogModel.title = "Choose property type";
-		$scope.dialogModel.dataTypes = $scope.dataTypes;
 		$scope.dialogModel.view = "views/documentType/dialogs/property.html";
 
 		property.dialogIsOpen = true;
@@ -306,15 +332,14 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 				property.config = propertyType.config;
 				property.editor = propertyType.editor;
 				property.view = propertyType.view;
-				property.dataType = selectedDataType;
+				property.dataTypeId = selectedDataType.id;
+				property.dataTypeIcon = selectedDataType.icon;
+				property.dataTypeName = selectedDataType.name;
 
 				property.propertyState = "active";
 
-				// open settings dialog
-				$scope.editPropertyTypeSettings(property);
-
-				// push new init property to scope
-				addInitProperty(tab);
+				// open data type configuration
+				$scope.configDataType(property);
 
 				// push new init tab to scope
 				addInitTab();
@@ -329,6 +354,66 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 		};
 
 	};
+
+	$scope.configDataType = function(property) {
+
+		$scope.dialogModel = {};
+		$scope.dialogModel.title = "Edit data type";
+		$scope.dialogModel.dataType = {};
+		$scope.dialogModel.property = property;
+		$scope.dialogModel.view = "views/documentType/dialogs/editDataType/editDataType.html";
+		$scope.showDialog = true;
+
+		$scope.dialogModel.submit = function(model) {
+
+			var dataType = model.dataType;
+			var preValues = createPreValueProps(model.dataType.preValues);
+			var isNew = false;
+
+			dataTypeResource.save(dataType, preValues, isNew).then(function(dataType) {
+
+				contentTypeResource.getPropertyTypeScaffold(dataType.id).then(function(propertyType){
+
+					property.config = propertyType.config;
+					property.editor = propertyType.editor;
+					property.view = propertyType.view;
+					property.dataTypeId = dataType.id;
+					property.dataTypeIcon = dataType.icon;
+					property.dataTypeName = dataType.name;
+
+					// open settings dialog
+					$scope.editPropertyTypeSettings(property);
+
+					// push new init property to scope
+					addInitPropertyOnActiveTab();
+
+				});
+
+			});
+
+		};
+
+		$scope.dialogModel.close = function(model){
+			$scope.showDialog = false;
+			$scope.dialogModel = null;
+		};
+
+	};
+
+	function createPreValueProps(preVals) {
+		var preValues = [];
+		for (var i = 0; i < preVals.length; i++) {
+			preValues.push({
+				hideLabel: preVals[i].hideLabel,
+				alias: preVals[i].key,
+				description: preVals[i].description,
+				label: preVals[i].label,
+				view: preVals[i].view,
+				value: preVals[i].value
+			});
+		}
+		return preValues;
+	}
 
 	$scope.addItems = function(tab){
 

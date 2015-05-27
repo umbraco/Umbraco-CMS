@@ -32,28 +32,24 @@
 
             <h5>Property type</h5>
 
-            <div class="" ng-click="changePropertyEditor(model.property)">
-                <i class="icon" ng-class="model.property.dataType.icon"></i>
-                <span>{{ model.property.dataType.name }}</span>
-                <span>{{ model.property.view }}</span>
-            </div>
-            <button class="btn" ng-click="editDataType(model.property)">Change editor settings</button>
+            <label>Icon</label>
+            <i class="{{ model.property.dataType.icon }}" ng-class="{'icon-autofill': model.property.dataType.icon == null}"></i>
+
+            <label>Data type</label>
+            <div>{{ model.property.dataTypeName }}</div>
+
+            <label>Editor</label>
+            <div>{{ model.property.editor }}</div>
+
+            <button class="btn" ng-click="model.changePropertyEditor(model.property)">Change property editor</button>
+
+            <button class="btn" ng-click="model.editDataType(model.property)">Change editor settings</button>
 
             <pre>{{ model | json }}</pre>
 
         </form>
 
     </div>
-
-    <!-- overlay for change data type -->
-    <umb-overlay
-            ng-style="{'width': '500px'}"
-            ng-if="showDialog"
-            model="dialogModel"
-            animation="slide-in-right"
-            position="right"
-            view="dialogModel.view">
-    </umb-overlay>
 
 </div>
 

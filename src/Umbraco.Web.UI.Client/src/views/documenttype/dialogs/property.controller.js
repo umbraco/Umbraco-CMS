@@ -8,18 +8,6 @@
  */
 function DocumentTypePropertyController($scope, dataTypeResource) {
 
-	/*
-	$scope.selectDataType = function(dataType, model){
-		contentTypeResource.getPropertyTypeScaffold(dataType.id)
-			.then(function(pt){
-				model.property.config = pt.config;
-				model.property.editor = pt.config;
-				model.property.view = pt.view;
-				$scope.closeOverLay();
-		});
-	};
-	*/
-
 	$scope.dataTypes = {
 		"userConfigured": [],
 		"userPropertyEditors": [],
