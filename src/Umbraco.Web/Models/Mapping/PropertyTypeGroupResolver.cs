@@ -34,10 +34,12 @@ namespace Umbraco.Web.Models.Mapping
                 foreach(var tab in ct.CompositionPropertyGroups){
                     var group = new PropertyTypeGroupDisplay() { Id = tab.Id, Inherited = true, Name = tab.Name, SortOrder = tab.SortOrder };
                     group.ContentTypeId = ct.Id;
+                    group.ParentTabContentTypes = new[] { ct.Id };
+
                     if (tab.ParentId.HasValue)
                         group.ParentGroupId = tab.ParentId.Value;
 
-                    group.Properties = MapProperties(tab.PropertyTypes, ct.Id);
+                    group.Properties = MapProperties(tab.PropertyTypes, ct.Id, tab.Id);
                     groups.Add(tab.Id, group);
                 }
             }
@@ -66,7 +68,7 @@ namespace Umbraco.Web.Models.Mapping
                 var mergedProperties = new List<PropertyTypeDisplay>();
                 mergedProperties.AddRange(group.Properties);
 
-                var newproperties = MapProperties( ownTab.PropertyTypes , source.Id).Where(x => mergedProperties.Any( y => y.Id == x.Id ) == false);
+                var newproperties = MapProperties( ownTab.PropertyTypes , source.Id, ownTab.Id).Where(x => mergedProperties.Any( y => y.Id == x.Id ) == false);
                 mergedProperties.AddRange(newproperties);
 
                 group.Properties = mergedProperties.OrderBy(x => x.SortOrder);
@@ -76,9 +78,49 @@ namespace Umbraco.Web.Models.Mapping
             if (genericProperties.Any())
             {
                 var genericTab = new PropertyTypeGroupDisplay() { Id = 0, Name = "Generic properties", ParentGroupId = 0, ContentTypeId = source.Id, SortOrder = 999, Inherited = false };
-                genericTab.Properties = MapProperties(genericProperties, source.Id);
+                genericTab.Properties = MapProperties(genericProperties, source.Id, 0);
                 groups.Add(0, genericTab);
             }
+
+
+            //merge tabs based on names (magic and insanity)
+            var nameGroupedGroups = groups.Values.GroupBy(x => x.Name);
+            if (nameGroupedGroups.Any(x => x.Count() > 1))
+            {
+                var sortedGroups = new List<PropertyTypeGroupDisplay>();
+
+                foreach (var groupOfGroups in nameGroupedGroups)
+                {
+                    //single name groups
+                    if(groupOfGroups.Count() == 1)
+                        sortedGroups.Add(groupOfGroups.First());
+                    else{
+                        //multiple name groups
+
+                        //find the mother tab - if we have our own use it. otherwise pick a random inherited one - since it wont matter
+                        var mainTab = groupOfGroups.FirstOrDefault(x => x.Inherited == false);
+                        if (mainTab == null)
+                            mainTab = groupOfGroups.First();
+
+
+                        //take all properties from all the other tabs and merge into one tab
+                        var properties = new List<PropertyTypeDisplay>();
+                        properties.AddRange(mainTab.Properties);
+                        properties.AddRange(groupOfGroups.Where(x => x.Id != mainTab.Id).SelectMany(x => x.Properties));
+                        mainTab.Properties = properties;
+
+                        //lock the tab
+                        mainTab.Inherited = true;
+
+                        //collect all the involved content types
+                        mainTab.ParentTabContentTypes = groupOfGroups.Where(x => x.ContentTypeId != source.Id).Select(x => x.ContentTypeId);
+                        sortedGroups.Add(mainTab);
+                    }
+                }
+
+                return sortedGroups.OrderBy(x => x.SortOrder);
+            }
+
 
             return groups.Values.OrderBy(x => x.SortOrder);
         }
@@ -98,7 +140,7 @@ namespace Umbraco.Web.Models.Mapping
             return mappedGroups;
         }
         */
-        private IEnumerable<PropertyTypeDisplay> MapProperties(IEnumerable<PropertyType> properties, int contentTypeId)
+        private IEnumerable<PropertyTypeDisplay> MapProperties(IEnumerable<PropertyType> properties, int contentTypeId, int groupId)
         {
             var mappedProperties = new List<PropertyTypeDisplay>();
             foreach (var p in properties)
@@ -118,7 +160,8 @@ namespace Umbraco.Web.Models.Mapping
                         View = editor.ValueEditor.View,
                         Config = editor.PreValueEditor.ConvertDbToEditor(editor.DefaultPreValues, preVals) ,
                         Value = "",
-                        ContentTypeId = contentTypeId
+                        ContentTypeId = contentTypeId,
+                        GroupId = groupId
                     });
             }
 
