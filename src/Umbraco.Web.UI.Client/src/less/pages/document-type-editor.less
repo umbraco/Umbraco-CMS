@@ -80,10 +80,10 @@
   }
 
   .tab-title{
-    padding: 10px 20px 0 20px;
+    padding: 5px 10px 0 10px;
     position: absolute;
     left: -2px;
-    top: -50px;
+    top: -45px;
     height: 38px;
     background: white;
     border: 2px solid #CCCCCC;
@@ -180,12 +180,9 @@
 
   .edt-property-group{
     position: relative;
-    padding: 40px 20px 30px 20px;
+    padding: 10px 10px 0 10px;
     -webkit-transition: all 0.5s;
     transition: all 0.5s;
-    @media screen and (max-width: 1500px) {
-      padding: 20px 20px 10px 20px;
-    }
   }
 
   .edt-property-list {
@@ -297,6 +294,7 @@
 
   // property state init - property placeholder
   .edt-property.property-state-init {
+    background: #ffffff;
     border: 2px dashed @grayLight;
     border-radius: 5px;
     cursor: pointer;
@@ -340,10 +338,6 @@
   // sorting properties
 
   .editors-document-type-canvas.is-in-sorting-mode {
-
-    .edt-property-group{
-      padding: 20px 20px 10px 20px;
-    }
 
     .edt-property {
       height: 50px;
