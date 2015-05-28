@@ -11,6 +11,7 @@ using System.Web.Services;
 using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
 
 namespace umbraco.presentation.webservices
@@ -28,6 +29,7 @@ namespace umbraco.presentation.webservices
         {
             if (BusinessLogic.User.validateCredentials(login, password) == false)
             {
+                LogHelper.Warn<CacheRefresher>("Credentials validation failed. Refresh cache request ignored.");
                 return;
             }
 
@@ -40,6 +42,7 @@ namespace umbraco.presentation.webservices
                 // the server refreshing it's cache twice.
                 if (HttpRuntime.AppDomainAppId == appId)
                 {
+                    LogHelper.Warn<CacheRefresher>("Both IIS App Id and appId from request are the same. Refresh cache request ignored.");
                     return;
                 }
             }
@@ -74,10 +77,12 @@ namespace umbraco.presentation.webservices
 		[WebMethod]
 		public void RefreshAll(Guid uniqueIdentifier, string Login, string Password)
 		{
-			if (BusinessLogic.User.validateCredentials(Login, Password))
-			{
-			    RefreshAll(uniqueIdentifier);
-			}
+            if (BusinessLogic.User.validateCredentials(Login, Password) == false)
+            {
+                LogHelper.Warn<CacheRefresher>("Credentials validation failed. Refresh cache request ignored.");
+                return;
+            }
+            RefreshAll(uniqueIdentifier);
 		}
 
 	    private void RefreshAll(Guid uniqueIdentifier)
@@ -89,10 +94,12 @@ namespace umbraco.presentation.webservices
 	    [WebMethod]
 		public void RefreshByGuid(Guid uniqueIdentifier, Guid Id, string Login, string Password)
 		{
-			if (BusinessLogic.User.validateCredentials(Login, Password))
-			{
-                RefreshByGuid(uniqueIdentifier, Id);
-			}
+            if (BusinessLogic.User.validateCredentials(Login, Password) == false)
+            {
+                LogHelper.Warn<CacheRefresher>("Credentials validation failed. Refresh cache request ignored.");
+                return;
+            }
+            RefreshByGuid(uniqueIdentifier, Id);
 		}
 
         private void RefreshByGuid(Guid uniqueIdentifier, Guid Id)
@@ -104,10 +111,12 @@ namespace umbraco.presentation.webservices
 		[WebMethod]
 		public void RefreshById(Guid uniqueIdentifier, int Id, string Login, string Password)
 		{
-			if (BusinessLogic.User.validateCredentials(Login, Password))
-			{
-			    RefreshById(uniqueIdentifier, Id);
-			}
+            if (BusinessLogic.User.validateCredentials(Login, Password) == false)
+            {
+                LogHelper.Warn<CacheRefresher>("Credentials validation failed. Refresh cache request ignored.");
+                return;
+            }
+            RefreshById(uniqueIdentifier, Id);
 		}
 
         private void RefreshById(Guid uniqueIdentifier, int Id)
@@ -126,10 +135,12 @@ namespace umbraco.presentation.webservices
         [WebMethod]
         public void RefreshByIds(Guid uniqueIdentifier, string jsonIds, string Login, string Password)
         {
-            if (BusinessLogic.User.validateCredentials(Login, Password))
+            if (BusinessLogic.User.validateCredentials(Login, Password) == false)
             {
-                RefreshByIds(uniqueIdentifier, jsonIds);
+                LogHelper.Warn<CacheRefresher>("Credentials validation failed. Refresh cache request ignored.");
+                return;
             }
+            RefreshByIds(uniqueIdentifier, jsonIds);
         }
 
 	    private void RefreshByIds(Guid uniqueIdentifier, string jsonIds)
@@ -156,11 +167,13 @@ namespace umbraco.presentation.webservices
         /// </remarks>
         [WebMethod]
         public void RefreshByJson(Guid uniqueIdentifier, string jsonPayload, string Login, string Password)
-        {            
-            if (BusinessLogic.User.validateCredentials(Login, Password))
+        {
+            if (BusinessLogic.User.validateCredentials(Login, Password) == false)
             {
-                RefreshByJson(uniqueIdentifier, jsonPayload);
+                LogHelper.Warn<CacheRefresher>("Credentials validation failed. Refresh cache request ignored.");
+                return;
             }
+            RefreshByJson(uniqueIdentifier, jsonPayload);
         }
 
 	    private void RefreshByJson(Guid uniqueIdentifier, string jsonPayload)
@@ -176,10 +189,12 @@ namespace umbraco.presentation.webservices
 	    [WebMethod]
         public void RemoveById(Guid uniqueIdentifier, int Id, string Login, string Password) 
         {
-            if (BusinessLogic.User.validateCredentials(Login, Password))
+            if (BusinessLogic.User.validateCredentials(Login, Password) == false)
             {
-                RemoveById(uniqueIdentifier, Id);
+                LogHelper.Warn<CacheRefresher>("Credentials validation failed. Refresh cache request ignored.");
+                return;
             }
+            RemoveById(uniqueIdentifier, Id);
         }
 
 	    private void RemoveById(Guid uniqueIdentifier, int Id)
@@ -191,21 +206,21 @@ namespace umbraco.presentation.webservices
 	    [WebMethod]
 		public XmlDocument GetRefreshers(string Login, string Password) 
 		{
-			if (BusinessLogic.User.validateCredentials(Login, Password))
-			{
-				var xd = new XmlDocument();
-				xd.LoadXml("<cacheRefreshers/>");
-				foreach (var cr in CacheRefreshersResolver.Current.CacheRefreshers) 
-				{
-					var n = xmlHelper.addTextNode(xd, "cacheRefresher", cr.Name);
-					n.Attributes.Append(xmlHelper.addAttribute(xd, "uniqueIdentifier", cr.UniqueIdentifier.ToString()));
-					xd.DocumentElement.AppendChild(n);
-				}
-				return xd;
-						
-				
-			}
-			return null;
+            if (BusinessLogic.User.validateCredentials(Login, Password) == false)
+            {
+                LogHelper.Warn<CacheRefresher>("Credentials validation failed. Refresh cache request ignored.");
+                return null;
+            }
+
+            var xd = new XmlDocument();
+            xd.LoadXml("<cacheRefreshers/>");
+            foreach (var cr in CacheRefreshersResolver.Current.CacheRefreshers)
+            {
+                var n = xmlHelper.addTextNode(xd, "cacheRefresher", cr.Name);
+                n.Attributes.Append(xmlHelper.addAttribute(xd, "uniqueIdentifier", cr.UniqueIdentifier.ToString()));
+                xd.DocumentElement.AppendChild(n);
+            }
+            return xd;
 		}
 
 	}
