@@ -16,7 +16,7 @@ namespace Umbraco.Web.Models.ContentEditing
             AllowedTemplates = new List<EntityBasic>();
             AvailableCompositeContentTypes = new List<EntityBasic>();
             AllowedContentTypes = new List<EntityBasic>();
-            CompositeContentTypes = new List<EntityBasic>();
+            CompositeContentTypes = new List<int>();
             Groups = new List<PropertyTypeGroupDisplay>();
         }
 
@@ -30,10 +30,8 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "defaultTemplate")]
         public EntityBasic DefaultTemplate { get; set; }
 
-        // Allowed parent node types (could include root?)
         [DataMember(Name = "allowedContentTypes")]
         public IEnumerable<EntityBasic> AllowedContentTypes { get; set; }
-
 
         //List view
         [DataMember(Name = "enableListView")]
@@ -45,7 +43,7 @@ namespace Umbraco.Web.Models.ContentEditing
 
         //Compositions
         [DataMember(Name = "compositeContentTypes")]
-        public IEnumerable<EntityBasic> CompositeContentTypes { get; set; }
+        public IEnumerable<int> CompositeContentTypes { get; set; }
 
         [DataMember(Name = "availableCompositeContentTypes")]
         public IEnumerable<EntityBasic> AvailableCompositeContentTypes { get; set; }

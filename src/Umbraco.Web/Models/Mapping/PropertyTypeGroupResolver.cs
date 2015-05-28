@@ -27,10 +27,15 @@ namespace Umbraco.Web.Models.Mapping
         protected override IEnumerable<PropertyTypeGroupDisplay> ResolveCore(IContentType source)
         {
             var groups = new Dictionary<int,PropertyTypeGroupDisplay>();
+
+            //for storing generic properties
+            var genericProperties = new List<PropertyTypeDisplay>();
+
             
-            //pull all tabs from all inherited composite types
+            //iterate through all composite types
             foreach (var ct in source.ContentTypeComposition)
             {
+                //process each tab
                 foreach(var tab in ct.CompositionPropertyGroups){
                     var group = new PropertyTypeGroupDisplay() { Id = tab.Id, Inherited = true, Name = tab.Name, SortOrder = tab.SortOrder };
                     group.ContentTypeId = ct.Id;
@@ -40,10 +45,17 @@ namespace Umbraco.Web.Models.Mapping
                     if (tab.ParentId.HasValue)
                         group.ParentGroupId = tab.ParentId.Value;
 
-                    group.Properties = MapProperties(tab.PropertyTypes, ct, tab.Id);
+                    group.Properties = MapProperties(tab.PropertyTypes, ct, tab.Id, true);
                     groups.Add(tab.Id, group);
                 }
+
+                //process inherited generic properties
+                var inheritedGenProperties = ct.CompositionPropertyTypes.Where(x => x.PropertyGroupId == null);
+                if (inheritedGenProperties.Any())
+                    genericProperties.AddRange(MapProperties(inheritedGenProperties, ct, 0, true));
             }
+
+
 
             //pull from own groups
             foreach (var ownTab in source.CompositionPropertyGroups)
@@ -69,17 +81,20 @@ namespace Umbraco.Web.Models.Mapping
                 var mergedProperties = new List<PropertyTypeDisplay>();
                 mergedProperties.AddRange(group.Properties);
 
-                var newproperties = MapProperties( ownTab.PropertyTypes , source, ownTab.Id).Where(x => mergedProperties.Any( y => y.Id == x.Id ) == false);
+                var newproperties = MapProperties( ownTab.PropertyTypes , source, ownTab.Id, false).Where(x => mergedProperties.Any( y => y.Id == x.Id ) == false);
                 mergedProperties.AddRange(newproperties);
 
                 group.Properties = mergedProperties.OrderBy(x => x.SortOrder);
             }
 
-            var genericProperties = source.CompositionPropertyTypes.Where(x => x.PropertyGroupId == null);
+
+            //get all generic properties not already mapped to the generic props collection 
+            var ownGenericProperties = source.CompositionPropertyTypes.Where(x => x.PropertyGroupId == null && genericProperties.Any(y => y.Id == x.Id));
+            genericProperties.AddRange(MapProperties(ownGenericProperties, source, 0, false));
+
             if (genericProperties.Any())
             {
                 var genericTab = new PropertyTypeGroupDisplay() { Id = 0, Name = "Generic properties", ParentGroupId = 0, ContentTypeId = source.Id, SortOrder = 999, Inherited = false };
-                genericTab.Properties = MapProperties(genericProperties, source, 0);
                 groups.Add(0, genericTab);
             }
 
@@ -126,7 +141,7 @@ namespace Umbraco.Web.Models.Mapping
             return groups.Values.OrderBy(x => x.SortOrder);
         }
 
-        private IEnumerable<PropertyTypeDisplay> MapProperties(IEnumerable<PropertyType> properties, IContentTypeBase contentType, int groupId)
+        private IEnumerable<PropertyTypeDisplay> MapProperties(IEnumerable<PropertyType> properties, IContentTypeBase contentType, int groupId, bool inherited)
         {
             var mappedProperties = new List<PropertyTypeDisplay>();
             foreach (var p in properties)
@@ -148,7 +163,8 @@ namespace Umbraco.Web.Models.Mapping
                         Value = "",
                         ContentTypeId = contentType.Id,
                         ContentTypeName = contentType.Name,
-                        GroupId = groupId
+                        GroupId = groupId,
+                        Inherited = inherited
                     });
             }
 

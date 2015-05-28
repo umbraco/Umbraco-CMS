@@ -53,7 +53,7 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "contentTypeId")]
         public int ContentTypeId { get; set; }
 
-        [DataMember(Name = "contenTypeName")]
+        [DataMember(Name = "contentTypeName")]
         public string ContentTypeName { get; set; }
     }
 }
