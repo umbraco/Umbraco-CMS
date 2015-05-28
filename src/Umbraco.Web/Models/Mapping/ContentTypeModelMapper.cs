@@ -53,7 +53,8 @@ namespace Umbraco.Web.Models.Mapping
                         dest.PropertyGroups.Add(Mapper.Map<PropertyGroup>(groupDisplay));
                     }
                 });
-            
+
+            config.CreateMap<IContentTypeComposition, int>().ConvertUsing(x => x.Id);
             config.CreateMap<IContentType, ContentTypeDisplay>()
                 //Ignore because this is not actually used for content types
                 .ForMember(display => display.Trashed, expression => expression.Ignore())
@@ -65,7 +66,10 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(
                     dto => dto.CompositeContentTypes,
                     expression => expression.MapFrom(dto => dto.ContentTypeComposition) )
-                
+
+                .ForMember(
+                    dto => dto.CompositeContentTypes,
+                    expression => expression.MapFrom(dto => dto.ContentTypeComposition))
 
                 .ForMember(
                     display => display.EnableListView, 
@@ -74,6 +78,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(
                     dto => dto.Groups,
                     expression => expression.ResolveUsing(new PropertyTypeGroupResolver(applicationContext, _propertyEditorResolver)));
+
+            
 
             config.CreateMap<PropertyTypeGroupDisplay, PropertyGroup>()
                 .ForMember(g => g.CreateDate, expression => expression.Ignore())                
