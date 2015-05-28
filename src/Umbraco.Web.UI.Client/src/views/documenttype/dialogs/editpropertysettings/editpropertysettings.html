@@ -1,51 +1,63 @@
 <div ng-controller="Umbraco.Editors.DocumentType.EditPropertySettingsController">
-    <div class="umb-overlay-body">
+    <div class="umb-overlay-body content-type-editor-dialog edit-property-settings">
 
         <form>
 
-            <h5>Property settings</h5>
+            <div class="umb-control-group clearfix">
 
-            <label>Name</label>
-            <input type="text" class="input-full-width" ng-model="model.property.label" />
+                <div class="title-wrapper">
+                    <input class="input-style-underline" ng-model="model.property.label" placeholder="Enter a name..." umb-auto-focus />
+                    <a href="" class="alias">
+                        <i class="icon icon-lock"></i>
+                        <span>{{ model.property.alias }}</span>
+                    </a>
+                </div>
 
-            <label>Alias</label>
-            <input type="text" class="input-full-width" ng-model="model.property.alias" />
+            </div>
 
-            <label>Description</label>
-            <textarea class="input-full-width" ng-model="model.property.description"></textarea>
+            <div class="umb-control-group clearfix">
+                <textarea class="description" ng-model="model.property.description" placeholder="Add your description here..."></textarea>
+            </div>
 
-            <h5>Validation</h5>
+            <div class="umb-control-group clearfix">
 
-            <label>Mandatory</label>
-            <input type="checkbox" ng-model="model.property.validation.mandatory">
-            <small>Lorem ipsum dolor</small>
+                <a href="" ng-if="!model.property.editor" class="editor-placeholder" ng-click="model.changePropertyEditor(model.property)">Add Editor</a>
 
-            <label>Validation</label>
-            <div>
-                <select class="umb-editor umb-dropdown">
+                <div class="editor clearfix" ng-if="model.property.editor">
+
+                    <a href="" class="editor-icon-wrapper" ng-click="model.changePropertyEditor(model.property)">
+                        <i class="icon {{ model.property.dataTypeIcon }}" ng-class="{'icon-autofill': model.property.dataType.icon == null}"></i>
+                    </a>
+
+                    <div class="editor-details">
+                        <div class="editor-name">{{ model.property.dataTypeName }}</div>
+                        <div class="editor-editor">{{ model.property.editor }}</div>
+                    </div>
+
+                </div>
+
+                <button class="btn" ng-click="model.editDataType(model.property)" ng-if="model.property.editor">Change editor settings</button>
+
+            </div>
+
+            <div class="umb-control-group clearfix">
+
+                <label class="checkbox">
+                    <input type="checkbox"> Mandatory
+                </label>
+
+                <select class="umb-editor umb-dropdown" placeholder="Validation">
                     <option>Email</option>
                     <option>Number</option>
                     <option>Tekst</option>
                     <option>Etc...</option>
                 </select>
+
             </div>
 
-            <h5>Property type</h5>
-
-            <label>Icon</label>
-            <i class="{{ model.property.dataType.icon }}" ng-class="{'icon-autofill': model.property.dataType.icon == null}"></i>
-
-            <label>Data type</label>
-            <div>{{ model.property.dataTypeName }}</div>
-
-            <label>Editor</label>
-            <div>{{ model.property.editor }}</div>
-
-            <button class="btn" ng-click="model.changePropertyEditor(model.property)">Change property editor</button>
-
-            <button class="btn" ng-click="model.editDataType(model.property)">Change editor settings</button>
-
+            <!--
             <pre>{{ model | json }}</pre>
+            -->
 
         </form>
 

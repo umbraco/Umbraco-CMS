@@ -65,32 +65,13 @@
                                 <input class="tab-title-input" type="text" ng-model="tab.name" ng-class="{'tab-title-placeholder': tab.name == ''}" ng-change="updateTabTitle(tab)" umb-blur="updateTabTitle(tab)" ng-disabled="tab.inherited" umb-auto-focus umb-auto-resize />
                             </div>
 
-                            <!--
-                            <div tabindex="-1" class="edt-tab-actions">
-
-                                <div class="tab-action">
-                                    <div href="" class="umb-btn-round umb-btn-round-small" ng-click="deleteTab($index)">
-                                        <i class="icon icon-trash"></i>
-                                    </div>
-                                </div>
-
-                                <div class="tab-action edt-tab-handle" ng-if="contentType.groups.length > 1">
-                                    <div href="" class="umb-btn-round umb-btn-round-small">
-                                        <i class="icon icon-navigation"></i>
-                                    </div>
-                                </div>
-
-                            </div>
-                            -->
-
-
                             <div class="edt-property-group">
                                 <ul class="edt-property-list no-style-list" ui-sortable="sortableOptionsEditor"
                                     ng-model="tab.properties" class="no-style-list">
                                     <li ng-repeat="property in tab.properties">
 
                                         <!-- Init property / Property placeholder / add new property -->
-                                        <div class="edt-property" ng-show="property.propertyState=='init'" ng-class="{'property-state-init animated fadeIn': property.propertyState=='init'}" ng-click="choosePropertyType(property, tab)">
+                                        <div class="edt-property" ng-show="property.propertyState=='init'" ng-class="{'property-state-init animated fadeIn': property.propertyState=='init'}" ng-click="editPropertyTypeSettings(property)">
 
                                             <div class="edt-property-meta">
                                                 <div class="placeholder-input-small"></div>
@@ -142,7 +123,7 @@
 
                                             <!-- property preview -->
                                             <!-- ng-if="tab.tabState=='active'" -->
-                                            <div tabindex="-1" class="edt-property-preview" ng-click="choosePropertyType(property)">
+                                            <div tabindex="-1" class="edt-property-preview" ng-click="editPropertyTypeSettings(property)">
 
                                                 <span class="edt-property-preview-overlay">
                                                     <span class="overlay-text">Choose property type</span>

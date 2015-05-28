@@ -295,6 +295,9 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 		// set indicator on property to tell the dialog is open - is used to set focus on the element
 		property.dialogIsOpen = true;
 
+		// set property to active
+		property.propertyState = "active";
+
 		$scope.dialogModel.changePropertyEditor = function(property) {
 			$scope.choosePropertyType(property);
 		};
@@ -304,24 +307,33 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 		};
 
 		$scope.dialogModel.submit = function(model){
+
 			property.dialogIsOpen = false;
+
 			$scope.showDialog = false;
 			$scope.dialogModel = null;
+
+			// push new init property to scope
+			addInitPropertyOnActiveTab();
+
 		};
 
 		$scope.dialogModel.close = function(model){
 			$scope.showDialog = false;
 			$scope.dialogModel = null;
+
+			// push new init property to scope
+			addInitPropertyOnActiveTab();
 		};
 
 	};
 
 	$scope.choosePropertyType = function(property) {
 
-		$scope.showDialog = true;
 		$scope.dialogModel = {};
 		$scope.dialogModel.title = "Choose property type";
 		$scope.dialogModel.view = "views/documentType/dialogs/property.html";
+		$scope.showDialog = true;
 
 		property.dialogIsOpen = true;
 
@@ -341,7 +353,7 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 				console.log(property);
 
 				// open data type configuration
-				$scope.configDataType(property);
+				$scope.editPropertyTypeSettings(property);
 
 				// push new init tab to scope
 				addInitTab();
@@ -351,8 +363,7 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 		};
 
 		$scope.dialogModel.close = function(model){
-			$scope.dialogModel = null;
-			$scope.showDialog = false;
+			$scope.editPropertyTypeSettings(property);
 		};
 
 	};
@@ -386,9 +397,6 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 					// open settings dialog
 					$scope.editPropertyTypeSettings(property);
 
-					// push new init property to scope
-					addInitPropertyOnActiveTab();
-
 				});
 
 			});
@@ -396,8 +404,7 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 		};
 
 		$scope.dialogModel.close = function(model){
-			$scope.showDialog = false;
-			$scope.dialogModel = null;
+			$scope.editPropertyTypeSettings(property);
 		};
 
 	};

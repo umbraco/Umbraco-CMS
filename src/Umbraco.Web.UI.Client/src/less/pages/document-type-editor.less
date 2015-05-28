@@ -340,7 +340,7 @@
   .editors-document-type-canvas.is-in-sorting-mode {
 
     .edt-property {
-      height: 50px;
+      height: 40px;
       margin-bottom: 10px;
       background: #E9E9E9;
       color: @grayDarker;
@@ -350,7 +350,7 @@
     }
 
     .edt-property-meta {
-      padding: 15px 0 0 10px;
+      padding: 10px 0 0 10px;
       width: auto;
       flex: 1;
       .icon {
@@ -487,3 +487,95 @@
   }
 
 }
+
+/* ---------- DIALOGS ---------- */
+
+.content-type-editor-dialog.edit-property-settings {
+
+  .title-wrapper {
+    float: left;
+    width: 300px;
+    input.input-style-underline {
+      border: none;
+      //border-bottom: 1px solid #cccccc;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px 0 0 0;
+      margin-bottom: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      &:focus {
+        outline: none;
+      }
+    }
+    .alias {
+      font-size: 13px;
+      color: @grayLight;
+    }
+  }
+
+  .editor-placeholder {
+    border: 2px dashed @grayLight;
+    width: 100%;
+    height: 80px;
+    line-height: 80px;
+    text-align: center;
+    display: block;
+    border-radius: 5px;
+    color: @gray;
+    font-weight: bold;
+    font-size: 13px;
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
+  .editor {
+    margin-bottom: 10px;
+    .editor-icon-wrapper {
+      border: 1px solid @grayLight;
+      width: 60px;
+      height: 60px;
+      text-align: center;
+      line-height: 60px;
+      border-radius: 5px;
+      float: left;
+      margin-right: 20px;
+      &:hover {
+        text-decoration: none;
+        border-color: @blueLight;
+      }
+      .icon {
+        font-size: 26px;
+      }
+    }
+    .editor-details {
+      float: left;
+      margin-top: 10px;
+      .editor-name {
+        font-weight: bold;
+      }
+      .editor-editor {
+        font-size: 12px;
+      }
+    }
+  }
+
+  textarea.description {
+    width: 100%;
+    box-sizing: border-box;
+    border: none;
+  }
+
+  .checkbox {
+    padding-left: 0;
+    margin-bottom: 20px;
+  }
+
+  .umb-editor {
+    width: 100%;
+  }
+
+}
+
+
