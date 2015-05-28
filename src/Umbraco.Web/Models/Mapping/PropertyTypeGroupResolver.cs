@@ -35,11 +35,12 @@ namespace Umbraco.Web.Models.Mapping
                     var group = new PropertyTypeGroupDisplay() { Id = tab.Id, Inherited = true, Name = tab.Name, SortOrder = tab.SortOrder };
                     group.ContentTypeId = ct.Id;
                     group.ParentTabContentTypes = new[] { ct.Id };
+                    group.ParentTabContentTypeNames = new[] { ct.Name };
 
                     if (tab.ParentId.HasValue)
                         group.ParentGroupId = tab.ParentId.Value;
 
-                    group.Properties = MapProperties(tab.PropertyTypes, ct.Id, tab.Id);
+                    group.Properties = MapProperties(tab.PropertyTypes, ct, tab.Id);
                     groups.Add(tab.Id, group);
                 }
             }
@@ -68,7 +69,7 @@ namespace Umbraco.Web.Models.Mapping
                 var mergedProperties = new List<PropertyTypeDisplay>();
                 mergedProperties.AddRange(group.Properties);
 
-                var newproperties = MapProperties( ownTab.PropertyTypes , source.Id, ownTab.Id).Where(x => mergedProperties.Any( y => y.Id == x.Id ) == false);
+                var newproperties = MapProperties( ownTab.PropertyTypes , source, ownTab.Id).Where(x => mergedProperties.Any( y => y.Id == x.Id ) == false);
                 mergedProperties.AddRange(newproperties);
 
                 group.Properties = mergedProperties.OrderBy(x => x.SortOrder);
@@ -78,7 +79,7 @@ namespace Umbraco.Web.Models.Mapping
             if (genericProperties.Any())
             {
                 var genericTab = new PropertyTypeGroupDisplay() { Id = 0, Name = "Generic properties", ParentGroupId = 0, ContentTypeId = source.Id, SortOrder = 999, Inherited = false };
-                genericTab.Properties = MapProperties(genericProperties, source.Id, 0);
+                genericTab.Properties = MapProperties(genericProperties, source, 0);
                 groups.Add(0, genericTab);
             }
 
@@ -125,22 +126,7 @@ namespace Umbraco.Web.Models.Mapping
             return groups.Values.OrderBy(x => x.SortOrder);
         }
 
-      /*  private IEnumerable<PropertyTypeGroupDisplay> MapChildGroups(PropertyTypeGroupDisplay parent, IEnumerable<PropertyGroup> groups)
-        {
-            var mappedGroups = new List<PropertyTypeGroupDisplay>();
-            
-            foreach (var child in groups.Where(x => x.ParentId == parent.Id))
-            {
-                var mapped = new PropertyTypeGroupDisplay() { Id = child.Id, ParentGroupId = child.ParentId.Value, Name = child.Name, SortOrder = child.SortOrder };
-                mapped.Name += child.PropertyTypes.Count.ToString();
-                mapped.Properties = MapProperties(child.PropertyTypes);               
-                mappedGroups.Add(mapped);
-            }
-
-            return mappedGroups;
-        }
-        */
-        private IEnumerable<PropertyTypeDisplay> MapProperties(IEnumerable<PropertyType> properties, int contentTypeId, int groupId)
+        private IEnumerable<PropertyTypeDisplay> MapProperties(IEnumerable<PropertyType> properties, IContentTypeBase contentType, int groupId)
         {
             var mappedProperties = new List<PropertyTypeDisplay>();
             foreach (var p in properties)
@@ -160,7 +146,8 @@ namespace Umbraco.Web.Models.Mapping
                         View = editor.ValueEditor.View,
                         Config = editor.PreValueEditor.ConvertDbToEditor(editor.DefaultPreValues, preVals) ,
                         Value = "",
-                        ContentTypeId = contentTypeId,
+                        ContentTypeId = contentType.Id,
+                        ContentTypeName = contentType.Name,
                         GroupId = groupId
                     });
             }

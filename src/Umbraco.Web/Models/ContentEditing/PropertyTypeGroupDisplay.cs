@@ -39,5 +39,8 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "parentTabContentTypes")]
         public IEnumerable<int> ParentTabContentTypes { get; set; }
+
+        [DataMember(Name = "parentTabContentTypeNames")]
+        public IEnumerable<string> ParentTabContentTypeNames { get; set; }
     }
 }

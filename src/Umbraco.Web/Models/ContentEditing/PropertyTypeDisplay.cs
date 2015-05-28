@@ -52,5 +52,8 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "contentTypeId")]
         public int ContentTypeId { get; set; }
+
+        [DataMember(Name = "contenTypeName")]
+        public string ContentTypeName { get; set; }
     }
 }
