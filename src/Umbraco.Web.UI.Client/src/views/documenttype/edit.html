@@ -49,9 +49,14 @@
 
                         </div>
 
-
                         <!-- TAB ACTIVE OR INACTIVE STATE -->
-                        <div class="edt-tab-inherited-from" ng-if="tab.inherited"><i class="icon icon-merge"></i> Inherited from {{ tab.inheritedFromName }}</div>
+                        <div class="edt-tab-inherited-from" ng-if="tab.inherited">
+                            <i class="icon icon-merge"></i> Inherited from {{ tab.inheritedFromName }}
+                            <span ng-repeat="contentTypeName in tab.parentTabContentTypeNames">
+                                {{ contentTypeName }}
+                                <span ng-if="!$last">, </span>
+                            </span>
+                        </div>
 
                         <div class="edt-tab umb-card edt-tab-handle" ng-class="{'tab-state-active':tab.tabState=='active', 'tab-state-inactive': tab.tabState=='inActive', 'tab-is-inherited': tab.inherited}" ng-click="activateTab(tab)" ng-if="tab.tabState !== 'init'">
 
@@ -111,7 +116,7 @@
                                             <!-- property meta text -->
                                             <div class="edt-property-meta" ng-class="{'edt-property-handle': sortingMode}">
 
-                                                <div class="edt-property-inherited-from" ng-if="property.inherited"><i class="icon icon-merge"></i> Inherited from {{property.inheritedFromName}}</div>
+                                                <div class="edt-property-inherited-from" ng-if="property.inherited"><i class="icon icon-merge"></i> Inherited from {{property.contentTypeName}}</div>
 
                                                 <div ng-if="!sortingMode">
                                                     <div class="edt-property-meta-alias invisible-field">

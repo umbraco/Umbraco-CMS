@@ -70,14 +70,14 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 
 							// set inherited state on tab
 							compositionGroup.inherited = true;
-							compositionGroup.inheritedFromId = compositeContentType.id;
-							compositionGroup.inheritedFromName = compositeContentType.name;
+							compositionGroup.contentTypeId = compositeContentType.id;
+							compositionGroup.contentTypeName = compositeContentType.name;
 
 							// set inherited state on properties
 							angular.forEach(compositionGroup.properties, function(property){
 								property.inherited = true;
-								property.inheritedFromId = compositeContentType.id;
-								property.inheritedFromName = compositeContentType.name;
+								property.contentTypeId = compositeContentType.id;
+								property.contentTypeName = compositeContentType.name;
 							});
 
 							// set tab state
@@ -114,7 +114,7 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 						angular.forEach($scope.contentType.groups, function(contentTypeGroup){
 
 							// remove inherited tabs
-							if( contentTypeGroup.inheritedFromId === compositeContentType.id ) {
+							if( contentTypeGroup.contentTypeId === compositeContentType.id ) {
 
 								var newProperties = false;
 
@@ -137,7 +137,7 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 
 								// create new array of properties which are not inherited
 								angular.forEach(contentTypeGroup.properties, function(property){
-									if(property.inheritedFromId !== compositeContentType.id) {
+									if(property.contentTypeId !== compositeContentType.id) {
 										newPropertiesArray.push(property);
 									}
 								});
@@ -337,6 +337,8 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 				property.dataTypeName = selectedDataType.name;
 
 				property.propertyState = "active";
+
+				console.log(property);
 
 				// open data type configuration
 				$scope.configDataType(property);
