@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -33,10 +35,12 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IContentType, ContentTypeBasic>();
             config.CreateMap<IMemberType, ContentTypeBasic>();
 
-
             config.CreateMap<ContentTypeDisplay, IContentType>()
                 .ConstructUsing((ContentTypeDisplay source) => new ContentType(source.ParentId))
-                //Ignore these since they are 'read only' and only updated with the repository layer
+
+                //only map id if set to something higher then zero
+                .ForMember(dto => dto.Id, expression => expression.Condition(display => (Convert.ToInt32(display.Id) > 0)))
+                
                 .ForMember(dto => dto.CreatorId, expression => expression.Ignore())
                 .ForMember(dto => dto.Level, expression => expression.Ignore())
                 .ForMember(dto => dto.CreateDate, expression => expression.Ignore())
@@ -48,7 +52,7 @@ namespace Umbraco.Web.Models.Mapping
                 .AfterMap((source, dest) =>
                 {
                     dest.PropertyGroups = new PropertyGroupCollection();
-                    foreach (var groupDisplay in source.Groups)
+                    foreach (var groupDisplay in source.Groups.Where(x => !x.Name.IsNullOrWhiteSpace() ) )
                     {
                         dest.PropertyGroups.Add(Mapper.Map<PropertyGroup>(groupDisplay));
                     }
@@ -82,14 +86,10 @@ namespace Umbraco.Web.Models.Mapping
             
 
             config.CreateMap<PropertyTypeGroupDisplay, PropertyGroup>()
+                .ForMember(dest => dest.Id, expression => expression.Condition(source => source.Id > 0))
                 .ForMember(g => g.CreateDate, expression => expression.Ignore())                
-                .ForMember(g => g.UpdateDate, expression => expression.Ignore())  
+                .ForMember(g => g.UpdateDate, expression => expression.Ignore())
                 .ForMember(g => g.ParentId, expression => expression.MapFrom(display => display.ParentGroupId))
-                
-                //NOTE: We don't actually need to map these because auto-mapper will automatically do that since they are the same name!
-                //.ForMember(g => g.SortOrder, expression => expression.MapFrom(display => display.SortOrder))
-                //.ForMember(g => g.Id, expression => expression.MapFrom(display => display.Id))
-                //.ForMember(g => g.Name, expression => expression.MapFrom(display => display.Name))
                 
                 //ignore these, we'll do this in after map
                 .ForMember(g => g.PropertyTypes, expression => expression.Ignore())
