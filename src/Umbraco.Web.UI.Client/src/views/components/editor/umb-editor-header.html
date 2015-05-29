@@ -1,10 +1,17 @@
 ﻿<div class="umb-panel-header">
     <div class="row-fluid">
-        <div class="span5">                
+        <div class="span7">
+            <div class="umb-panel-header-icon" ng-click="pickIcon()">
+                <span>Add icon</span>
+            </div>
+            <div class="umb-panel-header-title-wrapper">
                 <umb-content-name
-                    ng-disabled="content.isSystem == 1"
-                    placeholder="@placeholders_entername"
-                    ng-model="name"/>
+                        ng-disabled="content.isSystem == 1"
+                        placeholder="@placeholders_entername"
+                        ng-model="name">
+                </umb-content-name>
+                <div class="umb-panel-header-alias"><i class="icon icon-lock"></i>brandNew</div>
+            </div>
         </div>
         
         <div class="span7">
@@ -16,4 +23,15 @@
 
 	    <div ng-transclude></div>
     </div>
+
+    <umb-overlay
+            ng-style="{'width': '500px'}"
+            ng-if="showDialog"
+            model="dialogModel"
+            animation="slide-in-right"
+            position="right"
+            view="dialogModel.view">
+    </umb-overlay>
+
+
 </div>
