@@ -6,34 +6,79 @@
  * @description
  * The controller for the content type editor
  */
-function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, contentTypeResource, dataTypeResource) {
+function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, contentTypeResource, dataTypeResource, editorState) {
 
 	$scope.page = {actions: [], menu: [] };
 	$scope.actions = [{name: "Structure", cssClass: "list"},{name: "Structure", cssClass: "list"},{name: "Structure", cssClass: "list"}];
 	$scope.sortingMode = false;
 
 
-	contentTypeResource.getById($routeParams.id).then(function(dt){
+	if ($routeParams.create) {
+        //we are creating so get an empty data type item
+        contentTypeResource.getScaffold()
+            .then(function(dt) {
+            	$scope.contentType = dt;
 
-		$scope.contentType = dt;
+            	//set a shared state
+                editorState.set($scope.contentType);
 
-		// set all tab to inactive
-		if( $scope.contentType.groups.length !== 0 ) {
-			angular.forEach($scope.contentType.groups, function(group){
+                // add init tab
+				addInitTab();
+            });
+    }
+    else {
+		contentTypeResource.getById($routeParams.id).then(function(dt){
+			$scope.contentType = dt;
 
-				// set state
-				group.tabState = "inActive";
+			// set all tab to inactive
+			if( $scope.contentType.groups.length !== 0 ) {
+				angular.forEach($scope.contentType.groups, function(group){
+					// set state
+					group.tabState = "inActive";
 
-				// push init/placeholder property
-				addInitProperty(group);
+					// push init/placeholder property
+					addInitProperty(group);
 
-			});
-		}
+				});
+			}
 
-		// add init tab
-		addInitTab();
+			//set a shared state
+            editorState.set($scope.contentType);
 
-	});
+			// add init tab
+			addInitTab();
+		});
+	}
+
+	/* ---------- SAVE ---------- */
+
+	$scope.save = function() {
+
+		//perform any pre-save logic here
+
+		contentTypeResource.save($scope.contentType).then(function(dt){
+
+			//post save logic here -the saved doctype returns as a new object
+
+			// set all tab to inactive
+			if( $scope.contentType.groups.length !== 0 ) {
+				angular.forEach($scope.contentType.groups, function(group){
+					// set state
+					group.tabState = "inActive";
+
+					// push init/placeholder property
+					addInitProperty(group);
+
+				});
+			}
+
+			//set a shared state
+            editorState.set($scope.contentType);
+
+			// add init tab
+			addInitTab();
+		});
+	};
 
 	/* ---------- TOOLBAR ---------- */
 
