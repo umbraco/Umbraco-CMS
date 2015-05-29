@@ -14,6 +14,7 @@ using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 using Newtonsoft.Json;
 using Umbraco.Core.PropertyEditors;
+using System;
 
 namespace Umbraco.Web.Editors
 {
@@ -70,6 +71,12 @@ namespace Umbraco.Web.Editors
             return dto;
         }
 
+        public Umbraco.Web.Models.ContentEditing.ContentTypeDisplay GetScaffold()
+        {
+            var ct = new ContentType(-1);
+            var dto = Mapper.Map<IContentType, Umbraco.Web.Models.ContentEditing.ContentTypeDisplay>(ct);
+            return dto;
+        }
 
         public ContentPropertyDisplay GetPropertyTypeScaffold(int id)
         {
@@ -134,6 +141,54 @@ namespace Umbraco.Web.Editors
             }
 
             return basics;
+        }
+
+
+        public ContentTypeDisplay PostSave(ContentTypeDisplay contentType)
+        {
+            
+            var ctService = ApplicationContext.Services.ContentTypeService;
+
+            ///TODO: warn on content type alias conflicts
+            ///TODO: warn on property alias conflicts
+            
+            ///TODO: Validate the submitted model
+
+            var ctId = Convert.ToInt32(contentType.Id);
+
+            if (ctId > 0)
+            {
+                //its an update to an existing
+                IContentType found = ctService.GetContentType(ctId);
+                if(found == null)
+                    throw new HttpResponseException( HttpStatusCode.NotFound );
+
+                Mapper.Map(contentType, found);
+                ctService.Save(found);
+
+                //map the saved item back to the content type (it should now get id etc set)
+                Mapper.Map(found, contentType);
+                return contentType;
+            }
+            else
+            {
+                //ensure alias is set
+                if (string.IsNullOrEmpty(contentType.Alias))
+                    contentType.Alias = contentType.Name.ToSafeAlias();
+
+                contentType.Id = null;
+
+                //save as new
+                IContentType newCt = new ContentType(-1);
+                Mapper.Map(contentType, newCt);
+                
+                ctService.Save(newCt);
+
+                //map the saved item back to the content type (it should now get id etc set)
+                Mapper.Map(newCt, contentType);
+                return contentType;
+            }
+
         }
 
         // TODO: This should really be centralized and used anywhere globalization applies.

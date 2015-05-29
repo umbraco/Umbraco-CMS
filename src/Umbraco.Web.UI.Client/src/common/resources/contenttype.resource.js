@@ -89,6 +89,35 @@ function contentTypeResource($q, $http, umbRequestHelper) {
                        "GetById",
                        [{ id: id }])),
                'Failed to retrieve content type');
+        },
+
+        getScaffold: function () {
+
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "contentTypeApiBaseUrl",
+                       "GetScaffold")),
+               'Failed to retrieve content type scaffold');
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.contentTypeResource#save
+         * @methodOf umbraco.resources.contentTypeResource
+         *
+         * @description
+         * Saves or update a content type       
+         * 
+         * @param {Object} content data type object to create/update
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        save: function (contentType) {
+            
+            return umbRequestHelper.resourcePromise(
+                 $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostSave"), contentType),
+                'Failed to save data for content type id ' + contentType.id);
         }
 
     };
