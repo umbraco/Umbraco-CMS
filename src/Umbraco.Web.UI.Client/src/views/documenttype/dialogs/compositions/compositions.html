@@ -1,15 +1,15 @@
 <div ng-controller="Umbraco.Editors.DocumentType.CompositionsController">
     <div class="umb-overlay-body">
-
         <form>
             <div ng-repeat="compositeContentType in model.availableCompositeContentTypes">
-                <input type="checkbox" ng-model="compositeContentType.isSelected" ng-change="model.selectCompositeContentType(compositeContentType)" />
-                <label>{{ compositeContentType.name }}</label>
+                
+                <label class="checkbox"> 
+                	<input type="checkbox" 
+                		ng-model="compositeContentType.isSelected" 
+                		ng-change="model.selectCompositeContentType(compositeContentType)" /> 
+                		<i class="{{ compositeContentType.icon }}"></i> {{ compositeContentType.name }}</label>
             </div>
         </form>
-
-        <pre>{{ model.availableCompositeContentTypes | json }}</pre>
-
     </div>
 </div>
 
