@@ -103,15 +103,13 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 
 			contentTypeResource.getById(compositeContentType.id).then(function(contentType){
 
-				compositeContentType.contentType = contentType;
-
 				//merge composition with content type
 				if( $scope.contentType.compositeContentTypes.indexOf(compositeContentType.alias) !== -1 ) {
 
 					var groupsArrayLength = $scope.contentType.groups.length;
 					var positionToPush = groupsArrayLength - 1;
 
-					angular.forEach(compositeContentType.contentType.groups, function(compositionGroup){
+					angular.forEach(contentType.groups, function(compositionGroup){
 
 						// set inherited state on tab
 						compositionGroup.inherited = true;
