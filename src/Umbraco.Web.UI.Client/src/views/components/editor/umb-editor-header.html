@@ -8,10 +8,22 @@
         </div>
         
         <div class="span7">
-            <div class="pull-right" ng-if="actions" style="padding: 20px 20px 0px 0px">
+
+            <div class="pull-right" style="padding: 20px 20px 0px 0px">
+                <!--
                 <umb-editor-actions actions="actions"></umb-editor-actions>
                 <umb-editor-menu ng-if="menu" menu="menu"></umb-editor-menu>
+
+                TEMP HACK
+                -->
+                <div class="btn-group">
+                    <a class="btn" href="#" ng-click="getOptions()" prevent-default="" data-toggle="dropdown">
+                        <localize key="general_actions" class="ng-isolate-scope ng-scope">Actions</localize>
+                        <span class="caret"></span>
+                    </a>
+                </div>
             </div>
+
         </div>
 
 	    <div ng-transclude></div>
