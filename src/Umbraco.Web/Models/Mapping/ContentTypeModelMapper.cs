@@ -51,14 +51,33 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.PropertyGroups, expression => expression.Ignore())
                 .AfterMap((source, dest) =>
                 {
+
                     dest.PropertyGroups = new PropertyGroupCollection();
                     foreach (var groupDisplay in source.Groups.Where(x => !x.Name.IsNullOrWhiteSpace() ) )
                     {
                         dest.PropertyGroups.Add(Mapper.Map<PropertyGroup>(groupDisplay));
                     }
+
+                    //sync compositions
+                    var current = dest.CompositionAliases();
+                    var proposed = source.CompositeContentTypes;
+
+                    var remove = current.Where(x =>  !proposed.Contains(x));
+                    var add = proposed.Where(x => !current.Contains(x));
+
+                    foreach(var rem in remove)
+                        dest.RemoveContentType(rem);
+
+                    foreach(var a in add){
+                        var add_ct = ApplicationContext.Current.Services.ContentTypeService.GetContentType(a);
+                        if(add_ct != null)
+                             dest.AddContentType(add_ct);
+                    }
+
+                    
                 });
 
-            config.CreateMap<IContentTypeComposition, int>().ConvertUsing(x => x.Id);
+            config.CreateMap<IContentTypeComposition, string>().ConvertUsing(x => x.Alias);
             config.CreateMap<IContentType, ContentTypeDisplay>()
                 //Ignore because this is not actually used for content types
                 .ForMember(display => display.Trashed, expression => expression.Ignore())
@@ -89,6 +108,9 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Id, expression => expression.Condition(source => source.Id > 0))
                 .ForMember(g => g.CreateDate, expression => expression.Ignore())                
                 .ForMember(g => g.UpdateDate, expression => expression.Ignore())
+
+                //only map if a parent is actually set
+                .ForMember(g => g.ParentId, expression => expression.Condition(display => display.ParentGroupId > 0))
                 .ForMember(g => g.ParentId, expression => expression.MapFrom(display => display.ParentGroupId))
                 
                 //ignore these, we'll do this in after map
@@ -96,7 +118,7 @@ namespace Umbraco.Web.Models.Mapping
                 .AfterMap((source, destination) =>
                 {
                     destination.PropertyTypes = new PropertyTypeCollection();
-                    foreach (var propertyTypeDisplay in source.Properties)
+                    foreach (var propertyTypeDisplay in source.Properties.Where(x => x.Label.IsNullOrWhiteSpace() == false ))
                     {
                         destination.PropertyTypes.Add(Mapper.Map<PropertyType>(propertyTypeDisplay));
                     }
@@ -119,8 +141,9 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(type => type.UpdateDate, expression => expression.Ignore())
                 .ForMember(type => type.Mandatory, expression => expression.MapFrom(display => display.Validation.Mandatory))
                 .ForMember(type => type.ValidationRegExp, expression => expression.MapFrom(display => display.Validation.Pattern))
-                .ForMember(type => type.PropertyEditorAlias, expression => expression.MapFrom(display => display.Editor))                
-                .ForMember(type => type.DataTypeDefinitionId, expression => expression.MapFrom(display => display.DataTypeId));
+                .ForMember(type => type.PropertyEditorAlias, expression => expression.MapFrom(display => display.Editor))
+                .ForMember(type => type.DataTypeDefinitionId, expression => expression.MapFrom(display => display.DataTypeId))
+                .ForMember(type => type.Name, expression => expression.MapFrom(display => display.Label));
         }
 
         
