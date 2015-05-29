@@ -4,6 +4,8 @@ using System.Linq;
 using System.Net.Http.Formatting;
 using System.Text;
 using System.Threading.Tasks;
+using umbraco;
+using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
@@ -29,7 +31,22 @@ namespace Umbraco.Web.Trees
 
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
-            return new MenuItemCollection();
+            var menu = new MenuItemCollection();
+
+            if (id == Constants.System.Root.ToInvariantString())
+            {
+                // root actions              
+                menu.Items.Add<CreateChildEntity, ActionNew>(ui.Text("actions", ActionNew.Instance.Alias));
+                menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
+                return menu;
+            }
+            else
+            {
+                //delete doc type
+                menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
+            }
+
+            return menu;
         }
     }
 }
