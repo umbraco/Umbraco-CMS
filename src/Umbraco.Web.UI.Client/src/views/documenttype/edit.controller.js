@@ -415,13 +415,25 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 		$scope.dialogModel.dataType = {};
 		$scope.dialogModel.property = property;
 		$scope.dialogModel.view = "views/documentType/dialogs/editDataType/editDataType.html";
+		$scope.dialogModel.multiActions = [
+			{
+				label: "Save",
+				action: function(dataType) {
+					saveDataType(dataType, false);
+				}
+			},
+			{
+				label: "Save as new",
+				action: function(dataType) {
+					saveDataType(dataType, true);
+				}
+			}
+		];
 		$scope.showDialog = true;
 
-		$scope.dialogModel.submit = function(model) {
+		function saveDataType(dataType, isNew) {
 
-			var dataType = model.dataType;
-			var preValues = createPreValueProps(model.dataType.preValues);
-			var isNew = false;
+			var preValues = createPreValueProps(dataType.preValues);
 
 			dataTypeResource.save(dataType, preValues, isNew).then(function(dataType) {
 
@@ -441,7 +453,7 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 
 			});
 
-		};
+		}
 
 		$scope.dialogModel.close = function(model){
 			$scope.editPropertyTypeSettings(property);
