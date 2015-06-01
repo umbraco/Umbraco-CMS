@@ -1,0 +1,12 @@
+<div class="btn-group dropup">
+
+    <a class="btn btn-primary" href="#" ng-click="primaryAction.action(model)" prevent-default>{{ primaryAction.label }}</a>
+    <a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="#" ng-if="secondaryActions.length !== 0"><span class="caret"></span></a>
+
+    <ul class="dropdown-menu" ng-if="secondaryActions.length !== 0">
+        <li ng-repeat="secondaryAction in secondaryActions">
+            <a href="" ng-click="secondaryAction.action(model)" prevent-default>{{ secondaryAction.label }}</a>
+        </li>
+    </ul>
+
+</div>
