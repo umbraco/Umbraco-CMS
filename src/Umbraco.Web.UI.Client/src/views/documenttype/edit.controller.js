@@ -476,38 +476,6 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 		return preValues;
 	}
 
-	$scope.addItems = function(tab){
-
-		$scope.showDialog = true;
-		$scope.dialogModel = {};
-		$scope.dialogModel.title = "Add some stuff";
-		$scope.dialogModel.dataTypes = $scope.dataTypes;
-		$scope.dialogModel.view = "views/documentType/dialogs/property.html";
-
-		var target = tab;
-		if(tab.groups && tab.groups.length > 0){
-			target = _.last(tab.groups);
-		}
-
-		$scope.dialogModel.close = function(model){
-			$scope.dialogModel = null;
-			$scope.showDialog = false;
-		};
-
-		$scope.dialogModel.submit = function(dt){
-			contentTypeResource.getPropertyTypeScaffold(dt.id).then(function(pt){
-
-				pt.label = dt.name + " field";
-				pt.dataType = dt;
-				target.properties.push(pt);
-
-				// open settings dialog
-				$scope.editPropertyTypeSettings(pt);
-
-			});
-		};
-	};
-
 	$scope.deleteProperty = function(tab, propertyIndex) {
 		tab.properties.splice(propertyIndex, 1);
 	};
