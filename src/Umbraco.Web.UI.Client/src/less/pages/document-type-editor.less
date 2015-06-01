@@ -52,9 +52,9 @@
   .edt-tab{
     margin: 50px 0 0 0;
     min-height: 145px;
-    border: 2px solid #CCCCCC;
+    border: 1px solid #CCCCCC;
     padding: 0;
-    box-shadow: 0 3px 0 0 rgba(0,0,0,0.1);
+    //box-shadow: 0 3px 0 0 rgba(0,0,0,0.1);
     border-radius: 0 10px 10px 10px;
     -webkit-transition: all 0.5s;
     transition: all 0.5s;
@@ -79,38 +79,53 @@
     }
   }
 
-  .tab-title{
-    padding: 5px 10px 0 10px;
+  .tab-title-wrapper {
     position: absolute;
-    left: -2px;
-    top: -45px;
-    height: 38px;
-    background: white;
-    border: 2px solid #CCCCCC;
-    border-bottom: none;
-    border-radius: 10px 10px 0 0;
-    font-weight: bold;
-    -webkit-transition: all 0.5s;
-    transition: all 0.5s;
-    .tab-title-input {
-      border-color: transparent;
-      background: transparent;
-      min-width: 80px;
+    left: -1px;
+    top: -44px;
+    .tab-title{
+      display: inline-block;
+      padding: 5px 10px 0 10px;
+      height: 38px;
+      background: white;
+      border: 1px solid #CCCCCC;
+      border-bottom: none;
+      border-radius: 10px 10px 0 0;
       font-weight: bold;
-      color: #515151;
-      margin-bottom: 0;
-      height: 25px !important;
-      &:hover {
-        border-color: @inputBorder;
+      -webkit-transition: all 0.5s;
+      transition: all 0.5s;
+      .tab-title-input {
+        border-color: transparent;
+        background: transparent;
+        min-width: 80px;
+        font-weight: bold;
+        color: #515151;
+        margin-bottom: 0;
+        height: 25px !important;
+        &:hover {
+          border-color: @inputBorder;
+        }
+        &.tab-title-placeholder {
+          border: 1px dashed #979797 !important;
+        }
       }
-      &.tab-title-placeholder {
-        border: 1px dashed #979797 !important;
+      .tab-title-text {
+        position: relative;
+        top: 7px;
+        font-size: 14px;
       }
     }
-    .tab-title-text {
-      position: relative;
-      top: 7px;
-      font-size: 14px;
+  }
+
+  .edt-tab-inherited-from {
+    font-size: 13px;
+    color: @grayLight;
+    display: inline-block;
+    margin-left: 5px;
+    position: relative;
+    top: 2px;
+    .icon {
+      font-size: 15px;
     }
   }
 
@@ -127,10 +142,10 @@
   // tab is in init state
   .edt-tab.tab-state-init {
     cursor: pointer;
-    border: 2px dashed @grayLight;
-    box-shadow: none !important;
+    border: 1px dashed @grayLight;
+    //box-shadow: none !important;
     .tab-title{
-      border: 2px dashed @grayLight;
+      border: 1px dashed @grayLight;
       border-bottom: none;
       width: 70px;
     }
@@ -161,19 +176,11 @@
   .edt-tab.tab-is-inherited {
     background: #FDFDFD;
     border-color: #F2F2F2;
-    box-shadow: none;
+    //box-shadow: none;
 
     .tab-title{
       border-color: #F2F2F2;
       background: #FDFDFD;
-    }
-  }
-
-  .edt-tab-inherited-from {
-    font-size: 13px;
-    color: @grayLight;
-    .icon {
-      font-size: 15px;
     }
   }
 
@@ -296,7 +303,7 @@
   // property state init - property placeholder
   .edt-property.property-state-init {
     background: #ffffff;
-    border: 2px dashed @grayLight;
+    border: 1px dashed @grayLight;
     border-radius: 5px;
     cursor: pointer;
     &:hover {

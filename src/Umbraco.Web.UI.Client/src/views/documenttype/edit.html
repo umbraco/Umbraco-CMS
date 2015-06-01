@@ -38,8 +38,10 @@
                             <!-- ng-if="tab.tabState=='init'" -->
                             <div class="edt-tab umb-card edt-tab-placeholder" ng-click="addTab(tab)" ng-show="tab.tabState=='init' && !sortingMode" ng-class="{'tab-state-init animated fadeIn': tab.tabState=='init'}">
 
-                                <div class="tab-title">
-                                    <span class="tab-title-text"></span>
+                                <div class="tab-title-wrapper">
+                                    <div class="tab-title">
+                                        <span class="tab-title-text"></span>
+                                    </div>
                                 </div>
 
                                 <div class="edt-tab-center-text">
@@ -50,19 +52,23 @@
                             </div>
 
                             <!-- TAB ACTIVE OR INACTIVE STATE -->
-                            <div class="edt-tab-inherited-from" ng-if="tab.inherited">
-                                <i class="icon icon-merge"></i> Inherited from {{ tab.inheritedFromName }}
-                                <span ng-repeat="contentTypeName in tab.parentTabContentTypeNames">
-                                    {{ contentTypeName }}
-                                    <span ng-if="!$last">, </span>
-                                </span>
-                            </div>
-
                             <div class="edt-tab umb-card edt-tab-handle" ng-class="{'tab-state-active':tab.tabState=='active', 'tab-state-inactive': tab.tabState=='inActive', 'tab-is-inherited': tab.inherited}" ng-click="activateTab(tab)" ng-if="tab.tabState !== 'init'">
 
-                                <div class="tab-title">
-                                    <i class="icon icon-navigation" ng-if="sortingMode"></i>
-                                    <input class="tab-title-input" type="text" ng-model="tab.name" ng-class="{'tab-title-placeholder': tab.name == ''}" ng-change="updateTabTitle(tab)" umb-blur="updateTabTitle(tab)" ng-disabled="tab.inherited" umb-auto-focus umb-auto-resize />
+                                <div class="tab-title-wrapper">
+
+                                    <div class="tab-title">
+                                        <i class="icon icon-navigation" ng-if="sortingMode"></i>
+                                        <input class="tab-title-input" type="text" ng-model="tab.name" ng-class="{'tab-title-placeholder': tab.name == ''}" ng-change="updateTabTitle(tab)" umb-blur="updateTabTitle(tab)" ng-disabled="tab.inherited" umb-auto-focus umb-auto-resize />
+                                    </div>
+
+                                    <div class="edt-tab-inherited-from" ng-if="tab.inherited">
+                                        <i class="icon icon-merge"></i> Inherited from {{ tab.inheritedFromName }}
+                                        <span ng-repeat="contentTypeName in tab.parentTabContentTypeNames">
+                                            {{ contentTypeName }}
+                                            <span ng-if="!$last">, </span>
+                                        </span>
+                                    </div>
+
                                 </div>
 
                                 <div class="edt-property-group">
