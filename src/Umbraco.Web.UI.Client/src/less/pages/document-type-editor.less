@@ -206,6 +206,7 @@
     margin-bottom: 10px;
     padding: 10px 0;
     border: 1px solid transparent;
+    border-radius: 5px;
     &:hover {
       border: 1px solid @inputBorder;
     }
@@ -322,9 +323,18 @@
 
   .edt-property.property-is-inherited {
     background: #FDFDFD;
-    &:hover {
-      border-color: transparent;
-    }
+    border: 1px solid #F2F2F2;
+  }
+
+  .edt-property-inherited-from {
+    font-size: 11px;
+    background-color: #d9d9d9;
+    margin-left: 5px;
+    position: absolute;
+    right: 0;
+    z-index: 100;
+    padding: 0 10px 0 5px;
+    top: 0;
   }
 
 
@@ -523,7 +533,7 @@
   }
 
   .editor-placeholder {
-    border: 2px dashed @grayLight;
+    border: 1px dashed @grayLight;
     width: 100%;
     height: 80px;
     line-height: 80px;
