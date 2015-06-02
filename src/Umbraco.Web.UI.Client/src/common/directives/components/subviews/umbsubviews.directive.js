@@ -30,6 +30,9 @@ angular.module("umbraco.directives")
                 function init() {
                     // set first element to active
                     scope.page.subViews[0].isActive = true;
+
+                    // set tools from first view
+                    scope.tools = scope.page.subViews[0].tools;
                 }
 
                 scope.$watch('page.subViews', function(newValue, oldValue) {
