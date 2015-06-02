@@ -9,7 +9,7 @@ LazyLoad.js([
       '/Umbraco/js/umbraco.security.js',
       '/Umbraco/ServerVariables',
       '/Umbraco/lib/spectrum/spectrum.js',
-      'http://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js',
+      'https://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js',
       '/umbraco/js/canvasdesigner.panel.js',
 ], function () {
     jQuery(document).ready(function () {
