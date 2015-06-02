@@ -69,7 +69,7 @@ namespace Umbraco.Web.Models.Mapping
                         dest.RemoveContentType(rem);
 
                     foreach(var a in add){
-                        var add_ct = ApplicationContext.Current.Services.ContentTypeService.GetContentType(a);
+                        var add_ct = applicationContext.Services.ContentTypeService.GetContentType(a);
                         if(add_ct != null)
                              dest.AddContentType(add_ct);
                     }
