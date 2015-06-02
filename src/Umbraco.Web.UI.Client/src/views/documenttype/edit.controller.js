@@ -8,10 +8,50 @@
  */
 function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, contentTypeResource, dataTypeResource, editorState) {
 
-	$scope.page = {actions: [], menu: [] };
-	$scope.actions = [{name: "Structure", cssClass: "list"},{name: "Structure", cssClass: "list"},{name: "Structure", cssClass: "list"}];
+	$scope.page = {actions: [], menu: [], subViews: [] };
 	$scope.sortingMode = false;
 
+	$scope.page.subViews = [
+		{
+			"name": "Design",
+			"icon": "merge",
+			"view": "views/documentType/views/design/design.html",
+			"tools": [
+				{
+					"name": "Compositions",
+					"icon": "merge",
+					"action": function() {
+						$scope.openCompositionsDialog();
+					}
+				},
+				{
+					"name": "Reorder",
+					"icon": "navigation",
+					"action": function() {
+						$scope.toggleSortingMode();
+					}
+				}
+			]
+		},
+		{
+			"name": "List view",
+			"icon": "list",
+			"view": "views/documentType/views/listview/listview.html",
+			"tools": []
+		},
+		{
+			"name": "Permissions",
+			"icon": "keychain",
+			"view": "views/documentType/views/permissions/permissions.html",
+			"tools": []
+		},
+		{
+			"name": "Templates",
+			"icon": "article",
+			"view": "views/documentType/views/templates/templates.html",
+			"tools": []
+		}
+	];
 
 	if ($routeParams.create) {
         //we are creating so get an empty data type item

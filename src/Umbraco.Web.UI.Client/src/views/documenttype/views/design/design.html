@@ -1,0 +1,148 @@
+<!-- TABS -->
+<ul ui-sortable="sortableOptionsTab" ng-model="contentType.groups" class="no-style-list">
+
+    <li ng-repeat="tab in contentType.groups">
+
+        <!-- TAB INIT STATE -->
+        <!-- ng-if="tab.tabState=='init'" -->
+        <div class="edt-tab umb-card edt-tab-placeholder" ng-click="addTab(tab)" ng-show="tab.tabState=='init' && !sortingMode" ng-class="{'tab-state-init animated fadeIn': tab.tabState=='init'}">
+
+            <div class="tab-title-wrapper">
+                <div class="tab-title">
+                    <span class="tab-title-text"></span>
+                </div>
+            </div>
+
+            <div class="edt-tab-center-text">
+                <span ng-if="contentType.groups.length === 1">Add new tab</span>
+                <span ng-if="contentType.groups.length > 1">Add another tab</span>
+            </div>
+
+        </div>
+
+        <!-- TAB ACTIVE OR INACTIVE STATE -->
+        <div class="edt-tab umb-card edt-tab-handle" ng-class="{'tab-state-active':tab.tabState=='active', 'tab-state-inactive': tab.tabState=='inActive', 'tab-is-inherited': tab.inherited}" ng-click="activateTab(tab)" ng-if="tab.tabState !== 'init'">
+
+            <div class="tab-title-wrapper">
+
+                <div class="tab-title">
+                    <i class="icon icon-navigation" ng-if="sortingMode"></i>
+                    <input class="tab-title-input" type="text" ng-model="tab.name" ng-class="{'tab-title-placeholder': tab.name == ''}" ng-change="updateTabTitle(tab)" umb-blur="updateTabTitle(tab)" ng-disabled="tab.inherited" umb-auto-focus umb-auto-resize />
+                </div>
+
+                <div class="edt-tab-inherited-from" ng-if="tab.inherited">
+                    <i class="icon icon-merge"></i> Inherited from {{ tab.inheritedFromName }}
+                                        <span ng-repeat="contentTypeName in tab.parentTabContentTypeNames">
+                                            {{ contentTypeName }}
+                                            <span ng-if="!$last">, </span>
+                                        </span>
+                </div>
+
+            </div>
+
+            <div class="edt-property-group">
+                <ul class="edt-property-list no-style-list" ui-sortable="sortableOptionsEditor"
+                    ng-model="tab.properties" class="no-style-list">
+                    <li ng-repeat="property in tab.properties">
+
+                        <!-- Init property / Property placeholder / add new property -->
+                        <div class="edt-property" ng-show="property.propertyState=='init'" ng-class="{'property-state-init animated fadeIn': property.propertyState=='init'}" ng-click="editPropertyTypeSettings(property)">
+
+                            <div class="edt-property-meta">
+                                <div class="placeholder-input-small"></div>
+                                <div class="placeholder-input"></div>
+                                <div class="placeholder-text-group">
+                                    <div class="placeholder-text-line-full"></div>
+                                    <div class="placeholder-text-line-full"></div>
+                                    <div class="placeholder-text-line-short"></div>
+                                </div>
+                            </div>
+
+                            <div class="edt-property-preview">
+                                <span class="placeholder-text">Add property</span>
+                            </div>
+
+                            <div class="edt-property-actions"></div>
+
+                        </div>
+
+                        <div class="edt-property" ng-show="property.propertyState!=='init'" ng-class="{'active': property.dialogIsOpen, 'property-state-active animated fadeIn': property.propertyState=='active', 'property-is-inherited': property.inherited}">
+
+
+                            <!-- property meta text -->
+                            <div class="edt-property-meta" ng-class="{'edt-property-handle': sortingMode}">
+
+                                <div class="edt-property-inherited-from" ng-if="property.inherited"><i class="icon icon-merge"></i> Inherited from {{property.contentTypeName}}</div>
+
+                                <div ng-if="!sortingMode">
+                                    <div class="edt-property-meta-alias invisible-field">
+                                        <input type="text" placeholder="Alias.." ng-model="property.alias" ng-disabled="property.inherited">
+                                    </div>
+
+                                    <div class="edt-property-meta-label invisible-field">
+                                        <input type="text" placeholder="Label.." ng-model="property.label" ng-change="changePropertyLabel(property)" ng-disabled="property.inherited" />
+                                    </div>
+
+                                    <div class="edt-property-meta-description invisible-field">
+                                        <textarea ng-model="property.description" placeholder="Enter your description..." ng-disabled="property.inherited"></textarea>
+                                    </div>
+                                </div>
+
+                                <div ng-if="sortingMode">
+                                    <i class="icon icon-navigation"></i>
+                                    <span>{{ property.label }}</span>:
+                                    <span class="item-alias">{{ property.alias }}</span>
+                                </div>
+
+                            </div>
+
+                            <!-- property preview -->
+                            <!-- ng-if="tab.tabState=='active'" -->
+                            <div tabindex="-1" class="edt-property-preview" ng-click="editPropertyTypeSettings(property)">
+
+                                                    <span class="edt-property-preview-overlay">
+                                                        <span class="overlay-text">Choose property type</span>
+                                                    </span>
+
+                                                    <span class="edt-property-preview-label">
+                                                        <span ng-if="property.dataTypeName !== undefined">{{property.dataTypeName}}</span>
+                                                        <span ng-if="property.dataTypeName == undefined">Preview</span>
+                                                    </span>
+
+                                <umb-property-editor model="property" ng-if="property.view !== undefined"></umb-property-editor>
+
+                            </div>
+
+                            <!-- row tools -->
+                            <div tabindex="-1" class="edt-property-actions">
+
+                                <div ng-if="!property.inherited">
+
+                                    <!-- delete property -->
+                                    <a href="" class="property-action property-action-delete" ng-click="deleteProperty(tab, $index)">
+                                        <i class="icon icon-trash"></i>
+                                    </a>
+
+                                    <!-- settings for property -->
+                                    <a href="" class="property-action property-action-edit" ng-click="editPropertyTypeSettings(property)">
+                                        <i class="icon icon-settings"></i>
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </li>
+
+                </ul>
+            </div>
+
+        </div>
+
+        <br>
+
+    </li>
+
+</ul>
