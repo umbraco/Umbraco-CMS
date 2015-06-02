@@ -33,13 +33,15 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "allowedContentTypes")]
         public IEnumerable<EntityBasic> AllowedContentTypes { get; set; }
 
+
         //List view
-        [DataMember(Name = "enableListView")]
-        public bool EnableListView { get; set; }
+        [DataMember(Name = "isContainer")]
+        public bool IsContainer { get; set; }
 
         //we might not need this... 
-        [DataMember(Name = "allowedAtRoot")]
-        public bool AllowedAtRoot { get; set; }
+        [DataMember(Name = "allowAsRoot")]
+        public bool AllowAsRoot { get; set; }
+
 
         //Compositions
         [DataMember(Name = "compositeContentTypes")]

@@ -96,7 +96,7 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(display.ParentId, result.ParentId);
             Assert.AreEqual(display.Path, result.Path);
             Assert.AreEqual(display.Thumbnail, result.Thumbnail);
-            Assert.AreEqual(display.EnableListView, result.IsContainer);
+            Assert.AreEqual(display.IsContainer, result.IsContainer);
             
             //TODO: Now we need to assert all of the more complicated parts
             Assert.AreEqual(1, result.PropertyGroups.Count);
@@ -138,7 +138,7 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(contentType.ParentId, result.ParentId);
             Assert.AreEqual(contentType.Path, result.Path);
             Assert.AreEqual(contentType.Thumbnail, result.Thumbnail);
-            Assert.AreEqual(contentType.IsContainer, result.EnableListView);
+            Assert.AreEqual(contentType.IsContainer, result.IsContainer);
 
             Assert.AreEqual(contentType.DefaultTemplate.Alias, result.DefaultTemplate.Alias);
 
@@ -164,7 +164,7 @@ namespace Umbraco.Tests.Models.Mapping
                 Path = "-1,1234",
                 ParentId = -1,
                 Thumbnail = "tree-thumb",
-                EnableListView = true,
+                IsContainer = true,
                 Groups = new List<PropertyTypeGroupDisplay>()
                 {
                     new PropertyTypeGroupDisplay

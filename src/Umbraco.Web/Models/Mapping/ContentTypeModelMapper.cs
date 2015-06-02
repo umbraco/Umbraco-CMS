@@ -46,7 +46,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.CreateDate, expression => expression.Ignore())
                 .ForMember(dto => dto.UpdateDate, expression => expression.Ignore())
                 .ForMember(dto => dto.SortOrder, expression => expression.Ignore())
-                .ForMember(dto => dto.IsContainer, expression => expression.MapFrom(display => display.EnableListView))
+
                 //ignore, we'll do this in after map
                 .ForMember(dto => dto.PropertyGroups, expression => expression.Ignore())
                 .AfterMap((source, dest) =>
@@ -73,8 +73,6 @@ namespace Umbraco.Web.Models.Mapping
                         if(add_ct != null)
                              dest.AddContentType(add_ct);
                     }
-
-                    
                 });
 
             config.CreateMap<IContentTypeComposition, string>().ConvertUsing(x => x.Alias);
@@ -95,14 +93,9 @@ namespace Umbraco.Web.Models.Mapping
                     expression => expression.MapFrom(dto => dto.ContentTypeComposition))
 
                 .ForMember(
-                    display => display.EnableListView, 
-                    expression => expression.MapFrom(type => type.IsContainer))
-
-                .ForMember(
                     dto => dto.Groups,
                     expression => expression.ResolveUsing(new PropertyTypeGroupResolver(applicationContext, _propertyEditorResolver)));
 
-            
 
             config.CreateMap<PropertyTypeGroupDisplay, PropertyGroup>()
                 .ForMember(dest => dest.Id, expression => expression.Condition(source => source.Id > 0))
