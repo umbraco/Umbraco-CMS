@@ -1,1 +1,77 @@
-permissions
+<div ng-controller="Umbraco.Editors.DocumentType.PermissionsController">
+    <div class="sub-view-columns">
+
+        <div class="sub-view-column-left">
+            <h5>Allow as root</h5>
+            <small>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vulputate velit a velit consectetur luctus.</small>
+        </div>
+        <div class="sub-view-column-right">
+            <label class="checkbox no-indent">
+                <input type="checkbox" ng-model="contentType.allowAsRoot" /> Yes - lorem ipsum dolor sit
+            </label>
+        </div>
+
+    </div>
+
+    <div class="sub-view-columns">
+
+        <div class="sub-view-column-left">
+            <h5>Allowed child node types</h5>
+            <small>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vulputate velit a velit consectetur luctus.</small>
+        </div>
+
+        <div class="sub-view-column-right">
+
+            <div class="node-tree">
+
+                <!-- CURRENT CONTENT TYPE -->
+                <div class="node node-parent">
+                    <div class="node-description">
+                        <div class="node-icon-wrapper">
+                            <i class="icon {{ contentType.icon }}"></i>
+                        </div>
+                        <span class="node-name">{{ contentType.name }}</span>
+                        <small>(Current)</small>
+                    </div>
+                </div>
+
+                <div class="child-notes-wrapper">
+
+                    <!-- ADDED NODES -->
+                    <div class="node node-child" ng-repeat="allowedType in contentType.allowedContentTypes">
+                        <div class="node-description">
+                            <div class="node-icon-wrapper">
+                                <i class="icon {{ allowedType.icon }}"></i>
+                            </div>
+                            <span class="node-name"> {{ allowedType.name }}</span>
+                        </div>
+                        <div class="node-actions">
+                            <i class="icon icon-trash" ng-click="removeAllowedChildNode(allowedType)"></i>
+                        </div>
+                    </div>
+
+                    <!-- NODE PLACEHOLDER -->
+                    <div class="node node-placeholder" ng-if="(contentTypes | filter:{show:true}).length > 0">
+                        <div class="node-placeholder-text" ng-click="togglePlaceholderDetails()" ng-if="showPlaceholderDetails==false">Allow child node</div>
+                        <div class="node-placeholder-details" ng-if="showPlaceholderDetails">
+                            <select class="node-select" ng-model="selectedContentType" ng-options="contentType as contentType.name for contentType in contentTypes | filter:{show:true} | orderBy:'name'">
+                                <option value="">Select content type</option>
+                            </select>
+                            <a href="" class="btn" ng-click="addSelectedContentType(selectedContentType)">Allow</a>
+                        </div>
+                    </div>
+
+                    <!-- ALL NODES ADDED -->
+                    <div class="text-center" ng-if="(contentTypes | filter:{show:true}).length === 0">
+                        <small>All content types are added as child nodes</small>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
