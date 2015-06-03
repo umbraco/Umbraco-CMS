@@ -11,6 +11,15 @@ namespace Umbraco.Core
     // - this is NOT a reader/writer lock
     // - this is NOT a recursive lock
     //
+    // using a named Semaphore here and not a Mutex because mutexes have thread
+    // affinity which does not work with async situations
+    //
+    // it is important that managed code properly release the Semaphore before
+    // going down else it will maintain the lock - however note that when the
+    // whole process (w3wp.exe) goes down and all handles to the Semaphore have
+    // been closed, the Semaphore system object is destroyed - so in any case
+    // an iisreset should clean up everything
+    //
     internal class AsyncLock
     {
         private readonly SemaphoreSlim _semaphore;

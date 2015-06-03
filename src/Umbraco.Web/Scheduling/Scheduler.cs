@@ -48,9 +48,9 @@ namespace Umbraco.Web.Scheduling
                                 LogHelper.Debug<Scheduler>(() => "Initializing the scheduler");
 
                                 // backgrounds runners are web aware, if the app domain dies, these tasks will wind down correctly
-                                _publishingRunner = new BackgroundTaskRunner<IBackgroundTask>();
-                                _tasksRunner = new BackgroundTaskRunner<IBackgroundTask>();
-                                _scrubberRunner = new BackgroundTaskRunner<IBackgroundTask>();
+                                _publishingRunner = new BackgroundTaskRunner<IBackgroundTask>("ScheduledPublishing");
+                                _tasksRunner = new BackgroundTaskRunner<IBackgroundTask>("ScheduledTasks");
+                                _scrubberRunner = new BackgroundTaskRunner<IBackgroundTask>("LogScrubber");
 
                                 var settings = UmbracoConfig.For.UmbracoSettings();
 
