@@ -70,7 +70,7 @@ function valFormManager(serverValidationManager, $rootScope, $log, $timeout, not
 
             //This handles the 'unsaved changes' dialog which is triggered when a route is attempting to be changed but
             // the form has pending changes
-            unsubscribe.push($rootScope.$on('$locationChangeStart', function(event, nextLocation, currentLocation) {
+            var locationEvent = $rootScope.$on('$locationChangeStart', function(event, nextLocation, currentLocation) {
                 if (!formCtrl.$dirty || isSavingNewItem) {
                     return;
                 }
@@ -93,7 +93,9 @@ function valFormManager(serverValidationManager, $rootScope, $log, $timeout, not
                     eventsService.emit("valFormManager.pendingChanges", true);
                 }
 
-            }));
+            });
+            unsubscribe.push(locationEvent);
+
             //Ensure to remove the event handler when this instance is destroyted
             scope.$on('$destroy', function() {
                 for (var u in unsubscribe) {
