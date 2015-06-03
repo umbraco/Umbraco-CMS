@@ -49,7 +49,7 @@
   .edt-tab{
     margin: 50px 0 0 0;
     min-height: 145px;
-    border: 1px solid #CCCCCC;
+    border: 2px solid #CCCCCC;
     padding: 0;
     //box-shadow: 0 3px 0 0 rgba(0,0,0,0.1);
     border-radius: 0 10px 10px 10px;
@@ -78,14 +78,14 @@
 
   .tab-title-wrapper {
     position: absolute;
-    left: -1px;
-    top: -44px;
+    left: -2px;
+    top: -45px;
     .tab-title{
       display: inline-block;
       padding: 5px 10px 0 10px;
       height: 38px;
       background: white;
-      border: 1px solid #CCCCCC;
+      border: 2px solid #CCCCCC;
       border-bottom: none;
       border-radius: 10px 10px 0 0;
       font-weight: bold;
@@ -141,6 +141,10 @@
     cursor: pointer;
     border: 1px dashed @grayLight;
     //box-shadow: none !important;
+    .tab-title-wrapper {
+      left: -1px;
+      top: -44px;
+    }
     .tab-title{
       border: 1px dashed @grayLight;
       border-bottom: none;
@@ -320,7 +324,11 @@
 
   .edt-property.property-is-inherited {
     background: #FDFDFD;
-    border: 1px solid #F2F2F2;
+    border: transparent;
+    //border: 1px solid #F2F2F2;
+    &:hover {
+      border: transparent;
+    }
   }
 
   .edt-property-inherited-from {
