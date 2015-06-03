@@ -100,6 +100,23 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Returns all content type objects
+        /// </summary>
+        /// <param name="contentId"></param>
+        public IEnumerable<ContentTypeBasic> GetAll()
+        {
+            var types = Services.ContentTypeService.GetAllContentTypes().ToList();
+            var basics = types.Select(Mapper.Map<IContentType, ContentTypeBasic>).ToList();
+            foreach (var basic in basics)
+            {
+                basic.Name = TranslateItem(basic.Name);
+                basic.Description = TranslateItem(basic.Description);
+            }
+
+            return basics;
+        }
+
+        /// <summary>
         /// Returns the allowed child content type objects for the content item id passed in
         /// </summary>
         /// <param name="contentId"></param>

@@ -91,6 +91,27 @@ function contentTypeResource($q, $http, umbRequestHelper) {
                'Failed to retrieve content type');
         },
 
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.contentTypeResource#getAll
+         * @methodOf umbraco.resources.contentTypeResource
+         *
+         * @description
+         * Returns a list of all content types
+         *        
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        getAll: function () {
+
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "contentTypeApiBaseUrl",
+                       "GetAll")),
+               'Failed to retrieve all content types');
+        },
+
         getScaffold: function () {
 
             return umbRequestHelper.resourcePromise(
