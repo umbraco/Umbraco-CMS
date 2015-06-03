@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 using Umbraco.Core.Cache;
@@ -121,27 +122,29 @@ namespace umbraco.cms.businesslogic.web
 
                         using (var re = File.OpenText(IOHelper.MapPath(String.Format("{0}/{1}.css", SystemDirectories.Css, this.Text))))
                         {
-                            string input = null;
-                            _content = string.Empty;
                             // NH: Updates the reader to support properties
                             var readingProperties = false;
+                            // stop concatenating strings, use string builders!
+                            var contentBuilder = new StringBuilder();
+                            var propertiesBuilder = new StringBuilder();
 
-                            while ((input = re.ReadLine()) != null && true)
+                            string input;
+                            while ((input = re.ReadLine()) != null)
                             {
                                 if (input.Contains("EDITOR PROPERTIES"))
                                 {
                                     readingProperties = true;
                                 }
                                 else
-                                    if (readingProperties)
-                                    {
-                                        propertiesContent += input.Replace("\n", "") + "\n";
-                                    }
-                                    else
-                                    {
-                                        _content += input.Replace("\n", "") + "\n";
-                                    }
+                                {
+                                    var builder = readingProperties ? propertiesBuilder : contentBuilder;
+                                    builder.Append(input.Replace("\n", ""));
+                                    builder.Append("\n");
+                                }
                             }
+
+                            _content = contentBuilder.ToString();
+                            propertiesContent = propertiesBuilder.ToString();
                         }
 
                         // update properties

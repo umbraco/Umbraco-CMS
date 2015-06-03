@@ -40,26 +40,66 @@ namespace umbraco
 
         private content()
         {
-            if (SyncToXmlFile == false) return;
-
-            // there's always be one task keeping a ref to the runner
-            // so it's safe to just create it as a local var here
-            var runner = new BackgroundTaskRunner<XmlCacheFilePersister>(new BackgroundTaskRunnerOptions
+            if (SyncToXmlFile)
             {
-                LongRunning = true,
-                KeepAlive = true
-            });
+                // if we write to file, prepare the lock
+                // (if we don't use the file, or just read from it, no need to lock)
+                InitializeFileLock();
 
-            // create (and add to runner)
-            _persisterTask = new XmlCacheFilePersister(runner, this);
+                // and prepare the persister task
+                // there's always be one task keeping a ref to the runner
+                // so it's safe to just create it as a local var here
+                var runner = new BackgroundTaskRunner<XmlCacheFilePersister>("XmlCacheFilePersister", new BackgroundTaskRunnerOptions
+                {
+                    LongRunning = true,
+                    KeepAlive = true
+                });
 
-            InitializeFileLock();
+                // when the runner is terminating we need to ensure that no modifications
+                // to content are possible anymore, as they would not be written out to
+                // the xml file - unfortunately that is not possible in 7.x because we
+                // cannot lock the content service... and so we do nothing...
+                //runner.Terminating += (sender, args) =>
+                //{
+                //};
+
+                // when the runner has terminated we know we will not be writing to the file
+                // anymore, so we can release the lock now - no need to wait for the AppDomain
+                // unload - which means any "last minute" saves will be lost - but waiting for
+                // the AppDomain to unload has issues...
+                runner.Terminated += (sender, args) =>
+                {
+                    if (_fileLock == null) return; // not locking (testing?)
+                    if (_fileLocked == null) return; // not locked
+
+                    // thread-safety
+                    // lock something that's readonly and not null..
+                    lock (_xmlFileName)
+                    {
+                        // double-check
+                        if (_fileLocked == null) return;
+
+                        LogHelper.Debug<content>("Release file lock.");
+                        _fileLocked.Dispose();
+                        _fileLocked = null;
+                        _fileLock = null; // ensure we don't lock again
+                    }
+                };
+
+                // create (and add to runner)
+                _persisterTask = new XmlCacheFilePersister(runner, this);
+            }
 
             // initialize content - populate the cache
             using (var safeXml = GetSafeXmlWriter(false))
             {
                 bool registerXmlChange;
+
+                // if we don't use the file then LoadXmlLocked will not even
+                // read from the file and will go straight to database
                 LoadXmlLocked(safeXml, out registerXmlChange);
+                // if we use the file and registerXmlChange is true this will
+                // write to file, else it will not
                 safeXml.Commit(registerXmlChange);
             }
         }
@@ -1007,8 +1047,8 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         private void OnDomainUnloadReleaseFileLock(object sender, EventArgs args)
         {
             // the unload event triggers AFTER all hosted objects (eg the file persister
-            // background task runner) have been stopped, so we should NOT be accessing
-            // the file from now one - release the lock
+            // background task runner) have been stopped, so we should have released the
+            // lock already - this is for safety - might be possible to get rid of it
 
             // NOTE
             // trying to write to the log via LogHelper at that point is a BAD idea
@@ -1056,12 +1096,14 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         internal void SaveXmlToFile()
         {
             LogHelper.Info<content>("Save Xml to file...");
-            EnsureFileLock();
-
-            var xml = _xmlContent; // capture (atomic + volatile), immutable anyway
 
             try
             {
+                var xml = _xmlContent; // capture (atomic + volatile), immutable anyway
+                if (xml == null) return;
+
+                EnsureFileLock();
+
                 // delete existing file, if any
                 DeleteXmlFile();
 
@@ -1079,7 +1121,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                     fs.Write(bytes, 0, bytes.Length);
                 }
 
-                LogHelper.Debug<content>("Saved Xml to file.");
+                LogHelper.Info<content>("Saved Xml to file.");
             }
             catch (Exception e)
             {
@@ -1094,12 +1136,14 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         internal async System.Threading.Tasks.Task SaveXmlToFileAsync()
         {
             LogHelper.Info<content>("Save Xml to file...");
-            EnsureFileLock();
-
-            var xml = _xmlContent; // capture (atomic + volatile), immutable anyway
 
             try
             {
+                var xml = _xmlContent; // capture (atomic + volatile), immutable anyway
+                if (xml == null) return;
+
+                EnsureFileLock();
+
                 // delete existing file, if any
                 DeleteXmlFile();
 
@@ -1117,7 +1161,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                     await fs.WriteAsync(bytes, 0, bytes.Length);
                 }
 
-                LogHelper.Debug<content>("Saved Xml to file.");
+                LogHelper.Info<content>("Saved Xml to file.");
             }
             catch (Exception e)
             {
@@ -1160,18 +1204,26 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         private XmlDocument LoadXmlFromFile()
         {
             LogHelper.Info<content>("Load Xml from file...");
-            EnsureFileLock();
 
             try
             {
+                // if we're not writing back to the file, no need to lock
+                if (SyncToXmlFile)
+                    EnsureFileLock();
+
                 var xml = new XmlDocument();
                 using (var fs = new FileStream(_xmlFileName, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
                     xml.Load(fs);
                 }
                 _lastFileRead = DateTime.UtcNow;
-                LogHelper.Info<content>("Successfully loaded Xml from file.");
+                LogHelper.Info<content>("Loaded Xml from file.");
                 return xml;
+            }
+            catch (FileNotFoundException)
+            {
+                LogHelper.Warn<content>("Failed to load Xml, file does not exist.");
+                return null;
             }
             catch (Exception e)
             {

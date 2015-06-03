@@ -11,8 +11,7 @@
 
                 <div ng-style="img.style" class="umb-non-thumbnail" ng-if="!img.thumbnail">
                     <i class="icon large {{img.icon}}"></i>
-                    {{img.name}}
-                    
+                    <span>{{img.name}}</span>
                 </div>
 
                 <div ng-if="img.thumbnail" class="umb-photo" ng-style="img.thumbStyle" alt="{{img.name}}">

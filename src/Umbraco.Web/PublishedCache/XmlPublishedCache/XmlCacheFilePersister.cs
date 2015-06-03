@@ -106,7 +106,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
                 else if (_timer == null) // we don't have a timer yet
                 {
-                    LogHelper.Debug<XmlCacheFilePersister>("Touched, was idle, start and save in {0}ms.");
+                    LogHelper.Debug<XmlCacheFilePersister>("Touched, was idle, start and save in {0}ms.", () => WaitMilliseconds);
                     _initialTouch = DateTime.Now;
                     _timer = new Timer(_ => TimerRelease());
                     _timer.Change(WaitMilliseconds, 0);
@@ -130,7 +130,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             }
 
             if (runNow)
-                Run();
+                //Run();
+                LogHelper.Warn<XmlCacheFilePersister>("Cannot write now because we are going down, changes may be lost.");
 
             return ret; // this, by default, unless we created a new one
         }

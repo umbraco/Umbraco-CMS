@@ -105,15 +105,22 @@ namespace Umbraco.Core.Cache
                 
                 if (result == null || GetSafeLazyValue(result, true) == null) // get non-created as NonCreatedValue & exceptions as null
                 {
-                    result = new Lazy<object>(getCacheItem);
+                    result = GetSafeLazy(getCacheItem);
                     ContextItems[cacheKey] = result;
                 }
             }
 
-            // this may throw if getCacheItem throws, but this is the only place where
-            // it would throw as everywhere else we use GetLazySaveValue() to hide exceptions
-            // and pretend exceptions were never inserted into cache to begin with.
-            return result.Value;
+            // using GetSafeLazy and GetSafeLazyValue ensures that we don't cache
+            // exceptions (but try again and again) and silently eat them - however at
+            // some point we have to report them - so need to re-throw here
+
+            // this does not throw anymore
+            //return result.Value;
+
+            var value = result.Value; // will not throw (safe lazy)
+            var eh = value as ExceptionHolder;
+            if (eh != null) throw eh.Exception; // throw once!
+            return value;
         }
         
         #endregion
