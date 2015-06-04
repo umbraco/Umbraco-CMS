@@ -11,45 +11,43 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 	$scope.page = {actions: [], menu: [], subViews: [] };
 	$scope.sortingMode = false;
 
-	$scope.page.subViews = [
+	$scope.page.navigation = [
 		{
 			"name": "Design",
 			"icon": "merge",
 			"view": "views/documentType/views/design/design.html",
+			"active": true,
 			"tools": [
-				{
-					"name": "Compositions",
-					"icon": "merge",
-					"action": function() {
-						$scope.openCompositionsDialog();
-					}
-				},
-				{
-					"name": "Reorder",
-					"icon": "navigation",
-					"action": function() {
-						$scope.toggleSortingMode();
-					}
+			{
+				"name": "Compositions",
+				"icon": "merge",
+				"action": function() {
+					$scope.openCompositionsDialog();
 				}
-			]
+			},
+			{
+				"name": "Reorder",
+				"icon": "navigation",
+				"action": function() {
+					$scope.toggleSortingMode();
+				}
+			}
+		]
 		},
 		{
 			"name": "List view",
 			"icon": "list",
-			"view": "views/documentType/views/listview/listview.html",
-			"tools": []
+			"view": "views/documentType/views/listview/listview.html"
 		},
 		{
 			"name": "Permissions",
 			"icon": "keychain",
-			"view": "views/documentType/views/permissions/permissions.html",
-			"tools": []
+			"view": "views/documentType/views/permissions/permissions.html"
 		},
 		{
 			"name": "Templates",
 			"icon": "article",
-			"view": "views/documentType/views/templates/templates.html",
-			"tools": []
+			"view": "views/documentType/views/templates/templates.html"
 		}
 	];
 

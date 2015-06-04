@@ -292,6 +292,19 @@
 
 /* --------- UMB PANEL HEADER ---------- */
 
+.umb-panel-content {
+  display: flex;
+  align-items: center;
+  height: 100px;
+  padding: 0 20px;
+  justify-content: space-between;
+}
+
+.umb-panel-meta {
+  display: flex;
+  align-items: center;
+}
+
 // icon
 .umb-panel-header-icon {
   width: 50px;
@@ -299,27 +312,55 @@
   background: #ffffff;
   border: 1px dashed @gray;
   border-radius: 5px;
-  float: left;
   text-align: center;
   font-size: 11px;
   line-height: 50px;
   cursor: pointer;
-  margin-left: 15px;
-  margin-top: 15px;
+  margin: 0 5px 0 0;
   opacity: 0.7;
 }
 
 .umb-panel-header-title-wrapper {
-  float: left;
-  width: 400px;
+
+}
+
+.umb-panel-header-name-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+input.umb-panel-header-name {
+  border: 1px solid transparent;
+  background: transparent;
+  font-size: 16px;
+  color: #000000;
+  margin: 0 5px 0 0;
+  max-height: 25px;
+  &:hover {
+    background: #ffffff;
+    border: 1px solid #cccccc;
+  }
 }
 
 .umb-panel-header-alias {
-  margin-top: 5px;
-  margin-left: 20px;
   font-size: 13px;
   color: #cccccc;
+  cursor: pointer;
   .icon {
     margin-right: 5px;
   }
 }
+
+input.umb-panel-header-description {
+  background: transparent;
+  border-color: transparent;
+  width: 35%;
+  min-width: 300px;
+  margin: -5px 0 0 0;
+  &:hover {
+    background: #ffffff;
+    border-color: #cccccc;
+  }
+}
+
+
