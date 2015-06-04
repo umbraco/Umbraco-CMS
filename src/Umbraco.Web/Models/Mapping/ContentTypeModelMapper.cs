@@ -7,6 +7,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
+using System.Collections.Generic;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -47,16 +48,26 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.UpdateDate, expression => expression.Ignore())
                 .ForMember(dto => dto.SortOrder, expression => expression.Ignore())
 
+                //mapped in aftermap
+                .ForMember(dto => dto.AllowedContentTypes, expression => expression.Ignore())
+
                 //ignore, we'll do this in after map
                 .ForMember(dto => dto.PropertyGroups, expression => expression.Ignore())
                 .AfterMap((source, dest) =>
                 {
-
                     dest.PropertyGroups = new PropertyGroupCollection();
                     foreach (var groupDisplay in source.Groups.Where(x => !x.Name.IsNullOrWhiteSpace() ) )
                     {
                         dest.PropertyGroups.Add(Mapper.Map<PropertyGroup>(groupDisplay));
                     }
+
+                    //Sync allowed child types
+                    var allowedTypes = new List<ContentTypeSort>();
+                    var proposedAllowed = source.AllowedContentTypes.ToArray();
+                    for (int i = 0; i < proposedAllowed.Length; i++)
+                        allowedTypes.Add(new ContentTypeSort(proposedAllowed[i], i));
+
+                    dest.AllowedContentTypes = allowedTypes;
 
                     //sync compositions
                     var current = dest.CompositionAliases();
@@ -73,8 +84,12 @@ namespace Umbraco.Web.Models.Mapping
                         if(add_ct != null)
                              dest.AddContentType(add_ct);
                     }
+
+
+
                 });
 
+            config.CreateMap<ContentTypeSort, int>().ConvertUsing(x => x.Id.Value);
             config.CreateMap<IContentTypeComposition, string>().ConvertUsing(x => x.Alias);
             config.CreateMap<IContentType, ContentTypeDisplay>()
                 //Ignore because this is not actually used for content types
