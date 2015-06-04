@@ -1,17 +1,13 @@
 using System;
 using System.Collections;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml;
-using Umbraco.Core.Configuration;
+using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Publishing;
 using Umbraco.Core.Sync;
-using Umbraco.Core;
 
 namespace Umbraco.Web.Scheduling
 {
@@ -23,17 +19,15 @@ namespace Umbraco.Web.Scheduling
     {
         private readonly ApplicationContext _appContext;
         private readonly IUmbracoSettingsSection _settings;
-        private readonly Func<CancellationToken> _cancellationToken;
         private static readonly Hashtable ScheduledTaskTimes = new Hashtable();
         private static bool _isPublishingRunning = false;
 
         public ScheduledTasks(IBackgroundTaskRunner<ScheduledTasks> runner, int delayMilliseconds, int periodMilliseconds, 
-            ApplicationContext appContext, IUmbracoSettingsSection settings, Func<CancellationToken> cancellationToken)
+            ApplicationContext appContext, IUmbracoSettingsSection settings)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _appContext = appContext;
             _settings = settings;
-            _cancellationToken = cancellationToken;
         }
 
         public ScheduledTasks(ScheduledTasks source)
@@ -48,7 +42,7 @@ namespace Umbraco.Web.Scheduling
             return new ScheduledTasks(this);
         }
 
-        private async Task ProcessTasksAsync()
+        private async Task ProcessTasksAsync(CancellationToken token)
         {
             var scheduledTasks = _settings.ScheduledTasks.Tasks;
             foreach (var t in scheduledTasks)
@@ -71,14 +65,14 @@ namespace Umbraco.Web.Scheduling
 
                 if (runTask)
                 {
-                    bool taskResult = await GetTaskByHttpAync(t.Url);
+                    var taskResult = await GetTaskByHttpAync(t.Url, token);
                     if (t.Log)
                         LogHelper.Info<ScheduledTasks>(string.Format("{0} has been called with response: {1}", t.Alias, taskResult));
                 }
             }
         }
 
-        private async Task<bool> GetTaskByHttpAync(string url)
+        private async Task<bool> GetTaskByHttpAync(string url, CancellationToken token)
         {
             using (var wc = new HttpClient())
             {
@@ -88,18 +82,9 @@ namespace Umbraco.Web.Scheduling
                     Method = HttpMethod.Get,
                     Content = new StringContent(string.Empty)
                 };
+
                 //TODO: pass custom the authorization header, currently these aren't really secured!
                 //request.Headers.Authorization = AdminTokenAuthorizeAttribute.GetAuthenticationHeaderValue(_appContext);
-
-                var token = new CancellationToken();
-                try
-                {
-                    token = _cancellationToken();
-                }
-                catch (InvalidOperationException)
-                {
-                    //There is no valid token, so we'll continue with the empty one
-                }
 
                 try
                 {
@@ -119,7 +104,7 @@ namespace Umbraco.Web.Scheduling
             throw new NotImplementedException();
         }
 
-        public override async Task PerformRunAsync()
+        public override async Task PerformRunAsync(CancellationToken token)
         {
             if (ServerEnvironmentHelper.GetStatus(_settings) == CurrentServerEnvironmentStatus.Slave)
             {
@@ -135,7 +120,7 @@ namespace Umbraco.Web.Scheduling
 
                 try
                 {
-                    await ProcessTasksAsync();
+                    await ProcessTasksAsync(token);
                 }
                 catch (Exception ee)
                 {

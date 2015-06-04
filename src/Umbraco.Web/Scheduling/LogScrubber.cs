@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Caching;
@@ -73,7 +74,7 @@ namespace Umbraco.Web.Scheduling
             }           
         }
 
-        public override Task PerformRunAsync()
+        public override Task PerformRunAsync(CancellationToken token)
         {
             throw new NotImplementedException();
         }
