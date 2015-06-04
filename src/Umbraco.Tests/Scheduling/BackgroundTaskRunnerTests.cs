@@ -749,7 +749,7 @@ namespace Umbraco.Tests.Scheduling
                 HasRun = true;
             }
 
-            public override Task PerformRunAsync()
+            public override Task PerformRunAsync(CancellationToken token)
             {
                 throw new NotImplementedException();
             }
@@ -833,7 +833,7 @@ namespace Umbraco.Tests.Scheduling
                 Thread.Sleep(_runMilliseconds);
             }
 
-            public override Task PerformRunAsync()
+            public override Task PerformRunAsync(CancellationToken token)
             {
                 throw new NotImplementedException();
             }
