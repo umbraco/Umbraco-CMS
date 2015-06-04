@@ -596,20 +596,25 @@ namespace Umbraco.Web
 					var httpContext = ((HttpApplication)sender).Context;
 				    LogHelper.Debug<UmbracoModule>("Begin request: {0}.", () => httpContext.Request.Url);
                     BeginRequest(new HttpContextWrapper(httpContext));
-
-                    //disable asp.net headers (security)
-                    try
-                    {
-                        httpContext.Response.Headers.Remove("Server");
-                        //this doesn't normally work since IIS sets it but we'll keep it here anyways.
-                        httpContext.Response.Headers.Remove("X-Powered-By");
-                    }
-                    catch (PlatformNotSupportedException ex)
-                    {
-                        // can't remove headers this way on IIS6 or cassini.
-                    }
-
 				};
+
+            //disable asp.net headers (security)
+            // This is the correct place to modify headers according to MS: 
+            // https://our.umbraco.org/forum/umbraco-7/using-umbraco-7/65241-Heap-error-from-header-manipulation?p=0#comment220889
+		    app.PostReleaseRequestState += (sender, args) =>
+		    {
+                var httpContext = ((HttpApplication)sender).Context;
+                try
+                {
+                    httpContext.Response.Headers.Remove("Server");
+                    //this doesn't normally work since IIS sets it but we'll keep it here anyways.
+                    httpContext.Response.Headers.Remove("X-Powered-By");
+                }
+                catch (PlatformNotSupportedException ex)
+                {
+                    // can't remove headers this way on IIS6 or cassini.
+                }
+		    };
 
             app.AuthenticateRequest += AuthenticateRequest;
 
