@@ -1,7 +1,10 @@
 using System;
 using System.Diagnostics;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -16,15 +19,17 @@ namespace Umbraco.Web.Scheduling
     {
         private readonly ApplicationContext _appContext;
         private readonly IUmbracoSettingsSection _settings;
+        private readonly Func<CancellationToken> _cancellationToken;
 
         private static bool _isPublishingRunning;
 
         public ScheduledPublishing(IBackgroundTaskRunner<ScheduledPublishing> runner, int delayMilliseconds, int periodMilliseconds,
-            ApplicationContext appContext, IUmbracoSettingsSection settings)
+            ApplicationContext appContext, IUmbracoSettingsSection settings, Func<CancellationToken> cancellationToken)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _appContext = appContext;
             _settings = settings;
+            _cancellationToken = cancellationToken;
         }
 
         private ScheduledPublishing(ScheduledPublishing source)
@@ -41,6 +46,12 @@ namespace Umbraco.Web.Scheduling
 
         public override void PerformRun()
         {
+            throw new NotImplementedException();
+        }
+
+        public override async Task PerformRunAsync()
+        {
+            
             if (_appContext == null) return;
             if (ServerEnvironmentHelper.GetStatus(_settings) == CurrentServerEnvironmentStatus.Slave)
             {
@@ -57,7 +68,7 @@ namespace Umbraco.Web.Scheduling
                 var umbracoBaseUrl = ServerEnvironmentHelper.GetCurrentServerUmbracoBaseUrl(_appContext, _settings);
 
                 try
-                {                    
+                {
 
                     if (string.IsNullOrWhiteSpace(umbracoBaseUrl))
                     {
@@ -66,13 +77,30 @@ namespace Umbraco.Web.Scheduling
                     else
                     {
                         var url = string.Format("{0}RestServices/ScheduledPublish/Index", umbracoBaseUrl.EnsureEndsWith('/'));
-                        using (var wc = new WebClient())
+                        using (var wc = new HttpClient())
                         {
+                            var request = new HttpRequestMessage()
+                            {
+                                RequestUri = new Uri(url),
+                                Method = HttpMethod.Post,
+                                Content = new StringContent(string.Empty)
+                            };
                             //pass custom the authorization header
-                            wc.Headers.Set("Authorization", AdminTokenAuthorizeAttribute.GetAuthHeaderTokenVal(_appContext));
+                            request.Headers.Authorization = AdminTokenAuthorizeAttribute.GetAuthenticationHeaderValue(_appContext);
 
-                            var result = wc.UploadString(url, "");
-                        }                        
+                            var token = new CancellationToken();
+                            try
+                            {
+                                token = _cancellationToken();
+                            }
+                            catch (InvalidOperationException)
+                            {
+                                //There is no valid token, so we'll continue with the empty one
+                            }
+
+                            var result = await wc.SendAsync(request, token);
+                            
+                        }
                     }
                 }
                 catch (Exception ee)
@@ -88,14 +116,9 @@ namespace Umbraco.Web.Scheduling
             }            
         }
 
-        public override Task PerformRunAsync()
-        {
-            throw new NotImplementedException();
-        }
-
         public override bool IsAsync
         {
-            get { return false; }
+            get { return true; }
         }
     
         public override bool RunsOnShutdown
