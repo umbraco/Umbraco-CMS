@@ -6,10 +6,8 @@
         </div>
     </div>
 
-    <div class="umb-editor-sub-views-content" ng-repeat="view in page.navigation">
-        <div ng-if="view.view && view.active" ng-include="view.view"></div>
-        <div ng-if="!view.view && view.active" ng-transclude></div>
-    </div>
+    <div ng-if="activeView.view && activeView.active" ng-include="activeView.view"></div>
+    <div ng-if="!activeView.view && activeView.active" ng-transclude></div>
 
 </div>
 

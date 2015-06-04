@@ -7,6 +7,7 @@ angular.module("umbraco.directives")
             link: function (scope, element, attrs, ctrl) {
 
                 scope.tools = [];
+                scope.activeView = {};
 
                 // set toolbar from selected navigation item
                 function setToolBar(items) {
@@ -15,8 +16,13 @@ angular.module("umbraco.directives")
 
                     for (var index = 0; index < items.length; index++) {
                         var item = items[index];
+
                         if(item.active && item.tools) {
                             scope.tools = item.tools;
+                        }
+
+                        if(item.active && item.view) {
+                            scope.activeView = item;
                         }
                     }
                 }

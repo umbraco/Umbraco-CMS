@@ -22,13 +22,17 @@ angular.module("umbraco.directives")
 
                 function setItemToActive(selectedItem) {
                     // set all other views to inactive
-                    for (var index = 0; index < scope.navigation.length; index++) {
-                        var item = scope.navigation[index];
-                        item.active = false;
-                    }
+                    if(selectedItem.view) {
 
-                    // set view to active
-                    selectedItem.active = true;
+                        for (var index = 0; index < scope.navigation.length; index++) {
+                            var item = scope.navigation[index];
+                            item.active = false;
+                        }
+
+                        // set view to active
+                        selectedItem.active = true;
+
+                    }
                 }
 
             }
