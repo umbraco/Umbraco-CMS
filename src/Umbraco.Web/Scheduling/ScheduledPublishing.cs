@@ -98,8 +98,14 @@ namespace Umbraco.Web.Scheduling
                                 //There is no valid token, so we'll continue with the empty one
                             }
 
-                            var result = await wc.SendAsync(request, token);
-                            
+                            try
+                            {
+                                var result = await wc.SendAsync(request, token);
+                            }
+                            catch (Exception ex)
+                            {
+                                LogHelper.Error<ScheduledPublishing>("An error occurred calling scheduled publish url", ex);
+                            }
                         }
                     }
                 }
