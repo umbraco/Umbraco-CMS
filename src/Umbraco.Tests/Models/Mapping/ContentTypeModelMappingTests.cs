@@ -61,8 +61,87 @@ namespace Umbraco.Tests.Models.Mapping
             {
                 //initialize our content type mapper
                 var mapper = new ContentTypeModelMapper(new Lazy<PropertyEditorResolver>(() => _propertyEditorResolver.Object));
-                mapper.ConfigureMappings(configuration, appContext);                
+                mapper.ConfigureMappings(configuration, appContext);
+                var entityMapper = new EntityModelMapper();
+                entityMapper.ConfigureMappings(configuration, appContext);
             });
+        }
+
+        [Test]
+        public void ContentTypeDisplay_To_PropertyType()
+        {
+            // setup the mocks to return the data we want to test against...
+
+            _dataTypeService.Setup(x => x.GetDataTypeDefinitionById(It.IsAny<int>()))
+                .Returns(Mock.Of<IDataTypeDefinition>(
+                    definition =>
+                        definition.Id == 555
+                        && definition.PropertyEditorAlias == "myPropertyType"
+                        && definition.DatabaseType == DataTypeDatabaseType.Nvarchar));
+
+            var display = new PropertyTypeDisplay()
+            {
+                Id = 1,
+                Alias = "test",
+                ContentTypeId = 4,
+                Description = "testing",
+                DataTypeId = 555,
+
+                Value = "testsdfasdf",
+                Inherited = false,
+                Editor = "blah",
+                SortOrder = 6,
+                ContentTypeName = "Hello",
+                Label = "asdfasdf",
+                GroupId = 8,
+                Validation = new PropertyTypeValidation()
+                {
+                    Mandatory = true,
+                    Pattern = "asdfasdfa"
+                }
+            };
+
+            var result = Mapper.Map<PropertyType>(display);
+
+            Assert.AreEqual(1, result.Id);
+            Assert.AreEqual("test", result.Alias);
+            Assert.AreEqual("testing", result.Description);
+            Assert.AreEqual("blah", result.PropertyEditorAlias);
+            Assert.AreEqual(6, result.SortOrder);
+            Assert.AreEqual("asdfasdf", result.Name);
+            Assert.AreEqual(8, result.PropertyGroupId.Value);
+
+        }
+
+        [Test]
+        public void ContentGroupDisplay_To_PropertyGroup()
+        {
+            var display = new PropertyGroupDisplay()
+            {
+                ContentTypeId = 2,
+                Id = 1,
+                Inherited = false,
+                Name = "test",
+                ParentGroupId = 4,
+                ParentTabContentTypeNames = new[]
+                {
+                    "hello", "world"
+                },
+                SortOrder = 5,
+                ParentTabContentTypes = new[]
+                {
+                    10, 11
+                }
+            };
+
+
+            var result = Mapper.Map<PropertyGroup>(display);
+
+            Assert.AreEqual(1, result.Id);
+            Assert.AreEqual("test", result.Name);
+            Assert.AreEqual(4, result.ParentId);
+            Assert.AreEqual(5, result.SortOrder);
+
         }
 
         [Test]
@@ -97,10 +176,12 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(display.Path, result.Path);
             Assert.AreEqual(display.Thumbnail, result.Thumbnail);
             Assert.AreEqual(display.IsContainer, result.IsContainer);
+            Assert.AreEqual(display.AllowAsRoot, result.AllowedAsRoot);
             
             //TODO: Now we need to assert all of the more complicated parts
             Assert.AreEqual(1, result.PropertyGroups.Count);
             Assert.AreEqual(1, result.PropertyGroups[0].PropertyTypes.Count);
+            Assert.AreEqual(display.AllowedTemplates.Count(), result.AllowedTemplates.Count());
         }
 
         [Test]
@@ -152,7 +233,8 @@ namespace Umbraco.Tests.Models.Mapping
         {            
             return new ContentTypeDisplay
             {
-                Alias = "test",                
+                Alias = "test",     
+                AllowAsRoot = true,
                 AllowedTemplates = new List<EntityBasic>(),
                 AvailableCompositeContentTypes = new List<EntityBasic>(),
                 DefaultTemplate = new EntityBasic(){ Alias = "test" },
@@ -165,15 +247,15 @@ namespace Umbraco.Tests.Models.Mapping
                 ParentId = -1,
                 Thumbnail = "tree-thumb",
                 IsContainer = true,
-                Groups = new List<PropertyTypeGroupDisplay>()
+                Groups = new List<PropertyGroupDisplay>()
                 {
-                    new PropertyTypeGroupDisplay
+                    new PropertyGroupDisplay
                     {
                         Id = 987,
                         Name = "Tab 1",
                         ParentGroupId = -1,
                         SortOrder = 0,
-                        Inherited = false,
+                        Inherited = false,                        
                         Properties = new List<PropertyTypeDisplay>
                         {
                             new PropertyTypeDisplay

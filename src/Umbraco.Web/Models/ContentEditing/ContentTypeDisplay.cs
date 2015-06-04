@@ -17,7 +17,7 @@ namespace Umbraco.Web.Models.ContentEditing
             AvailableCompositeContentTypes = new List<EntityBasic>();
             AllowedContentTypes = new List<EntityBasic>();
             CompositeContentTypes = new List<string>();
-            Groups = new List<PropertyTypeGroupDisplay>();
+            Groups = new List<PropertyGroupDisplay>();
         }
 
         //name, alias, icon, thumb, desc, inherited from basic
@@ -54,6 +54,6 @@ namespace Umbraco.Web.Models.ContentEditing
         //Tabs
 
         [DataMember(Name = "groups")]
-        public IEnumerable<PropertyTypeGroupDisplay> Groups { get; set; }
+        public IEnumerable<PropertyGroupDisplay> Groups { get; set; }
     }
 }
