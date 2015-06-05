@@ -853,7 +853,7 @@ AND umbracoNode.id <> @id",
                     //first we want to get the main content type data this is 1 : 1 with umbraco node data
 
                     var ct = result
-                        .Where(x => x.ctId == currentCtId)
+                        .Where(x => (int)x.ctId == currentCtId)
                         .Select(x => new { x.ctPk, x.ctId, x.ctAlias, x.ctAllowAtRoot, x.ctDesc, x.ctIcon, x.ctIsContainer, x.ctThumb, x.nName, x.nCreateDate, x.nLevel, x.nObjectType, x.nUser, x.nParentId, x.nPath, x.nSortOrder, x.nTrashed, x.nUniqueId })
                         .DistinctBy(x => (int)x.ctId)
                         .FirstOrDefault();

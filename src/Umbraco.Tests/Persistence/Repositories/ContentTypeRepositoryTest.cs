@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AutoMapper;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -16,9 +17,11 @@ using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
+    [RequiresAutoMapperMappings]
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
     public class ContentTypeRepositoryTest : BaseDatabaseFactoryTest
@@ -147,6 +150,63 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
 
             
+        }
+
+        [Test]
+        public void Can_Perform_Update_On_ContentTypeRepository_After_Model_Mapping()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                // Act
+                var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
+
+                var display = Mapper.Map<ContentTypeDisplay>(contentType);
+
+                display.Thumbnail = "Doc2.png";
+                var contentGroup = display.Groups.Single(x => x.Name == "Content");
+
+                //add property
+                contentGroup.Properties = contentGroup.Properties.Concat(new[]
+                {
+                    new PropertyTypeDisplay()
+                    {
+                        Alias = "subtitle",
+                        Editor = "test",
+                        Label = "Subtitle",
+                        Description = "Optional Subtitle",
+                        Validation = new PropertyTypeValidation()
+                        {
+                            Mandatory = false,
+                            Pattern = ""
+                        },
+                        SortOrder = 1,
+                        DataTypeId = -88
+                    }
+                });
+
+                //simulate what would happen in the controller, we'd never map to a 'new' content type,
+                // we'd map to an existing content type when updating.
+                var mapped = Mapper.Map(display, contentType);
+
+                repository.AddOrUpdate(mapped);
+                unitOfWork.Commit();
+
+                var dirty = mapped.IsDirty();
+
+                // Assert
+                Assert.That(mapped.HasIdentity, Is.True);
+                Assert.That(dirty, Is.False);
+                Assert.That(mapped.Thumbnail, Is.EqualTo("Doc2.png"));
+                Assert.That(mapped.PropertyTypes.Any(x => x.Alias == "subtitle"), Is.True);
+                foreach (var propertyType in mapped.PropertyTypes)
+                {
+                    Assert.IsTrue(propertyType.HasIdentity);
+                    Assert.Greater(propertyType.Id, 0);
+                }
+            }
         }
 
         [Test]

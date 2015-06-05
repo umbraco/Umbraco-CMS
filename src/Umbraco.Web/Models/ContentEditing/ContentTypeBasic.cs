@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Umbraco.Core;
 using Umbraco.Core.IO;
@@ -14,6 +15,11 @@ namespace Umbraco.Web.Models.ContentEditing
     [DataContract(Name = "contentType", Namespace = "")]
     public class ContentTypeBasic : EntityBasic
     {
+        [DataMember(Name = "updateDate")]
+        public DateTime UpdateDate { get; set; }
+
+        [DataMember(Name = "createDate")]
+        public DateTime CreateDate { get; set; }
 
         [DataMember(Name = "description")]
         public string Description { get; set; }
