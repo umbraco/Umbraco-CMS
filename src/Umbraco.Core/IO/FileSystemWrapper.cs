@@ -102,5 +102,10 @@ namespace Umbraco.Core.IO
 		{
 			return _wrapped.GetCreated(path);
 		}
-	}
+
+        public string SubFolderIncrement()
+        {
+            return _wrapped.SubFolderIncrement();
+        }
+    }
 }

@@ -515,10 +515,11 @@ namespace Umbraco.Core.Models
                 return;
 
             //TODO: ALl of this naming logic needs to be put into the ImageHelper and then we need to change FileUploadPropertyValueEditor to do the same!
+            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
 
-            var numberedFolder = MediaSubfolderCounter.Current.Increment();
+            var numberedFolder = fs.SubFolderIncrement();
             var fileName = UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories
-                                              ? Path.Combine(numberedFolder.ToString(CultureInfo.InvariantCulture), filename)
+                                              ? Path.Combine(numberedFolder, filename)
                                               : numberedFolder + "-" + filename;
 
             var extension = Path.GetExtension(filename).Substring(1).ToLowerInvariant();
@@ -526,7 +527,6 @@ namespace Umbraco.Core.Models
             //the file size is the length of the stream in bytes
             var fileSize = fileStream.Length;
 
-            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
             fs.AddFile(fileName, fileStream);
 
             //Check if file supports resizing and create thumbnails

@@ -41,5 +41,7 @@ namespace Umbraco.Core.IO
         DateTimeOffset GetLastModified(string path);
 
         DateTimeOffset GetCreated(string path);
+
+	    string SubFolderIncrement();
     }
 }
