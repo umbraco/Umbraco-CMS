@@ -14,7 +14,7 @@ namespace Umbraco.Core.Media
     /// <summary>
     /// A helper class used for imaging
     /// </summary>
-    internal static class ImageHelper
+    public static class ImageHelper
     {
         /// <summary>
         /// Gets the dimensions of an image based on a stream
@@ -78,7 +78,7 @@ namespace Umbraco.Core.Media
         /// <param name="originalImage"></param>
         /// <param name="additionalThumbSizes"></param>
         /// <returns></returns>
-        internal static IEnumerable<ResizedImage> GenerateMediaThumbnails(
+        public static IEnumerable<ResizedImage> GenerateMediaThumbnails(
             IFileSystem fs, 
             string fileName, 
             string extension, 
@@ -135,12 +135,12 @@ namespace Umbraco.Core.Media
             return thumb;
         }
 
-        internal static ResizedImage GenerateThumbnail(Image image, int maxWidthHeight, string thumbnailFileName, string extension, IFileSystem fs)
+        public static ResizedImage GenerateThumbnail(Image image, int maxWidthHeight, string thumbnailFileName, string extension, IFileSystem fs)
         {
             return GenerateThumbnail(image, maxWidthHeight, -1, -1, thumbnailFileName, extension, fs);
         }
 
-        internal static ResizedImage GenerateThumbnail(Image image, int fixedWidth, int fixedHeight, string thumbnailFileName, string extension, IFileSystem fs)
+        public static ResizedImage GenerateThumbnail(Image image, int fixedWidth, int fixedHeight, string thumbnailFileName, string extension, IFileSystem fs)
         {
             return GenerateThumbnail(image, -1, fixedWidth, fixedHeight, thumbnailFileName, extension, fs);
         }
