@@ -41,6 +41,7 @@ namespace Umbraco.Web.Models.Mapping
 
                 //only map id if set to something higher then zero
                 .ForMember(dto => dto.Id, expression => expression.Condition(display => (Convert.ToInt32(display.Id) > 0)))
+                .ForMember(dto => dto.Id, expression => expression.MapFrom(display => Convert.ToInt32(display.Id)))
                 .ForMember(dto => dto.AllowedAsRoot, expression => expression.MapFrom(display => display.AllowAsRoot))
                 .ForMember(dto => dto.CreatorId, expression => expression.Ignore())
                 .ForMember(dto => dto.Level, expression => expression.Ignore())
@@ -79,6 +80,7 @@ namespace Umbraco.Web.Models.Mapping
                 });
 
             config.CreateMap<IContentTypeComposition, string>().ConvertUsing(x => x.Alias);
+
             config.CreateMap<IContentType, ContentTypeDisplay>()
                 .ForMember(display => display.AllowAsRoot, expression => expression.MapFrom(type => type.AllowedAsRoot))
                 //Ignore because this is not actually used for content types

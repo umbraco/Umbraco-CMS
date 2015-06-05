@@ -204,6 +204,17 @@ namespace Umbraco.Tests.Models.Mapping
                 .Returns(new[] { new TextboxPropertyEditor() });
             
             var contentType = MockedContentTypes.CreateTextpageContentType();
+            //ensure everything has ids
+            contentType.Id = 1234;
+            var itemid = 8888;
+            foreach (var propertyGroup in contentType.CompositionPropertyGroups)
+            {
+                propertyGroup.Id = itemid++;
+            }
+            foreach (var propertyType in contentType.CompositionPropertyTypes)
+            {
+                propertyType.Id = itemid++;
+            }
 
             //Act
 
