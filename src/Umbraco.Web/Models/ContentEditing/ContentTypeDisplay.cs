@@ -15,7 +15,7 @@ namespace Umbraco.Web.Models.ContentEditing
             //initialize collections so at least their never null
             AllowedTemplates = new List<EntityBasic>();
             AvailableCompositeContentTypes = new List<EntityBasic>();
-            AllowedContentTypes = new List<EntityBasic>();
+            AllowedContentTypes = new List<int>();
             CompositeContentTypes = new List<string>();
             Groups = new List<PropertyGroupDisplay>();
         }
@@ -30,9 +30,10 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "defaultTemplate")]
         public EntityBasic DefaultTemplate { get; set; }
 
-        [DataMember(Name = "allowedContentTypes")]
-        public IEnumerable<EntityBasic> AllowedContentTypes { get; set; }
 
+
+        [DataMember(Name = "allowedContentTypes")]
+        public IEnumerable<int> AllowedContentTypes { get; set; }
 
         //List view
         [DataMember(Name = "isContainer")]
