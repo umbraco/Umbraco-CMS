@@ -11,8 +11,8 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-   
-    internal class PropertyTypeGroupResolver : ValueResolver<IContentType, IEnumerable<PropertyTypeGroupDisplay>>
+
+    internal class PropertyTypeGroupResolver : ValueResolver<IContentTypeComposition, IEnumerable<PropertyTypeGroupDisplay>>
     {
         private readonly ApplicationContext _applicationContext;
         private readonly Lazy<PropertyEditorResolver> _propertyEditorResolver;
@@ -24,7 +24,7 @@ namespace Umbraco.Web.Models.Mapping
         }
 
 
-        protected override IEnumerable<PropertyTypeGroupDisplay> ResolveCore(IContentType source)
+        protected override IEnumerable<PropertyTypeGroupDisplay> ResolveCore(IContentTypeComposition source)
         {
             var groups = new Dictionary<int,PropertyTypeGroupDisplay>();
 
