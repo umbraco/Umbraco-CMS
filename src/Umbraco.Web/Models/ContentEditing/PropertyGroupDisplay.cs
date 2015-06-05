@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
-    [DataContract(Name = "propertyTypeGroup", Namespace = "")]
-    public class PropertyTypeGroupDisplay
+    [DataContract(Name = "propertyGroup", Namespace = "")]
+    public class PropertyGroupDisplay
     {
-        public PropertyTypeGroupDisplay()
+        public PropertyGroupDisplay()
         {
             Properties = new List<PropertyTypeDisplay>();
         }

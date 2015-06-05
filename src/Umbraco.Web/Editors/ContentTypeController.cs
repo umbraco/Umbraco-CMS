@@ -59,7 +59,7 @@ namespace Umbraco.Web.Editors
         }
 
 
-        public Umbraco.Web.Models.ContentEditing.ContentTypeDisplay GetById(int id)
+        public ContentTypeDisplay GetById(int id)
         {
             var ct = Services.ContentTypeService.GetContentType(id);
             if (ct == null)
@@ -67,14 +67,14 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var dto = Mapper.Map<IContentType, Umbraco.Web.Models.ContentEditing.ContentTypeDisplay>(ct);
+            var dto = Mapper.Map<IContentType, ContentTypeDisplay>(ct);
             return dto;
         }
 
-        public Umbraco.Web.Models.ContentEditing.ContentTypeDisplay GetEmpty()
+        public ContentTypeDisplay GetEmpty()
         {
             var ct = new ContentType(-1);
-            var dto = Mapper.Map<IContentType, Umbraco.Web.Models.ContentEditing.ContentTypeDisplay>(ct);
+            var dto = Mapper.Map<IContentType, ContentTypeDisplay>(ct);
             return dto;
         }
 
@@ -102,18 +102,17 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Returns all content type objects
         /// </summary>
-        /// <param name="contentId"></param>
         public IEnumerable<ContentTypeBasic> GetAll()
         {
             var types = Services.ContentTypeService.GetAllContentTypes();
             var basics = types.Select(Mapper.Map<IContentType, ContentTypeBasic>);
-            foreach (var basic in basics)
+
+            return basics.Select(basic =>
             {
                 basic.Name = TranslateItem(basic.Name);
                 basic.Description = TranslateItem(basic.Description);
-            }
-
-            return basics;
+                return basic;
+            });
         }
 
         /// <summary>
@@ -166,10 +165,10 @@ namespace Umbraco.Web.Editors
             
             var ctService = ApplicationContext.Services.ContentTypeService;
 
-            ///TODO: warn on content type alias conflicts
-            ///TODO: warn on property alias conflicts
+            //TODO: warn on content type alias conflicts
+            //TODO: warn on property alias conflicts
             
-            ///TODO: Validate the submitted model
+            //TODO: Validate the submitted model
 
             var ctId = Convert.ToInt32(contentType.Id);
 
@@ -196,8 +195,7 @@ namespace Umbraco.Web.Editors
                 contentType.Id = null;
 
                 //save as new
-                IContentType newCt = new ContentType(-1);
-                Mapper.Map(contentType, newCt);
+                var newCt = Mapper.Map<IContentType>(contentType);
                 
                 ctService.Save(newCt);
 

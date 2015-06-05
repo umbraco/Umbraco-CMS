@@ -9,17 +9,21 @@
                     name="contentType.name"
                     alias="contentType.alias"
                     description="contentType.description"
-                    menu="page.menu"
-                    actions="page.menu">
+                    navigation="page.navigation">
             </umb-editor-header>
 
             <umb-editor-container class="editors-document-type-container">
 
                 <div class="editors-document-type-canvas" ng-class="{'is-in-sorting-mode': sortingMode}">
 
-                    <umb-sub-views></umb-sub-views>
+                    <umb-editor-sub-views></umb-editor-sub-views>
 
+                    <!--
+                    <h2>Page</h2>
+                    <pre>{{ page | json }}</pre>
+                    <h2>Content type</h2>
                     <pre>{{ contentType | json }}</pre>
+                    -->
 
                 </div>
 

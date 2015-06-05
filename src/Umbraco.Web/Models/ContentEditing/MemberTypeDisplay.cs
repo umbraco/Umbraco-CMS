@@ -13,13 +13,13 @@ namespace Umbraco.Web.Models.ContentEditing
         public MemberTypeDisplay()
         {
             //initialize collections so at least their never null
-            Groups = new List<PropertyTypeGroupDisplay>();
+            Groups = new List<PropertyGroupDisplay>();
         }
 
         //name, alias, icon, thumb, desc, inherited from basic
 
         //Tabs
         [DataMember(Name = "groups")]
-        public IEnumerable<PropertyTypeGroupDisplay> Groups { get; set; }
+        public IEnumerable<PropertyGroupDisplay> Groups { get; set; }
     }
 }

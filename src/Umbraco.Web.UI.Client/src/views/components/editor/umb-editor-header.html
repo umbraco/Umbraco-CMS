@@ -1,39 +1,42 @@
 ﻿<div class="umb-panel-header">
-    <div class="row-fluid">
-        <div class="span7">
+
+    <div class="umb-panel-content">
+
+        <div class="umb-panel-meta">
+
             <div class="umb-panel-header-icon" ng-click="pickIcon()">
                 <span>Add icon</span>
             </div>
+
             <div class="umb-panel-header-title-wrapper">
+                <!--
                 <umb-content-name
                         ng-disabled="content.isSystem == 1"
                         placeholder="@placeholders_entername"
                         ng-model="name">
                 </umb-content-name>
-                <div class="umb-panel-header-alias"><i class="icon icon-lock"></i>brandNew</div>
-            </div>
-        </div>
-        
-        <div class="span5">
-
-            <div class="pull-right" style="padding: 20px 20px 0px 0px">
-                <!--
-                <umb-editor-actions actions="actions"></umb-editor-actions>
-                <umb-editor-menu ng-if="menu" menu="menu"></umb-editor-menu>
-
-                TEMP HACK
                 -->
-                <div class="btn-group">
-                    <a class="btn" href="#" ng-click="getOptions()" prevent-default="" data-toggle="dropdown">
-                        <localize key="general_actions" class="ng-isolate-scope ng-scope">Actions</localize>
-                        <span class="caret"></span>
-                    </a>
+                <div class="umb-panel-header-name-wrapper">
+                    <input type="text" class="umb-panel-header-name" ng-model="name" placeholder="Enter name..." umb-auto-resize />
+                    <div class="umb-panel-header-alias"><i class="icon icon-lock"></i>{{ alias }}</div>
                 </div>
+
+                <input type="text" class="umb-panel-header-description" ng-model="description" placeholder="Enter description..." />
             </div>
 
         </div>
 
-	    <div ng-transclude></div>
+
+        <div class="umb-panel-header-actions">
+            <umb-editor-actions ng-if="actions" actions="actions"></umb-editor-actions>
+            <umb-editor-menu ng-if="menu" menu="menu"></umb-editor-menu>
+            <umb-editor-navigation ng-if="navigation" navigation="navigation"></umb-editor-navigation>
+        </div>
+
+        <!--
+        <div ng-transclude></div>
+        -->
+
     </div>
 
     <umb-overlay
@@ -44,6 +47,5 @@
             position="right"
             view="dialogModel.view">
     </umb-overlay>
-
 
 </div>
