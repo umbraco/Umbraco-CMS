@@ -4,6 +4,7 @@ using System.Linq;
 using AutoMapper;
 using Moq;
 using NUnit.Framework;
+using umbraco;
 using umbraco.cms.presentation;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -61,8 +62,87 @@ namespace Umbraco.Tests.Models.Mapping
             {
                 //initialize our content type mapper
                 var mapper = new ContentTypeModelMapper(new Lazy<PropertyEditorResolver>(() => _propertyEditorResolver.Object));
-                mapper.ConfigureMappings(configuration, appContext);                
+                mapper.ConfigureMappings(configuration, appContext);
+                var entityMapper = new EntityModelMapper();
+                entityMapper.ConfigureMappings(configuration, appContext);
             });
+        }
+
+        [Test]
+        public void ContentTypeDisplay_To_PropertyType()
+        {
+            // setup the mocks to return the data we want to test against...
+
+            _dataTypeService.Setup(x => x.GetDataTypeDefinitionById(It.IsAny<int>()))
+                .Returns(Mock.Of<IDataTypeDefinition>(
+                    definition =>
+                        definition.Id == 555
+                        && definition.PropertyEditorAlias == "myPropertyType"
+                        && definition.DatabaseType == DataTypeDatabaseType.Nvarchar));
+
+            var display = new PropertyTypeDisplay()
+            {
+                Id = 1,
+                Alias = "test",
+                ContentTypeId = 4,
+                Description = "testing",
+                DataTypeId = 555,
+
+                Value = "testsdfasdf",
+                Inherited = false,
+                Editor = "blah",
+                SortOrder = 6,
+                ContentTypeName = "Hello",
+                Label = "asdfasdf",
+                GroupId = 8,
+                Validation = new PropertyTypeValidation()
+                {
+                    Mandatory = true,
+                    Pattern = "asdfasdfa"
+                }
+            };
+
+            var result = Mapper.Map<PropertyType>(display);
+
+            Assert.AreEqual(1, result.Id);
+            Assert.AreEqual("test", result.Alias);
+            Assert.AreEqual("testing", result.Description);
+            Assert.AreEqual("blah", result.PropertyEditorAlias);
+            Assert.AreEqual(6, result.SortOrder);
+            Assert.AreEqual("asdfasdf", result.Name);
+            Assert.AreEqual(8, result.PropertyGroupId.Value);
+
+        }
+
+        [Test]
+        public void ContentGroupDisplay_To_PropertyGroup()
+        {
+            var display = new PropertyGroupDisplay()
+            {
+                ContentTypeId = 2,
+                Id = 1,
+                Inherited = false,
+                Name = "test",
+                ParentGroupId = 4,
+                ParentTabContentTypeNames = new[]
+                {
+                    "hello", "world"
+                },
+                SortOrder = 5,
+                ParentTabContentTypes = new[]
+                {
+                    10, 11
+                }
+            };
+
+
+            var result = Mapper.Map<PropertyGroup>(display);
+
+            Assert.AreEqual(1, result.Id);
+            Assert.AreEqual("test", result.Name);
+            Assert.AreEqual(4, result.ParentId);
+            Assert.AreEqual(5, result.SortOrder);
+
         }
 
         [Test]
@@ -97,10 +177,36 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(display.Path, result.Path);
             Assert.AreEqual(display.Thumbnail, result.Thumbnail);
             Assert.AreEqual(display.IsContainer, result.IsContainer);
+            Assert.AreEqual(display.AllowAsRoot, result.AllowedAsRoot);
+            Assert.AreEqual(display.CreateDate, result.CreateDate);
+            Assert.AreEqual(display.UpdateDate, result.UpdateDate);
             
             //TODO: Now we need to assert all of the more complicated parts
-            Assert.AreEqual(1, result.PropertyGroups.Count);
-            Assert.AreEqual(1, result.PropertyGroups[0].PropertyTypes.Count);
+            Assert.AreEqual(display.Groups.Count(), result.PropertyGroups.Count);
+            for (var i = 0; i < display.Groups.Count(); i++)
+            {
+                Assert.AreEqual(display.Groups.ElementAt(i).Id, result.PropertyGroups.ElementAt(i).Id);
+                Assert.AreEqual(display.Groups.ElementAt(i).Name, result.PropertyGroups.ElementAt(i).Name);
+                var propTypes = display.Groups.ElementAt(i).Properties;
+                Assert.AreEqual(propTypes.Count(), result.PropertyTypes.Count());
+                for (var j = 0; j < propTypes.Count(); j++)
+                {
+                    Assert.AreEqual(propTypes.ElementAt(j).Id, result.PropertyTypes.ElementAt(j).Id);
+                    Assert.AreEqual(propTypes.ElementAt(j).DataTypeId, result.PropertyTypes.ElementAt(j).DataTypeDefinitionId);
+                }
+            }
+
+            Assert.AreEqual(display.AllowedTemplates.Count(), result.AllowedTemplates.Count());
+            for (var i = 0; i < display.AllowedTemplates.Count(); i++)
+            {
+                Assert.AreEqual(display.AllowedTemplates.ElementAt(i).Id, result.AllowedTemplates.ElementAt(i).Id);
+            }
+
+            Assert.AreEqual(display.AllowedContentTypes.Count(), result.AllowedContentTypes.Count());
+            for (var i = 0; i < display.AllowedContentTypes.Count(); i++)
+            {
+                Assert.AreEqual(display.AllowedContentTypes.ElementAt(i), result.AllowedContentTypes.ElementAt(i).Id.Value);
+            }
         }
 
         [Test]
@@ -123,6 +229,17 @@ namespace Umbraco.Tests.Models.Mapping
                 .Returns(new[] { new TextboxPropertyEditor() });
             
             var contentType = MockedContentTypes.CreateTextpageContentType();
+            //ensure everything has ids
+            contentType.Id = 1234;
+            var itemid = 8888;
+            foreach (var propertyGroup in contentType.CompositionPropertyGroups)
+            {
+                propertyGroup.Id = itemid++;
+            }
+            foreach (var propertyType in contentType.CompositionPropertyTypes)
+            {
+                propertyType.Id = itemid++;
+            }
 
             //Act
 
@@ -139,21 +256,63 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(contentType.Path, result.Path);
             Assert.AreEqual(contentType.Thumbnail, result.Thumbnail);
             Assert.AreEqual(contentType.IsContainer, result.IsContainer);
-
+            Assert.AreEqual(contentType.CreateDate, result.CreateDate);
+            Assert.AreEqual(contentType.UpdateDate, result.UpdateDate);
             Assert.AreEqual(contentType.DefaultTemplate.Alias, result.DefaultTemplate.Alias);
 
             //TODO: Now we need to assert all of the more complicated parts
-            Assert.AreEqual(2, result.Groups.Count());
-            Assert.AreEqual(2, result.Groups.ElementAt(0).Properties.Count());
-            Assert.AreEqual(2, result.Groups.ElementAt(1).Properties.Count());
+
+            Assert.AreEqual(contentType.PropertyGroups.Count(), result.Groups.Count());
+            for (var i = 0; i < contentType.PropertyGroups.Count(); i++)
+            {
+                Assert.AreEqual(contentType.PropertyGroups.ElementAt(i).Id, result.Groups.ElementAt(i).Id);
+                Assert.AreEqual(contentType.PropertyGroups.ElementAt(i).Name, result.Groups.ElementAt(i).Name);
+                var propTypes = contentType.PropertyGroups.ElementAt(i).PropertyTypes;
+
+                Assert.AreEqual(propTypes.Count(), result.Groups.ElementAt(i).Properties.Count());
+                for (var j = 0; j < propTypes.Count(); j++)
+                {
+                    Assert.AreEqual(propTypes.ElementAt(j).Id, result.Groups.ElementAt(i).Properties.ElementAt(j).Id);
+                    Assert.AreEqual(propTypes.ElementAt(j).DataTypeDefinitionId, result.Groups.ElementAt(i).Properties.ElementAt(j).DataTypeId);
+                }
+            }
+
+            Assert.AreEqual(contentType.AllowedTemplates.Count(), result.AllowedTemplates.Count());
+            for (var i = 0; i < contentType.AllowedTemplates.Count(); i++)
+            {
+                Assert.AreEqual(contentType.AllowedTemplates.ElementAt(i).Id, result.AllowedTemplates.ElementAt(i).Id);
+            }
+
+            Assert.AreEqual(contentType.AllowedContentTypes.Count(), result.AllowedContentTypes.Count());
+            for (var i = 0; i < contentType.AllowedContentTypes.Count(); i++)
+            {
+                Assert.AreEqual(contentType.AllowedContentTypes.ElementAt(i).Id.Value, result.AllowedContentTypes.ElementAt(i));
+            }
+
         }
 
         private ContentTypeDisplay CreateSimpleContentTypeDisplay()
         {            
             return new ContentTypeDisplay
             {
-                Alias = "test",                
-                AllowedTemplates = new List<EntityBasic>(),
+                Alias = "test",     
+                AllowAsRoot = true,
+                AllowedTemplates = new List<EntityBasic>
+                {
+                    new EntityBasic
+                    {
+                        Id = 555,
+                        Alias = "template1",
+                        Name = "Template1"
+                    },
+                    new EntityBasic
+                    {
+                        Id = 556,
+                        Alias = "template2",
+                        Name = "Template2"
+                    }
+                },
+                AllowedContentTypes = new [] {666, 667},
                 AvailableCompositeContentTypes = new List<EntityBasic>(),
                 DefaultTemplate = new EntityBasic(){ Alias = "test" },
                 Description = "hello world",
@@ -165,15 +324,15 @@ namespace Umbraco.Tests.Models.Mapping
                 ParentId = -1,
                 Thumbnail = "tree-thumb",
                 IsContainer = true,
-                Groups = new List<PropertyTypeGroupDisplay>()
+                Groups = new List<PropertyGroupDisplay>()
                 {
-                    new PropertyTypeGroupDisplay
+                    new PropertyGroupDisplay
                     {
                         Id = 987,
                         Name = "Tab 1",
                         ParentGroupId = -1,
                         SortOrder = 0,
-                        Inherited = false,
+                        Inherited = false,                        
                         Properties = new List<PropertyTypeDisplay>
                         {
                             new PropertyTypeDisplay

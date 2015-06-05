@@ -47,25 +47,34 @@ namespace Umbraco.Web.Models.Mapping
 
             config.CreateMap<ITemplate, EntityBasic>()
                .ForMember(basic => basic.Icon, expression => expression.UseValue("icon-layout"))
-               .ForMember(basic => basic.Path, expression => expression.UseValue(""))
+               .ForMember(basic => basic.Path, expression => expression.MapFrom(template => template.Path))
                .ForMember(basic => basic.ParentId, expression => expression.UseValue(-1))
                .ForMember(dto => dto.Trashed, expression => expression.Ignore())
                .ForMember(x => x.AdditionalData, expression => expression.Ignore());
 
+            config.CreateMap<EntityBasic, ITemplate>()
+                .ConstructUsing(basic => new Template(basic.Name, basic.Alias)
+                {
+                    Id = Convert.ToInt32(basic.Id),
+                    Key = basic.Key
+                })
+               .ForMember(t => t.Path, expression => expression.MapFrom(template => template.Path))
+               .ForMember(t => t.Id, expression => expression.MapFrom(template => Convert.ToInt32(template.Id)))
+               .ForMember(x => x.VirtualPath, expression => expression.Ignore())
+               .ForMember(x => x.CreateDate, expression => expression.Ignore())
+               .ForMember(x => x.UpdateDate, expression => expression.Ignore())
+               .ForMember(x => x.Content, expression => expression.Ignore());
+
+            config.CreateMap<EntityBasic, ContentTypeSort>()
+                .ForMember(x => x.Id, expression => expression.MapFrom(entity => new Lazy<int>(() => Convert.ToInt32(entity.Id))))
+                .ForMember(x => x.SortOrder, expression => expression.Ignore());
+
             config.CreateMap<IContentTypeComposition, EntityBasic>()
-                  .ForMember(basic => basic.Path, expression => expression.UseValue(""))
-                  .ForMember(basic => basic.ParentId, expression => expression.UseValue(-1))
-                  .ForMember(dto => dto.Trashed, expression => expression.Ignore())
-                  .ForMember(x => x.AdditionalData, expression => expression.Ignore());
-
-            config.CreateMap<ContentTypeSort, EntityBasic>()
-                  .ForMember(basic => basic.Icon, expression => expression.UseValue("icon-grid"))
-                  .ForMember(basic => basic.Path, expression => expression.UseValue(""))
-                  .ForMember(basic => basic.ParentId, expression => expression.UseValue(-1))
-                  .ForMember(dto => dto.Trashed, expression => expression.Ignore())
-                  .ForMember(x => x.AdditionalData, expression => expression.Ignore());
-
-            
+                .ForMember(basic => basic.Icon, expression => expression.UseValue("icon-grid"))
+                .ForMember(basic => basic.Path, expression => expression.MapFrom(x => x.Path))
+                .ForMember(basic => basic.ParentId, expression => expression.MapFrom(x => x.ParentId))
+                .ForMember(dto => dto.Trashed, expression => expression.Ignore())
+                .ForMember(x => x.AdditionalData, expression => expression.Ignore());
 
             config.CreateMap<SearchResult, EntityBasic>()
                 //default to document icon

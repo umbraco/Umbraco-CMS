@@ -11,8 +11,9 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-   
-    internal class PropertyTypeGroupResolver : ValueResolver<IContentType, IEnumerable<PropertyTypeGroupDisplay>>
+    
+
+    internal class PropertyTypeGroupResolver : ValueResolver<IContentType, IEnumerable<PropertyGroupDisplay>>
     {
         private readonly ApplicationContext _applicationContext;
         private readonly Lazy<PropertyEditorResolver> _propertyEditorResolver;
@@ -24,9 +25,9 @@ namespace Umbraco.Web.Models.Mapping
         }
 
 
-        protected override IEnumerable<PropertyTypeGroupDisplay> ResolveCore(IContentType source)
+        protected override IEnumerable<PropertyGroupDisplay> ResolveCore(IContentType source)
         {
-            var groups = new Dictionary<int,PropertyTypeGroupDisplay>();
+            var groups = new Dictionary<int,PropertyGroupDisplay>();
 
             //for storing generic properties
             var genericProperties = new List<PropertyTypeDisplay>();
@@ -37,7 +38,7 @@ namespace Umbraco.Web.Models.Mapping
             {
                 //process each tab
                 foreach(var tab in ct.CompositionPropertyGroups){
-                    var group = new PropertyTypeGroupDisplay() { Id = tab.Id, Inherited = true, Name = tab.Name, SortOrder = tab.SortOrder };
+                    var group = new PropertyGroupDisplay() { Id = tab.Id, Inherited = true, Name = tab.Name, SortOrder = tab.SortOrder };
                     group.ContentTypeId = ct.Id;
                     group.ParentTabContentTypes = new[] { ct.Id };
                     group.ParentTabContentTypeNames = new[] { ct.Name };
@@ -60,7 +61,7 @@ namespace Umbraco.Web.Models.Mapping
             //pull from own groups
             foreach (var ownTab in source.CompositionPropertyGroups)
             {
-                PropertyTypeGroupDisplay group;
+                PropertyGroupDisplay group;
                 
                 //if already added
                 if (groups.ContainsKey(ownTab.Id))
@@ -73,7 +74,7 @@ namespace Umbraco.Web.Models.Mapping
                 else
                 {
                     //if own
-                    group = new PropertyTypeGroupDisplay() { Id = ownTab.Id, Inherited = false, Name = ownTab.Name, SortOrder = ownTab.SortOrder, ContentTypeId = source.Id };
+                    group = new PropertyGroupDisplay() { Id = ownTab.Id, Inherited = false, Name = ownTab.Name, SortOrder = ownTab.SortOrder, ContentTypeId = source.Id };
                     groups.Add(ownTab.Id, group);
                 }
 
@@ -94,7 +95,7 @@ namespace Umbraco.Web.Models.Mapping
 
             if (genericProperties.Any())
             {
-                var genericTab = new PropertyTypeGroupDisplay() { Id = 0, Name = "Generic properties", ParentGroupId = 0, ContentTypeId = source.Id, SortOrder = 999, Inherited = false };
+                var genericTab = new PropertyGroupDisplay() { Id = 0, Name = "Generic properties", ParentGroupId = 0, ContentTypeId = source.Id, SortOrder = 999, Inherited = false };
                 groups.Add(0, genericTab);
             }
 
@@ -103,7 +104,7 @@ namespace Umbraco.Web.Models.Mapping
             var nameGroupedGroups = groups.Values.GroupBy(x => x.Name);
             if (nameGroupedGroups.Any(x => x.Count() > 1))
             {
-                var sortedGroups = new List<PropertyTypeGroupDisplay>();
+                var sortedGroups = new List<PropertyGroupDisplay>();
 
                 foreach (var groupOfGroups in nameGroupedGroups)
                 {
@@ -164,7 +165,9 @@ namespace Umbraco.Web.Models.Mapping
                         ContentTypeId = contentType.Id,
                         ContentTypeName = contentType.Name,
                         GroupId = groupId,
-                        Inherited = inherited
+                        Inherited = inherited,
+                        DataTypeId = p.DataTypeDefinitionId,
+                        SortOrder = p.SortOrder
                     });
             }
 

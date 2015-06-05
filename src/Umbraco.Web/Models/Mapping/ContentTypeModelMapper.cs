@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-
+using System.Threading;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -41,13 +42,11 @@ namespace Umbraco.Web.Models.Mapping
 
                 //only map id if set to something higher then zero
                 .ForMember(dto => dto.Id, expression => expression.Condition(display => (Convert.ToInt32(display.Id) > 0)))
-                
+                .ForMember(dto => dto.Id, expression => expression.MapFrom(display => Convert.ToInt32(display.Id)))
+                .ForMember(dto => dto.AllowedAsRoot, expression => expression.MapFrom(display => display.AllowAsRoot))
                 .ForMember(dto => dto.CreatorId, expression => expression.Ignore())
                 .ForMember(dto => dto.Level, expression => expression.Ignore())
-                .ForMember(dto => dto.CreateDate, expression => expression.Ignore())
-                .ForMember(dto => dto.UpdateDate, expression => expression.Ignore())
                 .ForMember(dto => dto.SortOrder, expression => expression.Ignore())
-
                 //mapped in aftermap
                 .ForMember(dto => dto.AllowedContentTypes, expression => expression.Ignore())
 
@@ -56,33 +55,34 @@ namespace Umbraco.Web.Models.Mapping
                 .AfterMap((source, dest) =>
                 {
                     dest.PropertyGroups = new PropertyGroupCollection();
-                    foreach (var groupDisplay in source.Groups.Where(x => !x.Name.IsNullOrWhiteSpace() ) )
+                    foreach (var groupDisplay in source.Groups.Where(x => x.Name.IsNullOrWhiteSpace() == false ) )
                     {
                         dest.PropertyGroups.Add(Mapper.Map<PropertyGroup>(groupDisplay));
                     }
 
                     //Sync allowed child types
-                    var allowedTypes = new List<ContentTypeSort>();
-                    var proposedAllowed = source.AllowedContentTypes.ToArray();
-                    for (int i = 0; i < proposedAllowed.Length; i++)
-                        allowedTypes.Add(new ContentTypeSort(proposedAllowed[i], i));
+                    var allowedTypes = source.AllowedContentTypes.Select((t, i) => new ContentTypeSort(t, i));
 
-                    dest.AllowedContentTypes = allowedTypes;
+                    dest.AllowedContentTypes = allowedTypes.ToArray();
 
                     //sync compositions
-                    var current = dest.CompositionAliases();
+                    var current = dest.CompositionAliases().ToArray();
                     var proposed = source.CompositeContentTypes;
 
-                    var remove = current.Where(x =>  !proposed.Contains(x));
-                    var add = proposed.Where(x => !current.Contains(x));
+                    var remove = current.Where(x =>  proposed.Contains(x) == false);
+                    var add = proposed.Where(x => current.Contains(x) == false);
 
-                    foreach(var rem in remove)
+                    foreach (var rem in remove)
+                    {
                         dest.RemoveContentType(rem);
+                    }
 
-                    foreach(var a in add){
-                        var add_ct = applicationContext.Services.ContentTypeService.GetContentType(a);
-                        if(add_ct != null)
-                             dest.AddContentType(add_ct);
+                    foreach(var a in add)
+                    {
+                        //TODO: Remove N+1 lookup
+                        var addCt = applicationContext.Services.ContentTypeService.GetContentType(a);
+                        if(addCt != null)
+                             dest.AddContentType(addCt);
                     }
 
 
@@ -91,9 +91,15 @@ namespace Umbraco.Web.Models.Mapping
 
             config.CreateMap<ContentTypeSort, int>().ConvertUsing(x => x.Id.Value);
             config.CreateMap<IContentTypeComposition, string>().ConvertUsing(x => x.Alias);
+
             config.CreateMap<IContentType, ContentTypeDisplay>()
+                .ForMember(display => display.AllowAsRoot, expression => expression.MapFrom(type => type.AllowedAsRoot))
                 //Ignore because this is not actually used for content types
                 .ForMember(display => display.Trashed, expression => expression.Ignore())
+
+                .ForMember(
+                    dto => dto.AllowedContentTypes,
+                    expression => expression.MapFrom(dto => dto.AllowedContentTypes.Select(x => x.Id.Value)))
 
                 .ForMember(
                     dto => dto.AvailableCompositeContentTypes,
@@ -101,21 +107,18 @@ namespace Umbraco.Web.Models.Mapping
 
                 .ForMember(
                     dto => dto.CompositeContentTypes,
-                    expression => expression.MapFrom(dto => dto.ContentTypeComposition) )
-
-                .ForMember(
-                    dto => dto.CompositeContentTypes,
                     expression => expression.MapFrom(dto => dto.ContentTypeComposition))
-
+                    
                 .ForMember(
                     dto => dto.Groups,
                     expression => expression.ResolveUsing(new PropertyTypeGroupResolver(applicationContext, _propertyEditorResolver)));
 
-
-            config.CreateMap<PropertyTypeGroupDisplay, PropertyGroup>()
+            config.CreateMap<PropertyGroupDisplay, PropertyGroup>()
                 .ForMember(dest => dest.Id, expression => expression.Condition(source => source.Id > 0))
-                .ForMember(g => g.CreateDate, expression => expression.Ignore())                
-                .ForMember(g => g.UpdateDate, expression => expression.Ignore())
+                .ForMember(g => g.Key, expression => expression.Ignore())
+                .ForMember(g => g.HasIdentity, expression => expression.Ignore())
+                .ForMember(dto => dto.CreateDate, expression => expression.Ignore())
+                .ForMember(dto => dto.UpdateDate, expression => expression.Ignore())
 
                 //only map if a parent is actually set
                 .ForMember(g => g.ParentId, expression => expression.Condition(display => display.ParentGroupId > 0))
@@ -125,6 +128,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(g => g.PropertyTypes, expression => expression.Ignore())
                 .AfterMap((source, destination) =>
                 {
+                     
+
                     destination.PropertyTypes = new PropertyTypeCollection();
                     foreach (var propertyTypeDisplay in source.Properties.Where(x => x.Label.IsNullOrWhiteSpace() == false ))
                     {
@@ -140,13 +145,17 @@ namespace Umbraco.Web.Models.Mapping
                     if (dataType == null) throw new NullReferenceException("No data type found with id " + propertyTypeDisplay.DataTypeId);
                     return new PropertyType(dataType, propertyTypeDisplay.Alias);
                 })
+                .ForMember(dest => dest.Id, expression => expression.Condition(source => source.Id > 0))
+                .ForMember(dto => dto.CreateDate, expression => expression.Ignore())
+                .ForMember(dto => dto.UpdateDate, expression => expression.Ignore())
+                .ForMember(type => type.PropertyGroupId, expression => expression.MapFrom(display => new Lazy<int>(() => display.GroupId, LazyThreadSafetyMode.None)))
+                .ForMember(type => type.Key, expression => expression.Ignore())
+                .ForMember(type => type.HelpText, expression => expression.Ignore())
+                .ForMember(type => type.HasIdentity, expression => expression.Ignore())
                 //ignore because this is set in the ctor
                 .ForMember(type => type.Alias, expression => expression.Ignore())
                 //ignore because this is obsolete and shouldn't be used
                 .ForMember(type => type.DataTypeId, expression => expression.Ignore())
-                //ignore because these are 'readonly'
-                .ForMember(type => type.CreateDate, expression => expression.Ignore())
-                .ForMember(type => type.UpdateDate, expression => expression.Ignore())
                 .ForMember(type => type.Mandatory, expression => expression.MapFrom(display => display.Validation.Mandatory))
                 .ForMember(type => type.ValidationRegExp, expression => expression.MapFrom(display => display.Validation.Pattern))
                 .ForMember(type => type.PropertyEditorAlias, expression => expression.MapFrom(display => display.Editor))
