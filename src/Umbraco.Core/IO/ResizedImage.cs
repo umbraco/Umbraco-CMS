@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Core.IO
 {
-    internal class ResizedImage
+    public class ResizedImage
     {
         public ResizedImage()
         {
