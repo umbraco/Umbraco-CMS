@@ -34,7 +34,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             config.CreateMap<IMediaType, ContentTypeBasic>();
             config.CreateMap<IContentType, ContentTypeBasic>();
-            config.CreateMap<IMemberType, ContentTypeBasic>();
+          
 
             config.CreateMap<ContentTypeDisplay, IContentType>()
                 .ConstructUsing((ContentTypeDisplay source) => new ContentType(source.ParentId))
@@ -84,10 +84,8 @@ namespace Umbraco.Web.Models.Mapping
                         if(add_ct != null)
                              dest.AddContentType(add_ct);
                     }
-
-
-
                 });
+
 
             config.CreateMap<ContentTypeSort, int>().ConvertUsing(x => x.Id.Value);
             config.CreateMap<IContentTypeComposition, string>().ConvertUsing(x => x.Alias);
