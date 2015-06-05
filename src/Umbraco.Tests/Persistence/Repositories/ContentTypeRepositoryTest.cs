@@ -111,10 +111,42 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.That(contentType.HasIdentity, Is.True);
                 Assert.That(contentType.PropertyGroups.All(x => x.HasIdentity), Is.True);
+                Assert.That(contentType.PropertyTypes.All(x => x.HasIdentity), Is.True);
                 Assert.That(contentType.Path.Contains(","), Is.True);
                 Assert.That(contentType.SortOrder, Is.GreaterThan(0));    
             }
             
+        }
+
+        [Test]
+        public void Can_Perform_Add_On_ContentTypeRepository_After_Model_Mapping()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                // Act
+                var contentType = (IContentType)MockedContentTypes.CreateSimpleContentType();
+                var display = Mapper.Map<ContentTypeDisplay>(contentType);
+                //simulate what would happen in the controller, we'd never map to a 'existing' content type,
+                // we'd map to an new content type when updating.
+                var mapped = Mapper.Map<IContentType>(display);
+
+                repository.AddOrUpdate(mapped);
+                unitOfWork.Commit();
+
+                //re-get
+                contentType = repository.Get(mapped.Id);
+
+                // Assert
+                Assert.That(contentType.HasIdentity, Is.True);
+                Assert.That(contentType.PropertyGroups.All(x => x.HasIdentity), Is.True);
+                Assert.That(contentType.PropertyTypes.All(x => x.HasIdentity), Is.True);
+                Assert.That(contentType.Path.Contains(","), Is.True);
+                Assert.That(contentType.SortOrder, Is.GreaterThan(0));
+            }
+
         }
 
         [Test]
@@ -196,12 +228,15 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var dirty = mapped.IsDirty();
 
+                //re-get
+                contentType = repository.Get(NodeDto.NodeIdSeed + 1);
+
                 // Assert
-                Assert.That(mapped.HasIdentity, Is.True);
+                Assert.That(contentType.HasIdentity, Is.True);
                 Assert.That(dirty, Is.False);
-                Assert.That(mapped.Thumbnail, Is.EqualTo("Doc2.png"));
-                Assert.That(mapped.PropertyTypes.Any(x => x.Alias == "subtitle"), Is.True);
-                foreach (var propertyType in mapped.PropertyTypes)
+                Assert.That(contentType.Thumbnail, Is.EqualTo("Doc2.png"));
+                Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "subtitle"), Is.True);
+                foreach (var propertyType in contentType.PropertyTypes)
                 {
                     Assert.IsTrue(propertyType.HasIdentity);
                     Assert.Greater(propertyType.Id, 0);

@@ -145,6 +145,7 @@ namespace Umbraco.Web.Models.Mapping
                     if (dataType == null) throw new NullReferenceException("No data type found with id " + propertyTypeDisplay.DataTypeId);
                     return new PropertyType(dataType, propertyTypeDisplay.Alias);
                 })
+                .ForMember(dest => dest.Id, expression => expression.Condition(source => source.Id > 0))
                 .ForMember(dto => dto.CreateDate, expression => expression.Ignore())
                 .ForMember(dto => dto.UpdateDate, expression => expression.Ignore())
                 .ForMember(type => type.PropertyGroupId, expression => expression.MapFrom(display => new Lazy<int>(() => display.GroupId, LazyThreadSafetyMode.None)))
