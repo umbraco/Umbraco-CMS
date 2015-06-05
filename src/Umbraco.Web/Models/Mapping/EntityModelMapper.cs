@@ -52,11 +52,6 @@ namespace Umbraco.Web.Models.Mapping
                .ForMember(dto => dto.Trashed, expression => expression.Ignore())
                .ForMember(x => x.AdditionalData, expression => expression.Ignore());
 
-            config.CreateMap<IContentType, EntityBasic>()
-              .ForMember(basic => basic.Icon, expression => expression.UseValue("icon-grid"))
-              .ForMember(dto => dto.Trashed, expression => expression.Ignore())
-              .ForMember(x => x.AdditionalData, expression => expression.Ignore());
-
             config.CreateMap<EntityBasic, ITemplate>()
                 .ConstructUsing(basic => new Template(basic.Name, basic.Alias)
                 {

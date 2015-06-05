@@ -63,10 +63,7 @@ namespace Umbraco.Web.Models.Mapping
                     }
 
                     //Sync allowed child types
-                    var allowedTypes = new List<ContentTypeSort>();
-                    var proposedAllowed = source.AllowedContentTypes.ToArray();
-                    for (int i = 0; i < proposedAllowed.Length; i++)
-                        allowedTypes.Add(new ContentTypeSort(proposedAllowed[i], i));
+                    var allowedTypes = source.AllowedContentTypes.Select((t, i) => new ContentTypeSort(t, i));
 
                     dest.AllowedContentTypes = allowedTypes;
 
@@ -121,11 +118,7 @@ namespace Umbraco.Web.Models.Mapping
 
                 .AfterMap((source, dest) =>
                 {
-                    //do allowed content types, we need to look them up then assign to a list of entity basic,
-                    //we are doing this manually because ContentTypeSort doesnt have a Name and we want that
-                    var foundCts = applicationContext.Services.ContentTypeService
-                        .GetAllContentTypes(source.AllowedContentTypes.Select(x => Convert.ToInt32(x.Id)).ToArray());
-                    dest.AllowedContentTypes = foundCts.Select(Mapper.Map<EntityBasic>);
+                    dest.AllowedContentTypes = source.AllowedContentTypes.Select(x => x.Id.Value);
                 });
 
 
