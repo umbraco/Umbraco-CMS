@@ -71,7 +71,7 @@ namespace Umbraco.Web.Editors
             return dto;
         }
 
-        public Umbraco.Web.Models.ContentEditing.ContentTypeDisplay GetScaffold()
+        public Umbraco.Web.Models.ContentEditing.ContentTypeDisplay GetEmpty()
         {
             var ct = new ContentType(-1);
             var dto = Mapper.Map<IContentType, Umbraco.Web.Models.ContentEditing.ContentTypeDisplay>(ct);
