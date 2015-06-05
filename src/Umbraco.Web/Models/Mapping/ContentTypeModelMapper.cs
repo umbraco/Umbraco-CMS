@@ -98,8 +98,11 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.AllowAsRoot, expression => expression.MapFrom(type => type.AllowedAsRoot))
                 //Ignore because this is not actually used for content types
                 .ForMember(display => display.Trashed, expression => expression.Ignore())
-                //Ignore, we'll do this in after map
-                .ForMember(dto => dto.AllowedContentTypes, expression => expression.Ignore())
+
+                .ForMember(
+                    dto => dto.AllowedContentTypes,
+                    expression => expression.MapFrom(dto => dto.AllowedContentTypes.Select(x => x.Id.Value)))
+
                 .ForMember(
                     dto => dto.AvailableCompositeContentTypes,
                     expression => expression.ResolveUsing(new AvailableCompositeContentTypesResolver(applicationContext)))
@@ -114,13 +117,7 @@ namespace Umbraco.Web.Models.Mapping
 
                 .ForMember(
                     dto => dto.Groups,
-                    expression => expression.ResolveUsing(new PropertyTypeGroupResolver(applicationContext, _propertyEditorResolver)))
-
-                .AfterMap((source, dest) =>
-                {
-                    dest.AllowedContentTypes = source.AllowedContentTypes.Select(x => x.Id.Value);
-                });
-
+                    expression => expression.ResolveUsing(new PropertyTypeGroupResolver(applicationContext, _propertyEditorResolver)));
 
             config.CreateMap<PropertyGroupDisplay, PropertyGroup>()
                 .ForMember(dest => dest.Id, expression => expression.Condition(source => source.Id > 0))
