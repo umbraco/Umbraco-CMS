@@ -90,6 +90,12 @@
             /// </summary>
             public const string MediaTypes = "mediatype";
 
+
+            /// <summary>
+            /// alias for the member type tree.
+            /// </summary>
+            public const string MemberTypes = "membertype";
+
             /// <summary>
             /// alias for the template tree.
             /// </summary>

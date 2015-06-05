@@ -1,0 +1,50 @@
+<div ng-controller="Umbraco.Editors.MemberType.EditController">
+    <form novalidate name="contentTypeForm"
+          ng-submit="save()"
+          val-form-manager>
+
+        <umb-editor-view>
+
+            <umb-editor-header
+                    name="contentType.name"
+                    alias="contentType.alias"
+                    description="contentType.description"
+                    menu="page.menu"
+                    actions="page.menu">
+            </umb-editor-header>
+
+            <umb-editor-container class="editors-document-type-container">
+
+                <div class="editors-document-type-canvas" ng-class="{'is-in-sorting-mode': sortingMode}">
+
+                    <umb-sub-views></umb-sub-views>
+
+                    <pre>{{ contentType | json }}</pre>
+
+                </div>
+
+            </umb-editor-container>
+
+
+            <umb-editor-footer>
+                <button type="submit" data-hotkey="ctrl+s" class="btn btn-success">
+                    <localize key="buttons_save">Save</localize>
+                </button>
+            </umb-editor-footer>
+
+        </umb-editor-view>
+
+
+
+    </form>
+
+    <!-- overlay for change property editor -->
+    <umb-overlay
+            ng-style="{'width': '500px'}"
+            ng-if="showDialog"
+            model="dialogModel"
+            animation="slide-in-right"
+            position="right"
+            view="dialogModel.view">
+    </umb-overlay>
+</div>
