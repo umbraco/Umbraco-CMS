@@ -110,8 +110,6 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual("blah", result.PropertyEditorAlias);
             Assert.AreEqual(6, result.SortOrder);
             Assert.AreEqual("asdfasdf", result.Name);
-            Assert.AreEqual(8, result.PropertyGroupId.Value);
-
         }
 
         [Test]

@@ -54,10 +54,18 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.PropertyGroups, expression => expression.Ignore())
                 .AfterMap((source, dest) =>
                 {
-                    dest.PropertyGroups = new PropertyGroupCollection();
                     foreach (var groupDisplay in source.Groups.Where(x => x.Name.IsNullOrWhiteSpace() == false ) )
                     {
-                        dest.PropertyGroups.Add(Mapper.Map<PropertyGroup>(groupDisplay));
+                        //use underlying logic to add the property group which should wire most things up for us
+                        dest.AddPropertyGroup(groupDisplay.Name);
+                        //now update that group with the values from the display object
+                        Mapper.Map(groupDisplay, dest.PropertyGroups[groupDisplay.Name]);
+                        
+                        foreach (var propertyTypeDisplay in groupDisplay.Properties)
+                        {
+                            dest.AddPropertyType(Mapper.Map<PropertyType>(propertyTypeDisplay), groupDisplay.Name);
+                        }
+                        //dest.PropertyGroups.Add(Mapper.Map<PropertyGroup>(groupDisplay));
                     }
 
                     //Sync allowed child types
@@ -117,31 +125,11 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(g => g.HasIdentity, expression => expression.Ignore())
                 .ForMember(dto => dto.CreateDate, expression => expression.Ignore())
                 .ForMember(dto => dto.UpdateDate, expression => expression.Ignore())
-
                 //only map if a parent is actually set
                 .ForMember(g => g.ParentId, expression => expression.Condition(display => display.ParentGroupId > 0))
                 .ForMember(g => g.ParentId, expression => expression.MapFrom(display => display.ParentGroupId))
-                
-                //ignore these, we'll do this in after map
-                .ForMember(g => g.PropertyTypes, expression => expression.Ignore())
-                .AfterMap((source, destination) =>
-                {
-                     
-
-                    destination.PropertyTypes = new PropertyTypeCollection();
-                    foreach (var propertyTypeDisplay in source.Properties.Where(x => x.Label.IsNullOrWhiteSpace() == false ))
-                    {
-                        var propertyType = Mapper.Map<PropertyType>(propertyTypeDisplay);
-                        if (source.Id <= 0)
-                        {
-                            //there is no id assigned which means it's a new group and the property type needs to be assigned to it, so 
-                            // we need to set the lazy id correctly to the PropertyGroup destination
-                            propertyType.PropertyGroupId = new Lazy<int>(() => destination.Id, false);
-                        }
-                        destination.PropertyTypes.Add(propertyType);
-                    }
-                });
-
+                //ignore these, this is handled with IContentType.AddPropertyType
+                .ForMember(g => g.PropertyTypes, expression => expression.Ignore());
 
             config.CreateMap<PropertyTypeDisplay, PropertyType>()
                 .ConstructUsing((PropertyTypeDisplay propertyTypeDisplay) =>
@@ -154,7 +142,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Id, expression => expression.Condition(source => source.Id > 0))
                 .ForMember(dto => dto.CreateDate, expression => expression.Ignore())
                 .ForMember(dto => dto.UpdateDate, expression => expression.Ignore())
-                //only map if it is actually set, if it's  not set, it needs to be handled differently!
+                //only map if it is actually set, if it's  not set, it needs to be handled differently and will be taken care of in the 
+                // IContentType.AddPropertyType
                 .ForMember(dest => dest.PropertyGroupId, expression => expression.Condition(source => source.GroupId > 0))
                 .ForMember(type => type.PropertyGroupId, expression => expression.MapFrom(display => new Lazy<int>(() => display.GroupId, false)))
                 .ForMember(type => type.Key, expression => expression.Ignore())
