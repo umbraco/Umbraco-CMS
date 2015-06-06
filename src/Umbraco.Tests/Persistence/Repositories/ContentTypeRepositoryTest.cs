@@ -104,7 +104,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork))
             {
                 // Act
-                var contentType = MockedContentTypes.CreateSimpleContentType();
+                var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test", propertyGroupName:"testGroup");
                 repository.AddOrUpdate(contentType);
                 unitOfWork.Commit();
 
@@ -113,7 +113,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(contentType.PropertyGroups.All(x => x.HasIdentity), Is.True);
                 Assert.That(contentType.PropertyTypes.All(x => x.HasIdentity), Is.True);
                 Assert.That(contentType.Path.Contains(","), Is.True);
-                Assert.That(contentType.SortOrder, Is.GreaterThan(0));    
+                Assert.That(contentType.SortOrder, Is.GreaterThan(0));
+
+                Assert.That(contentType.PropertyGroups.ElementAt(0).Name == "testGroup", Is.True);
+                var groupId = contentType.PropertyGroups.ElementAt(0).Id;
+                Assert.That(contentType.PropertyTypes.All(x => x.PropertyGroupId.Value == groupId), Is.True);
             }
             
         }
@@ -127,7 +131,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork))
             {
                 // Act
-                var contentType = (IContentType)MockedContentTypes.CreateSimpleContentType();
+                var contentType = (IContentType)MockedContentTypes.CreateSimpleContentType("test", "Test", propertyGroupName: "testGroup");
                 var display = Mapper.Map<ContentTypeDisplay>(contentType);
                 //simulate what would happen in the controller, we'd never map to a 'existing' content type,
                 // we'd map to an new content type when updating.
@@ -145,6 +149,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(contentType.PropertyTypes.All(x => x.HasIdentity), Is.True);
                 Assert.That(contentType.Path.Contains(","), Is.True);
                 Assert.That(contentType.SortOrder, Is.GreaterThan(0));
+
+                Assert.That(contentType.PropertyGroups.ElementAt(0).Name == "testGroup", Is.True);
+                var groupId = contentType.PropertyGroups.ElementAt(0).Id;
+                Assert.That(contentType.PropertyTypes.All(x => x.PropertyGroupId.Value == groupId), Is.True);
             }
 
         }
