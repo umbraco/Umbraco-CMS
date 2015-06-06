@@ -51,14 +51,8 @@
                     </div>
 
                     <!-- NODE PLACEHOLDER -->
-                    <div class="node node-placeholder" ng-if="(contentTypes | filter:{show:true}).length > 0">
-                        <div class="node-placeholder-text" ng-click="togglePlaceholderDetails()" ng-if="showPlaceholderDetails==false">Allow child node</div>
-                        <div class="node-placeholder-details" ng-if="showPlaceholderDetails">
-                            <select class="node-select" ng-model="selectedContentType" ng-options="contentType as contentType.name for contentType in contentTypes | filter:{show:true} | orderBy:'name'">
-                                <option value="">Select content type</option>
-                            </select>
-                            <a href="" class="btn" ng-click="addSelectedContentType(selectedContentType)">Allow</a>
-                        </div>
+                    <div class="node node-placeholder" ng-if="(contentTypes | filter:{show:true}).length > 0" ng-click="addItemOverlay($event)">
+                        <div class="node-placeholder-text">Allow child node</div>
                     </div>
 
                     <!-- ALL NODES ADDED -->
@@ -73,5 +67,14 @@
         </div>
 
     </div>
+
+    <umb-overlay
+            ng-style=""
+            ng-if="showDialog"
+            model="dialogModel"
+            animation="slide-in-right"
+            position="target"
+            view="dialogModel.view">
+    </umb-overlay>
 
 </div>

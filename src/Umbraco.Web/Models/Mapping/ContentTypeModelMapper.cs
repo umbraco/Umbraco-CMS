@@ -46,8 +46,6 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.AllowedAsRoot, expression => expression.MapFrom(display => display.AllowAsRoot))
                 .ForMember(dto => dto.CreatorId, expression => expression.Ignore())
                 .ForMember(dto => dto.Level, expression => expression.Ignore())
-                .ForMember(dto => dto.CreateDate, expression => expression.Ignore())
-                .ForMember(dto => dto.UpdateDate, expression => expression.Ignore())
                 .ForMember(dto => dto.SortOrder, expression => expression.Ignore())
                 //mapped in aftermap
                 .ForMember(dto => dto.AllowedContentTypes, expression => expression.Ignore())
@@ -65,7 +63,7 @@ namespace Umbraco.Web.Models.Mapping
                     //Sync allowed child types
                     var allowedTypes = source.AllowedContentTypes.Select((t, i) => new ContentTypeSort(t, i));
 
-                    dest.AllowedContentTypes = allowedTypes;
+                    dest.AllowedContentTypes = allowedTypes.ToArray();
 
                     //sync compositions
                     var current = dest.CompositionAliases().ToArray();
@@ -108,22 +106,17 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(
                     dto => dto.CompositeContentTypes,
                     expression => expression.MapFrom(dto => dto.ContentTypeComposition))
-
-                .ForMember(
-                    dto => dto.CompositeContentTypes,
-                    expression => expression.MapFrom(dto => dto.ContentTypeComposition))
-
+                    
                 .ForMember(
                     dto => dto.Groups,
                     expression => expression.ResolveUsing(new PropertyTypeGroupResolver(applicationContext, _propertyEditorResolver)));
 
             config.CreateMap<PropertyGroupDisplay, PropertyGroup>()
                 .ForMember(dest => dest.Id, expression => expression.Condition(source => source.Id > 0))
-                .ForMember(g => g.CreateDate, expression => expression.Ignore())
                 .ForMember(g => g.Key, expression => expression.Ignore())
-                .ForMember(g => g.CreateDate, expression => expression.Ignore())
-                .ForMember(g => g.HasIdentity, expression => expression.Ignore())   
-                .ForMember(g => g.UpdateDate, expression => expression.Ignore())
+                .ForMember(g => g.HasIdentity, expression => expression.Ignore())
+                .ForMember(dto => dto.CreateDate, expression => expression.Ignore())
+                .ForMember(dto => dto.UpdateDate, expression => expression.Ignore())
 
                 //only map if a parent is actually set
                 .ForMember(g => g.ParentId, expression => expression.Condition(display => display.ParentGroupId > 0))
@@ -150,6 +143,9 @@ namespace Umbraco.Web.Models.Mapping
                     if (dataType == null) throw new NullReferenceException("No data type found with id " + propertyTypeDisplay.DataTypeId);
                     return new PropertyType(dataType, propertyTypeDisplay.Alias);
                 })
+                .ForMember(dest => dest.Id, expression => expression.Condition(source => source.Id > 0))
+                .ForMember(dto => dto.CreateDate, expression => expression.Ignore())
+                .ForMember(dto => dto.UpdateDate, expression => expression.Ignore())
                 .ForMember(type => type.PropertyGroupId, expression => expression.MapFrom(display => new Lazy<int>(() => display.GroupId, LazyThreadSafetyMode.None)))
                 .ForMember(type => type.Key, expression => expression.Ignore())
                 .ForMember(type => type.HelpText, expression => expression.Ignore())
@@ -158,9 +154,6 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(type => type.Alias, expression => expression.Ignore())
                 //ignore because this is obsolete and shouldn't be used
                 .ForMember(type => type.DataTypeId, expression => expression.Ignore())
-                //ignore because these are 'readonly'
-                .ForMember(type => type.CreateDate, expression => expression.Ignore())
-                .ForMember(type => type.UpdateDate, expression => expression.Ignore())
                 .ForMember(type => type.Mandatory, expression => expression.MapFrom(display => display.Validation.Mandatory))
                 .ForMember(type => type.ValidationRegExp, expression => expression.MapFrom(display => display.Validation.Pattern))
                 .ForMember(type => type.PropertyEditorAlias, expression => expression.MapFrom(display => display.Editor))

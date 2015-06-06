@@ -6,12 +6,11 @@
  * @description
  * The controller for the content type editor property dialog
  */
-function PermissionsController($scope, contentTypeResource) {
+function PermissionsController($scope, contentTypeResource, $log) {
 
     /* ----------- SCOPE VARIABLES ----------- */
 
     $scope.contentTypes = [];
-    $scope.showPlaceholderDetails = false;
 
     /* ---------- INIT ---------- */
 
@@ -47,46 +46,6 @@ function PermissionsController($scope, contentTypeResource) {
 
     }
 
-    $scope.addSelectedContentType = function(selectedContentType) {
-
-        if(selectedContentType.alias !== "undefined" || selectedContentType.alias !== null) {
-
-            var reformatedContentType = {
-                "name": selectedContentType.name,
-                "id": {
-                    "m_boxed": {
-                        "m_value": selectedContentType.id
-                    }
-                },
-                "icon": selectedContentType.icon,
-                "key": selectedContentType.key,
-                "alias": selectedContentType.alias
-            };
-
-            // push selected content type to allowed array
-            $scope.contentType.allowedContentTypes.push(reformatedContentType);
-
-            // hide selected content type from content types array
-            for (var contentTypeIndex = 0; contentTypeIndex < $scope.contentTypes.length; contentTypeIndex++) {
-
-                var contentType = $scope.contentTypes[contentTypeIndex];
-
-                if( selectedContentType.alias === contentType.alias ) {
-                    contentType.show = false;
-                }
-            }
-
-            // hide placeholder details
-            $scope.showPlaceholderDetails = false;
-
-        }
-
-    };
-
-    $scope.togglePlaceholderDetails = function() {
-        $scope.showPlaceholderDetails = !$scope.showPlaceholderDetails;
-    };
-
     $scope.removeAllowedChildNode = function(selectedContentType) {
 
         // splice from array
@@ -105,6 +64,53 @@ function PermissionsController($scope, contentTypeResource) {
 
     };
 
+    $scope.addItemOverlay = function ($event) {
+
+        $scope.showDialog = false;
+        $scope.dialogModel = {};
+        $scope.dialogModel.title = "Choose content type";
+        $scope.dialogModel.contentTypes = $scope.contentTypes;
+        $scope.dialogModel.event = $event;
+        $scope.dialogModel.view = "views/documentType/dialogs/contenttypes/contenttypes.html";
+        $scope.showDialog = true;
+
+        $scope.dialogModel.chooseContentType = function(selectedContentType) {
+
+            // format content type to match service
+            var reformatedContentType = {
+                "name": selectedContentType.name,
+                "id": {
+                    "m_boxed": {
+                        "m_value": selectedContentType.id
+                    }
+                },
+                "icon": selectedContentType.icon,
+                "key": selectedContentType.key,
+                "alias": selectedContentType.alias
+            };
+
+            // push to content type model
+            $scope.contentType.allowedContentTypes.push(reformatedContentType);
+
+            // hide selected content type from content types array
+            for (var contentTypeIndex = 0; contentTypeIndex < $scope.contentTypes.length; contentTypeIndex++) {
+
+                var contentType = $scope.contentTypes[contentTypeIndex];
+
+                if( selectedContentType.alias === contentType.alias ) {
+                    contentType.show = false;
+                }
+            }
+
+            $scope.showDialog = false;
+            $scope.dialogModel = null;
+        };
+
+        $scope.dialogModel.close = function(){
+            $scope.showDialog = false;
+            $scope.dialogModel = null;
+        };
+    };
 
 }
 

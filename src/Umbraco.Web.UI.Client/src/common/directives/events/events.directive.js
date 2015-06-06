@@ -64,7 +64,7 @@ angular.module('umbraco.directives')
             scope.$on("$destroy", function() {
                 $(document).off("click", oneTimeClick);
             }); 
-        }, 1000);
+        }); // Temp removal of 1 sec timeout to prevent bug where overlay does not open. We need to find a better solution.
 
     };
 })
