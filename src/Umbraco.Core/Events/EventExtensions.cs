@@ -7,6 +7,18 @@ namespace Umbraco.Core.Events
 	/// </summary>
 	public static class EventExtensions
 	{
+        public static bool IsRaisedEventCancelled<TSender, TArgs>(
+            this TypedEventHandler<TSender, TArgs> eventHandler,
+            TArgs args,
+            TSender sender)
+            where TArgs : CancellableEventArgs
+        {
+            if (eventHandler != null)
+                eventHandler(sender, args);
+
+            return args.Cancel;
+        }
+
 		/// <summary>
 		/// Raises the event and returns a boolean value indicating if the event was cancelled
 		/// </summary>
@@ -15,17 +27,20 @@ namespace Umbraco.Core.Events
 		/// <param name="eventHandler"></param>
 		/// <param name="args"></param>
 		/// <param name="sender"></param>
+		/// <param name="customMessage"></param>
 		/// <returns></returns>
-		public static bool IsRaisedEventCancelled<TSender, TArgs>(
+        public static bool IsRaisedEventCancelled<TSender, TArgs>(
 			this TypedEventHandler<TSender, TArgs> eventHandler,
 			TArgs args,
-			TSender sender)
+			TSender sender, 
+            out string customMessage)
 			where TArgs : CancellableEventArgs
 		{
 			if (eventHandler != null)
 				eventHandler(sender, args);
 
-			return args.Cancel;
+		    customMessage = args.CustomMessage;
+            return args.Cancel;
 		}
 
 		/// <summary>

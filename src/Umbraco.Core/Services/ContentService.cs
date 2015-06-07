@@ -1729,9 +1729,12 @@ namespace Umbraco.Core.Services
         {
             if (raiseEvents)
             {
-                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this))
+                string customMessage;
+                var isRaisedEventCancelled = Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this, out customMessage);
+
+                if (isRaisedEventCancelled)
                 {
-                    return Attempt.Fail(new PublishStatus(content, PublishStatusType.FailedCancelledByEvent));
+                    return Attempt.Fail(new PublishStatus(content, PublishStatusType.FailedCancelledByEvent, customMessage));
                 }
             }
 

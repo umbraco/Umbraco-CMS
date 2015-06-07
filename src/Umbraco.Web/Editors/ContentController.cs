@@ -260,7 +260,6 @@ namespace Umbraco.Web.Editors
                 publishStatus = Services.ContentService.SaveAndPublishWithStatus(contentItem.PersistedContent, Security.CurrentUser.Id);
             }
             
-
             //return the updated model
             var display = Mapper.Map<IContent, ContentItemDisplay>(contentItem.PersistedContent);
 
@@ -612,7 +611,9 @@ namespace Umbraco.Web.Editors
                 case PublishStatusType.FailedCancelledByEvent:
                     display.AddWarningNotification(
                         ui.Text("publish"),
-                        ui.Text("speechBubbles", "contentPublishedFailedByEvent"));
+                        string.IsNullOrEmpty(status.CustomMessage)
+                            ? ui.Text("speechBubbles", "contentPublishedFailedByEvent")
+                            : status.CustomMessage);
                     break;                
                 case PublishStatusType.FailedAwaitingRelease:
                     display.AddWarningNotification(
