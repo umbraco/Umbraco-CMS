@@ -63,11 +63,6 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 			init(dt);
 		});
 	}
-
-	/* WIP template --- */
-	entityResource.getAll("Template").then(function(templates){
-		$scope.availableTemplates = templates;
-	});
 	
 
 	/* ---------- SAVE ---------- */

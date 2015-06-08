@@ -6,7 +6,7 @@
  * @description
  * The controller for the content type editor templates sub view
  */
-function TemplatesController($scope, contentTypeResource) {
+function TemplatesController($scope, entityResource) {
 
     /* ----------- SCOPE VARIABLES ----------- */
 
@@ -20,8 +20,8 @@ function TemplatesController($scope, contentTypeResource) {
 
     function init() {
 
-        contentTypeResource.getAll().then(function(contentTypes){
-            $scope.templates.availableTemplates = contentTypes;
+        entityResource.getAll("Template").then(function(templates){
+            $scope.templates.availableTemplates = templates;
 
             // we should be able to move this to a custom filter
             angular.forEach($scope.templates.availableTemplates, function(template){
@@ -43,7 +43,6 @@ function TemplatesController($scope, contentTypeResource) {
                 }
 
             });
-
         });
 
     }
