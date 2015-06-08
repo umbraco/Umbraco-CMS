@@ -1760,8 +1760,9 @@ namespace Umbraco.Core.Services
                     var internalStrategy = (PublishingStrategy)_publishingStrategy;
                     //Publish and then update the database with new status
                     var publishResult = internalStrategy.PublishInternal(content, userId);
-                    //set the status type to the publish result
+                    //set the status type and message to the publish result
                     publishStatus.StatusType = publishResult.Result.StatusType;
+                    publishStatus.CustomMessage = publishResult.Result.CustomMessage;
                 }
 
                 //we are successfully published if our publishStatus is still Successful
