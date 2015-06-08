@@ -7,6 +7,27 @@ namespace Umbraco.Core.Services
     internal static class UserServiceExtensions
     {
         /// <summary>
+        /// Remove all permissions for this user for all nodes specified
+        /// </summary>
+        /// <param name="userService"></param>
+        /// <param name="userId"></param>
+        /// <param name="entityIds"></param>
+        public static void RemoveUserPermissions(this IUserService userService, int userId, params int[] entityIds)
+        {
+            userService.ReplaceUserPermissions(userId, new char[] {}, entityIds);
+        }
+
+        /// <summary>
+        /// Remove all permissions for this user for all nodes
+        /// </summary>
+        /// <param name="userService"></param>
+        /// <param name="userId"></param>
+        public static void RemoveUserPermissions(this IUserService userService, int userId)
+        {
+            userService.ReplaceUserPermissions(userId, new char[] { });
+        }
+
+        /// <summary>
         /// Maps a custom provider's information to an umbraco user account
         /// </summary>
         /// <param name="userService"></param>

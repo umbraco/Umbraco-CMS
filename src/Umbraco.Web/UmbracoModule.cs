@@ -372,15 +372,23 @@ namespace Umbraco.Web
 			return false;
 		}
 
+	    private bool _notConfiguredReported;
+
 		// ensures Umbraco is configured
 		// if not, redirect to install and return false
 		// if yes, return true
-	    private static bool EnsureIsConfigured(HttpContextBase httpContext, Uri uri)
+	    private bool EnsureIsConfigured(HttpContextBase httpContext, Uri uri)
 	    {
 	        if (ApplicationContext.Current.IsConfigured)
 	            return true;
 
-            LogHelper.Warn<UmbracoModule>("Umbraco is not configured");
+	        if (_notConfiguredReported)
+	        {
+                // remember it's been reported so we don't flood the log
+                // no thread-safety so there may be a few log entries, doesn't matter
+                _notConfiguredReported = true;
+                LogHelper.Warn<UmbracoModule>("Umbraco is not configured");
+            }
 
 			var installPath = UriUtility.ToAbsolute(SystemDirectories.Install);
 			var installUrl = string.Format("{0}/?redir=true&url={1}", installPath, HttpUtility.UrlEncode(uri.ToString()));
@@ -412,6 +420,9 @@ namespace Umbraco.Web
             {
                 response.StatusCode = 404;
                 response.TrySkipIisCustomErrors = UmbracoConfig.For.UmbracoSettings().WebRouting.TrySkipIisCustomErrors;
+
+                if (response.TrySkipIisCustomErrors == false)
+                    LogHelper.Warn<UmbracoModule>("Status code is 404 yet TrySkipIisCustomErrors is false - IIS will take over.");          
             }
 
             if (pcr.ResponseStatusCode > 0)
@@ -553,6 +564,24 @@ namespace Umbraco.Web
                     BeginRequest(new HttpContextWrapper(httpContext));
 				};
 
+            //disable asp.net headers (security)
+            // This is the correct place to modify headers according to MS: 
+            // https://our.umbraco.org/forum/umbraco-7/using-umbraco-7/65241-Heap-error-from-header-manipulation?p=0#comment220889
+		    app.PostReleaseRequestState += (sender, args) =>
+		    {
+                var httpContext = ((HttpApplication)sender).Context;
+                try
+                {
+                    httpContext.Response.Headers.Remove("Server");
+                    //this doesn't normally work since IIS sets it but we'll keep it here anyways.
+                    httpContext.Response.Headers.Remove("X-Powered-By");
+                }
+                catch (PlatformNotSupportedException ex)
+                {
+                    // can't remove headers this way on IIS6 or cassini.
+                }
+		    };
+
             app.PostResolveRequestCache += (sender, e) =>
 				{
 					var httpContext = ((HttpApplication)sender).Context;
@@ -573,21 +602,6 @@ namespace Umbraco.Web
 					DisposeHttpContextItems(httpContext);
 				};
 
-            //disable asp.net headers (security)
-		    app.PreSendRequestHeaders += (sender, args) =>
-		        {
-                    var httpContext = ((HttpApplication)sender).Context;
-					try
-					{
-						httpContext.Response.Headers.Remove("Server");
-						//this doesn't normally work since IIS sets it but we'll keep it here anyways.
-						httpContext.Response.Headers.Remove("X-Powered-By");
-					}
-					catch (PlatformNotSupportedException ex)
-					{
-						// can't remove headers this way on IIS6 or cassini.
-					}
-		        };
 		}
 
 		public void Dispose()

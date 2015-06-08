@@ -55,7 +55,7 @@ namespace Umbraco.Web.Scheduling
         /// <remarks>Classes inheriting from <c>RecurringTaskBase</c> must implement <c>PerformRun</c>.</remarks>
         public virtual async Task RunAsync(CancellationToken token)
         {
-            await PerformRunAsync();
+            await PerformRunAsync(token);
             Repeat();
         }
 
@@ -95,8 +95,9 @@ namespace Umbraco.Web.Scheduling
         /// <summary>
         /// Runs the task asynchronously.
         /// </summary>
+        /// <param name="token">A cancellation token.</param>
         /// <returns>A <see cref="Task"/> instance representing the execution of the background task.</returns>
-        public abstract Task PerformRunAsync();
+        public abstract Task PerformRunAsync(CancellationToken token);
 
         /// <summary>
         /// Gets a new occurence of the recurring task.

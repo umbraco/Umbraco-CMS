@@ -1,12 +1,10 @@
 using System;
-using System.Diagnostics;
-using System.Net;
-using System.Text;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Publishing;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Mvc;
 
@@ -41,6 +39,12 @@ namespace Umbraco.Web.Scheduling
 
         public override void PerformRun()
         {
+            throw new NotImplementedException();
+        }
+
+        public override async Task PerformRunAsync(CancellationToken token)
+        {
+            
             if (_appContext == null) return;
             if (ServerEnvironmentHelper.GetStatus(_settings) == CurrentServerEnvironmentStatus.Slave)
             {
@@ -57,7 +61,7 @@ namespace Umbraco.Web.Scheduling
                 var umbracoBaseUrl = ServerEnvironmentHelper.GetCurrentServerUmbracoBaseUrl(_appContext, _settings);
 
                 try
-                {                    
+                {
 
                     if (string.IsNullOrWhiteSpace(umbracoBaseUrl))
                     {
@@ -66,13 +70,26 @@ namespace Umbraco.Web.Scheduling
                     else
                     {
                         var url = string.Format("{0}RestServices/ScheduledPublish/Index", umbracoBaseUrl.EnsureEndsWith('/'));
-                        using (var wc = new WebClient())
+                        using (var wc = new HttpClient())
                         {
+                            var request = new HttpRequestMessage()
+                            {
+                                RequestUri = new Uri(url),
+                                Method = HttpMethod.Post,
+                                Content = new StringContent(string.Empty)
+                            };
                             //pass custom the authorization header
-                            wc.Headers.Set("Authorization", AdminTokenAuthorizeAttribute.GetAuthHeaderTokenVal(_appContext));
+                            request.Headers.Authorization = AdminTokenAuthorizeAttribute.GetAuthenticationHeaderValue(_appContext);
 
-                            var result = wc.UploadString(url, "");
-                        }                        
+                            try
+                            {
+                                var result = await wc.SendAsync(request, token);
+                            }
+                            catch (Exception ex)
+                            {
+                                LogHelper.Error<ScheduledPublishing>("An error occurred calling scheduled publish url", ex);
+                            }
+                        }
                     }
                 }
                 catch (Exception ee)
@@ -88,14 +105,9 @@ namespace Umbraco.Web.Scheduling
             }            
         }
 
-        public override Task PerformRunAsync()
-        {
-            throw new NotImplementedException();
-        }
-
         public override bool IsAsync
         {
-            get { return false; }
+            get { return true; }
         }
     
         public override bool RunsOnShutdown

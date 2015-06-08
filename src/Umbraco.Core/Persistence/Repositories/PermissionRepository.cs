@@ -152,6 +152,42 @@ namespace Umbraco.Core.Persistence.Repositories
                 AssignedPermissions.RaiseEvent(
                     new SaveEventArgs<EntityPermission>(ConvertToPermissionList(toInsert), false), this);
             }
+        }
+
+        /// <summary>
+        /// Assigns one permission for a user to many entities
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="permission"></param>
+        /// <param name="entityIds"></param>
+        public void AssignUserPermission(int userId, char permission, params int[] entityIds)
+        {
+            var db = _unitOfWork.Database;
+            using (var trans = db.GetTransaction())
+            {
+                db.Execute("DELETE FROM umbracoUser2NodePermission WHERE userId=@userId AND permission=@permission AND nodeId in (@entityIds)",
+                    new
+                    {
+                        userId = userId,
+                        permission = permission.ToString(CultureInfo.InvariantCulture),
+                        entityIds = entityIds
+                    });
+
+                var actions = entityIds.Select(id => new User2NodePermissionDto
+                {
+                    NodeId = id,
+                    Permission = permission.ToString(CultureInfo.InvariantCulture),
+                    UserId = userId
+                }).ToArray();
+
+                _unitOfWork.Database.BulkInsertRecords(actions, trans);
+
+                trans.Complete();
+
+                //Raise the event
+                AssignedPermissions.RaiseEvent(
+                    new SaveEventArgs<EntityPermission>(ConvertToPermissionList(actions), false), this);
+            }
         } 
 
         /// <summary>

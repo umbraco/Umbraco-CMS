@@ -828,7 +828,7 @@ namespace Umbraco.Core.Services
                     else
                     {
                         //the Id field is actually the string property editor Alias
-                        var dataTypeDefinition = new DataTypeDefinition(-1, dataTypeElement.Attribute("Id").Value.Trim())
+                        var dataTypeDefinition = new DataTypeDefinition(dataTypeElement.Attribute("Id").Value.Trim())
                         {
                             Key = dataTypeDefinitionId,
                             Name = dataTypeDefinitionName,

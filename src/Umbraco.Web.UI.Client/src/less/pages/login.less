@@ -22,9 +22,10 @@
 }
 
 .login-overlay .form {
+    position:fixed;
     display: block;
-    padding-top: 100px;
-    padding-left: 165px;
+    top: 100px;
+    left: 165px;
     width: 370px;
     text-align: right;
 }
@@ -43,6 +44,14 @@
     padding-left: 6px;
     margin-top: 10px;
     text-align: center;
+}
+
+@media (max-width: 565px) {
+  // Remove padding on login-form on smaller devices
+  .login-overlay .form {
+    left: inherit;
+    right:25px;
+  }
 }
 
 #hrOr {

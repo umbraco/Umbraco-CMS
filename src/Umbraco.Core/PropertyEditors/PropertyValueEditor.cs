@@ -345,9 +345,7 @@ namespace Umbraco.Core.PropertyEditors
         public virtual string ConvertDbToString(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
         {
             if (property.Value == null)
-            {
                 return string.Empty;
-            }
 
             switch (GetDatabaseType())
             {

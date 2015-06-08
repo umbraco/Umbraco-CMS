@@ -18,9 +18,16 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
     //map the user config
     $scope.model.config = angular.extend(config, $scope.model.config);
 
+    $scope.datetimePickerValue = $scope.model.value;
+
     //hide picker if clicking on the document 
     $scope.hidePicker = function () {
-        $element.find("div:first").datetimepicker("hide");
+        //$element.find("div:first").datetimepicker("hide");
+        // Sometimes the statement above fails and generates errors in the browser console. The following statements fix that.
+        var dtp = $element.find("div:first");
+        if (dtp && dtp.datetimepicker) {
+            dtp.datetimepicker("hide");
+        }
     };
     $(document).bind("click", $scope.hidePicker);
 
@@ -67,8 +74,16 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 					.datetimepicker($scope.model.config)
 					.on("dp.change", applyDate);
 
-				//manually assign the date to the plugin
-				$element.find("div:first").datetimepicker("setValue", $scope.model.value ? $scope.model.value : null);
+			    //manually assign the date to the plugin
+				if (!$scope.model.config.format) {
+				    $element.find("div:first").datetimepicker("setValue", $scope.model.value ? $scope.model.value : null);
+				}
+				else {
+				    $element.find("div:first").datetimepicker("setValue", $scope.model.value ? new Date($scope.model.value) : null);
+				    if ($scope.model.value && $scope.model.config.format) {
+				        $scope.datetimePickerValue = moment($scope.model.value).format($scope.model.config.format);
+				    }
+				}
 
 				//Ensure to remove the event handler when this instance is destroyted
 				$scope.$on('$destroy', function () {

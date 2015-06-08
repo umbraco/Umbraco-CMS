@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence.Factories
 
         public IDataTypeDefinition BuildEntity(DataTypeDto dto)
         {
-            var dataTypeDefinition = new DataTypeDefinition(dto.NodeDto.ParentId, dto.PropertyEditorAlias)
+            var dataTypeDefinition = new DataTypeDefinition(dto.PropertyEditorAlias)
                                          {
                                              CreateDate = dto.NodeDto.CreateDate,
                                              DatabaseType = dto.DbType.EnumParse<DataTypeDatabaseType>(true),
