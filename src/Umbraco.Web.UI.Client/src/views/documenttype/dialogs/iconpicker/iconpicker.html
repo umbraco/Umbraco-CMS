@@ -2,6 +2,17 @@
     <div class="umb-overlay-body">
 
         <div class="umb-control-group">
+            <div class="form-search">
+                <i class="icon-search"></i>
+                <input type="text"
+                       style="width: 100%"
+                       ng-model="searchTerm"
+                       class="umb-search-field search-query input-block-level"
+                       placeholder="Filter...">
+            </div>
+        </div>
+
+        <div class="umb-control-group">
             <select ng-model="color" class="input-block-level">
                 <option value="">Black</option>
                 <option value="color-green">Green</option>
