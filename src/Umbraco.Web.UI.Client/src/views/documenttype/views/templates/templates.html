@@ -1,1 +1,49 @@
-templates
+<div class="sub-view-columns" ng-controller="Umbraco.Editors.DocumentType.TemplatesController">
+
+    <div class="sub-view-column-left">
+        <h5>Allowed Templates</h5>
+        <small>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vulputate velit a velit consectetur luctus.</small>
+    </div>
+
+    <div class="sub-view-column-right">
+
+        <div class="templates-grid">
+
+            <div class="template template-default">
+                <div class="template-content">
+                    <i class="icon icon-newspaper-alt"></i>
+                    <div class="template-name">{{ contentType.defaultTemplate.name }}</div>
+                    <span class="template-default-label">(Default)</span>
+                </div>
+            </div>
+
+            <div class="template" ng-repeat="template in contentType.allowedTemplates | filter: { id:'!'+contentType.defaultTemplate.id }">
+                <div class="template-content">
+                    <i class="icon icon-newspaper-alt"></i>
+                    <div class="template-name">{{ template.name }}</div>
+                    <a href="" class="template-default-label link-blue" ng-click="setAsDefaultTemplate(template)">Set as default</a>
+                </div>
+                <i class="icon icon-trash remove-template" ng-click="removeTemplate(template)"></i>
+            </div>
+
+            <div class="template template-placeholder">
+                <div class="template-content">
+                    <div class="template-name" ng-click="openTemplatesPicker($event)">Choose template</div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <umb-overlay
+            ng-style=""
+            ng-if="showDialog"
+            model="dialogModel"
+            animation="slide-in-right"
+            position="target"
+            view="dialogModel.view">
+    </umb-overlay>
+
+</div>
+

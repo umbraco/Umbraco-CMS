@@ -46,7 +46,7 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 		},
 		{
 			"name": "Templates",
-			"icon": "article",
+			"icon": "newspaper-alt",
 			"view": "views/documentType/views/templates/templates.html"
 		}
 	];

@@ -598,23 +598,59 @@
 
 }
 
-/* ---------- SUB VIEWS COLUMNS ----------- */
+/* ---------- TEMPLATES GRID ------------ */
 
-.sub-view-columns {
+.templates-grid {
   display: flex;
-  margin-bottom: 40px;
-  h5 {
-    margin-top: 0;
-  }
+  flex-direction: row;
+  flex-wrap: wrap;
 }
 
-.sub-view-column-left {
-  flex: 0 0 250px;
-  margin-right: 70px;
+.template {
+  width: 125px;
+  height: 150px;
+  padding: 20px;
+  background: #f8f8f8;
+  border: 1px solid #CCCCCC;
+  text-align: center;
+  margin: 0 20px 20px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  animation: fadeIn 0.5s;
+  position: relative;
 }
 
-.sub-view-column-right {
-  flex: 1;
+.template .template-content .icon {
+  font-size: 50px;
+  color: #d9d9d9;
+}
+
+.template .remove-template {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  cursor: pointer;
+}
+
+.template .template-default-label {
+  font-size: 11px;
+  color: #d9d9d9;
+}
+
+.template .link-blue {
+  color: @blue;
+}
+
+.template.template-default {
+  border-width: 2px;
+}
+
+.template.template-placeholder {
+  border: 1px dashed #d9d9d9;
+  background: none;
+  cursor: pointer;
 }
 
 /* ---------- CHILD NODE TREE ---------- */
