@@ -259,6 +259,15 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 
 				// push init/placeholder property
 				addInitProperty(group);
+
+				angular.forEach(group.properties, function(property){
+
+					// get data type detaisl for each property
+					getDataTypeDetails(property);
+
+				});
+
+
 			});
 		}
 
@@ -267,6 +276,18 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 
 		// add init tab
 		addInitTab();
+	}
+
+	function getDataTypeDetails(property) {
+
+		if( property.propertyState !== 'init' ) {
+
+			dataTypeResource.getById(property.dataTypeId)
+				.then(function(dataType) {
+					property.dataTypeIcon = dataType.icon;
+					property.dataTypeName = dataType.name;
+				});
+		}
 	}
 
 	function addInitTab() {
