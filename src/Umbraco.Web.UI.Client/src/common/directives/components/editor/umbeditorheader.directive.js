@@ -17,21 +17,25 @@ angular.module("umbraco.directives.html")
             templateUrl: 'views/components/editor/umb-editor-header.html',
             link: function(scope, elem, attrs, ctrl) {
 
-                scope.pickIcon = function() {
+                scope.openIconPicker = function() {
 
                     scope.dialogModel = {};
                     scope.dialogModel.title = "Choose icon";
-                    scope.dialogModel.view = "views/common/dialogs/iconpicker.html";
+                    scope.dialogModel.view = "views/documenttype/dialogs/iconpicker/iconpicker.html";
                     scope.showDialog = true;
 
-                    /*
-                    iconHelper.getIcons().then(function(icons){
-                        scope.icons = icons;
-                    });
-                    */
+                    scope.dialogModel.pickIcon = function(icon) {
+                        scope.icon = icon;
+                        scope.showDialog = false;
+                        scope.dialogModel = null;
+                    };
+
+                    scope.dialogModel.close = function(){
+                        scope.showDialog = false;
+                        scope.dialogModel = null;
+                    };
 
                 };
-
 
             }
         };

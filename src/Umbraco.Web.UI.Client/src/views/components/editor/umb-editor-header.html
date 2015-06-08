@@ -4,8 +4,11 @@
 
         <div class="umb-panel-meta">
 
-            <div class="umb-panel-header-icon" ng-click="pickIcon()">
-                <span>Add icon</span>
+            <div class="umb-panel-header-icon" ng-click="openIconPicker()">
+                <i class="icon {{icon}}"></i>
+                <div ng-if="icon === '' || icon === null || icon === undefined" class="umb-panel-header-icon-placeholder">
+                    <span>Add icon</span>
+                </div>
             </div>
 
             <div class="umb-panel-header-title-wrapper">
