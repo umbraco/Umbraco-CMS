@@ -20,7 +20,7 @@
                 </umb-content-name>
                 -->
                 <div class="umb-panel-header-name-wrapper">
-                    <input type="text" class="umb-panel-header-name" ng-model="name" placeholder="Enter name..." umb-auto-resize />
+                    <input type="text" class="umb-panel-header-name" ng-model="name" placeholder="Enter name..." ng-class="{'name-is-empty': name===null || name===''}" umb-auto-resize />
 
                     <umb-locked-field ng-model="alias"></umb-locked-field>
 
