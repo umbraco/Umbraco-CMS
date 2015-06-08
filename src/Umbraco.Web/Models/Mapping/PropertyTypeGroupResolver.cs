@@ -90,12 +90,13 @@ namespace Umbraco.Web.Models.Mapping
 
 
             //get all generic properties not already mapped to the generic props collection 
-            var ownGenericProperties = source.CompositionPropertyTypes.Where(x => x.PropertyGroupId == null && genericProperties.Any(y => y.Id == x.Id));
+            var ownGenericProperties = source.CompositionPropertyTypes.Where(x => x.PropertyGroupId == null && !genericProperties.Any(y => y.Id == x.Id));
             genericProperties.AddRange(MapProperties(ownGenericProperties, source, 0, false));
 
             if (genericProperties.Any())
             {
-                var genericTab = new PropertyGroupDisplay() { Id = 0, Name = "Generic properties", ParentGroupId = 0, ContentTypeId = source.Id, SortOrder = 999, Inherited = false };
+                var genericTab = new PropertyGroupDisplay() { Id = -666, Name = "Generic properties", ParentGroupId = 0, ContentTypeId = source.Id, SortOrder = 999, Inherited = false };
+                genericTab.Properties = genericProperties;
                 groups.Add(0, genericTab);
             }
 
@@ -145,7 +146,7 @@ namespace Umbraco.Web.Models.Mapping
         private IEnumerable<PropertyTypeDisplay> MapProperties(IEnumerable<PropertyType> properties, IContentTypeBase contentType, int groupId, bool inherited)
         {
             var mappedProperties = new List<PropertyTypeDisplay>();
-            foreach (var p in properties)
+            foreach (var p in properties.Where(x => x.DataTypeDefinitionId != 0) )
             {
                 var editor = _propertyEditorResolver.Value.GetByAlias(p.PropertyEditorAlias);
                 var preVals = _applicationContext.Services.DataTypeService.GetPreValuesCollectionByDataTypeId(p.DataTypeDefinitionId);

@@ -11,57 +11,34 @@ function MemberTypeEditController($scope, $rootScope, $routeParams, $log, member
 	$scope.page = {actions: [], menu: [], subViews: [] };
 	$scope.sortingMode = false;
 
-	$scope.page.subViews = [
-		{
-			"name": "Design",
-			"icon": "merge",
-			"view": "views/documentType/views/design/design.html",
-			"tools": [
-				{
-					"name": "Reorder",
-					"icon": "navigation",
-					"action": function() {
-						$scope.toggleSortingMode();
+	$scope.page.navigation = [
+			{
+				"name": "Design",
+				"icon": "merge",
+				"view": "views/documentType/views/design/design.html",
+				"active": true,
+				"tools": [
+					{
+						"name": "Reorder",
+						"icon": "navigation",
+						"action": function() {
+							$scope.toggleSortingMode();
+						}
 					}
-				}
-			]
-		}
-	];
+				]
+			}
+		];
 
 	if ($routeParams.create) {
         //we are creating so get an empty data type item
         memberTypeResource.getScaffold()
             .then(function(dt) {
-            	$scope.contentType = dt;
-
-            	//set a shared state
-                editorState.set($scope.contentType);
-
-                // add init tab
-				addInitTab();
+            	init(dt);
             });
     }
     else {
 		memberTypeResource.getById($routeParams.id).then(function(dt){
-			$scope.contentType = dt;
-
-			// set all tab to inactive
-			if( $scope.contentType.groups.length !== 0 ) {
-				angular.forEach($scope.contentType.groups, function(group){
-					// set state
-					group.tabState = "inActive";
-
-					// push init/placeholder property
-					addInitProperty(group);
-
-				});
-			}
-
-			//set a shared state
-            editorState.set($scope.contentType);
-
-			// add init tab
-			addInitTab();
+			init(dt);
 		});
 	}
 
@@ -72,26 +49,8 @@ function MemberTypeEditController($scope, $rootScope, $routeParams, $log, member
 		//perform any pre-save logic here
 
 		memberTypeResource.save($scope.contentType).then(function(dt){
-
 			//post save logic here -the saved doctype returns as a new object
-
-			// set all tab to inactive
-			if( $scope.contentType.groups.length !== 0 ) {
-				angular.forEach($scope.contentType.groups, function(group){
-					// set state
-					group.tabState = "inActive";
-
-					// push init/placeholder property
-					addInitProperty(group);
-
-				});
-			}
-
-			//set a shared state
-            editorState.set($scope.contentType);
-
-			// add init tab
-			addInitTab();
+			init(dt);
 		});
 	};
 
@@ -136,6 +95,29 @@ function MemberTypeEditController($scope, $rootScope, $routeParams, $log, member
 			addInitProperty(tab);
 		}
 	};
+
+
+	function init(contentType){
+
+		$scope.contentType = contentType;
+
+		// set all tab to inactive
+		if( $scope.contentType.groups.length !== 0 ) {
+			angular.forEach($scope.contentType.groups, function(group){
+				// set state
+				group.tabState = "inActive";
+
+				// push init/placeholder property
+				addInitProperty(group);
+			});
+		}
+
+		//set a shared state
+        editorState.set($scope.contentType);
+
+		// add init tab
+		addInitTab();
+	}
 
 	function addInitTab() {
 

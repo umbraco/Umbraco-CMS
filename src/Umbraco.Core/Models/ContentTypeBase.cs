@@ -26,7 +26,7 @@ namespace Umbraco.Core.Models
         private string _alias;
         private string _description;
         private int _sortOrder;
-        private string _icon = "folder.png";
+        private string _icon = "icon-folder";
         private string _thumbnail = "folder.png";
         private int _creatorId;
         private bool _allowedAsRoot;
