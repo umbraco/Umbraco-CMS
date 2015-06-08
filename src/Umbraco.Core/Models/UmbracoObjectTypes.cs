@@ -109,6 +109,13 @@ namespace Umbraco.Core.Models
         /// </summary>
         [UmbracoObjectTypeAttribute(Constants.ObjectTypes.DataType, typeof(IDataTypeDefinition))]
         [FriendlyName("Data Type")]
-        DataType
+        DataType,
+
+        /// <summary>
+        /// Entity Container
+        /// </summary>
+        [UmbracoObjectTypeAttribute(Constants.ObjectTypes.DocumentTypeContainer)]
+        [FriendlyName("Document Type Container")]
+        DocumentTypeContainer
     }
 }

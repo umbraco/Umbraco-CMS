@@ -15,6 +15,7 @@ using Constants = Umbraco.Core.Constants;
 using Newtonsoft.Json;
 using Umbraco.Core.PropertyEditors;
 using System;
+using System.Net.Http;
 
 namespace Umbraco.Web.Editors
 {
@@ -71,9 +72,9 @@ namespace Umbraco.Web.Editors
             return dto;
         }
 
-        public ContentTypeDisplay GetEmpty()
+        public ContentTypeDisplay GetEmpty(int parentId)
         {
-            var ct = new ContentType(-1);
+            var ct = new ContentType(parentId);
             var dto = Mapper.Map<IContentType, ContentTypeDisplay>(ct);
             return dto;
         }
@@ -159,11 +160,19 @@ namespace Umbraco.Web.Editors
             return basics;
         }
 
+        public HttpResponseMessage PostCreateFolder(int parentId, string name)
+        {
+            var result = Services.ContentTypeService.CreateFolder(parentId, name, Security.CurrentUser.Id);
+
+            return result 
+                ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id 
+                : Request.CreateValidationErrorResponse(result.Exception.Message);
+        }
 
         public ContentTypeDisplay PostSave(ContentTypeDisplay contentType)
         {
             
-            var ctService = ApplicationContext.Services.ContentTypeService;
+            var ctService = Services.ContentTypeService;
 
             //TODO: warn on content type alias conflicts
             //TODO: warn on property alias conflicts

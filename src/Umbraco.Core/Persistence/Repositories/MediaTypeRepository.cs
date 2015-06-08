@@ -181,5 +181,13 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         #endregion
+
+        /// <summary>
+        /// The container object type - used for organizing content types
+        /// </summary>
+        protected override Guid ContainerObjectTypeId
+        {
+            get { throw new NotImplementedException(); }
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Querying;
 
@@ -18,5 +19,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <returns></returns>
         IEnumerable<string> GetAllPropertyTypeAliases();
+
+        Attempt<int> CreateFolder(int parentId, string name, int userId);
     }
 }

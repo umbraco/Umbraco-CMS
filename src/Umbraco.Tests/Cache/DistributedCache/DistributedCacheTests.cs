@@ -138,6 +138,10 @@ namespace Umbraco.Tests.Cache.DistributedCache
             public List<string> PayloadsRefreshed = new List<string>(); 
             public int CountOfFullRefreshes = 0;
 
+            public void PerformRefresh(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, object payload)
+            {
+                // doing nothing
+            }
 
             public void PerformRefresh(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, string jsonPayload)
             {

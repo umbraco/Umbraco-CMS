@@ -36,11 +36,11 @@ using System.Security.Permissions;
 [assembly: InternalsVisibleTo("Umbraco.Web")]
 [assembly: InternalsVisibleTo("Umbraco.Web.UI")]
 [assembly: InternalsVisibleTo("UmbracoExamine")]
-[assembly: InternalsVisibleTo("Umbraco.Courier.Persistence")]
 
 [assembly: InternalsVisibleTo("Concorde.Sync")]
 [assembly: InternalsVisibleTo("Umbraco.Belle")]
 [assembly: InternalsVisibleTo("Umbraco.VisualStudio")]
+[assembly: InternalsVisibleTo("Umbraco.Courier.Core")]
 [assembly: InternalsVisibleTo("umbraco.providers")]
 
 //allow this to be mocked in our unit tests

@@ -213,10 +213,7 @@ namespace Umbraco.Core.Services
                 return user;
             }
         }
-
-        //TODO: Remove this in 7.3, we need to track this in a db column!
-        private readonly ConcurrentDictionary<int, int> _failedLoginAttempts = new ConcurrentDictionary<int, int>();
-
+        
         /// <summary>
         /// Get an <see cref="IUser"/> by username
         /// </summary>
@@ -228,16 +225,6 @@ namespace Umbraco.Core.Services
             {
                 var query = Query<IUser>.Builder.Where(x => x.Username.Equals(username));
                 var user = repository.GetByQuery(query).FirstOrDefault();
-
-                if (user != null)
-                {
-                    //check if they have any failed logins and merge
-                    int failedAttempts;
-                    if (_failedLoginAttempts.TryGetValue(user.Id, out failedAttempts))
-                    {
-                        user.FailedPasswordAttempts = failedAttempts;
-                    }    
-                }
                 return user;
             }
         }
@@ -305,9 +292,6 @@ namespace Umbraco.Core.Services
             }
             else
             {
-                int failedAttempts;
-                _failedLoginAttempts.TryRemove(user.Id, out failedAttempts);
-
                 if (DeletingUser.IsRaisedEventCancelled(new DeleteEventArgs<IUser>(user), this))
                     return;
 
@@ -341,8 +325,6 @@ namespace Umbraco.Core.Services
             {
                 repository.AddOrUpdate(entity);
                 uow.Commit();
-
-                _failedLoginAttempts.AddOrUpdate(entity.Id, i => entity.FailedPasswordAttempts, (i, i1) => entity.FailedPasswordAttempts);
             }
 
             if (raiseEvents)
@@ -372,11 +354,6 @@ namespace Umbraco.Core.Services
                 }
                 //commit the whole lot in one go
                 uow.Commit();
-                foreach (var member in entities)
-                {
-                    _failedLoginAttempts.AddOrUpdate(member.Id, i => member.FailedPasswordAttempts, (i, i1) => member.FailedPasswordAttempts);
-                }
-                
             }
 
             if (raiseEvents)
@@ -579,6 +556,21 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateUserRepository(uow))
             {
                 repository.ReplaceUserPermissions(userId, permissions, entityIds);
+            }
+        }
+
+        /// <summary>
+        /// Assigns the same permission set for a single user to any number of entities
+        /// </summary>
+        /// <param name="userId">Id of the user</param>
+        /// <param name="permission"></param>
+        /// <param name="entityIds">Specify the nodes to replace permissions for</param>
+        public void AssignUserPermission(int userId, char permission, params int[] entityIds)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateUserRepository(uow))
+            {
+                repository.AssignUserPermission(userId, permission, entityIds);
             }
         }
 

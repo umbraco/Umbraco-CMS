@@ -1,7 +1,7 @@
 <div class="umb-editor umb-datepicker" ng-controller="Umbraco.PropertyEditors.DatepickerController">
     <div class="input-append date datepicker" style="position: relative;" id="datepicker{{model.alias}}">        
         <input  name="datepicker" data-format="{{model.config.format}}" type="text" 
-                ng-model="model.value"   
+                ng-model="datetimePickerValue"   
                 ng-required="model.validation.mandatory"   
                 val-server="value" />
         <span class="add-on">

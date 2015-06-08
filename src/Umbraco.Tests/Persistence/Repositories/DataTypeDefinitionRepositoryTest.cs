@@ -199,7 +199,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork))
             {
 
-            var dataTypeDefinition = new DataTypeDefinition(-1, "Test.TestEditor")
+            var dataTypeDefinition = new DataTypeDefinition("Test.TestEditor")
                     {
                         DatabaseType = DataTypeDatabaseType.Integer,
                         Name = "AgeDataType",
@@ -226,7 +226,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork))
             {
 
-            var dataTypeDefinition = new DataTypeDefinition(-1, "Test.blah")
+            var dataTypeDefinition = new DataTypeDefinition("Test.blah")
                     {
                         DatabaseType = DataTypeDatabaseType.Integer,
                         Name = "AgeDataType",
@@ -260,7 +260,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork))
             {
 
-            var dataTypeDefinition = new DataTypeDefinition(-1, "Test.TestEditor")
+            var dataTypeDefinition = new DataTypeDefinition("Test.TestEditor")
                     {
                         DatabaseType = DataTypeDatabaseType.Integer,
                         Name = "AgeDataType",

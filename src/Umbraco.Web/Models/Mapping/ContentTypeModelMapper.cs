@@ -36,7 +36,6 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IMediaType, ContentTypeBasic>();
             config.CreateMap<IContentType, ContentTypeBasic>();
           
-
             config.CreateMap<ContentTypeDisplay, IContentType>()
                 .ConstructUsing((ContentTypeDisplay source) => new ContentType(source.ParentId))
 
@@ -56,7 +55,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.PropertyGroups, expression => expression.Ignore())
                 .AfterMap((source, dest) =>
                 {
-                    foreach (var groupDisplay in source.Groups.Where(x => x.Name.IsNullOrWhiteSpace() == false ) )
+                    //get all properties from groups that are not generic properties (-666 id)
+                    foreach (var groupDisplay in source.Groups.Where(x => x.Id != -666))
                     {
                         //use underlying logic to add the property group which should wire most things up for us
                         dest.AddPropertyGroup(groupDisplay.Name);
@@ -68,6 +68,15 @@ namespace Umbraco.Web.Models.Mapping
                             dest.AddPropertyType(Mapper.Map<PropertyType>(propertyTypeDisplay), groupDisplay.Name);
                         }
                         //dest.PropertyGroups.Add(Mapper.Map<PropertyGroup>(groupDisplay));
+                    }
+
+                    //add generic properties
+                    var genericProperties = source.Groups.FirstOrDefault(x => x.Id == -666);
+                    if(genericProperties != null){
+                        foreach (var propertyTypeDisplay in genericProperties.Properties)
+                        {
+                            dest.AddPropertyType(Mapper.Map<PropertyType>(propertyTypeDisplay));
+                        }
                     }
 
                     //Sync allowed child types

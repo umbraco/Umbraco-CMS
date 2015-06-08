@@ -39,7 +39,7 @@ function memberTypeResource($q, $http, umbRequestHelper) {
                'Failed to retrieve content type');
         },
 
-        getEmpty: function () {
+        getScaffold: function () {
 
             return umbRequestHelper.resourcePromise(
                $http.get(

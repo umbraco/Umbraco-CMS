@@ -9,6 +9,7 @@ using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models
 {
+
     /// <summary>
     /// Defines the type of a <see cref="Property"/> object
     /// </summary>

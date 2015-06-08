@@ -63,7 +63,7 @@ namespace Umbraco.Web.Scheduling
 
         public bool IsLatched
         {
-            get { return _latch != null; }
+            get { return _latch != null && _latch.IsSet == false; }
         }
 
         public virtual bool RunsOnShutdown

@@ -658,7 +658,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 // then we can use that entity. Otherwise if it is not published (which can be the case
                 // because we only store the 'latest' entries in the cache which might not be the published
                 // version)
-                var fromCache = RepositoryCache.RuntimeCache.GetCacheItem<IContent>(GetCacheIdKey<IContent>(dto.NodeId));
+                var fromCache = RuntimeCache.GetCacheItem<IContent>(GetCacheIdKey<IContent>(dto.NodeId));
                 //var fromCache = TryGetFromCache(dto.NodeId);
                 if (fromCache != null && fromCache.Published)
                 {

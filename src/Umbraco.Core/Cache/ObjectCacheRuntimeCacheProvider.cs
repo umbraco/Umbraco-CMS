@@ -21,9 +21,6 @@ namespace Umbraco.Core.Cache
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
         internal ObjectCache MemoryCache;
 
-        // an object that represent a value that has not been created yet
-        protected readonly object ValueNotCreated = new object();
-
         /// <summary>
         /// Used for debugging
         /// </summary>
@@ -33,21 +30,6 @@ namespace Umbraco.Core.Cache
         {
             MemoryCache = new MemoryCache("in-memory");
             InstanceId = Guid.NewGuid();
-        }
-
-        protected object GetSafeLazyValue(Lazy<object> lazy, bool onlyIfValueIsCreated = false)
-        {
-            try
-            {
-                // if onlyIfValueIsCreated, do not trigger value creation
-                // must return something, though, to differenciate from null values
-                if (onlyIfValueIsCreated && lazy.IsValueCreated == false) return ValueNotCreated;
-                return lazy.Value;
-            }
-            catch
-            {
-                return null;
-            }
         }
 
         #region Clear
@@ -83,7 +65,7 @@ namespace Umbraco.Core.Cache
                         // x.Value is Lazy<object> and not null, its value may be null
                         // remove null values as well, does not hurt
                         // get non-created as NonCreatedValue & exceptions as null
-                        var value = GetSafeLazyValue((Lazy<object>)x.Value, true);
+                        var value = DictionaryCacheProviderBase.GetSafeLazyValue((Lazy<object>)x.Value, true);
 
                         // if T is an interface remove anything that implements that interface
                         // otherwise remove exact types (not inherited types)
@@ -107,7 +89,7 @@ namespace Umbraco.Core.Cache
                         // x.Value is Lazy<object> and not null, its value may be null
                         // remove null values as well, does not hurt
                         // get non-created as NonCreatedValue & exceptions as null
-                        var value = GetSafeLazyValue((Lazy<object>)x.Value, true);
+                        var value = DictionaryCacheProviderBase.GetSafeLazyValue((Lazy<object>)x.Value, true);
 
                         // if T is an interface remove anything that implements that interface
                         // otherwise remove exact types (not inherited types)
@@ -132,7 +114,7 @@ namespace Umbraco.Core.Cache
                         // x.Value is Lazy<object> and not null, its value may be null
                         // remove null values as well, does not hurt
                         // get non-created as NonCreatedValue & exceptions as null
-                        var value = GetSafeLazyValue((Lazy<object>)x.Value, true);
+                        var value = DictionaryCacheProviderBase.GetSafeLazyValue((Lazy<object>)x.Value, true);
                         if (value == null) return true;
 
                         // if T is an interface remove anything that implements that interface
@@ -184,7 +166,7 @@ namespace Umbraco.Core.Cache
                     .ToArray(); // evaluate while locked
             }
             return entries
-                .Select(x => GetSafeLazyValue((Lazy<object>)x.Value)) // return exceptions as null
+                .Select(x => DictionaryCacheProviderBase.GetSafeLazyValue((Lazy<object>)x.Value)) // return exceptions as null
                 .Where(x => x != null) // backward compat, don't store null values in the cache
                 .ToList();
         }
@@ -199,7 +181,7 @@ namespace Umbraco.Core.Cache
                     .ToArray(); // evaluate while locked
             }
             return entries
-                .Select(x => GetSafeLazyValue((Lazy<object>)x.Value)) // return exceptions as null
+                .Select(x => DictionaryCacheProviderBase.GetSafeLazyValue((Lazy<object>)x.Value)) // return exceptions as null
                 .Where(x => x != null) // backward compat, don't store null values in the cache
                 .ToList();
         }
@@ -211,7 +193,7 @@ namespace Umbraco.Core.Cache
             {
                 result = MemoryCache.Get(cacheKey) as Lazy<object>; // null if key not found
             }
-            return result == null ? null : GetSafeLazyValue(result); // return exceptions as null
+            return result == null ? null : DictionaryCacheProviderBase.GetSafeLazyValue(result); // return exceptions as null
         }
 
         public object GetCacheItem(string cacheKey, Func<object> getCacheItem)
@@ -228,17 +210,23 @@ namespace Umbraco.Core.Cache
             using (var lck = new UpgradeableReadLock(_locker))
             {
                 result = MemoryCache.Get(cacheKey) as Lazy<object>;
-                if (result == null || GetSafeLazyValue(result, true) == null) // get non-created as NonCreatedValue & exceptions as null
+                if (result == null || DictionaryCacheProviderBase.GetSafeLazyValue(result, true) == null) // get non-created as NonCreatedValue & exceptions as null
                 {
-                    result = new Lazy<object>(getCacheItem);
+                    result = DictionaryCacheProviderBase.GetSafeLazy(getCacheItem);
                     var policy = GetPolicy(timeout, isSliding, removedCallback, dependentFiles);
 
                     lck.UpgradeToWriteLock();
+                    //NOTE: This does an add or update
                     MemoryCache.Set(cacheKey, result, policy);
                 }
             }
 
-            return result.Value;
+            //return result.Value;
+
+            var value = result.Value; // will not throw (safe lazy)
+            var eh = value as DictionaryCacheProviderBase.ExceptionHolder;
+            if (eh != null) throw eh.Exception; // throw once!
+            return value;
         }
 
         #endregion
@@ -250,11 +238,12 @@ namespace Umbraco.Core.Cache
             // NOTE - here also we must insert a Lazy<object> but we can evaluate it right now
             // and make sure we don't store a null value.
 
-            var result = new Lazy<object>(getCacheItem);
+            var result = DictionaryCacheProviderBase.GetSafeLazy(getCacheItem);
             var value = result.Value; // force evaluation now
             if (value == null) return; // do not store null values (backward compat)
 
             var policy = GetPolicy(timeout, isSliding, removedCallback, dependentFiles);
+            //NOTE: This does an add or update
             MemoryCache.Set(cacheKey, result, policy);
         }
 

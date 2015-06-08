@@ -112,13 +112,13 @@ function contentTypeResource($q, $http, umbRequestHelper) {
                'Failed to retrieve all content types');
         },
 
-        getScaffold: function () {
+        getScaffold: function (parentId) {
 
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "contentTypeApiBaseUrl",
-                       "GetEmpty")),
+                       "GetEmpty", { parentId: parentId })),
                'Failed to retrieve content type scaffold');
         },
 
@@ -139,6 +139,14 @@ function contentTypeResource($q, $http, umbRequestHelper) {
             return umbRequestHelper.resourcePromise(
                  $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostSave"), contentType),
                 'Failed to save data for content type id ' + contentType.id);
+        },
+
+        createFolder: function(parentId, name) {
+            
+            return umbRequestHelper.resourcePromise(
+                 $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostCreateFolder", { parentId: parentId, name: name })),
+                'Failed to create a folder under parent id ' + parentId);
+
         }
 
     };

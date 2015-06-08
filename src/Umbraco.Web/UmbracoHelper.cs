@@ -26,8 +26,7 @@ namespace Umbraco.Web
 		private readonly UmbracoContext _umbracoContext;
 		private readonly IPublishedContent _currentPage;
         private readonly ITypedPublishedContentQuery _typedQuery;
-        private readonly IDynamicPublishedContentQuery _dynamicQuery;
-        
+        private readonly IDynamicPublishedContentQuery _dynamicQuery;       
         private readonly HtmlStringUtilities _stringUtilities = new HtmlStringUtilities();
 
         private IUmbracoComponentRenderer _componentRenderer;        
@@ -362,13 +361,24 @@ namespace Umbraco.Web
 		/// <returns></returns>
 		public string GetDictionaryValue(string key)
 		{
-			if (_cultureDictionary == null)
-			{
-				var factory = CultureDictionaryFactoryResolver.Current.Factory;
-				_cultureDictionary = factory.CreateDictionary();
-			}
-			return _cultureDictionary[key];
+            return CultureDictionary[key];
 		}
+
+        /// <summary>
+        /// Returns the ICultureDictionary for access to dictionary items
+        /// </summary>
+        public ICultureDictionary CultureDictionary
+        {
+            get
+            {
+                if (_cultureDictionary == null)
+                {
+                    var factory = CultureDictionaryFactoryResolver.Current.Factory;
+                    _cultureDictionary = factory.CreateDictionary();
+                }
+                return _cultureDictionary;
+            }
+        }
 
 		#endregion
 
