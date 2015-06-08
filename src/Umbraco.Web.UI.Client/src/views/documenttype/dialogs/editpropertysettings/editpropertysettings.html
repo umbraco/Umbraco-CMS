@@ -46,17 +46,14 @@
             <div class="umb-control-group clearfix">
 
                 <label class="checkbox">
-                    <input type="checkbox"> Mandatory
+                    <input type="checkbox" ng-model="model.property.validation.mandatory"> Mandatory
                 </label>
 
-                <select class="umb-editor umb-dropdown" placeholder="Validation">
-                    <option>Validation</option>
-
-                    <option>Validate as email</option>
-                    <option>Validate as a number</option>
-                    <option>Validate as a Url</option>
-                    <option>...or enter a custom validation</option>
+                <select class="umb-editor umb-dropdown" ng-options="validationType as validationType.name for validationType in validationTypes" ng-model="selectedValidationType" ng-change="changeValidationType(selectedValidationType)">
+                    <option value="">Validation</option>
                 </select>
+
+                <textarea class="umb-editor pattern" placeholder="Enter a regular expression" ng-model="model.property.validation.pattern" ng-if="propertySettings.showValidationPattern"></textarea>
 
             </div>
 
