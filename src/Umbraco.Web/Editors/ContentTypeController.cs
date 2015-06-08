@@ -72,9 +72,9 @@ namespace Umbraco.Web.Editors
             return dto;
         }
 
-        public ContentTypeDisplay GetEmpty()
+        public ContentTypeDisplay GetEmpty(int parentId)
         {
-            var ct = new ContentType(-1);
+            var ct = new ContentType(parentId);
             var dto = Mapper.Map<IContentType, ContentTypeDisplay>(ct);
             return dto;
         }

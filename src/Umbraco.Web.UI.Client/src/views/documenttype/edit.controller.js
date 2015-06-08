@@ -6,10 +6,11 @@
  * @description
  * The controller for the content type editor
  */
-function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, contentTypeResource, entityResource, dataTypeResource, editorState, contentEditingHelper, formHelper) {
+function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, contentTypeResource, entityResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService) { 
 
 	$scope.page = {actions: [], menu: [], subViews: [] };
 	$scope.sortingMode = false;
+	$scope.currentNode = null; //the editors affiliated node
 
 	$scope.page.navigation = [
 		{
@@ -53,14 +54,16 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 
 	if ($routeParams.create) {
         //we are creating so get an empty data type item
-	    contentTypeResource.getScaffold()
+	    contentTypeResource.getScaffold($routeParams.id)
             .then(function(dt) {
             	init(dt);
             });
     }
     else {
 		contentTypeResource.getById($routeParams.id).then(function(dt){
-			init(dt);
+		    init(dt);
+
+		    syncTreeNode($scope.contentType, dt.path, true);
 		});
 	}
 	
@@ -83,7 +86,9 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
             });
 
 			//post save logic here -the saved doctype returns as a new object
-			init(dt);
+            init(dt);
+
+            syncTreeNode($scope.contentType, dt.path);
 		});
 	};
 
@@ -489,6 +494,15 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 		};
 
 	};
+
+    /** Syncs the content type  to it's tree node - this occurs on first load and after saving */
+	function syncTreeNode(dt, path, initialLoad) {
+
+	    navigationService.syncTree({ tree: "documenttype", path: path.split(","), forceReload: initialLoad !== true }).then(function (syncArgs) {
+	        $scope.currentNode = syncArgs.node;
+	    });
+
+	}
 
 	function createPreValueProps(preVals) {
 		var preValues = [];

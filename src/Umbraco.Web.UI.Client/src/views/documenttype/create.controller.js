@@ -41,7 +41,7 @@ function contentCreateController($scope, $location, navigationService, contentTy
     }
 
     $scope.createDocType = function() {
-        $location.path("/settings/documenttype/edit/-1").search("create", true);
+        $location.path("/settings/documenttype/edit/" + node.id).search("create", true);
         navigationService.hideMenu();
     }
 }
