@@ -4,7 +4,6 @@
     <li ng-repeat="tab in contentType.groups">
 
         <!-- TAB INIT STATE -->
-        <!-- ng-if="tab.tabState=='init'" -->
         <div class="edt-tab umb-card edt-tab-placeholder" ng-click="addTab(tab)" ng-show="tab.tabState=='init' && !sortingMode" ng-class="{'tab-state-init animated fadeIn': tab.tabState=='init'}">
 
             <div class="tab-title-wrapper">
@@ -32,10 +31,10 @@
 
                 <div class="edt-tab-inherited-from" ng-if="tab.inherited">
                     <i class="icon icon-merge"></i> Inherited from {{ tab.inheritedFromName }}
-                                        <span ng-repeat="contentTypeName in tab.parentTabContentTypeNames">
-                                            {{ contentTypeName }}
-                                            <span ng-if="!$last">, </span>
-                                        </span>
+                    <span ng-repeat="contentTypeName in tab.parentTabContentTypeNames">
+                        {{ contentTypeName }}
+                        <span ng-if="!$last">, </span>
+                    </span>
                 </div>
 
             </div>
@@ -96,18 +95,16 @@
 
                             </div>
 
-                            <!-- property preview -->
-                            <!-- ng-if="tab.tabState=='active'" -->
+
                             <div tabindex="-1" class="edt-property-preview" ng-click="editPropertyTypeSettings(property)">
+                                <span class="edt-property-preview-overlay">
+                                    <span class="overlay-text">Choose property type</span>
+                                </span>
 
-                                                    <span class="edt-property-preview-overlay">
-                                                        <span class="overlay-text">Choose property type</span>
-                                                    </span>
-
-                                                    <span class="edt-property-preview-label">
-                                                        <span ng-if="property.dataTypeName !== undefined">{{property.dataTypeName}}</span>
-                                                        <span ng-if="property.dataTypeName == undefined">Preview</span>
-                                                    </span>
+                                <span class="edt-property-preview-label">
+                                    <span ng-if="property.dataTypeName !== undefined">{{property.dataTypeName}}</span>
+                                    <span ng-if="property.dataTypeName == undefined">Preview</span>
+                                </span>
 
                                 <umb-property-editor model="property" ng-if="property.view !== undefined"></umb-property-editor>
 
