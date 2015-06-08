@@ -181,6 +181,13 @@ namespace Umbraco.Web.Editors
 
             var ctId = Convert.ToInt32(contentType.Id);
 
+            //filter out empty properties
+            contentType.Groups = contentType.Groups.Where(x => x.Name.IsNullOrWhiteSpace() == false).ToList();
+            foreach (var group in contentType.Groups)
+            {
+                group.Properties = group.Properties.Where(x => x.Alias.IsNullOrWhiteSpace() == false).ToList();
+            }
+
             if (ctId > 0)
             {
                 //its an update to an existing

@@ -1,0 +1,10 @@
+<div ng-controller="Umbraco.Editors.DocumentType.AvailableTemplatesController">
+    <div class="dialog-grid">
+        <div class="dialog-grid-element" ng-repeat="availableTemplate in model.templates | filter:{show:true} | orderBy:'name'">
+            <a href="" ng-click="model.chooseTemplate(availableTemplate)">
+                <i class="icon icon-newspaper-alt"></i>
+                {{ availableTemplate.name }}
+            </a>
+        </div>
+    </div>
+</div>

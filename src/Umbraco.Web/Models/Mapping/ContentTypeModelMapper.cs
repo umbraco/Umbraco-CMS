@@ -49,6 +49,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.SortOrder, expression => expression.Ignore())
                 //mapped in aftermap
                 .ForMember(dto => dto.AllowedContentTypes, expression => expression.Ignore())
+                .ForMember(dto => dto.AllowedTemplates, expression => expression.Ignore())
+
 
                 //ignore, we'll do this in after map
                 .ForMember(dto => dto.PropertyGroups, expression => expression.Ignore())
@@ -92,6 +94,9 @@ namespace Umbraco.Web.Models.Mapping
                         if(addCt != null)
                              dest.AddContentType(addCt);
                     }
+                    
+                    //sync templates
+                    dest.AllowedTemplates = source.AllowedTemplates.Select(x => Mapper.Map<ITemplate>(x));
                 });
 
 
@@ -132,12 +137,14 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(g => g.PropertyTypes, expression => expression.Ignore());
 
             config.CreateMap<PropertyTypeDisplay, PropertyType>()
+                
                 .ConstructUsing((PropertyTypeDisplay propertyTypeDisplay) =>
                 {
                     var dataType = applicationContext.Services.DataTypeService.GetDataTypeDefinitionById(propertyTypeDisplay.DataTypeId);
                     if (dataType == null) throw new NullReferenceException("No data type found with id " + propertyTypeDisplay.DataTypeId);
                     return new PropertyType(dataType, propertyTypeDisplay.Alias);
                 })
+
                 //only map if it is actually set
                 .ForMember(dest => dest.Id, expression => expression.Condition(source => source.Id > 0))
                 .ForMember(dto => dto.CreateDate, expression => expression.Ignore())
