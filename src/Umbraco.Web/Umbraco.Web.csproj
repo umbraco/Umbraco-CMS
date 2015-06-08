@@ -311,7 +311,7 @@
     <Compile Include="Models\Mapping\AvailableCompositeContentTypesResolver.cs" />
     <Compile Include="Models\Mapping\MemberTypeModelMapper.cs" />
     <Compile Include="Models\Mapping\PropertyTypeGroupResolver.cs" />
-    <Compile Include="Trees\DocumentTypeTreeController.cs" />
+    <Compile Include="Trees\ContentTypeTreeController.cs" />
     <Compile Include="Trees\MemberTypeTreeController.cs" />
     <Compile Include="UmbracoDefaultOwinStartup.cs" />
     <Compile Include="IUmbracoContextAccessor.cs" />

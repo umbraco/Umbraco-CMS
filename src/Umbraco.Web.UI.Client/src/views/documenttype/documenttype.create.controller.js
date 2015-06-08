@@ -4,13 +4,42 @@
  * @function
  * 
  * @description
- * The controller for the document type creation dialog
+ * The controller for the doc type creation dialog
  */
-function docTypeCreateController($scope, $routeParams, contentTypeResource, iconHelper) {
+function contentCreateController($scope, $location, navigationService, contentTypeResource, formHelper, appState) {
 
-    contentTypeResource.getAllowedTypes($scope.currentNode.id).then(function(data) {
-        $scope.allowedTypes = iconHelper.formatContentTypeIcons(data);
-    });
+    $scope.model = {
+        folderName: "",
+        creatingFolder: false
+    };
+
+    var node = $scope.dialogOptions.currentNode;
+
+    $scope.showCreateFolder = function() {
+        $scope.model.creatingFolder = true;
+    }
+
+    $scope.createFolder = function () {
+        if (formHelper.submitForm({ scope: $scope, formCtrl: this.createFolderForm, statusMessage: "Creating folder..." })) {
+            contentTypeResource.createFolder(node.id, $scope.model.folderName).then(function (folderId) {
+
+                navigationService.hideMenu();
+                var currPath = node.path ? node.path : "-1";
+                navigationService.syncTree({ tree: "documenttype", path: currPath + "," + folderId, forceReload: true, activate: true });
+
+                $location.path("/documenttype/list/" + folderId);
+
+            }, function(err) {
+
+               //TODO: Handle errors
+            });
+        };
+    }
+
+    $scope.createDocType = function() {
+        $location.path("/settings/documenttype/edit/-1").search("create", true);
+        navigationService.hideMenu();
+    }
 }
 
-angular.module('umbraco').controller("Umbraco.Editors.DocumentType.CreateController", docTypeCreateController);
+angular.module('umbraco').controller("Umbraco.Editors.DocumentType.CreateController", contentCreateController);

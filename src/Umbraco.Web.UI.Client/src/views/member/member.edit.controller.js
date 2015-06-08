@@ -55,7 +55,7 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
 
         if ($routeParams.id && $routeParams.id.length < 9) {
             entityResource.getById($routeParams.id, "Member").then(function(entity) {
-                $location.path("member/member/edit/" + entity.key);
+                $location.path("/member/member/edit/" + entity.key);
             });
         }
         else {

@@ -139,6 +139,14 @@ function contentTypeResource($q, $http, umbRequestHelper) {
             return umbRequestHelper.resourcePromise(
                  $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostSave"), contentType),
                 'Failed to save data for content type id ' + contentType.id);
+        },
+
+        createFolder: function(parentId, name) {
+            
+            return umbRequestHelper.resourcePromise(
+                 $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostCreateFolder", { parentId: parentId, name: name })),
+                'Failed to create a folder under parent id ' + parentId);
+
         }
 
     };
