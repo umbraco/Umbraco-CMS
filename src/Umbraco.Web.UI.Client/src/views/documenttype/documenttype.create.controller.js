@@ -27,7 +27,11 @@ function contentCreateController($scope, $location, navigationService, contentTy
                 var currPath = node.path ? node.path : "-1";
                 navigationService.syncTree({ tree: "documenttype", path: currPath + "," + folderId, forceReload: true, activate: true });
 
-                $location.path("/documenttype/list/" + folderId);
+                formHelper.resetForm({ scope: $scope });
+
+                var section = appState.getSectionState("currentSection");
+
+                $location.path("/" + section + "/documenttype/list/" + folderId);
 
             }, function(err) {
 

@@ -31,13 +31,23 @@ namespace Umbraco.Web.Trees
             nodes.AddRange(
                 Services.EntityService.GetChildren(intId.Result, UmbracoObjectTypes.DocumentTypeContainer)
                     .OrderBy(entity => entity.Name)
-                    .Select(dt => CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, "icon-folder", dt.HasChildren(),
-                        queryStrings.GetValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/list/" + dt.Id)));
+                    .Select(dt =>
+                    {
+                        var node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, "icon-folder", dt.HasChildren(),
+                            queryStrings.GetValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/list/" + dt.Id);
+                        node.Path = dt.Path;
+                        return node;
+                    }));
 
             nodes.AddRange(
                 Services.EntityService.GetChildren(intId.Result, UmbracoObjectTypes.DocumentType)
                     .OrderBy(entity => entity.Name)
-                    .Select(dt => CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, "icon-item-arrangement", false)));
+                    .Select(dt =>
+                    {
+                        var node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, "icon-item-arrangement", false);
+                        node.Path = dt.Path;
+                        return node;
+                    }));
 
             return nodes;
         }

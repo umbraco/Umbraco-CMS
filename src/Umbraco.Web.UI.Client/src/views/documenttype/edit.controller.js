@@ -53,7 +53,7 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 
 	if ($routeParams.create) {
         //we are creating so get an empty data type item
-        contentTypeResource.getEmpty()
+	    contentTypeResource.getScaffold()
             .then(function(dt) {
             	init(dt);
             });
