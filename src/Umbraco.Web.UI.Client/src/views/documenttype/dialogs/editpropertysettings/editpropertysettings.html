@@ -6,11 +6,11 @@
             <div class="umb-control-group clearfix">
 
                 <div class="title-wrapper">
-                    <input class="input-style-underline" ng-model="model.property.label" placeholder="Enter a name..." umb-auto-focus />
-                    <a href="" class="alias">
-                        <i class="icon icon-lock"></i>
-                        <span>{{ model.property.alias }}</span>
-                    </a>
+                    <input class="input-style-underline" 
+                        ng-model="model.property.label" 
+                        placeholder="Enter a name..." umb-auto-focus />
+
+                    <umb-locked-field ng-model="model.property.alias"></umb-locked-field>
                 </div>
 
             </div>
