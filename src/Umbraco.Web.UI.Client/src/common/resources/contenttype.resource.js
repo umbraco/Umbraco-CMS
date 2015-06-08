@@ -112,13 +112,13 @@ function contentTypeResource($q, $http, umbRequestHelper) {
                'Failed to retrieve all content types');
         },
 
-        getEmpty: function () {
+        getScaffold: function () {
 
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "contentTypeApiBaseUrl",
-                       "getEmpty")),
+                       "GetEmpty")),
                'Failed to retrieve content type scaffold');
         },
 

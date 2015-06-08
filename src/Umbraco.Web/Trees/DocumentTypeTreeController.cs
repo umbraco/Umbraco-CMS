@@ -9,6 +9,7 @@ using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Trees
 {
@@ -36,14 +37,14 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.Root.ToInvariantString())
             {
                 // root actions              
-                menu.Items.Add<CreateChildEntity, ActionNew>(ui.Text("actions", ActionNew.Instance.Alias));
-                menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
+                menu.Items.Add<CreateChildEntity, ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
+                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)));
                 return menu;
             }
             else
             {
                 //delete doc type
-                menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
+                menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
             }
 
             return menu;
