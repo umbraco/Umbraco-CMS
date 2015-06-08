@@ -6,7 +6,7 @@
  * @description
  * The controller for the content type editor
  */
-function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, contentTypeResource, dataTypeResource, editorState) {
+function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, contentTypeResource, entityResource, dataTypeResource, editorState, contentEditingHelper, formHelper) {
 
 	$scope.page = {actions: [], menu: [], subViews: [] };
 	$scope.sortingMode = false;
@@ -55,38 +55,20 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
         //we are creating so get an empty data type item
         contentTypeResource.getEmpty()
             .then(function(dt) {
-            	$scope.contentType = dt;
-
-            	//set a shared state
-                editorState.set($scope.contentType);
-
-                // add init tab
-				addInitTab();
+            	init(dt);
             });
     }
     else {
 		contentTypeResource.getById($routeParams.id).then(function(dt){
-			$scope.contentType = dt;
-
-			// set all tab to inactive
-			if( $scope.contentType.groups.length !== 0 ) {
-				angular.forEach($scope.contentType.groups, function(group){
-					// set state
-					group.tabState = "inActive";
-
-					// push init/placeholder property
-					addInitProperty(group);
-
-				});
-			}
-
-			//set a shared state
-            editorState.set($scope.contentType);
-
-			// add init tab
-			addInitTab();
+			init(dt);
 		});
 	}
+
+	/* WIP template --- */
+	entityResource.getAll("Template").then(function(templates){
+		$scope.availableTemplates = templates;
+	});
+	
 
 	/* ---------- SAVE ---------- */
 
@@ -96,29 +78,17 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 
 		contentTypeResource.save($scope.contentType).then(function(dt){
 
+			formHelper.resetForm({ scope: $scope, notifications: dt.notifications });
+            contentEditingHelper.handleSuccessfulSave({
+                scope: $scope,
+                savedContent: dt,
+                rebindCallback: function() {
+                    
+                }
+            });
+
 			//post save logic here -the saved doctype returns as a new object
-
-			_.each($scope.contentType.groups, function(group){
-				group.properties = _.filter(group.properties, function(property){ return property.name != null; });
-			});
-
-			// set all tab to inactive
-			if( $scope.contentType.groups.length !== 0 ) {
-				angular.forEach($scope.contentType.groups, function(group){
-					// set state
-					group.tabState = "inActive";
-
-					// push init/placeholder property
-					addInitProperty(group);
-
-				});
-			}
-
-			//set a shared state
-            editorState.set($scope.contentType);
-
-			// add init tab
-			addInitTab();
+			init(dt);
 		});
 	};
 
@@ -276,6 +246,28 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 			addInitProperty(tab);
 		}
 	};
+
+	function init(contentType){
+
+		$scope.contentType = contentType;
+
+		// set all tab to inactive
+		if( $scope.contentType.groups.length !== 0 ) {
+			angular.forEach($scope.contentType.groups, function(group){
+				// set state
+				group.tabState = "inActive";
+
+				// push init/placeholder property
+				addInitProperty(group);
+			});
+		}
+
+		//set a shared state
+        editorState.set($scope.contentType);
+
+		// add init tab
+		addInitTab();
+	}
 
 	function addInitTab() {
 
