@@ -25,7 +25,7 @@ angular.module("umbraco.directives")
 
             $timeout(function() {
                 update(true);
-            }, 200);
+            }, 500);
 
 
             //I hate bootstrap tabs
