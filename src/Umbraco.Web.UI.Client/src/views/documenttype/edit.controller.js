@@ -53,7 +53,7 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 
 	if ($routeParams.create) {
         //we are creating so get an empty data type item
-        contentTypeResource.getScaffold()
+        contentTypeResource.getEmpty()
             .then(function(dt) {
             	$scope.contentType = dt;
 
@@ -97,6 +97,10 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 		contentTypeResource.save($scope.contentType).then(function(dt){
 
 			//post save logic here -the saved doctype returns as a new object
+
+			_.each($scope.contentType.groups, function(group){
+				group.properties = _.filter(group.properties, function(property){ return property.name != null; });
+			});
 
 			// set all tab to inactive
 			if( $scope.contentType.groups.length !== 0 ) {
