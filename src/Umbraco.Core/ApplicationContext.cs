@@ -203,11 +203,22 @@ namespace Umbraco.Core
         }
 
         /// <summary>
-        /// If the db is configured and there is a database context, but we are not 'configured' , then it means we are upgrading
+        /// If the db is configured, there is a database context and there is an umbraco schema, but we are not 'configured' , then it means we are upgrading
         /// </summary>
 	    public bool IsUpgrading
 	    {
-	        get { return IsConfigured == false && DatabaseContext != null && DatabaseContext.IsDatabaseConfigured; }
+            get
+            {
+                if (IsConfigured == false 
+                    && DatabaseContext != null 
+                    && DatabaseContext.IsDatabaseConfigured)
+                {
+                    var schemaresult = DatabaseContext.ValidateDatabaseSchema();
+                    if (schemaresult.ValidTables.Count > 0) return true;
+                }
+
+                return false;
+            }
 	    }
 
 	    /// <summary>

@@ -110,11 +110,15 @@ namespace Umbraco.Web.Security.Identity
         /// Ensures that the UmbracoBackOfficeAuthenticationMiddleware is assigned to the pipeline
         /// </summary>
         /// <param name="app"></param>
+        /// <param name="appContext"></param>
         /// <returns></returns>
-        public static IAppBuilder UseUmbracoBackOfficeCookieAuthentication(this IAppBuilder app)
+        public static IAppBuilder UseUmbracoBackOfficeCookieAuthentication(this IAppBuilder app, ApplicationContext appContext)
         {
             if (app == null) throw new ArgumentNullException("app");
+            if (appContext == null) throw new ArgumentNullException("appContext");
 
+            //Don't proceed if the app is not ready
+            if (appContext.IsUpgrading == false && appContext.IsConfigured == false) return app;
 
             app.UseCookieAuthentication(new UmbracoBackOfficeCookieAuthOptions(
                     UmbracoConfig.For.UmbracoSettings().Security,
@@ -142,10 +146,15 @@ namespace Umbraco.Web.Security.Identity
         /// Umbraco back office configuration
         /// </summary>
         /// <param name="app"></param>
+        /// <param name="appContext"></param>
         /// <returns></returns>
-        public static IAppBuilder UseUmbracoBackOfficeExternalCookieAuthentication(this IAppBuilder app)
+        public static IAppBuilder UseUmbracoBackOfficeExternalCookieAuthentication(this IAppBuilder app, ApplicationContext appContext)
         {
             if (app == null) throw new ArgumentNullException("app");
+            if (appContext == null) throw new ArgumentNullException("appContext");
+
+            //Don't proceed if the app is not ready
+            if (appContext.IsUpgrading == false && appContext.IsConfigured == false) return app;
 
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
