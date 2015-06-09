@@ -21,6 +21,7 @@
   <appSettings xdt:Transform="InsertIfMissing" />
   <appSettings>
     <add key="ValidationSettings:UnobtrusiveValidationMode" value="None" xdt:Locator="Match(key)" xdt:Transform="InsertIfMissing" />
+    <add key="owin:appStartup" value="UmbracoDefaultOwinStartup" xdt:Locator="Match(key)" xdt:Transform="InsertIfMissing" />
   </appSettings>
 
   <umbracoConfiguration xdt:Transform="InsertIfMissing">
@@ -143,6 +144,7 @@
       <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Net.Http')" xdt:Transform="Remove" />
       <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='Newtonsoft.Json')" xdt:Transform="Remove" />
       <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Web.Mvc')" xdt:Transform="Remove" />
+      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Web.Htttp')" xdt:Transform="Remove" />
     </assemblyBinding>
   </runtime>
 
@@ -159,6 +161,10 @@
       <dependentAssembly xdt:Transform="Insert">
         <assemblyIdentity name="System.Web.Mvc" publicKeyToken="31bf3856ad364e35" culture="neutral" />
         <bindingRedirect oldVersion="0.0.0.0-4.0.0.0" newVersion="4.0.0.0" />
+      </dependentAssembly>
+      <dependentAssembly xdt:Transform="Insert">
+        <assemblyIdentity name="System.Web.Http" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+        <bindingRedirect oldVersion="0.0.0.0-5.2.3.0" newVersion="5.2.3.0" />
       </dependentAssembly>
     </assemblyBinding>
   </runtime>
