@@ -36,6 +36,14 @@ var app = angular.module("Umbraco.canvasdesigner", ['colorpicker', 'ui.slider', 
     };
 
     /*****************************************************************************/
+    /* Exit Preview */
+    /*****************************************************************************/
+
+    $scope.exitPreview = function () {
+        window.top.location.href = "/umbraco/endPreview.aspx?redir=%2f" + $scope.pageId;
+    };
+
+    /*****************************************************************************/
     /* UI designer managment */
     /*****************************************************************************/
 
