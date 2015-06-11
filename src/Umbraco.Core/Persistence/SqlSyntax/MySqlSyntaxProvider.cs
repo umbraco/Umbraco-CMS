@@ -342,6 +342,10 @@ ORDER BY TABLE_NAME, INDEX_NAME",
 
         public override string RenameColumn { get { return "ALTER TABLE {0} CHANGE {1} {2}"; } }
 
+        public override string IsNull { get { return "IFNULL({0},{1})"; } }
+        public override string ConvertIntegerToOrderableString { get { return "LPAD({0}, 8, '0')"; } }
+        public override string ConvertDateToOrderableString { get { return "DATE_FORMAT({0}, '%Y%m%d')"; } }
+
         public override bool? SupportsCaseInsensitiveQueries(Database db)
         {
             bool? supportsCaseInsensitiveQueries = null;

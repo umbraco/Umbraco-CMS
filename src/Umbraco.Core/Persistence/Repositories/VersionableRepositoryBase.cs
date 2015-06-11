@@ -19,6 +19,8 @@ using Umbraco.Core.Dynamics;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
+    using SqlSyntax;
+
     internal abstract class VersionableRepositoryBase<TId, TEntity> : PetaPocoRepositoryBase<TId, TEntity>
         where TEntity : class, IAggregateRoot
     {
@@ -263,11 +265,15 @@ namespace Umbraco.Core.Persistence.Repositories
             { 
                 // Sorting by a custom field, so set-up sub-query for ORDER BY clause to pull through valie
                 // from most recent content version for the given order by field
-                sortedSql.Append(@"ORDER BY (
+                var sortedInt = string.Format(SqlSyntaxContext.SqlSyntaxProvider.ConvertIntegerToOrderableString, "dataInt");
+                var sortedDate = string.Format(SqlSyntaxContext.SqlSyntaxProvider.ConvertIntegerToOrderableString, "dataDate");
+                var sortedString = string.Format(SqlSyntaxContext.SqlSyntaxProvider.IsNull, "dataNvarchar", "''");
+
+                var orderBySql = string.Format(@"ORDER BY (
 	                SELECT CASE
-		                WHEN dataInt Is Not Null THEN RIGHT('00000000' + CAST(dataInt AS varchar(8)),8)
-		                WHEN dataDate Is Not Null THEN CONVERT(varchar, dataDate, 102)
-		                ELSE IsNull(dataNvarchar,'')
+		                WHEN dataInt Is Not Null THEN {0}
+		                WHEN dataDate Is Not Null THEN {1}
+		                ELSE {2}
 	                END 
 	                FROM cmsContent c
 	                INNER JOIN cmsContentVersion cv ON cv.ContentId = c.nodeId AND VersionDate = (
@@ -279,7 +285,9 @@ namespace Umbraco.Core.Persistence.Repositories
 	                INNER JOIN cmsPropertyData cpd ON cpd.contentNodeId = c.nodeId
 		                AND cpd.versionId = cv.VersionId
 		                AND cpd.propertytypeId = cpt.id
-	                WHERE c.nodeId = umbracoNode.Id and cpt.Alias = @0)", orderBy);
+	                WHERE c.nodeId = umbracoNode.Id and cpt.Alias = @0)", sortedInt, sortedDate, sortedString);
+
+                sortedSql.Append(orderBySql, orderBy);
                 if (orderDirection == Direction.Descending)
                 {
                     sortedSql.Append(" DESC");
