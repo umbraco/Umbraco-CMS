@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Newtonsoft.Json;
 using Umbraco.Core.IO;
@@ -13,6 +14,7 @@ namespace Umbraco.Core.PropertyEditors
     /// <remarks>
     /// The Json serialization attributes are required for manifest property editors to work
     /// </remarks>
+    [DebuggerDisplay("{DebuggerDisplay(),nq}")]
     public class PropertyEditor : IParameterEditor
     {
         private readonly PropertyEditorAttribute _attribute;
@@ -161,6 +163,14 @@ namespace Umbraco.Core.PropertyEditors
         public override int GetHashCode()
         {
             return Alias.GetHashCode();
+        }
+
+        /// <summary>
+        /// Provides a summary of the PropertyEditor for use with the <see cref="DebuggerDisplayAttribute"/>.
+        /// </summary>
+        protected virtual string DebuggerDisplay()
+        {
+            return string.Format("Name: {0}, Alias: {1}, IsParameterEditor: {2}", Name, Alias, IsParameterEditor);
         }
     }
 }
