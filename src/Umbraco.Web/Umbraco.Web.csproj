@@ -268,6 +268,9 @@
     </Compile>
     <Compile Include="ApplicationContextExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
+    <Compile Include="Media\EmbedProviders\OEmbedJson.cs" />
+    <Compile Include="Media\EmbedProviders\OEmbedResponse.cs" />
+    <Compile Include="Media\EmbedProviders\OEmbedPhoto.cs" />
     <Compile Include="Models\ContentExtensions.cs" />
     <Compile Include="Models\LegacyConvertedNode.cs" />
     <Compile Include="Models\LegacyConvertedNodeProperty.cs" />
@@ -844,7 +847,6 @@
     <Compile Include="Scheduling\Scheduler.cs" />
     <Compile Include="Media\EmbedProviders\AbstractOEmbedProvider.cs" />
     <Compile Include="Media\EmbedProviders\AbstractProvider.cs" />
-    <Compile Include="Media\EmbedProviders\Flickr.cs" />
     <Compile Include="Media\EmbedProviders\OEmbedRich.cs" />
     <Compile Include="Media\EmbedProviders\OEmbedVideo.cs" />
     <Compile Include="Media\EmbedProviders\Settings\Dictionary.cs" />
