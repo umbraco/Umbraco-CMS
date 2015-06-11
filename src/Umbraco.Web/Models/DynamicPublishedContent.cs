@@ -8,15 +8,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Dynamic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Web;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
 using Umbraco.Core;
 using System.Reflection;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Strings;
-using ContentType = umbraco.cms.businesslogic.ContentType;
 
 namespace Umbraco.Web.Models
 {
@@ -57,7 +55,11 @@ namespace Umbraco.Web.Models
 
         // these two here have leaked in v6 and so we cannot remove them anymore
         // without breaking compatibility but... TODO: remove them in v7
+
+        [Obsolete("Will be removing in future versions")]
         public DynamicPublishedContentList ChildrenAsList { get { return Children; } }
+        
+        [Obsolete("Will be removing in future versions")]
         public int parentId { get { return PublishedContent.Parent.Id; } }
 
         #region DynamicObject
@@ -73,7 +75,9 @@ namespace Umbraco.Web.Models
 		/// <returns></returns>
 		public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
 		{
-			var attempt = DynamicInstanceHelper.TryInvokeMember(this, binder, args, new[]
+            var runtimeCache = ApplicationContext.Current != null ? ApplicationContext.Current.ApplicationCache.RuntimeCache : new NullCacheProvider();
+
+            var attempt = DynamicInstanceHelper.TryInvokeMember(runtimeCache, this, binder, args, new[]
         		{
 					typeof(DynamicPublishedContent)
         		});

@@ -64,7 +64,7 @@
     </Reference>
     <Reference Include="MySql.Data">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\MySql.Data.6.6.5\lib\net40\MySql.Data.dll</HintPath>
+      <HintPath>..\packages\MySql.Data.6.9.6\lib\net45\MySql.Data.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -136,6 +136,7 @@
     <Compile Include="ApplicationContext.cs" />
     <Compile Include="ApplicationEventHandler.cs" />
     <Compile Include="AssemblyExtensions.cs" />
+    <Compile Include="AsyncLock.cs" />
     <Compile Include="Attempt{T}.cs" />
     <Compile Include="Auditing\AuditTrail.cs" />
     <Compile Include="Auditing\Audit.cs" />
@@ -312,10 +313,46 @@
     <Compile Include="Events\SendToPublishEventArgs.cs" />
     <Compile Include="Exceptions\InvalidCompositionException.cs" />
     <Compile Include="HideFromTypeFinderAttribute.cs" />
+    <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="IApplicationEventHandler.cs" />
     <Compile Include="IDisposeOnRequestEnd.cs" />
+    <Compile Include="Manifest\GridEditorConverter.cs" />
+    <Compile Include="Media\Exif\BitConverterEx.cs" />
+    <Compile Include="Media\Exif\ExifBitConverter.cs" />
+    <Compile Include="Media\Exif\ExifEnums.cs" />
+    <Compile Include="Media\Exif\ExifExceptions.cs" />
+    <Compile Include="Media\Exif\ExifExtendedProperty.cs" />
+    <Compile Include="Media\Exif\ExifFileTypeDescriptor.cs" />
+    <Compile Include="Media\Exif\ExifInterOperability.cs" />
+    <Compile Include="Media\Exif\ExifProperty.cs" />
+    <Compile Include="Media\Exif\ExifPropertyCollection.cs" />
+    <Compile Include="Media\Exif\ExifPropertyFactory.cs" />
+    <Compile Include="Media\Exif\ExifTag.cs" />
+    <Compile Include="Media\Exif\ExifTagFactory.cs" />
+    <Compile Include="Media\Exif\IFD.cs" />
+    <Compile Include="Media\Exif\ImageFile.cs" />
+    <Compile Include="Media\Exif\ImageFileDirectory.cs" />
+    <Compile Include="Media\Exif\ImageFileDirectoryEntry.cs" />
+    <Compile Include="Media\Exif\ImageFileFormat.cs" />
+    <Compile Include="Media\Exif\JFIFEnums.cs" />
+    <Compile Include="Media\Exif\JFIFExtendedProperty.cs" />
+    <Compile Include="Media\Exif\JFIFThumbnail.cs" />
+    <Compile Include="Media\Exif\JPEGExceptions.cs" />
+    <Compile Include="Media\Exif\JPEGFile.cs" />
+    <Compile Include="Media\Exif\JPEGMarker.cs" />
+    <Compile Include="Media\Exif\JPEGSection.cs" />
+    <Compile Include="Media\Exif\MathEx.cs" />
+    <Compile Include="Media\Exif\TIFFFile.cs" />
+    <Compile Include="Media\Exif\TIFFHeader.cs" />
+    <Compile Include="Media\Exif\TIFFStrip.cs" />
+    <Compile Include="Media\Exif\Utility.cs" />
+    <Compile Include="Persistence\RecordPersistenceType.cs" />
     <Compile Include="IO\ResizedImage.cs" />
     <Compile Include="IO\UmbracoMediaFile.cs" />
+    <Compile Include="Models\IPartialView.cs" />
+    <Compile Include="PropertyEditors\GridEditor.cs" />
+    <Compile Include="Services\LocalizedTextService.cs" />
+    <Compile Include="Services\ILocalizedTextService.cs" />
     <Compile Include="Macros\XsltExtension.cs" />
     <Compile Include="Macros\XsltExtensionAttribute.cs" />
     <Compile Include="Macros\XsltExtensionsResolver.cs" />
@@ -401,7 +438,6 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixTwoZero\ChangePasswordColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixTwoZero\UpdateToNewMemberPropertyAliases.cs" />
     <Compile Include="Persistence\DbConnectionExtensions.cs" />
-    <Compile Include="Persistence\Repositories\Interfaces\IPartialViewMacroRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IPartialViewRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IRecycleBinRepository.cs" />
     <Compile Include="Persistence\Repositories\PartialViewMacroRepository.cs" />
@@ -1070,6 +1106,8 @@
     <Compile Include="Services\ITagService.cs" />
     <Compile Include="Services\IUserService.cs" />
     <Compile Include="Services\LocalizationService.cs" />
+    <Compile Include="Services\LocalizedTextServiceExtensions.cs" />
+    <Compile Include="Services\LocalizedTextServiceFileSources.cs" />
     <Compile Include="Services\MacroService.cs" />
     <Compile Include="Services\MediaService.cs" />
     <Compile Include="Models\Membership\MemberCountType.cs" />
@@ -1090,6 +1128,7 @@
     <Compile Include="Standalone\ServiceContextManager.cs" />
     <Compile Include="Standalone\StandaloneCoreApplication.cs" />
     <Compile Include="Standalone\StandaloneCoreBootManager.cs" />
+    <Compile Include="Strategies\RelateOnCopyHandler.cs" />
     <Compile Include="Strings\ContentBaseExtensions.cs" />
     <Compile Include="Strings\Diff.cs" />
     <Compile Include="Sync\CurrentServerEnvironmentStatus.cs" />
@@ -1178,6 +1217,7 @@
     <Compile Include="WriteLock.cs" />
     <Compile Include="XmlExtensions.cs" />
     <Compile Include="XmlHelper.cs" />
+    <Compile Include="Xml\UmbracoXPathPathSyntaxParser.cs" />
     <Compile Include="Xml\XPath\MacroNavigator.cs" />
     <Compile Include="Xml\XPath\INavigableContentType.cs" />
     <Compile Include="Xml\XPath\NavigableNavigator.cs" />

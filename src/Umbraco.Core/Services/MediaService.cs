@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml.Linq;
 using Umbraco.Core.Auditing;
@@ -402,12 +403,13 @@ namespace Umbraco.Core.Services
         /// <param name="totalChildren">Total records query would return without paging</param>
         /// <param name="orderBy">Field to order by</param>
         /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
         /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IMedia> GetPagedChildren(int id, int pageIndex, int pageSize, out int totalChildren,
-            string orderBy, Direction orderDirection, string filter = "")
+            string orderBy, Direction orderDirection, bool orderBySystemField = true, string filter = "")
         {
-            Mandate.ParameterCondition(pageIndex >= 0, "pageSize");
+            Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
             Mandate.ParameterCondition(pageSize > 0, "pageSize");
             using (var repository = _repositoryFactory.CreateMediaRepository(_uowProvider.GetUnitOfWork()))
             {
@@ -417,7 +419,7 @@ namespace Umbraco.Core.Services
                 {
                     query.Where(x => x.ParentId == id);
                 }
-                var medias = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, filter);
+                var medias = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
 
                 return medias;
             }
@@ -432,11 +434,12 @@ namespace Umbraco.Core.Services
         /// <param name="totalChildren">Total records query would return without paging</param>
         /// <param name="orderBy">Field to order by</param>
         /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
         /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        public IEnumerable<IMedia> GetPagedDescendants(int id, int pageIndex, int pageSize, out int totalChildren, string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "")
+        public IEnumerable<IMedia> GetPagedDescendants(int id, int pageIndex, int pageSize, out int totalChildren, string orderBy = "Path", Direction orderDirection = Direction.Ascending, bool orderBySystemField = true, string filter = "")
         {
-            Mandate.ParameterCondition(pageIndex >= 0, "pageSize");
+            Mandate.ParameterCondition(pageIndex >= 0, "pageIndex");
             Mandate.ParameterCondition(pageSize > 0, "pageSize");
             using (var repository = _repositoryFactory.CreateMediaRepository(_uowProvider.GetUnitOfWork()))
             {
@@ -447,7 +450,7 @@ namespace Umbraco.Core.Services
                 {
                     query.Where(x => x.Path.SqlContains(string.Format(",{0},", id), TextColumnType.NVarchar));
                 }
-                var contents = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, filter);
+                var contents = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
 
                 return contents;
             }
@@ -567,28 +570,38 @@ namespace Umbraco.Core.Services
         public IMedia GetMediaByPath(string mediaPath)
         {
             var umbracoFileValue = mediaPath;
-            var isResized = mediaPath.Contains("_") && mediaPath.Contains("x");
+            const string Pattern = ".*[_][0-9]+[x][0-9]+[.].*";
+            var isResized = Regex.IsMatch(mediaPath, Pattern);
 
             // If the image has been resized we strip the "_403x328" of the original "/media/1024/koala_403x328.jpg" url.
             if (isResized)
             {
-
                 var underscoreIndex = mediaPath.LastIndexOf('_');
                 var dotIndex = mediaPath.LastIndexOf('.');
                 umbracoFileValue = string.Concat(mediaPath.Substring(0, underscoreIndex), mediaPath.Substring(dotIndex));
             }
 
-            var sql = new Sql()
-                .Select("*")
-                .From<PropertyDataDto>()
-                .InnerJoin<PropertyTypeDto>()
-                .On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
-                .Where<PropertyTypeDto>(x => x.Alias == "umbracoFile")
-                .Where<PropertyDataDto>(x => x.VarChar == umbracoFileValue);
+            Func<string, Sql> createSql = url => new Sql().Select("*")
+                                                  .From<PropertyDataDto>()
+                                                  .InnerJoin<PropertyTypeDto>()
+                                                  .On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
+                                                  .Where<PropertyTypeDto>(x => x.Alias == "umbracoFile")
+                                                  .Where<PropertyDataDto>(x => x.VarChar == url);
+
+            var sql = createSql(umbracoFileValue);
 
             using (var uow = _uowProvider.GetUnitOfWork())
             {
                 var propertyDataDto = uow.Database.Fetch<PropertyDataDto, PropertyTypeDto>(sql).FirstOrDefault();
+
+                // If the stripped-down url returns null, we try again with the original url. 
+                // Previously, the function would fail on e.g. "my_x_image.jpg"
+                if (propertyDataDto == null)
+                {
+                    sql = createSql(mediaPath);
+                    propertyDataDto = uow.Database.Fetch<PropertyDataDto, PropertyTypeDto>(sql).FirstOrDefault();
+                }
+
                 return propertyDataDto == null ? null : GetById(propertyDataDto.NodeId);
             }
         }

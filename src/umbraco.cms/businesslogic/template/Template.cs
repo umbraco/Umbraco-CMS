@@ -552,6 +552,9 @@ namespace umbraco.cms.businesslogic.template
                 _templateAliasesInitialized = false;
                 InitTemplateAliases();
 
+                //remove refs from documents
+                SqlHelper.ExecuteNonQuery("UPDATE cmsDocument SET templateId = NULL WHERE templateId = " + this.Id);
+
                 //delete the template
                 SqlHelper.ExecuteNonQuery("delete from cmsTemplate where NodeId =" + this.Id);
 

@@ -32,9 +32,7 @@ namespace Umbraco.Core.Persistence.Factories
                     IsLockedOut = dto.NoConsole,
                     IsApproved = dto.Disabled == false,
                     Email = dto.Email,
-                    Language = dto.UserLanguage,
-                    //NOTE: The default permission come from the user type's default permissions
-                    DefaultPermissions = _userType.Permissions
+                    Language = dto.UserLanguage
                 };
 
             foreach (var app in dto.User2AppDtos)

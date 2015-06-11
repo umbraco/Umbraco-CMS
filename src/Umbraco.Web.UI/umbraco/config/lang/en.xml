@@ -100,7 +100,7 @@
     <key alias="contentRepublished">The content has been re-published.</key>
     <key alias="currentProperty">Current Property</key>
     <key alias="currentType">Current type</key>
-    <key alias="docTypeCannotBeChanged">The document type cannot be changed, as there are no alternatives valid for this location.</key>
+    <key alias="docTypeCannotBeChanged">The document type cannot be changed, as there are no alternatives valid for this location.  An alternative will be valid if it is allowed under the parent of the selected content item and that all existing child content items are allowed to be created under it.</key>
     <key alias="docTypeChanged">Document Type Changed</key>
     <key alias="mapProperties">Map Properties</key>
     <key alias="mapToProperty">Map to Property</key>
@@ -679,9 +679,11 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="paSimpleHelp">If you just want to setup simple protection using a single login and password</key>
   </area>
   <area alias="publish">
-    <key alias="contentPublishedFailedAwaitingRelease"><![CDATA[
+    <key alias="contentPublishedFailedAwaitingRelease">
+      <![CDATA[
       %0% could not be published because the item is scheduled for release.
-    ]]></key>
+    ]]>
+    </key>
     <key alias="contentPublishedFailedInvalid"><![CDATA[
       %0% could not be published because these properties:  %1%  did not pass validation rules.
     ]]></key>
@@ -847,7 +849,7 @@ To manage your website, simply open the Umbraco back office and start adding con
 
   <area alias="grid">
     <key alias="insertControl">Insert control</key>
-    <key alias="addRows">Add rows to your layout</key>
+    <key alias="addRows">Choose a layout for the page</key>
     <key alias="addElement"><![CDATA[To start, click the <i class="icon icon-add blue"></i> below and add your first element]]></key>
 
     <key alias="clickToEmbed">Click to embed</key>
@@ -1010,7 +1012,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="editors">Editor</key>
     <key alias="excerptField">Excerpt field</key>
     <key alias="language">Language</key>
-    <key alias="loginname">Login</key>
+    <key alias="loginname">Username</key>
     <key alias="mediastartnode">Start Node in Media Library</key>
     <key alias="modules">Sections</key>
     <key alias="noConsole">Disable Umbraco Access</key>
@@ -1029,7 +1031,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="permissionSelectPages">Select pages to modify their permissions</key>
     <key alias="searchAllChildren">Search all children</key>
     <key alias="startnode">Start Node in Content</key>
-    <key alias="username">Username</key>
+    <key alias="username">Name</key>
     <key alias="userPermissions">User permissions</key>
     <key alias="usertype">User type</key>
     <key alias="userTypes">User types</key>

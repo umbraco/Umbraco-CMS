@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Macros
         {
             var content = @"<p>asdfasdf</p>
 <p>asdfsadf</p>
-<?UMBRACO_MACRO macroAlias=""My.Map.isCool"" />
+<?UMBRACO_MACRO macroAlias=""My.Map.isCool eh[boy!]"" />
 <p>asdfasdf</p>";
             var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content, new Dictionary<string, string>() { { "test1", "value1" }, { "test2", "value2" } });
 
@@ -34,8 +34,8 @@ namespace Umbraco.Tests.Macros
             Assert.AreEqual(@"<p>asdfasdf</p>
 <p>asdfsadf</p>
 <div class=""umb-macro-holder mceNonEditable"" test1=""value1"" test2=""value2"">
-<!-- <?UMBRACO_MACRO macroAlias=""My.Map.isCool"" /> -->
-<ins>Macro alias: <strong>My.Map.isCool</strong></ins></div>
+<!-- <?UMBRACO_MACRO macroAlias=""My.Map.isCool eh[boy!]"" /> -->
+<ins>Macro alias: <strong>My.Map.isCool eh[boy!]</strong></ins></div>
 <p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty), result.Replace(Environment.NewLine, string.Empty));
         }
 
@@ -105,6 +105,29 @@ namespace Umbraco.Tests.Macros
 <p>asdfsadf</p>
 <div class=""umb-macro-holder mceNonEditable"" test1=""value1"" test2=""value2"">
 <!-- <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" /> -->
+<ins>Macro alias: <strong>Map</strong></ins></div>
+<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty), result.Replace(Environment.NewLine, string.Empty));
+        }
+
+        [Test]
+        public void Format_RTE_Data_For_Editor_With_Params_When_MacroAlias_Not_First()
+        {
+            var content = @"<p>asdfasdf</p>
+<p>asdfsadf</p>
+<?UMBRACO_MACRO test1=""value1"" test2=""value2"" macroAlias=""Map"" />
+<p>asdfasdf</p>";
+            var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content, new Dictionary<string, string>() { { "test1", "value1" }, { "test2", "value2" } });
+
+//            Assert.AreEqual(@"<p>asdfasdf</p>
+//<p>asdfsadf</p>
+//<div class=""umb-macro-holder Map mceNonEditable"" test1=""value1"" test2=""value2"">
+//<!-- <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" /> -->
+//<ins>Macro alias: <strong>Map</strong></ins></div>
+//<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty), result.Replace(Environment.NewLine, string.Empty));
+            Assert.AreEqual(@"<p>asdfasdf</p>
+<p>asdfsadf</p>
+<div class=""umb-macro-holder mceNonEditable"" test1=""value1"" test2=""value2"">
+<!-- <?UMBRACO_MACRO test1=""value1"" test2=""value2"" macroAlias=""Map"" /> -->
 <ins>Macro alias: <strong>Map</strong></ins></div>
 <p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty), result.Replace(Environment.NewLine, string.Empty));
         }

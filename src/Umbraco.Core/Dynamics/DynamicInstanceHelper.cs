@@ -5,6 +5,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Dynamics
@@ -34,38 +35,42 @@ namespace Umbraco.Core.Dynamics
 			FoundExtensionMethod
 		}
 
-		/// <summary>
-		/// Attempts to invoke a member based on the dynamic instance
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="thisObject">The object instance to invoke the extension method for</param>
-		/// <param name="binder"></param>
-		/// <param name="args"></param>
-		/// <returns></returns>
-		/// <remarks>
-		/// First tries to find a property with the binder name, if that fails it will try to find a static or instance method
-		/// on the object that matches the binder name
-		/// </remarks>
-		public static Attempt<TryInvokeMemberResult> TryInvokeMember<T>(T thisObject, InvokeMemberBinder binder, object[] args)
+	    /// <summary>
+	    /// Attempts to invoke a member based on the dynamic instance
+	    /// </summary>
+	    /// <typeparam name="T"></typeparam>
+	    /// <param name="runtimeCache"></param>
+	    /// <param name="thisObject">The object instance to invoke the extension method for</param>
+	    /// <param name="binder"></param>
+	    /// <param name="args"></param>
+	    /// <returns></returns>
+	    /// <remarks>
+	    /// First tries to find a property with the binder name, if that fails it will try to find a static or instance method
+	    /// on the object that matches the binder name
+	    /// </remarks>
+	    public static Attempt<TryInvokeMemberResult> TryInvokeMember<T>(IRuntimeCacheProvider runtimeCache, T thisObject, InvokeMemberBinder binder, object[] args)
 		{
-			return TryInvokeMember<T>(thisObject, binder, args, null);
+            return TryInvokeMember<T>(runtimeCache, thisObject, binder, args, null);
 		}
 
-		/// <summary>
-		/// Attempts to invoke a member based on the dynamic instance
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="thisObject">The object instance to invoke the extension method for</param>
-		/// <param name="binder"></param>
-		/// <param name="args"></param>
-		/// <param name="findExtensionMethodsOnTypes">The types to scan for extension methods </param>
-		/// <returns></returns>
-		/// <remarks>
-		/// First tries to find a property with the binder name, if that fails it will try to find a static or instance method
-		/// on the object that matches the binder name, if that fails it will then attempt to invoke an extension method
-		/// based on the binder name and the extension method types to scan.
-		/// </remarks>
-		public static Attempt<TryInvokeMemberResult> TryInvokeMember<T>(T thisObject, 
+	    /// <summary>
+	    /// Attempts to invoke a member based on the dynamic instance
+	    /// </summary>
+	    /// <typeparam name="T"></typeparam>
+	    /// <param name="runtimeCache"></param>
+	    /// <param name="thisObject">The object instance to invoke the extension method for</param>
+	    /// <param name="binder"></param>
+	    /// <param name="args"></param>
+	    /// <param name="findExtensionMethodsOnTypes">The types to scan for extension methods </param>
+	    /// <returns></returns>
+	    /// <remarks>
+	    /// First tries to find a property with the binder name, if that fails it will try to find a static or instance method
+	    /// on the object that matches the binder name, if that fails it will then attempt to invoke an extension method
+	    /// based on the binder name and the extension method types to scan.
+	    /// </remarks>
+	    public static Attempt<TryInvokeMemberResult> TryInvokeMember<T>(
+            IRuntimeCacheProvider runtimeCache,
+            T thisObject, 
 			InvokeMemberBinder binder, 
 			object[] args, 
 			IEnumerable<Type> findExtensionMethodsOnTypes)
@@ -76,9 +81,9 @@ namespace Umbraco.Core.Dynamics
 			{
 				//Property?
 				result = typeof(T).InvokeMember(binder.Name,
-				                                System.Reflection.BindingFlags.Instance |
-				                                System.Reflection.BindingFlags.Public |
-				                                System.Reflection.BindingFlags.GetProperty,
+				                                BindingFlags.Instance |
+				                                BindingFlags.Public |
+				                                BindingFlags.GetProperty,
 				                                null,
 				                                thisObject,
 				                                args);
@@ -90,10 +95,10 @@ namespace Umbraco.Core.Dynamics
 				{
 					//Static or Instance Method?
 					result = typeof(T).InvokeMember(binder.Name,
-					                                System.Reflection.BindingFlags.Instance |
-					                                System.Reflection.BindingFlags.Public |
-					                                System.Reflection.BindingFlags.Static |
-					                                System.Reflection.BindingFlags.InvokeMethod,
+					                                BindingFlags.Instance |
+					                                BindingFlags.Public |
+					                                BindingFlags.Static |
+					                                BindingFlags.InvokeMethod,
 					                                null,
 					                                thisObject,
 					                                args);
@@ -105,7 +110,7 @@ namespace Umbraco.Core.Dynamics
 					{
 						try
 						{
-							result = FindAndExecuteExtensionMethod(thisObject, args, binder.Name, findExtensionMethodsOnTypes);
+                            result = FindAndExecuteExtensionMethod(runtimeCache, thisObject, args, binder.Name, findExtensionMethodsOnTypes);
 							return Attempt.Succeed(new TryInvokeMemberResult(result, TryInvokeMemberSuccessReason.FoundExtensionMethod));
 						}
 						catch (TargetInvocationException ext)
@@ -138,16 +143,19 @@ namespace Umbraco.Core.Dynamics
 			}
 		}
 
-		/// <summary>
-		/// Attempts to find an extension method that matches the name and arguments based on scanning the Type's passed in
-		/// to the findMethodsOnTypes parameter
-		/// </summary>
-		/// <param name="thisObject">The instance object to execute the extension method for</param>
-		/// <param name="args"></param>
-		/// <param name="name"></param>
-		/// <param name="findMethodsOnTypes"></param>
-		/// <returns></returns>
-		internal static object FindAndExecuteExtensionMethod<T>(T thisObject, 
+	    /// <summary>
+	    /// Attempts to find an extension method that matches the name and arguments based on scanning the Type's passed in
+	    /// to the findMethodsOnTypes parameter
+	    /// </summary>
+	    /// <param name="runtimeCache"></param>
+	    /// <param name="thisObject">The instance object to execute the extension method for</param>
+	    /// <param name="args"></param>
+	    /// <param name="name"></param>
+	    /// <param name="findMethodsOnTypes"></param>
+	    /// <returns></returns>
+	    internal static object FindAndExecuteExtensionMethod<T>(
+            IRuntimeCacheProvider runtimeCache,
+            T thisObject, 
 			object[] args, 
 			string name, 
 			IEnumerable<Type> findMethodsOnTypes)
@@ -158,7 +166,7 @@ namespace Umbraco.Core.Dynamics
 			MethodInfo toExecute = null;
 			foreach (var t in findMethodsOnTypes)
 			{
-				toExecute = ExtensionMethodFinder.FindExtensionMethod(t, args, name, false);
+                toExecute = ExtensionMethodFinder.FindExtensionMethod(runtimeCache, t, args, name, false);
 				if (toExecute != null)
 					break;
 			}
@@ -166,6 +174,13 @@ namespace Umbraco.Core.Dynamics
 			if (toExecute != null)
 			{
 				var genericArgs = (new[] { (object)thisObject }).Concat(args);
+
+                // else we'd get an exception w/ message "Late bound operations cannot
+                // be performed on types or methods for which ContainsGenericParameters is true."
+                // because MakeGenericMethod must be used to obtain an actual method that can run
+                if (toExecute.ContainsGenericParameters)
+                    throw new InvalidOperationException("Method contains generic parameters, something's wrong.");
+                
 				result = toExecute.Invoke(null, genericArgs.ToArray());	
 			}
 			else

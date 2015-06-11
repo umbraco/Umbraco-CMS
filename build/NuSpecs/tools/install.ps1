@@ -47,108 +47,46 @@ if ($project) {
 		robocopy $umbracoClientFolder $umbracoClientBackupPath /e /LOG:$copyLogsPath\UmbracoClientBackup.log
 		robocopy $umbracoClientFolderSource $umbracoClientFolder /is /it /e /LOG:$copyLogsPath\UmbracoClientCopy.log		
 	}
-	
-	$copyWebconfig = $false
-	try		
-	{
-	  # SJ - What can I say: big up for James Newton King for teaching us a hack for detecting if this is a new install vs. an upgrade!
-	  # https://github.com/JamesNK/Newtonsoft.Json/pull/387 - would never have seen this without the controversial pull request..
-	  $dte2 = Get-Interface $dte ([EnvDTE80.DTE2])		
-			
-	  if ($dte2.ActiveWindow.Caption -eq "Package Manager Console")		
-	  {		
-		# user is installing from VS NuGet console		
-		# get reference to the window, the console host and the input history		
-		# copy web.config if "install-package UmbracoCms" was last input		
-			
-		$consoleWindow = $(Get-VSComponentModel).GetService([NuGetConsole.IPowerConsoleWindow])		
-			
-		$props = $consoleWindow.GetType().GetProperties([System.Reflection.BindingFlags]::Instance -bor [System.Reflection.BindingFlags]::NonPublic)		
-			
-		$prop = $props | ? { $_.Name -eq "ActiveHostInfo" } | select -first 1		
-		if ($prop -eq $null) { return }		
-			
-		$hostInfo = $prop.GetValue($consoleWindow)		
-		if ($hostInfo -eq $null) { return }		
-			
-		$history = $hostInfo.WpfConsole.InputHistory.History		
-			
-		$lastCommand = $history | select -last 1		
-			
-		if ($lastCommand)		
-		{		
-		  $lastCommand = $lastCommand.Trim().ToLower()		
-		  if ($lastCommand.StartsWith("install-package") -and $lastCommand.Contains("umbracocms"))		
-		  {		
-			$copyWebconfig = $true
-		  }
-		}		
-	  }		
-	  else		
-	  {		
-		# user is installing from VS NuGet dialog		
-		# get reference to the window, then smart output console provider		
-		# copy web.config if messages in buffered console contains "installing...UmbracoCms" in last operation		
-		
-		$instanceField = [NuGet.Dialog.PackageManagerWindow].GetField("CurrentInstance", [System.Reflection.BindingFlags]::Static -bor [System.Reflection.BindingFlags]::NonPublic)		
-		$consoleField = [NuGet.Dialog.PackageManagerWindow].GetField("_smartOutputConsoleProvider", [System.Reflection.BindingFlags]::Instance -bor [System.Reflection.BindingFlags]::NonPublic)		
-		if ($instanceField -eq $null -or $consoleField -eq $null) { return }		
-			
-		$instance = $instanceField.GetValue($null)		
-		if ($instance -eq $null) { return }		
-			
-		$consoleProvider = $consoleField.GetValue($instance)		
-		if ($consoleProvider -eq $null) { return }		
-			
-		$console = $consoleProvider.CreateOutputConsole($false)		
-			
-		$messagesField = $console.GetType().GetField("_messages", [System.Reflection.BindingFlags]::Instance -bor [System.Reflection.BindingFlags]::NonPublic)		
-		if ($messagesField -eq $null) { return }		
-			
-		$messages = $messagesField.GetValue($console)		
-		if ($messages -eq $null) { return }		
-			
-		$operations = $messages -split "=============================="		
-			
-		$lastOperation = $operations | select -last 1		
-			
-		if ($lastOperation)		
-		{		
-		  $lastOperation = $lastOperation.ToLower()		
-			
-		  $lines = $lastOperation -split "`r`n"		
-			
-		  $installMatch = $lines | ? { $_.StartsWith("------- installing...umbracocms ") } | select -first 1		
-			
-		  if ($installMatch)		
-		  {		
-			$copyWebconfig = $true
-		  }		
-		}		
-	  }		
-	}		
-	catch		
-	{		
-	  # stop potential errors from bubbling up		
-	  $ErrorMessage = $_.Exception.Message
-	  $FailedItem = $_.Exception.ItemName
-	  $installLogFile = Join-Path $projectDestinationPath "NuGetInstallError.log"
-	  $text = "Error occurred: " + $ErrorMessage + " failure: " + $FailedItem
-	  $text | Out-File $installLogFile
-	}
 
+	$copyWebconfig = $true
+	$destinationWebConfig = Join-Path $projectDestinationPath "Web.config"
+
+	if(Test-Path $destinationWebConfig) 
+	{
+		Try 
+		{
+			[xml]$config = Get-Content $destinationWebConfig
+			
+			$config.configuration.appSettings.ChildNodes | ForEach-Object { 
+				if($_.key -eq "umbracoConfigurationStatus") 
+				{
+					# The web.config has an umbraco-specific appSetting in it
+					# don't overwrite it and let config transforms do their thing
+					$copyWebconfig = $false 
+				}
+			}
+		} 
+		Catch { }
+	}
+	
 	if($copyWebconfig -eq $true) 
 	{
 		$packageWebConfigSource = Join-Path $rootPath "UmbracoFiles\Web.config"
-		$destinationWebConfig = Join-Path $projectDestinationPath "Web.config"
 		Copy-Item $packageWebConfigSource $destinationWebConfig -Force
-	}
+	} 
 
 	$installFolder = Join-Path $projectDestinationPath "Install"
 	if(Test-Path $installFolder) {
 		Remove-Item $installFolder -Force -Recurse -Confirm:$false
 	}
 	
-	# Open readme.txt file
-	$DTE.ItemOperations.OpenFile($toolsPath + '\Readme.txt')
+	# Open appropriate readme
+	if($copyWebconfig -eq $true)  
+	{
+		$DTE.ItemOperations.OpenFile($toolsPath + '\Readme.txt')
+	} 
+	else 
+	{	
+		$DTE.ItemOperations.OpenFile($toolsPath + '\ReadmeUpgrade.txt')
+	}
 }

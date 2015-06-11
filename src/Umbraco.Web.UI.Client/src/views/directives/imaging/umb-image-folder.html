@@ -1,0 +1,34 @@
+<form style="width: 100%" method="POST" enctype="multipart/form-data" class="umb-editor umb-folderbrowser"
+      umb-image-upload="blueimpOptions">
+
+    <div class="drop-zone">
+
+        <div class="fileinput-button umb-upload-button-big" ng-hide="dropping || uploading">
+            <i class="icon icon-page-up"></i>
+            <p><localize key="media_clickToUpload">Click to upload</localize></p>
+            <input type="file" name="files[]" multiple ng-disabled="disabled" class="uploader">
+        </div>
+
+        <umb-upload-dropzone ng-show="dropping && !uploading"></umb-upload-dropzone>
+
+        <div ng-if="uploading">
+
+            <umb-image-upload-progress></umb-image-upload-progress>
+
+            <div class="umb-photo-preview"
+                 ng-repeat="file in files"
+                 ng-style="{opacity: file.completed == true ? '0.25' : '1.0'}"
+                 umb-upload-preview="file">
+            </div>
+        </div>
+
+    </div>
+
+
+    <umb-photo-folder ng-show="files.length == 0"
+                      min-height="105"
+                      min-width="220"
+                      on-click="clickHandler"
+                      ng-model="images" />
+
+</form>

@@ -7,6 +7,8 @@ using System.Web.Compilation;
 using System.Runtime.CompilerServices;
 using System.Collections;
 using System.Linq.Expressions;
+using Umbraco.Core;
+using Umbraco.Core.Cache;
 
 namespace umbraco.MacroEngines
 {
@@ -16,7 +18,9 @@ namespace umbraco.MacroEngines
     {
 		public static MethodInfo FindExtensionMethod(Type thisType, object[] args, string name, bool argsContainsThis)
 		{
-			return Umbraco.Core.Dynamics.ExtensionMethodFinder.FindExtensionMethod(thisType, args, name, argsContainsThis);
+            var runtimeCache = ApplicationContext.Current != null ? ApplicationContext.Current.ApplicationCache.RuntimeCache : new NullCacheProvider();
+
+            return Umbraco.Core.Dynamics.ExtensionMethodFinder.FindExtensionMethod(runtimeCache, thisType, args, name, argsContainsThis);
 		}
     }
 }

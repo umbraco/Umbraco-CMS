@@ -337,74 +337,7 @@ namespace Umbraco.Core.Models
                 ChangePublishedState(PublishedState.Unpublished);
             }
         }
-
-        /// <summary>
-        /// Indicates whether a specific property on the current <see cref="IContent"/> entity is dirty.
-        /// </summary>
-        /// <param name="propertyName">Name of the property to check</param>
-        /// <returns>True if Property is dirty, otherwise False</returns>
-        public override bool IsPropertyDirty(string propertyName)
-        {
-            bool existsInEntity = base.IsPropertyDirty(propertyName);
-            if (existsInEntity)
-                return true;
-
-            return Properties.Any(x => x.IsPropertyDirty(propertyName));
-        }
-
-        /// <summary>
-        /// Indicates whether the current entity is dirty.
-        /// </summary>
-        /// <returns>True if entity is dirty, otherwise False</returns>
-        public override bool IsDirty()
-        {
-            return IsEntityDirty() || IsAnyUserPropertyDirty();
-        }
-
-        /// <summary>
-        /// Returns true if only the entity properties are direty
-        /// </summary>
-        /// <returns></returns>
-        public bool IsEntityDirty()
-        {
-            return base.IsDirty();
-        }
-
-        /// <summary>
-        /// Returns true if any of the properties are dirty
-        /// </summary>
-        /// <returns></returns>
-        public bool IsAnyUserPropertyDirty()
-        {
-            return Properties.Any(x => x.IsDirty());
-        }
-
-        /// <summary>
-        /// Returns a list of all dirty user defined properties
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerable<string> GetDirtyUserProperties()
-        {
-            return Properties.Where(x => x.IsDirty()).Select(x => x.Alias);
-        }
-
-        /// <summary>
-        /// Resets dirty properties by clearing the dictionary used to track changes.
-        /// </summary>
-        /// <remarks>
-        /// Please note that resetting the dirty properties could potentially
-        /// obstruct the saving of a new or updated entity.
-        /// </remarks>
-        public override void ResetDirtyProperties()
-        {
-            base.ResetDirtyProperties();
-
-            foreach (var property in Properties)
-            {
-                property.ResetDirtyProperties();
-            }
-        }
-
+        
         /// <summary>
         /// Method to call when Entity is being saved
         /// </summary>
@@ -460,10 +393,14 @@ namespace Umbraco.Core.Models
         public override object DeepClone()
         {
             var clone = (Content)base.DeepClone();
-
+            //turn off change tracking
+            clone.DisableChangeTracking();
             //need to manually clone this since it's not settable
             clone._contentType = (IContentType)ContentType.DeepClone();
+            //this shouldn't really be needed since we're not tracking
             clone.ResetDirtyProperties(false);
+            //re-enable tracking
+            clone.EnableChangeTracking();
 
             return clone;
 

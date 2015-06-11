@@ -27,7 +27,6 @@ if ($project) {
 		if(Test-Path $umbracoBinFolder\interfaces.dll) { Remove-Item $umbracoBinFolder\interfaces.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\log4net.dll) { Remove-Item $umbracoBinFolder\log4net.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Microsoft.ApplicationBlocks.Data.dll) { Remove-Item $umbracoBinFolder\Microsoft.ApplicationBlocks.Data.dll -Force -Confirm:$false }
-		if(Test-Path $umbracoBinFolder\Microsoft.Web.Helpers.dll) { Remove-Item $umbracoBinFolder\Microsoft.Web.Helpers.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\SQLCE4Umbraco.dll) { Remove-Item $umbracoBinFolder\SQLCE4Umbraco.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\System.Data.SqlServerCe.dll) { Remove-Item $umbracoBinFolder\System.Data.SqlServerCe.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\System.Data.SqlServerCe.Entity.dll) { Remove-Item $umbracoBinFolder\System.Data.SqlServerCe.Entity.dll -Force -Confirm:$false }
@@ -64,7 +63,6 @@ if ($project) {
 		if(Test-Path $umbracoBinFolder\MySql.Data.dll) { Remove-Item $umbracoBinFolder\MySql.Data.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Newtonsoft.Json.dll) { Remove-Item $umbracoBinFolder\Newtonsoft.Json.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\System.Net.Http.Formatting.dll) { Remove-Item $umbracoBinFolder\System.Net.Http.Formatting.dll -Force -Confirm:$false }
-		if(Test-Path $umbracoBinFolder\System.Web.Helpers.dll) { Remove-Item $umbracoBinFolder\System.Web.Helpers.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\System.Web.Http.dll) { Remove-Item $umbracoBinFolder\System.Web.Http.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\System.Web.Http.WebHost.dll) { Remove-Item $umbracoBinFolder\System.Web.Http.WebHost.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\System.Web.Mvc.dll) { Remove-Item $umbracoBinFolder\System.Web.Mvc.dll -Force -Confirm:$false }

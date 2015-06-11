@@ -1,5 +1,4 @@
-﻿using System.Web;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using System.Web.UI;
 using ClientDependency.Core;
 using ClientDependency.Core.CompositeFiles;
@@ -7,7 +6,7 @@ using ClientDependency.Core.CompositeFiles;
 namespace Umbraco.Web.Mvc
 {
     /// <summary>
-    /// Minifies and caches the result for the JavaScriptResult
+    /// Minifies the result for the JavaScriptResult
     /// </summary>
     /// <remarks>
     /// Only minifies in release mode

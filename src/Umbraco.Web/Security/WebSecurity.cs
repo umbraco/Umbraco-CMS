@@ -117,7 +117,7 @@ namespace Umbraco.Web.Security
                 StartContentNode = user.StartContentId,
                 StartMediaNode = user.StartMediaId,
                 Username = user.Username,
-                Culture = ui.Culture(user.Language)
+                Culture = ui.Culture(user)
             });
             
             LogHelper.Info<WebSecurity>("User Id: {0} logged in", () => user.Id);
@@ -222,7 +222,6 @@ namespace Umbraco.Web.Security
                 Language = GlobalSettings.DefaultUILanguage,
                 Name = membershipUser.UserName,
                 RawPasswordValue = Guid.NewGuid().ToString("N"), //Need to set this to something - will not be used though
-                DefaultPermissions = writer.Permissions,
                 Username = membershipUser.UserName,
                 StartContentId = -1,
                 StartMediaId = -1,
@@ -286,7 +285,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public int GetUserId()
         {
-            var identity = _httpContext.GetCurrentIdentity(true);
+            var identity = _httpContext.GetCurrentIdentity(false);
             if (identity == null)
                 return -1;
             return Convert.ToInt32(identity.Id);
@@ -298,7 +297,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public string GetSessionId()
         {
-            var identity = _httpContext.GetCurrentIdentity(true);
+            var identity = _httpContext.GetCurrentIdentity(false);
             if (identity == null)
                 return null;
             return identity.SessionId;

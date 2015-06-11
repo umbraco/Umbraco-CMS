@@ -760,7 +760,7 @@ angular.module('umbraco.mocks').
       return {
           register: function() {
               $httpBackend
-                  .whenGET(mocksUtils.urlRegex('js/language.aspx'))
+                  .whenGET(mocksUtils.urlRegex('LocalizedText'))
                   .respond(getLanguageResource);
           }
       };

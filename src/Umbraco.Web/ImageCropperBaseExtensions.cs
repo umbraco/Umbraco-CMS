@@ -1,19 +1,17 @@
-﻿using System.Globalization;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
-using Umbraco.Web.Models;
-
-namespace Umbraco.Web
+﻿namespace Umbraco.Web
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.Linq;
+    using System.Text;
+
+    using Newtonsoft.Json;
+
+    using Umbraco.Core;
+    using Umbraco.Core.Logging;
+    using Umbraco.Web.Models;
+
     internal static class ImageCropperBaseExtensions
     {
 
@@ -88,7 +86,7 @@ namespace Umbraco.Web
                 cropUrl.Append("?center=" + cropDataSet.FocalPoint.Top.ToString(CultureInfo.InvariantCulture) + "," + cropDataSet.FocalPoint.Left.ToString(CultureInfo.InvariantCulture));
                 cropUrl.Append("&mode=crop");
             }
-            else if (crop != null && crop.Coordinates != null)
+            else if (crop != null && crop.Coordinates != null && preferFocalPoint == false)
             {
                 cropUrl.Append("?crop=");
                 cropUrl.Append(crop.Coordinates.X1.ToString(CultureInfo.InvariantCulture)).Append(",");

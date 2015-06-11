@@ -40,8 +40,8 @@ namespace Umbraco.Core.Logging
 		/// <returns></returns>
 		private static string PrefixThreadId(string generateMessageFormat)
 		{
-			return "[Thread " + Thread.CurrentThread.ManagedThreadId + "] " + generateMessageFormat;
-		}
+            return "[T" + Thread.CurrentThread.ManagedThreadId + "/D" + AppDomain.CurrentDomain.Id + "] " + generateMessageFormat;
+        }
 
 		#region Error
 		/// <summary>

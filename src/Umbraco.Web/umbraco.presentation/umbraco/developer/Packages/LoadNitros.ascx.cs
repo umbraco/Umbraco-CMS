@@ -26,7 +26,7 @@ namespace umbraco.presentation.developer.packages {
 
             string repoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66"; //Hardcoded official package repo key.
 
-            var p = new cms.businesslogic.packager.Installer();
+            var p = new cms.businesslogic.packager.Installer(Umbraco.Web.UmbracoContext.Current.Security.CurrentUser.Id);
             var repo = cms.businesslogic.packager.repositories.Repository.getByGuid(repoGuid);
 
             if (repo == null)

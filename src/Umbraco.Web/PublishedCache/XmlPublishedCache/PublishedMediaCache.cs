@@ -145,18 +145,24 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 			var eMgr = GetExamineManagerSafe();
 			if (eMgr != null)
 			{
-				try
-				{
-					//by default use the InternalSearcher
-					return eMgr.SearchProviderCollection["InternalSearcher"];
-				}
-				catch (FileNotFoundException)
-				{
-					//Currently examine is throwing FileNotFound exceptions when we have a loadbalanced filestore and a node is published in umbraco
-					//See this thread: http://examine.cdodeplex.com/discussions/264341
-					//Catch the exception here for the time being, and just fallback to GetMedia
-					//TODO: Need to fix examine in LB scenarios!
-				}
+			    try
+			    {
+			        //by default use the InternalSearcher
+			        return eMgr.SearchProviderCollection["InternalSearcher"];
+			    }
+			    catch (FileNotFoundException)
+			    {
+			        //Currently examine is throwing FileNotFound exceptions when we have a loadbalanced filestore and a node is published in umbraco
+			        //See this thread: http://examine.cdodeplex.com/discussions/264341
+			        //Catch the exception here for the time being, and just fallback to GetMedia
+			        //TODO: Need to fix examine in LB scenarios!
+			    }
+			    catch (NullReferenceException)
+			    {
+			        //This will occur when the search provider cannot be initialized. In newer examine versions the initialization is lazy and therefore
+                    // the manager will return the singleton without throwing initialization errors, however if examine isn't configured correctly a null
+                    // reference error will occur because the examine settings are null.
+			    }
 			}
 			return null;
 		}

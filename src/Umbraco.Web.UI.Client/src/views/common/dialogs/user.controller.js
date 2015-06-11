@@ -5,14 +5,14 @@ angular.module("umbraco")
         $scope.history = historyService.getCurrent();
         $scope.version = Umbraco.Sys.ServerVariables.application.version + " assembly: " + Umbraco.Sys.ServerVariables.application.assemblyVersion;
 
-        var evtHandlers = [];
-        evtHandlers.push(eventsService.on("historyService.add", function (e, args) {
+        var evts = [];
+        evts.push(eventsService.on("historyService.add", function (e, args) {
             $scope.history = args.all;
         }));
-        evtHandlers.push(eventsService.on("historyService.remove", function (e, args) {
+        evts.push(eventsService.on("historyService.remove", function (e, args) {
             $scope.history = args.all;
         }));
-        evtHandlers.push(eventsService.on("historyService.removeAll", function (e, args) {
+        evts.push(eventsService.on("historyService.removeAll", function (e, args) {
             $scope.history = [];
         }));
 
@@ -62,8 +62,8 @@ angular.module("umbraco")
 
         //remove all event handlers
         $scope.$on('$destroy', function () {
-            for (var i = 0; i < evtHandlers.length; i++) {
-                evtHandlers[i]();
+            for (var e = 0; e < evts.length; e++) {
+                evts[e]();
             }
 
         });

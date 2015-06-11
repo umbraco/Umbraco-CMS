@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using Examine;
 using Examine.LuceneEngine.Config;
 using Umbraco.Core;
@@ -11,20 +12,7 @@ namespace UmbracoExamine
 {
     internal class ExamineHelper
     {
-        /// <summary>
-        /// Used to replace any available tokens in the index path before the lucene directory is assigned to the path
-        /// </summary>
-        /// <param name="matchingVerb"></param>
-        /// <param name="alreadyConfiguredCheck"></param>
-        /// <param name="name"></param>
-        /// <param name="config"></param>
-        public static void ReplaceTokensInIndexPath(string name, System.Collections.Specialized.NameValueCollection config, string matchingVerb, Func<bool> alreadyConfiguredCheck)
-        {
-            var indexSet = GetConfiguredIndexSet(name, config, matchingVerb, alreadyConfiguredCheck);
-            if (indexSet == null) return;
-            indexSet.IndexPath = indexSet.IndexPath.Replace("{machinename}", NetworkHelper.FileSafeMachineName).EnsureEndsWith('/');
-        }
-
+      
         public static IndexSet GetConfiguredIndexSet(string name, System.Collections.Specialized.NameValueCollection config, string matchingVerb, Func<bool> alreadyConfiguredCheck)
         {
             //Need to check if the index set or IndexerData is specified...

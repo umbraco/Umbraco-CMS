@@ -308,7 +308,7 @@ namespace Umbraco.Core.Services
                         throw new ArgumentOutOfRangeException("matchType");
                 }
 
-                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, "Name", Direction.Ascending);
+                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, "Name", Direction.Ascending, true);
             }
         }
 
@@ -349,7 +349,7 @@ namespace Umbraco.Core.Services
                         throw new ArgumentOutOfRangeException("matchType");
                 }
 
-                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize,  out totalRecords, "Email", Direction.Ascending);
+                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize,  out totalRecords, "Email", Direction.Ascending, true);
             }
         }
 
@@ -390,7 +390,7 @@ namespace Umbraco.Core.Services
                         throw new ArgumentOutOfRangeException("matchType");
                 }
 
-                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, "LoginName", Direction.Ascending);
+                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, "LoginName", Direction.Ascending, true);
             }
         }
 
@@ -677,22 +677,22 @@ namespace Umbraco.Core.Services
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateMemberRepository(uow))
             {
-                return repository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, "LoginName", Direction.Ascending);
+                return repository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, "LoginName", Direction.Ascending, true);
             }
         }
 
         public IEnumerable<IMember> GetAll(int pageIndex, int pageSize, out int totalRecords,
-            string orderBy, Direction orderDirection, string memberTypeAlias = null, string filter = "")
+            string orderBy, Direction orderDirection, bool orderBySystemField = true, string memberTypeAlias = null, string filter = "")
         {
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateMemberRepository(uow))
             {
                 if (memberTypeAlias == null)
                 {
-                    return repository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, orderBy, orderDirection, filter);    
+                    return repository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, orderBy, orderDirection, orderBySystemField, filter);    
                 }
                 var query = new Query<IMember>().Where(x => x.ContentTypeAlias == memberTypeAlias);
-                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, orderBy, orderDirection, filter);    
+                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, orderBy, orderDirection, orderBySystemField, filter);    
             }
         }
 
@@ -1221,44 +1221,38 @@ namespace Umbraco.Core.Services
                     Name = "Membership",
                     Id = --identity
                 };
-            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext, Constants.Conventions.Member.Comments)
                 {
-                    Alias = Constants.Conventions.Member.Comments,
                     Name = Constants.Conventions.Member.CommentsLabel,
                     SortOrder = 0,
                     Id = --identity
                 });
-            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.TrueFalseAlias, DataTypeDatabaseType.Integer)
+            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.TrueFalseAlias, DataTypeDatabaseType.Integer, Constants.Conventions.Member.IsApproved)
                 {
-                    Alias = Constants.Conventions.Member.IsApproved,
                     Name = Constants.Conventions.Member.IsApprovedLabel,
                     SortOrder = 3,
                     Id = --identity
                 });
-            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.TrueFalseAlias, DataTypeDatabaseType.Integer)
+            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.TrueFalseAlias, DataTypeDatabaseType.Integer, Constants.Conventions.Member.IsLockedOut)
                 {
-                    Alias = Constants.Conventions.Member.IsLockedOut,
                     Name = Constants.Conventions.Member.IsLockedOutLabel,
                     SortOrder = 4,
                     Id = --identity
                 });
-            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.NoEditAlias, DataTypeDatabaseType.Date)
+            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.NoEditAlias, DataTypeDatabaseType.Date, Constants.Conventions.Member.LastLockoutDate)
                 {
-                    Alias = Constants.Conventions.Member.LastLockoutDate,
                     Name = Constants.Conventions.Member.LastLockoutDateLabel,
                     SortOrder = 5,
                     Id = --identity
                 });
-            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.NoEditAlias, DataTypeDatabaseType.Date)
+            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.NoEditAlias, DataTypeDatabaseType.Date, Constants.Conventions.Member.LastLoginDate)
                 {
-                    Alias = Constants.Conventions.Member.LastLoginDate,
                     Name = Constants.Conventions.Member.LastLoginDateLabel,
                     SortOrder = 6,
                     Id = --identity
                 });
-            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.NoEditAlias, DataTypeDatabaseType.Date)
+            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.NoEditAlias, DataTypeDatabaseType.Date, Constants.Conventions.Member.LastPasswordChangeDate)
                 {
-                    Alias = Constants.Conventions.Member.LastPasswordChangeDate,
                     Name = Constants.Conventions.Member.LastPasswordChangeDateLabel,
                     SortOrder = 7,
                     Id = --identity

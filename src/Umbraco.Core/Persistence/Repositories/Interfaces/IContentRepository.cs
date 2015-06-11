@@ -28,6 +28,12 @@ namespace Umbraco.Core.Persistence.Repositories
         void ReplaceContentPermissions(EntityPermissionSet permissionSet);
 
         /// <summary>
+        /// Clears the published flag for a content.
+        /// </summary>
+        /// <param name="content"></param>
+        void ClearPublished(IContent content);
+
+        /// <summary>
         /// Gets a specific language version of an <see cref="IContent"/>
         /// </summary>
         /// <param name="id">Id of the <see cref="IContent"/> to retrieve version from</param>
@@ -86,9 +92,10 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="totalRecords">Total records query would return without paging</param>
         /// <param name="orderBy">Field to order by</param>
         /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
         /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IContent> GetPagedResultsByQuery(IQuery<IContent> query, int pageIndex, int pageSize, out int totalRecords,
-            string orderBy, Direction orderDirection, string filter = "");
+            string orderBy, Direction orderDirection, bool orderBySystemField, string filter = "");
     }
 }

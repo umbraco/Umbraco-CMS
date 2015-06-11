@@ -233,7 +233,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var processed = 0;
             do
             {
-                var descendants = GetPagedResultsByQuery(query, pageIndex, pageSize, out total, "Path", Direction.Ascending);
+                var descendants = GetPagedResultsByQuery(query, pageIndex, pageSize, out total, "Path", Direction.Ascending, true);
 
                 var xmlItems = (from descendant in descendants
                                 let xml = serializer(descendant)
@@ -631,6 +631,17 @@ namespace Umbraco.Core.Persistence.Repositories
             repo.ReplaceEntityPermissions(permissionSet);
         }
 
+        public void ClearPublished(IContent content)
+        {
+            // race cond!
+            var documentDtos = Database.Fetch<DocumentDto>("WHERE nodeId=@id AND published=@published", new { id = content.Id, published = true });
+            foreach (var documentDto in documentDtos)
+            {
+                documentDto.Published = false;
+                Database.Update(documentDto);
+            }
+        }
+
         public IContent GetByLanguage(int id, string language)
         {
             var sql = GetBaseQuery(false);
@@ -670,10 +681,8 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="content"></param>
         /// <param name="xml"></param>
         public void AddOrUpdateContentXml(IContent content, Func<IContent, XElement> xml)
-        {
-            var contentExists = Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId = @Id", new { Id = content.Id }) != 0;
-
-            _contentXmlRepository.AddOrUpdate(new ContentXmlEntity<IContent>(contentExists, content, xml));
+        {           
+            _contentXmlRepository.AddOrUpdate(new ContentXmlEntity<IContent>(content, xml));
         }
 
         /// <summary>
@@ -692,11 +701,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="xml"></param>
         public void AddOrUpdatePreviewXml(IContent content, Func<IContent, XElement> xml)
         {
-            var previewExists =
-                    Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId = @Id AND versionId = @Version",
-                                                    new { Id = content.Id, Version = content.Version }) != 0;
-
-            _contentPreviewRepository.AddOrUpdate(new ContentPreviewEntity<IContent>(previewExists, content, xml));
+            _contentPreviewRepository.AddOrUpdate(new ContentPreviewEntity<IContent>(content, xml));
         }
 
         /// <summary>
@@ -708,10 +713,11 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="totalRecords">Total records query would return without paging</param>
         /// <param name="orderBy">Field to order by</param>
         /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
         /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetPagedResultsByQuery(IQuery<IContent> query, int pageIndex, int pageSize, out int totalRecords,
-            string orderBy, Direction orderDirection, string filter = "")
+            string orderBy, Direction orderDirection, bool orderBySystemField, string filter = "")
         {
 
             //NOTE: This uses the GetBaseQuery method but that does not take into account the required 'newest' field which is 
@@ -730,7 +736,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return GetPagedResultsByQuery<DocumentDto, Content>(query, pageIndex, pageSize, out totalRecords,
                 new Tuple<string, string>("cmsDocument", "nodeId"),
-                ProcessQuery, orderBy, orderDirection,
+                ProcessQuery, orderBy, orderDirection, orderBySystemField,
                 filterCallback);
 
         }

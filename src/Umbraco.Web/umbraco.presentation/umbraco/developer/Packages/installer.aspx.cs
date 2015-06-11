@@ -30,11 +30,12 @@ namespace umbraco.presentation.developer.packages
         public Installer()
         {
             CurrentApp = DefaultApps.developer.ToString();
+            _installer = new cms.businesslogic.packager.Installer(UmbracoUser.Id);
         }
 
         private Control _configControl;
         private cms.businesslogic.packager.repositories.Repository _repo;
-        private readonly cms.businesslogic.packager.Installer _installer = new cms.businesslogic.packager.Installer();
+        private readonly cms.businesslogic.packager.Installer _installer = null;
         private string _tempFileName = "";
 
         protected string RefreshQueryString { get; set; }
@@ -81,7 +82,7 @@ namespace umbraco.presentation.developer.packages
                     if (!pack.Protected)
                     {
                         //if it isn't then go straigt to the accept licens screen
-                        tempFile.Value = _installer.Import(_repo.fetch(Request.GetItemAsString("guid")));
+                        tempFile.Value = _installer.Import(_repo.fetch(Request.GetItemAsString("guid"), UmbracoUser.Id));
                         UpdateSettings();
 
                     }
@@ -219,7 +220,7 @@ namespace umbraco.presentation.developer.packages
             var packageId = 0;
             int.TryParse(Request.GetItemAsString("pId"), out packageId);
 
-            switch (currentStep)
+            switch (currentStep.ToLowerInvariant())
             {
                 case "businesslogic":
                     //first load in the config from the temporary directory
@@ -240,7 +241,7 @@ namespace umbraco.presentation.developer.packages
                         Response.Redirect("installer.aspx?installing=refresh&dir=" + dir + "&pId=" + packageId.ToString() + "&customUrl=" + Server.UrlEncode(_installer.Url));
                     }
                     break;
-                case "customInstaller":
+                case "custominstaller":
                     var customControl = Request.GetItemAsString("customControl");
 
                     if (customControl.IsNullOrWhiteSpace() == false)

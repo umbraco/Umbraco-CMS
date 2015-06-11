@@ -62,7 +62,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets or sets the Path to the File from the root of the site
+        /// Gets or sets the Path to the File from the root of the file's associated IFileSystem
         /// </summary>
         [DataMember]
         public virtual string Path
@@ -100,6 +100,11 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Gets or sets the file's virtual path (i.e. the file path relative to the root of the website)
+        /// </summary>
+        public string VirtualPath { get; set; }
+
+        /// <summary>
         /// Boolean indicating whether the file could be validated
         /// </summary>
         /// <returns>True if file is valid, otherwise false</returns>
@@ -108,12 +113,15 @@ namespace Umbraco.Core.Models
         public override object DeepClone()
         {
             var clone = (File)base.DeepClone();
-
+            //turn off change tracking
+            clone.DisableChangeTracking();
             //need to manually assign since they are readonly properties
             clone._alias = Alias;
             clone._name = Name;
-
+            //this shouldn't really be needed since we're not tracking
             clone.ResetDirtyProperties(false);
+            //re-enable tracking
+            clone.EnableChangeTracking();
 
             return clone;
         }

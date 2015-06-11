@@ -65,7 +65,7 @@
 
         if(cfg != null)
             foreach (JProperty property in cfg.Properties()) {
-                attrs.Add(property.Name + "='" + property.Value.ToString() + "'");
+                attrs.Add(property.Name + "=\"" + property.Value.ToString() + "\"");
             }
                 
         JObject style = contentItem.styles;
@@ -76,7 +76,7 @@
             cssVals.Add(property.Name + ":" + property.Value.ToString() + ";");
 
         if (cssVals.Any())
-            attrs.Add("style='" + string.Join(" ", cssVals) + "'");
+            attrs.Add("style=\"" + string.Join(" ", cssVals) + "\"");
         }
             
         return new MvcHtmlString(string.Join(" ", attrs));

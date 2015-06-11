@@ -795,7 +795,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="DownloadXmlDTD">Download XML DTD</key>
     <key alias="fields">Felter</key>
     <key alias="includeSubpages">Inkluder undersider</key>
-    <key alias="mailBody">Hej %0%. Dette er en automatisk mail sendt for at informere dig om at dokumentet '%1' har en forespørgsel omkring oversættelse til '%5%' af %2%. Gå til http://%3%/Umbraco/translation/details.aspx?id=%4% for at redigere. Eller log ind i Umbraco for at få en oversigt over dine oversættelsesopgaver: http://%3%/Umbraco Hav en god dag! Mange hilsner Umbraco-robotten</key>
+    <key alias="mailBody">Hej %0%. Dette er en automatisk mail sendt for at informere dig om at dokumentet '%1' har en forespørgsel omkring oversættelse til '%5%' af %2%. Gå til http://%3%/translation/details.aspx?id=%4% for at redigere. Eller log ind i Umbraco for at få en oversigt over dine oversættelsesopgaver: http://%3%/Umbraco Hav en god dag! Mange hilsner Umbraco-robotten</key>
     <key alias="mailSubject">[%0%] Oversættelsesopgave for %1%</key>
     <key alias="noTranslators">Ingen oversættelsesbrugere er fundet. Opret venligst en oversættelsesbruger før du begynder at sende indhold til oversættelse</key>
     <key alias="ownedTasks">Opgaver oprettet af dig</key>
@@ -863,7 +863,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="editors">Redaktør</key>
     <key alias="excerptField">Uddragsfelt</key>
     <key alias="language">Sprog</key>
-    <key alias="loginname">Login</key>
+    <key alias="loginname">Brugernavn</key>
     <key alias="mediastartnode">Startnode i mediearkivet</key>
     <key alias="modules">Moduler</key>
     <key alias="noConsole">Deaktivér adgang til Umbraco</key>
@@ -881,12 +881,11 @@ Mange hilsner fra Umbraco robotten
     <key alias="permissionSelectPages">Vælg sider for at ændre deres rettigheder</key>
     <key alias="searchAllChildren">Søg alle 'børn'</key>
     <key alias="startnode">Start node</key>
-    <key alias="username">Brugernavn</key>
+    <key alias="username">Navn</key>
     <key alias="userPermissions">Bruger tilladelser</key>
     <key alias="usertype">Brugertype</key>
     <key alias="userTypes">Bruger typer</key>
     <key alias="writer">Forfatter</key>
-
     <key alias="yourProfile">Din profil</key>
     <key alias="yourHistory">Din historik</key>
     <key alias="sessionExpires">Session udløber</key>

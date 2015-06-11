@@ -19,6 +19,8 @@ using Umbraco.Core.Dynamics;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
+    using SqlSyntax;
+
     internal abstract class VersionableRepositoryBase<TId, TEntity> : PetaPocoRepositoryBase<TId, TEntity>
         where TEntity : class, IAggregateRoot
     {
@@ -238,24 +240,60 @@ namespace Umbraco.Core.Persistence.Repositories
             return filteredSql;
         }
 
-        private Sql GetSortedSqlForPagedResults(Sql sql, Direction orderDirection, string orderBy)
+        private Sql GetSortedSqlForPagedResults(Sql sql, Direction orderDirection, string orderBy, bool orderBySystemField)
         {
             //copy to var so that the original isn't changed
             var sortedSql = new Sql(sql.SQL, sql.Arguments);
-            // Apply order according to parameters
-            if (string.IsNullOrEmpty(orderBy) == false)
+
+            if (orderBySystemField)
             {
-                var orderByParams = new[] { GetDatabaseFieldNameForOrderBy(orderBy) };
-                if (orderDirection == Direction.Ascending)
+                // Apply order according to parameters
+                if (string.IsNullOrEmpty(orderBy) == false)
                 {
-                    sortedSql.OrderBy(orderByParams);
+                    var orderByParams = new[] { GetDatabaseFieldNameForOrderBy(orderBy) };
+                    if (orderDirection == Direction.Ascending)
+                    {
+                        sortedSql.OrderBy(orderByParams);
+                    }
+                    else
+                    {
+                        sortedSql.OrderByDescending(orderByParams);
+                    }
                 }
-                else
-                {
-                    sortedSql.OrderByDescending(orderByParams);
-                }
-                return sortedSql;
             }
+            else 
+            { 
+                // Sorting by a custom field, so set-up sub-query for ORDER BY clause to pull through valie
+                // from most recent content version for the given order by field
+                var sortedInt = string.Format(SqlSyntaxContext.SqlSyntaxProvider.ConvertIntegerToOrderableString, "dataInt");
+                var sortedDate = string.Format(SqlSyntaxContext.SqlSyntaxProvider.ConvertIntegerToOrderableString, "dataDate");
+                var sortedString = string.Format(SqlSyntaxContext.SqlSyntaxProvider.IsNull, "dataNvarchar", "''");
+
+                var orderBySql = string.Format(@"ORDER BY (
+	                SELECT CASE
+		                WHEN dataInt Is Not Null THEN {0}
+		                WHEN dataDate Is Not Null THEN {1}
+		                ELSE {2}
+	                END 
+	                FROM cmsContent c
+	                INNER JOIN cmsContentVersion cv ON cv.ContentId = c.nodeId AND VersionDate = (
+		                SELECT Max(VersionDate)
+		                FROM cmsContentVersion
+		                WHERE ContentId = c.nodeId
+	                )
+	                INNER JOIN cmsPropertyType cpt ON cpt.contentTypeId = c.contentType
+	                INNER JOIN cmsPropertyData cpd ON cpd.contentNodeId = c.nodeId
+		                AND cpd.versionId = cv.VersionId
+		                AND cpd.propertytypeId = cpt.id
+	                WHERE c.nodeId = umbracoNode.Id and cpt.Alias = @0)", sortedInt, sortedDate, sortedString);
+
+                sortedSql.Append(orderBySql, orderBy);
+                if (orderDirection == Direction.Descending)
+                {
+                    sortedSql.Append(" DESC");
+                }
+            }
+
             return sortedSql;
         }
 
@@ -273,6 +311,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="processQuery">A callback to process the query result</param>
         /// <param name="orderBy">The order by column</param>
         /// <param name="orderDirection">The order direction.</param>
+        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
         /// <returns></returns>
         /// <exception cref="System.ArgumentNullException">orderBy</exception>
         protected IEnumerable<TEntity> GetPagedResultsByQuery<TDto,TContentBase>(IQuery<TEntity> query, int pageIndex, int pageSize, out int totalRecords,
@@ -280,6 +319,7 @@ namespace Umbraco.Core.Persistence.Repositories
             Func<Sql, IEnumerable<TEntity>> processQuery,
             string orderBy, 
             Direction orderDirection,
+            bool orderBySystemField,
             Func<Tuple<string, object[]>> defaultFilter = null)
             where TContentBase : class, IAggregateRoot, TEntity
         {
@@ -302,7 +342,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //get sorted and filtered sql
             var sqlNodeIdsWithSort = GetSortedSqlForPagedResults(
                 GetFilteredSqlForPagedResults(sqlNodeIds, defaultFilter),
-                orderDirection, orderBy);
+                orderDirection, orderBy, orderBySystemField);
 
             // Get page of results and total count
             IEnumerable<TEntity> result;
@@ -340,22 +380,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 //get sorted and filtered sql
                 var fullQuery = GetSortedSqlForPagedResults(
                     GetFilteredSqlForPagedResults(withInnerJoinSql, defaultFilter),                     
-                    orderDirection, orderBy);
-                
-                var content = processQuery(fullQuery)
-                    .Cast<TContentBase>()
-                    .AsQueryable();
+                    orderDirection, orderBy, orderBySystemField);
 
-                // Now we need to ensure this result is also ordered by the same order by clause
-                var orderByProperty = GetEntityPropertyNameForOrderBy(orderBy);
-                if (orderDirection == Direction.Ascending)
-                {
-                    result = content.OrderBy(orderByProperty);
-                }
-                else
-                {
-                    result = content.OrderByDescending(orderByProperty);
-                }
+                return processQuery(fullQuery);
             }
             else
             {
@@ -513,6 +540,10 @@ WHERE EXISTS(
                 case "OWNER":
                     //TODO: This isn't going to work very nicely because it's going to order by ID, not by letter
                     return "umbracoNode.nodeUser";
+
+                // Members only
+                case "USERNAME":
+                    return "cmsMember.LoginName";
                 default:
                     return orderBy;
             }

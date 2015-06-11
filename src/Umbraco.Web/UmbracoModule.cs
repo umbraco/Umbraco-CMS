@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
@@ -408,15 +409,23 @@ namespace Umbraco.Web
 			return false;
 		}
 
+	    private bool _notConfiguredReported;
+
 		// ensures Umbraco is configured
 		// if not, redirect to install and return false
 		// if yes, return true
-	    private static bool EnsureIsConfigured(HttpContextBase httpContext, Uri uri)
+	    private bool EnsureIsConfigured(HttpContextBase httpContext, Uri uri)
 	    {
 	        if (ApplicationContext.Current.IsConfigured)
 	            return true;
 
-            LogHelper.Warn<UmbracoModule>("Umbraco is not configured");
+	        if (_notConfiguredReported)
+	        {
+                // remember it's been reported so we don't flood the log
+                // no thread-safety so there may be a few log entries, doesn't matter
+                _notConfiguredReported = true;
+                LogHelper.Warn<UmbracoModule>("Umbraco is not configured");
+            }
 
 			var installPath = UriUtility.ToAbsolute(SystemDirectories.Install);
 			var installUrl = string.Format("{0}/?redir=true&url={1}", installPath, HttpUtility.UrlEncode(uri.ToString()));
@@ -529,24 +538,8 @@ namespace Umbraco.Web
             urlRouting.PostResolveRequestCache(context);
         }
 
-        /// <summary>
-        /// Checks if the xml cache file needs to be updated/persisted
-        /// </summary>
-        /// <param name="httpContext"></param>
-        /// <remarks>
-        /// TODO: This needs an overhaul, see the error report created here:
-        ///   https://docs.google.com/document/d/1neGE3q3grB4lVJfgID1keWY2v9JYqf-pw75sxUUJiyo/edit		
-        /// </remarks>
-        static void PersistXmlCache(HttpContextBase httpContext)
-        {
-            if (content.Instance.IsXmlQueuedForPersistenceToFile)
-            {
-                content.Instance.RemoveXmlFilePersistenceQueue();
-                content.Instance.PersistXmlToFile();
-            }
-        }
-
-        /// <summary>
+       
+	    /// <summary>
         /// Any object that is in the HttpContext.Items collection that is IDisposable will get disposed on the end of the request
         /// </summary>
         /// <param name="http"></param>
@@ -605,19 +598,30 @@ namespace Umbraco.Web
                     BeginRequest(new HttpContextWrapper(httpContext));
 				};
 
+            //disable asp.net headers (security)
+            // This is the correct place to modify headers according to MS: 
+            // https://our.umbraco.org/forum/umbraco-7/using-umbraco-7/65241-Heap-error-from-header-manipulation?p=0#comment220889
+		    app.PostReleaseRequestState += (sender, args) =>
+		    {
+                var httpContext = ((HttpApplication)sender).Context;
+                try
+                {
+                    httpContext.Response.Headers.Remove("Server");
+                    //this doesn't normally work since IIS sets it but we'll keep it here anyways.
+                    httpContext.Response.Headers.Remove("X-Powered-By");
+                }
+                catch (PlatformNotSupportedException ex)
+                {
+                    // can't remove headers this way on IIS6 or cassini.
+                }
+		    };
+
             app.AuthenticateRequest += AuthenticateRequest;
 
             app.PostResolveRequestCache += (sender, e) =>
 				{
 					var httpContext = ((HttpApplication)sender).Context;
 					ProcessRequest(new HttpContextWrapper(httpContext));
-				};
-
-			// used to check if the xml cache file needs to be updated/persisted
-			app.PostRequestHandlerExecute += (sender, e) =>
-				{
-					var httpContext = ((HttpApplication)sender).Context;
-					PersistXmlCache(new HttpContextWrapper(httpContext));
 				};
 
 			app.EndRequest += (sender, args) =>
@@ -634,21 +638,6 @@ namespace Umbraco.Web
 					DisposeHttpContextItems(httpContext);
 				};
 
-            //disable asp.net headers (security)
-		    app.PreSendRequestHeaders += (sender, args) =>
-		        {
-                    var httpContext = ((HttpApplication)sender).Context;
-					try
-					{
-						httpContext.Response.Headers.Remove("Server");
-						//this doesn't normally work since IIS sets it but we'll keep it here anyways.
-						httpContext.Response.Headers.Remove("X-Powered-By");
-					}
-					catch (PlatformNotSupportedException ex)
-					{
-						// can't remove headers this way on IIS6 or cassini.
-					}
-		        };
 		}
 
 		public void Dispose()

@@ -15,4 +15,4 @@ function noDirtyCheck() {
         }
     };
 }
-angular.module('umbraco.directives').directive("noDirtyCheck", noDirtyCheck);
+angular.module('umbraco.directives.validation').directive("noDirtyCheck", noDirtyCheck);

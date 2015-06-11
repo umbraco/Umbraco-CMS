@@ -23,16 +23,17 @@ using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Macros;
+using Umbraco.Core.Models;
 using Umbraco.Core.Xml.XPath;
 using Umbraco.Core.Profiling;
 using umbraco.interfaces;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Macros;
+using Umbraco.Web.Models;
 using Umbraco.Web.Templates;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.macro;
-using umbraco.cms.businesslogic.member;
 using umbraco.DataLayer;
 using umbraco.NodeFactory;
 using umbraco.presentation.templateControls;
@@ -41,6 +42,9 @@ using Content = umbraco.cms.businesslogic.Content;
 using Macro = umbraco.cms.businesslogic.macro.Macro;
 using MacroErrorEventArgs = Umbraco.Core.Events.MacroErrorEventArgs;
 using System.Linq;
+using File = System.IO.File;
+using MacroTypes = umbraco.cms.businesslogic.macro.MacroTypes;
+using Member = umbraco.cms.businesslogic.member.Member;
 
 namespace umbraco
 {
@@ -1556,13 +1560,13 @@ namespace umbraco
             if (currentNodeProperty != null && currentNodeProperty.CanWrite &&
                 currentNodeProperty.PropertyType.IsAssignableFrom(typeof(Node)))
             {
-                currentNodeProperty.SetValue(control, Node.GetCurrent(), null);
+                currentNodeProperty.SetValue(control, GetCurrentNode(), null);
             }
             currentNodeProperty = type.GetProperty("currentNode");
             if (currentNodeProperty != null && currentNodeProperty.CanWrite &&
                 currentNodeProperty.PropertyType.IsAssignableFrom(typeof(Node)))
             {
-                currentNodeProperty.SetValue(control, Node.GetCurrent(), null);
+                currentNodeProperty.SetValue(control, GetCurrentNode(), null);
             }
         }
 
@@ -1846,10 +1850,22 @@ namespace umbraco
 
         private static INode GetCurrentNode()
         {
-            var id = Node.getCurrentNodeId();
-            var content = UmbracoContext.Current.ContentCache.GetById(id);
-            //TODO: This should check for null!
-            return CompatibilityHelper.ConvertToNode(content);
+            //Get the current content request
+
+            IPublishedContent content;
+            if (UmbracoContext.Current.IsFrontEndUmbracoRequest)
+            {
+                content = UmbracoContext.Current.PublishedContentRequest != null
+                    ? UmbracoContext.Current.PublishedContentRequest.PublishedContent
+                    : null;
+            }
+            else
+            {
+                var pageId = UmbracoContext.Current.PageId;
+                content = pageId.HasValue ? UmbracoContext.Current.ContentCache.GetById(pageId.Value) : null;
+            }
+                    
+            return content == null ? null : LegacyNodeHelper.ConvertToNode(content);
         }
 
         #region Events

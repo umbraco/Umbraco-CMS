@@ -8,6 +8,30 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
 
         /**
          * @ngdoc method
+         * @name umbraco.services.umbRequestHelper#convertVirtualToAbsolutePath
+         * @methodOf umbraco.services.umbRequestHelper
+         * @function
+         *
+         * @description
+         * This will convert a virtual path (i.e. ~/App_Plugins/Blah/Test.html ) to an absolute path
+         * 
+         * @param {string} a virtual path, if this is already an absolute path it will just be returned, if this is a relative path an exception will be thrown
+         */
+        convertVirtualToAbsolutePath: function(virtualPath) {
+            if (virtualPath.startsWith("/")) {
+                return virtualPath;
+            }
+            if (!virtualPath.startsWith("~/")) {
+                throw "The path " + virtualPath + " is not a virtual path";
+            }
+            if (!Umbraco.Sys.ServerVariables.application.applicationPath) { 
+                throw "No applicationPath defined in Umbraco.ServerVariables.application.applicationPath";
+            }
+            return Umbraco.Sys.ServerVariables.application.applicationPath + virtualPath.trimStart("~/");
+        },
+
+        /**
+         * @ngdoc method
          * @name umbraco.services.umbRequestHelper#dictionaryToQueryString
          * @methodOf umbraco.services.umbRequestHelper
          * @function
@@ -221,8 +245,14 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                     //when there's a 500 (unhandled) error show a YSOD overlay if debugging is enabled.
                     if (status >= 500 && status < 600) {
 
-                        //show a ysod dialog
-                        if (Umbraco.Sys.ServerVariables["isDebuggingEnabled"] === true) {
+                        //This is a bit of a hack to check if the error is due to a file being uploaded that is too large,
+                        // we have to just check for the existence of a string value but currently that is the best way to
+                        // do this since it's very hacky/difficult to catch this on the server
+                        if (data.indexOf("Maximum request length exceeded") >= 0) {
+                            notificationsService.error("Server error", "The uploaded file was too large, check with your site administrator to adjust the maximum size allowed");
+                        }                        
+                        else if (Umbraco.Sys.ServerVariables["isDebuggingEnabled"] === true) {
+                            //show a ysod dialog
                             dialogService.ysodDialog({
                                 errorMsg: 'An error occurred',
                                 data: data

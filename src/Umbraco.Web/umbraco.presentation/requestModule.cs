@@ -317,10 +317,10 @@ namespace umbraco.presentation
 
 		void context_PostRequestHandlerExecute(object sender, EventArgs e)
 		{
-			if (content.Instance.IsXmlQueuedForPersistenceToFile)
-			{
-				content.Instance.PersistXmlToFile();
-			}
+            //if (content.Instance.IsXmlQueuedForPersistenceToFile)
+            //{
+            //    content.Instance.PersistXmlToFile();
+            //}
 		}
 
 

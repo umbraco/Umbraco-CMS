@@ -131,20 +131,7 @@ namespace Umbraco.Core
 
             return true;
         }
-
-        // that method is broken (will return duplicates) and useless (GetInterfaces already does the job)
-        //public static IEnumerable<Type> AllInterfaces(this Type target)
-        //{
-        //    foreach (var IF in target.GetInterfaces())
-        //    {
-        //        yield return IF;
-        //        foreach (var childIF in IF.AllInterfaces())
-        //        {
-        //            yield return childIF;
-        //        }
-        //    }
-        //}
-
+        
         public static IEnumerable<Type> GetBaseTypes(this Type type, bool andSelf)
         {
             if (andSelf)
@@ -212,7 +199,7 @@ namespace Umbraco.Core
 			{
 				throw new ArgumentNullException("genericType");
 			}
-			if (!genericType.IsGenericType)
+			if (genericType.IsGenericType == false)
 			{
 				throw new ArgumentException("genericType must be a generic type");
 			}
@@ -257,7 +244,6 @@ namespace Umbraco.Core
 				}
 
 			}
-
 
 			return false;
 
@@ -307,6 +293,53 @@ namespace Umbraco.Core
 
             return type.GetProperties(BindingFlags.FlattenHierarchy
                 | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+        }
+
+        /// <summary>
+        /// Returns all public properties including inherited properties even for interfaces
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// taken from http://stackoverflow.com/questions/358835/getproperties-to-return-all-properties-for-an-interface-inheritance-hierarchy
+        /// </remarks>
+        public static PropertyInfo[] GetPublicProperties(this Type type)
+        {
+            if (type.IsInterface)
+            {
+                var propertyInfos = new List<PropertyInfo>();
+
+                var considered = new List<Type>();
+                var queue = new Queue<Type>();
+                considered.Add(type);
+                queue.Enqueue(type);
+                while (queue.Count > 0)
+                {
+                    var subType = queue.Dequeue();
+                    foreach (var subInterface in subType.GetInterfaces())
+                    {
+                        if (considered.Contains(subInterface)) continue;
+
+                        considered.Add(subInterface);
+                        queue.Enqueue(subInterface);
+                    }
+
+                    var typeProperties = subType.GetProperties(
+                        BindingFlags.FlattenHierarchy
+                        | BindingFlags.Public
+                        | BindingFlags.Instance);
+
+                    var newPropertyInfos = typeProperties
+                        .Where(x => !propertyInfos.Contains(x));
+
+                    propertyInfos.InsertRange(0, newPropertyInfos);
+                }
+
+                return propertyInfos.ToArray();
+            }
+
+            return type.GetProperties(BindingFlags.FlattenHierarchy
+                | BindingFlags.Public | BindingFlags.Instance);
         }
 
         /// <summary>
@@ -386,7 +419,13 @@ namespace Umbraco.Core
 		/// </example>
 		public static string GetFullNameWithAssembly(this Type type)
 		{
-			return string.Concat(type.FullName, ", ", type.Assembly.GetName().Name);
+		    var assemblyName = type.Assembly.GetName();
+
+			return string.Concat(type.FullName, ", ",
+                assemblyName.FullName.StartsWith("App_Code.") ? "App_Code" : assemblyName.Name);
 		}
-	}
+
+
+
+    }
 }

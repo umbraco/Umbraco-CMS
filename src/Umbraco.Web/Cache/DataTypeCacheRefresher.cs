@@ -120,11 +120,13 @@ namespace Umbraco.Web.Cache
             // db data type to store the value against and anytime a datatype changes, this also might change
             // we basically need to clear all sorts of runtime caches here because so many things depend upon a data type
             RuntimeCacheProvider.Current.Clear(typeof(IContent));
-            RuntimeCacheProvider.Current.Clear(typeof (IContentType));
+            RuntimeCacheProvider.Current.Clear(typeof(IContentType));
             RuntimeCacheProvider.Current.Clear(typeof(IMedia));
             RuntimeCacheProvider.Current.Clear(typeof(IMediaType));
             RuntimeCacheProvider.Current.Clear(typeof(IMember));
             RuntimeCacheProvider.Current.Clear(typeof(IMemberType));
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
 
             payloads.ForEach(payload =>
             {

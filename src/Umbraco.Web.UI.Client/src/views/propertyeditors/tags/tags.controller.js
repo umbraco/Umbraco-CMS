@@ -7,33 +7,43 @@ angular.module("umbraco")
         $scope.isLoading = true;
         $scope.tagToAdd = "";
 
-        assetsService.loadJs("lib/typeahead/typeahead.bundle.min.js").then(function () {
+        assetsService.loadJs("lib/typeahead-js/typeahead.bundle.min.js").then(function () {
 
             $scope.isLoading = false;
 
             //load current value
-            $scope.currentTags = [];
+
             if ($scope.model.value) {
-                if ($scope.model.config.storageType && $scope.model.config.storageType === "Json") {
-                    //it's a json array already
-                    $scope.currentTags = $scope.model.value;
-                }
-                else {
+                if (!$scope.model.config.storageType || $scope.model.config.storageType !== "Json") {
                     //it is csv
                     if (!$scope.model.value) {
-                        $scope.currentTags = [];
+                        $scope.model.value = [];
                     }
                     else {
-                        $scope.currentTags = $scope.model.value.split(",");
+                        $scope.model.value = $scope.model.value.split(",");
                     }
                 }
+            }
+            else {
+                $scope.model.value = [];
+            }
+
+            // Method required by the valPropertyValidator directive (returns true if the property editor has at least one tag selected)
+            $scope.validateMandatory = function () {
+                return {
+                    isValid: !$scope.model.validation.mandatory || ($scope.model.value != null && $scope.model.value.length > 0),
+                    errorMsg: "Value cannot be empty",
+                    errorKey: "required"
+                };
             }
 
             //Helper method to add a tag on enter or on typeahead select
             function addTag(tagToAdd) {
-                if (tagToAdd.length > 0) {
-                    if ($scope.currentTags.indexOf(tagToAdd) < 0) {                       
-                        $scope.currentTags.push(tagToAdd);
+                if (tagToAdd != null && tagToAdd.length > 0) {
+                    if ($scope.model.value.indexOf(tagToAdd) < 0) {
+                        $scope.model.value.push(tagToAdd);
+                        //this is required to re-validate
+                        $scope.propertyForm.tagCount.$setViewValue($scope.model.value.length);
                     }
                 }
             }
@@ -44,7 +54,6 @@ angular.module("umbraco")
                     if ($element.find('.tags-' + $scope.model.alias).parent().find(".tt-dropdown-menu .tt-cursor").length === 0) {
                         //this is required, otherwise the html form will attempt to submit.
                         e.preventDefault();
-                        
                         $scope.addTag();
                     }
                 }
@@ -63,33 +72,26 @@ angular.module("umbraco")
 
 
             $scope.removeTag = function (tag) {
-                var i = $scope.currentTags.indexOf(tag);
+                var i = $scope.model.value.indexOf(tag);
                 if (i >= 0) {
-                    $scope.currentTags.splice(i, 1);
+                    $scope.model.value.splice(i, 1);
+                    //this is required to re-validate
+                    $scope.propertyForm.tagCount.$setViewValue($scope.model.value.length);
                 }
             };
-
-            //sync model on submit, always push up a json array
-            $scope.$on("formSubmitting", function (ev, args) {
-                $scope.model.value = $scope.currentTags;
-            });
 
             //vice versa
             $scope.model.onValueChanged = function (newVal, oldVal) {
                 //update the display val again if it has changed from the server
                 $scope.model.value = newVal;
 
-                if ($scope.model.config.storageType && $scope.model.config.storageType === "Json") {
-                    //it's a json array already
-                    $scope.currentTags = $scope.model.value;
-                }
-                else {
+                if (!$scope.model.config.storageType || $scope.model.config.storageType !== "Json") {
                     //it is csv
                     if (!$scope.model.value) {
-                        $scope.currentTags = [];
+                        $scope.model.value = [];
                     }
                     else {
-                        $scope.currentTags = $scope.model.value.split(",");
+                        $scope.model.value = $scope.model.value.split(",");
                     }
                 }
             };
@@ -104,14 +106,14 @@ angular.module("umbraco")
                 });
                 // remove current tags from the list
                 return $.grep(tagList, function (tag) {
-                    return ($.inArray(tag.value, $scope.currentTags) === -1);
+                    return ($.inArray(tag.value, $scope.model.value) === -1);
                 });
             }
 
             // helper method to remove current tags
             function removeCurrentTagsFromSuggestions(suggestions) {
                 return $.grep(suggestions, function (suggestion) {
-                    return ($.inArray(suggestion.value, $scope.currentTags) === -1);
+                    return ($.inArray(suggestion.value, $scope.model.value) === -1);
                 });
             }
 
@@ -152,7 +154,6 @@ angular.module("umbraco")
                     // name = the data set name, we'll make this the tag group name
                     name: $scope.model.config.group,
                     displayKey: "value",
-                    //source: tagsHound.ttAdapter(),
                     source: function (query, cb) {
                         tagsHound.get(query, function (suggestions) {
                             cb(removeCurrentTagsFromSuggestions(suggestions));

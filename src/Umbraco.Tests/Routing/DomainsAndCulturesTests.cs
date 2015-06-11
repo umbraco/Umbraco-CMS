@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
+using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Web;
 using Umbraco.Web.Routing;
 using umbraco.cms.businesslogic.web;
-using umbraco.cms.businesslogic.language;
+using Language = umbraco.cms.businesslogic.language.Language;
 
 namespace Umbraco.Tests.Routing
 {
@@ -14,6 +16,13 @@ namespace Umbraco.Tests.Routing
     [TestFixture]
     class DomainsAndCulturesTests : BaseRoutingTest
     {
+        protected override void FreezeResolution()
+        {
+            SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(new SiteDomainHelper());
+
+            base.FreezeResolution();
+        }
+
         public override void Initialize()
         {
             base.Initialize();
@@ -234,6 +243,33 @@ namespace Umbraco.Tests.Routing
             Assert.IsTrue(result);
             Assert.AreEqual(expectedCulture, pcr.Culture.Name);
             Assert.AreEqual(pcr.PublishedContent.Id, expectedNode);
+        }
+
+        #region Cases
+        [TestCase(10011, "http://domain1.com/", "en-US")]
+        [TestCase(100111, "http://domain1.com/", "en-US")]
+        [TestCase(10011, "http://domain1.fr/", "fr-FR")]
+        [TestCase(100111, "http://domain1.fr/", "fr-FR")]
+        [TestCase(1001121, "http://domain1.fr/", "de-DE")]
+        #endregion
+        public void GetCulture(int nodeId, string currentUrl, string expectedCulture)
+        {
+            var langEn = Language.GetByCultureCode("en-US");
+            var langFr = Language.GetByCultureCode("fr-FR");
+            var langDe = Language.GetByCultureCode("de-DE");
+
+            Domain.MakeNew("domain1.com/", 1001, langEn.id);
+            Domain.MakeNew("domain1.fr/", 1001, langFr.id);
+            Domain.MakeNew("*100112", 100112, langDe.id);
+
+            var routingContext = GetRoutingContext("http://anything/");
+            var umbracoContext = routingContext.UmbracoContext;
+
+            var content = umbracoContext.ContentCache.GetById(nodeId);
+            Assert.IsNotNull(content);
+
+            var culture = Web.Models.ContentExtensions.GetCulture(umbracoContext, null, null, content.Id, content.Path, new Uri(currentUrl));
+            Assert.AreEqual(expectedCulture, culture.Name);
         }
     }
 }

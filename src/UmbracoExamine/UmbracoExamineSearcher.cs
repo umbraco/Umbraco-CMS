@@ -69,11 +69,6 @@ namespace UmbracoExamine
                 return;
             }
 
-            //Before we initialize the base provider which is going to setup all of the directory structures based on the index
-            // set, we want to dynamically override the index working folder based on a given token. Currently we only support one
-            // and that is {machinename}
-            ExamineHelper.ReplaceTokensInIndexPath(name, config, "Searcher", () => LuceneIndexFolder != null);
-
             base.Initialize(name, config);
 
             if (config != null && config["useTempStorage"] != null)
@@ -170,9 +165,10 @@ namespace UmbracoExamine
 
         protected override IndexReader OpenNewReader()
         {
+            var directory = GetLuceneDirectory();
             return IndexReader.Open(
-                GetLuceneDirectory(), 
-                DeletePolicyTracker.Current.GetPolicy(IndexSetName), 
+                directory, 
+                DeletePolicyTracker.Current.GetPolicy(directory), 
                 true);
         }
 

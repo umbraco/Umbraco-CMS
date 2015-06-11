@@ -1,6 +1,6 @@
 ﻿using System.Linq;
-using System.Web.Http;
 using System.Web.Http.Controllers;
+using System.Web.Http.Filters;
 using Umbraco.Core;
 
 namespace Umbraco.Web.WebApi.Filters
@@ -11,7 +11,7 @@ namespace Umbraco.Web.WebApi.Filters
     /// <remarks>
     /// This would allow a tree to be moved between sections
     /// </remarks>
-    public sealed class UmbracoTreeAuthorizeAttribute : AuthorizeAttribute
+    public sealed class UmbracoTreeAuthorizeAttribute : OverridableAuthorizationAttribute
     {
         /// <summary>
         /// Can be used by unit tests to enable/disable this filter

@@ -40,10 +40,8 @@ namespace Umbraco.Web.Editors
                 response = client.DownloadString(new Uri(googleWebFontAPIURL));
             }
 
-            var resp = new HttpResponseMessage()
-            {
-                Content = new StringContent(response)
-            };
+            var resp = Request.CreateResponse();
+            resp.Content = new StringContent(response);
             resp.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
             return resp;
 
@@ -69,10 +67,8 @@ namespace Umbraco.Web.Editors
             }
 
             // Response
-            var resp = new HttpResponseMessage()
-            {
-                Content = new StringContent("{" + String.Join(",", parameters) + "}")
-            };
+            var resp = Request.CreateResponse();
+            resp.Content = new StringContent("{" + String.Join(",", parameters) + "}");
             resp.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
             return resp;
         }
@@ -89,10 +85,8 @@ namespace Umbraco.Web.Editors
             // Save and compile styles
             CanvasDesignerUtility.SaveAndPublishStyle(parameters, pageId, inherited);
 
-            var resp = new HttpResponseMessage()
-            {
-                Content = new StringContent("ok")
-            };
+            var resp = Request.CreateResponse();
+            resp.Content = new StringContent("ok");
             resp.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
             return resp;
 
@@ -106,10 +100,8 @@ namespace Umbraco.Web.Editors
 
             CanvasDesignerUtility.DeleteStyle(int.Parse(pageId));
 
-            var resp = new HttpResponseMessage()
-            {
-                Content = new StringContent("ok")
-            };
+            var resp = Request.CreateResponse();
+            resp.Content = new StringContent("ok");
             resp.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
             return resp;
 

@@ -242,7 +242,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var processed = 0;
             do
             {
-                var descendants = GetPagedResultsByQuery(query, pageIndex, pageSize, out total, "Path", Direction.Ascending);
+                var descendants = GetPagedResultsByQuery(query, pageIndex, pageSize, out total, "Path", Direction.Ascending, true);
 
                 var xmlItems = (from descendant in descendants
                                 let xml = serializer(descendant)
@@ -259,18 +259,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public void AddOrUpdateContentXml(IMedia content, Func<IMedia, XElement> xml)
         {
-            var contentExists = Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId = @Id", new { Id = content.Id }) != 0;
-
-            _contentXmlRepository.AddOrUpdate(new ContentXmlEntity<IMedia>(contentExists, content, xml));
+            _contentXmlRepository.AddOrUpdate(new ContentXmlEntity<IMedia>(content, xml));
         }
 
         public void AddOrUpdatePreviewXml(IMedia content, Func<IMedia, XElement> xml)
         {
-            var previewExists =
-                    Database.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId = @Id AND versionId = @Version",
-                                                    new { Id = content.Id, Version = content.Version }) != 0;
-
-            _contentPreviewRepository.AddOrUpdate(new ContentPreviewEntity<IMedia>(previewExists, content, xml));
+            _contentPreviewRepository.AddOrUpdate(new ContentPreviewEntity<IMedia>(content, xml));
         }
 
         protected override void PerformDeleteVersion(int id, Guid versionId)
@@ -457,10 +451,11 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="totalRecords">Total records query would return without paging</param>
         /// <param name="orderBy">Field to order by</param>
         /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
         /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         public IEnumerable<IMedia> GetPagedResultsByQuery(IQuery<IMedia> query, int pageIndex, int pageSize, out int totalRecords,
-            string orderBy, Direction orderDirection, string filter = "")
+            string orderBy, Direction orderDirection, bool orderBySystemField, string filter = "")
         {
             var args = new List<object>();
             var sbWhere = new StringBuilder();
@@ -474,7 +469,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return GetPagedResultsByQuery<ContentVersionDto, Models.Media>(query, pageIndex, pageSize, out totalRecords,
                 new Tuple<string, string>("cmsContentVersion", "contentId"),
-                ProcessQuery, orderBy, orderDirection,
+                ProcessQuery, orderBy, orderDirection, orderBySystemField,
                 filterCallback);
 
         }

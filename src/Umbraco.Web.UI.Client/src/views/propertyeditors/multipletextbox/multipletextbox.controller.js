@@ -1,5 +1,13 @@
 ﻿function MultipleTextBoxController($scope) {
 
+    $scope.sortableOptions = {
+        axis: 'y',
+        containment: 'parent',
+        cursor: 'move',
+        items: '> div.control-group',
+        tolerance: 'pointer'
+    };
+
     if (!$scope.model.value) {
         $scope.model.value = [];
     }

@@ -112,5 +112,17 @@ namespace Umbraco.Tests.PropertyEditors
             var urlString = mediaPath.GetCropUrl(width: 100, height: 270, imageCropMode: ImageCropMode.Crop, imageCropAnchor: ImageCropAnchor.Center);
             Assert.AreEqual(mediaPath + "?mode=crop&anchor=center&width=100&height=270", urlString);
         }
+
+        /// <summary>
+        /// Test for preferFocalPoint when focal point is centered
+        /// </summary>
+        [Test]
+        public void GetCropUrl_PreferFocalPointCenter()
+        {
+            var cropperJson = "{\"focalPoint\": {\"left\": 0.5,\"top\": 0.5},\"src\": \"/media/1005/img_0671.jpg\",\"crops\": [{\"alias\":\"thumb\",\"width\": 100,\"height\": 100,\"coordinates\": {\"x1\": 0.58729977382575338,\"y1\": 0.055768992440203169,\"x2\": 0,\"y2\": 0.32457553600198386}}]}";
+
+            var urlString = mediaPath.GetCropUrl(imageCropperValue: cropperJson, width: 300, height: 150, preferFocalPoint:true);
+            Assert.AreEqual(mediaPath + "?anchor=center&mode=crop&width=300&height=150", urlString);
+        }
     }
 }
