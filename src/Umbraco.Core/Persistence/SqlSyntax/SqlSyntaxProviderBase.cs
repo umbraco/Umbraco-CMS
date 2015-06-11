@@ -501,5 +501,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         public virtual string CreateConstraint { get { return "ALTER TABLE {0} ADD CONSTRAINT {1} {2} ({3})"; } }
         public virtual string DeleteConstraint { get { return "ALTER TABLE {0} DROP CONSTRAINT {1}"; } }
         public virtual string CreateForeignKeyConstraint { get { return "ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4}){5}{6}"; } }
+
+        public virtual string IsNull { get { return "ISNULL({0},{1})"; } }
+        public virtual string ConvertIntegerToOrderableString { get { return "RIGHT('00000000' + CAST({0} AS varchar(8)),8)"; } }
+        public virtual string ConvertDateToOrderableString { get { return "CONVERT(varchar, {0}, 102)"; } }
     }
 }
