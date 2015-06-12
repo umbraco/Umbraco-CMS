@@ -432,7 +432,7 @@
     <key alias="databaseNotFound"><![CDATA[<p>Database not found! Please check that the information in the "connection string" of the "web.config" file is correct.</p>
               <p>To proceed, please edit the "web.config" file (using Visual Studio or your favourite text editor), scroll to the bottom, add the connection string for your database in the key named "UmbracoDbDSN" and save the file. </p>
               <p>
-              Click the <strong>retry</strong> button when 
+              Click the <strong>retry</strong> button when
               done.<br /><a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
 			              More information on editing web.config here.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[To complete this step, you must know some information regarding your database server ("connection string").<br />
@@ -443,9 +443,9 @@
       Press the <strong>upgrade</strong> button to upgrade your database to Umbraco %0%</p>
       <p>
       Don't worry - no content will be deleted and everything will continue working afterwards!
-      </p>    
+      </p>
       ]]></key>
-    <key alias="databaseUpgradeDone"><![CDATA[Your database has been upgraded to the final version %0%.<br />Press <strong>Next</strong> to 
+    <key alias="databaseUpgradeDone"><![CDATA[Your database has been upgraded to the final version %0%.<br />Press <strong>Next</strong> to
       proceed. ]]></key>
     <key alias="databaseUpToDate"><![CDATA[Your current database is up-to-date!. Click <strong>next</strong> to continue the configuration wizard]]></key>
     <key alias="defaultUserChangePass"><![CDATA[<strong>The Default users' password needs to be changed!</strong>]]></key>
@@ -454,7 +454,7 @@
     <key alias="defaultUserPasswordChanged">The password is changed!</key>
     <key alias="defaultUserText"><![CDATA[
         <p>
-          Umbraco creates a default user with a login <strong>('admin')</strong> and password <strong>('default')</strong>. It's <strong>important</strong> that the password is 
+          Umbraco creates a default user with a login <strong>('admin')</strong> and password <strong>('default')</strong>. It's <strong>important</strong> that the password is
           changed to something unique.
         </p>
         <p>
@@ -489,7 +489,7 @@
     ]]></key>
     <key alias="runwayFromScratch">I want to start from scratch</key>
     <key alias="runwayFromScratchText"><![CDATA[
-        Your website is completely empty at the moment, so that's perfect if you want to start from scratch and create your own document types and templates. 
+        Your website is completely empty at the moment, so that's perfect if you want to start from scratch and create your own document types and templates.
         (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
         You can still choose to install Runway later on. Please go to the Developer section and choose Packages.
       ]]></key>
@@ -503,8 +503,8 @@
     <key alias="runwaySimpleSite">I want to start with a simple website</key>
     <key alias="runwaySimpleSiteText"><![CDATA[
       <p>
-      "Runway" is a simple website providing some basic document types and templates. The installer can set up Runway for you automatically, 
-        but you can easily edit, extend or remove it. It's not necessary and you can perfectly use Umbraco without it. However, 
+      "Runway" is a simple website providing some basic document types and templates. The installer can set up Runway for you automatically,
+        but you can easily edit, extend or remove it. It's not necessary and you can perfectly use Umbraco without it. However,
         Runway offers an easy foundation based on best practices to get you started faster than ever.
         If you choose to install Runway, you can optionally select basic building blocks called Runway Modules to enhance your Runway pages.
         </p>
@@ -525,9 +525,9 @@ You installed Runway, so why not see how your new website looks.]]></key>
     <key alias="theEndFurtherHelp"><![CDATA[<h3>Further help and information</h3>
 Get help from our award winning community, browse the documentation or watch some free videos on how to build a simple site, how to use packages and a quick guide to the Umbraco terminology]]></key>
     <key alias="theEndHeader">Umbraco %0% is installed and ready for use</key>
-    <key alias="theEndInstallFailed"><![CDATA[To finish the installation, you'll need to 
+    <key alias="theEndInstallFailed"><![CDATA[To finish the installation, you'll need to
         manually edit the <strong>/web.config file</strong> and update the AppSetting key <strong>UmbracoConfigurationStatus</strong> in the bottom to the value of <strong>'%0%'</strong>.]]></key>
-    <key alias="theEndInstallSuccess"><![CDATA[You can get <strong>started instantly</strong> by clicking the "Launch Umbraco" button below. <br />If you are <strong>new to Umbraco</strong>, 
+    <key alias="theEndInstallSuccess"><![CDATA[You can get <strong>started instantly</strong> by clicking the "Launch Umbraco" button below. <br />If you are <strong>new to Umbraco</strong>,
 you can find plenty of resources on our getting started pages.]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Launch Umbraco</h3>
 To manage your website, simply open the Umbraco back office and start adding content, updating the templates and stylesheets or add new functionality]]></key>
@@ -595,13 +595,13 @@ To manage your website, simply open the Umbraco back office and start adding con
     ]]></key>
     <key alias="mailBodyHtml"><![CDATA[<p>Hi %0%</p>
 
-		  <p>This is an automated mail to inform you that the task <strong>'%1%'</strong> 
+		  <p>This is an automated mail to inform you that the task <strong>'%1%'</strong>
 		  has been performed on the page <a href="http://%4%/#/content/content/edit/%5%"><strong>'%2%'</strong></a>
 		  by the user <strong>'%3%'</strong>
 	  </p>
 		  <div style="margin: 8px 0; padding: 8px; display: block;">
 				<br />
-				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
 				<br />
 		  </div>
 		  <p>
@@ -613,7 +613,7 @@ To manage your website, simply open the Umbraco back office and start adding con
 
 		  <div style="margin: 8px 0; padding: 8px; display: block;">
 				<br />
-				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
 				<br />
 		  </div>
 
@@ -850,19 +850,19 @@ To manage your website, simply open the Umbraco back office and start adding con
 
   <area alias="grid">
     <key alias="insertControl">Insert control</key>
-    <key alias="addRows">Choose a layout for the page</key>
+    <key alias="addRows">Choose a layout for this section</key>
     <key alias="addElement"><![CDATA[To start, click the <i class="icon icon-add blue"></i> below and add your first element]]></key>
 
     <key alias="clickToEmbed">Click to embed</key>
     <key alias="clickToInsertImage">Click to insert image</key>
     <key alias="placeholderImageCaption">Image caption...</key>
     <key alias="placeholderWriteHere">Write here...</key>
-    
+
     <key alias="gridLayouts">Grid layouts</key>
     <key alias="gridLayoutsDetail">Layouts are the overall work area for the grid editor, usually you only need one or two different layouts</key>
     <key alias="addGridLayout">Add grid layout</key>
     <key alias="addGridLayoutDetail">Adjust the layout by setting column widths and adding additional sections</key>
-    
+
     <key alias="rowConfigurations">Row configurations</key>
     <key alias="rowConfigurationsDetail">Rows are predefined cells arranged horizontally</key>
     <key alias="addRowConfiguration">Add row configuration</key>
@@ -870,7 +870,7 @@ To manage your website, simply open the Umbraco back office and start adding con
 
     <key alias="columns">Columns</key>
     <key alias="columnsDetails">Total combined number of columns in the grid layout</key>
-    
+
     <key alias="settings">Settings</key>
     <key alias="settingsDetails">Configure what settings editors can change</key>
 
@@ -916,7 +916,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="translation">
     <key alias="assignedTasks">Tasks assigned to you</key>
-    <key alias="assignedTasksHelp"><![CDATA[ The list below shows translation tasks <strong>assigned to you</strong>. To see a detailed view including comments, click on "Details" or just the page name. 
+    <key alias="assignedTasksHelp"><![CDATA[ The list below shows translation tasks <strong>assigned to you</strong>. To see a detailed view including comments, click on "Details" or just the page name.
      You can also download the page as XML directly by clicking the "Download Xml" link. <br/>
      To close a translation task, please go to the Details view and click the "Close" button.
     ]]></key>
@@ -945,8 +945,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="mailSubject">[%0%] Translation task for %1%</key>
     <key alias="noTranslators">No translator users found. Please create a translator user before you start sending content to translation</key>
     <key alias="ownedTasks">Tasks created by you</key>
-    <key alias="ownedTasksHelp"><![CDATA[ The list below shows pages <strong>created by you</strong>. To see a detailed view including comments, 
-     click on "Details" or just the page name. You can also download the page as XML directly by clicking the "Download Xml" link. 
+    <key alias="ownedTasksHelp"><![CDATA[ The list below shows pages <strong>created by you</strong>. To see a detailed view including comments,
+     click on "Details" or just the page name. You can also download the page as XML directly by clicking the "Download Xml" link.
      To close a translation task, please go to the Details view and click the "Close" button.
     ]]></key>
     <key alias="pageHasBeenSendToTranslation">The page '%0%' has been send to translation</key>
