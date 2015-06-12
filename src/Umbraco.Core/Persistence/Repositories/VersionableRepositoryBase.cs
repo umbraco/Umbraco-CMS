@@ -266,7 +266,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 // Sorting by a custom field, so set-up sub-query for ORDER BY clause to pull through valie
                 // from most recent content version for the given order by field
                 var sortedInt = string.Format(SqlSyntaxContext.SqlSyntaxProvider.ConvertIntegerToOrderableString, "dataInt");
-                var sortedDate = string.Format(SqlSyntaxContext.SqlSyntaxProvider.ConvertIntegerToOrderableString, "dataDate");
+                var sortedDate = string.Format(SqlSyntaxContext.SqlSyntaxProvider.ConvertDateToOrderableString, "dataDate");
                 var sortedString = string.Format(SqlSyntaxContext.SqlSyntaxProvider.IsNull, "dataNvarchar", "''");
 
                 var orderBySql = string.Format(@"ORDER BY (
