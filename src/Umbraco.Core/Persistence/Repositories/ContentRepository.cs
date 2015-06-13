@@ -337,8 +337,8 @@ namespace Umbraco.Core.Persistence.Repositories
             var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
             int level = parent.Level + 1;
             int sortOrder =
-                Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode WHERE parentID = @ParentId AND nodeObjectType = @NodeObjectType",
-                                                      new { ParentId = entity.ParentId, NodeObjectType = NodeObjectTypeId });
+                Database.ExecuteScalar<int>("SELECT ISNULL( MAX(sortOrder) + 1 , 0) FROM umbracoNode WHERE parentID = @ParentId",
+                                                      new { ParentId = entity.ParentId });
 
             //Create the (base) node data - umbracoNode
             var nodeDto = dto.ContentVersionDto.ContentDto.NodeDto;
