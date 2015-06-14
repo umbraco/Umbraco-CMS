@@ -296,7 +296,8 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 pageNumber: 0,
                 filter: '',
                 orderDirection: "Ascending",
-                orderBy: "SortOrder"
+                orderBy: "SortOrder",
+                orderBySystemField: true
             };
             if (options === undefined) {
                 options = {};
@@ -324,6 +325,7 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                            { pageSize: options.pageSize },
                            { orderBy: options.orderBy },
                            { orderDirection: options.orderDirection },
+                           { orderBySystemField: options.orderBySystemField },
                            { filter: options.filter }
                        ])),
                'Failed to retrieve children for media item ' + parentId);
