@@ -281,10 +281,9 @@ namespace Umbraco.Core.Persistence.Repositories
 		                FROM cmsContentVersion
 		                WHERE ContentId = c.nodeId
 	                )
-	                INNER JOIN cmsPropertyType cpt ON cpt.contentTypeId = c.contentType
 	                INNER JOIN cmsPropertyData cpd ON cpd.contentNodeId = c.nodeId
 		                AND cpd.versionId = cv.VersionId
-		                AND cpd.propertytypeId = cpt.id
+	                INNER JOIN cmsPropertyType cpt ON cpt.Id = cpd.propertytypeId
 	                WHERE c.nodeId = umbracoNode.Id and cpt.Alias = @0)", sortedInt, sortedDate, sortedString);
 
                 sortedSql.Append(orderBySql, orderBy);
