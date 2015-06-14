@@ -86,6 +86,9 @@ namespace Umbraco.Web.Routing
                 Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = _pcr.Culture;
 		    }
 
+            // handle wildcard domains
+            HandleWildcardDomains();
+
 			// trigger the Prepared event - at that point it is still possible to change about anything
             // even though the request might be flagged for redirection - we'll redirect _after_ the event
             //
@@ -357,9 +360,6 @@ namespace Umbraco.Web.Routing
 
 			// handle umbracoRedirect
 			FollowExternalRedirect();
-
-			// handle wildcard domains
-			HandleWildcardDomains();
 		}
 
 	    /// <summary>
