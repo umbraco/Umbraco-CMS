@@ -20,7 +20,6 @@ LazyLoad.js(
         'lib/jquery-file-upload/jquery.fileupload-angular.js',
         
         'lib/bootstrap/js/bootstrap.2.3.2.min.js',
-        'lib/tabdrop/bootstrap-tabdrop.js',
         'lib/underscore/underscore-min.js',
         'lib/umbraco/Extensions.js',
         'lib/umbraco/NamespaceManager.js',
