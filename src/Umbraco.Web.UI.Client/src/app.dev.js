@@ -12,7 +12,7 @@ var app = angular.module('umbraco', [
     'tmh.dynamicLocale'
 ]);
 
-/* For Angular 1.2: we need to load in Route, animate and touch seperately
+/* For Angular 1.2: we need to load in Route, animate and touch separately
 	    'ngRoute',
 	    'ngAnimate',
 	    'ngTouch'

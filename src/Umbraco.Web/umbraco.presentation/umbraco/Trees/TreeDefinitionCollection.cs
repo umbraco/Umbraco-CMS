@@ -70,7 +70,7 @@ namespace umbraco.cms.presentation.Trees
             var foundTree = this.Find(
                delegate(TreeDefinition t)
                {
-                   // zb-00002 #29929 : use IsAssignableFrom instead of Equal, otherwise you can't override build-in
+                   // zb-00002 #29929 : use IsAssignableFrom instead of Equal, otherwise you can't override built-in
                    // trees because for ex. PermissionEditor.aspx.cs OnInit calls FindTree<loadContent>()
                    return typeof(T).IsAssignableFrom(t.TreeType);
                }

@@ -1220,7 +1220,7 @@ namespace Umbraco.Core
         // other helpers may not. DefaultShortStringHelper produces better, but non-compatible, results.
 
         /// <summary>
-        /// Splits a Pascal cased string into a phrase seperated by spaces.
+        /// Splits a Pascal cased string into a phrase separated by spaces.
         /// </summary>
         /// <param name="phrase">The text to split.</param>
         /// <returns>The splitted text.</returns>
