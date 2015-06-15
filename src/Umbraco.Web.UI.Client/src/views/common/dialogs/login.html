@@ -1,6 +1,5 @@
 ﻿<form name="loginForm" ng-submit="loginSubmit(login, password)" ng-controller="Umbraco.Dialogs.LoginController">
-    <div id="login" class="umb-modalcolumn" ng-class="{'show-validation': loginForm.$invalid}">
-
+    <div id="login" class="umb-modalcolumn" ng-class="{'show-validation': loginForm.$invalid}" ng-cloak>
         <div class="form">
             <h1>{{greeting}}</h1>
             <p>
@@ -13,11 +12,11 @@
             </div>
 
             <div class="control-group" ng-class="{error: loginForm.password.$invalid}">
-                <input type="password" ng-model="password" name="password" class="input-xlarge" localize="placeholder" placeholder="@placeholders_password"  />
+                <input type="password" ng-model="password" name="password" class="input-xlarge" localize="placeholder" placeholder="@placeholders_password" />
             </div>
 
             <button type="submit" class="btn" val-trigger-change="#login .form input"><localize key="general_login">Login</localize></button>
-            
+
             <div class="control-group" ng-show="loginForm.$invalid">
                 <div class="alert alert-error">{{errorMsg}}</div>
             </div>
