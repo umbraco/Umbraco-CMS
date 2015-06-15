@@ -753,33 +753,24 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
 }
-
 
 .dialog-grid-element:hover {
   background: #2e8aea;
-}
-
-.dialog-grid-element a {
-  color: #222;
+  color: white;
   text-decoration: none;
 }
 
-.dialog-grid-element i {
+.dialog-grid-element:hover .icon {
+  color: white;
+}
+
+.dialog-grid-element .icon {
   font-size: 30px;
   color: #999;
   display: block;
   margin-bottom: 10px;
-}
-
-
-.dialog-grid-element a:hover {
-  background: #2e8aea;
-  color: white;
-}
-
-.dialog-grid-element a:hover i {
-  color: white;
 }
 
 

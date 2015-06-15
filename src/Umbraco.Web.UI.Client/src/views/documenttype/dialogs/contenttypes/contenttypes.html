@@ -1,8 +1,6 @@
 <div class="dialog-grid">
-    <div class="dialog-grid-element" ng-repeat="contentType in model.contentTypes | filter:{show:true}">
-        <a href="" ng-click="model.chooseContentType(contentType)">
-            <i class="icon {{contentType.icon}}"></i>
-            {{ contentType.name }}
-        </a>
-    </div>
+    <a href="" class="dialog-grid-element" ng-repeat="contentType in model.contentTypes | filter:{show:true}" ng-click="model.chooseContentType(contentType)">
+        <i class="icon {{contentType.icon}}"></i>
+        {{ contentType.name }}
+    </a>
 </div>
