@@ -423,6 +423,7 @@
     <Compile Include="Services\IExternalLoginService.cs" />
     <Compile Include="Services\IPublicAccessService.cs" />
     <Compile Include="Services\ITaskService.cs" />
+    <Compile Include="Services\LocalizedTextServiceSupplementaryFileSource.cs" />
     <Compile Include="Services\PublicAccessService.cs" />
     <Compile Include="Services\PublicAccessServiceExtensions.cs" />
     <Compile Include="Services\RepositoryService.cs" />

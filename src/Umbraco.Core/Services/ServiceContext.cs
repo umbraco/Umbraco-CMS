@@ -2,6 +2,7 @@ using System;
 using log4net;
 using Umbraco.Core.Logging;
 using System.IO;
+using System.Linq;
 using Umbraco.Core.IO;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -164,9 +165,40 @@ namespace Umbraco.Core.Services
                 _auditService = new Lazy<IAuditService>(() => new AuditService(provider, repositoryFactory, logger));
 
             if (_localizedTextService == null)
+            {
+                
                 _localizedTextService = new Lazy<ILocalizedTextService>(() => new LocalizedTextService(
-                    new LocalizedTextServiceFileSources(cache.RuntimeCache, new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Umbraco + "/config/lang/"))),
+                    new Lazy<LocalizedTextServiceFileSources>(() =>
+                    {
+                        var mainLangFolder = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Umbraco + "/config/lang/"));
+                        var appPlugins = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.AppPlugins));
+                        var configLangFolder = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Config + "/lang/"));
+
+                        var pluginLangFolders = appPlugins.Exists == false
+                            ? Enumerable.Empty<LocalizedTextServiceSupplementaryFileSource>()
+                            : appPlugins.GetDirectories()
+                                .SelectMany(x => x.GetDirectories("Lang"))
+                                .SelectMany(x => x.GetFiles("*.xml", SearchOption.TopDirectoryOnly))
+                                .Where(x => Path.GetFileNameWithoutExtension(x.FullName).Length == 5)
+                                .Select(x => new LocalizedTextServiceSupplementaryFileSource(x, false));
+
+                        //user defined langs that overwrite the default, these should not be used by plugin creators
+                        var userLangFolders = configLangFolder.Exists == false
+                            ? Enumerable.Empty<LocalizedTextServiceSupplementaryFileSource>()
+                            : configLangFolder
+                                .GetFiles("*.user.xml", SearchOption.TopDirectoryOnly)
+                                .Where(x => Path.GetFileNameWithoutExtension(x.FullName).Length == 10)
+                                .Select(x => new LocalizedTextServiceSupplementaryFileSource(x, true));
+
+                        return new LocalizedTextServiceFileSources(
+                            cache.RuntimeCache,
+                            mainLangFolder,
+                            pluginLangFolders.Concat(userLangFolders));
+
+                    }),
                     logger));
+            }
+                
 
             if (_notificationService == null)
                 _notificationService = new Lazy<INotificationService>(() => new NotificationService(provider, _userService.Value, _contentService.Value, logger));
