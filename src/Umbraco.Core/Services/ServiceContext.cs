@@ -191,6 +191,7 @@ namespace Umbraco.Core.Services
                                 .Select(x => new LocalizedTextServiceSupplementaryFileSource(x, true));
 
                         return new LocalizedTextServiceFileSources(
+                            logger,
                             cache.RuntimeCache,
                             mainLangFolder,
                             pluginLangFolders.Concat(userLangFolders));
