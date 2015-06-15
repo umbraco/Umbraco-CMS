@@ -90,7 +90,7 @@ Before running build.bat, then the latest UI files will be included.
 
 
 ##Conclusion
-Having Umbraco 7 UI as a seperate project does indeed give us a bit more complexity when building and running from visual studio, since 2 build systems are in play: grunt and msbuild. 
+Having Umbraco 7 UI as a separate project does indeed give us a bit more complexity when building and running from visual studio, since 2 build systems are in play: grunt and msbuild. 
 
 However, the alternative would be to shove everything into the msbuil process, making the entire thing inaccesible to a large number of frontend developers and with a clunkier and less uptodate system.
 

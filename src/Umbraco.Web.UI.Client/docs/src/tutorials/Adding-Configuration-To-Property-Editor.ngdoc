@@ -32,7 +32,7 @@ So to add configuration options to our markdown editor, open the package.manifes
 		]
 	}
 
-**Remember to: ** seperate the editor element and prevalue editor definition with a comma, or you will get a json error. 
+**Remember to: ** separate the editor element and prevalue editor definition with a comma, or you will get a json error. 
 
 So what did we just add? We added a prevalue editor, with a `fields` collection. This collection contains infomation about the UI we will render on the data type configuration for this editor. 
 
