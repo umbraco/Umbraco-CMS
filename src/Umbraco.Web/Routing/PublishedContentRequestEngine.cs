@@ -104,10 +104,13 @@ namespace Umbraco.Web.Routing
 		    {
                 // find the document & template
                 FindPublishedContentAndTemplate();
-
-                // set the culture on the thread -- again, 'cos it might have changed due to a wildcard domain
-                Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = _pcr.Culture;
 		    }
+
+            // handle wildcard domains
+            HandleWildcardDomains();
+
+            // set the culture on the thread -- again, 'cos it might have changed due to a finder or wildcard domain
+            Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = _pcr.Culture;
 
 			// trigger the Prepared event - at that point it is still possible to change about anything
             // even though the request might be flagged for redirection - we'll redirect _after_ the event
@@ -380,9 +383,6 @@ namespace Umbraco.Web.Routing
 
 			// handle umbracoRedirect
 			FollowExternalRedirect();
-
-			// handle wildcard domains
-			HandleWildcardDomains();
 		}
 
 	    /// <summary>
