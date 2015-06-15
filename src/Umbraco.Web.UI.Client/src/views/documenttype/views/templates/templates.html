@@ -9,12 +9,13 @@
 
         <div class="templates-grid">
 
-            <div class="template template-default">
+            <div class="template template-default" ng-if="contentType.defaultTemplate !== null">
                 <div class="template-content">
                     <i class="icon icon-newspaper-alt"></i>
                     <div class="template-name">{{ contentType.defaultTemplate.name }}</div>
                     <span class="template-default-label">(Default)</span>
                 </div>
+                <i class="icon icon-trash remove-template" ng-if="contentType.allowedTemplates.length === 1" ng-click="removeDefaultTemplate()"></i>
             </div>
 
             <div class="template" ng-repeat="template in contentType.allowedTemplates | filter: { id:'!'+contentType.defaultTemplate.id }">
@@ -26,12 +27,17 @@
                 <i class="icon icon-trash remove-template" ng-click="removeTemplate(template)"></i>
             </div>
 
-            <div class="template template-placeholder">
+            <div class="template template-placeholder" ng-if="(templates.availableTemplates | filter:{show:true}).length > 0">
                 <div class="template-content">
-                    <div class="template-name" ng-click="openTemplatesPicker($event)">Choose template</div>
+                    <div class="template-name" ng-if="contentType.defaultTemplate !== null" ng-click="openTemplatesPicker($event)">Choose template</div>
+                    <div class="template-name" ng-if="contentType.defaultTemplate === null" ng-click="openTemplatesPicker($event, true)">Choose default template</div>
                 </div>
             </div>
 
+        </div>
+
+        <div class="text-center" ng-if="(templates.availableTemplates | filter:{show:true}).length === 0">
+            <small>All templates are added as allowed templates</small>
         </div>
 
     </div>

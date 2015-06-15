@@ -36,11 +36,8 @@ function TemplatesController($scope, entityResource) {
 
                 });
 
-                if(exists) {
-                    template.show = false;
-                } else {
-                    template.show = true;
-                }
+                // set template show/hide in overlay
+                template.show = !exists;
 
             });
         });
@@ -54,18 +51,24 @@ function TemplatesController($scope, entityResource) {
         $scope.contentType.allowedTemplates.splice(selectedTemplateIndex, 1);
 
         // show content type in content types array
-        for (var templateIndex = 0; templateIndex < $scope.templates.availableTemplates.length; templateIndex++) {
-
-            var template = $scope.templates.availableTemplates[templateIndex];
-
-            if( selectedTemplate.alias === template.alias ) {
-                template.show = true;
-            }
-        }
+        showTemplateInOverlay(selectedTemplate);
 
     };
 
-    $scope.openTemplatesPicker = function($event){
+    $scope.removeDefaultTemplate = function() {
+
+        // show template in picker
+        showTemplateInOverlay($scope.contentType.defaultTemplate);
+
+        // remove default template from array - it will be the last template so we can clear the array
+        $scope.contentType.allowedTemplates = [];
+
+        // remove as default template
+        $scope.contentType.defaultTemplate = null;
+
+    };
+
+    $scope.openTemplatesPicker = function($event, setAsDefaultTemplate){
         $scope.showDialog = false;
         $scope.dialogModel = {};
         $scope.dialogModel.title = "Choose template";
@@ -76,17 +79,23 @@ function TemplatesController($scope, entityResource) {
 
         $scope.dialogModel.chooseTemplate = function(selectedTemplate) {
 
+            // push template as allowed template
             $scope.contentType.allowedTemplates.push(selectedTemplate);
 
+            // if true set template as default template
+            if(setAsDefaultTemplate) {
+                $scope.setAsDefaultTemplate(selectedTemplate);
+            }
+
+            // remove template from overlay picker
             for (var templateIndex = 0; templateIndex < $scope.templates.availableTemplates.length; templateIndex++) {
-
                 var template = $scope.templates.availableTemplates[templateIndex];
-
                 if( selectedTemplate.alias === template.alias ) {
                     template.show = false;
                 }
             }
 
+            // hide dialog
             $scope.showDialog = false;
             $scope.dialogModel = null;
         };
@@ -97,6 +106,20 @@ function TemplatesController($scope, entityResource) {
         };
 
     };
+
+    function showTemplateInOverlay(templateToShow) {
+
+        for (var templateIndex = 0; templateIndex < $scope.templates.availableTemplates.length; templateIndex++) {
+
+            var template = $scope.templates.availableTemplates[templateIndex];
+
+            if( templateToShow.alias === template.alias ) {
+                template.show = true;
+            }
+        }
+
+    }
+
 
     $scope.setAsDefaultTemplate = function(template) {
         $scope.contentType.defaultTemplate = {};
