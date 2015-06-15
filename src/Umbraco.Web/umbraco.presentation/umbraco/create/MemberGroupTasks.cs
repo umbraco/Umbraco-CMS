@@ -21,7 +21,7 @@ namespace umbraco
 
         public override bool PerformDelete()
         {
-            // only build-in roles can be deleted
+            // only built-in roles can be deleted
             if (Member.IsUsingUmbracoRoles())
             {
                 MemberGroup.GetByName(Alias).delete();
