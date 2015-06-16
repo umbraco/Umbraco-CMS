@@ -204,6 +204,11 @@
     <Compile Include="Configuration\FileSystemProviderElement.cs" />
     <Compile Include="Configuration\FileSystemProviderElementCollection.cs" />
     <Compile Include="Configuration\FileSystemProvidersSection.cs" />
+    <Compile Include="Configuration\Grid\GridConfig.cs" />
+    <Compile Include="Configuration\Grid\GridEditorsConfig.cs" />
+    <Compile Include="Configuration\Grid\IGridConfig.cs" />
+    <Compile Include="Configuration\Grid\IGridEditorConfig.cs" />
+    <Compile Include="Configuration\Grid\IGridEditorsConfig.cs" />
     <Compile Include="Configuration\UmbracoConfig.cs" />
     <Compile Include="Configuration\UmbracoConfigurationSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\AppCodeFileExtensionsCollection.cs" />
@@ -403,6 +408,7 @@
     <Compile Include="Persistence\Repositories\RepositoryCacheOptions.cs" />
     <Compile Include="Persistence\Repositories\TaskRepository.cs" />
     <Compile Include="Persistence\Repositories\TaskTypeRepository.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\GridValueConverter.cs" />
     <Compile Include="Security\BackOfficeClaimsIdentityFactory.cs" />
     <Compile Include="Security\BackOfficeUserManager.cs" />
     <Compile Include="Security\BackOfficeUserStore.cs" />

@@ -163,48 +163,14 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public JsonNetResult GetGridConfig()
         {
-            Func<List<GridEditor>> getResult = () =>
-            {
-                var editors = new List<GridEditor>();
-                var gridConfig = Server.MapPath("~/Config/grid.editors.config.js");
-                if (System.IO.File.Exists(gridConfig))
-                {
-                    try
-                    {
-                        var arr = JArray.Parse(System.IO.File.ReadAllText(gridConfig));
-                        //ensure the contents parse correctly to objects
-                        var parsed = ManifestParser.GetGridEditors(arr);
-                        editors.AddRange(parsed);
-                    }
-                    catch (Exception ex)
-                    {
-                        LogHelper.Error<BackOfficeController>("Could not parse the contents of grid.editors.config.js into a JSON array", ex);
-                    }
-                }
+            var gridConfig = UmbracoConfig.For.GridConfig(
+                Logger,
+                ApplicationContext.ApplicationCache.RuntimeCache,
+                new DirectoryInfo(Server.MapPath(SystemDirectories.AppPlugins)),
+                new DirectoryInfo(Server.MapPath(SystemDirectories.Config)),
+                HttpContext.IsDebuggingEnabled);
 
-                var plugins = new DirectoryInfo(Server.MapPath("~/App_Plugins"));
-                var parser = new ManifestParser(plugins, ApplicationContext.ApplicationCache.RuntimeCache);
-                var builder = new ManifestBuilder(ApplicationContext.ApplicationCache.RuntimeCache, parser);
-                foreach (var gridEditor in builder.GridEditors)
-                {
-                    //no duplicates! (based on alias)
-                    if (editors.Contains(gridEditor) == false)
-                    {
-                        editors.Add(gridEditor);
-                    }
-                }
-                return editors;
-            };
-
-            //cache the result if debugging is disabled
-            var result = HttpContext.IsDebuggingEnabled
-                ? getResult()
-                : ApplicationContext.ApplicationCache.RuntimeCache.GetCacheItem<List<GridEditor>>(
-                    typeof(BackOfficeController) + "GetGridConfig",
-                    () => getResult(),
-                    new TimeSpan(0, 10, 0));
-            
-            return new JsonNetResult { Data = result, Formatting = Formatting.Indented };
+            return new JsonNetResult { Data = gridConfig.EditorsConfig.Editors, Formatting = Formatting.Indented };
         }
 
         /// <summary>
