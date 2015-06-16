@@ -54,8 +54,8 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
          * ##usage
          * <pre>
          * dataTypeResource.getById(1234)
-         *    .then(function() {
-         *        alert('its gone!');
+         *    .then(function(datatype) {
+         *        alert('its here!');
          *    });
          * </pre> 
          * 
@@ -72,6 +72,37 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
                        "GetById",
                        [{ id: id }])),
                'Failed to retrieve data for data type id ' + id);
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.dataTypeResource#getByName
+         * @methodOf umbraco.resources.dataTypeResource
+         *
+         * @description
+         * Gets a data type item with a given name
+         *
+         * ##usage
+         * <pre>
+         * dataTypeResource.getByName("upload")
+         *    .then(function(datatype) {
+         *        alert('its here!');
+         *    });
+         * </pre> 
+         * 
+         * @param {String} name Name of data type to retrieve        
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        getByName: function (name) {
+
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "dataTypeApiBaseUrl",
+                       "GetByName",
+                       [{ name: name }])),
+               'Failed to retrieve data for data type with name: ' + name);
         },
 
         getAll: function () {
@@ -170,6 +201,39 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 'Failed to delete item ' + id);
         },
         
+        
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.dataTypeResource#getCustomListView
+         * @methodOf umbraco.resources.dataTypeResource
+         *
+         * @description
+         * Returns a custom listview, given a content types alias
+         * 
+         * 
+         * ##usage
+         * <pre>
+         * dataTypeResource.getCustomListView("home")
+         *    .then(function(listview) {
+         *    });
+         * </pre> 
+         * 
+         * @returns {Promise} resourcePromise object containing the listview datatype.
+         *
+         */
+
+         getCustomListView: function (contentTypeAlias) {      
+                return umbRequestHelper.resourcePromise(
+                   $http.get(
+                       umbRequestHelper.getApiUrl(
+                           "dataTypeApiBaseUrl",
+                           "GetCustomListView",
+                           { contentTypeAlias: contentTypeAlias }
+                           )),
+                   'Failed to retrieve data for custom listview datatype');
+         },
+
         /**
          * @ngdoc method
          * @name umbraco.resources.dataTypeResource#save

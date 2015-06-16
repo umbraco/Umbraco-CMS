@@ -141,6 +141,22 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Returns a custom listview, based on a content type alias, if found
+        /// </summary>
+        /// <param name="contentTypeAlias"></param>
+        /// <returns>a DataTypeDisplay</returns>
+        public DataTypeDisplay GetCustomListView(string contentTypeAlias)
+        {
+            var dt = Services.DataTypeService.GetDataTypeDefinitionByName(Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias);
+            if (dt == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            return Mapper.Map<IDataTypeDefinition, DataTypeDisplay>(dt);
+        }
+
+        /// <summary>
         /// Returns the pre-values for the specified property editor
         /// </summary>
         /// <param name="editorAlias"></param>
