@@ -518,7 +518,11 @@ WHERE alias = @alias
 AND datatypeNodeId = @dtdid
 AND id <> @id",
                         new { id = entity.Id, alias = entity.Alias, dtdid = entity.DataType.Id });
-                if (exists > 0)
+
+
+                var excludedDataTypes = new string[] { "Umbraco.CheckBoxList", "Umbraco.DropDown", "Umbraco.DropDownMultiple", "Umbraco.DropdownlistMultiplePublishKeys", "Umbraco.DropdownlistPublishingKeys", "Umbraco.RadioButtonList" };
+
+                if (exists > 0 && excludedDataTypes.Contains(entity.DataType.PropertyEditorAlias) == false)
                 {
                     throw new DuplicateNameException("A pre value with the alias " + entity.Alias + " already exists for this data type");
                 }
