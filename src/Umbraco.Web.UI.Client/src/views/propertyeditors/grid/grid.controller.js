@@ -635,4 +635,50 @@ angular.module("umbraco")
             $scope.initContent();
 
         });
+
+        //Clean the grid value before submitting to the server, we don't need 
+        // all of that grid configuration in the value to be stored!! All of that
+        // needs to be merged in at runtime to ensure that the real config values are used
+        // if they are ever updated.
+
+        var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
+            
+            if ($scope.model.value.sections) {
+                _.each($scope.model.value.sections, function(section) {
+                    if (section.rows) {
+                        _.each(section.rows, function (row) {
+                            if (row.areas) {
+                                _.each(row.areas, function (area) {
+
+                                    //Remove the 'editors' - these are the allowed editors, these will
+                                    // be injected at runtime to this editor, it should not be persisted
+
+                                    if (area.editors) {
+                                        delete area.editors;
+                                    }
+
+                                    if (area.controls) {
+                                        _.each(area.controls, function (control) {
+                                            if (control.editor) {
+                                                //replace
+                                                var alias = control.editor.alias;
+                                                control.editor = {
+                                                    alias: alias
+                                                }
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
+        //when the scope is destroyed we need to unsubscribe
+        $scope.$on('$destroy', function () {
+            unsubscribe();
+        });
+
     });
