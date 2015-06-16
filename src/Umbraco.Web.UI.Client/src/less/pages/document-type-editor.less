@@ -210,21 +210,18 @@
   }
 
   .edt-property-meta {
-    width: 300px;
+    flex: 0 0 175px;
     margin-right: 50px;
     -webkit-transition: all 0.5s;
     transition: all 0.5s;
     .property-meta-group {
       display: inline-block;
     }
-    @media screen and (max-width: 1500px) {
-      width: 200px;
-    }
   }
 
   .edt-property-preview{
-    flex: 2;
-    height: 50px;
+    flex: 1;
+    height: 30px;
     overflow: hidden;
     position: relative;
     padding: 25px 10px;
@@ -282,7 +279,7 @@
 
 
   .edt-property-actions {
-    width: 50px;
+    flex: 0 0 50px;
     text-align: center;
     margin: 15px 0 0 0;
     .property-action {
@@ -310,6 +307,7 @@
 
     .edt-property-meta {
       padding: 0 0 0 10px;
+      box-sizing: border-box;
     }
 
     .edt-property-preview {
