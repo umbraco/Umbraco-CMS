@@ -235,6 +235,35 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
          },
 
         /**
+        * @ngdoc method
+        * @name umbraco.resources.dataTypeResource#createCustomListView
+        * @methodOf umbraco.resources.dataTypeResource
+        *
+        * @description
+        * Creates and returns a custom listview, given a content types alias
+        * 
+        * ##usage
+        * <pre>
+        * dataTypeResource.createCustomListView("home")
+        *    .then(function(listview) {
+        *    });
+        * </pre> 
+        * 
+        * @returns {Promise} resourcePromise object containing the listview datatype.
+        *
+        */
+         createCustomListView: function (contentTypeAlias) {
+             return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "dataTypeApiBaseUrl",
+                        "PostCreateCustomListView",
+                        { contentTypeAlias: contentTypeAlias }
+                        )),
+                'Failed to create a custom listview datatype');
+         },
+
+        /**
          * @ngdoc method
          * @name umbraco.resources.dataTypeResource#save
          * @methodOf umbraco.resources.dataTypeResource
