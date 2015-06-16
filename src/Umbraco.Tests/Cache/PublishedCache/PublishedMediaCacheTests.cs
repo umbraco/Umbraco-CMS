@@ -146,7 +146,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
 			result.Fields.Add("writerName", "Shannon");
 
             var store = new PublishedMediaCache(ctx.Application);
-			var doc = store.CreateFromCacheValues(store.ConvertFromSearchResult(result));
+			var doc = store.ConvertFromSearchResult(result);
 
 			DoAssert(doc, 1234, 0, 0, "", "Image", 0, "Shannon", "", 0, 0, "-1,1234", default(DateTime), DateTime.Parse("2012-07-16T10:34:09"), 2);
 			Assert.AreEqual(null, doc.Parent);
@@ -160,7 +160,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
 			var xmlDoc = GetMediaXml();
 			var navigator = xmlDoc.SelectSingleNode("/root/Image").CreateNavigator();
             var cache = new PublishedMediaCache(ctx.Application);
-			var doc = cache.CreateFromCacheValues(cache.ConvertFromXPathNavigator(navigator, true));
+			var doc = cache.ConvertFromXPathNavigator(navigator);
 
 			DoAssert(doc, 2000, 0, 2, "image1", "Image", 2044, "Shannon", "Shannon2", 22, 33, "-1,2000", DateTime.Parse("2012-06-12T14:13:17"), DateTime.Parse("2012-07-20T18:50:43"), 1);
 			Assert.AreEqual(null, doc.Parent);
@@ -246,14 +246,12 @@ namespace Umbraco.Tests.Cache.PublishedCache
 					//there is no parent
 						a => null,
 					//we're not going to test this so ignore
-						(dd, n) => new List<IPublishedContent>(),
+						a => new List<IPublishedContent>(),
 						(dd, a) => dd.Properties.FirstOrDefault(x => x.PropertyTypeAlias.InvariantEquals(a)), 
-                        null,
 						false),
 				//callback to get the children
-				(dd, n) => children,
+				d => children,
 				(dd, a) => dd.Properties.FirstOrDefault(x => x.PropertyTypeAlias.InvariantEquals(a)), 
-                null,
 				false);
 			return dicDoc;
 		}
