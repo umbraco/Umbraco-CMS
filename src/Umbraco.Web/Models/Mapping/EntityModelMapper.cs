@@ -70,7 +70,6 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.SortOrder, expression => expression.Ignore());
 
             config.CreateMap<IContentTypeComposition, EntityBasic>()
-                .ForMember(basic => basic.Icon, expression => expression.UseValue("icon-grid"))
                 .ForMember(basic => basic.Path, expression => expression.MapFrom(x => x.Path))
                 .ForMember(basic => basic.ParentId, expression => expression.MapFrom(x => x.ParentId))
                 .ForMember(dto => dto.Trashed, expression => expression.Ignore())
