@@ -3,7 +3,7 @@
 	<div ng-if="dataTypes.userConfigured.length > 0">
 		<h5>Your configurations</h5>
 		<ul class="umb-card-grid">
-			<li ng-repeat="configuredDataType in dataTypes.userConfigured">
+			<li ng-repeat="configuredDataType in dataTypes.userConfigured | orderBy:'name'">
 				<a href="" ng-click="model.selectDataType(configuredDataType)">
 					<i class="{{ configuredDataType.icon }}" ng-class="{'icon-autofill': configuredDataType.icon == null}"></i>
 					{{ configuredDataType.name }}
@@ -15,7 +15,7 @@
 	<div ng-if="dataTypes.userPropertyEditors.length > 0">
 		<h5>Custom property editors</h5>
 		<ul class="umb-card-grid">
-			<li ng-repeat="customEditor in dataTypes.userPropertyEditors">
+			<li ng-repeat="customEditor in dataTypes.userPropertyEditors | orderBy:'name'">
 				<a href="" ng-click="model.selectDataType(customEditor)">
 					<i class="{{ customEditor.icon }}" ng-class="{'icon-autofill': customEditor.icon == null}"></i>
 					{{ customEditor.name }}
@@ -27,7 +27,7 @@
 	<div ng-if="dataTypes.system.length > 0">
 		<h5>Standard</h5>
 		<ul class="umb-card-grid">
-			<li ng-repeat="systemDataType in dataTypes.system">
+			<li ng-repeat="systemDataType in dataTypes.system | orderBy:'name'">
 				<a href="" ng-click="model.selectDataType(systemDataType)">
 					<i class="{{ systemDataType.icon }}" ng-class="{'icon-autofill': systemDataType.icon == null}"></i>
 					{{ systemDataType.name }}
