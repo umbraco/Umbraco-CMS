@@ -26,7 +26,7 @@
 
                 <div class="tab-title">
                     <i class="icon icon-navigation" ng-if="sortingMode"></i>
-                    <input class="tab-title-input" type="text" ng-model="tab.name" ng-class="{'tab-title-placeholder': tab.name == ''}" ng-change="updateTabTitle(tab)" umb-blur="updateTabTitle(tab)" ng-disabled="tab.inherited" umb-auto-focus umb-auto-resize />
+                    <input class="tab-title-input" type="text" placeholder="Enter name..." ng-model="tab.name" ng-class="{'tab-title-placeholder': tab.name == ''}" ng-change="updateTabTitle(tab)" umb-blur="updateTabTitle(tab)" ng-disabled="tab.inherited" umb-auto-focus umb-auto-resize />
                 </div>
 
                 <div class="edt-tab-inherited-from" ng-if="tab.inherited">
