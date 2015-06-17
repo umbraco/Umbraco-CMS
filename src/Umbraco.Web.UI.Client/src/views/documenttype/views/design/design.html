@@ -78,12 +78,13 @@
                                     <div class="edt-property-meta-alias">{{ property.alias }}</div>
 
                                     <div class="edt-property-meta-label invisible-field">
-                                        <input type="text" placeholder="Label.." ng-model="property.label" ng-change="changePropertyLabel(property)" ng-disabled="property.inherited" />
+                                        <textarea placeholder="Label..." ng-model="property.label" ng-disabled="property.inherited" umb-auto-resize></textarea>
                                     </div>
 
                                     <div class="edt-property-meta-description invisible-field">
                                         <textarea ng-model="property.description" placeholder="Enter your description..." ng-disabled="property.inherited" umb-auto-resize></textarea>
                                     </div>
+
                                 </div>
 
                                 <div ng-if="sortingMode">

@@ -436,11 +436,18 @@
   }
 
   .edt-property-meta-label {
-    input {
+    textarea {
       font-size: 15px;
       font-weight: bold;
       margin-bottom: 0;
       color: @grayDarker;
+      min-width: 100%;
+      min-height: 25px;
+      box-sizing: border-box;
+      resize: none;
+      .field-is-empty {
+        height: 25px !important;
+      }
     }
   }
 
@@ -505,25 +512,16 @@
 
 .content-type-editor-dialog.edit-property-settings {
 
-  .title-wrapper {
-    float: left;
-    width: 300px;
-    input.input-style-underline {
-      border: none;
-      //border-bottom: 1px solid #cccccc;
-      width: 100%;
-      box-sizing: border-box;
-      padding: 10px 0 0 0;
-      margin-bottom: 10px;
-      font-size: 16px;
-      font-weight: bold;
-      &:focus {
-        outline: none;
-      }
-    }
-    .alias {
-      font-size: 13px;
-      color: @grayLight;
+  .editor-label {
+    border: none;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 0 0 0;
+    margin-bottom: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    &:focus {
+      outline: none;
     }
   }
 
@@ -574,19 +572,21 @@
     }
   }
 
-  textarea.description,
-  textarea.pattern {
-    width: 100%;
-    box-sizing: border-box;
-    border: none;
-  }
-
   .checkbox {
-    padding-left: 0;
     margin-bottom: 20px;
   }
 
-  .umb-editor {
+  .editor-description,
+  .editor-validation-pattern {
+    min-width: 100%;
+    min-height: 25px;
+    resize: none;
+    box-sizing: border-box;
+    border: none;
+    overflow: hidden;
+  }
+
+  .umb-dropdown {
     width: 100%;
   }
 

@@ -5,18 +5,16 @@
 
             <div class="umb-control-group clearfix">
 
-                <div class="title-wrapper">
-                    <input class="input-style-underline" 
-                        ng-model="model.property.label" 
-                        placeholder="Enter a name..." umb-auto-focus />
+                <input class="editor-label"
+                       ng-model="model.property.label"
+                       placeholder="Enter a name..." umb-auto-focus />
 
-                    <umb-locked-field ng-model="model.property.alias"></umb-locked-field>
-                </div>
+                <umb-locked-field ng-model="model.property.alias"></umb-locked-field>
 
             </div>
 
             <div class="umb-control-group clearfix">
-                <textarea class="description" ng-model="model.property.description" placeholder="Add your description here..."></textarea>
+                <textarea class="editor-description" ng-model="model.property.description" placeholder="Add your description here..." umb-auto-resize></textarea>
             </div>
 
             <div class="umb-control-group clearfix">
@@ -45,15 +43,15 @@
 
             <div class="umb-control-group clearfix">
 
-                <label class="checkbox">
+                <label class="checkbox no-indent">
                     <input type="checkbox" ng-model="model.property.validation.mandatory"> Field is mandatory
                 </label>
 
-                <select class="umb-editor umb-dropdown" ng-options="validationType as validationType.name for validationType in validationTypes" ng-model="selectedValidationType" ng-change="changeValidationType(selectedValidationType)">
+                <select class="umb-dropdown" ng-options="validationType as validationType.name for validationType in validationTypes" ng-model="selectedValidationType" ng-change="changeValidationType(selectedValidationType)">
                     <option value="">Validation</option>
                 </select>
 
-                <textarea class="umb-editor pattern" placeholder="Enter a regular expression" ng-model="model.property.validation.pattern" ng-if="propertySettings.showValidationPattern"></textarea>
+                <textarea class="editor-validation-pattern" placeholder="Enter a regular expression" ng-model="model.property.validation.pattern" ng-if="propertySettings.showValidationPattern" umb-auto-resize></textarea>
 
             </div>
 
