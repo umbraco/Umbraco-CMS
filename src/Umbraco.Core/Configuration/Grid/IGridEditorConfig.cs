@@ -9,6 +9,7 @@ namespace Umbraco.Core.Configuration.Grid
         string Alias { get; }
         string View { get; }
         string Render { get; }
+        string Icon { get; }
         IDictionary<string, object> Config { get; }
     }
 }
