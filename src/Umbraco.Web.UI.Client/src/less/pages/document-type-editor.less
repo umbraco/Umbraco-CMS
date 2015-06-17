@@ -723,6 +723,60 @@
 
 }
 
+/* ---------- LIST VIEW ---------- */
+
+.list-view-container {
+  background: #f8f8f8;
+  border: 1px solid #CCCCCC;
+  display: flex;
+  border-radius: 5px;
+  animation: fadeIn 0.5s;
+  padding: 15px;
+  position: relative;
+  z-index: 1;
+}
+
+.list-view-container.list-view-settings-open {
+  border-bottom: transparent;
+  border-radius: 5px 5px 0 0;
+}
+
+.list-view-container .list-view-container-content {
+  display: flex;
+}
+
+.list-view-container .icon-list {
+  font-size: 20px;
+  color: #d9d9d9;
+  margin-right: 10px;
+}
+
+.list-view-container .list-view-name {
+  margin-right: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  float: left;
+}
+
+.list-view-container .list-view-create-new {
+  font-size: 12px;
+  color: @blue;
+}
+
+.list-view-container .list-view-remove-new {
+  font-size: 12px;
+  color: @red;
+}
+
+.list-view-settings {
+  border: 1px dashed #d9d9d9;
+  border-radius: 0 0 5px 5px;
+  padding: 50px 20px 20px 20px;
+  position: relative;
+  top: -20px;
+  z-index: 0;
+}
+
 /* ---------- DIALOG ---------- */
 
 .dialog-grid {
