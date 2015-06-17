@@ -114,6 +114,23 @@ namespace Umbraco.Web.Editors
                 .Select(Mapper.Map<PropertyEditorBasic>);
         }
 
+
+        /// <summary>
+        /// Gets the content json for all property editors
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Permission is granted to this method if the user has access to any of these trees: DataTypes, Content or Media
+        /// </remarks>
+        [UmbracoTreeAuthorize(Constants.Trees.DataTypes, Constants.Trees.Content, Constants.Trees.Media)]
+        public IEnumerable<PropertyEditorBasic> GetAllPropertyEditors()
+        {
+            return PropertyEditorResolver.Current.PropertyEditors
+                .OrderBy(x => x.Name)
+                .Select(Mapper.Map<PropertyEditorBasic>);
+        }
+
         /// <summary>
         /// Deletes a data type wth a given ID
         /// </summary>

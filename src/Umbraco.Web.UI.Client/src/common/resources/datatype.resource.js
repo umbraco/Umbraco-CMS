@@ -135,6 +135,16 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 'Failed to retrieve data');
         },
 
+        getAllPropertyEditors: function () {
+
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "dataTypeApiBaseUrl",
+                        "GetAllPropertyEditors")),
+                'Failed to retrieve data');
+        },
+
         /**
          * @ngdoc method
          * @name umbraco.resources.contentResource#getScaffold
