@@ -305,6 +305,10 @@ module.exports = function (grunt) {
 
 
         watch: {
+            docs: {
+                files: ['docs/src/**/*.md'],
+                tasks: ['watch-docs', 'timestamp']
+            },
             css: {
                 files: 'src/**/*.less',
                 tasks: ['watch-less', 'timestamp'],
@@ -347,8 +351,8 @@ module.exports = function (grunt) {
                 title: 'API Documentation'
             },
             tutorials: {
-                src: ['docs/src/tutorials/**/*.ngdoc'],
-                title: 'Tutorials'
+                src: [],
+                title: ''
             }
         },
 
