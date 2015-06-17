@@ -127,8 +127,12 @@ namespace Umbraco.Core.Persistence.Repositories
             var db = _unitOfWork.Database;
             using (var trans = db.GetTransaction())
             {
-                db.Execute("DELETE FROM umbracoUser2NodePermission WHERE userId=@userId AND nodeId in (@nodeIds)",
-                    new {userId = userId, nodeIds = entityIds});
+                //we need to batch these in groups of 2000 so we don't exceed the max 2100 limit
+                foreach (var idGroup in entityIds.InGroupsOf(2000))
+                {
+                    db.Execute("DELETE FROM umbracoUser2NodePermission WHERE userId=@userId AND nodeId in (@nodeIds)",
+                        new { userId = userId, nodeIds = idGroup });
+                }
 
                 var toInsert = new List<User2NodePermissionDto>();
                 foreach (var p in permissions)
