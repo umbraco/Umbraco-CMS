@@ -129,6 +129,9 @@ angular.module("umbraco")
             },
 
             start: function (e, ui) {
+                // reset dragged RTE settings in case a RTE isn't dragged
+                draggedRteSettings = undefined;
+
                 ui.item.find('.mceNoEditor').each(function () {
                     notIncludedRte = [];
 
@@ -148,12 +151,14 @@ angular.module("umbraco")
                     }
                 });
                 $timeout(function () {
-                    // reconstruct the dragged RTE
-                    tinyMCE.init(draggedRteSettings);
+                    // reconstruct the dragged RTE (could be undefined when dragging something else than RTE)
+                    if (draggedRteSettings !== undefined) {
+                        tinyMCE.init(draggedRteSettings);
+                    }
 
                     _.forEach(notIncludedRte, function (id) {
                         // reset all the other RTEs
-                        if (id != draggedRteSettings.id) {
+                        if (draggedRteSettings === undefined || id != draggedRteSettings.id) {
                             var rteSettings = _.findWhere(tinyMCE.editors, { id: id }).settings;
                             tinyMCE.execCommand('mceRemoveEditor', false, id);
                             tinyMCE.init(rteSettings);
