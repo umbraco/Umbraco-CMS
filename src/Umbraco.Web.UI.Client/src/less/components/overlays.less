@@ -1,106 +1,97 @@
+.umb-overlay {
+     position: fixed;
+     overflow: hidden;
+     background: white;
+     z-index: 996660;
+     border: 1px solid #ccc;
+}
 
-// CENTERED OVERLAY
-.umb-overlay-center{
+.umb-overlay .umb-overlay-header {
+     border-bottom: 1px solid @grayLight;
+     color: #999;
+     background: @grayLighter;
+     padding: 10px;
+     margin-top: 0;
+}
+
+.umb-overlay .umb-overlay-container {
+     top: 50px;
+     left: 7px;
+     right: 7px;
+     bottom: 7px;
      position: absolute;
+     overflow: auto;
+}
+
+.umb-overlay .umb-overlay-drawer {
+     position: absolute;
+     right: 0;
+     bottom: 0;
+     left: 0;
+     height: 31px;
+     padding: 10px;
+     margin: 0;
+}
+
+.umb-overlay .umb-overlay-drawer .umb-overlay-drawer-content {
+     display: flex;
+     justify-content: flex-end;
+}
+
+.umb-overlay .umb-overlay-drawer .umb-overlay-drawer-content .dropdown-menu {
+     right: 0;
+     left: auto;
+}
+
+/* ---------- OVERLAY CENTER ---------- */
+
+.umb-overlay.umb-overlay-center {
      width: 460px;
      height: 400px;
-     overflow: hidden;
-     border: 1px solid #ccc;
-     margin-top: -200px;
-     margin-left: -230px;
-     background: white;
-     padding: 7px;
      top: 50%;
      left: 50%;
-     z-index: 996660;
-     
-     .umb-overlay-header{
-          border-bottom: 1px solid #d9d9d9;
-          color: #999;
-          padding: 10px;
-          margin-top: 0;
-     }
-
-     .umb-overlay-container{
-          top: 50px; left: 7px; right: 7px; bottom: 7px; position: absolute; overflow: auto;
-     }
+     transform: translate(-50%, -50%);
  }
 
+.umb-overlay.umb-overlay-center .umb-overlay-header {
+     text-align: center;
+}
 
-// TARGET OVERLAY
-.umb-overlay-target {
-     position: fixed;
+/* ---------- OVERLAY TARGET ---------- */
+
+.umb-overlay.umb-overlay-target {
      width: 400px;
      height: 400px;
-     overflow: hidden;
-     border: 1px solid #ccc;
-     background: white;
-     padding: 7px;
-     z-index: 996660;
      box-sizing: border-box;
-     .umb-overlay-header{
-          border-bottom: 1px solid #d9d9d9;
-          color: #999;
-          padding: 10px;
-          margin-top: 0;
-          text-align: center;
-     }
-     .umb-overlay-container{
-          position: absolute;
-          top: 68px;
-          left: 7px;
-          right: 7px;
-          bottom: 7px;
-          overflow: auto;
-     }
+}
+
+.umb-overlay.umb-overlay-target .umb-overlay-header {
+     text-align: center;
+}
+
+.umb-overlay.umb-overlay-target .umb-overlay-container {
+     top: 68px;
 }
  
+/* ---------- OVERLAY RIGHT ---------- */
 
-
-// RIGHT SIDE OVERLAY
-.umb-overlay-right{
-     position: fixed;
+.umb-overlay.umb-overlay-right {
      width: 460px;
-     overflow: hidden;
-     background: white;
      top: 0;
      right: 0;
      bottom: 0;
-     z-index: 996660;
-
-     .umb-overlay-header{
-          height: 64px;
-          background: @grayLighter;
-          border-bottom: 1px solid @grayLight;
-          padding: 15px 10px 20px 20px;
-     }
-
-     .umb-overlay-container{
-          top: 100px; left: 0px; right: 0px; bottom: 50px; position: absolute; overflow: auto;
-     }
-
-     .umb-overlay-drawer{
-          position: absolute;
-          right: 0;
-          bottom: 0;
-          left: 0;
-          height: 31px;
-          padding: 10px;
-          margin: 0;
-     }
-
-     .umb-overlay-drawer-content {
-          display: flex;
-          justify-content: flex-end;
-          .dropdown-menu {
-               right: 0;
-               left: auto;
-          }
-     }
-
-     .umb-overlay-body{
-          padding: 20px;
-     }
+     border: none;
 }
 
+.umb-overlay.umb-overlay-right .umb-overlay-header {
+     height: 64px;
+     padding: 15px 10px 20px 20px;
+}
 
+.umb-overlay.umb-overlay-right .umb-overlay-container {
+     top: 100px;
+     left: 0;
+     right: 0;
+     bottom: 50px;
+     padding: 20px;
+}

@@ -1,63 +1,60 @@
-<div ng-controller="Umbraco.Editors.DocumentType.EditPropertySettingsController">
-    <div class="umb-overlay-body content-type-editor-dialog edit-property-settings">
+<div class="content-type-editor-dialog edit-property-settings" ng-controller="Umbraco.Editors.DocumentType.EditPropertySettingsController">
 
-        <form>
+    <form>
 
-            <div class="umb-control-group clearfix">
+        <div class="umb-control-group clearfix">
 
-                <input class="editor-label"
-                       ng-model="model.property.label"
-                       placeholder="Enter a name..." umb-auto-focus />
+            <input class="editor-label"
+                   ng-model="model.property.label"
+                   placeholder="Enter a name..." umb-auto-focus />
 
-                <umb-locked-field ng-model="model.property.alias"></umb-locked-field>
+            <umb-locked-field ng-model="model.property.alias"></umb-locked-field>
 
-            </div>
+        </div>
 
-            <div class="umb-control-group clearfix">
-                <textarea class="editor-description" ng-model="model.property.description" placeholder="Add your description here..." umb-auto-resize></textarea>
-            </div>
+        <div class="umb-control-group clearfix">
+            <textarea class="editor-description" ng-model="model.property.description" placeholder="Add your description here..." umb-auto-resize></textarea>
+        </div>
 
-            <div class="umb-control-group clearfix">
+        <div class="umb-control-group clearfix">
 
-                <a href="" ng-if="!model.property.editor" class="editor-placeholder" ng-click="model.changePropertyEditor(model.property)">Add Editor</a>
+            <a href="" ng-if="!model.property.editor" class="editor-placeholder" ng-click="model.changePropertyEditor(model.property)">Add Editor</a>
 
-                <div class="editor clearfix" ng-if="model.property.editor">
+            <div class="editor clearfix" ng-if="model.property.editor">
 
-                    <a href="" class="editor-icon-wrapper" ng-click="model.changePropertyEditor(model.property)">
-                        <i class="icon {{ model.property.dataTypeIcon }}" ng-class="{'icon-autofill': model.property.dataType.icon == null}"></i>
-                    </a>
+                <a href="" class="editor-icon-wrapper" ng-click="model.changePropertyEditor(model.property)">
+                    <i class="icon {{ model.property.dataTypeIcon }}" ng-class="{'icon-autofill': model.property.dataType.icon == null}"></i>
+                </a>
 
-                    <div class="editor-details">
-                        <div class="editor-name">{{ model.property.dataTypeName }}</div>
-                        <div class="editor-editor">{{ model.property.editor }}</div>
-                    </div>
-
-                    <a href class="pull-right" style="padding-top: 15px" 
-                        ng-click="model.editDataType(model.property)" ng-if="model.property.editor">
-                        <i class="icon icon-settings" style="font-size: 15px; color: #555"></i>
-                    </a>
-
+                <div class="editor-details">
+                    <div class="editor-name">{{ model.property.dataTypeName }}</div>
+                    <div class="editor-editor">{{ model.property.editor }}</div>
                 </div>
 
-            </div>
-
-            <div class="umb-control-group clearfix">
-
-                <label class="checkbox no-indent">
-                    <input type="checkbox" ng-model="model.property.validation.mandatory"> Field is mandatory
-                </label>
-
-                <select class="umb-dropdown" ng-options="validationType as validationType.name for validationType in validationTypes" ng-model="selectedValidationType" ng-change="changeValidationType(selectedValidationType)">
-                    <option value="">Validation</option>
-                </select>
-
-                <textarea class="editor-validation-pattern" placeholder="Enter a regular expression" ng-model="model.property.validation.pattern" ng-if="propertySettings.showValidationPattern" umb-auto-resize></textarea>
+                <a href class="pull-right" style="padding-top: 15px"
+                   ng-click="model.editDataType(model.property)" ng-if="model.property.editor">
+                    <i class="icon icon-settings" style="font-size: 15px; color: #555"></i>
+                </a>
 
             </div>
 
-        </form>
+        </div>
 
-    </div>
+        <div class="umb-control-group clearfix">
+
+            <label class="checkbox no-indent">
+                <input type="checkbox" ng-model="model.property.validation.mandatory"> Field is mandatory
+            </label>
+
+            <select class="umb-dropdown" ng-options="validationType as validationType.name for validationType in validationTypes" ng-model="selectedValidationType" ng-change="changeValidationType(selectedValidationType)">
+                <option value="">Validation</option>
+            </select>
+
+            <textarea class="editor-validation-pattern" placeholder="Enter a regular expression" ng-model="model.property.validation.pattern" ng-if="propertySettings.showValidationPattern" umb-auto-resize></textarea>
+
+        </div>
+
+    </form>
 
 </div>
 
