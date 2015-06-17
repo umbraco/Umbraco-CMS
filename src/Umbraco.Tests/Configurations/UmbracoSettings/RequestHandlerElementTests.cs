@@ -26,14 +26,14 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         }
         [Test]
         public void CharCollection()
-        {            
-            var chars = @" ,"",',%,.,;,/,\,:,#,+,*,&,?,æ,ø,å,ä,ö,ü,ß,Ä,Ö,|,<,>";
+        {
+            var chars = @" ,"",',%,.,;,/,\,:,#,+,*,&,?,æ,ø,å,ä,ö,ü,ß,Ä,Ö,ã,à,á,â,ç,é,ê,í,õ,ó,ô,ú,|,<,>";
             var items = chars.Split(',');
             Assert.AreEqual(items.Length, SettingsSection.RequestHandler.CharCollection.Count());
             Assert.IsTrue(SettingsSection.RequestHandler.CharCollection
                                  .All(x => items.Contains(x.Char)));
 
-            var vals = @"-,plus,star,ae,oe,aa,ae,oe,ue,ss,ae,oe,-";
+            var vals = @"-,plus,star,ae,oe,aa,ae,oe,ue,ss,ae,oe,a,a,a,a,c,e,e,i,o,o,o,u,-";
             var splitVals = vals.Split(',');
             Assert.AreEqual(splitVals.Length, SettingsSection.RequestHandler.CharCollection.Count(x => x.Replacement.IsNullOrWhiteSpace() == false));
             Assert.IsTrue(SettingsSection.RequestHandler.CharCollection
