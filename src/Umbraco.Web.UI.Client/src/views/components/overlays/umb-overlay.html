@@ -10,10 +10,10 @@
     </div>
 
     <div class="umb-overlay-drawer" ng-if="model.close || model.submit">
-    	<button  ng-if="model.close" ng-click="model.close(model)" class="btn btn-link">Cancel</button> 
-    	<button ng-click="model.submit(model)" ng-if="model.submit" class="btn btn-success">Submit</button>
-
-		<umb-button-group model="model.dataType" actions="model.multiActions" ng-if="model.multiActions"></umb-button-group>
-
+		<div class="umb-overlay-drawer-content">
+    		<button  ng-if="model.close" ng-click="model.close(model)" class="btn btn-link">Cancel</button>
+    		<button ng-click="model.submit(model)" ng-if="model.submit" class="btn btn-success">Submit</button>
+			<umb-button-group model="model.dataType" actions="model.multiActions" ng-if="model.multiActions"></umb-button-group>
+		</div>
     </div>
 </div>

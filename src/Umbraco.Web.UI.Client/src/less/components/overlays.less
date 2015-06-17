@@ -80,12 +80,22 @@
      }
 
      .umb-overlay-drawer{
-          height: 50px;
-          left: 0px;
-          right: 0px;
-          bottom: 0px;
           position: absolute;
+          right: 0;
+          bottom: 0;
+          left: 0;
+          height: 31px;
           padding: 10px;
+          margin: 0;
+     }
+
+     .umb-overlay-drawer-content {
+          display: flex;
+          justify-content: flex-end;
+          .dropdown-menu {
+               right: 0;
+               left: auto;
+          }
      }
 
      .umb-overlay-body{
