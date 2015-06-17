@@ -243,14 +243,20 @@ angular.module("umbraco")
             $scope.currentInfohighlightRow = null;
         };
 
-        $scope.getAllowedLayouts = function (column) {
+        function getAllowedLayouts(section) {
+
             var layouts = $scope.model.config.items.layouts;
 
-            if (column.allowed && column.allowed.length > 0) {
+            //This will occur if it is a new section which has been
+            // created from a 'template'
+            if (section.allowed && section.allowed.length > 0) {
                 return _.filter(layouts, function (layout) {
-                    return _.indexOf(column.allowed, layout.name) >= 0;
+                    return _.indexOf(section.allowed, layout.name) >= 0;
                 });
-            } else {
+            }
+            else {
+                
+
                 return layouts;
             }
         };
@@ -454,6 +460,31 @@ angular.module("umbraco")
             }
 
             if ($scope.model.value && $scope.model.value.sections && $scope.model.value.sections.length > 0) {
+
+                if ($scope.model.value.name && angular.isArray($scope.model.config.items.templates)) {
+
+                    //This will occur if it is an existing value, in which case
+                    // we need to determine which layout was applied by looking up 
+                    // the name
+                    // TODO: We need to change this to an immutable ID!!
+
+                    var found = _.find($scope.model.config.items.templates, function (t) {
+                        return t.name === $scope.model.value.name;
+                    });
+
+                    if (found && angular.isArray(found.sections) && found.sections.length === $scope.model.value.sections.length) {
+
+                        //Cool, we've found the template associated with our current value with matching sections counts, now we need to 
+                        // merge this template data on to our current value (as if it was new) so that we can preserve what is and isn't
+                        // allowed for this template based on the current config.
+
+                        _.each(found.sections, function (templateSection, index) {
+                            angular.extend($scope.model.value.sections[index], angular.copy(templateSection));
+                        });
+                         
+                    }
+                }
+
                 _.forEach($scope.model.value.sections, function (section, index) {
 
                     if (section.grid > 0) {
@@ -479,15 +510,7 @@ angular.module("umbraco")
         $scope.initSection = function (section) {
             section.$percentage = $scope.percentage(section.grid);
 
-            var layouts = $scope.model.config.items.layouts;
-
-            if (section.allowed && section.allowed.length > 0) {
-                section.$allowedLayouts = _.filter(layouts, function (layout) {
-                    return _.indexOf(section.allowed, layout.name) >= 0;
-                });
-            } else {
-                section.$allowedLayouts = layouts;
-            }
+            section.$allowedLayouts = getAllowedLayouts(section);
 
             if (!section.rows) {
                 section.rows = [];
