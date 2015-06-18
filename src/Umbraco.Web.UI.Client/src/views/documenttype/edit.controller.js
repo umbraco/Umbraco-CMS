@@ -6,7 +6,7 @@
  * @description
  * The controller for the content type editor
  */
-function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, contentTypeResource, entityResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService) { 
+function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, contentTypeResource, entityResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper) {
 
 	$scope.page = {actions: [], menu: [], subViews: [] };
 	$scope.sortingMode = false;
@@ -271,11 +271,33 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 			});
 		}
 
+		// convert legacy icons
+		convertLegacyIcons();
+
 		//set a shared state
         editorState.set($scope.contentType);
 
 		// add init tab
 		addInitTab();
+	}
+
+	function convertLegacyIcons() {
+
+		// convert icons for composite content types
+		iconHelper.formatContentTypeIcons($scope.contentType.availableCompositeContentTypes);
+
+		// make array to store contentType icon
+		var contentTypeArray = [];
+
+		// push icon to array
+		contentTypeArray.push({"icon":$scope.contentType.icon});
+
+		// run through icon method
+		iconHelper.formatContentTypeIcons(contentTypeArray);
+
+		// set icon back on contentType
+		$scope.contentType.icon = contentTypeArray[0].icon;
+
 	}
 
 	function getDataTypeDetails(property) {
