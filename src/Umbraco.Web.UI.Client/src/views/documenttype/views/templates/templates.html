@@ -11,7 +11,7 @@
 
             <div class="template template-default" ng-if="contentType.defaultTemplate !== null">
                 <div class="template-content">
-                    <i class="icon icon-newspaper-alt"></i>
+                    <i class="icon {{ contentType.defaultTemplate.icon }}"></i>
                     <div class="template-name">{{ contentType.defaultTemplate.name }}</div>
                     <span class="template-default-label">(Default)</span>
                 </div>
@@ -20,7 +20,7 @@
 
             <div class="template" ng-repeat="template in contentType.allowedTemplates | filter: { id:'!'+contentType.defaultTemplate.id }">
                 <div class="template-content">
-                    <i class="icon icon-newspaper-alt"></i>
+                    <i class="icon {{ template.icon }}"></i>
                     <div class="template-name">{{ template.name }}</div>
                     <a href="" class="template-default-label link-blue" ng-click="setAsDefaultTemplate(template)">Set as default</a>
                 </div>
