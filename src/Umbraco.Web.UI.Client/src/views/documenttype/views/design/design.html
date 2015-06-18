@@ -42,10 +42,10 @@
             <div class="edt-property-group">
                 <ul class="edt-property-list no-style-list" ui-sortable="sortableOptionsEditor"
                     ng-model="tab.properties" class="no-style-list">
-                    <li ng-repeat="property in tab.properties">
+                    <li ng-repeat="property in tab.properties" class="edt-property" ng-class="{'active': property.dialogIsOpen, 'property-state-active animated fadeIn': property.propertyState=='active', 'property-state-init animated fadeIn': property.propertyState=='init', 'property-is-inherited': property.inherited, 'edt-property-handle': sortingMode}">
 
                         <!-- Init property / Property placeholder / add new property -->
-                        <div class="edt-property" ng-show="property.propertyState=='init'" ng-class="{'property-state-init animated fadeIn': property.propertyState=='init'}" ng-click="editPropertyTypeSettings(property)">
+                        <div class="edt-property-content" ng-if="property.propertyState=='init'" ng-click="editPropertyTypeSettings(property)">
 
                             <div class="edt-property-meta">
                                 <div class="placeholder-input-small"></div>
@@ -65,7 +65,7 @@
 
                         </div>
 
-                        <div class="edt-property" ng-show="property.propertyState!=='init'" ng-class="{'active': property.dialogIsOpen, 'property-state-active animated fadeIn': property.propertyState=='active', 'property-is-inherited': property.inherited, 'edt-property-handle': sortingMode}">
+                        <div class="edt-property-content" ng-if="property.propertyState!=='init'">
 
                             <!-- property meta text -->
                             <div class="edt-property-meta">
