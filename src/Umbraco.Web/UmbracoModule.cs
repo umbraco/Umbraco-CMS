@@ -199,41 +199,41 @@ namespace Umbraco.Web
             return false;
         }
 
-        private static readonly ConcurrentHashSet<string> IgnoreTicketRenewUrls = new ConcurrentHashSet<string>(); 
-        /// <summary>
-        /// Determines if the authentication ticket should be renewed with a new timeout
-        /// </summary>
-        /// <param name="url"></param>
-        /// <param name="httpContext"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// We do not want to renew the ticket when we are checking for the user's remaining timeout unless -
-        /// UmbracoConfig.For.UmbracoSettings().Security.KeepUserLoggedIn == true
-        /// </remarks>
-        internal static bool ShouldIgnoreTicketRenew(Uri url, HttpContextBase httpContext)
-        {
-            //this setting will renew the ticket for all requests.
-            if (UmbracoConfig.For.UmbracoSettings().Security.KeepUserLoggedIn)
-            {
-                return false;
-            }
+        //private static readonly ConcurrentHashSet<string> IgnoreTicketRenewUrls = new ConcurrentHashSet<string>(); 
+        ///// <summary>
+        ///// Determines if the authentication ticket should be renewed with a new timeout
+        ///// </summary>
+        ///// <param name="url"></param>
+        ///// <param name="httpContext"></param>
+        ///// <returns></returns>
+        ///// <remarks>
+        ///// We do not want to renew the ticket when we are checking for the user's remaining timeout unless -
+        ///// UmbracoConfig.For.UmbracoSettings().Security.KeepUserLoggedIn == true
+        ///// </remarks>
+        //internal static bool ShouldIgnoreTicketRenew(Uri url, HttpContextBase httpContext)
+        //{
+        //    //this setting will renew the ticket for all requests.
+        //    if (UmbracoConfig.For.UmbracoSettings().Security.KeepUserLoggedIn)
+        //    {
+        //        return false;
+        //    }
 
-            //initialize the ignore ticket urls - we don't need to lock this, it's concurrent and a hashset
-            // we don't want to have to gen the url each request so this will speed things up a teeny bit.
-            if (IgnoreTicketRenewUrls.Any() == false)
-            {                
-                var urlHelper = new UrlHelper(new RequestContext(httpContext, new RouteData()));
-                var checkSessionUrl = urlHelper.GetUmbracoApiService<AuthenticationController>(controller => controller.GetRemainingTimeoutSeconds());
-                IgnoreTicketRenewUrls.Add(checkSessionUrl);
-            }
+        //    //initialize the ignore ticket urls - we don't need to lock this, it's concurrent and a hashset
+        //    // we don't want to have to gen the url each request so this will speed things up a teeny bit.
+        //    if (IgnoreTicketRenewUrls.Any() == false)
+        //    {                
+        //        var urlHelper = new UrlHelper(new RequestContext(httpContext, new RouteData()));
+        //        var checkSessionUrl = urlHelper.GetUmbracoApiService<AuthenticationController>(controller => controller.GetRemainingTimeoutSeconds());
+        //        IgnoreTicketRenewUrls.Add(checkSessionUrl);
+        //    }
 
-            if (IgnoreTicketRenewUrls.Any(x => url.AbsolutePath.StartsWith(x)))
-            {
-                return true;
-            }
+        //    if (IgnoreTicketRenewUrls.Any(x => url.AbsolutePath.StartsWith(x)))
+        //    {
+        //        return true;
+        //    }
 
-            return false;            
-        }
+        //    return false;            
+        //}
 
 		/// <summary>
 		/// Checks the current request and ensures that it is routable based on the structure of the request and URI

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Web;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
@@ -12,6 +11,7 @@ using Microsoft.Owin.Security.Cookies;
 using Owin;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
@@ -28,7 +28,7 @@ namespace Umbraco.Web.Security.Identity
         public static void SetUmbracoLoggerFactory(this IAppBuilder app)
         {
             app.SetLoggerFactory(new OwinLoggerFactory());
-        } 
+        }
 
         #region Backoffice
 
@@ -38,8 +38,8 @@ namespace Umbraco.Web.Security.Identity
         /// <param name="app"></param>
         /// <param name="appContext"></param>
         /// <param name="userMembershipProvider"></param>
-        public static void ConfigureUserManagerForUmbracoBackOffice(this IAppBuilder app, 
-            ApplicationContext appContext, 
+        public static void ConfigureUserManagerForUmbracoBackOffice(this IAppBuilder app,
+            ApplicationContext appContext,
             MembershipProviderBase userMembershipProvider)
         {
             if (appContext == null) throw new ArgumentNullException("appContext");
@@ -93,7 +93,7 @@ namespace Umbraco.Web.Security.Identity
         public static void ConfigureUserManagerForUmbracoBackOffice<TManager, TUser>(this IAppBuilder app,
             ApplicationContext appContext,
             Func<IdentityFactoryOptions<TManager>, IOwinContext, TManager> userManager)
-            where TManager : BackOfficeUserManager<TUser> 
+            where TManager : BackOfficeUserManager<TUser>
             where TUser : BackOfficeIdentityUser
         {
             if (appContext == null) throw new ArgumentNullException("appContext");
@@ -120,13 +120,13 @@ namespace Umbraco.Web.Security.Identity
             //Don't proceed if the app is not ready
             if (appContext.IsUpgrading == false && appContext.IsConfigured == false) return app;
 
-            app.UseCookieAuthentication(new UmbracoBackOfficeCookieAuthOptions(
-                    UmbracoConfig.For.UmbracoSettings().Security,
-                    GlobalSettings.TimeOutInMinutes,
-                    GlobalSettings.UseSSL)
+            var authOptions = new UmbracoBackOfficeCookieAuthOptions(
+                UmbracoConfig.For.UmbracoSettings().Security,
+                GlobalSettings.TimeOutInMinutes,
+                GlobalSettings.UseSSL)
             {
                 Provider = new CookieAuthenticationProvider
-                {                    
+                {
                     // Enables the application to validate the security stamp when the user 
                     // logs in. This is a security feature which is used when you 
                     // change a password or add an external login to your account.  
@@ -136,7 +136,12 @@ namespace Umbraco.Web.Security.Identity
                             (manager, user) => user.GenerateUserIdentityAsync(manager),
                             identity => identity.GetUserId<int>())
                 }
-            });
+            };
+
+            //This is a custom middleware, we need to return the user's remaining logged in seconds
+            app.Use<GetUserSecondsMiddleWare>(authOptions, UmbracoConfig.For.UmbracoSettings().Security);
+
+            app.UseCookieAuthentication(authOptions);
 
             return app;
         }
@@ -171,7 +176,7 @@ namespace Umbraco.Web.Security.Identity
             });
 
             return app;
-        } 
+        }
         #endregion
 
     }

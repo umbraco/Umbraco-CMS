@@ -493,9 +493,17 @@ namespace Umbraco.Web.Editors
         private async Task SignInAsync(BackOfficeIdentityUser user, bool isPersistent)
         {
             OwinContext.Authentication.SignOut(Core.Constants.Security.BackOfficeExternalAuthenticationType);
-            
+
+            var nowUtc = DateTime.Now.ToUniversalTime();
+
             OwinContext.Authentication.SignIn(
-                new AuthenticationProperties() {IsPersistent = isPersistent},
+                new AuthenticationProperties()
+                {
+                    IsPersistent = isPersistent,
+                    AllowRefresh = true,
+                    IssuedUtc = nowUtc,
+                    ExpiresUtc = nowUtc.AddMinutes(GlobalSettings.TimeOutInMinutes)
+                },
                 await user.GenerateUserIdentityAsync(UserManager));
         }
 
