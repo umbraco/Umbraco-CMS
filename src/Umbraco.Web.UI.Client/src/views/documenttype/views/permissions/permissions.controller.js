@@ -6,7 +6,7 @@
  * @description
  * The controller for the content type editor property dialog
  */
-function PermissionsController($scope, contentTypeResource, $log) {
+function PermissionsController($scope, contentTypeResource, $log, iconHelper) {
 
     /* ----------- SCOPE VARIABLES ----------- */
 
@@ -23,6 +23,9 @@ function PermissionsController($scope, contentTypeResource, $log) {
             $scope.contentTypes = contentTypes;
 
             angular.forEach($scope.contentTypes, function(contentType){
+
+                // convert legacy icons
+                iconHelper.formatContentTypeIcons($scope.contentTypes);
 
                 var exists = false;
 
