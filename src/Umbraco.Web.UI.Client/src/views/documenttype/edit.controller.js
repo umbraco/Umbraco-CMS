@@ -15,7 +15,7 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 	$scope.page.navigation = [
 		{
 			"name": "Design",
-			"icon": "merge",
+			"icon": "document-dashed-line",
 			"view": "views/documentType/views/design/design.html",
 			"active": true,
 			"tools": [
