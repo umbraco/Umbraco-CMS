@@ -402,46 +402,50 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 	};
 
 	$scope.editPropertyTypeSettings = function(property) {
-		$scope.dialogModel = {};
-		$scope.dialogModel.title = "Edit property type settings";
-		$scope.dialogModel.property = property;
-		$scope.dialogModel.view = "views/documentType/dialogs/editPropertySettings/editPropertySettings.html";
-		$scope.showDialog = true;
 
-		// set indicator on property to tell the dialog is open - is used to set focus on the element
-		property.dialogIsOpen = true;
+		if(!property.inherited) {
 
-		// set property to active
-		property.propertyState = "active";
+			$scope.dialogModel = {};
+			$scope.dialogModel.title = "Edit property type settings";
+			$scope.dialogModel.property = property;
+			$scope.dialogModel.view = "views/documentType/dialogs/editPropertySettings/editPropertySettings.html";
+			$scope.showDialog = true;
 
-		$scope.dialogModel.changePropertyEditor = function(property) {
-			$scope.choosePropertyType(property);
-		};
+			// set indicator on property to tell the dialog is open - is used to set focus on the element
+			property.dialogIsOpen = true;
 
-		$scope.dialogModel.editDataType = function(property) {
-			$scope.configDataType(property);
-		};
+			// set property to active
+			property.propertyState = "active";
 
-		$scope.dialogModel.submit = function(model){
+			$scope.dialogModel.changePropertyEditor = function(property) {
+				$scope.choosePropertyType(property);
+			};
 
-			property.dialogIsOpen = false;
+			$scope.dialogModel.editDataType = function(property) {
+				$scope.configDataType(property);
+			};
 
-			$scope.showDialog = false;
-			$scope.dialogModel = null;
+			$scope.dialogModel.submit = function(model){
 
-			// push new init property to scope
-			addInitPropertyOnActiveTab();
+				property.dialogIsOpen = false;
 
-		};
+				$scope.showDialog = false;
+				$scope.dialogModel = null;
 
-		$scope.dialogModel.close = function(model){
-			$scope.showDialog = false;
-			$scope.dialogModel = null;
+				// push new init property to scope
+				addInitPropertyOnActiveTab();
 
-			// push new init property to scope
-			addInitPropertyOnActiveTab();
-		};
+			};
 
+			$scope.dialogModel.close = function(model){
+				$scope.showDialog = false;
+				$scope.dialogModel = null;
+
+				// push new init property to scope
+				addInitPropertyOnActiveTab();
+			};
+
+		}
 	};
 
 	$scope.choosePropertyType = function(property) {
