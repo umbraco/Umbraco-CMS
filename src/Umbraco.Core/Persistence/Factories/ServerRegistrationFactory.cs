@@ -5,8 +5,6 @@ namespace Umbraco.Core.Persistence.Factories
 {
     internal class ServerRegistrationFactory 
     {
-        #region Implementation of IEntityFactory<Language,LanguageDto>
-
         public ServerRegistration BuildEntity(ServerRegistrationDto dto)
         {
             var model = new ServerRegistration(dto.Id, dto.ServerAddress, dto.ServerIdentity, dto.DateRegistered, dto.DateAccessed, dto.IsActive);
@@ -16,23 +14,21 @@ namespace Umbraco.Core.Persistence.Factories
             return model;
         }
 
-        public ServerRegistrationDto BuildDto(ServerRegistration entity)
+        public ServerRegistrationDto BuildDto(IServerRegistration entity)
         {
             var dto = new ServerRegistrationDto
-                {
-                    ServerAddress = entity.ServerAddress,
-                    DateRegistered = entity.CreateDate,
-                    IsActive = entity.IsActive,
-                    DateAccessed = entity.UpdateDate,
-                    ServerIdentity = entity.ServerIdentity
-                };
+            {
+                ServerAddress = entity.ServerAddress,
+                DateRegistered = entity.CreateDate,
+                IsActive = entity.IsActive,
+                DateAccessed = entity.UpdateDate,
+                ServerIdentity = entity.ServerIdentity
+            };
 
             if (entity.HasIdentity)
                 dto.Id = entity.Id;
 
             return dto;
         }
-
-        #endregion
     }
 }

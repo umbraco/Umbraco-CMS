@@ -13,14 +13,14 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal class ServerRegistrationRepository : PetaPocoRepositoryBase<int, ServerRegistration>
+    internal class ServerRegistrationRepository : PetaPocoRepositoryBase<int, IServerRegistration>, IServerRegistrationRepository
     {
         public ServerRegistrationRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
         {
         }
 
-        protected override ServerRegistration PerformGet(int id)
+        protected override IServerRegistration PerformGet(int id)
         {
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
@@ -39,45 +39,35 @@ namespace Umbraco.Core.Persistence.Repositories
             return entity;
         }
 
-        protected override IEnumerable<ServerRegistration> PerformGetAll(params int[] ids)
+        protected override IEnumerable<IServerRegistration> PerformGetAll(params int[] ids)
         {
+            var factory = new ServerRegistrationFactory();
+
             if (ids.Any())
             {
-                foreach (var id in ids)
-                {
-                    yield return Get(id);
-                }
+                return Database.Fetch<ServerRegistrationDto>("WHERE id in (@ids)", new { ids = ids })
+                    .Select(x => factory.BuildEntity(x));
             }
-            else
-            {
-                var serverDtos = Database.Fetch<ServerRegistrationDto>("WHERE id > 0");
-                foreach (var serverDto in serverDtos)
-                {
-                    yield return Get(serverDto.Id);
-                }
-            }
+
+            return Database.Fetch<ServerRegistrationDto>("WHERE id > 0")
+                .Select(x => factory.BuildEntity(x));
         }
 
-        protected override IEnumerable<ServerRegistration> PerformGetByQuery(IQuery<ServerRegistration> query)
+        protected override IEnumerable<IServerRegistration> PerformGetByQuery(IQuery<IServerRegistration> query)
         {
+            var factory = new ServerRegistrationFactory();
             var sqlClause = GetBaseQuery(false);
-            var translator = new SqlTranslator<ServerRegistration>(sqlClause, query);
+            var translator = new SqlTranslator<IServerRegistration>(sqlClause, query);
             var sql = translator.Translate();
 
-            var dtos = Database.Fetch<ServerRegistration>(sql);
-
-            foreach (var dto in dtos)
-            {
-                yield return Get(dto.Id);
-            }
-
+            return Database.Fetch<ServerRegistrationDto>(sql).Select(x => factory.BuildEntity(x));
         }
 
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*")
-               .From<ServerRegistrationDto>();
+               .From<ServerRegistrationDto>(SqlSyntax);
             return sql;
         }
 
@@ -100,9 +90,9 @@ namespace Umbraco.Core.Persistence.Repositories
             get { throw new NotImplementedException(); }
         }
 
-        protected override void PersistNewItem(ServerRegistration entity)
+        protected override void PersistNewItem(IServerRegistration entity)
         {
-            entity.AddingEntity();
+            ((ServerRegistration)entity).AddingEntity();
 
             var factory = new ServerRegistrationFactory();
             var dto = factory.BuildDto(entity);
@@ -113,9 +103,9 @@ namespace Umbraco.Core.Persistence.Repositories
             entity.ResetDirtyProperties();
         }
 
-        protected override void PersistUpdatedItem(ServerRegistration entity)
+        protected override void PersistUpdatedItem(IServerRegistration entity)
         {
-            entity.UpdatingEntity();
+            ((ServerRegistration)entity).UpdatingEntity();
 
             var factory = new ServerRegistrationFactory();
             var dto = factory.BuildDto(entity);
@@ -129,7 +119,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var timeoutDate = DateTime.UtcNow.Subtract(staleTimeout);
 
-            Database.Update<ServerRegistrationDto>("SET isActive=0 WHERE lastNotifiedDate < @timeoutDate", new {timeoutDate = timeoutDate});
+            Database.Update<ServerRegistrationDto>("SET isActive=0 WHERE lastNotifiedDate < @timeoutDate", new { timeoutDate = timeoutDate });
         }
 
     }

@@ -18,6 +18,7 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class ServiceContext
     {
+        private Lazy<IMigrationEntryService> _migrationEntryService; 
         private Lazy<IPublicAccessService> _publicAccessService; 
         private Lazy<ITaskService> _taskService; 
         private Lazy<IDomainService> _domainService; 
@@ -33,7 +34,7 @@ namespace Umbraco.Core.Services
         private Lazy<IFileService> _fileService;
         private Lazy<ILocalizationService> _localizationService;
         private Lazy<IPackagingService> _packagingService;
-        private Lazy<ServerRegistrationService> _serverRegistrationService;
+        private Lazy<IServerRegistrationService> _serverRegistrationService;
         private Lazy<IEntityService> _entityService;
         private Lazy<IRelationService> _relationService;
         private Lazy<IApplicationTreeService> _treeService;
@@ -70,6 +71,8 @@ namespace Umbraco.Core.Services
         /// <param name="taskService"></param>
         /// <param name="macroService"></param>
         /// <param name="publicAccessService"></param>
+        /// <param name="externalLoginService"></param>
+        /// <param name="migrationEntryService"></param>
         public ServiceContext(
             IContentService contentService = null,
             IMediaService mediaService = null,
@@ -94,8 +97,10 @@ namespace Umbraco.Core.Services
             ITaskService taskService = null,
             IMacroService macroService = null,
             IPublicAccessService publicAccessService = null,
-            IExternalLoginService externalLoginService = null)
+            IExternalLoginService externalLoginService = null,
+            IMigrationEntryService migrationEntryService = null)
         {
+            if (migrationEntryService != null) _migrationEntryService = new Lazy<IMigrationEntryService>(() => migrationEntryService);
             if (externalLoginService != null) _externalLoginService = new Lazy<IExternalLoginService>(() => externalLoginService);
             if (auditService != null) _auditService = new Lazy<IAuditService>(() => auditService);
             if (localizedTextService != null) _localizedTextService = new Lazy<ILocalizedTextService>(() => localizedTextService);
@@ -148,6 +153,9 @@ namespace Umbraco.Core.Services
         {
             var provider = dbUnitOfWorkProvider;
             var fileProvider = fileUnitOfWorkProvider;
+
+            if (_migrationEntryService == null)
+                _migrationEntryService = new Lazy<IMigrationEntryService>(() => new MigrationEntryService(provider, repositoryFactory, logger));
 
             if (_externalLoginService == null)
                 _externalLoginService = new Lazy<IExternalLoginService>(() => new ExternalLoginService(provider, repositoryFactory, logger));
@@ -205,7 +213,7 @@ namespace Umbraco.Core.Services
                 _notificationService = new Lazy<INotificationService>(() => new NotificationService(provider, _userService.Value, _contentService.Value, logger));
 
             if (_serverRegistrationService == null)
-                _serverRegistrationService = new Lazy<ServerRegistrationService>(() => new ServerRegistrationService(provider, repositoryFactory, logger));
+                _serverRegistrationService = new Lazy<IServerRegistrationService>(() => new ServerRegistrationService(provider, repositoryFactory, logger));
 
             if (_userService == null)
                 _userService = new Lazy<IUserService>(() => new UserService(provider, repositoryFactory, logger));
@@ -264,6 +272,14 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Gets the <see cref="IMigrationEntryService"/>
+        /// </summary>
+        public IMigrationEntryService MigrationEntryService
+        {
+            get { return _migrationEntryService.Value; }
+        }
+
+        /// <summary>
         /// Gets the <see cref="IPublicAccessService"/>
         /// </summary>
         public IPublicAccessService PublicAccessService
@@ -314,7 +330,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets the <see cref="ServerRegistrationService"/>
         /// </summary>
-        public ServerRegistrationService ServerRegistrationService
+        public IServerRegistrationService ServerRegistrationService
         {
             get { return _serverRegistrationService.Value; }
         }
