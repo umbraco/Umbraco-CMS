@@ -3,11 +3,17 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Security.Claims;
+using System.ServiceModel.Security;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 using System.Web.UI;
 using dotless.Core.Parser.Tree;
+using Microsoft.AspNet.Identity;
+using Microsoft.Owin;
+using Microsoft.Owin.Security;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Configuration;
@@ -27,6 +33,13 @@ using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Models;
 using Umbraco.Web.WebServices;
 using Umbraco.Web.WebApi.Filters;
+using System.Web;
+using AutoMapper;
+using Microsoft.AspNet.Identity.Owin;
+using Umbraco.Core.Models.Identity;
+using Umbraco.Core.Security;
+using Task = System.Threading.Tasks.Task;
+using Umbraco.Web.Security.Identity;
 
 namespace Umbraco.Web.Editors
 {
@@ -37,13 +50,22 @@ namespace Umbraco.Web.Editors
     [DisableClientCache]
     public class BackOfficeController : UmbracoController
     {
+        private BackOfficeUserManager _userManager;
+
+        protected BackOfficeUserManager UserManager
+        {
+            get { return _userManager ?? (_userManager = OwinContext.GetUserManager<BackOfficeUserManager>()); }
+        }
+
         /// <summary>
         /// Render the default view
         /// </summary>
         /// <returns></returns>
-        public ActionResult Default()
+        public async Task<ActionResult> Default()
         {
-            return View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml");
+            return await RenderDefaultOrProcessExternalLoginAsync(
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml"),
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml"));
         }
 
         /// <summary>
@@ -52,9 +74,13 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>      
         [HttpGet]
-        public ActionResult AuthorizeUpgrade()
+        public async Task<ActionResult> AuthorizeUpgrade()
         {
-            return View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml");
+            return await RenderDefaultOrProcessExternalLoginAsync(
+                //The default view to render when there is no external login info or errors
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml"),
+                //The ActionResult to perform if external login is successful
+                () => Redirect("/"));
         }
 
         /// <summary>
@@ -65,9 +91,9 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public JsonNetResult LocalizedText(string culture = null)
         {
-            var cultureInfo = culture == null 
+            var cultureInfo = string.IsNullOrWhiteSpace(culture)
                 //if the user is logged in, get their culture, otherwise default to 'en'
-                ? User.Identity.IsAuthenticated && User.Identity is UmbracoBackOfficeIdentity
+                ? User.Identity.IsAuthenticated
                     ? Security.CurrentUser.GetUserCulture(Services.TextService) 
                     : CultureInfo.GetCultureInfo("en")
                 : CultureInfo.GetCultureInfo(culture);
@@ -137,48 +163,14 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public JsonNetResult GetGridConfig()
         {
-            Func<List<GridEditor>> getResult = () =>
-            {
-                var editors = new List<GridEditor>();
-                var gridConfig = Server.MapPath("~/Config/grid.editors.config.js");
-                if (System.IO.File.Exists(gridConfig))
-                {
-                    try
-                    {
-                        var arr = JArray.Parse(System.IO.File.ReadAllText(gridConfig));
-                        //ensure the contents parse correctly to objects
-                        var parsed = ManifestParser.GetGridEditors(arr);
-                        editors.AddRange(parsed);
-                    }
-                    catch (Exception ex)
-                    {
-                        LogHelper.Error<BackOfficeController>("Could not parse the contents of grid.editors.config.js into a JSON array", ex);
-                    }
-                }
+            var gridConfig = UmbracoConfig.For.GridConfig(
+                Logger,
+                ApplicationContext.ApplicationCache.RuntimeCache,
+                new DirectoryInfo(Server.MapPath(SystemDirectories.AppPlugins)),
+                new DirectoryInfo(Server.MapPath(SystemDirectories.Config)),
+                HttpContext.IsDebuggingEnabled);
 
-                var plugins = new DirectoryInfo(Server.MapPath("~/App_Plugins"));
-                var parser = new ManifestParser(plugins, ApplicationContext.ApplicationCache.RuntimeCache);
-                var builder = new ManifestBuilder(ApplicationContext.ApplicationCache.RuntimeCache, parser);
-                foreach (var gridEditor in builder.GridEditors)
-                {
-                    //no duplicates! (based on alias)
-                    if (editors.Contains(gridEditor) == false)
-                    {
-                        editors.Add(gridEditor);
-                    }
-                }
-                return editors;
-            };
-
-            //cache the result if debugging is disabled
-            var result = HttpContext.IsDebuggingEnabled
-                ? getResult()
-                : ApplicationContext.ApplicationCache.RuntimeCache.GetCacheItem<List<GridEditor>>(
-                    typeof(BackOfficeController) + "GetGridConfig",
-                    () => getResult(),
-                    new TimeSpan(0, 10, 0));
-            
-            return new JsonNetResult { Data = result, Formatting = Formatting.Indented };
+            return new JsonNetResult { Data = gridConfig.EditorsConfig.Editors, Formatting = Formatting.Indented };
         }
 
         /// <summary>
@@ -196,6 +188,8 @@ namespace Umbraco.Web.Editors
                     {
                         "umbracoUrls", new Dictionary<string, object>
                         {
+                        {"externalLoginsUrl", Url.Action("ExternalLogin", "BackOffice")},
+                        {"externalLinkLoginsUrl", Url.Action("LinkLogin", "BackOffice")},
                             {"legacyTreeJs", Url.Action("LegacyTreeJs", "BackOffice")},
                             {"manifestAssetList", Url.Action("GetManifestAssetList", "BackOffice")},
                             {"gridConfig", Url.Action("GetGridConfig", "BackOffice")},
@@ -278,6 +272,10 @@ namespace Umbraco.Web.Editors
                                     controller => controller.Fetch(string.Empty))
                             },
                             {
+                            "relationApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<RelationController>(
+                                controller => controller.GetById(0))
+                        },
+                        {
                                 "rteApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<RichTextPreValueController>(
                                     controller => controller.GetConfiguration())
                             },
@@ -343,7 +341,25 @@ namespace Umbraco.Web.Editors
                         }
                     },
                     {"isDebuggingEnabled", HttpContext.IsDebuggingEnabled},
-                    {"application", GetApplicationState()}
+                {
+                    "application", GetApplicationState()
+                },
+                {
+                    "externalLogins", new Dictionary<string, object>
+                    {
+                        {
+                            "providers", HttpContext.GetOwinContext().Authentication.GetExternalAuthenticationTypes()
+                                .Where(p => p.Properties.ContainsKey("UmbracoBackOffice"))
+                                .Select(p => new
+                                {
+                                    authType = p.AuthenticationType, caption = p.Caption,
+                                    //TODO: Need to see if this exposes any sensitive data!
+                                    properties = p.Properties
+                                })
+                                .ToArray()
+                        }
+                    }
+                }
                 };
 
                 //Parse the variables to a string
@@ -360,6 +376,141 @@ namespace Umbraco.Web.Editors
 
             return JavaScript(result);
         }
+        
+        [HttpPost]
+        public ActionResult ExternalLogin(string provider, string redirectUrl = null)
+        {
+            if (redirectUrl == null)
+            {
+                redirectUrl = Url.Action("Default", "BackOffice");
+            }
+
+            // Request a redirect to the external login provider
+            return new ChallengeResult(provider, redirectUrl);
+        }
+
+        [UmbracoAuthorize]
+        [HttpPost]
+        public ActionResult LinkLogin(string provider)
+        {
+            // Request a redirect to the external login provider to link a login for the current user
+            return new ChallengeResult(provider,
+                Url.Action("ExternalLinkLoginCallback", "BackOffice"),
+                User.Identity.GetUserId());
+        }
+
+        
+
+        [HttpGet]
+        public async Task<ActionResult> ExternalLinkLoginCallback()
+        {
+            var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync(
+                Core.Constants.Security.BackOfficeExternalAuthenticationType,
+                XsrfKey, User.Identity.GetUserId());
+            
+            if (loginInfo == null)
+            {
+                //Add error and redirect for it to be displayed
+                TempData["ExternalSignInError"] = new[] { "An error occurred, could not get external login info" };
+                return RedirectToLocal(Url.Action("Default", "BackOffice"));
+            }
+
+            var result = await UserManager.AddLoginAsync(User.Identity.GetUserId<int>(), loginInfo.Login);
+            if (result.Succeeded)
+            {
+                return RedirectToLocal(Url.Action("Default", "BackOffice"));
+            }
+
+            //Add errors and redirect for it to be displayed
+            TempData["ExternalSignInError"] = result.Errors;
+            return RedirectToLocal(Url.Action("Default", "BackOffice"));
+        }
+
+        /// <summary>
+        /// Used by Default and AuthorizeUpgrade to render as per normal if there's no external login info, otherwise
+        /// process the external login info.
+        /// </summary>
+        /// <returns></returns>
+        private async Task<ActionResult> RenderDefaultOrProcessExternalLoginAsync(Func<ActionResult> defaultResponse, Func<ActionResult> externalSignInResponse)
+        {
+            if (defaultResponse == null) throw new ArgumentNullException("defaultResponse");
+            if (externalSignInResponse == null) throw new ArgumentNullException("externalSignInResponse");
+
+            ViewBag.UmbracoPath = GlobalSettings.UmbracoMvcArea;
+
+            //check if there's errors in the TempData, assign to view bag and render the view
+            if (TempData["ExternalSignInError"] != null)
+            {
+                ViewBag.ExternalSignInError = TempData["ExternalSignInError"];
+                return defaultResponse();
+            }
+
+            //First check if there's external login info, if there's not proceed as normal
+            var loginInfo = await OwinContext.Authentication.GetExternalLoginInfoAsync(
+                Core.Constants.Security.BackOfficeExternalAuthenticationType);
+
+            if (loginInfo == null)
+            {
+                return defaultResponse();
+            }
+
+            //we're just logging in with an external source, not linking accounts
+            return await ExternalSignInAsync(loginInfo, externalSignInResponse);
+        }
+
+        private async Task<ActionResult> ExternalSignInAsync(ExternalLoginInfo loginInfo, Func<ActionResult> response)
+        {
+            if (loginInfo == null) throw new ArgumentNullException("loginInfo");
+            if (response == null) throw new ArgumentNullException("response");
+
+            // Sign in the user with this external login provider if the user already has a login
+            var user = await UserManager.FindAsync(loginInfo.Login);
+            if (user != null)
+            {
+                //TODO: It might be worth keeping some of the claims associated with the ExternalLoginInfo, in which case we 
+                // wouldn't necessarily sign the user in here with the standard login, instead we'd update the 
+                // UseUmbracoBackOfficeExternalCookieAuthentication extension method to have the correct provider and claims factory,
+                // ticket format, etc.. to create our back office user including the claims assigned and in this method we'd just ensure 
+                // that the ticket is created and stored and that the user is logged in.
+
+                //sign in
+                await SignInAsync(user, isPersistent: false);
+            }
+            else
+            {
+                ViewBag.ExternalSignInError = new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not been linked to to an account" };
+
+                //Remove the cookie otherwise this message will keep appearing
+                if (Response.Cookies[Core.Constants.Security.BackOfficeExternalCookieName] != null)
+                {
+                    Response.Cookies[Core.Constants.Security.BackOfficeExternalCookieName].Expires = DateTime.MinValue;    
+                }
+            }
+
+            return response();
+        }
+
+        private async Task SignInAsync(BackOfficeIdentityUser user, bool isPersistent)
+        {
+            OwinContext.Authentication.SignOut(Core.Constants.Security.BackOfficeExternalAuthenticationType);
+
+            var nowUtc = DateTime.Now.ToUniversalTime();
+
+            OwinContext.Authentication.SignIn(
+                new AuthenticationProperties()
+                {
+                    IsPersistent = isPersistent,
+                    AllowRefresh = true,
+                    IssuedUtc = nowUtc,
+                    ExpiresUtc = nowUtc.AddMinutes(GlobalSettings.TimeOutInMinutes)
+                },
+                await user.GenerateUserIdentityAsync(UserManager));
+        }
+
+        private IAuthenticationManager AuthenticationManager
+        {
+            get { return OwinContext.Authentication; }
+        }        
         
         /// <summary>
         /// Returns the server variables regarding the application state
@@ -507,5 +658,43 @@ namespace Umbraco.Web.Editors
             JsUrl
         }
 
+        private ActionResult RedirectToLocal(string returnUrl)
+        {
+            if (Url.IsLocalUrl(returnUrl))
+            {
+                return Redirect(returnUrl);
+            }
+            return Redirect("/");
+        }
+
+        // Used for XSRF protection when adding external logins
+        private const string XsrfKey = "XsrfId";
+
+        private class ChallengeResult : HttpUnauthorizedResult
+        {
+            public ChallengeResult(string provider, string redirectUri, string userId = null)
+            {
+                LoginProvider = provider;
+                RedirectUri = redirectUri;
+                UserId = userId;
+            }
+
+            private string LoginProvider { get; set; }
+            private string RedirectUri { get; set; }
+            private string UserId { get; set; }
+
+            public override void ExecuteResult(ControllerContext context)
+            {
+                //Ensure the forms auth module doesn't do a redirect!
+                context.HttpContext.Response.SuppressFormsAuthenticationRedirect = true;
+
+                var properties = new AuthenticationProperties() { RedirectUri = RedirectUri.EnsureEndsWith('/') };
+                if (UserId != null)
+                {
+                    properties.Dictionary[XsrfKey] = UserId;
+                }
+                context.HttpContext.GetOwinContext().Authentication.Challenge(properties, LoginProvider);
+            }
+        }
     }
 }

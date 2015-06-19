@@ -8,7 +8,6 @@ using System.Xml.XPath;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Tests.TestHelpers;
 using umbraco;
 
 namespace Umbraco.Tests
@@ -19,7 +18,6 @@ namespace Umbraco.Tests
         [SetUp]
         public void Setup()
         {
-            TestHelper.SetupLog4NetForTests();
         }
 
         [Ignore("This is a benchmark test so is ignored by default")]

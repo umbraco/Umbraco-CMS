@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Caching;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -16,12 +17,19 @@ namespace Umbraco.Core.Cache
     /// </summary>
     internal class ObjectCacheRuntimeCacheProvider : IRuntimeCacheProvider
     {
+
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
         internal ObjectCache MemoryCache;
+
+        /// <summary>
+        /// Used for debugging
+        /// </summary>
+        internal Guid InstanceId { get; private set; }
 
         public ObjectCacheRuntimeCacheProvider()
         {
             MemoryCache = new MemoryCache("in-memory");
+            InstanceId = Guid.NewGuid();
         }
 
         #region Clear
@@ -46,6 +54,9 @@ namespace Umbraco.Core.Cache
 
         public virtual void ClearCacheObjectTypes(string typeName)
         {
+            var type = TypeFinder.GetTypeByName(typeName);
+            if (type == null) return;
+            var isInterface = type.IsInterface;
             using (new WriteLock(_locker))
             {
                 foreach (var key in MemoryCache
@@ -55,7 +66,10 @@ namespace Umbraco.Core.Cache
                         // remove null values as well, does not hurt
                         // get non-created as NonCreatedValue & exceptions as null
                         var value = DictionaryCacheProviderBase.GetSafeLazyValue((Lazy<object>)x.Value, true);
-                        return value == null || value.GetType().ToString().InvariantEquals(typeName);
+
+                        // if T is an interface remove anything that implements that interface
+                        // otherwise remove exact types (not inherited types)
+                        return value == null || (isInterface ? (type.IsInstanceOfType(value)) : (value.GetType() == type));
                     })
                     .Select(x => x.Key)
                     .ToArray()) // ToArray required to remove
@@ -68,6 +82,7 @@ namespace Umbraco.Core.Cache
             using (new WriteLock(_locker))
             {
                 var typeOfT = typeof (T);
+                var isInterface = typeOfT.IsInterface;
                 foreach (var key in MemoryCache
                     .Where(x =>
                     {
@@ -75,7 +90,11 @@ namespace Umbraco.Core.Cache
                         // remove null values as well, does not hurt
                         // get non-created as NonCreatedValue & exceptions as null
                         var value = DictionaryCacheProviderBase.GetSafeLazyValue((Lazy<object>)x.Value, true);
-                        return value == null || value.GetType() == typeOfT;
+
+                        // if T is an interface remove anything that implements that interface
+                        // otherwise remove exact types (not inherited types)
+                        return value == null || (isInterface ? (value is T) : (value.GetType() == typeOfT));
+
                     })
                     .Select(x => x.Key)
                     .ToArray()) // ToArray required to remove
@@ -88,6 +107,7 @@ namespace Umbraco.Core.Cache
             using (new WriteLock(_locker))
             {
                 var typeOfT = typeof(T);
+                var isInterface = typeOfT.IsInterface;
                 foreach (var key in MemoryCache
                     .Where(x =>
                     {
@@ -96,8 +116,11 @@ namespace Umbraco.Core.Cache
                         // get non-created as NonCreatedValue & exceptions as null
                         var value = DictionaryCacheProviderBase.GetSafeLazyValue((Lazy<object>)x.Value, true);
                         if (value == null) return true;
-                        return value.GetType() == typeOfT
-                            && predicate(x.Key, (T) value);
+
+                        // if T is an interface remove anything that implements that interface
+                        // otherwise remove exact types (not inherited types)
+                        return (isInterface ? (value is T) : (value.GetType() == typeOfT))
+                               && predicate(x.Key, (T)value);
                     })
                     .Select(x => x.Key)
                     .ToArray()) // ToArray required to remove
@@ -193,6 +216,7 @@ namespace Umbraco.Core.Cache
                     var policy = GetPolicy(timeout, isSliding, removedCallback, dependentFiles);
 
                     lck.UpgradeToWriteLock();
+                    //NOTE: This does an add or update
                     MemoryCache.Set(cacheKey, result, policy);
                 }
             }
@@ -219,6 +243,7 @@ namespace Umbraco.Core.Cache
             if (value == null) return; // do not store null values (backward compat)
 
             var policy = GetPolicy(timeout, isSliding, removedCallback, dependentFiles);
+            //NOTE: This does an add or update
             MemoryCache.Set(cacheKey, result, policy);
         }
 

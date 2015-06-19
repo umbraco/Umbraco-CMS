@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
@@ -12,8 +13,11 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     [SqlSyntaxProviderAttribute("MySql.Data.MySqlClient")]
     public class MySqlSyntaxProvider : SqlSyntaxProviderBase<MySqlSyntaxProvider>
     {
-        public MySqlSyntaxProvider()
+        private readonly ILogger _logger;
+
+        public MySqlSyntaxProvider(ILogger logger)
         {
+            _logger = logger;
             DefaultStringLength = 255;
             StringLengthColumnDefinitionFormat = StringLengthUnicodeColumnDefinitionFormat;
             StringColumnDefinition = string.Format(StringLengthColumnDefinitionFormat, DefaultStringLength);
@@ -357,7 +361,7 @@ ORDER BY TABLE_NAME, INDEX_NAME",
             }
             catch (Exception ex)
             {
-                Logging.LogHelper.Error<MySqlSyntaxProvider>("Error querying for lower_case support", ex);
+                _logger.Error<MySqlSyntaxProvider>("Error querying for lower_case support", ex);
             }
             finally
             {

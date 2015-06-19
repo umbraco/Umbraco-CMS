@@ -176,3 +176,80 @@ body {
 .emptySection #contentwrapper {left: 80px;}
 .emptySection #speechbubble {left: 0;}
 .emptySection #navigation {display: none}
+
+.login-only #speechbubble {
+    z-index: 10000;
+    left: 0 !important;
+}
+.login-only #speechbubble ul {
+    padding-left:20px
+}
+
+
+
+@media (max-width: 767px) {
+    
+    // make leftcolumn smaller on tablets
+    #leftcolumn {
+      width: 60px;
+    }
+    #applications ul.sections {
+        width: 60px;
+    }
+    ul.sections.sections-tray {
+        width: 60px;
+    }
+    #applications-tray {
+        left: 60px;
+    }
+    #navigation {
+        left: 60px;
+    }
+    #contentwrapper, #contentcolumn {
+        left: 30px;
+    }
+    #umbracoMainPageBody .umb-modal-left.fade.in {
+      margin-left: 60px;
+    }
+}
+
+
+
+@media (max-width: 500px) {
+    
+    // make leftcolumn smaller on mobiles
+    #leftcolumn {
+      width: 40px;
+    }
+    #applications ul.sections {
+        width: 40px;
+    }
+    ul.sections li [class^="icon-"]:before {
+        font-size: 25px!important;
+    }
+    #applications ul.sections li.avatar a img  {
+        width: 25px;
+    }
+    ul.sections a span {
+        display:none !important;
+    }
+    #applications ul.sections-tray {
+        width: 40px;
+    }
+    ul.sections.sections-tray {
+        width: 40px;
+    }
+    #applications-tray {
+        left: 40px;
+    }
+    #navigation {
+        left: 40px;
+    }
+    #contentwrapper, #contentcolumn {
+        left: 20px;
+    }
+    #umbracoMainPageBody .umb-modal-left.fade.in {
+        margin-left: 40px;
+        width: 85%!important;
+    }
+}

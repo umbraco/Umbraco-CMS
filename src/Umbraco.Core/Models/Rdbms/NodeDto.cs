@@ -40,9 +40,9 @@ namespace Umbraco.Core.Models.Rdbms
         public int SortOrder { get; set; }
 
         [Column("uniqueID")]
-        [NullSetting(NullSetting = NullSettings.Null)]
-        [Index(IndexTypes.NonClustered, Name = "IX_umbracoNodeUniqueID")]
-        public Guid? UniqueId { get; set; }
+        [NullSetting(NullSetting = NullSettings.NotNull)]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoNodeUniqueID")]
+        public Guid UniqueId { get; set; }
 
         [Column("text")]
         [NullSetting(NullSetting = NullSettings.Null)]

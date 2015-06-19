@@ -8,6 +8,13 @@ namespace Umbraco.Core
 {
 	internal static class NameValueCollectionExtensions
 	{
+        public static IEnumerable<KeyValuePair<string, string>> AsEnumerable(this NameValueCollection nvc)
+        {
+            foreach (string key in nvc.AllKeys)
+            {
+                yield return new KeyValuePair<string, string>(key, nvc[key]);
+            }
+        }
 
 		public static bool ContainsKey(this NameValueCollection collection, string key)
 		{

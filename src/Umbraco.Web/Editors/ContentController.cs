@@ -151,13 +151,13 @@ namespace Umbraco.Web.Editors
         [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IContent>>), "Items")]
         public PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>> GetChildren(
             int id, 
-            int pageNumber = 0, 
+            int pageNumber = 0,  //TODO: This should be '1' as it's not the index
             int pageSize = 0, 
             string orderBy = "SortOrder", 
             Direction orderDirection = Direction.Ascending, 
             string filter = "")
         {
-            int totalChildren;
+            long totalChildren;
             IContent[] children;
             if (pageNumber > 0 && pageSize > 0)
             {
@@ -181,8 +181,14 @@ namespace Umbraco.Web.Editors
             return pagedResult;
         }
 
-        [HttpGet]
+        [Obsolete("Dont use this, it is incorrectly named, use HasPermission instead")]
         public bool GetHasPermission(string permissionToCheck, int nodeId)
+        {
+           return HasPermission(permissionToCheck, nodeId);
+        }
+
+        [HttpGet]
+        public bool HasPermission(string permissionToCheck, int nodeId)
         {
             var p = Services.UserService.GetPermissions(Security.CurrentUser, nodeId).FirstOrDefault();
             if (p != null && p.AssignedPermissions.Contains(permissionToCheck.ToString(CultureInfo.InvariantCulture)))

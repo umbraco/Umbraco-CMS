@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Web;
 using System.Web.Mvc;
+using Microsoft.Owin;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
 
@@ -17,30 +20,68 @@ namespace Umbraco.Web.Mvc
             UmbracoContext = umbracoContext;
         }
 
+        protected UmbracoController(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper)
+        {
+            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            if (umbracoHelper == null) throw new ArgumentNullException("umbracoHelper");
+            UmbracoContext = umbracoContext;
+            _umbraco = umbracoHelper;
+        }
+
         protected UmbracoController()
             : this(UmbracoContext.Current)
         {
             
         }
 
+        protected IOwinContext OwinContext
+        {
+            get { return Request.GetOwinContext(); }
+        }
+
         private UmbracoHelper _umbraco;
+
+        /// <summary>
+        /// Returns the MemberHelper instance
+        /// </summary>
+        public MembershipHelper Members
+        {
+            get { return Umbraco.MembershipHelper; }
+        }
+
         /// <summary>
         /// Returns an UmbracoHelper object
         /// </summary>
-        public UmbracoHelper Umbraco
+        public virtual UmbracoHelper Umbraco
         {
             get { return _umbraco ?? (_umbraco = new UmbracoHelper(UmbracoContext)); }
         }
 
         /// <summary>
+        /// Returns an ILogger
+        /// </summary>
+        public ILogger Logger
+        {
+            get { return ProfilingLogger.Logger; }
+        }
+
+        /// <summary>
+        /// Returns a ProfilingLogger
+        /// </summary>
+        public virtual ProfilingLogger ProfilingLogger
+        {
+            get { return UmbracoContext.Application.ProfilingLogger; }
+        }
+
+        /// <summary>
         /// Returns the current UmbracoContext
         /// </summary>
-        public UmbracoContext UmbracoContext { get; private set; }
+        public virtual UmbracoContext UmbracoContext { get; private set; }
 
         /// <summary>
         /// Returns the current ApplicationContext
         /// </summary>
-        public ApplicationContext ApplicationContext
+        public virtual ApplicationContext ApplicationContext
         {
             get { return UmbracoContext.Application; }
         }
@@ -64,7 +105,7 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Returns the WebSecurity instance
         /// </summary>
-        public WebSecurity Security
+        public virtual WebSecurity Security
         {
             get { return UmbracoContext.Security; }
         }

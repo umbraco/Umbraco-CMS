@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Core.Macros
@@ -9,13 +10,14 @@ namespace Umbraco.Core.Macros
     /// </summary>
     internal sealed class XsltExtensionsResolver : LazyManyObjectsResolverBase<XsltExtensionsResolver, XsltExtension>
     {
-
         /// <summary>
-		/// Constructor
-		/// </summary>
-		/// <param name="packageActions"></param>		
-        internal XsltExtensionsResolver(Func<IEnumerable<Type>> packageActions)
-			: base(packageActions, ObjectLifetimeScope.Application)
+        /// Constructor
+        /// </summary>
+        /// <param name="serviceProvider"></param>
+        /// <param name="logger"></param>
+        /// <param name="packageActions"></param>		
+        internal XsltExtensionsResolver(IServiceProvider serviceProvider, ILogger logger, Func<IEnumerable<Type>> packageActions)
+            : base(serviceProvider, logger, packageActions, ObjectLifetimeScope.Application)
 		{
 
 		}

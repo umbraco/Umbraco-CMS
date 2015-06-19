@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Events;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence;
@@ -10,17 +11,20 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
 {
-    public class RelationService : IRelationService
+    public class RelationService : RepositoryService, IRelationService
     {
-        private readonly IDatabaseUnitOfWorkProvider _uowProvider;
-        private readonly RepositoryFactory _repositoryFactory;
         private readonly IEntityService _entityService;
 
-        public RelationService(IDatabaseUnitOfWorkProvider uowProvider, RepositoryFactory repositoryFactory,
-                               IEntityService entityService)
+        [Obsolete("Use the constructors that specify all dependencies instead")]
+        public RelationService(IDatabaseUnitOfWorkProvider uowProvider, RepositoryFactory repositoryFactory, IEntityService entityService)
+            : this(uowProvider, repositoryFactory, LoggerResolver.Current.Logger, entityService)
         {
-            _uowProvider = uowProvider;
-            _repositoryFactory = repositoryFactory;
+        }
+
+        public RelationService(IDatabaseUnitOfWorkProvider uowProvider, RepositoryFactory repositoryFactory, ILogger logger, IEntityService entityService)
+            : base(uowProvider, repositoryFactory, logger)
+        {
+            if (entityService == null) throw new ArgumentNullException("entityService");
             _entityService = entityService;
         }
 
@@ -31,7 +35,7 @@ namespace Umbraco.Core.Services
         /// <returns>A <see cref="Relation"/> object</returns>
         public IRelation GetById(int id)
         {
-            using (var repository = _repositoryFactory.CreateRelationRepository(_uowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateRelationRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.Get(id);
             }
@@ -44,7 +48,7 @@ namespace Umbraco.Core.Services
         /// <returns>A <see cref="RelationType"/> object</returns>
         public IRelationType GetRelationTypeById(int id)
         {
-            using (var repository = _repositoryFactory.CreateRelationTypeRepository(_uowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateRelationTypeRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.Get(id);
             }
@@ -57,7 +61,7 @@ namespace Umbraco.Core.Services
         /// <returns>A <see cref="RelationType"/> object</returns>
         public IRelationType GetRelationTypeByAlias(string alias)
         {
-            using (var repository = _repositoryFactory.CreateRelationTypeRepository(_uowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateRelationTypeRepository(UowProvider.GetUnitOfWork()))
             {
                 var query = new Query<IRelationType>().Where(x => x.Alias == alias);
                 return repository.GetByQuery(query).FirstOrDefault();
@@ -71,7 +75,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="Relation"/> objects</returns>
         public IEnumerable<IRelation> GetAllRelations(params int[] ids)
         {
-            using (var repository = _repositoryFactory.CreateRelationRepository(_uowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateRelationRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.GetAll(ids);
             }
@@ -94,7 +98,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="Relation"/> objects</returns>
         public IEnumerable<IRelation> GetAllRelationsByRelationType(int relationTypeId)
         {
-            using (var repository = _repositoryFactory.CreateRelationRepository(_uowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateRelationRepository(UowProvider.GetUnitOfWork()))
             {
                 var query = new Query<IRelation>().Where(x => x.RelationTypeId == relationTypeId);
                 return repository.GetByQuery(query);
@@ -108,7 +112,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="RelationType"/> objects</returns>
         public IEnumerable<IRelationType> GetAllRelationTypes(params int[] ids)
         {
-            using (var repository = _repositoryFactory.CreateRelationTypeRepository(_uowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateRelationTypeRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.GetAll(ids);
             }
@@ -121,7 +125,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="Relation"/> objects</returns>
         public IEnumerable<IRelation> GetByParentId(int id)
         {
-            using (var repository = _repositoryFactory.CreateRelationRepository(_uowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateRelationRepository(UowProvider.GetUnitOfWork()))
             {
                 var query = new Query<IRelation>().Where(x => x.ParentId == id);
                 return repository.GetByQuery(query);
@@ -156,7 +160,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="Relation"/> objects</returns>
         public IEnumerable<IRelation> GetByChildId(int id)
         {
-            using (var repository = _repositoryFactory.CreateRelationRepository(_uowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateRelationRepository(UowProvider.GetUnitOfWork()))
             {
                 var query = new Query<IRelation>().Where(x => x.ChildId == id);
                 return repository.GetByQuery(query);
@@ -192,10 +196,27 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="Relation"/> objects</returns>
         public IEnumerable<IRelation> GetByParentOrChildId(int id)
         {
-            using (var repository = _repositoryFactory.CreateRelationRepository(_uowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateRelationRepository(UowProvider.GetUnitOfWork()))
             {
                 var query = new Query<IRelation>().Where(x => x.ChildId == id || x.ParentId == id);
                 return repository.GetByQuery(query);
+            }
+        }
+
+        public IEnumerable<IRelation> GetByParentOrChildId(int id, string relationTypeAlias)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var relationTypeRepository = RepositoryFactory.CreateRelationTypeRepository(uow))
+            {
+                var rtQuery = new Query<IRelationType>().Where(x => x.Alias == relationTypeAlias);
+                var relationType = relationTypeRepository.GetByQuery(rtQuery).FirstOrDefault();
+                if (relationType == null) return Enumerable.Empty<IRelation>();
+
+                using (var relationRepo = RepositoryFactory.CreateRelationRepository(uow))
+                {
+                    var query = new Query<IRelation>().Where(x => (x.ChildId == id || x.ParentId == id) && x.RelationTypeId == relationType.Id);
+                    return relationRepo.GetByQuery(query);
+                }
             }
         }
 
@@ -207,7 +228,7 @@ namespace Umbraco.Core.Services
         public IEnumerable<IRelation> GetByRelationTypeName(string relationTypeName)
         {
             List<int> relationTypeIds = null;
-            using (var repository = _repositoryFactory.CreateRelationTypeRepository(_uowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateRelationTypeRepository(UowProvider.GetUnitOfWork()))
             {
                 var query = new Query<IRelationType>().Where(x => x.Name == relationTypeName);
                 var relationTypes = repository.GetByQuery(query);
@@ -231,7 +252,7 @@ namespace Umbraco.Core.Services
         public IEnumerable<IRelation> GetByRelationTypeAlias(string relationTypeAlias)
         {
             List<int> relationTypeIds = null;
-            using (var repository = _repositoryFactory.CreateRelationTypeRepository(_uowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateRelationTypeRepository(UowProvider.GetUnitOfWork()))
             {
                 var query = new Query<IRelationType>().Where(x => x.Alias == relationTypeAlias);
                 var relationTypes = repository.GetByQuery(query);
@@ -254,7 +275,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="Relation"/> objects</returns>
         public IEnumerable<IRelation> GetByRelationTypeId(int relationTypeId)
         {
-            using (var repository = _repositoryFactory.CreateRelationRepository(_uowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateRelationRepository(UowProvider.GetUnitOfWork()))
             {
                 var query = new Query<IRelation>().Where(x => x.RelationTypeId == relationTypeId);
                 return repository.GetByQuery(query);
@@ -372,8 +393,8 @@ namespace Umbraco.Core.Services
             if (SavingRelation.IsRaisedEventCancelled(new SaveEventArgs<IRelation>(relation), this))
                 return relation;
 
-            var uow = _uowProvider.GetUnitOfWork();
-            using (var repository = _repositoryFactory.CreateRelationRepository(uow))
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateRelationRepository(uow))
             {
                 repository.AddOrUpdate(relation);
                 uow.Commit();
@@ -400,8 +421,8 @@ namespace Umbraco.Core.Services
             if (SavingRelation.IsRaisedEventCancelled(new SaveEventArgs<IRelation>(relation), this))
                 return relation;
 
-            var uow = _uowProvider.GetUnitOfWork();
-            using (var repository = _repositoryFactory.CreateRelationRepository(uow))
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateRelationRepository(uow))
             {
                 repository.AddOrUpdate(relation);
                 uow.Commit();
@@ -418,7 +439,7 @@ namespace Umbraco.Core.Services
         /// <returns>Returns <c>True</c> if any relations exists for the given <see cref="RelationType"/>, otherwise <c>False</c></returns>
         public bool HasRelations(IRelationType relationType)
         {
-            using (var repository = _repositoryFactory.CreateRelationRepository(_uowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateRelationRepository(UowProvider.GetUnitOfWork()))
             {
                 var query = new Query<IRelation>().Where(x => x.RelationTypeId == relationType.Id);
                 return repository.GetByQuery(query).Any();
@@ -432,7 +453,7 @@ namespace Umbraco.Core.Services
         /// <returns>Returns <c>True</c> if any relations exists with the given Id, otherwise <c>False</c></returns>
         public bool IsRelated(int id)
         {
-            using (var repository = _repositoryFactory.CreateRelationRepository(_uowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateRelationRepository(UowProvider.GetUnitOfWork()))
             {
                 var query = new Query<IRelation>().Where(x => x.ParentId == id || x.ChildId == id);
                 return repository.GetByQuery(query).Any();
@@ -447,7 +468,7 @@ namespace Umbraco.Core.Services
         /// <returns>Returns <c>True</c> if any relations exists with the given Ids, otherwise <c>False</c></returns>
         public bool AreRelated(int parentId, int childId)
         {
-            using (var repository = _repositoryFactory.CreateRelationRepository(_uowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateRelationRepository(UowProvider.GetUnitOfWork()))
             {
                 var query = new Query<IRelation>().Where(x => x.ParentId == parentId && x.ChildId == childId);
                 return repository.GetByQuery(query).Any();
@@ -480,7 +501,7 @@ namespace Umbraco.Core.Services
         /// <returns>Returns <c>True</c> if any relations exists with the given Ids and relation type, otherwise <c>False</c></returns>
         public bool AreRelated(int parentId, int childId, IRelationType relationType)
         {
-            using (var repository = _repositoryFactory.CreateRelationRepository(_uowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateRelationRepository(UowProvider.GetUnitOfWork()))
             {
                 var query = new Query<IRelation>().Where(x => x.ParentId == parentId && x.ChildId == childId && x.RelationTypeId == relationType.Id);
                 return repository.GetByQuery(query).Any();
@@ -520,8 +541,8 @@ namespace Umbraco.Core.Services
             if (SavingRelation.IsRaisedEventCancelled(new SaveEventArgs<IRelation>(relation), this))
                 return;
 
-            var uow = _uowProvider.GetUnitOfWork();
-            using (var repository = _repositoryFactory.CreateRelationRepository(uow))
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateRelationRepository(uow))
             {
                 repository.AddOrUpdate(relation);
                 uow.Commit();
@@ -539,8 +560,8 @@ namespace Umbraco.Core.Services
             if (SavingRelationType.IsRaisedEventCancelled(new SaveEventArgs<IRelationType>(relationType), this))
                 return;
 
-            var uow = _uowProvider.GetUnitOfWork();
-            using (var repository = _repositoryFactory.CreateRelationTypeRepository(uow))
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateRelationTypeRepository(uow))
             {
                 repository.AddOrUpdate(relationType);
                 uow.Commit();
@@ -558,8 +579,8 @@ namespace Umbraco.Core.Services
             if (DeletingRelation.IsRaisedEventCancelled(new DeleteEventArgs<IRelation>(relation), this))
                 return;
 
-            var uow = _uowProvider.GetUnitOfWork();
-            using (var repository = _repositoryFactory.CreateRelationRepository(uow))
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateRelationRepository(uow))
             {
                 repository.Delete(relation);
                 uow.Commit();
@@ -577,8 +598,8 @@ namespace Umbraco.Core.Services
             if (DeletingRelationType.IsRaisedEventCancelled(new DeleteEventArgs<IRelationType>(relationType), this))
                 return;
 
-            var uow = _uowProvider.GetUnitOfWork();
-            using (var repository = _repositoryFactory.CreateRelationTypeRepository(uow))
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateRelationTypeRepository(uow))
             {
                 repository.Delete(relationType);
                 uow.Commit();
@@ -594,8 +615,8 @@ namespace Umbraco.Core.Services
         public void DeleteRelationsOfType(IRelationType relationType)
         {
             var relations = new List<IRelation>();
-            var uow = _uowProvider.GetUnitOfWork();
-            using (var repository = _repositoryFactory.CreateRelationRepository(uow))
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateRelationRepository(uow))
             {
                 var query = new Query<IRelation>().Where(x => x.RelationTypeId == relationType.Id);
                 relations.AddRange(repository.GetByQuery(query).ToList());
@@ -614,7 +635,7 @@ namespace Umbraco.Core.Services
         private IEnumerable<IRelation> GetRelationsByListOfTypeIds(IEnumerable<int> relationTypeIds)
         {
             var relations = new List<IRelation>();
-            using (var repository = _repositoryFactory.CreateRelationRepository(_uowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateRelationRepository(UowProvider.GetUnitOfWork()))
             {
                 foreach (var relationTypeId in relationTypeIds)
                 {

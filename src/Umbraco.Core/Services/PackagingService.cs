@@ -26,6 +26,7 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class PackagingService : IPackagingService
     {
+        private readonly ILogger _logger;
         private readonly IContentService _contentService;
         private readonly IContentTypeService _contentTypeService;
         private readonly IMediaService _mediaService;
@@ -40,7 +41,9 @@ namespace Umbraco.Core.Services
         private readonly IUserService _userService;
 
 
-        public PackagingService(IContentService contentService,
+        public PackagingService(
+            ILogger logger,
+            IContentService contentService,
             IContentTypeService contentTypeService,
             IMediaService mediaService,
             IMacroService macroService,
@@ -51,6 +54,7 @@ namespace Umbraco.Core.Services
             RepositoryFactory repositoryFactory,
             IDatabaseUnitOfWorkProvider uowProvider)
         {
+            _logger = logger;
             _contentService = contentService;
             _contentTypeService = contentTypeService;
             _mediaService = mediaService;
@@ -531,7 +535,7 @@ namespace Umbraco.Core.Services
                     }
                     else
                     {
-                        LogHelper.Warn<PackagingService>(
+                        _logger.Warn<PackagingService>(
                             string.Format(
                                 "Packager: Error handling allowed templates. Template with alias '{0}' could not be found.",
                                 alias));
@@ -550,7 +554,7 @@ namespace Umbraco.Core.Services
                 }
                 else
                 {
-                    LogHelper.Warn<PackagingService>(
+                    _logger.Warn<PackagingService>(
                         string.Format(
                             "Packager: Error handling default template. Default template with alias '{0}' could not be found.",
                             defaultTemplateElement.Value));
@@ -636,7 +640,7 @@ namespace Umbraco.Core.Services
                 // This means that the property will not be created.
                 if (dataTypeDefinition == null)
                 {
-                    LogHelper.Warn<PackagingService>(
+                    _logger.Warn<PackagingService>(
                         string.Format("Packager: Error handling creation of PropertyType '{0}'. Could not find DataTypeDefintion with unique id '{1}' nor one referencing the DataType with a property editor alias (or legacy control id) '{2}'. Did the package creator forget to package up custom datatypes? This property will be converted to a label/readonly editor if one exists.",
                                       property.Element("Name").Value,
                                       dataTypeDefinitionId,
@@ -655,12 +659,6 @@ namespace Umbraco.Core.Services
                                            Mandatory = property.Element("Mandatory").Value.ToLowerInvariant().Equals("true"),
                                            ValidationRegExp = property.Element("Validation").Value
                                        };
-
-                var helpTextElement = property.Element("HelpText");
-                if (helpTextElement != null)
-                {
-                    propertyType.HelpText = helpTextElement.Value;
-                }
 
                 var tab = property.Element("Tab").Value;
                 if (string.IsNullOrEmpty(tab))
@@ -691,7 +689,7 @@ namespace Umbraco.Core.Services
                 }
                 else
                 {
-                    LogHelper.Warn<PackagingService>(
+                    _logger.Warn<PackagingService>(
                     string.Format(
                         "Packager: Error handling DocumentType structure. DocumentType with alias '{0}' could not be found and was not added to the structure for '{1}'.",
                         alias, contentType.Alias));
@@ -830,7 +828,7 @@ namespace Umbraco.Core.Services
                     else
                     {
                         //the Id field is actually the string property editor Alias
-                        var dataTypeDefinition = new DataTypeDefinition(-1, dataTypeElement.Attribute("Id").Value.Trim())
+                        var dataTypeDefinition = new DataTypeDefinition(dataTypeElement.Attribute("Id").Value.Trim())
                         {
                             Key = dataTypeDefinitionId,
                             Name = dataTypeDefinitionName,
@@ -1381,7 +1379,7 @@ namespace Umbraco.Core.Services
                          templateElements.Any(x => x.Element("Alias").Value == elementCopy.Element("Master").Value) ==
                          false)
                 {
-                    LogHelper.Info<PackagingService>(string.Format("Template '{0}' has an invalid Master '{1}', so the reference has been ignored.", elementCopy.Element("Alias").Value, elementCopy.Element("Master").Value));
+                    _logger.Info<PackagingService>(string.Format("Template '{0}' has an invalid Master '{1}', so the reference has been ignored.", elementCopy.Element("Alias").Value, elementCopy.Element("Master").Value));
                 }
 
                 var field = new TopologicalSorter.DependencyField<XElement>

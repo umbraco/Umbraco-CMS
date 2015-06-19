@@ -47,13 +47,18 @@ namespace umbraco
                 InitializeFileLock();
 
                 // and prepare the persister task
+            var logger = LoggerResolver.HasCurrent ? LoggerResolver.Current.Logger : new DebugDiagnosticsLogger();
+            var profingLogger = new ProfilingLogger(
+                logger,
+                ProfilerResolver.HasCurrent ? ProfilerResolver.Current.Profiler : new LogProfiler(logger));
+
                 // there's always be one task keeping a ref to the runner
                 // so it's safe to just create it as a local var here
                 var runner = new BackgroundTaskRunner<XmlCacheFilePersister>("XmlCacheFilePersister", new BackgroundTaskRunnerOptions
                 {
                     LongRunning = true,
                     KeepAlive = true
-                });
+            }, logger);
 
                 // when the runner is terminating we need to ensure that no modifications
                 // to content are possible anymore, as they would not be written out to
@@ -87,7 +92,7 @@ namespace umbraco
                 };
 
                 // create (and add to runner)
-                _persisterTask = new XmlCacheFilePersister(runner, this);
+            _persisterTask = new XmlCacheFilePersister(runner, this, profingLogger);
             }
 
             // initialize content - populate the cache
@@ -229,8 +234,8 @@ namespace umbraco
                 }
             }
 
-			return xmlContentCopy;
-		}
+            return xmlContentCopy;
+        }
 
         private static XmlNode GetPreviewOrPublishedNode(Document d, XmlDocument xmlContentCopy, bool isPreview)
         {
@@ -294,8 +299,8 @@ namespace umbraco
 
             if (!e.Cancel)
             {
-				// lock the xml cache so no other thread can write to it at the same time
-				// note that some threads could read from it while we hold the lock, though
+                // lock the xml cache so no other thread can write to it at the same time
+                // note that some threads could read from it while we hold the lock, though
                 using (var safeXml = GetSafeXmlWriter())
                 {
                     safeXml.Xml = PublishNodeDo(d, safeXml.Xml, true);
@@ -304,8 +309,8 @@ namespace umbraco
                 ClearContextCache();
 
                 var cachedFieldKeyStart = string.Format("{0}{1}_", CacheKeys.ContentItemCacheKey, d.Id);
-                ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(cachedFieldKeyStart);                    
-                
+                ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(cachedFieldKeyStart);
+
                 FireAfterUpdateDocumentCache(d, e);
             }
         }
@@ -374,13 +379,13 @@ namespace umbraco
 
             ClearContextCache();
         }
-        
+
         [Obsolete("Method obsolete in version 4.1 and later, please use UpdateDocumentCache", true)]
         public virtual void UpdateDocumentCacheAsync(int documentId)
         {
             UpdateDocumentCache(documentId);
         }
-        
+
         [Obsolete("Method obsolete in version 4.1 and later, please use ClearDocumentCache", true)]
         public virtual void ClearDocumentCacheAsync(int documentId)
         {
@@ -442,7 +447,7 @@ namespace umbraco
                 {
                     var prov = (UmbracoSiteMapProvider)SiteMap.Provider;
                     prov.RemoveNode(doc.Id);
-                }                
+                }
             }
         }
 
@@ -485,7 +490,7 @@ namespace umbraco
 
                 try
                 {
-					LogHelper.Debug<content>("Republishing starting");
+                    LogHelper.Debug<content>("Republishing starting");
 
                     lock (DbReadSyncLock)
                     {
@@ -798,7 +803,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
 
         private static XmlDocument Clone(XmlDocument xmlDoc)
         {
-            return xmlDoc == null ? null : (XmlDocument) xmlDoc.CloneNode(true);
+            return xmlDoc == null ? null : (XmlDocument)xmlDoc.CloneNode(true);
         }
 
         private static void EnsureSchema(string contentTypeAlias, XmlDocument xml)
@@ -920,7 +925,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                 {
                     return _xml;
                 }
-                set 
+                set
                 {
                     if (_isWriter == false)
                         throw new InvalidOperationException("Not writing.");
@@ -980,7 +985,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         private AsyncLock _fileLock; // protects the file
         private IDisposable _fileLocked; // protects the file
 
-        private const int FileLockTimeoutMilliseconds = 4*60*1000; // 4'
+        private const int FileLockTimeoutMilliseconds = 4 * 60 * 1000; // 4'
 
         private void InitializeFileLock()
         {
@@ -1377,7 +1382,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
             // append all attributes from the document node to the published node
             if (documentNode.Attributes == null) throw new Exception("oops");
             foreach (XmlAttribute att in documentNode.Attributes)
-                ((XmlElement) publishedNode).SetAttribute(att.Name, att.Value);
+                ((XmlElement)publishedNode).SetAttribute(att.Name, att.Value);
 
             // find the first child node, if any
             var childNodes = publishedNode.SelectNodes(ChildNodesXPath);

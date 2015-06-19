@@ -451,7 +451,7 @@ namespace umbraco
 
         /// <summary>
         /// Gets all repositories registered, and returns them as XmlNodes, containing name, alias and webservice url.
-        /// These repositories are used by the build-in package installer and uninstaller to install new packages and check for updates.
+        /// These repositories are used by the built-in package installer and uninstaller to install new packages and check for updates.
         /// All repositories should have a unique alias.
         /// All packages installed from a repository gets the repository alias included in the install information
         /// </summary>

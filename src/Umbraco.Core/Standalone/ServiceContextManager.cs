@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
@@ -13,13 +16,17 @@ namespace Umbraco.Core.Standalone
     {
         private readonly string _connectionString;
         private readonly string _providerName;
+        private readonly ILogger _logger;
+        private readonly ISqlSyntaxProvider _syntaxProvider;
         private ServiceContext _serviceContext;
         private readonly StandaloneCoreApplication _application;
 
-        public ServiceContextManager(string connectionString, string providerName, string baseDirectory)
+        public ServiceContextManager(string connectionString, string providerName, string baseDirectory, ILogger logger, ISqlSyntaxProvider syntaxProvider)
         {
             _connectionString = connectionString;
             _providerName = providerName;
+            _logger = logger;
+            _syntaxProvider = syntaxProvider;
 
             Trace.WriteLine("ServiceContextManager-Current AppDomain: " + AppDomain.CurrentDomain.FriendlyName);
             Trace.WriteLine("ServiceContextManager-Current AppDomain: " + AppDomain.CurrentDomain.BaseDirectory);
@@ -52,14 +59,16 @@ namespace Umbraco.Core.Standalone
                         //we have no request based cache when running standalone
                         new NullCacheProvider());
 
-                    var dbFactory = new DefaultDatabaseFactory(_connectionString, _providerName);
-                    var dbContext = new DatabaseContext(dbFactory);
+                    var dbFactory = new DefaultDatabaseFactory(_connectionString, _providerName, _logger);
+                    var dbContext = new DatabaseContext(dbFactory, _logger, _syntaxProvider, _providerName);
                     Database.Mapper = new PetaPocoMapper();
                     _serviceContext = new ServiceContext(
+                        new RepositoryFactory(cacheHelper, _logger, dbContext.SqlSyntax, UmbracoConfig.For.UmbracoSettings()), 
                         new PetaPocoUnitOfWorkProvider(dbFactory),
                         new FileUnitOfWorkProvider(),
                         new PublishingStrategy(),
-                        cacheHelper);
+                        cacheHelper,
+                        new DebugDiagnosticsLogger());
 
                     //initialize the DatabaseContext
                     dbContext.Initialize(_providerName);

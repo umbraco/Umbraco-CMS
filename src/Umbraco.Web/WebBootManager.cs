@@ -11,6 +11,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using ClientDependency.Core.Config;
 using Examine;
+using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
@@ -37,6 +38,7 @@ using Umbraco.Web.Scheduling;
 using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic;
+using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using ProfilingViewEngine = Umbraco.Core.Profiling.ProfilingViewEngine;
 
 
@@ -49,7 +51,7 @@ namespace Umbraco.Web
     {
         private readonly bool _isForTesting;
         //NOTE: see the Initialize method for what this is used for
-        private List<IIndexer> _indexesToRebuild = new List<IIndexer>(); 
+        private readonly List<IIndexer> _indexesToRebuild = new List<IIndexer>(); 
 
         public WebBootManager(UmbracoApplicationBase umbracoApplication)
             : this(umbracoApplication, false)
@@ -190,6 +192,9 @@ namespace Umbraco.Web
                 }
             }
 
+            //Now ensure webapi is initialized after everything
+            GlobalConfiguration.Configuration.EnsureInitialized();
+
             return this;
         }
 
@@ -319,18 +324,23 @@ namespace Umbraco.Web
         {
             base.InitializeResolvers();
 
-            XsltExtensionsResolver.Current = new XsltExtensionsResolver(() => PluginManager.Current.ResolveXsltExtensions());
+            XsltExtensionsResolver.Current = new XsltExtensionsResolver(ServiceProvider, LoggerResolver.Current.Logger, () => PluginManager.Current.ResolveXsltExtensions());
 
             //set the default RenderMvcController
             DefaultRenderMvcControllerResolver.Current = new DefaultRenderMvcControllerResolver(typeof(RenderMvcController));
 
-            //Override the ServerMessengerResolver to set a username/password for the distributed calls
-            ServerMessengerResolver.Current.SetServerMessenger(new BatchedServerMessenger(() =>
+            ServerMessengerResolver.Current.SetServerMessenger(new BatchedWebServiceServerMessenger(() =>
             {
                 //we should not proceed to change this if the app/database is not configured since there will 
                 // be no user, plus we don't need to have server messages sent if this is the case.
                 if (ApplicationContext.IsConfigured && ApplicationContext.DatabaseContext.IsDatabaseConfigured)
                 {
+                    //disable if they are not enabled
+                    if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled == false)
+                    {
+                        return null;
+                    }
+
                     try
                     {
                         var user = User.GetUser(UmbracoConfig.For.UmbracoSettings().DistributedCall.UserId);
@@ -338,18 +348,20 @@ namespace Umbraco.Web
                     }
                     catch (Exception e)
                     {
-                        LogHelper.Error<WebBootManager>("An error occurred trying to set the IServerMessenger during application startup", e);
+                        LoggerResolver.Current.Logger.Error<WebBootManager>("An error occurred trying to set the IServerMessenger during application startup", e);
                         return null;
                     }
                 }
-                LogHelper.Warn<WebBootManager>("Could not initialize the DefaultServerMessenger, the application is not configured or the database is not configured");
+                LoggerResolver.Current.Logger.Warn<WebBootManager>("Could not initialize the DefaultServerMessenger, the application is not configured or the database is not configured");
                 return null;
             }));
 
             SurfaceControllerResolver.Current = new SurfaceControllerResolver(
+                ServiceProvider, LoggerResolver.Current.Logger,
                 PluginManager.Current.ResolveSurfaceControllers());
 
             UmbracoApiControllerResolver.Current = new UmbracoApiControllerResolver(
+                ServiceProvider, LoggerResolver.Current.Logger,
                 PluginManager.Current.ResolveUmbracoApiControllers());
 
             // both TinyMceValueConverter (in Core) and RteMacroRenderingValueConverter (in Web) will be
@@ -370,6 +382,7 @@ namespace Umbraco.Web
                 new NamespaceHttpControllerSelector(GlobalConfiguration.Configuration));
 
             FilteredControllerFactoriesResolver.Current = new FilteredControllerFactoriesResolver(
+                ServiceProvider, LoggerResolver.Current.Logger,
                 // add all known factories, devs can then modify this list on application
                 // startup either by binding to events or in their own global.asax
                 new[]
@@ -378,6 +391,7 @@ namespace Umbraco.Web
 					});
 
             UrlProviderResolver.Current = new UrlProviderResolver(
+                ServiceProvider, LoggerResolver.Current.Logger,
                     //typeof(AliasUrlProvider), // not enabled by default
                     typeof(DefaultUrlProvider),
                     typeof(CustomRouteUrlProvider)
@@ -392,6 +406,7 @@ namespace Umbraco.Web
                 new ContentLastChanceFinderByNotFoundHandlers());
 
             ContentFinderResolver.Current = new ContentFinderResolver(
+                ServiceProvider, LoggerResolver.Current.Logger,
                 // all built-in finders in the correct order, devs can then modify this list
                 // on application startup via an application event handler.
                 typeof(ContentFinderByPageIdQuery),
@@ -415,9 +430,11 @@ namespace Umbraco.Web
             PublishedCache.XmlPublishedCache.PublishedContentCache.UnitTesting = _isForTesting;
 
             ThumbnailProvidersResolver.Current = new ThumbnailProvidersResolver(
+                ServiceProvider, LoggerResolver.Current.Logger,
                 PluginManager.Current.ResolveThumbnailProviders());
 
             ImageUrlProviderResolver.Current = new ImageUrlProviderResolver(
+                ServiceProvider, LoggerResolver.Current.Logger,
                 PluginManager.Current.ResolveImageUrlProviders());
 
             CultureDictionaryFactoryResolver.Current = new CultureDictionaryFactoryResolver(

@@ -174,7 +174,7 @@ namespace Umbraco.Core.Configuration
         /// We also make sure that the virtual directory (SystemDirectories.Root) is stripped off first, otherwise we'd end up with something
         /// like "MyVirtualDirectory-Umbraco" instead of just "Umbraco".
         /// </remarks>
-        internal static string UmbracoMvcArea
+        public static string UmbracoMvcArea
         {
             get
             {

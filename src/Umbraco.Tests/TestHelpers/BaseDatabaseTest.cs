@@ -2,16 +2,21 @@
 using System.Collections.Generic;
 using System.Data.SqlServerCe;
 using System.IO;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Profiling;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
+using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -25,12 +30,14 @@ namespace Umbraco.Tests.TestHelpers
     public abstract class BaseDatabaseTest
     {
         private Database _database;
+        protected ILogger Logger { get; private set; }
 
         [SetUp]
         public virtual void Initialize()
         {
-            TestHelper.SetupLog4NetForTests();
             TestHelper.InitializeContentDirectories();
+
+            Logger = new Logger(new FileInfo(TestHelper.MapPathForTest("~/unit-test-log4net.config")));
 
             string path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
@@ -53,24 +60,21 @@ namespace Umbraco.Tests.TestHelpers
                     throw;
                 }
             
-
-            RepositoryResolver.Current = new RepositoryResolver(
-                new RepositoryFactory(true));  //disable all repo caches for tests!
-
-            SqlSyntaxProvidersResolver.Current = new SqlSyntaxProvidersResolver(
-                new List<Type> { typeof(MySqlSyntaxProvider), typeof(SqlCeSyntaxProvider), typeof(SqlServerSyntaxProvider) }) { CanResolveBeforeFrozen = true };
-
             Resolution.Freeze();
 
             //disable cache
             var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
 
+            var logger = new Logger(new FileInfo(TestHelper.MapPathForTest("~/unit-test-log4net.config")));
+            var repositoryFactory = new RepositoryFactory(cacheHelper, Logger, SyntaxProvider, SettingsForTests.GenerateMockSettings());
+            var dbFactory = new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, logger);
             ApplicationContext.Current = new ApplicationContext(
                 //assign the db context
-                new DatabaseContext(new DefaultDatabaseFactory()),
+                new DatabaseContext(dbFactory, logger, SqlSyntaxProviders.CreateDefault(logger)),
                 //assign the service context
-                new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper),
-                cacheHelper)
+                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, logger),
+                cacheHelper,
+                new ProfilingLogger(logger, Mock.Of<IProfiler>()))
                 {
                     IsReady = true
                 };
@@ -98,8 +102,6 @@ namespace Umbraco.Tests.TestHelpers
 
             //reset the app context
             ApplicationContext.Current = null;
-
-            RepositoryResolver.Reset();
         }
     }
 }

@@ -1,61 +1,30 @@
 {
-    "name": "Umbraco",
-    "version": "7",
-    "homepage": "https://github.com/umbraco/Umbraco-CMS",
-    "authors": [
-        "Shannon <sdeminick@umbraco.com>"
-    ],
-    "description": "Umbraco CMS",
-    "license": "MIT",
-    "private": true,
-    "ignore": [
-        "**/.*",
-        "node_modules",
-        "bower_components",
-        "test",
-        "tests"
-    ],
-    "dependencies": {
-        "typeahead.js": "~0.10.5",
-        "underscore": "~1.7.0",
-        "rgrove-lazyload": "*",
-        "jquery": "2.0.3",
-        "jquery-file-upload": "~9.4.0",
-        "jquery-ui": "1.10.3",
-        "angular-dynamic-locale":  "~0.1.27"
-    },
-    "exportsOverride": {
-        "rgrove-lazyload": {
-            "": "lazyload.js"
-        },
-        "typeahead.js": {
-            "": "dist/typeahead.bundle.min.js"
-        },
-        "underscore": {
-            "": "underscore-min.{js,map}"
-        },
-        "angular-dynamic-locale": {
-            "": "tmhDynamicLocale.min.{js,js.map}"
-        },
-        "jquery": {
-            "": "jquery.min.{js,map}"  
-        },
-        "jquery-file-upload": {
-            "": "**/jquery.{fileupload,fileupload-process,fileupload-angular,fileupload-image}.js"
-        },
-        "jquery-ui": {
-            "": "ui/minified/jquery-ui.min.js"
-        },
-        "blueimp-load-image": {
-            "": "js/load-image.all.min.js"
-        },
-
-        "blueimp-tmpl": {
-            "ignore": "*.ignore"
-        },
-        
-        "blueimp-canvas-to-blob": {
-            "ignore": "*.ignore"
-        }
-    }
+  "name": "Umbraco",
+  "version": "7",
+  "homepage": "https://github.com/umbraco/Umbraco-CMS",
+  "authors": [
+    "Shannon <sdeminick@umbraco.com>"
+  ],
+  "description": "Umbraco CMS",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "typeahead.js": "~0.10.5",
+    "underscore": "~1.7.0",
+    "rgrove-lazyload": "*",
+    "bootstrap-social": "~4.8.0",
+    "jquery": "2.0.3",
+    "jquery-file-upload": "~9.4.0",
+    "jquery-ui": "1.10.3",
+    "angular-dynamic-locale": "~0.1.27",
+    "tinymce": "~4.1.10",
+    "bootstrap-tabdrop": "~1.0.0"
+  }
 }

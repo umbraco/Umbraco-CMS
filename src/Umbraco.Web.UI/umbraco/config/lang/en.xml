@@ -27,6 +27,7 @@
     <key alias="unpublish">Unpublish</key>
     <key alias="refreshNode">Reload nodes</key>
     <key alias="republish">Republish entire site</key>
+    <key alias="restore" version="7.3.0">Restore</key>
     <key alias="rights">Permissions</key>
     <key alias="rollback">Rollback</key>
     <key alias="sendtopublish">Send To Publish</key>
@@ -849,7 +850,7 @@ To manage your website, simply open the Umbraco back office and start adding con
 
   <area alias="grid">
     <key alias="insertControl">Insert control</key>
-    <key alias="addRows">Choose a layout for the page</key>
+    <key alias="addRows">Choose a layout for this section</key>
     <key alias="addElement"><![CDATA[To start, click the <i class="icon icon-add blue"></i> below and add your first element]]></key>
 
     <key alias="clickToEmbed">Click to embed</key>
@@ -1036,6 +1037,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="usertype">User type</key>
     <key alias="userTypes">User types</key>
     <key alias="writer">Writer</key>
+    <key alias="translator">Translator</key>
     <key alias="yourProfile" version="7.0">Your profile</key>
     <key alias="yourHistory" version="7.0">Your recent history</key>
     <key alias="sessionExpires" version="7.0">Session expires in</key>

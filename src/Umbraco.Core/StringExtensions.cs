@@ -114,13 +114,11 @@ namespace Umbraco.Core
 
         internal static string ReplaceNonAlphanumericChars(this string input, char replacement)
         {
-            //any character that is not alphanumeric, convert to a hyphen
-            var mName = input;
-            foreach (var c in mName.ToCharArray().Where(c => !char.IsLetterOrDigit(c)))
-            {
-                mName = mName.Replace(c, replacement);
-            }
-            return mName;
+            var inputArray = input.ToCharArray();
+            var outputArray = new char[input.Length];
+            for (var i = 0; i < inputArray.Length; i++)
+                outputArray[i] = char.IsLetterOrDigit(inputArray[i]) ? inputArray[i] : replacement;
+            return new string(outputArray);
         }
 
         /// <summary>
@@ -383,6 +381,11 @@ namespace Umbraco.Core
         public static string EnsureEndsWith(this string input, char value)
         {
             return input.EndsWith(value.ToString(CultureInfo.InvariantCulture)) ? input : input + value;
+        }
+
+        public static string EnsureEndsWith(this string input, string toEndWith)
+        {
+            return input.EndsWith(toEndWith.ToString(CultureInfo.InvariantCulture)) ? input : input + toEndWith;
         }
 
         public static bool IsLowerCase(this char ch)
@@ -1217,7 +1220,7 @@ namespace Umbraco.Core
         // other helpers may not. DefaultShortStringHelper produces better, but non-compatible, results.
 
         /// <summary>
-        /// Splits a Pascal cased string into a phrase seperated by spaces.
+        /// Splits a Pascal cased string into a phrase separated by spaces.
         /// </summary>
         /// <param name="phrase">The text to split.</param>
         /// <returns>The splitted text.</returns>

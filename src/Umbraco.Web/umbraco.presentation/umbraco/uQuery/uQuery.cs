@@ -121,7 +121,7 @@ namespace umbraco
 		/// <summary>
 		/// build a string array from a csv
 		/// </summary>
-		/// <param name="csv">string of comma seperated values</param>
+		/// <param name="csv">string of comma separated values</param>
 		/// <returns>An array of node ids as string.</returns>
 		public static string[] GetCsvIds(string csv)
 		{

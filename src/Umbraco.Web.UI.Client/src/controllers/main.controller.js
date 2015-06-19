@@ -15,13 +15,7 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
     $scope.authenticated = null;
     $scope.avatar = "assets/img/application/logo.png";
     $scope.touchDevice = appState.getGlobalState("touchDevice");
-    //subscribes to notifications in the notification service
-    $scope.notifications = notificationsService.current;
-    $scope.$watch('notificationsService.current', function (newVal, oldVal, scope) {
-        if (newVal) {
-            $scope.notifications = newVal;
-        }
-    });
+    
 
     $scope.removeNotification = function (index) {
         notificationsService.remove(index);

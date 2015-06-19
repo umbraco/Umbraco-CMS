@@ -24,7 +24,7 @@ namespace umbraco
     /// <summary>
     /// Holds methods for parsing and building umbraco templates
     /// </summary>
-    /// 
+    [Obsolete("Do not use this class, use Umbraco.Core.Service.IFileService to work with templates")]
     public class template
     {
         #region private variables

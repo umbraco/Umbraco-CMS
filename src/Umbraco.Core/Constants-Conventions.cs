@@ -11,6 +11,25 @@ namespace Umbraco.Core
 		/// </summary>
 		public static class Conventions
 		{
+		    public static class PublicAccess
+		    {
+                public const string MemberUsernameRuleType = "MemberUsername";               
+                public const string MemberRoleRuleType = "MemberRole";
+
+                [Obsolete("No longer supported, this is here for backwards compatibility only")]
+                public const string MemberIdRuleType = "MemberId";
+                [Obsolete("No longer supported, this is here for backwards compatibility only")]
+                public const string MemberGroupIdRuleType = "MemberGroupId";
+		    }
+
+		    public static class Localization
+		    {
+                /// <summary>
+                /// The root id for all top level dictionary items
+                /// </summary>
+                public const string DictionaryItemRootId = "41c7638d-f529-4bff-853e-59a0c2fb1bde";
+		    }
+
 		    public static class DataTypes
 		    {
 		        public const string ListViewPrefix = "List View - ";
@@ -284,7 +303,7 @@ namespace Umbraco.Core
 			}
             
             /// <summary>
-            /// Defines the alias identifiers for Umbraco relation types.
+            /// Defines the alias identifiers for built-in Umbraco relation types.
             /// </summary>
             public static class RelationTypes
             {
@@ -297,6 +316,16 @@ namespace Umbraco.Core
                 /// ContentType alias for default relation type "Relate Document On Copy".
                 /// </summary>
                 public const string RelateDocumentOnCopyAlias = "relateDocumentOnCopy";
+
+                /// <summary>
+                /// ContentType name for default relation type "Relate Parent Document On Delete".
+                /// </summary>
+                public const string RelateParentDocumentOnDeleteName = "Relate Parent Document On Delete";
+
+                /// <summary>
+                /// ContentType alias for default relation type "Relate Parent Document On Delete".
+                /// </summary>
+                public const string RelateParentDocumentOnDeleteAlias = "relateParentDocumentOnDelete";
             }
 		}
 	}

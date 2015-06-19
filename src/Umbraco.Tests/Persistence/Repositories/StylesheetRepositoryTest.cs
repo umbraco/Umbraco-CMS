@@ -1,8 +1,10 @@
 ﻿using System.IO;
 using System.Linq;
 using System.Text;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -32,10 +34,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var dbUnitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork();
 
             // Act
-            var repository = new StylesheetRepository(unitOfWork, dbUnitOfWork, _fileSystem);
+            var repository = new StylesheetRepository(unitOfWork, _fileSystem);
 
 
             // Assert
@@ -43,14 +44,13 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Can_Perform_Add_On_StylesheetRepository()
+        public void Can_Perform_Add()
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var dbUnitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork();
 
-            var repository = new StylesheetRepository(unitOfWork, dbUnitOfWork, _fileSystem);
+            var repository = new StylesheetRepository(unitOfWork, _fileSystem);
 
             // Act
             var stylesheet = new Stylesheet("test-add.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
@@ -62,19 +62,18 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Can_Perform_Update_On_StylesheetRepository()
+        public void Can_Perform_Update()
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var dbUnitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork();
-            var repository = new StylesheetRepository(unitOfWork, dbUnitOfWork, _fileSystem);
+            
+            var repository = new StylesheetRepository(unitOfWork, _fileSystem);
 
             // Act
             var stylesheet = new Stylesheet("test-update.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
             repository.AddOrUpdate(stylesheet);
             unitOfWork.Commit();
-            dbUnitOfWork.Commit();
 
             var stylesheetUpdate = repository.Get("test-update.css");
             stylesheetUpdate.Content = "body { color:#000; }";
@@ -90,13 +89,43 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Can_Perform_Delete_On_StylesheetRepository()
+        public void Can_Perform_Update_With_Property()
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var dbUnitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork();
-            var repository = new StylesheetRepository(unitOfWork, dbUnitOfWork, _fileSystem);
+            
+            var repository = new StylesheetRepository(unitOfWork, _fileSystem);
+
+            // Act
+            var stylesheet = new Stylesheet("test-update.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
+            repository.AddOrUpdate(stylesheet);
+            unitOfWork.Commit();
+
+            stylesheet.AddProperty(new StylesheetProperty("Test", "p", "font-size:2em;"));
+
+            repository.AddOrUpdate(stylesheet);
+            unitOfWork.Commit();
+
+            //re-get
+            stylesheet = repository.Get(stylesheet.Name);
+
+            //Assert           
+            Assert.That(stylesheet.Content, Is.EqualTo(@"body { color:#000; } .bold {font-weight:bold;}
+
+/**umb_name:Test*/
+p{font-size:2em;}"));
+            Assert.AreEqual(1, stylesheet.Properties.Count());
+        }
+
+        [Test]
+        public void Can_Perform_Delete()
+        {
+            // Arrange
+            var provider = new FileUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            
+            var repository = new StylesheetRepository(unitOfWork, _fileSystem);
 
             // Act
             var stylesheet = new Stylesheet("test-delete.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
@@ -111,13 +140,13 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Can_Perform_Get_On_StylesheetRepository()
+        public void Can_Perform_Get()
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var dbUnitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork();
-            var repository = new StylesheetRepository(unitOfWork, dbUnitOfWork, _fileSystem);
+            
+            var repository = new StylesheetRepository(unitOfWork, _fileSystem);
 
             // Act
             var stylesheet = repository.Get("styles.css");
@@ -126,22 +155,21 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.That(stylesheet, Is.Not.Null);
             Assert.That(stylesheet.HasIdentity, Is.True);
             Assert.That(stylesheet.Content, Is.EqualTo("body {background:#EE7600; color:#FFF;}"));
-            Assert.That(stylesheet.IsFileValidCss(), Is.True);
+            Assert.That(repository.ValidateStylesheet(stylesheet), Is.True);
         }
 
         [Test]
-        public void Can_Perform_GetAll_On_StylesheetRepository()
+        public void Can_Perform_GetAll()
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var dbUnitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork();
-            var repository = new StylesheetRepository(unitOfWork, dbUnitOfWork, _fileSystem);
+            
+            var repository = new StylesheetRepository(unitOfWork, _fileSystem);
 
             var stylesheet = new Stylesheet("styles-v2.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
             repository.AddOrUpdate(stylesheet);
             unitOfWork.Commit();
-            dbUnitOfWork.Commit();
 
             // Act
             var stylesheets = repository.GetAll();
@@ -154,18 +182,17 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Can_Perform_GetAll_With_Params_On_StylesheetRepository()
+        public void Can_Perform_GetAll_With_Params()
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var dbUnitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork();
-            var repository = new StylesheetRepository(unitOfWork, dbUnitOfWork, _fileSystem);
+            
+            var repository = new StylesheetRepository(unitOfWork, _fileSystem);
 
             var stylesheet = new Stylesheet("styles-v2.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
             repository.AddOrUpdate(stylesheet);
             unitOfWork.Commit();
-            dbUnitOfWork.Commit();
 
             // Act
             var stylesheets = repository.GetAll("styles-v2.css", "styles.css");
@@ -178,13 +205,13 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Can_Perform_Exists_On_StylesheetRepository()
+        public void Can_Perform_Exists()
         {
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var dbUnitOfWork = PetaPocoUnitOfWorkProvider.CreateUnitOfWork();
-            var repository = new StylesheetRepository(unitOfWork, dbUnitOfWork, _fileSystem);
+            
+            var repository = new StylesheetRepository(unitOfWork, _fileSystem);
 
             // Act
             var exists = repository.Exists("styles.css");
@@ -196,6 +223,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         [TearDown]
         public void TearDown()
         {
+            base.TearDown();
+
             //Delete all files
             var files = _fileSystem.GetFiles("", "*.css");
             foreach (var file in files)

@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Events;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
@@ -9,26 +11,30 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
 {
-    public class MemberGroupService : IMemberGroupService
+    public class MemberGroupService : RepositoryService, IMemberGroupService
     {
-        private readonly RepositoryFactory _repositoryFactory;
-        private readonly IDatabaseUnitOfWorkProvider _uowProvider;
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public MemberGroupService(RepositoryFactory repositoryFactory)
             : this(new PetaPocoUnitOfWorkProvider(), repositoryFactory)
         {
         }
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public MemberGroupService(IDatabaseUnitOfWorkProvider provider)
             : this(provider, new RepositoryFactory())
         {
         }
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public MemberGroupService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory)
-        {
-            _repositoryFactory = repositoryFactory;
-            _uowProvider = provider;
+            : this(provider, repositoryFactory, LoggerResolver.Current.Logger)
+        {            
+        }
 
+        public MemberGroupService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger)
+            : base(provider, repositoryFactory, logger)
+        {
             //Proxy events!
             MemberGroupRepository.SavedMemberGroup += MemberGroupRepository_SavedMemberGroup;
             MemberGroupRepository.SavingMemberGroup += MemberGroupRepository_SavingMemberGroup;
@@ -51,7 +57,7 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IMemberGroup> GetAll()
         {
-            using (var repository = _repositoryFactory.CreateMemberGroupRepository(_uowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateMemberGroupRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.GetAll();
             }
@@ -59,7 +65,7 @@ namespace Umbraco.Core.Services
 
         public IMemberGroup GetById(int id)
         {
-            using (var repository = _repositoryFactory.CreateMemberGroupRepository(_uowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateMemberGroupRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.Get(id);
             }
@@ -67,7 +73,7 @@ namespace Umbraco.Core.Services
 
         public IMemberGroup GetByName(string name)
         {
-            using (var repository = _repositoryFactory.CreateMemberGroupRepository(_uowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateMemberGroupRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.GetByName(name);
             }
@@ -83,8 +89,8 @@ namespace Umbraco.Core.Services
                 }
             }
 
-            var uow = _uowProvider.GetUnitOfWork();
-            using (var repository = _repositoryFactory.CreateMemberGroupRepository(uow))
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateMemberGroupRepository(uow))
             {
                 repository.AddOrUpdate(memberGroup);
                 uow.Commit();
@@ -99,8 +105,8 @@ namespace Umbraco.Core.Services
             if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMemberGroup>(memberGroup), this))
                 return;
 
-            var uow = _uowProvider.GetUnitOfWork();
-            using (var repository = _repositoryFactory.CreateMemberGroupRepository(uow))
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateMemberGroupRepository(uow))
             {
                 repository.Delete(memberGroup);
                 uow.Commit();

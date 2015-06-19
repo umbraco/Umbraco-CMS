@@ -5,6 +5,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     /// <summary>
     /// Singleton to handle the configuration of a SqlSyntaxProvider
     /// </summary>
+    [Obsolete("This should not be used, the ISqlSyntaxProvider is part of the DatabaseContext or should be injected into your services as a constructor parameter")]
     public static class SqlSyntaxContext
     {
         private static ISqlSyntaxProvider _sqlSyntaxProvider;

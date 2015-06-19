@@ -20,9 +20,15 @@ namespace Umbraco.Core.Cache
 
         private readonly System.Web.Caching.Cache _cache;
 
+        /// <summary>
+        /// Used for debugging
+        /// </summary>
+        internal Guid InstanceId { get; private set; }
+
         public HttpRuntimeCacheProvider(System.Web.Caching.Cache cache)
         {
             _cache = cache;
+            InstanceId = Guid.NewGuid();
         }
 
         protected override IEnumerable<DictionaryEntry> GetDictionaryEntries()
@@ -134,6 +140,7 @@ namespace Umbraco.Core.Cache
                     var sliding = isSliding == false ? System.Web.Caching.Cache.NoSlidingExpiration : (timeout ?? System.Web.Caching.Cache.NoSlidingExpiration);
 
                     lck.UpgradeToWriteLock();
+                    //NOTE: 'Insert' on System.Web.Caching.Cache actually does an add or update!
                     _cache.Insert(cacheKey, result, dependency, absolute, sliding, priority, removedCallback);
                 }
             }
@@ -191,6 +198,7 @@ namespace Umbraco.Core.Cache
 
             using (new WriteLock(_locker))
             {
+                //NOTE: 'Insert' on System.Web.Caching.Cache actually does an add or update!
                 _cache.Insert(cacheKey, result, dependency, absolute, sliding, priority, removedCallback);
             }
         }

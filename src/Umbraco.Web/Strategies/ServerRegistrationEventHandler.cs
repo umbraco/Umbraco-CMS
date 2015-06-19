@@ -1,149 +1,95 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Web;
+using Newtonsoft.Json;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Strategies
 {
     /// <summary>
-    /// This will ensure that the server is automatically registered in the database as an active node 
-    /// on application startup and whenever a back office request occurs.
+    /// Ensures that servers are automatically registered in the database, when using the database server registrar.
     /// </summary>
     /// <remarks>
-    /// We do this on app startup to ensure that the server is in the database but we also do it for the first 'x' times
-    /// a back office request is made so that we can tell if they are using https protocol which would update to that address
-    /// in the database. The first front-end request probably wouldn't be an https request.
-    /// 
-    /// For back office requests (so that we don't constantly make db calls), we'll only update the database when we detect at least
-    /// a timespan of 1 minute between requests.
+    /// <para>At the moment servers are automatically registered upon first request and then on every
+    /// request but not more than once per (configurable) period. This really is "for information & debug" purposes so
+    /// we can look at the table and see what servers are registered - but the info is not used anywhere.</para>
+    /// <para>Should we actually want to use this, we would need a better and more deterministic way of figuring
+    /// out the "server address" ie the address to which server-to-server requests should be sent - because it
+    /// probably is not the "current request address" - especially in multi-domains configurations.</para>
     /// </remarks>
     public sealed class ServerRegistrationEventHandler : ApplicationEventHandler
     {
-        private static bool _initUpdated = false;
         private static DateTime _lastUpdated = DateTime.MinValue;
-        private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
 
-
-        //protected override void ApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
-        //{            
-        //    ServerRegistrarResolver.Current.SetServerRegistrar(
-        //        new DatabaseServerRegistrar(
-        //            new Lazy<ServerRegistrationService>(() => applicationContext.Services.ServerRegistrationService)));
-        //}
-
-        /// <summary>
-        /// Update the database with this entry and bind to request events
-        /// </summary>
-        /// <param name="umbracoApplication"></param>
-        /// <param name="applicationContext"></param>
+        // bind to events
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
-            //no need to bind to the event if we are not actually using the database server registrar
+            // only for the DatabaseServerRegistrar
             if (ServerRegistrarResolver.Current.Registrar is DatabaseServerRegistrar)
-            {
-                //bind to event
-                UmbracoModule.RouteAttempt += UmbracoModuleRouteAttempt;   
-            }
+                UmbracoModule.RouteAttempt += UmbracoModuleRouteAttempt;
         }
 
-
-        static void UmbracoModuleRouteAttempt(object sender, RoutableAttemptEventArgs e)
+        // handles route attempts.
+        private static void UmbracoModuleRouteAttempt(object sender, RoutableAttemptEventArgs e)
         {
             if (e.HttpContext.Request == null || e.HttpContext.Request.Url == null) return;
 
-            if (e.Outcome == EnsureRoutableOutcome.IsRoutable)
+            switch (e.Outcome)
             {
-                using (var lck = new UpgradeableReadLock(Locker))
-                {
-                    //we only want to do the initial update once
-                    if (!_initUpdated)
-                    {
-                        lck.UpgradeToWriteLock();
-                        _initUpdated = true;
-                        UpdateServerEntry(e.HttpContext, e.UmbracoContext.Application);
-                        return;
-                    }
-                }
-            }
-
-            //if it is not a document request, we'll check if it is a back end request
-            if (e.Outcome == EnsureRoutableOutcome.NotDocumentRequest)
-            {
-                //check if this is in the umbraco back office
-                if (e.HttpContext.Request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath))
-                {
-                    //yup it's a back office request!
-                    using (var lck = new UpgradeableReadLock(Locker))
-                    {
-                        //we don't want to update if it's not been at least a minute since last time
-                        var isItAMinute = DateTime.Now.Subtract(_lastUpdated).TotalSeconds >= 60;
-                        if (isItAMinute)
-                        {
-                            lck.UpgradeToWriteLock();
-                            _initUpdated = true;
-                            _lastUpdated = DateTime.Now;
-                            UpdateServerEntry(e.HttpContext, e.UmbracoContext.Application);
-                        }
-                    }
-                }
+                case EnsureRoutableOutcome.IsRoutable:
+                    // front-end request
+                    RegisterServer(e);
+                    break;
+                case EnsureRoutableOutcome.NotDocumentRequest:
+                    // anything else (back-end request, service...)
+                    //so it's not a document request, we'll check if it's a back office request
+                    if (e.HttpContext.Request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath))
+                        RegisterServer(e);
+                    break;
+                /*
+                case EnsureRoutableOutcome.NotReady:
+                case EnsureRoutableOutcome.NotConfigured:
+                case EnsureRoutableOutcome.NoContent:
+                default:
+                    // otherwise, do nothing
+                    break;
+                */
             }
         }
 
-
-        private static void UpdateServerEntry(HttpContextBase httpContext, ApplicationContext applicationContext)
+        // register current server (throttled).
+        private static void RegisterServer(UmbracoRequestEventArgs e)
         {
+            var reg = (DatabaseServerRegistrar) ServerRegistrarResolver.Current.Registrar;
+            var options = reg.Options;
+            var secondsSinceLastUpdate = DateTime.Now.Subtract(_lastUpdated).TotalSeconds;
+            if (secondsSinceLastUpdate < options.ThrottleSeconds) return;
+
+            _lastUpdated = DateTime.Now;
+
+            var url = e.HttpContext.Request.Url;
+            var svc = e.UmbracoContext.Application.Services.ServerRegistrationService;
+
             try
             {
-                var address = httpContext.Request.Url.GetLeftPart(UriPartial.Authority);
-                applicationContext.Services.ServerRegistrationService.EnsureActive(address);
+                if (url == null)
+                    throw new Exception("Request.Url is null.");
+
+                var serverAddress = url.GetLeftPart(UriPartial.Authority);
+                var serverIdentity = JsonConvert.SerializeObject(new
+                {
+                    machineName = NetworkHelper.MachineName, 
+                    appDomainAppId = HttpRuntime.AppDomainAppId
+                });
+
+                svc.TouchServer(serverAddress, serverIdentity, options.StaleServerTimeout);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                LogHelper.Error<ServerRegistrationEventHandler>("Failed to update server record in database.", e);
+                LogHelper.Error<ServerRegistrationEventHandler>("Failed to update server record in database.", ex);
             }
         }
-
-        //private static IEnumerable<KeyValuePair<string, string>> GetBindings(HttpContextBase context)
-        //{
-        //    // Get the Site name  
-        //    string siteName = System.Web.Hosting.HostingEnvironment.SiteName;
-
-        //    // Get the sites section from the AppPool.config 
-        //    Microsoft.Web.Administration.ConfigurationSection sitesSection =
-        //        Microsoft.Web.Administration.WebConfigurationManager.GetSection(null, null, "system.applicationHost/sites");
-
-        //    foreach (Microsoft.Web.Administration.ConfigurationElement site in sitesSection.GetCollection())
-        //    {
-        //        // Find the right Site 
-        //        if (String.Equals((string)site["name"], siteName, StringComparison.OrdinalIgnoreCase))
-        //        {
-
-        //            // For each binding see if they are http based and return the port and protocol 
-        //            foreach (Microsoft.Web.Administration.ConfigurationElement binding in site.GetCollection("bindings"))
-        //            {
-        //                string protocol = (string)binding["protocol"];
-        //                string bindingInfo = (string)binding["bindingInformation"];
-
-        //                if (protocol.StartsWith("http", StringComparison.OrdinalIgnoreCase))
-        //                {
-        //                    string[] parts = bindingInfo.Split(':');
-        //                    if (parts.Length == 3)
-        //                    {
-        //                        string port = parts[1];
-        //                        yield return new KeyValuePair<string, string>(protocol, port);
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
     }
 }

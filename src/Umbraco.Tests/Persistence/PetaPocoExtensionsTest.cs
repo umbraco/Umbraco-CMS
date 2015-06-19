@@ -222,16 +222,16 @@ namespace Umbraco.Tests.Persistence
             {
                 servers.Add(new ServerRegistrationDto
                     {
-                        Address = "address" + i,
-                        ComputerName = "computer" + i,
+                        ServerAddress = "address" + i,
+                        ServerIdentity = "computer" + i,
                         DateRegistered = DateTime.Now,
                         IsActive = true,
-                        LastNotified = DateTime.Now
+                        DateAccessed = DateTime.Now
                     });
             }
 
             // Act
-            using (DisposableTimer.TraceDuration<PetaPocoExtensionsTest>("starting insert", "finished insert"))
+            using (ProfilingLogger.TraceDuration<PetaPocoExtensionsTest>("starting insert", "finished insert"))
             {
                 db.BulkInsertRecords(servers);    
             }
@@ -251,11 +251,11 @@ namespace Umbraco.Tests.Persistence
             {
                 servers.Add(new ServerRegistrationDto
                     {
-                        Address = "address" + i,
-                        ComputerName = "computer" + i,
+                        ServerAddress = "address" + i,
+                        ServerIdentity = "computer" + i,
                         DateRegistered = DateTime.Now,
                         IsActive = true,
-                        LastNotified = DateTime.Now
+                        DateAccessed = DateTime.Now
                     });
             }
             db.OpenSharedConnection();
@@ -282,11 +282,11 @@ namespace Umbraco.Tests.Persistence
             {
                 servers.Add(new ServerRegistrationDto
                 {
-                    Address = "address" + i,
-                    ComputerName = "computer" + i,
+                    ServerAddress = "address" + i,
+                    ServerIdentity = "computer" + i,
                     DateRegistered = DateTime.Now,
                     IsActive = true,
-                    LastNotified = DateTime.Now
+                    DateAccessed = DateTime.Now
                 });
             }
             db.OpenSharedConnection();

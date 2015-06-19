@@ -1,12 +1,22 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading;
 using System.Web;
 using System.Web.Security;
+using AutoMapper;
+using Microsoft.Owin;
 using Newtonsoft.Json;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Models.Membership;
+using Microsoft.Owin;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Security
 {
@@ -88,8 +98,25 @@ namespace Umbraco.Core.Security
         {
             if (http == null) throw new ArgumentNullException("http");
             if (http.User == null) return null; //there's no user at all so no identity
-            var identity = http.User.Identity as UmbracoBackOfficeIdentity;
-            if (identity != null) return identity;
+
+            //If it's already a UmbracoBackOfficeIdentity
+            var backOfficeIdentity = http.User.Identity as UmbracoBackOfficeIdentity;
+            if (backOfficeIdentity != null) return backOfficeIdentity;
+
+            //Otherwise convert to a UmbracoBackOfficeIdentity if it's auth'd and has the back office session            
+            var claimsIdentity = http.User.Identity as ClaimsIdentity;
+            if (claimsIdentity != null && claimsIdentity.IsAuthenticated)
+            {
+                try
+                {
+                    return UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    //This will occur if the required claim types are missing which would mean something strange is going on
+                    LogHelper.Error(typeof(AuthenticationExtensions), "The current identity cannot be converted to " + typeof(UmbracoBackOfficeIdentity), ex);
+                }
+            }
 
             if (authenticateRequestIfNotFound == false) return null;
 
@@ -158,8 +185,60 @@ namespace Umbraco.Core.Security
                 Expires = DateTime.Now.AddYears(-1),
                 Path = "/"
             };
+            //remove the external login cookie too
+            var extLoginCookie = new CookieHeaderValue(Constants.Security.BackOfficeExternalCookieName, "")
+            {
+                Expires = DateTime.Now.AddYears(-1),
+                Path = "/"
+            };
 
-            response.Headers.AddCookies(new[] { authCookie, prevCookie });
+            response.Headers.AddCookies(new[] { authCookie, prevCookie, extLoginCookie });
+        }
+
+        /// <summary>
+        /// This adds the forms authentication cookie for webapi since cookies are handled differently
+        /// </summary>
+        /// <param name="response"></param>
+        /// <param name="user"></param>
+        public static FormsAuthenticationTicket UmbracoLoginWebApi(this HttpResponseMessage response, IUser user)
+        {
+            if (response == null) throw new ArgumentNullException("response");
+
+            //remove the external login cookie
+            var extLoginCookie = new CookieHeaderValue(Constants.Security.BackOfficeExternalCookieName, "")
+            {
+                Expires = DateTime.Now.AddYears(-1),
+                Path = "/"
+            };
+
+            var userDataString = JsonConvert.SerializeObject(Mapper.Map<UserData>(user));
+
+            var ticket = new FormsAuthenticationTicket(
+                4,
+                user.Username,
+                DateTime.Now,
+                DateTime.Now.AddMinutes(GlobalSettings.TimeOutInMinutes),
+                true,
+                userDataString,
+                "/"
+                );
+            
+            // Encrypt the cookie using the machine key for secure transport
+            var encrypted = FormsAuthentication.Encrypt(ticket);
+
+            //add the cookie
+            var authCookie = new CookieHeaderValue(UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName, encrypted)
+            {
+                //Umbraco has always persisted it's original cookie for 1 day so we'll keep it that way
+                Expires = DateTime.Now.AddMinutes(1440),
+                Path = "/",
+                Secure = GlobalSettings.UseSSL,
+                HttpOnly = true
+            };
+
+            response.Headers.AddCookies(new[] { authCookie, extLoginCookie });
+
+            return ticket;
         }
 
         /// <summary>
@@ -211,7 +290,6 @@ namespace Umbraco.Core.Security
                 GlobalSettings.TimeOutInMinutes, 
                 //Umbraco has always persisted it's original cookie for 1 day so we'll keep it that way
                 1440, 
-                "/",
                 UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName,
                 UmbracoConfig.For.UmbracoSettings().Security.AuthCookieDomain);
         }
@@ -268,6 +346,23 @@ namespace Umbraco.Core.Security
             return new HttpContextWrapper(http).GetUmbracoAuthTicket();
         }
 
+        internal static FormsAuthenticationTicket GetUmbracoAuthTicket(this IOwinContext ctx)
+        {
+            if (ctx == null) throw new ArgumentNullException("ctx");
+            //get the ticket
+            try
+            {
+                return GetAuthTicket(ctx.Request.Cookies.ToDictionary(x => x.Key, x => x.Value), UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName);
+            }
+            catch (Exception)
+            {
+                //TODO: Do we need to do more here?? need to make sure that the forms cookie is gone, but is that
+                // taken care of in our custom middleware somehow?
+                ctx.Authentication.SignOut();
+                return null;
+            }
+        }
+
         /// <summary>
         /// This clears the forms authentication cookie
         /// </summary>
@@ -276,8 +371,8 @@ namespace Umbraco.Core.Security
         private static void Logout(this HttpContextBase http, string cookieName)
         {
             if (http == null) throw new ArgumentNullException("http");
-            //clear the preview cookie too
-            var cookies = new[] { cookieName, Constants.Web.PreviewCookieName };
+            //clear the preview cookie and external login
+            var cookies = new[] { cookieName, Constants.Web.PreviewCookieName, Constants.Security.BackOfficeExternalCookieName };
             foreach (var c in cookies)
             {
                 //remove from the request
@@ -301,16 +396,18 @@ namespace Umbraco.Core.Security
 
         private static FormsAuthenticationTicket GetAuthTicket(this HttpContextBase http, string cookieName)
         {
-            if (http == null) throw new ArgumentNullException("http");
-            var formsCookie = http.Request.Cookies[cookieName];
-            if (formsCookie == null)
+            var asDictionary = new Dictionary<string, string>();
+            for (var i = 0; i < http.Request.Cookies.Keys.Count; i++)
             {
-                return null;
+                var key = http.Request.Cookies.Keys.Get(i);
+                asDictionary[key] = http.Request.Cookies[key].Value;
             }
+
             //get the ticket
             try
             {
-                return FormsAuthentication.Decrypt(formsCookie.Value);
+
+                return GetAuthTicket(asDictionary, cookieName);
             }
             catch (Exception)
             {
@@ -318,6 +415,21 @@ namespace Umbraco.Core.Security
                 http.Logout(cookieName);
                 return null;
             }
+        }
+
+        private static FormsAuthenticationTicket GetAuthTicket(IDictionary<string, string> cookies, string cookieName)
+        {
+            if (cookies == null) throw new ArgumentNullException("cookies");
+
+            if (cookies.ContainsKey(cookieName) == false) return null;
+
+            var formsCookie = cookies[cookieName];
+            if (formsCookie == null)
+            {
+                return null;
+            }
+            //get the ticket
+            return FormsAuthentication.Decrypt(formsCookie);
         }
 
         /// <summary>
@@ -373,7 +485,6 @@ namespace Umbraco.Core.Security
         /// <param name="userData">The user data.</param>
         /// <param name="loginTimeoutMins">The login timeout mins.</param>
         /// <param name="minutesPersisted">The minutes persisted.</param>
-        /// <param name="cookiePath">The cookie path.</param>
         /// <param name="cookieName">Name of the cookie.</param>
         /// <param name="cookieDomain">The cookie domain.</param>
         private static FormsAuthenticationTicket CreateAuthTicketAndCookie(this HttpContextBase http,
@@ -381,7 +492,6 @@ namespace Umbraco.Core.Security
                                             string userData,
                                             int loginTimeoutMins,
                                             int minutesPersisted,
-                                            string cookiePath,
                                             string cookieName,
                                             string cookieDomain)
         {
@@ -394,7 +504,7 @@ namespace Umbraco.Core.Security
                 DateTime.Now.AddMinutes(loginTimeoutMins),
                 true,
                 userData,
-                cookiePath
+                "/"
                 );
 	
             // Encrypt the cookie using the machine key for secure transport
@@ -404,7 +514,8 @@ namespace Umbraco.Core.Security
                 hash)
                 {
                     Expires = DateTime.Now.AddMinutes(minutesPersisted),
-                    Domain = cookieDomain
+                    Domain = cookieDomain,
+                    Path = "/"
                 };
 
 			if (GlobalSettings.UseSSL)

@@ -1,5 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http;
+using System.Security.Claims;
+using System.Web.Http;
 using System.Web.Http.Filters;
 
 namespace Umbraco.Web.WebApi.Filters
@@ -10,13 +12,23 @@ namespace Umbraco.Web.WebApi.Filters
     /// <remarks>
     /// Code derived from http://ericpanorel.net/2013/07/28/spa-authentication-and-csrf-mvc4-antiforgery-implementation/
     /// 
-    /// TODO: If/when we enable custom authorization (OAuth, or whatever) we'll need to detect that and disable this filter since with custom auth that 
-    /// doesn't come from the same website (cookie), this will always fail.
+    /// If the authentication type is cookie based, then this filter will execute, otherwise it will be disabled
     /// </remarks>
     public sealed class ValidateAngularAntiForgeryTokenAttribute : ActionFilterAttribute
     {
         public override void OnActionExecuting(System.Web.Http.Controllers.HttpActionContext actionContext)
         {
+            var userIdentity = ((ApiController) actionContext.ControllerContext.Controller).User.Identity as ClaimsIdentity;
+            if (userIdentity != null)
+            {
+                //if there is not CookiePath claim, then exist
+                if (userIdentity.HasClaim(x => x.Type == ClaimTypes.CookiePath) == false)
+                {
+                    base.OnActionExecuting(actionContext);
+                    return;
+                }
+            }
+
             string failedReason;
             if (AngularAntiForgeryHelper.ValidateHeaders(actionContext.Request.Headers, out failedReason) == false)
             {

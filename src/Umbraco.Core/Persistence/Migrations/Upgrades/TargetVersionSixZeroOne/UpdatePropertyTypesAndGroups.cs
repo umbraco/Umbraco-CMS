@@ -1,13 +1,19 @@
 ﻿using System;
 using System.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixZeroOne
 {
     [Migration("6.0.2", 0, GlobalSettings.UmbracoMigrationName)]
     public class UpdatePropertyTypesAndGroups : MigrationBase
     {
+        public UpdatePropertyTypesAndGroups(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
+        {
+        }
+
         public override void Up()
         {
             Execute.Code(UpdatePropertyTypesAndGroupsDo);
