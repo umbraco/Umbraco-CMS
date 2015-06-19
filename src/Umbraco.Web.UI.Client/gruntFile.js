@@ -455,6 +455,9 @@ module.exports = function (grunt) {
                         },
                         'angular-dynamic-locale': {
                             files: ['tmhDynamicLocale.min.js', 'tmhDynamicLocale.min.js.map']
+                        },
+                        'bootstrap-tabdrop': {
+                            keepExpandedHierarchy: false
                         }
                     }
                 }
