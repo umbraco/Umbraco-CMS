@@ -22,6 +22,10 @@
         <!-- TAB ACTIVE OR INACTIVE STATE -->
         <div class="edt-tab umb-card" ng-class="{'tab-state-active':tab.tabState=='active', 'tab-state-inactive': tab.tabState=='inActive', 'tab-is-inherited': tab.inherited, 'edt-tab-handle': sortingMode}" ng-click="activateTab(tab)" ng-if="tab.tabState !== 'init'">
 
+            <div class="tab-remove" ng-if="!sortingMode && !tab.inherited && !tab.parentTabContentTypeNames.length > 0">
+                <i class="icon icon-trash" ng-click="removeTab($index)"></i>
+            </div>
+
             <div class="tab-title-wrapper">
 
                 <div class="tab-title">
