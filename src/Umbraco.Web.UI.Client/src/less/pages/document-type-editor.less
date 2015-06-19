@@ -195,8 +195,10 @@
     min-height: 50px;
   }
 
-  .edt-property {
+  .edt-property{
     position: relative;
+    display: flex;
+    flex-flow: row;
     -webkit-transition: all 0.5s;
     transition: all 0.5s;
     margin-bottom: 5px;
@@ -206,15 +208,6 @@
     &:hover {
       border: 1px solid @inputBorder;
     }
-  }
-
-  .edt-property:last-child {
-    margin-bottom: 0;
-  }
-
-  .edt-property-content {
-    display: flex;
-    flex-flow: row;
   }
 
   .edt-property-meta {
