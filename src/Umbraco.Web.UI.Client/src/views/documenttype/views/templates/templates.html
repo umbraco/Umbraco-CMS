@@ -27,7 +27,7 @@
                 <i class="icon icon-trash remove-template" ng-click="removeTemplate(template)"></i>
             </div>
 
-            <div class="template template-placeholder" ng-if="(templates.availableTemplates | filter:{show:true}).length > 0">
+            <div class="template template-placeholder" ng-if="(templates.availableTemplates | compareArrays:contentType.allowedTemplates:'alias').length > 0">
                 <div class="template-content">
                     <div class="template-name" ng-if="contentType.defaultTemplate !== null" ng-click="openTemplatesPicker($event)">Choose template</div>
                     <div class="template-name" ng-if="contentType.defaultTemplate === null" ng-click="openTemplatesPicker($event, true)">Choose default template</div>
@@ -36,7 +36,7 @@
 
         </div>
 
-        <div class="text-center" ng-if="(templates.availableTemplates | filter:{show:true}).length === 0">
+        <div class="text-center" ng-if="(templates.availableTemplates | compareArrays:contentType.allowedTemplates:'alias').length === 0">
             <small>All templates are added as allowed templates</small>
         </div>
 

@@ -22,24 +22,6 @@ function TemplatesController($scope, entityResource) {
 
         entityResource.getAll("Template").then(function(templates){
             $scope.templates.availableTemplates = templates;
-
-            // we should be able to move this to a custom filter
-            angular.forEach($scope.templates.availableTemplates, function(template){
-
-                var exists = false;
-
-                angular.forEach($scope.contentType.allowedTemplates, function(allowedTemplate){
-
-                    if( template.alias === allowedTemplate.alias ) {
-                        exists = true;
-                    }
-
-                });
-
-                // set template show/hide in overlay
-                template.show = !exists;
-
-            });
         });
 
     }
@@ -50,15 +32,9 @@ function TemplatesController($scope, entityResource) {
         var selectedTemplateIndex = $scope.contentType.allowedTemplates.indexOf(selectedTemplate);
         $scope.contentType.allowedTemplates.splice(selectedTemplateIndex, 1);
 
-        // show content type in content types array
-        showTemplateInOverlay(selectedTemplate);
-
     };
 
     $scope.removeDefaultTemplate = function() {
-
-        // show template in picker
-        showTemplateInOverlay($scope.contentType.defaultTemplate);
 
         // remove default template from array - it will be the last template so we can clear the array
         $scope.contentType.allowedTemplates = [];
@@ -72,7 +48,8 @@ function TemplatesController($scope, entityResource) {
         $scope.showDialog = false;
         $scope.dialogModel = {};
         $scope.dialogModel.title = "Choose template";
-        $scope.dialogModel.templates = $scope.templates.availableTemplates;
+        $scope.dialogModel.availableTemplates = $scope.templates.availableTemplates;
+        $scope.dialogModel.allowedTemplates = $scope.contentType.allowedTemplates;
         $scope.dialogModel.event = $event;
         $scope.dialogModel.view = "views/documentType/dialogs/templates/templates.html";
         $scope.showDialog = true;
@@ -87,14 +64,6 @@ function TemplatesController($scope, entityResource) {
                 $scope.setAsDefaultTemplate(selectedTemplate);
             }
 
-            // remove template from overlay picker
-            for (var templateIndex = 0; templateIndex < $scope.templates.availableTemplates.length; templateIndex++) {
-                var template = $scope.templates.availableTemplates[templateIndex];
-                if( selectedTemplate.alias === template.alias ) {
-                    template.show = false;
-                }
-            }
-
             // hide dialog
             $scope.showDialog = false;
             $scope.dialogModel = null;
@@ -106,21 +75,7 @@ function TemplatesController($scope, entityResource) {
         };
 
     };
-
-    function showTemplateInOverlay(templateToShow) {
-
-        for (var templateIndex = 0; templateIndex < $scope.templates.availableTemplates.length; templateIndex++) {
-
-            var template = $scope.templates.availableTemplates[templateIndex];
-
-            if( templateToShow.alias === template.alias ) {
-                template.show = true;
-            }
-        }
-
-    }
-
-
+    
     $scope.setAsDefaultTemplate = function(template) {
         $scope.contentType.defaultTemplate = {};
         $scope.contentType.defaultTemplate = template;
