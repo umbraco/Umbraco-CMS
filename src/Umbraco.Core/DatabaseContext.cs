@@ -542,7 +542,7 @@ namespace Umbraco.Core
             return _result;
         }
 
-        internal Result CreateDatabaseSchemaAndData()
+        internal Result CreateDatabaseSchemaAndData(ApplicationContext applicationContext)
         {   
             try
             {
@@ -584,7 +584,9 @@ namespace Umbraco.Core
                 //If Configuration Status is empty and the determined version is "empty" its a new install - otherwise upgrade the existing
                 if (string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus) && installedVersion.Equals(new Version(0, 0, 0)))
                 {
-                    database.CreateDatabaseSchema();
+                    var helper = new DatabaseSchemaHelper(database, _logger, SqlSyntax);
+                    helper.CreateDatabaseSchema(true, applicationContext);
+
                     message = message + "<p>Installation completed!</p>";
 
                     //now that everything is done, we need to determine the version of SQL server that is executing

@@ -1,10 +1,12 @@
 using System;
 using System.Linq;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Migrations.Initial;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence
 {
@@ -60,7 +62,7 @@ namespace Umbraco.Core.Persistence
             if (guardConfiguration && applicationContext.IsConfigured)
                 throw new Exception("Umbraco is already configured!");
 
-            CreateDatabaseSchemaDo();
+            CreateDatabaseSchemaDo(applicationContext.Services.MigrationEntryService);
         }
 
         internal void CreateDatabaseSchemaDo(bool guardConfiguration, ApplicationContext applicationContext)
@@ -68,15 +70,18 @@ namespace Umbraco.Core.Persistence
             if (guardConfiguration && applicationContext.IsConfigured)
                 throw new Exception("Umbraco is already configured!");
 
-            CreateDatabaseSchemaDo();
+            CreateDatabaseSchemaDo(applicationContext.Services.MigrationEntryService);
         }
 
-        internal void CreateDatabaseSchemaDo()
+        internal void CreateDatabaseSchemaDo(IMigrationEntryService migrationEntryService)
         {
             _logger.Info<Database>("Initializing database schema creation");
 
             var creation = new DatabaseSchemaCreation(_db, _logger, _syntaxProvider);
             creation.InitializeDatabaseSchema();
+
+            //Now ensure to cretae the tag in the db for the current migration version
+            migrationEntryService.CreateEntry(GlobalSettings.UmbracoMigrationName, UmbracoVersion.Current);
 
             _logger.Info<Database>("Finalized database schema creation");
         }
