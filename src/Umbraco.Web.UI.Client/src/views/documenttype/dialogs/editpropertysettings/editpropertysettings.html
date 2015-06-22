@@ -8,7 +8,7 @@
                    ng-model="model.property.label"
                    placeholder="Enter a name..." umb-auto-focus />
 
-            <umb-locked-field ng-model="model.property.alias"></umb-locked-field>
+            <umb-generate-alias enable-lock="true" alias-from="model.property.label" alias="model.property.alias"></umb-generate-alias>
 
         </div>
 
