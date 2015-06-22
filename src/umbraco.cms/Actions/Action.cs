@@ -13,6 +13,7 @@ using umbraco.cms.businesslogic.workflow;
 using umbraco.interfaces;
 using System.Text.RegularExpressions;
 using System.Linq;
+using Umbraco.Core.IO;
 using TypeFinder = Umbraco.Core.TypeFinder;
 
 namespace umbraco.BusinessLogic.Actions
@@ -89,7 +90,7 @@ namespace umbraco.BusinessLogic.Actions
         {
             return ActionsResolver.Current.Actions
                 .Where(x => !string.IsNullOrWhiteSpace(x.JsSource))
-                .Select(x => x.JsSource).ToList();
+                .Select(x => IOHelper.ResolveUrl(x.JsSource)).ToList();
             //return ActionJsReference;
         }
 
