@@ -38,7 +38,7 @@
 	<div ng-if="(dataTypes.system | filter:searchTerm).length > 0">
 		<h5>Standard</h5>
 		<ul class="umb-card-grid">
-			<li ng-repeat="systemDataType in dataTypes.system | orderBy:'name' | filter: searchTerm">
+			<li ng-repeat="systemDataType in dataTypes.system | compareArrays:dataTypes.userConfigured:'id' | orderBy:'name' | filter: searchTerm">
 				<a href="" ng-click="model.selectDataType(systemDataType)">
 					<i class="{{ systemDataType.icon }}" ng-class="{'icon-autofill': systemDataType.icon == null}"></i>
 					{{ systemDataType.name }}
