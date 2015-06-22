@@ -8,6 +8,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.Migrations.Syntax.Alter.Expressions;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Tests.Migrations
 {
@@ -17,7 +18,9 @@ namespace Umbraco.Tests.Migrations
         [Test]
         public void Executes_Only_One_Migration_For_Spanning_Multiple_Targets()
         {
-            var runner = new MigrationRunner(Mock.Of<ILogger>(), new Version(4, 0, 0), new Version(6, 0, 0), "Test");
+            var runner = new MigrationRunner(
+                Mock.Of<IMigrationEntryService>(),
+                Mock.Of<ILogger>(), new Version(4, 0, 0), new Version(6, 0, 0), "Test");
 
             var migrations = runner.OrderedUpgradeMigrations(new List<IMigration> { new MultiMigration(new SqlCeSyntaxProvider(), Mock.Of<ILogger>()) });
 
@@ -33,7 +36,9 @@ namespace Umbraco.Tests.Migrations
         [Test]
         public void Executes_Migration_For_Spanning_One_Target_1()
         {
-            var runner = new MigrationRunner(Mock.Of<ILogger>(), new Version(4, 0, 0), new Version(5, 0, 0), "Test");
+            var runner = new MigrationRunner(
+                Mock.Of<IMigrationEntryService>(),
+                Mock.Of<ILogger>(), new Version(4, 0, 0), new Version(5, 0, 0), "Test");
 
             var migrations = runner.OrderedUpgradeMigrations(new List<IMigration> { new MultiMigration(new SqlCeSyntaxProvider(), Mock.Of<ILogger>()) });
 
@@ -49,7 +54,9 @@ namespace Umbraco.Tests.Migrations
         [Test]
         public void Executes_Migration_For_Spanning_One_Target_2()
         {
-            var runner = new MigrationRunner(Mock.Of<ILogger>(), new Version(5, 0, 1), new Version(6, 0, 0), "Test");
+            var runner = new MigrationRunner(
+                Mock.Of<IMigrationEntryService>(), 
+                Mock.Of<ILogger>(), new Version(5, 0, 1), new Version(6, 0, 0), "Test");
 
             var migrations = runner.OrderedUpgradeMigrations(new List<IMigration> { new MultiMigration(new SqlCeSyntaxProvider(), Mock.Of<ILogger>()) });
 

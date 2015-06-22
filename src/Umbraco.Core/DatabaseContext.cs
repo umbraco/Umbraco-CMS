@@ -13,6 +13,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.Migrations.Initial;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core
 {
@@ -90,7 +91,7 @@ namespace Umbraco.Core
         /// This should not be used for CRUD operations or queries against the
         /// standard Umbraco tables! Use the Public services for that.
         /// </remarks>
-        public UmbracoDatabase Database
+        public virtual UmbracoDatabase Database
         {
             get { return _factory.CreateDatabase(); }
         }
@@ -98,7 +99,7 @@ namespace Umbraco.Core
         /// <summary>
         /// Boolean indicating whether the database has been configured
         /// </summary>
-        public bool IsDatabaseConfigured
+        public virtual bool IsDatabaseConfigured
         {
             get { return _configured; }
         }
@@ -106,7 +107,7 @@ namespace Umbraco.Core
         /// <summary>
         /// Determines if the db can be connected to
         /// </summary>
-        public bool CanConnect
+        public virtual bool CanConnect
         {
             get
             {
@@ -132,7 +133,7 @@ namespace Umbraco.Core
         /// <summary>
         /// Gets the configured umbraco db connection string.
         /// </summary>
-        public string ConnectionString
+        public virtual string ConnectionString
         {
             get { return _connectionString; }
         }
@@ -164,7 +165,7 @@ namespace Umbraco.Core
         /// <summary>
         /// Returns the Type of DatabaseProvider used
         /// </summary>
-        public DatabaseProviders DatabaseProvider
+        public virtual DatabaseProviders DatabaseProvider
         {
             get
             {
@@ -612,7 +613,7 @@ namespace Umbraco.Core
         /// This assumes all of the previous checks are done!
         /// </summary>
         /// <returns></returns>
-        internal Result UpgradeSchemaAndData()
+        internal Result UpgradeSchemaAndData(IMigrationEntryService migrationEntryService)
         {
             try
             {
@@ -639,7 +640,7 @@ namespace Umbraco.Core
                                                 ? installedVersion
                                                 : new Version(GlobalSettings.ConfigurationStatus);
                 var targetVersion = UmbracoVersion.Current;
-                var runner = new MigrationRunner(_logger, currentVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
+                var runner = new MigrationRunner(migrationEntryService, _logger, currentVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
                 var upgraded = runner.Execute(database, true);
                 message = message + "<p>Upgrade completed!</p>";
 

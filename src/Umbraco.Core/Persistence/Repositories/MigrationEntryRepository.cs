@@ -115,9 +115,11 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IMigrationEntry FindEntry(string migrationName, Version version)
         {
+            var versionString = version.ToString();
+
             var sql = new Sql().Select("*")
                 .From<MigrationDto>(SqlSyntax)
-                .Where<MigrationDto>(x => x.Name.InvariantEquals(migrationName) && x.Version == version.ToString());
+                .Where<MigrationDto>(x => x.Name.InvariantEquals(migrationName) && x.Version == versionString);
 
             var result = Database.FirstOrDefault<MigrationDto>(sql);
 
