@@ -237,7 +237,7 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 
 	};
 
-	$scope.deleteTab = function(tabIndex) {
+	$scope.removeTab = function(tabIndex) {
 		$scope.contentType.groups.splice(tabIndex, 1);
 	};
 
