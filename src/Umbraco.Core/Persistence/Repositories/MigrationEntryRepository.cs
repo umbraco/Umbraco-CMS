@@ -112,5 +112,18 @@ namespace Umbraco.Core.Persistence.Repositories
 
             entity.ResetDirtyProperties();
         }
+
+        public IMigrationEntry FindEntry(string migrationName, Version version)
+        {
+            var sql = new Sql().Select("*")
+                .From<MigrationDto>(SqlSyntax)
+                .Where<MigrationDto>(x => x.Name.InvariantEquals(migrationName) && x.Version == version.ToString());
+
+            var result = Database.FirstOrDefault<MigrationDto>(sql);
+
+            var factory = new MigrationEntryFactory();
+
+            return result == null ? null : factory.BuildEntity(result);
+        }
     }
 }

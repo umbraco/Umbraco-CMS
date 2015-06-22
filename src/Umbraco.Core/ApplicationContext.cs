@@ -38,6 +38,8 @@ namespace Umbraco.Core
             _services = serviceContext;
             ApplicationCache = cache;
             ProfilingLogger = logger;
+
+            Init();
 	    }
 
 	    /// <summary>
@@ -60,6 +62,8 @@ namespace Umbraco.Core
         public ApplicationContext(CacheHelper cache)
         {
             ApplicationCache = cache;
+
+            Init();
         }
 
 	    /// <summary>
@@ -190,16 +194,10 @@ namespace Umbraco.Core
         //   GlobalSettings.CurrentVersion returns the hard-coded "current version"
         //   the system is configured if they match
         //   if they don't, install runs, updates web.config (presumably) and updates GlobalSettings.ConfiguredStatus
-        //
-        //   then there is Application["umbracoNeedConfiguration"] which makes no sense... getting rid of it... SD: I have actually remove that now!
-        //
+        
         public bool IsConfigured
         {
-            // todo - we should not do this - ok for now
-            get
-            {
-            	return Configured;
-            }
+            get { return _configured.Value; }
         }
 
         /// <summary>
@@ -233,37 +231,51 @@ namespace Umbraco.Core
         /// </remarks>
         internal string OriginalRequestUrl { get; set; }
 
-	    private bool _versionsDifferenceReported;
 
-        /// <summary>
-        /// Checks if the version configured matches the assembly version
-        /// </summary>
-		private bool Configured
-		{
-			get
-			{
-				try
-				{
-					var configStatus = ConfigurationStatus;
-					var currentVersion = UmbracoVersion.Current.ToString(3);
-				    var ok = configStatus == currentVersion;
+	    private Lazy<bool> _configured;
 
-					if (ok == false && _versionsDifferenceReported == false)
-					{
-                        // remember it's been reported so we don't flood the log
-                        // no thread-safety so there may be a few log entries, doesn't matter
-                        _versionsDifferenceReported = true;
+	    private void Init()
+	    {
+
+            //Create the lazy value to resolve whether or not the application is 'configured'
+            _configured = new Lazy<bool>(() =>
+            {
+                try
+                {
+                    var configStatus = ConfigurationStatus;
+                    var currentVersion = UmbracoVersion.Current.ToString(3);
+                    var ok = configStatus == currentVersion;
+
+                    if (ok)
+                    {
+                        //The versions are the same in config, but are they the same in the database. We can only check this
+                        // if we have a db context available, if we don't then we are not installed anyways
+                        if (DatabaseContext.IsDatabaseConfigured && DatabaseContext.CanConnect)
+                        {
+                            var found = Services.MigrationEntryService.FindEntry(GlobalSettings.UmbracoMigrationName, UmbracoVersion.Current);
+                            if (found == null)
+                            {
+                                //we haven't executed this migration in this environment, so even though the config versions match, 
+                                // this db has not been updated.
+                                ProfilingLogger.Logger.Debug<ApplicationContext>("The migration for version: '" + currentVersion + " has not been executed, there is no record in the database");
+                                ok = false;
+                            }
+                        }
+                    }
+                    else
+                    {
                         ProfilingLogger.Logger.Debug<ApplicationContext>("CurrentVersion different from configStatus: '" + currentVersion + "','" + configStatus + "'");
-					}
-						
-					return ok;
-				}
-				catch
-				{
-					return false;
-				}
-			}
-		}
+                    }
+
+                    return ok;
+                }
+                catch
+                {
+                    return false;
+                }
+
+            }); 
+	    }
 
 		private string ConfigurationStatus
 		{

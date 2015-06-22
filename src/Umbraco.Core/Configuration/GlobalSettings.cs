@@ -242,6 +242,7 @@ namespace Umbraco.Core.Configuration
             }
         }
 
+        //TODO: Move these to constants!
         public const string UmbracoConnectionName = "umbracoDbDSN";
         public const string UmbracoMigrationName = "Umbraco";
 
