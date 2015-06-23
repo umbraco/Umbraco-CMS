@@ -1,7 +1,7 @@
 <!-- TABS -->
 <ul ui-sortable="sortableOptionsTab" ng-model="contentType.groups" class="content-type-groups-list no-style-list">
 
-    <li ng-repeat="tab in contentType.groups">
+    <li ng-repeat="tab in contentType.groups" ng-class="{'edt-tab-sortable': sortingMode && !tab.inherited}">
 
         <!-- TAB INIT STATE -->
         <div class="edt-tab umb-card edt-tab-placeholder" ng-click="addTab(tab)" ng-show="tab.tabState=='init' && !sortingMode" ng-class="{'tab-state-init animated fadeIn': tab.tabState=='init'}">
@@ -20,7 +20,7 @@
         </div>
 
         <!-- TAB ACTIVE OR INACTIVE STATE -->
-        <div class="edt-tab umb-card" ng-class="{'tab-state-active':tab.tabState=='active', 'tab-state-inactive': tab.tabState=='inActive', 'tab-is-inherited': tab.inherited, 'edt-tab-handle': sortingMode}" ng-click="activateTab(tab)" ng-if="tab.tabState !== 'init'">
+        <div class="edt-tab umb-card" ng-class="{'tab-state-active':tab.tabState=='active', 'tab-state-inactive': tab.tabState=='inActive', 'tab-is-inherited': tab.inherited, 'edt-tab-handle': sortingMode && !tab.inherited}" ng-click="activateTab(tab)" ng-if="tab.tabState !== 'init'">
 
             <div class="tab-remove" ng-if="!sortingMode && tab.properties.length <= 1">
                 <i class="icon icon-trash" ng-click="removeTab($index)"></i>
@@ -29,7 +29,7 @@
             <div class="tab-title-wrapper">
 
                 <div class="tab-title">
-                    <i class="icon icon-navigation" ng-if="sortingMode"></i>
+                    <i class="icon icon-navigation" ng-if="sortingMode && !tab.inherited"></i>
                     <input class="tab-title-input" type="text" placeholder="Enter name..." ng-model="tab.name" ng-class="{'tab-title-placeholder': tab.name == ''}" ng-change="updateTabTitle(tab)" umb-blur="updateTabTitle(tab)" ng-disabled="tab.inherited" umb-auto-focus umb-auto-resize />
                 </div>
 
@@ -46,7 +46,7 @@
             <div class="edt-property-group">
                 <ul class="edt-property-list no-style-list" ui-sortable="sortableOptionsEditor"
                     ng-model="tab.properties" class="no-style-list">
-                    <li ng-repeat="property in tab.properties">
+                    <li ng-class="{'edt-property-sortable': sortingMode && !property.inherited}" ng-repeat="property in tab.properties">
 
                         <!-- Init property / Property placeholder / add new property -->
                         <div class="edt-property" ng-show="property.propertyState=='init'" ng-class="{'property-state-init animated fadeIn': property.propertyState=='init'}" ng-click="editPropertyTypeSettings(property)">
@@ -69,7 +69,7 @@
 
                         </div>
 
-                        <div class="edt-property" ng-show="property.propertyState!=='init'" ng-class="{'active': property.dialogIsOpen, 'property-state-active animated fadeIn': property.propertyState=='active', 'property-is-inherited': property.inherited, 'edt-property-handle': sortingMode}">
+                        <div class="edt-property" ng-show="property.propertyState!=='init'" ng-class="{'active': property.dialogIsOpen, 'property-state-active animated fadeIn': property.propertyState=='active', 'property-is-inherited': property.inherited, 'edt-property-handle': sortingMode && !property.inherited}">
 
                             <!-- property meta text -->
                             <div class="edt-property-meta">
@@ -92,8 +92,8 @@
 
                                 <div ng-if="sortingMode">
                                     <i class="icon icon-navigation"></i>
-                                    <span>{{ property.label }}</span>:
-                                    <span class="item-alias">{{ property.alias }}</span>
+                                    <span class="property-name">{{ property.label }}</span>
+                                    <span class="item-alias">({{ property.alias }})</span>
                                 </div>
 
                             </div>

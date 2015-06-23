@@ -610,7 +610,6 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 
 	$scope.sortableOptionsTab = {
 		distance: 10,
-		revert: true,
 		tolerance: "pointer",
 		opacity: 0.7,
 		scroll: true,
@@ -618,6 +617,7 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 		placeholder: "ui-sortable-tabs-placeholder",
 		zIndex: 6000,
 		handle: ".edt-tab-handle",
+		items: ".edt-tab-sortable",
 		start: function (e, ui) {
 			ui.placeholder.height(ui.item.height());
 		},
@@ -628,7 +628,6 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 
 	$scope.sortableOptionsEditor = {
 		distance: 10,
-		revert: true,
 		tolerance: "pointer",
 		connectWith: ".edt-property-list",
 		opacity: 0.7,
@@ -637,6 +636,7 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 		placeholder: "ui-sortable-properties-placeholder",
 		zIndex: 6000,
 		handle: ".edt-property-handle",
+		items: ".edt-property-sortable",
 		start: function (e, ui) {
 			ui.placeholder.height(ui.item.height());
 		},

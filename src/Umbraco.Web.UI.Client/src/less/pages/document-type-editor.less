@@ -336,7 +336,7 @@
 
   .edt-property-inherited-from {
     font-size: 11px;
-    background-color: #d9d9d9;
+    background-color: #E9E9E9;
     margin-left: 5px;
     position: absolute;
     right: 0;
@@ -371,17 +371,18 @@
 
     .edt-property {
       height: 40px;
-      margin-bottom: 10px;
       background: #E9E9E9;
       color: @grayDarker;
       border-radius: @baseBorderRadius;
       padding: 0;
       cursor: move;
       border: none;
+      display: flex;
+      align-items: center;
     }
 
     .edt-property-meta {
-      padding: 10px 0 0 10px;
+      padding: 0 0 0 10px;
       width: auto;
       flex: 1;
       .icon {
@@ -399,6 +400,17 @@
       }
     }
 
+    .property-name {
+      font-size: 12px;
+      font-weight: bold;
+      margin-right: 2px;
+    }
+
+    .item-alias {
+      font-size: 12px;
+      color: #cccccc;
+    }
+
     .edt-property-preview {
       display: none;
     }
@@ -412,6 +424,7 @@
     }
 
     .edt-property.property-is-inherited {
+      background: @grayLighter;
       cursor: auto;
       .icon-navigation {
         visibility: hidden;
@@ -427,15 +440,15 @@
   // sorting placeholders
   .ui-sortable-tabs-placeholder {
     background: transparent;
-    border: 2px solid #E9E9E9;
+    border: 1px dashed @grayLight;
     margin: 0 0 70px 0;
     border-radius: 10px;
   }
 
   .ui-sortable-properties-placeholder {
     background: transparent;
-    border: 2px solid #E9E9E9;
-    margin-bottom: 10px;
+    border: 1px dashed @grayLight;
+    margin-bottom: 5px;
   }
 
 
