@@ -1,4 +1,19 @@
-﻿/**
+Skip to content
+This repository  
+Pull requests
+Issues
+Gist
+ @YuraDubensky
+ Unwatch 1
+  Star 0
+  Fork 695
+YuraDubensky/Umbraco-CMS
+forked from umbraco/Umbraco-CMS
+ tree: 95da5d6e38  Umbraco-CMS/src/Umbraco.Web.UI.Client/src/common/directives/validation/valformmanager.directive.js
+@YuraDubenskyYuraDubensky 14 minutes ago Add leave page validation for browser tab closing
+3 contributors @Shazwazza @wp-manaosoftware @YuraDubensky
+RawBlameHistory    124 lines (102 sloc)  5.895 kB
+/**
 * @ngdoc directive
 * @name umbraco.directives.directive:valFormManager
 * @restrict A
@@ -95,12 +110,23 @@ function valFormManager(serverValidationManager, $rootScope, $log, $timeout, not
 
             });
             unsubscribe.push(locationEvent);
+            
+            // leave page validation for tab closing (tested in Chrome, Firefox and IE)
+            var previousUnloadHandler = window.onbeforeunload;
+            window.onbeforeunload = confirmExit;
+            function confirmExit() {
+                if (formCtrl.$dirty) {
+                    return "You have unsaved changes";
+                }
+            }
 
             //Ensure to remove the event handler when this instance is destroyted
             scope.$on('$destroy', function() {
                 for (var u in unsubscribe) {
                     unsubscribe[u]();
                 }
+                                    // restore previous unload handler
+                window.onbeforeunload = previousUnloadHandler;
             });
 
             $timeout(function(){
@@ -110,3 +136,5 @@ function valFormManager(serverValidationManager, $rootScope, $log, $timeout, not
     };
 }
 angular.module('umbraco.directives.validation').directive("valFormManager", valFormManager);
+Status API Training Shop Blog About Help
+© 2015 GitHub, Inc. Terms Privacy Security Contact
