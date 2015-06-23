@@ -29,7 +29,7 @@ namespace Umbraco.Core.Persistence.Migrations
 
         [Obsolete("Use the ctor that specifies all dependencies instead")]
         public MigrationRunner(ILogger logger, Version currentVersion, Version targetVersion, string productName)
-            : this(logger, currentVersion, targetVersion, productName, Enumerable.Empty<IMigration>().ToArray())
+            : this(logger, currentVersion, targetVersion, productName, null)
         {
         }
 
@@ -53,7 +53,8 @@ namespace Umbraco.Core.Persistence.Migrations
             _currentVersion = currentVersion;
             _targetVersion = targetVersion;
             _productName = productName;
-            _migrations = migrations;
+            //ensure this is null if there aren't any
+            _migrations = migrations.Length == 0 ? null : migrations;
         }
 
         /// <summary>

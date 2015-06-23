@@ -551,6 +551,7 @@
     <Compile Include="TestHelpers\FakeHttpContextFactory.cs" />
     <Compile Include="Plugins\TypeFinderTests.cs" />
     <Compile Include="Routing\UmbracoModuleTests.cs" />
+    <Compile Include="VersionExtensionTests.cs" />
     <Compile Include="XmlExtensionsTests.cs" />
     <Compile Include="XmlHelperTests.cs" />
   </ItemGroup>
