@@ -13,6 +13,8 @@ namespace Umbraco.Web.Models.ContentEditing
         public PropertyGroupDisplay()
         {
             Properties = new List<PropertyTypeDisplay>();
+            ParentTabContentTypeNames = new List<string>();
+            ParentTabContentTypes = new List<int>();
         }
 
         [DataMember(Name = "id")]
