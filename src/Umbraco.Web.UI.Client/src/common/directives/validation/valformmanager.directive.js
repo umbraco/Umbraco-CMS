@@ -95,12 +95,23 @@ function valFormManager(serverValidationManager, $rootScope, $log, $timeout, not
 
             });
             unsubscribe.push(locationEvent);
+            
+            // leave page validation for tab closing (tested in Chrome, Firefox and IE)
+            var previousUnloadHandler = window.onbeforeunload;
+            window.onbeforeunload = confirmExit;
+            function confirmExit() {
+                if (formCtrl.$dirty) {
+                    return "You have unsaved changes";
+                }
+            }
 
             //Ensure to remove the event handler when this instance is destroyted
             scope.$on('$destroy', function() {
                 for (var u in unsubscribe) {
                     unsubscribe[u]();
                 }
+                                    // restore previous unload handler
+                window.onbeforeunload = previousUnloadHandler;
             });
 
             $timeout(function(){
