@@ -6,7 +6,7 @@
  * @description
  * The controller for the content type editor
  */
-function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, contentTypeResource, entityResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper) {
+function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, contentTypeResource, entityResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper) {
 
 	$scope.page = {actions: [], menu: [], subViews: [] };
 	$scope.sortingMode = false;
@@ -113,155 +113,21 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 
 		$scope.dialogModel.selectCompositeContentType = function(compositeContentType) {
 
-			//merge composition with content type
 			if( $scope.contentType.compositeContentTypes.indexOf(compositeContentType.alias) === -1 ) {
 
-				mergeCompositeContentType(compositeContentType);
+				//merge composition with content type
+				contentTypeHelper.mergeCompositeContentType($scope.contentType, compositeContentType);
 
-			// split composition from content type
 			} else {
 
-				splitCompositeContentType(compositeContentType);
+				// split composition from content type
+				contentTypeHelper.splitCompositeContentType($scope.contentType, compositeContentType);
 
 			}
 
 		}
 
 	};
-
-	function mergeCompositeContentType(compositeContentType) {
-
-		contentTypeResource.getById(compositeContentType.id).then(function(composition){
-
-			var groupsArrayLength = $scope.contentType.groups.length;
-			var positionToPush = groupsArrayLength - 1;
-
-			angular.forEach(composition.groups, function(compositionGroup){
-
-				// set inherited state on tab
-				compositionGroup.inherited = true;
-
-				// set inherited state on properties
-				angular.forEach(compositionGroup.properties, function(compositionProperty){
-					compositionProperty.inherited = true;
-				});
-
-				// set tab state
-				compositionGroup.tabState = "inActive";
-
-				// if groups are named the same - merge the groups
-				angular.forEach($scope.contentType.groups, function(contentTypeGroup){
-
-					if( contentTypeGroup.name === compositionGroup.name ) {
-
-						// set flag to show if properties has been merged into a tab
-						compositionGroup.groupIsMerged = true;
-
-						// make group inherited
-						contentTypeGroup.inherited = true;
-
-						// add properties to the top of the array
-						contentTypeGroup.properties = compositionGroup.properties.concat(contentTypeGroup.properties);
-
-						// make parentTabContentTypeNames to an array so we can push values
-						if(contentTypeGroup.parentTabContentTypeNames === null || contentTypeGroup.parentTabContentTypeNames === undefined) {
-							contentTypeGroup.parentTabContentTypeNames = [];
-						}
-
-						// push name to array of merged composite content types
-						contentTypeGroup.parentTabContentTypeNames.push(compositeContentType.name);
-
-						// make parentTabContentTypes to an array so we can push values
-						if(contentTypeGroup.parentTabContentTypes === null || contentTypeGroup.parentTabContentTypes === undefined) {
-							contentTypeGroup.parentTabContentTypes = [];
-						}
-
-						// push id to array of merged composite content types
-						contentTypeGroup.parentTabContentTypes.push(compositeContentType.id);
-
-					}
-
-				});
-
-				// if group is not merged - push it to the end of the array - before init tab
-				if( compositionGroup.groupIsMerged === false || compositionGroup.groupIsMerged == undefined ) {
-
-					// make parentTabContentTypeNames to an array so we can push values
-					if(compositionGroup.parentTabContentTypeNames === null || compositionGroup.parentTabContentTypeNames === undefined) {
-						compositionGroup.parentTabContentTypeNames = [];
-					}
-
-					// push name to array of merged composite content types
-					compositionGroup.parentTabContentTypeNames.push(compositeContentType.name);
-
-					// make parentTabContentTypes to an array so we can push values
-					if(compositionGroup.parentTabContentTypes === null || compositionGroup.parentTabContentTypes === undefined) {
-						compositionGroup.parentTabContentTypes = [];
-					}
-
-					// push id to array of merged composite content types
-					compositionGroup.parentTabContentTypes.push(compositeContentType.id);
-
-					//push init property to group
-					addInitProperty(compositionGroup);
-
-					// push group before placeholder tab
-					$scope.contentType.groups.splice(positionToPush,0,compositionGroup);
-
-				}
-
-			});
-
-		});
-
-
-	}
-
-	function splitCompositeContentType(compositeContentType) {
-
-		angular.forEach($scope.contentType.groups, function(contentTypeGroup){
-
-			if( contentTypeGroup.tabState !== "init" ) {
-
-				var idIndex = contentTypeGroup.parentTabContentTypes.indexOf(compositeContentType.id);
-				var nameIndex = contentTypeGroup.parentTabContentTypeNames.indexOf(compositeContentType.name);
-				var groupIndex = $scope.contentType.groups.indexOf(contentTypeGroup);
-
-
-				if( idIndex !== -1  ) {
-
-					var properties = [];
-
-					// remove all properties from composite content type
-					angular.forEach(contentTypeGroup.properties, function(property){
-						if(property.contentTypeId !== compositeContentType.id) {
-							properties.push(property);
-						}
-					});
-
-					// set new properties array to properties
-					contentTypeGroup.properties = properties;
-
-					// remove composite content type name and id from inherited arrays
-					contentTypeGroup.parentTabContentTypes.splice(idIndex, 1);
-					contentTypeGroup.parentTabContentTypeNames.splice(nameIndex, 1);
-
-					// remove inherited state if there are no inherited properties
-					if(contentTypeGroup.parentTabContentTypes.length === 0) {
-						contentTypeGroup.inherited = false;
-					}
-
-					// remove group if there are no properties left
-					if(contentTypeGroup.properties.length <= 1) {
-						$scope.contentType.groups.splice(groupIndex, 1);
-					}
-
-				}
-
-			}
-
-		});
-	}
 
 	/* ---------- TABS ---------- */
 
@@ -270,7 +136,7 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 		$scope.activateTab(tab);
 
 		// push new init tab to the scope
-		addInitTab();
+		contentTypeHelper.addInitTab($scope.contentType);
 
 	};
 
@@ -294,7 +160,7 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 
 	$scope.updateTabTitle = function(tab) {
 		if(tab.properties.length === 0) {
-			addInitProperty(tab);
+			contentTypeHelper.addInitProperty(tab);
 		}
 	};
 
@@ -309,7 +175,7 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 				group.tabState = "inActive";
 
 				// push init/placeholder property
-				addInitProperty(group);
+				contentTypeHelper.addInitProperty(group);
 
 				angular.forEach(group.properties, function(property){
 
@@ -329,7 +195,8 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
         editorState.set($scope.contentType);
 
 		// add init tab
-		addInitTab();
+		contentTypeHelper.addInitTab($scope.contentType);
+
 	}
 
 	function convertLegacyIcons() {
@@ -361,71 +228,6 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 					property.dataTypeName = dataType.name;
 				});
 		}
-	}
-
-	function addInitTab() {
-
-		// check i init tab already exists
-		var addTab = true;
-
-		angular.forEach($scope.contentType.groups, function(group){
-			if(group.tabState === "init") {
-				addTab = false;
-			}
-		});
-
-		if(addTab) {
-			$scope.contentType.groups.push({
-				groups: [],
-				properties:[],
-				name: "",
-				tabState: "init"
-			});
-		}
-	}
-
-	function addInitProperty(tab) {
-
-		var addInitProperty = true;
-
-		// check if there already is an init property
-		angular.forEach(tab.properties, function(property){
-			if(property.propertyState === "init") {
-				addInitProperty = false;
-			}
-		});
-
-		if(addInitProperty) {
-			tab.properties.push({
-				propertyState: "init"
-			});
-		}
-
-	}
-
-	function addInitPropertyOnActiveTab() {
-
-		var addInitProperty = true;
-
-		angular.forEach($scope.contentType.groups, function(group){
-
-			if(group.tabState === 'active') {
-
-				angular.forEach(group.properties, function(property){
-					if(property.propertyState === "init") {
-						addInitProperty = false;
-					}
-				});
-
-				if(addInitProperty) {
-					group.properties.push({
-						propertyState: "init"
-					});
-				}
-
-			}
-		});
-
 	}
 
 	/* ---------- PROPERTIES ---------- */
@@ -470,7 +272,7 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 				$scope.dialogModel = null;
 
 				// push new init property to scope
-				addInitPropertyOnActiveTab();
+				contentTypeHelper.addInitPropertyOnActiveTab($scope.contentType);
 
 			};
 
@@ -479,7 +281,7 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 				$scope.dialogModel = null;
 
 				// push new init property to scope
-				addInitPropertyOnActiveTab();
+				contentTypeHelper.addInitPropertyOnActiveTab($scope.contentType);
 			};
 
 		}
