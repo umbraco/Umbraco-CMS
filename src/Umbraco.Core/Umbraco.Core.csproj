@@ -285,6 +285,7 @@
     <Compile Include="Configuration\UmbracoVersion.cs" />
     <Compile Include="Attempt.cs" />
     <Compile Include="Constants-Examine.cs" />
+    <Compile Include="Constants-Icons.cs" />
     <Compile Include="ControlExtensions.cs" />
     <Compile Include="CoreBootManager.cs" />
     <Compile Include="DatabaseContext.cs" />
