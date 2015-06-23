@@ -44,7 +44,7 @@
 
   .edt-tab{
     margin: 50px 0 0 0;
-    min-height: 145px;
+    min-height: 96px;
     border: 2px solid #CCCCCC;
     padding: 0;
     //box-shadow: 0 3px 0 0 rgba(0,0,0,0.1);
@@ -72,6 +72,16 @@
     }
   }
 
+  .tab-remove {
+    position: absolute;
+    top: -30px;
+    right: 28px;
+  }
+
+  .tab-remove:hover {
+    cursor: pointer;
+  }
+
   .tab-title-wrapper {
     position: absolute;
     left: -2px;
@@ -90,7 +100,6 @@
       .tab-title-input {
         border-color: transparent;
         background: transparent;
-        min-width: 80px;
         font-weight: bold;
         color: #515151;
         margin-bottom: 0;
@@ -100,6 +109,8 @@
         }
         &.tab-title-placeholder {
           border: 1px dashed #979797 !important;
+          min-width: 110px;
+          width: 0;
         }
       }
       .tab-title-text {
@@ -185,7 +196,7 @@
 
   .edt-property-group{
     position: relative;
-    padding: 10px 10px 0 10px;
+    padding: 10px;
     -webkit-transition: all 0.5s;
     transition: all 0.5s;
   }
@@ -200,8 +211,8 @@
     flex-flow: row;
     -webkit-transition: all 0.5s;
     transition: all 0.5s;
-    margin-bottom: 10px;
-    padding: 10px 0;
+    margin-bottom: 5px;
+    padding: 5px 0;
     border: 1px solid transparent;
     border-radius: 5px;
     &:hover {
@@ -210,21 +221,18 @@
   }
 
   .edt-property-meta {
-    width: 300px;
-    margin-right: 50px;
+    flex: 0 0 175px;
+    margin-right: 20px;
     -webkit-transition: all 0.5s;
     transition: all 0.5s;
     .property-meta-group {
       display: inline-block;
     }
-    @media screen and (max-width: 1500px) {
-      width: 200px;
-    }
   }
 
   .edt-property-preview{
-    flex: 2;
-    height: 50px;
+    flex: 1;
+    height: 30px;
     overflow: hidden;
     position: relative;
     padding: 25px 10px;
@@ -257,14 +265,6 @@
     border-radius: 10px;
     background: url("../img/checkered-background.png");
     opacity: 0.2;
-    .overlay-text {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      color: @grayDark;
-      display: none;
-    }
   }
 
   .edt-property-preview-label{
@@ -282,7 +282,7 @@
 
 
   .edt-property-actions {
-    width: 50px;
+    flex: 0 0 50px;
     text-align: center;
     margin: 15px 0 0 0;
     .property-action {
@@ -310,14 +310,17 @@
 
     .edt-property-meta {
       padding: 0 0 0 10px;
+      box-sizing: border-box;
     }
 
     .edt-property-preview {
       background: @grayLight;
+      height: 0;
     }
 
   }
 
+  // property state inherited
   .edt-property.property-is-inherited {
     background: #FDFDFD;
     border: transparent;
@@ -327,9 +330,13 @@
     }
   }
 
+  .edt-property.property-is-inherited .edt-property-preview:hover {
+    cursor: auto;
+  }
+
   .edt-property-inherited-from {
     font-size: 11px;
-    background-color: #d9d9d9;
+    background-color: #E9E9E9;
     margin-left: 5px;
     position: absolute;
     right: 0;
@@ -352,6 +359,10 @@
       cursor: auto;
     }
 
+    .edt-tab .tab-title {
+      padding-left: 20px;
+    }
+
   }
 
   // sorting properties
@@ -360,17 +371,18 @@
 
     .edt-property {
       height: 40px;
-      margin-bottom: 10px;
       background: #E9E9E9;
       color: @grayDarker;
       border-radius: @baseBorderRadius;
       padding: 0;
       cursor: move;
       border: none;
+      display: flex;
+      align-items: center;
     }
 
     .edt-property-meta {
-      padding: 10px 0 0 10px;
+      padding: 0 0 0 10px;
       width: auto;
       flex: 1;
       .icon {
@@ -388,6 +400,17 @@
       }
     }
 
+    .property-name {
+      font-size: 12px;
+      font-weight: bold;
+      margin-right: 2px;
+    }
+
+    .item-alias {
+      font-size: 12px;
+      color: #cccccc;
+    }
+
     .edt-property-preview {
       display: none;
     }
@@ -401,6 +424,7 @@
     }
 
     .edt-property.property-is-inherited {
+      background: @grayLighter;
       cursor: auto;
       .icon-navigation {
         visibility: hidden;
@@ -416,15 +440,15 @@
   // sorting placeholders
   .ui-sortable-tabs-placeholder {
     background: transparent;
-    border: 2px solid #E9E9E9;
+    border: 1px dashed @grayLight;
     margin: 0 0 70px 0;
     border-radius: 10px;
   }
 
   .ui-sortable-properties-placeholder {
     background: transparent;
-    border: 2px solid #E9E9E9;
-    margin-bottom: 10px;
+    border: 1px dashed @grayLight;
+    margin-bottom: 5px;
   }
 
 
@@ -439,20 +463,24 @@
   }
 
   .edt-property-meta-alias {
-    input {
-      font-size: 12px;
-      color: @gray;
-      margin-bottom: 0;
-      height: 10px;
-    }
+    font-size: 11px;
+    color: @gray;
+    margin-left: 7px;
   }
 
   .edt-property-meta-label {
-    input {
-      font-size: 16px;
+    textarea {
+      font-size: 15px;
       font-weight: bold;
       margin-bottom: 0;
       color: @grayDarker;
+      min-width: 100%;
+      min-height: 25px;
+      box-sizing: border-box;
+      resize: none;
+      .field-is-empty {
+        height: 25px !important;
+      }
     }
   }
 
@@ -460,6 +488,11 @@
     textarea {
       font-size: 12px;
       color: @grayDark;
+      margin-bottom: 0;
+      min-width: 100%;
+      min-height: 25px;
+      box-sizing: border-box;
+      resize: none;
     }
   }
 
@@ -478,7 +511,7 @@
   .placeholder-input-small {
     background: @grayLight;
     display: block;
-    height: 10px;
+    height: 5px;
     margin-bottom: 5px;
     width: 25%;
   }
@@ -486,7 +519,7 @@
   .placeholder-input {
     background: @grayLight;
     display: block;
-    height: 20px;
+    height: 10px;
     margin-bottom: 5px;
   }
 
@@ -494,14 +527,14 @@
     .placeholder-text-line-full {
       background: @grayLight;
       display: block;
-      height: 5px;
-      margin-bottom: 5px;
+      height: 3px;
+      margin-bottom: 3px;
     }
     .placeholder-text-line-short {
       background: @grayLight;
       display: block;
-      height: 5px;
-      margin-bottom: 5px;
+      height: 3px;
+      margin-bottom: 3px;
       width: 75%;
     }
   }
@@ -512,25 +545,16 @@
 
 .content-type-editor-dialog.edit-property-settings {
 
-  .title-wrapper {
-    float: left;
-    width: 300px;
-    input.input-style-underline {
-      border: none;
-      //border-bottom: 1px solid #cccccc;
-      width: 100%;
-      box-sizing: border-box;
-      padding: 10px 0 0 0;
-      margin-bottom: 10px;
-      font-size: 16px;
-      font-weight: bold;
-      &:focus {
-        outline: none;
-      }
-    }
-    .alias {
-      font-size: 13px;
-      color: @grayLight;
+  .editor-label {
+    border: none;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 0 0 0;
+    margin-bottom: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    &:focus {
+      outline: none;
     }
   }
 
@@ -581,19 +605,21 @@
     }
   }
 
-  textarea.description,
-  textarea.pattern {
-    width: 100%;
-    box-sizing: border-box;
-    border: none;
-  }
-
   .checkbox {
-    padding-left: 0;
     margin-bottom: 20px;
   }
 
-  .umb-editor {
+  .editor-description,
+  .editor-validation-pattern {
+    min-width: 100%;
+    min-height: 25px;
+    resize: none;
+    box-sizing: border-box;
+    border: none;
+    overflow: hidden;
+  }
+
+  .umb-dropdown {
     width: 100%;
   }
 
@@ -732,6 +758,60 @@
     float: left;
   }
 
+}
+
+/* ---------- LIST VIEW ---------- */
+
+.list-view-container {
+  background: #f8f8f8;
+  border: 1px solid #CCCCCC;
+  display: flex;
+  border-radius: 5px;
+  animation: fadeIn 0.5s;
+  padding: 15px;
+  position: relative;
+  z-index: 1;
+}
+
+.list-view-container.list-view-settings-open {
+  border-bottom: transparent;
+  border-radius: 5px 5px 0 0;
+}
+
+.list-view-container .list-view-container-content {
+  display: flex;
+}
+
+.list-view-container .icon-list {
+  font-size: 20px;
+  color: #d9d9d9;
+  margin-right: 10px;
+}
+
+.list-view-container .list-view-name {
+  margin-right: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  float: left;
+}
+
+.list-view-container .list-view-create-new {
+  font-size: 12px;
+  color: @blue;
+}
+
+.list-view-container .list-view-remove-new {
+  font-size: 12px;
+  color: @red;
+}
+
+.list-view-settings {
+  border: 1px dashed #d9d9d9;
+  border-radius: 0 0 5px 5px;
+  padding: 50px 20px 20px 20px;
+  position: relative;
+  top: -20px;
+  z-index: 0;
 }
 
 /* ---------- DIALOG ---------- */

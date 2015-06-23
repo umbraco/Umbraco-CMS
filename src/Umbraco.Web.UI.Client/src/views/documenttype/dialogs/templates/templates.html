@@ -1,7 +1,7 @@
 <div ng-controller="Umbraco.Editors.DocumentType.AvailableTemplatesController">
     <div class="dialog-grid">
-        <a href="" class="dialog-grid-element" ng-repeat="availableTemplate in model.templates | filter:{show:true} | orderBy:'name'" ng-click="model.chooseTemplate(availableTemplate)">
-            <i class="icon icon-newspaper-alt"></i>
+        <a href="" class="dialog-grid-element" ng-repeat="availableTemplate in model.availableTemplates | compareArrays:model.allowedTemplates:'alias' | orderBy:'name'" ng-click="model.chooseTemplate(availableTemplate)">
+            <i class="icon {{ availableTemplate.icon }}"></i>
             <span class="dialog-grid-element-text">{{ availableTemplate.name }}</span>
         </a>
     </div>

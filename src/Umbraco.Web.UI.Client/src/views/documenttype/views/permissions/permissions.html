@@ -51,12 +51,12 @@
                     </div>
 
                     <!-- NODE PLACEHOLDER -->
-                    <div class="node node-placeholder" ng-if="(contentTypes | filter:{show:true}).length > 0" ng-click="addItemOverlay($event)">
+                    <div class="node node-placeholder" ng-if="(contentTypes | compareArrays:contentType.allowedContentTypes:'alias').length > 0" ng-click="addItemOverlay($event)">
                         <div class="node-placeholder-text">Allow child node</div>
                     </div>
 
                     <!-- ALL NODES ADDED -->
-                    <div class="text-center" ng-if="(contentTypes | filter:{show:true}).length === 0">
+                    <div class="text-center" ng-if="(contentTypes | compareArrays:contentType.allowedContentTypes:'alias').length === 0">
                         <small>All content types are added as child nodes</small>
                     </div>
 

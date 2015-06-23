@@ -6,7 +6,7 @@
  * @description
  * The controller for the content type editor property dialog
  */
-function PermissionsController($scope, contentTypeResource, $log) {
+function PermissionsController($scope, contentTypeResource, $log, iconHelper) {
 
     /* ----------- SCOPE VARIABLES ----------- */
 
@@ -19,29 +19,7 @@ function PermissionsController($scope, contentTypeResource, $log) {
     function init() {
 
         contentTypeResource.getAll().then(function(contentTypes){
-
             $scope.contentTypes = contentTypes;
-
-            angular.forEach($scope.contentTypes, function(contentType){
-
-                var exists = false;
-
-                angular.forEach($scope.contentType.allowedContentTypes, function(allowedContentType){
-
-                    if( contentType.alias === allowedContentType.alias ) {
-                        exists = true;
-                    }
-
-                });
-
-                if(exists) {
-                    contentType.show = false;
-                } else {
-                    contentType.show = true;
-                }
-
-            });
-
         });
 
     }
@@ -52,16 +30,6 @@ function PermissionsController($scope, contentTypeResource, $log) {
         var selectedContentTypeIndex = $scope.contentType.allowedContentTypes.indexOf(selectedContentType);
         $scope.contentType.allowedContentTypes.splice(selectedContentTypeIndex, 1);
 
-        // show content type in content types array
-        for (var contentTypeIndex = 0; contentTypeIndex < $scope.contentTypes.length; contentTypeIndex++) {
-
-            var contentType = $scope.contentTypes[contentTypeIndex];
-
-            if( selectedContentType.alias === contentType.alias ) {
-                contentType.show = true;
-            }
-        }
-
     };
 
     $scope.addItemOverlay = function ($event) {
@@ -70,6 +38,7 @@ function PermissionsController($scope, contentTypeResource, $log) {
         $scope.dialogModel = {};
         $scope.dialogModel.title = "Choose content type";
         $scope.dialogModel.contentTypes = $scope.contentTypes;
+        $scope.dialogModel.allowedContentTypes = $scope.contentType.allowedContentTypes;
         $scope.dialogModel.event = $event;
         $scope.dialogModel.view = "views/documentType/dialogs/contenttypes/contenttypes.html";
         $scope.showDialog = true;
@@ -91,16 +60,6 @@ function PermissionsController($scope, contentTypeResource, $log) {
 
             // push to content type model
             $scope.contentType.allowedContentTypes.push(reformatedContentType);
-
-            // hide selected content type from content types array
-            for (var contentTypeIndex = 0; contentTypeIndex < $scope.contentTypes.length; contentTypeIndex++) {
-
-                var contentType = $scope.contentTypes[contentTypeIndex];
-
-                if( selectedContentType.alias === contentType.alias ) {
-                    contentType.show = false;
-                }
-            }
 
             $scope.showDialog = false;
             $scope.dialogModel = null;

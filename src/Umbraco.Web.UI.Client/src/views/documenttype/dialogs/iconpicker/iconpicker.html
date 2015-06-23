@@ -1,39 +1,37 @@
 <div ng-controller="Umbraco.Editors.DocumentType.IconPickerController">
-    <div class="umb-overlay-body">
 
-        <div class="umb-control-group">
-            <div class="form-search">
-                <i class="icon-search"></i>
-                <input type="text"
-                       style="width: 100%"
-                       ng-model="searchTerm"
-                       class="umb-search-field search-query input-block-level"
-                       placeholder="Filter...">
-            </div>
+    <div class="umb-control-group">
+        <div class="form-search">
+            <i class="icon-search"></i>
+            <input type="text"
+                   style="width: 100%"
+                   ng-model="searchTerm"
+                   class="umb-search-field search-query input-block-level"
+                   placeholder="Filter...">
         </div>
-
-        <div class="umb-control-group">
-            <select ng-model="color" class="input-block-level">
-                <option value="">Black</option>
-                <option value="color-green">Green</option>
-                <option value="color-yellow">Yellow</option>
-                <option value="color-orange">Orange</option>
-                <option value="color-blue">Blue</option>
-                <option value="color-red">Red</option>
-            </select>
-        </div>
-
-        <div class="umb-loader" ng-hide="icons"></div>
-
-        <div class="umb-control-group">
-            <ul class="umb-thumbnails thumbnails" ng-class="color">
-                <li class="span1" ng-repeat="icon in icons|filter: searchTerm">
-                    <a href="#" title="{{icon}}" class="thumbnail" ng-click="model.pickIcon(icon)" prevent-default>
-                        <i class="{{icon}} large" style="font-size: 32px"></i>
-                    </a>
-                </li>
-            </ul>
-        </div>
-
     </div>
+
+    <div class="umb-control-group">
+        <select ng-model="color" class="input-block-level">
+            <option value="">Black</option>
+            <option value="color-green">Green</option>
+            <option value="color-yellow">Yellow</option>
+            <option value="color-orange">Orange</option>
+            <option value="color-blue">Blue</option>
+            <option value="color-red">Red</option>
+        </select>
+    </div>
+
+    <div class="umb-loader" ng-hide="icons"></div>
+
+    <div class="umb-control-group">
+        <ul class="umb-thumbnails thumbnails" ng-class="color">
+            <li class="span1" ng-repeat="icon in icons|filter: searchTerm">
+                <a href="#" title="{{icon}}" class="thumbnail" ng-click="model.pickIcon(icon, color)" prevent-default>
+                    <i class="{{icon}} large" style="font-size: 32px"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+
 </div>

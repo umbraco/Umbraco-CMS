@@ -1,14 +1,11 @@
-<div class="umb-locked-field"> 
-	
-	<a href ng-click="toggleLock()"> 
-		<i class="icon icon-lock" 
-			ng-class="{'icon-lock': locked, 'icon-unlocked': locked != true}"></i>
+<div class="umb-locked-field">
+
+	<a href="" ng-click="toggleLock()">
+		<i class="icon" ng-class="{'icon-lock': locked, 'icon-unlocked': !locked}"></i>
 	</a>
 			
-	<span ng-show="locked">{{model}}</span>
+	<span ng-if="locked">{{model}}</span>
 
-	<input type="text" 
-		ng-if="locked === false" 
-		ng-model="$parent.model"
-		placeholder="Enter value..." umb-auto-resize />  
-	</div>
+	<input type="text" ng-if="!locked" ng-model="$parent.model" placeholder="Enter value..." umb-auto-resize />
+
+</div>

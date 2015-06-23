@@ -6,7 +6,7 @@
  * @description
  * The controller for the content type editor
  */
-function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, contentTypeResource, entityResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService) { 
+function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, contentTypeResource, entityResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper) {
 
 	$scope.page = {actions: [], menu: [], subViews: [] };
 	$scope.sortingMode = false;
@@ -15,7 +15,7 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 	$scope.page.navigation = [
 		{
 			"name": "Design",
-			"icon": "merge",
+			"icon": "document-dashed-line",
 			"view": "views/documentType/views/design/design.html",
 			"active": true,
 			"tools": [
@@ -47,7 +47,7 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 		},
 		{
 			"name": "Templates",
-			"icon": "newspaper-alt",
+			"icon": "layout",
 			"view": "views/documentType/views/templates/templates.html"
 		}
 	];
@@ -113,104 +113,155 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 
 		$scope.dialogModel.selectCompositeContentType = function(compositeContentType) {
 
-			contentTypeResource.getById(compositeContentType.id).then(function(contentType){
+			//merge composition with content type
+			if( $scope.contentType.compositeContentTypes.indexOf(compositeContentType.alias) === -1 ) {
 
-				//merge composition with content type
-				if( $scope.contentType.compositeContentTypes.indexOf(compositeContentType.alias) !== -1 ) {
+				mergeCompositeContentType(compositeContentType);
 
-					var groupsArrayLength = $scope.contentType.groups.length;
-					var positionToPush = groupsArrayLength - 1;
+			// split composition from content type
+			} else {
 
-					angular.forEach(contentType.groups, function(compositionGroup){
+				splitCompositeContentType(compositeContentType);
 
-						// set inherited state on tab
-						compositionGroup.inherited = true;
-						compositionGroup.contentTypeId = compositeContentType.id;
-						compositionGroup.contentTypeName = compositeContentType.name;
-
-						// set inherited state on properties
-						angular.forEach(compositionGroup.properties, function(property){
-							property.inherited = true;
-							property.contentTypeId = compositeContentType.id;
-							property.contentTypeName = compositeContentType.name;
-						});
-
-						// set tab state
-						compositionGroup.tabState = "inActive";
-
-						// if groups are named the same - merge the groups
-						angular.forEach($scope.contentType.groups, function(contentTypeGroup){
-
-							if( contentTypeGroup.name === compositionGroup.name ) {
-
-								// set flag to show if properties has been merged into a tab
-								compositionGroup.groupIsMerged = true;
-
-								// add properties to the top of the array
-								contentTypeGroup.properties = compositionGroup.properties.concat(contentTypeGroup.properties);
-
-							}
-
-						});
-
-						// if group is not merged - push it to the end of the array - before init tab
-						if( compositionGroup.groupIsMerged === false || compositionGroup.groupIsMerged == undefined ) {
-							$scope.contentType.groups.splice(positionToPush,0,compositionGroup);
-						}
-
-					});
-
-				// split composition from content type
-				} else {
-
-					var newGroupsArray = [];
-
-					angular.forEach($scope.contentType.groups, function(contentTypeGroup){
-
-						// remove inherited tabs
-						if( contentTypeGroup.contentTypeId === compositeContentType.id ) {
-
-							var newProperties = false;
-
-							// check if group contains properties that are not inherited
-							angular.forEach(contentTypeGroup.properties, function(property){
-								if(property.inherited === false) {
-									newProperties = true;
-								}
-							});
-
-							// if new properties keep tab in array
-							if(newProperties) {
-								newGroupsArray.push(contentTypeGroup);
-							}
-
-							// remove inherited properties in merged tabs
-						} else {
-
-							var newPropertiesArray = [];
-
-							// create new array of properties which are not inherited
-							angular.forEach(contentTypeGroup.properties, function(property){
-								if(property.contentTypeId !== compositeContentType.id) {
-									newPropertiesArray.push(property);
-								}
-							});
-
-							contentTypeGroup.properties = newPropertiesArray;
-							newGroupsArray.push(contentTypeGroup);
-
-						}
-
-					});
-
-					$scope.contentType.groups = newGroupsArray;
-				}
-
-			});
+			}
 
 		}
 
 	};
+
+	function mergeCompositeContentType(compositeContentType) {
+
+		contentTypeResource.getById(compositeContentType.id).then(function(composition){
+
+			var groupsArrayLength = $scope.contentType.groups.length;
+			var positionToPush = groupsArrayLength - 1;
+
+			angular.forEach(composition.groups, function(compositionGroup){
+
+				// set inherited state on tab
+				compositionGroup.inherited = true;
+
+				// set inherited state on properties
+				angular.forEach(compositionGroup.properties, function(compositionProperty){
+					compositionProperty.inherited = true;
+				});
+
+				// set tab state
+				compositionGroup.tabState = "inActive";
+
+				// if groups are named the same - merge the groups
+				angular.forEach($scope.contentType.groups, function(contentTypeGroup){
+
+					if( contentTypeGroup.name === compositionGroup.name ) {
+
+						// set flag to show if properties has been merged into a tab
+						compositionGroup.groupIsMerged = true;
+
+						// make group inherited
+						contentTypeGroup.inherited = true;
+
+						// add properties to the top of the array
+						contentTypeGroup.properties = compositionGroup.properties.concat(contentTypeGroup.properties);
+
+						// make parentTabContentTypeNames to an array so we can push values
+						if(contentTypeGroup.parentTabContentTypeNames === null || contentTypeGroup.parentTabContentTypeNames === undefined) {
+							contentTypeGroup.parentTabContentTypeNames = [];
+						}
+
+						// push name to array of merged composite content types
+						contentTypeGroup.parentTabContentTypeNames.push(compositeContentType.name);
+
+						// make parentTabContentTypes to an array so we can push values
+						if(contentTypeGroup.parentTabContentTypes === null || contentTypeGroup.parentTabContentTypes === undefined) {
+							contentTypeGroup.parentTabContentTypes = [];
+						}
+
+						// push id to array of merged composite content types
+						contentTypeGroup.parentTabContentTypes.push(compositeContentType.id);
+
+					}
+
+				});
+
+				// if group is not merged - push it to the end of the array - before init tab
+				if( compositionGroup.groupIsMerged === false || compositionGroup.groupIsMerged == undefined ) {
+
+					// make parentTabContentTypeNames to an array so we can push values
+					if(compositionGroup.parentTabContentTypeNames === null || compositionGroup.parentTabContentTypeNames === undefined) {
+						compositionGroup.parentTabContentTypeNames = [];
+					}
+
+					// push name to array of merged composite content types
+					compositionGroup.parentTabContentTypeNames.push(compositeContentType.name);
+
+					// make parentTabContentTypes to an array so we can push values
+					if(compositionGroup.parentTabContentTypes === null || compositionGroup.parentTabContentTypes === undefined) {
+						compositionGroup.parentTabContentTypes = [];
+					}
+
+					// push id to array of merged composite content types
+					compositionGroup.parentTabContentTypes.push(compositeContentType.id);
+
+					//push init property to group
+					addInitProperty(compositionGroup);
+
+					// push group before placeholder tab
+					$scope.contentType.groups.splice(positionToPush,0,compositionGroup);
+
+				}
+
+			});
+
+		});
+
+
+	}
+
+	function splitCompositeContentType(compositeContentType) {
+
+		angular.forEach($scope.contentType.groups, function(contentTypeGroup){
+
+			if( contentTypeGroup.tabState !== "init" ) {
+
+				var idIndex = contentTypeGroup.parentTabContentTypes.indexOf(compositeContentType.id);
+				var nameIndex = contentTypeGroup.parentTabContentTypeNames.indexOf(compositeContentType.name);
+				var groupIndex = $scope.contentType.groups.indexOf(contentTypeGroup);
+
+
+				if( idIndex !== -1  ) {
+
+					var properties = [];
+
+					// remove all properties from composite content type
+					angular.forEach(contentTypeGroup.properties, function(property){
+						if(property.contentTypeId !== compositeContentType.id) {
+							properties.push(property);
+						}
+					});
+
+					// set new properties array to properties
+					contentTypeGroup.properties = properties;
+
+					// remove composite content type name and id from inherited arrays
+					contentTypeGroup.parentTabContentTypes.splice(idIndex, 1);
+					contentTypeGroup.parentTabContentTypeNames.splice(nameIndex, 1);
+
+					// remove inherited state if there are no inherited properties
+					if(contentTypeGroup.parentTabContentTypes.length === 0) {
+						contentTypeGroup.inherited = false;
+					}
+
+					// remove group if there are no properties left
+					if(contentTypeGroup.properties.length <= 1) {
+						$scope.contentType.groups.splice(groupIndex, 1);
+					}
+
+				}
+
+			}
+
+		});
+	}
 
 	/* ---------- TABS ---------- */
 
@@ -223,7 +274,7 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 
 	};
 
-	$scope.deleteTab = function(tabIndex) {
+	$scope.removeTab = function(tabIndex) {
 		$scope.contentType.groups.splice(tabIndex, 1);
 	};
 
@@ -271,11 +322,33 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 			});
 		}
 
+		// convert legacy icons
+		convertLegacyIcons();
+
 		//set a shared state
         editorState.set($scope.contentType);
 
 		// add init tab
 		addInitTab();
+	}
+
+	function convertLegacyIcons() {
+
+		// convert icons for composite content types
+		iconHelper.formatContentTypeIcons($scope.contentType.availableCompositeContentTypes);
+
+		// make array to store contentType icon
+		var contentTypeArray = [];
+
+		// push icon to array
+		contentTypeArray.push({"icon":$scope.contentType.icon});
+
+		// run through icon method
+		iconHelper.formatContentTypeIcons(contentTypeArray);
+
+		// set icon back on contentType
+		$scope.contentType.icon = contentTypeArray[0].icon;
+
 	}
 
 	function getDataTypeDetails(property) {
@@ -357,21 +430,6 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 
 	/* ---------- PROPERTIES ---------- */
 
-
-	$scope.changePropertyLabel = function(property) {
-
-		var str = property.label;
-
-		// capitalize all words
-		str = str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-
-		// remove spaces
-		str = str.replace(/\s/g, '');
-
-		property.alias = str;
-
-	};
-
 	$scope.toggleGroupSize = function(group){
 		if(group.columns !== 12){
 			group.columns = 12;
@@ -381,46 +439,50 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 	};
 
 	$scope.editPropertyTypeSettings = function(property) {
-		$scope.dialogModel = {};
-		$scope.dialogModel.title = "Edit property type settings";
-		$scope.dialogModel.property = property;
-		$scope.dialogModel.view = "views/documentType/dialogs/editPropertySettings/editPropertySettings.html";
-		$scope.showDialog = true;
 
-		// set indicator on property to tell the dialog is open - is used to set focus on the element
-		property.dialogIsOpen = true;
+		if(!property.inherited) {
 
-		// set property to active
-		property.propertyState = "active";
+			$scope.dialogModel = {};
+			$scope.dialogModel.title = "Edit property type settings";
+			$scope.dialogModel.property = property;
+			$scope.dialogModel.view = "views/documentType/dialogs/editPropertySettings/editPropertySettings.html";
+			$scope.showDialog = true;
 
-		$scope.dialogModel.changePropertyEditor = function(property) {
-			$scope.choosePropertyType(property);
-		};
+			// set indicator on property to tell the dialog is open - is used to set focus on the element
+			property.dialogIsOpen = true;
 
-		$scope.dialogModel.editDataType = function(property) {
-			$scope.configDataType(property);
-		};
+			// set property to active
+			property.propertyState = "active";
 
-		$scope.dialogModel.submit = function(model){
+			$scope.dialogModel.changePropertyEditor = function(property) {
+				$scope.choosePropertyType(property);
+			};
 
-			property.dialogIsOpen = false;
+			$scope.dialogModel.editDataType = function(property) {
+				$scope.configDataType(property);
+			};
 
-			$scope.showDialog = false;
-			$scope.dialogModel = null;
+			$scope.dialogModel.submit = function(model){
 
-			// push new init property to scope
-			addInitPropertyOnActiveTab();
+				property.dialogIsOpen = false;
 
-		};
+				$scope.showDialog = false;
+				$scope.dialogModel = null;
 
-		$scope.dialogModel.close = function(model){
-			$scope.showDialog = false;
-			$scope.dialogModel = null;
+				// push new init property to scope
+				addInitPropertyOnActiveTab();
 
-			// push new init property to scope
-			addInitPropertyOnActiveTab();
-		};
+			};
 
+			$scope.dialogModel.close = function(model){
+				$scope.showDialog = false;
+				$scope.dialogModel = null;
+
+				// push new init property to scope
+				addInitPropertyOnActiveTab();
+			};
+
+		}
 	};
 
 	$scope.choosePropertyType = function(property) {
@@ -548,7 +610,6 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 
 	$scope.sortableOptionsTab = {
 		distance: 10,
-		revert: true,
 		tolerance: "pointer",
 		opacity: 0.7,
 		scroll: true,
@@ -556,6 +617,7 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 		placeholder: "ui-sortable-tabs-placeholder",
 		zIndex: 6000,
 		handle: ".edt-tab-handle",
+		items: ".edt-tab-sortable",
 		start: function (e, ui) {
 			ui.placeholder.height(ui.item.height());
 		},
@@ -566,7 +628,6 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 
 	$scope.sortableOptionsEditor = {
 		distance: 10,
-		revert: true,
 		tolerance: "pointer",
 		connectWith: ".edt-property-list",
 		opacity: 0.7,
@@ -575,6 +636,7 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 		placeholder: "ui-sortable-properties-placeholder",
 		zIndex: 6000,
 		handle: ".edt-property-handle",
+		items: ".edt-property-sortable",
 		start: function (e, ui) {
 			ui.placeholder.height(ui.item.height());
 		},

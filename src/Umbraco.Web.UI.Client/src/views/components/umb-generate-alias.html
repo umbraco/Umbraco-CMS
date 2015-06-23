@@ -1,0 +1,4 @@
+<div>
+    <span ng-if="!enableLock">{{ alias }}</span>
+    <umb-locked-field ng-if="enableLock" locked="$parent.locked" ng-model="$parent.alias"></umb-locked-field>
+</div>

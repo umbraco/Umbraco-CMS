@@ -10,26 +10,24 @@
 angular.module("umbraco.directives")
 	.directive('umbLockedField', function ($timeout, localizationService) {
 	    return {
-
 			require: "ngModel",
 			restrict: 'E',
 			replace: true,
-
 			templateUrl: 'views/components/umb-locked-field.html',
-			
 			scope: {
-				model: '=ngModel'
+				model: '=ngModel',
+				locked: "=?"
 			},
 
 			link: function(scope, element, attrs, ngModel) {
 
-				scope.locked = true;
+				// if locked state is not defined as an attr set default state
+				if(scope.locked === undefined || scope.locked === null) {
+					scope.locked = true;
+				}
+
 				scope.toggleLock = function(){
-					if(scope.locked){
-						scope.locked = false;
-					}else{
-						scope.locked =true;
-					}
+					scope.locked = !scope.locked;
 				};
 
 			}
