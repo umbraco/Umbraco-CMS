@@ -15,7 +15,7 @@
 
             <umb-editor-container class="editors-document-type-container">
 
-                <div class="editors-document-type-canvas" ng-class="{'is-in-sorting-mode': sortingMode}">
+                <div class="editors-document-type-canvas">
 
                     <umb-editor-sub-views></umb-editor-sub-views>
 
@@ -36,13 +36,4 @@
 
     </form>
 
-    <!-- overlay for change property editor -->
-    <umb-overlay
-            ng-style="{'width': '500px'}"
-            ng-if="showDialog"
-            model="dialogModel"
-            animation="slide-in-right"
-            position="right"
-            view="dialogModel.view">
-    </umb-overlay>
 </div>
