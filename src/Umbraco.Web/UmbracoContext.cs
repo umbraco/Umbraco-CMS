@@ -353,7 +353,7 @@ namespace Umbraco.Web
 		/// <summary>
 		/// Gets/sets the RoutingContext object
 		/// </summary>
-		internal RoutingContext RoutingContext { get; set; }	
+		public RoutingContext RoutingContext { get; internal set; }	
 
 		/// <summary>
 		/// Gets/sets the PublishedContentRequest object
