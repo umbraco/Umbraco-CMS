@@ -7,7 +7,7 @@ angular.module("umbraco")
         $scope.isLoading = true;
         $scope.tagToAdd = "";
 
-        assetsService.loadJs("lib/typeahead-js/typeahead.bundle.min.js").then(function () {
+        assetsService.loadJs("lib/typeahead.js/typeahead.bundle.min.js").then(function () {
 
             $scope.isLoading = false;
 

@@ -20,7 +20,7 @@ namespace Umbraco.Web
         public static MvcHtmlString GetGridHtml(this HtmlHelper html, IPublishedProperty property, string framework = "bootstrap3")
         {
             var asString = property.Value as string;
-            if (asString.IsNullOrWhiteSpace()) return new MvcHtmlString(string.Empty);
+            if (asString != null && string.IsNullOrEmpty(asString)) return new MvcHtmlString(string.Empty);
 
             var view = "Grid/" + framework;
             return html.Partial(view, property.Value);
@@ -56,7 +56,7 @@ namespace Umbraco.Web
         public static MvcHtmlString GetGridHtml(this IPublishedProperty property, HtmlHelper html, string framework = "bootstrap3")
         {
             var asString = property.Value as string;
-            if (asString.IsNullOrWhiteSpace()) return new MvcHtmlString(string.Empty);
+            if (asString != null && string.IsNullOrEmpty(asString)) return new MvcHtmlString(string.Empty);
 
             var view = "Grid/" + framework;
             return html.Partial(view, property.Value);
@@ -91,7 +91,7 @@ namespace Umbraco.Web
         public static MvcHtmlString GetGridHtml(this IPublishedProperty property, string framework = "bootstrap3")
         {
             var asString = property.Value as string;
-            if (asString.IsNullOrWhiteSpace()) return new MvcHtmlString(string.Empty);
+            if (asString != null && string.IsNullOrEmpty(asString)) return new MvcHtmlString(string.Empty);
 
             var htmlHelper = CreateHtmlHelper(property.Value);
             return htmlHelper.GetGridHtml(property, framework);

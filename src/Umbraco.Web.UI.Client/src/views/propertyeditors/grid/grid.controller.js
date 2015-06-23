@@ -129,6 +129,9 @@ angular.module("umbraco")
             },
 
             start: function (e, ui) {
+                // reset dragged RTE settings in case a RTE isn't dragged
+                draggedRteSettings = undefined;
+
                 ui.item.find('.mceNoEditor').each(function () {
                     notIncludedRte = [];
 
@@ -148,12 +151,14 @@ angular.module("umbraco")
                     }
                 });
                 $timeout(function () {
-                    // reconstruct the dragged RTE
-                    tinyMCE.init(draggedRteSettings);
+                    // reconstruct the dragged RTE (could be undefined when dragging something else than RTE)
+                    if (draggedRteSettings !== undefined) {
+                        tinyMCE.init(draggedRteSettings);
+                    }
 
                     _.forEach(notIncludedRte, function (id) {
                         // reset all the other RTEs
-                        if (id != draggedRteSettings.id) {
+                        if (draggedRteSettings === undefined || id != draggedRteSettings.id) {
                             var rteSettings = _.findWhere(tinyMCE.editors, { id: id }).settings;
                             tinyMCE.execCommand('mceRemoveEditor', false, id);
                             tinyMCE.init(rteSettings);
@@ -243,14 +248,20 @@ angular.module("umbraco")
             $scope.currentInfohighlightRow = null;
         };
 
-        $scope.getAllowedLayouts = function (column) {
+        function getAllowedLayouts(section) {
+
             var layouts = $scope.model.config.items.layouts;
 
-            if (column.allowed && column.allowed.length > 0) {
+            //This will occur if it is a new section which has been
+            // created from a 'template'
+            if (section.allowed && section.allowed.length > 0) {
                 return _.filter(layouts, function (layout) {
-                    return _.indexOf(column.allowed, layout.name) >= 0;
+                    return _.indexOf(section.allowed, layout.name) >= 0;
                 });
-            } else {
+            }
+            else {
+                
+
                 return layouts;
             }
         };
@@ -454,6 +465,31 @@ angular.module("umbraco")
             }
 
             if ($scope.model.value && $scope.model.value.sections && $scope.model.value.sections.length > 0) {
+
+                if ($scope.model.value.name && angular.isArray($scope.model.config.items.templates)) {
+
+                    //This will occur if it is an existing value, in which case
+                    // we need to determine which layout was applied by looking up 
+                    // the name
+                    // TODO: We need to change this to an immutable ID!!
+
+                    var found = _.find($scope.model.config.items.templates, function (t) {
+                        return t.name === $scope.model.value.name;
+                    });
+
+                    if (found && angular.isArray(found.sections) && found.sections.length === $scope.model.value.sections.length) {
+
+                        //Cool, we've found the template associated with our current value with matching sections counts, now we need to 
+                        // merge this template data on to our current value (as if it was new) so that we can preserve what is and isn't
+                        // allowed for this template based on the current config.
+
+                        _.each(found.sections, function (templateSection, index) {
+                            angular.extend($scope.model.value.sections[index], angular.copy(templateSection));
+                        });
+                         
+                    }
+                }
+
                 _.forEach($scope.model.value.sections, function (section, index) {
 
                     if (section.grid > 0) {
@@ -479,15 +515,7 @@ angular.module("umbraco")
         $scope.initSection = function (section) {
             section.$percentage = $scope.percentage(section.grid);
 
-            var layouts = $scope.model.config.items.layouts;
-
-            if (section.allowed && section.allowed.length > 0) {
-                section.$allowedLayouts = _.filter(layouts, function (layout) {
-                    return _.indexOf(section.allowed, layout.name) >= 0;
-                });
-            } else {
-                section.$allowedLayouts = layouts;
-            }
+            section.$allowedLayouts = getAllowedLayouts(section);
 
             if (!section.rows) {
                 section.rows = [];
@@ -635,4 +663,50 @@ angular.module("umbraco")
             $scope.initContent();
 
         });
+
+        //Clean the grid value before submitting to the server, we don't need 
+        // all of that grid configuration in the value to be stored!! All of that
+        // needs to be merged in at runtime to ensure that the real config values are used
+        // if they are ever updated.
+
+        var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
+            
+            if ($scope.model.value.sections) {
+                _.each($scope.model.value.sections, function(section) {
+                    if (section.rows) {
+                        _.each(section.rows, function (row) {
+                            if (row.areas) {
+                                _.each(row.areas, function (area) {
+
+                                    //Remove the 'editors' - these are the allowed editors, these will
+                                    // be injected at runtime to this editor, it should not be persisted
+
+                                    if (area.editors) {
+                                        delete area.editors;
+                                    }
+
+                                    if (area.controls) {
+                                        _.each(area.controls, function (control) {
+                                            if (control.editor) {
+                                                //replace
+                                                var alias = control.editor.alias;
+                                                control.editor = {
+                                                    alias: alias
+                                                }
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
+        //when the scope is destroyed we need to unsubscribe
+        $scope.$on('$destroy', function () {
+            unsubscribe();
+        });
+
     });

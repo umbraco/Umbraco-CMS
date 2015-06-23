@@ -26,51 +26,9 @@
     "jquery-ui": "1.10.3",
     "angular-dynamic-locale": "~0.1.27",
     "ng-file-upload": "~3.0.2"
+    "tinymce": "~4.1.10",
+    "bootstrap-tabdrop": "~1.0.0"
   },
 
-  "exportsOverride": {
-    "rgrove-lazyload": {
-      "": "lazyload.js"
-    },
-    "typeahead.js": {
-      "": "dist/typeahead.bundle.min.js"
-    },
-    "underscore": {
-      "": "underscore-min.{js,map}"
-    },
-    "angular-dynamic-locale": {
-      "": "tmhDynamicLocale.min.{js,js.map}"
-    },
-    "bootstrap-social": {
-      "": "bootstrap-social.css"
-    },
-    "font-awesome": {
-      "css": "css/font-awesome.min.css",
-      "fonts": "fonts/*"
-    },
-    "bootstrap": {
-      "ignore": "*.ignore"
-    },
-    "jquery": {
-      "": "jquery.min.{js,map}"
-    },
-    "jquery-file-upload": {
-      "": "**/jquery.{fileupload,fileupload-process,fileupload-angular,fileupload-image}.js"
-    },
-    "jquery-ui": {
-      "": "ui/minified/jquery-ui.min.js"
-    },
-    "ng-file-upload": {
-      "": "angular-file-upload.min.js"
-    },
-    "blueimp-load-image": {
-      "": "js/load-image.all.min.js"
-    },
-    "blueimp-tmpl": {
-      "ignore": "*.ignore"
-    },
-    "blueimp-canvas-to-blob": {
-      "ignore": "*.ignore"
-    }
   }
 }

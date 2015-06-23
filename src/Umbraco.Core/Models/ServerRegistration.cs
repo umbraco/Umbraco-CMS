@@ -9,7 +9,7 @@ namespace Umbraco.Core.Models
     /// <summary>
     /// Represents a registered server in a multiple-servers environment.
     /// </summary>
-    public class ServerRegistration : Entity, IServerAddress, IAggregateRoot
+    public class ServerRegistration : Entity, IServerRegistration
     {
         private string _serverAddress;
         private string _serverIdentity;

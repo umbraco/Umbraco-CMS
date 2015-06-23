@@ -32,7 +32,7 @@ namespace Umbraco.Web.Security.Identity
             {
                 return null;
             }
-
+            
             return UmbracoModule.ShouldAuthenticateRequest(
                 context.HttpContextFromOwinContext().Request, 
                 _umbracoContextAccessor.Value.OriginalRequestUrl) == false 
@@ -41,5 +41,6 @@ namespace Umbraco.Web.Security.Identity
                 //Return the default implementation
                 : base.GetRequestCookie(context, key);
         }
+
     }
 }

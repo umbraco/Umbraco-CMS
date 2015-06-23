@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Xml.XPath;
@@ -18,6 +19,9 @@ using Umbraco.Core.Xml;
 using Umbraco.Web.Models;
 using UmbracoExamine;
 using umbraco;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Sync;
+using Umbraco.Web.Cache;
 
 namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 {
@@ -51,6 +55,11 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 	        _searchProvider = searchProvider;
 		    _indexProvider = indexProvider;
 		}
+
+	    static PublishedMediaCache()
+	    {
+	        InitializeCacheConfig();
+	    }
 
         private readonly ApplicationContext _applicationContext;
 	    private readonly BaseSearchProvider _searchProvider;
@@ -167,9 +176,20 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 			return null;
 		}
 
-		private IPublishedContent GetUmbracoMedia(int id)
-		{
-			var searchProvider = GetSearchProviderSafe();
+	    private IPublishedContent GetUmbracoMedia(int id)
+	    {
+            // this recreates an IPublishedContent and model each time
+            // it is called, but at least it should NOT hit the database
+            // nor Lucene each time, relying on the memory cache instead
+
+	        var cacheValues = GetCacheValues(id, GetUmbracoMediaCacheValues);
+
+	        return cacheValues == null ? null : CreateFromCacheValues(cacheValues);
+	    }
+
+        private CacheValues GetUmbracoMediaCacheValues(int id)
+        {
+    	    var searchProvider = GetSearchProviderSafe();
 
 			if (searchProvider != null)
 			{
@@ -202,12 +222,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 "Could not retrieve media {0} from Examine index, reverting to looking up media via legacy library.GetMedia method",
                 () => id);
 
-			var media = global::umbraco.library.GetMedia(id, true);
+			var media = global::umbraco.library.GetMedia(id, false);
 
 		    return ConvertFromXPathNodeIterator(media, id);
 		}
 
-        internal IPublishedContent ConvertFromXPathNodeIterator(XPathNodeIterator media, int id)
+        internal CacheValues ConvertFromXPathNodeIterator(XPathNodeIterator media, int id)
 	    {
             if (media != null && media.Current != null)
             {
@@ -223,7 +243,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             return null;
 	    }
 
-		internal IPublishedContent ConvertFromSearchResult(SearchResult searchResult)
+		internal CacheValues ConvertFromSearchResult(SearchResult searchResult)
 		{
 			//NOTE: Some fields will not be included if the config section for the internal index has been 
             //mucked around with. It should index everything and so the index definition should simply be:
@@ -253,19 +273,24 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				values.Add("level", values["__Path"].Split(',').Length.ToString());
 			}
 
+		    return new CacheValues
+		    {
+		        Values = values,
+                FromExamine = true
+		    };
 
-			var content = new DictionaryPublishedContent(values,
-			                                      d => d.ParentId != -1 //parent should be null if -1
-				                                           ? GetUmbracoMedia(d.ParentId)
-				                                           : null,
-			                                      //callback to return the children of the current node
-			                                      d => GetChildrenMedia(d.Id),
-			                                      GetProperty,
-			                                      true);
-		    return content.CreateModel();
+            //var content = new DictionaryPublishedContent(values,
+            //                                      d => d.ParentId != -1 //parent should be null if -1
+            //                                               ? GetUmbracoMedia(d.ParentId)
+            //                                               : null,
+            //                                      //callback to return the children of the current node
+            //                                      d => GetChildrenMedia(d.Id),
+            //                                      GetProperty,
+            //                                      true);
+            //return content.CreateModel();
 		}
 
-		internal IPublishedContent ConvertFromXPathNavigator(XPathNavigator xpath)
+		internal CacheValues ConvertFromXPathNavigator(XPathNavigator xpath, bool forceNav = false)
 		{
 			if (xpath == null) throw new ArgumentNullException("xpath");
 
@@ -313,15 +338,21 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				}
 			}
 
-			var content = new DictionaryPublishedContent(values, 
-				d => d.ParentId != -1 //parent should be null if -1
-					? GetUmbracoMedia(d.ParentId) 
-					: null,
-				//callback to return the children of the current node based on the xml structure already found
-				d => GetChildrenMedia(d.Id, xpath),
-				GetProperty,
-				false);
-		    return content.CreateModel();
+		    return new CacheValues
+		    {
+                Values = values,
+                XPath = forceNav ? xpath : null // outside of tests we do NOT want to cache the navigator!
+		    };
+
+		    //var content = new DictionaryPublishedContent(values, 
+		    //    d => d.ParentId != -1 //parent should be null if -1
+		    //        ? GetUmbracoMedia(d.ParentId) 
+		    //        : null,
+		    //    //callback to return the children of the current node based on the xml structure already found
+		    //    d => GetChildrenMedia(d.Id, xpath),
+		    //    GetProperty,
+		    //    false);
+		    //return content.CreateModel();
 		}
 
 		/// <summary>
@@ -398,9 +429,17 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 						
 						if (results.Any())
 						{
-						    return useLuceneSort
-						               ? results.Select(ConvertFromSearchResult) //will already be sorted by lucene
-						               : results.Select(ConvertFromSearchResult).OrderBy(x => x.SortOrder);
+                            // var medias = results.Select(ConvertFromSearchResult);
+						    var medias = results.Select(x =>
+						    {
+						        int nid;
+						        if (int.TryParse(x["__NodeId"], out nid) == false && int.TryParse(x["NodeId"], out nid) == false)
+						            throw new Exception("Failed to extract NodeId from search result.");
+						        var cacheValues = GetCacheValues(nid, id => ConvertFromSearchResult(x));
+						        return CreateFromCacheValues(cacheValues);
+						    });
+
+						    return useLuceneSort ? medias : medias.OrderBy(x => x.SortOrder);
 						}
 						else
 						{
@@ -432,29 +471,51 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				}
 			}
 
-			//The xpath might be the whole xpath including the current ones ancestors so we need to select the current node
-			var item = xpath.Select("//*[@id='" + parentId + "']");
-			if (item.Current == null)
-			{
-                return Enumerable.Empty<IPublishedContent>();
-			}
-			var children = item.Current.SelectChildren(XPathNodeType.Element);
+            var mediaList = new List<IPublishedContent>();
 
-			var mediaList = new List<IPublishedContent>();
-			foreach(XPathNavigator x in children)
-			{
-				//NOTE: I'm not sure why this is here, it is from legacy code of ExamineBackedMedia, but
-				// will leave it here as it must have done something!
-				if (x.Name != "contents")
-				{
-					//make sure it's actually a node, not a property 
-					if (!string.IsNullOrEmpty(x.GetAttribute("path", "")) &&
-						!string.IsNullOrEmpty(x.GetAttribute("id", "")))
-					{
-						mediaList.Add(ConvertFromXPathNavigator(x));
-					}
-				}	
-			}
+            // this is so bad, really
+            var item = xpath.Select("//*[@id='" + parentId + "']");
+            if (item.Current == null)
+                return Enumerable.Empty<IPublishedContent>();
+            var items = item.Current.SelectChildren(XPathNodeType.Element);
+
+            // and this does not work, because... meh
+		    //var q = "//* [@id='" + parentId + "']/* [@id]";
+            //var items = xpath.Select(q);
+
+		    foreach (XPathNavigator itemm in items)
+		    {
+		        int id;
+		        if (int.TryParse(itemm.GetAttribute("id", ""), out id) == false)
+		            continue; // wtf?
+		        var captured = itemm;
+		        var cacheValues = GetCacheValues(id, idd => ConvertFromXPathNavigator(captured));
+		        mediaList.Add(CreateFromCacheValues(cacheValues));
+		    }
+
+            ////The xpath might be the whole xpath including the current ones ancestors so we need to select the current node
+            //var item = xpath.Select("//*[@id='" + parentId + "']");
+            //if (item.Current == null)
+            //{
+            //    return Enumerable.Empty<IPublishedContent>();
+            //}
+            //var children = item.Current.SelectChildren(XPathNodeType.Element);
+
+            //foreach(XPathNavigator x in children)
+            //{
+            //    //NOTE: I'm not sure why this is here, it is from legacy code of ExamineBackedMedia, but
+            //    // will leave it here as it must have done something!
+            //    if (x.Name != "contents")
+            //    {
+            //        //make sure it's actually a node, not a property 
+            //        if (!string.IsNullOrEmpty(x.GetAttribute("path", "")) &&
+            //            !string.IsNullOrEmpty(x.GetAttribute("id", "")))
+            //        {
+            //            mediaList.Add(ConvertFromXPathNavigator(x));
+            //        }
+            //    }	
+            //}
+
 			return mediaList;
 		}
 
@@ -477,23 +538,25 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
 			public DictionaryPublishedContent(
 				IDictionary<string, string> valueDictionary, 
-				Func<DictionaryPublishedContent, IPublishedContent> getParent,
-				Func<DictionaryPublishedContent, IEnumerable<IPublishedContent>> getChildren,
+				Func<int, IPublishedContent> getParent,
+				Func<int, XPathNavigator, IEnumerable<IPublishedContent>> getChildren,
 				Func<DictionaryPublishedContent, string, IPublishedProperty> getProperty,
+                XPathNavigator nav,
 				bool fromExamine)
 			{
 				if (valueDictionary == null) throw new ArgumentNullException("valueDictionary");
 				if (getParent == null) throw new ArgumentNullException("getParent");
 				if (getProperty == null) throw new ArgumentNullException("getProperty");
 
-				_getParent = getParent;
-				_getChildren = getChildren;
+				_getParent = new Lazy<IPublishedContent>(() => getParent(ParentId));
+				_getChildren = new Lazy<IEnumerable<IPublishedContent>>(() => getChildren(Id, nav));
 				_getProperty = getProperty;
 
 				LoadedFromExamine = fromExamine;
 
 				ValidateAndSetProperty(valueDictionary, val => _id = int.Parse(val), "id", "nodeId", "__NodeId"); //should validate the int!
-				ValidateAndSetProperty(valueDictionary, val => _templateId = int.Parse(val), "template", "templateId");
+				// wtf are we dealing with templates for medias?!
+                ValidateAndSetProperty(valueDictionary, val => _templateId = int.Parse(val), "template", "templateId");
 				ValidateAndSetProperty(valueDictionary, val => _sortOrder = int.Parse(val), "sortOrder");
 				ValidateAndSetProperty(valueDictionary, val => _name = val, "nodeName", "__nodeName");
 				ValidateAndSetProperty(valueDictionary, val => _urlName = val, "urlName");
@@ -576,8 +639,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 			/// </summary>
 			internal bool LoadedFromExamine { get; private set; }
 
-			private readonly Func<DictionaryPublishedContent, IPublishedContent> _getParent;
-			private readonly Func<DictionaryPublishedContent, IEnumerable<IPublishedContent>> _getChildren;
+			//private readonly Func<DictionaryPublishedContent, IPublishedContent> _getParent;
+		    private readonly Lazy<IPublishedContent> _getParent; 
+			//private readonly Func<DictionaryPublishedContent, IEnumerable<IPublishedContent>> _getChildren;
+		    private readonly Lazy<IEnumerable<IPublishedContent>> _getChildren;
 			private readonly Func<DictionaryPublishedContent, string, IPublishedProperty> _getProperty;
 
 			/// <summary>
@@ -590,7 +655,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
 			public override IPublishedContent Parent
 			{
-				get { return _getParent(this); }
+				get { return _getParent.Value; }
 			}
 
 			public int ParentId { get; private set; }
@@ -690,7 +755,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
 			public override IEnumerable<IPublishedContent> Children
 			{
-				get { return _getChildren(this); }
+				get { return _getChildren.Value; }
 			}
 
 			public override IPublishedProperty GetProperty(string alias)
@@ -768,5 +833,93 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				_keysAdded.Add(key);
 			}
         }
-	}
+
+        // REFACTORING
+
+        // caching the basic atomic values - and the parent id
+        // but NOT caching actual parent nor children and NOT even
+        // the list of children ids - BUT caching the path
+
+	    internal class CacheValues
+	    {
+            public IDictionary<string, string> Values { get; set; }
+            public XPathNavigator XPath { get; set; }
+            public bool FromExamine { get; set; }
+	    }
+
+        public const string PublishedMediaCacheKey = "MediaCacheMeh.";
+	    private const int PublishedMediaCacheTimespanSeconds = 4 * 60; // 4 mins
+        private static TimeSpan _publishedMediaCacheTimespan;
+	    private static bool _publishedMediaCacheEnabled;
+
+	    private static void InitializeCacheConfig()
+	    {
+	        var value = ConfigurationManager.AppSettings["Umbraco.PublishedMediaCache.Seconds"];
+	        int seconds;
+	        if (int.TryParse(value, out seconds) == false)
+	            seconds = PublishedMediaCacheTimespanSeconds;
+	        if (seconds > 0)
+	        {
+	            _publishedMediaCacheEnabled = true;
+	            _publishedMediaCacheTimespan = TimeSpan.FromSeconds(seconds);
+	        }
+	        else
+	        {
+	            _publishedMediaCacheEnabled = false;
+	        }
+	    }
+
+        internal IPublishedContent CreateFromCacheValues(CacheValues cacheValues)
+        {
+            var content = new DictionaryPublishedContent(
+                cacheValues.Values,
+                parentId => parentId < 0 ? null : GetUmbracoMedia(parentId),
+                GetChildrenMedia,
+                GetProperty,
+                cacheValues.XPath, // though, outside of tests, that should be null
+                cacheValues.FromExamine
+            );
+            return content.CreateModel();
+        }
+
+	    private static CacheValues GetCacheValues(int id, Func<int, CacheValues> func)
+	    {
+	        if (_publishedMediaCacheEnabled == false)
+	            return func(id);
+
+	        var cache = ApplicationContext.Current.ApplicationCache.RuntimeCache;
+            var key = PublishedMediaCacheKey + id;
+            return (CacheValues) cache.GetCacheItem(key, () => func(id), _publishedMediaCacheTimespan);
+	    }
+
+	    internal static void ClearCache(int id)
+	    {
+            var cache = ApplicationContext.Current.ApplicationCache.RuntimeCache;
+	        var sid = id.ToString();
+            var key = PublishedMediaCacheKey + sid;
+
+            // we do clear a lot of things... but the cache refresher is somewhat
+            // convoluted and it's hard to tell what to clear exactly ;-(
+            
+            // clear the parent - NOT (why?)
+            //var exist = (CacheValues) cache.GetCacheItem(key);
+            //if (exist != null)
+            //    cache.ClearCacheItem(PublishedMediaCacheKey + GetValuesValue(exist.Values, "parentID"));
+            
+            // clear the item
+            cache.ClearCacheItem(key);
+            
+            // clear all children - in case we moved and their path has changed
+	        var fid = "/" + sid + "/";
+            cache.ClearCacheObjectTypes<CacheValues>((k, v) =>
+                GetValuesValue(v.Values, "path", "__Path").Contains(fid));
+        }
+
+	    private static string GetValuesValue(IDictionary<string, string> d, params string[] keys)
+	    {
+	        string value = null;
+	        var ignored = keys.Any(x => d.TryGetValue(x, out value));
+            return value ?? "";
+	    }
+    }
 }

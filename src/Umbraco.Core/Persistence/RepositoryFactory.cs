@@ -216,7 +216,15 @@ namespace Umbraco.Core.Persistence
                 _settings.Templates);
         }
 
-        internal virtual ServerRegistrationRepository CreateServerRegistrationRepository(IDatabaseUnitOfWork uow)
+        public virtual IMigrationEntryRepository CreateMigrationEntryRepository(IDatabaseUnitOfWork uow)
+        {
+            return new MigrationEntryRepository(
+                uow,
+                CacheHelper.CreateDisabledCacheHelper(), //never cache
+                _logger, _sqlSyntax);
+        }
+
+        public virtual IServerRegistrationRepository CreateServerRegistrationRepository(IDatabaseUnitOfWork uow)
         {
             return new ServerRegistrationRepository(
                 uow,

@@ -13,6 +13,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.Migrations.Initial;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core
 {
@@ -90,7 +91,7 @@ namespace Umbraco.Core
         /// This should not be used for CRUD operations or queries against the
         /// standard Umbraco tables! Use the Public services for that.
         /// </remarks>
-        public UmbracoDatabase Database
+        public virtual UmbracoDatabase Database
         {
             get { return _factory.CreateDatabase(); }
         }
@@ -98,7 +99,7 @@ namespace Umbraco.Core
         /// <summary>
         /// Boolean indicating whether the database has been configured
         /// </summary>
-        public bool IsDatabaseConfigured
+        public virtual bool IsDatabaseConfigured
         {
             get { return _configured; }
         }
@@ -106,7 +107,7 @@ namespace Umbraco.Core
         /// <summary>
         /// Determines if the db can be connected to
         /// </summary>
-        public bool CanConnect
+        public virtual bool CanConnect
         {
             get
             {
@@ -132,7 +133,7 @@ namespace Umbraco.Core
         /// <summary>
         /// Gets the configured umbraco db connection string.
         /// </summary>
-        public string ConnectionString
+        public virtual string ConnectionString
         {
             get { return _connectionString; }
         }
@@ -164,7 +165,7 @@ namespace Umbraco.Core
         /// <summary>
         /// Returns the Type of DatabaseProvider used
         /// </summary>
-        public DatabaseProviders DatabaseProvider
+        public virtual DatabaseProviders DatabaseProvider
         {
             get
             {
@@ -541,7 +542,7 @@ namespace Umbraco.Core
             return _result;
         }
 
-        internal Result CreateDatabaseSchemaAndData()
+        internal Result CreateDatabaseSchemaAndData(ApplicationContext applicationContext)
         {   
             try
             {
@@ -578,12 +579,15 @@ namespace Umbraco.Core
                 message = GetResultMessageForMySql();
 
                 var schemaResult = ValidateDatabaseSchema();
-                var installedVersion = schemaResult.DetermineInstalledVersion();
+                
+                var installedSchemaVersion = schemaResult.DetermineInstalledVersion();
                 
                 //If Configuration Status is empty and the determined version is "empty" its a new install - otherwise upgrade the existing
-                if (string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus) && installedVersion.Equals(new Version(0, 0, 0)))
+                if (string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus) && installedSchemaVersion.Equals(new Version(0, 0, 0)))
                 {
-                    database.CreateDatabaseSchema();
+                    var helper = new DatabaseSchemaHelper(database, _logger, SqlSyntax);
+                    helper.CreateDatabaseSchema(true, applicationContext);
+
                     message = message + "<p>Installation completed!</p>";
 
                     //now that everything is done, we need to determine the version of SQL server that is executing
@@ -612,7 +616,7 @@ namespace Umbraco.Core
         /// This assumes all of the previous checks are done!
         /// </summary>
         /// <returns></returns>
-        internal Result UpgradeSchemaAndData()
+        internal Result UpgradeSchemaAndData(IMigrationEntryService migrationEntryService)
         {
             try
             {
@@ -631,15 +635,31 @@ namespace Umbraco.Core
                 var message = GetResultMessageForMySql();
 
                 var schemaResult = ValidateDatabaseSchema();
-                var installedVersion = schemaResult.DetermineInstalledVersion();
+
+                var installedSchemaVersion = schemaResult.DetermineInstalledVersion();
+                var installedMigrationVersion = schemaResult.DetermineInstalledVersionByMigrations(migrationEntryService);
+
+                var targetVersion = UmbracoVersion.Current;
                 
+                //In some cases - like upgrading from 7.2.6 -> 7.3, there will be no migration information in the database and therefore it will
+                // return a version of 0.0.0 and we don't necessarily want to run all migrations from 0 -> 7.3, so we'll just ensure that the 
+                // migrations are run for the target version
+                if (installedMigrationVersion == new Version(0, 0, 0) && installedSchemaVersion > new Version(0, 0, 0))
+                {
+                    //set the installedMigrationVersion to be one less than the target so the latest migrations are guaranteed to execute
+                    installedMigrationVersion = targetVersion.SubtractRevision();
+                }
+
                 //DO the upgrade!
 
                 var currentVersion = string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus)
-                                                ? installedVersion
-                                                : new Version(GlobalSettings.ConfigurationStatus);
-                var targetVersion = UmbracoVersion.Current;
-                var runner = new MigrationRunner(_logger, currentVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
+                    //Take the minimum version between the detected schema version and the installed migration version
+                    ? new[] {installedSchemaVersion, installedMigrationVersion}.Min()
+                    //Take the minimum version between the installed migration version and the version specified in the config
+                    : new[] { new Version(GlobalSettings.ConfigurationStatus), installedMigrationVersion }.Min();
+
+                
+                var runner = new MigrationRunner(migrationEntryService, _logger, currentVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
                 var upgraded = runner.Execute(database, true);
                 message = message + "<p>Upgrade completed!</p>";
 

@@ -181,8 +181,14 @@ namespace Umbraco.Web.Editors
             return pagedResult;
         }
 
-        [HttpGet]
+        [Obsolete("Dont use this, it is incorrectly named, use HasPermission instead")]
         public bool GetHasPermission(string permissionToCheck, int nodeId)
+        {
+           return HasPermission(permissionToCheck, nodeId);
+        }
+
+        [HttpGet]
+        public bool HasPermission(string permissionToCheck, int nodeId)
         {
             var p = Services.UserService.GetPermissions(Security.CurrentUser, nodeId).FirstOrDefault();
             if (p != null && p.AssignedPermissions.Contains(permissionToCheck.ToString(CultureInfo.InvariantCulture)))

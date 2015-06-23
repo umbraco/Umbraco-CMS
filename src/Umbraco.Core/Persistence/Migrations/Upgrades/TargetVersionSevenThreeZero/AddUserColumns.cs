@@ -30,7 +30,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
             if (columns.Any(x => x.TableName.InvariantEquals("umbracoUser") && x.ColumnName.InvariantEquals("lastPasswordChangeDate")) == false)
                 Create.Column("lastPasswordChangeDate").OnTable("umbracoUser").AsDateTime().Nullable();
 
-            if (columns.Any(x => x.TableName.InvariantEquals("umbracoUser") && x.ColumnName.InvariantEquals("lastLoginDate")) == false);
+            if (columns.Any(x => x.TableName.InvariantEquals("umbracoUser") && x.ColumnName.InvariantEquals("lastLoginDate")) == false)
                 Create.Column("lastLoginDate").OnTable("umbracoUser").AsDateTime().Nullable();
         }
 

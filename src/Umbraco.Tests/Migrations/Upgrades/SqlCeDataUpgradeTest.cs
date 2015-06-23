@@ -6,6 +6,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Services;
 using Umbraco.Web.Strategies.Migrations;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 
@@ -26,7 +27,10 @@ namespace Umbraco.Tests.Migrations.Upgrades
             var fix = new PublishAfterUpgradeToVersionSixth();
 
             //Setup the MigrationRunner
-            var migrationRunner = new MigrationRunner(Mock.Of<ILogger>(), configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
+            var migrationRunner = new MigrationRunner(
+                Mock.Of<IMigrationEntryService>(),
+                Mock.Of<ILogger>(), configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
+
             bool upgraded = migrationRunner.Execute(db, provider, true);
 
             Assert.That(upgraded, Is.True);

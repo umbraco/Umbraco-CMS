@@ -32,8 +32,8 @@ namespace Umbraco.Web
             //Ensure owin is configured for Umbraco back office authentication. If you have any front-end OWIN
             // cookie configuration, this must be declared after it.
             app
-                .UseUmbracoBackOfficeCookieAuthentication()
-                .UseUmbracoBackOfficeExternalCookieAuthentication();
+                .UseUmbracoBackOfficeCookieAuthentication(ApplicationContext.Current)
+                .UseUmbracoBackOfficeExternalCookieAuthentication(ApplicationContext.Current);
         }
     }
 }

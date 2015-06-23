@@ -6,6 +6,7 @@ using System.Text;
 using System.Web.Configuration;
 using System.Web.Security;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Querying;
@@ -344,7 +345,10 @@ namespace Umbraco.Web.Security.Providers
                 //don't raise events for this! It just sets the member dates, if we do raise events this will
                 // cause all distributed cache to execute - which will clear out some caches we don't want.
                 // http://issues.umbraco.org/issue/U4-3451
-                MemberService.Save(member, false);
+
+                // when upgrating from 7.2 to 7.3 trying to save will throw
+                if (UmbracoVersion.Current >= new Version(7, 3, 0, 0))
+                    MemberService.Save(member, false);
             }
 
             return ConvertToMembershipUser(member);
@@ -590,7 +594,10 @@ namespace Umbraco.Web.Security.Providers
             // http://issues.umbraco.org/issue/U4-3451
             //TODO: In v8 we aren't going to have an overload to disable events, so we'll need to make a different method
             // for this type of thing (i.e. UpdateLastLogin or similar).
-            MemberService.Save(member, false);
+
+            // when upgrating from 7.2 to 7.3 trying to save will throw
+            if (UmbracoVersion.Current >= new Version(7, 3, 0, 0))
+                MemberService.Save(member, false);
 
             return authenticated;
         }

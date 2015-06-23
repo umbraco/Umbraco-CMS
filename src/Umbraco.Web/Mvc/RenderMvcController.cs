@@ -101,10 +101,8 @@ namespace Umbraco.Web.Mvc
         protected ActionResult CurrentTemplate<T>(T model)
         {
             var template = ControllerContext.RouteData.Values["action"].ToString();
-            if (!EnsurePhsyicalViewExists(template))
-            {
-                return Content("");
-            }
+            if (EnsurePhsyicalViewExists(template) == false)
+                throw new Exception("No physical template file was found for template " + template);
             return View(template, model);
         }
 

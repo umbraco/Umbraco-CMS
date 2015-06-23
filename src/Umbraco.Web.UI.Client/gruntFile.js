@@ -305,6 +305,10 @@ module.exports = function (grunt) {
 
 
         watch: {
+            docs: {
+                files: ['docs/src/**/*.md'],
+                tasks: ['watch-docs', 'timestamp']
+            },
             css: {
                 files: 'src/**/*.less',
                 tasks: ['watch-less', 'timestamp'],
@@ -347,8 +351,8 @@ module.exports = function (grunt) {
                 title: 'API Documentation'
             },
             tutorials: {
-                src: ['docs/src/tutorials/**/*.ngdoc'],
-                title: 'Tutorials'
+                src: [],
+                title: ''
             }
         },
 
@@ -407,20 +411,59 @@ module.exports = function (grunt) {
         },
 
         bower: {
-            install: {
+            dev: {
+                dest: '<%= distdir %>/lib',
                 options: {
-                    targetDir: "<%= distdir %>/lib",
-                    cleanTargetDir: false,
-                    layout: function (type, component, source) {
-
-                        var path = require('path');
-
-                        //this is the same as 'byComponent', however we will not allow
-                        // folders with '.' in them since the grunt copy task does not like that
-                        var componentWithoutPeriod = component.replace(".", "-");
-                        return path.join(componentWithoutPeriod, type);
+                    expand: true,
+                    ignorePackages: ['blueimp-canvas-to-blob', 'blueimp-tmpl', 'bootstrap'],
+                    packageSpecific: {
+                        'typeahead.js': {                            
+                            keepExpandedHierarchy: false
+                        },
+                        'underscore': {
+                            files: ['underscore-min.js', 'underscore-min.map']
+                        },
+                        'rgrove-lazyload': {
+                            files: ['lazyload.js']
+                        },
+                        'angular-dynamic-locale': {
+                            files: ['tmhDynamicLocale.min.js,tmhDynamicLocale.min.js.map}']
+                        },
+                        'bootstrap-social': {
+                            files: ['bootstrap-social.css']
+                        },
+                        'font-awesome': {
+                            files: ['css/font-awesome.min.css', 'fonts/*']
+                        },
+                        'jquery': {
+                            files: ['jquery.min.js', 'jquery.min.map']
+                        },
+                        'jquery-file-upload': {
+                            keepExpandedHierarchy: false,
+                            files: ['js/jquery.fileupload.js', 'js/jquery.fileupload-process.js', 'js/jquery.fileupload-angular.js', 'js/jquery.fileupload-image.js']
+                        },
+                        'jquery-ui': {
+                            keepExpandedHierarchy: false,
+                            files: ['ui/minified/jquery-ui.min.js']
+                        },
+                        'blueimp-load-image': {
+                            keepExpandedHierarchy: false,
+                            files: ['js/load-image.all.min.js']
+                        },
+                        'tinymce': {
+                            files: ['plugins/**', 'themes/**', 'tinymce.min.js']
+                        },
+                        'angular-dynamic-locale': {
+                            files: ['tmhDynamicLocale.min.js', 'tmhDynamicLocale.min.js.map']
+                        },
+                        'bootstrap-tabdrop': {
+                            keepExpandedHierarchy: false
+                        }
                     }
                 }
+            },
+            options: {
+                expand: true
             }
         }
     });
@@ -439,7 +482,7 @@ module.exports = function (grunt) {
 
     grunt.loadNpmTasks('grunt-open');
     grunt.loadNpmTasks('grunt-contrib-connect');
-    grunt.loadNpmTasks('grunt-bower-task');
+    grunt.loadNpmTasks('grunt-bower');
     grunt.loadNpmTasks('grunt-ngdocs');
 
 };

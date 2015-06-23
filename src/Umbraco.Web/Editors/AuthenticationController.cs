@@ -64,27 +64,7 @@ namespace Umbraco.Web.Editors
                 return _userManager;
             }
         }
-
-        /// <summary>
-        /// This is a special method that will return the current users' remaining session seconds, the reason
-        /// it is special is because this route is ignored in the UmbracoModule so that the auth ticket doesn't get
-        /// updated with a new timeout.
-        /// </summary>
-        /// <returns></returns>
-        [WebApi.UmbracoAuthorize]
-        [ValidateAngularAntiForgeryToken]
-        public double GetRemainingTimeoutSeconds()
-        {
-            var httpContextAttempt = TryGetHttpContext();
-            if (httpContextAttempt.Success)
-            {
-                return httpContextAttempt.Result.GetRemainingAuthSeconds();
-            }
-
-            //we need an http context
-            throw new NotSupportedException("An HttpContext is required for this request");
-        }
-
+        
         [WebApi.UmbracoAuthorize]
         [ValidateAngularAntiForgeryToken]
         public async Task<HttpResponseMessage> PostUnLinkLogin(UnLinkLoginModel unlinkLoginModel)
@@ -225,8 +205,16 @@ namespace Umbraco.Web.Editors
 
             owinContext.Authentication.SignOut(Core.Constants.Security.BackOfficeExternalAuthenticationType);
 
+            var nowUtc = DateTime.Now.ToUniversalTime();
+
             owinContext.Authentication.SignIn(
-                new AuthenticationProperties() { IsPersistent = isPersistent },
+                new AuthenticationProperties()
+                {
+                    IsPersistent = isPersistent,
+                    AllowRefresh = true,
+                    IssuedUtc = nowUtc,
+                    ExpiresUtc = nowUtc.AddMinutes(GlobalSettings.TimeOutInMinutes)
+                },
                 await user.GenerateUserIdentityAsync(UserManager));
         }
 

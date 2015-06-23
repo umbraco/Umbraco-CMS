@@ -59,9 +59,15 @@
             redirectUrl = Url.Action("AuthorizeUpgrade", "BackOffice")
         });
     }
-    @Html.BareMinimumServerVariables(Url, externalLoginUrl)
+    @Html.BareMinimumServerVariablesScript(Url, externalLoginUrl)
 
-    @Html.AngularExternalLoginInfoValues((IEnumerable<string>)ViewBag.ExternalSignInError)
+    <script type="text/javascript">
+    document.angularReady = function (app) {
+
+        @Html.AngularExternalLoginInfoValuesScript((IEnumerable<string>)ViewBag.ExternalSignInError)
+
+    }
+    </script>
 
     @*And finally we can load in our angular app*@
     <script type="text/javascript" src="lib/rgrove-lazyload/lazyload.js"></script>
