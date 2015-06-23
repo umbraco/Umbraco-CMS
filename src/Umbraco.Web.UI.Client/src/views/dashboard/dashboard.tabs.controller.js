@@ -192,9 +192,19 @@ function MediaFolderBrowserDashboardController($rootScope, $scope, assetsService
         $scope.filesUploading = [];
         $scope.nodeId = -1;
 
+        function loadChildren() {
+                mediaResource.getChildren($scope.nodeId)
+                    .then(function(data) {
+                        $scope.images = data.items;
+                });
+        }
+
         $scope.onUploadComplete = function () {
             navigationService.reloadSection("media");
+            loadChildren();
         }
+
+        loadChildren();
 
 }
 angular.module("umbraco").controller("Umbraco.Dashboard.MediaFolderBrowserDashboardController", MediaFolderBrowserDashboardController);

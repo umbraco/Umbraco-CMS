@@ -6,14 +6,19 @@
 **/
 function umbImageFolder($rootScope, assetsService, $timeout, $log, umbRequestHelper, mediaResource, imageHelper, notificationsService) {
     return {
+
         restrict: 'E',
+        require: "ngModel",
+        
         replace: true,
         templateUrl: 'views/directives/imaging/umb-image-folder.html',
+        
         scope: {
             options: '=',
             nodeId: '@',
             onUploadComplete: '='
         },
+
         link: function (scope, element, attrs) {
             //NOTE: Blueimp handlers are documented here: https://github.com/blueimp/jQuery-File-Upload/wiki/Options
             //NOTE: We are using a Blueimp version specifically ~9.4.0 because any higher than that and we get crazy errors with jquery, also note

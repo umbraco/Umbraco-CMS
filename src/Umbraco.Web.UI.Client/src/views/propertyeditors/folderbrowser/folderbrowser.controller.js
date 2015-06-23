@@ -1,11 +1,20 @@
 angular.module("umbraco")
 
 .controller("Umbraco.PropertyEditors.FolderBrowserController",
-    function ($rootScope, $scope, $routeParams, $timeout, editorState, navigationService) {
+    function ($rootScope, $scope, $routeParams, $timeout, editorState, navigationService, mediaResource) {
 
         var dialogOptions = $scope.dialogOptions;
         $scope.creating = $routeParams.create;
         $scope.nodeId = $routeParams.id;
+        loadChildren();
+
+        function loadChildren() {
+                mediaResource.getChildren($scope.nodeId)
+                    .then(function(data) {
+                        $scope.images = data.items;
+                });
+        }
+
 
         $scope.onUploadComplete = function () {
 
@@ -16,5 +25,6 @@ angular.module("umbraco")
                 navigationService.reloadNode(syncArgs.node);
             });
 
+            loadChildren();
         }
 });

@@ -7,9 +7,10 @@ var app = angular.module('umbraco', [
     'ngCookies',
     'ngSanitize',
     'ngMobile',
-    'blueimp.fileupload',
-    'tmh.dynamicLocale'
+    'tmh.dynamicLocale',
+    'angularFileUpload'
 ]);
+
 var packages = angular.module("umbraco.packages", []);
 
 //Call a document callback if defined, this is sort of a dodgy hack to 
