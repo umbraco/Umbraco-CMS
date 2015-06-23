@@ -121,5 +121,3 @@ function valFormManager(serverValidationManager, $rootScope, $log, $timeout, not
     };
 }
 angular.module('umbraco.directives.validation').directive("valFormManager", valFormManager);
-Status API Training Shop Blog About Help
-© 2015 GitHub, Inc. Terms Privacy Security Contact
