@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Xml.XPath;
@@ -54,6 +55,11 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 	        _searchProvider = searchProvider;
 		    _indexProvider = indexProvider;
 		}
+
+	    static PublishedMediaCache()
+	    {
+	        InitializeCacheConfig();
+	    }
 
         private readonly ApplicationContext _applicationContext;
 	    private readonly BaseSearchProvider _searchProvider;
@@ -842,8 +848,26 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 	    }
 
         public const string PublishedMediaCacheKey = "MediaCacheMeh.";
-	    private const int PublishedMediaCacheTimespanSeconds = 60;
-        private static readonly TimeSpan PublishedMediaCacheTimespan = TimeSpan.FromSeconds(PublishedMediaCacheTimespanSeconds);
+	    private const int PublishedMediaCacheTimespanSeconds = 4 * 60; // 4 mins
+        private static TimeSpan _publishedMediaCacheTimespan;
+	    private static bool _publishedMediaCacheEnabled;
+
+	    private static void InitializeCacheConfig()
+	    {
+	        var value = ConfigurationManager.AppSettings["Umbraco.PublishedMediaCache.Seconds"];
+	        int seconds;
+	        if (int.TryParse(value, out seconds) == false)
+	            seconds = PublishedMediaCacheTimespanSeconds;
+	        if (seconds > 0)
+	        {
+	            _publishedMediaCacheEnabled = true;
+	            _publishedMediaCacheTimespan = TimeSpan.FromSeconds(seconds);
+	        }
+	        else
+	        {
+	            _publishedMediaCacheEnabled = false;
+	        }
+	    }
 
         internal IPublishedContent CreateFromCacheValues(CacheValues cacheValues)
         {
@@ -860,9 +884,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
 	    private static CacheValues GetCacheValues(int id, Func<int, CacheValues> func)
 	    {
+	        if (_publishedMediaCacheEnabled == false)
+	            return func(id);
+
 	        var cache = ApplicationContext.Current.ApplicationCache.RuntimeCache;
             var key = PublishedMediaCacheKey + id;
-            return (CacheValues) cache.GetCacheItem(key, () => func(id), PublishedMediaCacheTimespan);
+            return (CacheValues) cache.GetCacheItem(key, () => func(id), _publishedMediaCacheTimespan);
 	    }
 
 	    internal static void ClearCache(int id)
