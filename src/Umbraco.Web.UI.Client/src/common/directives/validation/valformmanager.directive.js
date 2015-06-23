@@ -1,18 +1,3 @@
-Skip to content
-This repository  
-Pull requests
-Issues
-Gist
- @YuraDubensky
- Unwatch 1
-  Star 0
-  Fork 695
-YuraDubensky/Umbraco-CMS
-forked from umbraco/Umbraco-CMS
- tree: 95da5d6e38  Umbraco-CMS/src/Umbraco.Web.UI.Client/src/common/directives/validation/valformmanager.directive.js
-@YuraDubenskyYuraDubensky 14 minutes ago Add leave page validation for browser tab closing
-3 contributors @Shazwazza @wp-manaosoftware @YuraDubensky
-RawBlameHistory    124 lines (102 sloc)  5.895 kB
 /**
 * @ngdoc directive
 * @name umbraco.directives.directive:valFormManager
