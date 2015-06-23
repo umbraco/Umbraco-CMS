@@ -6,7 +6,7 @@
  * @description
  * The controller for the content type editor
  */
-function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, contentTypeResource, entityResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper) {
+function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, contentTypeResource, entityResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, dataTypeHelper) {
 
 	$scope.page = {actions: [], menu: [], subViews: [] };
 	$scope.sortingMode = false;
@@ -352,7 +352,7 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 
 		function saveDataType(dataType, isNew) {
 
-			var preValues = createPreValueProps(dataType.preValues);
+			var preValues = dataTypeHelper.createPreValueProps(dataType.preValues);
 
 			dataTypeResource.save(dataType, preValues, isNew).then(function(dataType) {
 
@@ -387,21 +387,6 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 	        $scope.currentNode = syncArgs.node;
 	    });
 
-	}
-
-	function createPreValueProps(preVals) {
-		var preValues = [];
-		for (var i = 0; i < preVals.length; i++) {
-			preValues.push({
-				hideLabel: preVals[i].hideLabel,
-				alias: preVals[i].key,
-				description: preVals[i].description,
-				label: preVals[i].label,
-				view: preVals[i].view,
-				value: preVals[i].value
-			});
-		}
-		return preValues;
 	}
 
 	$scope.deleteProperty = function(tab, propertyIndex) {
