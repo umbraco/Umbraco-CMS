@@ -4,49 +4,68 @@
 angular.module('umbraco.directives')
 
 .directive('onKeyup', function () {
-    return function (scope, elm, attrs) {
-        elm.bind("keyup", function () {
-            scope.$apply(attrs.onKeyup);
-        });
+    return {
+        link: function (scope, elm, attrs) {
+            var f = function () {
+                scope.$apply(attrs.onKeyup);
+            };
+            elm.on("keyup", f);
+            scope.$on("$destroy", function(){ elm.off(f);} );
+        }
     };
 })
 
 .directive('onKeydown', function () {
     return {
         link: function (scope, elm, attrs) {
-            scope.$apply(attrs.onKeydown);
+            var f = function () {
+                scope.$apply(attrs.onKeydown);
+            };
+            elm.on("keydown", f);
+            scope.$on("$destroy", function(){ elm.off(f);} );
         }
     };
 })
 
 .directive('onBlur', function () {
-    return function (scope, elm, attrs) {
-        elm.bind("blur", function () {
-            scope.$apply(attrs.onBlur);
-        });
+    return {
+        link: function (scope, elm, attrs) {
+            var f = function () {
+                scope.$apply(attrs.onBlur);
+            };
+            elm.on("blur", f);
+            scope.$on("$destroy", function(){ elm.off(f);} );
+        }
     };
 })
 
 .directive('onFocus', function () {
-    return function (scope, elm, attrs) {
-        elm.bind("focus", function () {
-            scope.$apply(attrs.onFocus);
-        });
+    return {
+        link: function (scope, elm, attrs) {
+            var f = function () {
+                scope.$apply(attrs.onFocus);
+            };
+            elm.on("focus", f);
+            scope.$on("$destroy", function(){ elm.off(f);} );
+        }
     };
 })
 
 .directive('onDragEnter', function () {
-    return function (scope, elm, attrs) {
-        elm.bind("dragenter", function () {
-            scope.$apply(attrs.onDragEnter);
-        });
+    return {
+        link: function (scope, elm, attrs) {
+            var f = function () {
+                scope.$apply(attrs.onDragEnter);
+            };
+            elm.on("dragenter", f);
+            scope.$on("$destroy", function(){ elm.off(f);} );
+        }
     };
 })
 
 .directive('onDragLeave', function () {
     return function (scope, elm, attrs) {
-        elm.bind("dragleave", function (event) {
-
+        var f = function (event) {
             var rect = this.getBoundingClientRect();
             var getXY = function getCursorPosition(event) {
                 var x, y;
@@ -69,39 +88,58 @@ angular.module('umbraco.directives')
             if (e.x > rect.left + rect.width - 1 || e.x < rect.left || e.y > rect.top + rect.height - 1 || e.y < rect.top) {
                 scope.$apply(attrs.onDragLeave);
             }
-        });
+        };
+
+        elm.on("dragleave", f);
+        scope.$on("$destroy", function(){ elm.off(f);} );
     };
 })
 
 .directive('onDragOver', function () {
-    return function (scope, elm, attrs) {
-        elm.bind("dragover", function () {
-            scope.$apply(attrs.onDragOver);
-        });
+    return {
+        link: function (scope, elm, attrs) {
+            var f = function () {
+                scope.$apply(attrs.onDragOver);
+            };
+            elm.on("dragover", f);
+            scope.$on("$destroy", function(){ elm.off(f);} );
+        }
     };
 })
 
 .directive('onDragStart', function () {
-    return function (scope, elm, attrs) {
-        elm.bind("dragstart", function () {
-            scope.$apply(attrs.onDragStart);
-        });
+    return {
+        link: function (scope, elm, attrs) {
+            var f = function () {
+                scope.$apply(attrs.onDragStart);
+            };
+            elm.on("dragstart", f);
+            scope.$on("$destroy", function(){ elm.off(f);} );
+        }
     };
 })
 
 .directive('onDragEnd', function () {
-    return function (scope, elm, attrs) {
-        elm.bind("dragend", function () {
-            scope.$apply(attrs.onDragEnd);
-        });
+    return {
+        link: function (scope, elm, attrs) {
+            var f = function () {
+                scope.$apply(attrs.onDragEnd);
+            };
+            elm.on("dragend", f);
+            scope.$on("$destroy", function(){ elm.off(f);} );
+        }
     };
 })
 
 .directive('onDrop', function () {
-    return function (scope, elm, attrs) {
-        elm.bind("drop", function () {
-            scope.$apply(attrs.onDrop);
-        });
+    return {
+        link: function (scope, elm, attrs) {
+            var f = function () {
+                scope.$apply(attrs.onDrop);
+            };
+            elm.on("drop", f);
+            scope.$on("$destroy", function(){ elm.off(f);} );
+        }
     };
 })
 
@@ -150,7 +188,7 @@ angular.module('umbraco.directives')
     };  
 
     return function(scope,el,attrs){
-        el.bind('contextmenu',function(e){
+        el.on('contextmenu',function(e){
             e.preventDefault();
             e.stopPropagation();
             scope.$apply(attrs.onRightClick);
