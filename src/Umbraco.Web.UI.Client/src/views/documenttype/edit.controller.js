@@ -315,7 +315,7 @@ function DocumentTypeEditController($scope, $rootScope, $routeParams, $log, cont
 				$scope.editPropertyTypeSettings(property);
 
 				// push new init tab to scope
-				addInitTab();
+				contentTypeHelper.addInitTab($scope.contentType);
 
 			});
 
