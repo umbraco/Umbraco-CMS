@@ -67,6 +67,7 @@ namespace Umbraco.Core.Persistence.Factories
                     propertyType.DataTypeDefinitionId = typeDto.DataTypeId;
                     propertyType.Description = typeDto.Description;
                     propertyType.Id = typeDto.Id;
+                    propertyType.Key = typeDto.UniqueId;
                     propertyType.Name = typeDto.Name;
                     propertyType.Mandatory = typeDto.Mandatory;
                     propertyType.SortOrder = typeDto.SortOrder;
@@ -127,7 +128,8 @@ namespace Umbraco.Core.Persistence.Factories
                                           Mandatory = propertyType.Mandatory,
                                           Name = propertyType.Name,
                                           SortOrder = propertyType.SortOrder,
-                                          ValidationRegExp = propertyType.ValidationRegExp
+                                          ValidationRegExp = propertyType.ValidationRegExp,
+                                          UniqueId = propertyType.Key
                                       };
 
             if (tabId != default(int))

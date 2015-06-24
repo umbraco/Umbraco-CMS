@@ -1111,7 +1111,8 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                                                Name = gpData.Name.Trim(),
                                                Mandatory = gpData.Mandatory,
                                                ValidationRegExp = gpData.Validation,
-                                               Description = gpData.Description
+                                               Description = gpData.Description,
+                                               Key = Guid.NewGuid()
                                            };
                     //gpData.Tab == 0 Generic Properties / No Group
                     if (gpData.Tab == 0)
