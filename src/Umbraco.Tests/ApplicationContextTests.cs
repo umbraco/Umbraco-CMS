@@ -2,6 +2,7 @@ using System;
 using System.Configuration;
 using Moq;
 using NUnit.Framework;
+using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
@@ -19,10 +20,10 @@ namespace Umbraco.Tests
         [Test]
         public void Is_Configured()
         {
-            ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", UmbracoVersion.Current.ToString(3));
+            ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", UmbracoVersion.GetSemanticVersion().ToString());
 
             var migrationEntryService = new Mock<IMigrationEntryService>();
-            migrationEntryService.Setup(x => x.FindEntry(It.IsAny<string>(), It.IsAny<Version>()))
+            migrationEntryService.Setup(x => x.FindEntry(It.IsAny<string>(), It.IsAny<SemVersion>()))
                 .Returns(Mock.Of<IMigrationEntry>());
 
             var dbCtx = new Mock<DatabaseContext>(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), new SqlCeSyntaxProvider(), "test");
@@ -41,10 +42,10 @@ namespace Umbraco.Tests
         [Test]
         public void Is_Not_Configured_By_Migration_Not_Found()
         {
-            ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", UmbracoVersion.Current.ToString(3));
+            ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", UmbracoVersion.GetSemanticVersion().ToString());
 
             var migrationEntryService = new Mock<IMigrationEntryService>();
-            migrationEntryService.Setup(x => x.FindEntry(It.IsAny<string>(), It.IsAny<Version>()))
+            migrationEntryService.Setup(x => x.FindEntry(It.IsAny<string>(), It.IsAny<SemVersion>()))
                 .Returns((IMigrationEntry)null);
 
             var dbCtx = new Mock<DatabaseContext>(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), new SqlCeSyntaxProvider(), "test");
@@ -63,7 +64,7 @@ namespace Umbraco.Tests
         [Test]
         public void Is_Not_Configured_By_Configuration()
         {
-            ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", new Version(UmbracoVersion.Current.Major - 1, 0, 0).ToString());
+            ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", new SemVersion(UmbracoVersion.Current.Major - 1, 0, 0).ToString());
 
             var migrationEntryService = new Mock<IMigrationEntryService>();
 
@@ -83,7 +84,7 @@ namespace Umbraco.Tests
         [Test]
         public void Is_Not_Configured_By_Database_Not_Configured()
         {
-            ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", new Version(UmbracoVersion.Current.Major - 1, 0, 0).ToString());
+            ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", new SemVersion(UmbracoVersion.Current.Major - 1, 0, 0).ToString());
 
             var migrationEntryService = new Mock<IMigrationEntryService>();
 
@@ -103,7 +104,7 @@ namespace Umbraco.Tests
         [Test]
         public void Is_Not_Configured_By_Database_Cannot_Connect()
         {
-            ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", new Version(UmbracoVersion.Current.Major - 1, 0, 0).ToString());
+            ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", new SemVersion(UmbracoVersion.Current.Major - 1, 0, 0).ToString());
 
             var migrationEntryService = new Mock<IMigrationEntryService>();
 
