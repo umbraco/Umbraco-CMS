@@ -48,7 +48,7 @@
             </div>
         </div>
     </div>
-
+    
     <!-- List of uploading/uploaded files  -->
     <ul class="file-list" ng-show="done.length > 0 || queue.length > 0">
         
@@ -65,17 +65,19 @@
 
             <!-- upload error -->
             <div class="file-upload-done" ng-if="file.uploadStatus == 'error'">
+                <span class="errorMessage color-red">{{file.errorMessage}}</span>
                 <i class="icon icon-alert color-red"></i>
             </div>
         </li>
 
         <li class="file" ng-if="currentFile">
             <!-- file name -->
-            <div class="file-name">{{ currentfile.name }}</div>
+            <div class="file-name">{{ currentFile.name }}</div>
 
             <!-- upload progress bar -->
-            <div class="file-upload-progress">
-                <span class="file-upload-progress-indicator" ng-style="{'width': currentfile.uploadProgress + '%'}"></span>
+            <div class="file-progress">
+                <span class="file-progress-indicator" 
+                ng-style="{'width': currentFile.uploadProgress + '%'}"></span>
             </div>
         </li>
 

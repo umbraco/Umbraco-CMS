@@ -69,6 +69,7 @@ angular.module("umbraco.directives")
 
 
 			function _processQueueItem(){
+
 				if(scope.queue.length > 0){
 					scope.currentFile = scope.queue.shift();
 					_upload(scope.currentFile);
@@ -125,8 +126,18 @@ angular.module("umbraco.directives")
 					//after processing, test if everthing is done
 					_processQueueItem();
 
-				}).error( function (evt) {
+				}).error( function (evt, status, headers, config) {
 					file.uploadStatus = "error";
+
+					//if the service returns a detailed error
+					if(evt.InnerException){
+						file.errorMessage = evt.InnerException.ExceptionMessage;
+
+						//Check if its the common "too large file" exception
+						if(evt.InnerException.StackTrace && evt.InnerException.StackTrace.indexOf("ValidateRequestEntityLength") > 0){
+							file.errorMessage = "File too large to upload";
+						}
+					}
 
 					//after processing, test if everthing is done
 					scope.done.push(file);
