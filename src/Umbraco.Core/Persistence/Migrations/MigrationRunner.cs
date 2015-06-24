@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Semver;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Migrations.Syntax.IfDatabase;
@@ -16,8 +17,8 @@ namespace Umbraco.Core.Persistence.Migrations
     {
         private readonly IMigrationEntryService _migrationEntryService;
         private readonly ILogger _logger;
-        private readonly Version _currentVersion;
-        private readonly Version _targetVersion;
+        private readonly SemVersion _currentVersion;
+        private readonly SemVersion _targetVersion;
         private readonly string _productName;
         private readonly IMigration[] _migrations;
 
@@ -35,12 +36,12 @@ namespace Umbraco.Core.Persistence.Migrations
 
         [Obsolete("Use the ctor that specifies all dependencies instead")]
         public MigrationRunner(ILogger logger, Version currentVersion, Version targetVersion, string productName, params IMigration[] migrations)
-            : this(ApplicationContext.Current.Services.MigrationEntryService, logger, currentVersion, targetVersion, productName, migrations)
+            : this(ApplicationContext.Current.Services.MigrationEntryService, logger, new SemVersion(currentVersion), new SemVersion(targetVersion), productName, migrations)
         {
             
         }
 
-        public MigrationRunner(IMigrationEntryService migrationEntryService, ILogger logger, Version currentVersion, Version targetVersion, string productName, params IMigration[] migrations)
+        public MigrationRunner(IMigrationEntryService migrationEntryService, ILogger logger, SemVersion currentVersion, SemVersion targetVersion, string productName, params IMigration[] migrations)
         {
             if (migrationEntryService == null) throw new ArgumentNullException("migrationEntryService");
             if (logger == null) throw new ArgumentNullException("logger");
@@ -127,16 +128,22 @@ namespace Umbraco.Core.Persistence.Migrations
         public IEnumerable<IMigration> OrderedUpgradeMigrations(IEnumerable<IMigration> foundMigrations)
         {
             var migrations = (from migration in foundMigrations
-                              let migrationAttributes = migration.GetType().GetCustomAttributes<MigrationAttribute>(false)
-                              from migrationAttribute in migrationAttributes
-                              where migrationAttribute != null
-                              where migrationAttribute.TargetVersion > _currentVersion &&
-                                  migrationAttribute.TargetVersion <= _targetVersion &&
-                                  migrationAttribute.ProductName == _productName &&
-                    //filter if the migration specifies a minimum current version for which to execute
-                    (migrationAttribute.MinimumCurrentVersion == null || _currentVersion >= migrationAttribute.MinimumCurrentVersion)
-                              orderby migrationAttribute.TargetVersion, migrationAttribute.SortOrder ascending
-                              select migration).Distinct();
+                let migrationAttributes = migration.GetType().GetCustomAttributes<MigrationAttribute>(false)
+                from migrationAttribute in migrationAttributes
+                where migrationAttribute != null
+                let migrationInfo = new
+                {
+                    attribute = migrationAttribute,
+                    targetVersion = new SemVersion(migrationAttribute.TargetVersion),
+                    minVersion = new SemVersion(migrationAttribute.MinimumCurrentVersion)
+                }
+                where migrationInfo.targetVersion > _currentVersion &&
+                      migrationInfo.targetVersion <= _targetVersion &&
+                      migrationAttribute.ProductName == _productName &&
+                      //filter if the migration specifies a minimum current version for which to execute
+                      (migrationAttribute.MinimumCurrentVersion == null || _currentVersion >= migrationInfo.minVersion)
+                orderby migrationAttribute.TargetVersion, migrationAttribute.SortOrder ascending
+                select migration).Distinct();
             return migrations;
         }
 
@@ -148,17 +155,23 @@ namespace Umbraco.Core.Persistence.Migrations
         public IEnumerable<IMigration> OrderedDowngradeMigrations(IEnumerable<IMigration> foundMigrations)
         {
             var migrations = (from migration in foundMigrations
-                              let migrationAttributes = migration.GetType().GetCustomAttributes<MigrationAttribute>(false)
-                              from migrationAttribute in migrationAttributes
-                              where migrationAttribute != null
-                              where
-                    migrationAttribute.TargetVersion > _currentVersion &&
-                                  migrationAttribute.TargetVersion <= _targetVersion &&
+                let migrationAttributes = migration.GetType().GetCustomAttributes<MigrationAttribute>(false)
+                from migrationAttribute in migrationAttributes
+                where migrationAttribute != null
+                let migrationInfo = new
+                {
+                    attribute = migrationAttribute,
+                    targetVersion = new SemVersion(migrationAttribute.TargetVersion),
+                    minVersion = new SemVersion(migrationAttribute.MinimumCurrentVersion)
+                }
+                where
+                    migrationInfo.targetVersion > _currentVersion &&
+                    migrationInfo.targetVersion <= _targetVersion &&
                     migrationAttribute.ProductName == _productName &&
                     //filter if the migration specifies a minimum current version for which to execute
-                    (migrationAttribute.MinimumCurrentVersion == null || _currentVersion >= migrationAttribute.MinimumCurrentVersion)
-                              orderby migrationAttribute.TargetVersion, migrationAttribute.SortOrder descending
-                              select migration).Distinct();
+                    (migrationAttribute.MinimumCurrentVersion == null || _currentVersion >= migrationInfo.minVersion)
+                orderby migrationAttribute.TargetVersion, migrationAttribute.SortOrder descending
+                select migration).Distinct();
             return migrations;
         }
 

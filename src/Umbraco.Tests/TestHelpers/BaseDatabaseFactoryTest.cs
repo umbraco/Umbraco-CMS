@@ -97,7 +97,7 @@ namespace Umbraco.Tests.TestHelpers
                 InitializeDatabase();
 
                 //ensure the configuration matches the current version for tests
-                SettingsForTests.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
+                SettingsForTests.ConfigurationStatus = UmbracoVersion.GetSemanticVersion().ToString();
             }
         }
 

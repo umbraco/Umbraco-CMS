@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Moq;
 using NUnit.Framework;
+using Semver;
 using SQLCE4Umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -69,8 +70,8 @@ namespace Umbraco.Tests.Migrations
                     db.Execute(new Sql(rawStatement));
             }
 
-            var configuredVersion = new Version("4.8.0");
-            var targetVersion = new Version("6.0.0");
+            var configuredVersion = new SemVersion(4, 8, 0);
+            var targetVersion = new SemVersion(6, 0, 0);
             var foundMigrations = MigrationResolver.Current.Migrations;
 
             var migrationRunner = new MigrationRunner(

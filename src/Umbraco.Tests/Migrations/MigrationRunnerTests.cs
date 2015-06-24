@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
+using Semver;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
@@ -20,7 +21,7 @@ namespace Umbraco.Tests.Migrations
         {
             var runner = new MigrationRunner(
                 Mock.Of<IMigrationEntryService>(),
-                Mock.Of<ILogger>(), new Version(4, 0, 0), new Version(6, 0, 0), "Test");
+                Mock.Of<ILogger>(), new SemVersion(4, 0, 0), new SemVersion(6, 0, 0), "Test");
 
             var migrations = runner.OrderedUpgradeMigrations(new List<IMigration> { new MultiMigration(new SqlCeSyntaxProvider(), Mock.Of<ILogger>()) });
 
@@ -38,7 +39,7 @@ namespace Umbraco.Tests.Migrations
         {
             var runner = new MigrationRunner(
                 Mock.Of<IMigrationEntryService>(),
-                Mock.Of<ILogger>(), new Version(4, 0, 0), new Version(5, 0, 0), "Test");
+                Mock.Of<ILogger>(), new SemVersion(4, 0, 0), new SemVersion(5, 0, 0), "Test");
 
             var migrations = runner.OrderedUpgradeMigrations(new List<IMigration> { new MultiMigration(new SqlCeSyntaxProvider(), Mock.Of<ILogger>()) });
 
@@ -55,8 +56,8 @@ namespace Umbraco.Tests.Migrations
         public void Executes_Migration_For_Spanning_One_Target_2()
         {
             var runner = new MigrationRunner(
-                Mock.Of<IMigrationEntryService>(), 
-                Mock.Of<ILogger>(), new Version(5, 0, 1), new Version(6, 0, 0), "Test");
+                Mock.Of<IMigrationEntryService>(),
+                Mock.Of<ILogger>(), new SemVersion(5, 0, 1), new SemVersion(6, 0, 0), "Test");
 
             var migrations = runner.OrderedUpgradeMigrations(new List<IMigration> { new MultiMigration(new SqlCeSyntaxProvider(), Mock.Of<ILogger>()) });
 

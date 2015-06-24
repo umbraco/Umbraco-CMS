@@ -6,6 +6,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Configuration;
 using System.Xml.Linq;
+using Semver;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -636,7 +637,7 @@ namespace Umbraco.Core
 
                 var schemaResult = ValidateDatabaseSchema();
 
-                var installedSchemaVersion = schemaResult.DetermineInstalledVersion();
+                var installedSchemaVersion = new SemVersion(schemaResult.DetermineInstalledVersion());
                 var installedMigrationVersion = schemaResult.DetermineInstalledVersionByMigrations(migrationEntryService);
 
                 var targetVersion = UmbracoVersion.Current;
@@ -644,10 +645,10 @@ namespace Umbraco.Core
                 //In some cases - like upgrading from 7.2.6 -> 7.3, there will be no migration information in the database and therefore it will
                 // return a version of 0.0.0 and we don't necessarily want to run all migrations from 0 -> 7.3, so we'll just ensure that the 
                 // migrations are run for the target version
-                if (installedMigrationVersion == new Version(0, 0, 0) && installedSchemaVersion > new Version(0, 0, 0))
+                if (installedMigrationVersion == new SemVersion(new Version(0, 0, 0)) && installedSchemaVersion > new SemVersion(new Version(0, 0, 0)))
                 {
                     //set the installedMigrationVersion to be one less than the target so the latest migrations are guaranteed to execute
-                    installedMigrationVersion = targetVersion.SubtractRevision();
+                    installedMigrationVersion = new SemVersion(targetVersion.SubtractRevision());
                 }
 
                 //DO the upgrade!
@@ -656,10 +657,11 @@ namespace Umbraco.Core
                     //Take the minimum version between the detected schema version and the installed migration version
                     ? new[] {installedSchemaVersion, installedMigrationVersion}.Min()
                     //Take the minimum version between the installed migration version and the version specified in the config
-                    : new[] { new Version(GlobalSettings.ConfigurationStatus), installedMigrationVersion }.Min();
+                    : new[] { SemVersion.Parse(GlobalSettings.ConfigurationStatus), installedMigrationVersion }.Min();
 
-                
-                var runner = new MigrationRunner(migrationEntryService, _logger, currentVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
+
+                var runner = new MigrationRunner(migrationEntryService, _logger, currentVersion, UmbracoVersion.GetSemanticVersion(), GlobalSettings.UmbracoMigrationName);
+
                 var upgraded = runner.Execute(database, true);
                 message = message + "<p>Upgrade completed!</p>";
 
