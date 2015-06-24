@@ -1,11 +1,29 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Semver;
 
 namespace Umbraco.Core
 {
     internal static class VersionExtensions
     {
+        public static Version GetVersion(this SemVersion semVersion, int maxParts = 4)
+        {
+            int build = 0;
+            int.TryParse(semVersion.Build, out build);
+
+            if (maxParts > 4)
+            {
+                return new Version(semVersion.Major, semVersion.Minor, semVersion.Patch, build);    
+            }
+            if (maxParts == 3)
+            {
+                return new Version(semVersion.Major, semVersion.Minor, semVersion.Patch);
+            }
+
+            return new Version(semVersion.Major, semVersion.Minor);
+        }
+
         public static Version SubtractRevision(this Version version)
         {
             var parts = new List<int>(new[] {version.Major, version.Minor, version.Build, version.Revision});

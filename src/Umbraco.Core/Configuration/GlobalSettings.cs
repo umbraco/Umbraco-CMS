@@ -421,14 +421,15 @@ namespace Umbraco.Core.Configuration
         /// Gets a value indicating whether the current version of umbraco is configured.
         /// </summary>
         /// <value><c>true</c> if configured; otherwise, <c>false</c>.</value>
-        public static bool Configured
+        [Obsolete("Do not use this, it is no longer in use and will be removed from the codebase in future versions")]
+        internal static bool Configured
         {
             get
             {
                 try
                 {
                     string configStatus = ConfigurationStatus;
-                    string currentVersion = UmbracoVersion.Current.ToString(3);
+                    string currentVersion = UmbracoVersion.GetSemanticVersion().ToString();
 
 
                     if (currentVersion != configStatus)
@@ -595,10 +596,7 @@ namespace Umbraco.Core.Configuration
         [Obsolete("Use Umbraco.Core.Configuration.UmbracoVersion.Current instead", false)]
         public static string CurrentVersion
         {
-            get
-            {
-                return UmbracoVersion.Current.ToString(3);
-            }
+            get { return UmbracoVersion.GetSemanticVersion().ToString(); }
         }
 
         /// <summary>

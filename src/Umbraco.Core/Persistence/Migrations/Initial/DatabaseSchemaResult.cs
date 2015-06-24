@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Semver;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -40,12 +41,12 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         /// </summary>
         /// <param name="migrationEntryService"></param>
         /// <returns></returns>
-        public Version DetermineInstalledVersionByMigrations(IMigrationEntryService migrationEntryService)
+        public SemVersion DetermineInstalledVersionByMigrations(IMigrationEntryService migrationEntryService)
         {
             var allMigrations = migrationEntryService.GetAll(GlobalSettings.UmbracoMigrationName);
             var mostrecent = allMigrations.OrderByDescending(x => x.Version).Select(x => x.Version).FirstOrDefault();
 
-            return mostrecent ?? new Version(0, 0, 0);
+            return mostrecent ?? new SemVersion(new Version(0, 0, 0));
         }
 
         /// <summary>

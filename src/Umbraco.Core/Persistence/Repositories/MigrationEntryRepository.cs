@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Semver;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
@@ -113,7 +114,7 @@ namespace Umbraco.Core.Persistence.Repositories
             entity.ResetDirtyProperties();
         }
 
-        public IMigrationEntry FindEntry(string migrationName, Version version)
+        public IMigrationEntry FindEntry(string migrationName, SemVersion version)
         {
             var versionString = version.ToString();
 

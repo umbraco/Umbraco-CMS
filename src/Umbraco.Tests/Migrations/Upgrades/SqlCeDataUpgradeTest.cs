@@ -1,6 +1,7 @@
 ﻿using System;
 using Moq;
 using NUnit.Framework;
+using Semver;
 using SQLCE4Umbraco;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
@@ -19,8 +20,8 @@ namespace Umbraco.Tests.Migrations.Upgrades
         [Test, NUnit.Framework.Ignore]
         public override void Can_Upgrade_From_470_To_600()
         {
-            var configuredVersion = new Version("4.11.0");
-            var targetVersion = new Version("6.0.0");
+            var configuredVersion = new SemVersion(4, 11, 0);
+            var targetVersion = new SemVersion(6, 0, 0);
             var provider = GetDatabaseProvider();
             var db = GetConfiguredDatabase();
 

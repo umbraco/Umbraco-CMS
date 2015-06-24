@@ -169,12 +169,12 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <label for="textSearch" class="radio inline">
-                                    <input type="radio" name="searchType" id="textSearch" value="text" ng-model="searcher.searchType" />
+                                <label for="{{searcher.name}}-textSearch" class="radio inline">
+                                    <input type="radio" name="searchType" id="{{searcher.name}}-textSearch" value="text" ng-model="searcher.searchType" />
                                     Text Search
                                 </label>
-                                <label for="luceneSearch" class="radio inline">
-                                    <input type="radio" name="searchType" id="luceneSearch" value="lucene" ng-model="searcher.searchType" />
+                                <label for="{{searcher.name}}-luceneSearch" class="radio inline">
+                                    <input type="radio" name="searchType" id="{{searcher.name}}-luceneSearch" value="lucene" ng-model="searcher.searchType" />
                                     Lucene Search
                                 </label>
                             </div>
