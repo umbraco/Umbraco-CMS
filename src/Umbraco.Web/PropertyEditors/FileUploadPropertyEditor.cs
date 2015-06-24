@@ -20,7 +20,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.UploadFieldAlias, "File upload", "fileupload")]
+    [PropertyEditor(Constants.PropertyEditors.UploadFieldAlias, "File upload", "fileupload", Icon = "icon-download-alt", Group = "media")]
     public class FileUploadPropertyEditor : PropertyEditor
     {
         /// <summary>

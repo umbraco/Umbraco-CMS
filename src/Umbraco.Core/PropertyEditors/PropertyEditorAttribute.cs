@@ -20,6 +20,8 @@ namespace Umbraco.Core.PropertyEditors
 
             //defaults
             ValueType = "string";
+            Icon = Constants.Icons.PropertyEditor;
+            Group = "common";
         }
 
         public PropertyEditorAttribute(string alias, string name)
@@ -33,6 +35,7 @@ namespace Umbraco.Core.PropertyEditors
             //defaults
             ValueType = "string";
             Icon = Constants.Icons.PropertyEditor;
+            Group = "common";
         }
 
         public PropertyEditorAttribute(string alias, string name, string valueType, string editorView)
@@ -46,6 +49,9 @@ namespace Umbraco.Core.PropertyEditors
             Name = name;
             ValueType = valueType;
             EditorView = editorView;
+
+            Icon = Constants.Icons.PropertyEditor;
+            Group = "common";
         }
 
         public string Alias { get; private set; }

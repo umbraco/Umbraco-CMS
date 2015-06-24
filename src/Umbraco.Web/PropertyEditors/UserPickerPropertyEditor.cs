@@ -6,7 +6,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.UserPickerAlias, "User picker", "INT", "entitypicker")]
+    [PropertyEditor(Constants.PropertyEditors.UserPickerAlias, "User picker", "INT", "entitypicker", Group="People", Icon="icon-user")]
     public class UserPickerPropertyEditor : PropertyEditor
     {
         private IDictionary<string, object> _defaultPreValues;

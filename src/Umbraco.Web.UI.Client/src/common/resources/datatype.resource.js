@@ -135,6 +135,15 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 'Failed to retrieve data');
         },
 
+        getAllTypesAndEditors : function(){
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "dataTypeApiBaseUrl",
+                        "GetAllDataTypesAndEditors")),
+                'Failed to retrieve data');
+        },
+        
         getAllPropertyEditors: function () {
 
             return umbRequestHelper.resourcePromise(

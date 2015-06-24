@@ -21,9 +21,13 @@ function DocumentTypePropertyController($scope, dataTypeResource) {
 
 	function getAllDatatypes() {
 
-		dataTypeResource.getAll().then(function(data){
+		dataTypeResource.getAllTypesAndEditors().then(function(data){
 			$scope.dataTypes.system = data;
 		});
+
+//		dataTypeResource.getAll().then(function(data){
+//			$scope.dataTypes.system = data;
+//		});
 
 	}
 

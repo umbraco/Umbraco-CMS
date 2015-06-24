@@ -34,10 +34,21 @@ namespace Umbraco.Web.Models.Mapping
                 Constants.System.DefaultMembersListViewDataTypeId
             };
 
-            config.CreateMap<IDataTypeDefinition, DataTypeBasic>()                
+            config.CreateMap<PropertyEditor, DataTypeBasic>();
+
+            config.CreateMap<IDataTypeDefinition, DataTypeBasic>()
                 .ForMember(x => x.Icon, expression => expression.Ignore())
                 .ForMember(x => x.Alias, expression => expression.Ignore())
-                .ForMember(x => x.IsSystemDataType, expression => expression.MapFrom(definition => systemIds.Contains(definition.Id)));
+                .ForMember(x => x.IsSystemDataType, expression => expression.MapFrom(definition => systemIds.Contains(definition.Id)))
+                .AfterMap( (def,basic) =>
+                {
+                    var editor = PropertyEditorResolver.Current.GetByAlias(def.PropertyEditorAlias);
+                    if(editor != null){
+                        basic.Group = editor.Group;
+                        basic.Icon = editor.Icon;
+                    }
+
+                });
 
             config.CreateMap<IDataTypeDefinition, DataTypeDisplay>()
                 .ForMember(display => display.AvailableEditors, expression => expression.ResolveUsing<AvailablePropertyEditorsResolver>())

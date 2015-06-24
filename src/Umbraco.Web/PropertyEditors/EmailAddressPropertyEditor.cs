@@ -3,7 +3,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.EmailAddressAlias, "Email address", "email")]
+    [PropertyEditor(Constants.PropertyEditors.EmailAddressAlias, "Email address", "email", Icon="icon-message")]
     public class EmailAddressPropertyEditor : PropertyEditor
     {
         protected override PropertyValueEditor CreateValueEditor()

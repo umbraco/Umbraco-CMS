@@ -9,7 +9,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.ListViewAlias, "List view", "listview", HideLabel = true)]
+    [PropertyEditor(Constants.PropertyEditors.ListViewAlias, "List view", "listview", HideLabel = true, Group = "lists", Icon = "icon-item-arrangement")]
     public class ListViewPropertyEditor : PropertyEditor
     {
         protected override PreValueEditor CreatePreValueEditor()

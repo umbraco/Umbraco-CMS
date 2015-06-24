@@ -9,7 +9,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.DateAlias, "Date", "DATE", "datepicker")]
+    [PropertyEditor(Constants.PropertyEditors.DateAlias, "Date", "DATE", "datepicker", Icon="icon-calendar")]
     public class DatePropertyEditor : PropertyEditor
     {
         public DatePropertyEditor()

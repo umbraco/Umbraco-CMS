@@ -115,6 +115,26 @@ namespace Umbraco.Web.Editors
         }
 
 
+        [UmbracoTreeAuthorize(Constants.Trees.DataTypes, Constants.Trees.Content, Constants.Trees.Media)]
+        public IDictionary<string, List<DataTypeBasic>> GetAllDataTypesAndEditors()
+        {  
+            var datadefs = Services.DataTypeService
+                                    .GetAllDataTypeDefinitions();
+             var editors = PropertyEditorResolver.Current.PropertyEditors.Where(x => datadefs.Any(y => y.PropertyEditorAlias == x.Alias) == false);
+
+            var datatypes = new List<DataTypeBasic>();
+
+            foreach (var datadef in datadefs)
+                datatypes.Add(Mapper.Map<DataTypeBasic>(datadef));
+
+            foreach (var unusedEditor in editors)
+                datatypes.Add(Mapper.Map<DataTypeBasic>(unusedEditor));
+
+            var grouped = datatypes.GroupBy(x => x.Group.ToLower()).ToDictionary(group => group.Key, group => group.ToList());
+            return grouped;
+        }
+
+
         /// <summary>
         /// Gets the content json for all property editors
         /// </summary>

@@ -10,7 +10,7 @@
 				   placeholder="Filter...">
 		</div>
 	</div>
-
+	
 	<div ng-if="(dataTypes.userConfigured | filter:searchTerm).length > 0">
 		<h5>Your configurations</h5>
 		<ul class="umb-card-grid">
@@ -25,6 +25,7 @@
 
 	<div ng-if="(dataTypes.userPropertyEditors | filter:searchTerm).length > 0">
 		<h5>Custom property editors</h5>
+
 		<ul class="umb-card-grid">
 			<li ng-repeat="customEditor in dataTypes.userPropertyEditors | orderBy:'name' | filter: searchTerm">
 				<a href="" ng-click="model.selectDataType(customEditor)">
@@ -35,16 +36,20 @@
 		</ul>
 	</div>
 
-	<div ng-if="(dataTypes.system | filter:searchTerm).length > 0">
-		<h5>Standard</h5>
+		
+	<div ng-repeat="(key,value) in dataTypes.system">
+		<h5>{{key}}</h5>
+
 		<ul class="umb-card-grid">
-			<li ng-repeat="systemDataType in dataTypes.system | compareArrays:dataTypes.userConfigured:'id' | orderBy:'name' | filter: searchTerm">
+			<li ng-repeat="systemDataType in value | orderBy:'name' | filter: searchTerm">
 				<a href="" ng-click="model.selectDataType(systemDataType)">
-					<i class="{{ systemDataType.icon }}" ng-class="{'icon-autofill': systemDataType.icon == null}"></i>
+					<i class="{{ systemDataType.icon }}" 
+						ng-class="{'icon-autofill': systemDataType.icon == null}"></i>
 					{{ systemDataType.name }}
 				</a>
 			</li>
 		</ul>
+
 	</div>
 
 </div>
