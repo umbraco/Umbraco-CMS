@@ -458,6 +458,22 @@ module.exports = function (grunt) {
                         },
                         'bootstrap-tabdrop': {
                             keepExpandedHierarchy: false
+                        },
+                        'codemirror': {
+                            files: [
+                                'lib/codemirror.js',
+                                'lib/codemirror.css',
+
+                                'mode/css/*',
+                                'mode/javascript/*',
+                                'mode/xml/*',
+                                'mode/htmlmixed/*',
+
+                                'addon/search/*',
+                                'addon/edit/*',
+                                'addon/selection/*',
+                                'addon/dialog/*'
+                            ]
                         }
                     }
                 }
