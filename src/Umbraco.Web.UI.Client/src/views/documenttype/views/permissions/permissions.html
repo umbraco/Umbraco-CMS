@@ -1,4 +1,5 @@
-<div ng-controller="Umbraco.Editors.DocumentType.PermissionsController">
+<div ng-controller="Umbraco.Editors.DocumentType.PermissionsController as vm">
+
     <div class="sub-view-columns">
 
         <div class="sub-view-column-left">
@@ -7,7 +8,7 @@
         </div>
         <div class="sub-view-column-right">
             <label class="checkbox no-indent">
-                <input type="checkbox" ng-model="contentType.allowAsRoot" /> Yes - allow content of this type in the root
+                <input type="checkbox" ng-model="model.allowAsRoot" /> Yes - allow content of this type in the root
             </label>
         </div>
 
@@ -28,9 +29,9 @@
                 <div class="node node-parent">
                     <div class="node-description">
                         <div class="node-icon-wrapper">
-                            <i class="icon {{ contentType.icon }}"></i>
+                            <i class="icon {{ model.icon }}"></i>
                         </div>
-                        <span class="node-name">{{ contentType.name }}</span>
+                        <span class="node-name">{{ model.name }}</span>
                         <small>(Current)</small>
                     </div>
                 </div>
@@ -38,7 +39,7 @@
                 <div class="child-notes-wrapper">
 
                     <!-- ADDED NODES -->
-                    <div class="node node-child" ng-repeat="allowedType in contentType.allowedContentTypes">
+                    <div class="node node-child" ng-repeat="allowedType in model.allowedContentTypes">
                         <div class="node-description">
                             <div class="node-icon-wrapper">
                                 <i class="icon {{ allowedType.icon }}"></i>
@@ -46,17 +47,17 @@
                             <span class="node-name"> {{ allowedType.name }}</span>
                         </div>
                         <div class="node-actions">
-                            <i class="icon icon-trash" ng-click="removeAllowedChildNode(allowedType)"></i>
+                            <i class="icon icon-trash" ng-click="vm.removeAllowedChildNode(allowedType)"></i>
                         </div>
                     </div>
 
                     <!-- NODE PLACEHOLDER -->
-                    <div class="node node-placeholder" ng-if="(contentTypes | compareArrays:contentType.allowedContentTypes:'alias').length > 0" ng-click="addItemOverlay($event)">
+                    <div class="node node-placeholder" ng-if="(vm.contentTypes | compareArrays:model.allowedContentTypes:'alias').length > 0" ng-click="vm.addItemOverlay($event)">
                         <div class="node-placeholder-text">Allow child node</div>
                     </div>
 
                     <!-- ALL NODES ADDED -->
-                    <div class="text-center" ng-if="(contentTypes | compareArrays:contentType.allowedContentTypes:'alias').length === 0">
+                    <div class="text-center" ng-if="(vm.contentTypes | compareArrays:model.allowedContentTypes:'alias').length === 0">
                         <small>All content types are added as child nodes</small>
                     </div>
 
@@ -67,14 +68,13 @@
         </div>
 
     </div>
-
     <umb-overlay
             ng-style=""
-            ng-if="showDialog"
-            model="dialogModel"
+            ng-if="vm.showDialog"
+            model="vm.dialogModel"
             animation="slide-in-right"
             position="target"
-            view="dialogModel.view">
+            view="vm.dialogModel.view">
     </umb-overlay>
 
 </div>
