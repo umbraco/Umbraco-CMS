@@ -437,7 +437,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>MediaChooserScripts.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="MultiNodeTreePicker\MNTPResources.resx" />
+    <EmbeddedResource Include="MultiNodeTreePicker\MNTPResources.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="textfield\textFieldDataEditor.resx">
       <DependentUpon>textFieldDataEditor.cs</DependentUpon>
       <SubType>Designer</SubType>

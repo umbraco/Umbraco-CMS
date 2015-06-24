@@ -348,7 +348,7 @@ function umbModelMapper() {
          * @param {String} source.name The node name
          * @param {String} source.icon The models icon as a css class (.icon-doc)
          * @param {Number} source.parentId The parentID, if no parent, set to -1
-         * @param {path} source.path comma-seperated string of ancestor IDs (-1,1234,1782,1234)
+         * @param {path} source.path comma-separated string of ancestor IDs (-1,1234,1782,1234)
          */
 
         /** This converts the source model to a basic entity model, it will throw an exception if there isn't enough data to create the model */

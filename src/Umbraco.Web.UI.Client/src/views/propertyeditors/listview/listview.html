@@ -39,6 +39,13 @@
                 </a>
             </div>
             <span ng-bind="bulkStatus" ng-show="isAnythingSelected()"></span>
+
+            <form class="form-search pull-right" novalidate>
+                <div class="inner-addon left-addon">
+                    <i class="icon icon-search" ng-click="enterSearch($event)"></i>
+                    <input type="text" class="form-control" localize="placeholder" placeholder="@general_typeToSearch" ng-model="options.filter" on-keyup="search()" prevent-enter-submit no-dirty-check>
+                </div>
+            </form>
         </div>
 
         <table class="table table-striped">
@@ -60,19 +67,12 @@
                             <i class="icon" ng-class="{'icon-navigation-up': isSortDirection(column.alias, 'asc'), 'icon-navigation-down': isSortDirection(column.alias, 'desc')}"></i>
                         </a>
                     </td>
-
-                    <td>
-                        <form class="pull-right" novalidate>
-                            <i class="icon-search" ng-click="enterSearch($event)"></i>
-                            <input type="text" ng-model="options.filter" on-keyup="search()" prevent-enter-submit no-dirty-check>
-                        </form>
-                    </td>
                 </tr>
             </thead>
 
             <tbody ng-show="listViewResultSet.totalItems === 0">
                 <tr>
-                    <td colspan="{{options.includeProperties.length + 3}}">
+                    <td colspan="{{options.includeProperties.length + 2}}">
                         <p><localize key="content_listViewNoItems">There are no items show in the list.</localize></p>
                     </td>
                 </tr>
@@ -95,14 +95,12 @@
                     <td ng-repeat="column in options.includeProperties">
                         <span>{{result[column.alias]}}</span>
                     </td>
-                    
-                    <td></td>
                 </tr>
             </tbody>
 
             <tfoot ng-show="pagination.length > 1">
                 <tr>
-                    <th colspan="{{options.includeProperties.length + 3}}">
+                    <th colspan="{{options.includeProperties.length + 2}}">
                         <div class="pull-left">
                         </div>
                         <div class="pagination pagination-right">
@@ -129,7 +127,6 @@
                                 </li>
                             </ul>
                         </div>
-
                     </th>
                 </tr>
             </tfoot>

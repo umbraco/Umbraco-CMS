@@ -28,7 +28,7 @@ namespace Umbraco.Web
         /// These are the bare minimal server variables that are required for the application to start without being authenticated,
         /// we will load the rest of the server vars after the user is authenticated.
         /// </remarks>
-        public static IHtmlString BareMinimumServerVariables(this HtmlHelper html, UrlHelper uri, string externalLoginsUrl)
+        public static IHtmlString BareMinimumServerVariablesScript(this HtmlHelper html, UrlHelper uri, string externalLoginsUrl)
         {
             var str = @"<script type=""text/javascript"">
                 var Umbraco = {};
@@ -55,7 +55,7 @@ namespace Umbraco.Web
         /// <param name="html"></param>
         /// <param name="externalLoginErrors"></param>
         /// <returns></returns>
-        public static IHtmlString AngularExternalLoginInfoValues(this HtmlHelper html, IEnumerable<string> externalLoginErrors)
+        public static IHtmlString AngularExternalLoginInfoValuesScript(this HtmlHelper html, IEnumerable<string> externalLoginErrors)
         {
             var loginProviders = html.ViewContext.HttpContext.GetOwinContext().Authentication.GetExternalAuthenticationTypes()
                 .Where(p => p.Properties.ContainsKey("UmbracoBackOffice"))
@@ -71,8 +71,8 @@ namespace Umbraco.Web
             //define a callback that is executed when we bootstrap angular, this is used to inject angular values
             //with server side info
 
-            var sb = new StringBuilder(@"<script type=""text/javascript"">");
-            sb.AppendLine(@"document.angularReady = function(app) {");
+            var sb = new StringBuilder();
+            sb.AppendLine();
             sb.AppendLine(@"var errors = [];");
 
             if (externalLoginErrors != null)
@@ -88,8 +88,6 @@ namespace Umbraco.Web
             sb.Append(@"providers: ");
             sb.AppendLine(JsonConvert.SerializeObject(loginProviders));
             sb.AppendLine(@"});");
-            sb.AppendLine(@"}");
-            sb.AppendLine("</script>");
 
             return html.Raw(sb.ToString());
         }

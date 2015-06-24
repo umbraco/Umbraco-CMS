@@ -18,10 +18,10 @@ module.exports = function (grunt) {
     grunt.registerTask('watch-test', ['jshint:dev', 'karma:unit']);
 
     //triggered from grunt dev or grunt
-    grunt.registerTask('build', ['clean', 'concat', 'recess:min', 'recess:installer', 'recess:canvasdesigner', 'bower', 'copy']);
+    grunt.registerTask('build', ['clean', 'concat', 'recess:min', 'recess:installer', 'recess:canvasdesigner', 'bower-install-simple', 'bower', 'copy']);
 
     //build-dev doesn't min - we are trying to speed this up and we don't want minified stuff when we are in dev mode
-    grunt.registerTask('build-dev', ['clean', 'concat', 'recess:build', 'recess:installer', 'bower', 'copy']);
+    grunt.registerTask('build-dev', ['clean', 'concat', 'recess:build', 'recess:installer', 'bower-install-simple', 'bower', 'copy']);
 
     //utillity tasks
     grunt.registerTask('docs', ['ngdocs']);
@@ -42,14 +42,14 @@ module.exports = function (grunt) {
                     port: 9990,
                     hostname: '0.0.0.0',
                     base: './build',
-                    middleware: function (connect, options) {
+                    middleware: function(connect, options) {
                         return [
-                          //uncomment to enable CSP
-                          // util.csp(),
-                          //util.rewrite(),
-                          connect.favicon('images/favicon.ico'),
-                          connect.static(options.base),
-                          connect.directory(options.base)
+                            //uncomment to enable CSP
+                            // util.csp(),
+                            //util.rewrite(),
+                            connect.favicon('images/favicon.ico'),
+                            connect.static(options.base),
+                            connect.directory(options.base)
                         ];
                     }
                 }
@@ -60,13 +60,13 @@ module.exports = function (grunt) {
                     port: 8880,
                     hostname: '0.0.0.0',
                     base: './docs/api',
-                    middleware: function (connect, options) {
+                    middleware: function(connect, options) {
                         return [
-                          //uncomment to enable CSP
-                          // util.csp(),
-                          //util.rewrite(),
-                          connect.static(options.base),
-                          connect.directory(options.base)
+                            //uncomment to enable CSP
+                            // util.csp(),
+                            //util.rewrite(),
+                            connect.static(options.base),
+                            connect.directory(options.base)
                         ];
                     }
                 }
@@ -86,10 +86,10 @@ module.exports = function (grunt) {
         vsdir: '../Umbraco.Web.UI/umbraco',
         pkg: grunt.file.readJSON('package.json'),
         banner:
-        '/*! <%= pkg.title || pkg.name %>\n' +
-        '<%= pkg.homepage ? " * " + pkg.homepage + "\\n" : "" %>' +
-        ' * Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author %>;\n' +
-        ' * Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %>\n */\n',
+            '/*! <%= pkg.title || pkg.name %>\n' +
+                '<%= pkg.homepage ? " * " + pkg.homepage + "\\n" : "" %>' +
+                ' * Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author %>;\n' +
+                ' * Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %>\n */\n',
         src: {
             js: ['src/**/*.js', 'src/*.js'],
             common: ['src/common/**/*.js'],
@@ -153,7 +153,7 @@ module.exports = function (grunt) {
                     //everything except the index.html root file!
                     //then we need to figure out how to not copy all the test stuff either!?
                     { dest: '<%= vsdir %>/assets', src: '**', expand: true, cwd: '<%= distdir %>/assets' },
-                    { dest: '<%= vsdir %>/js', src: '**', expand: true, cwd: '<%= distdir %>/js' },                    
+                    { dest: '<%= vsdir %>/js', src: '**', expand: true, cwd: '<%= distdir %>/js' },
                     { dest: '<%= vsdir %>/views', src: '**', expand: true, cwd: '<%= distdir %>/views' },
                     { dest: '<%= vsdir %>/preview', src: '**', expand: true, cwd: '<%= distdir %>/preview' },
                     { dest: '<%= vsdir %>/lib', src: '**', expand: true, cwd: '<%= distdir %>/lib' }
@@ -305,6 +305,10 @@ module.exports = function (grunt) {
 
 
         watch: {
+            docs: {
+                files: ['docs/src/**/*.md'],
+                tasks: ['watch-docs', 'timestamp']
+            },
             css: {
                 files: 'src/**/*.less',
                 tasks: ['watch-less', 'timestamp'],
@@ -347,8 +351,8 @@ module.exports = function (grunt) {
                 title: 'API Documentation'
             },
             tutorials: {
-                src: ['docs/src/tutorials/**/*.ngdoc'],
-                title: 'Tutorials'
+                src: [],
+                title: ''
             }
         },
 
@@ -406,22 +410,64 @@ module.exports = function (grunt) {
             }
         },
 
-        bower: {
-            install: {
+        bower: {            
+            dev: {
+                dest: '<%= distdir %>/lib',
                 options: {
-                    targetDir: "<%= distdir %>/lib",
-                    cleanTargetDir: false,
-                    layout: function (type, component, source) {
-
-                        var path = require('path');
-
-                        //this is the same as 'byComponent', however we will not allow
-                        // folders with '.' in them since the grunt copy task does not like that
-                        var componentWithoutPeriod = component.replace(".", "-");
-                        return path.join(componentWithoutPeriod, type);
+                    expand: true,
+                    ignorePackages: ['bootstrap'],
+                    packageSpecific: {
+                        'typeahead.js': {
+                            keepExpandedHierarchy: false
+                        },
+                        'underscore': {
+                            files: ['underscore-min.js', 'underscore-min.map']
+                        },
+                        'rgrove-lazyload': {
+                            files: ['lazyload.js']
+                        },
+                        'angular-dynamic-locale': {
+                            files: ['tmhDynamicLocale.min.js,tmhDynamicLocale.min.js.map}']
+                        },
+                        'bootstrap-social': {
+                            files: ['bootstrap-social.css']
+                        },
+                        'font-awesome': {
+                            files: ['css/font-awesome.min.css', 'fonts/*']
+                        },
+                        'jquery': {
+                            files: ['jquery.min.js', 'jquery.min.map']
+                        },
+                        'jquery-ui': {
+                            keepExpandedHierarchy: false,
+                            files: ['ui/minified/jquery-ui.min.js']
+                        },
+                        'tinymce': {
+                            files: ['plugins/**', 'themes/**', 'tinymce.min.js']
+                        },
+                        'angular-dynamic-locale': {
+                            files: ['tmhDynamicLocale.min.js', 'tmhDynamicLocale.min.js.map']
+                        },
+                        'bootstrap-tabdrop': {
+                            keepExpandedHierarchy: false
+                        },
+                        'ng-file-upload': {
+                            keepExpandedHierarchy: false,
+                            files: ['angular-file-upload.min.js']
+                        }
                     }
                 }
+            },
+            options: {
+                expand: true
             }
+        },
+
+        "bower-install-simple": {
+            options: {
+                color: true
+            },
+            "dev": {}
         }
     });
 
@@ -439,7 +485,8 @@ module.exports = function (grunt) {
 
     grunt.loadNpmTasks('grunt-open');
     grunt.loadNpmTasks('grunt-contrib-connect');
-    grunt.loadNpmTasks('grunt-bower-task');
+    grunt.loadNpmTasks("grunt-bower-install-simple");
+    grunt.loadNpmTasks('grunt-bower');
     grunt.loadNpmTasks('grunt-ngdocs');
 
 };

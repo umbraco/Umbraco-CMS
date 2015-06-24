@@ -1,13 +1,5 @@
 <div class="umb-editor-sub-views">
-
-    <div class="umb-editor-sub-views-tools">
-        <div class="umb-editor-sub-views-tool" ng-repeat="tool in tools" ng-click="tool.action(tool)">
-            <i class="icon-{{tool.icon}}"></i> {{ tool.name }}
-        </div>
-    </div>
-
     <div ng-if="activeView.view && activeView.active" ng-include="activeView.view"></div>
     <div ng-if="!activeView.view && activeView.active" ng-transclude></div>
-
 </div>
 

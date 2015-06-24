@@ -268,11 +268,6 @@ namespace Umbraco.Core.Models
             get { return _additionalData; }
         }
 
-        /// <summary>
-        /// Some entities may expose additional data that other's might not, this custom data will be available in this collection
-        /// </summary>
-        public IDictionary<string, object> AdditionalData { get; private set; }
-
         internal override void AddingEntity()
         {
             base.AddingEntity();

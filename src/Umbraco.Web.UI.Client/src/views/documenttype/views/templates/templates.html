@@ -1,4 +1,4 @@
-<div class="sub-view-columns" ng-controller="Umbraco.Editors.DocumentType.TemplatesController">
+<div class="sub-view-columns" ng-controller="Umbraco.Editors.DocumentType.TemplatesController as vm">
 
     <div class="sub-view-column-left">
         <h5>Allowed Templates</h5>
@@ -9,34 +9,34 @@
 
         <div class="templates-grid">
 
-            <div class="template template-default" ng-if="contentType.defaultTemplate !== null">
+            <div class="template template-default" ng-if="model.defaultTemplate !== null">
                 <div class="template-content">
-                    <i class="icon {{ contentType.defaultTemplate.icon }}"></i>
-                    <div class="template-name">{{ contentType.defaultTemplate.name }}</div>
+                    <i class="icon {{ model.defaultTemplate.icon }}"></i>
+                    <div class="template-name">{{ model.defaultTemplate.name }}</div>
                     <span class="template-default-label">(Default)</span>
                 </div>
-                <i class="icon icon-trash remove-template" ng-if="contentType.allowedTemplates.length === 1" ng-click="removeDefaultTemplate()"></i>
+                <i class="icon icon-trash remove-template" ng-if="model.allowedTemplates.length === 1" ng-click="vm.removeDefaultTemplate()"></i>
             </div>
 
-            <div class="template" ng-repeat="template in contentType.allowedTemplates | filter: { id:'!'+contentType.defaultTemplate.id }">
+            <div class="template" ng-repeat="template in model.allowedTemplates | filter: { id:'!'+model.defaultTemplate.id }">
                 <div class="template-content">
                     <i class="icon {{ template.icon }}"></i>
                     <div class="template-name">{{ template.name }}</div>
-                    <a href="" class="template-default-label link-blue" ng-click="setAsDefaultTemplate(template)">Set as default</a>
+                    <a href="" class="template-default-label link-blue" ng-click="vm.setAsDefaultTemplate(template)">Set as default</a>
                 </div>
-                <i class="icon icon-trash remove-template" ng-click="removeTemplate(template)"></i>
+                <i class="icon icon-trash remove-template" ng-click="vm.removeTemplate(template)"></i>
             </div>
 
-            <div class="template template-placeholder" ng-if="(templates.availableTemplates | compareArrays:contentType.allowedTemplates:'alias').length > 0">
+            <div class="template template-placeholder" ng-if="(vm.availableTemplates | compareArrays:model.allowedTemplates:'alias').length > 0">
                 <div class="template-content">
-                    <div class="template-name" ng-if="contentType.defaultTemplate !== null" ng-click="openTemplatesPicker($event)">Choose template</div>
-                    <div class="template-name" ng-if="contentType.defaultTemplate === null" ng-click="openTemplatesPicker($event, true)">Choose default template</div>
+                    <div class="template-name" ng-if="model.defaultTemplate !== null" ng-click="vm.openTemplatesPicker($event)">Choose template</div>
+                    <div class="template-name" ng-if="model.defaultTemplate === null" ng-click="vm.openTemplatesPicker($event, true)">Choose default template</div>
                 </div>
             </div>
 
         </div>
 
-        <div class="text-center" ng-if="(templates.availableTemplates | compareArrays:contentType.allowedTemplates:'alias').length === 0">
+        <div class="text-center" ng-if="(vm.availableTemplates | compareArrays:model.allowedTemplates:'alias').length === 0">
             <small>All templates are added as allowed templates</small>
         </div>
 
@@ -44,11 +44,11 @@
 
     <umb-overlay
             ng-style=""
-            ng-if="showDialog"
-            model="dialogModel"
+            ng-if="vm.showDialog"
+            model="vm.dialogModel"
             animation="slide-in-right"
             position="target"
-            view="dialogModel.view">
+            view="vm.dialogModel.view">
     </umb-overlay>
 
 </div>

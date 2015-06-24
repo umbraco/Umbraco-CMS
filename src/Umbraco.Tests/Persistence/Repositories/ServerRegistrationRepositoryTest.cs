@@ -128,7 +128,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepositor(unitOfWork))
             {
                 // Act
-                var query = Query<ServerRegistration>.Builder.Where(x => x.ServerIdentity.ToUpper() == "COMPUTER3");
+                var query = Query<IServerRegistration>.Builder.Where(x => x.ServerIdentity.ToUpper() == "COMPUTER3");
                 var result = repository.GetByQuery(query);
 
                 // Assert
@@ -145,7 +145,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepositor(unitOfWork))
             {
                 // Act
-                var query = Query<ServerRegistration>.Builder.Where(x => x.ServerAddress.StartsWith("http://"));
+                var query = Query<IServerRegistration>.Builder.Where(x => x.ServerAddress.StartsWith("http://"));
                 int count = repository.Count(query);
 
                 // Assert

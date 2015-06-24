@@ -537,8 +537,8 @@ namespace umbraco
         /// <returns></returns>
         private Control AddMacroResultToCache(Control macroControl)
         {
-            // Add result to cache if successful
-            if (Model.CacheDuration > 0)
+            // Add result to cache if successful (and cache is enabled)
+            if (UmbracoContext.Current.InPreviewMode == false && Model.CacheDuration > 0)
             {
                 // do not add to cache if there's no member and it should cache by personalization
                 if (!Model.CacheByMember || (Model.CacheByMember && Member.IsLoggedOn()))

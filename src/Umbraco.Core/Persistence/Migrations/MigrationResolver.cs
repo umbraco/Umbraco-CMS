@@ -47,7 +47,11 @@ namespace Umbraco.Core.Persistence.Migrations
                 var normalArgs = new[] {typeof (ISqlSyntaxProvider), typeof (ILogger)};
 	            var found = serviceType.GetConstructor(normalArgs);
 	            if (found != null)
-	                return found.Invoke(new object[] {ApplicationContext.Current.DatabaseContext.SqlSyntax, LoggerResolver.Current.Logger});
+	                return found.Invoke(new object[]
+	                {
+	                    ApplicationContext.Current.DatabaseContext.SqlSyntax, 
+                        ApplicationContext.Current.ProfilingLogger.Logger
+	                });
                 //use normal ctor
 	            return Activator.CreateInstance(serviceType);
 	        }

@@ -45,6 +45,27 @@ namespace Umbraco.Tests.Services
         //TODO Add test to delete specific version (with and without deleting prior versions) and versions by date.
 
         [Test]
+        public void Remove_Scheduled_Publishing_Date()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+
+            // Act
+            var content = contentService.CreateContentWithIdentity("Test", -1, "umbTextpage", 0);
+
+            content.ReleaseDate = DateTime.Now.AddHours(2);
+            contentService.Save(content, 0);
+
+            content = contentService.GetById(content.Id);
+            content.ReleaseDate = null;
+            contentService.Save(content, 0);
+
+
+            // Assert
+            Assert.IsTrue(contentService.PublishWithStatus(content).Success);
+        }
+
+        [Test]
         public void Count_All()
         {
             // Arrange

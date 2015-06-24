@@ -14,7 +14,7 @@ namespace Umbraco.Core.Services
     public class LocalizedTextService : ILocalizedTextService
     {
         private readonly ILogger _logger;
-        private readonly LocalizedTextServiceFileSources _fileSources;
+        private readonly Lazy<LocalizedTextServiceFileSources> _fileSources;
         private readonly IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>> _dictionarySource;
         private readonly IDictionary<CultureInfo, Lazy<XDocument>> _xmlSource;
 
@@ -23,7 +23,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="fileSources"></param>
         /// <param name="logger"></param>
-        public LocalizedTextService(LocalizedTextServiceFileSources fileSources, ILogger logger)
+        public LocalizedTextService(Lazy<LocalizedTextServiceFileSources> fileSources, ILogger logger)
         {
             if (logger == null) throw new ArgumentNullException("logger");
             _logger = logger;
@@ -73,7 +73,7 @@ namespace Umbraco.Core.Services
             var alias = keyParts.Length > 1 ? keyParts[1] : keyParts[0];
 
             var xmlSource = _xmlSource ?? (_fileSources != null
-                ? _fileSources.GetXmlSources()
+                ? _fileSources.Value.GetXmlSources()
                 : null);
 
             if (xmlSource != null)
@@ -100,7 +100,7 @@ namespace Umbraco.Core.Services
             var result = new Dictionary<string, string>();
 
             var xmlSource = _xmlSource ?? (_fileSources != null
-                ? _fileSources.GetXmlSources()
+                ? _fileSources.Value.GetXmlSources()
                 : null);
 
             if (xmlSource != null)
@@ -160,7 +160,7 @@ namespace Umbraco.Core.Services
         public IEnumerable<CultureInfo> GetSupportedCultures()
         {
             var xmlSource = _xmlSource ?? (_fileSources != null
-                ? _fileSources.GetXmlSources()
+                ? _fileSources.Value.GetXmlSources()
                 : null);
 
             return xmlSource != null ? xmlSource.Keys : _dictionarySource.Keys;
@@ -187,7 +187,7 @@ namespace Umbraco.Core.Services
             if (_fileSources == null) return currentCulture;
             if (currentCulture.Name.Length > 2) return currentCulture;
 
-            var attempt = _fileSources.TryConvert2LetterCultureTo4Letter(currentCulture.TwoLetterISOLanguageName);
+            var attempt = _fileSources.Value.TryConvert2LetterCultureTo4Letter(currentCulture.TwoLetterISOLanguageName);
             return attempt ? attempt.Result : currentCulture;
         }
 

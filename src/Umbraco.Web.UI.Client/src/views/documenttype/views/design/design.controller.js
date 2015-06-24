@@ -6,277 +6,303 @@
  * @description
  * The controller for the content type editor list view section
  */
-function DesignController($scope, contentTypeResource, dataTypeResource, contentTypeHelper, dataTypeHelper) {
+(function() {
+    'use strict';
 
-    $scope.sortingMode = false;
+    function DesignController($scope, contentTypeResource, dataTypeResource, contentTypeHelper, dataTypeHelper) {
 
-    /* ---------- TOOLBAR ---------- */
+        var vm = this;
 
-    $scope.page.toggleSortingMode = function() {
-        $scope.sortingMode = !$scope.sortingMode;
-    };
+        vm.addTab = addTab;
+        vm.removeTab = removeTab;
+        vm.activateTab = activateTab;
+        vm.updateTabTitle = updateTabTitle;
+        vm.toggleGroupSize = toggleGroupSize;
+        vm.editPropertyTypeSettings = editPropertyTypeSettings;
+        vm.choosePropertyType = choosePropertyType;
+        vm.configDataType = configDataType;
+        vm.deleteProperty = deleteProperty;
 
-    $scope.page.openCompositionsDialog = function() {
-        $scope.dialogModel = {};
-        $scope.dialogModel.title = "Compositions";
-        $scope.dialogModel.availableCompositeContentTypes = $scope.contentType.availableCompositeContentTypes;
-        $scope.dialogModel.compositeContentTypes = $scope.contentType.compositeContentTypes;
-        $scope.dialogModel.view = "views/documentType/dialogs/compositions/compositions.html";
-        $scope.showDialog = true;
-
-        $scope.dialogModel.close = function(){
-            $scope.showDialog = false;
-            $scope.dialogModel = null;
-        };
-
-        $scope.dialogModel.selectCompositeContentType = function(compositeContentType) {
-
-            if( $scope.contentType.compositeContentTypes.indexOf(compositeContentType.alias) === -1 ) {
-
-                //merge composition with content type
-                contentTypeHelper.mergeCompositeContentType($scope.contentType, compositeContentType);
-
-            } else {
-
-                // split composition from content type
-                contentTypeHelper.splitCompositeContentType($scope.contentType, compositeContentType);
-
-            }
-
-        }
-
-    };
-
-    /* ---------- TABS ---------- */
-
-    $scope.addTab = function(tab){
-
-        $scope.activateTab(tab);
-
-        // push new init tab to the scope
-        contentTypeHelper.addInitTab($scope.contentType);
-
-    };
-
-    $scope.removeTab = function(tabIndex) {
-        $scope.contentType.groups.splice(tabIndex, 1);
-    };
-
-    $scope.activateTab = function(tab) {
-
-        // set all other tabs that are inactive to active
-        angular.forEach($scope.contentType.groups, function(group){
-            // skip init tab
-            if(group.tabState !== "init") {
-                group.tabState = "inActive";
-            }
-        });
-
-        tab.tabState = "active";
-
-    };
-
-    $scope.updateTabTitle = function(tab) {
-        if(tab.properties.length === 0) {
-            contentTypeHelper.addInitProperty(tab);
-        }
-    };
-
-    /* ---------- PROPERTIES ---------- */
-
-    $scope.toggleGroupSize = function(group){
-        if(group.columns !== 12){
-            group.columns = 12;
-        }else{
-            group.columns = 6;
-        }
-    };
-
-    $scope.editPropertyTypeSettings = function(property) {
-
-        if(!property.inherited) {
-
-            $scope.dialogModel = {};
-            $scope.dialogModel.title = "Edit property type settings";
-            $scope.dialogModel.property = property;
-            $scope.dialogModel.view = "views/documentType/dialogs/editPropertySettings/editPropertySettings.html";
-            $scope.showDialog = true;
-
-            // set indicator on property to tell the dialog is open - is used to set focus on the element
-            property.dialogIsOpen = true;
-
-            // set property to active
-            property.propertyState = "active";
-
-            $scope.dialogModel.changePropertyEditor = function(property) {
-                $scope.choosePropertyType(property);
-            };
-
-            $scope.dialogModel.editDataType = function(property) {
-                $scope.configDataType(property);
-            };
-
-            $scope.dialogModel.submit = function(model){
-
-                property.dialogIsOpen = false;
-
-                $scope.showDialog = false;
-                $scope.dialogModel = null;
-
-                // push new init property to scope
-                contentTypeHelper.addInitPropertyOnActiveTab($scope.contentType);
-
-            };
-
-            $scope.dialogModel.close = function(model){
-                $scope.showDialog = false;
-                $scope.dialogModel = null;
-
-                // push new init property to scope
-                contentTypeHelper.addInitPropertyOnActiveTab($scope.contentType);
-            };
-
-        }
-    };
-
-    $scope.choosePropertyType = function(property) {
-
-        $scope.dialogModel = {};
-        $scope.dialogModel.title = "Choose property type";
-        $scope.dialogModel.view = "views/documentType/dialogs/property.html";
-        $scope.showDialog = true;
-
-        property.dialogIsOpen = true;
-
-        $scope.dialogModel.selectDataType = function(selectedDataType) {
-
-            contentTypeResource.getPropertyTypeScaffold(selectedDataType.id).then(function(propertyType){
-
-                property.config = propertyType.config;
-                property.editor = propertyType.editor;
-                property.view = propertyType.view;
-                property.dataTypeId = selectedDataType.id;
-                property.dataTypeIcon = selectedDataType.icon;
-                property.dataTypeName = selectedDataType.name;
-
-                property.propertyState = "active";
-
-                console.log(property);
-
-                // open data type configuration
-                $scope.editPropertyTypeSettings(property);
-
-                // push new init tab to scope
-                contentTypeHelper.addInitTab($scope.contentType);
-
-            });
-
-        };
-
-        $scope.dialogModel.close = function(model){
-            $scope.editPropertyTypeSettings(property);
-        };
-
-    };
-
-    $scope.configDataType = function(property) {
-
-        $scope.dialogModel = {};
-        $scope.dialogModel.title = "Edit data type";
-        $scope.dialogModel.dataType = {};
-        $scope.dialogModel.property = property;
-        $scope.dialogModel.view = "views/documentType/dialogs/editDataType/editDataType.html";
-        $scope.dialogModel.multiActions = [
+        vm.sortingMode = false;
+        vm.toolbar = [
             {
-                label: "Save",
-                action: function(dataType) {
-                    saveDataType(dataType, false);
+                "name": "Compositions",
+                "icon": "merge",
+                "action": function() {
+                    openCompositionsDialog();
                 }
             },
             {
-                label: "Save as new",
-                action: function(dataType) {
-                    saveDataType(dataType, true);
+                "name": "Reorder",
+                "icon": "navigation",
+                "action": function() {
+                    toggleSortingMode();
                 }
             }
         ];
-        $scope.showDialog = true;
+        vm.sortableOptionsTab = {
+            distance: 10,
+            tolerance: "pointer",
+            opacity: 0.7,
+            scroll: true,
+            cursor: "move",
+            placeholder: "ui-sortable-tabs-placeholder",
+            zIndex: 6000,
+            handle: ".edt-tab-handle",
+            items: ".edt-tab-sortable",
+            start: function (e, ui) {
+                ui.placeholder.height(ui.item.height());
+            },
+            stop: function(e, ui){
 
-        function saveDataType(dataType, isNew) {
+            }
+        };
+        vm.sortableOptionsEditor = {
+            distance: 10,
+            tolerance: "pointer",
+            connectWith: ".edt-property-list",
+            opacity: 0.7,
+            scroll: true,
+            cursor: "move",
+            placeholder: "ui-sortable-properties-placeholder",
+            zIndex: 6000,
+            handle: ".edt-property-handle",
+            items: ".edt-property-sortable",
+            start: function (e, ui) {
+                ui.placeholder.height(ui.item.height());
+            },
+            stop: function(e, ui){
 
-            var preValues = dataTypeHelper.createPreValueProps(dataType.preValues);
+            }
+        };
 
-            dataTypeResource.save(dataType, preValues, isNew).then(function(dataType) {
+        /* ---------- TOOLBAR ---------- */
 
-                contentTypeResource.getPropertyTypeScaffold(dataType.id).then(function(propertyType){
+        function toggleSortingMode() {
+            vm.sortingMode = !vm.sortingMode;
+        }
+
+        function openCompositionsDialog() {
+            vm.dialogModel = {};
+            vm.dialogModel.title = "Compositions";
+            vm.dialogModel.availableCompositeContentTypes = $scope.model.availableCompositeContentTypes;
+            vm.dialogModel.compositeContentTypes = $scope.model.compositeContentTypes;
+            vm.dialogModel.view = "views/documentType/dialogs/compositions/compositions.html";
+            vm.showDialog = true;
+
+            vm.dialogModel.close = function(){
+                vm.showDialog = false;
+                vm.dialogModel = null;
+            };
+
+            vm.dialogModel.selectCompositeContentType = function(compositeContentType) {
+
+                if( $scope.model.compositeContentTypes.indexOf(compositeContentType.alias) === -1 ) {
+
+                    //merge composition with content type
+                    contentTypeHelper.mergeCompositeContentType($scope.model, compositeContentType);
+
+                } else {
+
+                    // split composition from content type
+                    contentTypeHelper.splitCompositeContentType($scope.model, compositeContentType);
+
+                }
+
+            }
+
+        }
+
+        /* ---------- TABS ---------- */
+
+        function addTab(tab){
+
+            vm.activateTab(tab);
+
+            // push new init tab to the scope
+            contentTypeHelper.addInitTab($scope.model);
+
+        }
+
+        function removeTab(tabIndex) {
+            $scope.model.groups.splice(tabIndex, 1);
+        }
+
+        function activateTab(tab) {
+
+            // set all other tabs that are inactive to active
+            angular.forEach($scope.model.groups, function(group){
+                // skip init tab
+                if(group.tabState !== "init") {
+                    group.tabState = "inActive";
+                }
+            });
+
+            tab.tabState = "active";
+
+        }
+
+        function updateTabTitle(tab) {
+            if(tab.properties.length === 0) {
+                contentTypeHelper.addInitProperty(tab);
+            }
+        }
+
+        /* ---------- PROPERTIES ---------- */
+
+        function toggleGroupSize(group){
+            if(group.columns !== 12){
+                group.columns = 12;
+            }else{
+                group.columns = 6;
+            }
+        }
+
+        function editPropertyTypeSettings(property) {
+
+            if(!property.inherited) {
+
+                vm.dialogModel = {};
+                vm.dialogModel.title = "Edit property type settings";
+                vm.dialogModel.property = property;
+                vm.dialogModel.view = "views/documentType/dialogs/editPropertySettings/editPropertySettings.html";
+                vm.showDialog = true;
+
+                // set indicator on property to tell the dialog is open - is used to set focus on the element
+                property.dialogIsOpen = true;
+
+                // set property to active
+                property.propertyState = "active";
+
+                vm.dialogModel.changePropertyEditor = function(property) {
+                    choosePropertyType(property);
+                };
+
+                vm.dialogModel.editDataType = function(property) {
+                    configDataType(property);
+                };
+
+                vm.dialogModel.submit = function(model){
+
+                    property.dialogIsOpen = false;
+
+                    vm.showDialog = false;
+                    vm.dialogModel = null;
+
+                    // push new init property to scope
+                    contentTypeHelper.addInitPropertyOnActiveTab($scope.model);
+
+                };
+
+                vm.dialogModel.close = function(model){
+                    vm.showDialog = false;
+                    vm.dialogModel = null;
+
+                    // push new init property to scope
+                    contentTypeHelper.addInitPropertyOnActiveTab($scope.model);
+                };
+
+            }
+        }
+
+        function choosePropertyType(property) {
+
+            vm.dialogModel = {};
+            vm.dialogModel.title = "Choose property type";
+            vm.dialogModel.view = "views/documentType/dialogs/property.html";
+            vm.showDialog = true;
+
+            property.dialogIsOpen = true;
+
+            vm.dialogModel.selectDataType = function(selectedDataType) {
+
+                contentTypeResource.getPropertyTypeScaffold(selectedDataType.id).then(function(propertyType){
 
                     property.config = propertyType.config;
                     property.editor = propertyType.editor;
                     property.view = propertyType.view;
-                    property.dataTypeId = dataType.id;
-                    property.dataTypeIcon = dataType.icon;
-                    property.dataTypeName = dataType.name;
+                    property.dataTypeId = selectedDataType.id;
+                    property.dataTypeIcon = selectedDataType.icon;
+                    property.dataTypeName = selectedDataType.name;
 
-                    // open settings dialog
-                    $scope.editPropertyTypeSettings(property);
+                    property.propertyState = "active";
+
+                    console.log(property);
+
+                    // open data type configuration
+                    editPropertyTypeSettings(property);
+
+                    // push new init tab to scope
+                    contentTypeHelper.addInitTab($scope.model);
 
                 });
 
-            });
+            };
+
+            vm.dialogModel.close = function(model){
+                editPropertyTypeSettings(property);
+            };
 
         }
 
-        $scope.dialogModel.close = function(model){
-            $scope.editPropertyTypeSettings(property);
-        };
+        function configDataType(property) {
 
-    };
+            vm.dialogModel = {};
+            vm.dialogModel.title = "Edit data type";
+            vm.dialogModel.dataType = {};
+            vm.dialogModel.property = property;
+            vm.dialogModel.view = "views/documentType/dialogs/editDataType/editDataType.html";
+            vm.dialogModel.multiActions = [
+                {
+                    label: "Save",
+                    action: function(dataType) {
+                        saveDataType(dataType, false);
+                    }
+                },
+                {
+                    label: "Save as new",
+                    action: function(dataType) {
+                        saveDataType(dataType, true);
+                    }
+                }
+            ];
+            vm.showDialog = true;
 
-    $scope.deleteProperty = function(tab, propertyIndex) {
-        tab.properties.splice(propertyIndex, 1);
-    };
+            function saveDataType(dataType, isNew) {
 
+                var preValues = dataTypeHelper.createPreValueProps(dataType.preValues);
 
-    /* ---------- SORTING OPTIONS ---------- */
+                dataTypeResource.save(dataType, preValues, isNew).then(function(dataType) {
 
-    $scope.sortableOptionsTab = {
-        distance: 10,
-        tolerance: "pointer",
-        opacity: 0.7,
-        scroll: true,
-        cursor: "move",
-        placeholder: "ui-sortable-tabs-placeholder",
-        zIndex: 6000,
-        handle: ".edt-tab-handle",
-        items: ".edt-tab-sortable",
-        start: function (e, ui) {
-            ui.placeholder.height(ui.item.height());
-        },
-        stop: function(e, ui){
+                    contentTypeResource.getPropertyTypeScaffold(dataType.id).then(function(propertyType){
+
+                        property.config = propertyType.config;
+                        property.editor = propertyType.editor;
+                        property.view = propertyType.view;
+                        property.dataTypeId = dataType.id;
+                        property.dataTypeIcon = dataType.icon;
+                        property.dataTypeName = dataType.name;
+
+                        // open settings dialog
+                        editPropertyTypeSettings(property);
+
+                    });
+
+                });
+
+            }
+
+            vm.dialogModel.close = function(model){
+                editPropertyTypeSettings(property);
+            };
 
         }
-    };
 
-    $scope.sortableOptionsEditor = {
-        distance: 10,
-        tolerance: "pointer",
-        connectWith: ".edt-property-list",
-        opacity: 0.7,
-        scroll: true,
-        cursor: "move",
-        placeholder: "ui-sortable-properties-placeholder",
-        zIndex: 6000,
-        handle: ".edt-property-handle",
-        items: ".edt-property-sortable",
-        start: function (e, ui) {
-            ui.placeholder.height(ui.item.height());
-        },
-        stop: function(e, ui){
-
+        function deleteProperty(tab, propertyIndex) {
+            tab.properties.splice(propertyIndex, 1);
         }
-    };
 
+    }
 
-}
-
-angular.module("umbraco").controller("Umbraco.Editors.DocumentType.DesignController", DesignController);
+    angular.module("umbraco").controller("Umbraco.Editors.DocumentType.DesignController", DesignController);
+})();

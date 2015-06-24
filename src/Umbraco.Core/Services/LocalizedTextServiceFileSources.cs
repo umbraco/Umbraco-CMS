@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.Cache;
@@ -14,7 +15,9 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class LocalizedTextServiceFileSources
     {
+        private readonly ILogger _logger;
         private readonly IRuntimeCacheProvider _cache;
+        private readonly IEnumerable<LocalizedTextServiceSupplementaryFileSource> _supplementFileSources;
         private readonly DirectoryInfo _fileSourceFolder;
 
         //TODO: See other notes in this class, this is purely a hack because we store 2 letter culture file names that contain 4 letter cultures :(
@@ -22,11 +25,26 @@ namespace Umbraco.Core.Services
 
         private readonly Lazy<Dictionary<CultureInfo, Lazy<XDocument>>> _xmlSources;
 
-        public LocalizedTextServiceFileSources(IRuntimeCacheProvider cache, DirectoryInfo fileSourceFolder)
+        /// <summary>
+        /// This is used to configure the file sources with the main file sources shipped with Umbraco and also including supplemental/plugin based
+        /// localization files. The supplemental files will be loaded in and merged in after the primary files. 
+        /// The supplemental files must be named with the 4 letter culture name with a hyphen such as : en-AU.xml
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="cache"></param>
+        /// <param name="fileSourceFolder"></param>
+        /// <param name="supplementFileSources"></param>
+        public LocalizedTextServiceFileSources(
+            ILogger logger,
+            IRuntimeCacheProvider cache, 
+            DirectoryInfo fileSourceFolder,
+            IEnumerable<LocalizedTextServiceSupplementaryFileSource> supplementFileSources)           
         {
+            if (logger == null) throw new ArgumentNullException("logger");
             if (cache == null) throw new ArgumentNullException("cache");
             if (fileSourceFolder == null) throw new ArgumentNullException("fileSourceFolder");
 
+            _logger = logger;
             _cache = cache;
 
             //Create the lazy source for the _xmlSources
@@ -86,13 +104,21 @@ namespace Umbraco.Core.Services
 
                     //get the lazy value from cache                
                     result[culture] = new Lazy<XDocument>(() => _cache.GetCacheItem<XDocument>(
-                        string.Format("{0}-{1}", typeof (LocalizedTextServiceFileSources).Name, culture.Name), () =>
+                        string.Format("{0}-{1}", typeof(LocalizedTextServiceFileSources).Name, culture.Name), () =>
                         {
+                            XDocument xdoc;
+
+                            //load in primary
                             using (var fs = localCopy.OpenRead())
                             {
-                                return XDocument.Load(fs);
+                                xdoc = XDocument.Load(fs);
                             }
-                        }, isSliding: true, timeout: TimeSpan.FromMinutes(10), dependentFiles: new[] {localCopy.FullName}));
+
+                            //load in supplementary
+                            MergeSupplementaryFiles(culture, xdoc);
+
+                            return xdoc;
+                        }, isSliding: true, timeout: TimeSpan.FromMinutes(10), dependentFiles: new[] { localCopy.FullName }));
                 }
                 return result;
             });
@@ -103,8 +129,21 @@ namespace Umbraco.Core.Services
             }
             else
             {
-                _fileSourceFolder = fileSourceFolder;    
+                _fileSourceFolder = fileSourceFolder;
+                _supplementFileSources = supplementFileSources;
             }
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="cache"></param>
+        /// <param name="fileSourceFolder"></param>
+        public LocalizedTextServiceFileSources(ILogger logger, IRuntimeCacheProvider cache, DirectoryInfo fileSourceFolder)
+            : this(logger, cache, fileSourceFolder, Enumerable.Empty<LocalizedTextServiceSupplementaryFileSource>())
+        {
+            
         }
 
         /// <summary>
@@ -127,6 +166,79 @@ namespace Umbraco.Core.Services
             return _twoLetterCultureConverter.ContainsKey(twoLetterCulture)
                 ? Attempt.Succeed(_twoLetterCultureConverter[twoLetterCulture])
                 : Attempt<CultureInfo>.Fail();
+        }
+
+        private void MergeSupplementaryFiles(CultureInfo culture, XDocument xMasterDoc)
+        {
+            if (xMasterDoc.Root == null) return;
+            if (_supplementFileSources != null)
+            {
+                //now load in suplementary
+                var found = _supplementFileSources.Where(x =>
+                {
+                    var fileName = Path.GetFileName(x.File.FullName);
+                    return fileName.InvariantStartsWith(culture.Name) && fileName.InvariantEndsWith(".xml");
+                });
+                
+                foreach (var supplementaryFile in found)
+                {
+                    using (var fs = supplementaryFile.File.OpenRead())
+                    {
+                        XDocument xChildDoc;
+                        try
+                        {
+                            xChildDoc = XDocument.Load(fs);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Error<LocalizedTextServiceFileSources>("Could not load file into XML " + supplementaryFile.File.FullName, ex);
+                            continue;
+                        }
+
+                        if (xChildDoc.Root == null) continue;
+                        foreach (var xArea in xChildDoc.Root.Elements("area")
+                            .Where(x => ((string)x.Attribute("alias")).IsNullOrWhiteSpace() == false))
+                        {
+                            var areaAlias = (string)xArea.Attribute("alias");
+
+                            var areaFound = xMasterDoc.Root.Elements("area").FirstOrDefault(x => ((string)x.Attribute("alias")) == areaAlias);
+                            if (areaFound == null)
+                            {
+                                //add the whole thing
+                                xMasterDoc.Root.Add(xArea);
+                            }
+                            else
+                            {
+                                MergeChildKeys(xArea, areaFound, supplementaryFile.OverwriteCoreKeys);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void MergeChildKeys(XElement source, XElement destination, bool overwrite)
+        {
+            if (destination == null) throw new ArgumentNullException("destination");
+            if (source == null) throw new ArgumentNullException("source");
+
+            //merge in the child elements
+            foreach (var key in source.Elements("key")
+                .Where(x => ((string)x.Attribute("alias")).IsNullOrWhiteSpace() == false))
+            {
+                var keyAlias = (string)key.Attribute("alias");
+                var keyFound = destination.Elements("key").FirstOrDefault(x => ((string)x.Attribute("alias")) == keyAlias);
+                if (keyFound == null)
+                {
+                    //append, it doesn't exist
+                    destination.Add(key);
+                }
+                else if (overwrite)
+                {
+                    //overwrite
+                    keyFound.Value = key.Value;
+                }
+            }
         }
     }
 }

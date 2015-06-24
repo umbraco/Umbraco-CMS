@@ -4,22 +4,20 @@ angular.module("umbraco.directives")
             restrict: 'E',
             replace: true,
             templateUrl: 'views/components/editor/umb-editor-sub-views.html',
+            scope: {
+                subViews: "=",
+                model: "="
+            },
             link: function (scope, element, attrs, ctrl) {
 
-                scope.tools = [];
                 scope.activeView = {};
 
                 // set toolbar from selected navigation item
-                function setToolBar(items) {
-
-                    scope.tools = [];
+                function setActiveView(items) {
 
                     for (var index = 0; index < items.length; index++) {
-                        var item = items[index];
 
-                        if(item.active && item.tools) {
-                            scope.tools = item.tools;
-                        }
+                        var item = items[index];
 
                         if(item.active && item.view) {
                             scope.activeView = item;
@@ -28,10 +26,9 @@ angular.module("umbraco.directives")
                 }
 
                 // watch for navigation changes
-                scope.$watch('page.navigation', function(newValue, oldValue) {
+                scope.$watch('subViews', function(newValue, oldValue) {
                     if (newValue) {
-
-                        setToolBar(newValue);
+                        setActiveView(newValue);
                     }
                 },true);
 

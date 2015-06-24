@@ -9,11 +9,10 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
 {
-
     /// <summary>
     /// Manages server registrations in the database.
     /// </summary>
-    public sealed class ServerRegistrationService : RepositoryService
+    public sealed class ServerRegistrationService : RepositoryService, IServerRegistrationService
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ServerRegistrationService"/> class.
@@ -36,14 +35,14 @@ namespace Umbraco.Core.Services
             var uow = UowProvider.GetUnitOfWork();
             using (var repo = RepositoryFactory.CreateServerRegistrationRepository(uow))
             {
-                var query = Query<ServerRegistration>.Builder.Where(x => x.ServerIdentity.ToUpper() == serverIdentity.ToUpper());
+                var query = Query<IServerRegistration>.Builder.Where(x => x.ServerIdentity.ToUpper() == serverIdentity.ToUpper());
                 var server = repo.GetByQuery(query).FirstOrDefault();
                 if (server == null)
                 {
                     server = new ServerRegistration(serverAddress, serverIdentity, DateTime.UtcNow)
                     {
                         IsActive = true
-                    };                    
+                    };
                 }
                 else
                 {
@@ -67,7 +66,7 @@ namespace Umbraco.Core.Services
             var uow = UowProvider.GetUnitOfWork();
             using (var repo = RepositoryFactory.CreateServerRegistrationRepository(uow))
             {
-                var query = Query<ServerRegistration>.Builder.Where(x => x.ServerIdentity.ToUpper() == serverIdentity.ToUpper());
+                var query = Query<IServerRegistration>.Builder.Where(x => x.ServerIdentity.ToUpper() == serverIdentity.ToUpper());
                 var server = repo.GetByQuery(query).FirstOrDefault();
                 if (server != null)
                 {
@@ -95,12 +94,12 @@ namespace Umbraco.Core.Services
         /// Return all active servers.
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<ServerRegistration> GetActiveServers()
+        public IEnumerable<IServerRegistration> GetActiveServers()
         {
             var uow = UowProvider.GetUnitOfWork();
             using (var repo = RepositoryFactory.CreateServerRegistrationRepository(uow))
             {
-                var query = Query<ServerRegistration>.Builder.Where(x => x.IsActive);
+                var query = Query<IServerRegistration>.Builder.Where(x => x.IsActive);
                 return repo.GetByQuery(query).ToArray();
             }
         }

@@ -336,7 +336,7 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
          *
          * @description
          * Saves changes made to a media item, if the media item is new, the isNew paramater must be passed to force creation
-         * if the media item needs to have files attached, they must be provided as the files param and passed seperately 
+         * if the media item needs to have files attached, they must be provided as the files param and passed separately 
          * 
          * 
          * ##usage

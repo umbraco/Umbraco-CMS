@@ -4,6 +4,7 @@ using System.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Migrations.Syntax.IfDatabase;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Migrations
 {
@@ -13,6 +14,7 @@ namespace Umbraco.Core.Persistence.Migrations
     /// </summary>
     public class MigrationRunner
     {
+        private readonly IMigrationEntryService _migrationEntryService;
         private readonly ILogger _logger;
         private readonly Version _currentVersion;
         private readonly Version _targetVersion;
@@ -25,31 +27,34 @@ namespace Umbraco.Core.Persistence.Migrations
         {
         }
 
+        [Obsolete("Use the ctor that specifies all dependencies instead")]
         public MigrationRunner(ILogger logger, Version currentVersion, Version targetVersion, string productName)
+            : this(logger, currentVersion, targetVersion, productName, null)
         {
-            if (logger == null) throw new ArgumentNullException("logger");
-            if (currentVersion == null) throw new ArgumentNullException("currentVersion");
-            if (targetVersion == null) throw new ArgumentNullException("targetVersion");
-            Mandate.ParameterNotNullOrEmpty(productName, "productName");
-
-            _logger = logger;
-            _currentVersion = currentVersion;
-            _targetVersion = targetVersion;
-            _productName = productName;
         }
-        
+
+        [Obsolete("Use the ctor that specifies all dependencies instead")]
         public MigrationRunner(ILogger logger, Version currentVersion, Version targetVersion, string productName, params IMigration[] migrations)
+            : this(ApplicationContext.Current.Services.MigrationEntryService, logger, currentVersion, targetVersion, productName, migrations)
         {
+            
+        }
+
+        public MigrationRunner(IMigrationEntryService migrationEntryService, ILogger logger, Version currentVersion, Version targetVersion, string productName, params IMigration[] migrations)
+        {
+            if (migrationEntryService == null) throw new ArgumentNullException("migrationEntryService");
             if (logger == null) throw new ArgumentNullException("logger");
             if (currentVersion == null) throw new ArgumentNullException("currentVersion");
             if (targetVersion == null) throw new ArgumentNullException("targetVersion");
             Mandate.ParameterNotNullOrEmpty(productName, "productName");
 
+            _migrationEntryService = migrationEntryService;
             _logger = logger;
             _currentVersion = currentVersion;
             _targetVersion = targetVersion;
             _productName = productName;
-            _migrations = migrations;
+            //ensure this is null if there aren't any
+            _migrations = migrations.Length == 0 ? null : migrations;
         }
 
         /// <summary>
@@ -222,10 +227,18 @@ namespace Umbraco.Core.Persistence.Migrations
                         continue;
                     }
 
+                    //TODO: We should output all of these SQL calls to files in a migration folder in App_Data/TEMP
+                    // so if people want to executed them manually on another environment, they can.
+
                     _logger.Info<MigrationRunner>("Executing sql statement " + i + ": " + sql);
                     database.Execute(sql);
                     i++;
                 }
+
+                //Now that this is all complete, we need to add an entry to the migrations table flagging that migrations
+                // for this version have executed.
+
+                _migrationEntryService.CreateEntry(_productName, _targetVersion);
 
                 transaction.Complete();
             }

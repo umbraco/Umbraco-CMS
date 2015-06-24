@@ -1,23 +1,24 @@
-<div ng-controller="Umbraco.Editors.DocumentType.EditController">
+<div ng-controller="Umbraco.Editors.DocumentType.EditController as vm">
     <form novalidate name="contentTypeForm"
-          ng-submit="save()"
+          ng-submit="vm.save()"
           val-form-manager>
 
         <umb-editor-view>
 
             <umb-editor-header
-                    name="contentType.name"
-                    alias="contentType.alias"
-                    description="contentType.description"
-                    navigation="page.navigation"
-                    icon="contentType.icon">
+                    name="vm.contentType.name"
+                    alias="vm.contentType.alias"
+                    description="vm.contentType.description"
+                    navigation="vm.page.navigation"
+                    icon="vm.contentType.icon">
             </umb-editor-header>
 
             <umb-editor-container class="editors-document-type-container">
 
                 <div class="editors-document-type-canvas">
 
-                    <umb-editor-sub-views></umb-editor-sub-views>
+                    <umb-editor-sub-views sub-views="vm.page.navigation" model="vm.contentType"></umb-editor-sub-views>
+
 
                 </div>
 

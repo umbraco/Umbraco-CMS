@@ -1,63 +1,31 @@
 {
-  "name": "Umbraco",
-  "version": "7",
-  "homepage": "https://github.com/umbraco/Umbraco-CMS",
-  "authors": [
-    "Shannon <sdeminick@umbraco.com>"
-  ],
-  "description": "Umbraco CMS",
-  "license": "MIT",
-  "private": true,
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "test",
-    "tests"
-  ],
-  
-  "dependencies": {
-    "typeahead.js": "~0.10.5",
-    "underscore": "~1.7.0",
-    "rgrove-lazyload": "*",
-    "bootstrap-social": "~4.8.0",
-    "jquery": "2.0.3",
-    "jquery-ui": "1.10.3",
-    "angular-dynamic-locale": "~0.1.27",
-    "ng-file-upload": "~3.0.2"
-  },
+    "name": "Umbraco",
+    "version": "7",
+    "homepage": "https://github.com/umbraco/Umbraco-CMS",
+    "authors": [
+        "Shannon <shannon@umbraco.com>"
+    ],
+    "description": "Umbraco CMS",
+    "license": "MIT",
+    "private": true,
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "test",
+        "tests"
+    ],
 
-  "exportsOverride": {
-    "rgrove-lazyload": {
-      "": "lazyload.js"
-    },
-    "typeahead.js": {
-      "": "dist/typeahead.bundle.min.js"
-    },
-    "underscore": {
-      "": "underscore-min.{js,map}"
-    },
-    "angular-dynamic-locale": {
-      "": "tmhDynamicLocale.min.{js,js.map}"
-    },
-    "bootstrap-social": {
-      "": "bootstrap-social.css"
-    },
-    "font-awesome": {
-      "css": "css/font-awesome.min.css",
-      "fonts": "fonts/*"
-    },
-    "bootstrap": {
-      "ignore": "*.ignore"
-    },
-    "jquery": {
-      "": "jquery.min.{js,map}"
-    },
-    "jquery-ui": {
-      "": "ui/minified/jquery-ui.min.js"
-    },
-    "ng-file-upload": {
-      "": "angular-file-upload.min.js"
+    "dependencies": {
+        "typeahead.js": "~0.10.5",
+        "underscore": "~1.7.0",
+        "rgrove-lazyload": "*",
+        "bootstrap-social": "~4.8.0",
+        "jquery": "2.0.3",
+        "jquery-ui": "1.10.3",
+        "angular-dynamic-locale": "~0.1.27",
+        "ng-file-upload": "~3.0.2",
+        "tinymce": "~4.1.10",
+        "bootstrap-tabdrop": "~1.0.0"
     }
-  }
 }

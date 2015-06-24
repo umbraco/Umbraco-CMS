@@ -27,12 +27,16 @@ namespace Umbraco.Web.Security.Identity
         {
             var backofficeIdentity = (UmbracoBackOfficeIdentity)data.Identity;
             var userDataString = JsonConvert.SerializeObject(backofficeIdentity.UserData);
-
+            
             var ticket = new FormsAuthenticationTicket(
                 5,
                 data.Identity.Name,
-                data.Properties.IssuedUtc.HasValue ? data.Properties.IssuedUtc.Value.LocalDateTime : DateTime.Now,
-                data.Properties.ExpiresUtc.HasValue ? data.Properties.ExpiresUtc.Value.LocalDateTime : DateTime.Now.AddMinutes(_loginTimeoutMinutes),
+                data.Properties.IssuedUtc.HasValue 
+                    ? data.Properties.IssuedUtc.Value.LocalDateTime 
+                    : DateTime.Now,
+                data.Properties.ExpiresUtc.HasValue 
+                    ? data.Properties.ExpiresUtc.Value.LocalDateTime 
+                    : DateTime.Now.AddMinutes(_loginTimeoutMinutes),
                 data.Properties.IsPersistent,
                 userDataString,
                 "/"
@@ -65,7 +69,8 @@ namespace Umbraco.Web.Security.Identity
             {
                 ExpiresUtc = decrypt.Expiration.ToUniversalTime(),
                 IssuedUtc = decrypt.IssueDate.ToUniversalTime(),
-                IsPersistent = decrypt.IsPersistent
+                IsPersistent = decrypt.IsPersistent,
+                AllowRefresh = true
             });
 
             return ticket;
