@@ -152,7 +152,7 @@ namespace Umbraco.Core
                 _providerName = "System.Data.SqlClient";
                 if (ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName] != null)
                 {
-                    if (!string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName))
+                    if (string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName) == false)
                         _providerName = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName;
                 }
                 else
@@ -638,7 +638,13 @@ namespace Umbraco.Core
                 var schemaResult = ValidateDatabaseSchema();
 
                 var installedSchemaVersion = new SemVersion(schemaResult.DetermineInstalledVersion());
-                var installedMigrationVersion = schemaResult.DetermineInstalledVersionByMigrations(migrationEntryService);
+
+                var installedMigrationVersion = new SemVersion(0);
+                //we cannot check the migrations table if it doesn't exist, this will occur when upgrading to 7.3
+                if (schemaResult.ValidTables.Any(x => x.InvariantEquals("umbracoMigration")))
+                {
+                    installedMigrationVersion = schemaResult.DetermineInstalledVersionByMigrations(migrationEntryService);    
+                }
 
                 var targetVersion = UmbracoVersion.Current;
                 
@@ -663,6 +669,12 @@ namespace Umbraco.Core
                 var runner = new MigrationRunner(migrationEntryService, _logger, currentVersion, UmbracoVersion.GetSemanticVersion(), GlobalSettings.UmbracoMigrationName);
 
                 var upgraded = runner.Execute(database, true);
+
+                if (upgraded == false)
+                {
+                    throw new ApplicationException("Upgrading failed, either an error occurred during the upgrade process or an event canceled the upgrade process, see log for full details");
+                }
+
                 message = message + "<p>Upgrade completed!</p>";
 
                 //now that everything is done, we need to determine the version of SQL server that is executing

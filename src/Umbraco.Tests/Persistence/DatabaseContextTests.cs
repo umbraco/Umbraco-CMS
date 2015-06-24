@@ -8,6 +8,8 @@ using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Profiling;
+using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence
@@ -90,8 +92,14 @@ namespace Umbraco.Tests.Persistence
 
             var schemaHelper = new DatabaseSchemaHelper(_dbContext.Database, Mock.Of<ILogger>(), new SqlCeSyntaxProvider());
 
+            var appCtx = new ApplicationContext(
+                new DatabaseContext(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test"),
+                new ServiceContext(migrationEntryService: Mock.Of<IMigrationEntryService>()), 
+                CacheHelper.CreateDisabledCacheHelper(),
+                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+
             //Create the umbraco database
-            schemaHelper.CreateDatabaseSchema(false, new ApplicationContext(CacheHelper.CreateDisabledCacheHelper()));
+            schemaHelper.CreateDatabaseSchema(false, appCtx);
 
             bool umbracoNodeTable = schemaHelper.TableExist("umbracoNode");
             bool umbracoUserTable = schemaHelper.TableExist("umbracoUser");

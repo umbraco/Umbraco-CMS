@@ -7,12 +7,21 @@ namespace Umbraco.Core
 {
     internal static class VersionExtensions
     {
-        public static Version GetVersion(this SemVersion semVersion)
+        public static Version GetVersion(this SemVersion semVersion, int maxParts = 4)
         {
             int build = 0;
             int.TryParse(semVersion.Build, out build);
 
-            return new Version(semVersion.Major, semVersion.Minor, semVersion.Patch, build);
+            if (maxParts > 4)
+            {
+                return new Version(semVersion.Major, semVersion.Minor, semVersion.Patch, build);    
+            }
+            if (maxParts == 3)
+            {
+                return new Version(semVersion.Major, semVersion.Minor, semVersion.Patch);
+            }
+
+            return new Version(semVersion.Major, semVersion.Minor);
         }
 
         public static Version SubtractRevision(this Version version)

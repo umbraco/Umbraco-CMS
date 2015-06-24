@@ -21,7 +21,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
             if (tables.InvariantContains("umbracoMigration")) return;
 
             Create.Table("umbracoMigration")
-                .WithColumn("id").AsInt32().NotNullable().PrimaryKey("PK_umbracoMigrations")
+                .WithColumn("id").AsInt32().NotNullable().PrimaryKey("PK_umbracoMigrations").Identity()
                 .WithColumn("name").AsString(255).NotNullable()
                 .WithColumn("version").AsString(50).NotNullable()
                 .WithColumn("createDate").AsDateTime().NotNullable().WithDefault(SystemMethods.CurrentDateTime);
