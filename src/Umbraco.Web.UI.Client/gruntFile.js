@@ -18,10 +18,10 @@ module.exports = function (grunt) {
     grunt.registerTask('watch-test', ['jshint:dev', 'karma:unit']);
 
     //triggered from grunt dev or grunt
-    grunt.registerTask('build', ['clean', 'concat', 'recess:min', 'recess:installer', 'recess:canvasdesigner', 'bower', 'copy']);
+    grunt.registerTask('build', ['clean', 'concat', 'recess:min', 'recess:installer', 'recess:canvasdesigner', 'bower-install-simple', 'bower', 'copy']);
 
     //build-dev doesn't min - we are trying to speed this up and we don't want minified stuff when we are in dev mode
-    grunt.registerTask('build-dev', ['clean', 'concat', 'recess:build', 'recess:installer', 'bower', 'copy']);
+    grunt.registerTask('build-dev', ['clean', 'concat', 'recess:build', 'recess:installer', 'bower-install-simple', 'bower', 'copy']);
 
     //utillity tasks
     grunt.registerTask('docs', ['ngdocs']);
@@ -410,12 +410,12 @@ module.exports = function (grunt) {
             }
         },
 
-        bower: {
+        bower: {            
             dev: {
                 dest: '<%= distdir %>/lib',
                 options: {
                     expand: true,
-                    ignorePackages: ['blueimp-canvas-to-blob', 'blueimp-tmpl', 'bootstrap'],
+                    ignorePackages: ['bootstrap'],
                     packageSpecific: {
                         'typeahead.js': {
                             keepExpandedHierarchy: false
@@ -438,17 +438,9 @@ module.exports = function (grunt) {
                         'jquery': {
                             files: ['jquery.min.js', 'jquery.min.map']
                         },
-                        'jquery-file-upload': {
-                            keepExpandedHierarchy: false,
-                            files: ['js/jquery.fileupload.js', 'js/jquery.fileupload-process.js', 'js/jquery.fileupload-angular.js', 'js/jquery.fileupload-image.js']
-                        },
                         'jquery-ui': {
                             keepExpandedHierarchy: false,
                             files: ['ui/minified/jquery-ui.min.js']
-                        },
-                        'blueimp-load-image': {
-                            keepExpandedHierarchy: false,
-                            files: ['js/load-image.all.min.js']
                         },
                         'tinymce': {
                             files: ['plugins/**', 'themes/**', 'tinymce.min.js']
@@ -469,6 +461,13 @@ module.exports = function (grunt) {
             options: {
                 expand: true
             }
+        },
+
+        "bower-install-simple": {
+            options: {
+                color: true
+            },
+            "dev": {}
         }
     });
 
@@ -486,6 +485,7 @@ module.exports = function (grunt) {
 
     grunt.loadNpmTasks('grunt-open');
     grunt.loadNpmTasks('grunt-contrib-connect');
+    grunt.loadNpmTasks("grunt-bower-install-simple");
     grunt.loadNpmTasks('grunt-bower');
     grunt.loadNpmTasks('grunt-ngdocs');
 

@@ -3,7 +3,7 @@
     "version": "7",
     "homepage": "https://github.com/umbraco/Umbraco-CMS",
     "authors": [
-        "Shannon <sdeminick@umbraco.com>"
+        "Shannon <shannon@umbraco.com>"
     ],
     "description": "Umbraco CMS",
     "license": "MIT",
@@ -22,12 +22,10 @@
         "rgrove-lazyload": "*",
         "bootstrap-social": "~4.8.0",
         "jquery": "2.0.3",
-        "jquery-file-upload": "~9.4.0",
         "jquery-ui": "1.10.3",
         "angular-dynamic-locale": "~0.1.27",
         "ng-file-upload": "~3.0.2",
         "tinymce": "~4.1.10",
         "bootstrap-tabdrop": "~1.0.0"
     }
-
 }
