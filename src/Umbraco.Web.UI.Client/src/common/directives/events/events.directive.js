@@ -195,4 +195,43 @@ angular.module('umbraco.directives')
             return false;
         });
     };
-});
+})
+
+.directive('onDelayedMouseleave', function ($timeout, $parse) {
+        return {
+
+            restrict: 'A',
+            
+            link: function (scope, element, attrs, ctrl) {
+                var active = false;
+                var fn = $parse(attrs.delayedMouseleave);
+
+                var leave_f = function(event) {
+                    var callback = function() {
+                        fn(scope, {$event:event});
+                    };
+
+                    active = false;
+                    $timeout(function(){
+                        if(active === false){
+                            scope.$apply(callback);
+                        }
+                    }, 650);
+                };
+
+                var enter_f = function(event, args){
+                    active = true;
+                };
+
+
+                element.on("mouseleave", leave_f);
+                element.on("mouseenter", enter_f);
+
+                //unsub events
+                scope.$on("$destroy", function(){
+                    element.off(leave_f);
+                    element.off(enter_f);
+                });
+            }
+        };
+    });
