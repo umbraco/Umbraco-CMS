@@ -42,14 +42,14 @@ module.exports = function (grunt) {
                     port: 9990,
                     hostname: '0.0.0.0',
                     base: './build',
-                    middleware: function (connect, options) {
+                    middleware: function(connect, options) {
                         return [
-                          //uncomment to enable CSP
-                          // util.csp(),
-                          //util.rewrite(),
-                          connect.favicon('images/favicon.ico'),
-                          connect.static(options.base),
-                          connect.directory(options.base)
+                            //uncomment to enable CSP
+                            // util.csp(),
+                            //util.rewrite(),
+                            connect.favicon('images/favicon.ico'),
+                            connect.static(options.base),
+                            connect.directory(options.base)
                         ];
                     }
                 }
@@ -60,13 +60,13 @@ module.exports = function (grunt) {
                     port: 8880,
                     hostname: '0.0.0.0',
                     base: './docs/api',
-                    middleware: function (connect, options) {
+                    middleware: function(connect, options) {
                         return [
-                          //uncomment to enable CSP
-                          // util.csp(),
-                          //util.rewrite(),
-                          connect.static(options.base),
-                          connect.directory(options.base)
+                            //uncomment to enable CSP
+                            // util.csp(),
+                            //util.rewrite(),
+                            connect.static(options.base),
+                            connect.directory(options.base)
                         ];
                     }
                 }
@@ -86,10 +86,10 @@ module.exports = function (grunt) {
         vsdir: '../Umbraco.Web.UI/umbraco',
         pkg: grunt.file.readJSON('package.json'),
         banner:
-        '/*! <%= pkg.title || pkg.name %>\n' +
-        '<%= pkg.homepage ? " * " + pkg.homepage + "\\n" : "" %>' +
-        ' * Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author %>;\n' +
-        ' * Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %>\n */\n',
+            '/*! <%= pkg.title || pkg.name %>\n' +
+                '<%= pkg.homepage ? " * " + pkg.homepage + "\\n" : "" %>' +
+                ' * Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author %>;\n' +
+                ' * Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %>\n */\n',
         src: {
             js: ['src/**/*.js', 'src/*.js'],
             common: ['src/common/**/*.js'],
@@ -153,7 +153,7 @@ module.exports = function (grunt) {
                     //everything except the index.html root file!
                     //then we need to figure out how to not copy all the test stuff either!?
                     { dest: '<%= vsdir %>/assets', src: '**', expand: true, cwd: '<%= distdir %>/assets' },
-                    { dest: '<%= vsdir %>/js', src: '**', expand: true, cwd: '<%= distdir %>/js' },                    
+                    { dest: '<%= vsdir %>/js', src: '**', expand: true, cwd: '<%= distdir %>/js' },
                     { dest: '<%= vsdir %>/views', src: '**', expand: true, cwd: '<%= distdir %>/views' },
                     { dest: '<%= vsdir %>/preview', src: '**', expand: true, cwd: '<%= distdir %>/preview' },
                     { dest: '<%= vsdir %>/lib', src: '**', expand: true, cwd: '<%= distdir %>/lib' }
@@ -417,7 +417,7 @@ module.exports = function (grunt) {
                     expand: true,
                     ignorePackages: ['blueimp-canvas-to-blob', 'blueimp-tmpl', 'bootstrap'],
                     packageSpecific: {
-                        'typeahead.js': {                            
+                        'typeahead.js': {
                             keepExpandedHierarchy: false
                         },
                         'underscore': {
@@ -458,6 +458,10 @@ module.exports = function (grunt) {
                         },
                         'bootstrap-tabdrop': {
                             keepExpandedHierarchy: false
+                        },
+                        'ng-file-upload': {
+                            keepExpandedHierarchy: false,
+                            files: ['angular-file-upload.min.js']
                         }
                     }
                 }
