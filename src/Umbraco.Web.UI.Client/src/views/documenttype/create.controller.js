@@ -6,7 +6,7 @@
  * @description
  * The controller for the doc type creation dialog
  */
-function contentCreateController($scope, $location, navigationService, contentTypeResource, formHelper, appState) {
+function contentTypeCreateController($scope, $location, navigationService, contentTypeResource, formHelper, appState) {
 
     $scope.model = {
         folderName: "",
@@ -46,4 +46,4 @@ function contentCreateController($scope, $location, navigationService, contentTy
     }
 }
 
-angular.module('umbraco').controller("Umbraco.Editors.DocumentType.CreateController", contentCreateController);
+angular.module('umbraco').controller("Umbraco.Editors.DocumentType.CreateController", contentTypeCreateController);
