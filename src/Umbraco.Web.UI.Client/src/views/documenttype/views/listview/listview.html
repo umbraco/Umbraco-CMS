@@ -1,4 +1,4 @@
-<div class="sub-view-columns" ng-controller="Umbraco.Editors.DocumentType.ListViewController">
+<div class="sub-view-columns" ng-controller="Umbraco.Editors.DocumentType.ListViewController as vm">
 
     <div class="sub-view-column-left">
         <h5>Enable list view</h5>
@@ -8,38 +8,38 @@
 
         <div class="sub-view-column-section">
             <label class="checkbox no-indent">
-                <input type="checkbox" ng-model="contentType.isContainer" ng-click="toggleListView()" /> Yes - enable list view
+                <input type="checkbox" ng-model="model.isContainer" ng-click="vm.toggleListView()" /> Yes - enable list view
             </label>
         </div>
 
         <div class="sub-view-column-section">
 
             <!-- list view enabled -->
-            <div class="list-view-container" ng-if="contentType.isContainer" ng-class="{'list-view-settings-open': listView.editDataTypeSettings}">
+            <div class="list-view-container" ng-if="model.isContainer" ng-class="{'list-view-settings-open': vm.editDataTypeSettings}">
 
                 <div class="list-view-container-content">
                     <i class="icon icon-list"></i>
                     <div>
                         <div>
-                            <div class="list-view-name">{{ listView.dataType.name }} <em ng-if="!listView.customListViewCreated">(default)</em></div>
-                            <a href="" ng-click="toggleEditListViewDataTypeSettings()"><i class="icon icon-settings"></i></a>
+                            <div class="list-view-name">{{ vm.dataType.name }} <em ng-if="!vm.customListViewCreated">(default)</em></div>
+                            <a href="" ng-click="vm.toggleEditListViewDataTypeSettings()"><i class="icon icon-settings"></i></a>
                         </div>
-                        <a href="" class="list-view-create-new" ng-if="!listView.customListViewCreated" ng-click="createCustomListViewDataType()">Create custom list view</a>
-                        <a href="" class="list-view-remove-new" ng-if="listView.customListViewCreated" ng-click="removeCustomListDataType()">Remove custom list view</a>
+                        <a href="" class="list-view-create-new" ng-if="!vm.customListViewCreated" ng-click="vm.createCustomListViewDataType()">Create custom list view</a>
+                        <a href="" class="list-view-remove-new" ng-if="vm.customListViewCreated" ng-click="vm.removeCustomListDataType()">Remove custom list view</a>
                     </div>
                 </div>
 
             </div>
 
             <!-- list view settings -->
-            <div class="list-view-settings form-horizontal" ng-if="listView.editDataTypeSettings" ng-class="{'list-view-settings-open': listView.editDataTypeSettings}">
+            <div class="list-view-settings form-horizontal" ng-if="vm.editDataTypeSettings" ng-class="{'list-view-settings-open': vm.editDataTypeSettings}">
 
-                <umb-property property="preValue" ng-repeat="preValue in listView.dataType.preValues">
+                <umb-property property="preValue" ng-repeat="preValue in vm.dataType.preValues">
                     <umb-editor model="preValue" is-pre-value="true"></umb-editor>
                 </umb-property>
 
-                <button type="button" class="btn" ng-click="toggleEditListViewDataTypeSettings()">Close</button>
-                <button type="button" class="btn btn-success" ng-click="saveListViewDataType()">Save list view</button>
+                <button type="button" class="btn" ng-click="vm.toggleEditListViewDataTypeSettings()">Close</button>
+                <button type="button" class="btn btn-success" ng-click="vm.saveListViewDataType()">Save list view</button>
 
             </div>
 

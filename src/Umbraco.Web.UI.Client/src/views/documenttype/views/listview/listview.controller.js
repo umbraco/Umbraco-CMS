@@ -6,150 +6,162 @@
  * @description
  * The controller for the content type editor list view section
  */
-function ListViewController($scope, contentTypeResource, dataTypeResource, dataTypeHelper) {
+(function() {
+    'use strict';
 
-    /* ---------- SCOPE VARIABLES ---------- */
+    function ListViewController($scope, contentTypeResource, dataTypeResource, dataTypeHelper) {
 
-    $scope.listView = {};
-    $scope.listView.dataType = {};
-    $scope.listView.editDataTypeSettings = false;
-    $scope.listView.customListViewCreated = false;
+        /* ---------- SCOPE VARIABLES ---------- */
+
+        var vm = this;
+
+        vm.toggleListView = toggleListView;
+        vm.toggleEditListViewDataTypeSettings = toggleEditListViewDataTypeSettings;
+        vm.saveListViewDataType = saveListViewDataType;
+        vm.createCustomListViewDataType = createCustomListViewDataType;
+        vm.removeCustomListDataType = removeCustomListDataType;
+
+        vm.dataType = {};
+        vm.editDataTypeSettings = false;
+        vm.customListViewCreated = false;
 
 
-    /* ---------- INIT ---------- */
+        /* ---------- INIT ---------- */
 
-    init();
+        init();
 
-    function init() {
+        function init() {
 
-        if($scope.contentType.isContainer) {
+            if($scope.model.isContainer) {
 
-            contentTypeResource.getAssignedListViewDataType($scope.contentType.id)
-                .then(function(dataType) {
+                contentTypeResource.getAssignedListViewDataType($scope.model.id)
+                    .then(function(dataType) {
 
-                    $scope.listView.dataType = dataType;
+                        vm.dataType = dataType;
 
-                    $scope.listView.customListViewCreated = checkForCustomListView();
+                        vm.customListViewCreated = checkForCustomListView();
 
-                });
+                    });
+            }
         }
+
+        /* ----------- LIST VIEW --------- */
+
+        function toggleListView() {
+
+            if($scope.model.isContainer) {
+
+                // add list view data type
+                contentTypeResource.getAssignedListViewDataType($scope.model.id)
+                    .then(function(dataType) {
+
+                        vm.dataType = dataType;
+
+                        vm.customListViewCreated = checkForCustomListView();
+
+                    });
+
+            } else {
+
+                vm.dataType = {};
+
+            }
+
+        }
+
+
+        /* ----------- LIST VIEW SETTINGS --------- */
+
+        function toggleEditListViewDataTypeSettings() {
+
+            if(!vm.editDataTypeSettings) {
+
+                // get dataType
+                dataTypeResource.getById(vm.dataType.id)
+                    .then(function(dataType) {
+
+                        // store data type
+                        vm.dataType = dataType;
+
+                        // show edit panel
+                        vm.editDataTypeSettings = true;
+
+                    });
+
+            } else {
+
+                // hide edit panel
+                vm.editDataTypeSettings = false;
+
+            }
+
+        }
+
+        function saveListViewDataType() {
+
+            var preValues = dataTypeHelper.createPreValueProps(vm.dataType.preValues);
+
+            dataTypeResource.save(vm.dataType, preValues, false).then(function(dataType) {
+
+                // store data type
+                vm.dataType = dataType;
+
+                // hide settings panel
+                vm.editDataTypeSettings = false;
+
+            });
+
+        }
+
+
+        /* ---------- CUSTOM LIST VIEW ---------- */
+
+        function createCustomListViewDataType() {
+
+            dataTypeResource.createCustomListView($scope.model.alias).then(function(dataType) {
+
+                // store data type
+                vm.dataType = dataType;
+
+                // change state to custom list view
+                vm.customListViewCreated = true;
+
+                // show settings panel
+                vm.editDataTypeSettings = true;
+
+            });
+
+        }
+
+        function removeCustomListDataType() {
+
+            // delete custom list view data type
+            dataTypeResource.deleteById(vm.dataType.id).then(function(dataType) {
+
+                // get default data type
+                contentTypeResource.getAssignedListViewDataType($scope.model.id)
+                    .then(function(dataType) {
+
+                        // store data type
+                        vm.dataType = dataType;
+
+                        // change state to default list view
+                        vm.customListViewCreated = false;
+
+                    });
+
+            });
+
+        }
+
+
+        function checkForCustomListView() {
+            return vm.dataType.name === "List View - " + $scope.model.alias;
+        }
+
+
     }
 
-    /* ----------- LIST VIEW --------- */
+    angular.module("umbraco").controller("Umbraco.Editors.DocumentType.ListViewController", ListViewController);
 
-    $scope.toggleListView = function() {
-
-        if($scope.contentType.isContainer) {
-
-            // add list view data type
-            contentTypeResource.getAssignedListViewDataType($scope.contentType.id)
-                .then(function(dataType) {
-
-                    $scope.listView.dataType = dataType;
-
-                    $scope.listView.customListViewCreated = checkForCustomListView();
-
-                });
-
-        } else {
-
-            $scope.listView.dataType = {};
-
-        }
-
-    };
-
-
-    /* ----------- LIST VIEW SETTINGS --------- */
-
-    $scope.toggleEditListViewDataTypeSettings = function() {
-
-        if(!$scope.listView.editDataTypeSettings) {
-
-            // get dataType
-            dataTypeResource.getById($scope.listView.dataType.id)
-                .then(function(dataType) {
-
-                    // store data type
-                    $scope.listView.dataType = dataType;
-
-                    // show edit panel
-                    $scope.listView.editDataTypeSettings = true;
-
-                });
-
-        } else {
-
-            // hide edit panel
-            $scope.listView.editDataTypeSettings = false;
-
-        }
-
-    };
-
-    $scope.saveListViewDataType = function() {
-
-        var preValues = dataTypeHelper.createPreValueProps($scope.listView.dataType.preValues);
-
-        dataTypeResource.save($scope.listView.dataType, preValues, false).then(function(dataType) {
-
-            // store data type
-            $scope.listView.dataType = dataType;
-
-            // hide settings panel
-            $scope.listView.editDataTypeSettings = false;
-
-        });
-
-    };
-
-
-    /* ---------- CUSTOM LIST VIEW ---------- */
-
-    $scope.createCustomListViewDataType = function() {
-
-        dataTypeResource.createCustomListView($scope.contentType.alias).then(function(dataType) {
-
-            // store data type
-            $scope.listView.dataType = dataType;
-
-            // change state to custom list view
-            $scope.listView.customListViewCreated = true;
-
-            // show settings panel
-            $scope.listView.editDataTypeSettings = true;
-
-        });
-
-    };
-
-    $scope.removeCustomListDataType = function() {
-
-        // delete custom list view data type
-        dataTypeResource.deleteById($scope.listView.dataType.id).then(function(dataType) {
-
-            // get default data type
-            contentTypeResource.getAssignedListViewDataType($scope.contentType.id)
-                .then(function(dataType) {
-
-                    // store data type
-                    $scope.listView.dataType = dataType;
-
-                    // change state to default list view
-                    $scope.listView.customListViewCreated = false;
-
-                });
-
-        });
-
-    };
-
-
-    function checkForCustomListView() {
-        return $scope.listView.dataType.name === "List View - " + $scope.contentType.alias;
-    }
-
-
-}
-
-angular.module("umbraco").controller("Umbraco.Editors.DocumentType.ListViewController", ListViewController);
+})();
