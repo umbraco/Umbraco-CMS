@@ -303,12 +303,16 @@
     <Compile Include="AreaRegistrationContextExtensions.cs" />
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
     <Compile Include="Models\ContentEditing\ContentTypeDisplay.cs" />
+    <Compile Include="Media\EmbedProviders\Flickr.cs" />
     <Compile Include="Models\ContentEditing\MemberTypeDisplay.cs" />
     <Compile Include="PropertyEditors\DatePreValueEditor.cs" />
     <Compile Include="Security\Identity\GetUserSecondsMiddleWare.cs" />
     <Compile Include="Models\ContentEditing\PropertyTypeDisplay.cs" />
     <Compile Include="Models\ContentEditing\PropertyGroupDisplay.cs" />
     <Compile Include="Models\Mapping\AvailableCompositeContentTypesResolver.cs" />
+    <Compile Include="Media\EmbedProviders\OEmbedJson.cs" />
+    <Compile Include="Media\EmbedProviders\OEmbedResponse.cs" />
+    <Compile Include="Media\EmbedProviders\OEmbedPhoto.cs" />
     <Compile Include="Models\Mapping\MemberTypeModelMapper.cs" />
     <Compile Include="Models\Mapping\PropertyTypeGroupResolver.cs" />
     <Compile Include="Trees\ContentTypeTreeController.cs" />
@@ -919,7 +923,6 @@
     <Compile Include="Scheduling\Scheduler.cs" />
     <Compile Include="Media\EmbedProviders\AbstractOEmbedProvider.cs" />
     <Compile Include="Media\EmbedProviders\AbstractProvider.cs" />
-    <Compile Include="Media\EmbedProviders\Flickr.cs" />
     <Compile Include="Media\EmbedProviders\OEmbedRich.cs" />
     <Compile Include="Media\EmbedProviders\OEmbedVideo.cs" />
     <Compile Include="Media\EmbedProviders\Settings\Dictionary.cs" />

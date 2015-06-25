@@ -36,11 +36,11 @@
 
             <form method="POST" name="loginForm" ng-submit="loginSubmit(login, password)">
                 <div class="control-group" ng-class="{error: loginForm.username.$invalid}">
-                    <input type="text" autofocus ng-model="login" name="username" class="input-xlarge" localize="placeholder" placeholder="@placeholders_username" />
+                    <input type="text" autofocus ng-model="login" name="username" class="input-xlarge" localize="placeholder" placeholder="@placeholders_username" autocomplete="off" />
                 </div>
 
                 <div class="control-group" ng-class="{error: loginForm.password.$invalid}">
-                    <input type="password" ng-model="password" name="password" class="input-xlarge" localize="placeholder" placeholder="@placeholders_password" />
+                    <input type="password" ng-model="password" name="password" class="input-xlarge" localize="placeholder" placeholder="@placeholders_password" autocomplete="off" />
                 </div>
 
                 <button type="submit" class="btn" val-trigger-change="#login .form input"><localize key="general_login">Login</localize></button>
