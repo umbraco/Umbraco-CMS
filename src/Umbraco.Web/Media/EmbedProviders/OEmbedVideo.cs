@@ -9,7 +9,7 @@ namespace Umbraco.Web.Media.EmbedProviders
             string requestUrl = BuildFullUrl(url, maxWidth, maxHeight);
 
             XmlDocument doc = GetXmlResponse(requestUrl);
-            return GetXmlProperty(doc, "/oembed/Html");
+            return GetXmlProperty(doc, "/oembed/html");
         }
     }
 }
