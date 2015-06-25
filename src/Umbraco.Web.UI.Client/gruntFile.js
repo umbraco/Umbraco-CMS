@@ -92,7 +92,10 @@ module.exports = function (grunt) {
                 ' * Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %>\n */\n',
         src: {
             js: ['src/**/*.js', 'src/*.js'],
+            
             common: ['src/common/**/*.js'],
+            controllers: ['src/**/*.controller.js'],
+
             specs: ['test/**/*.spec.js'],
             scenarios: ['test/**/*.scenario.js'],
             samples: ['sample files/*.js'],
@@ -195,6 +198,7 @@ module.exports = function (grunt) {
                 src: ['src/canvasdesigner/canvasdesigner.global.js', 'src/canvasdesigner/canvasdesigner.controller.js', 'src/canvasdesigner/editors/*.js', 'src/canvasdesigner/lib/*.js'],
                 dest: '<%= distdir %>/js/canvasdesigner.panel.js'
             },
+
             controllers: {
                 src: ['src/controllers/**/*.controller.js', 'src/views/**/*.controller.js'],
                 dest: '<%= distdir %>/js/umbraco.controllers.js',
@@ -203,6 +207,7 @@ module.exports = function (grunt) {
                     footer: "\n\n})();"
                 }
             },
+
             services: {
                 src: ['src/common/services/*.js'],
                 dest: '<%= distdir %>/js/umbraco.services.js',
@@ -211,6 +216,7 @@ module.exports = function (grunt) {
                     footer: "\n\n})();"
                 }
             },
+
             security: {
                 src: ['src/common/security/*.js'],
                 dest: '<%= distdir %>/js/umbraco.security.js',
@@ -219,6 +225,7 @@ module.exports = function (grunt) {
                     footer: "\n\n})();"
                 }
             },
+
             resources: {
                 src: ['src/common/resources/*.js'],
                 dest: '<%= distdir %>/js/umbraco.resources.js',
@@ -227,6 +234,7 @@ module.exports = function (grunt) {
                     footer: "\n\n})();"
                 }
             },
+
             testing: {
                 src: ['src/common/mocks/*/*.js'],
                 dest: '<%= distdir %>/js/umbraco.testing.js',
@@ -235,6 +243,7 @@ module.exports = function (grunt) {
                     footer: "\n\n})();"
                 }
             },
+
             directives: {
                 src: ['src/common/directives/**/*.js'],
                 dest: '<%= distdir %>/js/umbraco.directives.js',
@@ -243,6 +252,7 @@ module.exports = function (grunt) {
                     footer: "\n\n})();"
                 }
             },
+
             filters: {
                 src: ['src/common/filters/*.js'],
                 dest: '<%= distdir %>/js/umbraco.filters.js',
@@ -356,16 +366,21 @@ module.exports = function (grunt) {
             }
         },
 
+        eslint:{
+            src: ['<%= src.common %>','<%= src.controllers %>'],
+            options: {quiet: true}
+        },
+
         jshint: {
             dev: {
                 files: {
-                    src: ['<%= src.common %>', '<%= src.specs %>', '<%= src.scenarios %>', '<%= src.samples %>']
+                    src: ['<%= src.common %>']
                 },
                 options: {
                     curly: true,
                     eqeqeq: true,
                     immed: true,
-                    latedef: true,
+                    latedef: "nofunc",
                     newcap: true,
                     noarg: true,
                     sub: true,
@@ -390,7 +405,7 @@ module.exports = function (grunt) {
                     curly: true,
                     eqeqeq: true,
                     immed: true,
-                    latedef: true,
+                    latedef: "nofunc",
                     newcap: true,
                     noarg: true,
                     sub: true,
@@ -489,4 +504,5 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-bower');
     grunt.loadNpmTasks('grunt-ngdocs');
 
+    grunt.loadNpmTasks('grunt-eslint');
 };
