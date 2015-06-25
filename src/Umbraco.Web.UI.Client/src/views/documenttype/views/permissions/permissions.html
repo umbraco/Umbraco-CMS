@@ -22,59 +22,13 @@
         </div>
 
         <div class="sub-view-column-right">
-
-            <div class="node-tree">
-
-                <!-- CURRENT CONTENT TYPE -->
-                <div class="node node-parent">
-                    <div class="node-description">
-                        <div class="node-icon-wrapper">
-                            <i class="icon {{ model.icon }}"></i>
-                        </div>
-                        <span class="node-name">{{ model.name }}</span>
-                        <small>(Current)</small>
-                    </div>
-                </div>
-
-                <div class="child-notes-wrapper">
-
-                    <!-- ADDED NODES -->
-                    <div class="node node-child" ng-repeat="allowedType in model.allowedContentTypes">
-                        <div class="node-description">
-                            <div class="node-icon-wrapper">
-                                <i class="icon {{ allowedType.icon }}"></i>
-                            </div>
-                            <span class="node-name"> {{ allowedType.name }}</span>
-                        </div>
-                        <div class="node-actions">
-                            <i class="icon icon-trash" ng-click="vm.removeAllowedChildNode(allowedType)"></i>
-                        </div>
-                    </div>
-
-                    <!-- NODE PLACEHOLDER -->
-                    <div class="node node-placeholder" ng-if="(vm.contentTypes | compareArrays:model.allowedContentTypes:'alias').length > 0" ng-click="vm.addItemOverlay($event)">
-                        <div class="node-placeholder-text">Allow child node</div>
-                    </div>
-
-                    <!-- ALL NODES ADDED -->
-                    <div class="text-center" ng-if="(vm.contentTypes | compareArrays:model.allowedContentTypes:'alias').length === 0">
-                        <small>All content types are added as child nodes</small>
-                    </div>
-
-                </div>
-
-            </div>
-
+            <umb-child-selector
+                    selected-children="model.allowedContentTypes"
+                    available-children="vm.contentTypes"
+                    parent="vm.parent">
+            </umb-child-selector>
         </div>
 
     </div>
-    <umb-overlay
-            ng-style=""
-            ng-if="vm.showDialog"
-            model="vm.dialogModel"
-            animation="slide-in-right"
-            position="target"
-            view="vm.dialogModel.view">
-    </umb-overlay>
 
 </div>
