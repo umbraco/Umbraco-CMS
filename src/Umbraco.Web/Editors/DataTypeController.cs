@@ -116,7 +116,7 @@ namespace Umbraco.Web.Editors
 
 
         [UmbracoTreeAuthorize(Constants.Trees.DataTypes, Constants.Trees.Content, Constants.Trees.Media)]
-        public IDictionary<string, List<DataTypeBasic>> GetAllDataTypesAndEditors()
+        public IDictionary<string, IEnumerable<DataTypeBasic>> GetAllDataTypesAndEditors()
         {  
             var datadefs = Services.DataTypeService
                                     .GetAllDataTypeDefinitions();
@@ -130,7 +130,7 @@ namespace Umbraco.Web.Editors
             foreach (var unusedEditor in editors)
                 datatypes.Add(Mapper.Map<DataTypeBasic>(unusedEditor));
 
-            var grouped = datatypes.GroupBy(x => x.Group.ToLower()).ToDictionary(group => group.Key, group => group.ToList());
+            var grouped = datatypes.GroupBy(x => x.Group.ToLower()).ToDictionary(group => group.Key, group => group.AsEnumerable());
             return grouped;
         }
 
