@@ -104,7 +104,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork))
             {
                 // Act
-                var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test", propertyGroupName:"testGroup");
+                var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test", propertyGroupName: "testGroup");
                 repository.AddOrUpdate(contentType);
                 unitOfWork.Commit();
 
@@ -118,12 +118,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(contentType.PropertyGroups.ElementAt(0).Name == "testGroup", Is.True);
                 var groupId = contentType.PropertyGroups.ElementAt(0).Id;
                 Assert.That(contentType.PropertyTypes.All(x => x.PropertyGroupId.Value == groupId), Is.True);
-            
+
                 foreach (var propertyType in contentType.PropertyTypes)
                 {
                     Assert.AreNotEqual(propertyType.Key, Guid.Empty);
                 }
-            
+            }
         }
 
         [Test]
