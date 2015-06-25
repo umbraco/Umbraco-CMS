@@ -12,7 +12,7 @@ namespace Umbraco.Core
             int build = 0;
             int.TryParse(semVersion.Build, out build);
 
-            if (maxParts > 4)
+            if (maxParts >= 4)
             {
                 return new Version(semVersion.Major, semVersion.Minor, semVersion.Patch, build);    
             }
