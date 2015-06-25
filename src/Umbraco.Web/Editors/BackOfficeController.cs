@@ -526,9 +526,7 @@ namespace Umbraco.Web.Editors
                     {"assemblyVersion", UmbracoVersion.AssemblyVersion}
                 };
 
-            var version = string.IsNullOrEmpty(UmbracoVersion.CurrentComment)
-                            ? UmbracoVersion.Current.ToString(3)
-                            : string.Format("{0}-{1}", UmbracoVersion.Current.ToString(3), UmbracoVersion.CurrentComment);
+            var version = UmbracoVersion.GetSemanticVersion().ToString();
 
             app.Add("version", version);
             app.Add("cdf", ClientDependency.Core.Config.ClientDependencySettings.Instance.Version);

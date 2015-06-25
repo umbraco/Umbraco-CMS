@@ -9,6 +9,12 @@ namespace Umbraco.Core.Models.Rdbms
     [ExplicitColumns]
     internal class NodeDto
     {
+        public NodeDto()
+        {
+            //By default, always generate a new guid
+            UniqueId = Guid.NewGuid();
+        }
+
         public const int NodeIdSeed = 1050;
 
         [Column("id")]
@@ -42,6 +48,7 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("uniqueID")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
         [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoNodeUniqueID")]
+        [Constraint(Default = "newid()")]
         public Guid UniqueId { get; set; }
 
         [Column("text")]

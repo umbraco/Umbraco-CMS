@@ -1285,37 +1285,43 @@ namespace Umbraco.Core.Services
                 {
                     Name = Constants.Conventions.Member.CommentsLabel,
                     SortOrder = 0,
-                    Id = --identity
+                    Id = --identity,
+                    Key = identity.ToGuid()
                 });
             propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.TrueFalseAlias, DataTypeDatabaseType.Integer, Constants.Conventions.Member.IsApproved)
                 {
                     Name = Constants.Conventions.Member.IsApprovedLabel,
                     SortOrder = 3,
-                    Id = --identity
+                    Id = --identity,
+                    Key = identity.ToGuid()
                 });
             propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.TrueFalseAlias, DataTypeDatabaseType.Integer, Constants.Conventions.Member.IsLockedOut)
                 {
                     Name = Constants.Conventions.Member.IsLockedOutLabel,
                     SortOrder = 4,
-                    Id = --identity
+                    Id = --identity,
+                    Key = identity.ToGuid()
                 });
             propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.NoEditAlias, DataTypeDatabaseType.Date, Constants.Conventions.Member.LastLockoutDate)
                 {
                     Name = Constants.Conventions.Member.LastLockoutDateLabel,
                     SortOrder = 5,
-                    Id = --identity
+                    Id = --identity,
+                    Key = identity.ToGuid()
                 });
             propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.NoEditAlias, DataTypeDatabaseType.Date, Constants.Conventions.Member.LastLoginDate)
                 {
                     Name = Constants.Conventions.Member.LastLoginDateLabel,
                     SortOrder = 6,
-                    Id = --identity
+                    Id = --identity,
+                    Key = identity.ToGuid()
                 });
             propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.NoEditAlias, DataTypeDatabaseType.Date, Constants.Conventions.Member.LastPasswordChangeDate)
                 {
                     Name = Constants.Conventions.Member.LastPasswordChangeDateLabel,
                     SortOrder = 7,
-                    Id = --identity
+                    Id = --identity,
+                    Key = identity.ToGuid()
                 });
 
             memType.PropertyGroups.Add(propGroup);

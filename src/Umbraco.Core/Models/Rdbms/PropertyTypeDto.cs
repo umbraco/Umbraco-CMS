@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Persistence;
+﻿using System;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
@@ -8,6 +9,12 @@ namespace Umbraco.Core.Models.Rdbms
     [ExplicitColumns]
     internal class PropertyTypeDto
     {
+        public PropertyTypeDto()
+        {
+            //by default always create a new guid
+            UniqueId = Guid.NewGuid();
+        }
+
         [Column("id")]
         [PrimaryKeyColumn(IdentitySeed = 50)]
         public int Id { get; set; }
@@ -51,5 +58,11 @@ namespace Umbraco.Core.Models.Rdbms
 
         [ResultColumn]
         public DataTypeDto DataTypeDto { get; set; }
+
+        [Column("UniqueID")]
+        [NullSetting(NullSetting = NullSettings.NotNull)]
+        [Constraint(Default = "newid()")]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_cmsPropertyTypeUniqueID")]
+        public Guid UniqueId { get; set; }
     }
 }

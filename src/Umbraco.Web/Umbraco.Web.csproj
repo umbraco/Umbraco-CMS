@@ -181,6 +181,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
+    <Reference Include="Semver, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\semver.1.1.2\lib\net45\Semver.dll</HintPath>
+    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
@@ -298,8 +302,12 @@
     <Compile Include="ApplicationContextExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
+    <Compile Include="Media\EmbedProviders\Flickr.cs" />
     <Compile Include="PropertyEditors\DatePreValueEditor.cs" />
     <Compile Include="Security\Identity\GetUserSecondsMiddleWare.cs" />
+    <Compile Include="Media\EmbedProviders\OEmbedJson.cs" />
+    <Compile Include="Media\EmbedProviders\OEmbedResponse.cs" />
+    <Compile Include="Media\EmbedProviders\OEmbedPhoto.cs" />
     <Compile Include="UmbracoDefaultOwinStartup.cs" />
     <Compile Include="IUmbracoContextAccessor.cs" />
     <Compile Include="Models\ContentEditing\Relation.cs" />
@@ -906,7 +914,6 @@
     <Compile Include="Scheduling\Scheduler.cs" />
     <Compile Include="Media\EmbedProviders\AbstractOEmbedProvider.cs" />
     <Compile Include="Media\EmbedProviders\AbstractProvider.cs" />
-    <Compile Include="Media\EmbedProviders\Flickr.cs" />
     <Compile Include="Media\EmbedProviders\OEmbedRich.cs" />
     <Compile Include="Media\EmbedProviders\OEmbedVideo.cs" />
     <Compile Include="Media\EmbedProviders\Settings\Dictionary.cs" />

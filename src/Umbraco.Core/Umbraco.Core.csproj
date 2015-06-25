@@ -95,6 +95,9 @@
     <Reference Include="Owin">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
+    <Reference Include="Semver">
+      <HintPath>..\packages\semver.1.1.2\lib\net45\Semver.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
@@ -374,7 +377,9 @@
     <Compile Include="Persistence\Mappers\DomainMapper.cs" />
     <Compile Include="Persistence\Mappers\MigrationEntryMapper.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\AddExternalLoginsTable.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\AddMigrationTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\AddPublicAccessTables.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\AddUniqueIdPropertyTypeColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\AddUserColumns.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\MovePublicAccessXmlDataToDb.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\RemoveHelpTextColumn.cs" />
@@ -1313,6 +1318,7 @@
     <Compile Include="StringExtensions.cs" />
     <Compile Include="UriExtensions.cs" />
     <Compile Include="SystemUtilities.cs" />
+    <Compile Include="VersionExtensions.cs" />
     <Compile Include="WriteLock.cs" />
     <Compile Include="XmlExtensions.cs" />
     <Compile Include="XmlHelper.cs" />

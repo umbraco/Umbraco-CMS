@@ -243,7 +243,7 @@ namespace Umbraco.Core
                 try
                 {
                     var configStatus = ConfigurationStatus;
-                    var currentVersion = UmbracoVersion.Current.ToString(3);
+                    var currentVersion = UmbracoVersion.GetSemanticVersion();
                     var ok = configStatus == currentVersion;
 
                     if (ok)
@@ -252,7 +252,7 @@ namespace Umbraco.Core
                         // if we have a db context available, if we don't then we are not installed anyways
                         if (DatabaseContext.IsDatabaseConfigured && DatabaseContext.CanConnect)
                         {
-                            var found = Services.MigrationEntryService.FindEntry(GlobalSettings.UmbracoMigrationName, UmbracoVersion.Current);
+                            var found = Services.MigrationEntryService.FindEntry(GlobalSettings.UmbracoMigrationName, UmbracoVersion.GetSemanticVersion());
                             if (found == null)
                             {
                                 //we haven't executed this migration in this environment, so even though the config versions match, 

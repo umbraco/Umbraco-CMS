@@ -97,6 +97,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="Semver">
+      <HintPath>..\packages\semver.1.1.2\lib\net45\Semver.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.configuration" />
@@ -551,6 +554,7 @@
     <Compile Include="TestHelpers\FakeHttpContextFactory.cs" />
     <Compile Include="Plugins\TypeFinderTests.cs" />
     <Compile Include="Routing\UmbracoModuleTests.cs" />
+    <Compile Include="VersionExtensionTests.cs" />
     <Compile Include="XmlExtensionsTests.cs" />
     <Compile Include="XmlHelperTests.cs" />
   </ItemGroup>

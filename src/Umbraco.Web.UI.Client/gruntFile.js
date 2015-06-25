@@ -18,10 +18,10 @@ module.exports = function (grunt) {
     grunt.registerTask('watch-test', ['jshint:dev', 'karma:unit']);
 
     //triggered from grunt dev or grunt
-    grunt.registerTask('build', ['clean', 'concat', 'recess:min', 'recess:installer', 'recess:canvasdesigner', 'bower', 'copy']);
+    grunt.registerTask('build', ['clean', 'concat', 'recess:min', 'recess:installer', 'recess:canvasdesigner', 'bower-install-simple', 'bower', 'copy']);
 
     //build-dev doesn't min - we are trying to speed this up and we don't want minified stuff when we are in dev mode
-    grunt.registerTask('build-dev', ['clean', 'concat', 'recess:build', 'recess:installer', 'bower', 'copy']);
+    grunt.registerTask('build-dev', ['clean', 'concat', 'recess:build', 'recess:installer', 'bower-install-simple', 'bower', 'copy']);
 
     //utillity tasks
     grunt.registerTask('docs', ['ngdocs']);
@@ -458,6 +458,22 @@ module.exports = function (grunt) {
                         },
                         'bootstrap-tabdrop': {
                             keepExpandedHierarchy: false
+                        },
+                        'codemirror': {
+                            files: [
+                                'lib/codemirror.js',
+                                'lib/codemirror.css',
+
+                                'mode/css/*',
+                                'mode/javascript/*',
+                                'mode/xml/*',
+                                'mode/htmlmixed/*',
+
+                                'addon/search/*',
+                                'addon/edit/*',
+                                'addon/selection/*',
+                                'addon/dialog/*'
+                            ]
                         }
                     }
                 }
@@ -465,6 +481,13 @@ module.exports = function (grunt) {
             options: {
                 expand: true
             }
+        },
+
+        "bower-install-simple": {
+            options: {
+                color: true
+            },
+            "dev": {}
         }
     });
 
@@ -482,6 +505,7 @@ module.exports = function (grunt) {
 
     grunt.loadNpmTasks('grunt-open');
     grunt.loadNpmTasks('grunt-contrib-connect');
+    grunt.loadNpmTasks("grunt-bower-install-simple");
     grunt.loadNpmTasks('grunt-bower');
     grunt.loadNpmTasks('grunt-ngdocs');
 

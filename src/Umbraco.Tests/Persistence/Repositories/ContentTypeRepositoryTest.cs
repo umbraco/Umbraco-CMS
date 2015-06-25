@@ -109,7 +109,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(contentType.HasIdentity, Is.True);
                 Assert.That(contentType.PropertyGroups.All(x => x.HasIdentity), Is.True);
                 Assert.That(contentType.Path.Contains(","), Is.True);
-                Assert.That(contentType.SortOrder, Is.GreaterThan(0));    
+                Assert.That(contentType.SortOrder, Is.GreaterThan(0));
+
+                foreach (var propertyType in contentType.PropertyTypes)
+                {
+                    Assert.AreNotEqual(propertyType.Key, Guid.Empty);
+                }
             }
             
         }
