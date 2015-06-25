@@ -26,6 +26,7 @@
         "angular-dynamic-locale": "~0.1.27",
         "ng-file-upload": "~3.0.2",
         "tinymce": "~4.1.10",
-        "bootstrap-tabdrop": "~1.0.0"
+    "bootstrap-tabdrop": "~1.0.0",
+    "codemirror": "~5.3.0"
     }
 }

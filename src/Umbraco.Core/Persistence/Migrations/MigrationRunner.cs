@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using log4net;
 using Semver;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Migrations.Syntax.IfDatabase;
@@ -255,7 +257,11 @@ namespace Umbraco.Core.Persistence.Migrations
                 //NOTE: We CANNOT do this as part of the transaction!!! This is because when upgrading to 7.3, we cannot
                 // create the migrations table and then add data to it in the same transaction without issuing things like GO
                 // commands and since we need to support all Dbs, we need to just do this after the fact.
-                _migrationEntryService.CreateEntry(_productName, _targetVersion);
+                var exists = _migrationEntryService.FindEntry(GlobalSettings.UmbracoMigrationName, _targetVersion);
+                if (exists == null)
+                {
+                    _migrationEntryService.CreateEntry(_productName, _targetVersion);    
+                }
                
             }
         }

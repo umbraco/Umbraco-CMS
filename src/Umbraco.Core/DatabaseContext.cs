@@ -656,17 +656,28 @@ namespace Umbraco.Core
                     //set the installedMigrationVersion to be one less than the target so the latest migrations are guaranteed to execute
                     installedMigrationVersion = new SemVersion(targetVersion.SubtractRevision());
                 }
-
-                //DO the upgrade!
-
-                var currentVersion = string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus)
+                
+                //Figure out what our current installed version is. If the web.config doesn't have a version listed, then we'll use the minimum
+                // version detected between the schema installed and the migrations listed in the migration table. 
+                // If there is a version in the web.config, we'll take the minimum between the listed migration in the db and what
+                // is declared in the web.config.
+                
+                var currentInstalledVersion = string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus)
                     //Take the minimum version between the detected schema version and the installed migration version
                     ? new[] {installedSchemaVersion, installedMigrationVersion}.Min()
                     //Take the minimum version between the installed migration version and the version specified in the config
                     : new[] { SemVersion.Parse(GlobalSettings.ConfigurationStatus), installedMigrationVersion }.Min();
 
+                //Ok, another edge case here. If the current version is a pre-release, 
+                // then we want to ensure all migrations for the current release are executed. 
+                if (currentInstalledVersion.Prerelease.IsNullOrWhiteSpace() == false)
+                {
+                    currentInstalledVersion  = new SemVersion(currentInstalledVersion.GetVersion().SubtractRevision());
+                }
 
-                var runner = new MigrationRunner(migrationEntryService, _logger, currentVersion, UmbracoVersion.GetSemanticVersion(), GlobalSettings.UmbracoMigrationName);
+                //DO the upgrade!
+
+                var runner = new MigrationRunner(migrationEntryService, _logger, currentInstalledVersion, UmbracoVersion.GetSemanticVersion(), GlobalSettings.UmbracoMigrationName);
 
                 var upgraded = runner.Execute(database, true);
 

@@ -77,20 +77,33 @@ namespace UmbracoExamine
         /// <returns></returns>
         protected override IIndexCriteria GetIndexerData(IndexSet indexSet)
         {
+            var indexerData = base.GetIndexerData(indexSet);
+
             if (CanInitialize())
-            {           
-                var searchableEmail = indexSet.IndexUserFields["_searchEmail"];
-                if (searchableEmail == null)
+            {
+                //If the fields are missing a custom _searchEmail, then add it
+
+                if (indexerData.UserFields.Any(x => x.Name == "_searchEmail") == false)
                 {
-                    indexSet.IndexUserFields.Add(new IndexField
+                    var field = new IndexField {Name = "_searchEmail"};
+                    var policy = IndexFieldPolicies.FirstOrDefault(x => x.Name == "_searchEmail");
+                    if (policy != null)
                     {
-                        Name = "_searchEmail"
-                    });
+                        field.Type = policy.Type;
+                        field.EnableSorting = policy.EnableSorting;
+                    }
+
+                    return new IndexCriteria(
+                        indexerData.StandardFields,
+                        indexerData.UserFields.Concat(new[] {field}),
+                        indexerData.IncludeNodeTypes,
+                        indexerData.ExcludeNodeTypes,
+                        indexerData.ParentNodeId
+                        );
                 }
-                return indexSet.ToIndexCriteria(DataService, IndexFieldPolicies);
             }
 
-            return base.GetIndexerData(indexSet);
+	        return indexerData;
         }
 
 	    /// <summary>
