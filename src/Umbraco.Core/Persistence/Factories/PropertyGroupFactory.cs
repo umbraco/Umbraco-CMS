@@ -120,17 +120,21 @@ namespace Umbraco.Core.Persistence.Factories
         internal PropertyTypeDto BuildPropertyTypeDto(int tabId, PropertyType propertyType)
         {
             var propertyTypeDto = new PropertyTypeDto
-                                      {
-                                          Alias = propertyType.Alias,
-                                          ContentTypeId = _id,
-                                          DataTypeId = propertyType.DataTypeDefinitionId,
-                                          Description = propertyType.Description,
-                                          Mandatory = propertyType.Mandatory,
-                                          Name = propertyType.Name,
-                                          SortOrder = propertyType.SortOrder,
-                                          ValidationRegExp = propertyType.ValidationRegExp,
-                                          UniqueId = propertyType.Key
-                                      };
+            {
+                Alias = propertyType.Alias,
+                ContentTypeId = _id,
+                DataTypeId = propertyType.DataTypeDefinitionId,
+                Description = propertyType.Description,
+                Mandatory = propertyType.Mandatory,
+                Name = propertyType.Name,
+                SortOrder = propertyType.SortOrder,
+                ValidationRegExp = propertyType.ValidationRegExp,
+                UniqueId = propertyType.HasIdentity
+                    ? propertyType.Key == Guid.Empty
+                        ? Guid.NewGuid()
+                        : propertyType.Key
+                    : Guid.NewGuid()
+            };
 
             if (tabId != default(int))
             {
