@@ -302,6 +302,7 @@
     <Compile Include="ApplicationContextExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
+    <Compile Include="Media\EmbedProviders\Flickr.cs" />
     <Compile Include="PropertyEditors\DatePreValueEditor.cs" />
     <Compile Include="Security\Identity\GetUserSecondsMiddleWare.cs" />
     <Compile Include="Media\EmbedProviders\OEmbedJson.cs" />
