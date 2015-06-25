@@ -671,7 +671,7 @@ angular.module("umbraco")
 
         var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
             
-            if ($scope.model.value.sections) {
+            if ($scope.model.value && $scope.model.value.sections) {
                 _.each($scope.model.value.sections, function(section) {
                     if (section.rows) {
                         _.each(section.rows, function (row) {
