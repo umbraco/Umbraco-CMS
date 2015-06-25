@@ -454,6 +454,22 @@ module.exports = function (grunt) {
                         'ng-file-upload': {
                             keepExpandedHierarchy: false,
                             files: ['angular-file-upload.min.js']
+                        },
+                        'codemirror': {
+                            files: [
+                                'lib/codemirror.js',
+                                'lib/codemirror.css',
+
+                                'mode/css/*',
+                                'mode/javascript/*',
+                                'mode/xml/*',
+                                'mode/htmlmixed/*',
+
+                                'addon/search/*',
+                                'addon/edit/*',
+                                'addon/selection/*',
+                                'addon/dialog/*'
+                            ]
                         }
                     }
                 }
