@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
@@ -279,13 +280,16 @@ AND umbracoNode.id <> @id",
             return GetAndCachePreValueCollection(dataTypeId);
         }
 
+        internal static string GetCacheKeyRegex(int preValueId)
+        {
+            return CacheKeys.DataTypePreValuesCacheKey + @"[-\d]+-([\d]*,)*" + preValueId + @"(?!\d)[,\d$]*";
+        }
+
         public string GetPreValueAsString(int preValueId)
         {
             //We need to see if we can find the cached PreValueCollection based on the cache key above
 
-            var regex = CacheKeys.DataTypePreValuesCacheKey + @"[-\d]+-([\d]*,)*" + preValueId + @"(?!\d)[,\d$]*";
-
-            var cached = _cacheHelper.RuntimeCache.GetCacheItemsByKeyExpression<PreValueCollection>(regex);
+            var cached = _cacheHelper.RuntimeCache.GetCacheItemsByKeyExpression<PreValueCollection>(GetCacheKeyRegex(preValueId));
             if (cached != null && cached.Any())
             {
                 //return from the cache
