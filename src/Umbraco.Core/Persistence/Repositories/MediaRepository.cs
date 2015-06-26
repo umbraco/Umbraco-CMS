@@ -283,10 +283,11 @@ namespace Umbraco.Core.Persistence.Repositories
             //NOTE Should the logic below have some kind of fallback for empty parent ids ?
             //Logic for setting Path, Level and SortOrder
             var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
-            int level = parent.Level + 1;
-            int sortOrder =
-                Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode WHERE parentID = @ParentId AND nodeObjectType = @NodeObjectType",
-                                                      new { ParentId = entity.ParentId, NodeObjectType = NodeObjectTypeId });
+            var level = parent.Level + 1;
+            var maxSortOrder = Database.ExecuteScalar<int>(
+                "SELECT coalesce(max(sortOrder),-1) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType",
+                new { /*ParentId =*/ entity.ParentId, NodeObjectType = NodeObjectTypeId });
+            var sortOrder = maxSortOrder + 1;
 
             //Create the (base) node data - umbracoNode
             var nodeDto = dto.ContentDto.NodeDto;
