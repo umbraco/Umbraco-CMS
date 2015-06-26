@@ -12,6 +12,13 @@ namespace Umbraco.Core.Models.Identity
     public class BackOfficeIdentityUser : IdentityUser<int, IIdentityUserLogin, IdentityUserRole<string>, IdentityUserClaim<int>>
     {
 
+        public BackOfficeIdentityUser()
+        {
+            StartMediaId = -1;
+            StartContentId = -1;
+            Culture = Configuration.GlobalSettings.DefaultUILanguage;
+        }
+
         public virtual async Task<ClaimsIdentity> GenerateUserIdentityAsync(BackOfficeUserManager manager)
         {
             // NOTE the authenticationType must match the umbraco one

@@ -75,12 +75,12 @@ namespace Umbraco.Core.Security
             {
                 DefaultToLiveEditing = false,
                 Email = user.Email,
-                Language = Configuration.GlobalSettings.DefaultUILanguage,
+                Language = user.Culture ?? Configuration.GlobalSettings.DefaultUILanguage,
                 Name = user.Name,
                 Username = user.UserName,
-                StartContentId = -1,
-                StartMediaId = -1,
-                IsLockedOut = false,
+                StartContentId = user.StartContentId == 0 ? -1 : user.StartContentId,
+                StartMediaId = user.StartMediaId == 0 ? -1 : user.StartMediaId,
+                IsLockedOut = user.LockoutEnabled,
                 IsApproved = true
             };
 
@@ -168,7 +168,7 @@ namespace Umbraco.Core.Security
         /// </summary>
         /// <param name="userId"/>
         /// <returns/>
-        public Task<BackOfficeIdentityUser> FindByIdAsync(int userId)
+        public async Task<BackOfficeIdentityUser> FindByIdAsync(int userId)
         {
             ThrowIfDisposed();
             var user = _userService.GetUserById(userId);
@@ -176,7 +176,7 @@ namespace Umbraco.Core.Security
             {
                 return null;
             }
-            return Task.FromResult(AssignLoginsCallback(Mapper.Map<BackOfficeIdentityUser>(user)));
+            return await Task.FromResult(AssignLoginsCallback(Mapper.Map<BackOfficeIdentityUser>(user)));
         }
 
         /// <summary>
@@ -184,7 +184,7 @@ namespace Umbraco.Core.Security
         /// </summary>
         /// <param name="userName"/>
         /// <returns/>
-        public Task<BackOfficeIdentityUser> FindByNameAsync(string userName)
+        public async Task<BackOfficeIdentityUser> FindByNameAsync(string userName)
         {
             ThrowIfDisposed();
             var user = _userService.GetByUsername(userName);
@@ -195,7 +195,7 @@ namespace Umbraco.Core.Security
 
             var result = AssignLoginsCallback(Mapper.Map<BackOfficeIdentityUser>(user));
 
-            return Task.FromResult(result);
+            return await Task.FromResult(result);
         }
 
         /// <summary>

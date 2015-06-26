@@ -37,6 +37,7 @@ using System.Web;
 using AutoMapper;
 using Microsoft.AspNet.Identity.Owin;
 using Umbraco.Core.Models.Identity;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Task = System.Threading.Tasks.Task;
 using Umbraco.Web.Security.Identity;
@@ -478,7 +479,10 @@ namespace Umbraco.Web.Editors
             }
             else
             {
-                ViewBag.ExternalSignInError = new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not been linked to to an account" };
+                if (await AutoLinkAndSignInExternalAccount(loginInfo) == false)
+                {
+                    ViewBag.ExternalSignInError = new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not been linked to to an account" };        
+                }
 
                 //Remove the cookie otherwise this message will keep appearing
                 if (Response.Cookies[Core.Constants.Security.BackOfficeExternalCookieName] != null)
@@ -488,6 +492,104 @@ namespace Umbraco.Web.Editors
             }
 
             return response();
+        }
+
+        private async Task<bool> AutoLinkAndSignInExternalAccount(ExternalLoginInfo loginInfo)
+        {
+            //Here we can check if the provider associated with the request has been configured to allow
+            // new users (auto-linked external accounts). This would never be used with public providers such as 
+            // Google, unless you for some reason wanted anybody to be able to access the backend if they have a Google account
+            // .... not likely! 
+
+            var authType = OwinContext.Authentication.GetExternalAuthenticationTypes().FirstOrDefault(x => x.AuthenticationType == loginInfo.Login.LoginProvider);
+            if (authType == null)
+            {
+                Logger.Warn<BackOfficeController>("Could not find external authentication provider registered: " + loginInfo.Login.LoginProvider);
+                return false;
+            }
+
+            var autoLinkOptions = authType.GetExternalAuthenticationOptions();
+            if (autoLinkOptions != null)
+            {
+                if (autoLinkOptions.ShouldAutoLinkExternalAccount(UmbracoContext, loginInfo))
+                {
+                    //we are allowing auto-linking/creating of local accounts
+                    if (loginInfo.Email.IsNullOrWhiteSpace())
+                    {
+                        ViewBag.ExternalSignInError = new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not provided an email address, the account cannot be linked." };
+                    }
+                    else
+                    {
+
+                        //Now we need to perform the auto-link, so first we need to lookup/create a user with the email address
+                        var foundByEmail = Services.UserService.GetByEmail(loginInfo.Email);
+                        if (foundByEmail != null)
+                        {
+                            ViewBag.ExternalSignInError = new[] { "A user with this email address already exists locally. You will need to login locally to Umbraco and link this external provider: " + loginInfo.Login.LoginProvider };
+                        }
+                        else
+                        {
+                            var defaultUserType = autoLinkOptions.GetDefaultUserType(UmbracoContext, loginInfo);
+                            var userType = Services.UserService.GetUserTypeByAlias(defaultUserType);
+                            if (userType == null)
+                            {
+                                ViewBag.ExternalSignInError = new[] { "Could not auto-link this account, the specified User Type does not exist: " + defaultUserType };
+                            }
+                            else
+                            {
+                                //var userMembershipProvider = global::Umbraco.Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
+
+                                var autoLinkUser = new BackOfficeIdentityUser()
+                                {
+                                    Email = loginInfo.Email,
+                                    Name = loginInfo.ExternalIdentity.Name,
+                                    UserTypeAlias = userType.Alias,
+                                    AllowedSections = autoLinkOptions.GetDefaultAllowedSections(UmbracoContext, loginInfo),
+                                    Culture = autoLinkOptions.GetDefaultCulture(UmbracoContext, loginInfo),
+                                    UserName = loginInfo.Email
+                                };
+                                var userCreationResult = await UserManager.CreateAsync(autoLinkUser);
+
+                                if (userCreationResult.Succeeded == false)
+                                {
+                                    ViewBag.ExternalSignInError = userCreationResult.Errors;
+                                }
+                                else
+                                {
+                                    var linkResult = await UserManager.AddLoginAsync(autoLinkUser.Id, loginInfo.Login);
+                                    if (linkResult.Succeeded == false)
+                                    {
+                                        ViewBag.ExternalSignInError = linkResult.Errors;
+
+                                        //If this fails, we should really delete the user since it will be in an inconsistent state!
+                                        var deleteResult = await UserManager.DeleteAsync(autoLinkUser);
+                                        if (deleteResult.Succeeded == false)
+                                        {
+                                            //DOH! ... this isn't good, combine all errors to be shown
+                                            ViewBag.ExternalSignInError = linkResult.Errors.Concat(deleteResult.Errors);
+                                        }
+                                    }
+                                    else
+                                    {
+
+                                        //Ok, we're all linked up! Assign the auto-link options to a ViewBag property, this can be used
+                                        // in the view to render a custom view (AutoLinkExternalAccountView) if required, which will allow
+                                        // a developer to display a custom angular view to prompt the user for more information if required.
+                                        ViewBag.ExternalSignInAutoLinkOptions = autoLinkOptions;
+
+                                        //sign in
+                                        await SignInAsync(autoLinkUser, isPersistent: false);
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                }
+                return true;
+            }
+
+            return false;
         }
 
         private async Task SignInAsync(BackOfficeIdentityUser user, bool isPersistent)
