@@ -1,10 +1,15 @@
 ﻿using System.Text;
 using System.Xml;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
+using Newtonsoft.Json;
 using Umbraco.Core.Media;
 
 namespace Umbraco.Web.Media.EmbedProviders
 {
+    //TODO: Make all Http calls async
+
     public abstract class AbstractOEmbedProvider: IEmbedProvider
     {
         public virtual bool SupportsDimensions
@@ -39,16 +44,34 @@ namespace Umbraco.Web.Media.EmbedProviders
             return fullUrl.ToString();
         }
 
+        public virtual string DownloadResponse(string url)
+        {
+            using (var webClient = new WebClient())
+            {
+                return webClient.DownloadString(url);
+            }
+        }
+
+        public virtual T GetJsonResponse<T>(string url) where T : class
+        {
+            var response = DownloadResponse(url);
+            return JsonConvert.DeserializeObject<T>(response);
+        }
+
         public virtual XmlDocument GetXmlResponse(string url)
         {
-            var webClient = new System.Net.WebClient();
-
-            var response = webClient.DownloadString(url);
-
+            var response = DownloadResponse(url);
             var doc = new XmlDocument();
             doc.LoadXml(response);
 
             return doc;
         }
+
+        public virtual string GetXmlProperty(XmlDocument doc, string property)
+        {
+            var selectSingleNode = doc.SelectSingleNode(property);
+            return selectSingleNode != null ? selectSingleNode.InnerText : string.Empty;
+        }
+
     }
 }

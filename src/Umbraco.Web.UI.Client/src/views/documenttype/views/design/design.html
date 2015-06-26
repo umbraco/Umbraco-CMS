@@ -2,7 +2,7 @@
 
     <umb-editor-toolbar tools="vm.toolbar"></umb-editor-toolbar>
 
-    <ul ui-sortable="sortableOptionsTab" ng-model="model.groups" class="content-type-groups-list no-style-list">
+    <ul ui-sortable="vm.sortableOptionsTab" ng-model="model.groups" class="content-type-groups-list no-style-list">
 
         <li ng-repeat="tab in model.groups" ng-class="{'edt-tab-sortable': vm.sortingMode && !tab.inherited}">
 
@@ -47,7 +47,7 @@
                 </div>
 
                 <div class="edt-property-group">
-                    <ul class="edt-property-list no-style-list" ui-sortable="sortableOptionsEditor"
+                    <ul class="edt-property-list no-style-list" ui-sortable="vm.sortableOptionsEditor"
                         ng-model="tab.properties" class="no-style-list">
                         <li ng-class="{'edt-property-sortable': vm.sortingMode && !property.inherited}" ng-repeat="property in tab.properties">
 

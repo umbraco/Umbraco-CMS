@@ -64,6 +64,7 @@
 		function save() {
 
 			//perform any pre-save logic here
+			vm.contentType.allowedContentTypes = contentTypeHelper.reformatAllowedContentTypes(vm.contentType.allowedContentTypes);
 
 			contentTypeResource.save(vm.contentType).then(function(dt){
 

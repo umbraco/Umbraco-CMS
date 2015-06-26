@@ -7,6 +7,33 @@ function contentTypeHelper(contentTypeResource) {
 
     var contentTypeHelperService = {
 
+        reformatAllowedContentTypes: function(allowedContentTypes) {
+
+            var allowedContentTypesCopy = angular.copy(allowedContentTypes);
+
+            allowedContentTypes = [];
+
+            angular.forEach(allowedContentTypesCopy, function(allowedContentTypeCopy){
+
+                var reformattedAllowedContentType = {
+                    "name": allowedContentTypeCopy.name,
+                    "id": {
+                        "m_boxed": {
+                            "m_value": allowedContentTypeCopy.id
+                        }
+                    },
+                    "icon": allowedContentTypeCopy.icon,
+                    "key": allowedContentTypeCopy.key,
+                    "alias": allowedContentTypeCopy.alias
+                };
+
+                allowedContentTypes.push(reformattedAllowedContentType);
+            });
+
+            return allowedContentTypes;
+
+        },
+
         addInitTab: function(contentType) {
 
             // check i init tab already exists
