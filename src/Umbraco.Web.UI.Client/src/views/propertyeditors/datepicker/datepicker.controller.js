@@ -135,18 +135,20 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 			            $scope.model.value = null;
 			        }
 			    });
+			    //unbind doc click event!
+			    $scope.$on('$destroy', function () {
+			        unsubscribe();
+			    });
 
 
 			});
         });
         
     });
-    
 
     //unbind doc click event!
     $scope.$on('$destroy', function () {
         $(document).unbind("click", $scope.hidePicker);
-        unsubscribe();
     });
 }
 
