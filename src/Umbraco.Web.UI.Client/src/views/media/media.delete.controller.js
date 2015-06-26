@@ -34,7 +34,7 @@ function MediaDeleteController($scope, mediaResource, treeService, navigationSer
 
             	//If the deleted item lived at the root then just redirect back to the root, otherwise redirect to the item's parent
             	var location = "/media";
-            	if ($scope.currentNode.parentId !== -1)
+            	if ($scope.currentNode.parentId.toString() !== "-1")
             		location = "/media/media/edit/" + $scope.currentNode.parentId;
 
                 $location.path(location);
