@@ -100,6 +100,12 @@ namespace Umbraco.Web.Editors
             };
         }
 
+        public HttpResponseMessage GetSafeAlias(string value, bool camelCase = true)
+        {
+            var returnValue = (string.IsNullOrWhiteSpace(value)) ? string.Empty : value.ToSafeAlias(camelCase);
+            return Request.CreateResponse(HttpStatusCode.OK, returnValue);
+        }
+
         /// <summary>
         /// Returns all content type objects
         /// </summary>
