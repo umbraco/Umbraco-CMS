@@ -13,7 +13,7 @@ namespace Umbraco.Web.Security.Identity
         /// </summary>
         /// <param name="authOptions"></param>
         /// <param name="options"></param>
-        public static void SetExternalAuthenticationOptions(
+        public static void SetExternalSignInAutoLinkOptions(
             this AuthenticationOptions authOptions,
             ExternalSignInAutoLinkOptions options)
         {
