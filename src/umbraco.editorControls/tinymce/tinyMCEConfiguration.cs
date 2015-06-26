@@ -160,13 +160,19 @@ namespace umbraco.editorControls.tinymce
 
             if (xd.DocumentElement.SelectSingleNode("./invalidElements") != null)
                 _invalidElements = xd.DocumentElement.SelectSingleNode("./invalidElements").FirstChild.Value;
+
             if (xd.DocumentElement.SelectSingleNode("./validElements") != null)
             {
                 string _val = xd.DocumentElement.SelectSingleNode("./validElements").FirstChild.Value.Replace("\r", "");
-                foreach (string s in _val.Split("\n".ToCharArray()))
-                    _validElements += "'" + s + "' + \n";
-                _validElements = _validElements.Substring(0, _validElements.Length - 4);
 
+                string validElements = string.Empty;
+
+                foreach (string s in _val.Split("\n".ToCharArray()))
+                {
+                    validElements += "'" + s + "' + \n";
+                }
+
+                _validElements = validElements.Substring(0, validElements.Length - 4);
             }
 
             _init = true;
