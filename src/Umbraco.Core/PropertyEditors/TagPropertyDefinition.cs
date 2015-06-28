@@ -31,7 +31,10 @@ namespace Umbraco.Core.PropertyEditors
             Delimiter = tagsAttribute.Delimiter;
             ReplaceTags = tagsAttribute.ReplaceTags;
             TagGroup = tagsAttribute.TagGroup;
-            StorageType = TagCacheStorageType.Csv;
+
+            var preValues = propertySaving.PreValues.PreValuesAsDictionary;
+            StorageType =  preValues.ContainsKey("storageType") && preValues["storageType"].Value == TagCacheStorageType.Json.ToString() ? 
+                TagCacheStorageType.Json : TagCacheStorageType.Csv;
         }
 
         /// <summary>
