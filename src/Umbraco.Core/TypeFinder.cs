@@ -699,14 +699,7 @@ namespace Umbraco.Core
 
         #endregion
 
-        public static Type GetTypeByName(string typeName)
-        {
-            var type = Type.GetType(typeName);
-            if (type != null) return type;
-            return AppDomain.CurrentDomain.GetAssemblies()
-                .Select(x => x.GetType(typeName))
-                .FirstOrDefault(x => x != null);
-        }
+
 
     }
 }

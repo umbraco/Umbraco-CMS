@@ -20,7 +20,12 @@ namespace Umbraco.Core.Models
         /// </summary>
         bool Published { get; }
 
-        [Obsolete("This will be removed in future versions")]
+        /// <summary>
+        /// Language of the data contained within this Content object.
+        /// </summary>
+        /// <remarks>
+        /// Left internal until multilingual support is implemented.
+        /// </remarks>
         string Language { get; set; }
 
         /// <summary>
@@ -73,15 +78,5 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <returns></returns>
         IContent DeepCloneWithResetIdentities();
-
-        /// <summary>
-        /// Gets a value indicating whether the content has a published version.
-        /// </summary>
-        bool HasPublishedVersion { get; }
-
-        /// <summary>
-        /// Gets the unique identifier of the published version, if any.
-        /// </summary>
-        Guid PublishedVersionGuid { get; }
     }
 }

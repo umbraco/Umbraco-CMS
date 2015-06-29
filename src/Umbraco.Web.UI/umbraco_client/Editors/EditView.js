@@ -155,9 +155,6 @@
                 }
                 path = args.path;
             }
-            if (args.contents) {
-                UmbEditor.SetCode(args.contents);
-            }
 
             UmbClientMgr.mainTree().setActiveTreeType(this._opts.currentTreeType);
 

@@ -41,7 +41,7 @@ angular.module('umbraco')
 
 			if(index !== null && $scope.renderModel[index]) {
 				var macro = $scope.renderModel[index];
-				dialogData["macroData"] = macro;
+				dialogData[macroData] = macro;
 			}
 			
 			dialogService.macroPicker({
@@ -85,18 +85,13 @@ angular.module('umbraco')
 	        $scope.renderModel = [];
 	    };
 
-	    var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {	
+	    $scope.$on("formSubmitting", function (ev, args) {	
 			var syntax = [];
 	    	angular.forEach($scope.renderModel, function(value, key){
 	    		syntax.push(value.syntax);
 	    	});
 
 			$scope.model.value = syntax.join("");
-	    });
-
-	    //when the scope is destroyed we need to unsubscribe
-	    $scope.$on('$destroy', function () {
-	        unsubscribe();
 	    });
 
 

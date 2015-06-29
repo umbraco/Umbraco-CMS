@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Migrations.Syntax.Delete.DefaultConstraint;
 using Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions;
@@ -20,10 +19,6 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     [Migration("7.0.0", 6, GlobalSettings.UmbracoMigrationName)]
     public class AlterCmsMacroPropertyTable : MigrationBase
     {
-        public AlterCmsMacroPropertyTable(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
-
         public override void Up()
         {
             //now that the controlId column is renamed and now a string we need to convert
@@ -64,8 +59,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
             {
                 //Before we try to delete this constraint, we'll see if it exists first, some older schemas never had it and some older schema's had this named
                 // differently than the default.
-
-                var keyConstraints = SqlSyntax.GetConstraintsPerColumn(Context.Database).Distinct();
+                
+                var keyConstraints = SqlSyntaxContext.SqlSyntaxProvider.GetConstraintsPerColumn(Context.Database).Distinct();
                 var constraint = keyConstraints
                     .SingleOrDefault(x => x.Item1 == "cmsMacroProperty" && x.Item2 == "macroPropertyType" && x.Item3.InvariantStartsWith("PK_") == false);
                 if (constraint != null)

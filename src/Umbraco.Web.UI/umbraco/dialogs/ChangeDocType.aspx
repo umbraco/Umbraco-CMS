@@ -51,7 +51,7 @@
         </cc1:PropertyPanel>
 
         <asp:PlaceHolder ID="NotAvailablePlaceholder" runat="server" Visible="false">        
-            <div class="propertyItem notice" style="padding-top: 10px">     
+            <div class="propertyItem notice" style="padding: 10px">     
                 <p><%=umbraco.ui.Text("changeDocType", "docTypeCannotBeChanged") %></p>
             </div>
         </asp:PlaceHolder>
@@ -91,14 +91,15 @@
     </cc1:Pane>
 
     <asp:PlaceHolder ID="SuccessPlaceholder" runat="server" Visible="false">
-        <p><%=umbraco.ui.Text("changeDocType", "docTypeChanged") %></p>
-        <p>        
+        <h2 class="propertypaneTitel"><%=umbraco.ui.Text("changeDocType", "docTypeChanged") %></h2>
+        <br />
+        <div class="success" style="padding: 10px">        
             <asp:Literal ID="SuccessMessage" runat="server" />
             <asp:Literal ID="PropertiesMappedMessage" runat="server" />
             <asp:Literal ID="ContentPublishedMessage" runat="server" />
             <br /><br />
             <a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("defaultdialogs", "closeThisWindow") %></a>  
-        </p>
+        </div>
     </asp:PlaceHolder>
 
     <asp:PlaceHolder ID="ValidationPlaceholder" runat="server" Visible="false">

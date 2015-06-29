@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using System.Web.Routing;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.ObjectResolution;
@@ -32,7 +31,7 @@ namespace Umbraco.Tests.PublishedContent
 
             // this is so the model factory looks into the test assembly
             _pluginManager = PluginManager.Current;
-            PluginManager.Current = new PluginManager(new ActivatorServiceProvider(), new NullCacheProvider(), ProfilingLogger, false)
+            PluginManager.Current = new PluginManager(false)
                 {
                     AssembliesToScan = _pluginManager.AssembliesToScan
                         .Union(new[] { typeof (PublishedContentMoreTests).Assembly})
@@ -44,7 +43,7 @@ namespace Umbraco.Tests.PublishedContent
         protected override void FreezeResolution()
         {
             PropertyValueConvertersResolver.Current =
-                new PropertyValueConvertersResolver(new ActivatorServiceProvider(), Logger);
+                new PropertyValueConvertersResolver();
             var types = PluginManager.Current.ResolveTypes<PublishedContentModel>();
             PublishedContentModelFactoryResolver.Current =
                 new PublishedContentModelFactoryResolver(new PublishedContentModelFactory(types));

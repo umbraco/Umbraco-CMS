@@ -47,17 +47,15 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
 
     $scope.selectedId = navigationService.currentId;
 
-    var evts = [];
-
     //Listen for global state changes
-    evts.push(eventsService.on("appState.globalState.changed", function(e, args) {
+    eventsService.on("appState.globalState.changed", function (e, args) {
         if (args.key === "showNavigation") {
             $scope.showNavigation = args.value;
         }
-    }));
+    });
 
     //Listen for menu state changes
-    evts.push(eventsService.on("appState.menuState.changed", function(e, args) {
+    eventsService.on("appState.menuState.changed", function (e, args) {
         if (args.key === "showMenuDialog") {
             $scope.showContextMenuDialog = args.value;
         }
@@ -73,21 +71,20 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
         if (args.key === "currentNode") {
             $scope.menuNode = args.value;
         }
-    }));
+    });
 
     //Listen for section state changes
-    evts.push(eventsService.on("appState.treeState.changed", function(e, args) {
+    eventsService.on("appState.treeState.changed", function (e, args) {
         var f = args;
-        if (args.value.root && args.value.root.metaData.containsTrees === false) {
+        if(args.value.root && args.value.root.children.length === 0){
             $rootScope.emptySection = true;
-        }
-        else {
+        }else{
             $rootScope.emptySection = false;
         }
-    }));
+    });
 
     //Listen for section state changes
-    evts.push(eventsService.on("appState.sectionState.changed", function(e, args) {
+    eventsService.on("appState.sectionState.changed", function (e, args) {
         //section changed
         if (args.key === "currentSection") {
             $scope.currentSection = args.value;
@@ -96,26 +93,26 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
         if (args.key === "showSearchResults") {
             $scope.showSearchResults = args.value;
         }
-    }));
+    });
 
     //This reacts to clicks passed to the body element which emits a global call to close all dialogs
-    evts.push(eventsService.on("app.closeDialogs", function(event) {
+    eventsService.on("app.closeDialogs", function (event) {
         if (appState.getGlobalState("stickyNavigation")) {
             navigationService.hideNavigation();
             //TODO: don't know why we need this? - we are inside of an angular event listener.
             angularHelper.safeApply($scope);
         }
-    }));
+    });
 
     //when a user logs out or timesout
-    evts.push(eventsService.on("app.notAuthenticated", function() {
+    eventsService.on("app.notAuthenticated", function () {
         $scope.authenticated = false;
-    }));
+    });
 
     //when the application is ready and the user is authorized setup the data
-    evts.push(eventsService.on("app.ready", function(evt, data) {
+    eventsService.on("app.ready", function (evt, data) {
         $scope.authenticated = true;
-    }));
+    });
 
     //this reacts to the options item in the tree
     //todo, migrate to nav service
@@ -154,13 +151,6 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
             }, 300);
         }
     };
-
-    //ensure to unregister from all events!
-    $scope.$on('$destroy', function () {
-        for (var e in evts) {
-            eventsService.unsubscribe(evts[e]);
-        }
-    });
 }
 
 //register it

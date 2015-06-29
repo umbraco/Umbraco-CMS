@@ -1,6 +1,8 @@
+using System;
+
 namespace Umbraco.Core
 {
-    /// <summary>
+	/// <summary>
 	/// Helper methods for Activation
 	/// </summary>
 	internal static class ActivatorHelper
@@ -12,9 +14,7 @@ namespace Umbraco.Core
 		/// <returns></returns>
 		public static T CreateInstance<T>() where T : class, new()
 		{
-		    return new ActivatorServiceProvider().GetService(typeof (T)) as T;
+			return Activator.CreateInstance(typeof(T)) as T;
 		}
-
-	    
 	}
 }

@@ -17,7 +17,6 @@ using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.template;
 using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
-using Umbraco.Core.Configuration;
 using Property = umbraco.cms.businesslogic.property.Property;
 
 namespace umbraco
@@ -153,27 +152,22 @@ namespace umbraco
 		{			
 			populatePageData(node);
 
-		    if (UmbracoConfig.For.UmbracoSettings().WebRouting.DisableAlternativeTemplates == false)
-		    {
-                // Check for alternative template
-		        if (HttpContext.Current.Items[Constants.Conventions.Url.AltTemplate] != null &&
-		            HttpContext.Current.Items[Constants.Conventions.Url.AltTemplate].ToString() != String.Empty)
-		        {
-		            _template =
-		                umbraco.cms.businesslogic.template.Template.GetTemplateIdFromAlias(
-		                    HttpContext.Current.Items[Constants.Conventions.Url.AltTemplate].ToString());
-		            _elements.Add("template", _template.ToString());
-		        }
-		        else if (helper.Request(Constants.Conventions.Url.AltTemplate) != String.Empty)
-		        {
-		            _template =
-		                umbraco.cms.businesslogic.template.Template.GetTemplateIdFromAlias(
-		                    helper.Request(Constants.Conventions.Url.AltTemplate).ToLower());
-		            _elements.Add("template", _template.ToString());
-		        }
-		    }
-
-		    if (_template == 0)
+			// Check for alternative template
+			if (HttpContext.Current.Items[Constants.Conventions.Url.AltTemplate] != null &&
+				HttpContext.Current.Items[Constants.Conventions.Url.AltTemplate].ToString() != String.Empty)
+			{
+				_template =
+					umbraco.cms.businesslogic.template.Template.GetTemplateIdFromAlias(
+						HttpContext.Current.Items[Constants.Conventions.Url.AltTemplate].ToString());
+				_elements.Add("template", _template.ToString());
+			}
+			else if (helper.Request(Constants.Conventions.Url.AltTemplate) != String.Empty)
+			{
+				_template =
+					umbraco.cms.businesslogic.template.Template.GetTemplateIdFromAlias(helper.Request(Constants.Conventions.Url.AltTemplate).ToLower());
+				_elements.Add("template", _template.ToString());
+			}
+			if (_template == 0)
 			{
 				try
 				{

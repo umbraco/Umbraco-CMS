@@ -20,15 +20,9 @@ namespace Umbraco.Core.Cache
 
         private readonly System.Web.Caching.Cache _cache;
 
-        /// <summary>
-        /// Used for debugging
-        /// </summary>
-        internal Guid InstanceId { get; private set; }
-
         public HttpRuntimeCacheProvider(System.Web.Caching.Cache cache)
         {
             _cache = cache;
-            InstanceId = Guid.NewGuid();
         }
 
         protected override IEnumerable<DictionaryEntry> GetDictionaryEntries()
@@ -135,27 +129,19 @@ namespace Umbraco.Core.Cache
 
                 if (result == null || GetSafeLazyValue(result, true) == null) // get non-created as NonCreatedValue & exceptions as null
                 {
-                    result = GetSafeLazy(getCacheItem);
+                    result = new Lazy<object>(getCacheItem);
                     var absolute = isSliding ? System.Web.Caching.Cache.NoAbsoluteExpiration : (timeout == null ? System.Web.Caching.Cache.NoAbsoluteExpiration : DateTime.Now.Add(timeout.Value));
                     var sliding = isSliding == false ? System.Web.Caching.Cache.NoSlidingExpiration : (timeout ?? System.Web.Caching.Cache.NoSlidingExpiration);
 
                     lck.UpgradeToWriteLock();
-                    //NOTE: 'Insert' on System.Web.Caching.Cache actually does an add or update!
                     _cache.Insert(cacheKey, result, dependency, absolute, sliding, priority, removedCallback);
                 }
             }
 
-            // using GetSafeLazy and GetSafeLazyValue ensures that we don't cache
-            // exceptions (but try again and again) and silently eat them - however at
-            // some point we have to report them - so need to re-throw here
-
-            // this does not throw anymore
-            //return result.Value;
-
-            value = result.Value; // will not throw (safe lazy)
-            var eh = value as ExceptionHolder;
-            if (eh != null) throw eh.Exception; // throw once!
-            return value;
+            // this may throw if getCacheItem throws, but this is the only place where
+            // it would throw as everywhere else we use GetLazySaveValue() to hide exceptions
+            // and pretend exceptions were never inserted into cache to begin with.
+            return result.Value;
         }
 
         public object GetCacheItem(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
@@ -187,7 +173,7 @@ namespace Umbraco.Core.Cache
             // NOTE - here also we must insert a Lazy<object> but we can evaluate it right now
             // and make sure we don't store a null value.
 
-            var result = GetSafeLazy(getCacheItem);
+            var result = new Lazy<object>(getCacheItem);
             var value = result.Value; // force evaluation now - this may throw if cacheItem throws, and then nothing goes into cache
             if (value == null) return; // do not store null values (backward compat)
 
@@ -198,7 +184,6 @@ namespace Umbraco.Core.Cache
 
             using (new WriteLock(_locker))
             {
-                //NOTE: 'Insert' on System.Web.Caching.Cache actually does an add or update!
                 _cache.Insert(cacheKey, result, dependency, absolute, sliding, priority, removedCallback);
             }
         }

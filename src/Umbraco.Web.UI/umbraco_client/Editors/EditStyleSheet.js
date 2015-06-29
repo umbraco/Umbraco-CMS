@@ -37,14 +37,14 @@
                 codeVal = UmbEditor.GetCode();
             }
             umbraco.presentation.webservices.codeEditorSave.SaveCss(
-                fileName, self._opts.originalFileName, codeVal, 0,
-                function (t) { self.submitSucces(t, fileName); },
+                fileName, self._opts.originalFileName, codeVal, self._opts.cssId,
+                function(t) { self.submitSucces(t); },
                 function(t) { self.submitFailure(t); });
 
 
         },
 
-        submitSucces: function (t, fileName) {
+        submitSucces: function(t) {
             if (t != 'true') {
                 top.UmbSpeechBubble.ShowMessage('error', unescape(this._opts.text.cssErrorHeader), unescape(this._opts.text.cssErrorText));
             }
@@ -53,7 +53,7 @@
             }
 
             UmbClientMgr.mainTree().setActiveTreeType('stylesheets');
-            UmbClientMgr.mainTree().syncTree("-1,init," + fileName, true);
+            UmbClientMgr.mainTree().syncTree("-1,init," + this._opts.cssId, true);
 
             //update the originalFileName prop
             this._opts.originalFileName = this._opts.nameTxtBox.val();

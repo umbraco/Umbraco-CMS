@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Xml.XPath;
 using Umbraco.Core;
@@ -14,130 +13,82 @@ namespace Umbraco.Web
     /// <summary>
     /// A class used to query for published content, media items
     /// </summary>
-    public class PublishedContentQuery : ITypedPublishedContentQuery, IDynamicPublishedContentQuery
+    public class PublishedContentQuery
     {
-        private readonly ITypedPublishedContentQuery _typedContentQuery;
-        private readonly IDynamicPublishedContentQuery _dynamicContentQuery;
         private readonly ContextualPublishedContentCache _contentCache;
         private readonly ContextualPublishedMediaCache _mediaCache;
 
-        /// <summary>
-        /// Constructor used to return results from the caches
-        /// </summary>
-        /// <param name="contentCache"></param>
-        /// <param name="mediaCache"></param>
         public PublishedContentQuery(ContextualPublishedContentCache contentCache, ContextualPublishedMediaCache mediaCache)
         {
-            if (contentCache == null) throw new ArgumentNullException("contentCache");
-            if (mediaCache == null) throw new ArgumentNullException("mediaCache");
             _contentCache = contentCache;
             _mediaCache = mediaCache;
-        }
-
-        /// <summary>
-        /// Constructor used to wrap the ITypedPublishedContentQuery and IDynamicPublishedContentQuery objects passed in
-        /// </summary>
-        /// <param name="typedContentQuery"></param>
-        /// <param name="dynamicContentQuery"></param>
-        public PublishedContentQuery(ITypedPublishedContentQuery typedContentQuery, IDynamicPublishedContentQuery dynamicContentQuery)
-        {
-            if (typedContentQuery == null) throw new ArgumentNullException("typedContentQuery");
-            if (dynamicContentQuery == null) throw new ArgumentNullException("dynamicContentQuery");
-            _typedContentQuery = typedContentQuery;
-            _dynamicContentQuery = dynamicContentQuery;
         }
 
         #region Content
 
         public IPublishedContent TypedContent(int id)
         {
-            return _typedContentQuery == null
-                ? TypedDocumentById(id, _contentCache)
-                : _typedContentQuery.TypedContent(id);
+            return TypedDocumentById(id, _contentCache);
         }
 
         public IPublishedContent TypedContentSingleAtXPath(string xpath, params XPathVariable[] vars)
         {
-            return _typedContentQuery == null
-                ? TypedDocumentByXPath(xpath, vars, _contentCache)
-                : _typedContentQuery.TypedContentSingleAtXPath(xpath, vars);
+            return TypedDocumentByXPath(xpath, vars, _contentCache);
         }
         
         public IEnumerable<IPublishedContent> TypedContent(IEnumerable<int> ids)
         {
-            return _typedContentQuery == null
-                ? TypedDocumentsByIds(_contentCache, ids)
-                : _typedContentQuery.TypedContent(ids);
+            return TypedDocumentsByIds(_contentCache, ids);
         }
 
         public IEnumerable<IPublishedContent> TypedContentAtXPath(string xpath, params XPathVariable[] vars)
         {
-            return _typedContentQuery == null
-                ? TypedDocumentsByXPath(xpath, vars, _contentCache)
-                : _typedContentQuery.TypedContentAtXPath(xpath, vars);
+            return TypedDocumentsByXPath(xpath, vars, _contentCache);
         }
 
         public IEnumerable<IPublishedContent> TypedContentAtXPath(XPathExpression xpath, params XPathVariable[] vars)
         {
-            return _typedContentQuery == null
-                ? TypedDocumentsByXPath(xpath, vars, _contentCache)
-                : _typedContentQuery.TypedContentAtXPath(xpath, vars);
+            return TypedDocumentsByXPath(xpath, vars, _contentCache);
         }
 
         public IEnumerable<IPublishedContent> TypedContentAtRoot()
         {
-            return _typedContentQuery == null
-                ? TypedDocumentsAtRoot(_contentCache)
-                : _typedContentQuery.TypedContentAtRoot();
+            return TypedDocumentsAtRoot(_contentCache);
         }
 
         public dynamic Content(int id)
         {
-            return _dynamicContentQuery == null
-                ? DocumentById(id, _contentCache, DynamicNull.Null)
-                : _dynamicContentQuery.Content(id);
+            return DocumentById(id, _contentCache, DynamicNull.Null);
         }
         
         public dynamic ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
         {
-            return _dynamicContentQuery == null
-                ? DocumentByXPath(xpath, vars, _contentCache, DynamicNull.Null)
-                : _dynamicContentQuery.ContentSingleAtXPath(xpath, vars);
+            return DocumentByXPath(xpath, vars, _contentCache, DynamicNull.Null);
         }
 
         public dynamic ContentSingleAtXPath(XPathExpression xpath, params XPathVariable[] vars)
         {
-            return _dynamicContentQuery == null
-                ? DocumentByXPath(xpath, vars, _contentCache, DynamicNull.Null)
-                : _dynamicContentQuery.ContentSingleAtXPath(xpath, vars);
+            return DocumentByXPath(xpath, vars, _contentCache, DynamicNull.Null);
         }
         
         public dynamic Content(IEnumerable<int> ids)
         {
-            return _dynamicContentQuery == null
-                ? DocumentByIds(_contentCache, ids.ToArray())
-                : _dynamicContentQuery.Content(ids);
+            return DocumentByIds(_contentCache, ids.ToArray());
         }
 
         public dynamic ContentAtXPath(string xpath, params XPathVariable[] vars)
         {
-            return _dynamicContentQuery == null
-                ? DocumentsByXPath(xpath, vars, _contentCache)
-                : _dynamicContentQuery.ContentAtXPath(xpath, vars);
+            return DocumentsByXPath(xpath, vars, _contentCache);
         }
 
         public dynamic ContentAtXPath(XPathExpression xpath, params XPathVariable[] vars)
         {
-            return _dynamicContentQuery == null
-                ? DocumentsByXPath(xpath, vars, _contentCache)
-                : _dynamicContentQuery.ContentAtXPath(xpath, vars);
+            return DocumentsByXPath(xpath, vars, _contentCache);
         }
 
         public dynamic ContentAtRoot()
         {
-            return _dynamicContentQuery == null
-                ? DocumentsAtRoot(_contentCache)
-                : _dynamicContentQuery.ContentAtRoot();
+            return DocumentsAtRoot(_contentCache);
         }
 
         #endregion
@@ -146,44 +97,32 @@ namespace Umbraco.Web
         
         public IPublishedContent TypedMedia(int id)
         {
-            return _typedContentQuery == null
-                ? TypedDocumentById(id, _mediaCache)
-                : _typedContentQuery.TypedMedia(id);
+            return TypedDocumentById(id, _mediaCache);
         }
         
         public IEnumerable<IPublishedContent> TypedMedia(IEnumerable<int> ids)
         {
-            return _typedContentQuery == null
-                ? TypedDocumentsByIds(_mediaCache, ids)
-                : _typedContentQuery.TypedMedia(ids);
+            return TypedDocumentsByIds(_mediaCache, ids);
         }
 
         public IEnumerable<IPublishedContent> TypedMediaAtRoot()
         {
-            return _typedContentQuery == null
-                ? TypedDocumentsAtRoot(_mediaCache)
-                : _typedContentQuery.TypedMediaAtRoot();
+            return TypedDocumentsAtRoot(_mediaCache);
         }
 
         public dynamic Media(int id)
         {
-            return _dynamicContentQuery == null
-                ? DocumentById(id, _mediaCache, DynamicNull.Null)
-                : _dynamicContentQuery.Media(id);
+            return DocumentById(id, _mediaCache, DynamicNull.Null);
         }
         
         public dynamic Media(IEnumerable<int> ids)
         {
-            return _dynamicContentQuery == null
-                ? DocumentByIds(_mediaCache, ids)
-                : _dynamicContentQuery.Media(ids);
+            return DocumentByIds(_mediaCache, ids);
         }
 
         public dynamic MediaAtRoot()
         {
-            return _dynamicContentQuery == null
-                ? DocumentsAtRoot(_mediaCache)
-                : _dynamicContentQuery.MediaAtRoot();
+            return DocumentsAtRoot(_mediaCache);
         }
 
         #endregion
@@ -301,10 +240,8 @@ namespace Umbraco.Web
         /// <returns></returns>
         public dynamic Search(string term, bool useWildCards = true, string searchProvider = null)
         {
-            return _dynamicContentQuery == null
-                ? new DynamicPublishedContentList(
-                    TypedSearch(term, useWildCards, searchProvider))
-                : _dynamicContentQuery.Search(term, useWildCards, searchProvider);
+            return new DynamicPublishedContentList(
+                TypedSearch(term, useWildCards, searchProvider));
         }
 
         /// <summary>
@@ -315,10 +252,8 @@ namespace Umbraco.Web
         /// <returns></returns>
         public dynamic Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
         {
-            return _dynamicContentQuery == null
-                ? new DynamicPublishedContentList(
-                    TypedSearch(criteria, searchProvider))
-                : _dynamicContentQuery.Search(criteria, searchProvider);
+            return new DynamicPublishedContentList(
+                TypedSearch(criteria, searchProvider));
         }
 
         /// <summary>
@@ -330,8 +265,6 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IEnumerable<IPublishedContent> TypedSearch(string term, bool useWildCards = true, string searchProvider = null)
         {
-            if (_typedContentQuery != null) return _typedContentQuery.TypedSearch(term, useWildCards, searchProvider);
-
             var searcher = Examine.ExamineManager.Instance.DefaultSearchProvider;
             if (string.IsNullOrEmpty(searchProvider) == false)
                 searcher = Examine.ExamineManager.Instance.SearchProviderCollection[searchProvider];
@@ -348,8 +281,6 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IEnumerable<IPublishedContent> TypedSearch(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
         {
-            if (_typedContentQuery != null) return _typedContentQuery.TypedSearch(criteria, searchProvider);
-
             var s = Examine.ExamineManager.Instance.DefaultSearchProvider;
             if (searchProvider != null)
                 s = searchProvider;

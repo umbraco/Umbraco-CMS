@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using ClientDependency.Core.Logging;
 using Umbraco.Core.Logging;
-using ILogger = ClientDependency.Core.Logging.ILogger;
 
 namespace Umbraco.Web.UI
 {

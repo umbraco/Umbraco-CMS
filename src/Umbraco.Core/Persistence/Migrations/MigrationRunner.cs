@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using log4net;
-using Semver;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Migrations.Syntax.IfDatabase;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Migrations
 {
@@ -17,47 +13,15 @@ namespace Umbraco.Core.Persistence.Migrations
     /// </summary>
     public class MigrationRunner
     {
-        private readonly IMigrationEntryService _migrationEntryService;
-        private readonly ILogger _logger;
-        private readonly SemVersion _currentVersion;
-        private readonly SemVersion _targetVersion;
+        private readonly Version _currentVersion;
+        private readonly Version _targetVersion;
         private readonly string _productName;
-        private readonly IMigration[] _migrations;
 
-        [Obsolete("Use the ctor that specifies all dependencies instead")]
         public MigrationRunner(Version currentVersion, Version targetVersion, string productName)
-            : this(LoggerResolver.Current.Logger, currentVersion, targetVersion, productName)
         {
-        }
-
-        [Obsolete("Use the ctor that specifies all dependencies instead")]
-        public MigrationRunner(ILogger logger, Version currentVersion, Version targetVersion, string productName)
-            : this(logger, currentVersion, targetVersion, productName, null)
-        {
-        }
-
-        [Obsolete("Use the ctor that specifies all dependencies instead")]
-        public MigrationRunner(ILogger logger, Version currentVersion, Version targetVersion, string productName, params IMigration[] migrations)
-            : this(ApplicationContext.Current.Services.MigrationEntryService, logger, new SemVersion(currentVersion), new SemVersion(targetVersion), productName, migrations)
-        {
-            
-        }
-
-        public MigrationRunner(IMigrationEntryService migrationEntryService, ILogger logger, SemVersion currentVersion, SemVersion targetVersion, string productName, params IMigration[] migrations)
-        {
-            if (migrationEntryService == null) throw new ArgumentNullException("migrationEntryService");
-            if (logger == null) throw new ArgumentNullException("logger");
-            if (currentVersion == null) throw new ArgumentNullException("currentVersion");
-            if (targetVersion == null) throw new ArgumentNullException("targetVersion");
-            Mandate.ParameterNotNullOrEmpty(productName, "productName");
-
-            _migrationEntryService = migrationEntryService;
-            _logger = logger;
             _currentVersion = currentVersion;
             _targetVersion = targetVersion;
             _productName = productName;
-            //ensure this is null if there aren't any
-            _migrations = migrations.Length == 0 ? null : migrations;
         }
 
         /// <summary>
@@ -80,7 +44,7 @@ namespace Umbraco.Core.Persistence.Migrations
         /// <returns><c>True</c> if migrations were applied, otherwise <c>False</c></returns>
         public virtual bool Execute(Database database, DatabaseProviders databaseProvider, bool isUpgrade = true)
         {
-            _logger.Info<MigrationRunner>("Initializing database migrations");
+            LogHelper.Info<MigrationRunner>("Initializing database migrations");
 
             var foundMigrations = FindMigrations();
 
@@ -89,12 +53,10 @@ namespace Umbraco.Core.Persistence.Migrations
                                  ? OrderedUpgradeMigrations(foundMigrations).ToList()
                                  : OrderedDowngradeMigrations(foundMigrations).ToList();
 
-            
+            //SD: Why do we want this?
+            //MCH: Because extensibility ... Mostly relevant to package developers who needs to utilize this type of event to add or remove migrations from the list
             if (Migrating.IsRaisedEventCancelled(new MigrationEventArgs(migrations, _currentVersion, _targetVersion, true), this))
-            {
-                _logger.Warn<MigrationRunner>("Migration was cancelled by an event");
                 return false;
-            }
 
             //Loop through migrations to generate sql
             var migrationContext = InitializeMigrations(migrations, database, databaseProvider, isUpgrade);
@@ -131,21 +93,17 @@ namespace Umbraco.Core.Persistence.Migrations
         /// <returns></returns>
         public IEnumerable<IMigration> OrderedUpgradeMigrations(IEnumerable<IMigration> foundMigrations)
         {
-            //get the version instance to compare with the migrations, this will be a normal c# Version object with only 3 parts
-            var targetVersionToCompare = _targetVersion.GetVersion(3);
-            var currentVersionToCompare = _currentVersion.GetVersion(3);
-
             var migrations = (from migration in foundMigrations
-                let migrationAttributes = migration.GetType().GetCustomAttributes<MigrationAttribute>(false)
-                from migrationAttribute in migrationAttributes
-                where migrationAttribute != null
-                where migrationAttribute.TargetVersion > currentVersionToCompare &&
-                      migrationAttribute.TargetVersion <= targetVersionToCompare &&
-                      migrationAttribute.ProductName == _productName &&
-                      //filter if the migration specifies a minimum current version for which to execute
-                      (migrationAttribute.MinimumCurrentVersion == null || currentVersionToCompare >= migrationAttribute.MinimumCurrentVersion)
-                orderby migrationAttribute.TargetVersion, migrationAttribute.SortOrder ascending
-                select migration).Distinct();
+                              let migrationAttributes = migration.GetType().GetCustomAttributes<MigrationAttribute>(false)
+                              from migrationAttribute in migrationAttributes
+                              where migrationAttribute != null
+                              where migrationAttribute.TargetVersion > _currentVersion &&
+                                  migrationAttribute.TargetVersion <= _targetVersion &&
+                                  migrationAttribute.ProductName == _productName &&
+                    //filter if the migration specifies a minimum current version for which to execute
+                    (migrationAttribute.MinimumCurrentVersion == null || _currentVersion >= migrationAttribute.MinimumCurrentVersion)
+                              orderby migrationAttribute.TargetVersion, migrationAttribute.SortOrder ascending
+                              select migration).Distinct();
             return migrations;
         }
 
@@ -156,22 +114,18 @@ namespace Umbraco.Core.Persistence.Migrations
         /// <returns></returns>
         public IEnumerable<IMigration> OrderedDowngradeMigrations(IEnumerable<IMigration> foundMigrations)
         {
-            //get the version instance to compare with the migrations, this will be a normal c# Version object with only 3 parts
-            var targetVersionToCompare = _targetVersion.GetVersion(3);
-            var currentVersionToCompare = _currentVersion.GetVersion(3);
-
             var migrations = (from migration in foundMigrations
-                let migrationAttributes = migration.GetType().GetCustomAttributes<MigrationAttribute>(false)
-                from migrationAttribute in migrationAttributes
-                where migrationAttribute != null
-                where
-                    migrationAttribute.TargetVersion > currentVersionToCompare &&
-                    migrationAttribute.TargetVersion <= targetVersionToCompare &&
+                              let migrationAttributes = migration.GetType().GetCustomAttributes<MigrationAttribute>(false)
+                              from migrationAttribute in migrationAttributes
+                              where migrationAttribute != null
+                              where
+                    migrationAttribute.TargetVersion > _currentVersion &&
+                                  migrationAttribute.TargetVersion <= _targetVersion &&
                     migrationAttribute.ProductName == _productName &&
                     //filter if the migration specifies a minimum current version for which to execute
-                    (migrationAttribute.MinimumCurrentVersion == null || currentVersionToCompare >= migrationAttribute.MinimumCurrentVersion)
-                orderby migrationAttribute.TargetVersion, migrationAttribute.SortOrder descending
-                select migration).Distinct();
+                    (migrationAttribute.MinimumCurrentVersion == null || _currentVersion >= migrationAttribute.MinimumCurrentVersion)
+                              orderby migrationAttribute.TargetVersion, migrationAttribute.SortOrder descending
+                              select migration).Distinct();
             return migrations;
         }
 
@@ -182,13 +136,13 @@ namespace Umbraco.Core.Persistence.Migrations
         protected virtual IMigration[] FindMigrations()
         {
             //MCH NOTE: Consider adding the ProductName filter to the Resolver so we don't get a bunch of irrelevant migrations
-            return _migrations ?? MigrationResolver.Current.Migrations.ToArray();
+            return MigrationResolver.Current.Migrations.ToArray();
         }
 
         internal MigrationContext InitializeMigrations(List<IMigration> migrations, Database database, DatabaseProviders databaseProvider, bool isUpgrade = true)
         {
             //Loop through migrations to generate sql
-            var context = new MigrationContext(databaseProvider, database, _logger);
+            var context = new MigrationContext(databaseProvider, database);
 
             foreach (var migration in migrations)
             {
@@ -198,12 +152,12 @@ namespace Umbraco.Core.Persistence.Migrations
                     if (isUpgrade)
                     {
                         baseMigration.GetUpExpressions(context);
-                        _logger.Info<MigrationRunner>(string.Format("Added UPGRADE migration '{0}' to context", baseMigration.GetType().Name));
+                        LogHelper.Info<MigrationRunner>(string.Format("Added UPGRADE migration '{0}' to context", baseMigration.GetType().Name));
                     }
                     else
                     {
                         baseMigration.GetDownExpressions(context);
-                        _logger.Info<MigrationRunner>(string.Format("Added DOWNGRADE migration '{0}' to context", baseMigration.GetType().Name));
+                        LogHelper.Info<MigrationRunner>(string.Format("Added DOWNGRADE migration '{0}' to context", baseMigration.GetType().Name));
                     }
                 }
                 else
@@ -212,12 +166,12 @@ namespace Umbraco.Core.Persistence.Migrations
                     if (isUpgrade)
                     {
                         migration.Up();
-                        _logger.Info<MigrationRunner>(string.Format("Added UPGRADE migration '{0}' to context", migration.GetType().Name));
+                        LogHelper.Info<MigrationRunner>(string.Format("Added UPGRADE migration '{0}' to context", migration.GetType().Name));
                     }
                     else
                     {
                         migration.Down();
-                        _logger.Info<MigrationRunner>(string.Format("Added DOWNGRADE migration '{0}' to context", migration.GetType().Name));
+                        LogHelper.Info<MigrationRunner>(string.Format("Added DOWNGRADE migration '{0}' to context", migration.GetType().Name));
                     }
                 }
             }
@@ -240,29 +194,12 @@ namespace Umbraco.Core.Persistence.Migrations
                         continue;
                     }
 
-                    //TODO: We should output all of these SQL calls to files in a migration folder in App_Data/TEMP
-                    // so if people want to executed them manually on another environment, they can.
-
-                    _logger.Info<MigrationRunner>("Executing sql statement " + i + ": " + sql);
+                    LogHelper.Info<MigrationRunner>("Executing sql statement " + i + ": " + sql);
                     database.Execute(sql);
                     i++;
                 }
 
-                
-
                 transaction.Complete();
-
-                //Now that this is all complete, we need to add an entry to the migrations table flagging that migrations
-                // for this version have executed.
-                //NOTE: We CANNOT do this as part of the transaction!!! This is because when upgrading to 7.3, we cannot
-                // create the migrations table and then add data to it in the same transaction without issuing things like GO
-                // commands and since we need to support all Dbs, we need to just do this after the fact.
-                var exists = _migrationEntryService.FindEntry(GlobalSettings.UmbracoMigrationName, _targetVersion);
-                if (exists == null)
-                {
-                    _migrationEntryService.CreateEntry(_productName, _targetVersion);    
-                }
-               
             }
         }
 

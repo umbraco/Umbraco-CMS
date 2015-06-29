@@ -78,12 +78,12 @@
 			/// </summary>
 			public const string Dictionary = "dictionary";
 
-            public const string Stylesheets = "stylesheets";
+            //TODO: Fill in the rest!
 
             /// <summary>
-            /// alias for the template tree.
+            /// alias for the media tree.
             /// </summary>
-            public const string Templates = "templates";
+            public const string Templates = "template";
 
             public const string RelationTypes = "relationTypes";
 
@@ -91,7 +91,6 @@
 
             public const string Languages = "languages";
 
-            //TODO: Fill in the rest!
         }
 	}
 

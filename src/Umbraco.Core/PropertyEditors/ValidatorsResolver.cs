@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Core.PropertyEditors
@@ -10,9 +9,9 @@ namespace Umbraco.Core.PropertyEditors
     /// A resolver to resolve all registered validators
     /// </summary>
     internal class ValidatorsResolver : LazyManyObjectsResolverBase<ValidatorsResolver, ManifestValueValidator>
-    {
-        public ValidatorsResolver(IServiceProvider serviceProvider, ILogger logger, IEnumerable<Lazy<Type>> lazyTypeList)
-            : base(serviceProvider, logger, lazyTypeList, ObjectLifetimeScope.Application)
+    {        
+        public ValidatorsResolver(IEnumerable<Lazy<Type>> lazyTypeList)
+            : base(lazyTypeList, ObjectLifetimeScope.Application)
         {
         }
 

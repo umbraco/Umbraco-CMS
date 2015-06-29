@@ -124,12 +124,11 @@ IFRAME {overflow:hidden;}
      border: 1px dashed rgba(0,0,0,0);
 }
 
-.umb-grid .tb:hover .usky-row{
-    border-bottom:1px dashed rgba(182, 182, 182, 0) !important;
+.usky-grid .tb:hover .usky-row{
+    border-bottom:1px dashed rgba(182, 182, 182, 0.3);
 }
 
-/*
-.usky-grid .selectedRow {
+/*.usky-grid .selectedRow {
      border: 1px solid rgba(182, 182, 182, 0.3);
 }*/
 
@@ -152,15 +151,9 @@ IFRAME {overflow:hidden;}
     bottom: 0;
     top: 0;
     right: 0;
-    width: 50px;
+    width: 150px;
     opacity: 0.3;
     z-index: 50;
-}
-//special rule to ensure forms doesnt overrride (forms will align in a later release)
-.umb-grid .cell-tools{width: 50px !important;}
-
-.usky-grid  .cell-tools.with-prompt {
-    width:200px;
 }
 
 .usky-grid .cell-tools:hover{
@@ -236,7 +229,7 @@ IFRAME {overflow:hidden;}
 
 .usky-grid  .usky-control:hover{
     /*border: 1px solid rgba(182, 182, 182, 0.3);*/
-    /*border-bottom: 1px solid rgba(182, 182, 182, 0.3);*/
+    //border-bottom: 1px solid rgba(182, 182, 182, 0.3);
 }
 
 .usky-grid  .usky-control-placeholder:hover{
@@ -252,39 +245,9 @@ IFRAME {overflow:hidden;}
      border: 1px dashed @blue !important;
 }
 
-.usky-grid .warnhighlight > ins.item-label{border-color: @red; color: @red;}
-.usky-grid .infohighlight > ins.item-label{border-color: @blue; color: @blue;}
-
-
-.usky-grid ins.item-label {
-    position: absolute;
-    top: -22px;
-    left: -1px;
-    text-decoration: none;
-    padding: 0px 7px;
-    display:none;
-    font-size:0.8em;
-    background-color: white;
-    color: @grayLight;
-    border: 1px dashed @grayLight;
-    border-bottom: 1px solid white !important;
-    height: 20px;
-    overflow: hidden;
+.usky-grid .usky-control-inner{
+    min-height: 60px;
 }
-
-.usky-grid .usky-row-inner > ins.item-label{
-    top: -20px;
-    left: 0px;
-}
-
-.usky-grid .usky-control-inner.selectedControl , .usky-grid .usky-row-inner.selectedRow{
-    border: 1px dashed @grayLight;
-    
-    > ins.item-label {
-        display: block;
-        z-index:100000;
-    }
-} 
 
 
 
@@ -380,20 +343,8 @@ IFRAME {overflow:hidden;}
      border-radius: 200px;
      background: rgba(255,255,255, 1);
      border:1px solid rgb(182, 182, 182);
-     margin: 2px;    
+     margin: 2px;
  }
-
-  .usky-grid  .iconBox span.prompt {
-      display:block;
-      white-space: nowrap;
-      text-align:center;
-
-  }
-
-  .usky-grid  .iconBox span.prompt > a {
-      text-decoration:underline;
-  }
-
  .usky-grid .iconBox:hover, .usky-grid .iconBox:hover *{
           background: @blue !important;
           color: white !important;
@@ -537,7 +488,6 @@ IFRAME {overflow:hidden;}
  /**************************************************************************************************/
 
  .usky-grid .usky-cell{
-    padding-top: 5px;
     padding-bottom: 15px;
  }
 
@@ -556,16 +506,12 @@ IFRAME {overflow:hidden;}
     border: 1px dashed transparent;
  }
 
- .usky-grid .usky-control-inner {
+ .usky-grid .usky-control-inner{
     padding: 5px;
     margin-right: 45px;
     margin-bottom: 15px;
-
     border: 1px dashed transparent;
-    min-height: 60px;
-    position:relative;
  }
-
 
 
  /**************************************************************************************************/

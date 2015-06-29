@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Web;
 using System.Xml;
@@ -31,7 +30,7 @@ using Umbraco.Core;
 
 namespace umbraco
 {
-    [Tree(Constants.Applications.Settings, Constants.Trees.Stylesheets, "Stylesheets")]
+    [Tree(Constants.Applications.Settings, "stylesheets", "Stylesheets")]
 	public class loadStylesheets : BaseTree
 	{
         public loadStylesheets(string application) : base(application) { }
@@ -47,8 +46,8 @@ namespace umbraco
         {
             Javascript.Append(
                 @"
-			function openStylesheet(name) {
-				UmbClientMgr.contentFrame('settings/stylesheet/editStylesheet.aspx?id=' + name);
+			function openStylesheet(id) {
+				UmbClientMgr.contentFrame('settings/stylesheet/editStylesheet.aspx?id=' + id);
 			}
 			");
         }
@@ -62,18 +61,15 @@ namespace umbraco
 
         public override void Render(ref XmlTree tree)
         {            
-            foreach (var sheet in Services.FileService.GetStylesheets())
+            foreach (StyleSheet n in StyleSheet.GetAll())
             {
-                var nodeId = sheet.Path.TrimEnd(".css");
-                var xNode = XmlTreeNode.Create(this);
-                xNode.NodeID = nodeId;
-                xNode.Text = nodeId;
-                xNode.Action = "javascript:openStylesheet('" +
-                    //Needs to be escaped for JS
-                    HttpUtility.UrlEncode(sheet.Path) + "');";
-                var styleSheetPropertyTree = new loadStylesheetProperty(this.app);
-                xNode.Source = styleSheetPropertyTree.GetTreeServiceUrl(nodeId);
-				xNode.HasChildren = sheet.Properties.Any();
+                XmlTreeNode xNode = XmlTreeNode.Create(this);
+                xNode.NodeID = n.Id.ToString(CultureInfo.InvariantCulture);
+                xNode.Text = n.Text;
+                xNode.Action = "javascript:openStylesheet(" + n.Id + ");";
+                loadStylesheetProperty styleSheetPropertyTree = new loadStylesheetProperty(this.app);
+                xNode.Source = styleSheetPropertyTree.GetTreeServiceUrl(n.Id);
+				xNode.HasChildren = n.HasChildren;
                 xNode.Icon = " icon-brackets";
                 xNode.OpenIcon = "icon-brackets";
                 xNode.NodeType = "stylesheet"; //this shouldn't be like this, it should be this.TreeAlias but the ui.config file points to this name.

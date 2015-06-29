@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Web.Security;
-using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.Models.Membership
 {
@@ -26,7 +25,7 @@ namespace Umbraco.Core.Models.Membership
 
         //NOTE: We are not calling the base constructor which will validate that a provider with the specified name exists which causes issues with unit tests. The ctor
         // validation for that doesn't need to be there anyways (have checked the source).
-        public UmbracoMembershipMember(IMembershipUser member, string providerName, bool providerKeyAsGuid = false)
+        public UmbracoMembershipMember(IMembershipUser member, string providerName)
         {
             _member = member;
             //NOTE: We are copying the values here so that everything is consistent with how the underlying built-in ASP.Net membership user
@@ -38,7 +37,7 @@ namespace Umbraco.Core.Models.Membership
             if (member.PasswordQuestion != null)
                 _passwordQuestion = member.PasswordQuestion.Trim();
             _providerName = providerName;
-            _providerUserKey = providerKeyAsGuid ? member.ProviderUserKey : member.Id;
+            _providerUserKey = member.ProviderUserKey;
             _comment = member.Comments;
             _isApproved = member.IsApproved;
             _isLockedOut = member.IsLockedOut;

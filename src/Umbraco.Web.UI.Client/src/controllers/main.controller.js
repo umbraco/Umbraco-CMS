@@ -15,7 +15,13 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
     $scope.authenticated = null;
     $scope.avatar = "assets/img/application/logo.png";
     $scope.touchDevice = appState.getGlobalState("touchDevice");
-    
+    //subscribes to notifications in the notification service
+    $scope.notifications = notificationsService.current;
+    $scope.$watch('notificationsService.current', function (newVal, oldVal, scope) {
+        if (newVal) {
+            $scope.notifications = newVal;
+        }
+    });
 
     $scope.removeNotification = function (index) {
         notificationsService.remove(index);
@@ -42,16 +48,14 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
         eventsService.emit("app.closeDialogs", event);
     };
 
-    var evts = [];
-
     //when a user logs out or timesout
-    evts.push(eventsService.on("app.notAuthenticated", function() {
+    eventsService.on("app.notAuthenticated", function() {
         $scope.authenticated = null;
         $scope.user = null;
-    }));
+    });
     
     //when the app is read/user is logged in, setup the data
-    evts.push(eventsService.on("app.ready", function (evt, data) {
+    eventsService.on("app.ready", function (evt, data) {
         
         $scope.authenticated = data.authenticated;
         $scope.user = data.user;
@@ -69,7 +73,7 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
                     notificationsService.add(notification);
                 }
             }
-        })
+        });
 
         //if the user has changed we need to redirect to the root so they don't try to continue editing the
         //last item in the URL (NOTE: the user id can equal zero, so we cannot just do !data.lastUserId since that will resolve to true)
@@ -100,13 +104,6 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
               }, 3000);  
         }
 
-    }));
-
-    //ensure to unregister from all events!
-    $scope.$on('$destroy', function () {
-        for (var e in evts) {
-            eventsService.unsubscribe(evts[e]);
-        }
     });
 
 }

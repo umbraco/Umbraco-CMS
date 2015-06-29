@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using umbraco.interfaces;
 
@@ -13,14 +12,13 @@ namespace Umbraco.Core
 	/// </summary>
 	internal sealed class ActionsResolver : LazyManyObjectsResolverBase<ActionsResolver, IAction>
 	{
-	    /// <summary>
-	    /// Constructor
-	    /// </summary>
-	    /// <param name="serviceProvider"></param>
-	    /// <param name="logger"></param>
-	    /// <param name="packageActions"></param>		
-	    internal ActionsResolver(IServiceProvider serviceProvider, ILogger logger, Func<IEnumerable<Type>> packageActions)
-            : base(serviceProvider, logger, packageActions)
+
+		/// <summary>
+		/// Constructor
+		/// </summary>
+		/// <param name="packageActions"></param>		
+		internal ActionsResolver(Func<IEnumerable<Type>> packageActions)
+			: base(packageActions)
 		{
 
 		}
@@ -57,7 +55,7 @@ namespace Umbraco.Core
 				var instance = type.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static);
 				//if the singletone initializer is not found, try simply creating an instance of the IAction if it supports public constructors
 				if (instance == null)
-					typeInstance = ServiceProvider.GetService(type) as IAction;
+					typeInstance = PluginManager.Current.CreateInstance<IAction>(type);
 				else
 					typeInstance = instance.GetValue(null, null) as IAction;
 

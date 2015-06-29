@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Umbraco.Core.Configuration.UmbracoSettings
+﻿namespace Umbraco.Core.Configuration.UmbracoSettings
 {
     public interface ITemplatesSection : IUmbracoConfigurationSection
     {
@@ -10,7 +8,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         RenderingEngine DefaultRenderingEngine { get; }
 
-        [Obsolete("This has no affect and will be removed in future versions")]
         bool EnableTemplateFolders { get; }
     }
 }

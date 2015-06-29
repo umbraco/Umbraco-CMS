@@ -120,22 +120,27 @@ namespace Umbraco.Core.Models
 
         public bool Equals(PropertyGroup other)
         {
-            if (base.Equals(other)) return true;
+            //Check whether the compared object is null. 
+            if (Object.ReferenceEquals(other, null)) return false;
+
+            //Check whether the compared object references the same data. 
+            if (Object.ReferenceEquals(this, other)) return true;
 
             //Check whether the PropertyGroup's properties are equal. 
-            return Name.InvariantEquals(other.Name);
+            return Id.Equals(other.Id) && Name.Equals(other.Name);
         }
 
         public override int GetHashCode()
         {
-            //Get hash code for the Name field if it is not null. 
-            int baseHash = base.GetHashCode();
 
-            //Get hash code for the Alias field. 
-            int nameHash = Name.ToLowerInvariant().GetHashCode();
+            //Get hash code for the Name field if it is not null. 
+            int hashName = Name == null ? 0 : Name.GetHashCode();
+
+            //Get hash code for the Id field. 
+            int hashId = Id.GetHashCode();
 
             //Calculate the hash code for the product. 
-            return baseHash ^ nameHash;
+            return hashName ^ hashId;
         }
 
     }

@@ -12,8 +12,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             _internalPreValues = new Dictionary<string, object>
                 {                 
-                    {"showEditButton", "0"},
-                    {"startNodeId", "-1"}
+                    {"showEditButton", "0"}
                 };
         }
 
@@ -33,9 +32,6 @@ namespace Umbraco.Web.PropertyEditors
         {
             [PreValueField("showEditButton", "Show edit button (this feature is in preview!)", "boolean")]
             public string ShowEditButton { get; set; }
-            
-            [PreValueField("startNodeId", "Start node", "treepicker")]
-            public int StartNodeId { get; set; }
 
         }
     }

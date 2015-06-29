@@ -11,7 +11,6 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
-using Umbraco.Web.Trees;
 
 namespace umbraco.settings
 {
@@ -43,7 +42,7 @@ namespace umbraco.settings
 				updateCultureList();
 
 				ClientTools
-					.SetActiveTreeType(Constants.Trees.Languages)
+					.SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadLanguages>().Tree.Alias)
 					.SyncTree(helper.Request("id"), false);
 			}
 			

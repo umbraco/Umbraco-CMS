@@ -14,58 +14,58 @@ namespace Umbraco.Web.Install
         internal static readonly string[] PermissionFiles = { };
         internal static readonly string[] PackagesPermissionsDirs = { SystemDirectories.Bin, SystemDirectories.Umbraco, SystemDirectories.UserControls, SystemDirectories.Packages };
 
-        public static bool RunFilePermissionTestSuite(out Dictionary<string, List<string>> errorReport)
+        public static bool RunFilePermissionTestSuite()
         {
-            errorReport = new Dictionary<string, List<string>>();
+            var newReport = new Dictionary<string, string>();
 
-            List<string> errors;
+            if (!TestDirectories(PermissionDirs, ref newReport))
+                return false;
 
-            if (TestDirectories(PermissionDirs, out errors) == false)
-                errorReport["Folder creation failed"] = errors.ToList();
+            if (!TestDirectories(PackagesPermissionsDirs, ref newReport))
+                return false;
 
-            if (TestDirectories(PackagesPermissionsDirs, out errors) == false)
-                errorReport["File writing for packages failed"] = errors.ToList();
+            if (!TestFiles(PermissionFiles, ref newReport))
+                return false;
 
-            if (TestFiles(PermissionFiles, out errors) == false)
-                errorReport["File writing failed"] = errors.ToList();
+            if (!TestContentXml(ref newReport)) 
+                return false;
 
-            if (TestContentXml(out errors) == false)
-                errorReport["Cache file writing failed"] = errors.ToList();
+            if (!TestFolderCreation(SystemDirectories.Media, ref newReport))
+                return false;
 
-            if (TestFolderCreation(SystemDirectories.Media, out errors) == false)
-                errorReport["Media folder creation failed"] = errors.ToList();
-
-            return errorReport.Any() == false;
+            return true;
         }
 
-        public static bool TestDirectories(string[] directories, out List<string> errorReport)
+        public static bool TestDirectories(string[] directories, ref Dictionary<string, string> errorReport)
         {
-            errorReport = new List<string>();
             bool succes = true;
             foreach (string dir in PermissionDirs)
             {
                 bool result = SaveAndDeleteFile(IOHelper.MapPath(dir + "/configWizardPermissionTest.txt"));
 
-                if (result == false)
+                if (!result)
                 {
                     succes = false;
-                    errorReport.Add(dir);
+
+                    if (errorReport != null)
+                        errorReport.Add(dir, "Missing permissions, cannot create new files");
                 }
             }
 
             return succes;
         }
 
-        public static bool TestFiles(string[] files, out List<string> errorReport)
+        public static bool TestFiles(string[] files, ref Dictionary<string,string> errorReport)
         {
-            errorReport = new List<string>();
             bool succes = true;
             foreach (string file in PermissionFiles)
             {
                 bool result = OpenFileForWrite(IOHelper.MapPath(file));
-                if (result == false)
+                if (!result)
                 {
-                    errorReport.Add(file);
+                    if (errorReport != null)
+                        errorReport.Add(file, "Missing write permissions");
+
                     succes = false;
                 }
             }
@@ -73,9 +73,8 @@ namespace Umbraco.Web.Install
             return succes;
         }
 
-        public static bool TestFolderCreation(string folder, out List<string> errorReport)
+        public static bool TestFolderCreation(string folder, ref Dictionary<string,string> errorReport)
         {
-            errorReport = new List<string>();
             try
             {
                 string tempDir = IOHelper.MapPath(folder + "/testCreatedByConfigWizard");
@@ -85,26 +84,24 @@ namespace Umbraco.Web.Install
             }
             catch
             {
-                errorReport.Add(folder);
+                if (errorReport != null)
+                    errorReport.Add(folder, "Could not create sub-directory");
                 return false;
             }
         }
 
-        public static bool TestContentXml(out List<string> errorReport)
+        public static bool TestContentXml(ref Dictionary<string, string> errorReport)
         {
-            errorReport = new List<string>();
-            // Test creating/saving/deleting a file in the same location as the content xml file
-            // NOTE: We cannot modify the xml file directly because a background thread is responsible for 
-            // that and we might get lock issues.
+            // Test umbraco.xml file
             try
             {
-                var xmlFile = content.Instance.UmbracoXmlDiskCacheFileName + ".tmp";
-                SaveAndDeleteFile(xmlFile);
+                content.Instance.PersistXmlToFile();
                 return true;
             }
             catch
             {
-                errorReport.Add(SystemFiles.ContentCacheXml);
+                if(errorReport != null)
+                    errorReport.Add(SystemFiles.ContentCacheXml, "Could not persist content cache");
                 return false;    
             }
         }
@@ -115,7 +112,7 @@ namespace Umbraco.Web.Install
             {
                 //first check if the directory of the file exists, and if not try to create that first.
                 FileInfo fi = new FileInfo(file);
-                if (fi.Directory.Exists == false)
+                if (!fi.Directory.Exists)
                 {
                     fi.Directory.Create();
                 }

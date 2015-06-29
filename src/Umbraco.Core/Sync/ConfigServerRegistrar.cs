@@ -1,35 +1,53 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Xml;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Sync
 {
     /// <summary>
-    /// Provides server registrations to the distributed cache by reading the legacy Xml configuration
-    /// in umbracoSettings to get the list of (manually) configured server nodes.
+    /// A registrar that uses the legacy xml configuration in umbracoSettings to get a list of defined server nodes
     /// </summary>
     internal class ConfigServerRegistrar : IServerRegistrar
     {
-        private readonly List<IServerAddress> _addresses;
+        private readonly IEnumerable<IServer> _servers;
 
         public ConfigServerRegistrar()
             : this(UmbracoConfig.For.UmbracoSettings().DistributedCall.Servers)
-        { }
+        {
+            
+        }
 
         internal ConfigServerRegistrar(IEnumerable<IServer> servers)
         {
-            _addresses = servers == null
-                ? new List<IServerAddress>()
-                : servers
-                    .Select(x => new ConfigServerAddress(x))
-                    .Cast<IServerAddress>()
-                    .ToList();
+            _servers = servers;
         }
+
+        private List<IServerAddress> _addresses;
 
         public IEnumerable<IServerAddress> Registrations
         {
-            get { return _addresses; }
+            get
+            {
+                if (_addresses == null)
+                {
+                    _addresses = new List<IServerAddress>();
+                    
+                    if (_servers != null)
+                    {
+                        foreach (var n in _servers)
+                        {
+                            _addresses.Add(new ConfigServerAddress(n));
+                        } 
+                    }
+                }
+
+                return _addresses;
+            }
         }
     }
 }

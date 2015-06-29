@@ -6,7 +6,10 @@ namespace Umbraco.Web.Media.EmbedProviders
     {
         public override bool SupportsDimensions
         {
-            get { return false; }
+            get
+            {
+                return false;
+            }
         }
 
         public override string GetMarkup(string url, int maxWidth, int maxHeight)

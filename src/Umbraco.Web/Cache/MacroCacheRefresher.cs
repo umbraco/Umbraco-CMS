@@ -4,8 +4,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using umbraco;
-
-using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Caching;
 using umbraco.interfaces;
 using System.Linq;
 using Macro = umbraco.cms.businesslogic.macro.Macro;
@@ -171,12 +170,12 @@ namespace Umbraco.Web.Cache
 
         public override void RefreshAll()
         {
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<MacroCacheContent>();
+            ApplicationContext.Current.ApplicationCache.ClearCacheObjectTypes<MacroCacheContent>();
             GetAllMacroCacheKeys().ForEach(
                     prefix =>
-                    ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(prefix));
+                    ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(prefix));
 
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IMacro>();
+            RuntimeCacheProvider.Current.Clear(typeof (IMacro));
 
             base.RefreshAll();
         }
@@ -189,9 +188,9 @@ namespace Umbraco.Web.Cache
             {
                 GetCacheKeysForAlias(payload.Alias).ForEach(
                     alias =>
-                    ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(alias));
+                    ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(alias));
 
-                ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(RepositoryBase.GetCacheIdKey<IMacro>(payload.Id));
+                RuntimeCacheProvider.Current.Delete(typeof(IMacro), payload.Id);
             });
 
             base.Refresh(jsonPayload);

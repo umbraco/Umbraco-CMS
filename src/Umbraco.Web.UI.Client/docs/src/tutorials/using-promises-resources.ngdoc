@@ -1,0 +1,108 @@
+@ngdoc overview
+@name Using AngularJS Promises and Umbraco Resources
+@description
+
+##Overview
+Document to outline the way we work with data from the Umbraco rest API which is always returned as a promise, so we in an async way can resolve our data.  
+
+##Promises in Umbraco Resources
+
+All Umbraco resource methods utilize a helper method:
+
+	umbRequestHelper.resourcePromise
+
+This method accepts 2 arguments:
+
+* The angular HttpPromise which is created with a call to $http.get (post, etc..)
+* The error message that is bubbled to the UI when the http call fails
+
+Here's an example of the usage in an Umbraco resource. This example is the method of the treeResource that fetches data to display the menu for a tree node:
+
+	/** Loads in the data to display the nodes menu */
+    loadMenu: function (node) {
+        
+        return umbRequestHelper.resourcePromise(
+            $http.get(getTreeMenuUrl(node)),
+            "Failed to retrieve data for a node's menu " + node.id);
+    }
+
+HTTP error handling is performed automatically inside of the `umbRequestHelper.resourcePromise` and inside of Umbraco's response interceptors.
+
+##Consuming Umbraco resources
+
+When consuming Umbraco resources, a normal angular promise will be returned based on the above `umbRequestHelper.resourcePromise`. The success callback will always receive the RAW json data from the server and the error callback will always receive an object containing these properties:
+
+* erroMsg = the error message that can be used to show in the UI
+* data = the original data object used to create the promise
+
+Error handling will be done automatically in the Umbraco resource. Http error handling should not be done during the consumption of an Umbraco resource.
+
+###Simple example
+
+An simple example of consuming an Umbraco resource:
+
+	treeResource.loadMenu(treeItem.node)
+    	.then(function(data) {        
+            scope.menu = data;
+        });
+
+###Transforming result data
+
+Sometimes the consumption of an Umbraco resource needs to return a promise itself. This is required in some circumstances such as:
+
+The data from a result of an http resource might need to be transformed into something usable in the UI so a Service may need to call a resource, transform the result and continue to return it's own promise (since everything happens async).
+
+This is actually very simple to do, the Service (or whatever is consuming the resource) just returns the result of their 'then' call. Example - this example is the `getActions` method of the `treeService` that consumes the treeResource, transforms the result and continues to return it's own promise:
+
+    getActions: function(treeItem, section) {
+
+        return treeResource.loadMenu(treeItem.node)
+            .then(function(data) {
+                //need to convert the icons to new ones
+                for (var i = 0; i < data.length; i++) {
+                    data[i].cssclass = iconHelper.convertFromLegacyIcon(data[i].cssclass);
+                }
+                return data;
+            });
+    } 
+
+Notice that this is just returning the call to 'then' which will return a promise that resolves the data from it's return statement.
+
+###Error hanlding
+
+Ok, what about error handling ? This is really simple as well, we just add an additional method to the .then call. A simple example:
+
+	treeResource.loadMenu(treeItem.node)
+    	.then(function(data) {        
+            scope.menu = data;
+        }, function(err) {
+			//display the error
+            notificationsService.error(err.errorMsg);
+		});
+
+###Error handling when transforming result data
+
+This is one of those things that is important to note! If you need to return a custom promise based on the result of an Umbraco resource (like the example above in Transforming result data) then you will need to 'throw' an error if you want to 'bubble' the error to the handler of your custom promise.
+
+The good news is, this is very simple to do, example:
+
+    getActions: function(treeItem, section) {
+
+        return treeResource.loadMenu(treeItem.node)
+            .then(function(data) {
+                //need to convert the icons to new ones
+                for (var i = 0; i < data.length; i++) {
+                    data[i].cssclass = iconHelper.convertFromLegacyIcon(data[i].cssclass);
+                }
+                return data;
+            }, function(err) {
+				//display the error
+            	notificationsService.error(err.errorMsg);
+				
+				//since we want the handler of this promise to be notified of this error
+				// we just need to rethrow it:
+				throw err;
+			});
+    }
+
+The next thing that is important to note is that **you don't have to do anything** if you don't want to do anything with the error but still want the error bubbled up to your promises handlers. So for example, if you are expecting the handler of this promise to handle the error and display something in the UI, just leave out the function(err) callback which would look exactly the same as the example for 'Transforming result data'

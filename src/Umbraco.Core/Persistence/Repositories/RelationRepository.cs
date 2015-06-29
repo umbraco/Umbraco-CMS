@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
-
+using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -20,8 +18,14 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly IRelationTypeRepository _relationTypeRepository;
 
-        public RelationRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IRelationTypeRepository relationTypeRepository)
-            : base(work, cache, logger, sqlSyntax)
+        public RelationRepository(IDatabaseUnitOfWork work, IRelationTypeRepository relationTypeRepository)
+            : base(work)
+        {
+            _relationTypeRepository = relationTypeRepository;
+        }
+
+        public RelationRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IRelationTypeRepository relationTypeRepository)
+            : base(work, cache)
         {
             _relationTypeRepository = relationTypeRepository;
         }
@@ -50,8 +54,6 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return entity;
         }
-
-        //TODO: Fix N+1 !
 
         protected override IEnumerable<IRelation> PerformGetAll(params int[] ids)
         {
@@ -146,16 +148,5 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         #endregion
-
-        /// <summary>
-        /// Dispose disposable properties
-        /// </summary>
-        /// <remarks>
-        /// Ensure the unit of work is disposed
-        /// </remarks>
-        protected override void DisposeResources()
-        {
-            _relationTypeRepository.Dispose();
-        }
     }
 }

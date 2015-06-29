@@ -35,9 +35,7 @@ namespace Umbraco.Web.Scheduling
                     }
                     catch (Exception ee)
                     {
-                        LogHelper.Error<KeepAlive>(
-                        string.Format("Error in ping. The base url used in the request was: {0}, see http://our.umbraco.org/documentation/Using-Umbraco/Config-files/umbracoSettings/#ScheduledTasks documentation for details on setting a baseUrl if this is in error", umbracoBaseUrl)
-                        , ee);
+                        LogHelper.Error<KeepAlive>("Error in ping", ee);
                     }
                 }
             }

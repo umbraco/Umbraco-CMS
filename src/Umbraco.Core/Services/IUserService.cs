@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Services
@@ -55,14 +54,6 @@ namespace Umbraco.Core.Services
         void DeleteSectionFromAllUsers(string sectionAlias);
         
         /// <summary>
-        /// Add a specific section to all users or those specified as parameters
-        /// </summary>
-        /// <remarks>This is useful when a new section is created to allow specific users accessing it</remarks>
-        /// <param name="sectionAlias">Alias of the section to add</param>
-        /// <param name="userIds">Specifiying nothing will add the section to all user</param>
-        void AddSectionToAllUsers(string sectionAlias, params int[] userIds);
-        
-        /// <summary>
         /// Get permissions set for a user and optional node ids
         /// </summary>
         /// <remarks>If no permissions are found for a particular entity then the user's default permissions will be applied</remarks>
@@ -73,23 +64,12 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Replaces the same permission set for a single user to any number of entities
-        /// </summary>        
-        /// <param name="userId">Id of the user</param>
-        /// <param name="permissions">
-        /// Permissions as enumerable list of <see cref="char"/>, 
-        /// if no permissions are specified then all permissions for this node are removed for this user
-        /// </param>
-        /// <param name="entityIds">Specify the nodes to replace permissions for. If nothing is specified all permissions are removed.</param>
-        /// <remarks>If no 'entityIds' are specified all permissions will be removed for the specified user.</remarks>
-        void ReplaceUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds);
-
-        /// <summary>
-        /// Assigns the same permission set for a single user to any number of entities
         /// </summary>
+        /// <remarks>If no 'entityIds' are specified all permissions will be removed for the specified user.</remarks>
         /// <param name="userId">Id of the user</param>
-        /// <param name="permission"></param>
-        /// <param name="entityIds">Specify the nodes to replace permissions for</param>
-        void AssignUserPermission(int userId, char permission, params int[] entityIds);
+        /// <param name="permissions">Permissions as enumerable list of <see cref="char"/></param>
+        /// <param name="entityIds">Specify the nodes to replace permissions for. If nothing is specified all permissions are removed.</param>
+        void ReplaceUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds);
 
         #region User types
 

@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Linq;
-using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
-
+using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -32,16 +30,30 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private RelationRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out RelationTypeRepository relationTypeRepository)
         {
-            relationTypeRepository = new RelationTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
-            var repository = new RelationRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, relationTypeRepository);
+            relationTypeRepository = new RelationTypeRepository(unitOfWork, NullCacheProvider.Current);
+            var repository = new RelationRepository(unitOfWork, NullCacheProvider.Current, relationTypeRepository);
             return repository;
+        }
+
+        [Test]
+        public void Can_Instantiate_Repository_From_Resolver()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+
+            // Act
+            var repository = RepositoryResolver.Current.ResolveByType<IRelationRepository>(unitOfWork);
+
+            // Assert
+            Assert.That(repository, Is.Not.Null);
         }
 
         [Test]
         public void Can_Perform_Add_On_RelationRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
             RelationTypeRepository repositoryType;
             using (var repository = CreateRepository(unitOfWork, out repositoryType))
@@ -63,7 +75,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_On_RelationRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
             RelationTypeRepository repositoryType;
             using (var repository = CreateRepository(unitOfWork, out repositoryType))
@@ -88,7 +100,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_On_RelationRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
             RelationTypeRepository repositoryType;
             using (var repository = CreateRepository(unitOfWork, out repositoryType))
@@ -110,7 +122,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_On_RelationRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
             RelationTypeRepository repositoryType;
             using (var repository = CreateRepository(unitOfWork, out repositoryType))
@@ -132,7 +144,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_On_RelationRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
             RelationTypeRepository repositoryType;
             using (var repository = CreateRepository(unitOfWork, out repositoryType))
@@ -153,7 +165,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_With_Params_On_RelationRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
             RelationTypeRepository repositoryType;
             using (var repository = CreateRepository(unitOfWork, out repositoryType))
@@ -174,7 +186,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Exists_On_RelationRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
             RelationTypeRepository repositoryType;
             using (var repository = CreateRepository(unitOfWork, out repositoryType))
@@ -194,7 +206,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Count_On_RelationRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
             RelationTypeRepository repositoryType;
             using (var repository = CreateRepository(unitOfWork, out repositoryType))
@@ -213,14 +225,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetByQuery_On_RelationRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
             RelationTypeRepository repositoryType;
             using (var repository = CreateRepository(unitOfWork, out repositoryType))
             {
-                
+
                 // Act
-                var query = Query<IRelation>.Builder.Where(x => x.RelationTypeId == RelationTypeDto.NodeIdSeed);
+                var query = Query<IRelation>.Builder.Where(x => x.RelationTypeId == 2);
                 var relations = repository.GetByQuery(query);
 
                 // Assert
@@ -235,7 +247,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Delete_Content_And_Verify_Relation_Is_Removed()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
             RelationTypeRepository repositoryType;
             using (var repository = CreateRepository(unitOfWork, out repositoryType))
@@ -265,10 +277,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             var relateContent = new RelationType(new Guid(Constants.ObjectTypes.Document), new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"), "relateContentOnCopy") { IsBidirectional = true, Name = "Relate Content on Copy" };
             var relateContentType = new RelationType(new Guid(Constants.ObjectTypes.DocumentType), new Guid("A2CB7800-F571-4787-9638-BC48539A0EFB"), "relateContentTypeOnCopy") { IsBidirectional = true, Name = "Relate ContentType on Copy" };
 
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var relationTypeRepository = new RelationTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
-            var relationRepository = new RelationRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, relationTypeRepository);
+            var relationTypeRepository = new RelationTypeRepository(unitOfWork);
+            var relationRepository = new RelationRepository(unitOfWork, NullCacheProvider.Current, relationTypeRepository);
 
             relationTypeRepository.AddOrUpdate(relateContent);
             relationTypeRepository.AddOrUpdate(relateContentType);

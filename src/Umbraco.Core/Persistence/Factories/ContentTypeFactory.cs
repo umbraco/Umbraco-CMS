@@ -6,7 +6,7 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class ContentTypeFactory 
+    internal class ContentTypeFactory : IEntityFactory<IContentType, DocumentTypeDto>
     {
         private readonly Guid _nodeObjectType;
 
@@ -22,7 +22,10 @@ namespace Umbraco.Core.Persistence.Factories
             var contentType = new ContentType(dto.ContentTypeDto.NodeDto.ParentId)
                                   {
                                       Id = dto.ContentTypeDto.NodeDto.NodeId,
-                                      Key = dto.ContentTypeDto.NodeDto.UniqueId,
+                                      Key =
+                                          dto.ContentTypeDto.NodeDto.UniqueId.HasValue
+                                              ? dto.ContentTypeDto.NodeDto.UniqueId.Value
+                                              : dto.ContentTypeDto.NodeDto.NodeId.ToGuid(),
                                       Alias = dto.ContentTypeDto.Alias,
                                       Name = dto.ContentTypeDto.NodeDto.Text,
                                       Icon = dto.ContentTypeDto.Icon,

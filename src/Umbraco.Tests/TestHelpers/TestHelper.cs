@@ -7,12 +7,13 @@ using System.Reflection;
 using SqlCE4Umbraco;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using log4net.Config;
 using umbraco.DataLayer;
 using GlobalSettings = umbraco.GlobalSettings;
 
 namespace Umbraco.Tests.TestHelpers
 {
-    /// <summary>
+	/// <summary>
 	/// Common helper properties and methods useful to testing
 	/// </summary>
 	public static class TestHelper
@@ -71,7 +72,12 @@ namespace Umbraco.Tests.TestHelpers
 			return relativePath.Replace("~/", CurrentAssemblyDirectory + "/");
 		}
 
-	    public static void InitializeContentDirectories()
+		public static void SetupLog4NetForTests()
+		{
+			XmlConfigurator.Configure(new FileInfo(MapPathForTest("~/unit-test-log4net.config")));
+		}
+
+        public static void InitializeContentDirectories()
         {
             CreateDirectories(new[] { SystemDirectories.Masterpages, SystemDirectories.MvcViews, SystemDirectories.Media, SystemDirectories.AppPlugins });
         }

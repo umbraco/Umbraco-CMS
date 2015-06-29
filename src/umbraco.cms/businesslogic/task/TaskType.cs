@@ -1,34 +1,33 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Text;
 using System.Runtime.CompilerServices;
 
 using umbraco.BusinessLogic;
-using Umbraco.Core;
 using umbraco.DataLayer;
 
 
 namespace umbraco.cms.businesslogic.task
 {
-    [Obsolete("Use Umbraco.Core.Service.ITaskService instead")]
     public class TaskType
     {
-        internal Umbraco.Core.Models.TaskType TaskTypeEntity;
+        
 
         #region Public Properties
 
         public int Id
         {
-            get { return TaskTypeEntity.Id; }
-            set { TaskTypeEntity.Id = value; }
+            get { return _id; }
+            set { _id = value; }
         }
+
+        private string _alias;
 
         public string Alias
         {
-            get { return TaskTypeEntity.Alias; }
-            set { TaskTypeEntity.Alias = value; }
+            get { return _alias; }
+            set { _alias = value; }
         }
 
         /// <summary>
@@ -39,11 +38,11 @@ namespace umbraco.cms.businesslogic.task
             get
             {
                 //lazy load the tasks
-                if (_tasks == null)
+                if (m_Tasks == null)
                 {
-                    _tasks = Task.GetTasksByType(this.Id);
+                    m_Tasks = Task.GetTasksByType(this.Id);
                 }
-                return _tasks;
+                return m_Tasks;
             }
         }
 
@@ -55,40 +54,70 @@ namespace umbraco.cms.businesslogic.task
         {
             get { return Application.SqlHelper; }
         }
-
-        private Tasks _tasks;
+        private int _id;
+        private Tasks m_Tasks;
 
         #endregion
 
         #region Constructors
-
-        internal TaskType(Umbraco.Core.Models.TaskType tt)
-        {
-            TaskTypeEntity = tt;
-        }
-        
         public TaskType()
         {
         }
 
         public TaskType(string TypeAlias)
         {
-            TaskTypeEntity = ApplicationContext.Current.Services.TaskService.GetTaskTypeByAlias(TypeAlias);
-            if (TaskTypeEntity == null) throw new NullReferenceException("No task type found by alias " + TypeAlias);            
+            Id = SqlHelper.ExecuteScalar<int>(
+                "select id from cmsTaskType where alias = @alias",
+                SqlHelper.CreateParameter("@alias", TypeAlias));
+            setup();
         }
 
         public TaskType(int TaskTypeId)
         {
-            TaskTypeEntity = ApplicationContext.Current.Services.TaskService.GetTaskTypeById(TaskTypeId);
-            if (TaskTypeEntity == null) throw new NullReferenceException("No task type found by alias " + TaskTypeId);            
+            Id = TaskTypeId;
+            setup();
         } 
-        #endregion      
+        #endregion
+
+        #region Private methods
+        private void setup()         
+        {
+			using (IRecordsReader dr =
+				SqlHelper.ExecuteReader("select alias from cmsTaskType where id = @id",
+				                        SqlHelper.CreateParameter("@id", Id)))
+			{
+                if (dr.Read())
+                {
+                    _id = Id;
+                    Alias = dr.GetString("alias");
+                }
+                else
+                {
+                    throw new ArgumentException("No Task type found for the id specified");
+                }
+			}
+        }
+        #endregion
 
         #region Public methods
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void Save()
         {
-            ApplicationContext.Current.Services.TaskService.Save(TaskTypeEntity);
+            if (Id == 0)
+            {
+                // The method is synchronized
+                SqlHelper.ExecuteNonQuery("INSERT INTO cmsTaskType (alias) values (@alias)",
+                    SqlHelper.CreateParameter("@alias", Alias));
+                Id = SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM cmsTaskType");
+            }
+            else
+            {
+                SqlHelper.ExecuteNonQuery(
+                    "update cmsTaskType set alias = @alias where id = @id",
+                    SqlHelper.CreateParameter("@alias", Alias),
+                    SqlHelper.CreateParameter("@id", Id));
+            }
         }
 
         /// <summary>
@@ -97,7 +126,12 @@ namespace umbraco.cms.businesslogic.task
         /// </summary>
         public void Delete()
         {
-            ApplicationContext.Current.Services.TaskService.Delete(TaskTypeEntity);
+            foreach (Task t in Tasks)
+            {
+                t.Delete();
+            }
+            m_Tasks.Clear(); //remove the internal collection
+            SqlHelper.ExecuteNonQuery("DELETE FROM cmsTaskType WHERE id = @id", SqlHelper.CreateParameter("@id", this._id));
         } 
 
         #endregion
@@ -109,8 +143,16 @@ namespace umbraco.cms.businesslogic.task
         /// <returns></returns>
         public static IEnumerable<TaskType> GetAll()
         {
-            return ApplicationContext.Current.Services.TaskService.GetAllTaskTypes()
-                .Select(x => new TaskType(x));
+            var sql = "SELECT id, alias FROM cmsTaskType";
+            var types = new List<TaskType>();
+            using (IRecordsReader dr = SqlHelper.ExecuteReader(sql))
+            {
+                while (dr.Read())
+                {
+                    types.Add(new TaskType() { _alias = dr.GetString("alias"), _id = Convert.ToInt32(dr.Get<object>("id")) });
+                }
+            }
+            return types;
         } 
         #endregion
 	

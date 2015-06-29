@@ -14,5 +14,8 @@ namespace Umbraco.Web.Models.ContentEditing
         
         [DataMember(Name = "path")]
         public string Path { get; set; }
+
+        [DataMember(Name = "id")]
+        public int Id { get; set; }
     }
 }

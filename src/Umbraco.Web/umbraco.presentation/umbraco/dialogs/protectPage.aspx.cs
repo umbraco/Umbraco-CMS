@@ -172,10 +172,10 @@ namespace umbraco.presentation.umbraco.dialogs
 
         protected void protect_Click(object sender, CommandEventArgs e)
         {
-            if (string.IsNullOrEmpty(errorPagePicker.Value) || errorPagePicker.Value == "-1")
+            if (string.IsNullOrEmpty(errorPagePicker.Value))
                 cv_errorPage.IsValid = false;
 
-            if (string.IsNullOrEmpty(loginPagePicker.Value) || loginPagePicker.Value == "-1")
+            if (string.IsNullOrEmpty(loginPagePicker.Value))
                 cv_loginPage.IsValid = false;
 
             //reset

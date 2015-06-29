@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Text.RegularExpressions;
 using Umbraco.Core;
+using umbraco.cms.businesslogic.web;
  
 namespace Umbraco.Web.Routing
 {

@@ -3,7 +3,7 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class RelationFactory 
+    internal class RelationFactory : IEntityFactory<IRelation, RelationDto>
     {
         private readonly IRelationType _relationType;
 

@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Reflection;
-using Semver;
 
 namespace Umbraco.Core.Configuration
 {
     public class UmbracoVersion
     {
-        private static readonly Version Version = new Version("7.3.0");
+        private static readonly Version Version = new Version("7.2.0");
 
         /// <summary>
         /// Gets the current version of Umbraco.
@@ -24,20 +23,10 @@ namespace Umbraco.Core.Configuration
         /// Gets the version comment (like beta or RC).
         /// </summary>
         /// <value>The version comment.</value>
-        public static string CurrentComment { get { return "beta.2"; } }
+        public static string CurrentComment { get { return ""; } }
 
         // Get the version of the umbraco.dll by looking at a class in that dll
         // Had to do it like this due to medium trust issues, see: http://haacked.com/archive/2010/11/04/assembly-location-and-medium-trust.aspx
         public static string AssemblyVersion { get { return new AssemblyName(typeof(ActionsResolver).Assembly.FullName).Version.ToString(); } }
-
-        public static SemVersion GetSemanticVersion()
-        {
-            return new SemVersion(
-                Current.Major, 
-                Current.Minor,
-                Current.Build, 
-                CurrentComment.IsNullOrWhiteSpace() ? null : CurrentComment,
-                Current.Revision > 0 ? Current.Revision.ToInvariantString() : null);
-        }
     }
 }

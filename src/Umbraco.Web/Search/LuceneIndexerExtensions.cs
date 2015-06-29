@@ -13,6 +13,23 @@ namespace Umbraco.Web.Search
     /// </summary>
     internal static class ExamineExtensions
     {
+        public static LuceneSearcher GetSearcherForIndexer(this LuceneIndexer indexer)
+        {
+            var indexSet = indexer.IndexSetName;
+            var searcher = ExamineManager.Instance.SearchProviderCollection.OfType<LuceneSearcher>()
+                                         .FirstOrDefault(x => x.IndexSetName == indexSet);
+            if (searcher == null)
+                throw new InvalidOperationException("No searcher assigned to the index set " + indexer.IndexSetName);
+            return searcher;
+        }
+
+        private static IndexReader GetIndexReaderForSearcher(this BaseLuceneSearcher searcher)
+        {
+            var indexSearcher = searcher.GetSearcher() as IndexSearcher;
+            if (indexSearcher == null)
+                throw new InvalidOperationException("The index searcher is not of type " + typeof(IndexSearcher) + " cannot execute this method");
+            return indexSearcher.GetIndexReader();
+        }
 
         /// <summary>
         /// Return the number of indexed documents in Lucene
@@ -21,10 +38,7 @@ namespace Umbraco.Web.Search
         /// <returns></returns>
         public static int GetIndexDocumentCount(this LuceneIndexer indexer)
         {
-            using (var reader = indexer.GetIndexWriter().GetReader())
-            {
-                return reader.NumDocs();
-            }
+            return indexer.GetSearcherForIndexer().GetIndexReaderForSearcher().NumDocs();
         }
 
         /// <summary>
@@ -34,10 +48,7 @@ namespace Umbraco.Web.Search
         /// <returns></returns>
         public static int GetIndexFieldCount(this LuceneIndexer indexer)
         {
-            using (var reader = indexer.GetIndexWriter().GetReader())
-            {
-                return reader.GetFieldNames(IndexReader.FieldOption.ALL).Count;
-            }
+            return indexer.GetSearcherForIndexer().GetIndexReaderForSearcher().GetFieldNames(IndexReader.FieldOption.ALL).Count;
         }
 
         /// <summary>
@@ -47,10 +58,7 @@ namespace Umbraco.Web.Search
         /// <returns></returns>
         public static bool IsIndexOptimized(this LuceneIndexer indexer)
         {
-            using (var reader = indexer.GetIndexWriter().GetReader())
-            {
-                return reader.IsOptimized();
-            }
+            return indexer.GetSearcherForIndexer().GetIndexReaderForSearcher().IsOptimized();
         }
 
         /// <summary>
@@ -62,9 +70,9 @@ namespace Umbraco.Web.Search
         /// If the index does not exist we'll consider it locked
         /// </remarks>
         public static bool IsIndexLocked(this LuceneIndexer indexer)
-        {   
-            return indexer.IndexExists() == false
-                   || IndexWriter.IsLocked(indexer.GetLuceneDirectory());
+        {
+            return !indexer.IndexExists()
+                   || IndexWriter.IsLocked(indexer.GetSearcherForIndexer().GetIndexReaderForSearcher().Directory());
         }
 
         /// <summary>
@@ -74,10 +82,7 @@ namespace Umbraco.Web.Search
         /// <returns></returns>
         public static int GetDeletedDocumentsCount(this LuceneIndexer indexer)
         {
-            using (var reader = indexer.GetIndexWriter().GetReader())
-            {
-                return reader.NumDeletedDocs();
-            }
+            return indexer.GetSearcherForIndexer().GetIndexReaderForSearcher().NumDeletedDocs();
         }
     }
 }

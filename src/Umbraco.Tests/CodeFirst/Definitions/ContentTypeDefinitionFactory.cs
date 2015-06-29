@@ -108,11 +108,12 @@ namespace Umbraco.Tests.CodeFirst.Definitions
                 //Check if a PropertyType with the same alias already exists, as we don't want to override existing ones
                 if(group.PropertyTypes.Contains(definition.Alias)) continue;
 
-                var propertyType = new PropertyType(definition.DataTypeDefinition, definition.Alias)
+                var propertyType = new PropertyType(definition.DataTypeDefinition)
                                        {
                                            Mandatory = definition.Mandatory,
                                            ValidationRegExp = definition.ValidationRegExp,
                                            SortOrder = definition.Order,
+                                           Alias = definition.Alias,
                                            Name = definition.Name
                                        };
 
@@ -324,7 +325,7 @@ namespace Umbraco.Tests.CodeFirst.Definitions
                                ? string.Concat(@alias, ".cshtml")
                                : string.Concat(@alias, ".masterpage");
 
-                    template = new Template(string.Empty, name, @alias) { Content = string.Empty};
+                    template = new Template(string.Empty, name, @alias) { CreatorId = 0, Content = string.Empty};
 					ApplicationContext.Current.Services.FileService.SaveTemplate(template);
                 }
                 templates.Add(template);
@@ -346,10 +347,12 @@ namespace Umbraco.Tests.CodeFirst.Definitions
             {
                 if(type == currentType) continue;//If the referenced type is equal to the current type we skip it to avoid a circular dependency
 
-                
+                var contentTypeSort = new ContentTypeSort();
                 var isResolved = _contentTypeCache.ContainsKey(type.FullName);
                 var lazy = isResolved ? _contentTypeCache[type.FullName].ContentType : GetContentTypeDefinition(type);
-                var contentTypeSort = new ContentTypeSort(new Lazy<int>(() => lazy.Value.Id), order, lazy.Value.Alias);
+                contentTypeSort.Id = new Lazy<int>(() => lazy.Value.Id);
+                contentTypeSort.Alias = lazy.Value.Alias;
+                contentTypeSort.SortOrder = order;
                 contentTypeSorts.Add(contentTypeSort);
                 order++;
             }

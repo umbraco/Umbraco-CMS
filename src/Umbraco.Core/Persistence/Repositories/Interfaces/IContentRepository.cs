@@ -28,10 +28,12 @@ namespace Umbraco.Core.Persistence.Repositories
         void ReplaceContentPermissions(EntityPermissionSet permissionSet);
 
         /// <summary>
-        /// Clears the published flag for a content.
+        /// Gets a specific language version of an <see cref="IContent"/>
         /// </summary>
-        /// <param name="content"></param>
-        void ClearPublished(IContent content);
+        /// <param name="id">Id of the <see cref="IContent"/> to retrieve version from</param>
+        /// <param name="language">Culture code for the language to retrieve</param>
+        /// <returns>An <see cref="IContent"/> item</returns>
+        IContent GetByLanguage(int id, string language);
 
         /// <summary>
         /// Gets all published Content by the specified query
@@ -86,7 +88,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="orderDirection">Direction to order by</param>
         /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        IEnumerable<IContent> GetPagedResultsByQuery(IQuery<IContent> query, long pageIndex, int pageSize, out long totalRecords,
+        IEnumerable<IContent> GetPagedResultsByQuery(IQuery<IContent> query, int pageIndex, int pageSize, out int totalRecords,
             string orderBy, Direction orderDirection, string filter = "");
     }
 }

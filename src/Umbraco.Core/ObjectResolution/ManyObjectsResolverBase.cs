@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Web;
-using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.ObjectResolution
 {
@@ -17,110 +15,70 @@ namespace Umbraco.Core.ObjectResolution
 		where TResolved : class
         where TResolver : ResolverBase
 	{
-		private Lazy<IEnumerable<TResolved>> _applicationInstances;
+		private IEnumerable<TResolved> _applicationInstances = null;
 		private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 		private readonly string _httpContextKey;
 		private readonly List<Type> _instanceTypes = new List<Type>();
-	    private IEnumerable<TResolved> _sortedValues;
+	    private IEnumerable<TResolved> _sortedValues = null;
 
 		private int _defaultPluginWeight = 10;
 
 		#region Constructors
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ManyObjectsResolverBase{TResolver, TResolved}"/> class with an empty list of objects,
-        /// and an optional lifetime scope.
-        /// </summary>
-        /// <param name="serviceProvider"></param>
-        /// <param name="logger"></param>
-        /// <param name="scope">The lifetime scope of instantiated objects, default is per Application.</param>
-        /// <remarks>If <paramref name="scope"/> is per HttpRequest then there must be a current HttpContext.</remarks>
-        /// <exception cref="InvalidOperationException"><paramref name="scope"/> is per HttpRequest but the current HttpContext is null.</exception>
-        protected ManyObjectsResolverBase(IServiceProvider serviceProvider, ILogger logger, ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
-        {
-            if (serviceProvider == null) throw new ArgumentNullException("serviceProvider");
-            if (logger == null) throw new ArgumentNullException("logger");
-            CanResolveBeforeFrozen = false;
-            if (scope == ObjectLifetimeScope.HttpRequest)
-            {
-                if (HttpContext.Current == null)
-                    throw new InvalidOperationException("Use alternative constructor accepting a HttpContextBase object in order to set the lifetime scope to HttpRequest when HttpContext.Current is null");
-
-                CurrentHttpContext = new HttpContextWrapper(HttpContext.Current);
-            }
-
-            ServiceProvider = serviceProvider;
-            Logger = logger;
-            LifetimeScope = scope;
-            if (scope == ObjectLifetimeScope.HttpRequest)
-                _httpContextKey = GetType().FullName;
-            _instanceTypes = new List<Type>();
-
-            InitializeAppInstances();
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use ctor specifying IServiceProvider instead")]
-		protected ManyObjectsResolverBase(ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
-            : this(new ActivatorServiceProvider(), LoggerResolver.Current.Logger, scope)
-		{
 			
-		}
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ManyObjectsResolverBase{TResolver, TResolved}"/> class with an empty list of objects,
-        /// with creation of objects based on an HttpRequest lifetime scope.
-        /// </summary>
-        /// <param name="serviceProvider"></param>
-        /// <param name="logger"></param>
-        /// <param name="httpContext">The HttpContextBase corresponding to the HttpRequest.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="httpContext"/> is <c>null</c>.</exception>
-        protected ManyObjectsResolverBase(IServiceProvider serviceProvider, ILogger logger, HttpContextBase httpContext)
-		{
-            if (serviceProvider == null) throw new ArgumentNullException("serviceProvider");
-            if (httpContext == null) throw new ArgumentNullException("httpContext");
-            CanResolveBeforeFrozen = false;
-            Logger = logger;
-			LifetimeScope = ObjectLifetimeScope.HttpRequest;
-			_httpContextKey = GetType().FullName;
-            ServiceProvider = serviceProvider;
-            CurrentHttpContext = httpContext;
-			_instanceTypes = new List<Type>();
-
-            InitializeAppInstances();
-		}
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use ctor specifying IServiceProvider instead")]
-        protected ManyObjectsResolverBase(HttpContextBase httpContext)
-            : this(new ActivatorServiceProvider(), LoggerResolver.Current.Logger, httpContext)
-        {
-
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ManyObjectsResolverBase{TResolver, TResolved}"/> class with an initial list of object types,
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ManyObjectsResolverBase{TResolver, TResolved}"/> class with an empty list of objects,
         /// and an optional lifetime scope.
-        /// </summary>
-        /// <param name="serviceProvider"></param>
-        /// <param name="logger"></param>
-        /// <param name="value">The list of object types.</param>
-        /// <param name="scope">The lifetime scope of instantiated objects, default is per Application.</param>
-        /// <remarks>If <paramref name="scope"/> is per HttpRequest then there must be a current HttpContext.</remarks>
-        /// <exception cref="InvalidOperationException"><paramref name="scope"/> is per HttpRequest but the current HttpContext is null.</exception>
-        protected ManyObjectsResolverBase(IServiceProvider serviceProvider, ILogger logger, IEnumerable<Type> value, ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
-            : this(serviceProvider, logger, scope)
+		/// </summary>
+		/// <param name="scope">The lifetime scope of instantiated objects, default is per Application.</param>
+		/// <remarks>If <paramref name="scope"/> is per HttpRequest then there must be a current HttpContext.</remarks>
+		/// <exception cref="InvalidOperationException"><paramref name="scope"/> is per HttpRequest but the current HttpContext is null.</exception>
+		protected ManyObjectsResolverBase(ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
+		{
+			CanResolveBeforeFrozen = false;
+			if (scope == ObjectLifetimeScope.HttpRequest)
+			{
+				if (HttpContext.Current == null)
+					throw new InvalidOperationException("Use alternative constructor accepting a HttpContextBase object in order to set the lifetime scope to HttpRequest when HttpContext.Current is null");		
+
+				CurrentHttpContext = new HttpContextWrapper(HttpContext.Current);
+			}
+
+			LifetimeScope = scope;
+			if (scope == ObjectLifetimeScope.HttpRequest)
+				_httpContextKey = this.GetType().FullName;
+			_instanceTypes = new List<Type>();
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ManyObjectsResolverBase{TResolver, TResolved}"/> class with an empty list of objects,
+		/// with creation of objects based on an HttpRequest lifetime scope.
+		/// </summary>
+		/// <param name="httpContext">The HttpContextBase corresponding to the HttpRequest.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="httpContext"/> is <c>null</c>.</exception>
+		protected ManyObjectsResolverBase(HttpContextBase httpContext)
+		{
+			CanResolveBeforeFrozen = false;
+			if (httpContext == null)
+				throw new ArgumentNullException("httpContext");
+			LifetimeScope = ObjectLifetimeScope.HttpRequest;
+			_httpContextKey = this.GetType().FullName;
+			CurrentHttpContext = httpContext;
+			_instanceTypes = new List<Type>();
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ManyObjectsResolverBase{TResolver, TResolved}"/> class with an initial list of object types,
+        /// and an optional lifetime scope.
+		/// </summary>
+		/// <param name="value">The list of object types.</param>
+		/// <param name="scope">The lifetime scope of instantiated objects, default is per Application.</param>
+		/// <remarks>If <paramref name="scope"/> is per HttpRequest then there must be a current HttpContext.</remarks>
+		/// <exception cref="InvalidOperationException"><paramref name="scope"/> is per HttpRequest but the current HttpContext is null.</exception>
+		protected ManyObjectsResolverBase(IEnumerable<Type> value, ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
+			: this(scope)
 		{
 			_instanceTypes = value.ToList();
 		}
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use ctor specifying IServiceProvider instead")]
-        protected ManyObjectsResolverBase(IEnumerable<Type> value, ObjectLifetimeScope scope = ObjectLifetimeScope.Application)
-            : this(new ActivatorServiceProvider(), LoggerResolver.Current.Logger, value, scope)
-        {
-            
-        }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ManyObjectsResolverBase{TResolver, TResolved}"/> class with an initial list of objects,
@@ -129,18 +87,12 @@ namespace Umbraco.Core.ObjectResolution
 		/// <param name="httpContext">The HttpContextBase corresponding to the HttpRequest.</param>
 		/// <param name="value">The list of object types.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="httpContext"/> is <c>null</c>.</exception>
-        [Obsolete("Use ctor specifying IServiceProvider instead")]
-        protected ManyObjectsResolverBase(HttpContextBase httpContext, IEnumerable<Type> value)
-            : this(new ActivatorServiceProvider(), LoggerResolver.Current.Logger, httpContext)
+		protected ManyObjectsResolverBase(HttpContextBase httpContext, IEnumerable<Type> value)
+			: this(httpContext)
 		{
 			_instanceTypes = value.ToList();
 		} 
 		#endregion
-
-        private void InitializeAppInstances()
-        {
-            _applicationInstances = new Lazy<IEnumerable<TResolved>>(() => CreateInstances().ToArray());
-        }
 
 		/// <summary>
 		/// Gets or sets a value indicating whether the resolver can resolve objects before resolution is frozen.
@@ -162,14 +114,7 @@ namespace Umbraco.Core.ObjectResolution
 		/// <remarks>If not null, then <c>LifetimeScope</c> will be <c>ObjectLifetimeScope.HttpRequest</c>.</remarks>
 		protected HttpContextBase CurrentHttpContext { get; private set; }
 
-        /// <summary>
-        /// Returns the service provider used to instantiate objects
-        /// </summary>
-        public IServiceProvider ServiceProvider { get; private set; }
-
-        public ILogger Logger { get; private set; }
-
-        /// <summary>
+		/// <summary>
 		/// Gets or sets the lifetime scope of resolved objects.
 		/// </summary>
 		protected ObjectLifetimeScope LifetimeScope { get; private set; }
@@ -233,24 +178,30 @@ namespace Umbraco.Core.ObjectResolution
                     switch (LifetimeScope)
                     {
                         case ObjectLifetimeScope.HttpRequest:
-
                             // create new instances per HttpContext
-                            if (CurrentHttpContext.Items[_httpContextKey] == null)
+                            using (var l = new UpgradeableReadLock(_lock))
                             {
-                                var instances = CreateInstances().ToArray();
-                                var disposableInstances = instances.OfType<IDisposable>();
-                                //Ensure anything resolved that is IDisposable is disposed when the request termintates
-                                foreach (var disposable in disposableInstances)
+                                // create if not already there
+                                if (CurrentHttpContext.Items[_httpContextKey] == null)
                                 {
-                                    CurrentHttpContext.DisposeOnPipelineCompleted(disposable);
+                                    l.UpgradeToWriteLock();
+                                    CurrentHttpContext.Items[_httpContextKey] = CreateInstances().ToArray();
                                 }
-                                CurrentHttpContext.Items[_httpContextKey] = instances;
+                                return (TResolved[])CurrentHttpContext.Items[_httpContextKey];
                             }
-                            return (TResolved[])CurrentHttpContext.Items[_httpContextKey];
-                            
-                        case ObjectLifetimeScope.Application:
 
-                            return _applicationInstances.Value;
+                        case ObjectLifetimeScope.Application:
+                            // create new instances per application
+                            using (var l = new UpgradeableReadLock(_lock))
+                            {
+                                // create if not already there
+                                if (_applicationInstances == null)
+                                {
+                                    l.UpgradeToWriteLock();
+                                    _applicationInstances = CreateInstances().ToArray();
+                                }
+                                return _applicationInstances;
+                            }
 
                         case ObjectLifetimeScope.Transient:
                         default:
@@ -267,7 +218,7 @@ namespace Umbraco.Core.ObjectResolution
 		/// <returns>A list of objects of type <typeparamref name="TResolved"/>.</returns>
 		protected virtual IEnumerable<TResolved> CreateInstances()
 		{
-			return ServiceProvider.CreateInstances<TResolved>(InstanceTypes, Logger);
+			return PluginManager.Current.CreateInstances<TResolved>(InstanceTypes);
 		}
 
 		#region Types collection manipulation
@@ -476,7 +427,7 @@ namespace Umbraco.Core.ObjectResolution
 			{
 				EnsureCorrectType(existingType);
 				EnsureCorrectType(value);
-                if (_instanceTypes.Contains(existingType) == false)
+                if (!_instanceTypes.Contains(existingType))
 				{
 					throw new InvalidOperationException(string.Format(
 						"Type {0} is not in the collection of types.", existingType.FullName));
@@ -567,9 +518,9 @@ namespace Umbraco.Core.ObjectResolution
         /// <exception cref="InvalidOperationException">the type is not a valid type for the resolver.</exception>
         protected virtual void EnsureCorrectType(Type value)
         {
-            if (TypeHelper.IsTypeAssignableFrom<TResolved>(value) == false)
+            if (!TypeHelper.IsTypeAssignableFrom<TResolved>(value))
                 throw new InvalidOperationException(string.Format(
-                    "Type {0} is not an acceptable type for resolver {1}.", value.FullName, GetType().FullName));
+                    "Type {0} is not an acceptable type for resolver {1}.", value.FullName, this.GetType().FullName));
         }
 
         #endregion
@@ -582,7 +533,7 @@ namespace Umbraco.Core.ObjectResolution
         /// <exception cref="InvalidOperationException">The resolver does not support removing types.</exception>
         protected void EnsureSupportsRemove()
 		{
-			if (SupportsRemove == false)
+			if (!SupportsRemove)
                 throw new InvalidOperationException("This resolver does not support removing types");
 		}
 
@@ -591,7 +542,7 @@ namespace Umbraco.Core.ObjectResolution
         /// </summary>
         /// <exception cref="InvalidOperationException">The resolver does not support clearing types.</exception>
         protected void EnsureSupportsClear()		{
-			if (SupportsClear == false)
+			if (!SupportsClear)
                 throw new InvalidOperationException("This resolver does not support clearing types");
 		}
 
@@ -601,7 +552,7 @@ namespace Umbraco.Core.ObjectResolution
         /// <exception cref="InvalidOperationException">The resolver does not support adding types.</exception>
         protected void EnsureSupportsAdd()
 		{
-			if (SupportsAdd == false)
+			if (!SupportsAdd)
                 throw new InvalidOperationException("This resolver does not support adding new types");
 		}
 
@@ -611,7 +562,7 @@ namespace Umbraco.Core.ObjectResolution
         /// <exception cref="InvalidOperationException">The resolver does not support inserting types.</exception>
         protected void EnsureSupportsInsert()
 		{
-			if (SupportsInsert == false)
+			if (!SupportsInsert)
                 throw new InvalidOperationException("This resolver does not support inserting new types");
 		}
 

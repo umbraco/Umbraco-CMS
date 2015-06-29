@@ -5,7 +5,7 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class MacroFactory 
+    internal class MacroFactory : IEntityFactory<IMacro, MacroDto>
     {
         #region Implementation of IEntityFactory<Language,LanguageDto>
 

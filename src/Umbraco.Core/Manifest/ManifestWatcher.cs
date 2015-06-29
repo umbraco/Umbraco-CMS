@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Web;
@@ -8,16 +7,9 @@ namespace Umbraco.Core.Manifest
 {
     internal class ManifestWatcher : DisposableObject
     {
-        private readonly ILogger _logger;
         private readonly List<FileSystemWatcher> _fws = new List<FileSystemWatcher>();
         private static volatile bool _isRestarting = false;
         private static readonly object Locker = new object();
-
-        public ManifestWatcher(ILogger logger)
-        {
-            if (logger == null) throw new ArgumentNullException("logger");
-            _logger = logger;
-        }
 
         public void Start(params string[] packageFolders)
         {
@@ -51,7 +43,7 @@ namespace Umbraco.Core.Manifest
                         {
                             _isRestarting = true;
 
-                            _logger.Info<ManifestWatcher>("manifest has changed, app pool is restarting (" + e.FullPath + ")");
+                            LogHelper.Info<ManifestWatcher>("manifest has changed, app pool is restarting (" + e.FullPath + ")");
                             HttpRuntime.UnloadAppDomain();
                             Dispose();               
                         }

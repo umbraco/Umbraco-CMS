@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Net;
-using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
 using System.Web.Security;
@@ -15,7 +12,6 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.WebApi.Filters;
 using System.Linq;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Web;
 
 namespace Umbraco.Web.WebApi.Binders
 {
@@ -198,52 +194,6 @@ namespace Umbraco.Web.WebApi.Binders
         /// </summary>
         internal class MemberValidationHelper : ContentItemValidationHelper<IMember, MemberSave>
         {
-            /// <summary>
-            /// We need to manually validate a few things here like email and login to make sure they are valid and aren't duplicates
-            /// </summary>
-            /// <param name="postedItem"></param>
-            /// <param name="actionContext"></param>
-            /// <returns></returns>           
-            protected override bool ValidatePropertyData(ContentItemBasic<ContentPropertyBasic, IMember> postedItem, HttpActionContext actionContext)
-            {
-                var memberSave = (MemberSave)postedItem;
-
-                if (memberSave.Username.IsNullOrWhiteSpace())
-                {
-                    actionContext.ModelState.AddPropertyError(
-                            new ValidationResult("Invalid user name", new[] { "value" }),
-                            string.Format("{0}login", Constants.PropertyEditors.InternalGenericPropertiesPrefix));    
-                }
-
-                if (memberSave.Email.IsNullOrWhiteSpace() || new EmailAddressAttribute().IsValid(memberSave.Email) == false)
-                {
-                    actionContext.ModelState.AddPropertyError(
-                            new ValidationResult("Invalid email", new[] { "value" }),
-                            string.Format("{0}email", Constants.PropertyEditors.InternalGenericPropertiesPrefix));    
-                }
-
-                //default provider!
-                var membershipProvider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
-
-                var validEmail = ValidateUniqueEmail(memberSave, membershipProvider, actionContext);
-                if (validEmail == false)
-                {
-                    actionContext.ModelState.AddPropertyError(
-                        new ValidationResult("Email address is already in use", new[] { "value" }),
-                        string.Format("{0}email", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
-                }
-
-                var validLogin = ValidateUniqueLogin(memberSave, membershipProvider, actionContext);
-                if (validLogin == false)
-                {
-                    actionContext.ModelState.AddPropertyError(
-                        new ValidationResult("Username is already in use", new[] { "value" }),
-                        string.Format("{0}login", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
-                }
-
-                return base.ValidatePropertyData(postedItem, actionContext);
-            }
-
             protected override bool ValidateProperties(ContentItemBasic<ContentPropertyBasic, IMember> postedItem, HttpActionContext actionContext)
             {
                 var propertiesToValidate = postedItem.Properties.ToList();
@@ -255,90 +205,6 @@ namespace Umbraco.Web.WebApi.Binders
                 }
 
                 return ValidateProperties(propertiesToValidate.ToArray(), postedItem.PersistedContent.Properties.ToArray(), actionContext);
-            }
-
-            internal bool ValidateUniqueLogin(MemberSave contentItem, MembershipProvider membershipProvider, HttpActionContext actionContext)
-            {
-                if (contentItem == null) throw new ArgumentNullException("contentItem");
-                if (membershipProvider == null) throw new ArgumentNullException("membershipProvider");
-
-                int totalRecs;
-                var existingByName = membershipProvider.FindUsersByName(contentItem.Username.Trim(), 0, int.MaxValue, out totalRecs);
-                switch (contentItem.Action)
-                {
-                    case ContentSaveAction.Save:
-
-                        //ok, we're updating the member, we need to check if they are changing their login and if so, does it exist already ?
-                        if (contentItem.PersistedContent.Username.InvariantEquals(contentItem.Username.Trim()) == false)
-                        {
-                            //they are changing their login name
-                            if (existingByName.Cast<MembershipUser>().Select(x => x.UserName)
-                                .Any(x => x == contentItem.Username.Trim()))
-                            {
-                                //the user cannot use this login
-                                return false;
-                            }
-                        }
-                        break;
-                    case ContentSaveAction.SaveNew:
-                        //check if the user's login already exists
-                        if (existingByName.Cast<MembershipUser>().Select(x => x.UserName)
-                            .Any(x => x == contentItem.Username.Trim()))
-                        {
-                            //the user cannot use this login
-                            return false;
-                        }
-                        break;
-                    default:
-                        //we don't support this for members
-                        throw new HttpResponseException(HttpStatusCode.NotFound);
-                }
-
-                return true;
-            }
-
-            internal bool ValidateUniqueEmail(MemberSave contentItem, MembershipProvider membershipProvider, HttpActionContext actionContext)
-            {
-                if (contentItem == null) throw new ArgumentNullException("contentItem");
-                if (membershipProvider == null) throw new ArgumentNullException("membershipProvider");
-
-                if (membershipProvider.RequiresUniqueEmail == false)
-                {
-                    return true;
-                }
-
-                int totalRecs;
-                var existingByEmail = membershipProvider.FindUsersByEmail(contentItem.Email.Trim(), 0, int.MaxValue, out totalRecs);
-                switch (contentItem.Action)
-                {
-                    case ContentSaveAction.Save:
-                        //ok, we're updating the member, we need to check if they are changing their email and if so, does it exist already ?
-                        if (contentItem.PersistedContent.Email.InvariantEquals(contentItem.Email.Trim()) == false)
-                        {
-                            //they are changing their email
-                            if (existingByEmail.Cast<MembershipUser>().Select(x => x.Email)
-                                               .Any(x => x.InvariantEquals(contentItem.Email.Trim())))
-                            {
-                                //the user cannot use this email
-                                return false;
-                            }
-                        }
-                        break;
-                    case ContentSaveAction.SaveNew:
-                        //check if the user's email already exists
-                        if (existingByEmail.Cast<MembershipUser>().Select(x => x.Email)
-                                           .Any(x => x.InvariantEquals(contentItem.Email.Trim())))
-                        {
-                            //the user cannot use this email
-                            return false;
-                        }
-                        break;
-                    default:
-                        //we don't support this for members
-                        throw new HttpResponseException(HttpStatusCode.NotFound);
-                }
-
-                return true;
             }
         }
     }

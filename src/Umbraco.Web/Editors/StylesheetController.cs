@@ -11,7 +11,6 @@ using System.Web.Http;
 using System.Web.Services.Description;
 using Newtonsoft.Json.Linq;
 using umbraco.cms.businesslogic.web;
-using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
@@ -28,21 +27,32 @@ namespace Umbraco.Web.Editors
     {
         public IEnumerable<Stylesheet> GetAll()
         {
-            return Services.FileService.GetStylesheets()
+            return StyleSheet.GetAll()
                 .Select(x => 
                     new Stylesheet() {
-                        Name = x.Alias,
-                        Path = x.VirtualPath
+                        Name = x.Text,
+                        Id = x.Id,
+                        Path = SystemDirectories.Css + "/" + x.Text + ".css" 
                     });
+        }
+
+        public IEnumerable<StylesheetRule> GetRules(int id)
+        {
+            var css = StyleSheet.GetStyleSheet(id, true, true);
+            if (css == null)
+                return Enumerable.Empty<StylesheetRule>();
+
+            return css.Properties.Select(x => new StylesheetRule() { Id = x.Id, Name = x.Text, Selector = x.Alias });
         }
         
         public IEnumerable<StylesheetRule> GetRulesByName(string name)
         {
-            var css = Services.FileService.GetStylesheetByName(name.EnsureEndsWith(".css"));
+            var css = StyleSheet.GetByName(name);
+
             if (css == null)
                 return Enumerable.Empty<StylesheetRule>();
 
-            return css.Properties.Select(x => new StylesheetRule() { Name = x.Name, Selector = x.Alias });
+            return css.Properties.Select(x => new StylesheetRule() { Id = x.Id, Name = x.Text, Selector = x.Alias });
         }
     }
 

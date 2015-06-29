@@ -2,13 +2,10 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Configuration;
-using System.IO;
 using System.Linq;
 using System.Threading;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.BaseRest;
 using Umbraco.Core.Configuration.Dashboard;
-using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 
@@ -70,7 +67,6 @@ namespace Umbraco.Core.Configuration
         private IDashboardSection _dashboardSection;
         private IUmbracoSettingsSection _umbracoSettings;
         private IBaseRestSection _baseRestExtensions;
-        private IGridConfig _gridConfig;
 
         /// <summary>
         /// Gets the IDashboardSection
@@ -87,20 +83,14 @@ namespace Umbraco.Core.Configuration
             return _dashboardSection;
         }        
 
-        /// <summary>
-        /// Only for testing
-        /// </summary>
-        /// <param name="value"></param>
+        //ONLY for unit testing
         internal void SetDashboardSettings(IDashboardSection value)
         {
             _dashboardSection = value;
         }
 
-        /// <summary>
-        /// Only for testing
-        /// </summary>
-        /// <param name="value"></param>
-        public void SetUmbracoSettings(IUmbracoSettingsSection value)
+        //ONLY for unit testing
+        internal void SetUmbracoSettings(IUmbracoSettingsSection value)
         {
             _umbracoSettings = value;
         }
@@ -120,10 +110,7 @@ namespace Umbraco.Core.Configuration
             return _umbracoSettings;
         }
         
-        /// <summary>
-        /// Only for testing
-        /// </summary>
-        /// <param name="value"></param>
+        //ONLY for unit testing
         public void SetBaseRestExtensions(IBaseRestSection value)
         {
             _baseRestExtensions = value;
@@ -142,28 +129,6 @@ namespace Umbraco.Core.Configuration
             }
 
             return _baseRestExtensions;
-        }
-
-        /// <summary>
-        /// Only for testing
-        /// </summary>
-        /// <param name="value"></param>
-        public void SetGridConfig(IGridConfig value)
-        {
-            _gridConfig = value;
-        }
-
-        /// <summary>
-        /// Gets the IGridConfig
-        /// </summary>
-        public IGridConfig GridConfig(ILogger logger, IRuntimeCacheProvider runtimeCache, DirectoryInfo appPlugins, DirectoryInfo configFolder, bool isDebug)
-        {
-            if (_gridConfig == null)
-            {
-                _gridConfig = new GridConfig(logger, runtimeCache, appPlugins, configFolder, isDebug);
-            }
-
-            return _gridConfig;
         }
 
         //TODO: Add other configurations here !

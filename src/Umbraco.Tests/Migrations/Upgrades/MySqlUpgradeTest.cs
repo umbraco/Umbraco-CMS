@@ -1,6 +1,4 @@
-﻿using Moq;
-using NUnit.Framework;
-using Umbraco.Core.Logging;
+﻿using NUnit.Framework;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -21,12 +19,12 @@ namespace Umbraco.Tests.Migrations.Upgrades
 
         public override ISqlSyntaxProvider GetSyntaxProvider()
         {
-            return new MySqlSyntaxProvider(Mock.Of<ILogger>());
+            return MySqlSyntax.Provider;
         }
 
         public override UmbracoDatabase GetConfiguredDatabase()
         {
-            return new UmbracoDatabase("Server = 169.254.120.3; Database = upgradetest; Uid = umbraco; Pwd = umbraco", "MySql.Data.MySqlClient", Mock.Of<ILogger>());
+            return new UmbracoDatabase("Server = 169.254.120.3; Database = upgradetest; Uid = umbraco; Pwd = umbraco", "MySql.Data.MySqlClient");
         }
 
         public override DatabaseProviders GetDatabaseProvider()

@@ -10,7 +10,6 @@ using System.Collections;
 using System.IO;
 using System.Web;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
 
 namespace Umbraco.Core.Dynamics
 {
@@ -163,10 +162,8 @@ namespace Umbraco.Core.Dynamics
                 return true; //anyway
             }
 
-            var runtimeCache = ApplicationContext.Current != null ? ApplicationContext.Current.ApplicationCache.RuntimeCache : new NullCacheProvider();
-
 			//ok, now lets try to match by member, property, extensino method
-            var attempt = DynamicInstanceHelper.TryInvokeMember(runtimeCache, this, binder, args, new[]
+			var attempt = DynamicInstanceHelper.TryInvokeMember(this, binder, args, new[]
 				{
 					typeof (IEnumerable<DynamicXml>),
 					typeof (IEnumerable<XElement>),

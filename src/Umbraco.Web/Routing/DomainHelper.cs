@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
+using umbraco.cms.businesslogic.web;
 
 namespace Umbraco.Web.Routing
 {
@@ -12,18 +12,32 @@ namespace Umbraco.Web.Routing
     /// </summary>
 	public class DomainHelper
 	{
-        private readonly IDomainService _domainService;
+        #region Temp. abstract Umbraco's API
 
-        [Obsolete("Use the contructor specifying all dependencies instead")]
-        public DomainHelper()
-            : this(ApplicationContext.Current.Services.DomainService)
+        /// <summary>
+        /// Gets all domains defined in the system.
+        /// </summary>
+        /// <param name="includeWildcards">A value indicating whether to include wildcard domains.</param>
+        /// <returns>All domains defined in the system.</returns>
+        /// <remarks>This is to temporarily abstract Umbraco's API.</remarks>
+        internal static Domain[] GetAllDomains(bool includeWildcards)
         {
+            return Domain.GetDomains(includeWildcards).ToArray();
         }
 
-        public DomainHelper(IDomainService domainService)
+        /// <summary>
+        /// Gets all domains defined in the system at a specified node.
+        /// </summary>
+        /// <param name="nodeId">The node identifier.</param>
+        /// <param name="includeWildcards">A value indicating whether to include wildcard domains.</param>
+        /// <returns>All domains defined in the system at the specified node.</returns>
+        /// <remarks>This is to temporarily abstract Umbraco's API.</remarks>
+        internal static Domain[] GetNodeDomains(int nodeId, bool includeWildcards)
         {
-            _domainService = domainService;
+            return Domain.GetDomains(includeWildcards).Where(d => d.RootNodeId == nodeId).ToArray();
         }
+
+        #endregion
 
         #region Domain for Node
 
@@ -35,17 +49,17 @@ namespace Umbraco.Web.Routing
         /// <returns>The domain and its uri, if any, that best matches the specified uri, else null.</returns>
         /// <remarks>If at least a domain is set on the node then the method returns the domain that
         /// best matches the specified uri, else it returns null.</remarks>
-        internal DomainAndUri DomainForNode(int nodeId, Uri current)
+        internal static DomainAndUri DomainForNode(int nodeId, Uri current)
         {
             // be safe
             if (nodeId <= 0)
                 return null;
 
             // get the domains on that node
-            var domains = _domainService.GetAssignedDomains(nodeId, false).ToArray();
+            var domains = GetNodeDomains(nodeId, false);
 
             // none?
-            if (domains.Any() == false)
+            if (!domains.Any())
                 return null;
 
             // else filter
@@ -63,9 +77,9 @@ namespace Umbraco.Web.Routing
         /// </summary>
         /// <param name="nodeId">The node identifier.</param>
         /// <returns>True if the node has domains, else false.</returns>
-        internal bool NodeHasDomains(int nodeId)
+        internal static bool NodeHasDomains(int nodeId)
         {
-            return nodeId > 0 && _domainService.GetAssignedDomains(nodeId, false).Any();
+            return nodeId > 0 && GetNodeDomains(nodeId, false).Any();
         }
 
         /// <summary>
@@ -77,17 +91,17 @@ namespace Umbraco.Web.Routing
         /// <returns>The domains and their uris, that match the specified uri, else null.</returns>
         /// <remarks>If at least a domain is set on the node then the method returns the domains that
         /// best match the specified uri, else it returns null.</remarks>
-        internal IEnumerable<DomainAndUri> DomainsForNode(int nodeId, Uri current, bool excludeDefault = true)
+        internal static IEnumerable<DomainAndUri> DomainsForNode(int nodeId, Uri current, bool excludeDefault = true)
         {
             // be safe
             if (nodeId <= 0)
                 return null;
 
             // get the domains on that node
-            var domains = _domainService.GetAssignedDomains(nodeId, false).ToArray();
+            var domains = GetNodeDomains(nodeId, false);
 
             // none?
-            if (domains.Any() == false)
+            if (!domains.Any())
                 return null;
 
             // get the domains and their uris
@@ -114,20 +128,20 @@ namespace Umbraco.Web.Routing
         /// the right one, unless it is <c>null</c>, in which case the method returns <c>null</c>.</para>
         /// <para>The filter, if any, will be called only with a non-empty argument, and _must_ return something.</para>
         /// </remarks>
-        internal static DomainAndUri DomainForUri(IEnumerable<IDomain> domains, Uri current, Func<DomainAndUri[], DomainAndUri> filter = null)
+        internal static DomainAndUri DomainForUri(Domain[] domains, Uri current, Func<DomainAndUri[], DomainAndUri> filter = null)
         {
             // sanitize the list to have proper uris for comparison (scheme, path end with /)
             // we need to end with / because example.com/foo cannot match example.com/foobar
             // we need to order so example.com/foo matches before example.com/
             var scheme = current == null ? Uri.UriSchemeHttp : current.Scheme;
             var domainsAndUris = domains
-                .Where(d => d.IsWildcard == false)
+                .Where(d => !d.IsWildcard)
                 .Select(SanitizeForBackwardCompatibility)
                 .Select(d => new DomainAndUri(d, scheme))
                 .OrderByDescending(d => d.Uri.ToString())
                 .ToArray();
 
-            if (domainsAndUris.Any() == false)
+            if (!domainsAndUris.Any())
                 return null;
 
             DomainAndUri domainAndUri;
@@ -143,12 +157,6 @@ namespace Umbraco.Web.Routing
                 var currentWithSlash = current.EndPathWithSlash();
                 domainAndUri = domainsAndUris
                     .FirstOrDefault(d => d.Uri.EndPathWithSlash().IsBaseOf(currentWithSlash));
-                if (domainAndUri != null) return domainAndUri;
-
-                // if none matches, try again without the port
-                // ie current is www.example.com:1234/foo/bar, look for domain www.example.com
-                domainAndUri = domainsAndUris
-                    .FirstOrDefault(d => d.Uri.EndPathWithSlash().IsBaseOf(currentWithSlash.WithoutPort()));
                 if (domainAndUri != null) return domainAndUri;
 
                 // if none matches, then try to run the filter to pick a domain
@@ -171,11 +179,11 @@ namespace Umbraco.Web.Routing
         /// <param name="domains">The group of domains.</param>
         /// <param name="current">The uri, or null.</param>
         /// <returns>The domains and their normalized uris, that match the specified uri.</returns>
-        internal static IEnumerable<DomainAndUri> DomainsForUri(IEnumerable<IDomain> domains, Uri current)
+        internal static IEnumerable<DomainAndUri> DomainsForUri(Domain[] domains, Uri current)
         {
             var scheme = current == null ? Uri.UriSchemeHttp : current.Scheme;
             return domains
-                .Where(d => d.IsWildcard == false)
+                .Where(d => !d.IsWildcard)
                 .Select(SanitizeForBackwardCompatibility)
                 .Select(d => new DomainAndUri(d, scheme))
                 .OrderByDescending(d => d.Uri.ToString());
@@ -194,14 +202,14 @@ namespace Umbraco.Web.Routing
         /// using hostnames such as "/en" which happened to work pre-4.10 but really make no sense at
         /// all... and 4.10 throws on them, so here we just try to find a way so 4.11 does not throw.
         /// But really... no.</remarks>
-        private static IDomain SanitizeForBackwardCompatibility(IDomain domain)
+        private static Domain SanitizeForBackwardCompatibility(Domain domain)
         {
             var context = System.Web.HttpContext.Current;
-            if (context != null && domain.DomainName.StartsWith("/"))
+            if (context != null && domain.Name.StartsWith("/"))
             {
                 // turn "/en" into "http://whatever.com/en" so it becomes a parseable uri
                 var authority = context.Request.Url.GetLeftPart(UriPartial.Authority);
-                domain.DomainName = authority + domain.DomainName;
+                domain.Name = authority + domain.Name;
             }
             return domain;
         }
@@ -214,7 +222,7 @@ namespace Umbraco.Web.Routing
         /// <param name="rootNodeId">The current domain root node identifier, or null.</param>
         /// <returns>A value indicating if there is another domain defined down in the path.</returns>
         /// <remarks>Looks _under_ rootNodeId but not _at_ rootNodeId.</remarks>
-        internal static bool ExistsDomainInPath(IEnumerable<IDomain> domains, string path, int? rootNodeId)
+        internal static bool ExistsDomainInPath(Domain[] domains, string path, int? rootNodeId)
         {
             return FindDomainInPath(domains, path, rootNodeId) != null;
         }
@@ -227,7 +235,7 @@ namespace Umbraco.Web.Routing
         /// <param name="rootNodeId">The current domain root node identifier, or null.</param>
         /// <returns>The deepest non-wildcard Domain in the path, or null.</returns>
         /// <remarks>Looks _under_ rootNodeId but not _at_ rootNodeId.</remarks>
-        internal static IDomain FindDomainInPath(IEnumerable<IDomain> domains, string path, int? rootNodeId)
+        internal static Domain FindDomainInPath(Domain[] domains, string path, int? rootNodeId)
         {
             var stopNodeId = rootNodeId ?? -1;
 
@@ -235,7 +243,7 @@ namespace Umbraco.Web.Routing
                        .Reverse()
                        .Select(int.Parse)
                        .TakeWhile(id => id != stopNodeId)
-                       .Select(id => domains.FirstOrDefault(d => d.RootContent.Id == id && d.IsWildcard == false))
+                       .Select(id => domains.FirstOrDefault(d => d.RootNodeId == id && !d.IsWildcard))
                        .SkipWhile(domain => domain == null)
                        .FirstOrDefault();
         }
@@ -248,7 +256,7 @@ namespace Umbraco.Web.Routing
         /// <param name="rootNodeId">The current domain root node identifier, or null.</param>
         /// <returns>The deepest wildcard Domain in the path, or null.</returns>
         /// <remarks>Looks _under_ rootNodeId but not _at_ rootNodeId.</remarks>
-        internal static IDomain FindWildcardDomainInPath(IEnumerable<IDomain> domains, string path, int? rootNodeId)
+        internal static Domain FindWildcardDomainInPath(Domain[] domains, string path, int? rootNodeId)
         {
             var stopNodeId = rootNodeId ?? -1;
 
@@ -256,7 +264,7 @@ namespace Umbraco.Web.Routing
                        .Reverse()
                        .Select(int.Parse)
                        .TakeWhile(id => id != stopNodeId)
-                       .Select(id => domains.FirstOrDefault(d => d.RootContent.Id == id && d.IsWildcard))
+                       .Select(id => domains.FirstOrDefault(d => d.RootNodeId == id && d.IsWildcard))
                        .FirstOrDefault(domain => domain != null);
         }
 

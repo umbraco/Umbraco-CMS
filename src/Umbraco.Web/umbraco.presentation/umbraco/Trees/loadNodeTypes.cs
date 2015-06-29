@@ -46,8 +46,6 @@ namespace umbraco
             actions.Add(ActionExport.Instance);
             actions.Add(ContextMenuSeperator.Instance);
             actions.Add(ActionDelete.Instance);
-            actions.Add(ContextMenuSeperator.Instance);
-            actions.Add(ActionRefresh.Instance);
         }
 
         public override void RenderJS(ref StringBuilder Javascript)

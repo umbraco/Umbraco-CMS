@@ -85,17 +85,6 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
         public ICreateTableColumnOptionSyntax PrimaryKey()
         {
             CurrentColumn.IsPrimaryKey = true;
-
-            var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey)
-            {
-                Constraint =
-                {
-                    TableName = CurrentColumn.TableName,
-                    Columns = new[] { CurrentColumn.Name }
-                }
-            };
-            _context.Expressions.Add(expression);
-
             return this;
         }
 
@@ -103,18 +92,6 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
         {
             CurrentColumn.IsPrimaryKey = true;
             CurrentColumn.PrimaryKeyName = primaryKeyName;
-
-            var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey)
-            {
-                Constraint =
-                {
-                    ConstraintName = primaryKeyName,
-                    TableName = CurrentColumn.TableName,
-                    Columns = new[] { CurrentColumn.Name }
-                }
-            };
-            _context.Expressions.Add(expression);
-            
             return this;
         }
 

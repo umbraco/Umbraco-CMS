@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.Serialization;
-using System.Threading;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
@@ -69,7 +68,7 @@ namespace Umbraco.Web.Models.Mapping
                     expression => expression.MapFrom(content =>
                         UmbracoContext.Current == null
                             ? new[] {"Cannot generate urls without a current Umbraco Context"}
-                            : content.GetContentUrls(UmbracoContext.Current)))
+                            : content.GetContentUrls()))
                 .ForMember(display => display.Properties, expression => expression.Ignore())
                 .ForMember(display => display.TreeNodeUrl, expression => expression.Ignore())
                 .ForMember(display => display.Notifications, expression => expression.Ignore())
@@ -78,7 +77,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Tabs, expression => expression.ResolveUsing<TabsAndPropertiesResolver>())
                 .ForMember(display => display.AllowedActions, expression => expression.ResolveUsing(
                     new ActionButtonsResolver(new Lazy<IUserService>(() => applicationContext.Services.UserService))))
-                .AfterMap((media, display) => AfterMap(media, display, applicationContext.Services.DataTypeService, applicationContext.Services.TextService));
+                .AfterMap((media, display) => AfterMap(media, display, applicationContext.Services.DataTypeService));
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
             config.CreateMap<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>()
@@ -117,9 +116,7 @@ namespace Umbraco.Web.Models.Mapping
         /// </summary>
         /// <param name="content"></param>
         /// <param name="display"></param>
-        /// <param name="dataTypeService"></param>
-        /// <param name="localizedText"></param>
-        private static void AfterMap(IContent content, ContentItemDisplay display, IDataTypeService dataTypeService, ILocalizedTextService localizedText)
+        private static void AfterMap(IContent content, ContentItemDisplay display, IDataTypeService dataTypeService)
         {
             //map the tree node url
             if (HttpContext.Current != null)
@@ -128,7 +125,7 @@ namespace Umbraco.Web.Models.Mapping
                 var url = urlHelper.GetUmbracoApiService<ContentTreeController>(controller => controller.GetTreeNode(display.Id.ToString(), null));
                 display.TreeNodeUrl = url;
             }
-            
+
             //fill in the template config to be passed to the template drop down.
             var templateItemConfig = new Dictionary<string, string> { { "", "Choose..." } };
             foreach (var t in content.ContentType.AllowedTemplates
@@ -147,14 +144,14 @@ namespace Umbraco.Web.Models.Mapping
                 new ContentPropertyDisplay
                     {
                         Alias = string.Format("{0}releasedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                        Label = localizedText.Localize("content/releaseDate"),
+                        Label = ui.Text("content", "releaseDate"),
                         Value = display.ReleaseDate.HasValue ? display.ReleaseDate.Value.ToIsoString() : null,
                         View = "datepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
                     },
                 new ContentPropertyDisplay
                     {
                         Alias = string.Format("{0}expiredate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                        Label = localizedText.Localize("content/unpublishDate"),
+                        Label = ui.Text("content", "unpublishDate"),
                         Value = display.ExpireDate.HasValue ? display.ExpireDate.Value.ToIsoString() : null,
                         View = "datepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
                     },
@@ -172,7 +169,7 @@ namespace Umbraco.Web.Models.Mapping
                 new ContentPropertyDisplay
                     {
                         Alias = string.Format("{0}urls", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                        Label = localizedText.Localize("content/urls"),
+                        Label = ui.Text("content", "urls"),
                         Value = string.Join(",", display.Urls),
                         View = "urllist" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
                     });
@@ -192,7 +189,7 @@ namespace Umbraco.Web.Models.Mapping
             {
                 return content.UpdateDate;
             }
-            if (content.HasPublishedVersion)
+            if (content.HasPublishedVersion())
             {
                 var published = applicationContext.Services.ContentService.GetPublishedVersion(content.Id);
                 return published.UpdateDate;

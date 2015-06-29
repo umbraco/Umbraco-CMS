@@ -1,6 +1,5 @@
 ﻿using System;
 using Umbraco.Core;
-using Umbraco.Core.Events;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Services;
 using umbraco.interfaces;
@@ -17,9 +16,14 @@ namespace Umbraco.Web.Strategies.Migrations
     /// 
     /// * If current is less than or equal to 7.0.0
     /// </remarks>
-    public class RebuildMediaXmlCacheAfterUpgrade : MigrationStartupHander
+    public class RebuildMediaXmlCacheAfterUpgrade : IApplicationStartupHandler
     {
-        protected override void AfterMigration(MigrationRunner sender, MigrationEventArgs e)
+        public RebuildMediaXmlCacheAfterUpgrade()
+        {
+            MigrationRunner.Migrated += MigrationRunner_Migrated;
+        }
+
+        void MigrationRunner_Migrated(MigrationRunner sender, Core.Events.MigrationEventArgs e)
         {
             var target70 = new Version(7, 0, 0);
 
@@ -28,6 +32,7 @@ namespace Umbraco.Web.Strategies.Migrations
                 var mediasvc = (MediaService)ApplicationContext.Current.Services.MediaService;
                 mediasvc.RebuildXmlStructures();
             }
+
         }
     }
 }

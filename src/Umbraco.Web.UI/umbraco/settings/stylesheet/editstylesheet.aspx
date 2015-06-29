@@ -13,7 +13,7 @@
             $(document).ready(function () {
                 var editor = new Umbraco.Editors.EditStyleSheet({
                     nameTxtBox: $('#<%= NameTxt.ClientID %>'),
-                    originalFileName: '<%= NameTxt.Text.Replace("\\", "\\\\") %>',
+                    originalFileName: '<%= NameTxt.Text %>',
                     cssId: '<%= Request.QueryString["id"] %>',
                     saveButton: $("#<%= ((Control)SaveButton).ClientID %>"),
                     editorSourceElement: $('#<%= editorSource.ClientID %>'), 

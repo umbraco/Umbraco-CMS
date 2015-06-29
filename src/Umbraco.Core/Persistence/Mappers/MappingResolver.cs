@@ -12,11 +12,9 @@ namespace Umbraco.Core.Persistence.Mappers
         /// <summary>
         /// Constructor accepting a list of BaseMapper types that are attributed with the MapperFor attribute
         /// </summary>
-        /// <param name="serviceProvider"></param>
-        /// <param name="logger"></param>
         /// <param name="assignedMapperTypes"></param>
-        public MappingResolver(IServiceProvider serviceProvider, ILogger logger, Func<IEnumerable<Type>> assignedMapperTypes)
-            : base(serviceProvider, logger, assignedMapperTypes)
+        public MappingResolver(Func<IEnumerable<Type>> assignedMapperTypes)
+            : base(assignedMapperTypes)
         {
             
         }
@@ -43,6 +41,11 @@ namespace Umbraco.Core.Persistence.Mappers
                     {
                         return byAttribute.Result;
                     }
+
+                    //static mapper registration if not using attributes, could be something like this:
+                    //if (type == typeof (UserType))
+                    //    return new UserTypeMapper();
+
                     throw new Exception("Invalid Type: A Mapper could not be resolved based on the passed in Type");
                 });
         }
@@ -53,18 +56,31 @@ namespace Umbraco.Core.Persistence.Mappers
         /// <param name="entityType"></param>
         /// <returns></returns>
         private Attempt<BaseMapper> TryGetMapperByAttribute(Type entityType)
-        {            
+        {
+            //get all BaseMapper types that have a MapperFor attribute:
+            var assignedMapperTypes = InstanceTypes;
+
             //check if any of the mappers are assigned to this type
-            var mapper = Values.FirstOrDefault(
-                x => x.GetType().GetCustomAttributes<MapperForAttribute>(false)
+            var mapper = assignedMapperTypes.FirstOrDefault(
+                x => x.GetCustomAttributes<MapperForAttribute>(false)
                       .Any(m => m.EntityType == entityType));
 
             if (mapper == null)
             {
                 return Attempt<BaseMapper>.Fail();
             }
-
-            return Attempt<BaseMapper>.Succeed(mapper);
+            try
+            {
+                var instance = Activator.CreateInstance(mapper) as BaseMapper;
+                return instance != null 
+                    ? Attempt<BaseMapper>.Succeed(instance) 
+                    : Attempt<BaseMapper>.Fail();
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error(typeof(MappingResolver), "Could not instantiate mapper of type " + mapper, ex);
+                return Attempt<BaseMapper>.Fail(ex);
+            }
         }  
 
         internal string GetMapping(Type type, string propertyName)

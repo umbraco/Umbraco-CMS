@@ -127,24 +127,9 @@ angular.module("umbraco")
             );
         };
 
-        //var rowDeletesPending = false;
-        $scope.deleteLayout = function (index) {
-            //rowDeletesPending = true;
 
-            //show ok/cancel dialog
-            var confirmDialog = dialogService.open(
-               {
-                   template: "views/propertyEditors/grid/dialogs/rowdeleteconfirm.html",
-                   show: true,
-                   callback: function() {
-                       $scope.model.value.layouts.splice(index, 1);
-                   },
-                   dialogData: {
-                       rowName: $scope.model.value.layouts[index].name
-                   }
-               }
-           );
-            
+        $scope.deleteLayout = function(index){
+            $scope.model.value.layouts.splice(index, 1);
         };
         
 
@@ -231,7 +216,7 @@ angular.module("umbraco")
         /****************
             Clean up
         *****************/
-        var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
+        $scope.$on("formSubmitting", function (ev, args) {
             var ts = $scope.model.value.templates;
             var ls = $scope.model.value.layouts;
 
@@ -250,11 +235,6 @@ angular.module("umbraco")
                    }
                });
             });
-        });
-
-        //when the scope is destroyed we need to unsubscribe
-        $scope.$on('$destroy', function () {
-            unsubscribe();
         });
 
     });

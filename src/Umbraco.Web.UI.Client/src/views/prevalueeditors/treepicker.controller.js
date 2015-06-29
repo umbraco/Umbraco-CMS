@@ -29,7 +29,7 @@ angular.module('umbraco')
 		$scope.openContentPicker =function() {
 		    var d = dialogService.treePicker({
 		        section: config.type,
-		        treeAlias: config.treeAlias,
+		        treeAlias: config.type,
 		        multiPicker: config.multiPicker,
 		        callback: populate
 		    });
@@ -58,13 +58,8 @@ angular.module('umbraco')
 		};
 
 
-	    var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
+	    $scope.$on("formSubmitting", function (ev, args) {
 			$scope.model.value = trim($scope.ids.join(), ",");
-	    });
-
-	    //when the scope is destroyed we need to unsubscribe
-	    $scope.$on('$destroy', function () {
-	        unsubscribe();
 	    });
 
 		function trim(str, chr) {

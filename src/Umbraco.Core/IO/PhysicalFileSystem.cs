@@ -15,7 +15,7 @@ namespace Umbraco.Core.IO
         public PhysicalFileSystem(string virtualRoot)
         {
 	        if (virtualRoot == null) throw new ArgumentNullException("virtualRoot");
-			if (virtualRoot.StartsWith("~/") == false)
+			if (!virtualRoot.StartsWith("~/"))
 				throw new ArgumentException("The virtualRoot argument must be a virtual path and start with '~/'");
 
 	        RootPath = IOHelper.MapPath(virtualRoot);
@@ -65,7 +65,7 @@ namespace Umbraco.Core.IO
 
         public void DeleteDirectory(string path, bool recursive)
         {
-            if (DirectoryExists(path) == false)
+            if (!DirectoryExists(path))
                 return;
 
             try

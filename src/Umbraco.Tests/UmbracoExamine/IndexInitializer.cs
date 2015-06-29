@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Linq;
+using System.Net.Mime;
+using System.Xml.XPath;
 using Examine;
 using Examine.LuceneEngine.Config;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Standard;
-using Lucene.Net.Store;
 using Moq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -14,9 +15,9 @@ using Umbraco.Core.Services;
 using UmbracoExamine;
 using UmbracoExamine.Config;
 using UmbracoExamine.DataServices;
-using IContentService = Umbraco.Core.Services.IContentService;
-using IMediaService = Umbraco.Core.Services.IMediaService;
-using Version = Lucene.Net.Util.Version;
+using UmbracoExamine.PDF;
+using IContentService = UmbracoExamine.DataServices.IContentService;
+using IMediaService = UmbracoExamine.DataServices.IMediaService;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
@@ -26,11 +27,11 @@ namespace Umbraco.Tests.UmbracoExamine
 	internal static class IndexInitializer
 	{
 		public static UmbracoContentIndexer GetUmbracoIndexer(
-            Directory luceneDir, 
+            Lucene.Net.Store.Directory luceneDir, 
             Analyzer analyzer = null,
             IDataService dataService = null,
-            IContentService contentService = null,
-            IMediaService mediaService = null,
+            Umbraco.Core.Services.IContentService contentService = null,
+            Umbraco.Core.Services.IMediaService mediaService = null,
             IDataTypeService dataTypeService = null,
             IMemberService memberService = null,
             IUserService userService = null)
@@ -41,7 +42,7 @@ namespace Umbraco.Tests.UmbracoExamine
             }
 		    if (contentService == null)
 		    {
-                contentService = Mock.Of<IContentService>();
+                contentService = Mock.Of<Umbraco.Core.Services.IContentService>();
 		    }
 		    if (userService == null)
 		    {
@@ -72,7 +73,7 @@ namespace Umbraco.Tests.UmbracoExamine
                     .ToArray();
                     
 
-                mediaService = Mock.Of<IMediaService>(
+                mediaService = Mock.Of<Umbraco.Core.Services.IMediaService>(
                     x => x.GetPagedDescendants(
                         It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), out totalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<string>()) 
                         ==
@@ -90,7 +91,7 @@ namespace Umbraco.Tests.UmbracoExamine
 
             if (analyzer == null)
             {
-                analyzer = new StandardAnalyzer(Version.LUCENE_29);
+                analyzer = new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29);
             }
 
 		    var indexSet = new IndexSet();
@@ -112,23 +113,33 @@ namespace Umbraco.Tests.UmbracoExamine
 
 			return i;
 		}
-        public static UmbracoExamineSearcher GetUmbracoSearcher(Directory luceneDir, Analyzer analyzer = null)
+        public static UmbracoExamineSearcher GetUmbracoSearcher(Lucene.Net.Store.Directory luceneDir, Analyzer analyzer = null)
 		{
             if (analyzer == null)
             {
-                analyzer = new StandardAnalyzer(Version.LUCENE_29);
+                analyzer = new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29);
             }
             return new UmbracoExamineSearcher(luceneDir, analyzer);
 		}
 		
-		public static LuceneSearcher GetLuceneSearcher(Directory luceneDir)
+		public static LuceneSearcher GetLuceneSearcher(Lucene.Net.Store.Directory luceneDir)
 		{
-			return new LuceneSearcher(luceneDir, new StandardAnalyzer(Version.LUCENE_29));
+			return new LuceneSearcher(luceneDir, new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29));
 		}
-		
-		public static MultiIndexSearcher GetMultiSearcher(Directory pdfDir, Directory simpleDir, Directory conventionDir, Directory cwsDir)
+		public static PDFIndexer GetPdfIndexer(Lucene.Net.Store.Directory luceneDir)
 		{
-			var i = new MultiIndexSearcher(new[] { pdfDir, simpleDir, conventionDir, cwsDir }, new StandardAnalyzer(Version.LUCENE_29));
+			var i = new PDFIndexer(luceneDir,
+									  new TestDataService(),
+									  new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29),
+									  false);
+
+			i.IndexingError += IndexingError;
+
+			return i;
+		}
+		public static MultiIndexSearcher GetMultiSearcher(Lucene.Net.Store.Directory pdfDir, Lucene.Net.Store.Directory simpleDir, Lucene.Net.Store.Directory conventionDir, Lucene.Net.Store.Directory cwsDir)
+		{
+			var i = new MultiIndexSearcher(new[] { pdfDir, simpleDir, conventionDir, cwsDir }, new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29));
 			return i;
 		}
 

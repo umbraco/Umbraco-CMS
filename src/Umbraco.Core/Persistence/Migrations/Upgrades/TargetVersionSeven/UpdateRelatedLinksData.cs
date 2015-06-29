@@ -12,23 +12,18 @@ using Newtonsoft.Json;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 {
     [Migration("7.0.0", 10, GlobalSettings.UmbracoMigrationName)]
     public class UpdateRelatedLinksData : MigrationBase
     {
-        public UpdateRelatedLinksData(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
-
         public override void Up()
         {
             Execute.Code(UpdateRelatedLinksDataDo);
         }
 
-        public string UpdateRelatedLinksDataDo(Database database)
+        public static string UpdateRelatedLinksDataDo(Database database)
         {
             if (database != null)
             {
@@ -71,7 +66,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                         }
                         catch (Exception ex) 
                         {
-                            Logger.Error<UpdateRelatedLinksData>("The data stored for property id " + data.Id + " on document " + data.NodeId + 
+                            LogHelper.Error<UpdateRelatedLinksData>("The data stored for property id " + data.Id + " on document " + data.NodeId + 
                                 " is not valid XML, the data will be removed because it cannot be converted to the new format. The value was: " + data.Text, ex);
 
                             data.Text = "";

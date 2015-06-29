@@ -14,13 +14,11 @@ namespace Umbraco.Core.Models
     public abstract class File : Entity, IFile
     {
         private string _path;
-        private string _originalPath;
         private string _content = string.Empty; //initialize to empty string, not null
 
         protected File(string path)
         {
             _path = path;
-            _originalPath = _path;
         }
 
         private static readonly PropertyInfo ContentSelector = ExpressionHelper.GetPropertyInfo<File, string>(x => x.Content);
@@ -34,7 +32,14 @@ namespace Umbraco.Core.Models
         [DataMember]
         public virtual string Name
         {
-            get { return _name ?? (_name = System.IO.Path.GetFileName(Path)); }
+            get
+            {
+                if (_name == null)
+                {
+                    _name = System.IO.Path.GetFileName(Path);
+                }
+                return _name;
+            }
         }
 
         /// <summary>
@@ -57,7 +62,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets or sets the Path to the File from the root of the file's associated IFileSystem
+        /// Gets or sets the Path to the File from the root of the site
         /// </summary>
         [DataMember]
         public virtual string Path
@@ -78,22 +83,6 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets the original path of the file
-        /// </summary>
-        public string OriginalPath
-        {
-            get { return _originalPath; }
-        }
-
-        /// <summary>
-        /// Called to re-set the OriginalPath to the Path
-        /// </summary>
-        public void ResetOriginalPath()
-        {
-            _originalPath = _path;
-        }
-
-        /// <summary>
         /// Gets or sets the Content of a File
         /// </summary>
         [DataMember]
@@ -111,28 +100,20 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets or sets the file's virtual path (i.e. the file path relative to the root of the website)
+        /// Boolean indicating whether the file could be validated
         /// </summary>
-        public string VirtualPath { get; set; }
-
-        [Obsolete("This is no longer used and will be removed from the codebase in future versions")]
-        public virtual bool IsValid()
-        {
-            return true;
-        }
+        /// <returns>True if file is valid, otherwise false</returns>
+        public abstract bool IsValid();
 
         public override object DeepClone()
         {
             var clone = (File)base.DeepClone();
-            //turn off change tracking
-            clone.DisableChangeTracking();
+
             //need to manually assign since they are readonly properties
             clone._alias = Alias;
             clone._name = Name;
-            //this shouldn't really be needed since we're not tracking
+
             clone.ResetDirtyProperties(false);
-            //re-enable tracking
-            clone.EnableChangeTracking();
 
             return clone;
         }

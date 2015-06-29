@@ -89,7 +89,5 @@ namespace Umbraco.Web.UI
 
         public abstract string ReturnUrl { get; }
         public abstract string AssignedApp { get; }
-
-        public IDictionary<string, object> AdditionalValues { get; set; }
     }
 }

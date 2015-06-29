@@ -34,13 +34,11 @@
                 }
                 $scope.model.value[idx].edit = true;
             };
-  
 
-            $scope.saveEdit = function (idx) {
-                $scope.model.value[idx].title = $scope.model.value[idx].caption;
+            $scope.cancelEdit = function(idx) {
                 $scope.model.value[idx].edit = false;
             };
-
+            
             $scope.delete = function (idx) {               
                 $scope.model.value.splice(idx, 1);               
             };

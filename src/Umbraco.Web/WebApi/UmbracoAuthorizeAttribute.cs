@@ -4,7 +4,6 @@ using Umbraco.Core;
 
 namespace Umbraco.Web.WebApi
 {
-
     /// <summary>
     /// Ensures authorization is successful for a back office user
     /// </summary>    

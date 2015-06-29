@@ -4,7 +4,7 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class DictionaryTranslationFactory 
+    internal class DictionaryTranslationFactory : IEntityFactory<IDictionaryTranslation, LanguageTextDto>
     {
         private readonly Guid _uniqueId;
         private ILanguage _language;

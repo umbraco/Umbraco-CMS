@@ -1,0 +1,147 @@
+<!DOCTYPE  html>
+<html>
+  <head>
+    <title>doc</title>
+    <style>
+      /*github.com style (c) Vasily Polovnyov <vast@whiteants.net>*/
+      pre code {
+        display: block; padding: 0.5em;
+        color: #333;
+        background: #f8f8ff
+      }
+      pre .comment,
+      pre .template_comment,
+      pre .diff .header,
+      pre .javadoc {
+        color: #998;
+        font-style: italic
+      }
+      pre .keyword,
+      pre .css .rule .keyword,
+      pre .winutils,
+      pre .javascript .title,
+      pre .nginx .title,
+      pre .subst,
+      pre .request,
+      pre .status {
+        color: #333;
+        font-weight: bold
+      }
+      pre .number,
+      pre .hexcolor,
+      pre .ruby .constant {
+        color: #099;
+      }
+      pre .string,
+      pre .tag .value,
+      pre .phpdoc,
+      pre .tex .formula {
+        color: #d14
+      }
+      pre .title,
+      pre .id {
+        color: #900;
+        font-weight: bold
+      }
+      pre .javascript .title,
+      pre .lisp .title,
+      pre .clojure .title,
+      pre .subst {
+        font-weight: normal
+      }
+      pre .class .title,
+      pre .haskell .type,
+      pre .vhdl .literal,
+      pre .tex .command {
+        color: #458;
+        font-weight: bold
+      }
+      pre .tag,
+      pre .tag .title,
+      pre .rules .property,
+      pre .django .tag .keyword {
+        color: #000080;
+        font-weight: normal
+      }
+      pre .attribute,
+      pre .variable,
+      pre .lisp .body {
+        color: #008080
+      }
+      pre .regexp {
+        color: #009926
+      }
+      pre .class {
+        color: #458;
+        font-weight: bold
+      }
+      pre .symbol,
+      pre .ruby .symbol .string,
+      pre .lisp .keyword,
+      pre .tex .special,
+      pre .prompt {
+        color: #990073
+      }
+      pre .built_in,
+      pre .lisp .title,
+      pre .clojure .built_in {
+        color: #0086b3
+      }
+      pre .preprocessor,
+      pre .pi,
+      pre .doctype,
+      pre .shebang,
+      pre .cdata {
+        color: #999;
+        font-weight: bold
+      }
+      pre .deletion {
+        background: #fdd
+      }
+      pre .addition {
+        background: #dfd
+      }
+      pre .diff .change {
+        background: #0086b3
+      }
+      pre .chunk {
+        color: #aaa
+      }
+    </style>
+  </head>
+  <body>  
+    <h1>Getting up and running with Belle</h1>
+<p><em>The super fast introduction to getting belle running on your local machine, both as a pre-built environment, and with the full setup with unit-tests, grunt-tasks and node.</em></p>
+<h2>Running the prebuilt site</h2>
+<h3>Windows</h3>
+<p>Right-click the <code>/build</code> folder and choose &quot;open in webmatrix&quot;, run the website in webmatrix and browse to <code>localhost:9999/Belle/</code>, this should display the Belle login screen</p>
+<p><em>Port 9999 should be used because that is the target site that the grunt build command mentioned below will launch</em></p>
+<h3>OSX</h3>
+<p>Open a terminal inside the &quot;/build&quot; folder and run the command:</p>
+<pre><code>python -m SimpleHTTPServer 9999</code></pre>
+<p>This will start a local webserver, hosting the site on <code>localhost:9999</code> browse to localhost:9999/Belle/ which should display the belle login screen.</p>
+<h2>Uing the dev environment</h2>
+<p><em>The dev environment is tad more tricky to get running, since it depends on a number of unit tests and automated tools, to produce the contents of the /build folder</em></p>
+<p><em>The dev environment is cross platform, so will work on both osx and windows, and do not currently have any dependencies to .net</em></p>
+<h3>Install node.js</h3>
+<p>We need node to run tests and automated less compiling and other automated tasks. go to <a href="http://nodejs.org">http://nodejs.org</a>. Node.js is a powerfull javascript engine, which allows us to run all our tests and tasks written in javascript locally.</p>
+<p><em>note:</em> On windows you might need to restart explorer.exe to register node.</p>
+<h3>Install dependencies</h3>
+<p>Next we need to install all the required packages. This is done with the package tool, included with node.js, open /Umbraco.Belle.Client in cmd.exe or osx terminal and run the command:</p>
+<pre><code>npm install</code></pre>
+<p>this will fetch all needed packages to your local machine.</p>
+<h3>Install grunt globally</h3>
+<p>Grunt is a task runner for node.js, and we use it for all automated tasks in the build process. For convenience we need to install it globally on your machine, so it can be used directly in cmd.exe or the terminal.</p>
+<p>So run the command:</p>
+<pre><code>npm install grunt-cli -g</code></pre>
+<p><em>note:</em> On windows you might need to restart explorer.exe to register the grunt cmd.</p>
+<p><em>note:</em> On OSX you might need to run:</p>
+<pre><code>sudo npm install grunt-cli -g</code></pre>
+<p>Now that you have node and grunt installed, you can open <code>/Umbraco.Belle.Client</code> in either <code>cmd.exe</code> or terminal and run: </p>
+<pre><code>grunt dev</code></pre>
+<p>This will build the site, merge less files, run tests and create the /Build folder, launch the web browser and monitor changes.</p>
+<h3>Automated builds and tests</h3>
+<p>grunt dev will continue to run in the background monitoring changes to files. When changes are detected it will rebuild the JS and also run the unit tests.</p>
+
+  </body>
+</html>

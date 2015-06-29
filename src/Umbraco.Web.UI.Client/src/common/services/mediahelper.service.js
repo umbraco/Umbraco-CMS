@@ -327,11 +327,6 @@ function mediaHelper(umbRequestHelper) {
          * @param {string} imagePath Image path, ex: /media/1234/my-image.jpg
          */
         detectIfImageByExtension: function (imagePath) {
-
-            if (!imagePath) {
-                return false;
-            }
-            
             var lowered = imagePath.toLowerCase();
             var ext = lowered.substr(lowered.lastIndexOf(".") + 1);
             return ("," + Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes + ",").indexOf("," + ext + ",") !== -1;

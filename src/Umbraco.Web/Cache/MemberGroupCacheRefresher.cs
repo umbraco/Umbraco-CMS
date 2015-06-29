@@ -4,8 +4,7 @@ using System.Web.Script.Serialization;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
-
-using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Caching;
 
 namespace Umbraco.Web.Cache
 {
@@ -110,7 +109,7 @@ namespace Umbraco.Web.Cache
                 {
                     ApplicationContext.Current.ApplicationCache.RuntimeCache
                         .ClearCacheByKeySearch(string.Format("{0}.{1}", typeof(IMemberGroup).FullName, payload.Name));
-                    ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(RepositoryBase.GetCacheIdKey<IMemberGroup>(payload.Id));
+                    RuntimeCacheProvider.Current.Delete(typeof(IMemberGroup), payload.Id);   
                 }                
             });
             

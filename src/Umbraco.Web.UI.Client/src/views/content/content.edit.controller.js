@@ -32,14 +32,13 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
 
         editorState.set($scope.content);
 
-        //We fetch all ancestors of the node to generate the footer breadcrumb navigation
+        //We fetch all ancestors of the node to generate the footer breadcrump navigation
         if (!$routeParams.create) {
-            if (content.parentId && content.parentId != -1) {
-                entityResource.getAncestors(content.id, "document")
-               .then(function (anc) {
-                   $scope.ancestors = anc;
-               });
-            }
+            entityResource.getAncestors(content.id, "document")
+                .then(function (anc) {
+                    anc.pop();
+                    $scope.ancestors = anc;
+                });
         }
     }
 
@@ -68,8 +67,6 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
 
     // This is a helper method to reduce the amount of code repitition for actions: Save, Publish, SendToPublish
     function performSave(args) {
-        var deferred = $q.defer();
-
         contentEditingHelper.contentEditorPerformSave({
             statusMessage: args.statusMessage,
             saveMethod: args.saveMethod,
@@ -79,17 +76,12 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
             //success            
             init($scope.content);
             syncTreeNode($scope.content, data.path);
-
-            deferred.resolve(data);
         }, function (err) {
             //error
             if (err) {
                 editorState.set($scope.content);
             }
-            deferred.reject(err);
         });
-
-        return deferred.promise;
     }
 
     function resetLastListPageNumber(content) {

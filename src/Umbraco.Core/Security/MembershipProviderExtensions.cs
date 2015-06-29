@@ -13,21 +13,21 @@ using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Security
 {
-    public static class MembershipProviderExtensions
+    internal static class MembershipProviderExtensions
     {
-        internal static MembershipUserCollection FindUsersByName(this MembershipProvider provider, string usernameToMatch)
+        public static MembershipUserCollection FindUsersByName(this MembershipProvider provider, string usernameToMatch)
         {
             int totalRecords = 0;
             return provider.FindUsersByName(usernameToMatch, 0, int.MaxValue, out totalRecords);
         }
 
-        internal static MembershipUserCollection FindUsersByEmail(this MembershipProvider provider, string emailToMatch)
+        public static MembershipUserCollection FindUsersByEmail(this MembershipProvider provider, string emailToMatch)
         {
             int totalRecords = 0;
             return provider.FindUsersByEmail(emailToMatch, 0, int.MaxValue, out totalRecords);
         }
 
-        internal static MembershipUser CreateUser(this MembershipProvider provider, string username, string password, string email)
+        public static MembershipUser CreateUser(this MembershipProvider provider, string username, string password, string email)
         {
             MembershipCreateStatus status;
             var user = provider.CreateUser(username, password, email, null, null, true, null, out status);
@@ -80,7 +80,7 @@ namespace Umbraco.Core.Security
         /// </summary>
         /// <param name="membershipProvider"></param>
         /// <returns></returns>
-        internal static MembershipUser GetCurrentUser(this MembershipProvider membershipProvider)
+        public static MembershipUser GetCurrentUser(this MembershipProvider membershipProvider)
         {
             var username = membershipProvider.GetCurrentUserName();
             return username.IsNullOrWhiteSpace()
@@ -93,7 +93,7 @@ namespace Umbraco.Core.Security
         /// </summary>
         /// <param name="membershipProvider"></param>
         /// <returns></returns>
-        internal static string GetCurrentUserName(this MembershipProvider membershipProvider)
+        public static string GetCurrentUserName(this MembershipProvider membershipProvider)
         {
             if (HostingEnvironment.IsHosted)
             {

@@ -18,12 +18,7 @@
         /// <summary>
         /// Creates a new database file and schema for the whole fixture, each test will use the pre-existing one
         /// </summary>
-        NewDbFileAndSchemaPerFixture,
-
-        /// <summary>
-        /// For each test a new database file without a schema
-        /// </summary>
-        EmptyDbFilePerTest,
+        NewDbFileAndSchemaPerFixture
       
     }
 }

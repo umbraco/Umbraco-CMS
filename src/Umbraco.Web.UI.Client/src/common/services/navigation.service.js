@@ -513,26 +513,23 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
          * Opens the user dialog, next to the sections navigation
          * template is located in views/common/dialogs/user.html
          */
-        showUserDialog: function () {
-            // hide tray and close help dialog
-            if (service.helpDialog) {
-                service.helpDialog.close();
-            }
-            service.hideTray();
+        showUserDialog: function() {
 
-            if (service.userDialog) {
-                service.userDialog.close();
-                service.userDialog = undefined;
+            if(userDialog){
+                userDialog.close();
+                userDialog = null;
             }
 
-            service.userDialog = dialogService.open(
-            {
-                template: "views/common/dialogs/user.html",
-                modalClass: "umb-modal-left",
-                show: true
-            });
+            userDialog = dialogService.open(
+                {
+                    template: "views/common/dialogs/user.html",
+                    modalClass: "umb-modal-left",
+                    show: true
+                });
+        
+            
 
-            return service.userDialog;
+            return userDialog;
         },
 
         /**
@@ -544,13 +541,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
          * Opens the user dialog, next to the sections navigation
          * template is located in views/common/dialogs/user.html
          */
-        showHelpDialog: function () {
-            // hide tray and close user dialog
-            service.hideTray();
-            if (service.userDialog) {
-                service.userDialog.close();
-            }
-
+        showHelpDialog: function() {
             if(service.helpDialog){
                 service.helpDialog.close();
                 service.helpDialog = undefined;

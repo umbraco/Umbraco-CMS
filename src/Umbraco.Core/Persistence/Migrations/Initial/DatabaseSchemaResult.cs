@@ -2,11 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Semver;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Migrations.Initial
 {
@@ -37,20 +35,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         internal IEnumerable<DbIndexDefinition> DbIndexDefinitions { get; set; }
 
         /// <summary>
-        /// Checks in the db which version is installed based on the migrations that have been run
-        /// </summary>
-        /// <param name="migrationEntryService"></param>
-        /// <returns></returns>
-        public SemVersion DetermineInstalledVersionByMigrations(IMigrationEntryService migrationEntryService)
-        {
-            var allMigrations = migrationEntryService.GetAll(GlobalSettings.UmbracoMigrationName);
-            var mostrecent = allMigrations.OrderByDescending(x => x.Version).Select(x => x.Version).FirstOrDefault();
-
-            return mostrecent ?? new SemVersion(new Version(0, 0, 0));
-        }
-
-        /// <summary>
-        /// Determines the version of the currently installed database by detecting the current database structure
+        /// Determines the version of the currently installed database.
         /// </summary>
         /// <returns>
         /// A <see cref="Version"/> with Major and Minor values for 
@@ -111,12 +96,6 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             if (Errors.Any(x => x.Item1.Equals("Constraint") && (x.Item2.InvariantEquals("FK_cmsContent_cmsContentType_nodeId"))))
             {
                 return new Version(7, 0, 0);
-            }
-
-            //if the error is for umbracoAccess it must be the previous version to 7.3 since that is when it is added
-            if (Errors.Any(x => x.Item1.Equals("Table") && (x.Item2.InvariantEquals("umbracoAccess"))))
-            {
-                return new Version(7, 2, 5);
             }
 
             return UmbracoVersion.Current;

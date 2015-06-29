@@ -6,6 +6,7 @@ using System.Threading;
 using System.Web.UI.WebControls;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests
 {
@@ -15,6 +16,7 @@ namespace Umbraco.Tests
         [TestFixtureSetUp]
 		public void FixtureSetup()
 		{
+			TestHelper.SetupLog4NetForTests();
 		}
 
         [Test]

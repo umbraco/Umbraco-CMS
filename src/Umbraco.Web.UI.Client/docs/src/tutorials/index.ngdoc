@@ -1,0 +1,65 @@
+@ngdoc overview
+@name Tutorials
+@description
+
+##Tutorials
+
+This section contains longer written tutorials on how to perform certain tasks with the new angular-based UI. 
+
+Our initial focus is getting developers up and running with their own property editors, and secondly we will focus on how to use the serverside support methods to hook into the clientside code from asp.net.
+
+##Getting up and running
+There are 2 ways to get umbraco 7 running, either from source, or from one of the nightly builds. 
+
+###{@link Running Running a nightly build}
+This only works on windows with IIS or IISExpress
+
+###{@link Building Building from source} 
+You can run the client bits on osx and windows, or simple run the source from Visual Studio
+
+
+
+##Create your own editor
+One of the big breaking changes in Umbraco 7 is the new format for property editors / data types. Get ahead by reading through our series on how to build your own: 
+
+###{@link CreatingAPropertyEditor Create an editor}
+The initial setup of the plugin, the manifest and files
+
+###{@link Adding-Configuration-To-Property-Editor Adding configuration}
+How we make the editor configurable so it becomes flexible and reusable
+
+###{@link Intergrating-Services-With-PropertyEditor Intergrating services}
+How you can get access to all the standard services inside of Umbraco from your editor
+
+###{@link Add-ServerSide-Data Adding serverside data}
+How you can return your own custom data from the server to a property editor
+through a ApiController 
+
+##Start developing
+
+###{@link Source-Code-Structure how the source code is structured}
+An overview of the different folders and files in the Umbraco 7 client project
+
+##Recommended reading
+
+It is always recommended to have a clear understanding of the underlying framework, before you start building on top of it. 
+
+###Html and css
+For our html, css and various widgets, we use twitter bootstrap 2
+
+- [getbootstrap.com](http://getbootstrap.com/)
+
+###Javascript application framework
+For the underlying application framework we use AngularJS, there are plenty of really good ressources for learning but these are our preffered ones:
+
+- [egghead.io](http://www.egghead.io/)
+- [angularjs.org/tutorial](http://docs.angularjs.org/tutorial)
+- [Tekpub](http://tekpub.com/products/angular)
+
+###Environment
+We use various tools to built the client-side code. This is to ensure that our javascript is automatically tested, our .less files are compiled, and that files are minified and linted. 
+
+For all these automated tasks, we use [gruntjs](http://gruntjs.com) which is a javascript based task-runner for [node.js](http://nodejs.com) 
+
+it is highly recommended to read and understand the basics of grunt, and have a closer look at our gruntfile.js in the source, since this ties the entire application together.  
+

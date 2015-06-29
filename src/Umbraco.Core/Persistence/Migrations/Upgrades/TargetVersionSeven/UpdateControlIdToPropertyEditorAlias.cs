@@ -1,7 +1,5 @@
 ﻿using System;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
@@ -12,10 +10,6 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     [Migration("7.0.0", 1, GlobalSettings.UmbracoMigrationName)]
     public class UpdateControlIdToPropertyEditorAlias : MigrationBase
     {
-        public UpdateControlIdToPropertyEditorAlias(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
-
         public override void Up()
         {
             //now that the controlId column is renamed and now a string we need to convert
