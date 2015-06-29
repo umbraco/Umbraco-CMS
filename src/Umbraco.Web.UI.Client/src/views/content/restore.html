@@ -1,0 +1,26 @@
+<div ng-controller="Umbraco.Editors.Content.RestoreController">
+	<div class="umb-dialog-body">
+		<umb-pane>
+
+			<p class="abstract" ng-hide="error != null || success == true">
+				Restore <strong>{{currentNode.name}}</strong> to under <strong>{{target.name}}</strong>?
+			</p>
+
+			<div class="alert alert-error" ng-show="error != null">
+				<h4>{{error.errorMsg}}</h4>
+				<p>{{error.data.Message}}</p>
+			</div>
+
+			<div class="alert alert-success" ng-show="success == true">
+				<p><strong>{{currentNode.name}}</strong> was moved underneath <strong>{{target.name}}</strong></p>
+				<button class="btn btn-primary" ng-click="nav.hideDialog()">OK</button>
+			</div>
+
+		</umb-pane>
+	</div>
+
+	<div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="success == true">
+		<a class="btn btn-link" ng-click="nav.hideDialog()">Cancel</a>
+		<button class="btn btn-primary" ng-click="restore()" ng-show="error == null">Restore</button>
+	</div>
+</div>

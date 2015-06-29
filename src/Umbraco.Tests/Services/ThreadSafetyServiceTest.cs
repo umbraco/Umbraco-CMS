@@ -7,8 +7,10 @@ using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
@@ -35,9 +37,9 @@ namespace Umbraco.Tests.Services
 			//a Database instance is created per thread, whereas the default implementation which will work in an HttpContext
 			//threading environment, or a single apartment threading environment will not work for this test because 
 			//it is multi-threaded.
-			_dbFactory = new PerThreadDatabaseFactory();
+			_dbFactory = new PerThreadDatabaseFactory(Logger);
 			//overwrite the local object
-			ApplicationContext.DatabaseContext = new DatabaseContext(_dbFactory);
+            ApplicationContext.DatabaseContext = new DatabaseContext(_dbFactory, Logger, new SqlCeSyntaxProvider(), "System.Data.SqlServerCe.4.0");
 
             //disable cache
 		    var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
@@ -45,8 +47,15 @@ namespace Umbraco.Tests.Services
 			//here we are going to override the ServiceContext because normally with our test cases we use a 
 			//global Database object but this is NOT how it should work in the web world or in any multi threaded scenario.
 			//we need a new Database object for each thread.
+            var repositoryFactory = new RepositoryFactory(cacheHelper, Logger, SqlSyntax, SettingsForTests.GenerateMockSettings());
 			_uowProvider = new PerThreadPetaPocoUnitOfWorkProvider(_dbFactory);
-            ApplicationContext.Services = new ServiceContext(_uowProvider, new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper);
+            ApplicationContext.Services = new ServiceContext(
+                repositoryFactory,
+                _uowProvider, 
+                new FileUnitOfWorkProvider(), 
+                new PublishingStrategy(), 
+                cacheHelper, 
+                Logger);
 
 			CreateTestData();
 		}
@@ -208,11 +217,20 @@ namespace Umbraco.Tests.Services
 		/// </summary>
 		internal class PerThreadDatabaseFactory : DisposableObject, IDatabaseFactory
 		{
-			private readonly ConcurrentDictionary<int, UmbracoDatabase> _databases = new ConcurrentDictionary<int, UmbracoDatabase>(); 
+		    private readonly ILogger _logger;
+
+		    public PerThreadDatabaseFactory(ILogger logger)
+		    {
+		        _logger = logger;
+		    }
+
+		    private readonly ConcurrentDictionary<int, UmbracoDatabase> _databases = new ConcurrentDictionary<int, UmbracoDatabase>(); 
 
 			public UmbracoDatabase CreateDatabase()
 			{
-				var db = _databases.GetOrAdd(Thread.CurrentThread.ManagedThreadId, i => new UmbracoDatabase(Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName));
+				var db = _databases.GetOrAdd(
+                    Thread.CurrentThread.ManagedThreadId,
+                    i => new UmbracoDatabase(Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName, _logger));
 				return db;
 			}
 

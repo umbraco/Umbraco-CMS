@@ -10,6 +10,8 @@ using System.Web.Http.Dispatcher;
 using System.Web.Mvc;
 using System.Web.Routing;
 using ClientDependency.Core.Config;
+using Examine;
+using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
@@ -36,6 +38,7 @@ using Umbraco.Web.Scheduling;
 using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic;
+using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using ProfilingViewEngine = Umbraco.Core.Profiling.ProfilingViewEngine;
 
 
@@ -47,6 +50,8 @@ namespace Umbraco.Web
     public class WebBootManager : CoreBootManager
     {
         private readonly bool _isForTesting;
+        //NOTE: see the Initialize method for what this is used for
+        private readonly List<IIndexer> _indexesToRebuild = new List<IIndexer>(); 
 
         public WebBootManager(UmbracoApplicationBase umbracoApplication)
             : this(umbracoApplication, false)
@@ -71,6 +76,13 @@ namespace Umbraco.Web
         /// <returns></returns>
         public override IBootManager Initialize()
         {
+             //This is basically a hack for this item: http://issues.umbraco.org/issue/U4-5976
+            // when Examine initializes it will try to rebuild if the indexes are empty, however in many cases not all of Examine's 
+            // event handlers will be assigned during bootup when the rebuilding starts which is a problem. So with the examine 0.1.58.2941 build
+            // it has an event we can subscribe to in order to cancel this rebuilding process, but what we'll do is cancel it and postpone the rebuilding until the
+            // boot process has completed. It's a hack but it works.
+            ExamineManager.Instance.BuildingEmptyIndexOnStartup += OnInstanceOnBuildingEmptyIndexOnStartup;
+
             base.Initialize();
 
             // Backwards compatibility - set the path and URL type for ClientDependency 1.5.1 [LK]
@@ -101,15 +113,19 @@ namespace Umbraco.Web
 
             //Register a custom renderer - used to process property editor dependencies
             var renderer = new DependencyPathRenderer();
-            renderer.Initialize("Umbraco.DependencyPathRenderer", new NameValueCollection { { "compositeFileHandlerPath", "~/DependencyHandler.axd" } });
+            renderer.Initialize("Umbraco.DependencyPathRenderer", new NameValueCollection
+            {
+                { "compositeFileHandlerPath", ClientDependencySettings.Instance.CompositeFileHandlerPath }
+            });
             ClientDependencySettings.Instance.MvcRendererCollection.Add(renderer);
+            
 
             InstallHelper insHelper = new InstallHelper(UmbracoContext.Current);
             insHelper.DeleteLegacyInstaller();
 
             return this;
         }
-
+        
         /// <summary>
         /// Override this method in order to ensure that the UmbracoContext is also created, this can only be 
         /// created after resolution is frozen!
@@ -163,6 +179,21 @@ namespace Umbraco.Web
 
             //Now, startup all of our legacy startup handler
             ApplicationEventsResolver.Current.InstantiateLegacyStartupHandlers();
+            
+            //Ok, now that everything is complete we'll check if we've stored any references to index that need rebuilding and run them 
+            // (see the initialize method for notes) - we'll ensure we remove the event handler too in case examine manager doesn't actually
+            // initialize during startup, in which case we want it to rebuild the indexes itself.
+            ExamineManager.Instance.BuildingEmptyIndexOnStartup -= OnInstanceOnBuildingEmptyIndexOnStartup;
+            if (_indexesToRebuild.Any())
+            {
+                foreach (var indexer in _indexesToRebuild)
+                {
+                    indexer.RebuildIndex();
+                }
+            }
+
+            //Now ensure webapi is initialized after everything
+            GlobalConfiguration.Configuration.EnsureInitialized();
 
             return this;
         }
@@ -293,18 +324,23 @@ namespace Umbraco.Web
         {
             base.InitializeResolvers();
 
-            XsltExtensionsResolver.Current = new XsltExtensionsResolver(() => PluginManager.Current.ResolveXsltExtensions());
+            XsltExtensionsResolver.Current = new XsltExtensionsResolver(ServiceProvider, LoggerResolver.Current.Logger, () => PluginManager.Current.ResolveXsltExtensions());
 
             //set the default RenderMvcController
             DefaultRenderMvcControllerResolver.Current = new DefaultRenderMvcControllerResolver(typeof(RenderMvcController));
 
-            //Override the ServerMessengerResolver to set a username/password for the distributed calls
-            ServerMessengerResolver.Current.SetServerMessenger(new BatchedServerMessenger(() =>
+            ServerMessengerResolver.Current.SetServerMessenger(new BatchedWebServiceServerMessenger(() =>
             {
                 //we should not proceed to change this if the app/database is not configured since there will 
                 // be no user, plus we don't need to have server messages sent if this is the case.
                 if (ApplicationContext.IsConfigured && ApplicationContext.DatabaseContext.IsDatabaseConfigured)
                 {
+                    //disable if they are not enabled
+                    if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled == false)
+                    {
+                        return null;
+                    }
+
                     try
                     {
                         var user = User.GetUser(UmbracoConfig.For.UmbracoSettings().DistributedCall.UserId);
@@ -312,18 +348,20 @@ namespace Umbraco.Web
                     }
                     catch (Exception e)
                     {
-                        LogHelper.Error<WebBootManager>("An error occurred trying to set the IServerMessenger during application startup", e);
+                        LoggerResolver.Current.Logger.Error<WebBootManager>("An error occurred trying to set the IServerMessenger during application startup", e);
                         return null;
                     }
                 }
-                LogHelper.Warn<WebBootManager>("Could not initialize the DefaultServerMessenger, the application is not configured or the database is not configured");
+                LoggerResolver.Current.Logger.Warn<WebBootManager>("Could not initialize the DefaultServerMessenger, the application is not configured or the database is not configured");
                 return null;
             }));
 
             SurfaceControllerResolver.Current = new SurfaceControllerResolver(
+                ServiceProvider, LoggerResolver.Current.Logger,
                 PluginManager.Current.ResolveSurfaceControllers());
 
             UmbracoApiControllerResolver.Current = new UmbracoApiControllerResolver(
+                ServiceProvider, LoggerResolver.Current.Logger,
                 PluginManager.Current.ResolveUmbracoApiControllers());
 
             // both TinyMceValueConverter (in Core) and RteMacroRenderingValueConverter (in Web) will be
@@ -344,6 +382,7 @@ namespace Umbraco.Web
                 new NamespaceHttpControllerSelector(GlobalConfiguration.Configuration));
 
             FilteredControllerFactoriesResolver.Current = new FilteredControllerFactoriesResolver(
+                ServiceProvider, LoggerResolver.Current.Logger,
                 // add all known factories, devs can then modify this list on application
                 // startup either by binding to events or in their own global.asax
                 new[]
@@ -352,6 +391,7 @@ namespace Umbraco.Web
 					});
 
             UrlProviderResolver.Current = new UrlProviderResolver(
+                ServiceProvider, LoggerResolver.Current.Logger,
                     //typeof(AliasUrlProvider), // not enabled by default
                     typeof(DefaultUrlProvider),
                     typeof(CustomRouteUrlProvider)
@@ -366,6 +406,7 @@ namespace Umbraco.Web
                 new ContentLastChanceFinderByNotFoundHandlers());
 
             ContentFinderResolver.Current = new ContentFinderResolver(
+                ServiceProvider, LoggerResolver.Current.Logger,
                 // all built-in finders in the correct order, devs can then modify this list
                 // on application startup via an application event handler.
                 typeof(ContentFinderByPageIdQuery),
@@ -389,14 +430,24 @@ namespace Umbraco.Web
             PublishedCache.XmlPublishedCache.PublishedContentCache.UnitTesting = _isForTesting;
 
             ThumbnailProvidersResolver.Current = new ThumbnailProvidersResolver(
+                ServiceProvider, LoggerResolver.Current.Logger,
                 PluginManager.Current.ResolveThumbnailProviders());
 
             ImageUrlProviderResolver.Current = new ImageUrlProviderResolver(
+                ServiceProvider, LoggerResolver.Current.Logger,
                 PluginManager.Current.ResolveImageUrlProviders());
 
             CultureDictionaryFactoryResolver.Current = new CultureDictionaryFactoryResolver(
                 new DefaultCultureDictionaryFactory());
         }
 
+
+        private void OnInstanceOnBuildingEmptyIndexOnStartup(object sender, BuildingEmptyIndexOnStartupEventArgs args)
+        {
+            //store the indexer that needs rebuilding because it's empty for when the boot process 
+            // is complete and cancel this current event so the rebuild process doesn't start right now.
+            args.Cancel = true;
+            _indexesToRebuild.Add(args.Indexer);
+        }
     }
 }

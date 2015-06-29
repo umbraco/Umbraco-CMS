@@ -6,8 +6,12 @@ using System.Security;
 using System.Text;
 using System.Threading;
 using System.Web;
+using Examine.LuceneEngine.Config;
 using Examine.LuceneEngine.Providers;
+using Examine.Providers;
 using Lucene.Net.Analysis;
+using Lucene.Net.Documents;
+using Lucene.Net.Index;
 using Umbraco.Core;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
@@ -15,6 +19,7 @@ using UmbracoExamine.DataServices;
 using Examine;
 using System.IO;
 using System.Xml.Linq;
+using UmbracoExamine.LocalStorage;
 
 namespace UmbracoExamine
 {
@@ -60,8 +65,24 @@ namespace UmbracoExamine
         /// Used for unit tests
         /// </summary>
         internal static bool? DisableInitializationCheck = null;
+        private readonly LocalTempStorageIndexer _localTempStorageHelper = new LocalTempStorageIndexer();
+        private BaseLuceneSearcher _internalTempStorageSearcher = null;
 
         #region Properties
+
+        public bool UseTempStorage
+        {
+            get { return _localTempStorageHelper.LuceneDirectory != null; }
+        }
+
+        public string TempStorageLocation
+        {
+            get
+            {
+                if (UseTempStorage == false) return string.Empty;
+                return _localTempStorageHelper.TempPath;
+            }
+        }
 
         /// <summary>
         /// If true, the IndexingActionHandler will be run to keep the default index up to date.
@@ -95,7 +116,8 @@ namespace UmbracoExamine
         /// <param name="name"></param>
         /// <param name="config"></param>
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
-        {           
+        {
+
             if (config["dataService"] != null && !string.IsNullOrEmpty(config["dataService"]))
             {
                 //this should be a fully qualified type
@@ -134,13 +156,69 @@ namespace UmbracoExamine
                 EnableDefaultEventHandler = enabled;
             }         
 
-            DataService.LogService.AddVerboseLog(-1, string.Format("{0} indexer initializing", name));
-            
+            DataService.LogService.AddVerboseLog(-1, string.Format("{0} indexer initializing", name));               
+
             base.Initialize(name, config);
+
+            if (config["useTempStorage"] != null)
+            {
+                //Use the temp storage directory which will store the index in the local/codegen folder, this is useful
+                // for websites that are running from a remove file server and file IO latency becomes an issue
+                var attemptUseTempStorage = config["useTempStorage"].TryConvertTo<LocalStorageType>();
+                if (attemptUseTempStorage)
+                {
+                    
+                    var indexSet = IndexSets.Instance.Sets[IndexSetName];
+                    var configuredPath = indexSet.IndexPath;
+
+                    _localTempStorageHelper.Initialize(config, configuredPath, base.GetLuceneDirectory(), IndexingAnalyzer, attemptUseTempStorage.Result);
+                }
+            }
         }
 
         #endregion
 
+        protected override BaseSearchProvider InternalSearcher
+        {
+            get
+            {
+                //if temp local storage is configured use that, otherwise return the default
+                if (UseTempStorage)
+                {
+                    //create one if one has not been created already
+                    return _internalTempStorageSearcher 
+                        ?? (_internalTempStorageSearcher = new LuceneSearcher(_localTempStorageHelper.LuceneDirectory, IndexingAnalyzer));
+                }
+
+                return base.InternalSearcher;
+            }
+        }
+
+        public override Lucene.Net.Store.Directory GetLuceneDirectory()
+        {
+            //if temp local storage is configured use that, otherwise return the default
+            if (UseTempStorage)
+            {
+                return _localTempStorageHelper.LuceneDirectory;
+            }
+
+            return base.GetLuceneDirectory();
+
+        }
+
+        protected override IndexWriter CreateIndexWriter()
+        {
+            //if temp local storage is configured use that, otherwise return the default
+            if (UseTempStorage)
+            {
+                var directory = GetLuceneDirectory();
+                return new IndexWriter(GetLuceneDirectory(), IndexingAnalyzer,
+                    DeletePolicyTracker.Current.GetPolicy(directory),
+                    IndexWriter.MaxFieldLength.UNLIMITED);
+            }
+
+            return base.CreateIndexWriter();
+        }
 
         ///// <summary>
         ///// Override to check if we can actually initialize.
@@ -368,6 +446,9 @@ namespace UmbracoExamine
             }
 
         }
+
+        
+
         #endregion
     }
 }

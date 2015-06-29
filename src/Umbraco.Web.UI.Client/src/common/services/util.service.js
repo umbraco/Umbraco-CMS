@@ -195,14 +195,18 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
                 //if there is only one image, then return the target height
                 return targetHeight;
             }
+            else if (currRowWidth / targetRowWidth > 0.90) {
+                //it's close enough, it's at least 90% of the width so we'll accept it with the target height
+                return targetHeight;
+            }
             else {
-                //if it's not successful, return false
+                //if it's not successful, return null
                 return null;
             }
         },
 
         /** builds an image grid row */
-        buildRow: function(imgs, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow, margin) {
+        buildRow: function(imgs, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow, margin, totalRemaining) {
             var currRowWidth = 0;
             var row = { images: [] };
 
@@ -249,8 +253,8 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
                 this.setImageStyle(row.images[j], sizes[j].width, sizes[j].height, margin, bottomMargin);
             }
 
-            if (row.images.length === 1) {
-                //if there's only one image on the row, set the container to max width
+            if (row.images.length === 1 && totalRemaining > 1) {
+                //if there's only one image on the row and there are more images remaining, set the container to max width
                 row.images[0].style.width = maxRowWidth + "px"; 
             }
             
@@ -274,7 +278,7 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
         buildGrid: function(images, maxRowWidth, maxRowHeight, startingIndex, minDisplayHeight, idealImgPerRow, margin,imagesOnly) {
 
             var rows = [];
-            var imagesProcessed = 0;
+            var imagesProcessed = 0; 
 
             //first fill in all of the original image sizes and URLs
             for (var i = startingIndex; i < images.length; i++) {
@@ -294,7 +298,8 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
                 var currImgs = images.slice(imagesProcessed);
 
                 //build the row
-                var row = this.buildRow(currImgs, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow, margin);
+                var remaining = images.length - imagesProcessed;
+                var row = this.buildRow(currImgs, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow, margin, remaining);
                 if (row.images.length > 0) {
                     rows.push(row);
                     imagesProcessed += row.images.length;
@@ -343,7 +348,7 @@ function umbModelMapper() {
          * @param {String} source.name The node name
          * @param {String} source.icon The models icon as a css class (.icon-doc)
          * @param {Number} source.parentId The parentID, if no parent, set to -1
-         * @param {path} source.path comma-seperated string of ancestor IDs (-1,1234,1782,1234)
+         * @param {path} source.path comma-separated string of ancestor IDs (-1,1234,1782,1234)
          */
 
         /** This converts the source model to a basic entity model, it will throw an exception if there isn't enough data to create the model */

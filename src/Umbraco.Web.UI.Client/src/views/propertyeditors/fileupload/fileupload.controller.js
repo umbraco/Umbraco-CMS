@@ -21,6 +21,11 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
         fileManager.setFiles($scope.model.alias, []);
         //clear the current files
         $scope.files = [];
+        if ($scope.propertyForm.fileCount) {
+            //this is required to re-validate
+            $scope.propertyForm.fileCount.$setViewValue($scope.files.length);
+        }
+       
     }
 
     /** this method is used to initialize the data and to re-initialize it if the server value is changed */
@@ -71,6 +76,15 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
 
     initialize();
 
+    // Method required by the valPropertyValidator directive (returns true if the property editor has at least one file selected)
+    $scope.validateMandatory = function () {
+        return {
+            isValid: !$scope.model.validation.mandatory || ((($scope.persistedFiles != null && $scope.persistedFiles.length > 0) || ($scope.files != null && $scope.files.length > 0)) && !$scope.clearFiles),
+            errorMsg: "Value cannot be empty",
+            errorKey: "required"
+        };
+    }
+
     //listen for clear files changes to set our model to be sent up to the server
     $scope.$watch("clearFiles", function (isCleared) {
         if (isCleared == true) {
@@ -80,6 +94,8 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
         else {
             //reset to original value
             $scope.model.value = $scope.originalValue;
+            //this is required to re-validate
+            $scope.propertyForm.fileCount.$setViewValue($scope.files.length);
         }
     });
 
@@ -96,6 +112,10 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
                 $scope.files.push({ alias: $scope.model.alias, file: args.files[i] });
                 newVal += args.files[i].name + ",";
             }
+
+            //this is required to re-validate
+            $scope.propertyForm.fileCount.$setViewValue($scope.files.length);
+
             //set clear files to false, this will reset the model too
             $scope.clearFiles = false;
             //set the model value to be the concatenation of files selected. Please see the notes

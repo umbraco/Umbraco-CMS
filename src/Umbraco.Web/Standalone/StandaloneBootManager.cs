@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
@@ -61,11 +62,12 @@ namespace Umbraco.Web.Standalone
 
             PublishedCachesResolver.Current = new PublishedCachesResolver(caches);
 
-            UrlProviderResolver.Current = new UrlProviderResolver(typeof (DefaultUrlProvider));
+            UrlProviderResolver.Current = new UrlProviderResolver(ServiceProvider, LoggerResolver.Current.Logger, typeof(DefaultUrlProvider));
             SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(new SiteDomainHelper());
 
             ContentLastChanceFinderResolver.Current = new ContentLastChanceFinderResolver();
 			ContentFinderResolver.Current = new ContentFinderResolver(
+                ServiceProvider, LoggerResolver.Current.Logger,
 				typeof (ContentFinderByPageIdQuery),
 				typeof (ContentFinderByNiceUrl),
 				typeof (ContentFinderByIdPath),

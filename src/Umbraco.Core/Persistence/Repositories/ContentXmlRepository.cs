@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence.Caching;
+
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -15,8 +17,8 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class ContentXmlRepository<TContent> : PetaPocoRepositoryBase<int, ContentXmlEntity<TContent>> 
         where TContent : IContentBase
     {
-        public ContentXmlRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache)
-            : base(work, cache)
+        public ContentXmlRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+            : base(work, cache, logger, sqlSyntax)
         {
         }
 
@@ -55,6 +57,12 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             get { throw new NotImplementedException(); }
         }
+
+        //NOTE: Not implemented because all ContentXmlEntity will always return false for having an Identity
+        protected override void PersistUpdatedItem(ContentXmlEntity<TContent> entity)
+        {
+            throw new NotImplementedException();
+        }
         
         #endregion
 
@@ -68,22 +76,21 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             if (entity.Content.HasIdentity == false)
             {
-                throw new InvalidOperationException("Cannot insert an xml entry for a content item that has no identity");
+                throw new InvalidOperationException("Cannot insert or update an xml entry for a content item that has no identity");
             }
 
-            var poco = new ContentXmlDto { NodeId = entity.Id, Xml = entity.Xml.ToString(SaveOptions.None) };
-            Database.Insert(poco);
-        }
-
-        protected override void PersistUpdatedItem(ContentXmlEntity<TContent> entity)
-        {
-            if (entity.Content.HasIdentity == false)
+            var poco = new ContentXmlDto
             {
-                throw new InvalidOperationException("Cannot update an xml entry for a content item that has no identity");
-            }
+                NodeId = entity.Id, 
+                Xml = entity.Xml.ToString(SaveOptions.None)
+            };
 
-            var poco = new ContentXmlDto { NodeId = entity.Id, Xml = entity.Xml.ToString(SaveOptions.None) };
-            Database.Update(poco);
+            //We need to do a special InsertOrUpdate here because we know that the ContentXmlDto table has a 1:1 relation
+            // with the content table and a record may or may not exist so the 
+            // unique constraint which can be violated if 2+ threads try to execute the same insert sql at the same time.
+            Database.InsertOrUpdate(poco);
+            
         }
+
     }
 }

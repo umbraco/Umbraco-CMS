@@ -16,6 +16,24 @@ namespace Umbraco.Core.Services
         //Remove Text (in translation)
 
         /// <summary>
+        /// Adds or updates a translation for a dictionary item and language
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="language"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        void AddOrUpdateDictionaryValue(IDictionaryItem item, ILanguage language, string value);
+
+        /// <summary>
+        /// Creates and saves a new dictionary item and assigns a value to all languages if defaultValue is specified.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="parentId"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
+        IDictionaryItem CreateDictionaryItemWithIdentity(string key, Guid? parentId, string defaultValue = null);
+
+        /// <summary>
         /// Gets a <see cref="IDictionaryItem"/> by its <see cref="Int32"/> id
         /// </summary>
         /// <param name="id">Id of the <see cref="IDictionaryItem"/></param>

@@ -14,8 +14,27 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
     /// </summary>
     internal class DatabaseSchemaCreation
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="database"></param>
+        /// <param name="logger"></param>
+        /// <param name="sqlSyntaxProvider"></param>
+        public DatabaseSchemaCreation(Database database, ILogger logger, ISqlSyntaxProvider sqlSyntaxProvider)
+        {
+            _database = database;
+            _logger = logger;
+            _sqlSyntaxProvider = sqlSyntaxProvider;
+             _schemaHelper = new DatabaseSchemaHelper(database, logger, sqlSyntaxProvider);
+        }
+
         #region Private Members
+
+        private readonly DatabaseSchemaHelper _schemaHelper;
         private readonly Database _database;
+        private readonly ILogger _logger;
+        private readonly ISqlSyntaxProvider _sqlSyntaxProvider;
+
         private static readonly Dictionary<int, Type> OrderedTables = new Dictionary<int, Type>
                                                                           {
                                                                               {0, typeof (NodeDto)},
@@ -59,7 +78,12 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                               {37, typeof (User2AppDto)},
                                                                               {38, typeof (User2NodeNotifyDto)},
                                                                               {39, typeof (User2NodePermissionDto)},
-                                                                              {40, typeof (ServerRegistrationDto)}
+                                                                              {40, typeof (ServerRegistrationDto)},
+                                                                              {41, typeof (AccessDto)},
+                                                                              {42, typeof (AccessRuleDto)},
+                                                                              {43, typeof(CacheInstructionDto)},
+                                                                              {44, typeof (ExternalLoginDto)},
+                                                                              {45, typeof (MigrationDto)}
                                                                           };
         #endregion
         
@@ -68,7 +92,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         /// </summary>
         internal void UninstallDatabaseSchema()
         {
-            LogHelper.Info<DatabaseSchemaCreation>("Start UninstallDatabaseSchema");
+            _logger.Info<DatabaseSchemaCreation>("Start UninstallDatabaseSchema");
 
             foreach (var item in OrderedTables.OrderByDescending(x => x.Key))
             {
@@ -76,28 +100,25 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
                 string tableName = tableNameAttribute == null ? item.Value.Name : tableNameAttribute.Value;
 
-                LogHelper.Info<DatabaseSchemaCreation>("Uninstall" + tableName);
+                _logger.Info<DatabaseSchemaCreation>("Uninstall" + tableName);
 
                 try
                 {
-                    if (_database.TableExist(tableName))
+                    if (_schemaHelper.TableExist(tableName))
                     {
-                        _database.DropTable(tableName);    
+                        _schemaHelper.DropTable(tableName);    
                     }
                 }
                 catch (Exception ex)
                 {
                     //swallow this for now, not sure how best to handle this with diff databases... though this is internal
                     // and only used for unit tests. If this fails its because the table doesn't exist... generally!
-                    LogHelper.Error<DatabaseSchemaCreation>("Could not drop table " + tableName, ex);
+                    _logger.Error<DatabaseSchemaCreation>("Could not drop table " + tableName, ex);
                 }
             }
         }
 
-        public DatabaseSchemaCreation(Database database)
-        {
-            _database = database;
-        }
+       
 
         /// <summary>
         /// Initialize the database by creating the umbraco db schema
@@ -111,7 +132,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             {
                 foreach (var item in OrderedTables.OrderBy(x => x.Key))
                 {
-                    _database.CreateTable(false, item.Value);
+                    _schemaHelper.CreateTable(false, item.Value);
                 }
             }
 
@@ -126,7 +147,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             var result = new DatabaseSchemaResult();
 
             //get the db index defs
-            result.DbIndexDefinitions = SqlSyntaxContext.SqlSyntaxProvider.GetDefinedIndexes(_database)
+            result.DbIndexDefinitions = _sqlSyntaxProvider.GetDefinedIndexes(_database)
                 .Select(x => new DbIndexDefinition()
                 {
                     TableName = x.Item1,
@@ -157,11 +178,11 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             //MySql doesn't conform to the "normal" naming of constraints, so there is currently no point in doing these checks.
             //TODO: At a later point we do other checks for MySql, but ideally it should be necessary to do special checks for different providers.
             // ALso note that to get the constraints for MySql we have to open a connection which we currently have not.
-            if (SqlSyntaxContext.SqlSyntaxProvider is MySqlSyntaxProvider)
+            if (_sqlSyntaxProvider is MySqlSyntaxProvider)
                 return;
 
             //Check constraints in configured database against constraints in schema
-            var constraintsInDatabase = SqlSyntaxContext.SqlSyntaxProvider.GetConstraintsPerColumn(_database).DistinctBy(x => x.Item3).ToList();
+            var constraintsInDatabase = _sqlSyntaxProvider.GetConstraintsPerColumn(_database).DistinctBy(x => x.Item3).ToList();
             var foreignKeysInDatabase = constraintsInDatabase.Where(x => x.Item3.InvariantStartsWith("FK_")).Select(x => x.Item3).ToList();
             var primaryKeysInDatabase = constraintsInDatabase.Where(x => x.Item3.InvariantStartsWith("PK_")).Select(x => x.Item3).ToList();
             var indexesInDatabase = constraintsInDatabase.Where(x => x.Item3.InvariantStartsWith("IX_")).Select(x => x.Item3).ToList();
@@ -244,7 +265,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         private void ValidateDbColumns(DatabaseSchemaResult result)
         {
             //Check columns in configured database against columns in schema
-            var columnsInDatabase = SqlSyntaxContext.SqlSyntaxProvider.GetColumnsInSchema(_database);
+            var columnsInDatabase = _sqlSyntaxProvider.GetColumnsInSchema(_database);
             var columnsPerTableInDatabase = columnsInDatabase.Select(x => string.Concat(x.TableName, ",", x.ColumnName)).ToList();
             var columnsPerTableInSchema = result.TableDefinitions.SelectMany(x => x.Columns.Select(y => string.Concat(y.TableName, ",", y.Name))).ToList();
             //Add valid and invalid column differences to the result object
@@ -266,7 +287,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         private void ValidateDbTables(DatabaseSchemaResult result)
         {
             //Check tables in configured database against tables in schema
-            var tablesInDatabase = SqlSyntaxContext.SqlSyntaxProvider.GetTablesInSchema(_database).ToList();
+            var tablesInDatabase = _sqlSyntaxProvider.GetTablesInSchema(_database).ToList();
             var tablesInSchema = result.TableDefinitions.Select(x => x.Name).ToList();
             //Add valid and invalid table differences to the result object
             var validTableDifferences = tablesInDatabase.Intersect(tablesInSchema, StringComparer.InvariantCultureIgnoreCase);

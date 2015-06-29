@@ -3,7 +3,7 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class TagFactory : IEntityFactory<ITag, TagDto>
+    internal class TagFactory 
     {
         public ITag BuildEntity(TagDto dto)
         {

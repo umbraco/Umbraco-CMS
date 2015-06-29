@@ -12,8 +12,8 @@ namespace Umbraco.Core.Persistence.Mappers
             SourcePropertyName = sourcePropertyName;
         }
 
-        public string SourcePropertyName { get; set; }
-        public Type Type { get; set; }
-        public PropertyInfo PropertyInfo { get; set; }
+        public string SourcePropertyName { get; private set; }
+        public Type Type { get; private set; }
+        public PropertyInfo PropertyInfo { get; private set; }
     }
 }

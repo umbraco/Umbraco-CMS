@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using Umbraco.Core.IO;
-using Umbraco.Core.Models.Css;
+using Umbraco.Core.Strings.Css;
 
 namespace Umbraco.Core.Models
 {
@@ -15,140 +16,147 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class Stylesheet : File
     {
-        public Stylesheet(string path) : base(path)
+        public Stylesheet(string path) 
+            : base(path)
+        {          
+            InitializeProperties();
+        }
+      
+        private Lazy<List<StylesheetProperty>> _properties;
+
+        private void InitializeProperties()
         {
-            base.Path = path;
+            //if the value is already created, we need to be created and update the collection according to 
+            //what is now in the content
+            if (_properties != null && _properties.IsValueCreated)
+            {
+                //re-parse it so we can check what properties are different and adjust the event handlers
+                var parsed = StylesheetHelper.ParseRules(Content).ToArray();
+                var names = parsed.Select(x => x.Name).ToArray();
+                var existing = _properties.Value.Where(x => names.Contains(x.Name)).ToArray();
+                //update existing
+                foreach (var stylesheetProperty in existing)
+                {
+                    var updateFrom = parsed.Single(x => x.Name == stylesheetProperty.Name);
+                    //remove current event handler while we update, we'll reset it after
+                    stylesheetProperty.PropertyChanged -= Property_PropertyChanged;
+                    stylesheetProperty.Alias = updateFrom.Selector;
+                    stylesheetProperty.Value = updateFrom.Styles;
+                    //re-add
+                    stylesheetProperty.PropertyChanged += Property_PropertyChanged;
+                }
+                //remove no longer existing
+                var nonExisting = _properties.Value.Where(x => names.Contains(x.Name) == false).ToArray();
+                foreach (var stylesheetProperty in nonExisting)
+                {
+                    stylesheetProperty.PropertyChanged -= Property_PropertyChanged;
+                    _properties.Value.Remove(stylesheetProperty);
+                }
+                //add new ones
+                var newItems = parsed.Where(x => _properties.Value.Select(p => p.Name).Contains(x.Name) == false);
+                foreach (var stylesheetRule in newItems)
+                {
+                    var prop = new StylesheetProperty(stylesheetRule.Name, stylesheetRule.Selector, stylesheetRule.Styles);
+                    prop.PropertyChanged += Property_PropertyChanged;
+                    _properties.Value.Add(prop);
+                }               
+            }
+
+            //we haven't read the properties yet so create the lazy delegate
+            _properties = new Lazy<List<StylesheetProperty>>(() =>
+            {
+                var parsed = StylesheetHelper.ParseRules(Content);
+                return parsed.Select(statement =>
+                {
+                    var property = new StylesheetProperty(statement.Name, statement.Selector, statement.Styles);
+                    property.PropertyChanged += Property_PropertyChanged;
+                    return property;
+
+                }).ToList();
+            });
         }
 
         /// <summary>
-        /// Returns a flat list of <see cref="StylesheetProperty"/> objects
+        /// If the property has changed then we need to update the content
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void Property_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            var prop = (StylesheetProperty) sender;
+
+            //Ensure we are setting base.Content here so that the properties don't get reset and thus any event handlers would get reset too
+            base.Content = StylesheetHelper.ReplaceRule(Content, prop.Name, new StylesheetRule
+            {
+                Name = prop.Name,
+                Selector = prop.Alias,
+                Styles = prop.Value
+            });
+        }
+
+        /// <summary>
+        /// Gets or sets the Content of a File
+        /// </summary>
+        public override string Content
+        {
+            get { return base.Content; }
+            set
+            {
+                base.Content = value;
+                //re-set the properties so they are re-read from the content
+                InitializeProperties();
+            }
+        }
+
+        /// <summary>
+        /// Returns a list of umbraco back office enabled stylesheet properties
         /// </summary>
         /// <remarks>
-        /// Please note that the list is flattend by formatting single css selectors with
-        /// its value(s). Blocks in css @ rules are also flatten, but noted as part of an @ rule
-        /// by setting the <see cref="StylesheetProperty"/> property IsPartOfAtRule=true.
-        /// This is done to make the stylesheet usable in the backoffice.
+        /// An umbraco back office enabled stylesheet property has a special prefix, for example: 
+        /// 
+        /// /** umb_name: MyPropertyName */ p { font-size: 1em; }
         /// </remarks>
         [IgnoreDataMember]
         public IEnumerable<StylesheetProperty> Properties
         {
-            get
-            {
-                var properties = new List<StylesheetProperty>();
-                var parser = new CssParser(Content);
-
-                foreach (var statement in parser.StyleSheet.Statements.OfType<CssAtRule>())
-                {
-                    var cssBlock = statement.Block;
-                    if(cssBlock == null) continue;
-
-                    var cssValues = cssBlock.Values;
-                    if(cssValues == null) continue;
-
-                    properties.AddRange(FormatCss(cssBlock.Values, true));
-                }
-
-                var statements = parser.StyleSheet.Statements.Where(s => s is CssRuleSet);
-                properties.AddRange(FormatCss(statements, false));
-
-                return properties;
-            }
+            get { return _properties.Value; }
         }
 
         /// <summary>
-        /// Formats a list of statements to a simple <see cref="StylesheetProperty"/> object
+        /// Adds an Umbraco stylesheet property for use in the back office
         /// </summary>
-        /// <param name="statements">Enumerable list of <see cref="ICssValue"/> statements</param>
-        /// <param name="isPartOfAtRule">Boolean indicating whether the current list of statements is part of an @ rule</param>
-        /// <returns>An Enumerable list of <see cref="StylesheetProperty"/> objects</returns>
-        private IEnumerable<StylesheetProperty> FormatCss(IEnumerable<ICssValue> statements, bool isPartOfAtRule)
+        /// <param name="property"></param>
+        public void AddProperty(StylesheetProperty property)
         {
-            var properties = new List<StylesheetProperty>();
-
-            foreach (var statement in statements.OfType<CssRuleSet>())
+            if (Properties.Any(x => x.Name == property.Name))
             {
-                foreach (var selector in statement.Selectors)
-                {
-                    var declarations = new StringBuilder();
-                    foreach (var declaration in statement.Declarations)
-                    {
-                        declarations.AppendFormat("{0}:{1};", declaration.Property, FormatCss(declaration.Value));
-                        declarations.AppendLine("");
-                    }
-                    properties.Add(new StylesheetProperty(selector.Value.TrimStart('.', '#'), declarations.ToString()) { IsPartOfAtRule = isPartOfAtRule });
-                }
+                throw new DuplicateNameException("The property with the name " + property.Name + " already exists in the collection");
             }
 
-            return properties;
+            //now we need to serialize out the new property collection over-top of the string Content. 
+            Content = StylesheetHelper.AppendRule(Content, new StylesheetRule
+            {
+                Name = property.Name,
+                Selector = property.Alias,
+                Styles = property.Value
+            });
+
+            //re-set lazy collection
+            InitializeProperties();
         }
 
         /// <summary>
-        /// Formats a <see cref="CssValueList"/> to a single string
+        /// Removes an Umbraco stylesheet property
         /// </summary>
-        /// <param name="valueList"><see cref="CssValueList"/> to format</param>
-        /// <returns>Value list formatted as a string</returns>
-        private string FormatCss(CssValueList valueList)
+        /// <param name="name"></param>
+        public void RemoveProperty(string name)
         {
-            bool space = false;
-            var values = new StringBuilder();
-
-            foreach (CssString value in valueList.Values)
+            if (Properties.Any(x => x.Name == name))
             {
-                if (space)
-                {
-                    values.Append(" ");
-                }
-                else
-                {
-                    space = true;
-                }
-
-                values.Append(value);
+                Content = StylesheetHelper.ReplaceRule(Content, name, null);
             }
-
-            return values.ToString();
         }
-        
-        /// <summary>
-        /// Boolean indicating whether the file could be validated
-        /// </summary>
-        /// <returns>True if file is valid, otherwise false</returns>
-        //TODO: This makes no sense to be here, any validation methods should be at the service level,
-        // when we move Scripts to truly use IFileSystem, then this validation logic doesn't work anymore
-        public override bool IsValid()
-        {
-            var dirs = SystemDirectories.Css;
-
-            //Validate file
-            var validFile = IOHelper.VerifyEditPath(Path, dirs.Split(','));
-
-            //Validate extension
-            var validExtension = IOHelper.VerifyFileExtension(Path, new List<string> {"css"});
-
-            return validFile && validExtension;
-        }
-
-        /// <summary>
-        /// Boolean indicating whether the file is valid css using a css parser
-        /// </summary>
-        /// <returns>True if css is valid, otherwise false</returns>
-        public bool IsFileValidCss()
-        {
-            var parser = new CssParser(Content);
-
-            try
-            {
-                var styleSheet = parser.StyleSheet;//Get stylesheet to invoke parsing
-            }
-            catch (Exception ex)
-            {
-                //Log exception?
-                return false;
-            }
-            
-            return !parser.Errors.Any();
-        }
-
+  
         /// <summary>
         /// Indicates whether the current entity has an identity, which in this case is a path/name.
         /// </summary>

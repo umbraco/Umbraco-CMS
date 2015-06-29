@@ -12,6 +12,27 @@ namespace Umbraco.Tests.Models.Collections
     public class PropertyCollectionTests : BaseUmbracoConfigurationTest
     {
         [Test]
+        public void Property_Adds_Case_Insensitive_Compare()
+        {
+            var collection = new PropertyCollection();
+
+            collection.Add(new Property(new PropertyType("propEditor", DataTypeDatabaseType.Nvarchar, "test")));
+            collection.Add(new Property(new PropertyType("propEditor", DataTypeDatabaseType.Nvarchar, "Test")));
+
+            Assert.AreEqual(1, collection.Count);
+        }
+
+        [Test]
+        public void Property_Contains_Case_Insensitive_Compare()
+        {
+            var collection = new PropertyCollection();
+
+            collection.Add(new Property(new PropertyType("propEditor", DataTypeDatabaseType.Nvarchar, "test")));
+            
+            Assert.IsTrue(collection.Contains("Test"));
+        }
+
+        [Test]
         public void SimpleOrder_Returns_Null_On_FirstOrDefault_When_Empty()
         {
             var orders = new SimpleOrder();

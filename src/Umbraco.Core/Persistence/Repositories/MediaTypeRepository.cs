@@ -5,9 +5,10 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence.Caching;
+
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -17,13 +18,9 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class MediaTypeRepository : ContentTypeBaseRepository<IMediaType>, IMediaTypeRepository
     {
-		public MediaTypeRepository(IDatabaseUnitOfWork work)
-            : base(work)
-        {
-        }
 
-		public MediaTypeRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache)
-            : base(work, cache)
+        public MediaTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+            : base(work, cache, logger, sqlSyntax)
         {
         }
 
@@ -63,13 +60,13 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             if (ids.Any())
             {
-                return ContentTypeQueryMapper.GetMediaTypes(ids, Database, this);
+                return ContentTypeQueryMapper.GetMediaTypes(ids, Database, SqlSyntax, this);
             }
             else
             {
                 var sql = new Sql().Select("id").From<NodeDto>().Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId);
                 var allIds = Database.Fetch<int>(sql).ToArray();
-                return ContentTypeQueryMapper.GetMediaTypes(allIds, Database, this);
+                return ContentTypeQueryMapper.GetMediaTypes(allIds, Database, SqlSyntax, this);
             }
         }
 

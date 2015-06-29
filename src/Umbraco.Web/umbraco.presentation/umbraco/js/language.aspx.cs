@@ -6,6 +6,7 @@ using umbraco.BusinessLogic;
 
 namespace umbraco.js
 {
+    [Obsolete("This is no longer used and will be removed from the codebase in future versions")]
 	public partial class language : BasePage
 	{
 		protected void Page_Load(object sender, EventArgs e)
@@ -55,25 +56,5 @@ namespace umbraco.js
             Response.Write(f);
 		}
 
-		#region Web Form Designer generated code
-
-		protected override void OnInit(EventArgs e)
-		{
-			//
-			// CODEGEN: This call is required by the ASP.NET Web Form Designer.
-			//
-			InitializeComponent();
-			base.OnInit(e);
-		}
-
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{
-		}
-
-		#endregion
 	}
 }

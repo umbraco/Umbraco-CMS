@@ -4,6 +4,7 @@ using System.Configuration.Provider;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Web;
 using System.Web.Configuration;
 using System.Web.Hosting;
 using System.Web.Security;
@@ -16,6 +17,19 @@ namespace Umbraco.Core.Security
     /// </summary>
     public abstract class MembershipProviderBase : MembershipProvider
     {
+
+        public string HashPasswordForStorage(string password)
+        {
+            string salt;
+            var hashed = EncryptOrHashNewPassword(password, out salt);
+            return FormatPasswordForStorage(hashed, salt);
+        }
+
+        public bool VerifyPassword(string password, string hashedPassword)
+        {
+            return CheckPassword(password, hashedPassword);
+        }
+
         /// <summary>
         /// Providers can override this setting, default is 7
         /// </summary>
@@ -891,6 +905,16 @@ namespace Umbraco.Core.Security
             sb.AppendLine("_requiresQuestionAndAnswer=" + _requiresQuestionAndAnswer);
             sb.AppendLine("_requiresUniqueEmail=" + _requiresUniqueEmail);
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// Returns the current request IP address for logging if there is one
+        /// </summary>
+        /// <returns></returns>
+        protected string GetCurrentRequestIpAddress()
+        {
+            var httpContext = HttpContext.Current == null ? (HttpContextBase) null : new HttpContextWrapper(HttpContext.Current);
+            return httpContext.GetCurrentRequestIpAddress();
         }
 
     }

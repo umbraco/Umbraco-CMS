@@ -1,12 +1,12 @@
 using NUnit.Framework;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Routing
 {
+    //TODO: We should be able to decouple this from the base db tests since we're just mocking the services now
 
     [TestFixture]
-    public class ContentFinderByAliasTests : BaseRoutingTest
+    public class ContentFinderByAliasTests : UrlRoutingTestBase
     {
         [TestCase("/this/is/my/alias", 1001)]
         [TestCase("/anotheralias", 1001)]

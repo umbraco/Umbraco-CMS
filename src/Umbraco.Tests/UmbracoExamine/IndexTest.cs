@@ -142,12 +142,15 @@ namespace Umbraco.Tests.UmbracoExamine
 		{
 			var s = (IndexSearcher)_searcher.GetSearcher();
 
+            
+
 			//first delete all 'Content' (not media). This is done by directly manipulating the index with the Lucene API, not examine!
-			var r = IndexReader.Open(s.GetIndexReader().Directory(), false);
+			
 			var contentTerm = new Term(LuceneIndexer.IndexTypeFieldName, IndexTypes.Content);
-			var delCount = r.DeleteDocuments(contentTerm);
-			r.Commit();
-			r.Close();
+		    var writer = _indexer.GetIndexWriter();
+            writer.DeleteDocuments(contentTerm);
+            writer.Commit();
+			
 
 			//make sure the content is gone. This is done with lucene APIs, not examine!
 			var collector = new AllHitsCollector(false, true);

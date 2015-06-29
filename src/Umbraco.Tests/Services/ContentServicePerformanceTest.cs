@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
@@ -49,10 +52,10 @@ namespace Umbraco.Tests.Services
             // ... NOPE, made even more nice changes, it is now...
             // 4452ms !!!!!!!
 
-            var contentType1 = MockedContentTypes.CreateTextpageContentType("test1", "test1");                        
+            var contentType1 = MockedContentTypes.CreateTextpageContentType("test1", "test1");
             var contentType2 = MockedContentTypes.CreateTextpageContentType("test2", "test2");
-            var contentType3 = MockedContentTypes.CreateTextpageContentType("test3", "test3");            
-            ServiceContext.ContentTypeService.Save(new[] {contentType1, contentType2, contentType3});
+            var contentType3 = MockedContentTypes.CreateTextpageContentType("test3", "test3");
+            ServiceContext.ContentTypeService.Save(new[] { contentType1, contentType2, contentType3 });
             contentType1.AllowedContentTypes = new[]
             {
                 new ContentTypeSort(new Lazy<int>(() => contentType2.Id), 0, contentType2.Alias),
@@ -69,7 +72,7 @@ namespace Umbraco.Tests.Services
                 new ContentTypeSort(new Lazy<int>(() => contentType2.Id), 1, contentType2.Alias)
             };
             ServiceContext.ContentTypeService.Save(new[] { contentType1, contentType2, contentType3 });
-            
+
             var roots = MockedContent.CreateTextpageContent(contentType1, -1, 10);
             ServiceContext.ContentService.Save(roots);
             foreach (var root in roots)
@@ -142,21 +145,28 @@ namespace Umbraco.Tests.Services
             var pages = MockedContent.CreateTextpageContent(contentType, -1, 100);
             ServiceContext.ContentService.Save(pages, 0);
 
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
 
-            // Act
-            Stopwatch watch = Stopwatch.StartNew();
-            var contents = repository.GetAll();
-            watch.Stop();
-            var elapsed = watch.ElapsedMilliseconds;
+            using (var tRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>()))
+            using (var tagRepo = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax))
+            using (var ctRepository = new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, tRepository))
+            using (var repository = new ContentRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, ctRepository, tRepository, tagRepo))
+            {
+                // Act
+                Stopwatch watch = Stopwatch.StartNew();
+                var contents = repository.GetAll();
+                watch.Stop();
+                var elapsed = watch.ElapsedMilliseconds;
 
-            Console.WriteLine("100 content items retrieved in {0} ms without caching", elapsed);
+                Console.WriteLine("100 content items retrieved in {0} ms without caching", elapsed);
 
-            // Assert
-            Assert.That(contents.Any(x => x.HasIdentity == false), Is.False);
-            Assert.That(contents.Any(x => x == null), Is.False);
+                // Assert
+                Assert.That(contents.Any(x => x.HasIdentity == false), Is.False);
+                Assert.That(contents.Any(x => x == null), Is.False);
+            }
+
+
         }
 
         [Test, NUnit.Framework.Ignore]
@@ -167,21 +177,25 @@ namespace Umbraco.Tests.Services
             var pages = MockedContent.CreateTextpageContent(contentType, -1, 1000);
             ServiceContext.ContentService.Save(pages, 0);
 
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
+            using (var tRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>()))
+            using (var tagRepo = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax))
+            using (var ctRepository = new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, tRepository))
+            using (var repository = new ContentRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, ctRepository, tRepository, tagRepo))
+            {
+                // Act
+                Stopwatch watch = Stopwatch.StartNew();
+                var contents = repository.GetAll();
+                watch.Stop();
+                var elapsed = watch.ElapsedMilliseconds;
 
-            // Act
-            Stopwatch watch = Stopwatch.StartNew();
-            var contents = repository.GetAll();
-            watch.Stop();
-            var elapsed = watch.ElapsedMilliseconds;
+                Console.WriteLine("1000 content items retrieved in {0} ms without caching", elapsed);
 
-            Console.WriteLine("1000 content items retrieved in {0} ms without caching", elapsed);
-
-            // Assert
-            //Assert.That(contents.Any(x => x.HasIdentity == false), Is.False);
-            //Assert.That(contents.Any(x => x == null), Is.False);
+                // Assert
+                //Assert.That(contents.Any(x => x.HasIdentity == false), Is.False);
+                //Assert.That(contents.Any(x => x == null), Is.False);
+            }
         }
 
         [Test]
@@ -192,24 +206,30 @@ namespace Umbraco.Tests.Services
             var pages = MockedContent.CreateTextpageContent(contentType, -1, 100);
             ServiceContext.ContentService.Save(pages, 0);
 
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
 
-            // Act
-            var contents = repository.GetAll();
+            using (var tRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>()))
+            using (var tagRepo = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax))
+            using (var ctRepository = new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, tRepository))
+            using (var repository = new ContentRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, ctRepository, tRepository, tagRepo))
+            {
 
-            Stopwatch watch = Stopwatch.StartNew();
-            var contentsCached = repository.GetAll();
-            watch.Stop();
-            var elapsed = watch.ElapsedMilliseconds;
+                // Act
+                var contents = repository.GetAll();
 
-            Console.WriteLine("100 content items retrieved in {0} ms with caching", elapsed);
+                Stopwatch watch = Stopwatch.StartNew();
+                var contentsCached = repository.GetAll();
+                watch.Stop();
+                var elapsed = watch.ElapsedMilliseconds;
 
-            // Assert
-            Assert.That(contentsCached.Any(x => x.HasIdentity == false), Is.False);
-            Assert.That(contentsCached.Any(x => x == null), Is.False);
-            Assert.That(contentsCached.Count(), Is.EqualTo(contents.Count()));
+                Console.WriteLine("100 content items retrieved in {0} ms with caching", elapsed);
+
+                // Assert
+                Assert.That(contentsCached.Any(x => x.HasIdentity == false), Is.False);
+                Assert.That(contentsCached.Any(x => x == null), Is.False);
+                Assert.That(contentsCached.Count(), Is.EqualTo(contents.Count()));
+            }
         }
 
         [Test, NUnit.Framework.Ignore]
@@ -220,24 +240,29 @@ namespace Umbraco.Tests.Services
             var pages = MockedContent.CreateTextpageContent(contentType, -1, 1000);
             ServiceContext.ContentService.Save(pages, 0);
 
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.ResolveByType<IContentRepository>(unitOfWork);
+            using (var tRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>()))
+            using (var tagRepo = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax))
+            using (var ctRepository = new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, tRepository))
+            using (var repository = new ContentRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, ctRepository, tRepository, tagRepo))
+            {
 
-            // Act
-            var contents = repository.GetAll();
+                // Act
+                var contents = repository.GetAll();
 
-            Stopwatch watch = Stopwatch.StartNew();
-            var contentsCached = repository.GetAll();
-            watch.Stop();
-            var elapsed = watch.ElapsedMilliseconds;
+                Stopwatch watch = Stopwatch.StartNew();
+                var contentsCached = repository.GetAll();
+                watch.Stop();
+                var elapsed = watch.ElapsedMilliseconds;
 
-            Console.WriteLine("1000 content items retrieved in {0} ms with caching", elapsed);
+                Console.WriteLine("1000 content items retrieved in {0} ms with caching", elapsed);
 
-            // Assert
-            //Assert.That(contentsCached.Any(x => x.HasIdentity == false), Is.False);
-            //Assert.That(contentsCached.Any(x => x == null), Is.False);
-            //Assert.That(contentsCached.Count(), Is.EqualTo(contents.Count()));
+                // Assert
+                //Assert.That(contentsCached.Any(x => x.HasIdentity == false), Is.False);
+                //Assert.That(contentsCached.Any(x => x == null), Is.False);
+                //Assert.That(contentsCached.Count(), Is.EqualTo(contents.Count()));
+            }
         }
 
         [TearDown]

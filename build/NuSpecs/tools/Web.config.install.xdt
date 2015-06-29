@@ -21,6 +21,7 @@
   <appSettings xdt:Transform="InsertIfMissing" />
   <appSettings>
     <add key="ValidationSettings:UnobtrusiveValidationMode" value="None" xdt:Locator="Match(key)" xdt:Transform="InsertIfMissing" />
+    <add key="owin:appStartup" value="UmbracoDefaultOwinStartup" xdt:Locator="Match(key)" xdt:Transform="InsertIfMissing" />
   </appSettings>
 
   <umbracoConfiguration xdt:Transform="InsertIfMissing">
@@ -37,8 +38,10 @@
     <DbProviderFactories xdt:Transform="InsertIfMissing">
       <remove invariant="System.Data.SqlServerCe.4.0" xdt:Locator="Match(invariant)" xdt:Transform="InsertIfMissing" />
       <add name="Microsoft SQL Server Compact Data Provider 4.0" invariant="System.Data.SqlServerCe.4.0" description=".NET Framework Data Provider for Microsoft SQL Server Compact" type="System.Data.SqlServerCe.SqlCeProviderFactory, System.Data.SqlServerCe" xdt:Locator="Match(invariant)" xdt:Transform="SetAttributes(invariant,description,type)" />
-      <remove invariant="MySql.Data.MySqlClient" xdt:Locator="Match(invariant)" xdt:Transform="InsertIfMissing" />
-      <add name="MySQL Data Provider" invariant="MySql.Data.MySqlClient" description=".Net Framework Data Provider for MySQL" type="MySql.Data.MySqlClient.MySqlClientFactory, MySql.Data" xdt:Locator="Match(invariant)" xdt:Transform="SetAttributes(invariant,description,type)" />
+      <remove invariant="MySql.Data.MySqlClient" xdt:Locator="Match(invariant)" xdt:Transform="InsertIfMissing" />	  
+      <add invariant="MySql.Data.MySqlClient" xdt:Locator="Match(invariant)" xdt:Transform="Remove" />
+      <add name="MySQL Data Provider" invariant="MySql.Data.MySqlClient" description=".Net Framework Data Provider for MySQL" type="MySql.Data.MySqlClient.MySqlClientFactory, MySql.Data" xdt:Locator="Match(invariant)" xdt:Transform="InsertIfMissing" />
+      <add invariant="MySql.Data.MySqlClient" type="MySql.Data.MySqlClient.MySqlClientFactory, MySql.Data" xdt:Locator="Match(invariant)" xdt:Transform="SetAttributes(type)" />
     </DbProviderFactories>
   </system.data>
   <clientDependency xdt:Transform="RemoveAttributes(version)" />
@@ -141,6 +144,7 @@
       <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Net.Http')" xdt:Transform="Remove" />
       <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='Newtonsoft.Json')" xdt:Transform="Remove" />
       <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Web.Mvc')" xdt:Transform="Remove" />
+      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Web.Htttp')" xdt:Transform="Remove" />
     </assemblyBinding>
   </runtime>
 
@@ -157,6 +161,10 @@
       <dependentAssembly xdt:Transform="Insert">
         <assemblyIdentity name="System.Web.Mvc" publicKeyToken="31bf3856ad364e35" culture="neutral" />
         <bindingRedirect oldVersion="0.0.0.0-4.0.0.0" newVersion="4.0.0.0" />
+      </dependentAssembly>
+      <dependentAssembly xdt:Transform="Insert">
+        <assemblyIdentity name="System.Web.Http" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+        <bindingRedirect oldVersion="0.0.0.0-5.2.3.0" newVersion="5.2.3.0" />
       </dependentAssembly>
     </assemblyBinding>
   </runtime>

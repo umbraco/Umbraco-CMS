@@ -1,13 +1,14 @@
 ﻿<div>
 
-    <input type="email" name="textbox"
+    <input type="text" name="textbox"
            ng-model="model.value"
            id="{{model.alias}}"
            class="umb-editor umb-textstring textstring"
+           val-email
            ng-required="model.config.IsRequired || model.validation.mandatory"
            val-server="value" />
     
     <span class="help-inline" val-msg-for="textbox" val-toggle-msg="required">Required</span>
-    <span class="help-inline" val-msg-for="textbox" val-toggle-msg="email">Invalid email</span>
+    <span class="help-inline" val-msg-for="textbox" val-toggle-msg="valEmail">Invalid email</span>
     <span class="help-inline" val-msg-for="textbox" val-toggle-msg="valServer"></span>
 </div>

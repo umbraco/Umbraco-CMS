@@ -7,6 +7,21 @@ namespace Umbraco.Core.Services
 {
     public interface IEntityService
     {
+        /// <summary>
+        /// Returns the integer id for a given GUID
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="umbracoObjectType"></param>
+        /// <returns></returns>
+        Attempt<int> GetIdForKey(Guid key, UmbracoObjectTypes umbracoObjectType);
+
+        /// <summary>
+        /// Returns the GUID for a given integer id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="umbracoObjectType"></param>
+        /// <returns></returns>
+        Attempt<Guid> GetKeyForId(int id, UmbracoObjectTypes umbracoObjectType);
 
         /// <summary>
         /// Gets an UmbracoEntity by its Id, and optionally loads the complete object graph.

@@ -6,6 +6,7 @@ using System.Text;
 using System.Web.Configuration;
 using System.Web.Security;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Querying;
@@ -34,7 +35,17 @@ namespace Umbraco.Web.Security.Providers
         public abstract string ProviderName { get; }
 
         protected abstract MembershipUser ConvertToMembershipUser(TEntity entity);
-        
+
+        private bool _allowManuallyChangingPassword = true;
+
+        /// <summary>
+        /// For backwards compatibility, this provider supports this option by default it is true
+        /// </summary>
+        public override bool AllowManuallyChangingPassword
+        {
+            get { return _allowManuallyChangingPassword; }
+        }
+
         /// <summary>
         /// Initializes the provider.
         /// </summary>
@@ -54,6 +65,7 @@ namespace Umbraco.Web.Security.Providers
             // Initialize base provider class
             base.Initialize(name, config);
 
+            _allowManuallyChangingPassword = config.GetValue("allowManuallyChangingPassword", true);
         }
 
         /// <summary>
@@ -333,7 +345,10 @@ namespace Umbraco.Web.Security.Providers
                 //don't raise events for this! It just sets the member dates, if we do raise events this will
                 // cause all distributed cache to execute - which will clear out some caches we don't want.
                 // http://issues.umbraco.org/issue/U4-3451
-                MemberService.Save(member, false);
+
+                // when upgrating from 7.2 to 7.3 trying to save will throw
+                if (UmbracoVersion.Current >= new Version(7, 3, 0, 0))
+                    MemberService.Save(member, false);
             }
 
             return ConvertToMembershipUser(member);
@@ -500,16 +515,35 @@ namespace Umbraco.Web.Security.Providers
         {
             var member = MemberService.GetByUsername(username);
 
-            if (member == null) return false;
+            if (member == null)
+            {
+                LogHelper.Info<UmbracoMembershipProviderBase>(
+                    string.Format(
+                        "Login attempt failed for username {0} from IP address {1}, the user does not exist",
+                        username,
+                        GetCurrentRequestIpAddress()));
+
+                return false;
+            }
 
             if (member.IsApproved == false)
             {
-                LogHelper.Info<UmbracoMembershipProvider<T, TEntity>>("Cannot validate member " + username + " because they are not approved");
+                LogHelper.Info<UmbracoMembershipProviderBase>(
+                    string.Format(
+                        "Login attempt failed for username {0} from IP address {1}, the user is not approved",
+                        username,
+                        GetCurrentRequestIpAddress()));
+
                 return false;
             }
             if (member.IsLockedOut)
             {
-                LogHelper.Info<UmbracoMembershipProvider<T, TEntity>>("Cannot validate member " + username + " because they are currently locked out");
+                LogHelper.Info<UmbracoMembershipProviderBase>(
+                    string.Format(
+                        "Login attempt failed for username {0} from IP address {1}, the user is locked",
+                        username,
+                        GetCurrentRequestIpAddress()));
+
                 return false;
             }
 
@@ -527,19 +561,43 @@ namespace Umbraco.Web.Security.Providers
                 {
                     member.IsLockedOut = true;
                     member.LastLockoutDate = DateTime.Now;
-                    LogHelper.Info<UmbracoMembershipProvider<T, TEntity>>("Member " + username + " is now locked out, max invalid password attempts exceeded");
+
+                    LogHelper.Info<UmbracoMembershipProviderBase>(
+                        string.Format(
+                            "Login attempt failed for username {0} from IP address {1}, the user is now locked out, max invalid password attempts exceeded",
+                            username,
+                            GetCurrentRequestIpAddress()));
+                }
+                else
+                {
+                    LogHelper.Info<UmbracoMembershipProviderBase>(
+                        string.Format(
+                            "Login attempt failed for username {0} from IP address {1}",
+                            username,
+                            GetCurrentRequestIpAddress()));
                 }
             }
             else
             {
                 member.FailedPasswordAttempts = 0;
                 member.LastLoginDate = DateTime.Now;
+
+                LogHelper.Info<UmbracoMembershipProviderBase>(
+                        string.Format(
+                            "Login attempt succeeded for username {0} from IP address {1}",
+                            username,
+                            GetCurrentRequestIpAddress()));
             }
 
             //don't raise events for this! It just sets the member dates, if we do raise events this will
             // cause all distributed cache to execute - which will clear out some caches we don't want.
             // http://issues.umbraco.org/issue/U4-3451
-            MemberService.Save(member, false);
+            //TODO: In v8 we aren't going to have an overload to disable events, so we'll need to make a different method
+            // for this type of thing (i.e. UpdateLastLogin or similar).
+
+            // when upgrating from 7.2 to 7.3 trying to save will throw
+            if (UmbracoVersion.Current >= new Version(7, 3, 0, 0))
+                MemberService.Save(member, false);
 
             return authenticated;
         }

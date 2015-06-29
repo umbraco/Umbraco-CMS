@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
@@ -33,12 +34,12 @@ namespace Umbraco.Core.Persistence.Repositories
             get { return _fileSystem; }
         }
 
-        internal virtual void AddFolder(string folderPath)
+        public virtual void AddFolder(string folderPath)
         {
             _work.RegisterAdded(new Folder(folderPath), this);
         }
 
-        internal virtual void DeleteFolder(string folderPath)
+        public virtual void DeleteFolder(string folderPath)
         {
             _work.RegisterRemoved(new Folder(folderPath), this);
         }
@@ -47,7 +48,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public virtual void AddOrUpdate(TEntity entity)
         {
-            if (FileSystem.FileExists(entity.Path) == false)
+            if (FileSystem.FileExists(entity.OriginalPath) == false)
             {
                 _work.RegisterAdded(entity, this);
             }
@@ -132,7 +133,7 @@ namespace Umbraco.Core.Persistence.Repositories
         
         protected virtual void PersistNewItem(TEntity entity)
         {
-            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(entity.Content)))
+            using (var stream = GetContentStream(entity.Content))
             {
                 FileSystem.AddFile(entity.Path, stream, true);
                 entity.CreateDate = FileSystem.GetCreated(entity.Path).UtcDateTime;
@@ -140,12 +141,17 @@ namespace Umbraco.Core.Persistence.Repositories
                 //the id can be the hash
                 entity.Id = entity.Path.GetHashCode();
                 entity.Key = entity.Path.EncodeAsGuid();
+                entity.VirtualPath = FileSystem.GetUrl(entity.Path);
             }
         }
 
         protected virtual void PersistUpdatedItem(TEntity entity)
         {
-            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(entity.Content)))
+            //TODO: A big problem here is if the entities 'Path' changes, if that is the case then 
+            // we'd need to rename the underlying file, BUT how would we do this since we aren't storing an 
+            // original path property.
+
+            using (var stream = GetContentStream(entity.Content))
             {
                 FileSystem.AddFile(entity.Path, stream, true);
                 entity.CreateDate = FileSystem.GetCreated(entity.Path).UtcDateTime;
@@ -153,6 +159,16 @@ namespace Umbraco.Core.Persistence.Repositories
                 //the id can be the hash
                 entity.Id = entity.Path.GetHashCode();
                 entity.Key = entity.Path.EncodeAsGuid();
+                entity.VirtualPath = FileSystem.GetUrl(entity.Path);
+            }
+
+            //now that the file has been written, we need to check if the path had been changed
+            if (entity.Path.InvariantEquals(entity.OriginalPath) == false)
+            {
+                //delete the original file
+                FileSystem.DeleteFile(entity.OriginalPath);
+                //reset the original path on the file
+                entity.ResetOriginalPath();
             }
         }
 
@@ -166,15 +182,38 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
-        protected IEnumerable<string> FindAllFiles(string path)
+        /// <summary>
+        /// Gets a stream that is used to write to the file
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        protected virtual Stream GetContentStream(string content)
+        {
+            return new MemoryStream(Encoding.UTF8.GetBytes(content));
+        }
+
+        /// <summary>
+        /// Returns all files in the file system
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="filter"></param>
+        /// <returns>
+        /// Returns a list of all files with their paths. For example:
+        /// 
+        /// \hello.txt
+        /// \folder1\test.txt
+        /// \folder1\blah.csv
+        /// \folder1\folder2\blahhhhh.svg
+        /// </returns>
+        protected IEnumerable<string> FindAllFiles(string path, string filter)
         {
             var list = new List<string>();
-            list.AddRange(FileSystem.GetFiles(path, "*"));
+            list.AddRange(FileSystem.GetFiles(path, filter));
 
             var directories = FileSystem.GetDirectories(path);
             foreach (var directory in directories)
             {
-                list.AddRange(FindAllFiles(directory));
+                list.AddRange(FindAllFiles(directory, filter));
             }
 
             return list;

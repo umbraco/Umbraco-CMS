@@ -59,7 +59,7 @@ namespace umbraco.cms.presentation.developer.RelationTypes.TreeMenu
 		/// </summary>
 		public string Icon
 		{
-			get { return ".sprDelete"; } // .sprDelete refers to an existing sprite
+            get { return "delete"; } // delete refers to an existing sprite
 		}
 
 		/// <summary>
@@ -67,7 +67,7 @@ namespace umbraco.cms.presentation.developer.RelationTypes.TreeMenu
 		/// </summary>
 		public string JsSource
 		{
-			get { return "/umbraco/developer/RelationTypes/TreeMenu/ActionDeleteRelationType.js"; }
+			get { return "~/umbraco/developer/RelationTypes/TreeMenu/ActionDeleteRelationType.js"; }
 		}
 
 		/// <summary>

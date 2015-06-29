@@ -2,7 +2,7 @@
 
 	<div class="usky-editor-placeholder" ng-click="setEmbed()" ng-if="control.value === null">
 		<i class="icon icon-movie-alt"></i>
-		<div class="help-text">Click to embed</div>
+		<div class="help-text"><localize key="grid_clickToEmbed">Click to embed</localize></div>
 	</div>
 
 	<div ng-if="control.value" ng-bind-html-unsafe="control.value"></div>

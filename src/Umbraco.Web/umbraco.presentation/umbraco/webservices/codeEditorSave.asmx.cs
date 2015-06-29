@@ -11,6 +11,7 @@ using System.Web.Services;
 using System.Web.UI;
 using System.Xml;
 using System.Xml.Xsl;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Web.WebServices;
@@ -39,34 +40,19 @@ namespace umbraco.presentation.webservices
         {
             if (AuthorizeRequest(DefaultApps.settings.ToString()))
             {
-                string returnValue;
-                var stylesheet = new StyleSheet(fileID)
-                    {
-                        Content = fileContents, Text = fileName
-                    };
+                var stylesheet = Services.FileService.GetStylesheetByName(oldName.EnsureEndsWith(".css"));
+                if (stylesheet == null) throw new InvalidOperationException("No stylesheet found with name " + oldName);
 
-                try
+                stylesheet.Content = fileContents;
+                if (fileName.InvariantEquals(oldName) == false)
                 {
-                    stylesheet.saveCssToFile();
-                    stylesheet.Save();
-                    returnValue = "true";
-
-
-                    //deletes the old css file if the name was changed... 
-                    if (fileName.ToLowerInvariant() != oldName.ToLowerInvariant())
-                    {
-                        var p = IOHelper.MapPath(SystemDirectories.Css + "/" + oldName + ".css");
-                        if (File.Exists(p))
-                            File.Delete(p);
-                    }
-
-                }
-                catch (Exception ex)
-                {
-                    return ex.ToString();
+                    //it's changed which means we need to change the path
+                    stylesheet.Path = stylesheet.Path.TrimEnd(oldName.EnsureEndsWith(".css")) + fileName.EnsureEndsWith(".css");
                 }
 
-                return returnValue;
+                Services.FileService.SaveStylesheet(stylesheet, Security.CurrentUser.Id);
+
+                return "true";
             }
             return "false";
         }

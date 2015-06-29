@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="en" intName="English (UK)" localName="English (UK)" lcid="" culture="en-GB">
   <creator>
     <name>The Umbraco community</name>
@@ -27,6 +27,7 @@
     <key alias="unpublish">Unpublish</key>
     <key alias="refreshNode">Reload nodes</key>
     <key alias="republish">Republish entire site</key>
+    <key alias="restore" version="7.3.0">Restore</key>
     <key alias="rights">Permissions</key>
     <key alias="rollback">Rollback</key>
     <key alias="sendtopublish">Send To Publish</key>
@@ -100,7 +101,7 @@
     <key alias="contentRepublished">The content has been re-published.</key>
     <key alias="currentProperty">Current Property</key>
     <key alias="currentType">Current type</key>
-    <key alias="docTypeCannotBeChanged">The document type cannot be changed, as there are no alternatives valid for this location.</key>
+    <key alias="docTypeCannotBeChanged">The document type cannot be changed, as there are no alternatives valid for this location.  An alternative will be valid if it is allowed under the parent of the selected content item and that all existing child content items are allowed to be created under it.</key>
     <key alias="docTypeChanged">Document Type Changed</key>
     <key alias="mapProperties">Map Properties</key>
     <key alias="mapToProperty">Map to Property</key>
@@ -679,9 +680,11 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="paSimpleHelp">If you just want to setup simple protection using a single login and password</key>
   </area>
   <area alias="publish">
-    <key alias="contentPublishedFailedAwaitingRelease"><![CDATA[
+    <key alias="contentPublishedFailedAwaitingRelease">
+      <![CDATA[
       %0% could not be published because the item is scheduled for release.
-    ]]></key>
+    ]]>
+    </key>
     <key alias="contentPublishedFailedInvalid"><![CDATA[
       %0% could not be published because these properties:  %1%  did not pass validation rules.
     ]]></key>
@@ -705,16 +708,16 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="noColors">You have not configured any approved colours</key>
   </area>
   <area alias="relatedlinks">
-    <key alias="addExternal">Add external link</key>
-    <key alias="addInternal">Add internal link</key>
-    <key alias="addlink">Add</key>
+    <key alias="enterExternal">enter external link</key>
+    <key alias="chooseInternal">choose internal page</key>
     <key alias="caption">Caption</key>
-    <key alias="internalPage">Internal page</key>
-    <key alias="linkurl">URL</key>
-    <key alias="modeDown">Move Down</key>
-    <key alias="modeUp">Move Up</key>
-    <key alias="newWindow">Open in new window</key>
-    <key alias="removeLink">Remove link</key>
+    <key alias="link">Link</key>
+    <key alias="newWindow">New window</key>
+    <key alias="captionPlaceholder">Enter a new caption</key>
+    <key alias="externalLinkPlaceholder">Enter the link</key>
+  </area>
+  <area alias="imagecropper">
+    <key alias="reset">Reset</key>
   </area>
   <area alias="rollback">
     <key alias="currentVersion">Current version</key>
@@ -845,14 +848,18 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="template">Template</key>
   </area>
 
-
   <area alias="grid">
     <key alias="insertControl">Insert control</key>
-    <key alias="addRows">Add rows to your layout</key>
+    <key alias="addRows">Choose a layout for this section</key>
     <key alias="addElement"><![CDATA[To start, click the <i class="icon icon-add blue"></i> below and add your first element]]></key>
 
+    <key alias="clickToEmbed">Click to embed</key>
+    <key alias="clickToInsertImage">Click to insert image</key>
+    <key alias="placeholderImageCaption">Image caption...</key>
+    <key alias="placeholderWriteHere">Write here...</key>
+    
     <key alias="gridLayouts">Grid layouts</key>
-    <key alias="gridLayoutsDetail">Layouts are the overall work area for the grid editor, usually you only need one or two differnt layouts</key>
+    <key alias="gridLayoutsDetail">Layouts are the overall work area for the grid editor, usually you only need one or two different layouts</key>
     <key alias="addGridLayout">Add grid layout</key>
     <key alias="addGridLayoutDetail">Adjust the layout by setting column widths and adding additional sections</key>
     
@@ -1006,7 +1013,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="editors">Editor</key>
     <key alias="excerptField">Excerpt field</key>
     <key alias="language">Language</key>
-    <key alias="loginname">Login</key>
+    <key alias="loginname">Username</key>
     <key alias="mediastartnode">Start Node in Media Library</key>
     <key alias="modules">Sections</key>
     <key alias="noConsole">Disable Umbraco Access</key>
@@ -1025,11 +1032,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="permissionSelectPages">Select pages to modify their permissions</key>
     <key alias="searchAllChildren">Search all children</key>
     <key alias="startnode">Start Node in Content</key>
-    <key alias="username">Username</key>
+    <key alias="username">Name</key>
     <key alias="userPermissions">User permissions</key>
     <key alias="usertype">User type</key>
     <key alias="userTypes">User types</key>
     <key alias="writer">Writer</key>
+    <key alias="translator">Translator</key>
     <key alias="yourProfile" version="7.0">Your profile</key>
     <key alias="yourHistory" version="7.0">Your recent history</key>
     <key alias="sessionExpires" version="7.0">Session expires in</key>

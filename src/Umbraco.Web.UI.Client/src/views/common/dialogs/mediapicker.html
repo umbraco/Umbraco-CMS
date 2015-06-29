@@ -1,150 +1,147 @@
-<form ng-controller="Umbraco.Dialogs.MediaPickerController" id="fileupload" method="POST" enctype="multipart/form-data" 
-data-file-upload="options" data-file-upload-progress="" data-ng-class="{'fileupload-processing': processing() || loadingFiles}">
+<form ng-controller="Umbraco.Dialogs.MediaPickerController" id="fileupload"
+      method="POST"
+      enctype="multipart/form-data"
+      umb-image-upload="options">
 
-<div class="umb-panel umb-dialogs-mediapicker" ng-if="target">
- 	<div class="umb-panel-body no-header with-footer compact">
- 			<umb-pane>
- 				<umb-control-group ng-if="target.url">
-	 				
-	 				<div class="clearfix">
-	 					<umb-image-gravity 
-	 						src="target.url"
-	 						center="target.focalPoint" />
-	 				</div>
+    <div class="umb-panel umb-dialogs-mediapicker" ng-if="target">
+        <div class="umb-panel-body no-header with-footer compact">
+            <umb-pane>
+                <umb-control-group ng-if="target.url">
 
-	 				<div ng-if="cropSize">
-	 					<h5>Preview</h5>
-	 					<umb-image-thumbnail
-	 						center="target.focalPoint"
-	 						src="target.url"
-	 						height="{{cropSize.height}}"
-	 						width="{{cropSize.width}}"
-	 						max-size="400"/>
-	 				</div>
+                    <div class="clearfix">
+                        <umb-image-gravity src="target.url"
+                                           center="target.focalPoint" />
+                    </div>
 
-
- 				</umb-control-group>
-
- 				<umb-control-group label="@general_url">
- 					<input type="text"
- 						localize="placeholder" 
- 						placeholder="@general_url" 
- 						class="umb-editor umb-textstring" 
- 						ng-model="target.url"
- 						ng-disabled="target.id"/>	
- 				</umb-control-group>
-
- 				<umb-control-group label="@content_altTextOptional">
- 					<input type="text"
- 						class="umb-editor umb-textstring" 
- 						ng-model="target.altText" />
- 				</umb-control-group>
- 			</umb-pane>
- 		</div>
-
- 		<div class="umb-panel-footer" >
- 			<div class="umb-el-wrap umb-panel-buttons">
- 		        <div class="btn-toolbar umb-btn-toolbar pull-right">
- 		        	<a href ng-click="exitDetails()" class="btn btn-link">
- 		        		<localize key="general_cancel">Cancel</localize>
- 					</a>
-
- 					<button
- 						class="btn btn-primary"
- 						ng-click="submit(target)">
- 						<localize key="general_insert">Insert</localize>
- 					</button>
- 		        </div>
- 			</div>
- 		</div>
-</div>
+                    <div ng-if="cropSize">
+                        <h5>Preview</h5>
+                        <umb-image-thumbnail center="target.focalPoint"
+                                             src="target.url"
+                                             height="{{cropSize.height}}"
+                                             width="{{cropSize.width}}"
+                                             max-size="400" />
+                    </div>
 
 
-<div class="umb-panel umb-dialogs-mediapicker" ng-hide="target">
-	<div class="umb-panel-header">
-		
-		<div class="umb-el-wrap umb-panel-buttons">
-			<div class="span5">
-	                <div class="form-search">
-	                    <i class="icon-search"></i>
-	                    <input type="text" 
-	                           ng-model="searchTerm" 
-	                           class="umb-search-field search-query" 
-	                           placeholder="Filter...">
-	                </div>
-	        </div>
+                </umb-control-group>
 
-		    <div class="pull-right">
-				    	<span class="btn fileinput-button" ng-class="{disabled: disabled}">
-				    	    <i class="icon-page-up"></i>
-				    	    <input type="file" name="files[]" multiple ng-disabled="disabled">
-				    	</span>
-	        </div>
+                <umb-control-group label="@general_url">
+                    <input type="text"
+                           localize="placeholder"
+                           placeholder="@general_url"
+                           class="umb-editor umb-textstring"
+                           ng-model="target.url"
+                           ng-disabled="target.id" />
+                </umb-control-group>
 
-		</div>
-
-		<div class="row">
-			<ul class="breadcrumb span12">
-				<li ng-hide="startNodeId != -1">
-					<a href ng-click="gotoFolder()" prevent-default>Media</a> / </li>
-
-				<li ng-repeat="item in path">
-					<a href ng-click="gotoFolder(item)" prevent-default>{{item.name}}</a> / 
-				</li>
-				
-				<li>
-					<a href ng-hide="showFolderInput" ng-click="showFolderInput = true">
-						<i class="icon icon-add small"></i>
-					</a>
-
-					<input type="text" 
-						class="input-foldername input-mini inline" 
-						ng-show="showFolderInput" 
-						ng-model="newFolderName"
-						ng-keydown="submitFolder($event)"
-						on-blur="showFolderInput = false">
-				</li>
-			</ul>
-		</div>
-	</div>
-
-	<div class="umb-panel-body with-footer">
-		
-        <div class="umb-loader-wrapper" ng-hide="active() == 0">
-            <div class="umb-loader"></div>
+                <umb-control-group label="@content_altTextOptional">
+                    <input type="text"
+                           class="umb-editor umb-textstring"
+                           ng-model="target.altText" />
+                </umb-control-group>
+            </umb-pane>
         </div>
 
-        <umb-photo-folder 
-        	min-height="105" 
-        	min-width="150"
-        	max-height="250"
-            ideal-items-per-row="3"
-        	on-click="clickHandler"
-        	ng-model="images"
-        	images-only="{{onlyImages}}"
-        	filter-by="searchTerm"/>
-	</div>	
+        <div class="umb-panel-footer">
+            <div class="umb-el-wrap umb-panel-buttons">
+                <div class="btn-toolbar umb-btn-toolbar pull-right">
+                    <a href ng-click="exitDetails()" class="btn btn-link">
+                        <localize key="general_cancel">Cancel</localize>
+                    </a>
+
+                    <button class="btn btn-primary"
+                            ng-click="submit(target)">
+                        <localize key="general_insert">Insert</localize>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
-	<div class="umb-panel-footer" >
-		<div class="umb-el-wrap umb-panel-buttons">
-	        <div class="btn-toolbar umb-btn-toolbar pull-right">
+    <div class="umb-panel umb-dialogs-mediapicker browser" ng-hide="target" ng-style="{opacity: dropping == true ? '0.25' : '1.0'}">
+        <div class="umb-panel-header">
 
-	        	<a href ng-click="close()" class="btn btn-link">
-	        		<localize key="general_cancel">Cancel</localize>
-				</a>
+            <div class="umb-el-wrap umb-panel-buttons">
+                <div class="span5">
+                    <div class="form-search">
+                        <i class="icon-search"></i>
+                        <input type="text"
+                               ng-model="searchTerm"
+                               class="umb-search-field search-query"
+                               placeholder="Filter...">
+                    </div>
+                </div>
 
-				<button
-					class="btn btn-primary"
-					ng-show="multiPicker" 
-					ng-click="submit(dialogData.selection)">
-					<localize key="buttons_select">Select</localize>({{dialogData.selection.length}})
-				</button>
+                <div class="pull-right">
+                    <span class="btn fileinput-button" ng-class="{disabled: disabled}">
+                        <i class="icon-page-up"></i>
+                        <input type="file" name="files[]" multiple ng-disabled="disabled" class="uploader">
+                        <localize key="general_upload">Upload</localize>
+                    </span>
+                </div>
 
-	        </div>
-		</div>
-	</div>
+            </div>
 
-</div>
+            <div class="row">
+                <ul class="breadcrumb span12">
+                    <li ng-hide="startNodeId != -1">
+                        <a href ng-click="gotoFolder()" prevent-default>Media</a> /
+                    </li>
+
+                    <li ng-repeat="item in path">
+                        <a href ng-click="gotoFolder(item)" prevent-default>{{item.name}}</a> /
+                    </li>
+
+                    <li>
+                        <a href ng-hide="showFolderInput" ng-click="showFolderInput = true">
+                            <i class="icon icon-add small"></i>
+                        </a>
+
+                        <input type="text"
+                               class="input-foldername input-mini inline"
+                               ng-show="showFolderInput"
+                               ng-model="newFolderName"
+                               ng-keydown="submitFolder($event)"
+                               on-blur="showFolderInput = false">
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="umb-panel-body with-footer">
+            
+            <umb-image-upload-progress ng-show="filesUploading > 0"></umb-image-upload-progress>
+
+            <umb-photo-folder min-height="105"
+                              min-width="150"
+                              max-height="250"
+                              ideal-items-per-row="3"
+                              on-click="clickHandler"
+                              ng-model="images"
+                              images-only="{{onlyImages}}"
+                              filter-by="searchTerm" />
+        </div>
+
+
+        <div class="umb-panel-footer">
+            <div class="umb-el-wrap umb-panel-buttons">
+                <div class="btn-toolbar umb-btn-toolbar pull-right">
+
+                    <a href ng-click="close()" class="btn btn-link">
+                        <localize key="general_cancel">Cancel</localize>
+                    </a>
+
+                    <button class="btn btn-primary"
+                            ng-show="multiPicker"
+                            ng-click="submit(dialogData.selection)">
+                        <localize key="buttons_select">Select</localize>({{dialogData.selection.length}})
+                    </button>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
 
 </form>

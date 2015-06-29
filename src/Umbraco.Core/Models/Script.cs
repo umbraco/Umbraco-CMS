@@ -14,56 +14,16 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class Script : File
     {
-        private readonly IContentSection _contentConfig;
-
         public Script(string path)
-            : this(path, UmbracoConfig.For.UmbracoSettings().Content)
+            : base(path)
         {
             
         }
 
+        [Obsolete("This is no longer used and will be removed from the codebase in future versions")]
         public Script(string path, IContentSection contentConfig)
-            : base(path)
-        {
-            _contentConfig = contentConfig;
-            base.Path = path;
-        }
-        
-        /// <summary>
-        /// Boolean indicating whether the file could be validated
-        /// </summary>
-        /// <remarks>
-        /// The validation logic was previsouly placed in the codebehind of editScript.aspx,
-        /// but has been moved to the script file so the validation is central.
-        /// </remarks>
-        /// <returns>True if file is valid, otherwise false</returns>
-        //TODO: This makes no sense to be here, any validation methods should be at the service level,
-        // when we move Scripts to truly use IFileSystem, then this validation logic doesn't work anymore
-        public override bool IsValid()
-        {
-            //NOTE Since a script file can be both JS, Razor Views, Razor Macros and Xslt
-            //it might be an idea to create validations for all 3 and divide the validation 
-            //into 4 private methods.
-            //See codeEditorSave.asmx.cs for reference.
-
-            var exts = _contentConfig.ScriptFileTypes.ToList();
-            /*if (UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
-            {
-                exts.Add("cshtml");
-                exts.Add("vbhtml");
-            }*/
-
-            var dirs = SystemDirectories.Scripts;
-            /*if (UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
-                dirs += "," + SystemDirectories.MvcViews;*/
-
-            //Validate file
-            var validFile = IOHelper.VerifyEditPath(Path, dirs.Split(','));
-
-            //Validate extension
-            var validExtension = IOHelper.VerifyFileExtension(Path, exts);
-
-            return validFile && validExtension;
+            : this(path)
+        {           
         }
 
         /// <summary>

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
@@ -8,6 +9,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
     [Migration("6.0.0", 10, GlobalSettings.UmbracoMigrationName)]
     public class DeleteAppTables : MigrationBase
     {
+        public DeleteAppTables(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
+        {
+        }
+
         public override void Up()
         {
             Delete.Table("umbracoAppTree");
@@ -26,7 +31,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
             }) == false)
             {
                 //These are the old aliases, before removing them, check they exist
-                var constraints = SqlSyntaxContext.SqlSyntaxProvider.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
+                var constraints = SqlSyntax.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
                 if (constraints.Any(x => x.Item1.InvariantEquals("umbracoUser2app") && x.Item3.InvariantEquals("FK_umbracoUser2app_umbracoApp")))
                 {
                     Delete.ForeignKey("FK_umbracoUser2app_umbracoApp").OnTable("umbracoUser2app");

@@ -6,6 +6,7 @@ using System.Text;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
 using AutoMapper;
+using ClientDependency.Core;
 using Examine.LuceneEngine;
 using Examine.LuceneEngine.Providers;
 using Newtonsoft.Json;
@@ -27,6 +28,7 @@ using Examine.SearchCriteria;
 using Umbraco.Web.Dynamics;
 using umbraco;
 using System.Text.RegularExpressions;
+using Umbraco.Core.Xml;
 
 namespace Umbraco.Web.Editors
 {
@@ -145,6 +147,8 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public EntityBasic GetByQuery(string query, int nodeContextId, UmbracoEntityTypes type)
         {
+            //TODO: Rename this!!! It's a bit misleading, it should be GetByXPath
+
           
             if (type != UmbracoEntityTypes.Document)
                 throw new ArgumentException("Get by query is only compatible with enitities of type Document");
@@ -162,76 +166,15 @@ namespace Umbraco.Web.Editors
         //PP: wip in progress on the query parser
         private string ParseXPathQuery(string query, int id)
         {
-            //no need to parse it
-            if (!query.StartsWith("$"))
-                return query;
-
-            //get full path
-            Func<int, IEnumerable<string>> getPath = delegate(int nodeid){
-                var ent = Services.EntityService.Get(nodeid);
-                return ent.Path.Split(',').Reverse();
-            };
-
-            //get nearest published item
-            Func<IEnumerable<string>, int> getClosestPublishedAncestor = (path => 
-            {
-                
-                foreach (var _id in path)
+            return UmbracoXPathPathSyntaxParser.ParseXPathQuery(
+                xpathExpression: query,
+                nodeContextId: id,
+                getPath: nodeid =>
                 {
-                    var item = Umbraco.TypedContent(int.Parse(_id));
-
-                    if (item != null)
-                        return item.Id;
-                }
-                return -1;
-            });
-
-            var rootXpath = "descendant::*[@id={0}]";
-
-            //parseable items:
-            var vars = new Dictionary<string, Func<string, string>>();
-            vars.Add("$current", q => {
-                var _id = getClosestPublishedAncestor(getPath(id));
-                return q.Replace("$current", string.Format(rootXpath, _id));
-            });
-
-            vars.Add("$parent", q =>
-            {
-                //remove the first item in the array if its the current node
-                //this happens when current is published, but we are looking for its parent specifically
-                var path = getPath(id);
-                if(path.ElementAt(0) == id.ToString()){
-                    path = path.Skip(1);
-                }
-
-                var _id = getClosestPublishedAncestor(path);
-                return q.Replace("$parent", string.Format(rootXpath, _id));
-            });
-
-
-            vars.Add("$site", q =>
-            {
-                var _id = getClosestPublishedAncestor(getPath(id));
-                return q.Replace("$site", string.Format(rootXpath, _id) + "/ancestor-or-self::*[@level = 1]");
-            });
-
-
-            vars.Add("$root", q =>
-            {
-                return q.Replace("$root", string.Empty);
-            });
-
-
-            foreach (var varible in vars)
-            {
-                if (query.StartsWith(varible.Key))
-                {
-                    query = varible.Value.Invoke(query);
-                    break;
-                }
-            }
-
-            return query;
+                    var ent = Services.EntityService.Get(nodeid);
+                    return ent.Path.Split(',').Reverse();
+                },
+                publishedContentExists: i => Umbraco.TypedContent(i) != null);
         }
         
         public EntityBasic GetById(int id, UmbracoEntityTypes type)
@@ -339,7 +282,7 @@ namespace Umbraco.Web.Editors
                     throw new NotSupportedException("The " + typeof(EntityController) + " currently does not support searching against object type " + entityType);                    
             }
 
-            var internalSearcher = (LuceneSearcher)ExamineManager.Instance.SearchProviderCollection[searcher];
+            var internalSearcher = ExamineManager.Instance.SearchProviderCollection[searcher];
 
             //build a lucene query:
             // the __nodeName will be boosted 10x without wildcards
@@ -556,6 +499,7 @@ namespace Umbraco.Web.Editors
 
                 return Services.EntityService.GetAll(objectType.Value, ids)
                     .WhereNotNull()
+                    .OrderBy(x => x.Level)
                     .Select(Mapper.Map<EntityBasic>);
             }
             //now we need to convert the unknown ones
@@ -637,14 +581,19 @@ namespace Umbraco.Web.Editors
 
         private IEnumerable<EntityBasic> GetResultForKeys(IEnumerable<Guid> keys, UmbracoEntityTypes entityType)
         {
-            if (keys.Any() == false) return Enumerable.Empty<EntityBasic>();
+            var keysArray = keys.ToArray();
+            if (keysArray.Any() == false) return Enumerable.Empty<EntityBasic>();
 
             var objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
             {
-                var result = Services.EntityService.GetAll(objectType.Value, keys.ToArray())
+                var entities = Services.EntityService.GetAll(objectType.Value, keysArray)
                     .WhereNotNull()
                     .Select(Mapper.Map<EntityBasic>);
+
+                // entities are in "some" order, put them back in order
+                var xref = entities.ToDictionary(x => x.Id);
+                var result = keysArray.Select(x => xref.ContainsKey(x) ? xref[x] : null).Where(x => x != null);
 
                 return result;
             }
@@ -664,14 +613,19 @@ namespace Umbraco.Web.Editors
 
         private IEnumerable<EntityBasic> GetResultForIds(IEnumerable<int> ids, UmbracoEntityTypes entityType)
         {
-            if (ids.Any() == false) return Enumerable.Empty<EntityBasic>();
+            var idsArray = ids.ToArray();
+            if (idsArray.Any() == false) return Enumerable.Empty<EntityBasic>();
 
             var objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
             {
-                var result = Services.EntityService.GetAll(objectType.Value, ids.ToArray())
+                var entities = Services.EntityService.GetAll(objectType.Value, idsArray)
                     .WhereNotNull()
                     .Select(Mapper.Map<EntityBasic>);
+
+                // entities are in "some" order, put them back in order
+                var xref = entities.ToDictionary(x => x.Id);
+                var result = idsArray.Select(x => xref.ContainsKey(x) ? xref[x] : null).Where(x => x != null);
 
                 return result;
             }

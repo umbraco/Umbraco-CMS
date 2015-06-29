@@ -25,7 +25,7 @@
 }
 
 .umb-codeeditor{
-  width: 99%; 
+  width: 99%;
 }
 
 //
@@ -68,7 +68,7 @@ div.umb-codeeditor .umb-btn-toolbar {
 .mce-ico{font-size: 12px !important; color: @blackLight !important;}
 /* Special case to support helviticons for the tiny mce button controls */
 .mce-ico.mce-i-custom[class^="icon-"],
-.mce-ico.mce-i-custom[class*=" icon-"] {    
+.mce-ico.mce-i-custom[class*=" icon-"] {
   font-family: icomoon;
   font-size:16px !important;
 }
@@ -100,8 +100,8 @@ ul.color-picker li a  {
 /* pre-value editor */
 
 .control-group.color-picker-preval pre {
-    display: inline; 
-    margin-right: 20px; 
+    display: inline;
+    margin-right: 20px;
     margin-left: 10px;
 }
 
@@ -116,8 +116,8 @@ ul.color-picker li a  {
 // --------------------------------------------------
 .umb-mediapicker .add-link{
   display: inline-block;
-  height: 120px; 
-  width: 120px; 
+  height: 120px;
+  width: 120px;
   text-align: center;
   color: @grayLight;
   border: 2px @grayLight dashed !important;
@@ -187,7 +187,7 @@ ul.color-picker li a  {
 
 .umb-sortable-thumbnails li img
 {
-  max-width:100%; 
+  max-width:100%;
   max-height:100%;
   margin:auto;
   display:block;
@@ -206,12 +206,12 @@ ul.color-picker li a  {
 .umb-sortable-thumbnails .icon-holder *
 {
   color: @grayLight;
-  display: block 
+  display: block
 }
 
 
 //
-// Cropper 
+// Cropper
 // -------------------------------------------------
 
 .umb-cropper{
@@ -237,7 +237,7 @@ ul.color-picker li a  {
     position: relative;
     margin: auto;
  }
- 
+
 .umb-cropper-gravity .viewport{
    overflow: hidden;
    position: relative;
@@ -294,22 +294,105 @@ ul.color-picker li a  {
    margin-top: 7px;
    width: 320px;
 }
+   .umb-cropper-gravity .viewport, .umb-cropper-gravity, .umb-cropper-imageholder {
+        display: inline-block;
+    }
 
+    .umb-cropper-imageholder {
+        float: left;
+    }
+
+    .cropList {
+        display: inline-block;
+        position: relative;
+        vertical-align: top;
+    }
+
+    .gravity-container .viewport {
+        width: 494px;
+    }
+
+    .imagecropper .umb-sortable-thumbnails {
+        border-left: 2px solid #f8f8f8;
+        margin-left: 4px;
+        padding-left: 2px;
+        float: left;
+        width: 100px;
+    }
+
+    .imagecropper .umb-sortable-thumbnails li {
+        display: block;
+    }
+
+    .imagecropper .umb-sortable-thumbnails li.current a, .imagecropper .umb-sortable-thumbnails li.current a:hover {
+        background: #eeeeee;
+        text-decoration: none;
+    }
+
+    .imagecropper .umb-sortable-thumbnails li:first-of-type {
+        margin-top: 0;
+        padding-top: 0;
+    }
+
+    .imagecropper .umb-sortable-thumbnails li .crop-name, .imagecropper .umb-sortable-thumbnails li .crop-size {
+        display: block;
+        text-align: left;
+        font-size: 11px;
+    }
+
+    .imagecropper .umb-sortable-thumbnails li .crop-size {
+        font-size: 10px;
+        font-style: italic;
+        color: #666;
+    }
+
+    .imagecropper .umb-sortable-thumbnails li a {
+        display: block;
+        padding: 5px;
+    }
+
+    .imagecropper .umb-sortable-thumbnails li a:hover {
+        background: #f8f8f8;
+        text-decoration: none;
+    }
+
+    .imagecropper .umb-sortable-thumbnails li a:hover .crop-text {
+        text-decoration: none;
+    }
+
+    .btn-crop-delete {
+        display: block;
+        text-align: left;
+    }
+
+    .imagecropper .umb-sortable-thumbnails.many {
+        width: 210px;
+    }
+
+    .imagecropper .umb-sortable-thumbnails.many li {
+        width: 85px;
+        float: left;
+    }
+
+    .imagecropper .umb-sortable-thumbnails.many li:nth-child(2) {
+        margin-top: 0;
+        padding-top: 0;
+    }
 
 //
 // folder-browser
 // --------------------------------------------------
 .umb-folderbrowser .add-link{
   display: inline-block;
-  height: 120px; 
-  width: 120px; 
+  height: 120px;
+  width: 120px;
   text-align: center;
   border: 1px @grayLight dashed;
   line-height: 120px
 }
 
-.umb-folderbrowser .selector-overlay{
-  display: none !important;
+.umb-upload-drop-zone{
+    margin-bottom:5px;
 }
 
 .umb-upload-drop-zone .info, .umb-upload-button-big{
@@ -364,8 +447,8 @@ ul.color-picker li a  {
 
 
 
-.umb-photo-folder .picrow div a:first-child {    
-    width:100%;
+.umb-photo-folder .picrow div a:first-child {
+     width:100%;
     height:100%;
 }
 
@@ -378,15 +461,19 @@ ul.color-picker li a  {
 .umb-photo-folder a:hover{text-decoration: none}
 .umb-photo-folder .umb-non-thumbnail{
   text-align: center;
-  vertical-align: center;
+  vertical-align: middle;
   font-size: 12px;
   background: @grayLighter;
   color: @black;
   text-decoration: none;
 }
 
+.umb-photo-folder .selector-overlay{
+  display: none;
+}
+
 //this is a temp hack, to provide selectors in the dialog:
-.umb-photo-folder .pic:hover .selector-overlay{
+.umb-photo-folder .pic:hover .selector-overlay {
   position: absolute;
   bottom: 0px;
   left: 0px;
@@ -398,6 +485,11 @@ ul.color-picker li a  {
   text-align: center;
   color: white;
   opacity: 0.4;
+  text-decoration:none;
+
+    overflow: hidden;
+    text-overlow: ellipsis;
+    white-space: nowrap;
 }
 
 .umb-photo-folder .umb-non-thumbnail i{
@@ -406,7 +498,18 @@ ul.color-picker li a  {
   line-height: 60px;
   display: block;
   margin: auto;
-  padding-top: 20px;
+  /*vertically aligns */
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.umb-photo-folder .umb-non-thumbnail span{
+  position: absolute;
+  display: block;
+  margin: auto;
+  width: 100%;
+  top: 20px;
 }
 
 .umb-photo-folder .selected{
@@ -502,3 +605,14 @@ ul.color-picker li a  {
 .bootstrap-datetimepicker-widget .btn{padding: 0;}
 .bootstrap-datetimepicker-widget .picker-switch .btn{ background: none; border: none;}
 .umb-datepicker .input-append .add-on{cursor: pointer;}
+.umb-datepicker p {margin-top:10px;}
+.umb-datepicker p a{color: @gray;}
+
+//
+// Code mirror - even though this isn't a proprety editor right now, it could be so I'm putting the styles here
+// --------------------------------------------------
+
+.CodeMirror, .CodeMirror-scroll { 
+	height: 100%;
+    min-height:200px;
+}

@@ -24,12 +24,18 @@ namespace Umbraco.Core.Services
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         private readonly IUserService _userService;
         private readonly IContentService _contentService;
+        private readonly ILogger _logger;
 
-        public NotificationService(IDatabaseUnitOfWorkProvider provider, IUserService userService, IContentService contentService)
+        public NotificationService(IDatabaseUnitOfWorkProvider provider, IUserService userService, IContentService contentService, ILogger logger)
         {
+            if (provider == null) throw new ArgumentNullException("provider");
+            if (userService == null) throw new ArgumentNullException("userService");
+            if (contentService == null) throw new ArgumentNullException("contentService");
+            if (logger == null) throw new ArgumentNullException("logger");
             _uowProvider = provider;
             _userService = userService;
             _contentService = contentService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -75,11 +81,11 @@ namespace Umbraco.Core.Services
                     try
                     {
                         SendNotification(operatingUser, u, content, allVersions, actionName, http, createSubject, createBody);
-                        LogHelper.Debug<NotificationService>(string.Format("Notification type: {0} sent to {1} ({2})", action, u.Name, u.Email));
+                        _logger.Debug<NotificationService>(string.Format("Notification type: {0} sent to {1} ({2})", action, u.Name, u.Email));
                     }
                     catch (Exception ex)
                     {
-                        LogHelper.Error<NotificationService>("An error occurred sending notification", ex);
+                        _logger.Error<NotificationService>("An error occurred sending notification", ex);
                     }
                 }
             }
@@ -331,7 +337,7 @@ namespace Umbraco.Core.Services
                     }
                     catch (Exception ex)
                     {
-                        LogHelper.Error<NotificationService>("An error occurred sending notification", ex);
+                        _logger.Error<NotificationService>("An error occurred sending notification", ex);
                     }
                 });
         }

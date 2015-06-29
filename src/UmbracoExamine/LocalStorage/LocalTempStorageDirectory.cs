@@ -6,6 +6,9 @@ using Lucene.Net.Store;
 
 namespace UmbracoExamine.LocalStorage
 {
+    /// <summary>
+    /// Used to read data from local temp storage and write to both local storage and main storage
+    /// </summary>
     public class LocalTempStorageDirectory : SimpleFSDirectory
     {
         private readonly Lucene.Net.Store.Directory _realDirectory;

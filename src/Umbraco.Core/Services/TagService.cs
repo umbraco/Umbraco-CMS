@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
@@ -12,29 +14,35 @@ namespace Umbraco.Core.Services
     /// <remarks>
     /// If there is unpublished content with tags, those tags will not be contained
     /// </remarks>
-    public class TagService : ITagService
+    public class TagService : RepositoryService, ITagService
     {
-        private readonly RepositoryFactory _repositoryFactory;
-        private readonly IDatabaseUnitOfWorkProvider _uowProvider;
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public TagService()
             : this(new RepositoryFactory())
         {}
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public TagService(RepositoryFactory repositoryFactory)
             : this(new PetaPocoUnitOfWorkProvider(), repositoryFactory)
         {
         }
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public TagService(IDatabaseUnitOfWorkProvider provider)
             : this(provider, new RepositoryFactory())
         {
         }
 
+        [Obsolete("Use the constructors that specify all dependencies instead")]
         public TagService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory)
+            : this(provider, repositoryFactory, LoggerResolver.Current.Logger)
         {
-            _repositoryFactory = repositoryFactory;
-            _uowProvider = provider;
+        }
+
+        public TagService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger)
+            : base(provider, repositoryFactory, logger)
+        {
         }
 
         /// <summary>
@@ -45,7 +53,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="TaggedEntity"/></returns>
         public IEnumerable<TaggedEntity> GetTaggedContentByTagGroup(string tagGroup)
         {
-            using (var repository = _repositoryFactory.CreateTagRepository(_uowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTagRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Content, tagGroup);
             }         
@@ -60,7 +68,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="TaggedEntity"/></returns>
         public IEnumerable<TaggedEntity> GetTaggedContentByTag(string tag, string tagGroup = null)
         {
-            using (var repository = _repositoryFactory.CreateTagRepository(_uowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTagRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Content, tag, tagGroup);
             }         
@@ -74,7 +82,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="TaggedEntity"/></returns>
         public IEnumerable<TaggedEntity> GetTaggedMediaByTagGroup(string tagGroup)
         {
-            using (var repository = _repositoryFactory.CreateTagRepository(_uowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTagRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Media, tagGroup);
             }    
@@ -89,7 +97,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="TaggedEntity"/></returns>
         public IEnumerable<TaggedEntity> GetTaggedMediaByTag(string tag, string tagGroup = null)
         {
-            using (var repository = _repositoryFactory.CreateTagRepository(_uowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTagRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Media, tag, tagGroup);
             }    
@@ -103,7 +111,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="TaggedEntity"/></returns>
         public IEnumerable<TaggedEntity> GetTaggedMembersByTagGroup(string tagGroup)
         {
-            using (var repository = _repositoryFactory.CreateTagRepository(_uowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTagRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.GetTaggedEntitiesByTagGroup(TaggableObjectTypes.Member, tagGroup);
             }    
@@ -118,7 +126,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="TaggedEntity"/></returns>
         public IEnumerable<TaggedEntity> GetTaggedMembersByTag(string tag, string tagGroup = null)
         {
-            using (var repository = _repositoryFactory.CreateTagRepository(_uowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTagRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.GetTaggedEntitiesByTag(TaggableObjectTypes.Member, tag, tagGroup);
             }    
@@ -131,16 +139,9 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="ITag"/></returns>
         public IEnumerable<ITag> GetAllTags(string tagGroup = null)
         {
-            using (var repository = _repositoryFactory.CreateTagRepository(_uowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTagRepository(UowProvider.GetUnitOfWork()))
             {
-                if (tagGroup.IsNullOrWhiteSpace())
-                {
-                    return repository.GetAll();
-                }
-
-                var query = Query<ITag>.Builder.Where(x => x.Group == tagGroup);
-                var definitions = repository.GetByQuery(query);
-                return definitions;
+                return repository.GetTagsForEntityType(TaggableObjectTypes.All, tagGroup);
             }  
         }
 
@@ -153,7 +154,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="ITag"/></returns>
         public IEnumerable<ITag> GetAllContentTags(string tagGroup = null)
         {
-            using (var repository = _repositoryFactory.CreateTagRepository(_uowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTagRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.GetTagsForEntityType(TaggableObjectTypes.Content, tagGroup);
             }
@@ -168,7 +169,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="ITag"/></returns>
         public IEnumerable<ITag> GetAllMediaTags(string tagGroup = null)
         {
-            using (var repository = _repositoryFactory.CreateTagRepository(_uowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTagRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.GetTagsForEntityType(TaggableObjectTypes.Media, tagGroup);
             }
@@ -183,7 +184,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="ITag"/></returns>
         public IEnumerable<ITag> GetAllMemberTags(string tagGroup = null)
         {
-            using (var repository = _repositoryFactory.CreateTagRepository(_uowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTagRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.GetTagsForEntityType(TaggableObjectTypes.Member, tagGroup);
             }
@@ -200,7 +201,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="ITag"/></returns>
         public IEnumerable<ITag> GetTagsForProperty(int contentId, string propertyTypeAlias, string tagGroup = null)
         {
-            using (var repository = _repositoryFactory.CreateTagRepository(_uowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTagRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.GetTagsForProperty(contentId, propertyTypeAlias, tagGroup);
             }
@@ -216,7 +217,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="ITag"/></returns>
         public IEnumerable<ITag> GetTagsForEntity(int contentId, string tagGroup = null)
         {
-            using (var repository = _repositoryFactory.CreateTagRepository(_uowProvider.GetUnitOfWork()))
+            using (var repository = RepositoryFactory.CreateTagRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.GetTagsForEntity(contentId, tagGroup);
             }

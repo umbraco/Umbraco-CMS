@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Web;
 using System.Xml;
@@ -13,6 +14,9 @@ using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
 using Umbraco.Core.IO;
 using umbraco.NodeFactory;
+using Umbraco.Core;
+using Umbraco.Web;
+using Umbraco.Web.Routing;
 
 namespace umbraco {
 
@@ -277,10 +281,13 @@ namespace umbraco {
                 {
                     _redirectID = int.Parse(urlNode.Attributes.GetNamedItem("id").Value);
 
-                    HttpContext.Current.Items["altTemplate"] = templateAlias;
-                    HttpContext.Current.Trace.Write("umbraco.altTemplateHandler",
-                                                    string.Format("Templated changed to: '{0}'",
-                                                                  HttpContext.Current.Items["altTemplate"]));
+                    if (UmbracoConfig.For.UmbracoSettings().WebRouting.DisableAlternativeTemplates == false)
+                    {
+                        HttpContext.Current.Items[Constants.Conventions.Url.AltTemplate] = templateAlias;
+                        HttpContext.Current.Trace.Write("umbraco.altTemplateHandler",
+                            string.Format("Template changed to: '{0}'", HttpContext.Current.Items[Constants.Conventions.Url.AltTemplate]));
+                    }
+
                     _succes = true;
                 }
             }
@@ -313,13 +320,22 @@ namespace umbraco {
 			{
                 LogHelper.Info<handle404>(string.Format("NotFound url {0} (from '{1}')", url, HttpContext.Current.Request.UrlReferrer));
 
-				// Test if the error404 not child elements
-				string error404 = umbraco.library.GetCurrentNotFoundPageId();
+                // Test if the error404 not child elements
+			    var error404 = NotFoundHandlerHelper.GetCurrentNotFoundPageId(
+			        UmbracoConfig.For.UmbracoSettings().Content.Error404Collection.ToArray(),
+			        HttpContext.Current.Request.ServerVariables["SERVER_NAME"],
+			        ApplicationContext.Current.Services.EntityService,
+			        new PublishedContentQuery(UmbracoContext.Current.ContentCache, UmbracoContext.Current.MediaCache),
+                    ApplicationContext.Current.Services.DomainService);
 
+			    if (error404.HasValue)
+			    {
+			        _redirectID = error404.Value;
+			        HttpContext.Current.Response.StatusCode = 404;
+			        return true;
+			    }
 
-				_redirectID = int.Parse(error404);
-				HttpContext.Current.Response.StatusCode = 404;
-				return true;
+			    return false;
 			}
 			catch (Exception err)
 			{

@@ -1,5 +1,7 @@
 ﻿using System.Web;
 using System.Web.UI;
+using ClientDependency.Core;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Web.UI;
 using Umbraco.Web;
@@ -9,6 +11,7 @@ using System.Web.UI.WebControls;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using Umbraco.Web;
+using System.Linq;
 using UmbracoUserControl = Umbraco.Web.UI.Controls.UmbracoUserControl;
 
 namespace umbraco.cms.presentation.create.controls
@@ -16,7 +19,7 @@ namespace umbraco.cms.presentation.create.controls
     /// <summary>
     ///		Summary description for simple.
     /// </summary>
-	public partial class simple : UmbracoUserControl
+    public partial class simple : UmbracoUserControl
     {
 
         protected void Page_Load(object sender, EventArgs e)
@@ -35,19 +38,20 @@ namespace umbraco.cms.presentation.create.controls
                 if (int.TryParse(Request.QueryString["nodeId"], out nodeId) == false)
                     nodeId = -1;
 
-		try
+                try
                 {
 
-                var returnUrl = LegacyDialogHandler.Create(
-                    new HttpContextWrapper(Context),
-                    new User(Security.CurrentUser),
-                    Request.GetItemAsString("nodeType"),
-                        nodeId,
-                        rename.Text.Trim());
+                    var returnUrl = LegacyDialogHandler.Create(
+                        new HttpContextWrapper(Context),
+                        new User(Security.CurrentUser),
+                        Request.GetItemAsString("nodeType"),
+                            nodeId,
+                            rename.Text.Trim(),
+                            Request.QueryString.AsEnumerable().ToDictionary(x => x.Key, x => (object)x.Value));
 
                     BasePage.Current.ClientTools
                     .ChangeContentFrameUrl(returnUrl)
-					.ReloadActionNode(false, true)
+                    .ReloadActionNode(false, true)
                     .CloseModalWindow();
                 }
                 catch (Exception ex)

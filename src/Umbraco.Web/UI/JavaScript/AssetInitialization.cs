@@ -47,51 +47,47 @@ namespace Umbraco.Web.UI.JavaScript
         }
 
         /// <summary>
-        /// This will check if we're in release mode, if so it will create a CDF URL to load them all in at once
+        /// This will use CDF to optimize the asset file collection
         /// </summary>
         /// <param name="fileRefs"></param>
         /// <param name="cdfType"></param>
         /// <param name="httpContext"></param>
-        /// <returns></returns>
-        protected JArray CheckIfReleaseAndOptimized(JArray fileRefs, ClientDependencyType cdfType, HttpContextBase httpContext)
+        /// <returns>
+        /// Return the asset URLs that should be loaded, if the application is in debug mode then the URLs returned will be the same as the ones
+        /// passed in with the CDF version query strings appended so cache busting works correctly.
+        /// </returns>
+        protected JArray OptimizeAssetCollection(JArray fileRefs, ClientDependencyType cdfType, HttpContextBase httpContext)
         {
             if (httpContext == null) throw new ArgumentNullException("httpContext");
-            
-            if (httpContext.IsDebuggingEnabled == false)
-            {
-                return GetOptimized(fileRefs, cdfType, httpContext);
-            }
-            return fileRefs;
-        }
 
-        /// <summary>
-        /// Return array of optimized URLs
-        /// </summary>
-        /// <param name="fileRefs"></param>
-        /// <param name="cdfType"></param>
-        /// <param name="httpContext"></param>
-        /// <returns></returns>
-        protected JArray GetOptimized(JArray fileRefs, ClientDependencyType cdfType, HttpContextBase httpContext)
-        {
             var depenencies = fileRefs.Select(x =>
+            {
+                var asString = x.ToString();
+                if (asString.StartsWith("/") == false)
                 {
-                    var asString = x.ToString();
-                    if (asString.StartsWith("/") == false)
+                    //most declarations with be made relative to the /umbraco folder, so things like lib/blah/blah.js
+                    // so we need to turn them into absolutes here
+                    if (Uri.IsWellFormedUriString(asString, UriKind.Relative))
                     {
-                        if (Uri.IsWellFormedUriString(asString, UriKind.Relative))
-                        {
-                            var absolute = new Uri(httpContext.Request.Url, asString);
-                            return new BasicFile(cdfType) { FilePath = absolute.AbsolutePath };
-                        }
-                        return null;
+                        var absolute = new Uri(httpContext.Request.Url, asString);
+                        return (IClientDependencyFile)new BasicFile(cdfType) { FilePath = absolute.AbsolutePath };
                     }
-                    return new JavascriptFile(asString);
-                }).Where(x => x != null);
+                }
+                return cdfType == ClientDependencyType.Javascript
+                    ? (IClientDependencyFile)new JavascriptFile(asString)
+                    : (IClientDependencyFile)new CssFile(asString);
+            }).Where(x => x != null).ToList();
 
-            var urls = ClientDependencySettings.Instance.DefaultCompositeFileProcessingProvider.ProcessCompositeList(
-                depenencies,
-                cdfType,
-                httpContext);
+            //Get the output string for these registrations which will be processed by CDF correctly to stagger the output based
+            // on internal vs external resources. The output will be delimited based on our custom Umbraco.Web.UI.JavaScript.DependencyPathRenderer
+            string jsOut;
+            string cssOut;
+            var renderer = ClientDependencySettings.Instance.MvcRendererCollection["Umbraco.DependencyPathRenderer"];
+            renderer.RegisterDependencies(depenencies, new HashSet<IClientDependencyPath>(), out jsOut, out cssOut, httpContext);
+
+            var urls = cdfType == ClientDependencyType.Javascript
+                ? jsOut.Split(new string[] { DependencyPathRenderer.Delimiter }, StringSplitOptions.RemoveEmptyEntries)
+                : cssOut.Split(new string[] { DependencyPathRenderer.Delimiter }, StringSplitOptions.RemoveEmptyEntries);
 
             var result = new JArray();
             foreach (var u in urls)
@@ -100,5 +96,6 @@ namespace Umbraco.Web.UI.JavaScript
             }
             return result;
         }
+
     }
 }

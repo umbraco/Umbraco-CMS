@@ -26,11 +26,6 @@ namespace Umbraco.Core.Models.Rdbms
         [Constraint(Default = "getdate()")]
         public DateTime VersionDate { get; set; }
 
-        [Column("LanguageLocale")]
-        [Length(10)]
-        [NullSetting(NullSetting = NullSettings.Null)]
-        public string Language { get; set; }
-
         [ResultColumn]
         public ContentDto ContentDto { get; set; }
     }

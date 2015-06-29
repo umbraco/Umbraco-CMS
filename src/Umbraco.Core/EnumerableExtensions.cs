@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -114,13 +115,7 @@ namespace Umbraco.Core
         /// <returns></returns>
         public static bool ContainsAll<TSource>(this IEnumerable<TSource> source, IEnumerable<TSource> other)
         {
-            var matches = true;
-            foreach (var i in other)
-            {
-                matches = source.Contains(i);
-                if (!matches) break;
-            }
-            return matches;
+            return other.Except(source).Any() == false;
         }
 
         /// <summary>
@@ -132,7 +127,7 @@ namespace Umbraco.Core
         /// <returns></returns>
         public static bool ContainsAny<TSource>(this IEnumerable<TSource> source, IEnumerable<TSource> other)
         {
-            return other.Any(i => source.Contains(i));
+            return other.Any(source.Contains);
         }
 
         /// <summary>
@@ -224,7 +219,7 @@ namespace Umbraco.Core
             return sequence.Select(
                 x =>
                 {
-                    if (typeof(TActual).IsAssignableFrom(x.GetType()))
+                    if (x is TActual)
                     {
                         var casted = x as TActual;
                         projection.Invoke(casted);
@@ -276,6 +271,34 @@ namespace Umbraco.Core
         ///<param name="items">The enumerable to search.</param>
         ///<param name="item">The item to find.</param>
         ///<returns>The index of the first matching item, or -1 if the item was not found.</returns>
-        public static int IndexOf<T>(this IEnumerable<T> items, T item) { return items.FindIndex(i => EqualityComparer<T>.Default.Equals(item, i)); }
+        public static int IndexOf<T>(this IEnumerable<T> items, T item)
+        {
+            return items.FindIndex(i => EqualityComparer<T>.Default.Equals(item, i));
+        }
+
+        /// <summary>
+        /// Determines if 2 lists have equal elements within them regardless of how they are sorted
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// The logic for this is taken from:
+        /// http://stackoverflow.com/questions/4576723/test-whether-two-ienumerablet-have-the-same-values-with-the-same-frequencies
+        /// 
+        /// There's a few answers, this one seems the best for it's simplicity and based on the comment of Eamon
+        /// </remarks>
+        public static bool UnsortedSequenceEqual<T>(this IEnumerable<T> source, IEnumerable<T> other)
+        {
+            if (source == null && other == null) return true;
+            if (source == null || other == null) return false;
+
+            var list1Groups = source.ToLookup(i => i);
+            var list2Groups = other.ToLookup(i => i);
+            return list1Groups.Count == list2Groups.Count
+               && list1Groups.All(g => g.Count() == list2Groups[g.Key].Count());
+        }
+
     }
 }

@@ -101,15 +101,24 @@ namespace Umbraco.Core
             }
         }
 
-        internal static string ReplaceNonAlphanumericChars(this string input, char replacement)
+        internal static string ReplaceNonAlphanumericChars(this string input, string replacement)
         {
             //any character that is not alphanumeric, convert to a hyphen
             var mName = input;
             foreach (var c in mName.ToCharArray().Where(c => !char.IsLetterOrDigit(c)))
             {
-                mName = mName.Replace(c, replacement);
+                mName = mName.Replace(c.ToString(CultureInfo.InvariantCulture), replacement);
             }
             return mName;
+        }
+
+        internal static string ReplaceNonAlphanumericChars(this string input, char replacement)
+        {
+            var inputArray = input.ToCharArray();
+            var outputArray = new char[input.Length];
+            for (var i = 0; i < inputArray.Length; i++)
+                outputArray[i] = char.IsLetterOrDigit(inputArray[i]) ? inputArray[i] : replacement;
+            return new string(outputArray);
         }
 
         /// <summary>
@@ -374,6 +383,11 @@ namespace Umbraco.Core
             return input.EndsWith(value.ToString(CultureInfo.InvariantCulture)) ? input : input + value;
         }
 
+        public static string EnsureEndsWith(this string input, string toEndWith)
+        {
+            return input.EndsWith(toEndWith.ToString(CultureInfo.InvariantCulture)) ? input : input + toEndWith;
+        }
+
         public static bool IsLowerCase(this char ch)
         {
             return ch.ToString(CultureInfo.InvariantCulture) == ch.ToString(CultureInfo.InvariantCulture).ToLowerInvariant();
@@ -482,15 +496,25 @@ namespace Umbraco.Core
         /// <returns></returns>
         public static string ConvertToHex(this string input)
         {
-            if (String.IsNullOrEmpty(input)) return String.Empty;
+            if (string.IsNullOrEmpty(input)) return string.Empty;
 
             var sb = new StringBuilder(input.Length);
-            foreach (char c in input)
+            foreach (var c in input)
             {
-                int tmp = c;
                 sb.AppendFormat("{0:x2}", Convert.ToUInt32(c));
             }
             return sb.ToString();
+        }
+
+        public static string DecodeFromHex(this string hexValue)
+        {
+            var strValue = "";
+            while (hexValue.Length > 0)
+            {
+                strValue += Convert.ToChar(Convert.ToUInt32(hexValue.Substring(0, 2), 16)).ToString();
+                hexValue = hexValue.Substring(2, hexValue.Length - 2);
+            }
+            return strValue;
         }
 
         ///<summary>
@@ -1196,7 +1220,7 @@ namespace Umbraco.Core
         // other helpers may not. DefaultShortStringHelper produces better, but non-compatible, results.
 
         /// <summary>
-        /// Splits a Pascal cased string into a phrase seperated by spaces.
+        /// Splits a Pascal cased string into a phrase separated by spaces.
         /// </summary>
         /// <param name="phrase">The text to split.</param>
         /// <returns>The splitted text.</returns>

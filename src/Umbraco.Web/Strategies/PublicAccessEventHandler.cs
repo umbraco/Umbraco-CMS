@@ -10,7 +10,7 @@ using Umbraco.Core.Services;
 namespace Umbraco.Web.Strategies
 {
     /// <summary>
-    /// Used to ensure that the access.xml file is kept up to date properly
+    /// Used to ensure that the public access data file is kept up to date properly
     /// </summary>
     public sealed class PublicAccessEventHandler : ApplicationEventHandler
     {
@@ -31,7 +31,7 @@ namespace Umbraco.Web.Strategies
                     && grp.AdditionalData["previousName"].ToString().IsNullOrWhiteSpace() == false
                     && grp.AdditionalData["previousName"].ToString() != grp.Name)
                 {
-                    Access.RenameMemberShipRole(grp.AdditionalData["previousName"].ToString(), grp.Name);    
+                    ApplicationContext.Current.Services.PublicAccessService.RenameMemberGroupRoleRules(grp.AdditionalData["previousName"].ToString(), grp.Name);
                 }
             }
         }

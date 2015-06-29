@@ -77,20 +77,33 @@ namespace UmbracoExamine
         /// <returns></returns>
         protected override IIndexCriteria GetIndexerData(IndexSet indexSet)
         {
+            var indexerData = base.GetIndexerData(indexSet);
+
             if (CanInitialize())
-            {           
-                var searchableEmail = indexSet.IndexUserFields["_searchEmail"];
-                if (searchableEmail == null)
+            {
+                //If the fields are missing a custom _searchEmail, then add it
+
+                if (indexerData.UserFields.Any(x => x.Name == "_searchEmail") == false)
                 {
-                    indexSet.IndexUserFields.Add(new IndexField
+                    var field = new IndexField {Name = "_searchEmail"};
+                    var policy = IndexFieldPolicies.FirstOrDefault(x => x.Name == "_searchEmail");
+                    if (policy != null)
                     {
-                        Name = "_searchEmail"
-                    });
+                        field.Type = policy.Type;
+                        field.EnableSorting = policy.EnableSorting;
+                    }
+
+                    return new IndexCriteria(
+                        indexerData.StandardFields,
+                        indexerData.UserFields.Concat(new[] {field}),
+                        indexerData.IncludeNodeTypes,
+                        indexerData.ExcludeNodeTypes,
+                        indexerData.ParentNodeId
+                        );
                 }
-                return indexSet.ToIndexCriteria(DataService, IndexFieldPolicies);
             }
 
-            return base.GetIndexerData(indexSet);
+	        return indexerData;
         }
 
 	    /// <summary>
@@ -115,9 +128,10 @@ namespace UmbracoExamine
                 return;
 
             //Re-index all members in batches of 5000
-            IMember[] members;
-            const int pageSize = 5000;
+	        int memberCount = 0;
+            const int pageSize = 1000;
             var pageIndex = 0;
+            var serializer = new EntityXmlSerializer();
 
 	        if (IndexerData.IncludeNodeTypes.Any())
 	        {
@@ -127,10 +141,15 @@ namespace UmbracoExamine
                     do
                     {
                         int total;
-                        members = _memberService.GetAll(pageIndex, pageSize, out total, "LoginName", Direction.Ascending, nodeType).ToArray();
-                        AddNodesToIndex(GetSerializedMembers(members), type);
+                        var members = _memberService.GetAll(pageIndex, pageSize, out total, "LoginName", Direction.Ascending, nodeType);
+                        memberCount = 0;
+                        foreach (var member in members)
+                        {
+                            AddNodesToIndex(new[] { serializer.Serialize(_dataTypeService, member) }, type);
+                            memberCount++;
+                        }
                         pageIndex++;
-                    } while (members.Length == pageSize);
+                    } while (memberCount == pageSize);
 	            }
 	        }
 	        else
@@ -139,21 +158,17 @@ namespace UmbracoExamine
                 do
                 {
                     int total;
-                    members = _memberService.GetAll(pageIndex, pageSize, out total).ToArray();
-                    AddNodesToIndex(GetSerializedMembers(members), type);
+                    var members = _memberService.GetAll(pageIndex, pageSize, out total);
+                    memberCount = 0;
+                    foreach (var member in members)
+                    {
+                        AddNodesToIndex(new[] {serializer.Serialize(_dataTypeService, member)}, type);
+                        memberCount++;
+                    }
                     pageIndex++;
-                } while (members.Length == pageSize);
+                } while (memberCount == pageSize);
 	        }
 	    }
-
-	    private IEnumerable<XElement> GetSerializedMembers(IEnumerable<IMember> members)
-        {
-            var serializer = new EntityXmlSerializer();
-            foreach (var member in members)
-            {
-                yield return serializer.Serialize(_dataTypeService, member);
-            }
-	    } 
 
 	    protected override XDocument GetXDocument(string xPath, string type)
 	    {

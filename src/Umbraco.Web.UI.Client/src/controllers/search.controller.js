@@ -7,7 +7,7 @@
  * Controls the search functionality in the site
  *  
  */
-function SearchController($scope, searchService, $log, $location, navigationService) {
+function SearchController($scope, searchService, $log, $location, navigationService, $q) {
 
     $scope.searchTerm = null;
     $scope.searchResults = [];
@@ -87,25 +87,41 @@ function SearchController($scope, searchService, $log, $location, navigationServ
         $scope.selectedItem = group.results[itemIndex];
     }
 
-    //watch the value change but don't do the search on every change - that's far too many queries
-    // we need to debounce
-    var debounced = _.debounce(function () {
-        if ($scope.searchTerm) {
-            $scope.isSearching = true;
-            navigationService.showSearch();
-            $scope.selectedItem = undefined;
-            searchService.searchAll({ term: $scope.searchTerm }).then(function (result) {
-                $scope.groups = _.filter(result, function(group){return group.results.length > 0;});
-            });
-        }else{
-            $scope.isSearching = false;
-            navigationService.hideSearch();
-            $scope.selectedItem = undefined;
-        }
-    }, 300);
+    //used to cancel any request in progress if another one needs to take it's place
+    var canceler = null;
 
-    
-    $scope.$watch("searchTerm", debounced);
+    $scope.$watch("searchTerm", _.debounce(function (newVal, oldVal) {
+        $scope.$apply(function() {
+            if ($scope.searchTerm) {
+                if (newVal !== null && newVal !== undefined && newVal !== oldVal) {
+                    $scope.isSearching = true;
+                    navigationService.showSearch();
+                    $scope.selectedItem = undefined;
+
+                    //a canceler exists, so perform the cancelation operation and reset
+                    if (canceler) {
+                        console.log("CANCELED!");
+                        canceler.resolve();
+                        canceler = $q.defer();
+                    }
+                    else {
+                        canceler = $q.defer();
+                    }
+
+                    searchService.searchAll({ term: $scope.searchTerm, canceler: canceler }).then(function(result) {
+                        $scope.groups = _.filter(result, function (group) { return group.results.length > 0; });
+                        //set back to null so it can be re-created
+                        canceler = null;
+                    });
+                }
+            }
+            else {
+                $scope.isSearching = false;
+                navigationService.hideSearch();
+                $scope.selectedItem = undefined;
+            }
+        });
+    }, 200));
 
 }
 //register it

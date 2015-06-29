@@ -15,6 +15,8 @@ namespace umbraco.interfaces
         void Refresh(int Id);
         void Remove(int Id);
         void Refresh(Guid Id);
+
+        //void Notify(object payload);
     }
 
 }

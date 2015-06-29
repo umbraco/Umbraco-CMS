@@ -30,7 +30,7 @@ namespace Umbraco.Tests.PublishedContent
 
             // this is so the model factory looks into the test assembly
             _pluginManager = PluginManager.Current;
-            PluginManager.Current = new PluginManager(false)
+            PluginManager.Current = new PluginManager(new ActivatorServiceProvider(), CacheHelper.RuntimeCache, ProfilingLogger, false)
             {
                 AssembliesToScan = _pluginManager.AssembliesToScan
                     .Union(new[] { typeof(PublishedContentTests).Assembly })

@@ -1,4 +1,7 @@
-﻿using Umbraco.Core.Logging;
+﻿using System.Linq;
+using System.Web;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Routing
@@ -17,17 +20,23 @@ namespace Umbraco.Web.Routing
 		{
 			LogHelper.Debug<ContentFinderByLegacy404>("Looking for a page to handle 404.");
 
-            // TODO - replace the whole logic and stop calling into library!
-			var error404 = global::umbraco.library.GetCurrentNotFoundPageId();
-			var id = int.Parse(error404);
+            // TODO - replace the whole logic
+		    var error404 = NotFoundHandlerHelper.GetCurrentNotFoundPageId(
+                //TODO: The IContentSection should be ctor injected into this class in v8!
+		        UmbracoConfig.For.UmbracoSettings().Content.Error404Collection.ToArray(),
+                //TODO: Is there a better way to extract this value? at least we're not relying on singletons here though
+		        pcr.RoutingContext.UmbracoContext.HttpContext.Request.ServerVariables["SERVER_NAME"],
+                pcr.RoutingContext.UmbracoContext.Application.Services.EntityService,
+                new PublishedContentQuery(pcr.RoutingContext.UmbracoContext.ContentCache, pcr.RoutingContext.UmbracoContext.MediaCache),
+                pcr.RoutingContext.UmbracoContext.Application.Services.DomainService);
 
 			IPublishedContent content = null;
 
-			if (id > 0)
+            if (error404.HasValue)
 			{
-				LogHelper.Debug<ContentFinderByLegacy404>("Got id={0}.", () => id);
+                LogHelper.Debug<ContentFinderByLegacy404>("Got id={0}.", () => error404.Value);
 
-				content = pcr.RoutingContext.UmbracoContext.ContentCache.GetById(id);
+                content = pcr.RoutingContext.UmbracoContext.ContentCache.GetById(error404.Value);
 
 			    LogHelper.Debug<ContentFinderByLegacy404>(content == null
 			        ? "Could not find content with that id."

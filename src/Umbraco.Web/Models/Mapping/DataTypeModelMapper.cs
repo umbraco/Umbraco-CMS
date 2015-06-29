@@ -59,7 +59,7 @@ namespace Umbraco.Web.Models.Mapping
                       });
 
             config.CreateMap<DataTypeSave, IDataTypeDefinition>()
-                .ConstructUsing(save => new DataTypeDefinition(-1, save.SelectedEditor) {CreateDate = DateTime.Now})
+                .ConstructUsing(save => new DataTypeDefinition(save.SelectedEditor) {CreateDate = DateTime.Now})
                 .ForMember(definition => definition.Id, expression => expression.MapFrom(save => Convert.ToInt32(save.Id)))
                 //we have to ignore the Key otherwise this will reset the UniqueId field which should never change!
                 // http://issues.umbraco.org/issue/U4-3911                

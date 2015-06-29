@@ -53,5 +53,8 @@ namespace Umbraco.Core.Models.Rdbms
 
         [ResultColumn]
         public ContentVersionDto ContentVersionDto { get; set; }
+
+        [ResultColumn]
+        public DocumentPublishedReadOnlyDto DocumentPublishedReadOnlyDto { get; set; }
     }
 }

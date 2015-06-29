@@ -65,6 +65,9 @@ angular.module("umbraco.directives")
                                               r.inline = "span";
                                               r.classes = rule.selector.substring(1);
                                           }else if (rule.selector[0] === "#") {
+                                              //Even though this will render in the style drop down, it will not actually be applied
+                                              // to the elements, don't think TinyMCE even supports this and it doesn't really make much sense
+                                              // since only one element can have one id.
                                               r.inline = "span";
                                               r.attributes = { id: rule.selector.substring(1) };
                                           }else {
@@ -134,6 +137,32 @@ angular.module("umbraco.directives")
                                     }, 400);
 
                                 });
+                                
+                                // pin toolbar to top of screen if we have focus and it scrolls off the screen
+                                var pinToolbar = function () {
+
+                                    var _toolbar = $(editor.editorContainer).find(".mce-toolbar");
+                                    var toolbarHeight = _toolbar.height();
+
+                                    var _tinyMce = $(editor.editorContainer);
+                                    var tinyMceRect = _tinyMce[0].getBoundingClientRect();
+                                    var tinyMceTop = tinyMceRect.top;
+                                    var tinyMceBottom = tinyMceRect.bottom;
+
+                                    if (tinyMceTop < 100 && (tinyMceBottom > (100 + toolbarHeight))) {
+                                        _toolbar
+                                            .css("visibility", "visible")
+                                            .css("position", "fixed")
+                                            .css("top", "100px")
+                                            .css("margin-top", "0");
+                                    } else {
+                                        _toolbar
+                                            .css("visibility", "visible")
+                                            .css("position", "absolute")
+                                            .css("top", "auto")
+                                            .css("margin-top", (-toolbarHeight - 2) + "px");
+                                    }
+                                };
 
                                 //when we leave the editor (maybe)
                                 editor.on('blur', function (e) {
@@ -149,6 +178,7 @@ angular.module("umbraco.directives")
                                         }
 
                                         _toolbar.css("visibility", "hidden");
+                                        $('.umb-panel-body').off('scroll', pinToolbar);
                                     });
                                 });
 
@@ -156,17 +186,12 @@ angular.module("umbraco.directives")
                                 editor.on('focus', function (e) {
                                     angularHelper.safeApply(scope, function () {
 
-                                        var _toolbar = $(editor.editorContainer)
-                                             .find(".mce-toolbar");
-
                                         if(scope.onFocus){
                                             scope.onFocus();
                                         }
 
-                                        var toolbarHeight = -_toolbar.height() - 2;
-                                        _toolbar
-                                            .css("visibility", "visible")
-                                            .css("margin-top", toolbarHeight + "px");
+                                        pinToolbar();
+                                        $('.umb-panel-body').on('scroll', pinToolbar);
                                     });
                                 });
 
@@ -174,17 +199,12 @@ angular.module("umbraco.directives")
                                 editor.on('click', function (e) {
                                     angularHelper.safeApply(scope, function () {
 
-                                        var _toolbar = $(editor.editorContainer)
-                                             .find(".mce-toolbar");
-
                                         if(scope.onClick){
                                             scope.onClick();
                                         }
 
-                                        var toolbarHeight = -_toolbar.height() - 2;
-                                        _toolbar
-                                            .css("visibility", "visible")
-                                            .css("margin-top", toolbarHeight + "px");
+                                        pinToolbar();
+                                        $('.umb-panel-body').on('scroll', pinToolbar);
                                     });
                                 });
 
@@ -215,7 +235,7 @@ angular.module("umbraco.directives")
                                 });
 
                                 editor.on('ObjectResized', function (e) {
-                                    var qs = "?width=" + e.width + "px&height=" + e.height + "px";
+                                    var qs = "?width=" + e.width + "&height=" + e.height;
                                     var srcAttr = $(e.target).attr("src");
                                     var path = srcAttr.split("?")[0];
                                     $(e.target).attr("data-mce-src", path + qs);

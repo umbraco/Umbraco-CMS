@@ -17,6 +17,15 @@
   ],
   "dependencies": {
     "typeahead.js": "~0.10.5",
-    "rgrove-lazyload": "*"
+    "underscore": "~1.7.0",
+    "rgrove-lazyload": "*",
+    "bootstrap-social": "~4.8.0",
+    "jquery": "2.0.3",
+    "jquery-file-upload": "~9.4.0",
+    "jquery-ui": "1.10.3",
+    "angular-dynamic-locale": "~0.1.27",
+    "tinymce": "~4.1.10",
+    "bootstrap-tabdrop": "~1.0.0",
+    "codemirror": "~5.3.0"
   }
 }
