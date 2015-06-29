@@ -87,55 +87,44 @@
 
 		function init(contentType){
 
-			vm.contentType = contentType;
-
 			// set all tab to inactive
-			if( vm.contentType.groups.length !== 0 ) {
-				angular.forEach(vm.contentType.groups, function(group){
-					// set state
-					group.tabState = "inActive";
-
-					// push init/placeholder property
-					contentTypeHelper.addInitProperty(group);
+			if( contentType.groups.length !== 0 ) {
+				angular.forEach(contentType.groups, function(group){
 
 					angular.forEach(group.properties, function(property){
-
-						// get data type detaisl for each property
+						// get data type details for each property
 						getDataTypeDetails(property);
-
 					});
-
 
 				});
 			}
 
 			// convert legacy icons
-			convertLegacyIcons();
+			convertLegacyIcons(contentType);
 
 			//set a shared state
-			editorState.set(vm.contentType);
+			editorState.set(contentType);
 
-			// add init tab
-			contentTypeHelper.addInitTab(vm.contentType);
+			vm.contentType = contentType;
 
 		}
 
-		function convertLegacyIcons() {
+		function convertLegacyIcons(contentType) {
 
 			// convert icons for composite content types
-			iconHelper.formatContentTypeIcons(vm.contentType.availableCompositeContentTypes);
+			iconHelper.formatContentTypeIcons(contentType.availableCompositeContentTypes);
 
 			// make array to store contentType icon
 			var contentTypeArray = [];
 
 			// push icon to array
-			contentTypeArray.push({"icon":vm.contentType.icon});
+			contentTypeArray.push({"icon":contentType.icon});
 
 			// run through icon method
 			iconHelper.formatContentTypeIcons(contentTypeArray);
 
 			// set icon back on contentType
-			vm.contentType.icon = contentTypeArray[0].icon;
+			contentType.icon = contentTypeArray[0].icon;
 
 		}
 
@@ -150,7 +139,6 @@
 					});
 			}
 		}
-
 
 
 		/** Syncs the content type  to it's tree node - this occurs on first load and after saving */

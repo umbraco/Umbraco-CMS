@@ -34,80 +34,6 @@ function contentTypeHelper(contentTypeResource) {
 
         },
 
-        addInitTab: function(contentType) {
-
-            // check i init tab already exists
-            var addTab = true;
-
-            angular.forEach(contentType.groups, function(group){
-                if(group.tabState === "init") {
-                    addTab = false;
-                }
-            });
-
-            if(addTab) {
-                contentType.groups.push({
-                    groups: [],
-                    properties:[],
-                    parentTabContentTypes: [],
-                    parentTabContentTypeNames: [],
-                    name: "",
-                    tabState: "init"
-                });
-            }
-
-            return contentType;
-
-        },
-
-        addInitProperty: function(group) {
-
-            var addInitProperty = true;
-
-            // check if there already is an init property
-            angular.forEach(group.properties, function(property){
-                if(property.propertyState === "init") {
-                    addInitProperty = false;
-                }
-            });
-
-            if(addInitProperty) {
-                group.properties.push({
-                    propertyState: "init"
-                });
-            }
-
-            return group;
-
-        },
-
-        addInitPropertyOnActiveTab: function(contentType) {
-
-            var addInitProperty = true;
-
-            angular.forEach(contentType.groups, function(group){
-
-                if(group.tabState === 'active') {
-
-                    angular.forEach(group.properties, function(property){
-                        if(property.propertyState === "init") {
-                            addInitProperty = false;
-                        }
-                    });
-
-                    if(addInitProperty) {
-                        group.properties.push({
-                            propertyState: "init"
-                        });
-                    }
-
-                }
-            });
-
-            return contentType;
-
-        },
-
         mergeCompositeContentType: function (contentType, compositeContentType) {
 
             contentTypeResource.getById(compositeContentType.id).then(function(composition){
@@ -182,7 +108,7 @@ function contentTypeHelper(contentTypeResource) {
                         compositionGroup.parentTabContentTypes.push(compositeContentType.id);
 
                         //push init property to group
-                        contentTypeHelperService.addInitProperty(compositionGroup);
+                        compositionGroup.properties.push({propertyState: "init"});
 
                         // push group before placeholder tab
                         contentType.groups.splice(positionToPush,0,compositionGroup);
