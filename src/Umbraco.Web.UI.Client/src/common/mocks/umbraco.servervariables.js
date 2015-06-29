@@ -20,7 +20,6 @@ Umbraco.Sys.ServerVariables = {
         "entityApiBaseUrl": "/umbraco/UmbracoApi/Entity/",
         "dashboardApiBaseUrl": "/umbraco/UmbracoApi/Dashboard/",
         "updateCheckApiBaseUrl": "/umbraco/Api/UpdateCheck/",
-        "relationApiBaseUrl": "/umbraco/UmbracoApi/Relation/",
         "rteApiBaseUrl": "/umbraco/UmbracoApi/RichTextPreValue/"
     },
     umbracoSettings: {

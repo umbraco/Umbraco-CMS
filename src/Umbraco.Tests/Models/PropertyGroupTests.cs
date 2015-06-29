@@ -15,9 +15,10 @@ namespace Umbraco.Tests.Models
             var pg = new PropertyGroup(
                 new PropertyTypeCollection(new[]
                 {
-                    new PropertyType("TestPropertyEditor", DataTypeDatabaseType.Nvarchar, "test")
+                    new PropertyType("TestPropertyEditor", DataTypeDatabaseType.Nvarchar)
                     {
                         Id = 3,
+                        Alias = "test",
                         CreateDate = DateTime.Now,
                         DataTypeDefinitionId = 5,
                         PropertyEditorAlias = "propTest",
@@ -31,9 +32,10 @@ namespace Umbraco.Tests.Models
                         ValidationRegExp = "xxxx",
                         DataTypeDatabaseType = DataTypeDatabaseType.Nvarchar
                     },
-                    new PropertyType("TestPropertyEditor", DataTypeDatabaseType.Nvarchar, "test2")
+                    new PropertyType("TestPropertyEditor", DataTypeDatabaseType.Nvarchar)
                     {
                         Id = 4,
+                        Alias = "test2",
                         CreateDate = DateTime.Now,
                         DataTypeDefinitionId = 6,
                         PropertyEditorAlias = "propTest",
@@ -94,9 +96,10 @@ namespace Umbraco.Tests.Models
             var pg = new PropertyGroup(
                 new PropertyTypeCollection(new[]
                 {
-                    new PropertyType("TestPropertyEditor", DataTypeDatabaseType.Nvarchar, "test")
+                    new PropertyType("TestPropertyEditor", DataTypeDatabaseType.Nvarchar)
                     {
                         Id = 3,
+                        Alias = "test",
                         CreateDate = DateTime.Now,
                         DataTypeDefinitionId = 5,
                         PropertyEditorAlias = "propTest",
@@ -110,9 +113,10 @@ namespace Umbraco.Tests.Models
                         ValidationRegExp = "xxxx",
                         DataTypeDatabaseType = DataTypeDatabaseType.Nvarchar
                     },
-                    new PropertyType("TestPropertyEditor2", DataTypeDatabaseType.Nvarchar, "test2")
+                    new PropertyType("TestPropertyEditor2", DataTypeDatabaseType.Nvarchar)
                     {
                         Id = 4,
+                        Alias = "test2",
                         CreateDate = DateTime.Now,
                         DataTypeDefinitionId = 6,
                         PropertyEditorAlias = "propTest",

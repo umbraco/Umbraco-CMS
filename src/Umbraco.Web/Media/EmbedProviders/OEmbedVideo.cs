@@ -6,10 +6,12 @@ namespace Umbraco.Web.Media.EmbedProviders
     {
         public override string GetMarkup(string url, int maxWidth, int maxHeight)
         {
-            string requestUrl = BuildFullUrl(url, maxWidth, maxHeight);
-
-            XmlDocument doc = GetXmlResponse(requestUrl);
-            return GetXmlProperty(doc, "/oembed/html");
+            string videoUrl = BuildFullUrl(url, maxWidth, maxHeight) ;
+           
+            XmlDocument doc = GetXmlResponse(videoUrl);
+           
+            // add xslt transformation to return markup
+            return doc.SelectSingleNode("/oembed/html").InnerText;
         }
     }
 }

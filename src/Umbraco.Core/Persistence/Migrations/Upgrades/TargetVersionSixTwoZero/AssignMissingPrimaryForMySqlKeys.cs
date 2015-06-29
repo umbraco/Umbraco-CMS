@@ -1,7 +1,6 @@
 using System.Linq;
 using System.Web.UI;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
@@ -12,15 +11,11 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
     [Migration("6.2.0", 0, GlobalSettings.UmbracoMigrationName)]
     public class AssignMissingPrimaryForMySqlKeys : MigrationBase
     {
-        public AssignMissingPrimaryForMySqlKeys(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
-
         public override void Up()
         {
             if (Context.CurrentDatabaseProvider == DatabaseProviders.MySql)
             {
-                var constraints = SqlSyntax.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
+                var constraints = SqlSyntaxContext.SqlSyntaxProvider.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
                 
                 //This should be 2 because this table has 2 keys
                 if (constraints.Count(x => x.Item1.InvariantEquals("cmsContentTypeAllowedContentType") && x.Item3.InvariantEquals("PRIMARY")) == 0)

@@ -1,0 +1,178 @@
+<!DOCTYPE  html>
+<html>
+  <head>
+    <title>doc</title>
+    <style>
+      /*github.com style (c) Vasily Polovnyov <vast@whiteants.net>*/
+      pre code {
+        display: block; padding: 0.5em;
+        color: #333;
+        background: #f8f8ff
+      }
+      pre .comment,
+      pre .template_comment,
+      pre .diff .header,
+      pre .javadoc {
+        color: #998;
+        font-style: italic
+      }
+      pre .keyword,
+      pre .css .rule .keyword,
+      pre .winutils,
+      pre .javascript .title,
+      pre .nginx .title,
+      pre .subst,
+      pre .request,
+      pre .status {
+        color: #333;
+        font-weight: bold
+      }
+      pre .number,
+      pre .hexcolor,
+      pre .ruby .constant {
+        color: #099;
+      }
+      pre .string,
+      pre .tag .value,
+      pre .phpdoc,
+      pre .tex .formula {
+        color: #d14
+      }
+      pre .title,
+      pre .id {
+        color: #900;
+        font-weight: bold
+      }
+      pre .javascript .title,
+      pre .lisp .title,
+      pre .clojure .title,
+      pre .subst {
+        font-weight: normal
+      }
+      pre .class .title,
+      pre .haskell .type,
+      pre .vhdl .literal,
+      pre .tex .command {
+        color: #458;
+        font-weight: bold
+      }
+      pre .tag,
+      pre .tag .title,
+      pre .rules .property,
+      pre .django .tag .keyword {
+        color: #000080;
+        font-weight: normal
+      }
+      pre .attribute,
+      pre .variable,
+      pre .lisp .body {
+        color: #008080
+      }
+      pre .regexp {
+        color: #009926
+      }
+      pre .class {
+        color: #458;
+        font-weight: bold
+      }
+      pre .symbol,
+      pre .ruby .symbol .string,
+      pre .lisp .keyword,
+      pre .tex .special,
+      pre .prompt {
+        color: #990073
+      }
+      pre .built_in,
+      pre .lisp .title,
+      pre .clojure .built_in {
+        color: #0086b3
+      }
+      pre .preprocessor,
+      pre .pi,
+      pre .doctype,
+      pre .shebang,
+      pre .cdata {
+        color: #999;
+        font-weight: bold
+      }
+      pre .deletion {
+        background: #fdd
+      }
+      pre .addition {
+        background: #dfd
+      }
+      pre .diff .change {
+        background: #0086b3
+      }
+      pre .chunk {
+        color: #aaa
+      }
+    </style>
+  </head>
+  <body>  
+    <h1>Naming conventions</h1>
+<h2>modules handle namespacing,</h2>
+<p>Naming: last one wins
+but to do this automaticly, we would need
+to auto-register all modules needed on app-start.
+This gives us a couple of complications for handling 3rd party applications. 
+As it would be a pain to scan every file for modules to load on app start.</p>
+<p>Proposed structure:
+<a href="http://briantford.com/blog/huuuuuge-angular-apps.html">http://briantford.com/blog/huuuuuge-angular-apps.html</a></p>
+<p>Register all modules in app.js
+Root module: Umbraco
+    - contains the core services: notifications,dialogs,etc
+    - contains the core resources: content,media etc
+    - contains the core directives</p>
+<p>1 module pr file princible</p>
+<p>1st level modules:
+    Umbraco (for misc system-level stuff, dialogs, notifications, etc)
+    Umbraco.PropertyEditors (for all editors, as they are shared between all modules)
+        - how would a 3rd party property editor access a 3rd party service in the Ucommerce module, when its loaded in the content editor? (which is inside the the content module?)
+    Umbraco.Content (registers that it needs umbraco module, for access to core services )
+    Umbraco.Media
+    Umbraco.Settings
+    Ucommerce
+    TeaCommerce
+    Etc</p>
+<p>Should all (core + 3rd party) services, filters and directives just be dependencies in the global umbraco module?</p>
+<p>Each section namespace knows what modules to initially have loaded: 
+Umbraco.Content
+    - EditController
+    - SortController</p>
+<p>Inside the EditController module, it references the needed services:
+    - DialogService
+    - ContentFactory
+    - Etc</p>
+<p>So things are only loaded when needed, due to the modules, and our application, really only needs to know about the root modules, Content,Media,Settings, Ucommerce etc.</p>
+<h2>Directives</h2>
+<p>If more directives have the same name, they will all be run</p>
+<h2>Controllers</h2>
+<p>Last one wins, so you can override core controllers
+Can be namedspaced, but shouldnt, the module is the namespace?
+Module: Umbraco.Section.Area.Page
+Name: PageNameController</p>
+<p>Filename: /umbraco/section/area/pagename.controller.js
+Ex: /umbraco/content/document/edit.controller.js
+Ex: /umbraco/settings/documenttype/edit.controller.js</p>
+<p>There is a need to have an extra level in the content tree urls due to all
+other sections have this as well, and we dont want to confuse the routing.</p>
+<p>The ctrl acronym is horrible and should not be used IMO.</p>
+<h2>Services</h2>
+<p>typeService ? - cant be namespaced
+Module: Umbraco.Services.Type
+Name: TypeService?</p>
+<p>Ex: Umbraco.Services.Notifications.NotificationsService
+Filename: /umbraco/common/services/notifcations.service.js</p>
+<h2>Resources</h2>
+<ul>
+<li>Content, media, etc, cant be namespaced:
+Module: Umbraco.Resources.Type
+Name: TypeFactory?</li>
+</ul>
+<p>Ex: Umbraco.Resources.Content.ContentFactory?
+filename: /umbraco/common/resources/content.resources.js ? or
+/umbraco/common/resoures/content.factory.js ?</p>
+
+  </body>
+</html>

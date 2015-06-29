@@ -5,6 +5,8 @@ using System.Text;
 
 using Umbraco.Core;
 using Umbraco.Core.ObjectResolution;
+using Umbraco.Tests.TestHelpers;
+
 using NUnit.Framework;
 
 namespace Umbraco.Tests.Resolvers
@@ -15,6 +17,7 @@ namespace Umbraco.Tests.Resolvers
         [SetUp]
         public void Setup()
         {
+            TestHelper.SetupLog4NetForTests();
         }
 
         [TearDown]

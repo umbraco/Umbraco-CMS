@@ -133,7 +133,6 @@ namespace umbraco
         /// Gets a value indicating whether the current version of umbraco is configured.
         /// </summary>
         /// <value><c>true</c> if configured; otherwise, <c>false</c>.</value>
-        [Obsolete("Do not use this, it is no longer in use and will be removed from the codebase in future versions")]
         public static bool Configured
         {
 			get { return Umbraco.Core.Configuration.GlobalSettings.Configured; }
@@ -317,7 +316,7 @@ namespace umbraco
         [Obsolete("Use Umbraco.Core.Configuration.UmbracoVersion.Current instead", false)]
         public static string VersionComment
         {
-			get { return UmbracoVersion.CurrentComment; }
+			get { return Umbraco.Core.Configuration.UmbracoVersion.CurrentComment; }
         }
 
 

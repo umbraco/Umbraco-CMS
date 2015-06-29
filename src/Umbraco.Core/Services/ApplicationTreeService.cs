@@ -15,7 +15,6 @@ namespace Umbraco.Core.Services
 {
     internal class ApplicationTreeService : IApplicationTreeService
     {
-        private readonly ILogger _logger;
         private readonly CacheHelper _cache;
         private IEnumerable<ApplicationTree> _allAvailableTrees;
         private volatile bool _isInitialized = false;
@@ -23,12 +22,12 @@ namespace Umbraco.Core.Services
         private static string _treeConfig;
         private static readonly object Locker = new object();
 
-        public ApplicationTreeService(ILogger logger, CacheHelper cache)
+        public ApplicationTreeService(CacheHelper cache)
         {
-            _logger = logger;
             _cache = cache;
         }
 
+        
 
         /// <summary>
         /// gets/sets the trees.config file path
@@ -129,7 +128,7 @@ namespace Umbraco.Core.Services
                     return list;
 
 
-                }, new TimeSpan(0, 10, 0));
+                });
         }
 
         /// <summary>
@@ -341,7 +340,7 @@ namespace Umbraco.Core.Services
                     var clrType = Type.GetType(type);
                     if (clrType == null)
                     {
-                        _logger.Warn<ApplicationTreeService>("The tree definition: " + addElement.ToString() + " could not be resolved to a .Net object type");
+                        LogHelper.Warn<ApplicationTreeService>("The tree definition: " + addElement.ToString() + " could not be resolved to a .Net object type");
                         continue;
                     }
 

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
-using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
@@ -87,7 +85,7 @@ namespace Umbraco.Tests.Persistence.Querying
         public void Model_Expression_Value_Does_Not_Get_Double_Escaped()
         {
             //mysql escapes backslashes, so we'll test with that
-            SqlSyntaxContext.SqlSyntaxProvider = new MySqlSyntaxProvider(Mock.Of<ILogger>());
+            SqlSyntaxContext.SqlSyntaxProvider = MySqlSyntax.Provider;
 
             Expression<Func<IUser, bool>> predicate = user => user.Username.Equals("mydomain\\myuser");
             var modelToSqlExpressionHelper = new ModelToSqlExpressionHelper<IUser>();
@@ -104,7 +102,7 @@ namespace Umbraco.Tests.Persistence.Querying
         public void Poco_Expression_Value_Does_Not_Get_Double_Escaped()
         {
             //mysql escapes backslashes, so we'll test with that
-            SqlSyntaxContext.SqlSyntaxProvider = new MySqlSyntaxProvider(Mock.Of<ILogger>());
+            SqlSyntaxContext.SqlSyntaxProvider = MySqlSyntax.Provider;
 
             Expression<Func<UserDto, bool>> predicate = user => user.Login.StartsWith("mydomain\\myuser");
             var modelToSqlExpressionHelper = new PocoToSqlExpressionHelper<UserDto>();

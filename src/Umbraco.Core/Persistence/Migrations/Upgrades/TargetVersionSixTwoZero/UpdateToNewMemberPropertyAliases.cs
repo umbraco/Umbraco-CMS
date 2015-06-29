@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
 {
@@ -11,16 +10,12 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
     [Migration("6.2.0", 4, GlobalSettings.UmbracoMigrationName)]
     public class UpdateToNewMemberPropertyAliases : MigrationBase
     {
-        public UpdateToNewMemberPropertyAliases(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
-
         public override void Up()
         {
             Execute.Code(Update);
         }
 
-        internal string Update(Database database)
+        internal static string Update(Database database)
         {
             if (database != null)
             {
@@ -80,7 +75,7 @@ WHERE umbracoNode.nodeObjectType = @objectType";
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error<UpdateToNewMemberPropertyAliases>("Exception was thrown when trying to upgrade old member aliases to the new ones", ex);
+                        LogHelper.Error<UpdateToNewMemberPropertyAliases>("Exception was thrown when trying to upgrade old member aliases to the new ones", ex);
                         throw;
                     }
                 }

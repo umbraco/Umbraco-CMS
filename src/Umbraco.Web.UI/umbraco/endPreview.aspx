@@ -1,24 +1,16 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" Inherits="System.Web.UI.Page" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="endPreview.aspx.cs" Inherits="umbraco.presentation.endPreview" %>
 
-<script runat="server">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-    protected override void OnLoad(EventArgs e)
-    {
-        base.OnLoad(e);
-
-        global::umbraco.presentation.preview.PreviewContent.ClearPreviewCookie();
-
-        if (!Uri.IsWellFormedUriString(Request.QueryString["redir"], UriKind.Relative))
-        {
-            Response.Redirect("/", true);
-        }
-        Uri url;
-        if (!Uri.TryCreate(Request.QueryString["redir"], UriKind.Relative, out url))
-        {
-            Response.Redirect("/", true);
-        }
-
-        Response.Redirect(url.ToString(), true);
-    }
-
-</script>
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head runat="server">
+    <title></title>
+</head>
+<body>
+    <form id="form1" runat="server">
+    <div>
+        Redirecting...
+    </div>
+    </form>
+</body>
+</html>

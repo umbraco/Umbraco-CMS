@@ -6,7 +6,6 @@
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
     <umb:JsInclude runat="server" FilePath="Dialogs/AssignDomain2.js" PathNameAlias="UmbracoClient" />
-    <umb:JsInclude runat="server" FilePath="PunyCode/punycode.min.js" PathNameAlias="UmbracoClient" />
     <umb:JsInclude runat="server" FilePath="Application/JQuery/jquery.validate.min.js" PathNameAlias="UmbracoClient" />
     <umb:CssInclude runat="server" FilePath="Dialogs/AssignDomain2.css" PathNameAlias="UmbracoClient" />
     <script type="text/javascript">
@@ -53,7 +52,7 @@
                     <tbody data-bind="foreach: domains">
                         <tr>
                             <td valign="top">
-                                <input class="domain" data-bind="value: Name, uniqueName: true" /><input type="hidden" value="0" data-bind="uniqueName: true"/></td>
+                                <input class="domain" data-bind="value: Name, uniqueName: true" /><input type="hidden" value="0" /></td>
                             <td valign="top">
                                 <select class="language" data-bind="options: $parent.languages, optionsText: 'Code', optionsValue: 'Id', value: Lang, uniqueName: true"></select></td>
                             <td valign="top"><a href="#" class="btn btn-danger" data-bind="click: $parent.removeDomain"><i class="icon icon-trash"></i></a></td>

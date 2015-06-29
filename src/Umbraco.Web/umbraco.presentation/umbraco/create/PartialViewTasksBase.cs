@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
@@ -44,10 +43,9 @@ namespace umbraco
             {
                 fileName += ".cshtml";
             }
-
+            
             var model = new PartialView(fileName);
             var fileService = (FileService)ApplicationContext.Current.Services.FileService;
-            var macroService = ApplicationContext.Current.Services.MacroService;
 
             if (IsPartialViewMacro == false)
             {
@@ -61,17 +59,8 @@ namespace umbraco
                 return attempt.Success;
             }
             else
-            {
-
-                var attempt = fileService.CreatePartialViewMacro(model, /*ParentID == 1,*/ snippetName, User.Id);
-                // if ParentId = 0 then that means that the "Create macro" checkbox was OFF, so don't try to create an actual macro
-                // See PartialViewMacro.ascx.cs and PartialView.ascx.cs: SubmitButton_Click
-                if (attempt && ParentID != 0)
-                {
-                    //The partial view path to be saved with the macro must be a fully qualified virtual path
-                    var virtualPath = string.Format("{0}/{1}/{2}", SystemDirectories.MvcViews, "MacroPartials", attempt.Result.Path);
-                    macroService.Save(new Macro(attempt.Result.Alias, attempt.Result.Alias) { ScriptPath = virtualPath });
-                }
+            {             
+                var attempt = fileService.CreatePartialViewMacro(model, ParentID == 1, snippetName, User.Id);
 
                 //TODO: We currently need to hack this because we are using the same editor for views, partial views, partial view macros and 
                 // the editor is using normal UI whereas the partial view repo and these classes are using IFileSystem with relative references
@@ -80,13 +69,13 @@ namespace umbraco
                 _returnUrl = string.Format("settings/views/EditView.aspx?treeType=partialViewMacros&file={0}", model.Path.TrimStart('/').EnsureStartsWith("MacroPartials/"));
                 return attempt.Success;
             }
-
+            
         }
 
         public override bool PerformDelete()
         {
             var fileService = (FileService)ApplicationContext.Current.Services.FileService;
-
+            
             if (IsPartialViewMacro == false)
             {
                 if (Alias.Contains(".") == false)

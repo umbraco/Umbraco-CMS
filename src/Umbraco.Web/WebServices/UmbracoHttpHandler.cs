@@ -3,7 +3,6 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
 
@@ -33,22 +32,6 @@ namespace Umbraco.Web.WebServices
         public ApplicationContext ApplicationContext
         {
             get { return UmbracoContext.Application; }
-        }
-
-        /// <summary>
-        /// Returns an ILogger
-        /// </summary>
-        public ILogger Logger
-        {
-            get { return ProfilingLogger.Logger; }
-        }
-
-        /// <summary>
-        /// Returns a ProfilingLogger
-        /// </summary>
-        public ProfilingLogger ProfilingLogger
-        {
-            get { return UmbracoContext.Application.ProfilingLogger; }
         }
 
         /// <summary>

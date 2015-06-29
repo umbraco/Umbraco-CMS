@@ -5,7 +5,7 @@
 * @element ANY
 * @restrict E
 **/
-function treeSearchBox(localizationService, searchService, $q) {
+function treeSearchBox(localizationService, searchService) {
     return {
         scope: {
             searchFromId: "@",
@@ -34,37 +34,19 @@ function treeSearchBox(localizationService, searchService, $q) {
                 scope.showSearch = "false";
             }
 
-            //used to cancel any request in progress if another one needs to take it's place
-            var canceler = null;
-
             function performSearch() {
                 if (scope.term) {
                     scope.results = [];
-                    
-                    //a canceler exists, so perform the cancelation operation and reset
-                    if (canceler) {
-                        console.log("CANCELED!");
-                        canceler.resolve();
-                        canceler = $q.defer();
-                    }
-                    else {
-                        canceler = $q.defer();
-                    }
 
                     var searchArgs = {
-                        term: scope.term,
-                        canceler: canceler
+                        term: scope.term
                     };
-
                     //append a start node context if there is one
                     if (scope.searchFromId) {
                         searchArgs["searchFrom"] = scope.searchFromId;
                     }
-
                     searcher(searchArgs).then(function (data) {
                         scope.searchCallback(data);
-                        //set back to null so it can be re-created
-                        canceler = null;
                     });
                 }
             }

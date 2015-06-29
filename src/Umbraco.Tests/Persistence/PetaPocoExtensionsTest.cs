@@ -176,8 +176,9 @@ namespace Umbraco.Tests.Persistence
             }
             contentType = MockedContentTypes.CreateSimpleContentType("umbMandatory" + Guid.NewGuid().ToString("N"), "Mandatory Doc Type", true);
             contentType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType("test", DataTypeDatabaseType.Ntext, "tags")
+                new PropertyType("test", DataTypeDatabaseType.Ntext)
                 {
+                    Alias = "tags",
                     DataTypeDefinitionId = 1041
                 });
             contentTypeService.Save(contentType);
@@ -222,16 +223,16 @@ namespace Umbraco.Tests.Persistence
             {
                 servers.Add(new ServerRegistrationDto
                     {
-                        ServerAddress = "address" + i,
-                        ServerIdentity = "computer" + i,
+                        Address = "address" + i,
+                        ComputerName = "computer" + i,
                         DateRegistered = DateTime.Now,
                         IsActive = true,
-                        DateAccessed = DateTime.Now
+                        LastNotified = DateTime.Now
                     });
             }
 
             // Act
-            using (ProfilingLogger.TraceDuration<PetaPocoExtensionsTest>("starting insert", "finished insert"))
+            using (DisposableTimer.TraceDuration<PetaPocoExtensionsTest>("starting insert", "finished insert"))
             {
                 db.BulkInsertRecords(servers);    
             }
@@ -251,11 +252,11 @@ namespace Umbraco.Tests.Persistence
             {
                 servers.Add(new ServerRegistrationDto
                     {
-                        ServerAddress = "address" + i,
-                        ServerIdentity = "computer" + i,
+                        Address = "address" + i,
+                        ComputerName = "computer" + i,
                         DateRegistered = DateTime.Now,
                         IsActive = true,
-                        DateAccessed = DateTime.Now
+                        LastNotified = DateTime.Now
                     });
             }
             db.OpenSharedConnection();
@@ -282,11 +283,11 @@ namespace Umbraco.Tests.Persistence
             {
                 servers.Add(new ServerRegistrationDto
                 {
-                    ServerAddress = "address" + i,
-                    ServerIdentity = "computer" + i,
+                    Address = "address" + i,
+                    ComputerName = "computer" + i,
                     DateRegistered = DateTime.Now,
                     IsActive = true,
-                    DateAccessed = DateTime.Now
+                    LastNotified = DateTime.Now
                 });
             }
             db.OpenSharedConnection();

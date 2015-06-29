@@ -8,11 +8,10 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
-
+using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -23,9 +22,11 @@ namespace Umbraco.Core.Persistence.Repositories
     internal abstract class VersionableRepositoryBase<TId, TEntity> : PetaPocoRepositoryBase<TId, TEntity>
         where TEntity : class, IAggregateRoot
     {
+        protected VersionableRepositoryBase(IDatabaseUnitOfWork work) : base(work)
+        {
+        }
 
-        protected VersionableRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-            : base(work, cache, logger, sqlSyntax)
+        protected VersionableRepositoryBase(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache) : base(work, cache)
         {
         }
 
@@ -274,7 +275,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="orderDirection">The order direction.</param>
         /// <returns></returns>
         /// <exception cref="System.ArgumentNullException">orderBy</exception>
-        protected IEnumerable<TEntity> GetPagedResultsByQuery<TDto, TContentBase>(IQuery<TEntity> query, long pageIndex, int pageSize, out long totalRecords,
+        protected IEnumerable<TEntity> GetPagedResultsByQuery<TDto,TContentBase>(IQuery<TEntity> query, int pageIndex, int pageSize, out int totalRecords,
             Tuple<string, string> nodeIdSelect,
             Func<Sql, IEnumerable<TEntity>> processQuery,
             string orderBy, 
@@ -471,7 +472,7 @@ WHERE EXISTS(
 
                     if (result.ContainsKey(def.Id))
                     {
-                        Logger.Warn<VersionableRepositoryBase<TId, TEntity>>("The query returned multiple property sets for document definition " + def.Id + ", " + def.Composition.Name);
+                        LogHelper.Warn<VersionableRepositoryBase<TId, TEntity>>("The query returned multiple property sets for document definition " + def.Id + ", " + def.Composition.Name);
                     }
                     result[def.Id] = new PropertyCollection(properties);
                 }                

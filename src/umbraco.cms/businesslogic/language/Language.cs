@@ -6,9 +6,8 @@ using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Services;
+
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 using System.Linq;
@@ -24,13 +23,14 @@ namespace umbraco.cms.businesslogic.language
     /// Besides by using the built in Dictionary you are able to store language specific bits and pieces of translated text
     /// for use in templates.
     /// </summary>
-    [Obsolete("Use the LocalizationService instead")]
     public class Language
     {
         #region Private members
-
-        internal ILanguage LanguageEntity { get; private set; }
-
+        private int _id;
+        private string _name = "";
+        private string _friendlyName;
+        private string _cultureAlias; 
+        private static readonly object Locker = new object();
         #endregion
 
         #region Constants and static members
@@ -56,22 +56,21 @@ namespace umbraco.cms.businesslogic.language
         /// <param name="id">The id.</param>
         public Language(int id)
         {
-            LanguageEntity = ApplicationContext.Current.Services.LocalizationService.GetLanguageById(id);
-            if (LanguageEntity == null)
+            var lang = GetAllAsList().SingleOrDefault(x => x.id == id);
+            if (lang == null)
             {
                 throw new ArgumentException("No language found with the specified id");
             }
+            
+            _id = lang.id;
+            _cultureAlias = lang.CultureAlias;
+            _friendlyName = lang.FriendlyName;
         }
 
         /// <summary>
         /// Empty constructor used to create a language object manually
         /// </summary>
         internal Language() { }
-
-        internal Language(ILanguage langEntity)
-        {
-            LanguageEntity = langEntity;
-        }
 
         #endregion
 
@@ -83,17 +82,18 @@ namespace umbraco.cms.businesslogic.language
         /// <param name="cultureCode">Culturecode of the language</param>
         public static void MakeNew(string cultureCode)
         {
-            var culture = GetCulture(cultureCode);
-            if (culture != null)
+            lock (Locker)
             {
-                //insert it
-                var lang = new Umbraco.Core.Models.Language(cultureCode)
+                var culture = GetCulture(cultureCode);
+                if (culture != null)
                 {
-                    CultureName = culture.DisplayName
-                };
-                ApplicationContext.Current.Services.LocalizationService.Save(lang);
-                var ct = new Language(lang);
-                ct.OnNew(new NewEventArgs());
+                    //insert it
+                    var newId = ApplicationContext.Current.DatabaseContext.Database.Insert(new LanguageDto { IsoCode = cultureCode });
+                    var ct = new Language { _id = Convert.ToInt32(newId), _cultureAlias = cultureCode };
+                    ct.UpdateNames();
+                    ct.OnNew(new NewEventArgs());
+                     
+                }
             }
         }
 
@@ -118,9 +118,23 @@ namespace umbraco.cms.businesslogic.language
         /// </remarks>
         public static IEnumerable<Language> GetAllAsList()
         {
-            var all = ApplicationContext.Current.Services.LocalizationService.GetAllLanguages().Select(x => new Language(x)).ToArray();
-            return all;
+            return ApplicationContext.Current.ApplicationCache.GetCacheItem<IEnumerable<Language>>(
+                CacheKeys.LanguageCacheKey,
+                TimeSpan.FromMinutes(60),
+                () =>
+                    {
+                        var languages = new List<Language>();
+                        var dtos = ApplicationContext.Current.DatabaseContext.Database.Fetch<LanguageDto>("");
+                        foreach (var dto in dtos)
+                        {
+                            var ct = new Language {_id = dto.Id, _cultureAlias = dto.IsoCode};
+                            ct.UpdateNames();
+                            languages.Add(ct);
+                        }
+                        return languages;
+                    });
         }
+
       
 
         /// <summary>
@@ -130,10 +144,7 @@ namespace umbraco.cms.businesslogic.language
         /// <returns></returns>
         public static Language GetByCultureCode(string cultureCode)
         {
-            var found = ApplicationContext.Current.Services.LocalizationService.GetLanguageByIsoCode(cultureCode);
-            if (found == null) return null;
-            var lang = new Language(found);
-            return lang;
+            return GetAllAsList().SingleOrDefault(x => x.CultureAlias == cultureCode);
         }
 
         private static CultureInfo GetCulture(string cultureCode)
@@ -155,7 +166,6 @@ namespace umbraco.cms.businesslogic.language
         /// </summary>
         /// <param name="xmlData">The XML data.</param>
         /// <returns></returns>
-        [Obsolete("This is no longer used and will be removed in future versions")]
         public static Language Import(XmlNode xmlData)
         {
             var cA = xmlData.Attributes["CultureAlias"].Value;
@@ -175,7 +185,7 @@ namespace umbraco.cms.businesslogic.language
         /// </summary>
         public int id
         {
-            get { return LanguageEntity.Id; }
+            get { return _id; }
         }
 
         /// <summary>
@@ -183,10 +193,16 @@ namespace umbraco.cms.businesslogic.language
         /// </summary>
         public string CultureAlias
         {
-            get { return LanguageEntity.IsoCode; }
+            get { return _cultureAlias; }
             set
             {
-                LanguageEntity.IsoCode = value;
+                _cultureAlias = value;
+                ApplicationContext.Current.DatabaseContext.Database.Update<LanguageDto>(
+                    "set languageISOCode = @cultureAlias where id = @id",
+                    new { cultureAlias = _cultureAlias,id=id}
+                    );
+ 
+                UpdateNames();
             }
         }
 
@@ -195,7 +211,7 @@ namespace umbraco.cms.businesslogic.language
         /// </summary>
         public string FriendlyName
         {
-            get { return LanguageEntity.CultureInfo.DisplayName; }
+            get { return _friendlyName; }
         } 
         #endregion
 
@@ -226,15 +242,12 @@ namespace umbraco.cms.businesslogic.language
         }
 
         /// <summary>
-        /// Used to persist object changes to the database
+        /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
         /// </summary>
         public virtual void Save()
         {
             var e = new SaveEventArgs();
             FireBeforeSave(e);
-
-            //Do the update!
-            ApplicationContext.Current.Services.LocalizationService.Save(LanguageEntity);
 
             if (!e.Cancel)
             {
@@ -251,25 +264,32 @@ namespace umbraco.cms.businesslogic.language
         /// You cannot delete the default language: en-US, this is installed by default and is required.
         /// </remarks>
         public void Delete()
-        {
-            if (ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<int>("SELECT count(id) FROM umbracoDomains where domainDefaultLanguage = @id", new { id = id }) == 0)
+        {            
+            lock (Locker)
             {
-                var e = new DeleteEventArgs();
-                FireBeforeDelete(e);
 
-                if (!e.Cancel)
+                if (ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<int>("SELECT count(id) FROM umbracoDomains where domainDefaultLanguage = @id", new { id = id }) == 0)
                 {
-                    ApplicationContext.Current.Services.LocalizationService.Delete(LanguageEntity);
+                    var e = new DeleteEventArgs();
+                    FireBeforeDelete(e);
 
-                    FireAfterDelete(e);
+                    if (!e.Cancel)
+                    {
+                        //remove the dictionary entries first
+                        Item.RemoveByLanguage(id);
+
+                        ApplicationContext.Current.DatabaseContext.Database.Delete<LanguageDto>("where id = @id",
+                                                                                                new {id = id});
+                        FireAfterDelete(e);
+                    }
                 }
-            }
-            else
-            {
-                var e = new DataException("Cannot remove language " + LanguageEntity.CultureInfo.DisplayName + " because it's attached to a domain on a node");
-                LogHelper.Error<Language>("Cannot remove language " + LanguageEntity.CultureInfo.DisplayName + " because it's attached to a domain on a node", e);
-                throw e;
-            }           
+                else
+                {
+                    var e = new DataException("Cannot remove language " + _friendlyName + " because it's attached to a domain on a node");
+                    LogHelper.Error<Language>("Cannot remove language " + _friendlyName + " because it's attached to a domain on a node", e);
+                    throw e;
+                }   
+            }            
         }
 
         /// <summary>
@@ -279,10 +299,42 @@ namespace umbraco.cms.businesslogic.language
         /// <returns></returns>
         public XmlNode ToXml(XmlDocument xd)
         {
-            var serializer = new EntityXmlSerializer();
-            var xml = serializer.Serialize(LanguageEntity);
-            return xml.GetXmlNode(xd);
+            var language = xd.CreateElement("Language");
+            language.Attributes.Append(XmlHelper.AddAttribute(xd, "Id", id.ToString()));
+            language.Attributes.Append(XmlHelper.AddAttribute(xd, "CultureAlias", CultureAlias));
+            language.Attributes.Append(XmlHelper.AddAttribute(xd, "FriendlyName", FriendlyName));
+
+            return language;
         } 
+        #endregion
+
+        #region Protected methods
+
+        protected void PopulateFromReader(IRecordsReader dr)
+        {
+            _id = Convert.ToInt32(dr.GetShort("id"));
+            _cultureAlias = dr.GetString("languageISOCode");
+            
+            UpdateNames();
+        }
+
+        #endregion
+
+        #region Private methods
+
+        private void UpdateNames()
+        {
+            try
+            {
+                var ci = new CultureInfo(_cultureAlias);
+                _friendlyName = ci.DisplayName;
+            }
+            catch
+            {
+                _friendlyName = _name + "(unknown Culture)";
+            }
+        } 
+
         #endregion
 
         #region Events

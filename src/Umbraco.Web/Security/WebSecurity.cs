@@ -1,16 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 using System.Web.Security;
-using AutoMapper;
+using Newtonsoft.Json.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
+using Umbraco.Web.Models;
+using Umbraco.Web.Models.ContentEditing;
 using umbraco;
+using umbraco.DataLayer;
 using umbraco.businesslogic.Exceptions;
+using umbraco.providers;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
+using Member = umbraco.cms.businesslogic.member.Member;
 using User = umbraco.BusinessLogic.User;
 
 namespace Umbraco.Web.Security
@@ -27,6 +35,10 @@ namespace Umbraco.Web.Security
         {
             _httpContext = httpContext;
             _applicationContext = applicationContext;
+            //This ensures the dispose method is called when the request terminates, though
+            // we also ensure this happens in the Umbraco module because the UmbracoContext is added to the
+            // http context items.
+            _httpContext.DisposeOnPipelineCompleted(this);
         }
         
         /// <summary>
@@ -58,7 +70,7 @@ namespace Umbraco.Web.Security
         /// Gets the current user.
         /// </summary>
         /// <value>The current user.</value>
-        public virtual IUser CurrentUser
+        public IUser CurrentUser
         {
             get
             {
@@ -82,7 +94,7 @@ namespace Umbraco.Web.Security
         /// </summary>
         /// <param name="userId">The user Id</param>
         /// <returns>returns the number of seconds until their session times out</returns>
-        public virtual double PerformLogin(int userId)
+        public double PerformLogin(int userId)
         {
             var user = _applicationContext.Services.UserService.GetUserById(userId);
             return PerformLogin(user).GetRemainingAuthSeconds();
@@ -92,21 +104,21 @@ namespace Umbraco.Web.Security
         /// Logs the user in
         /// </summary>
         /// <param name="user"></param>
-        /// <returns>returns the Forms Auth ticket created which is used to log them in</returns>
-        public virtual FormsAuthenticationTicket PerformLogin(IUser user)
+        /// <returns>returns the number of seconds until their session times out</returns>
+        public FormsAuthenticationTicket PerformLogin(IUser user)
         {
-            //clear the external cookie - we do this without owin context because we're writing cookies directly to httpcontext 
-            // and cookie handling is different with httpcontext vs webapi and owin, normally we'd do:
-            //_httpContext.GetOwinContext().Authentication.SignOut(Constants.Security.BackOfficeExternalAuthenticationType);
-
-            var externalLoginCookie = _httpContext.Request.Cookies.Get(Constants.Security.BackOfficeExternalCookieName);
-            if (externalLoginCookie != null)
+            var ticket = _httpContext.CreateUmbracoAuthTicket(new UserData(Guid.NewGuid().ToString("N"))
             {
-                externalLoginCookie.Expires = DateTime.Now.AddYears(-1);
-                _httpContext.Response.Cookies.Set(externalLoginCookie);
-            }
-
-            var ticket = _httpContext.CreateUmbracoAuthTicket(Mapper.Map<UserData>(user));
+                Id = user.Id,
+                AllowedApplications = user.AllowedSections.ToArray(),
+                RealName = user.Name,
+                //currently we only have one user type!
+                Roles = new[] { user.UserType.Alias },
+                StartContentNode = user.StartContentId,
+                StartMediaNode = user.StartMediaId,
+                Username = user.Username,
+                Culture = ui.Culture(user.Language)
+            });
             
             LogHelper.Info<WebSecurity>("User Id: {0} logged in", () => user.Id);
 
@@ -116,7 +128,7 @@ namespace Umbraco.Web.Security
         /// <summary>
         /// Clears the current login for the currently logged in user
         /// </summary>
-        public virtual void ClearCurrentLogin()
+        public void ClearCurrentLogin()
         {
             _httpContext.UmbracoLogout();
         }
@@ -124,7 +136,7 @@ namespace Umbraco.Web.Security
         /// <summary>
         /// Renews the user's login ticket
         /// </summary>
-        public virtual void RenewLoginTimeout()
+        public void RenewLoginTimeout()
         {
             _httpContext.RenewUmbracoAuthTicket();
         }
@@ -135,7 +147,7 @@ namespace Umbraco.Web.Security
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public virtual bool ValidateBackOfficeCredentials(string username, string password)
+        public bool ValidateBackOfficeCredentials(string username, string password)
         {
             var membershipProvider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
             return membershipProvider != null && membershipProvider.ValidateUser(username, password);
@@ -147,7 +159,7 @@ namespace Umbraco.Web.Security
         /// <param name="username"></param>
         /// <param name="setOnline"></param>
         /// <returns></returns>
-        public virtual MembershipUser GetBackOfficeMembershipUser(string username, bool setOnline)
+        public MembershipUser GetBackOfficeMembershipUser(string username, bool setOnline)
         {
             var membershipProvider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
             return membershipProvider != null ? membershipProvider.GetUser(username, setOnline) : null;
@@ -210,6 +222,7 @@ namespace Umbraco.Web.Security
                 Language = GlobalSettings.DefaultUILanguage,
                 Name = membershipUser.UserName,
                 RawPasswordValue = Guid.NewGuid().ToString("N"), //Need to set this to something - will not be used though
+                DefaultPermissions = writer.Permissions,
                 Username = membershipUser.UserName,
                 StartContentId = -1,
                 StartMediaId = -1,
@@ -271,9 +284,9 @@ namespace Umbraco.Web.Security
         /// Gets the currnet user's id.
         /// </summary>
         /// <returns></returns>
-        public virtual int GetUserId()
+        public int GetUserId()
         {
-            var identity = _httpContext.GetCurrentIdentity(false);
+            var identity = _httpContext.GetCurrentIdentity(true);
             if (identity == null)
                 return -1;
             return Convert.ToInt32(identity.Id);
@@ -283,9 +296,9 @@ namespace Umbraco.Web.Security
         /// Returns the current user's unique session id - used to mitigate csrf attacks or any other reason to validate a request
         /// </summary>
         /// <returns></returns>
-        public virtual string GetSessionId()
+        public string GetSessionId()
         {
-            var identity = _httpContext.GetCurrentIdentity(false);
+            var identity = _httpContext.GetCurrentIdentity(true);
             if (identity == null)
                 return null;
             return identity.SessionId;
@@ -306,40 +319,41 @@ namespace Umbraco.Web.Security
         /// Validates the currently logged in user and ensures they are not timed out
         /// </summary>
         /// <returns></returns>
-        public virtual bool ValidateCurrentUser()
+        public bool ValidateCurrentUser()
         {
             var result = ValidateCurrentUser(false);
-            return result == ValidateRequestAttempt.Success; 
+            return result == ValidateRequestAttempt.Success;
         }
 
         /// <summary>
-        /// Validates the current user assigned to the request and ensures the stored user data is valid
+        /// Validates the current user
         /// </summary>
         /// <param name="throwExceptions">set to true if you want exceptions to be thrown if failed</param>
         /// <returns></returns>
         internal ValidateRequestAttempt ValidateCurrentUser(bool throwExceptions)
         {
-            //This will first check if the current user is already authenticated - which should be the case in nearly all circumstances
-            // since the authentication happens in the Module, that authentication also checks the ticket expiry. We don't 
-            // need to check it a second time because that requires another decryption phase and nothing can tamper with it during the request.
+            var ticket = _httpContext.GetUmbracoAuthTicket();
 
-            if (_httpContext.User.Identity.IsAuthenticated == false) 
+            if (ticket != null)
             {
-                //There is no user
-                if (throwExceptions) throw new InvalidOperationException("The user has no umbraco contextid - try logging in");
-                return ValidateRequestAttempt.FailedNoContextId;
+                if (ticket.Expired == false)
+                {
+                    var user = CurrentUser;
+
+                    // Check for console access
+                    if (user.IsApproved == false || (user.IsLockedOut && GlobalSettings.RequestIsInUmbracoApplication(_httpContext)))
+                    {
+                        if (throwExceptions) throw new ArgumentException("You have no priviledges to the umbraco console. Please contact your administrator");
+                        return ValidateRequestAttempt.FailedNoPrivileges;
+                    }                    
+                    return ValidateRequestAttempt.Success;
+                }
+                if (throwExceptions) throw new ArgumentException("User has timed out!!");
+                return ValidateRequestAttempt.FailedTimedOut;
             }
 
-            var user = CurrentUser;
-
-            // Check for console access
-            if (user == null || user.IsApproved == false || (user.IsLockedOut && GlobalSettings.RequestIsInUmbracoApplication(_httpContext)))
-            {
-                if (throwExceptions) throw new ArgumentException("You have no priviledges to the umbraco console. Please contact your administrator");
-                return ValidateRequestAttempt.FailedNoPrivileges;
-            }
-            return ValidateRequestAttempt.Success;
-
+            if (throwExceptions) throw new InvalidOperationException("The user has no umbraco contextid - try logging in");
+            return ValidateRequestAttempt.FailedNoContextId;
         }
 
         /// <summary>

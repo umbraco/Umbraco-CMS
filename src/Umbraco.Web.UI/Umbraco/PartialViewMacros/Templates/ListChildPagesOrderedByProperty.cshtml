@@ -1,26 +1,18 @@
 @inherits Umbraco.Web.Macros.PartialViewMacroPage
-
 @*
-    Macro to list all child pages with a specific property, sorted by the value of that property.
-
-    How it works:
-        - Confirm the propertyAlias macro parameter has been passed in with a value
-        - Loop through all child pages that have the propertyAlias
-        - Display a list of link to those pages, sorted by the value of the propertyAlias
-
-    Macro Parameters To Create, for this macro to work:
+    Macro parameter to be set on the macro
     Alias:propertyAlias     Name:Property Alias    Type:Textbox
-*@
+*@   
 
-@{ var propertyAlias = Model.MacroParameters["propertyAlias"]; }
-@if (propertyAlias != null)
-{
+@{
+    @* Get the property alias we want to filter on from the macro parameter *@
+    var propertyAlias = Model.MacroParameters["propertyAlias"];
     var selection = CurrentPage.Children.Where("Visible").OrderBy(propertyAlias);
-
-    <ul>
-        @foreach (var item in selection)
-        {
-            <li><a href="@item.Url">@item.Name</a></li>
-        }
-    </ul>
 }
+
+<ul>
+    @foreach (var page in selection)
+    { 
+        <li><a href="@page.Url">@page.Name</a></li>
+    }
+</ul>

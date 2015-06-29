@@ -42,16 +42,23 @@ namespace Umbraco.Web.Security.Providers
         private string _defaultMemberTypeAlias = "Member";
         private volatile bool _hasDefaultMember = false;
         private static readonly object Locker = new object();
-        private bool _providerKeyAsGuid = false;
 
         public override string ProviderName
         {
             get { return "MembersMembershipProvider"; }
         }
-        
+
+        /// <summary>
+        /// For backwards compatibility, this provider supports this option
+        /// </summary>
+        public override bool AllowManuallyChangingPassword
+        {
+            get { return true; }
+        }
+
         protected override MembershipUser ConvertToMembershipUser(IMember entity)
         {
-            return entity.AsConcreteMembershipUser(Name, _providerKeyAsGuid);
+            return entity.AsConcreteMembershipUser(Name);
         }
 
         public string LockPropertyTypeAlias { get; private set; }
@@ -77,15 +84,6 @@ namespace Umbraco.Web.Security.Providers
                     throw new ProviderException("No default user type alias is specified in the web.config string. Please add a 'defaultUserTypeAlias' to the add element in the provider declaration in web.config");
                 }
                 _hasDefaultMember = true;
-            }
-
-            //devs can configure the provider user key to be a guid if they want, by default it is int
-            if (config["providerKeyType"] != null)
-            {
-                if (config["providerKeyType"] == "guid")
-                {
-                    _providerKeyAsGuid = true;
-                }
             }
         }
 

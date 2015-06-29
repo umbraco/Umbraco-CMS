@@ -1,5 +1,4 @@
-﻿using System;
-using System.Configuration;
+﻿using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
@@ -41,7 +40,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
-        [Obsolete("This has no affect and will be removed in future versions")]
         [ConfigurationProperty("enableTemplateFolders")]
         internal InnerTextConfigurationElement<bool> EnableTemplateFolders
         {
@@ -69,7 +67,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return DefaultRenderingEngine; }
         }
 
-        [Obsolete("This has no affect and will be removed in future versions")]
         bool ITemplatesSection.EnableTemplateFolders
         {
             get { return EnableTemplateFolders; }

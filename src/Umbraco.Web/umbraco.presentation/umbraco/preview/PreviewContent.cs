@@ -99,10 +99,10 @@ namespace umbraco.presentation.preview
                 //Inject preview xml
                 parentId = document.Level == 1 ? -1 : document.Parent.Id;
                 var previewXml = document.ToPreviewXml(XmlContent);
-                if (document.ContentEntity.Published == false 
+                if (document.Content.Published == false 
                     && ApplicationContext.Current.Services.ContentService.HasPublishedVersion(document.Id))
                     previewXml.Attributes.Append(XmlContent.CreateAttribute("isDraft"));
-                content.AddOrUpdateXmlNode(XmlContent, document.Id, document.Level, parentId, previewXml);
+                content.AppendDocumentXml(document.Id, document.Level, parentId, previewXml, XmlContent);
             }
 
             if (includeSubs)
@@ -112,7 +112,7 @@ namespace umbraco.presentation.preview
                     var previewXml = XmlContent.ReadNode(XmlReader.Create(new StringReader(prevNode.Xml)));
                     if (prevNode.IsDraft)
                         previewXml.Attributes.Append(XmlContent.CreateAttribute("isDraft"));
-                    content.AddOrUpdateXmlNode(XmlContent, prevNode.NodeId, prevNode.Level, prevNode.ParentId, previewXml);
+                    XmlContent = content.AppendDocumentXml(prevNode.NodeId, prevNode.Level, prevNode.ParentId, previewXml, XmlContent);
                 }
             }
 

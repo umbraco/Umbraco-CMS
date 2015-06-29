@@ -10,8 +10,6 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Xml;
 using System.Xml.Linq;
-using Umbraco.Core.Auditing;
-using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.packager.repositories;
 using Umbraco.Core.IO;
 using Umbraco.Core.Packaging.Models;
@@ -37,7 +35,7 @@ namespace Umbraco.Web.Editors
                 //our repo guid
                 using (var our = Repository.getByGuid("65194810-1f85-11dd-bd0b-0800200c9a66"))
                 {
-                    path = our.fetch(packageGuid, Security.CurrentUser.Id);    
+                    path = our.fetch(packageGuid);    
                 }
             }
             
@@ -46,24 +44,22 @@ namespace Umbraco.Web.Editors
             p.RepositoryGuid = Guid.Parse("65194810-1f85-11dd-bd0b-0800200c9a66");
             p.ZipFilePath = path;
             //p.ZipFilePath = Path.Combine("temp", "package.umb");
-
             return p;
         }
 
         [HttpPost]
         public PackageInstallModel Import(PackageInstallModel model)
         {
-            var ins = new global::umbraco.cms.businesslogic.packager.Installer(Security.CurrentUser.Id);
+            var ins = new global::umbraco.cms.businesslogic.packager.Installer();
             model.TemporaryDirectoryPath = Path.Combine(SystemDirectories.Data, ins.Import(model.ZipFilePath));
             model.Id = ins.CreateManifest( IOHelper.MapPath(model.TemporaryDirectoryPath), model.PackageGuid.ToString(), model.RepositoryGuid.ToString());
-
             return model;
         }
 
         [HttpPost]
         public PackageInstallModel InstallFiles(PackageInstallModel model)
         {
-            var ins = new global::umbraco.cms.businesslogic.packager.Installer(Security.CurrentUser.Id);
+            var ins = new global::umbraco.cms.businesslogic.packager.Installer();
             ins.LoadConfig(IOHelper.MapPath(model.TemporaryDirectoryPath));
             ins.InstallFiles(model.Id, IOHelper.MapPath(model.TemporaryDirectoryPath));
             return model;
@@ -73,7 +69,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public PackageInstallModel InstallData(PackageInstallModel model)
         {
-            var ins = new global::umbraco.cms.businesslogic.packager.Installer(Security.CurrentUser.Id);
+            var ins = new global::umbraco.cms.businesslogic.packager.Installer();
             ins.LoadConfig(IOHelper.MapPath(model.TemporaryDirectoryPath));
             ins.InstallBusinessLogic(model.Id, IOHelper.MapPath(model.TemporaryDirectoryPath));
             return model;
@@ -83,11 +79,11 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public PackageInstallModel CleanUp(PackageInstallModel model)
         {
-            var ins = new global::umbraco.cms.businesslogic.packager.Installer(Security.CurrentUser.Id);
+            var ins = new global::umbraco.cms.businesslogic.packager.Installer();
             ins.LoadConfig(IOHelper.MapPath(model.TemporaryDirectoryPath));
             ins.InstallCleanUp(model.Id, IOHelper.MapPath(model.TemporaryDirectoryPath));
 
-            var clientDependencyConfig = new Umbraco.Core.Configuration.ClientDependencyConfiguration(ApplicationContext.ProfilingLogger.Logger);
+            var clientDependencyConfig = new Umbraco.Core.Configuration.ClientDependencyConfiguration();
             var clientDependencyUpdated = clientDependencyConfig.IncreaseVersionNumber();
 
             //clear the tree cache - we'll do this here even though the browser will reload, but just in case it doesn't can't hurt.

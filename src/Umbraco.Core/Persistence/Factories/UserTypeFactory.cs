@@ -5,7 +5,7 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class UserTypeFactory
+    internal class UserTypeFactory : IEntityFactory<IUserType, UserTypeDto>
     {
         #region Implementation of IEntityFactory<IUserType,UserTypeDto>
 

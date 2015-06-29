@@ -6,7 +6,7 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class MemberFactory
+    internal class MemberFactory : IEntityFactory<IMember, MemberDto>
     {
         private readonly IMemberType _contentType;
         private readonly Guid _nodeObjectTypeId;
@@ -35,7 +35,10 @@ namespace Umbraco.Core.Persistence.Factories
                 dto.Email,dto.LoginName,dto.Password, _contentType)
             {
                 Id = _id,
-                Key = dto.ContentVersionDto.ContentDto.NodeDto.UniqueId,
+                Key =
+                    dto.ContentVersionDto.ContentDto.NodeDto.UniqueId.HasValue
+                        ? dto.ContentVersionDto.ContentDto.NodeDto.UniqueId.Value
+                        : _id.ToGuid(),
                 Path = dto.ContentVersionDto.ContentDto.NodeDto.Path,
                 CreatorId = dto.ContentVersionDto.ContentDto.NodeDto.UserId.Value,
                 Level = dto.ContentVersionDto.ContentDto.NodeDto.Level,

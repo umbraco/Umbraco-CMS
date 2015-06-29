@@ -190,12 +190,7 @@ namespace Umbraco.Web.Trees
         {
             var jsonUrl = Url.GetTreeUrl(GetType(), id, queryStrings);
             var menuUrl = Url.GetMenuUrl(GetType(), id, queryStrings);
-            var node = new TreeNode(id, parentId, jsonUrl, menuUrl)
-            {
-                Name = title, 
-                Icon = icon,
-                NodeType = TreeAlias
-            };
+            var node = new TreeNode(id, parentId, jsonUrl, menuUrl) { Name = title, Icon = icon };
             return node;
         }
 

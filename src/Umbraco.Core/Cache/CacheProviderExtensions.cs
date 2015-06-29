@@ -8,7 +8,7 @@ namespace Umbraco.Core.Cache
     /// <summary>
     /// Extensions for strongly typed access
     /// </summary>
-    public static class CacheProviderExtensions
+    internal static class CacheProviderExtensions
     {
         public static T GetCacheItem<T>(this IRuntimeCacheProvider provider,
             string cacheKey,

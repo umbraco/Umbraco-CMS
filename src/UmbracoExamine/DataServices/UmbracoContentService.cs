@@ -83,14 +83,31 @@ namespace UmbracoExamine.DataServices
         }
 
         /// <summary>
-        /// Check if the node is protected
+        /// Unfortunately, we need to implement our own IsProtected method since 
+        /// the Umbraco core code requires an HttpContext for this method and when we're running
+        /// async, there is no context
+        /// </summary>
+        /// <param name="documentId"></param>
+        /// <returns></returns>
+		
+		private static XmlNode GetPage(int documentId)
+        {
+            var xDoc = Access.GetXmlDocumentCopy();
+            var x = xDoc.SelectSingleNode("/access/page [@id=" + documentId.ToString() + "]");
+            return x;
+        }
+
+        /// <summary>
+        /// Unfortunately, we need to implement our own IsProtected method since 
+        /// the Umbraco core code requires an HttpContext for this method and when we're running
+        /// async, there is no context
         /// </summary>
         /// <param name="nodeId"></param>
         /// <param name="path"></param>
         /// <returns></returns>
         public bool IsProtected(int nodeId, string path)
         {
-            return _applicationContext.Services.PublicAccessService.IsProtected(path.EnsureEndsWith("," + nodeId));
+	        return path.Split(',').Any(id => GetPage(int.Parse(id)) != null);
         }
 
 	    /// <summary>

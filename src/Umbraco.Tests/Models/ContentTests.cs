@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Web;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
-
+using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Serialization;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -65,8 +63,8 @@ namespace Umbraco.Tests.Models
         {
             var contentType = MockedContentTypes.CreateSimpleContentType();
             //add non-grouped properties
-            contentType.AddPropertyType(new PropertyType("test", DataTypeDatabaseType.Ntext, "nonGrouped1") { Name = "Non Grouped 1", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
-            contentType.AddPropertyType(new PropertyType("test", DataTypeDatabaseType.Ntext, "nonGrouped2") { Name = "Non Grouped 2", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
+            contentType.AddPropertyType(new PropertyType("test", DataTypeDatabaseType.Ntext) { Alias = "nonGrouped1", Name = "Non Grouped 1", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
+            contentType.AddPropertyType(new PropertyType("test", DataTypeDatabaseType.Ntext) { Alias = "nonGrouped2", Name = "Non Grouped 2", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
             
             //ensure that nothing is marked as dirty
             contentType.ResetDirtyProperties(false);
@@ -222,14 +220,14 @@ namespace Umbraco.Tests.Models
             ((IUmbracoEntity)content).AdditionalData.Add("test1", 123);
             ((IUmbracoEntity)content).AdditionalData.Add("test2", "hello");
 
-            var runtimeCache = new ObjectCacheRuntimeCacheProvider();
-            runtimeCache.InsertCacheItem(content.Id.ToString(CultureInfo.InvariantCulture), () => content);
+            var runtimeCache = new RuntimeCacheProvider();
+            runtimeCache.Save(typeof(IContent), content);
 
             using (DisposableTimer.DebugDuration<ContentTests>("STARTING PERF TEST WITH RUNTIME CACHE"))
             {
                 for (int j = 0; j < 1000; j++)
                 {
-                    var clone = runtimeCache.GetCacheItem(content.Id.ToString(CultureInfo.InvariantCulture));
+                    var clone = runtimeCache.GetById(typeof(IContent), content.Id.ToGuid());
                 }
             }
 
@@ -339,7 +337,7 @@ namespace Umbraco.Tests.Models
             var asDirty = (ICanBeDirty)clone;
 
             Assert.IsFalse(asDirty.IsPropertyDirty("Properties"));
-            clone.Properties.Add(new Property(1, Guid.NewGuid(), new PropertyType("test", DataTypeDatabaseType.Ntext, "blah"), "blah"));
+            clone.Properties.Add(new Property(1, Guid.NewGuid(), new PropertyType("test", DataTypeDatabaseType.Ntext) {Alias = "blah"}, "blah"));
             Assert.IsTrue(asDirty.IsPropertyDirty("Properties"));
         }
 
@@ -478,10 +476,12 @@ namespace Umbraco.Tests.Models
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // Act
-            contentType.PropertyGroups["Content"].PropertyTypes.Add(new PropertyType("test", DataTypeDatabaseType.Ntext, "subtitle")
+            contentType.PropertyGroups["Content"].PropertyTypes.Add(new PropertyType("test", DataTypeDatabaseType.Ntext)
                                                                         {
+                                                                            Alias = "subtitle",
                                                                             Name = "Subtitle",
                                                                             Description = "Optional subtitle",
+                                                                            HelpText = "",
                                                                             Mandatory = false,
                                                                             SortOrder = 3,
                                                                             DataTypeDefinitionId = -88
@@ -500,9 +500,9 @@ namespace Umbraco.Tests.Models
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // Act
-            var propertyType = new PropertyType("test", DataTypeDatabaseType.Ntext, "subtitle")
+            var propertyType = new PropertyType("test", DataTypeDatabaseType.Ntext)
                                    {
-                                        Name = "Subtitle", Description = "Optional subtitle", Mandatory = false, SortOrder = 3, DataTypeDefinitionId = -88
+                                       Alias = "subtitle", Name = "Subtitle", Description = "Optional subtitle", HelpText = "", Mandatory = false, SortOrder = 3, DataTypeDefinitionId = -88
                                    };
             contentType.PropertyGroups["Content"].PropertyTypes.Add(propertyType);
             content.Properties.Add(new Property(propertyType){Value = "This is a subtitle Test"});
@@ -520,10 +520,12 @@ namespace Umbraco.Tests.Models
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // Act
-            var propertyType = new PropertyType("test", DataTypeDatabaseType.Ntext, "subtitle")
+            var propertyType = new PropertyType("test", DataTypeDatabaseType.Ntext)
                                    {
+                                       Alias = "subtitle",
                                        Name = "Subtitle",
                                        Description = "Optional subtitle",
+                                       HelpText = "",
                                        Mandatory = false,
                                        SortOrder = 3,
                                        DataTypeDefinitionId = -88
@@ -549,9 +551,9 @@ namespace Umbraco.Tests.Models
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             // Act - note that the PropertyType's properties like SortOrder is not updated through the Content object
-            var propertyType = new PropertyType("test", DataTypeDatabaseType.Ntext, "title")
+            var propertyType = new PropertyType("test", DataTypeDatabaseType.Ntext)
                                    {
-                                        Name = "Title", Description = "Title description added", Mandatory = false, SortOrder = 10, DataTypeDefinitionId = -88
+                                       Alias = "title", Name = "Title", Description = "Title description added", HelpText = "", Mandatory = false, SortOrder = 10, DataTypeDefinitionId = -88
                                    };
             content.Properties.Add(new Property(propertyType));
 
@@ -702,37 +704,6 @@ namespace Umbraco.Tests.Models
         }
 
         [Test]
-        public void After_Committing_Changes_Was_Dirty_Is_True_On_Changed_Property()
-        {
-            // Arrange
-            var contentType = MockedContentTypes.CreateTextpageContentType();
-            contentType.ResetDirtyProperties(); //reset
-            var content = MockedContent.CreateTextpageContent(contentType, "test", -1);
-            content.ResetDirtyProperties();
-
-            // Act
-            content.SetPropertyValue("title", "new title");
-            Assert.That(content.IsEntityDirty(), Is.False);
-            Assert.That(content.IsDirty(), Is.True);
-            Assert.That(content.IsPropertyDirty("title"), Is.True);
-            Assert.That(content.IsAnyUserPropertyDirty(), Is.True);
-            Assert.That(content.GetDirtyUserProperties().Count(), Is.EqualTo(1));
-            Assert.That(content.Properties[0].IsDirty(), Is.True);
-            Assert.That(content.Properties["title"].IsDirty(), Is.True);
-            
-            content.ResetDirtyProperties(); //this would be like committing the entity
-
-            // Assert
-            Assert.That(content.WasDirty(), Is.True);
-            Assert.That(content.Properties[0].WasDirty(), Is.True);
-
-
-            Assert.That(content.WasPropertyDirty("title"), Is.True);
-            Assert.That(content.Properties["title"].IsDirty(), Is.False);
-            Assert.That(content.Properties["title"].WasDirty(), Is.True);
-        }
-
-        [Test]
         public void If_Not_Committed_Was_Dirty_Is_False()
         {
             // Arrange
@@ -768,10 +739,12 @@ namespace Umbraco.Tests.Models
             contentType.ResetDirtyProperties();
 
             // Act
-            var propertyType = new PropertyType("test", DataTypeDatabaseType.Ntext, "subtitle")
+            var propertyType = new PropertyType("test", DataTypeDatabaseType.Ntext)
                                    {
+                                       Alias = "subtitle",
                                        Name = "Subtitle",
                                        Description = "Optional subtitle",
+                                       HelpText = "",
                                        Mandatory = false,
                                        SortOrder = 3,
                                        DataTypeDefinitionId = -88
@@ -793,10 +766,12 @@ namespace Umbraco.Tests.Models
                                                                                 new PropertyTypeCollection(
                                                                                     new List<PropertyType>
                                                                                         {
-                                                                                            new PropertyType("test", DataTypeDatabaseType.Ntext, "coauthor")
+                                                                                            new PropertyType("test", DataTypeDatabaseType.Ntext)
                                                                                                 {
+                                                                                                    Alias = "coauthor",
                                                                                                     Name = "Co-Author",
                                                                                                     Description = "Name of the Co-Author",
+                                                                                                    HelpText = "",
                                                                                                     Mandatory = false,
                                                                                                     SortOrder = 4,
                                                                                                     DataTypeDefinitionId = -88
@@ -824,10 +799,12 @@ namespace Umbraco.Tests.Models
                                                                                 new PropertyTypeCollection(
                                                                                     new List<PropertyType>
                                                                                         {
-                                                                                            new PropertyType("test", DataTypeDatabaseType.Ntext, "coauthor")
+                                                                                            new PropertyType("test", DataTypeDatabaseType.Ntext)
                                                                                                 {
+                                                                                                    Alias = "coauthor",
                                                                                                     Name = "Co-Author",
                                                                                                     Description = "Name of the Co-Author",
+                                                                                                    HelpText = "",
                                                                                                     Mandatory = false,
                                                                                                     SortOrder = 4,
                                                                                                     DataTypeDefinitionId = -88
@@ -857,10 +834,12 @@ namespace Umbraco.Tests.Models
             var mixin1 = MockedContentTypes.CreateSimpleContentType("mixin1", "Mixin1", new PropertyTypeCollection(
                                                                                     new List<PropertyType>
                                                                                         {
-                                                                                            new PropertyType("test", DataTypeDatabaseType.Ntext, "coauthor")
+                                                                                            new PropertyType("test", DataTypeDatabaseType.Ntext)
                                                                                                 {
+                                                                                                    Alias = "coauthor",
                                                                                                     Name = "Co-Author",
                                                                                                     Description = "Name of the Co-Author",
+                                                                                                    HelpText = "",
                                                                                                     Mandatory = false,
                                                                                                     SortOrder = 4,
                                                                                                     DataTypeDefinitionId = -88
@@ -869,10 +848,12 @@ namespace Umbraco.Tests.Models
             var mixin2 = MockedContentTypes.CreateSimpleContentType("mixin2", "Mixin2", new PropertyTypeCollection(
                                                                                     new List<PropertyType>
                                                                                         {
-                                                                                            new PropertyType("test", DataTypeDatabaseType.Ntext, "author")
+                                                                                            new PropertyType("test", DataTypeDatabaseType.Ntext)
                                                                                                 {
+                                                                                                    Alias = "author",
                                                                                                     Name = "Author",
                                                                                                     Description = "Name of the Author",
+                                                                                                    HelpText = "",
                                                                                                     Mandatory = false,
                                                                                                     SortOrder = 4,
                                                                                                     DataTypeDefinitionId = -88

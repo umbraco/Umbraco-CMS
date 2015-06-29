@@ -13,21 +13,12 @@ namespace Umbraco.Core.Persistence.Mappers
 
         internal abstract void BuildMap();
 
-        internal string Map(string propertyName, bool throws = false)
+        internal string Map(string propertyName)
         {
             DtoMapModel dtoTypeProperty;
-            if (PropertyInfoCache.TryGetValue(propertyName, out dtoTypeProperty))
-            {
-                return GetColumnName(dtoTypeProperty.Type, dtoTypeProperty.PropertyInfo);
-            }
-            else
-            {
-                if (throws)
-                {
-                    throw new InvalidOperationException("Could not get the value with the key " + propertyName + " from the property info cache, keys available: " + string.Join(", ", PropertyInfoCache.Keys));
-                }
-                return string.Empty;
-            }
+            return PropertyInfoCache.TryGetValue(propertyName, out dtoTypeProperty)
+                ? GetColumnName(dtoTypeProperty.Type, dtoTypeProperty.PropertyInfo)
+                : string.Empty;
         }
 
         internal void CacheMap<TSource, TDestination>(Expression<Func<TSource, object>> sourceMember, Expression<Func<TDestination, object>> destinationMember)
@@ -39,12 +30,7 @@ namespace Umbraco.Core.Persistence.Mappers
         internal DtoMapModel ResolveMapping<TSource, TDestination>(Expression<Func<TSource, object>> sourceMember, Expression<Func<TDestination, object>> destinationMember)
         {
             var source = ExpressionHelper.FindProperty(sourceMember);
-            var destination = (PropertyInfo)ExpressionHelper.FindProperty(destinationMember);
-
-            if (destination == null)
-            {
-                throw new InvalidOperationException("The 'destination' returned was null, cannot resolve the mapping");
-            }
+            var destination = ExpressionHelper.FindProperty(destinationMember) as PropertyInfo;
 
             return new DtoMapModel(typeof(TDestination), destination, source.Name);
         }

@@ -71,34 +71,16 @@ namespace Umbraco.Core.Models
         {
             using (new WriteLock(_addLocker))
             {
-                //Note this is done to ensure existig groups can be renamed
-                if (item.HasIdentity && item.Id > 0)
+                var key = GetKeyForItem(item);
+                if (key != null)
                 {
-                    var exists = this.Contains(item.Id);
+                    var exists = this.Contains(key);
                     if (exists)
                     {
-                        var keyExists = this.Contains(item.Name);
-                        if(keyExists)
-                            throw new Exception(string.Format("Naming conflict: Changing the name of PropertyGroup '{0}' would result in duplicates", item.Name));
-
-                        SetItem(IndexOfKey(item.Id), item);
+                        SetItem(IndexOfKey(key), item);
                         return;
                     }
                 }
-                else
-                {
-                    var key = GetKeyForItem(item);
-                    if (key != null)
-                    {
-                        var exists = this.Contains(key);
-                        if (exists)
-                        {
-                            SetItem(IndexOfKey(key), item);
-                            return;
-                        }
-                    }
-                }
-                
                 base.Add(item);
                 OnAdd.IfNotNull(x => x.Invoke());//Could this not be replaced by a Mandate/Contract for ensuring item is not null
 
@@ -117,11 +99,6 @@ namespace Umbraco.Core.Models
             return this.Any(x => x.Name == groupName);
         }
 
-        public bool Contains(int id)
-        {
-            return this.Any(x => x.Id == id);
-        }
-
         public void RemoveItem(string propertyGroupName)
         {
             var key = IndexOfKey(propertyGroupName);
@@ -135,18 +112,6 @@ namespace Umbraco.Core.Models
             for (var i = 0; i < this.Count; i++)
             {
                 if (this[i].Name == key)
-                {
-                    return i;
-                }
-            }
-            return -1;
-        }
-
-        public int IndexOfKey(int id)
-        {
-            for (var i = 0; i < this.Count; i++)
-            {
-                if (this[i].Id == id)
                 {
                     return i;
                 }

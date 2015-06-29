@@ -31,9 +31,7 @@ namespace Umbraco.Tests.AngularIntegration
     UmbClientMgr.setUmbracoPath('Hello');
 
     jQuery(document).ready(function () {
-
         angular.bootstrap(document, ['umbraco']);
-
     });
 });", result);
         }

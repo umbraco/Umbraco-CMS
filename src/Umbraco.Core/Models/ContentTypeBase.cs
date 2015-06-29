@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -16,7 +15,6 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    [DebuggerDisplay("Id: {Id}, Name: {Name}, Alias: {Alias}")]
     public abstract class ContentTypeBase : Entity, IContentTypeBase
     {
         private Lazy<int> _parentId;
@@ -351,11 +349,7 @@ namespace Umbraco.Core.Models
                 {
                     _allowedContentTypes = value;
                     return _allowedContentTypes;
-                }, _allowedContentTypes, AllowedContentTypesSelector,
-                    //Custom comparer for enumerable
-                    new DelegateEqualityComparer<IEnumerable<ContentTypeSort>>(
-                        (sorts, enumerable) => sorts.UnsortedSequenceEqual(enumerable),
-                        sorts => sorts.GetHashCode()));
+                }, _allowedContentTypes, AllowedContentTypesSelector);
             }
         }
 
@@ -460,11 +454,6 @@ namespace Umbraco.Core.Models
         /// <returns>Returns <c>True</c> if PropertyType was added, otherwise <c>False</c></returns>
         public bool AddPropertyType(PropertyType propertyType)
         {
-            if (propertyType.HasIdentity == false)
-            {
-                propertyType.Key = Guid.NewGuid();
-            }
-
             if (PropertyTypeExists(propertyType.Alias) == false)
             {
                 _propertyTypes.Add(propertyType);                
@@ -508,6 +497,7 @@ namespace Umbraco.Core.Models
         /// <param name="propertyTypeAlias">Alias of the <see cref="PropertyType"/> to remove</param>
         public void RemovePropertyType(string propertyTypeAlias)
         {
+
             //check if the property exist in one of our collections
             if (PropertyGroups.Any(group => group.PropertyTypes.Any(pt => pt.Alias == propertyTypeAlias))
                 || _propertyTypes.Any(x => x.Alias == propertyTypeAlias))
@@ -534,7 +524,6 @@ namespace Umbraco.Core.Models
         public void RemovePropertyGroup(string propertyGroupName)
         {
             PropertyGroups.RemoveItem(propertyGroupName);
-            OnPropertyChanged(PropertyGroupCollectionSelector);
         }
 
         /// <summary>
@@ -618,18 +607,13 @@ namespace Umbraco.Core.Models
         public override object DeepClone()
         {
             var clone = (ContentTypeBase)base.DeepClone();
-            //turn off change tracking
-            clone.DisableChangeTracking();
+
             //need to manually wire up the event handlers for the property type collections - we've ensured
             // its ignored from the auto-clone process because its return values are unions, not raw and 
             // we end up with duplicates, see: http://issues.umbraco.org/issue/U4-4842
 
             clone._propertyTypes = (PropertyTypeCollection)_propertyTypes.DeepClone();
             clone._propertyTypes.CollectionChanged += clone.PropertyTypesChanged;
-            //this shouldn't really be needed since we're not tracking
-            clone.ResetDirtyProperties(false);
-            //re-enable tracking
-            clone.EnableChangeTracking();
 
             return clone;
         }

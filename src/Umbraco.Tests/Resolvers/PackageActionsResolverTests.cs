@@ -9,14 +9,31 @@ using umbraco.interfaces;
 
 namespace Umbraco.Tests.Resolvers
 {
-    [TestFixture]
-    public class PackageActionsResolverTests : ResolverBaseTest
-	{		
+	[TestFixture]
+	public class PackageActionsResolverTests
+	{
+		[SetUp]
+		public void Initialize()
+		{
+			TestHelper.SetupLog4NetForTests();
+
+            PackageActionsResolver.Reset();
+
+			// ensures it's reset
+			PluginManager.Current = new PluginManager(false);
+
+			// for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
+			PluginManager.Current.AssembliesToScan = new[]
+				{
+					this.GetType().Assembly // this assembly only
+				};
+		}
 
 		[TearDown]
 		public void TearDown()
 		{
             PackageActionsResolver.Reset();
+            PluginManager.Current = null;
         }
         
         // NOTE
@@ -27,8 +44,7 @@ namespace Umbraco.Tests.Resolvers
 		public void FindAllPackageActions()
 		{
             PackageActionsResolver.Current = new PackageActionsResolver(
-                new ActivatorServiceProvider(), ProfilingLogger.Logger,
-                () => PluginManager.ResolvePackageActions());
+                () => PluginManager.Current.ResolvePackageActions());
 
             Resolution.Freeze();
 

@@ -362,7 +362,7 @@ namespace umbraco.presentation.developer.packages
 
         protected void delPack(object sender, EventArgs e)
         {
-            _pack.Delete(UmbracoUser.Id);
+            _pack.Delete();
             pane_uninstalled.Visible = true;
             pane_uninstall.Visible = false;
         }
@@ -545,7 +545,7 @@ namespace umbraco.presentation.developer.packages
                     }
                 }
                 _pack.Save();
-                _pack.Delete(UmbracoUser.Id);
+                _pack.Delete();
 
                 pane_uninstalled.Visible = true;
                 pane_uninstall.Visible = false;

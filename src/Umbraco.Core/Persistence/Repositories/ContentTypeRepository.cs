@@ -5,7 +5,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
-
+using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Relators;
@@ -21,8 +21,14 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly ITemplateRepository _templateRepository;
 
-        public ContentTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, ITemplateRepository templateRepository)
-            : base(work, cache, logger, sqlSyntax)
+        public ContentTypeRepository(IDatabaseUnitOfWork work, ITemplateRepository templateRepository)
+            : base(work)
+        {
+            _templateRepository = templateRepository;
+        }
+
+        public ContentTypeRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, ITemplateRepository templateRepository)
+            : base(work, cache)
         {
             _templateRepository = templateRepository;
         }
@@ -32,7 +38,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override IContentType PerformGet(int id)
         {
             var contentTypes = ContentTypeQueryMapper.GetContentTypes(
-                new[] {id}, Database, SqlSyntax, this, _templateRepository);
+                new[] {id}, Database, this, _templateRepository);
             
             var contentType = contentTypes.SingleOrDefault();
             return contentType;
@@ -42,13 +48,13 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             if (ids.Any())
             {
-                return ContentTypeQueryMapper.GetContentTypes(ids, Database, SqlSyntax, this, _templateRepository);
+                return ContentTypeQueryMapper.GetContentTypes(ids, Database, this, _templateRepository);
             }
             else
             {
                 var sql = new Sql().Select("id").From<NodeDto>().Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId);
                 var allIds = Database.Fetch<int>(sql).ToArray();
-                return ContentTypeQueryMapper.GetContentTypes(allIds, Database, SqlSyntax, this, _templateRepository);
+                return ContentTypeQueryMapper.GetContentTypes(allIds, Database, this, _templateRepository);
             }
         }
 
@@ -172,7 +178,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                                 entity.Name);
                                         var exception = new Exception(message);
 
-                                        Logger.Error<ContentTypeRepository>(message, exception);
+                                        LogHelper.Error<ContentTypeRepository>(message, exception);
                                         throw exception;
                                     });
 

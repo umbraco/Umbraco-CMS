@@ -4,14 +4,12 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Profiling;
-using Umbraco.Core.Services;
 using Umbraco.Tests.Migrations.Stubs;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Migrations
 {
@@ -21,9 +19,9 @@ namespace Umbraco.Tests.Migrations
         [SetUp]
         public void Initialize()
         {
-            MigrationResolver.Current = new MigrationResolver(
-                Mock.Of<ILogger>(),
-                () => new List<Type>
+            TestHelper.SetupLog4NetForTests();
+
+			MigrationResolver.Current = new MigrationResolver(() => new List<Type>
 				{
 					typeof (AlterUserTableMigrationStub),
 					typeof(Dummy),
@@ -33,25 +31,9 @@ namespace Umbraco.Tests.Migrations
                     typeof (FiveZeroMigration)                   
 				});
 
-            //This is needed because the Migration resolver is creating migratoni instances with their full ctors
-            ApplicationContext.EnsureContext(
-                new ApplicationContext(
-                    new DatabaseContext(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test"),
-                    new ServiceContext(), 
-                    CacheHelper.CreateDisabledCacheHelper(),
-                    new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())),  
-                true);
-
-            //This is needed because the Migration resolver is creating the migration instances with their full ctors
-            LoggerResolver.Current = new LoggerResolver(Mock.Of<ILogger>())
-            {
-                CanResolveBeforeFrozen = true
-            };
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
-
 			Resolution.Freeze();
 
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
+            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
         }
 
         [Test]
@@ -75,7 +57,7 @@ namespace Umbraco.Tests.Migrations
 
             Assert.That(list.Count, Is.EqualTo(3));
 
-            var context = new MigrationContext(DatabaseProviders.SqlServerCE, null, Mock.Of<ILogger>());
+            var context = new MigrationContext(DatabaseProviders.SqlServerCE, null);
             foreach (var migration1 in list)
             {
                 var migration = (MigrationBase) migration1;
@@ -94,7 +76,6 @@ namespace Umbraco.Tests.Migrations
         [TearDown]
         public void TearDown()
         {	        
-            LoggerResolver.Reset();
             MigrationResolver.Reset();
         }
     }

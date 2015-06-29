@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.GridController",
-    function ($scope, $http, assetsService, $rootScope, dialogService, gridService, mediaResource, imageHelper, $timeout, umbRequestHelper) {
+    function ($scope, $http, assetsService, $rootScope, dialogService, gridService, mediaResource, imageHelper, $timeout) {
 
         // Grid status variables
         $scope.currentRow = null;
@@ -13,8 +13,6 @@ angular.module("umbraco")
         // *********************************************
         // Sortable options
         // *********************************************
-
-        var draggedRteSettings;
 
         $scope.sortableOptions = {
             distance: 10,
@@ -42,22 +40,15 @@ angular.module("umbraco")
             },
 
             start: function (e, ui) {
-                draggedRteSettings = {};
                 ui.item.find('.mceNoEditor').each(function () {
-                    // remove all RTEs in the dragged row and save their settings
-                    var id = $(this).attr('id');
-                    draggedRteSettings[id] = _.findWhere(tinyMCE.editors, { id: id }).settings;
-                    tinyMCE.execCommand('mceRemoveEditor', false, id);
+                    tinyMCE.execCommand('mceRemoveEditor', false, $(this).attr('id'));
                 });
             },
 
             stop: function (e, ui) {
-                // reset all RTEs affected by the dragging
                 ui.item.parents(".usky-column").find('.mceNoEditor').each(function () {
-                    var id = $(this).attr('id');
-                    draggedRteSettings[id] = draggedRteSettings[id] || _.findWhere(tinyMCE.editors, { id: id }).settings;
-                    tinyMCE.execCommand('mceRemoveEditor', false, id);
-                    tinyMCE.init(draggedRteSettings[id]);
+                    tinyMCE.execCommand('mceRemoveEditor', false, $(this).attr('id'));
+                    tinyMCE.execCommand('mceAddEditor', false, $(this).attr('id'));
                 });
             }
         };
@@ -72,7 +63,7 @@ angular.module("umbraco")
             handle: '.cell-tools-move',
             connectWith: ".usky-cell",
             forcePlaceholderSize: true,
-            tolerance: "pointer",
+            tolerance:"pointer",
             zIndex: 999999999999999999,
             scrollSensitivity: 100,
             cursorAt: {
@@ -107,7 +98,6 @@ angular.module("umbraco")
             },
 
             update: function (event, ui) {
-                // add all RTEs which are affected by the dragging
                 if (!ui.sender) {
                     if (cancelMove) {
                         ui.item.sortable.cancel();
@@ -129,16 +119,8 @@ angular.module("umbraco")
             },
 
             start: function (e, ui) {
-                // reset dragged RTE settings in case a RTE isn't dragged
-                draggedRteSettings = undefined;
-
                 ui.item.find('.mceNoEditor').each(function () {
                     notIncludedRte = [];
-
-                    // save the dragged RTE settings
-                    draggedRteSettings = _.findWhere(tinyMCE.editors, { id: $(this).attr('id') }).settings;
-
-                    // remove the dragged RTE
                     tinyMCE.execCommand('mceRemoveEditor', false, $(this).attr('id'));
                 });
             },
@@ -146,23 +128,14 @@ angular.module("umbraco")
             stop: function (e, ui) {
                 ui.item.parents(".usky-cell").find('.mceNoEditor').each(function () {
                     if ($.inArray($(this).attr('id'), notIncludedRte) < 0) {
-                        // add all dragged's neighbouring RTEs in the new cell
                         notIncludedRte.splice(0, 0, $(this).attr('id'));
                     }
                 });
                 $timeout(function () {
-                    // reconstruct the dragged RTE (could be undefined when dragging something else than RTE)
-                    if (draggedRteSettings !== undefined) {
-                        tinyMCE.init(draggedRteSettings);
-                    }
-
                     _.forEach(notIncludedRte, function (id) {
-                        // reset all the other RTEs
-                        if (draggedRteSettings === undefined || id != draggedRteSettings.id) {
-                            var rteSettings = _.findWhere(tinyMCE.editors, { id: id }).settings;
-                            tinyMCE.execCommand('mceRemoveEditor', false, id);
-                            tinyMCE.init(rteSettings);
-                        }
+                        tinyMCE.execCommand('mceRemoveEditor', false, id);
+                        tinyMCE.execCommand('mceAddEditor', false, id);
+                        console.info("stop " + id);
                     });
                 }, 500, false);
             }
@@ -179,7 +152,7 @@ angular.module("umbraco")
             key: undefined
         };
 
-        $scope.addItemOverlay = function (event, area, index, key) {
+        $scope.addItemOverlay = function(event, area, index, key){
             $scope.overlayMenu.area = area;
             $scope.overlayMenu.index = index;
             $scope.overlayMenu.style = {};
@@ -190,10 +163,10 @@ angular.module("umbraco")
             var height = $(window).height();
             var width = $(window).width();
 
-            if ((height - offset.top) < 250) {
+            if((height-offset.top) < 250){
                 $scope.overlayMenu.style.bottom = 0;
                 $scope.overlayMenu.style.top = "initial";
-            } else if (offset.top < 300) {
+            }else if(offset.top < 300){
                 $scope.overlayMenu.style.top = 190;
             }
 
@@ -214,7 +187,7 @@ angular.module("umbraco")
             $scope.model.value = angular.copy(template);
 
             //default row data
-            _.forEach($scope.model.value.sections, function (section) {
+            _.forEach($scope.model.value.sections, function(section){
                 $scope.initSection(section);
             });
         };
@@ -248,20 +221,14 @@ angular.module("umbraco")
             $scope.currentInfohighlightRow = null;
         };
 
-        function getAllowedLayouts(section) {
-
+        $scope.getAllowedLayouts = function(column){
             var layouts = $scope.model.config.items.layouts;
 
-            //This will occur if it is a new section which has been
-            // created from a 'template'
-            if (section.allowed && section.allowed.length > 0) {
-                return _.filter(layouts, function (layout) {
-                    return _.indexOf(section.allowed, layout.name) >= 0;
+            if(column.allowed && column.allowed.length > 0){
+                return _.filter(layouts, function(layout){
+                    return _.indexOf(column.allowed, layout.name) >= 0;
                 });
-            }
-            else {
-                
-
+            }else{
                 return layouts;
             }
         };
@@ -275,8 +242,8 @@ angular.module("umbraco")
             row = $scope.initRow(row);
 
             // Push the new row
-            if (row) {
-                section.rows.push(row);
+            if(row){
+               section.rows.push(row);
             }
         };
 
@@ -297,7 +264,7 @@ angular.module("umbraco")
                     gridItem: gridItem,
                     config: $scope.model.config,
                     itemType: itemType,
-                    callback: function (data) {
+                    callback: function(data){
 
                         gridItem.styles = data.styles;
                         gridItem.config = data.config;
@@ -319,11 +286,11 @@ angular.module("umbraco")
             $scope.currentCell = null;
         };
 
-        $scope.cellPreview = function (cell) {
-            if (cell && cell.$allowedEditors) {
+        $scope.cellPreview = function(cell){
+            if(cell && cell.$allowedEditors){
                 var editor = cell.$allowedEditors[0];
                 return editor.icon;
-            } else {
+            }else{
                 return "icon-layout";
             }
         };
@@ -388,7 +355,7 @@ angular.module("umbraco")
             };
         })();
 
-        $scope.addControl = function (editor, cell, index) {
+        $scope.addControl = function (editor, cell, index){
             $scope.closeItemOverlay();
 
             var newControl = {
@@ -402,18 +369,18 @@ angular.module("umbraco")
             }
 
             //populate control
-            $scope.initControl(newControl, index + 1);
+            $scope.initControl(newControl, index+1);
 
             cell.controls.splice(index + 1, 0, newControl);
         };
 
-        $scope.addTinyMce = function (cell) {
+        $scope.addTinyMce = function(cell){
             var rte = $scope.getEditor("rte");
             $scope.addControl(rte, cell);
         };
 
-        $scope.getEditor = function (alias) {
-            return _.find($scope.availableEditors, function (editor) { return editor.alias === alias; });
+        $scope.getEditor = function(alias){
+            return  _.find($scope.availableEditors, function(editor){return editor.alias === alias;});
         };
 
         $scope.removeControl = function (cell, $index) {
@@ -421,20 +388,15 @@ angular.module("umbraco")
             cell.controls.splice($index, 1);
         };
 
-        $scope.percentage = function (spans) {
-            return ((spans / $scope.model.config.items.columns) * 100).toFixed(1);
+        $scope.percentage = function(spans){
+            return ((spans/12)*100).toFixed(1);
         };
 
 
-        $scope.clearPrompt = function (scopedObject, e) {
-            scopedObject.deletePrompt = false;
-            e.preventDefault();
-            e.stopPropagation();
-        }
 
-        $scope.showPrompt = function (scopedObject) {
-            scopedObject.deletePrompt = true;
-        }
+
+
+
 
 
         // *********************************************
@@ -449,85 +411,61 @@ angular.module("umbraco")
         // *********************************************
         // Init template + sections
         // *********************************************
-        $scope.initContent = function () {
+        $scope.initContent = function() {
             var clear = true;
 
             //settings indicator shortcut
-            if ($scope.model.config.items.config || $scope.model.config.items.styles) {
+            if($scope.model.config.items.config || $scope.model.config.items.styles){
                 $scope.hasSettings = true;
             }
 
-            //ensure the grid has a column value set, if nothing is found, set it to 12
-            if ($scope.model.config.items.columns && angular.isString($scope.model.config.items.columns)) {
-                $scope.model.config.items.columns = parseInt($scope.model.config.items.columns);
-            } else {
-                $scope.model.config.items.columns = 12;
-            }
-
             if ($scope.model.value && $scope.model.value.sections && $scope.model.value.sections.length > 0) {
+                _.forEach($scope.model.value.sections, function(section, index){
 
-                if ($scope.model.value.name && angular.isArray($scope.model.config.items.templates)) {
-
-                    //This will occur if it is an existing value, in which case
-                    // we need to determine which layout was applied by looking up 
-                    // the name
-                    // TODO: We need to change this to an immutable ID!!
-
-                    var found = _.find($scope.model.config.items.templates, function (t) {
-                        return t.name === $scope.model.value.name;
-                    });
-
-                    if (found && angular.isArray(found.sections) && found.sections.length === $scope.model.value.sections.length) {
-
-                        //Cool, we've found the template associated with our current value with matching sections counts, now we need to 
-                        // merge this template data on to our current value (as if it was new) so that we can preserve what is and isn't
-                        // allowed for this template based on the current config.
-
-                        _.each(found.sections, function (templateSection, index) {
-                            angular.extend($scope.model.value.sections[index], angular.copy(templateSection));
-                        });
-                         
-                    }
-                }
-
-                _.forEach($scope.model.value.sections, function (section, index) {
-
-                    if (section.grid > 0) {
+                    if(section.grid > 0){
                         $scope.initSection(section);
 
                         //we do this to ensure that the grid can be reset by deleting the last row
-                        if (section.rows.length > 0) {
+                        if(section.rows.length > 0){
                             clear = false;
                         }
-                    } else {
+                    }else{
                         $scope.model.value.sections.splice(index, 1);
                     }
                 });
-            } else if ($scope.model.config.items.templates && $scope.model.config.items.templates.length === 1) {
+            }else if($scope.model.config.items.templates && $scope.model.config.items.templates.length === 1){
                 $scope.addTemplate($scope.model.config.items.templates[0]);
             }
 
-            if (clear) {
+            if(clear){
                 $scope.model.value = undefined;
             }
         };
 
-        $scope.initSection = function (section) {
+        $scope.initSection = function(section){
             section.$percentage = $scope.percentage(section.grid);
 
-            section.$allowedLayouts = getAllowedLayouts(section);
+            var layouts = $scope.model.config.items.layouts;
 
-            if (!section.rows) {
+            if(section.allowed && section.allowed.length > 0){
+                section.$allowedLayouts = _.filter(layouts, function(layout){
+                    return _.indexOf(section.allowed, layout.name) >= 0;
+                });
+            }else{
+                section.$allowedLayouts = layouts;
+            }
+
+            if(!section.rows){
                 section.rows = [];
-            } else {
-                _.forEach(section.rows, function (row, index) {
-                    if (!row.$initialized) {
+            }else{
+                _.forEach(section.rows, function(row, index){
+                    if(!row.$initialized){
                         var initd = $scope.initRow(row);
 
                         //if init fails, remove
-                        if (!initd) {
+                        if(!initd){
                             section.rows.splice(index, 1);
-                        } else {
+                        }else{
                             section.rows[index] = initd;
                         }
                     }
@@ -539,41 +477,38 @@ angular.module("umbraco")
         // *********************************************
         // Init layout / row
         // *********************************************
-        $scope.initRow = function (row) {
+        $scope.initRow = function(row){
 
             //merge the layout data with the original config data
             //if there are no config info on this, splice it out
             var original = _.find($scope.model.config.items.layouts, function (o) { return o.name === row.name; });
 
-            if (!original) {
+            if(!original){
                 return null;
-            } else {
+            }else{
                 //make a copy to not touch the original config
                 original = angular.copy(original);
                 original.styles = row.styles;
                 original.config = row.config;
 
                 //sync area configuration
-                _.each(original.areas, function (area, areaIndex) {
+                _.each(original.areas, function(area, areaIndex){
 
 
-                    if (area.grid > 0) {
+                    if(area.grid > 0){
                         var currentArea = row.areas[areaIndex];
-
-                        if (currentArea) {
-                            area.config = currentArea.config;
-                            area.styles = currentArea.styles;
-                        }
+                        area.config = currentArea.config;
+                        area.styles = currentArea.styles;
 
                         //copy over existing controls into the new areas
-                        if (row.areas.length > areaIndex && row.areas[areaIndex].controls) {
+                        if(row.areas.length > areaIndex && row.areas[areaIndex].controls){
                             area.controls = currentArea.controls;
 
-                            _.forEach(area.controls, function (control, controlIndex) {
+                            _.forEach(area.controls, function(control, controlIndex){
                                 $scope.initControl(control, controlIndex);
                             });
 
-                        } else {
+                        }else{
                             area.controls = [];
                         }
 
@@ -582,19 +517,19 @@ angular.module("umbraco")
                         area.$uniqueId = $scope.setUniqueId();
 
                         //set editor permissions
-                        if (!area.allowed || area.allowAll === true) {
+                        if(!area.allowed || area.allowAll === true){
                             area.$allowedEditors = $scope.availableEditors;
                             area.$allowsRTE = true;
-                        } else {
-                            area.$allowedEditors = _.filter($scope.availableEditors, function (editor) {
+                        }else{
+                            area.$allowedEditors = _.filter($scope.availableEditors, function(editor){
                                 return _.indexOf(area.allowed, editor.alias) >= 0;
                             });
 
-                            if (_.indexOf(area.allowed, "rte") >= 0) {
+                            if(_.indexOf(area.allowed,"rte")>=0){
                                 area.$allowsRTE = true;
                             }
                         }
-                    } else {
+                    }else{
                         original.areas.splice(areaIndex, 1);
                     }
                 });
@@ -618,41 +553,26 @@ angular.module("umbraco")
         // Init control
         // *********************************************
 
-        $scope.initControl = function (control, index) {
+        $scope.initControl = function(control, index){
             control.$index = index;
             control.$uniqueId = $scope.setUniqueId();
 
-            //error handling in case of missing editor..
-            //should only happen if stripped earlier 
-            if (!control.editor) {
-                control.$editorPath = "views/propertyeditors/grid/editors/error.html";
-            }
-
-            if (!control.$editorPath) {
+            if(!control.$editorPath){
                 var editorConfig = $scope.getEditor(control.editor.alias);
+                control.editor = editorConfig;
 
-                if (editorConfig) {
-                    control.editor = editorConfig;
-
-                    //if its an absolute path
-                    if (control.editor.view.startsWith("/") || control.editor.view.startsWith("~/")) {
-                        control.$editorPath = umbRequestHelper.convertVirtualToAbsolutePath(control.editor.view);
-                    }
-                    else {
-                        //use convention
-                        control.$editorPath = "views/propertyeditors/grid/editors/" + control.editor.view + ".html";
-                    }
-                }
-                else {
-                    control.$editorPath = "views/propertyeditors/grid/editors/error.html";
+                //if its a path
+                if(_.indexOf(control.editor.view, "/") >= 0){
+                    control.$editorPath = control.editor.view;
+                }else{
+                    //use convention
+                    control.$editorPath = "views/propertyeditors/grid/editors/" + control.editor.view + ".html";
                 }
             }
-
-
         };
 
 
-        gridService.getGridEditors().then(function (response) {
+        gridService.getGridEditors().then(function(response){
             $scope.availableEditors = response.data;
 
             $scope.contentReady = true;
@@ -663,50 +583,4 @@ angular.module("umbraco")
             $scope.initContent();
 
         });
-
-        //Clean the grid value before submitting to the server, we don't need 
-        // all of that grid configuration in the value to be stored!! All of that
-        // needs to be merged in at runtime to ensure that the real config values are used
-        // if they are ever updated.
-
-        var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
-            
-            if ($scope.model.value && $scope.model.value.sections) {
-                _.each($scope.model.value.sections, function(section) {
-                    if (section.rows) {
-                        _.each(section.rows, function (row) {
-                            if (row.areas) {
-                                _.each(row.areas, function (area) {
-
-                                    //Remove the 'editors' - these are the allowed editors, these will
-                                    // be injected at runtime to this editor, it should not be persisted
-
-                                    if (area.editors) {
-                                        delete area.editors;
-                                    }
-
-                                    if (area.controls) {
-                                        _.each(area.controls, function (control) {
-                                            if (control.editor) {
-                                                //replace
-                                                var alias = control.editor.alias;
-                                                control.editor = {
-                                                    alias: alias
-                                                }
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-                        });
-                    }
-                });
-            }
-        });
-
-        //when the scope is destroyed we need to unsubscribe
-        $scope.$on('$destroy', function () {
-            unsubscribe();
-        });
-
     });

@@ -15,9 +15,16 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class StylesheetRepository : FileRepository<string, Stylesheet>, IStylesheetRepository
     {
-        
-        public StylesheetRepository(IUnitOfWork work, IFileSystem fileSystem)
-            : base(work, fileSystem)
+        private readonly IDatabaseUnitOfWork _dbwork;
+
+        internal StylesheetRepository(IUnitOfWork work, IDatabaseUnitOfWork db, IFileSystem fileSystem)
+			: base(work, fileSystem)
+	    {
+            _dbwork = db;
+	    }
+
+        public StylesheetRepository(IUnitOfWork work, IDatabaseUnitOfWork db)
+            : this(work, db, new PhysicalFileSystem(SystemDirectories.Css))
         {
         }
 
@@ -27,15 +34,17 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             if (FileSystem.FileExists(id) == false)
             {
-                return null;
+                throw new Exception(string.Format("The file {0} was not found", id));
             }
 
-            string content;
+            var content = string.Empty;
 
             using (var stream = FileSystem.OpenFile(id))
-            using (var reader = new StreamReader(stream, Encoding.UTF8))
             {
-                content = reader.ReadToEnd();
+                byte[] bytes = new byte[stream.Length];
+                stream.Position = 0;
+                stream.Read(bytes, 0, (int) stream.Length);
+                content = Encoding.UTF8.GetString(bytes);
             }
 
             var path = FileSystem.GetRelativePath(id);
@@ -43,21 +52,56 @@ namespace Umbraco.Core.Persistence.Repositories
             var updated = FileSystem.GetLastModified(path).UtcDateTime;
 
             var stylesheet = new Stylesheet(path)
-            {
-                Content = content,
-                Key = path.EncodeAsGuid(),
-                CreateDate = created,
-                UpdateDate = updated,
-                Id = path.GetHashCode(),
-                VirtualPath = FileSystem.GetUrl(id)
-            };
+                                 {
+                                     Content = content,
+                                     Key = path.EncodeAsGuid(),
+                                     CreateDate = created,
+                                     UpdateDate = updated,
+                                     Id = GetStylesheetId(path)
+                                 };
 
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946
             stylesheet.ResetDirtyProperties(false);
 
             return stylesheet;
+            
+        }
 
+        // Fix for missing Id's on FileService.GetStylesheets() call.  This is needed as sytlesheets can only bo loaded in the editor via 
+        //  their Id so listing stylesheets needs to list there Id as well for custom plugins to render the build in editor.
+        //  http://issues.umbraco.org/issue/U4-3258
+        private int GetStylesheetId(string path)
+        {
+            var sql = new Sql()
+                .Select("*")
+                .From<NodeDto>()
+                .Where("nodeObjectType = @NodeObjectType AND umbracoNode.text = @Alias",
+                    new { NodeObjectType = UmbracoObjectTypes.Stylesheet.GetGuid(), 
+                        Alias = path.TrimEnd(".css").Replace("\\", "/") });
+            var nodeDto = _dbwork.Database.FirstOrDefault<NodeDto>(sql);
+            return nodeDto == null ? 0 : nodeDto.NodeId;
+        }
+
+        //This should be used later to do GetAll properly without individual selections
+        private IEnumerable<Tuple<int, string>> GetStylesheetIds(string[] paths)
+        {
+            var sql = new Sql()
+                .Select("*")
+                .From<NodeDto>()
+                .Where("nodeObjectType = @NodeObjectType AND umbracoNode.text in (@aliases)",
+                    new 
+                    {
+                        NodeObjectType = UmbracoObjectTypes.Stylesheet.GetGuid(),
+                        aliases = paths.Select(x => x.TrimEnd(".css").Replace("\\", "/")).ToArray()
+                    });
+            var dtos = _dbwork.Database.Fetch<NodeDto>(sql);
+
+            return dtos.Select(x => new Tuple<int, string>(
+                //the id
+                x.NodeId,
+                //the original path requested for the id
+                paths.First(p => p.TrimEnd(".css").Replace("\\", "/") == x.Text)));
         }
 
         public override IEnumerable<Stylesheet> GetAll(params string[] ids)
@@ -74,39 +118,12 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                var files = FindAllFiles("", "*.css");
+                var files = FindAllFiles("");
                 foreach (var file in files)
                 {
                     yield return Get(file);
                 }
             }
-        }
-
-        /// <summary>
-        /// Gets a list of all <see cref="Stylesheet"/> that exist at the relative path specified. 
-        /// </summary>
-        /// <param name="rootPath">
-        /// If null or not specified, will return the stylesheets at the root path relative to the IFileSystem
-        /// </param>
-        /// <returns></returns>
-        public IEnumerable<Stylesheet> GetStylesheetsAtPath(string rootPath = null)
-        {
-            return FileSystem.GetFiles(rootPath ?? string.Empty, "*.css").Select(Get);
-        }
-
-        public bool ValidateStylesheet(Stylesheet stylesheet)
-        {
-            var dirs = SystemDirectories.Css;
-
-            //Validate file
-            var validFile = IOHelper.VerifyEditPath(stylesheet.VirtualPath, dirs.Split(','));
-
-            //Validate extension
-            var validExtension = IOHelper.VerifyFileExtension(stylesheet.VirtualPath, new List<string> { "css" });
-
-            var fileValid = validFile && validExtension;
-
-            return fileValid;
         }
 
         #endregion

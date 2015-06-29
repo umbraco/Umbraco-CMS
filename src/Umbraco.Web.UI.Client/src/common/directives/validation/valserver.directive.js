@@ -7,53 +7,14 @@
     **/
 function valServer(serverValidationManager) {
     return {
-        require: ['ngModel', '?^umbProperty'],
+        require: 'ngModel',
         restrict: "A",
-        link: function (scope, element, attr, ctrls) {
-
-            var modelCtrl = ctrls[0];
-            var umbPropCtrl = ctrls.length > 1 ? ctrls[1] : null;
-            if (!umbPropCtrl) {
-                //we cannot proceed, this validator will be disabled
-                return;
+        link: function (scope, element, attr, ctrl) {
+            
+            if (!scope.model || !scope.model.alias){
+                throw "valServer can only be used in the scope of a content property object";
             }
-
-            var watcher = null;
-
-            //Need to watch the value model for it to change, previously we had  subscribed to 
-            //modelCtrl.$viewChangeListeners but this is not good enough if you have an editor that
-            // doesn't specifically have a 2 way ng binding. This is required because when we
-            // have a server error we actually invalidate the form which means it cannot be 
-            // resubmitted. So once a field is changed that has a server error assigned to it
-            // we need to re-validate it for the server side validator so the user can resubmit
-            // the form. Of course normal client-side validators will continue to execute.
-            function startWatch() {
-                //if there's not already a watch
-                if (!watcher) {
-                    watcher = scope.$watch(function () {
-                        return modelCtrl.$modelValue;
-                    }, function (newValue, oldValue) {
-
-                        if (!newValue || angular.equals(newValue, oldValue)) {
-                            return;
-                        }
-
-                        if (modelCtrl.$invalid) {
-                            modelCtrl.$setValidity('valServer', true);
-                            stopWatch();
-                        }
-                    }, true);
-                }
-            }
-
-            function stopWatch() {
-                if (watcher) {
-                    watcher();
-                    watcher = null;
-                }
-            }
-
-            var currentProperty = umbPropCtrl.property;
+            var currentProperty = scope.model;
 
             //default to 'value' if nothing is set
             var fieldName = "value";
@@ -64,20 +25,33 @@ function valServer(serverValidationManager) {
                     fieldName = attr.valServer;
                 }
             }            
+
+            //Need to watch the value model for it to change, previously we had  subscribed to 
+            //ctrl.$viewChangeListeners but this is not good enough if you have an editor that
+            // doesn't specifically have a 2 way ng binding. This is required because when we
+            // have a server error we actually invalidate the form which means it cannot be 
+            // resubmitted. So once a field is changed that has a server error assigned to it
+            // we need to re-validate it for the server side validator so the user can resubmit
+            // the form. Of course normal client-side validators will continue to execute.
+            scope.$watch(function() {
+                return ctrl.$modelValue;
+            }, function (newValue) {
+                if (ctrl.$invalid) {
+                    ctrl.$setValidity('valServer', true);
+                }
+            });            
             
             //subscribe to the server validation changes
             serverValidationManager.subscribe(currentProperty.alias, fieldName, function (isValid, propertyErrors, allErrors) {
                 if (!isValid) {
-                    modelCtrl.$setValidity('valServer', false);
+                    ctrl.$setValidity('valServer', false);
                     //assign an error msg property to the current validator
-                    modelCtrl.errorMsg = propertyErrors[0].errorMsg;
-                    startWatch();
+                    ctrl.errorMsg = propertyErrors[0].errorMsg;
                 }
                 else {
-                    modelCtrl.$setValidity('valServer', true);
+                    ctrl.$setValidity('valServer', true);
                     //reset the error message
-                    modelCtrl.errorMsg = "";
-                    stopWatch();
+                    ctrl.errorMsg = "";
                 }
             });
             
@@ -85,10 +59,9 @@ function valServer(serverValidationManager) {
             // NOTE: this is very important otherwise when this controller re-binds the previous subscriptsion will remain
             // but they are a different callback instance than the above.
             element.bind('$destroy', function () {
-                stopWatch();
                 serverValidationManager.unsubscribe(currentProperty.alias, fieldName);
             });
         }
     };
 }
-angular.module('umbraco.directives.validation').directive("valServer", valServer);
+angular.module('umbraco.directives').directive("valServer", valServer);

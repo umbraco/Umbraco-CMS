@@ -9,7 +9,6 @@ using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models
 {
@@ -49,7 +48,7 @@ namespace Umbraco.Core.Models
             Id = id;
             UseInEditor = useInEditor;
             CacheDuration = cacheDuration;
-            Alias = alias.ToCleanString(CleanStringType.Alias);
+            Alias = alias;
             Name = name;
             ControlType = controlType;
             ControlAssembly = controlAssembly;
@@ -88,7 +87,7 @@ namespace Umbraco.Core.Models
         {
             UseInEditor = useInEditor;
             CacheDuration = cacheDuration;
-            Alias = alias.ToCleanString(CleanStringType.Alias);
+            Alias = alias;
             Name = name;
             ControlType = controlType;
             ControlAssembly = controlAssembly;
@@ -208,7 +207,7 @@ namespace Umbraco.Core.Models
             {
                 SetPropertyValueAndDetectChanges(o =>
                 {
-                    _alias = value.ToCleanString(CleanStringType.Alias);
+                    _alias = value;
                     return _alias;
                 }, _alias, AliasSelector);
             }
@@ -399,17 +398,14 @@ namespace Umbraco.Core.Models
         public override object DeepClone()
         {
             var clone = (Macro)base.DeepClone();
-            //turn off change tracking
-            clone.DisableChangeTracking();
+
             clone._addedProperties = new List<string>();
             clone._removedProperties = new List<string>();
             clone._properties = (MacroPropertyCollection)Properties.DeepClone();
             //re-assign the event handler
             clone._properties.CollectionChanged += clone.PropertiesChanged;
-            //this shouldn't really be needed since we're not tracking
+
             clone.ResetDirtyProperties(false);
-            //re-enable tracking
-            clone.EnableChangeTracking();
 
             return clone;
         }

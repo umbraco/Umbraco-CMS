@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models
@@ -20,43 +18,88 @@ namespace Umbraco.Core.Models
     {
         private string _alias;
         private string _name;
+        private int _creatorId;
+        private int _level;
+        private int _sortOrder;
+        private int _parentId;
         private string _masterTemplateAlias;
-        private Lazy<int> _masterTemplateId;
 
+        private static readonly PropertyInfo CreatorIdSelector = ExpressionHelper.GetPropertyInfo<Template, int>(x => x.CreatorId);
+        private static readonly PropertyInfo LevelSelector = ExpressionHelper.GetPropertyInfo<Template, int>(x => x.Level);
+        private static readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<Template, int>(x => x.SortOrder);
+        private static readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<Template, int>(x => x.ParentId);
         private static readonly PropertyInfo MasterTemplateAliasSelector = ExpressionHelper.GetPropertyInfo<Template, string>(x => x.MasterTemplateAlias);
-        private static readonly PropertyInfo MasterTemplateIdSelector = ExpressionHelper.GetPropertyInfo<Template, Lazy<int>>(x => x.MasterTemplateId);
-        private static readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<Template, string>(x => x.Alias);
-        private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<Template, string>(x => x.Name);
-
-        public Template(string name, string alias)
-            : base(string.Empty)
-        {
-            _name = name;
-            _alias = alias.ToCleanString(CleanStringType.UnderscoreAlias);
-            _masterTemplateId = new Lazy<int>(() => -1);
-        }        
-
-        [Obsolete("This constructor should not be used, file path is determined by alias, setting the path here will have no affect")]
+        
         public Template(string path, string name, string alias)
-            : this(name, alias)
-        {            
+            : base(path)
+        {
+            base.Path = path;
+            ParentId = -1;
+            _name = name; //.Replace("/", ".").Replace("\\", ""); // why? that's just the name!
+            _alias = alias.ToCleanString(CleanStringType.UnderscoreAlias);
         }
 
         [DataMember]
-        public Lazy<int> MasterTemplateId
+        internal int CreatorId
         {
-            get { return _masterTemplateId; }
+            get { return _creatorId; }
             set
             {
                 SetPropertyValueAndDetectChanges(o =>
                 {
-                    _masterTemplateId = value;
-                    return _masterTemplateId;
-                }, _masterTemplateId, MasterTemplateIdSelector);
+                    _creatorId = value;
+                    return _creatorId;
+                }, _creatorId, CreatorIdSelector);    
             }
         }
 
-        public string MasterTemplateAlias
+        [DataMember]
+        internal int Level
+        {
+            get { return _level; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _level = value;
+                    return _level;
+                }, _level, LevelSelector);    
+            }
+        }
+
+        [DataMember]
+        internal int SortOrder
+        {
+            get { return _sortOrder; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _sortOrder = value;
+                    return _sortOrder;
+                }, _sortOrder, SortOrderSelector);    
+            }
+        }
+
+        [DataMember]
+        internal int ParentId
+        {
+            get { return _parentId; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _parentId = value;
+                    return _parentId;
+                }, _parentId, ParentIdSelector);    
+            }
+        }
+        
+        [DataMember]
+        internal Lazy<int> MasterTemplateId { get; set; }
+
+        [DataMember]
+        internal string MasterTemplateAlias
         {
             get { return _masterTemplateAlias; }
             set
@@ -65,50 +108,68 @@ namespace Umbraco.Core.Models
                 {
                     _masterTemplateAlias = value;
                     return _masterTemplateAlias;
-                }, _masterTemplateAlias, MasterTemplateAliasSelector);
+                }, _masterTemplateAlias, MasterTemplateAliasSelector);    
             }
         }
 
         [DataMember]
-        public new string Name
+        public override string Alias
         {
-            get { return _name; }
-            set
+            get
             {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _name = value;
-                    return _name;
-                }, _name, NameSelector);
-                
+                return _alias;
             }
         }
 
         [DataMember]
-        public new string Alias
+        public override string Name
         {
-            get { return _alias; }
-            set
+            get
             {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _alias = value.ToCleanString(CleanStringType.UnderscoreAlias);
-                    return _alias;
-                }, _alias, AliasSelector);
-                
+                return _name;
             }
         }
 
         /// <summary>
-        /// Returns true if the template is used as a layout for other templates (i.e. it has 'children')
+        /// Returns the <see cref="RenderingEngine"/> that corresponds to the template file
         /// </summary>
-        public bool IsMasterTemplate { get; internal set; }
-
-        [Obsolete("This is no longer used and will be removed from the codebase in future versions, use the IFileSystem DetermineRenderingEngine method instead")]
+        /// <returns><see cref="RenderingEngine"/></returns>
         public RenderingEngine GetTypeOfRenderingEngine()
         {
-            //Hack! TODO: Remove this method entirely
-            return ApplicationContext.Current.Services.FileService.DetermineTemplateRenderingEngine(this);
+            if(Path.EndsWith("cshtml") || Path.EndsWith("vbhtml"))
+                return RenderingEngine.Mvc;
+
+            return RenderingEngine.WebForms;
+        }
+
+        /// <summary>
+        /// Boolean indicating whether the file could be validated
+        /// </summary>
+        /// <returns>True if file is valid, otherwise false</returns>
+        public override bool IsValid()
+        {
+            var exts = new List<string>();
+            if (UmbracoConfig.For.UmbracoSettings().Templates.DefaultRenderingEngine == RenderingEngine.Mvc)
+            {
+                exts.Add("cshtml");
+                exts.Add("vbhtml");
+            }
+            else
+            {
+                exts.Add(UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages ? "master" : "aspx");
+            }
+
+            var dirs = SystemDirectories.Masterpages;
+            if (UmbracoConfig.For.UmbracoSettings().Templates.DefaultRenderingEngine == RenderingEngine.Mvc)
+                dirs += "," + SystemDirectories.MvcViews;
+
+            //Validate file
+            var validFile = IOHelper.VerifyEditPath(Path, dirs.Split(','));
+
+            //Validate extension
+            var validExtension = IOHelper.VerifyFileExtension(Path, exts);
+
+            return validFile && validExtension;
         }
 
         /// <summary>
@@ -126,40 +187,20 @@ namespace Umbraco.Core.Models
 
         public void SetMasterTemplate(ITemplate masterTemplate)
         {
-            if (masterTemplate == null)
-            {
-                MasterTemplateId = new Lazy<int>(() => -1);
-                MasterTemplateAlias = null;
-            }
-            else
-            {
-                MasterTemplateId = new Lazy<int>(() => masterTemplate.Id);
-                MasterTemplateAlias = masterTemplate.Alias;
-            }
-           
+            MasterTemplateId = new Lazy<int>(() => masterTemplate.Id);
         }
 
         public override object DeepClone()
         {
-        
-            //We cannot call in to the base classes to clone because the base File class treats Alias, Name.. differently so we need to manually do the clone
+            var clone = (Template)base.DeepClone();
 
-            //Memberwise clone on Entity will work since it doesn't have any deep elements
-            // for any sub class this will work for standard properties as well that aren't complex object's themselves.
-            var clone = (Template)MemberwiseClone();
-            //turn off change tracking
-            clone.DisableChangeTracking();
-            //Automatically deep clone ref properties that are IDeepCloneable
-            DeepCloneHelper.DeepCloneRefProperties(this, clone);
+            //need to manually assign since they are readonly properties
+            clone._alias = Alias;
+            clone._name = Name;
 
-            //this shouldn't really be needed since we're not tracking
             clone.ResetDirtyProperties(false);
-            //re-enable tracking
-            clone.EnableChangeTracking();
 
             return clone;
         }
-
-        
     }
 }

@@ -11,10 +11,10 @@ namespace Umbraco.Web
     /// <summary>
     /// A class that exposes methods used to query tag data in views
     /// </summary>
-    public class TagQuery : ITagQuery
+    public class TagQuery
     {
         private readonly ITagService _tagService;
-        private readonly ITypedPublishedContentQuery _typedContentQuery;
+        private readonly PublishedContentQuery _contentQuery;
 
         [Obsolete("Use the alternate constructor specifying the contentQuery instead")]
         public TagQuery(ITagService tagService)
@@ -22,26 +22,12 @@ namespace Umbraco.Web
         {
         }
 
-         [Obsolete("Use the alternate constructor specifying the ITypedPublishedContentQuery instead")]
         public TagQuery(ITagService tagService, PublishedContentQuery contentQuery)
         {
             if (tagService == null) throw new ArgumentNullException("tagService");
             if (contentQuery == null) throw new ArgumentNullException("contentQuery");
             _tagService = tagService;
-            _typedContentQuery = contentQuery;
-        }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="tagService"></param>
-        /// <param name="typedContentQuery"></param>
-        public TagQuery(ITagService tagService, ITypedPublishedContentQuery typedContentQuery)
-        {
-            if (tagService == null) throw new ArgumentNullException("tagService");
-            if (typedContentQuery == null) throw new ArgumentNullException("typedContentQuery");
-            _tagService = tagService;
-            _typedContentQuery = typedContentQuery;
+            _contentQuery = contentQuery;
         }
         
         /// <summary>
@@ -54,7 +40,7 @@ namespace Umbraco.Web
         {
             var ids = _tagService.GetTaggedContentByTag(tag, tagGroup)
                 .Select(x => x.EntityId);
-            return _typedContentQuery.TypedContent(ids)
+            return _contentQuery.TypedContent(ids)
                 .Where(x => x != null);
         }
 
@@ -67,7 +53,7 @@ namespace Umbraco.Web
         {
             var ids = _tagService.GetTaggedContentByTagGroup(tagGroup)
                 .Select(x => x.EntityId);
-            return _typedContentQuery.TypedContent(ids)
+            return _contentQuery.TypedContent(ids)
                 .Where(x => x != null);
         }
 
@@ -81,7 +67,7 @@ namespace Umbraco.Web
         {
             var ids = _tagService.GetTaggedMediaByTag(tag, tagGroup)
                 .Select(x => x.EntityId);
-            return _typedContentQuery.TypedMedia(ids)
+            return _contentQuery.TypedMedia(ids)
                 .Where(x => x != null);
         }
 
@@ -94,7 +80,7 @@ namespace Umbraco.Web
         {
             var ids = _tagService.GetTaggedMediaByTagGroup(tagGroup)
                 .Select(x => x.EntityId);
-            return _typedContentQuery.TypedMedia(ids)
+            return _contentQuery.TypedMedia(ids)
                 .Where(x => x != null);
         }
 

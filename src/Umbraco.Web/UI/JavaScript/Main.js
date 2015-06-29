@@ -3,8 +3,6 @@ LazyLoad.js("##JsInitialize##", function () {
     UmbClientMgr.setUmbracoPath('"##UmbracoPath##"');
 
     jQuery(document).ready(function () {
-
         angular.bootstrap(document, ['umbraco']);
-
     });
 });

@@ -1,9 +1,6 @@
-﻿using Moq;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Migrations.Initial;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence
@@ -29,7 +26,7 @@ namespace Umbraco.Tests.Persistence
         {
             // Arrange
             var db = DatabaseContext.Database;
-            var schema = new DatabaseSchemaCreation(db, Logger, new SqlCeSyntaxProvider());
+            var schema = new DatabaseSchemaCreation(db);
 
             // Act
             var result = schema.ValidateSchema();

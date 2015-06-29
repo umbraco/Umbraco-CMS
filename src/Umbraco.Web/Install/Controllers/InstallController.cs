@@ -37,23 +37,31 @@ namespace Umbraco.Web.Install.Controllers
         [HttpGet]
         public ActionResult Index()
         {
-            if (ApplicationContext.Current.IsConfigured)
+            //if this is not an upgrade we will log in with the default user.
+            // It's not considered an upgrade if the ConfigurationStatus is missing or empty or if the db is not configured.
+            if (string.IsNullOrWhiteSpace(GlobalSettings.ConfigurationStatus) == false
+                && ApplicationContext.Current.DatabaseContext.IsDatabaseConfigured)
             {
-                return Redirect(SystemDirectories.Umbraco.EnsureEndsWith('/'));   
-            }
+                Version current;
+                if (Version.TryParse(GlobalSettings.ConfigurationStatus, out current))
+                {
+                    //check if we are on the current version, and not let the installer execute
+                    if (current == UmbracoVersion.Current)
+                    {
+                        return Redirect(SystemDirectories.Umbraco.EnsureEndsWith('/'));
+                    }    
+                }
 
-            if (ApplicationContext.Current.IsUpgrading)
-            {
                 var result = _umbracoContext.Security.ValidateCurrentUser(false);
 
                 switch (result)
                 {
                     case ValidateRequestAttempt.FailedNoPrivileges:
+                    case ValidateRequestAttempt.FailedTimedOut:
                     case ValidateRequestAttempt.FailedNoContextId:
-                        return Redirect(SystemDirectories.Umbraco + "/AuthorizeUpgrade?redir=" + Server.UrlEncode(Request.RawUrl));
+                        return Redirect(SystemDirectories.Umbraco + "/AuthorizeUpgrade?redir=" + Server.UrlEncode(Request.RawUrl));                        
                 }
-            }
-       
+            }            
 
             //gen the install base url
             ViewBag.InstallApiBaseUrl = Url.GetUmbracoApiService("GetSetup", "InstallApi", "UmbracoInstall").TrimEnd("GetSetup");

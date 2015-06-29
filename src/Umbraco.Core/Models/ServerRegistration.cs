@@ -2,67 +2,61 @@
 using System.Globalization;
 using System.Reflection;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Sync;
 
 namespace Umbraco.Core.Models
 {
-    /// <summary>
-    /// Represents a registered server in a multiple-servers environment.
-    /// </summary>
-    public class ServerRegistration : Entity, IServerRegistration
+    internal class ServerRegistration : Entity, IServerAddress, IAggregateRoot
     {
         private string _serverAddress;
-        private string _serverIdentity;
+        private string _computerName;
         private bool _isActive;
 
         private static readonly PropertyInfo ServerAddressSelector = ExpressionHelper.GetPropertyInfo<ServerRegistration, string>(x => x.ServerAddress);
-        private static readonly PropertyInfo ServerIdentitySelector = ExpressionHelper.GetPropertyInfo<ServerRegistration, string>(x => x.ServerIdentity);
+        private static readonly PropertyInfo ComputerNameSelector = ExpressionHelper.GetPropertyInfo<ServerRegistration, string>(x => x.ComputerName);
         private static readonly PropertyInfo IsActiveSelector = ExpressionHelper.GetPropertyInfo<ServerRegistration, bool>(x => x.IsActive);
 
-        /// <summary>
-        /// Initialiazes a new instance of the <see cref="ServerRegistration"/> class.
-        /// </summary>
         public ServerRegistration()
-        { }
+        {
+
+        }
 
         /// <summary>
-        /// Initialiazes a new instance of the <see cref="ServerRegistration"/> class.
+        /// Creates an item with pre-filled properties
         /// </summary>
-        /// <param name="id">The unique id of the server registration.</param>
-        /// <param name="serverAddress">The server url.</param>
-        /// <param name="serverIdentity">The unique server identity.</param>
-        /// <param name="registered">The date and time the registration was created.</param>
-        /// <param name="accessed">The date and time the registration was last accessed.</param>
-        /// <param name="isActive">A value indicating whether the registration is active.</param>
-        public ServerRegistration(int id, string serverAddress, string serverIdentity, DateTime registered, DateTime accessed, bool isActive)
+        /// <param name="id"></param>
+        /// <param name="serverAddress"></param>
+        /// <param name="computerName"></param>
+        /// <param name="createDate"></param>
+        /// <param name="updateDate"></param>
+        /// <param name="isActive"></param>
+        public ServerRegistration(int id, string serverAddress, string computerName, DateTime createDate, DateTime updateDate, bool isActive)
         {
-            UpdateDate = accessed;
-            CreateDate = registered;
-            Key = id.ToString(CultureInfo.InvariantCulture).EncodeAsGuid();
+            UpdateDate = updateDate;
+            CreateDate = createDate;
+            Key = Id.ToString(CultureInfo.InvariantCulture).EncodeAsGuid();
             Id = id;
             ServerAddress = serverAddress;
-            ServerIdentity = serverIdentity;
+            ComputerName = computerName;
             IsActive = isActive;
         }
 
         /// <summary>
-        /// Initialiazes a new instance of the <see cref="ServerRegistration"/> class.
+        /// Creates a new instance for persisting a new item
         /// </summary>
-        /// <param name="serverAddress">The server url.</param>
-        /// <param name="serverIdentity">The unique server identity.</param>
-        /// <param name="registered">The date and time the registration was created.</param>
-        public ServerRegistration(string serverAddress, string serverIdentity, DateTime registered)
+        /// <param name="serverAddress"></param>
+        /// <param name="computerName"></param>
+        /// <param name="createDate"></param>
+        public ServerRegistration(string serverAddress, string computerName, DateTime createDate)
         {
-            CreateDate = registered;
-            UpdateDate = registered;
+            CreateDate = createDate;
+            UpdateDate = createDate;
             Key = 0.ToString(CultureInfo.InvariantCulture).EncodeAsGuid();
             ServerAddress = serverAddress;
-            ServerIdentity = serverIdentity;
+            ComputerName = computerName;
         }
 
-        /// <summary>
-        /// Gets or sets the server url.
-        /// </summary>
         public string ServerAddress
         {
             get { return _serverAddress; }
@@ -76,25 +70,19 @@ namespace Umbraco.Core.Models
             }
         }
 
-        /// <summary>
-        /// Gets or sets the server unique identity.
-        /// </summary>
-        public string ServerIdentity
+        public string ComputerName
         {
-            get { return _serverIdentity; }
+            get { return _computerName; }
             set
             {
                 SetPropertyValueAndDetectChanges(o =>
                 {
-                    _serverIdentity = value;
-                    return _serverIdentity;
-                }, _serverIdentity, ServerIdentitySelector);
+                    _computerName = value;
+                    return _computerName;
+                }, _computerName, ComputerNameSelector);
             }
         }
 
-        /// <summary>
-        /// Gets or sets a value indicating whether the server is active.
-        /// </summary>
         public bool IsActive
         {
             get { return _isActive; }
@@ -108,23 +96,9 @@ namespace Umbraco.Core.Models
             }
         }
 
-        /// <summary>
-        /// Gets the date and time the registration was created.
-        /// </summary>
-        public DateTime Registered { get { return CreateDate; } set { CreateDate = value; }}
-
-        /// <summary>
-        /// Gets the date and time the registration was last accessed.
-        /// </summary>
-        public DateTime Accessed { get { return UpdateDate; } set { UpdateDate = value; }}
-
-        /// <summary>
-        /// Converts the value of this instance to its equivalent string representation.
-        /// </summary>
-        /// <returns></returns>
         public override string ToString()
         {
-            return string.Format("{{\"{0}\", \"{1}\", {2}active}}", ServerAddress, ServerIdentity, IsActive ? "" : "!");
+            return "(" + ServerAddress + ", " + ComputerName + ", IsActive = " + IsActive + ")";
         }
     }
 }

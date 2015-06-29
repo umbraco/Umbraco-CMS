@@ -35,14 +35,12 @@ namespace Umbraco.Web.WebServices
         public bool CheckContentXmlTable()
         {
             var totalPublished = Services.ContentService.CountPublished();
-            
             var subQuery = new Sql()
-                .Select("DISTINCT cmsContentXml.nodeId")
+                .Select("Count(DISTINCT cmsContentXml.nodeId)")
                 .From<ContentXmlDto>()
                 .InnerJoin<DocumentDto>()
                 .On<DocumentDto, ContentXmlDto>(left => left.NodeId, right => right.NodeId);
-
-            var totalXml = ApplicationContext.DatabaseContext.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM (" + subQuery.SQL + ") as tmp");
+            var totalXml = ApplicationContext.DatabaseContext.Database.ExecuteScalar<int>(subQuery);
 
             return totalXml == totalPublished;
         }

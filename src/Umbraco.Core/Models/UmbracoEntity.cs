@@ -288,8 +288,7 @@ namespace Umbraco.Core.Models
         public override object DeepClone()
         {
             var clone = (UmbracoEntity) base.DeepClone();
-            //turn off change tracking
-            clone.DisableChangeTracking();
+
             //This ensures that any value in the dictionary that is deep cloneable is cloned too
             foreach (var key in clone.AdditionalData.Keys.ToArray())
             {
@@ -299,10 +298,7 @@ namespace Umbraco.Core.Models
                     clone.AdditionalData[key] = deepCloneable.DeepClone();
                 }
             }
-            //this shouldn't really be needed since we're not tracking
-            clone.ResetDirtyProperties(false);
-            //re-enable tracking
-            clone.EnableChangeTracking();
+
             return clone;
         }
 

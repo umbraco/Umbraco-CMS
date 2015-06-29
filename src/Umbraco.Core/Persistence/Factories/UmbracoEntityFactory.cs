@@ -9,11 +9,11 @@ using Umbraco.Core.Persistence.Repositories;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class UmbracoEntityFactory 
+    internal class UmbracoEntityFactory : IEntityFactory<UmbracoEntity, EntityRepository.UmbracoEntityDto>
     {
         internal void AddAdditionalData(UmbracoEntity entity, IDictionary<string, object> originalEntityProperties)
         {
-            var entityProps = typeof(IUmbracoEntity).GetPublicProperties().Select(x => x.Name).ToArray();
+            var entityProps = TypeHelper.GetPublicProperties(typeof(IUmbracoEntity)).Select(x => x.Name).ToArray();
             
             //figure out what extra properties we have that are not on the IUmbracoEntity and add them to additional data
             foreach (var k in originalEntityProperties.Keys
@@ -75,7 +75,7 @@ namespace Umbraco.Core.Persistence.Factories
                                  CreateDate = dto.CreateDate,
                                  CreatorId = dto.UserId.Value,
                                  Id = dto.NodeId,
-                                 Key = dto.UniqueId,
+                                 Key = dto.UniqueId.Value,
                                  Level = dto.Level,
                                  Name = dto.Text,
                                  NodeObjectTypeId = dto.NodeObjectType.Value,

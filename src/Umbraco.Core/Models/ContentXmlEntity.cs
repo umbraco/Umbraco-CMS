@@ -11,11 +11,13 @@ namespace Umbraco.Core.Models
     internal class ContentXmlEntity<TContent> : IAggregateRoot
         where TContent : IContentBase
     {
+        private readonly bool _entityExists;
         private readonly Func<TContent, XElement> _xml;
 
-        public ContentXmlEntity(TContent content, Func<TContent, XElement> xml)
-        {
+        public ContentXmlEntity(bool entityExists, TContent content, Func<TContent, XElement> xml)
+        {            
             if (content == null) throw new ArgumentNullException("content");
+            _entityExists = entityExists;
             _xml = xml;            
             Content = content;
         }
@@ -30,7 +32,6 @@ namespace Umbraco.Core.Models
         {
             get { return _xml(Content); }
         }
-
         public TContent Content { get; private set; }
 
         public int Id
@@ -43,14 +44,9 @@ namespace Umbraco.Core.Models
         public DateTime CreateDate { get; set; }
         public DateTime UpdateDate { get; set; }
 
-        /// <summary>
-        /// Special case, always return false, this will cause the repositories managing 
-        /// this object to always do an 'insert' but these are special repositories that 
-        /// do an InsertOrUpdate on insert since the data for this needs to be managed this way
-        /// </summary>        
         public bool HasIdentity
         {
-            get { return false; }         
+            get { return _entityExists; }         
         }
 
         public object DeepClone()

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Globalization;
@@ -8,7 +6,6 @@ using System.IO;
 using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Security;
@@ -17,34 +14,25 @@ using umbraco;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.language;
 using umbraco.cms.businesslogic.member;
-using Umbraco.Core.Services;
-using Umbraco.Web.Security;
 using RenderingEngine = Umbraco.Core.RenderingEngine;
 
 namespace Umbraco.Web.Routing
 {
 	internal class PublishedContentRequestEngine
-	{	    
-	    private readonly PublishedContentRequest _pcr;
-	    private readonly RoutingContext _routingContext;
-	    private readonly IWebRoutingSection _webRoutingSection;
+	{
+		private readonly PublishedContentRequest _pcr;
+		private readonly RoutingContext _routingContext;
 
-	    /// <summary>
-	    /// Initializes a new instance of the <see cref="PublishedContentRequestEngine"/> class with a content request.
-	    /// </summary>
-	    /// <param name="webRoutingSection"></param>
-	    /// <param name="pcr">The content request.</param>
-	    public PublishedContentRequestEngine(            
-            IWebRoutingSection webRoutingSection,
-            PublishedContentRequest pcr)
+		/// <summary>
+		/// Initializes a new instance of the <see cref="PublishedContentRequestEngine"/> class with a content request.
+		/// </summary>
+		/// <param name="pcr">The content request.</param>
+		public PublishedContentRequestEngine(PublishedContentRequest pcr)
 		{
-	        if (pcr == null) throw new ArgumentException("pcr is null.");
-	        if (webRoutingSection == null) throw new ArgumentNullException("webRoutingSection");
-	       
-	        _pcr = pcr;
-	        _webRoutingSection = webRoutingSection;
-
-	        _routingContext = pcr.RoutingContext;
+			if (pcr == null) throw new ArgumentException("pcr is null.");
+			_pcr = pcr;
+			
+			_routingContext = pcr.RoutingContext;
 			if (_routingContext == null) throw new ArgumentException("pcr.RoutingContext is null.");
 			
 			var umbracoContext = _routingContext.UmbracoContext;
@@ -53,17 +41,6 @@ namespace Umbraco.Web.Routing
 			// no! not set yet.
 			//if (umbracoContext.PublishedContentRequest != _pcr) throw new ArgumentException("PublishedContentRequest confusion.");
 		}
-
-        protected ProfilingLogger ProfilingLogger
-	    {
-            get { return _routingContext.UmbracoContext.Application.ProfilingLogger; }
-	    }
-
-	    protected ServiceContext Services
-	    {
-            get { return _routingContext.UmbracoContext.Application.Services; }
-
-	    }
 
 		#region Public
 
@@ -104,13 +81,10 @@ namespace Umbraco.Web.Routing
 		    {
                 // find the document & template
                 FindPublishedContentAndTemplate();
+
+                // set the culture on the thread -- again, 'cos it might have changed due to a wildcard domain
+                Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = _pcr.Culture;
 		    }
-
-            // handle wildcard domains
-            HandleWildcardDomains();
-
-            // set the culture on the thread -- again, 'cos it might have changed due to a finder or wildcard domain
-            Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = _pcr.Culture;
 
 			// trigger the Prepared event - at that point it is still possible to change about anything
             // even though the request might be flagged for redirection - we'll redirect _after_ the event
@@ -195,7 +169,7 @@ namespace Umbraco.Web.Routing
 			if (_pcr.IsRedirect)
 				return;
 
-			if (_pcr.HasPublishedContent == false)
+			if (!_pcr.HasPublishedContent)
 			{
 				// means the engine could not find a proper document to handle 404
 				// restore the saved content so we know it exists
@@ -203,7 +177,7 @@ namespace Umbraco.Web.Routing
 				return;
 			}
 
-			if (_pcr.HasTemplate == false)
+			if (!_pcr.HasTemplate)
 			{
 				// means we may have a document, but we have no template
 				// at that point there isn't much we can do and there is no point returning
@@ -236,24 +210,24 @@ namespace Umbraco.Web.Routing
 
 			// note - we are not handling schemes nor ports here.
 
-			ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Uri=\"{1}\"", () => tracePrefix, () => _pcr.Uri);
+			LogHelper.Debug<PublishedContentRequestEngine>("{0}Uri=\"{1}\"", () => tracePrefix, () => _pcr.Uri);
 
 			// try to find a domain matching the current request
-            var domainAndUri = DomainHelper.DomainForUri(Services.DomainService.GetAll(false), _pcr.Uri);
+            var domainAndUri = DomainHelper.DomainForUri(DomainHelper.GetAllDomains(false), _pcr.Uri);
 
 			// handle domain
 			if (domainAndUri != null)
 			{
 				// matching an existing domain
-				ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Matches domain=\"{1}\", rootId={2}, culture=\"{3}\"",
+				LogHelper.Debug<PublishedContentRequestEngine>("{0}Matches domain=\"{1}\", rootId={2}, culture=\"{3}\"",
 												 () => tracePrefix,
-												 () => domainAndUri.UmbracoDomain.DomainName,
-												 () => domainAndUri.UmbracoDomain.RootContent.Id,
-                                                 () => domainAndUri.UmbracoDomain.Language.IsoCode);
+												 () => domainAndUri.Domain.Name,
+												 () => domainAndUri.Domain.RootNodeId,
+												 () => domainAndUri.Domain.Language.CultureAlias);
 
-                _pcr.UmbracoDomain = domainAndUri.UmbracoDomain;
+				_pcr.Domain = domainAndUri.Domain;
 				_pcr.DomainUri = domainAndUri.Uri;
-                _pcr.Culture = new CultureInfo(domainAndUri.UmbracoDomain.Language.IsoCode);
+				_pcr.Culture = new CultureInfo(domainAndUri.Domain.Language.CultureAlias);
 
 				// canonical? not implemented at the moment
 				// if (...)
@@ -265,15 +239,15 @@ namespace Umbraco.Web.Routing
 			else
 			{
 				// not matching any existing domain
-				ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Matches no domain", () => tracePrefix);
+				LogHelper.Debug<PublishedContentRequestEngine>("{0}Matches no domain", () => tracePrefix);
 
-                var defaultLanguage = Services.LocalizationService.GetAllLanguages().FirstOrDefault();
-				_pcr.Culture = defaultLanguage == null ? CultureInfo.CurrentUICulture : new CultureInfo(defaultLanguage.IsoCode);
+				var defaultLanguage = Language.GetAllAsList().FirstOrDefault();
+				_pcr.Culture = defaultLanguage == null ? CultureInfo.CurrentUICulture : new CultureInfo(defaultLanguage.CultureAlias);
 			}
 
-			ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Culture=\"{1}\"", () => tracePrefix, () => _pcr.Culture.Name);
+			LogHelper.Debug<PublishedContentRequestEngine>("{0}Culture=\"{1}\"", () => tracePrefix, () => _pcr.Culture.Name);
 
-			return _pcr.UmbracoDomain != null;
+			return _pcr.Domain != null;
 		}
 
 		/// <summary>
@@ -283,23 +257,23 @@ namespace Umbraco.Web.Routing
 		{
 			const string tracePrefix = "HandleWildcardDomains: ";
 
-			if (_pcr.HasPublishedContent == false)
+			if (!_pcr.HasPublishedContent)
 				return;
 
 			var nodePath = _pcr.PublishedContent.Path;
-			ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Path=\"{1}\"", () => tracePrefix, () => nodePath);
-            var rootNodeId = _pcr.HasDomain ? _pcr.UmbracoDomain.RootContent.Id : (int?)null;
-            var domain = DomainHelper.FindWildcardDomainInPath(Services.DomainService.GetAll(true), nodePath, rootNodeId);
+			LogHelper.Debug<PublishedContentRequestEngine>("{0}Path=\"{1}\"", () => tracePrefix, () => nodePath);
+			var rootNodeId = _pcr.HasDomain ? _pcr.Domain.RootNodeId : (int?)null;
+			var domain = DomainHelper.FindWildcardDomainInPath(DomainHelper.GetAllDomains(true), nodePath, rootNodeId);
 
 			if (domain != null)
 			{
-				_pcr.Culture = new CultureInfo(domain.Language.IsoCode);
-				ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Got domain on node {1}, set culture to \"{2}\".", () => tracePrefix,
-                    () => domain.RootContent.Id, () => _pcr.Culture.Name);
+				_pcr.Culture = new CultureInfo(domain.Language.CultureAlias);
+				LogHelper.Debug<PublishedContentRequestEngine>("{0}Got domain on node {1}, set culture to \"{2}\".", () => tracePrefix,
+					() => domain.RootNodeId, () => _pcr.Culture.Name);
 			}
 			else
 			{
-				ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}No match.", () => tracePrefix);
+				LogHelper.Debug<PublishedContentRequestEngine>("{0}No match.", () => tracePrefix);
 			}
 		}
 
@@ -334,7 +308,7 @@ namespace Umbraco.Web.Routing
 
         internal bool FindTemplateRenderingEngineInDirectory(DirectoryInfo directory, string alias, string[] extensions)
         {
-            if (directory == null || directory.Exists == false)
+            if (directory == null || !directory.Exists)
                 return false;
 
             var pos = alias.IndexOf('/');
@@ -361,7 +335,7 @@ namespace Umbraco.Web.Routing
 	    private void FindPublishedContentAndTemplate()
 		{
 			const string tracePrefix = "FindPublishedContentAndTemplate: ";
-			ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Path=\"{1}\"", () => tracePrefix, () => _pcr.Uri.AbsolutePath);
+			LogHelper.Debug<PublishedContentRequestEngine>("{0}Path=\"{1}\"", () => tracePrefix, () => _pcr.Uri.AbsolutePath);
 
 			// run the document finders
 			FindPublishedContent();
@@ -383,6 +357,9 @@ namespace Umbraco.Web.Routing
 
 			// handle umbracoRedirect
 			FollowExternalRedirect();
+
+			// handle wildcard domains
+			HandleWildcardDomains();
 		}
 
 	    /// <summary>
@@ -397,15 +374,13 @@ namespace Umbraco.Web.Routing
 			// the first successful finder, if any, will set this.PublishedContent, and may also set this.Template
 			// some finders may implement caching
 
-            using (ProfilingLogger.DebugDuration<PublishedContentRequestEngine>(
-				string.Format("{0}Begin finders", tracePrefix),
-				string.Format("{0}End finders, {1}", tracePrefix, (_pcr.HasPublishedContent ? "a document was found" : "no document was found"))))
+            using (DisposableTimer.DebugDuration<PublishedContentRequestEngine>(
+				() => string.Format("{0}Begin finders", tracePrefix),
+				() => string.Format("{0}End finders, {1}", tracePrefix, (_pcr.HasPublishedContent ? "a document was found" : "no document was found"))))
 			{
 			    if (_routingContext.PublishedContentFinders == null)
                     throw new InvalidOperationException("There is no finder collection.");
-
-                //iterate but return on first one that finds it
-			    var found = _routingContext.PublishedContentFinders.Any(finder => finder.TryFindContent(_pcr));
+			    _routingContext.PublishedContentFinders.Any(finder => finder.TryFindContent(_pcr));
 			}
 
 		    // indicate that the published content (if any) we have at the moment is the
@@ -429,23 +404,23 @@ namespace Umbraco.Web.Routing
 			const int maxLoop = 8;
 			do
 			{
-				ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}{1}", () => tracePrefix, () => (i == 0 ? "Begin" : "Loop"));
+				LogHelper.Debug<PublishedContentRequestEngine>("{0}{1}", () => tracePrefix, () => (i == 0 ? "Begin" : "Loop"));
 
 				// handle not found
-				if (_pcr.HasPublishedContent == false)
+				if (!_pcr.HasPublishedContent)
 				{
 					_pcr.Is404 = true;
-					ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}No document, try last chance lookup", () => tracePrefix);
+					LogHelper.Debug<PublishedContentRequestEngine>("{0}No document, try last chance lookup", () => tracePrefix);
 
 					// if it fails then give up, there isn't much more that we can do
 					var lastChance = _routingContext.PublishedContentLastChanceFinder;
-					if (lastChance == null || lastChance.TryFindContent(_pcr) == false)
+					if (lastChance == null || !lastChance.TryFindContent(_pcr))
 					{
-						ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Failed to find a document, give up", () => tracePrefix);
+						LogHelper.Debug<PublishedContentRequestEngine>("{0}Failed to find a document, give up", () => tracePrefix);
 						break;
 					}
 
-					ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Found a document", () => tracePrefix);
+					LogHelper.Debug<PublishedContentRequestEngine>("{0}Found a document", () => tracePrefix);
 				}
 
 				// follow internal redirects as long as it's not running out of control ie infinite loop of some sort
@@ -463,15 +438,15 @@ namespace Umbraco.Web.Routing
 				// got us to nowhere and now we need to run the notFoundLookup again
 				// as long as it's not running out of control ie infinite loop of some sort
 
-			} while (_pcr.HasPublishedContent == false && i++ < maxLoop);
+			} while (!_pcr.HasPublishedContent && i++ < maxLoop);
 
 			if (i == maxLoop || j == maxLoop)
 			{
-				ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Looks like we're running into an infinite loop, abort", () => tracePrefix);
+				LogHelper.Debug<PublishedContentRequestEngine>("{0}Looks like we're running into an infinite loop, abort", () => tracePrefix);
 				_pcr.PublishedContent = null;
 			}
 
-			ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}End", () => tracePrefix);
+			LogHelper.Debug<PublishedContentRequestEngine>("{0}End", () => tracePrefix);
 		}
 
 		/// <summary>
@@ -492,24 +467,24 @@ namespace Umbraco.Web.Routing
 			bool redirect = false;
 			var internalRedirect = _pcr.PublishedContent.GetPropertyValue<string>(Constants.Conventions.Content.InternalRedirectId);
 
-			if (string.IsNullOrWhiteSpace(internalRedirect) == false)
+			if (!string.IsNullOrWhiteSpace(internalRedirect))
 			{
-				ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Found umbracoInternalRedirectId={1}", () => tracePrefix, () => internalRedirect);
+				LogHelper.Debug<PublishedContentRequestEngine>("{0}Found umbracoInternalRedirectId={1}", () => tracePrefix, () => internalRedirect);
 
 				int internalRedirectId;
-				if (int.TryParse(internalRedirect, out internalRedirectId) == false)
+				if (!int.TryParse(internalRedirect, out internalRedirectId))
 					internalRedirectId = -1;
 
 				if (internalRedirectId <= 0)
 				{
 					// bad redirect - log and display the current page (legacy behavior)
 					//_pcr.Document = null; // no! that would be to force a 404
-					ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Failed to redirect to id={1}: invalid value", () => tracePrefix, () => internalRedirect);
+					LogHelper.Debug<PublishedContentRequestEngine>("{0}Failed to redirect to id={1}: invalid value", () => tracePrefix, () => internalRedirect);
 				}
 				else if (internalRedirectId == _pcr.PublishedContent.Id)
 				{
 					// redirect to self
-					ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Redirecting to self, ignore", () => tracePrefix);
+					LogHelper.Debug<PublishedContentRequestEngine>("{0}Redirecting to self, ignore", () => tracePrefix);
 				}
 				else
 				{
@@ -520,18 +495,18 @@ namespace Umbraco.Web.Routing
                     if (node != null)
 					{
 						redirect = true;
-						ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Redirecting to id={1}", () => tracePrefix, () => internalRedirectId);
+						LogHelper.Debug<PublishedContentRequestEngine>("{0}Redirecting to id={1}", () => tracePrefix, () => internalRedirectId);
 					}
 					else
 					{
-						ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Failed to redirect to id={1}: no such published document", () => tracePrefix, () => internalRedirectId);
+						LogHelper.Debug<PublishedContentRequestEngine>("{0}Failed to redirect to id={1}: no such published document", () => tracePrefix, () => internalRedirectId);
 					}
 				}
 			}
 
 			return redirect;
 		}
-        
+
 		/// <summary>
 		/// Ensures that access to current node is permitted.
 		/// </summary>
@@ -545,38 +520,48 @@ namespace Umbraco.Web.Routing
 
 			var path = _pcr.PublishedContent.Path;
 
-		    var publicAccessAttempt = Services.PublicAccessService.IsProtected(path);
-
-            if (publicAccessAttempt)
+			if (Access.IsProtected(_pcr.PublishedContent.Id, path))
 			{
-				ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Page is protected, check for access", () => tracePrefix);
+				LogHelper.Debug<PublishedContentRequestEngine>("{0}Page is protected, check for access", () => tracePrefix);
 
-			    var membershipHelper = new MembershipHelper(_routingContext.UmbracoContext);
+                //TODO: We coud speed this up, the only reason we are looking up the members is for it's
+                // ProviderUserKey (id). We could store this id in the FormsAuth cookie custom data when 
+                // a member logs in. Then we can check if the value exists and just use that, otherwise lookup 
+                // the member like we are currently doing.
 
-				if (membershipHelper.IsLoggedIn() == false)
+				System.Web.Security.MembershipUser user = null;
+				try
 				{
-					ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Not logged in, redirect to login page", () => tracePrefix);
+                    var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+                    user = provider.GetCurrentUser();
+				}
+				catch (ArgumentException)
+				{
+					LogHelper.Debug<PublishedContentRequestEngine>("{0}Membership.GetUser returned ArgumentException", () => tracePrefix);
+				}
 
-                    var loginPageId = publicAccessAttempt.Result.LoginNodeId;
-
+				if (user == null || !Member.IsLoggedOn())
+				{
+					LogHelper.Debug<PublishedContentRequestEngine>("{0}Not logged in, redirect to login page", () => tracePrefix);
+					var loginPageId = Access.GetLoginPage(path);
 					if (loginPageId != _pcr.PublishedContent.Id)
                         _pcr.PublishedContent = _routingContext.UmbracoContext.ContentCache.GetById(loginPageId);
 				}
-                else if (Services.PublicAccessService.HasAccess(_pcr.PublishedContent.Id, Services.ContentService, _pcr.GetRolesForLogin(membershipHelper.CurrentUserName)) == false)
+				else if (!Access.HasAccces(_pcr.PublishedContent.Id, user.ProviderUserKey))
 				{
-					ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Current member has not access, redirect to error page", () => tracePrefix);
-				    var errorPageId = publicAccessAttempt.Result.NoAccessNodeId;
+					LogHelper.Debug<PublishedContentRequestEngine>("{0}Current member has not access, redirect to error page", () => tracePrefix);
+					var errorPageId = Access.GetErrorPage(path);
 					if (errorPageId != _pcr.PublishedContent.Id)
                         _pcr.PublishedContent = _routingContext.UmbracoContext.ContentCache.GetById(errorPageId);
 				}
 				else
 				{
-					ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Current member has access", () => tracePrefix);
+					LogHelper.Debug<PublishedContentRequestEngine>("{0}Current member has access", () => tracePrefix);
 				}
 			}
 			else
 			{
-				ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Page is not protected", () => tracePrefix);
+				LogHelper.Debug<PublishedContentRequestEngine>("{0}Page is not protected", () => tracePrefix);
 			}
 		}
 
@@ -601,9 +586,8 @@ namespace Umbraco.Web.Routing
 			// only if the published content is the initial once, else the alternate template
 			// does not apply
             // + optionnally, apply the alternate template on internal redirects
-            var useAltTemplate = _webRoutingSection.DisableAlternativeTemplates == false 
-                && (_pcr.IsInitialPublishedContent
-                || (_webRoutingSection.InternalRedirectPreservesTemplate && _pcr.IsInternalRedirectPublishedContent));
+            var useAltTemplate = _pcr.IsInitialPublishedContent
+                || (UmbracoConfig.For.UmbracoSettings().WebRouting.InternalRedirectPreservesTemplate && _pcr.IsInternalRedirectPublishedContent);
             string altTemplate = useAltTemplate
                 ? _routingContext.UmbracoContext.HttpContext.Request[Constants.Conventions.Url.AltTemplate]
 				: null;
@@ -616,7 +600,7 @@ namespace Umbraco.Web.Routing
 
 				if (_pcr.HasTemplate)
 				{
-					ProfilingLogger.Logger.Debug<PublishedContentRequest>("{0}Has a template already, and no alternate template.", () => tracePrefix);
+					LogHelper.Debug<PublishedContentRequest>("{0}Has a template already, and no alternate template.", () => tracePrefix);
 					return;
 				}
 
@@ -627,16 +611,16 @@ namespace Umbraco.Web.Routing
 
 				if (templateId > 0)
 				{
-					ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Look for template id={1}", () => tracePrefix, () => templateId);
+					LogHelper.Debug<PublishedContentRequestEngine>("{0}Look for template id={1}", () => tracePrefix, () => templateId);
 					var template = ApplicationContext.Current.Services.FileService.GetTemplate(templateId);
 					if (template == null)
 						throw new InvalidOperationException("The template with Id " + templateId + " does not exist, the page cannot render");
 					_pcr.TemplateModel = template;
-					ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Got template id={1} alias=\"{2}\"", () => tracePrefix, () => template.Id, () => template.Alias);
+					LogHelper.Debug<PublishedContentRequestEngine>("{0}Got template id={1} alias=\"{2}\"", () => tracePrefix, () => template.Id, () => template.Alias);
 				}
 				else
 				{
-					ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}No specified template.", () => tracePrefix);
+					LogHelper.Debug<PublishedContentRequestEngine>("{0}No specified template.", () => tracePrefix);
 				}
 			}
 			else
@@ -648,24 +632,24 @@ namespace Umbraco.Web.Routing
 				// ignore if the alias does not match - just trace
 
 				if (_pcr.HasTemplate)
-					ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Has a template already, but also an alternate template.", () => tracePrefix);
-				ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Look for alternate template alias=\"{1}\"", () => tracePrefix, () => altTemplate);
+					LogHelper.Debug<PublishedContentRequestEngine>("{0}Has a template already, but also an alternate template.", () => tracePrefix);
+				LogHelper.Debug<PublishedContentRequestEngine>("{0}Look for alternate template alias=\"{1}\"", () => tracePrefix, () => altTemplate);
 
 				var template = ApplicationContext.Current.Services.FileService.GetTemplate(altTemplate);
 				if (template != null)
 				{
 					_pcr.TemplateModel = template;
-					ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Got template id={1} alias=\"{2}\"", () => tracePrefix, () => template.Id, () => template.Alias);
+					LogHelper.Debug<PublishedContentRequestEngine>("{0}Got template id={1} alias=\"{2}\"", () => tracePrefix, () => template.Id, () => template.Alias);
 				}
 				else
 				{
-					ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}The template with alias=\"{1}\" does not exist, ignoring.", () => tracePrefix, () => altTemplate);
+					LogHelper.Debug<PublishedContentRequestEngine>("{0}The template with alias=\"{1}\" does not exist, ignoring.", () => tracePrefix, () => altTemplate);
 				}
 			}
 
-			if (_pcr.HasTemplate == false)
+			if (!_pcr.HasTemplate)
 			{
-				ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}No template was found.", () => tracePrefix);
+				LogHelper.Debug<PublishedContentRequestEngine>("{0}No template was found.", () => tracePrefix);
 
 				// initial idea was: if we're not already 404 and UmbracoSettings.HandleMissingTemplateAs404 is true
 				// then reset _pcr.Document to null to force a 404.
@@ -678,7 +662,7 @@ namespace Umbraco.Web.Routing
 			}
 			else
 			{
-				ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Running with template id={1} alias=\"{2}\"", () => tracePrefix, () => _pcr.TemplateModel.Id, () => _pcr.TemplateModel.Alias);
+				LogHelper.Debug<PublishedContentRequestEngine>("{0}Running with template id={1} alias=\"{2}\"", () => tracePrefix, () => _pcr.TemplateModel.Id, () => _pcr.TemplateModel.Alias);
 			}
 		}
 
@@ -688,7 +672,7 @@ namespace Umbraco.Web.Routing
 		/// <remarks>As per legacy, if the redirect does not work, we just ignore it.</remarks>
 		private void FollowExternalRedirect()
 		{
-		    if (_pcr.HasPublishedContent == false) return;
+		    if (!_pcr.HasPublishedContent) return;
 
 		    var redirectId = _pcr.PublishedContent.GetPropertyValue(Constants.Conventions.Content.Redirect, -1);
 		    var redirectUrl = "#";

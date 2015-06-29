@@ -1,6 +1,4 @@
-﻿using Moq;
-using NUnit.Framework;
-using Umbraco.Core.Logging;
+﻿using NUnit.Framework;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -19,12 +17,12 @@ namespace Umbraco.Tests.Migrations.Upgrades
 
         public override ISqlSyntaxProvider GetSyntaxProvider()
         {
-            return new SqlServerSyntaxProvider();
+            return SqlServerSyntax.Provider;
         }
 
         public override UmbracoDatabase GetConfiguredDatabase()
         {
-            return new UmbracoDatabase(@"server=.\SQLEXPRESS;database=EmptyForTest;user id=umbraco;password=umbraco", "System.Data.SqlClient", Mock.Of<ILogger>());
+            return new UmbracoDatabase(@"server=.\SQLEXPRESS;database=EmptyForTest;user id=umbraco;password=umbraco", "System.Data.SqlClient");
         }
 
         public override DatabaseProviders GetDatabaseProvider()

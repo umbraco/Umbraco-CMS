@@ -21,6 +21,7 @@ using umbraco.DataLayer;
 using umbraco.editorControls.tags;
 using umbraco.interfaces;
 using umbraco.MacroEngines;
+using Umbraco.Tests.TestHelpers;
 using umbraco.uicontrols;
 using Umbraco.Web.BaseRest;
 
@@ -41,7 +42,9 @@ namespace Umbraco.Tests.Plugins
 		[SetUp]
 		public void Initialize()
 		{
-		    _assemblies = new[]
+			TestHelper.SetupLog4NetForTests();
+
+			_assemblies = new[]
 			    {
 			        this.GetType().Assembly, 
 			        typeof(ApplicationStartupHandler).Assembly,
@@ -79,8 +82,8 @@ namespace Umbraco.Tests.Plugins
             var originalTypesFound = TypeFinderOriginal.FindClassesOfType<IApplicationStartupHandler>(_assemblies);
 
             Assert.AreEqual(originalTypesFound.Count(), typesFound.Count());
-            Assert.AreEqual(8, typesFound.Count());
-            Assert.AreEqual(8, originalTypesFound.Count());
+            Assert.AreEqual(5, typesFound.Count());
+            Assert.AreEqual(5, originalTypesFound.Count());
         }
 
         [Test]

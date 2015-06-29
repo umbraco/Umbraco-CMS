@@ -676,8 +676,9 @@ namespace Umbraco.Tests.Services
         public void Get_By_Property_Int_Value_Exact()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.IntegerAlias, DataTypeDatabaseType.Integer, "number")
+            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.IntegerAlias, DataTypeDatabaseType.Integer)
                 {
+                    Alias = "number",
                     Name = "Number",
                     //NOTE: This is what really determines the db type - the above definition doesn't really do anything
                     DataTypeDefinitionId = -51
@@ -700,8 +701,9 @@ namespace Umbraco.Tests.Services
         public void Get_By_Property_Int_Value_Greater_Than()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.IntegerAlias, DataTypeDatabaseType.Integer, "number")
+            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.IntegerAlias, DataTypeDatabaseType.Integer)
             {
+                Alias = "number",
                 Name = "Number",
                 //NOTE: This is what really determines the db type - the above definition doesn't really do anything
                 DataTypeDefinitionId = -51
@@ -724,8 +726,9 @@ namespace Umbraco.Tests.Services
         public void Get_By_Property_Int_Value_Greater_Than_Equal_To()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.IntegerAlias, DataTypeDatabaseType.Integer, "number")
+            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.IntegerAlias, DataTypeDatabaseType.Integer)
             {
+                Alias = "number",
                 Name = "Number",
                 //NOTE: This is what really determines the db type - the above definition doesn't really do anything
                 DataTypeDefinitionId = -51
@@ -748,8 +751,9 @@ namespace Umbraco.Tests.Services
         public void Get_By_Property_Int_Value_Less_Than()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.DateAlias, DataTypeDatabaseType.Date, "number")
+            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.DateAlias, DataTypeDatabaseType.Date)
             {
+                Alias = "number",
                 Name = "Number",
                 //NOTE: This is what really determines the db type - the above definition doesn't really do anything
                 DataTypeDefinitionId = -51
@@ -772,8 +776,9 @@ namespace Umbraco.Tests.Services
         public void Get_By_Property_Int_Value_Less_Than_Or_Equal()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.IntegerAlias, DataTypeDatabaseType.Integer, "number")
+            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.IntegerAlias, DataTypeDatabaseType.Integer)
             {
+                Alias = "number",
                 Name = "Number",
                 //NOTE: This is what really determines the db type - the above definition doesn't really do anything
                 DataTypeDefinitionId = -51
@@ -796,8 +801,9 @@ namespace Umbraco.Tests.Services
         public void Get_By_Property_Date_Value_Exact()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.IntegerAlias, DataTypeDatabaseType.Integer, "date")
+            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.IntegerAlias, DataTypeDatabaseType.Integer)
             {
+                Alias = "date",
                 Name = "Date",
                 //NOTE: This is what really determines the db type - the above definition doesn't really do anything
                 DataTypeDefinitionId = -36
@@ -820,8 +826,9 @@ namespace Umbraco.Tests.Services
         public void Get_By_Property_Date_Value_Greater_Than()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.IntegerAlias, DataTypeDatabaseType.Integer, "date")
+            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.IntegerAlias, DataTypeDatabaseType.Integer)
             {
+                Alias = "date",
                 Name = "Date",
                 //NOTE: This is what really determines the db type - the above definition doesn't really do anything
                 DataTypeDefinitionId = -36
@@ -844,8 +851,9 @@ namespace Umbraco.Tests.Services
         public void Get_By_Property_Date_Value_Greater_Than_Equal_To()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.IntegerAlias, DataTypeDatabaseType.Integer, "date")
+            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.IntegerAlias, DataTypeDatabaseType.Integer)
             {
+                Alias = "date",
                 Name = "Date",
                 //NOTE: This is what really determines the db type - the above definition doesn't really do anything
                 DataTypeDefinitionId = -36
@@ -868,8 +876,9 @@ namespace Umbraco.Tests.Services
         public void Get_By_Property_Date_Value_Less_Than()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.IntegerAlias, DataTypeDatabaseType.Integer, "date")
+            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.IntegerAlias, DataTypeDatabaseType.Integer)
             {
+                Alias = "date",
                 Name = "Date",
                 //NOTE: This is what really determines the db type - the above definition doesn't really do anything
                 DataTypeDefinitionId = -36
@@ -892,8 +901,9 @@ namespace Umbraco.Tests.Services
         public void Get_By_Property_Date_Value_Less_Than_Or_Equal()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
-            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.IntegerAlias, DataTypeDatabaseType.Integer, "date")
+            memberType.AddPropertyType(new PropertyType(Constants.PropertyEditors.IntegerAlias, DataTypeDatabaseType.Integer)
             {
+                Alias = "date",
                 Name = "Date",
                 //NOTE: This is what really determines the db type - the above definition doesn't really do anything
                 DataTypeDefinitionId = -36
@@ -1056,9 +1066,9 @@ namespace Umbraco.Tests.Services
             var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             ServiceContext.MemberService.Save(customMember);
 
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-
-            using (var uow = provider.GetUnitOfWork())
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var uow = provider.GetUnitOfWork();
+            using (RepositoryResolver.Current.ResolveByType<IMemberRepository>(uow))
             {
                 Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(customMember.Id));
             }

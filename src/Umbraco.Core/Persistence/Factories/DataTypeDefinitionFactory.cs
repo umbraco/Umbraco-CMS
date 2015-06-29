@@ -5,7 +5,7 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class DataTypeDefinitionFactory
+    internal class DataTypeDefinitionFactory : IEntityFactory<IDataTypeDefinition, DataTypeDto>
     {
         private readonly Guid _nodeObjectTypeId;
         private int _primaryKey;
@@ -19,12 +19,15 @@ namespace Umbraco.Core.Persistence.Factories
 
         public IDataTypeDefinition BuildEntity(DataTypeDto dto)
         {
-            var dataTypeDefinition = new DataTypeDefinition(dto.PropertyEditorAlias)
+            var dataTypeDefinition = new DataTypeDefinition(dto.NodeDto.ParentId, dto.PropertyEditorAlias)
                                          {
                                              CreateDate = dto.NodeDto.CreateDate,
                                              DatabaseType = dto.DbType.EnumParse<DataTypeDatabaseType>(true),
                                              Id = dto.DataTypeId,
-                                             Key = dto.NodeDto.UniqueId,
+                                             Key =
+                                                 dto.NodeDto.UniqueId.HasValue
+                                                     ? dto.NodeDto.UniqueId.Value
+                                                     : dto.DataTypeId.ToGuid(),
                                              Level = dto.NodeDto.Level,
                                              UpdateDate = dto.NodeDto.CreateDate,
                                              Name = dto.NodeDto.Text,

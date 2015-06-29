@@ -1,6 +1,9 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using System.Web.Routing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 
@@ -46,7 +49,7 @@ namespace Umbraco.Core
             var urlPath = fullUrlPath.TrimStart(appPath).EnsureStartsWith('/');
             
             //check if this is in the umbraco back office
-            var isUmbracoPath = urlPath.InvariantStartsWith(GlobalSettings.Path.EnsureStartsWith('/').TrimStart(appPath.EnsureStartsWith('/')).EnsureStartsWith('/'));
+            var isUmbracoPath = urlPath.InvariantStartsWith(GlobalSettings.Path.EnsureStartsWith('/'));
             //if not, then def not back office
             if (isUmbracoPath == false) return false;
 
@@ -299,16 +302,6 @@ namespace Umbraco.Core
             var query = posq < 0 ? null : (posf < 0 ? s.Substring(posq) : s.Substring(posq, posf - posq));
 
             return query;
-        }
-
-        /// <summary>
-        /// Removes the port from the uri.
-        /// </summary>
-        /// <param name="uri">The uri.</param>
-        /// <returns>The same uri, without its port.</returns>
-        public static Uri WithoutPort(this Uri uri)
-        {
-            return new Uri(uri.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Port, UriFormat.UriEscaped));
         }
     }
 }

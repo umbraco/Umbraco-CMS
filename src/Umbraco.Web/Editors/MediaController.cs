@@ -32,7 +32,6 @@ using umbraco;
 using umbraco.BusinessLogic.Actions;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Persistence.FaultHandling;
 
 namespace Umbraco.Web.Editors
 {
@@ -291,6 +290,9 @@ namespace Umbraco.Web.Editors
             Services.MediaService.EmptyRecycleBin();
             return Request.CreateResponse(HttpStatusCode.OK);
         }
+
+
+
         
         /// <summary>
         /// Change the sort order for media
@@ -332,7 +334,7 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        [EnsureUserPermissionForMedia("folder.ParentId")]        
+        [EnsureUserPermissionForMedia("folder.ParentId")]
         public MediaItemDisplay PostAddFolder(EntityBasic folder)
         {
             var mediaService = ApplicationContext.Services.MediaService;
@@ -348,8 +350,8 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         /// <remarks>
         /// We cannot validate this request with attributes (nicely) due to the nature of the multi-part for data.
+        /// 
         /// </remarks>
-        [FileUploadCleanupFilter(false)]
         public async Task<HttpResponseMessage> PostAddFile()
         {
             if (Request.Content.IsMimeMultipartContent() == false)
@@ -388,8 +390,6 @@ namespace Umbraco.Web.Editors
                 return Request.CreateResponse(HttpStatusCode.Unauthorized);
             }
 
-            var tempFiles = new PostedFiles();
-
             //get the files
             foreach (var file in result.FileData)
             {
@@ -405,11 +405,7 @@ namespace Umbraco.Web.Editors
 
                     var mediaService = ApplicationContext.Services.MediaService;
                     var f = mediaService.CreateMedia(fileName, parentId, mediaType);
-
-                    var fileInfo = new FileInfo(file.LocalFileName);
-                    var fs = fileInfo.OpenReadWithRetry();
-                    if (fs == null) throw new InvalidOperationException("Could not acquire file stream");
-                    using (fs)
+                    using (var fs = System.IO.File.OpenRead(file.LocalFileName))
                     {
                         f.SetValue(Constants.Conventions.Media.File, fileName, fs);
                     }
@@ -421,48 +417,13 @@ namespace Umbraco.Web.Editors
                     LogHelper.Warn<MediaController>("Cannot upload file " + file + ", it is not an approved file type");
                 }
 
-                tempFiles.UploadedFiles.Add(new ContentItemFile
-                {
-                    FileName = fileName,
-                    PropertyAlias = Constants.Conventions.Media.File,
-                    TempFilePath = file.LocalFileName
-                });
+                //now we can remove the temp file
+                System.IO.File.Delete(file.LocalFileName);
             }
 
-            //Different response if this is a 'blueimp' request
-            if (Request.GetQueryNameValuePairs().Any(x => x.Key == "origin"))
-            {
-                var origin = Request.GetQueryNameValuePairs().First(x => x.Key == "origin");
-                if (origin.Value == "blueimp")
-                {
-                    return Request.CreateResponse(HttpStatusCode.OK,
-                        tempFiles.UploadedFiles.Select(x => new
-                        {
-                            name = x.FileName,
-                            size = "",
-                            url = "",
-                            thumbnailUrl = ""
-                        }), 
-                        //Don't output the angular xsrf stuff, blue imp doesn't like that
-                        new JsonMediaTypeFormatter());
-                }
-            }
-
-            return Request.CreateResponse(HttpStatusCode.OK, tempFiles);
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
-        /// <summary>
-        /// This is used for the response of PostAddFile so that we can analyze the response in a filter and remove the 
-        /// temporary files that were created.
-        /// </summary>
-        private class PostedFiles : IHaveUploadedFiles
-        {
-            public PostedFiles()
-            {
-                UploadedFiles = new List<ContentItemFile>();
-            }
-            public List<ContentItemFile> UploadedFiles { get; private set; }
-        }
 
         /// <summary>
         /// Ensures the item can be moved/copied to the new location

@@ -13,19 +13,13 @@ namespace Umbraco.Core.Persistence
     /// </summary>
     public static class PetaPocoSqlExtensions
     {
-        [Obsolete("Use the overload specifying ISqlSyntaxProvider instead")]
         public static Sql From<T>(this Sql sql)
         {
-            return From<T>(sql, SqlSyntaxContext.SqlSyntaxProvider);
-        }
-
-        public static Sql From<T>(this Sql sql, ISqlSyntaxProvider sqlSyntax)
-        {
-            var type = typeof(T);
+            var type = typeof (T);
             var tableNameAttribute = type.FirstAttribute<TableNameAttribute>();
             string tableName = tableNameAttribute == null ? string.Empty : tableNameAttribute.Value;
 
-            return sql.From(sqlSyntax.GetQuotedTableName(tableName));
+            return sql.From(SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(tableName));
         }
 
         public static Sql Where<T>(this Sql sql, Expression<Func<T, bool>> predicate)
@@ -42,13 +36,7 @@ namespace Umbraco.Core.Persistence
             return sql.Where(fieldExpression + " IN (@values)", new {@values = values});
         }
 
-        [Obsolete("Use the overload specifying ISqlSyntaxProvider instead")]
         public static Sql OrderBy<TColumn>(this Sql sql, Expression<Func<TColumn, object>> columnMember)
-        {
-            return OrderBy<TColumn>(sql, columnMember, SqlSyntaxContext.SqlSyntaxProvider);
-        }
-
-        public static Sql OrderBy<TColumn>(this Sql sql, Expression<Func<TColumn, object>> columnMember, ISqlSyntaxProvider sqlSyntax)
         {
             var column = ExpressionHelper.FindProperty(columnMember) as PropertyInfo;
             var columnName = column.FirstAttribute<ColumnAttribute>().Name;
@@ -59,19 +47,13 @@ namespace Umbraco.Core.Persistence
 
             //need to ensure the order by is in brackets, see: https://github.com/toptensoftware/PetaPoco/issues/177
             var syntax = string.Format("({0}.{1})",
-                sqlSyntax.GetQuotedTableName(tableName),
-                sqlSyntax.GetQuotedColumnName(columnName));
+                SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(tableName),
+                SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(columnName));
 
             return sql.OrderBy(syntax);
         }
 
-        [Obsolete("Use the overload specifying ISqlSyntaxProvider instead")]
         public static Sql OrderByDescending<TColumn>(this Sql sql, Expression<Func<TColumn, object>> columnMember)
-        {
-            return OrderByDescending<TColumn>(sql, columnMember, SqlSyntaxContext.SqlSyntaxProvider);
-        }
-
-        public static Sql OrderByDescending<TColumn>(this Sql sql, Expression<Func<TColumn, object>> columnMember, ISqlSyntaxProvider sqlSyntax)
         {
             var column = ExpressionHelper.FindProperty(columnMember) as PropertyInfo;
             var columnName = column.FirstAttribute<ColumnAttribute>().Name;
@@ -81,98 +63,61 @@ namespace Umbraco.Core.Persistence
             string tableName = tableNameAttribute == null ? string.Empty : tableNameAttribute.Value;
 
             var syntax = string.Format("{0}.{1} DESC",
-                sqlSyntax.GetQuotedTableName(tableName),
-                sqlSyntax.GetQuotedColumnName(columnName));
+                SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(tableName),
+                SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(columnName));
 
             return sql.OrderBy(syntax);
         }
 
-        [Obsolete("Use the overload specifying ISqlSyntaxProvider instead")]
         public static Sql GroupBy<TColumn>(this Sql sql, Expression<Func<TColumn, object>> columnMember)
-        {
-            return GroupBy<TColumn>(sql, columnMember, SqlSyntaxContext.SqlSyntaxProvider);
-        }
-
-        public static Sql GroupBy<TColumn>(this Sql sql, Expression<Func<TColumn, object>> columnMember, ISqlSyntaxProvider sqlProvider)
         {
             var column = ExpressionHelper.FindProperty(columnMember) as PropertyInfo;
             var columnName = column.FirstAttribute<ColumnAttribute>().Name;
 
-            return sql.GroupBy(sqlProvider.GetQuotedColumnName(columnName));
+            return sql.GroupBy(SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(columnName));
         }
 
-        [Obsolete("Use the overload specifying ISqlSyntaxProvider instead")]
         public static Sql.SqlJoinClause InnerJoin<T>(this Sql sql)
         {
-            return InnerJoin<T>(sql, SqlSyntaxContext.SqlSyntaxProvider);
-        }
-
-        public static Sql.SqlJoinClause InnerJoin<T>(this Sql sql, ISqlSyntaxProvider sqlSyntax)
-        {
-            var type = typeof(T);
+            var type = typeof (T);
             var tableNameAttribute = type.FirstAttribute<TableNameAttribute>();
             string tableName = tableNameAttribute == null ? string.Empty : tableNameAttribute.Value;
 
-            return sql.InnerJoin(sqlSyntax.GetQuotedTableName(tableName));
+            return sql.InnerJoin(SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(tableName));
         }
 
-        [Obsolete("Use the overload specifying ISqlSyntaxProvider instead")]
         public static Sql.SqlJoinClause LeftJoin<T>(this Sql sql)
         {
-            return LeftJoin<T>(sql, SqlSyntaxContext.SqlSyntaxProvider);
-        }
-
-        public static Sql.SqlJoinClause LeftJoin<T>(this Sql sql, ISqlSyntaxProvider sqlSyntax)
-        {
-            var type = typeof(T);
+            var type = typeof (T);
             var tableNameAttribute = type.FirstAttribute<TableNameAttribute>();
             string tableName = tableNameAttribute == null ? string.Empty : tableNameAttribute.Value;
 
-            return sql.LeftJoin(sqlSyntax.GetQuotedTableName(tableName));
+            return sql.LeftJoin(SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(tableName));
         }
 
-        [Obsolete("Use the overload specifying ISqlSyntaxProvider instead")]
         public static Sql.SqlJoinClause LeftOuterJoin<T>(this Sql sql)
         {
-            return LeftOuterJoin<T>(sql, SqlSyntaxContext.SqlSyntaxProvider);
-        }
-
-        public static Sql.SqlJoinClause LeftOuterJoin<T>(this Sql sql, ISqlSyntaxProvider sqlSyntax)
-        {
             var type = typeof(T);
             var tableNameAttribute = type.FirstAttribute<TableNameAttribute>();
             string tableName = tableNameAttribute == null ? string.Empty : tableNameAttribute.Value;
 
-            return sql.LeftOuterJoin(sqlSyntax.GetQuotedTableName(tableName));
+            return sql.LeftOuterJoin(SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(tableName));
         }
 
-        [Obsolete("Use the overload specifying ISqlSyntaxProvider instead")]
         public static Sql.SqlJoinClause RightJoin<T>(this Sql sql)
         {
-            return RightJoin<T>(sql, SqlSyntaxContext.SqlSyntaxProvider);
-        }
-
-        public static Sql.SqlJoinClause RightJoin<T>(this Sql sql, ISqlSyntaxProvider sqlSyntax)
-        {
-            var type = typeof(T);
+            var type = typeof (T);
             var tableNameAttribute = type.FirstAttribute<TableNameAttribute>();
             string tableName = tableNameAttribute == null ? string.Empty : tableNameAttribute.Value;
 
-            return sql.RightJoin(sqlSyntax.GetQuotedTableName(tableName));
+            return sql.RightJoin(SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(tableName));
         }
 
-        [Obsolete("Use the overload specifying ISqlSyntaxProvider instead")]
         public static Sql On<TLeft, TRight>(this Sql.SqlJoinClause sql, Expression<Func<TLeft, object>> leftMember,
                                             Expression<Func<TRight, object>> rightMember, params object[] args)
         {
-            return On<TLeft, TRight>(sql, SqlSyntaxContext.SqlSyntaxProvider, leftMember, rightMember, args);
-        }
-
-        public static Sql On<TLeft, TRight>(this Sql.SqlJoinClause sql, ISqlSyntaxProvider sqlSyntax, Expression<Func<TLeft, object>> leftMember,
-                                           Expression<Func<TRight, object>> rightMember, params object[] args)
-        {
-            var leftType = typeof(TLeft);
-            var rightType = typeof(TRight);
+            var leftType = typeof (TLeft);
+            var rightType = typeof (TRight);
             var leftTableName = leftType.FirstAttribute<TableNameAttribute>().Value;
             var rightTableName = rightType.FirstAttribute<TableNameAttribute>().Value;
 
@@ -181,11 +126,11 @@ namespace Umbraco.Core.Persistence
             var leftColumnName = left.FirstAttribute<ColumnAttribute>().Name;
             var rightColumnName = right.FirstAttribute<ColumnAttribute>().Name;
 
-            string onClause = string.Format("{0}.{1} = {2}.{3}",
-                sqlSyntax.GetQuotedTableName(leftTableName),
-                sqlSyntax.GetQuotedColumnName(leftColumnName),
-                sqlSyntax.GetQuotedTableName(rightTableName),
-                sqlSyntax.GetQuotedColumnName(rightColumnName));
+            string onClause = string.Format("{0}.{1} = {2}.{3}", 
+                SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(leftTableName),
+                SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(leftColumnName),
+                SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(rightTableName),
+                SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(rightColumnName));
             return sql.On(onClause);
         }
 

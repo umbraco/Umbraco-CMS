@@ -1,6 +1,6 @@
 /**
 * @ngdoc directive
-* @name umbraco.directives.directive:umbUploadDropzone
+* @name umbraco.directives.directive:umbPanel
 * @restrict E
 **/
 angular.module("umbraco.directives.html")
@@ -8,6 +8,11 @@ angular.module("umbraco.directives.html")
 		return {
 			restrict: 'E',
 			replace: true,
+			scope: {
+				dropping: "=",
+				files: "="
+			},
+			transclude: 'true',
 			templateUrl: 'views/directives/html/umb-upload-dropzone.html'
 		};
 	});

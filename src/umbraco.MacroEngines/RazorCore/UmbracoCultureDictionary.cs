@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Dynamic;
 using System.Globalization;
 using umbraco.cms.businesslogic;
@@ -40,13 +39,7 @@ namespace umbraco.MacroEngines
 			}
 		}
 
-	    [Obsolete("This returns an empty dictionary, it is not intended to be used by the legacy razor macros")]
-	    public IDictionary<string, string> GetChildren(string key)
-	    {
-	        return new Dictionary<string, string>();
-	    }
-
-	    public Language Language
+		public Language Language
 		{
 			get { return Language.GetByCultureCode(System.Threading.Thread.CurrentThread.CurrentUICulture.Name); }
 		}

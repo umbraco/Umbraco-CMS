@@ -4,7 +4,7 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class MemberGroupFactory 
+    internal class MemberGroupFactory : IEntityFactory<IMemberGroup, NodeDto>
     {
         
         private readonly Guid _nodeObjectTypeId;
@@ -22,7 +22,7 @@ namespace Umbraco.Core.Persistence.Factories
             {
                 CreateDate = dto.CreateDate,
                 Id = dto.NodeId,
-                Key = dto.UniqueId,
+                Key = dto.UniqueId.Value,
                 Name = dto.Text                
             };
 

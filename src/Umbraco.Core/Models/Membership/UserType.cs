@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
@@ -68,11 +67,7 @@ namespace Umbraco.Core.Models.Membership
                 {
                     _permissions = value;
                     return _permissions;
-                }, _permissions, PermissionsSelector,
-                    //Custom comparer for enumerable
-                    new DelegateEqualityComparer<IEnumerable<string>>(
-                        (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
-                        enum1 => enum1.GetHashCode()));
+                }, _permissions, PermissionsSelector);
             }
         }
     }

@@ -5,7 +5,7 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class ContentFactory
+    internal class ContentFactory : IEntityFactory<IContent, DocumentDto>
     {
         private readonly IContentType _contentType;
         private readonly Guid _nodeObjectTypeId;
@@ -32,9 +32,13 @@ namespace Umbraco.Core.Persistence.Factories
             var content = new Content(dto.Text, dto.ContentVersionDto.ContentDto.NodeDto.ParentId, _contentType)
             {
                 Id = _id,
-                Key = dto.ContentVersionDto.ContentDto.NodeDto.UniqueId,
+                Key =
+                    dto.ContentVersionDto.ContentDto.NodeDto.UniqueId.HasValue
+                        ? dto.ContentVersionDto.ContentDto.NodeDto.UniqueId.Value
+                        : _id.ToGuid(),
                 Name = dto.Text,
                 NodeName = dto.ContentVersionDto.ContentDto.NodeDto.Text,
+                Language = dto.ContentVersionDto.Language,
                 Path = dto.ContentVersionDto.ContentDto.NodeDto.Path,
                 CreatorId = dto.ContentVersionDto.ContentDto.NodeDto.UserId.Value,
                 WriterId = dto.WriterUserId,
@@ -48,8 +52,7 @@ namespace Umbraco.Core.Persistence.Factories
                 ExpireDate = dto.ExpiresDate.HasValue ? dto.ExpiresDate.Value : (DateTime?)null,
                 ReleaseDate = dto.ReleaseDate.HasValue ? dto.ReleaseDate.Value : (DateTime?)null,
                 Version = dto.ContentVersionDto.VersionId,
-                PublishedState = dto.Published ? PublishedState.Published : PublishedState.Unpublished,
-                PublishedVersionGuid = dto.DocumentPublishedReadOnlyDto == null ? default(Guid) : dto.DocumentPublishedReadOnlyDto.VersionId
+                PublishedState = dto.Published ? PublishedState.Published : PublishedState.Unpublished
             };
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946
@@ -104,6 +107,7 @@ namespace Umbraco.Core.Persistence.Factories
                 NodeId = entity.Id,
                 VersionDate = entity.UpdateDate,
                 VersionId = entity.Version,
+                Language = lang,
                 ContentDto = BuildContentDto(entity)
             };
             return contentVersionDto;

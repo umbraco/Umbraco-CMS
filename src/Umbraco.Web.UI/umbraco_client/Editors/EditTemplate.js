@@ -148,9 +148,6 @@
                 }
                 path = args.path;
             }
-            if (args.contents) {
-                UmbEditor.SetCode(args.contents);
-            }
             
             top.UmbSpeechBubble.ShowMessage('save', header, msg);
             UmbClientMgr.mainTree().setActiveTreeType('templates');

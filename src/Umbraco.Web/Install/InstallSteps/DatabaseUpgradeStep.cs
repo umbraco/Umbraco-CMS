@@ -30,7 +30,7 @@ namespace Umbraco.Web.Install.InstallSteps
             {
                 LogHelper.Info<DatabaseUpgradeStep>("Running 'Upgrade' service");
 
-                var result = _applicationContext.DatabaseContext.UpgradeSchemaAndData(_applicationContext.Services.MigrationEntryService);
+                var result = _applicationContext.DatabaseContext.UpgradeSchemaAndData();
 
                 if (result.Success == false)
                 {

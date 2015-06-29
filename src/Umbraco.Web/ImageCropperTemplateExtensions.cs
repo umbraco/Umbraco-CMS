@@ -1,11 +1,16 @@
-﻿namespace Umbraco.Web
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Umbraco.Core;
+using Umbraco.Core.Models;
+using Umbraco.Web.Models;
+using Umbraco.Web.PropertyEditors;
+
+namespace Umbraco.Web
 {
     using System.Globalization;
-    using System.Text;
-
-    using Umbraco.Core;
-    using Umbraco.Core.Models;
-    using Umbraco.Web.Models;
 
     /// <summary>
     /// Provides extension methods for getting ImageProcessor Url from the core Image Cropper property editor

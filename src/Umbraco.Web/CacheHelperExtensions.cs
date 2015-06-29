@@ -5,7 +5,6 @@ using System.Web.Mvc;
 using System.Web.Mvc.Html;
 using Umbraco.Core;
 using umbraco.cms.businesslogic.web;
-using Umbraco.Core.Cache;
 
 namespace Umbraco.Web
 {
@@ -38,18 +37,12 @@ namespace Umbraco.Web
 			string cacheKey,
 			ViewDataDictionary viewData = null)
 		{
-            //disable cached partials in debug mode: http://issues.umbraco.org/issue/U4-5940
-            if (htmlHelper.ViewContext.HttpContext.IsDebuggingEnabled)
-            {
-                // just return a normal partial view instead
-                return htmlHelper.Partial(partialViewName, model, viewData);
-            }
-
-            return cacheHelper.RuntimeCache.GetCacheItem<IHtmlString>(
+			return cacheHelper.GetCacheItem(
 				PartialViewCacheKey + cacheKey,
-                () => htmlHelper.Partial(partialViewName, model, viewData),
-				priority: CacheItemPriority.NotRemovable, //not removable, the same as macros (apparently issue #27610)
-				timeout: new TimeSpan(0, 0, 0, cachedSeconds));
+				CacheItemPriority.NotRemovable, //not removable, the same as macros (apparently issue #27610)
+				null,
+				new TimeSpan(0, 0, 0, cachedSeconds),
+				() => htmlHelper.Partial(partialViewName, model, viewData));
 		}
 
 		/// <summary>

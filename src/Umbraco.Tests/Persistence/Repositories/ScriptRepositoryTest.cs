@@ -1,9 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
 using System.Text;
-using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
@@ -38,7 +36,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
 
             // Act
-            var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
+            var repository = new ScriptRepository(unitOfWork, _fileSystem);
 
             // Assert
             Assert.That(repository, Is.Not.Null);
@@ -50,7 +48,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
+			var repository = new ScriptRepository(unitOfWork, _fileSystem);
 
             // Act
             var script = new Script("test-add-script.js") {Content = "/// <reference name=\"MicrosoftAjax.js\"/>"};
@@ -67,7 +65,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
+			var repository = new ScriptRepository(unitOfWork, _fileSystem);
 
             // Act
             var script = new Script("test-updated-script.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
@@ -91,7 +89,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
+			var repository = new ScriptRepository(unitOfWork, _fileSystem);
 
             // Act
             var script = repository.Get("test-script.js");
@@ -110,7 +108,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
+			var repository = new ScriptRepository(unitOfWork, _fileSystem);
 
             // Act
             var exists = repository.Get("test-script.js");
@@ -127,7 +125,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
+			var repository = new ScriptRepository(unitOfWork, _fileSystem);
 
             var script = new Script("test-script1.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
             repository.AddOrUpdate(script);
@@ -153,7 +151,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
+            var repository = new ScriptRepository(unitOfWork, _fileSystem);
 
             var script = new Script("test-script1.js") { Content = "/// <reference name=\"MicrosoftAjax.js\"/>" };
             repository.AddOrUpdate(script);
@@ -179,7 +177,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
+            var repository = new ScriptRepository(unitOfWork, _fileSystem);
 
             // Act
             var exists = repository.Exists("test-script.js");

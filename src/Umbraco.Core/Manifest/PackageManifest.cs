@@ -26,10 +26,5 @@ namespace Umbraco.Core.Manifest
         /// The json array of parameter editors
         /// </summary>
         public JArray ParameterEditors { get; set; }
-
-        /// <summary>
-        /// The json array of grid editors
-        /// </summary>
-        public JArray GridEditors { get; set; }
     }
 }

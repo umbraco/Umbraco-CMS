@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Umbraco.Core
+﻿namespace Umbraco.Core
 {
 	public static partial class Constants
 	{
@@ -72,11 +70,7 @@ namespace Umbraco.Core
 			/// <summary>
 			/// Guid for a Stylesheet object.
 			/// </summary>
-            [Obsolete("This no longer exists in the database")]
-            public const string Stylesheet = "9F68DA4F-A3A8-44C2-8226-DCBD125E4840";
-
-            [Obsolete("This no longer exists in the database")]
-            internal const string StylesheetProperty = "5555da4f-a123-42b2-4488-dcdfb25e4111";
+			public const string Stylesheet = "9F68DA4F-A3A8-44C2-8226-DCBD125E4840";
 
 			/// <summary>
 			/// Guid for the System Root.

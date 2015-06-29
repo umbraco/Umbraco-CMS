@@ -10,14 +10,12 @@ namespace Umbraco.Core.Models
     internal class ContentPreviewEntity<TContent> : ContentXmlEntity<TContent> 
         where TContent : IContentBase
     {
-        public ContentPreviewEntity(TContent content, Func<TContent, XElement> xml)
-            : base(content, xml)
+        public ContentPreviewEntity(bool previewExists, TContent content, Func<TContent, XElement> xml)
+            : base(previewExists, content, xml)
         {
+            Version = content.Version;
         }
 
-        public Guid Version
-        {
-            get { return Content.Version; }
-        }
+        public Guid Version { get; private set; }
     }
 }

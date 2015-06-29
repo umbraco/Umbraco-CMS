@@ -21,7 +21,7 @@ namespace Umbraco.Web.PropertyEditors
         private IDictionary<string, object> _defaultPreVals;
 
         /// <summary>
-        /// Overridden because we ONLY support Date + Time format
+        /// Overridden because we ONLY support Date + Time format and we don't have pre-values in the db.
         /// </summary>
         public override IDictionary<string, object> DefaultPreValues
         {
@@ -36,11 +36,6 @@ namespace Umbraco.Web.PropertyEditors
             editor.Validators.Add(new DateTimeValidator());
 
             return editor;
-        }
-
-        protected override PreValueEditor CreatePreValueEditor()
-        {
-            return new DatePreValueEditor();
         }
     }
 }

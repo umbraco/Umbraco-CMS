@@ -1,11 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Globalization;
-using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models;
 
 using umbraco;
@@ -35,34 +31,22 @@ namespace Umbraco.Web.Routing
 		// the content request is just a data holder
 		private readonly PublishedContentRequestEngine _engine;
 
-	    /// <summary>
-	    /// Initializes a new instance of the <see cref="PublishedContentRequest"/> class with a specific Uri and routing context.
-	    /// </summary>
-	    /// <param name="uri">The request <c>Uri</c>.</param>
-	    /// <param name="routingContext">A routing context.</param>
-        /// <param name="getRolesForLogin">A callback method to return the roles for the provided login name when required</param>
-        /// <param name="routingConfig"></param>
-	    public PublishedContentRequest(Uri uri, RoutingContext routingContext, IWebRoutingSection routingConfig, Func<string, IEnumerable<string>> getRolesForLogin)
-	    {
-            if (uri == null) throw new ArgumentNullException("uri");
-            if (routingContext == null) throw new ArgumentNullException("routingContext");
+		/// <summary>
+		/// Initializes a new instance of the <see cref="PublishedContentRequest"/> class with a specific Uri and routing context.
+		/// </summary>
+		/// <param name="uri">The request <c>Uri</c>.</param>
+		/// <param name="routingContext">A routing context.</param>
+		public PublishedContentRequest(Uri uri, RoutingContext routingContext)
+		{
+			if (uri == null) throw new ArgumentNullException("uri");
+			if (routingContext == null) throw new ArgumentNullException("routingContext");
 
-            Uri = uri;
-            RoutingContext = routingContext;
-	        GetRolesForLogin = getRolesForLogin;
+			Uri = uri;
+			RoutingContext = routingContext;
 
-	        _engine = new PublishedContentRequestEngine(
-                routingConfig,
-                this);
+			_engine = new PublishedContentRequestEngine(this);
 
             RenderingEngine = RenderingEngine.Unknown;
-	    }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use the constructor specifying all dependencies instead")]
-		public PublishedContentRequest(Uri uri, RoutingContext routingContext)
-            : this(uri, routingContext, UmbracoConfig.For.UmbracoSettings().WebRouting, s => Roles.Provider.GetRolesForUser(s))
-		{
 		}
 
 		/// <summary>
@@ -110,7 +94,7 @@ namespace Umbraco.Web.Routing
 			if (Prepared != null)
 				Prepared(this, EventArgs.Empty);
 
-		    if (HasPublishedContent == false)
+		    if (!HasPublishedContent)
                 Is404 = true; // safety
 
 		    _readonly = true;
@@ -350,17 +334,10 @@ namespace Umbraco.Web.Routing
 
 		#region Domain and Culture
 
-	    [Obsolete("Do not use this property, use the non-legacy UmbracoDomain property instead")]
-	    public Domain Domain
-	    {
-	        get { return new Domain(UmbracoDomain); }
-	    }
-
-        //TODO: Should we publicize the setter now that we are using a non-legacy entity??
-        /// <summary>
+		/// <summary>
         /// Gets or sets the content request's domain.
         /// </summary>
-        public IDomain UmbracoDomain { get; internal set; }
+        public Domain Domain { get; internal set; }
 
 		/// <summary>
 		/// Gets or sets the content request's domain Uri.
@@ -373,7 +350,7 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		public bool HasDomain
 		{
-			get { return UmbracoDomain != null; }
+			get { return Domain != null; }
 		}
 
 	    private CultureInfo _culture;
@@ -410,9 +387,7 @@ namespace Umbraco.Web.Routing
 		/// </summary>
 		public RoutingContext RoutingContext { get; private set; }
 
-	    internal Func<string, IEnumerable<string>> GetRolesForLogin { get; private set; }
-
-	    /// <summary>
+		/// <summary>
 		/// The "umbraco page" object.
 		/// </summary>
 		private page _umbracoPage;
@@ -457,7 +432,7 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// Gets a value indicating whether the content request triggers a redirect (permanent or not).
         /// </summary>
-        public bool IsRedirect { get { return string.IsNullOrWhiteSpace(RedirectUrl) == false; } }
+        public bool IsRedirect { get { return !string.IsNullOrWhiteSpace(RedirectUrl); } }
 
         /// <summary>
         /// Gets or sets a value indicating whether the redirect is permanent.

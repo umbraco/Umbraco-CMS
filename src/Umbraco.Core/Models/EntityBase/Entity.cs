@@ -17,6 +17,7 @@ namespace Umbraco.Core.Models.EntityBase
     public abstract class Entity : TracksChangesEntityBase, IEntity, IRememberBeingDirty, ICanBeDirty
     {
         private bool _hasIdentity;
+        private int? _hash;
         private int _id;
         private Guid _key;
         private DateTime _createDate;
@@ -174,7 +175,6 @@ namespace Umbraco.Core.Models.EntityBase
             }
         }
 
-        //TODO: Make this NOT virtual or even exist really!
         public virtual bool SameIdentityAs(IEntity other)
         {
             if (ReferenceEquals(null, other))
@@ -195,13 +195,11 @@ namespace Umbraco.Core.Models.EntityBase
             return SameIdentityAs(other);
         }
 
-        //TODO: Make this NOT virtual or even exist really!
         public virtual Type GetRealType()
         {
             return GetType();
         }
 
-        //TODO: Make this NOT virtual or even exist really!
         public virtual bool SameIdentityAs(Entity other)
         {
             if (ReferenceEquals(null, other))
@@ -228,13 +226,9 @@ namespace Umbraco.Core.Models.EntityBase
 
         public override int GetHashCode()
         {
-            unchecked
-            {
-                var hashCode = HasIdentity.GetHashCode();
-                hashCode = (hashCode * 397) ^ Id;
-                hashCode = (hashCode * 397) ^ GetType().GetHashCode();
-                return hashCode;
-            }
+            if (!_hash.HasValue)
+                _hash = !HasIdentity ? new int?(base.GetHashCode()) : new int?(Id.GetHashCode() * 397 ^ GetType().GetHashCode());
+            return _hash.Value;
         }
 
         public virtual object DeepClone()
@@ -242,17 +236,9 @@ namespace Umbraco.Core.Models.EntityBase
             //Memberwise clone on Entity will work since it doesn't have any deep elements
             // for any sub class this will work for standard properties as well that aren't complex object's themselves.
             var clone = (Entity)MemberwiseClone();
-            //ensure the clone has it's own dictionaries
-            clone.ResetChangeTrackingCollections();
-            //turn off change tracking
-            clone.DisableChangeTracking();
             //Automatically deep clone ref properties that are IDeepCloneable
             DeepCloneHelper.DeepCloneRefProperties(this, clone);
-            //this shouldn't really be needed since we're not tracking
             clone.ResetDirtyProperties(false);
-            //re-enable tracking
-            clone.EnableChangeTracking();
-
             return clone;
         }
     }

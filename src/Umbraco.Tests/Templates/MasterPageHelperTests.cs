@@ -4,8 +4,6 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using umbraco.cms.businesslogic.template;
-using Umbraco.Core.IO;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Tests.Templates
 {

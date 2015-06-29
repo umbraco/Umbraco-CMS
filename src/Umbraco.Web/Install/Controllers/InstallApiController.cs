@@ -21,13 +21,13 @@ namespace Umbraco.Web.Install.Controllers
     [HttpInstallAuthorize]
     public class InstallApiController : ApiController
     {
-        public InstallApiController()
+        protected InstallApiController()
             : this(UmbracoContext.Current)
         {
 
         }
 
-        public InstallApiController(UmbracoContext umbracoContext)
+        protected InstallApiController(UmbracoContext umbracoContext)
         {
             if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
             UmbracoContext = umbracoContext;
@@ -257,7 +257,7 @@ namespace Umbraco.Web.Install.Controllers
 
         internal InstallSetupResult ExecuteStep(InstallSetupStep step, JToken instruction)
         {
-            using (ApplicationContext.ProfilingLogger.TraceDuration<InstallApiController>("Executing installation step: " + step.Name, "Step completed"))
+            using (DisposableTimer.TraceDuration<InstallApiController>("Executing installation step: " + step.Name, "Step completed"))
             {
                 var model = instruction == null ? null : instruction.ToObject(step.StepType);
                 var genericStepType = typeof(InstallSetupStep<>);

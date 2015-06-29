@@ -10,7 +10,6 @@ using System.Data;
 using Umbraco.Core;
 using umbraco.MacroEngines.Library;
 using Umbraco.Web;
-using Umbraco.Web.Models;
 using Umbraco.Web.umbraco.presentation;
 
 namespace umbraco.MacroEngines
@@ -42,7 +41,7 @@ namespace umbraco.MacroEngines
                 return;
             }
 
-            var n = LegacyNodeHelper.ConvertToNode(UmbracoContext.Current.ContentCache.GetById(Id));
+            var n = CompatibilityHelper.ConvertToNode(UmbracoContext.Current.ContentCache.GetById(Id));
            
             this.content = n;
             this.Type = DynamicBackingItemType.Content;
@@ -76,7 +75,7 @@ namespace umbraco.MacroEngines
                 }
                 else
                 {
-                    this.content = LegacyNodeHelper.ConvertToNode(UmbracoContext.Current.ContentCache.GetById(Id));    
+                    this.content = CompatibilityHelper.ConvertToNode(UmbracoContext.Current.ContentCache.GetById(Id));    
                 }
                 
                 this.Type = Type;

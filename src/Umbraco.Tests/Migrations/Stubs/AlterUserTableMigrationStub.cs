@@ -1,17 +1,10 @@
-﻿using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence.Migrations;
-using Umbraco.Core.Persistence.SqlSyntax;
+﻿using Umbraco.Core.Persistence.Migrations;
 
 namespace Umbraco.Tests.Migrations.Stubs
 {
     [MigrationAttribute("6.0.0", 0, "Test")]
     public class AlterUserTableMigrationStub : MigrationBase
     {
-
-        public AlterUserTableMigrationStub(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
-
         public override void Up()
         {
             Alter.Table("umbracoUser")
@@ -29,10 +22,6 @@ namespace Umbraco.Tests.Migrations.Stubs
     [MigrationAttribute("1.0.0", 0, "Test")]
     public class DropForeignKeyMigrationStub : MigrationBase
     {
-        public DropForeignKeyMigrationStub(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
-
         public override void Up()
         {
             Delete.ForeignKey().FromTable("umbracoUser2app").ForeignColumn("user").ToTable("umbracoUser").PrimaryColumn("id");

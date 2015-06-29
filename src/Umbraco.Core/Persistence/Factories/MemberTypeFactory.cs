@@ -7,7 +7,7 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class MemberTypeFactory 
+    internal class MemberTypeFactory : IEntityFactory<IMemberType, ContentTypeDto>
     {
         private readonly Guid _nodeObjectType;
 

@@ -12,6 +12,4 @@ namespace Umbraco.Core.Models.Mapping
     {
         public abstract void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext);
     }
-
-    
 }
