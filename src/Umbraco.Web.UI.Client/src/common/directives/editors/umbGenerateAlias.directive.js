@@ -49,15 +49,6 @@ angular.module("umbraco.directives")
 
                 }
 
-                // if alias gets unlocked - stop watching alias
-                scope.$watch('locked', function(newValue, oldValue){
-
-                    if(newValue === false) {
-                        unbindWatcher();
-                    }
-
-                });
-
                 function validateAlias(value) {
 
                   if (generateAliasTimeout) {
@@ -76,7 +67,26 @@ angular.module("umbraco.directives")
 
                 }
 
-                activate();
+                // if alias gets unlocked - stop watching alias
+                scope.$watch('locked', function(newValue, oldValue){
+                    if(newValue === false) {
+                        unbindWatcher();
+                    }
+                });
+
+                // wait for aliasFrom input before activating
+                scope.$watch('aliasFrom', function(newValue, oldValue){
+                  if(newValue !== undefined) {
+                    activate();
+                  }
+                });
+
+                // validate custom entered alias
+                scope.$watch('alias', function(newValue, oldValue){
+                  if(scope.locked === false && newValue !== undefined) {
+                    validateAlias(newValue);
+                  }
+                });
 
             }
         };
