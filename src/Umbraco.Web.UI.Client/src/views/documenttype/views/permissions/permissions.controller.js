@@ -9,7 +9,7 @@
 (function() {
     'use strict';
 
-    function PermissionsController($scope, contentTypeResource) {
+    function PermissionsController($scope, contentTypeResource, iconHelper) {
 
         /* ----------- SCOPE VARIABLES ----------- */
 
@@ -25,7 +25,11 @@
         function init() {
 
             contentTypeResource.getAll().then(function(contentTypes){
+
                 vm.contentTypes = contentTypes;
+
+                // convert legacy icons
+                iconHelper.formatContentTypeIcons(vm.contentTypes);
 
                 // set parent
                 vm.parent = {
