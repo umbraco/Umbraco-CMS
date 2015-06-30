@@ -3,7 +3,7 @@
  * @name umbraco.services.contentTypeHelper
  * @description A helper service for the content type editor
  **/
-function contentTypeHelper(contentTypeResource) {
+function contentTypeHelper(contentTypeResource, dataTypeResource) {
 
     var contentTypeHelperService = {
 
@@ -42,6 +42,15 @@ function contentTypeHelper(contentTypeResource) {
                 var positionToPush = groupsArrayLength - 1;
 
                 angular.forEach(composition.groups, function(compositionGroup){
+
+                    // get data type details
+                    angular.forEach(compositionGroup.properties, function(property){
+                      dataTypeResource.getById(property.dataTypeId)
+                        .then(function(dataType) {
+                          property.dataTypeIcon = dataType.icon;
+                          property.dataTypeName = dataType.name;
+                        });
+                    });
 
                     // set inherited state on tab
                     compositionGroup.inherited = true;
