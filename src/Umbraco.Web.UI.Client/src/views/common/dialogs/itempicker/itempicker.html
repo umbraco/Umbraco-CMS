@@ -1,6 +1,8 @@
-<div class="dialog-grid">
-    <a href="" class="dialog-grid-element" ng-repeat="availableItem in model.availableItems | compareArrays:model.selectedItems:'alias' | orderBy:'name'" ng-click="model.chooseItem(availableItem)">
-        <i class="icon {{ availableItem.icon }}"></i>
-        <span class="dialog-grid-element-text">{{ availableItem.name }}</span>
+<ul class="umb-card-grid">
+  <li ng-repeat="availableItem in model.availableItems | compareArrays:model.selectedItems:'alias' | orderBy:'name'">
+    <a href="" ng-click="model.chooseItem(availableItem)">
+        <i class="{{ availableItem.icon }}"></i>
+        {{ availableItem.name }}
     </a>
-</div>
+  </li>
+</ul>
