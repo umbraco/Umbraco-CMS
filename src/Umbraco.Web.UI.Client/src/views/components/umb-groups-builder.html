@@ -78,9 +78,7 @@
 
                                 <div ng-if="!sortingMode">
 
-                                    <div class="umb-group-builder__property-meta-alias">
-                                      <umb-generate-alias alias-from="property.label" alias="property.alias"><umb-generate-alias>
-                                    </div>
+                                    <div class="umb-group-builder__property-meta-alias">{{ property.alias }}</div>
 
                                     <div class="umb-group-builder__property-meta-label">
                                         <textarea placeholder="Label..." ng-model="property.label" ng-disabled="property.inherited" umb-auto-resize></textarea>
