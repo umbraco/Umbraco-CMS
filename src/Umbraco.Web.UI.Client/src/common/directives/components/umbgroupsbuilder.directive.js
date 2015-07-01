@@ -251,24 +251,58 @@
 
         scope.dialogModel.selectDataType = function(selectedDataType) {
 
-          contentTypeResource.getPropertyTypeScaffold(selectedDataType.id).then(function(propertyType) {
+          if( selectedDataType.id !== null ) {
 
-            property.config = propertyType.config;
-            property.editor = propertyType.editor;
-            property.view = propertyType.view;
-            property.dataTypeId = selectedDataType.id;
-            property.dataTypeIcon = selectedDataType.icon;
-            property.dataTypeName = selectedDataType.name;
+            contentTypeResource.getPropertyTypeScaffold(selectedDataType.id).then(function(propertyType) {
 
-            property.propertyState = "active";
+              property.config = propertyType.config;
+              property.editor = propertyType.editor;
+              property.view = propertyType.view;
+              property.dataTypeId = selectedDataType.id;
+              property.dataTypeIcon = selectedDataType.icon;
+              property.dataTypeName = selectedDataType.name;
 
-            // open data type configuration
-            scope.editPropertyTypeSettings(property);
+            });
 
-            // push new init tab to scope
-            addInitGroup(scope.model.groups);
+          } else {
 
-          });
+            // get data type scaffold
+            dataTypeResource.getScaffold().then(function(dataType) {
+
+              dataType.selectedEditor = selectedDataType.alias;
+              dataType.name = selectedDataType.name;
+
+              // create prevalues for data type
+              var preValues = dataTypeHelper.createPreValueProps(dataType.preValues);
+
+              // save data type
+              dataTypeResource.save(dataType, preValues, true).then(function(dataType) {
+
+                // get property scaffold
+                contentTypeResource.getPropertyTypeScaffold(dataType.id).then(function(propertyType) {
+
+                  property.config = propertyType.config;
+                  property.editor = propertyType.editor;
+                  property.view = propertyType.view;
+                  property.dataTypeId = dataType.id;
+                  property.dataTypeIcon = dataType.icon;
+                  property.dataTypeName = dataType.name;
+
+                });
+
+              });
+
+            });
+
+          }
+
+          property.propertyState = "active";
+
+          // open data type configuration
+          scope.editPropertyTypeSettings(property);
+
+          // push new init tab to scope
+          addInitGroup(scope.model.groups);
 
         };
 
