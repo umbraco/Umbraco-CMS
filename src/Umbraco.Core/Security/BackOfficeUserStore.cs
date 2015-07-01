@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Web.Security;
 using AutoMapper;
 using Microsoft.AspNet.Identity;
+using Microsoft.Owin;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
@@ -17,15 +18,12 @@ namespace Umbraco.Core.Security
         IUserEmailStore<BackOfficeIdentityUser, int>, 
         IUserLoginStore<BackOfficeIdentityUser, int>,
         IUserRoleStore<BackOfficeIdentityUser, int>,
-        IUserSecurityStampStore<BackOfficeIdentityUser, int>
-        
+        IUserSecurityStampStore<BackOfficeIdentityUser, int>,
+        IUserLockoutStore<BackOfficeIdentityUser, int>,
+        IUserTwoFactorStore<BackOfficeIdentityUser, int>
+
         //TODO: This would require additional columns/tables for now people will need to implement this on their own
         //IUserPhoneNumberStore<BackOfficeIdentityUser, int>,
-        //IUserTwoFactorStore<BackOfficeIdentityUser, int>,
-
-        //TODO: This will require additional columns/tables
-        //IUserLockoutStore<BackOfficeIdentityUser, int>
-
         //TODO: To do this we need to implement IQueryable -  we'll have an IQuerable implementation soon with the UmbracoLinqPadDriver implementation
         //IQueryableUserStore<BackOfficeIdentityUser, int>
     {
@@ -506,6 +504,117 @@ namespace Umbraco.Core.Security
             return user;
         }
 
+        /// <summary>
+        /// Sets whether two factor authentication is enabled for the user
+        /// </summary>
+        /// <param name="user"/><param name="enabled"/>
+        /// <returns/>
+        public virtual Task SetTwoFactorEnabledAsync(BackOfficeIdentityUser user, bool enabled)
+        {
+            user.TwoFactorEnabled = false;
+            return Task.FromResult(0);
+        }
+
+        /// <summary>
+        /// Returns whether two factor authentication is enabled for the user
+        /// </summary>
+        /// <param name="user"/>
+        /// <returns/>
+        public virtual Task<bool> GetTwoFactorEnabledAsync(BackOfficeIdentityUser user)
+        {
+            return Task.FromResult(false);
+        }
+
+        #region IUserLockoutStore
+        
+        /// <summary>
+        /// Returns the DateTimeOffset that represents the end of a user's lockout, any time in the past should be considered not locked out.
+        /// </summary>
+        /// <param name="user"/>
+        /// <returns/>
+        /// <remarks>
+        /// Currently we do not suport a timed lock out, when they are locked out, an admin will  have to reset the status
+        /// </remarks>
+        public Task<DateTimeOffset> GetLockoutEndDateAsync(BackOfficeIdentityUser user)
+        {
+            if (user == null) throw new ArgumentNullException("user");
+
+            return user.LockoutEndDateUtc.HasValue
+                ? Task.FromResult(new DateTimeOffset(user.LockoutEndDateUtc.Value, TimeSpan.FromHours(0)))
+                : Task.FromResult(DateTimeOffset.MaxValue);
+        }
+
+        /// <summary>
+        /// Locks a user out until the specified end date (set to a past date, to unlock a user)
+        /// </summary>
+        /// <param name="user"/><param name="lockoutEnd"/>
+        /// <returns/>
+        public Task SetLockoutEndDateAsync(BackOfficeIdentityUser user, DateTimeOffset lockoutEnd)
+        {
+            if (user == null) throw new ArgumentNullException("user");
+            user.LockoutEndDateUtc = lockoutEnd.UtcDateTime;
+            return Task.FromResult(0);
+        }
+
+        /// <summary>
+        /// Used to record when an attempt to access the user has failed
+        /// </summary>
+        /// <param name="user"/>
+        /// <returns/>
+        public Task<int> IncrementAccessFailedCountAsync(BackOfficeIdentityUser user)
+        {
+            if (user == null) throw new ArgumentNullException("user");
+            user.AccessFailedCount++;
+            return Task.FromResult(user.AccessFailedCount);
+        }
+
+        /// <summary>
+        /// Used to reset the access failed count, typically after the account is successfully accessed
+        /// </summary>
+        /// <param name="user"/>
+        /// <returns/>
+        public Task ResetAccessFailedCountAsync(BackOfficeIdentityUser user)
+        {
+            if (user == null) throw new ArgumentNullException("user");
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Returns the current number of failed access attempts.  This number usually will be reset whenever the password is
+        ///                 verified or the account is locked out.
+        /// </summary>
+        /// <param name="user"/>
+        /// <returns/>
+        public Task<int> GetAccessFailedCountAsync(BackOfficeIdentityUser user)
+        {
+            if (user == null) throw new ArgumentNullException("user");
+            return Task.FromResult(user.AccessFailedCount);
+        }
+
+        /// <summary>
+        /// Returns whether the user can be locked out.
+        /// </summary>
+        /// <param name="user"/>
+        /// <returns/>
+        public Task<bool> GetLockoutEnabledAsync(BackOfficeIdentityUser user)
+        {
+            if (user == null) throw new ArgumentNullException("user");
+            return Task.FromResult(user.LockoutEnabled);
+        }
+
+        /// <summary>
+        /// Sets whether the user can be locked out.
+        /// </summary>
+        /// <param name="user"/><param name="enabled"/>
+        /// <returns/>
+        public Task SetLockoutEnabledAsync(BackOfficeIdentityUser user, bool enabled)
+        {
+            if (user == null) throw new ArgumentNullException("user");
+            user.LockoutEnabled = enabled;
+            return Task.FromResult(0);
+        }
+        #endregion
+
         private bool UpdateMemberProperties(Models.Membership.IUser user, BackOfficeIdentityUser identityUser)
         {
             var anythingChanged = false;
@@ -579,10 +688,13 @@ namespace Umbraco.Core.Security
             return anythingChanged;
         }
 
+
         private void ThrowIfDisposed()
         {
             if (_disposed)
                 throw new ObjectDisposedException(GetType().Name);
         }
+
+      
     }
 }

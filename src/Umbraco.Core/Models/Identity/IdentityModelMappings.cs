@@ -15,6 +15,7 @@ namespace Umbraco.Core.Models.Identity
                 .ForMember(user => user.Email, expression => expression.MapFrom(user => user.Email))
                 .ForMember(user => user.Id, expression => expression.MapFrom(user => user.Id))
                 .ForMember(user => user.LockoutEnabled, expression => expression.MapFrom(user => user.IsLockedOut))
+                //Users currently are locked out for an infinite time, we do not support timed lock outs currently
                 .ForMember(user => user.LockoutEndDateUtc, expression => expression.UseValue(DateTime.MaxValue.ToUniversalTime()))
                 .ForMember(user => user.UserName, expression => expression.MapFrom(user => user.Username))
                 .ForMember(user => user.PasswordHash, expression => expression.MapFrom(user => GetPasswordHash(user.RawPasswordValue)))

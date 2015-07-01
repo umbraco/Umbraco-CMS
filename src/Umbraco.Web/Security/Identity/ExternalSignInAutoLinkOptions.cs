@@ -1,7 +1,9 @@
+using System;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Models.Identity;
 
 namespace Umbraco.Web.Security.Identity
 {
@@ -10,21 +12,26 @@ namespace Umbraco.Web.Security.Identity
     /// </summary>
     public sealed class ExternalSignInAutoLinkOptions
     {
-        
         public ExternalSignInAutoLinkOptions(
             bool autoLinkExternalAccount = false,
-            string defaultUserType = "editor", string[] defaultAllowedSections = null, string defaultCulture = null, string autoLinkExternalAccountView = null)
+            string defaultUserType = "editor", 
+            string[] defaultAllowedSections = null, 
+            string defaultCulture = null)
         {
             Mandate.ParameterNotNullOrEmpty(defaultUserType, "defaultUserType");
 
             _defaultUserType = defaultUserType;
             _defaultAllowedSections = defaultAllowedSections ?? new[] { "content", "media" };
             _autoLinkExternalAccount = autoLinkExternalAccount;
-            _autoLinkExternalAccountView = autoLinkExternalAccountView;
             _defaultCulture = defaultCulture ?? GlobalSettings.DefaultUILanguage;
         }
 
         private readonly string _defaultUserType;
+
+        /// <summary>
+        /// A callback executed during account auto-linking and before the user is persisted
+        /// </summary>
+        public Action<BackOfficeIdentityUser, ExternalLoginInfo> OnAutoLinking { get; set; }
 
         /// <summary>
         /// The default User Type alias to use for auto-linking users
@@ -56,18 +63,7 @@ namespace Umbraco.Web.Security.Identity
         {
             return _autoLinkExternalAccount;
         }
-
-        private readonly string _autoLinkExternalAccountView;
-
-        /// <summary>
-        /// Generally this is empty which means auto-linking will be silent, however in some cases developers may want to 
-        /// prompt the user to enter additional user information that they want to save with the user that has been created.
-        /// </summary>
-        public string GetAutoLinkExternalAccountView(UmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
-        {
-            return _autoLinkExternalAccountView;
-        }
-
+        
         private readonly string _defaultCulture;
        
         /// <summary>

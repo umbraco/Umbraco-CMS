@@ -31,6 +31,7 @@ using Microsoft.AspNet.Identity.Owin;
 using Umbraco.Core.Logging;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Models.Identity;
+using Umbraco.Web.Security.Identity;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 
 namespace Umbraco.Web.Editors
@@ -47,6 +48,7 @@ namespace Umbraco.Web.Editors
     {
 
         private BackOfficeUserManager _userManager;
+        private BackOfficeSignInManager _signInManager;
 
         protected BackOfficeUserManager UserManager
         {
@@ -64,6 +66,24 @@ namespace Umbraco.Web.Editors
                 return _userManager;
             }
         }
+
+        protected BackOfficeSignInManager SignInManager
+        {
+            get
+            {
+                if (_signInManager == null)
+                {
+                    var mgr = TryGetOwinContext().Result.Get<BackOfficeSignInManager>();
+                    if (mgr == null)
+                    {
+                        throw new NullReferenceException("Could not resolve an instance of " + typeof(BackOfficeSignInManager) + " from the " + typeof(IOwinContext));
+                    }
+                    _signInManager = mgr;
+                }
+                return _signInManager;
+            }
+        }
+
         
         [WebApi.UmbracoAuthorize]
         [ValidateAngularAntiForgeryToken]
@@ -76,7 +96,7 @@ namespace Umbraco.Web.Editors
             if (result.Succeeded)
             {
                 var user = await UserManager.FindByIdAsync(User.Identity.GetUserId<int>());
-                await SignInAsync(user, isPersistent: false);
+                await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             else
@@ -146,36 +166,73 @@ namespace Umbraco.Web.Editors
             if (http.Success == false)
                 throw new InvalidOperationException("This method requires that an HttpContext be active");
 
-            if (UmbracoContext.Security.ValidateBackOfficeCredentials(loginModel.Username, loginModel.Password))
+            var result = await SignInManager.PasswordSignInAsync(
+                loginModel.Username, loginModel.Password, isPersistent: true, shouldLockout: true);
+
+            switch (result)
             {
-                //get the user
-                var user = Security.GetBackOfficeUser(loginModel.Username);
-                var userDetail = Mapper.Map<UserDetail>(user);
+                case SignInStatus.Success:
 
-                //create a response with the userDetail object
-                var response = Request.CreateResponse(HttpStatusCode.OK, userDetail);
+                    //get the user
+                    var user = Security.GetBackOfficeUser(loginModel.Username);
+                    var userDetail = Mapper.Map<UserDetail>(user);
 
-                //set the response cookies with the ticket (NOTE: This needs to be done with the custom webapi extension because
-                // we cannot mix HttpContext.Response.Cookies and the way WebApi/Owin work)
-                var ticket = response.UmbracoLoginWebApi(user);
+                    //create a response with the userDetail object
+                    var response = Request.CreateResponse(HttpStatusCode.OK, userDetail);
 
-                //Identity does some of it's own checks as well so we need to use it's sign in process too... this will essentially re-create the
-                // ticket/cookie above but we need to create the ticket now so we can assign the Current Thread User/IPrinciple below                
-                await SignInAsync(Mapper.Map<IUser, BackOfficeIdentityUser>(user), isPersistent: true);
-                //This ensure the current principal is set, otherwise any logic executing after this wouldn't actually be authenticated
-                http.Result.AuthenticateCurrentRequest(ticket, false);
-                
-                //update the userDetail and set their remaining seconds
-                userDetail.SecondsUntilTimeout = ticket.GetRemainingAuthSeconds();
+                    //set the response cookies with the ticket (NOTE: This needs to be done with the custom webapi extension because
+                    // we cannot mix HttpContext.Response.Cookies and the way WebApi/Owin work)
+                    var ticket = response.UmbracoLoginWebApi(user);
 
-                return response;
+                    //This ensure the current principal is set, otherwise any logic executing after this wouldn't actually be authenticated
+                    http.Result.AuthenticateCurrentRequest(ticket, false);
+
+                    //update the userDetail and set their remaining seconds
+                    userDetail.SecondsUntilTimeout = ticket.GetRemainingAuthSeconds();
+
+                    return response;
+
+                case SignInStatus.RequiresVerification:
+
+                    var twofactorOptions = UserManager as IUmbracoBackOfficeTwoFactorOptions;
+                    if (twofactorOptions == null)
+                    {
+                        throw new HttpResponseException(
+                            Request.CreateErrorResponse(
+                                HttpStatusCode.BadRequest, 
+                                "UserManager does not implement " + typeof(IUmbracoBackOfficeTwoFactorOptions)));
+                    }
+
+                    var twofactorView = twofactorOptions.GetTwoFactorView(
+                        TryGetOwinContext().Result,
+                        UmbracoContext,
+                        loginModel.Username);
+
+                    if (twofactorView.IsNullOrWhiteSpace())
+                    {
+                        throw new HttpResponseException(
+                            Request.CreateErrorResponse(
+                                HttpStatusCode.BadRequest,
+                                typeof(IUmbracoBackOfficeTwoFactorOptions) + ".GetTwoFactorView returned an empty string"));
+                    }
+
+                    //create a with information to display a custom two factor send code view
+                    var verifyResponse = Request.CreateResponse(HttpStatusCode.OK, new
+                    {
+                        twoFactorView = twofactorView
+                    });
+
+                    return verifyResponse;
+
+                case SignInStatus.LockedOut:
+                case SignInStatus.Failure:
+                default:
+                    //return BadRequest (400), we don't want to return a 401 because that get's intercepted 
+                    // by our angular helper because it thinks that we need to re-perform the request once we are
+                    // authorized and we don't want to return a 403 because angular will show a warning msg indicating 
+                    // that the user doesn't have access to perform this function, we just want to return a normal invalid msg.            
+                    throw new HttpResponseException(HttpStatusCode.BadRequest);
             }
-
-            //return BadRequest (400), we don't want to return a 401 because that get's intercepted 
-            // by our angular helper because it thinks that we need to re-perform the request once we are
-            // authorized and we don't want to return a 403 because angular will show a warning msg indicating 
-            // that the user doesn't have access to perform this function, we just want to return a normal invalid msg.            
-            throw new HttpResponseException(HttpStatusCode.BadRequest);
         }
 
 
@@ -197,25 +254,6 @@ namespace Umbraco.Web.Editors
             {
                 ModelState.AddModelError(prefix, error);
             }
-        }
-
-        private async Task SignInAsync(BackOfficeIdentityUser user, bool isPersistent)
-        {
-            var owinContext = TryGetOwinContext().Result;
-
-            owinContext.Authentication.SignOut(Core.Constants.Security.BackOfficeExternalAuthenticationType);
-
-            var nowUtc = DateTime.Now.ToUniversalTime();
-
-            owinContext.Authentication.SignIn(
-                new AuthenticationProperties()
-                {
-                    IsPersistent = isPersistent,
-                    AllowRefresh = true,
-                    IssuedUtc = nowUtc,
-                    ExpiresUtc = nowUtc.AddMinutes(GlobalSettings.TimeOutInMinutes)
-                },
-                await user.GenerateUserIdentityAsync(UserManager));
         }
 
     }
