@@ -102,6 +102,10 @@ namespace Umbraco.Core.Security
 
             manager.UserLockoutEnabledByDefault = true;
             manager.MaxFailedAccessAttemptsBeforeLockout = membershipProvider.MaxInvalidPasswordAttempts;
+            //NOTE: This just needs to be in the future, we currently don't support a lockout timespan, it's either they are locked
+            // or they are not locked, but this determines what is set on the account lockout date which corresponds to whether they are
+            // locked out or not.
+            manager.DefaultAccountLockoutTimeSpan = TimeSpan.FromDays(30);
 
             //custom identity factory for creating the identity object for which we auth against in the back office
             manager.ClaimsIdentityFactory = new BackOfficeClaimsIdentityFactory();

@@ -39,6 +39,30 @@ namespace Umbraco.Core.Models.Identity
         public string UserTypeAlias { get; set; }
 
         /// <summary>
+        /// Lockout is always enabled
+        /// </summary>
+        public override bool LockoutEnabled
+        {
+            get { return true; }
+            set 
+            {
+                //do nothing 
+            }
+        }
+
+        /// <summary>
+        /// Based on the user's lockout end date, this will determine if they are locked out
+        /// </summary>
+        internal bool IsLockedOut
+        {
+            get
+            {
+                var isLocked = (LockoutEndDateUtc.HasValue && LockoutEndDateUtc.Value.ToLocalTime() >= DateTime.Now);
+                return isLocked;
+            }
+        }
+
+        /// <summary>
         /// Overridden to make the retrieval lazy
         /// </summary>
         public override ICollection<IIdentityUserLogin> Logins

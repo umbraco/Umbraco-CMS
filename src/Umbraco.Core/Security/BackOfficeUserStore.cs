@@ -78,7 +78,7 @@ namespace Umbraco.Core.Security
                 Username = user.UserName,
                 StartContentId = user.StartContentId == 0 ? -1 : user.StartContentId,
                 StartMediaId = user.StartMediaId == 0 ? -1 : user.StartMediaId,
-                IsLockedOut = user.LockoutEnabled,
+                IsLockedOut = user.IsLockedOut,
                 IsApproved = true
             };
 
@@ -540,8 +540,8 @@ namespace Umbraco.Core.Security
             if (user == null) throw new ArgumentNullException("user");
 
             return user.LockoutEndDateUtc.HasValue
-                ? Task.FromResult(new DateTimeOffset(user.LockoutEndDateUtc.Value, TimeSpan.FromHours(0)))
-                : Task.FromResult(DateTimeOffset.MaxValue);
+                ? Task.FromResult(DateTimeOffset.MaxValue)
+                : Task.FromResult(DateTimeOffset.MinValue);
         }
 
         /// <summary>
@@ -576,7 +576,8 @@ namespace Umbraco.Core.Security
         public Task ResetAccessFailedCountAsync(BackOfficeIdentityUser user)
         {
             if (user == null) throw new ArgumentNullException("user");
-            throw new NotImplementedException();
+            user.AccessFailedCount = 0;
+            return Task.FromResult(0);
         }
 
         /// <summary>
@@ -592,7 +593,7 @@ namespace Umbraco.Core.Security
         }
 
         /// <summary>
-        /// Returns whether the user can be locked out.
+        /// Returns true
         /// </summary>
         /// <param name="user"/>
         /// <returns/>
@@ -603,7 +604,7 @@ namespace Umbraco.Core.Security
         }
 
         /// <summary>
-        /// Sets whether the user can be locked out.
+        /// Doesn't actually perform any function, users can always be locked out
         /// </summary>
         /// <param name="user"/><param name="enabled"/>
         /// <returns/>
@@ -635,10 +636,10 @@ namespace Umbraco.Core.Security
                 anythingChanged = true;
                 user.FailedPasswordAttempts = identityUser.AccessFailedCount;
             }
-            if (user.IsLockedOut != identityUser.LockoutEnabled)
+            if (user.IsLockedOut != identityUser.IsLockedOut)
             {
                 anythingChanged = true;
-                user.IsLockedOut = identityUser.LockoutEnabled;
+                user.IsLockedOut = identityUser.IsLockedOut;
             }
             if (user.Username != identityUser.UserName && identityUser.UserName.IsNullOrWhiteSpace() == false)
             {
@@ -671,6 +672,7 @@ namespace Umbraco.Core.Security
                 anythingChanged = true;
                 user.SecurityStamp = identityUser.SecurityStamp;
             }
+            
             if (user.AllowedSections.ContainsAll(identityUser.AllowedSections) == false
                 || identityUser.AllowedSections.ContainsAll(user.AllowedSections) == false)
             {
