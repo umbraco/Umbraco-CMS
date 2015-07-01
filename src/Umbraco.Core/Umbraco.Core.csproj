@@ -331,8 +331,12 @@
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="IApplicationEventHandler.cs" />
     <Compile Include="IDisposeOnRequestEnd.cs" />
+    <Compile Include="Logging\AsyncForwardingAppenderBase.cs" />
+    <Compile Include="Logging\LoggingEventContext.cs" />
+    <Compile Include="Logging\LoggingEventHelper.cs" />
     <Compile Include="Logging\OwinLogger.cs" />
     <Compile Include="Logging\OwinLoggerFactory.cs" />
+    <Compile Include="Logging\ParallelForwardingAppender.cs" />
     <Compile Include="Manifest\GridEditorConverter.cs" />
     <Compile Include="Models\AuditItem.cs" />
     <Compile Include="Models\AuditType.cs" />
@@ -431,7 +435,7 @@
     <Compile Include="IO\ResizedImage.cs" />
     <Compile Include="IO\UmbracoMediaFile.cs" />
     <Compile Include="Logging\DebugDiagnosticsLogger.cs" />
-    <Compile Include="Logging\AppDomainTokenFormatter.cs" />
+    <Compile Include="Logging\AppDomainTokenConverter.cs" />
     <Compile Include="Logging\LoggerExtensions.cs" />
     <Compile Include="Logging\LoggerResolver.cs" />
     <Compile Include="Logging\ProfilingLogger.cs" />
