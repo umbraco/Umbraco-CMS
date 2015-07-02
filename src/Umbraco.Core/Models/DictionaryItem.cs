@@ -14,22 +14,22 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class DictionaryItem : Entity, IDictionaryItem
     {
-        private Guid _parentId;
+        private Guid? _parentId;
         private string _itemKey;
         private IEnumerable<IDictionaryTranslation> _translations;
 
         public DictionaryItem(string itemKey)
-            : this(new Guid(Constants.Conventions.Localization.DictionaryItemRootId), itemKey)
+            : this(null, itemKey)
         {}
 
-        public DictionaryItem(Guid parentId, string itemKey)
+        public DictionaryItem(Guid? parentId, string itemKey)
         {
             _parentId = parentId;
             _itemKey = itemKey;
             _translations = new List<IDictionaryTranslation>();
         }
 
-        private static readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<DictionaryItem, Guid>(x => x.ParentId);
+        private static readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<DictionaryItem, Guid?>(x => x.ParentId);
         private static readonly PropertyInfo ItemKeySelector = ExpressionHelper.GetPropertyInfo<DictionaryItem, string>(x => x.ItemKey);
         private static readonly PropertyInfo TranslationsSelector = ExpressionHelper.GetPropertyInfo<DictionaryItem, IEnumerable<IDictionaryTranslation>>(x => x.Translations);
 
@@ -37,7 +37,7 @@ namespace Umbraco.Core.Models
         /// Gets or Sets the Parent Id of the Dictionary Item
         /// </summary>
         [DataMember]
-        public Guid ParentId
+        public Guid? ParentId
         {
             get { return _parentId; }
             set
@@ -95,11 +95,7 @@ namespace Umbraco.Core.Models
         {
             base.AddingEntity();
 
-            Key = Guid.NewGuid();
-
-            //If ParentId is not set we should default to the root parent id
-            if(ParentId == Guid.Empty)
-                _parentId = new Guid(Constants.Conventions.Localization.DictionaryItemRootId);
+            Key = Guid.NewGuid();            
         }
         
     }

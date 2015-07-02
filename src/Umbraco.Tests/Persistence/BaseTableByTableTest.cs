@@ -258,6 +258,7 @@ namespace Umbraco.Tests.Persistence
             using (Transaction transaction = Database.GetTransaction())
             {
                 DatabaseSchemaHelper.CreateTable<DictionaryDto>();
+                DatabaseSchemaHelper.CreateTable<LanguageDto>();
                 DatabaseSchemaHelper.CreateTable<LanguageTextDto>();
 
                 //transaction.Complete();

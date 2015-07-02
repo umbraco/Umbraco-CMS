@@ -103,12 +103,9 @@ namespace Umbraco.Core.Persistence.Repositories
             return new List<string>();
         }
 
-        /// <summary>
-        /// Returns the Top Level Parent Guid Id
-        /// </summary>
         protected override Guid NodeObjectTypeId
         {
-            get { return new Guid(Constants.Conventions.Localization.DictionaryItemRootId); }
+            get { throw new NotImplementedException(); }
         }
 
         #endregion

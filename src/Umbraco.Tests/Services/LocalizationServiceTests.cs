@@ -179,7 +179,7 @@ namespace Umbraco.Tests.Services
 
             Assert.Greater(item.Id, 0);
             Assert.IsTrue(item.HasIdentity);
-            Assert.AreEqual(new Guid(Constants.Conventions.Localization.DictionaryItemRootId), item.ParentId);
+            Assert.IsFalse(item.ParentId.HasValue);
             Assert.AreEqual("Testing123", item.ItemKey);
             Assert.AreEqual(1, item.Translations.Count());
         }
@@ -197,7 +197,7 @@ namespace Umbraco.Tests.Services
             Assert.IsNotNull(item);
             Assert.Greater(item.Id, 0);
             Assert.IsTrue(item.HasIdentity);
-            Assert.AreEqual(new Guid(Constants.Conventions.Localization.DictionaryItemRootId), item.ParentId);
+            Assert.IsFalse(item.ParentId.HasValue);
             Assert.AreEqual("Testing12345", item.ItemKey);
             var allLangs = ServiceContext.LocalizationService.GetAllLanguages();
             Assert.Greater(allLangs.Count(), 0);
