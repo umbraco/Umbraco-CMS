@@ -347,6 +347,11 @@
               property.dataTypeIcon = dataType.icon;
               property.dataTypeName = dataType.name;
 
+              // change all chosen datatypes to updated config
+              if(!isNew) {
+                updateSameDataTypes(property);
+              }
+
               // open settings dialog
               scope.editPropertyTypeSettings(property);
 
@@ -411,6 +416,28 @@
         });
 
         return groups;
+      }
+
+      function updateSameDataTypes(newProperty) {
+
+        // find each property
+        angular.forEach(scope.model.groups, function(group){
+          angular.forEach(group.properties, function(property){
+
+            if(property.dataTypeId === newProperty.dataTypeId) {
+
+              // update property data
+              property.config = newProperty.config;
+              property.editor = newProperty.editor;
+              property.view = newProperty.view;
+              property.dataTypeId = newProperty.dataTypeId;
+              property.dataTypeIcon = newProperty.dataTypeIcon;
+              property.dataTypeName = newProperty.dataTypeName;
+
+            }
+
+          });
+        });
       }
 
 
