@@ -81,53 +81,70 @@ if ($project) {
 	if(Test-Path $installFolder) {
 		Remove-Item $installFolder -Force -Recurse -Confirm:$false
 	}
-	
-    # Setup umbraco files for new installs
-    if($newInstall -eq $true) {
-    	if($project.Object -is "VSWebSite.VSWebSite") {
 
-    		# Website project, so copy umbraco files manually
+    # Handle web app / web site specific logic
+    if($project.Object -is "VSWebSite.VSWebSite"){
+	    if($newInstall -eq $true) {
 
-    		$umbracoFilesSource = Join-Path $rootPath "UmbracoFiles"
+			# Website project, so copy umbraco files manually
 
-    		robocopy $umbracoFilesSource $projectDestinationPath /e /xf $umbracoFilesSource\web.config /LOG:$copyLogsPath\UmbracoFilesBackup.log
+			$umbracoFilesSource = Join-Path $rootPath "UmbracoFiles"
 
-    	}
-    	else
-    	{
+			robocopy $umbracoFilesSource $projectDestinationPath /e /xf $umbracoFilesSource\web.config /LOG:$copyLogsPath\UmbracoFilesBackup.log
 
-    		# Web application project so inject msbuild props/target
+		}
+	} else {
 
-    		# Get props / target paths
-		    $propsFile = [System.IO.Path]::Combine($toolsPath, '..\msbuild\UmbracoCms.props')
-		    $targetsFile = [System.IO.Path]::Combine($toolsPath, '..\msbuild\UmbracoCms.targets')
-		 
-		    # Need to load MSBuild assembly if it's not loaded yet.
-		    Add-Type -AssemblyName 'Microsoft.Build, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'
+		# Need to load MSBuild assembly if it's not loaded yet.
+	    Add-Type -AssemblyName 'Microsoft.Build, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'
 
-		    # Grab the loaded MSBuild project for the project
-		    $msbuild = [Microsoft.Build.Evaluation.ProjectCollection]::GlobalProjectCollection.GetLoadedProjects($project.FullName) | Select-Object -First 1
-		 
-		    # Make paths relative to project folder.
-		    $projectUri = new-object Uri($project.FullName, [System.UriKind]::Absolute)
+	    # Grab the loaded MSBuild project for the project
+	    $msbuild = [Microsoft.Build.Evaluation.ProjectCollection]::GlobalProjectCollection.GetLoadedProjects($project.FullName) | Select-Object -First 1
 
-		    $propsUri = new-object Uri($propsFile, [System.UriKind]::Absolute)
-		    $propsRelPath = [System.Uri]::UnescapeDataString($projectUri.MakeRelativeUri($propsUri).ToString()).Replace([System.IO.Path]::AltDirectorySeparatorChar, [System.IO.Path]::DirectorySeparatorChar)
+	    # Get props / target paths
+	    $propsFile = [System.IO.Path]::Combine($toolsPath, '..\msbuild\UmbracoCms.props')
+	    $targetsFile = [System.IO.Path]::Combine($toolsPath, '..\msbuild\UmbracoCms.targets')
+	 
+	    # Make paths relative to project folder.
+	    $projectUri = new-object Uri($project.FullName, [System.UriKind]::Absolute)
 
-		    $targetUri = new-object Uri($targetsFile, [System.UriKind]::Absolute)
-		    $targetRelPath = [System.Uri]::UnescapeDataString($projectUri.MakeRelativeUri($targetUri).ToString()).Replace([System.IO.Path]::AltDirectorySeparatorChar, [System.IO.Path]::DirectorySeparatorChar)
-		 
-		    # Add the import with a condition, to allow the project to load without the files being present.
+	    $propsUri = new-object Uri($propsFile, [System.UriKind]::Absolute)
+	    $propsRelPath = [System.Uri]::UnescapeDataString($projectUri.MakeRelativeUri($propsUri).ToString()).Replace([System.IO.Path]::AltDirectorySeparatorChar, [System.IO.Path]::DirectorySeparatorChar)
+
+	    $targetUri = new-object Uri($targetsFile, [System.UriKind]::Absolute)
+	    $targetRelPath = [System.Uri]::UnescapeDataString($projectUri.MakeRelativeUri($targetUri).ToString()).Replace([System.IO.Path]::AltDirectorySeparatorChar, [System.IO.Path]::DirectorySeparatorChar)
+
+	    # Check for current imports
+		$propsImportExists = $false
+		$targetsImportExists = $false
+		$msbuild.Xml.Imports | ForEach-Object { 
+			if($_.Project -eq $propsRelPath) 
+			{
+				$propsImportExists = $true 
+			}
+			if($_.Project -eq $targetRelPath) 
+			{
+				$targetsImportExists = $true 
+			}
+		}
+
+		# Add the props import
+	    if($propsImportExists -eq $false) {
 		    $propsImport = $msbuild.Xml.AddImport($propsRelPath)
 		    $propsImport.Condition = "Exists('$propsRelPath')"
+	    }
 
-		    $targetImport = $msbuild.Xml.AddImport($targetRelPath)
-		    $targetImport.Condition = "Exists('$targetRelPath')"
+	    # Add the targets import
+	    if($targetsImportExists -eq $false) {
+		    $targetsImport = $msbuild.Xml.AddImport($targetRelPath)
+		    $targetsImport.Condition = "Exists('$targetRelPath')"
+	    }
 
-		    $project.Save()
-
-    	}
-    }
+	    # Save the project changes
+	    if($propsImportExists -eq $false -or $targetsImportExists -eq $false) {
+	    	$project.Save()
+	    }
+	}
 
 	# Open appropriate readme
 	if($newInstall -eq $true)  
