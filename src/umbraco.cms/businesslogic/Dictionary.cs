@@ -325,7 +325,9 @@ namespace umbraco.cms.businesslogic
                 if (!hasKey(key))
                 {
                     var item = ApplicationContext.Current.Services.LocalizationService.CreateDictionaryItemWithIdentity(
-                        key, parentId, defaultValue);
+                        key,
+                        parentId == TopLevelParent ? (Guid?)null : parentId, 
+                        defaultValue);
 
                     return item.Id;
                 }
