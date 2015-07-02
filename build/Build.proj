@@ -307,7 +307,7 @@
       Regex="AssemblyCopyright\(&quot;Copyright © Umbraco (\d{4})&quot;\)"
       ReplacementText="AssemblyCopyright(&quot;Copyright © Umbraco $([System.DateTime]::Now.ToString(`yyyy`))&quot;)"/>
 
-    <XmlPoke XmlInputPath=".\NuSpecs\build\UmbracoCms.props"
+    <XmlPoke XmlInputPath=".\NuSpecs\msbuild\UmbracoCms.props"
                Namespaces="&lt;Namespace Prefix='x' Uri='http://schemas.microsoft.com/developer/msbuild/2003' /&gt;"
          Query="//x:UmbracoVersion"
          Value="$(NewVersion)" />
