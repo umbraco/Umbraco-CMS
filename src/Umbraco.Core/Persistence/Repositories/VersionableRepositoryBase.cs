@@ -395,7 +395,7 @@ ON cmsPropertyType.dataTypeId = cmsDataTypePreValues.datatypeNodeId", docSql.Arg
             // below if any property requires tag support
             var allPreValues = new Lazy<IEnumerable<DataTypePreValueDto>>(() =>
             {
-                var preValsSql = new Sql(@"SELECT a.id as preValId, a.value, a.sortorder, a.alias, a.datatypeNodeId
+                var preValsSql = new Sql(@"SELECT a.id, a.value, a.sortorder, a.alias, a.datatypeNodeId
 FROM cmsDataTypePreValues a
 WHERE EXISTS(
     SELECT DISTINCT b.id as preValIdInner
