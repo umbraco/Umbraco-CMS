@@ -6,10 +6,12 @@
 	</div>
 
 	<div ng-if="control.value">
-		<img
+		<img 
 			ng-if="url"
 			ng-click="setImage()"
 			ng-src="{{url}}"
+			ng-attr-title="{{control.value.name}}"
+         	ng-attr-alt="{{control.value.altText}}"
 			class="fullSizeImage" />
         <input type="text" class="caption" ng-model="control.value.caption" localize="placeholder" placeholder="@grid_placeholderImageCaption" />
  	</div>

@@ -14,7 +14,9 @@ angular.module("umbraco")
                     $scope.control.value = {
                         focalPoint: data.focalPoint,
                         id: data.id,
-                        image: data.image
+                        image: data.image,
+                        altText: data.altText,
+                        name: data.name
                     };
 
                     $scope.setUrl();
