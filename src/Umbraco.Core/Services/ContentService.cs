@@ -1111,7 +1111,7 @@ namespace Umbraco.Core.Services
                     Deleted.RaiseEvent(args, this);
 
                     //remove any flagged media files
-                    repository.DeleteFiles(args.MediaFilesToDelete);
+                    repository.DeleteMediaFiles(args.MediaFilesToDelete);
                 }
 
                 Audit(AuditType.Delete, "Delete Content performed by user", userId, content.Id);
@@ -1310,7 +1310,7 @@ namespace Umbraco.Core.Services
                     EmptiedRecycleBin.RaiseEvent(new RecycleBinEventArgs(nodeObjectType, entities, files, success), this);
 
                     if (success)
-                        repository.DeleteFiles(files);
+                        repository.DeleteMediaFiles(files);
                 }
 
 

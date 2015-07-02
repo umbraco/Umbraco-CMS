@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
@@ -33,8 +34,8 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ContentXmlRepository<IMember> _contentXmlRepository;
         private readonly ContentPreviewRepository<IMember> _contentPreviewRepository;
 
-        public MemberRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository)
-            : base(work, cache, logger, sqlSyntax)
+        public MemberRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository, IContentSection contentSection)
+            : base(work, cache, logger, sqlSyntax, contentSection)
         {
             if (memberTypeRepository == null) throw new ArgumentNullException("memberTypeRepository");
             if (tagRepository == null) throw new ArgumentNullException("tagRepository");
@@ -371,36 +372,6 @@ namespace Umbraco.Core.Persistence.Repositories
             UpdatePropertyTags(entity, _tagRepository);
 
             dirtyEntity.ResetDirtyProperties();
-        }
-
-        protected override void PersistDeletedItem(IMember entity)
-        {
-            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
-            var uploadFieldAlias = Constants.PropertyEditors.UploadFieldAlias;
-            //Loop through properties to check if the media item contains images/file that should be deleted
-            foreach (var property in ((Member)entity).Properties)
-            {
-                if (property.PropertyType.PropertyEditorAlias == uploadFieldAlias &&
-                    string.IsNullOrEmpty(property.Value.ToString()) == false
-                    && fs.FileExists(fs.GetRelativePath(property.Value.ToString())))
-                {
-                    var relativeFilePath = fs.GetRelativePath(property.Value.ToString());
-                    var parentDirectory = System.IO.Path.GetDirectoryName(relativeFilePath);
-
-                    // don't want to delete the media folder if not using directories.
-                    if (UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories && parentDirectory != fs.GetRelativePath("/"))
-                    {
-                        //issue U4-771: if there is a parent directory the recursive parameter should be true
-                        fs.DeleteDirectory(parentDirectory, String.IsNullOrEmpty(parentDirectory) == false);
-                    }
-                    else
-                    {
-                        fs.DeleteFile(relativeFilePath, true);
-                    }
-                }
-            }
-
-            base.PersistDeletedItem(entity);
         }
 
         #endregion
@@ -791,5 +762,6 @@ namespace Umbraco.Core.Persistence.Repositories
             _contentXmlRepository.Dispose();
             _contentPreviewRepository.Dispose();
         }
+
     }
 }
