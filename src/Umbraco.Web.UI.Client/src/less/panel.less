@@ -374,12 +374,25 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  background: #ffffff;
+  border: 1px solid #ECECEC;
+  border-radius: 5px;
+  animation: fadeIn 0.5s;
+}
+
+.umb-panel-header-icon.-placeholder {
+  border: 1px dashed @grayLight;
 }
 
 .umb-panel-header-icon .icon {
-  font-size: 45px;
+  font-size: 35px;
   color: @grayLight;
-  animation: fadeIn 0.5s;
+}
+
+.umb-panel-header-icon-text {
+  color: @blue;
+  font-weight: bold;
+  font-size: 10px;
 }
 
 .umb-panel-header-name-wrapper {

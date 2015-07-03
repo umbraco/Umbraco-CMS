@@ -4,8 +4,9 @@
 
         <div class="umb-panel-meta">
 
-            <div class="umb-panel-header-icon" ng-click="openIconPicker()">
-                <i class="icon {{icon}}"></i>
+            <div class="umb-panel-header-icon" ng-if="icon!==undefined" ng-click="openIconPicker()" ng-class="{'-placeholder': icon==='' || icon===null}">
+                <i class="icon {{icon}}"  ng-if="icon!=='' && icon!==null"></i>
+                <div class="umb-panel-header-icon-text" ng-if="icon==='' || icon===null">Add icon</div>
             </div>
 
             <div class="umb-panel-header-title-wrapper">
@@ -17,11 +18,11 @@
                 </umb-content-name>
                 -->
                 <div class="umb-panel-header-name-wrapper">
-                    <input type="text" class="umb-panel-header-name" ng-model="name" placeholder="Enter name..." ng-class="{'name-is-empty': name===null || name===''}" umb-auto-resize />
-                    <umb-generate-alias alias="alias" alias-from="name" enable-lock="true"></umb-generate-alias>
+                    <input ng-if="name!==undefined" type="text" class="umb-panel-header-name" ng-model="name" placeholder="Enter name..." ng-class="{'name-is-empty': name===null || name===''}" umb-auto-resize />
+                    <umb-generate-alias ng-if="alias!==undefined" alias="alias" alias-from="name" enable-lock="true"></umb-generate-alias>
                 </div>
 
-                <input type="text" class="umb-panel-header-description" ng-model="description" placeholder="Enter description..." />
+                <input type="text" class="umb-panel-header-description" placeholder="Enter description..." ng-if="description!==undefined" ng-model="description" />
             </div>
 
         </div>
