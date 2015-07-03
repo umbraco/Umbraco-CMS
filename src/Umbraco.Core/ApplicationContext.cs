@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Configuration;
 using System.Threading;
-using System.Web;
-using System.Web.Caching;
-using Umbraco.Core.Cache;
+using System.Threading.Tasks;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
-
 
 namespace Umbraco.Core
 {
@@ -65,13 +61,13 @@ namespace Umbraco.Core
 	    /// </remarks>
 	    public static ApplicationContext EnsureContext(ApplicationContext appContext, bool replaceContext)
 	    {
-            if (ApplicationContext.Current != null)
+            if (Current != null)
             {
                 if (!replaceContext)
-                    return ApplicationContext.Current;
+                    return Current;
             }
-            ApplicationContext.Current = appContext;
-            return ApplicationContext.Current;
+            Current = appContext;
+            return Current;
 	    }
 
 	    /// <summary>
@@ -90,14 +86,14 @@ namespace Umbraco.Core
 	    /// </remarks>
 	    public static ApplicationContext EnsureContext(DatabaseContext dbContext, ServiceContext serviceContext, CacheHelper cache, bool replaceContext)
         {
-            if (ApplicationContext.Current != null)
+            if (Current != null)
             {
                 if (!replaceContext)
-                    return ApplicationContext.Current;
+                    return Current;
             }
             var ctx = new ApplicationContext(dbContext, serviceContext, cache);
-            ApplicationContext.Current = ctx;
-            return ApplicationContext.Current;
+            Current = ctx;
+            return Current;
         }
 
 	    /// <summary>
@@ -196,9 +192,12 @@ namespace Umbraco.Core
         internal string _umbracoApplicationUrl; // internal for tests
 
         private Lazy<bool> _configured;
-
+        internal MainDom MainDom { get; private set; }
+       
         private void Init()
         {
+            MainDom = new MainDom();
+            MainDom.Acquire();
             //Create the lazy value to resolve whether or not the application is 'configured'
             _configured = new Lazy<bool>(() =>
             {
