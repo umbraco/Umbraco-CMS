@@ -12,22 +12,10 @@ angular.module("umbraco.directives")
             link: function (scope, element, attrs, ctrl) {
 
                 var unbindWatcher = function(){};
+                var bindWatcher = true;
                 var generateAliasTimeout = "";
 
                 scope.locked = true;
-
-                function activate() {
-                  // if alias is already filled - do not add wacther
-                  if (scope.alias === undefined || scope.alias === "" || scope.alias === null) {
-
-                    unbindWatcher = scope.$watch('aliasFrom', function(newValue, oldValue) {
-                      if (newValue !== undefined && newValue !== null) {
-                        generateAlias(newValue);
-                      }
-                    });
-
-                  }
-                }
 
                 function generateAlias(value) {
 
@@ -71,19 +59,23 @@ angular.module("umbraco.directives")
                 scope.$watch('locked', function(newValue, oldValue){
                     if(newValue === false) {
                         unbindWatcher();
+                        bindWatcher = false;
                     }
-                });
-
-                // wait for aliasFrom input before activating
-                scope.$watch('aliasFrom', function(newValue, oldValue){
-                  if(newValue !== undefined) {
-                    activate();
-                  }
                 });
 
                 // validate custom entered alias
                 scope.$watch('alias', function(newValue, oldValue){
-                  if(scope.locked === false && newValue !== undefined) {
+
+                  if(scope.alias === undefined && bindWatcher === true|| scope.alias === "" && bindWatcher === true || scope.alias === null && bindWatcher === true) {
+                    // add watcher
+                    unbindWatcher = scope.$watch('aliasFrom', function(newValue, oldValue) {
+                      if (newValue !== undefined && newValue !== null) {
+                        generateAlias(newValue);
+                      }
+                    });
+                  }
+
+                  if(scope.locked === false && newValue !== undefined && newValue !== null) {
                     validateAlias(newValue);
                   }
                 });
