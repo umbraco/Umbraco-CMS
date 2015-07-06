@@ -60,6 +60,7 @@ namespace Umbraco.Web.Models.Mapping
                     {
                         //use underlying logic to add the property group which should wire most things up for us
                         dest.AddPropertyGroup(groupDisplay.Name);
+                        
                         //now update that group with the values from the display object
                         Mapper.Map(groupDisplay, dest.PropertyGroups[groupDisplay.Name]);
                         
@@ -128,10 +129,17 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(
                     dto => dto.CompositeContentTypes,
                     expression => expression.MapFrom(dto => dto.ContentTypeComposition))
-                    
+
                 .ForMember(
                     dto => dto.Groups,
-                    expression => expression.ResolveUsing(new PropertyTypeGroupResolver(applicationContext, _propertyEditorResolver)));
+                    expression => expression.ResolveUsing(new PropertyTypeGroupResolver(applicationContext, _propertyEditorResolver)))
+                .AfterMap(((type, display) =>
+                {
+                    //TODO : How do we avoid hardcoding content here? 
+                    display.ListViewEditorName = Constants.Conventions.DataTypes.ListViewPrefix + type.Alias;
+                    if (string.IsNullOrEmpty(type.Alias))
+                        display.ListViewEditorName += "Content";
+                }));
 
             config.CreateMap<PropertyGroupDisplay, PropertyGroup>()
                 .ForMember(dest => dest.Id, expression => expression.Condition(source => source.Id > 0))

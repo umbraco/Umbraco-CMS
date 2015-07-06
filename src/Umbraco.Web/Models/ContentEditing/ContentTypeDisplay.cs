@@ -30,14 +30,15 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "defaultTemplate")]
         public EntityBasic DefaultTemplate { get; set; }
 
-
-
         [DataMember(Name = "allowedContentTypes")]
         public IEnumerable<int> AllowedContentTypes { get; set; }
 
         //List view
         [DataMember(Name = "isContainer")]
         public bool IsContainer { get; set; }
+
+        [DataMember(Name = "listViewEditorName")]
+        public string ListViewEditorName { get; set; }
 
         //we might not need this... 
         [DataMember(Name = "allowAsRoot")]
