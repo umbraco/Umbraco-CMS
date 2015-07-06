@@ -304,6 +304,7 @@
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
     <Compile Include="Media\EmbedProviders\Flickr.cs" />
     <Compile Include="PropertyEditors\DatePreValueEditor.cs" />
+    <Compile Include="Scheduling\LatchedBackgroundTaskBase.cs" />
     <Compile Include="Security\Identity\ExternalSignInAutoLinkOptions.cs" />
     <Compile Include="Security\Identity\GetUserSecondsMiddleWare.cs" />
     <Compile Include="Media\EmbedProviders\OEmbedJson.cs" />
@@ -558,7 +559,6 @@
     <Compile Include="Routing\CustomRouteUrlProvider.cs" />
     <Compile Include="Routing\UrlProviderExtensions.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunnerOptions.cs" />
-    <Compile Include="Scheduling\DelayedRecurringTaskBase.cs" />
     <Compile Include="Scheduling\IBackgroundTaskRunner.cs" />
     <Compile Include="Scheduling\ILatchedBackgroundTask.cs" />
     <Compile Include="Scheduling\RecurringTaskBase.cs" />
