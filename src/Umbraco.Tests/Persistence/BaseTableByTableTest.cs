@@ -579,18 +579,6 @@ namespace Umbraco.Tests.Persistence
         }
 
         [Test]
-        public void Can_Create_umbracoUserLogins_Table()
-        {
-            
-            using (Transaction transaction = Database.GetTransaction())
-            {
-                DatabaseSchemaHelper.CreateTable<UserLoginDto>();
-
-                //transaction.Complete();
-            }
-        }
-
-        [Test]
         public void Can_Create_umbracoUser_Table()
         {
             

@@ -390,6 +390,7 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\RemoveHelpTextColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\RemoveLanguageLocaleColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\RemoveStylesheetDataAndTables.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\RemoveUmbracoLoginsTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\UpdateUniqueIdToHaveCorrectIndexType.cs" />
     <Compile Include="Media\Exif\IFD.cs" />
     <Compile Include="Media\Exif\ImageFile.cs" />
@@ -1108,7 +1109,6 @@
     <Compile Include="Models\Rdbms\User2NodeNotifyDto.cs" />
     <Compile Include="Models\Rdbms\User2NodePermissionDto.cs" />
     <Compile Include="Models\Rdbms\UserDto.cs" />
-    <Compile Include="Models\Rdbms\UserLoginDto.cs" />
     <Compile Include="Models\Rdbms\UserTypeDto.cs" />
     <Compile Include="NameValueCollectionExtensions.cs" />
     <Compile Include="ObjectResolution\WeightedPluginAttribute.cs" />

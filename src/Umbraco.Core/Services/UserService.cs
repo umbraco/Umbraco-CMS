@@ -243,10 +243,6 @@ namespace Umbraco.Core.Services
                 membershipUser.Username = DateTime.Now.ToString("yyyyMMdd") + "_" + membershipUser.Username;
             }
             Save(membershipUser);
-
-            //clear out the user logins!
-            var uow = UowProvider.GetUnitOfWork();
-            uow.Database.Execute("delete from umbracoUserLogins where userID = @id", new {id = membershipUser.Id});
         }
 
         /// <summary>

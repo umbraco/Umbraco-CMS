@@ -20,7 +20,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
             var constraints = SqlSyntax.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
 
             //if the FK doesn't exist
-            if (constraints.Any(x => x.Item1.InvariantEquals("cmsLanguageText") && x.Item2.InvariantEquals("umbracoLanguage") && x.Item3.InvariantEquals("FK_cmsLanguageText_umbracoLanguage_id")) == false)
+            if (constraints.Any(x => x.Item1.InvariantEquals("cmsLanguageText") && x.Item2.InvariantEquals("languageId") && x.Item3.InvariantEquals("FK_cmsLanguageText_umbracoLanguage_id")) == false)
             {
                 //Somehow, a language text item might end up with a language Id of zero or one that no longer exists
                 //before we add the foreign key
