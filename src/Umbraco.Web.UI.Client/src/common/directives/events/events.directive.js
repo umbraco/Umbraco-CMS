@@ -157,7 +157,13 @@ angular.module('umbraco.directives')
                 if(parents.length > 0){
                     return;
                 }
-                
+
+                // ignore clicks on dialog from old dialog service
+                var oldDialog = $(el).parents("#old-dialog-service");
+                if (oldDialog.length === 1) {
+                    return;
+                }
+
                 //ignore clicks inside this element
                 if( $(element).has( $(event.target) ).length > 0 ){
                     return;

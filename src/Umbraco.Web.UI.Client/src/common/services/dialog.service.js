@@ -108,9 +108,9 @@ angular.module('umbraco.services')
         // destroy the scope when the dialog is closed regardless if it is in use elsewhere which is why it shouldn't be done.
         var scope = options.scope || $rootScope.$new();
 
-        //Modal dom obj and unique id
+        //Modal dom obj and set id to old-dialog-service - used until we get all dialogs moved the the new overlay directive
         dialog.element = $('<div ng-swipe-right="swipeHide($event)"  data-backdrop="false"></div>');
-        var id = dialog.template.replace('.html', '').replace('.aspx', '').replace(/[\/|\.|:\&\?\=]/g, "-") + '-' + scope.$id;
+        var id = "old-dialog-service";
 
         if (options.inline) {
             dialog.animation = "";
