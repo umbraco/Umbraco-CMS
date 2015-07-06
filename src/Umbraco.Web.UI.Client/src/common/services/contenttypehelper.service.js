@@ -38,9 +38,6 @@ function contentTypeHelper(contentTypeResource, dataTypeResource) {
 
             contentTypeResource.getById(compositeContentType.id).then(function(composition){
 
-                var groupsArrayLength = contentType.groups.length;
-                var positionToPush = groupsArrayLength - 1;
-
                 angular.forEach(composition.groups, function(compositionGroup){
 
                     // get data type details
@@ -93,6 +90,12 @@ function contentTypeHelper(contentTypeResource, dataTypeResource) {
                             // push id to array of merged composite content types
                             contentTypeGroup.parentTabContentTypes.push(compositeContentType.id);
 
+                            // splice group to the top of the array
+                            var contentTypeGroupCopy = angular.copy(contentTypeGroup);
+                            var index = contentType.groups.indexOf(contentTypeGroup);
+                            contentType.groups.splice(index,1);
+                            contentType.groups.unshift(contentTypeGroupCopy);
+
                         }
 
                     });
@@ -120,7 +123,7 @@ function contentTypeHelper(contentTypeResource, dataTypeResource) {
                         compositionGroup.properties.push({propertyState: "init"});
 
                         // push group before placeholder tab
-                        contentType.groups.splice(positionToPush,0,compositionGroup);
+                        contentType.groups.unshift(compositionGroup);
 
                     }
 
