@@ -1632,7 +1632,7 @@ namespace Umbraco.Core.Services
                     {
                         var xml = _entitySerializer.Serialize(this, _dataTypeService, _userService, content);
 
-                        var poco = new ContentXmlDto { NodeId = content.Id, Xml = xml.ToString(SaveOptions.None) };
+                        var poco = new ContentXmlDto { NodeId = content.Id, Xml = xml.ToDataString() };
                         var exists =
                             uow.Database.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = content.Id }) !=
                             null;
