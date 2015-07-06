@@ -131,7 +131,9 @@ namespace Umbraco.Web.Models.Mapping
                         mainTab.Inherited = true;
 
                         //collect all the involved content types
-                        mainTab.ParentTabContentTypes = groupOfGroups.Where(x => x.ContentTypeId != source.Id).Select(x => x.ContentTypeId);
+                        var parents = groupOfGroups.Where(x => x.ContentTypeId != source.Id).ToList();
+                        mainTab.ParentTabContentTypes = parents.Select(x => x.ContentTypeId);
+                        mainTab.ParentTabContentTypeNames = parents.SelectMany(x => x.ParentTabContentTypeNames);
                         sortedGroups.Add(mainTab);
                     }
                 }
