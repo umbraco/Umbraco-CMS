@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -12,7 +13,16 @@ namespace Umbraco.Core.Logging
 	/// Used for logging
 	///</summary>
     public class Logger : ILogger
-	{
+    {
+        private static string _processAndDomain;
+
+        static Logger()
+        {
+            // these won't change and can go in a static variable
+            _processAndDomain = "P" + Process.GetCurrentProcess().Id
+                                + "/D" + AppDomain.CurrentDomain.Id;
+        }
+
         public Logger(FileInfo log4NetConfigFile)
         {
             XmlConfigurator.Configure(log4NetConfigFile);
@@ -61,7 +71,10 @@ namespace Umbraco.Core.Logging
 		/// <returns></returns>
 		private string PrefixThreadId(string generateMessageFormat)
 		{
-			return "[Thread " + Thread.CurrentThread.ManagedThreadId + "] " + generateMessageFormat;
+            return "[" + _processAndDomain
+                + "/T" + Thread.CurrentThread.ManagedThreadId 
+                + "] " 
+                + generateMessageFormat;
 		}
 
 		public void Error(Type callingType, string message, Exception exception)

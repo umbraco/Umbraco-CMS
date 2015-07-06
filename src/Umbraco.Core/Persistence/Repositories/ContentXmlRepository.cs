@@ -81,8 +81,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var poco = new ContentXmlDto
             {
-                NodeId = entity.Id, 
-                Xml = entity.Xml.ToString(SaveOptions.None)
+                NodeId = entity.Id,
+                Xml = entity.Xml.ToDataString()
             };
 
             //We need to do a special InsertOrUpdate here because we know that the ContentXmlDto table has a 1:1 relation

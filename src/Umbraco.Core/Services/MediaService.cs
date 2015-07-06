@@ -1160,7 +1160,7 @@ namespace Umbraco.Core.Services
 
         //private void CreateAndSaveMediaXml(XElement xml, int id, UmbracoDatabase db)
         //{
-        //    var poco = new ContentXmlDto { NodeId = id, Xml = xml.ToString(SaveOptions.None) };
+        //    var poco = new ContentXmlDto { NodeId = id, Xml = xml.ToDataString() };
         //    var exists = db.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = id }) != null;
         //    int result = exists ? db.Update(poco) : Convert.ToInt32(db.Insert(poco));
         //}
