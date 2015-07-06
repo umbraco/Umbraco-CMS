@@ -123,8 +123,8 @@ namespace Umbraco.Web.Models.Mapping
 
                         //take all properties from all the other tabs and merge into one tab
                         var properties = new List<PropertyTypeDisplay>();
-                        properties.AddRange(mainTab.Properties);
                         properties.AddRange(groupOfGroups.Where(x => x.Id != mainTab.Id).SelectMany(x => x.Properties));
+                        properties.AddRange(mainTab.Properties);
                         mainTab.Properties = properties;
 
                         //lock the tab
