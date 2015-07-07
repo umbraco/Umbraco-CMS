@@ -80,7 +80,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateMemberTypeRepository(UowProvider.GetUnitOfWork()))
             {
-                var types = repository.GetAll().Select(x => x.Alias).ToArray();
+                var types = repository.GetAll(new int[]{}).Select(x => x.Alias).ToArray();
 
                 if (types.Any() == false)
                 {

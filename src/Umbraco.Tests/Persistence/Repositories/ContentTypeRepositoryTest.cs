@@ -227,6 +227,25 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Can_Perform_Get_By_Guid_On_ContentTypeRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
+
+                // Act
+                contentType = repository.Get(contentType.Key);
+
+                // Assert
+                Assert.That(contentType, Is.Not.Null);
+                Assert.That(contentType.Id, Is.EqualTo(NodeDto.NodeIdSeed + 1));
+            }
+        }
+
+        [Test]
         public void Can_Perform_GetAll_On_ContentTypeRepository()
         {
             // Arrange
@@ -241,6 +260,29 @@ namespace Umbraco.Tests.Persistence.Repositories
                     DatabaseContext.Database.ExecuteScalar<int>(
                         "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
                         new {NodeObjectType = new Guid(Constants.ObjectTypes.DocumentType)});
+
+                // Assert
+                Assert.That(contentTypes.Any(), Is.True);
+                Assert.That(contentTypes.Count(), Is.EqualTo(count));
+            }
+        }
+
+        [Test]
+        public void Can_Perform_GetAll_By_Guid_On_ContentTypeRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var allGuidIds = repository.GetAll().Select(x => x.Key).ToArray();
+
+                // Act
+                var contentTypes = repository.GetAll(allGuidIds);
+                int count =
+                    DatabaseContext.Database.ExecuteScalar<int>(
+                        "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
+                        new { NodeObjectType = new Guid(Constants.ObjectTypes.DocumentType) });
 
                 // Assert
                 Assert.That(contentTypes.Any(), Is.True);
