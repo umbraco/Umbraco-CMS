@@ -98,7 +98,7 @@ namespace Umbraco.Web.Install
             // that and we might get lock issues.
             try
             {
-                var xmlFile = content.Instance.UmbracoXmlDiskCacheFileName + ".tmp";
+                var xmlFile = content.GetUmbracoXmlDiskFileName() + ".tmp";
                 SaveAndDeleteFile(xmlFile);
                 return true;
             }

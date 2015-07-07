@@ -132,23 +132,26 @@ namespace umbraco
         private static readonly object DbReadSyncLock = new object();
 
         private const string XmlContextContentItemKey = "UmbracoXmlContextContent";
-        private string _umbracoXmlDiskCacheFileName = string.Empty;
+        private static string _umbracoXmlDiskCacheFileName = string.Empty;
         private volatile XmlDocument _xmlContent;
 
         /// <summary>
         /// Gets the path of the umbraco XML disk cache file.
         /// </summary>
         /// <value>The name of the umbraco XML disk cache file.</value>
+        public static string GetUmbracoXmlDiskFileName()
+        {
+            if (string.IsNullOrEmpty(_umbracoXmlDiskCacheFileName))
+            {
+                _umbracoXmlDiskCacheFileName = IOHelper.MapPath(SystemFiles.ContentCacheXml);
+            }
+            return _umbracoXmlDiskCacheFileName;
+        }
+
+        [Obsolete("Use the safer static GetUmbracoXmlDiskFileName() method instead to retrieve this value")]
         public string UmbracoXmlDiskCacheFileName
         {
-            get
-            {
-                if (string.IsNullOrEmpty(_umbracoXmlDiskCacheFileName))
-                {
-                    _umbracoXmlDiskCacheFileName = IOHelper.MapPath(SystemFiles.ContentCacheXml);
-                }
-                return _umbracoXmlDiskCacheFileName;
-            }
+            get { return GetUmbracoXmlDiskFileName(); }
             set { _umbracoXmlDiskCacheFileName = value; }
         }
 
@@ -674,9 +677,9 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         {
             //TODO: Should there be a try/catch here in case the file is being written to while this is trying to be executed?
 
-            if (File.Exists(UmbracoXmlDiskCacheFileName))
+            if (File.Exists(GetUmbracoXmlDiskFileName()))
             {
-                return new FileInfo(UmbracoXmlDiskCacheFileName).LastWriteTimeUtc;
+                return new FileInfo(GetUmbracoXmlDiskFileName()).LastWriteTimeUtc;
             }
 
             return DateTime.MinValue;
