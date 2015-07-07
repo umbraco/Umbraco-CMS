@@ -72,6 +72,25 @@ namespace Umbraco.Web.Editors
             return dto;
         }
 
+        /// <summary>
+        /// Deletes a document type wth a given ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [HttpPost]
+        public HttpResponseMessage DeleteById(int id)
+        {
+            var foundType = Services.ContentTypeService.GetContentType(id);
+            if (foundType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            Services.ContentTypeService.Delete(foundType, Security.CurrentUser.Id);
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
         public ContentTypeDisplay GetEmpty(int parentId)
         {
             var ct = new ContentType(parentId);
@@ -100,10 +119,15 @@ namespace Umbraco.Web.Editors
             };
         }
 
-        public HttpResponseMessage GetSafeAlias(string value, bool camelCase = true)
+        public dynamic GetSafeAlias(string value, bool camelCase = true)
         {
             var returnValue = (string.IsNullOrWhiteSpace(value)) ? string.Empty : value.ToSafeAlias(camelCase);
-            return Request.CreateResponse(HttpStatusCode.OK, returnValue);
+            dynamic returnObj = new System.Dynamic.ExpandoObject();
+            returnObj.alias = returnValue;
+            returnObj.original = value;
+            returnObj.camelCase = camelCase;
+
+            return returnObj;
         }
 
         /// <summary>

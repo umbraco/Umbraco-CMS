@@ -47,7 +47,7 @@ angular.module("umbraco.directives")
 
                     generateAliasTimeout = $timeout(function () {
                       contentTypeResource.getSafeAlias(value, true).then(function(safeAlias){
-                        scope.alias = safeAlias;
+                        scope.alias = safeAlias.alias;
                       });
                     }, 1000);
 
