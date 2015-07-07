@@ -15,7 +15,7 @@
 
         if(scope.enableListView) {
 
-          contentTypeResource.getAssignedListViewDataType(scope.modelId)
+          dataTypeResource.getByName(scope.listViewName)
             .then(function(dataType) {
 
               scope.dataType = dataType;
@@ -35,26 +35,7 @@
       /* ----------- LIST VIEW SETTINGS --------- */
 
       scope.toggleEditListViewDataTypeSettings = function() {
-
-        if (!scope.editDataTypeSettings) {
-
-          // get dataType
-          dataTypeResource.getById(scope.dataType.id)
-            .then(function(dataType) {
-
-              // store data type
-              scope.dataType = dataType;
-
-              // show edit panel
-              scope.editDataTypeSettings = true;
-
-            });
-
-        } else {
-          // hide edit panel
-          scope.editDataTypeSettings = false;
-        }
-
+        scope.editDataTypeSettings = !scope.editDataTypeSettings;
       };
 
       scope.saveListViewDataType = function() {
@@ -78,10 +59,13 @@
 
       scope.createCustomListViewDataType = function() {
 
-          dataTypeResource.createCustomListView(scope.modelAlias).then(function(dataType) {
+          dataTypeResource.createCustomListView(scope.modelName).then(function(dataType) {
 
               // store data type
               scope.dataType = dataType;
+
+              // set list view name on scope
+              scope.listViewName = dataType.name;
 
               // change state to custom list view
               scope.customListViewCreated = true;
@@ -95,11 +79,16 @@
 
       scope.removeCustomListDataType = function() {
 
+          scope.editDataTypeSettings = false;
+
           // delete custom list view data type
           dataTypeResource.deleteById(scope.dataType.id).then(function(dataType) {
 
+              // set list view name on scope
+              scope.listViewName = "List View - Content";
+
               // get default data type
-              contentTypeResource.getAssignedListViewDataType(scope.modelId)
+              dataTypeResource.getByName(scope.listViewName)
                   .then(function(dataType) {
 
                       // store data type
@@ -125,7 +114,7 @@
       /* ----------- METHODS ---------- */
 
       function checkForCustomListView() {
-          return scope.dataType.name === "List View - " + scope.modelAlias;
+          return scope.dataType.name === "List View - " + scope.modelName;
       }
 
     }
@@ -136,8 +125,8 @@
       templateUrl: 'views/components/umb-list-view.html',
       scope: {
         enableListView: "=",
-        modelId: "=",
-        modelAlias: "="
+        listViewName: "=",
+        modelName: "="
       },
       link: link
     };
