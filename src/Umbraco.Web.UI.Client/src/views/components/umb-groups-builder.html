@@ -22,7 +22,7 @@
             <div class="umb-group-builder__group" ng-if="tab.tabState !== 'init'" ng-class="{'-active':tab.tabState=='active', '-inherited': tab.inherited, 'umb-group-builder__group-handle -sortable': sortingMode && !tab.inherited}" ng-click="activateGroup(tab)">
 
                 <div class="umb-group-builder__group-remove" ng-if="!sortingMode && tab.properties.length <= 1">
-                    <i class="icon icon-trash" ng-click="removeGroup($index)"></i>
+                    <umb-confirm-delete confirm-action="removeGroup($index)"></umbraco-confirm-delete>
                 </div>
 
                 <div class="umb-group-builder__group-title-wrapper">
@@ -118,9 +118,9 @@
                                 <div ng-if="!property.inherited">
 
                                     <!-- delete property -->
-                                    <a href="" class="umb-group-builder__property-action" ng-click="deleteProperty(tab, $index)">
-                                        <i class="icon icon-trash"></i>
-                                    </a>
+                                    <div class="umb-group-builder__property-action">
+                                      <umb-confirm-delete confirm-action="deleteProperty(tab, $index)"></umbraco-confirm-delete>
+                                    </div>
 
                                     <!-- settings for property -->
                                     <a href="" class="umb-group-builder__property-action" ng-click="editPropertyTypeSettings(property)">
