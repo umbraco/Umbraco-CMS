@@ -14,23 +14,19 @@ namespace Umbraco.Core.Logging
 	///</summary>
     public class Logger : ILogger
     {
-        private static string _processAndDomain;
-
-        static Logger()
-        {
-            // these won't change and can go in a static variable
-            _processAndDomain = "P" + Process.GetCurrentProcess().Id
-                                + "/D" + AppDomain.CurrentDomain.Id;
-        }
 
         public Logger(FileInfo log4NetConfigFile)
+            :this()
         {
             XmlConfigurator.Configure(log4NetConfigFile);
         }
 
         private Logger()
         {
-            
+            //Add custom global properties to the log4net context that we can use in our logging output
+
+            log4net.GlobalContext.Properties["processId"] = Process.GetCurrentProcess().Id;
+            log4net.GlobalContext.Properties["appDomainId"] = AppDomain.CurrentDomain.Id;
         }
 
         /// <summary>
@@ -63,34 +59,19 @@ namespace Umbraco.Core.Logging
 			
 			return LogManager.GetLogger(getTypeFromInstance.GetType());
 		}
-
-		/// <summary>
-		/// Useful if the logger itself is running on another thread
-		/// </summary>
-		/// <param name="generateMessageFormat"></param>
-		/// <returns></returns>
-		private string PrefixThreadId(string generateMessageFormat)
-		{
-            return "[" + _processAndDomain
-                + "/T" + Thread.CurrentThread.ManagedThreadId 
-                + "] " 
-                + generateMessageFormat;
-		}
-
+        
 		public void Error(Type callingType, string message, Exception exception)
 		{
 			var logger = LogManager.GetLogger(callingType);
 			if (logger != null)
-				logger.Error(PrefixThreadId(message), exception);
+				logger.Error((message), exception);
 		}
-
-
 
 		public void Warn(Type callingType, string message, params Func<object>[] formatItems)
 		{
 			var logger = LogManager.GetLogger(callingType);
 			if (logger == null || logger.IsWarnEnabled == false) return;
-			logger.WarnFormat(PrefixThreadId(message), formatItems.Select(x => x.Invoke()).ToArray());
+			logger.WarnFormat((message), formatItems.Select(x => x.Invoke()).ToArray());
 		}
 
 		public void Warn(Type callingType, string message, bool showHttpTrace, params Func<object>[] formatItems)
@@ -105,7 +86,7 @@ namespace Umbraco.Core.Logging
 
 			var logger = LogManager.GetLogger(callingType);
 			if (logger == null || logger.IsWarnEnabled == false) return;
-			logger.WarnFormat(PrefixThreadId(message), formatItems.Select(x => x.Invoke()).ToArray());
+			logger.WarnFormat((message), formatItems.Select(x => x.Invoke()).ToArray());
 
 		}
 
@@ -118,7 +99,7 @@ namespace Umbraco.Core.Logging
             var logger = LogManager.GetLogger(callingType);
             if (logger == null || logger.IsWarnEnabled == false) return;
             var executedParams = formatItems.Select(x => x.Invoke()).ToArray();
-            logger.WarnFormat(PrefixThreadId(message) + ". Exception: " + e, executedParams);		
+            logger.WarnFormat((message) + ". Exception: " + e, executedParams);		
 		}
 
 		/// <summary>
@@ -130,7 +111,7 @@ namespace Umbraco.Core.Logging
 		{
 			var logger = LogManager.GetLogger(callingType);
 			if (logger == null || logger.IsInfoEnabled == false) return;
-			logger.Info(PrefixThreadId(generateMessage.Invoke()));
+			logger.Info((generateMessage.Invoke()));
 		}
 
 		/// <summary>
@@ -144,7 +125,7 @@ namespace Umbraco.Core.Logging
 			var logger = LogManager.GetLogger(type);
 			if (logger == null || logger.IsInfoEnabled == false) return;
 			var executedParams = formatItems.Select(x => x.Invoke()).ToArray();
-			logger.InfoFormat(PrefixThreadId(generateMessageFormat), executedParams);
+			logger.InfoFormat((generateMessageFormat), executedParams);
 		}
 
 
@@ -157,7 +138,7 @@ namespace Umbraco.Core.Logging
 		{
 			var logger = LogManager.GetLogger(callingType);
 			if (logger == null || logger.IsDebugEnabled == false) return;
-			logger.Debug(PrefixThreadId(generateMessage.Invoke()));
+			logger.Debug((generateMessage.Invoke()));
 		}
 
 		/// <summary>
@@ -171,7 +152,7 @@ namespace Umbraco.Core.Logging
 			var logger = LogManager.GetLogger(type);
 			if (logger == null || logger.IsDebugEnabled == false) return;
 			var executedParams = formatItems.Select(x => x.Invoke()).ToArray();
-			logger.DebugFormat(PrefixThreadId(generateMessageFormat), executedParams);
+			logger.DebugFormat((generateMessageFormat), executedParams);
 		}
 
 
