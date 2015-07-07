@@ -135,10 +135,15 @@ namespace Umbraco.Web.Models.Mapping
                     expression => expression.ResolveUsing(new PropertyTypeGroupResolver(applicationContext, _propertyEditorResolver)))
                 .AfterMap(((type, display) =>
                 {
-                    //TODO : How do we avoid hardcoding content here? 
-                    display.ListViewEditorName = Constants.Conventions.DataTypes.ListViewPrefix + type.Alias;
-                    if (string.IsNullOrEmpty(type.Alias))
-                        display.ListViewEditorName += "Content";
+                    //default
+                    display.ListViewEditorName = Constants.Conventions.DataTypes.ListViewPrefix +  "Content";
+                    if (string.IsNullOrEmpty(type.Name) == false)
+                    {
+                        var name = Constants.Conventions.DataTypes.ListViewPrefix + type.Name;
+                        if(applicationContext.Services.DataTypeService.GetDataTypeDefinitionByName(name) != null)
+                            display.ListViewEditorName = name;
+                    }    
+                    
                 }));
 
             config.CreateMap<PropertyGroupDisplay, PropertyGroup>()
