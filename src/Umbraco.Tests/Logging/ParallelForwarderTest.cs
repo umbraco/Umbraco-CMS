@@ -118,6 +118,8 @@ namespace Umbraco.Tests.Logging
             Assert.That(debugAppender.LoggedEventCount, Is.EqualTo(0));
             Assert.That(watch.ElapsedMilliseconds, Is.LessThan(testSize));
             Console.WriteLine("Logged {0} errors in {1}ms", testSize, watch.ElapsedMilliseconds);
+
+            debugAppender.Cancel = true;
         }
 
         [Test]
