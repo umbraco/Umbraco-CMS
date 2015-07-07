@@ -20,7 +20,7 @@ namespace Umbraco.Tests
         [Test]
         public void Is_Configured()
         {
-            ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", UmbracoVersion.GetSemanticVersion().ToString());
+            ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", UmbracoVersion.GetSemanticVersion().ToSemanticString());
 
             var migrationEntryService = new Mock<IMigrationEntryService>();
             migrationEntryService.Setup(x => x.FindEntry(It.IsAny<string>(), It.IsAny<SemVersion>()))
@@ -42,7 +42,7 @@ namespace Umbraco.Tests
         [Test]
         public void Is_Not_Configured_By_Migration_Not_Found()
         {
-            ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", UmbracoVersion.GetSemanticVersion().ToString());
+            ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", UmbracoVersion.GetSemanticVersion().ToSemanticString());
 
             var migrationEntryService = new Mock<IMigrationEntryService>();
             migrationEntryService.Setup(x => x.FindEntry(It.IsAny<string>(), It.IsAny<SemVersion>()))

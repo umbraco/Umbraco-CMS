@@ -286,14 +286,14 @@ namespace Umbraco.Core
                             {
                                 //we haven't executed this migration in this environment, so even though the config versions match, 
                                 // this db has not been updated.
-                                ProfilingLogger.Logger.Debug<ApplicationContext>("The migration for version: '" + currentVersion + " has not been executed, there is no record in the database");
+                                ProfilingLogger.Logger.Debug<ApplicationContext>(string.Format("The migration for version: '{0} has not been executed, there is no record in the database", currentVersion.ToSemanticString()));
                                 ok = false;
                             }
                         }
                     }
                     else
                     {
-                        ProfilingLogger.Logger.Debug<ApplicationContext>("CurrentVersion different from configStatus: '" + currentVersion + "','" + configStatus + "'");
+                        ProfilingLogger.Logger.Debug<ApplicationContext>(string.Format("CurrentVersion different from configStatus: '{0}','{1}'", currentVersion.ToSemanticString(), configStatus));
                     }
 
                     return ok;
