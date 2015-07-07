@@ -216,9 +216,23 @@ namespace Umbraco.Web.Editors
 
                 contentType.Id = null;
 
+                
+                //create a default template if it doesnt exist -but only if default template is == to the content type
+                if(contentType.DefaultTemplate != null && contentType.DefaultTemplate.Alias == contentType.Alias)
+                {
+                    var template = Services.FileService.GetTemplate(contentType.Alias);
+                    if(template == null)
+                    {
+                        template = new Template(contentType.Name, contentType.Alias);
+                        Services.FileService.SaveTemplate(template);
+
+                        //after saving, make sure to set the id on the default template
+                        contentType.DefaultTemplate.Id = template.Id;
+                    }   
+                }
+                
                 //save as new
                 var newCt = Mapper.Map<IContentType>(contentType);
-                
                 ctService.Save(newCt);
 
                 //map the saved item back to the content type (it should now get id etc set)
