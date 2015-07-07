@@ -55,6 +55,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.PropertyGroups, expression => expression.Ignore())
                 .AfterMap((source, dest) =>
                 {
+                    var addedProperties = new List<string>();
                     //get all properties from groups that are not generic properties (-666 id)
                     foreach (var groupDisplay in source.Groups.Where(x => x.Id != -666))
                     {
@@ -64,21 +65,31 @@ namespace Umbraco.Web.Models.Mapping
                         //now update that group with the values from the display object
                         Mapper.Map(groupDisplay, dest.PropertyGroups[groupDisplay.Name]);
                         
-                        foreach (var propertyTypeDisplay in groupDisplay.Properties)
+                        foreach (var propertyTypeDisplay in groupDisplay.Properties.Where(x => x.Inherited == false))
                         {
                             dest.AddPropertyType(Mapper.Map<PropertyType>(propertyTypeDisplay), groupDisplay.Name);
+                            addedProperties.Add(propertyTypeDisplay.Alias);
                         }
-                        //dest.PropertyGroups.Add(Mapper.Map<PropertyGroup>(groupDisplay));
+                            
                     }
 
                     //add generic properties
                     var genericProperties = source.Groups.FirstOrDefault(x => x.Id == -666);
                     if(genericProperties != null){
-                        foreach (var propertyTypeDisplay in genericProperties.Properties)
+                        foreach (var propertyTypeDisplay in genericProperties.Properties.Where(x => x.Inherited == false))
                         {
                             dest.AddPropertyType(Mapper.Map<PropertyType>(propertyTypeDisplay));
+                            addedProperties.Add(propertyTypeDisplay.Alias);
                         }
                     }
+
+                    //remove deleted types
+                    foreach(var removedType in dest.PropertyTypes
+                            .Where(x => addedProperties.Contains(x.Alias) == false).ToList())
+                    {
+                        dest.RemovePropertyType(removedType.Alias);
+                    }
+
 
                     //Sync allowed child types
                     var allowedTypes = source.AllowedContentTypes.Select((t, i) => new ContentTypeSort(t, i));
