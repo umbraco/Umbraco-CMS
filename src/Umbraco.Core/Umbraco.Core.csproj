@@ -435,6 +435,7 @@
     <Compile Include="Security\BackOfficeUserManager.cs" />
     <Compile Include="Security\BackOfficeUserStore.cs" />
     <Compile Include="Security\MembershipPasswordHasher.cs" />
+    <Compile Include="SemVersionExtensions.cs" />
     <Compile Include="ServiceProviderExtensions.cs" />
     <Compile Include="IO\ResizedImage.cs" />
     <Compile Include="IO\UmbracoMediaFile.cs" />
