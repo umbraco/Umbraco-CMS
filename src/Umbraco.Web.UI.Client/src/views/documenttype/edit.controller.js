@@ -7,9 +7,9 @@
  * The controller for the content type editor
  */
 (function() {
-	'use strict';
+	"use strict";
 
-	function DocumentTypeEditController($routeParams, contentTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper) {
+	function DocumentTypeEditController($scope, $routeParams, contentTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService) {
 
 		var vm = this;
 
@@ -68,15 +68,16 @@
 
 			contentTypeResource.save(vm.contentType).then(function(dt){
 
-				formHelper.resetForm({ scope: vm, notifications: dt.notifications });
+				formHelper.resetForm({ scope: $scope, notifications: dt.notifications });
 				contentEditingHelper.handleSuccessfulSave({
-					scope: vm,
+					scope: $scope,
 					savedContent: dt,
 					rebindCallback: function() {
 
 					}
 				});
 
+				notificationsService.success("Document type save");
 				//post save logic here -the saved doctype returns as a new object
 				init(dt);
 
@@ -130,7 +131,7 @@
 
 		function getDataTypeDetails(property) {
 
-			if( property.propertyState !== 'init' ) {
+			if( property.propertyState !== "init" ) {
 
 				dataTypeResource.getById(property.dataTypeId)
 					.then(function(dataType) {
