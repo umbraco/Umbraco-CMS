@@ -91,6 +91,17 @@ function contentTypeResource($q, $http, umbRequestHelper) {
                'Failed to retrieve content type');
         },
 
+        deleteById: function (id) {
+
+            return umbRequestHelper.resourcePromise(
+               $http.post(
+                   umbRequestHelper.getApiUrl(
+                       "contentTypeApiBaseUrl",
+                       "DeleteById",
+                       [{ id: id }])),
+               'Failed to retrieve content type');
+        },
+
         /**
          * @ngdoc method
          * @name umbraco.resources.contentTypeResource#getAll
