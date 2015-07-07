@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Web;
 using System.Web.Hosting;
+using log4net;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 
@@ -31,7 +32,6 @@ namespace Umbraco.Core
         /// </summary>
         internal void StartApplication(object sender, EventArgs e)
         {
-
             //boot up the application
             GetBootManager()
                 .Initialize()
@@ -139,6 +139,9 @@ namespace Umbraco.Core
                 Logger.Info<UmbracoApplicationBase>("Application shutdown. Reason: " + HostingEnvironment.ShutdownReason);
             }
             OnApplicationEnd(sender, e);
+
+            //Last thing to do is shutdown log4net
+            LogManager.Shutdown();
         }
 
         protected abstract IBootManager GetBootManager();
