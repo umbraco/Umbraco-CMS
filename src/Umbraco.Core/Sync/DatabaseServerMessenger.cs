@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -78,7 +79,7 @@ namespace Umbraco.Core.Sync
             {
                 UtcStamp = DateTime.UtcNow,
                 Instructions = JsonConvert.SerializeObject(instructions, Formatting.None),
-                OriginIdentity = GetLocalIdentity()
+                OriginIdentity = LocalIdentity
             };
 
             ApplicationContext.DatabaseContext.Database.Insert(dto);
@@ -186,7 +187,7 @@ namespace Umbraco.Core.Sync
             // only process instructions coming from a remote server, and ignore instructions coming from
             // the local server as they've already been processed. We should NOT assume that the sequence of
             // instructions in the database makes any sense whatsoever, because it's all async.
-            var localIdentity = GetLocalIdentity();
+            var localIdentity = LocalIdentity;
 
             var lastId = 0;
             foreach (var dto in dtos)
@@ -269,17 +270,20 @@ namespace Umbraco.Core.Sync
         }
 
         /// <summary>
-        /// Gets the local server unique identity.
+        /// Gets the unique local identity of the executing AppDomain.
         /// </summary>
-        /// <returns>The unique identity of the local server.</returns>
-        protected string GetLocalIdentity()
-        {
-            return JsonConvert.SerializeObject(new
-            {
-                machineName = NetworkHelper.MachineName, 
-                appDomainAppId = HttpRuntime.AppDomainAppId
-            });
-        }
+        /// <remarks>
+        /// <para>It is not only about the "server" (machine name and appDomainappId), but also about
+        /// an AppDomain, within a Process, on that server - because two AppDomains running at the same
+        /// time on the same server (eg during a restart) are, practically, a LB setup.</para>
+        /// <para>Practically, all we really need is the guid, the other infos are here for information
+        /// and debugging purposes.</para>
+        /// </remarks>
+        protected readonly static string LocalIdentity = NetworkHelper.MachineName // eg DOMAIN\SERVER
+            + "/" + HttpRuntime.AppDomainAppId // eg /LM/S3SVC/11/ROOT
+            + " [P" + Process.GetCurrentProcess().Id // eg 1234
+            + "/D" + AppDomain.CurrentDomain.Id // eg 22
+            + "] " + Guid.NewGuid().ToString("N").ToUpper(); // make it truly unique
 
         /// <summary>
         /// Gets the sync file path for the local server.
