@@ -49,12 +49,12 @@ namespace Umbraco.Core.Cache
             {
                 if (MemoryCache[key] == null) return;
                 MemoryCache.Remove(key);
-            }            
+            }
         }
 
         public virtual void ClearCacheObjectTypes(string typeName)
         {
-            var type = Type.GetType(typeName);
+            var type = TypeFinder.GetTypeByName(typeName);
             if (type == null) return;
             var isInterface = type.IsInterface;
             using (new WriteLock(_locker))
@@ -81,7 +81,7 @@ namespace Umbraco.Core.Cache
         {
             using (new WriteLock(_locker))
             {
-                var typeOfT = typeof (T);
+                var typeOfT = typeof(T);
                 var isInterface = typeOfT.IsInterface;
                 foreach (var key in MemoryCache
                     .Where(x =>
@@ -137,7 +137,7 @@ namespace Umbraco.Core.Cache
                     .Select(x => x.Key)
                     .ToArray()) // ToArray required to remove
                     MemoryCache.Remove(key);
-            }            
+            }
         }
 
         public virtual void ClearCacheByKeyExpression(string regexString)
@@ -149,7 +149,7 @@ namespace Umbraco.Core.Cache
                     .Select(x => x.Key)
                     .ToArray()) // ToArray required to remove
                     MemoryCache.Remove(key);
-            }     
+            }
         }
 
         #endregion
@@ -201,7 +201,7 @@ namespace Umbraco.Core.Cache
             return GetCacheItem(cacheKey, getCacheItem, null);
         }
 
-        public object GetCacheItem(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal,CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
+        public object GetCacheItem(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
         {
             // see notes in HttpRuntimeCacheProvider
 
@@ -216,6 +216,7 @@ namespace Umbraco.Core.Cache
                     var policy = GetPolicy(timeout, isSliding, removedCallback, dependentFiles);
 
                     lck.UpgradeToWriteLock();
+                    //NOTE: This does an add or update
                     MemoryCache.Set(cacheKey, result, policy);
                 }
             }
@@ -242,6 +243,7 @@ namespace Umbraco.Core.Cache
             if (value == null) return; // do not store null values (backward compat)
 
             var policy = GetPolicy(timeout, isSliding, removedCallback, dependentFiles);
+            //NOTE: This does an add or update
             MemoryCache.Set(cacheKey, result, policy);
         }
 
@@ -262,7 +264,7 @@ namespace Umbraco.Core.Cache
             {
                 policy.ChangeMonitors.Add(new HostFileChangeMonitor(dependentFiles.ToList()));
             }
-            
+
             if (removedCallback != null)
             {
                 policy.RemovedCallback = arguments =>
@@ -293,6 +295,6 @@ namespace Umbraco.Core.Cache
             }
             return policy;
         }
-        
+
     }
 }

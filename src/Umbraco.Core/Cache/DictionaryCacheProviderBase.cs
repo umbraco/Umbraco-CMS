@@ -90,7 +90,7 @@ namespace Umbraco.Core.Cache
             {
                 foreach (var entry in GetDictionaryEntries()
                     .ToArray())
-                    RemoveEntry((string) entry.Key);
+                    RemoveEntry((string)entry.Key);
             }
         }
 
@@ -105,7 +105,7 @@ namespace Umbraco.Core.Cache
 
         public virtual void ClearCacheObjectTypes(string typeName)
         {
-            var type = Type.GetType(typeName);
+            var type = TypeFinder.GetTypeByName(typeName);
             if (type == null) return;
             var isInterface = type.IsInterface;
             using (WriteLock)
@@ -123,7 +123,7 @@ namespace Umbraco.Core.Cache
                         return value == null || (isInterface ? (type.IsInstanceOfType(value)) : (value.GetType() == type));
                     })
                     .ToArray())
-                    RemoveEntry((string) entry.Key);
+                    RemoveEntry((string)entry.Key);
             }
         }
 
@@ -147,7 +147,7 @@ namespace Umbraco.Core.Cache
                         return value == null || (isInterface ? (value is T) : (value.GetType() == typeOfT));
                     })
                     .ToArray())
-                    RemoveEntry((string) entry.Key);
+                    RemoveEntry((string)entry.Key);
             }
         }
 
@@ -171,10 +171,10 @@ namespace Umbraco.Core.Cache
                         // if T is an interface remove anything that implements that interface
                         // otherwise remove exact types (not inherited types)
                         return (isInterface ? (value is T) : (value.GetType() == typeOfT))
-                               // run predicate on the 'public key' part only, ie without prefix
-                               && predicate(((string) x.Key).Substring(plen), (T) value);
+                            // run predicate on the 'public key' part only, ie without prefix
+                               && predicate(((string)x.Key).Substring(plen), (T)value);
                     }))
-                    RemoveEntry((string) entry.Key);
+                    RemoveEntry((string)entry.Key);
             }
         }
 
@@ -186,7 +186,7 @@ namespace Umbraco.Core.Cache
                 foreach (var entry in GetDictionaryEntries()
                     .Where(x => ((string)x.Key).Substring(plen).InvariantStartsWith(keyStartsWith))
                     .ToArray())
-                    RemoveEntry((string) entry.Key);
+                    RemoveEntry((string)entry.Key);
             }
         }
 
@@ -198,7 +198,7 @@ namespace Umbraco.Core.Cache
                 foreach (var entry in GetDictionaryEntries()
                     .Where(x => Regex.IsMatch(((string)x.Key).Substring(plen), regexString))
                     .ToArray())
-                    RemoveEntry((string) entry.Key);
+                    RemoveEntry((string)entry.Key);
             }
         }
 
