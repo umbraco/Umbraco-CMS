@@ -66,7 +66,9 @@ namespace Umbraco.Core
 
 	        InitializeProfilerResolver();
 
-            _timer = DisposableTimer.TraceDuration<CoreBootManager>("Umbraco application starting on '" + NetworkHelper.MachineName + "'", "Umbraco application startup complete");
+	        _timer = DisposableTimer.TraceDuration<CoreBootManager>(
+	            string.Format("Umbraco {0} application starting on {1}", UmbracoVersion.Current, NetworkHelper.MachineName),
+	            "Umbraco application startup complete");
             
 	        CreateApplicationCache();
 
