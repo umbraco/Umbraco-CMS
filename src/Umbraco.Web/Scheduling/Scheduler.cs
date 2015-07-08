@@ -67,7 +67,7 @@ namespace Umbraco.Web.Scheduling
                                 // install on all, will only run on non-slaves servers
                                 // both are delayed recurring tasks
                                 _publishingRunner.Add(new ScheduledPublishing(_publishingRunner, 60000, 60000, applicationContext, settings, () => _publishingRunner.CurrentCancellationToken));
-                                _tasksRunner.Add(new ScheduledTasks(_tasksRunner, 60000, 60000, applicationContext, settings));
+                                _tasksRunner.Add(new ScheduledTasks(_tasksRunner, 60000, 60000, applicationContext, settings, () => _tasksRunner.CurrentCancellationToken));
 
                                 // log scrubbing
                                 // install & run on all servers
