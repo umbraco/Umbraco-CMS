@@ -58,44 +58,41 @@ namespace Umbraco.Web.Scheduling
 
                 _isPublishingRunning = true;
 
-                var umbracoBaseUrl = ServerEnvironmentHelper.GetCurrentServerUmbracoBaseUrl(_appContext, _settings);
+                var umbracoAppUrl = _appContext.UmbracoApplicationUrl;
+                if (umbracoAppUrl.IsNullOrWhiteSpace())
+                {
+                    LogHelper.Warn<ScheduledPublishing>("No url for service (yet), skip.");
+                    return;
+                }
 
                 try
                 {
-
-                    if (string.IsNullOrWhiteSpace(umbracoBaseUrl))
+                    var url = umbracoAppUrl + "/RestServices/ScheduledPublish/Index";
+                    using (var wc = new HttpClient())
                     {
-                        LogHelper.Warn<ScheduledPublishing>("No url for service (yet), skip.");
-                    }
-                    else
-                    {
-                        var url = string.Format("{0}RestServices/ScheduledPublish/Index", umbracoBaseUrl.EnsureEndsWith('/'));
-                        using (var wc = new HttpClient())
+                        var request = new HttpRequestMessage()
                         {
-                            var request = new HttpRequestMessage()
-                            {
-                                RequestUri = new Uri(url),
-                                Method = HttpMethod.Post,
-                                Content = new StringContent(string.Empty)
-                            };
-                            //pass custom the authorization header
-                            request.Headers.Authorization = AdminTokenAuthorizeAttribute.GetAuthenticationHeaderValue(_appContext);
+                            RequestUri = new Uri(url),
+                            Method = HttpMethod.Post,
+                            Content = new StringContent(string.Empty)
+                        };
+                        //pass custom the authorization header
+                        request.Headers.Authorization = AdminTokenAuthorizeAttribute.GetAuthenticationHeaderValue(_appContext);
 
-                            try
-                            {
-                                var result = await wc.SendAsync(request, token);
-                            }
-                            catch (Exception ex)
-                            {
-                                LogHelper.Error<ScheduledPublishing>("An error occurred calling scheduled publish url", ex);
-                            }
+                        try
+                        {
+                            var result = await wc.SendAsync(request, token);
+                        }
+                        catch (Exception ex)
+                        {
+                            LogHelper.Error<ScheduledPublishing>("An error occurred calling scheduled publish url", ex);
                         }
                     }
                 }
                 catch (Exception ee)
                 {
                     LogHelper.Error<ScheduledPublishing>(
-                        string.Format("An error occurred with the scheduled publishing. The base url used in the request was: {0}, see http://our.umbraco.org/documentation/Using-Umbraco/Config-files/umbracoSettings/#ScheduledTasks documentation for details on setting a baseUrl if this is in error", umbracoBaseUrl)
+                        string.Format("An error occurred with the scheduled publishing. The base url used in the request was: {0}, see http://our.umbraco.org/documentation/Using-Umbraco/Config-files/umbracoSettings/#ScheduledTasks documentation for details on setting a baseUrl if this is in error", umbracoAppUrl)
                         , ee);
                 }
                 finally
