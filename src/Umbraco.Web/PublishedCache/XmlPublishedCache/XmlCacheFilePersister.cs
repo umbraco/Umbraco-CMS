@@ -17,11 +17,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
     /// if multiple threads are performing publishing tasks that the file will be persisted in accordance with the final resulting
     /// xml structure since the file writes are queued.
     /// </remarks>
-    internal class XmlCacheFilePersister : ILatchedBackgroundTask
+    internal class XmlCacheFilePersister : LatchedBackgroundTaskBase
     {
         private readonly IBackgroundTaskRunner<XmlCacheFilePersister> _runner;
         private readonly content _content;
-        private readonly ManualResetEventSlim _latch = new ManualResetEventSlim(false);
         private readonly object _locko = new object();
         private bool _released;
         private Timer _timer;
@@ -38,7 +37,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         private const int MaxWaitMilliseconds = 30000; // save the cache after some time (ie no more than 30s of changes)
 
         // save the cache when the app goes down
-        public bool RunsOnShutdown { get { return true; } }
+        public override bool RunsOnShutdown { get { return true; } }
 
         // initialize the first instance, which is inactive (not touched yet)
         public XmlCacheFilePersister(IBackgroundTaskRunner<XmlCacheFilePersister> runner, content content)
@@ -148,21 +147,11 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
                 // if running (because of shutdown) this will have no effect
                 // else it tells the runner it is time to run the task
-                _latch.Set();
+                Release();
             }
         }
 
-        public WaitHandle Latch
-        {
-            get { return _latch.WaitHandle; }
-        }
-
-        public bool IsLatched
-        {
-            get { return true; }
-        }
-
-        public async Task RunAsync(CancellationToken token)
+        public override async Task RunAsync(CancellationToken token)
         {
             lock (_locko)
             {
@@ -181,15 +170,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             }
         }
 
-        public bool IsAsync
+        public override bool IsAsync
         {
             get { return true; }
         }
 
-        public void Dispose()
-        { }
-
-        public void Run()
+        public override void Run()
         {
             lock (_locko)
             {

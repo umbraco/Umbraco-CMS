@@ -24,7 +24,7 @@ namespace Umbraco.Core.Sync
             if (url.IsNullOrWhiteSpace() == false)
             {
                 appContext.UmbracoApplicationUrl = url.TrimEnd('/');
-                LogHelper.Info<ApplicationContext>("ApplicationUrl: " + appContext.UmbracoApplicationUrl + " (using web.routing/@umbracoApplicationUrl)");
+                LogHelper.Info(typeof(ServerEnvironmentHelper), "ApplicationUrl: " + appContext.UmbracoApplicationUrl + " (using web.routing/@umbracoApplicationUrl)");
                 return;
             }
 
@@ -40,7 +40,7 @@ namespace Umbraco.Core.Sync
                 var ssl = GlobalSettings.UseSSL ? "s" : "";
                 url = "http" + ssl + "://" + url;
                 appContext.UmbracoApplicationUrl = url.TrimEnd('/');
-                LogHelper.Info<ApplicationContext>("ApplicationUrl: " + appContext.UmbracoApplicationUrl + " (using scheduledTasks/@baseUrl)");
+                LogHelper.Info(typeof(ServerEnvironmentHelper), "ApplicationUrl: " + appContext.UmbracoApplicationUrl + " (using scheduledTasks/@baseUrl)");
                 return;
             }
 
@@ -76,7 +76,7 @@ namespace Umbraco.Core.Sync
                         IOHelper.ResolveUrl(SystemDirectories.Umbraco).TrimStart('/'));
 
                     appContext.UmbracoApplicationUrl = url.TrimEnd('/');
-                    LogHelper.Info<ApplicationContext>("ApplicationUrl: " + appContext.UmbracoApplicationUrl + " (using distributedCall/servers)");
+                    LogHelper.Info(typeof(ServerEnvironmentHelper), "ApplicationUrl: " + appContext.UmbracoApplicationUrl + " (using distributedCall/servers)");
                 }
             }
         }

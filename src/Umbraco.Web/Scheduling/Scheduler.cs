@@ -1,11 +1,7 @@
-﻿using System;
-using System.Threading;
-using System.Web;
+﻿using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Sync;
 
 namespace Umbraco.Web.Scheduling
 {
@@ -18,7 +14,7 @@ namespace Umbraco.Web.Scheduling
     /// </remarks>
     internal sealed class Scheduler : ApplicationEventHandler
     {
-        private static Timer _pingTimer;
+        private static BackgroundTaskRunner<IBackgroundTask> _keepAliveRunner;
         private static BackgroundTaskRunner<IBackgroundTask> _publishingRunner;
         private static BackgroundTaskRunner<IBackgroundTask> _tasksRunner;
         private static BackgroundTaskRunner<IBackgroundTask> _scrubberRunner;
@@ -48,30 +44,24 @@ namespace Umbraco.Web.Scheduling
                                 LogHelper.Debug<Scheduler>(() => "Initializing the scheduler");
 
                                 // backgrounds runners are web aware, if the app domain dies, these tasks will wind down correctly
+                                _keepAliveRunner = new BackgroundTaskRunner<IBackgroundTask>("KeepAlive");
                                 _publishingRunner = new BackgroundTaskRunner<IBackgroundTask>("ScheduledPublishing");
                                 _tasksRunner = new BackgroundTaskRunner<IBackgroundTask>("ScheduledTasks");
                                 _scrubberRunner = new BackgroundTaskRunner<IBackgroundTask>("LogScrubber");
 
                                 var settings = UmbracoConfig.For.UmbracoSettings();
 
-                                // note
-                                // must use the single-parameter constructor on Timer to avoid it from being GC'd
-                                // also make the timer static to ensure further GC safety
-                                // read http://stackoverflow.com/questions/4962172/why-does-a-system-timers-timer-survive-gc-but-not-system-threading-timer
-
-                                // ping/keepalive - no need for a background runner - does not need to be web aware, ok if the app domain dies
-                                _pingTimer = new Timer(state => KeepAlive.Start(applicationContext, UmbracoConfig.For.UmbracoSettings()));
-                                _pingTimer.Change(60000, 300000);
+                                // ping/keepalive
+                                // on all servers
+                                _keepAliveRunner.Add(new KeepAlive(_keepAliveRunner, 60000, 300000, applicationContext));
 
                                 // scheduled publishing/unpublishing
                                 // install on all, will only run on non-slaves servers
-                                // both are delayed recurring tasks
                                 _publishingRunner.Add(new ScheduledPublishing(_publishingRunner, 60000, 60000, applicationContext, settings));
                                 _tasksRunner.Add(new ScheduledTasks(_tasksRunner, 60000, 60000, applicationContext, settings));
 
                                 // log scrubbing
-                                // install & run on all servers
-                                // LogScrubber is a delayed recurring task
+                                // install on all, will only run on non-slaves servers
                                 _scrubberRunner.Add(new LogScrubber(_scrubberRunner, 60000, LogScrubber.GetLogScrubbingInterval(settings), applicationContext, settings));
                             }
                         }
