@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Caching;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -53,6 +54,9 @@ namespace Umbraco.Core.Cache
 
         public virtual void ClearCacheObjectTypes(string typeName)
         {
+            var type = Type.GetType(typeName);
+            if (type == null) return;
+            var isInterface = type.IsInterface;
             using (new WriteLock(_locker))
             {
                 foreach (var key in MemoryCache
@@ -62,7 +66,10 @@ namespace Umbraco.Core.Cache
                         // remove null values as well, does not hurt
                         // get non-created as NonCreatedValue & exceptions as null
                         var value = DictionaryCacheProviderBase.GetSafeLazyValue((Lazy<object>)x.Value, true);
-                        return value == null || value.GetType().ToString().InvariantEquals(typeName);
+
+                        // if T is an interface remove anything that implements that interface
+                        // otherwise remove exact types (not inherited types)
+                        return value == null || (isInterface ? (type.IsInstanceOfType(value)) : (value.GetType() == type));
                     })
                     .Select(x => x.Key)
                     .ToArray()) // ToArray required to remove
@@ -75,6 +82,7 @@ namespace Umbraco.Core.Cache
             using (new WriteLock(_locker))
             {
                 var typeOfT = typeof (T);
+                var isInterface = typeOfT.IsInterface;
                 foreach (var key in MemoryCache
                     .Where(x =>
                     {
@@ -83,14 +91,9 @@ namespace Umbraco.Core.Cache
                         // get non-created as NonCreatedValue & exceptions as null
                         var value = DictionaryCacheProviderBase.GetSafeLazyValue((Lazy<object>)x.Value, true);
 
-                        //TODO: waiting on a response for this comment: https://github.com/umbraco/Umbraco-CMS/commit/c2db7b2b9b78847a828512818e79492ecc24ac7c#commitcomment-9492329
-                        // until then we will check if 'T' is an interface and if so we will use the 'is' clause, 
-                        // otherwise we do an exact match.
-
-                        return value == null ||
-                               (typeOfT.IsInterface
-                                   ? (value is T)
-                                   : value.GetType() == typeOfT);
+                        // if T is an interface remove anything that implements that interface
+                        // otherwise remove exact types (not inherited types)
+                        return value == null || (isInterface ? (value is T) : (value.GetType() == typeOfT));
 
                     })
                     .Select(x => x.Key)
@@ -104,6 +107,7 @@ namespace Umbraco.Core.Cache
             using (new WriteLock(_locker))
             {
                 var typeOfT = typeof(T);
+                var isInterface = typeOfT.IsInterface;
                 foreach (var key in MemoryCache
                     .Where(x =>
                     {
@@ -113,11 +117,9 @@ namespace Umbraco.Core.Cache
                         var value = DictionaryCacheProviderBase.GetSafeLazyValue((Lazy<object>)x.Value, true);
                         if (value == null) return true;
 
-                        //TODO: waiting on a response for this comment: https://github.com/umbraco/Umbraco-CMS/commit/c2db7b2b9b78847a828512818e79492ecc24ac7c#commitcomment-9492329
-                        // until then we will check if 'T' is an interface and if so we will use the 'is' clause, 
-                        // otherwise we do an exact match.
-
-                        return ((typeOfT.IsInterface && value is T) || (value.GetType() == typeOfT))
+                        // if T is an interface remove anything that implements that interface
+                        // otherwise remove exact types (not inherited types)
+                        return (isInterface ? (value is T) : (value.GetType() == typeOfT))
                                && predicate(x.Key, (T)value);
                     })
                     .Select(x => x.Key)
