@@ -419,6 +419,9 @@ module.exports = function (grunt) {
                         // folders with '.' in them since the grunt copy task does not like that
                         var componentWithoutPeriod = component.replace(".", "-");
                         return path.join(componentWithoutPeriod, type);
+                        },
+                        'bootstrap-tabdrop': {
+                            keepExpandedHierarchy: false
                     }
                 }
             }

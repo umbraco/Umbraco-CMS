@@ -1,28 +1,29 @@
 {
-    "name": "Umbraco",
-    "version": "7",
-    "homepage": "https://github.com/umbraco/Umbraco-CMS",
-    "authors": [
-        "Shannon <sdeminick@umbraco.com>"
-    ],
-    "description": "Umbraco CMS",
-    "license": "MIT",
-    "private": true,
-    "ignore": [
-        "**/.*",
-        "node_modules",
-        "bower_components",
-        "test",
-        "tests"
-    ],
-    "dependencies": {
-        "typeahead.js": "~0.10.5",
-        "underscore": "~1.7.0",
-        "rgrove-lazyload": "*",
-        "jquery": "2.0.3",
-        "jquery-file-upload": "~9.4.0",
-        "jquery-ui": "1.10.3",
-        "angular-dynamic-locale":  "~0.1.27"
+  "name": "Umbraco",
+  "version": "7",
+  "homepage": "https://github.com/umbraco/Umbraco-CMS",
+  "authors": [
+    "Shannon <sdeminick@umbraco.com>"
+  ],
+  "description": "Umbraco CMS",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "typeahead.js": "~0.10.5",
+    "underscore": "~1.7.0",
+    "rgrove-lazyload": "*",
+    "jquery": "2.0.3",
+    "jquery-file-upload": "~9.4.0",
+    "jquery-ui": "1.10.3",
+        "angular-dynamic-locale":  "~0.1.27",
+    "bootstrap-tabdrop": "~1.0.0"
     },
     "exportsOverride": {
         "rgrove-lazyload": {
@@ -57,5 +58,5 @@
         "blueimp-canvas-to-blob": {
             "ignore": "*.ignore"
         }
-    }
+  }
 }
