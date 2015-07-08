@@ -97,7 +97,18 @@ namespace Umbraco.Core
 
             //now we need to call the initialize methods
             ApplicationEventsResolver.Current.ApplicationEventHandlers
-                .ForEach(x => x.OnApplicationInitialized(UmbracoApplication, ApplicationContext));
+                .ForEach(x =>
+                {
+                    try
+                    {
+                        x.OnApplicationInitialized(UmbracoApplication, ApplicationContext);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogHelper.Error<CoreBootManager>("An error occurred running OnApplicationInitialized for handler " + x.GetType(), ex);
+                        throw;
+                    }
+                });
 
 			_isInitialized = true;
 
@@ -203,7 +214,18 @@ namespace Umbraco.Core
 
             //call OnApplicationStarting of each application events handler
             ApplicationEventsResolver.Current.ApplicationEventHandlers
-                .ForEach(x => x.OnApplicationStarting(UmbracoApplication, ApplicationContext));
+                .ForEach(x =>
+                {
+                    try
+                    {
+                        x.OnApplicationStarting(UmbracoApplication, ApplicationContext);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogHelper.Error<CoreBootManager>("An error occurred running OnApplicationStarting for handler " + x.GetType(), ex);
+                        throw;
+                    }
+                });
 
             if (afterStartup != null)
             {
@@ -229,7 +251,18 @@ namespace Umbraco.Core
             
             //call OnApplicationStarting of each application events handler
             ApplicationEventsResolver.Current.ApplicationEventHandlers
-                .ForEach(x => x.OnApplicationStarted(UmbracoApplication, ApplicationContext));
+                .ForEach(x =>
+                {
+                    try
+                    {
+                        x.OnApplicationStarted(UmbracoApplication, ApplicationContext);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogHelper.Error<CoreBootManager>("An error occurred running OnApplicationStarted for handler " + x.GetType(), ex);
+                        throw;
+                    }
+                });
 
             //Now, startup all of our legacy startup handler
             ApplicationEventsResolver.Current.InstantiateLegacyStartupHandlers();

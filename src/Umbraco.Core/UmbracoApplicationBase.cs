@@ -73,7 +73,18 @@ namespace Umbraco.Core
         protected virtual void OnApplicationStarting(object sender, EventArgs e)
         {
             if (ApplicationStarting != null)
-                ApplicationStarting(sender, e);
+            {
+                try
+                {
+                    ApplicationStarting(sender, e);
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.Error<UmbracoApplicationBase>("An error occurred in an ApplicationStarting event handler", ex);
+                    throw;
+                }
+            }
+                
         }
 
         /// <summary>
@@ -84,7 +95,17 @@ namespace Umbraco.Core
         protected virtual void OnApplicationStarted(object sender, EventArgs e)
         {
             if (ApplicationStarted != null)
-                ApplicationStarted(sender, e);
+            {
+                try
+                {
+                    ApplicationStarted(sender, e);
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.Error<UmbracoApplicationBase>("An error occurred in an ApplicationStarted event handler", ex);
+                    throw;
+                }
+            }
         }
 
         /// <summary>
@@ -95,7 +116,17 @@ namespace Umbraco.Core
         private void OnApplicationInit(object sender, EventArgs e)
         {
             if (ApplicationInit != null)
-                ApplicationInit(sender, e);
+            {
+                try
+                {
+                    ApplicationInit(sender, e);
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.Error<UmbracoApplicationBase>("An error occurred in an ApplicationInit event handler", ex);
+                    throw;
+                }
+            }
         }
 
         /// <summary>
