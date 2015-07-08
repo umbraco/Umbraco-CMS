@@ -134,7 +134,15 @@ namespace Umbraco.Core.Cache
                         // compare on exact type, don't use "is"
                         // get non-created as NonCreatedValue & exceptions as null
                         var value = GetSafeLazyValue((Lazy<object>)x.Value, true);
-                        return value == null || value.GetType() == typeOfT;
+
+                        //TODO: waiting on a response for this comment: https://github.com/umbraco/Umbraco-CMS/commit/c2db7b2b9b78847a828512818e79492ecc24ac7c#commitcomment-9492329
+                        // until then we will check if 'T' is an interface and if so we will use the 'is' clause, 
+                        // otherwise we do an exact match.
+
+                        return value == null ||
+                               (typeOfT.IsInterface
+                                   ? (value is T)
+                                   : value.GetType() == typeOfT);
                     })
                     .ToArray())
                     RemoveEntry((string) entry.Key);
@@ -156,9 +164,14 @@ namespace Umbraco.Core.Cache
                         // get non-created as NonCreatedValue & exceptions as null
                         var value = GetSafeLazyValue((Lazy<object>)x.Value, true);
                         if (value == null) return true;
-                        return value.GetType() == typeOfT
-                            // run predicate on the 'public key' part only, ie without prefix
-                            && predicate(((string)x.Key).Substring(plen), (T)value);
+
+                        //TODO: waiting on a response for this comment: https://github.com/umbraco/Umbraco-CMS/commit/c2db7b2b9b78847a828512818e79492ecc24ac7c#commitcomment-9492329
+                        // until then we will check if 'T' is an interface and if so we will use the 'is' clause, 
+                        // otherwise we do an exact match.
+
+                        return ((typeOfT.IsInterface && value is T) || (value.GetType() == typeOfT))
+                               // run predicate on the 'public key' part only, ie without prefix
+                               && predicate(((string) x.Key).Substring(plen), (T) value);
                     }))
                     RemoveEntry((string) entry.Key);
             }
