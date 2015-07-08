@@ -97,21 +97,6 @@ namespace Umbraco.Web.Scheduling
         }
 
         /// <summary>
-        /// Returns the current cancellation token
-        /// </summary>
-        public CancellationToken CurrentCancellationToken
-        {
-            get
-            {
-                if (_tokenSource == null)
-                {
-                    throw new InvalidOperationException("The token source has not been created which means the task runner has not been started");
-                }
-                return _tokenSource.Token;
-            }
-        }
-
-        /// <summary>
         /// Gets the number of tasks in the queue.
         /// </summary>
         public int TaskCount
