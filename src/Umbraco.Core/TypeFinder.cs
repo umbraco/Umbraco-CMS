@@ -700,7 +700,11 @@ namespace Umbraco.Core
 
         #endregion
 
-        public static Type GetTypeByName(string typeName)
+        //TODO: This isn't very elegant, and will have issues since the AppDomain.CurrentDomain
+        // doesn't actualy load in all assemblies, only the types that have been referenced so far.
+        // However, in a web context, the BuildManager will have executed which will force all assemblies
+        // to be loaded so it's fine for now.
+        internal static Type GetTypeByName(string typeName)
         {
             var type = Type.GetType(typeName);
             if (type != null) return type;

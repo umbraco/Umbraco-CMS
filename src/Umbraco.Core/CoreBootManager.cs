@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Web;
 using AutoMapper;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Mapping;
@@ -261,6 +263,9 @@ namespace Umbraco.Core
 
 		    FreezeResolution();
 
+            //Here we need to make sure the db can be connected to
+		    EnsureDatabaseConnection();
+
             using (DisposableTimer.DebugDuration<CoreBootManager>(
                 () => string.Format("Executing {0} IApplicationEventHandler.OnApplicationStarted", ApplicationEventsResolver.Current.ApplicationEventHandlers.Count()),
                 () => "Finished executing IApplicationEventHandler.OnApplicationStarted"))
@@ -298,6 +303,32 @@ namespace Umbraco.Core
             _timer.Dispose();
 			return this;
 		}
+
+        /// <summary>
+        /// We cannot continue if the db cannot be connected to
+        /// </summary>
+        private void EnsureDatabaseConnection()
+        {
+            if (ApplicationContext.IsConfigured == false) return;
+            if (ApplicationContext.DatabaseContext.IsDatabaseConfigured == false) return;
+
+            var currentTry = 0;
+            while (currentTry < 5)
+            {
+                if (ApplicationContext.DatabaseContext.CanConnect)
+                    break;
+
+                //wait and retry
+                Thread.Sleep(1000);
+                currentTry++;
+            }
+
+            if (currentTry == 5)
+            {
+                throw new UmbracoStartupFailedException("Umbraco cannot start. A connection string is configured but the Umbraco cannot connect to the database.");
+            }
+
+        }
 
         /// <summary>
         /// Freeze resolution to not allow Resolvers to be modified
