@@ -37,6 +37,8 @@ namespace Umbraco.Core
             _databaseContext = dbContext;
             _services = serviceContext;
             ApplicationCache = cache;
+
+            Init();
         }
 
         /// <summary>
@@ -46,6 +48,8 @@ namespace Umbraco.Core
         public ApplicationContext(CacheHelper cache)
         {
             ApplicationCache = cache;
+
+            Init();
         }
 
 	    /// <summary>
@@ -142,16 +146,10 @@ namespace Umbraco.Core
         //   GlobalSettings.CurrentVersion returns the hard-coded "current version"
         //   the system is configured if they match
         //   if they don't, install runs, updates web.config (presumably) and updates GlobalSettings.ConfiguredStatus
-        //
-        //   then there is Application["umbracoNeedConfiguration"] which makes no sense... getting rid of it... SD: I have actually remove that now!
-        //
+        
         public bool IsConfigured
         {
-            // todo - we should not do this - ok for now
-            get
-            {
-            	return Configured;
-            }
+            get { return _configured.Value; }
         }
 
 	    /// <summary>
@@ -196,37 +194,24 @@ namespace Umbraco.Core
         }
 
         internal string _umbracoApplicationUrl; // internal for tests
-	    private bool _versionsDifferenceReported;
 
-        /// <summary>
-        /// Checks if the version configured matches the assembly version
-        /// </summary>
-		private bool Configured
-		{
-			get
-			{
-				try
-				{
-					var configStatus = ConfigurationStatus;
-					var currentVersion = UmbracoVersion.Current.ToString(3);
-				    var ok = configStatus == currentVersion;
+        private Lazy<bool> _configured;
 
-					if (ok == false && _versionsDifferenceReported == false)
-					{
-                        // remember it's been reported so we don't flood the log
-                        // no thread-safety so there may be a few log entries, doesn't matter
-                        _versionsDifferenceReported = true;
-                        LogHelper.Info<ApplicationContext>("CurrentVersion different from configStatus: '" + currentVersion + "','" + configStatus + "'");
-					}
-						
-					return ok;
-				}
-				catch
-				{
-					return false;
-				}
-			}
-		}
+        private void Init()
+        {
+            //Create the lazy value to resolve whether or not the application is 'configured'
+            _configured = new Lazy<bool>(() =>
+            {
+                var configStatus = ConfigurationStatus;
+                var currentVersion = UmbracoVersion.Current.ToString(3);
+                var ok = configStatus == currentVersion;
+                if (ok == false)
+                {
+                    LogHelper.Debug<ApplicationContext>("CurrentVersion different from configStatus: '" + currentVersion + "','" + configStatus + "'");
+                }
+                return ok;
+            });
+        }
 
 		private string ConfigurationStatus
 		{
