@@ -35,21 +35,21 @@
                   // add template placeholder to available templates
                   vm.availableTemplates = contentTypeHelper.insertTemplateHolder($scope.model, vm.availableTemplates);
 
+                  // watch for changes in content type name change
+                  $scope.$watch('model.name', function(newValue, oldValue){
+
+                    // update template placeholder name
+                    $scope.model = contentTypeHelper.updateTemplateHolder($scope.model, true);
+
+                    vm.availableTemplates = contentTypeHelper.insertTemplateHolder($scope.model, vm.availableTemplates);
+
+                  });
+
                 }
 
             });
 
         }
-
-        // watch for changes in content type name change
-        $scope.$watch('model.name', function(newValue, oldValue){
-
-          // update template placeholder name
-          $scope.model = contentTypeHelper.updateTemplateHolder($scope.model, true);
-
-          vm.availableTemplates = contentTypeHelper.insertTemplateHolder($scope.model, vm.availableTemplates);
-
-        });
 
     }
 
