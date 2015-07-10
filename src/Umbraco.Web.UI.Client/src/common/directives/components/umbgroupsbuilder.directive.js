@@ -319,17 +319,23 @@
         scope.dialogModel.dataType = {};
         scope.dialogModel.property = property;
         scope.dialogModel.view = "views/documentType/dialogs/editDataType/editDataType.html";
-        scope.dialogModel.multiActions = [{
+        scope.dialogModel.multiActions = [
+        {
+          key: "save",
           label: "Save",
+          defaultAction: true,
           action: function(dataType) {
             saveDataType(dataType, false);
           }
-        }, {
+        },
+        {
+          key: "saveAsNew",
           label: "Save as new",
           action: function(dataType) {
             saveDataType(dataType, true);
           }
-        }];
+        }
+        ];
         scope.showDialog = true;
 
         function saveDataType(dataType, isNew) {
