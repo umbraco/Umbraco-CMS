@@ -1,6 +1,7 @@
 <div class="btn-group dropup">
 
-    <a class="btn btn-primary" href="#" ng-repeat="defaultAction in actions | filter: {defaultAction:'true'}" ng-click="defaultAction.action(model)" prevent-default>{{ defaultAction.label }}</a>
+    <a class="btn btn-primary" href="#" ng-repeat="defaultAction in actions | filter: {defaultAction:'true'}" ng-click="defaultAction.action(model)" hotkey="enter" prevent-default>{{ defaultAction.label }}</a>
+
     <a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="#" ng-if="secondaryActions.length !== 0"><span class="caret"></span></a>
 
     <ul class="dropdown-menu" ng-if="secondaryActions.length !== 0">
