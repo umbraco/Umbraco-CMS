@@ -180,6 +180,100 @@ function contentTypeHelper(contentTypeResource, dataTypeResource) {
 
             });
 
+        },
+
+        makeTemplateHolder: function(contentType) {
+
+          var template = {
+            "name": contentType.name,
+            "icon": "icon-layout",
+            "alias": "templateHolder"
+          };
+
+          return template;
+
+        },
+
+        insertDefaultTemplateHolder: function(contentType) {
+          
+          var template = contentTypeHelperService.makeTemplateHolder(contentType);
+
+          contentType.defaultTemplate = template;
+
+          return contentType;
+
+        },
+
+        insertTemplateHolder: function(contentType, array) {
+
+          var template = contentTypeHelperService.makeTemplateHolder(contentType);
+          var templateExists = false;
+
+          angular.forEach(array, function(arrayItem) {
+
+            // update existing template
+            if(arrayItem.alias === template.alias){
+
+              // set flag
+              templateExists = true;
+
+              // get new template holder
+              template = contentTypeHelperService.makeTemplateHolder(contentType);
+
+              // update name
+              arrayItem.name = template.name;
+
+            }
+
+          });
+
+          // push template placeholder
+          if(!templateExists) {
+            array.push(template);
+          }
+
+          return array;
+
+        },
+
+        updateTemplateHolder: function(contentType, updateName, updateAlias) {
+
+          var template = {"alias": "templateHolder"};
+
+          if (contentType.name !== null && contentType.alias !== null) {
+
+            // update from default template
+            if (contentType.defaultTemplate !== null && contentType.defaultTemplate.alias === template.alias) {
+
+              if(updateName) {
+                contentType.defaultTemplate.name = contentType.name;
+              }
+
+              if(updateAlias) {
+                contentType.defaultTemplate.alias = contentType.alias;
+              }
+
+            }
+
+            // update from allowed templates
+            angular.forEach(contentType.allowedTemplates, function(allowedTemplate) {
+              if (allowedTemplate.alias === template.alias) {
+
+                if(updateName) {
+                  allowedTemplate.name = contentType.name;
+                }
+
+                if(updateAlias) {
+                  allowedTemplate.alias = contentType.alias;
+                }
+
+              }
+            });
+
+          }
+
+          return contentType;
+
         }
 
     };

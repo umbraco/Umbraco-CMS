@@ -66,6 +66,11 @@
 			//perform any pre-save logic here
 			vm.contentType.allowedContentTypes = contentTypeHelper.reformatAllowedContentTypes(vm.contentType.allowedContentTypes);
 
+			// update template holder on new content types
+			if( vm.contentType.id === 0) {
+				vm.contentType = contentTypeHelper.updateTemplateHolder(vm.contentType, true, true);
+			}
+
 			contentTypeResource.save(vm.contentType).then(function(dt){
 
 				formHelper.resetForm({ scope: $scope, notifications: dt.notifications });
@@ -102,6 +107,17 @@
 
 			// convert legacy icons
 			convertLegacyIcons(contentType);
+
+			// insert template holder on new content types
+			if(contentType.id === 0) {
+
+				// insert template placeholder as default template
+				contentType = contentTypeHelper.insertDefaultTemplateHolder(contentType);
+
+				// insert template placeholder as allowed template
+				contentType.allowedTemplates = contentTypeHelper.insertTemplateHolder(contentType, contentType.allowedTemplates);
+
+			}
 
 			//set a shared state
 			editorState.set(contentType);
