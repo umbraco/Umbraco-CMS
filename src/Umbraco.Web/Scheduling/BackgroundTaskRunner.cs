@@ -90,7 +90,8 @@ namespace Umbraco.Web.Scheduling
             _options = options;
             _logPrefix = "[" + name + "] ";
             
-            HostingEnvironment.RegisterObject(this);
+            if (options.Hosted)
+                HostingEnvironment.RegisterObject(this);
 
             if (options.AutoStart)
                 StartUp();

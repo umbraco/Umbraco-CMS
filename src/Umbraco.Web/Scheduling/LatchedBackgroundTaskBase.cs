@@ -63,15 +63,22 @@ namespace Umbraco.Web.Scheduling
 
         protected virtual void Dispose(bool disposing)
         {
-            // lock on _latch instead of creating a new object as _timer is
+            if (disposing == false) return;
+
+            // lock on _latch instead of creating a new object as _latch is
             // private, non-null, readonly - so safe here
             lock (_latch)
             {
                 if (_disposed) return;
                 _disposed = true;
-
-                _latch.Dispose();                
+                _latch.Dispose();
+                DisposeResources();
             }
         }
+
+        protected virtual void DisposeResources()
+        { }
+
+        public bool Disposed { get {  return _disposed; } }
     }
 }
