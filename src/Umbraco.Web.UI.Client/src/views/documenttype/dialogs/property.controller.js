@@ -14,8 +14,8 @@ function DocumentTypePropertyController($scope, dataTypeResource) {
 		"system": []
 	};
 
-	getAllUserConfiguredDataTypes();
-	getAllUserPropertyEditors();
+	//getAllUserConfiguredDataTypes();
+	//getAllUserPropertyEditors();
 	getAllDatatypes();
 
 
