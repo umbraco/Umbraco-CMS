@@ -1215,6 +1215,7 @@
     <Compile Include="UriExtensions.cs" />
     <Compile Include="SystemUtilities.cs" />
     <Compile Include="UrlHelperExtensions.cs" />
+    <Compile Include="WaitHandleExtensions.cs" />
     <Compile Include="WriteLock.cs" />
     <Compile Include="XmlExtensions.cs" />
     <Compile Include="XmlHelper.cs" />
