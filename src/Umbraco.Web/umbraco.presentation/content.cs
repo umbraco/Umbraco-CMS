@@ -393,7 +393,18 @@ namespace umbraco
         public virtual void ClearDocumentCache(int documentId)
         {
             // Get the document
-            var d = new Document(documentId);
+            Document d;
+            try
+            {
+                d = new Document(documentId);
+            }
+            catch
+            {
+                // if we need the document to remove it... this cannot be LB?!
+                // shortcut everything here
+                ClearDocumentXmlCache(documentId);
+                return;
+            }
             ClearDocumentCache(d);
         }
 
@@ -414,26 +425,8 @@ namespace umbraco
                 // remove from xml db cache 
                 doc.XmlRemoveFromDB();
 
-                // We need to lock content cache here, because we cannot allow other threads
-                // making changes at the same time, they need to be queued
-                using (var safeXml = GetSafeXmlReader())
-                {
-                    // Check if node present, before cloning
-                    x = safeXml.Xml.GetElementById(doc.Id.ToString());
-                    if (x == null)
-                        return;
-
-                    safeXml.UpgradeToWriter(false);
-
-                    // Find the document in the xml cache
-                    x = safeXml.Xml.GetElementById(doc.Id.ToString());
-                    if (x != null)
-                    {
-                        // The document already exists in cache, so repopulate it
-                        x.ParentNode.RemoveChild(x);
-                        safeXml.Commit();
-                    }
-                }
+                // clear xml cache
+                ClearDocumentXmlCache(doc.Id);
 
                 ClearContextCache();
 
@@ -446,6 +439,30 @@ namespace umbraco
                     var prov = (UmbracoSiteMapProvider)SiteMap.Provider;
                     prov.RemoveNode(doc.Id);
                 }                
+            }
+        }
+
+        internal void ClearDocumentXmlCache(int id)
+        {
+            // We need to lock content cache here, because we cannot allow other threads
+            // making changes at the same time, they need to be queued
+            using (var safeXml = GetSafeXmlReader())
+            {
+                // Check if node present, before cloning
+                var x = safeXml.Xml.GetElementById(id.ToString());
+                if (x == null)
+                    return;
+
+                safeXml.UpgradeToWriter(false);
+
+                // Find the document in the xml cache
+                x = safeXml.Xml.GetElementById(id.ToString());
+                if (x != null)
+                {
+                    // The document already exists in cache, so repopulate it
+                    x.ParentNode.RemoveChild(x);
+                    safeXml.Commit();
+                }
             }
         }
 
