@@ -44,7 +44,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
                         whereClauses.Add(string.Format("{0} {1} {2}",
                                                        SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(item.Key),
                                                        item.Value == null ? "IS" : "=",
-                                                       SqlSyntaxContext.SqlSyntaxProvider.GetQuotedValue(item.Value.ToString())));
+                                                       GetQuotedValue(item.Value)));
                     }
 
                     deleteItems.Add(string.Format(SqlSyntaxContext.SqlSyntaxProvider.DeleteData,

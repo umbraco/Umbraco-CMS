@@ -7,15 +7,16 @@ using umbraco.BusinessLogic;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Sync;
 
 namespace Umbraco.Web.Scheduling
 {
-    internal class LogScrubber : DelayedRecurringTaskBase<LogScrubber>
+    internal class LogScrubber : RecurringTaskBase
     {
         private readonly ApplicationContext _appContext;
         private readonly IUmbracoSettingsSection _settings;
 
-        public LogScrubber(IBackgroundTaskRunner<LogScrubber> runner, int delayMilliseconds, int periodMilliseconds, 
+        public LogScrubber(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds, 
             ApplicationContext appContext, IUmbracoSettingsSection settings)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
@@ -23,20 +24,8 @@ namespace Umbraco.Web.Scheduling
             _settings = settings;
         }
 
-        public LogScrubber(LogScrubber source)
-            : base(source)
-        {
-            _appContext = source._appContext;
-            _settings = source._settings;
-        }
-
-        protected override LogScrubber GetRecurring()
-        {
-            return new LogScrubber(this);
-        }
-
         // maximum age, in minutes
-        private int GetLogScrubbingMaximumAge(IUmbracoSettingsSection settings)
+        private static int GetLogScrubbingMaximumAge(IUmbracoSettingsSection settings)
         {
             var maximumAge = 24 * 60; // 24 hours, in minutes
             try
@@ -46,7 +35,7 @@ namespace Umbraco.Web.Scheduling
             }
             catch (Exception e)
             {
-                LogHelper.Error<Scheduler>("Unable to locate a log scrubbing maximum age. Defaulting to 24 hours.", e);
+                LogHelper.Error<LogScrubber>("Unable to locate a log scrubbing maximum age. Defaulting to 24 hours.", e);
             }
             return maximumAge;
 
@@ -67,15 +56,25 @@ namespace Umbraco.Web.Scheduling
             return interval;
         }
 
-        public override void PerformRun()
+        public override bool PerformRun()
         {
+            if (_appContext == null) return true; // repeat...
+
+            if (ServerEnvironmentHelper.GetStatus(_settings) == CurrentServerEnvironmentStatus.Slave)
+            {
+                LogHelper.Debug<LogScrubber>("Does not run on slave servers.");
+                return false; // do NOT repeat, server status comes from config and will NOT change
+            }
+
             using (DisposableTimer.DebugDuration<LogScrubber>("Log scrubbing executing", "Log scrubbing complete"))
             {
                 Log.CleanLogs(GetLogScrubbingMaximumAge(_settings));
-            }           
+            }
+
+            return true; // repeat
         }
 
-        public override Task PerformRunAsync(CancellationToken token)
+        public override Task<bool> PerformRunAsync(CancellationToken token)
         {
             throw new NotImplementedException();
         }

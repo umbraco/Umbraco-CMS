@@ -40,7 +40,7 @@ namespace Umbraco.Core.Sync
             {
                 UtcStamp = DateTime.UtcNow,
                 Instructions = JsonConvert.SerializeObject(instructions, Formatting.None),
-                OriginIdentity = GetLocalIdentity()
+                OriginIdentity = LocalIdentity
             };
 
             ApplicationContext.DatabaseContext.Database.Insert(dto);

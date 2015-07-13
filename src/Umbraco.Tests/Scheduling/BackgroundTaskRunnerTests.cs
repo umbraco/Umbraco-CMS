@@ -525,15 +525,11 @@ namespace Umbraco.Tests.Scheduling
             var waitHandle = new ManualResetEvent(false);
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions(), _logger))
             {
-                runner.TaskCompleted += (sender, args) => runCount++;
-                runner.TaskStarting += async (sender, args) =>
+                runner.TaskCompleted += (sender, args) =>
                 {
-                    //wait for each task to finish once it's started
-                    await sender.CurrentThreadingTask;
+                    runCount++;
                     if (runCount > 3)
-                    {
                         waitHandle.Set();
-                    }
                 };
 
                 var task = new MyRecurringTask(runner, 200, 500);
@@ -548,7 +544,10 @@ namespace Umbraco.Tests.Scheduling
                 Assert.GreaterOrEqual(runCount, 4);
 
                 // stops recurring
-                runner.Shutdown(false, false);
+                runner.Shutdown(false, true);
+
+                // check that task has been disposed (timer has been killed, etc)
+                Assert.IsTrue(task.Disposed);
             }
         }
 
@@ -595,15 +594,12 @@ namespace Umbraco.Tests.Scheduling
             var waitHandle = new ManualResetEvent(false);
             using (var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions(), _logger))
             {
-                runner.TaskCompleted += (sender, args) => runCount++;
-                runner.TaskStarting += async (sender, args) =>
+                runner.TaskCompleted += (sender, args) =>
                 {
-                    //wait for each task to finish once it's started
-                    await sender.CurrentThreadingTask;
+                    runCount++;
                     if (runCount > 3)
-                    {
                         waitHandle.Set();
-                    }
+
                 };
 
                 var task = new MyDelayedRecurringTask(runner, 2000, 1000);
@@ -727,16 +723,12 @@ namespace Umbraco.Tests.Scheduling
             }
         }
 
-        private class MyDelayedRecurringTask : DelayedRecurringTaskBase<MyDelayedRecurringTask>
+        private class MyDelayedRecurringTask : RecurringTaskBase
         {
             public bool HasRun { get; private set; }
 
-            public MyDelayedRecurringTask(IBackgroundTaskRunner<MyDelayedRecurringTask> runner, int delayMilliseconds, int periodMilliseconds)
+            public MyDelayedRecurringTask(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds)
                 : base(runner, delayMilliseconds, periodMilliseconds)
-            { }
-
-            private MyDelayedRecurringTask(MyDelayedRecurringTask source)
-                : base(source)
             { }
 
             public override bool IsAsync
@@ -744,20 +736,18 @@ namespace Umbraco.Tests.Scheduling
                 get { return false; }
             }
 
-            public override void PerformRun()
+            public override bool PerformRun()
             {
                 HasRun = true;
+                return true; // repeat
             }
 
-            public override Task PerformRunAsync(CancellationToken token)
+            public override Task<bool> PerformRunAsync(CancellationToken token)
             {
                 throw new NotImplementedException();
             }
 
-            protected override MyDelayedRecurringTask GetRecurring()
-            {
-                return new MyDelayedRecurringTask(this);
-            }
+            public override bool RunsOnShutdown { get { return true; } }
         }
 
         private class MyDelayedTask : ILatchedBackgroundTask
@@ -811,29 +801,23 @@ namespace Umbraco.Tests.Scheduling
             { }
         }
 
-        private class MyRecurringTask : RecurringTaskBase<MyRecurringTask>
+        private class MyRecurringTask : RecurringTaskBase
         {
             private readonly int _runMilliseconds;
 
-
-            public MyRecurringTask(IBackgroundTaskRunner<MyRecurringTask> runner, int runMilliseconds, int periodMilliseconds)
-                : base(runner, periodMilliseconds)
+            public MyRecurringTask(IBackgroundTaskRunner<RecurringTaskBase> runner, int runMilliseconds, int periodMilliseconds)
+                : base(runner, 0, periodMilliseconds)
             {
                 _runMilliseconds = runMilliseconds;
             }
 
-            private MyRecurringTask(MyRecurringTask source, int runMilliseconds)
-                : base(source)
-            {
-                _runMilliseconds = runMilliseconds;
-            }
-
-            public override void PerformRun()
+            public override bool PerformRun()
             {                
                 Thread.Sleep(_runMilliseconds);
+                return true; // repeat
             }
 
-            public override Task PerformRunAsync(CancellationToken token)
+            public override Task<bool> PerformRunAsync(CancellationToken token)
             {
                 throw new NotImplementedException();
             }
@@ -843,10 +827,15 @@ namespace Umbraco.Tests.Scheduling
                 get { return false; }
             }
 
-            protected override MyRecurringTask GetRecurring()
+            public override bool RunsOnShutdown { get { return false; } }
+
+            protected override void Dispose(bool disposing)
             {
-                return new MyRecurringTask(this, _runMilliseconds);
+                Disposed = true;
+                base.Dispose(disposing);
             }
+
+            public bool Disposed { get; private set; }
         }
 
         private class MyTask : BaseTask

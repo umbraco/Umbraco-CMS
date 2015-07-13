@@ -4,6 +4,8 @@ using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
+    //TODO: This should be decoupled! Shouldn't inherit from the IRepository
+
     /// <summary>
     /// Defines the implementation of a Repository, which allows queries against the <see cref="TEntity"/>
     /// </summary>

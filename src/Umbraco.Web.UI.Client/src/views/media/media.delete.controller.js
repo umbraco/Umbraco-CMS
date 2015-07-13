@@ -31,7 +31,13 @@ function MediaDeleteController($scope, mediaResource, treeService, navigationSer
             
             //if the current edited item is the same one as we're deleting, we need to navigate elsewhere
             if (editorState.current && editorState.current.id == $scope.currentNode.id) {
-                $location.path("/media/media/edit/" + $scope.currentNode.parentId);
+
+            	//If the deleted item lived at the root then just redirect back to the root, otherwise redirect to the item's parent
+            	var location = "/media";
+            	if ($scope.currentNode.parentId.toString() !== "-1")
+            		location = "/media/media/edit/" + $scope.currentNode.parentId;
+
+                $location.path(location);
             }
 
             navigationService.hideMenu();

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Web;
 using System.Web.Hosting;
+using log4net;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 
@@ -31,6 +32,18 @@ namespace Umbraco.Core
         /// </summary>
         internal void StartApplication(object sender, EventArgs e)
         {
+            //take care of unhandled exceptions - there is nothing we can do to 
+            // prevent the entire w3wp process to go down but at least we can try
+            // and log the exception
+            AppDomain.CurrentDomain.UnhandledException += (_, args) =>
+            {
+                var exception = (Exception) args.ExceptionObject;
+                var isTerminating = args.IsTerminating; // always true?
+
+                var msg = "Unhandled exception in AppDomain";
+                if (isTerminating) msg += " (terminating)";
+                Logger.Error(typeof(UmbracoApplicationBase), msg, exception);
+            };
 
             //boot up the application
             GetBootManager()
@@ -139,6 +152,9 @@ namespace Umbraco.Core
                 Logger.Info<UmbracoApplicationBase>("Application shutdown. Reason: " + HostingEnvironment.ShutdownReason);
             }
             OnApplicationEnd(sender, e);
+
+            //Last thing to do is shutdown log4net
+            LogManager.Shutdown();
         }
 
         protected abstract IBootManager GetBootManager();
@@ -147,6 +163,7 @@ namespace Umbraco.Core
         {
             get
             {
+                // LoggerResolver can resolve before resolution is frozen
                 if (LoggerResolver.HasCurrent && LoggerResolver.Current.HasValue)
                 {
                     return LoggerResolver.Current.Logger;

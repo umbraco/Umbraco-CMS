@@ -825,7 +825,7 @@ namespace Umbraco.Core.Services
                     EmptiedRecycleBin.RaiseEvent(new RecycleBinEventArgs(nodeObjectType, entities, files, success), this);
 
                     if (success)
-                        repository.DeleteFiles(files);
+                        repository.DeleteMediaFiles(files);
                 }
             }
             Audit(AuditType.Delete, "Empty Media Recycle Bin performed by user", 0, -21);
@@ -910,7 +910,7 @@ namespace Umbraco.Core.Services
                 Deleted.RaiseEvent(args, this);
 
                 //remove any flagged media files
-                repository.DeleteFiles(args.MediaFilesToDelete);
+                repository.DeleteMediaFiles(args.MediaFilesToDelete);
             }
 
             Audit(AuditType.Delete, "Delete Media performed by user", userId, media.Id);
@@ -1160,7 +1160,7 @@ namespace Umbraco.Core.Services
 
         //private void CreateAndSaveMediaXml(XElement xml, int id, UmbracoDatabase db)
         //{
-        //    var poco = new ContentXmlDto { NodeId = id, Xml = xml.ToString(SaveOptions.None) };
+        //    var poco = new ContentXmlDto { NodeId = id, Xml = xml.ToDataString() };
         //    var exists = db.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = id }) != null;
         //    int result = exists ? db.Update(poco) : Convert.ToInt32(db.Insert(poco));
         //}

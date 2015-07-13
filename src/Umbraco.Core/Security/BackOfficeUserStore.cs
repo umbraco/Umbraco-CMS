@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Web.Security;
 using AutoMapper;
 using Microsoft.AspNet.Identity;
+using Microsoft.Owin;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
@@ -17,15 +18,12 @@ namespace Umbraco.Core.Security
         IUserEmailStore<BackOfficeIdentityUser, int>, 
         IUserLoginStore<BackOfficeIdentityUser, int>,
         IUserRoleStore<BackOfficeIdentityUser, int>,
-        IUserSecurityStampStore<BackOfficeIdentityUser, int>
-        
+        IUserSecurityStampStore<BackOfficeIdentityUser, int>,
+        IUserLockoutStore<BackOfficeIdentityUser, int>,
+        IUserTwoFactorStore<BackOfficeIdentityUser, int>
+
         //TODO: This would require additional columns/tables for now people will need to implement this on their own
         //IUserPhoneNumberStore<BackOfficeIdentityUser, int>,
-        //IUserTwoFactorStore<BackOfficeIdentityUser, int>,
-
-        //TODO: This will require additional columns/tables
-        //IUserLockoutStore<BackOfficeIdentityUser, int>
-
         //TODO: To do this we need to implement IQueryable -  we'll have an IQuerable implementation soon with the UmbracoLinqPadDriver implementation
         //IQueryableUserStore<BackOfficeIdentityUser, int>
     {
@@ -75,12 +73,12 @@ namespace Umbraco.Core.Security
             {
                 DefaultToLiveEditing = false,
                 Email = user.Email,
-                Language = Configuration.GlobalSettings.DefaultUILanguage,
+                Language = user.Culture ?? Configuration.GlobalSettings.DefaultUILanguage,
                 Name = user.Name,
                 Username = user.UserName,
-                StartContentId = -1,
-                StartMediaId = -1,
-                IsLockedOut = false,
+                StartContentId = user.StartContentId == 0 ? -1 : user.StartContentId,
+                StartMediaId = user.StartMediaId == 0 ? -1 : user.StartMediaId,
+                IsLockedOut = user.IsLockedOut,
                 IsApproved = true
             };
 
@@ -168,7 +166,7 @@ namespace Umbraco.Core.Security
         /// </summary>
         /// <param name="userId"/>
         /// <returns/>
-        public Task<BackOfficeIdentityUser> FindByIdAsync(int userId)
+        public async Task<BackOfficeIdentityUser> FindByIdAsync(int userId)
         {
             ThrowIfDisposed();
             var user = _userService.GetUserById(userId);
@@ -176,7 +174,7 @@ namespace Umbraco.Core.Security
             {
                 return null;
             }
-            return Task.FromResult(AssignLoginsCallback(Mapper.Map<BackOfficeIdentityUser>(user)));
+            return await Task.FromResult(AssignLoginsCallback(Mapper.Map<BackOfficeIdentityUser>(user)));
         }
 
         /// <summary>
@@ -184,7 +182,7 @@ namespace Umbraco.Core.Security
         /// </summary>
         /// <param name="userName"/>
         /// <returns/>
-        public Task<BackOfficeIdentityUser> FindByNameAsync(string userName)
+        public async Task<BackOfficeIdentityUser> FindByNameAsync(string userName)
         {
             ThrowIfDisposed();
             var user = _userService.GetByUsername(userName);
@@ -195,7 +193,7 @@ namespace Umbraco.Core.Security
 
             var result = AssignLoginsCallback(Mapper.Map<BackOfficeIdentityUser>(user));
 
-            return Task.FromResult(result);
+            return await Task.FromResult(result);
         }
 
         /// <summary>
@@ -506,6 +504,118 @@ namespace Umbraco.Core.Security
             return user;
         }
 
+        /// <summary>
+        /// Sets whether two factor authentication is enabled for the user
+        /// </summary>
+        /// <param name="user"/><param name="enabled"/>
+        /// <returns/>
+        public virtual Task SetTwoFactorEnabledAsync(BackOfficeIdentityUser user, bool enabled)
+        {
+            user.TwoFactorEnabled = false;
+            return Task.FromResult(0);
+        }
+
+        /// <summary>
+        /// Returns whether two factor authentication is enabled for the user
+        /// </summary>
+        /// <param name="user"/>
+        /// <returns/>
+        public virtual Task<bool> GetTwoFactorEnabledAsync(BackOfficeIdentityUser user)
+        {
+            return Task.FromResult(false);
+        }
+
+        #region IUserLockoutStore
+        
+        /// <summary>
+        /// Returns the DateTimeOffset that represents the end of a user's lockout, any time in the past should be considered not locked out.
+        /// </summary>
+        /// <param name="user"/>
+        /// <returns/>
+        /// <remarks>
+        /// Currently we do not suport a timed lock out, when they are locked out, an admin will  have to reset the status
+        /// </remarks>
+        public Task<DateTimeOffset> GetLockoutEndDateAsync(BackOfficeIdentityUser user)
+        {
+            if (user == null) throw new ArgumentNullException("user");
+
+            return user.LockoutEndDateUtc.HasValue
+                ? Task.FromResult(DateTimeOffset.MaxValue)
+                : Task.FromResult(DateTimeOffset.MinValue);
+        }
+
+        /// <summary>
+        /// Locks a user out until the specified end date (set to a past date, to unlock a user)
+        /// </summary>
+        /// <param name="user"/><param name="lockoutEnd"/>
+        /// <returns/>
+        public Task SetLockoutEndDateAsync(BackOfficeIdentityUser user, DateTimeOffset lockoutEnd)
+        {
+            if (user == null) throw new ArgumentNullException("user");
+            user.LockoutEndDateUtc = lockoutEnd.UtcDateTime;
+            return Task.FromResult(0);
+        }
+
+        /// <summary>
+        /// Used to record when an attempt to access the user has failed
+        /// </summary>
+        /// <param name="user"/>
+        /// <returns/>
+        public Task<int> IncrementAccessFailedCountAsync(BackOfficeIdentityUser user)
+        {
+            if (user == null) throw new ArgumentNullException("user");
+            user.AccessFailedCount++;
+            return Task.FromResult(user.AccessFailedCount);
+        }
+
+        /// <summary>
+        /// Used to reset the access failed count, typically after the account is successfully accessed
+        /// </summary>
+        /// <param name="user"/>
+        /// <returns/>
+        public Task ResetAccessFailedCountAsync(BackOfficeIdentityUser user)
+        {
+            if (user == null) throw new ArgumentNullException("user");
+            user.AccessFailedCount = 0;
+            return Task.FromResult(0);
+        }
+
+        /// <summary>
+        /// Returns the current number of failed access attempts.  This number usually will be reset whenever the password is
+        ///                 verified or the account is locked out.
+        /// </summary>
+        /// <param name="user"/>
+        /// <returns/>
+        public Task<int> GetAccessFailedCountAsync(BackOfficeIdentityUser user)
+        {
+            if (user == null) throw new ArgumentNullException("user");
+            return Task.FromResult(user.AccessFailedCount);
+        }
+
+        /// <summary>
+        /// Returns true
+        /// </summary>
+        /// <param name="user"/>
+        /// <returns/>
+        public Task<bool> GetLockoutEnabledAsync(BackOfficeIdentityUser user)
+        {
+            if (user == null) throw new ArgumentNullException("user");
+            return Task.FromResult(user.LockoutEnabled);
+        }
+
+        /// <summary>
+        /// Doesn't actually perform any function, users can always be locked out
+        /// </summary>
+        /// <param name="user"/><param name="enabled"/>
+        /// <returns/>
+        public Task SetLockoutEnabledAsync(BackOfficeIdentityUser user, bool enabled)
+        {
+            if (user == null) throw new ArgumentNullException("user");
+            user.LockoutEnabled = enabled;
+            return Task.FromResult(0);
+        }
+        #endregion
+
         private bool UpdateMemberProperties(Models.Membership.IUser user, BackOfficeIdentityUser identityUser)
         {
             var anythingChanged = false;
@@ -526,10 +636,10 @@ namespace Umbraco.Core.Security
                 anythingChanged = true;
                 user.FailedPasswordAttempts = identityUser.AccessFailedCount;
             }
-            if (user.IsLockedOut != identityUser.LockoutEnabled)
+            if (user.IsLockedOut != identityUser.IsLockedOut)
             {
                 anythingChanged = true;
-                user.IsLockedOut = identityUser.LockoutEnabled;
+                user.IsLockedOut = identityUser.IsLockedOut;
             }
             if (user.Username != identityUser.UserName && identityUser.UserName.IsNullOrWhiteSpace() == false)
             {
@@ -562,6 +672,7 @@ namespace Umbraco.Core.Security
                 anythingChanged = true;
                 user.SecurityStamp = identityUser.SecurityStamp;
             }
+            
             if (user.AllowedSections.ContainsAll(identityUser.AllowedSections) == false
                 || identityUser.AllowedSections.ContainsAll(user.AllowedSections) == false)
             {
@@ -579,10 +690,13 @@ namespace Umbraco.Core.Security
             return anythingChanged;
         }
 
+
         private void ThrowIfDisposed()
         {
             if (_disposed)
                 throw new ObjectDisposedException(GetType().Name);
         }
+
+      
     }
 }

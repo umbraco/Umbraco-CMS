@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -38,6 +39,23 @@ namespace Umbraco.Tests.Persistence.Repositories
                 new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax,
                     new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>())));
             return dataTypeDefinitionRepository;
+        }
+
+        [TestCase("UmbracoPreVal87-21,3,48", 3, true)]
+        [TestCase("UmbracoPreVal87-21,33,48", 3, false)]
+        [TestCase("UmbracoPreVal87-21,33,48", 33, true)]
+        [TestCase("UmbracoPreVal87-21,3,48", 33, false)]
+        [TestCase("UmbracoPreVal87-21,3,48", 21, true)]
+        [TestCase("UmbracoPreVal87-21,3,48", 48, true)]
+        [TestCase("UmbracoPreVal87-22,33,48", 2, false)]
+        [TestCase("UmbracoPreVal87-22,33,48", 22, true)]
+        [TestCase("UmbracoPreVal87-22,33,44", 4, false)]
+        [TestCase("UmbracoPreVal87-22,33,44", 44, true)]
+        [TestCase("UmbracoPreVal87-22,333,44", 33, false)]
+        [TestCase("UmbracoPreVal87-22,333,44", 333, true)]
+        public void Pre_Value_Cache_Key_Tests(string cacheKey, int preValueId, bool outcome)
+        {
+            Assert.AreEqual(outcome, Regex.IsMatch(cacheKey, DataTypeDefinitionRepository.GetCacheKeyRegex(preValueId)));
         }
 
         [Test]

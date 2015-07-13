@@ -18,7 +18,6 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class LocalizationService : RepositoryService, ILocalizationService
     {
-        private static readonly Guid RootParentId = new Guid(Constants.Conventions.Localization.DictionaryItemRootId);
 
         [Obsolete("Use the constructors that specify all dependencies instead")]
         public LocalizationService()
@@ -93,7 +92,7 @@ namespace Umbraco.Core.Services
                     }
                 }
 
-                var item = new DictionaryItem(parentId.HasValue ? parentId.Value : RootParentId, key);
+                var item = new DictionaryItem(parentId, key);
 
                 if (defaultValue.IsNullOrWhiteSpace() == false)
                 {
@@ -188,7 +187,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateDictionaryRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IDictionaryItem>.Builder.Where(x => x.ParentId == RootParentId);
+                var query = Query<IDictionaryItem>.Builder.Where(x => x.ParentId == null);
                 var items = repository.GetByQuery(query);
 
                 return items;

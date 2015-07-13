@@ -6,57 +6,51 @@ namespace Umbraco.Web.Scheduling
     /// <summary>
     /// Provides a base class for recurring background tasks.
     /// </summary>
-    /// <typeparam name="T">The type of the managed tasks.</typeparam>
-    internal abstract class RecurringTaskBase<T> : IBackgroundTask
-        where T : class, IBackgroundTask
+    internal abstract class RecurringTaskBase : LatchedBackgroundTaskBase
     {
-        private readonly IBackgroundTaskRunner<T> _runner;
+        private readonly IBackgroundTaskRunner<RecurringTaskBase> _runner;
         private readonly int _periodMilliseconds;
-        private Timer _timer;
-        private T _recurrent;
+        private readonly Timer _timer;
+        private bool _disposed;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RecurringTaskBase{T}"/> class with a tasks runner and a period.
+        /// Initializes a new instance of the <see cref="RecurringTaskBase"/> class.
         /// </summary>
         /// <param name="runner">The task runner.</param>
+        /// <param name="delayMilliseconds">The delay.</param>
         /// <param name="periodMilliseconds">The period.</param>
         /// <remarks>The task will repeat itself periodically. Use this constructor to create a new task.</remarks>
-        protected RecurringTaskBase(IBackgroundTaskRunner<T> runner, int periodMilliseconds)
+        protected RecurringTaskBase(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds)
         {
             _runner = runner;
             _periodMilliseconds = periodMilliseconds;
-        }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RecurringTaskBase{T}"/> class with a source task.
-        /// </summary>
-        /// <param name="source">The source task.</param>
-        /// <remarks>Use this constructor to create a new task from a source task in <c>GetRecurring</c>.</remarks>
-        protected RecurringTaskBase(RecurringTaskBase<T> source)
-        {
-            _runner = source._runner;
-            _timer = source._timer;
-            _periodMilliseconds = source._periodMilliseconds;
+            // note
+            // must use the single-parameter constructor on Timer to avoid it from being GC'd
+            // read http://stackoverflow.com/questions/4962172/why-does-a-system-timers-timer-survive-gc-but-not-system-threading-timer
+
+            _timer = new Timer(_ => Release());
+            _timer.Change(delayMilliseconds, 0);
         }
 
         /// <summary>
         /// Implements IBackgroundTask.Run().
         /// </summary>
         /// <remarks>Classes inheriting from <c>RecurringTaskBase</c> must implement <c>PerformRun</c>.</remarks>
-        public virtual void Run()
+        public override void Run()
         {
-            PerformRun();
-            Repeat();
+            var shouldRepeat = PerformRun();
+            if (shouldRepeat) Repeat();
         }
 
         /// <summary>
         /// Implements IBackgroundTask.RunAsync().
         /// </summary>
         /// <remarks>Classes inheriting from <c>RecurringTaskBase</c> must implement <c>PerformRun</c>.</remarks>
-        public virtual async Task RunAsync(CancellationToken token)
+        public override async Task RunAsync(CancellationToken token)
         {
-            await PerformRunAsync(token);
-            Repeat();
+            var shouldRepeat = await PerformRunAsync(token);
+            if (shouldRepeat) Repeat();
         }
 
         private void Repeat()
@@ -64,53 +58,45 @@ namespace Umbraco.Web.Scheduling
             // again?
             if (_runner.IsCompleted) return; // fail fast
 
-            if (_periodMilliseconds == 0) return;
+            if (_periodMilliseconds == 0) return; // safe
 
-            _recurrent = GetRecurring();
-            if (_recurrent == null)
-            {
-                _timer.Dispose();
-                _timer = null;
-                return; // done
-            }
+            Reset(); // re-latch
 
-            // note
-            // must use the single-parameter constructor on Timer to avoid it from being GC'd
-            // read http://stackoverflow.com/questions/4962172/why-does-a-system-timers-timer-survive-gc-but-not-system-threading-timer
-
-            _timer = _timer ?? new Timer(_ => _runner.TryAdd(_recurrent));
-            _timer.Change(_periodMilliseconds, 0);
+            // try to add again (may fail if runner has completed)
+            // if added, re-start the timer, else kill it
+            if (_runner.TryAdd(this))
+                _timer.Change(_periodMilliseconds, 0);
+            else
+                Dispose(true);
         }
-
-        /// <summary>
-        /// Indicates whether the background task can run asynchronously.
-        /// </summary>
-        public abstract bool IsAsync { get; }
 
         /// <summary>
         /// Runs the background task.
         /// </summary>
-        public abstract void PerformRun();
+        /// <returns>A value indicating whether to repeat the task.</returns>
+        public abstract bool PerformRun();
 
         /// <summary>
         /// Runs the task asynchronously.
         /// </summary>
         /// <param name="token">A cancellation token.</param>
-        /// <returns>A <see cref="Task"/> instance representing the execution of the background task.</returns>
-        public abstract Task PerformRunAsync(CancellationToken token);
+        /// <returns>A <see cref="Task{T}"/> instance representing the execution of the background task,
+        /// and returning a value indicating whether to repeat the task.</returns>
+        public abstract Task<bool> PerformRunAsync(CancellationToken token);
 
-        /// <summary>
-        /// Gets a new occurence of the recurring task.
-        /// </summary>
-        /// <returns>A new task instance to be queued, or <c>null</c> to terminate the recurring task.</returns>
-        /// <remarks>The new task instance must be created via the <c>RecurringTaskBase(RecurringTaskBase{T} source)</c> constructor,
-        /// where <c>source</c> is the current task, eg: <c>return new MyTask(this);</c></remarks>
-        protected abstract T GetRecurring();
+        protected override void Dispose(bool disposing)
+        {
+            // lock on _timer instead of creating a new object as _timer is
+            // private, non-null, readonly - so safe here
+            lock (_timer)
+            {
+                if (_disposed) return;
+                _disposed = true;
 
-        /// <summary>
-        /// Dispose the task.
-        /// </summary>
-        public virtual void Dispose()
-        { }
+                // stop the timer
+                _timer.Change(Timeout.Infinite, Timeout.Infinite);
+                _timer.Dispose();
+            }
+        }
     }
 }

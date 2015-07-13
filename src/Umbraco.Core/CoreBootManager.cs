@@ -76,7 +76,9 @@ namespace Umbraco.Core
 
             _profilingLogger = new ProfilingLogger(LoggerResolver.Current.Logger, ProfilerResolver.Current.Profiler);
 
-            _timer = _profilingLogger.TraceDuration<CoreBootManager>("Umbraco application starting", "Umbraco application startup complete");
+            _timer = _profilingLogger.TraceDuration<CoreBootManager>(
+                string.Format("Umbraco application ({0}) starting", UmbracoVersion.GetSemanticVersion().ToSemanticString()),
+                "Umbraco application startup complete");
 
             CreateApplicationCache();
 

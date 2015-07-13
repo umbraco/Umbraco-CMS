@@ -13,7 +13,7 @@ namespace Umbraco.Core.Sync
         /// </summary>
         public DatabaseServerMessengerOptions()
         {
-            DaysToRetainInstructions = 100; // 100 days
+            DaysToRetainInstructions = 2; // 2 days
             ThrottleSeconds = 5; // 5 seconds
         }
 

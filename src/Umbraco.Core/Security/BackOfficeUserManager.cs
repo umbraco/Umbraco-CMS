@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Linq;
-using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 using System.Web.Security;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
-using Microsoft.Owin;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Security
 {
+    
+
     /// <summary>
     /// Default back office user manager
     /// </summary>
@@ -89,6 +88,7 @@ namespace Umbraco.Core.Security
                 RequireDigit = false,
                 RequireLowercase = false,
                 RequireUppercase = false
+                //TODO: Do we support the old regex match thing that membership providers used?
             };
 
             //use a custom hasher based on our membership provider
@@ -99,6 +99,13 @@ namespace Umbraco.Core.Security
             {
                 manager.UserTokenProvider = new DataProtectorTokenProvider<BackOfficeIdentityUser, int>(dataProtectionProvider.Create("ASP.NET Identity"));
             }
+
+            manager.UserLockoutEnabledByDefault = true;
+            manager.MaxFailedAccessAttemptsBeforeLockout = membershipProvider.MaxInvalidPasswordAttempts;
+            //NOTE: This just needs to be in the future, we currently don't support a lockout timespan, it's either they are locked
+            // or they are not locked, but this determines what is set on the account lockout date which corresponds to whether they are
+            // locked out or not.
+            manager.DefaultAccountLockoutTimeSpan = TimeSpan.FromDays(30);
 
             //custom identity factory for creating the identity object for which we auth against in the back office
             manager.ClaimsIdentityFactory = new BackOfficeClaimsIdentityFactory();
@@ -149,13 +156,9 @@ namespace Umbraco.Core.Security
             get { return false; }
         }
 
-        //TODO: Support this
-        public override bool SupportsUserLockout
-        {
-            get { return false; }
-        }
-
-        //TODO: Support this
+        /// <summary>
+        /// Developers will need to override this to support custom 2 factor auth
+        /// </summary>
         public override bool SupportsUserTwoFactor
         {
             get { return false; }

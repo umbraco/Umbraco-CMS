@@ -37,6 +37,7 @@ using System.Web;
 using AutoMapper;
 using Microsoft.AspNet.Identity.Owin;
 using Umbraco.Core.Models.Identity;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Task = System.Threading.Tasks.Task;
 using Umbraco.Web.Security.Identity;
@@ -51,11 +52,22 @@ namespace Umbraco.Web.Editors
     public class BackOfficeController : UmbracoController
     {
         private BackOfficeUserManager _userManager;
+        private BackOfficeSignInManager _signInManager;
+
+        protected BackOfficeSignInManager SignInManager
+        {
+            get { return _signInManager ?? (_signInManager = OwinContext.Get<BackOfficeSignInManager>()); }
+        }
 
         protected BackOfficeUserManager UserManager
         {
             get { return _userManager ?? (_userManager = OwinContext.GetUserManager<BackOfficeUserManager>()); }
         }
+
+        protected IAuthenticationManager AuthenticationManager
+        {
+            get { return OwinContext.Authentication; }
+        } 
 
         /// <summary>
         /// Render the default view
@@ -449,7 +461,7 @@ namespace Umbraco.Web.Editors
             var loginInfo = await OwinContext.Authentication.GetExternalLoginInfoAsync(
                 Core.Constants.Security.BackOfficeExternalAuthenticationType);
 
-            if (loginInfo == null)
+            if (loginInfo == null || loginInfo.ExternalIdentity.IsAuthenticated == false)
             {
                 return defaultResponse();
             }
@@ -474,11 +486,14 @@ namespace Umbraco.Web.Editors
                 // that the ticket is created and stored and that the user is logged in.
 
                 //sign in
-                await SignInAsync(user, isPersistent: false);
+                await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
             }
             else
             {
-                ViewBag.ExternalSignInError = new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not been linked to to an account" };
+                if (await AutoLinkAndSignInExternalAccount(loginInfo) == false)
+                {
+                    ViewBag.ExternalSignInError = new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not been linked to to an account" };        
+                }
 
                 //Remove the cookie otherwise this message will keep appearing
                 if (Response.Cookies[Core.Constants.Security.BackOfficeExternalCookieName] != null)
@@ -490,27 +505,103 @@ namespace Umbraco.Web.Editors
             return response();
         }
 
-        private async Task SignInAsync(BackOfficeIdentityUser user, bool isPersistent)
+        private async Task<bool> AutoLinkAndSignInExternalAccount(ExternalLoginInfo loginInfo)
         {
-            OwinContext.Authentication.SignOut(Core.Constants.Security.BackOfficeExternalAuthenticationType);
+            //Here we can check if the provider associated with the request has been configured to allow
+            // new users (auto-linked external accounts). This would never be used with public providers such as 
+            // Google, unless you for some reason wanted anybody to be able to access the backend if they have a Google account
+            // .... not likely! 
 
-            var nowUtc = DateTime.Now.ToUniversalTime();
+            var authType = OwinContext.Authentication.GetExternalAuthenticationTypes().FirstOrDefault(x => x.AuthenticationType == loginInfo.Login.LoginProvider);
+            if (authType == null)
+            {
+                Logger.Warn<BackOfficeController>("Could not find external authentication provider registered: " + loginInfo.Login.LoginProvider);
+                return false;
+            }
 
-            OwinContext.Authentication.SignIn(
-                new AuthenticationProperties()
+            var autoLinkOptions = authType.GetExternalAuthenticationOptions();
+            if (autoLinkOptions != null)
+            {
+                if (autoLinkOptions.ShouldAutoLinkExternalAccount(UmbracoContext, loginInfo))
                 {
-                    IsPersistent = isPersistent,
-                    AllowRefresh = true,
-                    IssuedUtc = nowUtc,
-                    ExpiresUtc = nowUtc.AddMinutes(GlobalSettings.TimeOutInMinutes)
-                },
-                await user.GenerateUserIdentityAsync(UserManager));
-        }
+                    //we are allowing auto-linking/creating of local accounts
+                    if (loginInfo.Email.IsNullOrWhiteSpace())
+                    {
+                        ViewBag.ExternalSignInError = new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not provided an email address, the account cannot be linked." };
+                    }
+                    else
+                    {
 
-        private IAuthenticationManager AuthenticationManager
-        {
-            get { return OwinContext.Authentication; }
-        }        
+                        //Now we need to perform the auto-link, so first we need to lookup/create a user with the email address
+                        var foundByEmail = Services.UserService.GetByEmail(loginInfo.Email);
+                        if (foundByEmail != null)
+                        {
+                            ViewBag.ExternalSignInError = new[] { "A user with this email address already exists locally. You will need to login locally to Umbraco and link this external provider: " + loginInfo.Login.LoginProvider };
+                        }
+                        else
+                        {
+                            var defaultUserType = autoLinkOptions.GetDefaultUserType(UmbracoContext, loginInfo);
+                            var userType = Services.UserService.GetUserTypeByAlias(defaultUserType);
+                            if (userType == null)
+                            {
+                                ViewBag.ExternalSignInError = new[] { "Could not auto-link this account, the specified User Type does not exist: " + defaultUserType };
+                            }
+                            else
+                            {
+                                
+                                var autoLinkUser = new BackOfficeIdentityUser()
+                                {
+                                    Email = loginInfo.Email,
+                                    Name = loginInfo.ExternalIdentity.Name,
+                                    UserTypeAlias = userType.Alias,
+                                    AllowedSections = autoLinkOptions.GetDefaultAllowedSections(UmbracoContext, loginInfo),
+                                    Culture = autoLinkOptions.GetDefaultCulture(UmbracoContext, loginInfo),
+                                    UserName = loginInfo.Email
+                                };
+
+                                //call the callback if one is assigned
+                                if (autoLinkOptions.OnAutoLinking != null)
+                                {
+                                    autoLinkOptions.OnAutoLinking(autoLinkUser, loginInfo);
+                                }
+
+                                var userCreationResult = await UserManager.CreateAsync(autoLinkUser);
+
+                                if (userCreationResult.Succeeded == false)
+                                {
+                                    ViewBag.ExternalSignInError = userCreationResult.Errors;
+                                }
+                                else
+                                {
+                                    var linkResult = await UserManager.AddLoginAsync(autoLinkUser.Id, loginInfo.Login);
+                                    if (linkResult.Succeeded == false)
+                                    {
+                                        ViewBag.ExternalSignInError = linkResult.Errors;
+
+                                        //If this fails, we should really delete the user since it will be in an inconsistent state!
+                                        var deleteResult = await UserManager.DeleteAsync(autoLinkUser);
+                                        if (deleteResult.Succeeded == false)
+                                        {
+                                            //DOH! ... this isn't good, combine all errors to be shown
+                                            ViewBag.ExternalSignInError = linkResult.Errors.Concat(deleteResult.Errors);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        //sign in
+                                        await SignInManager.SignInAsync(autoLinkUser, isPersistent: false, rememberBrowser: false);
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                }
+                return true;
+            }
+
+            return false;
+        }
         
         /// <summary>
         /// Returns the server variables regarding the application state
@@ -526,7 +617,7 @@ namespace Umbraco.Web.Editors
                     {"assemblyVersion", UmbracoVersion.AssemblyVersion}
                 };
 
-            var version = UmbracoVersion.GetSemanticVersion().ToString();
+            var version = UmbracoVersion.GetSemanticVersion().ToSemanticString();
 
             app.Add("version", version);
             app.Add("cdf", ClientDependency.Core.Config.ClientDependencySettings.Instance.Version);

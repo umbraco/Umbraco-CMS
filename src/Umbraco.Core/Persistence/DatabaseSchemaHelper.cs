@@ -151,6 +151,13 @@ namespace Umbraco.Core.Persistence
                         _db.Update<UserDto>("SET id = @IdAfter WHERE id = @IdBefore AND userLogin = @Login", new { IdAfter = 0, IdBefore = 1, Login = "admin" });
                     }
 
+                    //Loop through index statements and execute sql
+                    foreach (var sql in indexSql)
+                    {
+                        int createdIndex = _db.Execute(new Sql(sql));
+                        _logger.Info<Database>(string.Format("Create Index sql {0}:\n {1}", createdIndex, sql));
+                    }
+
                     //Loop through foreignkey statements and execute sql
                     foreach (var sql in foreignSql)
                     {
@@ -158,12 +165,7 @@ namespace Umbraco.Core.Persistence
                         _logger.Info<Database>(string.Format("Create Foreign Key sql {0}:\n {1}", createdFk, sql));
                     }
 
-                    //Loop through index statements and execute sql
-                    foreach (var sql in indexSql)
-                    {
-                        int createdIndex = _db.Execute(new Sql(sql));
-                        _logger.Info<Database>(string.Format("Create Index sql {0}:\n {1}", createdIndex, sql));
-                    }
+                    
 
                     transaction.Complete();
                 }

@@ -98,6 +98,30 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
+        [Test]
+        public void Can_Get_All_Member_Types_By_Guid_Ids()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var memberType1 = MockedContentTypes.CreateSimpleMemberType();
+                repository.AddOrUpdate(memberType1);
+                unitOfWork.Commit();
+
+                var memberType2 = MockedContentTypes.CreateSimpleMemberType();
+                memberType2.Name = "AnotherType";
+                memberType2.Alias = "anotherType";
+                repository.AddOrUpdate(memberType2);
+                unitOfWork.Commit();
+
+                var result = repository.GetAll(memberType1.Key, memberType2.Key);
+
+                //there are 3 because of the Member type created for init data
+                Assert.AreEqual(2, result.Count());
+            }
+        }
+
         //NOTE: This tests for left join logic (rev 7b14e8eacc65f82d4f184ef46c23340c09569052)
         [Test]
         public void Can_Get_All_Members_When_No_Properties_Assigned()
@@ -125,6 +149,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
+
         [Test]
         public void Can_Get_Member_Type_By_Id()
         {
@@ -136,6 +161,21 @@ namespace Umbraco.Tests.Persistence.Repositories
                 repository.AddOrUpdate(memberType);
                 unitOfWork.Commit();
                 memberType = repository.Get(memberType.Id);
+                Assert.That(memberType, Is.Not.Null);
+            }
+        }
+
+        [Test]
+        public void Can_Get_Member_Type_By_Guid_Id()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+                repository.AddOrUpdate(memberType);
+                unitOfWork.Commit();
+                memberType = repository.Get(memberType.Key);
                 Assert.That(memberType, Is.Not.Null);
             }
         }
