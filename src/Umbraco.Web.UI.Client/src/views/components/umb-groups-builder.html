@@ -7,7 +7,7 @@
         <li ng-repeat="tab in model.groups" ng-class="{'umb-group-builder__group-sortable': sortingMode && !tab.inherited}">
 
             <!-- TAB INIT STATE -->
-            <div class="umb-group-builder__group -placeholder" ng-click="addGroup(tab)" ng-if="tab.tabState=='init' && !sortingMode">
+            <div class="umb-group-builder__group -placeholder" hotkey="alt+shift+t" ng-click="addGroup(tab)" ng-if="tab.tabState=='init' && !sortingMode">
 
                 <div class="umb-group-builder__group-title-wrapper -placeholder">
                   <div class="umb-group-builder__group-title -placeholder"></div>
