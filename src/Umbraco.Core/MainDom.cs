@@ -34,7 +34,7 @@ namespace Umbraco.Core
         // actions to run before releasing the main domain
         private readonly SortedList<int, Action> _callbacks = new SortedList<int, Action>();
 
-        private const int LockTimeoutMilliseconds = 4 * 60 * 1000; // 4'
+        private const int LockTimeoutMilliseconds = 90000; // (1.5 * 60 * 1000) == 1 min 30 seconds
 
         #endregion
 
