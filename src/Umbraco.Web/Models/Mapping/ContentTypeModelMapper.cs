@@ -55,6 +55,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.PropertyGroups, expression => expression.Ignore())
                 .AfterMap((source, dest) =>
                 {
+
                     var addedProperties = new List<string>();
                     //get all properties from groups that are not generic properties (-666 id)
                     foreach (var groupDisplay in source.Groups.Where(x => x.Id != -666))
@@ -69,8 +70,7 @@ namespace Umbraco.Web.Models.Mapping
                         {
                             dest.AddPropertyType(Mapper.Map<PropertyType>(propertyTypeDisplay), groupDisplay.Name);
                             addedProperties.Add(propertyTypeDisplay.Alias);
-                        }
-                            
+                        }   
                     }
 
                     //add generic properties
@@ -93,14 +93,13 @@ namespace Umbraco.Web.Models.Mapping
 
                     //Sync allowed child types
                     var allowedTypes = source.AllowedContentTypes.Select((t, i) => new ContentTypeSort(t, i));
-
                     dest.AllowedContentTypes = allowedTypes.ToArray();
 
                     //sync compositions
                     var current = dest.CompositionAliases().ToArray();
                     var proposed = source.CompositeContentTypes;
 
-                    var remove = current.Where(x =>  proposed.Contains(x) == false);
+                    var remove = current.Where(x => proposed.Contains(x) == false);
                     var add = proposed.Where(x => current.Contains(x) == false);
 
                     foreach (var rem in remove)
@@ -108,16 +107,18 @@ namespace Umbraco.Web.Models.Mapping
                         dest.RemoveContentType(rem);
                     }
 
-                    foreach(var a in add)
+                    foreach (var a in add)
                     {
                         //TODO: Remove N+1 lookup
                         var addCt = applicationContext.Services.ContentTypeService.GetContentType(a);
-                        if(addCt != null)
-                             dest.AddContentType(addCt);
+                        if (addCt != null)
+                            dest.AddContentType(addCt);
                     }
-                    
+
                     //sync templates
                     dest.AllowedTemplates = source.AllowedTemplates.Select(x => Mapper.Map<ITemplate>(x));
+                    if(source.DefaultTemplate != null)
+                        dest.SetDefaultTemplate(Mapper.Map<ITemplate>(source.DefaultTemplate)); 
                 });
 
 

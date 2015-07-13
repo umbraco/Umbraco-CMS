@@ -249,10 +249,13 @@ namespace Umbraco.Web.Editors
                     {
                         template = new Template(contentType.Name, contentType.Alias);
                         Services.FileService.SaveTemplate(template);
+                    }
 
-                        //after saving, make sure to set the id on the default template
-                        contentType.DefaultTemplate.Id = template.Id;
-                    }   
+                    //make sure the template id is set on the default and allowed template
+                    contentType.DefaultTemplate.Id = template.Id;
+                    var found = contentType.AllowedTemplates.FirstOrDefault(x => x.Alias == contentType.Alias);
+                    if(found != null)
+                        found.Id = template.Id;
                 }
                 
                 //save as new
