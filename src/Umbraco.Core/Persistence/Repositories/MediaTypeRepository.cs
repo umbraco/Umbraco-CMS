@@ -28,31 +28,10 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IMediaType PerformGet(int id)
         {
-            var contentTypeSql = GetBaseQuery(false);
-            contentTypeSql.Where(GetBaseWhereClause(), new { Id = id});
+            var contentTypes = ContentTypeQueryMapper.GetMediaTypes(
+                new[] { id }, Database, SqlSyntax, this);
 
-            var dto = Database.Fetch<ContentTypeDto, NodeDto>(contentTypeSql).FirstOrDefault();
-
-            if (dto == null)
-                return null;
-
-            var factory = new MediaTypeFactory(NodeObjectTypeId);
-            var contentType = factory.BuildEntity(dto);
-            
-            contentType.AllowedContentTypes = GetAllowedContentTypeIds(id);
-            contentType.PropertyGroups = GetPropertyGroupCollection(id, contentType.CreateDate, contentType.UpdateDate);
-            ((MediaType)contentType).PropertyTypes = GetPropertyTypeCollection(id, contentType.CreateDate, contentType.UpdateDate);
-
-            var list = Database.Fetch<ContentType2ContentTypeDto>("WHERE childContentTypeId = @Id", new{ Id = id});
-            foreach (var contentTypeDto in list)
-            {
-                bool result = contentType.AddContentType(Get(contentTypeDto.ParentId));
-                //Do something if adding fails? (Should hopefully not be possible unless someone create a circular reference)
-            }
-
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            ((Entity)contentType).ResetDirtyProperties(false);
+            var contentType = contentTypes.SingleOrDefault();
             return contentType;
         }
 
@@ -85,13 +64,18 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
+
+        /// <summary>
+        /// Gets all entities of the specified <see cref="PropertyType"/> query
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns>An enumerable list of <see cref="IContentType"/> objects</returns>
         public IEnumerable<IMediaType> GetByQuery(IQuery<PropertyType> query)
         {
-            var ints = PerformGetByQuery(query);
-            foreach (var i in ints)
-            {
-                yield return Get(i);
-            }
+            var ints = PerformGetByQuery(query).ToArray();
+            return ints.Any()
+                ? GetAll(ints)
+                : Enumerable.Empty<IMediaType>();
         }
 
         #region Overrides of PetaPocoRepositoryBase<int,IMedia>
@@ -188,6 +172,29 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override Guid ContainerObjectTypeId
         {
             get { throw new NotImplementedException(); }
+        }
+        
+        protected override IMediaType PerformGet(Guid id)
+        {
+            var contentTypes = ContentTypeQueryMapper.GetMediaTypes(
+                new[] { id }, Database, SqlSyntax, this);
+
+            var contentType = contentTypes.SingleOrDefault();
+            return contentType;
+        }
+
+        protected override IEnumerable<IMediaType> PerformGetAll(params Guid[] ids)
+        {
+            if (ids.Any())
+            {
+                return ContentTypeQueryMapper.GetMediaTypes(ids, Database, SqlSyntax, this);
+            }
+            else
+            {
+                var sql = new Sql().Select("id").From<NodeDto>(SqlSyntax).Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId);
+                var allIds = Database.Fetch<int>(sql).ToArray();
+                return ContentTypeQueryMapper.GetMediaTypes(allIds, Database, SqlSyntax, this);
+            }
         }
     }
 }

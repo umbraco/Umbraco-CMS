@@ -108,7 +108,8 @@ namespace Umbraco.Core.Persistence
                 _sqlSyntax,
                 CreateContentTypeRepository(uow),
                 CreateTemplateRepository(uow),
-                CreateTagRepository(uow))
+                CreateTagRepository(uow),
+                _settings.Content)
             {
                 EnsureUniqueNaming = _settings.Content.EnsureUniqueNaming
             };
@@ -158,7 +159,8 @@ namespace Umbraco.Core.Persistence
                 _cacheHelper,
                 _logger, _sqlSyntax,
                 CreateMediaTypeRepository(uow),
-                CreateTagRepository(uow)) { EnsureUniqueNaming = _settings.Content.EnsureUniqueNaming };
+                CreateTagRepository(uow),
+                _settings.Content);
         }
 
         public virtual IMediaTypeRepository CreateMediaTypeRepository(IDatabaseUnitOfWork uow)
@@ -266,7 +268,8 @@ namespace Umbraco.Core.Persistence
                 _logger, _sqlSyntax,
                 CreateMemberTypeRepository(uow),
                 CreateMemberGroupRepository(uow),
-                CreateTagRepository(uow));
+                CreateTagRepository(uow),
+                _settings.Content);
         }
 
         public virtual IMemberTypeRepository CreateMemberTypeRepository(IDatabaseUnitOfWork uow)

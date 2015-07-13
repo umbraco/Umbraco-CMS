@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
@@ -17,16 +20,19 @@ using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Dynamics;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
     internal abstract class VersionableRepositoryBase<TId, TEntity> : PetaPocoRepositoryBase<TId, TEntity>
         where TEntity : class, IAggregateRoot
     {
+        private readonly IContentSection _contentSection;
 
-        protected VersionableRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        protected VersionableRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IContentSection contentSection)
             : base(work, cache, logger, sqlSyntax)
         {
+            _contentSection = contentSection;
         }
 
         #region IRepositoryVersionable Implementation
@@ -395,7 +401,7 @@ ON cmsPropertyType.dataTypeId = cmsDataTypePreValues.datatypeNodeId", docSql.Arg
             // below if any property requires tag support
             var allPreValues = new Lazy<IEnumerable<DataTypePreValueDto>>(() =>
             {
-                var preValsSql = new Sql(@"SELECT a.id as preValId, a.value, a.sortorder, a.alias, a.datatypeNodeId
+                var preValsSql = new Sql(@"SELECT a.id, a.value, a.sortorder, a.alias, a.datatypeNodeId
 FROM cmsDataTypePreValues a
 WHERE EXISTS(
     SELECT DISTINCT b.id as preValIdInner
@@ -534,6 +540,51 @@ WHERE EXISTS(
                 default:
                     return orderBy;
             }
+        }
+
+        /// <summary>
+        /// Deletes all media files passed in.
+        /// </summary>
+        /// <param name="files"></param>
+        /// <returns></returns>
+        public virtual bool DeleteMediaFiles(IEnumerable<string> files)
+        {
+            //ensure duplicates are removed
+            files = files.Distinct();
+
+            var allsuccess = true;
+
+            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
+            Parallel.ForEach(files, file =>
+            {
+                try
+                {
+                    if (file.IsNullOrWhiteSpace()) return;
+
+                    var relativeFilePath = fs.GetRelativePath(file);
+                    if (fs.FileExists(relativeFilePath) == false) return;
+
+                    var parentDirectory = System.IO.Path.GetDirectoryName(relativeFilePath);
+
+                    // don't want to delete the media folder if not using directories.
+                    if (_contentSection.UploadAllowDirectories && parentDirectory != fs.GetRelativePath("/"))
+                    {
+                        //issue U4-771: if there is a parent directory the recursive parameter should be true
+                        fs.DeleteDirectory(parentDirectory, String.IsNullOrEmpty(parentDirectory) == false);
+                    }
+                    else
+                    {
+                        fs.DeleteFile(file, true);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.Error<VersionableRepositoryBase<TId, TEntity>>("An error occurred while deleting file attached to nodes: " + file, e);
+                    allsuccess = false;
+                }
+            });
+
+            return allsuccess;
         }
     }
 }

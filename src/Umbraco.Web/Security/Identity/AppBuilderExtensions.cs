@@ -55,6 +55,9 @@ namespace Umbraco.Web.Security.Identity
                     appContext.Services.UserService,
                     appContext.Services.ExternalLoginService,
                     userMembershipProvider));
+
+            //Create a sign in manager per request
+            app.CreatePerOwinContext<BackOfficeSignInManager>(BackOfficeSignInManager.Create);
         }
 
         /// <summary>
@@ -82,6 +85,9 @@ namespace Umbraco.Web.Security.Identity
                     options,
                     customUserStore,
                     userMembershipProvider));
+
+            //Create a sign in manager per request
+            app.CreatePerOwinContext<BackOfficeSignInManager>(BackOfficeSignInManager.Create);
         }
 
         /// <summary>
@@ -104,6 +110,9 @@ namespace Umbraco.Web.Security.Identity
 
             //Configure Umbraco user manager to be created per request
             app.CreatePerOwinContext<TManager>(userManager);
+
+            //Create a sign in manager per request
+            app.CreatePerOwinContext<BackOfficeSignInManager>(BackOfficeSignInManager.Create);
         }
 
         /// <summary>

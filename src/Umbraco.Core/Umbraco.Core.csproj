@@ -58,11 +58,11 @@
     </Reference>
     <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.0\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.AspNet.Identity.Owin, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.2.2.0\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.2.2.1\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Owin, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -332,8 +332,12 @@
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="IApplicationEventHandler.cs" />
     <Compile Include="IDisposeOnRequestEnd.cs" />
+    <Compile Include="Logging\AsyncForwardingAppenderBase.cs" />
+    <Compile Include="Logging\LoggingEventContext.cs" />
+    <Compile Include="Logging\LoggingEventHelper.cs" />
     <Compile Include="Logging\OwinLogger.cs" />
     <Compile Include="Logging\OwinLoggerFactory.cs" />
+    <Compile Include="Logging\ParallelForwardingAppender.cs" />
     <Compile Include="Manifest\GridEditorConverter.cs" />
     <Compile Include="Models\AuditItem.cs" />
     <Compile Include="Models\AuditType.cs" />
@@ -378,6 +382,7 @@
     <Compile Include="Persistence\Mappers\DomainMapper.cs" />
     <Compile Include="Persistence\Mappers\MigrationEntryMapper.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\AddExternalLoginsTable.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\AddForeignKeysForLanguageAndDictionaryTables.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\AddMigrationTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\AddPublicAccessTables.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\AddUniqueIdPropertyTypeColumn.cs" />
@@ -386,6 +391,7 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\RemoveHelpTextColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\RemoveLanguageLocaleColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\RemoveStylesheetDataAndTables.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\RemoveUmbracoLoginsTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\UpdateUniqueIdToHaveCorrectIndexType.cs" />
     <Compile Include="Media\Exif\IFD.cs" />
     <Compile Include="Media\Exif\ImageFile.cs" />
@@ -416,6 +422,7 @@
     <Compile Include="Persistence\Repositories\Interfaces\IMigrationEntryRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IPublicAccessRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IServerRegistrationRepository.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\IDeleteMediaFilesRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\ITaskRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\ITaskTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\MigrationEntryRepository.cs" />
@@ -425,14 +432,16 @@
     <Compile Include="Persistence\Repositories\TaskTypeRepository.cs" />
     <Compile Include="PropertyEditors\ValueConverters\GridValueConverter.cs" />
     <Compile Include="Security\BackOfficeClaimsIdentityFactory.cs" />
+    <Compile Include="Security\BackOfficeSignInManager.cs" />
     <Compile Include="Security\BackOfficeUserManager.cs" />
     <Compile Include="Security\BackOfficeUserStore.cs" />
     <Compile Include="Security\MembershipPasswordHasher.cs" />
+    <Compile Include="SemVersionExtensions.cs" />
     <Compile Include="ServiceProviderExtensions.cs" />
     <Compile Include="IO\ResizedImage.cs" />
     <Compile Include="IO\UmbracoMediaFile.cs" />
     <Compile Include="Logging\DebugDiagnosticsLogger.cs" />
-    <Compile Include="Logging\AppDomainTokenFormatter.cs" />
+    <Compile Include="Logging\AppDomainTokenConverter.cs" />
     <Compile Include="Logging\LoggerExtensions.cs" />
     <Compile Include="Logging\LoggerResolver.cs" />
     <Compile Include="Logging\ProfilingLogger.cs" />
@@ -1102,7 +1111,6 @@
     <Compile Include="Models\Rdbms\User2NodeNotifyDto.cs" />
     <Compile Include="Models\Rdbms\User2NodePermissionDto.cs" />
     <Compile Include="Models\Rdbms\UserDto.cs" />
-    <Compile Include="Models\Rdbms\UserLoginDto.cs" />
     <Compile Include="Models\Rdbms\UserTypeDto.cs" />
     <Compile Include="NameValueCollectionExtensions.cs" />
     <Compile Include="ObjectResolution\WeightedPluginAttribute.cs" />

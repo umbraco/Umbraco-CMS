@@ -258,6 +258,7 @@ namespace Umbraco.Tests.Persistence
             using (Transaction transaction = Database.GetTransaction())
             {
                 DatabaseSchemaHelper.CreateTable<DictionaryDto>();
+                DatabaseSchemaHelper.CreateTable<LanguageDto>();
                 DatabaseSchemaHelper.CreateTable<LanguageTextDto>();
 
                 //transaction.Complete();
@@ -572,18 +573,6 @@ namespace Umbraco.Tests.Persistence
             using (Transaction transaction = Database.GetTransaction())
             {
                 DatabaseSchemaHelper.CreateTable<TaskTypeDto>();
-
-                //transaction.Complete();
-            }
-        }
-
-        [Test]
-        public void Can_Create_umbracoUserLogins_Table()
-        {
-            
-            using (Transaction transaction = Database.GetTransaction())
-            {
-                DatabaseSchemaHelper.CreateTable<UserLoginDto>();
 
                 //transaction.Complete();
             }

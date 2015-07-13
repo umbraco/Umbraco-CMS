@@ -80,7 +80,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateMemberTypeRepository(UowProvider.GetUnitOfWork()))
             {
-                var types = repository.GetAll().Select(x => x.Alias).ToArray();
+                var types = repository.GetAll(new int[]{}).Select(x => x.Alias).ToArray();
 
                 if (types.Any() == false)
                 {
@@ -132,11 +132,11 @@ namespace Umbraco.Core.Services
 
             //go re-fetch the member and update the properties that may have changed
             var result = GetByUsername(member.Username);
-            
+
             //should never be null but it could have been deleted by another thread.
-            if (result == null) 
+            if (result == null)
                 return;
-            
+
             member.RawPasswordValue = result.RawPasswordValue;
             member.LastPasswordChangeDate = result.LastPasswordChangeDate;
             member.UpdateDate = member.UpdateDate;
@@ -975,9 +975,13 @@ namespace Umbraco.Core.Services
             {
                 repository.Delete(member);
                 uow.Commit();
-            }
 
-            Deleted.RaiseEvent(new DeleteEventArgs<IMember>(member, false), this);
+                var args = new DeleteEventArgs<IMember>(member, false);
+                Deleted.RaiseEvent(args, this);
+
+                //remove any flagged media files
+                repository.DeleteMediaFiles(args.MediaFilesToDelete);
+            }
         }
 
         /// <summary>
@@ -1169,7 +1173,7 @@ namespace Umbraco.Core.Services
                 repository.DissociateRoles(usernames, roleNames);
             }
         }
-        
+
         public void AssignRole(int memberId, string roleName)
         {
             AssignRoles(new[] { memberId }, new[] { roleName });
@@ -1198,7 +1202,7 @@ namespace Umbraco.Core.Services
             }
         }
 
-        
+
 
         #endregion
 
@@ -1233,7 +1237,7 @@ namespace Umbraco.Core.Services
                 uow.Commit();
             }
         }
-        
+
         #region Event Handlers
 
         /// <summary>
@@ -1250,7 +1254,7 @@ namespace Umbraco.Core.Services
         /// Occurs before Save
         /// </summary>
         public static event TypedEventHandler<IMemberService, SaveEventArgs<IMember>> Saving;
-        
+
         /// <summary>
         /// Occurs after Create
         /// </summary>

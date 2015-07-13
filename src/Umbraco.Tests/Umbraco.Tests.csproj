@@ -178,6 +178,9 @@
     <Compile Include="Cache\CacheRefresherTests.cs" />
     <Compile Include="Models\Mapping\ContentTypeModelMappingTests.cs" />
     <Compile Include="Cache\DeepCloneRuntimeCacheProviderTests.cs" />
+    <Compile Include="Logging\AsyncRollingFileAppenderTest.cs" />
+    <Compile Include="Logging\DebugAppender.cs" />
+    <Compile Include="Logging\ParallelForwarderTest.cs" />
     <Compile Include="Persistence\Repositories\AuditRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\DomainRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\PublicAccessRepositoryTest.cs" />
@@ -446,7 +449,7 @@
     <Compile Include="PublishedContent\PublishedContentMoreTests.cs" />
     <Compile Include="Publishing\PublishingStrategyTests.cs" />
     <Compile Include="Resolvers\ActionsResolverTests.cs" />
-    <Compile Include="AsynchronousRollingFileAppenderTests.cs" />
+    <Compile Include="Logging\RingBufferTest.cs" />
     <Compile Include="TestHelpers\BaseUmbracoConfigurationTest.cs" />
     <Compile Include="TestHelpers\DatabaseTestBehaviorAttribute.cs" />
     <Compile Include="TestHelpers\Entities\MockedMember.cs" />

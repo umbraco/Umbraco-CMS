@@ -18,7 +18,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    internal class Macro : Entity, IMacro
+    public class Macro : Entity, IMacro
     {
         public Macro()
         {

@@ -10,6 +10,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.Services;
+using Umbraco.Core.Sync;
 
 
 namespace Umbraco.Core
@@ -220,18 +221,46 @@ namespace Umbraco.Core
 	    }
 
 	    /// <summary>
-        /// The original/first url that the web application executes
+        /// The application url.
         /// </summary>
         /// <remarks>
-        /// we need to set the initial url in our ApplicationContext, this is so our keep alive service works and this must
-        /// exist on a global context because the keep alive service doesn't run in a web context.
-        /// we are NOT going to put a lock on this because locking will slow down the application and we don't really care
-        /// if two threads write to this at the exact same time during first page hit.
-        /// see: http://issues.umbraco.org/issue/U4-2059
+        /// The application url is the url that should be used by services to talk to the application,
+        /// eg keep alive or scheduled publishing services. It must exist on a global context because
+        /// some of these services may not run within a web context.
+        /// The format of the application url is:
+        /// - has a scheme (http or https)
+        /// - has the SystemDirectories.Umbraco path
+        /// - does not end with a slash
+        /// It is initialized on the first request made to the server, by UmbracoModule.EnsureApplicationUrl:
+        /// - if umbracoSettings:settings/web.routing/@appUrl is set, use the value (new setting)
+        /// - if umbracoSettings:settings/scheduledTasks/@baseUrl is set, use the value (backward compatibility)
+        /// - otherwise, use the url of the (first) request.
+        /// Not locking, does not matter if several threads write to this.
+        /// See also issues:
+        /// - http://issues.umbraco.org/issue/U4-2059
+        /// - http://issues.umbraco.org/issue/U4-6788
+        /// - http://issues.umbraco.org/issue/U4-5728
+        /// - http://issues.umbraco.org/issue/U4-5391
         /// </remarks>
-        internal string OriginalRequestUrl { get; set; }
+        internal string UmbracoApplicationUrl {
+	        get
+	        {
+                // if initialized, return
+	            if (_umbracoApplicationUrl != null) return _umbracoApplicationUrl;
 
+                // try settings
+                ServerEnvironmentHelper.TrySetApplicationUrlFromSettings(this, ProfilingLogger.Logger, UmbracoConfig.For.UmbracoSettings());
 
+                // and return what we have, may be null
+                return _umbracoApplicationUrl;
+            }
+	        set
+	        {
+	            _umbracoApplicationUrl = value;
+            }
+        }
+
+	    internal string _umbracoApplicationUrl; // internal for tests
 	    private Lazy<bool> _configured;
 
 	    private void Init()
@@ -257,14 +286,14 @@ namespace Umbraco.Core
                             {
                                 //we haven't executed this migration in this environment, so even though the config versions match, 
                                 // this db has not been updated.
-                                ProfilingLogger.Logger.Debug<ApplicationContext>("The migration for version: '" + currentVersion + " has not been executed, there is no record in the database");
+                                ProfilingLogger.Logger.Debug<ApplicationContext>(string.Format("The migration for version: '{0} has not been executed, there is no record in the database", currentVersion.ToSemanticString()));
                                 ok = false;
                             }
                         }
                     }
                     else
                     {
-                        ProfilingLogger.Logger.Debug<ApplicationContext>("CurrentVersion different from configStatus: '" + currentVersion + "','" + configStatus + "'");
+                        ProfilingLogger.Logger.Debug<ApplicationContext>(string.Format("CurrentVersion different from configStatus: '{0}','{1}'", currentVersion.ToSemanticString(), configStatus));
                     }
 
                     return ok;

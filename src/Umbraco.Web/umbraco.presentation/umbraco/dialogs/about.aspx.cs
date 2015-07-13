@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 
 namespace umbraco.dialogs
@@ -14,7 +15,7 @@ namespace umbraco.dialogs
 		{
 		    // Put user code to initialize the page here
 			thisYear.Text = DateTime.Now.Year.ToString(CultureInfo.InvariantCulture);
-		    version.Text = UmbracoVersion.GetSemanticVersion().ToString();
+		    version.Text = UmbracoVersion.GetSemanticVersion().ToSemanticString();
 		}
 
 	    #region Web Form Designer generated code

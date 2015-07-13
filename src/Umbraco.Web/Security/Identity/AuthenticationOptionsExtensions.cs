@@ -8,6 +8,31 @@ namespace Umbraco.Web.Security.Identity
     public static class AuthenticationOptionsExtensions
     {
         /// <summary>
+        /// Used during the External authentication process to assign external sign-in options
+        /// that are used by the Umbraco authentication process.
+        /// </summary>
+        /// <param name="authOptions"></param>
+        /// <param name="options"></param>
+        public static void SetExternalSignInAutoLinkOptions(
+            this AuthenticationOptions authOptions,
+            ExternalSignInAutoLinkOptions options)
+        {
+            authOptions.Description.Properties["ExternalSignInAutoLinkOptions"] = options;
+        }
+
+        /// <summary>
+        /// Used during the External authentication process to retrieve external sign-in options
+        /// that have been set with SetExternalAuthenticationOptions
+        /// </summary>
+        /// <param name="authenticationDescription"></param>
+        public static ExternalSignInAutoLinkOptions GetExternalAuthenticationOptions(this AuthenticationDescription authenticationDescription)
+        {
+            if (authenticationDescription.Properties.ContainsKey("ExternalSignInAutoLinkOptions") == false) return null;
+            var options = authenticationDescription.Properties["ExternalSignInAutoLinkOptions"] as ExternalSignInAutoLinkOptions;
+            return options;
+        }
+
+        /// <summary>
         /// Configures the properties of the authentication description instance for use with Umbraco back office
         /// </summary>
         /// <param name="options"></param>

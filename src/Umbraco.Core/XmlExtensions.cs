@@ -317,5 +317,25 @@ namespace Umbraco.Core
             }
         }
 
+        // this exists because
+        // new XElement("root", "a\nb").Value is "a\nb" but
+        // .ToString(SaveOptions.*) is "a\r\nb" and cannot figure out how to get rid of "\r"
+        // and when saving data we want nothing to change
+        // this method will produce a string that respects the \r and \n in the data value
+	    public static string ToDataString(this XElement xml)
+	    {
+	        var settings = new XmlWriterSettings
+	        {
+                OmitXmlDeclaration = true,
+	            NewLineHandling = NewLineHandling.None,
+                Indent = false
+	        };
+	        var output = new StringBuilder();
+	        using (var writer = XmlWriter.Create(output, settings))
+	        {
+                xml.WriteTo(writer);
+            }
+	        return output.ToString();
+	    }
 	}
 }

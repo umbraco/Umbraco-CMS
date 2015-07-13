@@ -63,18 +63,31 @@ namespace Umbraco.Core
             // for anonymous semaphore, use the unique releaser, else create a new one
             return _semaphore != null
                 ? _releaser // (IDisposable)new SemaphoreSlimReleaser(_semaphore)
-                : (IDisposable)new NamedSemaphoreReleaser(_semaphore2);
+                : new NamedSemaphoreReleaser(_semaphore2);
         }
 
         public Task<IDisposable> LockAsync()
         {
             var wait = _semaphore != null 
-                ? _semaphore.WaitAsync() 
+                ? _semaphore.WaitAsync()
                 : WaitOneAsync(_semaphore2);
 
             return wait.IsCompleted 
                 ? _releaserTask ?? Task.FromResult(CreateReleaser()) // anonymous vs named
                 : wait.ContinueWith((_, state) => (((AsyncLock) state).CreateReleaser()),
+                    this, CancellationToken.None,
+                    TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
+        }
+
+        public Task<IDisposable> LockAsync(int millisecondsTimeout)
+        {
+            var wait = _semaphore != null
+                ? _semaphore.WaitAsync(millisecondsTimeout)
+                : WaitOneAsync(_semaphore2, millisecondsTimeout);
+
+            return wait.IsCompleted
+                ? _releaserTask ?? Task.FromResult(CreateReleaser()) // anonymous vs named
+                : wait.ContinueWith((_, state) => (((AsyncLock)state).CreateReleaser()),
                     this, CancellationToken.None,
                     TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
         }
@@ -174,7 +187,7 @@ namespace Umbraco.Core
         // F# has a AwaitWaitHandle method that accepts a time out... and seems pretty complex...
         // version below should be OK
 
-        private static Task WaitOneAsync(WaitHandle handle)
+        private static Task WaitOneAsync(WaitHandle handle, int millisecondsTimeout = Timeout.Infinite)
         {
             var tcs = new TaskCompletionSource<object>();
             var callbackHandleInitLock = new object();
@@ -197,7 +210,7 @@ namespace Umbraco.Core
                         }
                     },
                     /*state:*/ null,
-                    /*millisecondsTimeOutInterval:*/ Timeout.Infinite,
+                    /*millisecondsTimeOutInterval:*/ millisecondsTimeout,
                     /*executeOnlyOnce:*/ true);
             }
 

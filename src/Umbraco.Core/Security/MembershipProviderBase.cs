@@ -225,7 +225,7 @@ namespace Umbraco.Core.Security
             _enablePasswordReset = config.GetValue("enablePasswordReset", false);
             _requiresQuestionAndAnswer = config.GetValue("requiresQuestionAndAnswer", false);
             _requiresUniqueEmail = config.GetValue("requiresUniqueEmail", true);
-            _maxInvalidPasswordAttempts = GetIntValue(config, "maxInvalidPasswordAttempts", 20, false, 0);
+            _maxInvalidPasswordAttempts = GetIntValue(config, "maxInvalidPasswordAttempts", 5, false, 0);
             _passwordAttemptWindow = GetIntValue(config, "passwordAttemptWindow", 10, false, 0);
             _minRequiredPasswordLength = GetIntValue(config, "minRequiredPasswordLength", DefaultMinPasswordLength, true, 0x80);
             _minRequiredNonAlphanumericCharacters = GetIntValue(config, "minRequiredNonalphanumericCharacters", DefaultMinNonAlphanumericChars, true, 0x80);

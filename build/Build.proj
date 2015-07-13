@@ -68,6 +68,12 @@
   <PropertyGroup Condition="'$(BUILD_RELEASE)'!='' AND '$(BUILD_COMMENT)'!=''">
     <DECIMAL_BUILD_NUMBER>.$(BUILD_RELEASE)-$(BUILD_COMMENT)</DECIMAL_BUILD_NUMBER>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(BUILD_RELEASE)'!='' AND '$(BUILD_NIGHTLY)'!=''">
+    <DECIMAL_BUILD_NUMBER>.$(BUILD_RELEASE)-$(BUILD_NIGHTLY)</DECIMAL_BUILD_NUMBER>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(BUILD_RELEASE)'!='' AND '$(BUILD_COMMENT)'!='' AND '$(BUILD_NIGHTLY)'!=''">
+    <DECIMAL_BUILD_NUMBER>.$(BUILD_RELEASE)-$(BUILD_COMMENT)-$(BUILD_NIGHTLY)</DECIMAL_BUILD_NUMBER>
+  </PropertyGroup>
 
   <PropertyGroup>
     <BuildConfiguration>Release</BuildConfiguration>
@@ -271,9 +277,11 @@
     <PropertyGroup>
       <NewVersion>$(BUILD_RELEASE)</NewVersion>
       <NewVersion Condition="'$(BUILD_COMMENT)'!=''">$(BUILD_RELEASE)-$(BUILD_COMMENT)</NewVersion>
+      <NewVersion Condition="'$(BUILD_NIGHTLY)'!=''">$(BUILD_RELEASE)-$(BUILD_NIGHTLY)</NewVersion>
+      <NewVersion Condition="'$(BUILD_COMMENT)'!='' And '$(BUILD_NIGHTLY)'!=''">$(BUILD_RELEASE)-$(BUILD_COMMENT)-$(BUILD_NIGHTLY)</NewVersion>
     </PropertyGroup>
 
-    <!-- Match & replace 3 and 4 digit version numbers and -beta (if it's there) -->
+    <!-- Match & replace 3 and 4 digit version numbers and -beta and +nightly (if they're there) -->
     <FileUpdate
       Files="..\src\Umbraco.Core\Configuration\UmbracoVersion.cs"
       Regex="(\d+)\.(\d+)\.(\d+)(.(\d+))?"
@@ -282,6 +290,16 @@
     <FileUpdate Files="..\src\Umbraco.Core\Configuration\UmbracoVersion.cs"
       Regex="CurrentComment { get { return &quot;(.+)?&quot;"
       ReplacementText="CurrentComment { get { return &quot;$(BUILD_COMMENT)&quot;"/>
+
+    <FileUpdate Files="..\src\Umbraco.Core\Configuration\UmbracoVersion.cs"
+	  Condition="'$(BUILD_NIGHTLY)'!=''"
+      Regex="CurrentComment { get { return &quot;(.+)?&quot;"
+      ReplacementText="CurrentComment { get { return &quot;$(BUILD_NIGHTLY)&quot;"/>
+	  
+    <FileUpdate Files="..\src\Umbraco.Core\Configuration\UmbracoVersion.cs"
+	  Condition="'$(BUILD_COMMENT)'!='' AND '$(BUILD_NIGHTLY)'!=''"
+      Regex="CurrentComment { get { return &quot;(.+)?&quot;"
+      ReplacementText="CurrentComment { get { return &quot;$(BUILD_COMMENT)-$(BUILD_NIGHTLY)&quot;"/>
 
     <!--This updates the AssemblyFileVersion for the solution to the umbraco version-->
     <FileUpdate
@@ -300,10 +318,24 @@
       Files="..\src\SolutionInfo.cs"
       Regex="AssemblyInformationalVersion\(&quot;(.+)?&quot;\)"
       ReplacementText="AssemblyInformationalVersion(&quot;$(BUILD_RELEASE)&quot;)"/>
+    <FileUpdate 
+      Condition="'$(BUILD_NIGHTLY)'!=''"
+      Files="..\src\SolutionInfo.cs"
+      Regex="AssemblyInformationalVersion\(&quot;(.+)?&quot;\)"
+      ReplacementText="AssemblyInformationalVersion(&quot;$(BUILD_RELEASE)-$(BUILD_NIGHTLY)&quot;)"/>
+	<FileUpdate 
+      Condition="'$(BUILD_COMMENT)'!='' AND '$(BUILD_NIGHTLY)'!=''"
+      Files="..\src\SolutionInfo.cs"
+      Regex="AssemblyInformationalVersion\(&quot;(.+)?&quot;\)"
+      ReplacementText="AssemblyInformationalVersion(&quot;$(BUILD_RELEASE)-$(BUILD_COMMENT)-$(BUILD_NIGHTLY)&quot;)"/>
+    <FileUpdate 
+      Condition="'$(BUILD_COMMENT)'=='' AND '$(BUILD_NIGHTLY)'==''"
+      Files="..\src\SolutionInfo.cs"
+      Regex="AssemblyInformationalVersion\(&quot;(.+)?&quot;\)"
+      ReplacementText="AssemblyInformationalVersion(&quot;$(BUILD_RELEASE)&quot;)"/>
     
     <!--This updates the copyright year-->
     <FileUpdate 
-      Condition="'$(BUILD_COMMENT)'==''"
       Files="..\src\SolutionInfo.cs"
       Regex="AssemblyCopyright\(&quot;Copyright © Umbraco (\d{4})&quot;\)"
       ReplacementText="AssemblyCopyright(&quot;Copyright © Umbraco $([System.DateTime]::Now.ToString(`yyyy`))&quot;)"/>

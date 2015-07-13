@@ -46,6 +46,8 @@ namespace Umbraco.Web.Models.Mapping
                 //only map id if set to something higher then zero
                 .ForMember(dto => dto.Id, expression => expression.Condition(display => (Convert.ToInt32(display.Id) > 0)))
                 .ForMember(dto => dto.Id, expression => expression.MapFrom(display => Convert.ToInt32(display.Id)))
+                .ForMember(dto => dto.AllowedAsRoot, expression => expression.Ignore())
+                .ForMember(dto => dto.IsContainer, expression => expression.Ignore())
                 .ForMember(dto => dto.CreatorId, expression => expression.Ignore())
                 .ForMember(dto => dto.Level, expression => expression.Ignore())
                 .ForMember(dto => dto.SortOrder, expression => expression.Ignore())

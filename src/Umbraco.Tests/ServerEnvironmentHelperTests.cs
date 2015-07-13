@@ -1,92 +1,105 @@
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Profiling;
 using Umbraco.Core.Sync;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests
 {
     [TestFixture]
     public class ServerEnvironmentHelperTests
     {
-        [Test]
-        public void Get_Base_Url_Single_Server_Orig_Request_Url_No_SSL()
+        private ILogger _logger;
+
+        // note: in tests, read appContext._umbracoApplicationUrl and not the property,
+        // because reading the property does run some code, as long as the field is null.
+
+        [TestFixtureSetUp]
+        public void InitializeFixture()
         {
-            var appContext = new ApplicationContext(null)
-            {
-                OriginalRequestUrl = "test.com"
-            };
-
-            ConfigurationManager.AppSettings.Set("umbracoUseSSL", "false");
-
-            var result = ServerEnvironmentHelper.GetCurrentServerUmbracoBaseUrl(
-                appContext,
-                Mock.Of<IUmbracoSettingsSection>(
-                    section => 
-                        section.DistributedCall == Mock.Of<IDistributedCallSection>(callSection => callSection.Servers == Enumerable.Empty<IServer>())
-                        && section.ScheduledTasks == Mock.Of<IScheduledTasksSection>()));
-
-
-            Assert.AreEqual("http://test.com/", result);
+            _logger = new Logger(new FileInfo(TestHelper.MapPathForTest("~/unit-test-log4net.config")));
         }
 
         [Test]
-        public void Get_Base_Url_Single_Server_Orig_Request_Url_With_SSL()
+        public void SetApplicationUrlWhenNoSettings()
         {
             var appContext = new ApplicationContext(null)
             {
-                OriginalRequestUrl = "test.com"
+                UmbracoApplicationUrl = null // NOT set
             };
 
-            ConfigurationManager.AppSettings.Set("umbracoUseSSL", "true");
+            ConfigurationManager.AppSettings.Set("umbracoUseSSL", "true"); // does not make a diff here
 
-            var result = ServerEnvironmentHelper.GetCurrentServerUmbracoBaseUrl(
-                appContext,
+            ServerEnvironmentHelper.TrySetApplicationUrlFromSettings(appContext, _logger,
                 Mock.Of<IUmbracoSettingsSection>(
                     section =>
                         section.DistributedCall == Mock.Of<IDistributedCallSection>(callSection => callSection.Servers == Enumerable.Empty<IServer>())
+                        && section.WebRouting == Mock.Of<IWebRoutingSection>(wrSection => wrSection.UmbracoApplicationUrl == (string) null)
                         && section.ScheduledTasks == Mock.Of<IScheduledTasksSection>()));
 
 
-            Assert.AreEqual("https://test.com/", result);
+            // still NOT set
+            Assert.IsNull(appContext._umbracoApplicationUrl);
         }
 
         [Test]
-        public void Get_Base_Url_Single_Server_Via_Config_Url_No_SSL()
+        public void SetApplicationUrlFromDcSettingsNoSsl()
         {
             var appContext = new ApplicationContext(null);
 
             ConfigurationManager.AppSettings.Set("umbracoUseSSL", "false");
 
-            var result = ServerEnvironmentHelper.GetCurrentServerUmbracoBaseUrl(
-                appContext,
+            ServerEnvironmentHelper.TrySetApplicationUrlFromSettings(appContext, _logger,
                 Mock.Of<IUmbracoSettingsSection>(
                     section =>
                         section.DistributedCall == Mock.Of<IDistributedCallSection>(callSection => callSection.Servers == Enumerable.Empty<IServer>())
-                        && section.ScheduledTasks == Mock.Of<IScheduledTasksSection>(tasksSection => tasksSection.BaseUrl == "mycoolhost.com/hello/world")));
+                        && section.WebRouting == Mock.Of<IWebRoutingSection>(wrSection => wrSection.UmbracoApplicationUrl == (string) null)
+                        && section.ScheduledTasks == Mock.Of<IScheduledTasksSection>(tasksSection => tasksSection.BaseUrl == "mycoolhost.com/hello/world/")));
 
 
-            Assert.AreEqual("http://mycoolhost.com/hello/world/", result);
+            Assert.AreEqual("http://mycoolhost.com/hello/world", appContext._umbracoApplicationUrl);
         }
 
         [Test]
-        public void Get_Base_Url_Single_Server_Via_Config_Url_With_SSL()
+        public void SetApplicationUrlFromDcSettingsSsl()
         {
             var appContext = new ApplicationContext(null);
 
             ConfigurationManager.AppSettings.Set("umbracoUseSSL", "true");
 
-            var result = ServerEnvironmentHelper.GetCurrentServerUmbracoBaseUrl(
-                appContext,
+            ServerEnvironmentHelper.TrySetApplicationUrlFromSettings(appContext, _logger,
                 Mock.Of<IUmbracoSettingsSection>(
                     section =>
                         section.DistributedCall == Mock.Of<IDistributedCallSection>(callSection => callSection.Servers == Enumerable.Empty<IServer>())
+                        && section.WebRouting == Mock.Of<IWebRoutingSection>(wrSection => wrSection.UmbracoApplicationUrl == (string) null)
                         && section.ScheduledTasks == Mock.Of<IScheduledTasksSection>(tasksSection => tasksSection.BaseUrl == "mycoolhost.com/hello/world")));
 
 
-            Assert.AreEqual("https://mycoolhost.com/hello/world/", result);
+            Assert.AreEqual("https://mycoolhost.com/hello/world", appContext._umbracoApplicationUrl);
+        }
+
+        [Test]
+        public void SetApplicationUrlFromWrSettingsSsl()
+        {
+            var appContext = new ApplicationContext(null);
+
+            ConfigurationManager.AppSettings.Set("umbracoUseSSL", "true"); // does not make a diff here
+
+            ServerEnvironmentHelper.TrySetApplicationUrlFromSettings(appContext, _logger,
+                Mock.Of<IUmbracoSettingsSection>(
+                    section =>
+                        section.DistributedCall == Mock.Of<IDistributedCallSection>(callSection => callSection.Servers == Enumerable.Empty<IServer>())
+                        && section.WebRouting == Mock.Of<IWebRoutingSection>(wrSection => wrSection.UmbracoApplicationUrl == "httpx://whatever.com/hello/world/")
+                        && section.ScheduledTasks == Mock.Of<IScheduledTasksSection>(tasksSection => tasksSection.BaseUrl == "mycoolhost.com/hello/world")));
+
+
+            Assert.AreEqual("httpx://whatever.com/hello/world", appContext._umbracoApplicationUrl);
         }
     }
 }

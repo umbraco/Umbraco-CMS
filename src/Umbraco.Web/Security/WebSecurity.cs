@@ -323,7 +323,7 @@ namespace Umbraco.Web.Security
             // since the authentication happens in the Module, that authentication also checks the ticket expiry. We don't 
             // need to check it a second time because that requires another decryption phase and nothing can tamper with it during the request.
 
-            if (_httpContext.User.Identity.IsAuthenticated == false) 
+            if (IsAuthenticated() == false) 
             {
                 //There is no user
                 if (throwExceptions) throw new InvalidOperationException("The user has no umbraco contextid - try logging in");
@@ -403,11 +403,22 @@ namespace Umbraco.Web.Security
             {
             }
         }
-        
+
+        /// <summary>
+        /// Ensures that a back office user is logged in
+        /// </summary>
+        /// <returns></returns>
+        public bool IsAuthenticated()
+        {
+            return _httpContext.User.Identity.IsAuthenticated && _httpContext.GetCurrentIdentity(false) != null;
+        }
+
         protected override void DisposeResources()
         {
             _httpContext = null;
             _applicationContext = null;
         }
+
+        
     }
 }

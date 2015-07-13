@@ -69,7 +69,7 @@ namespace Umbraco.Tests.Models.Mapping
         }
 
         [Test]
-        public void ContentTypeDisplay_To_PropertyType()
+        public void PropertyTypeDisplay_To_PropertyType()
         {
             // setup the mocks to return the data we want to test against...
 
@@ -208,6 +208,33 @@ namespace Umbraco.Tests.Models.Mapping
         }
 
         [Test]
+        public void ContentTypeDisplay_With_Composition_To_IContentType()
+        {
+            //Arrange
+
+            // setup the mocks to return the data we want to test against...
+
+            _dataTypeService.Setup(x => x.GetDataTypeDefinitionById(It.IsAny<int>()))
+                .Returns(Mock.Of<IDataTypeDefinition>(
+                    definition =>
+                        definition.Id == 555
+                        && definition.PropertyEditorAlias == "myPropertyType"
+                        && definition.DatabaseType == DataTypeDatabaseType.Nvarchar));
+
+
+            var display = CreateCompositionContentTypeDisplay();
+
+            //Act
+
+            var result = Mapper.Map<IContentType>(display);
+
+            //Assert
+
+            //TODO: Now we need to assert all of the more complicated parts
+            Assert.AreEqual(display.Groups.Count(x => x.Inherited == false), result.PropertyGroups.Count);
+        }
+
+        [Test]
         public void IContentType_To_ContentTypeDisplay()
         {
             //Arrange
@@ -227,17 +254,7 @@ namespace Umbraco.Tests.Models.Mapping
                 .Returns(new[] { new TextboxPropertyEditor() });
             
             var contentType = MockedContentTypes.CreateTextpageContentType();
-            //ensure everything has ids
-            contentType.Id = 1234;
-            var itemid = 8888;
-            foreach (var propertyGroup in contentType.CompositionPropertyGroups)
-            {
-                propertyGroup.Id = itemid++;
-            }
-            foreach (var propertyType in contentType.CompositionPropertyTypes)
-            {
-                propertyType.Id = itemid++;
-            }
+            MockedContentTypes.EnsureAllIds(contentType, 8888);
 
             //Act
 
@@ -288,6 +305,103 @@ namespace Umbraco.Tests.Models.Mapping
             }
 
         }
+
+        [Test]
+        public void IContentTypeComposition_To_ContentTypeDisplay()
+        {
+            //Arrange
+
+            // setup the mocks to return the data we want to test against...
+
+            // for any call to GetPreValuesCollectionByDataTypeId just return an empty dictionary for now
+            // TODO: but we'll need to change this to return some pre-values to test the mappings
+            _dataTypeService.Setup(x => x.GetPreValuesCollectionByDataTypeId(It.IsAny<int>()))
+                .Returns(new PreValueCollection(new Dictionary<string, PreValue>()));
+
+            //return a textbox property editor for any requested editor by alias
+            _propertyEditorResolver.Setup(resolver => resolver.GetByAlias(It.IsAny<string>()))
+                .Returns(new TextboxPropertyEditor());
+            //for testing, just return a list of whatever property editors we want
+            _propertyEditorResolver.Setup(resolver => resolver.PropertyEditors)
+                .Returns(new[] { new TextboxPropertyEditor() });
+
+            var ctMain = MockedContentTypes.CreateSimpleContentType();
+            //not assigned to tab
+            ctMain.AddPropertyType(new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "umbracoUrlName", Name = "Slug", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            });
+            MockedContentTypes.EnsureAllIds(ctMain, 8888);
+            var ctChild1 = MockedContentTypes.CreateSimpleContentType("child1", "Child 1", ctMain, true);
+            ctChild1.AddPropertyType(new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "someProperty",
+                Name = "Some Property",
+                Description = "",
+                Mandatory = false,
+                SortOrder = 1,
+                DataTypeDefinitionId = -88
+            }, "Another tab");
+            MockedContentTypes.EnsureAllIds(ctChild1, 7777);
+            var contentType = MockedContentTypes.CreateSimpleContentType("child2", "Child 2", ctChild1, true, "CustomGroup");
+            //not assigned to tab
+            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "umbracoUrlAlias", Name = "AltUrl", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
+            });
+            MockedContentTypes.EnsureAllIds(contentType, 6666);
+            
+
+            //Act
+
+            var result = Mapper.Map<ContentTypeDisplay>(contentType);
+
+            //Assert
+
+            Assert.AreEqual(contentType.Alias, result.Alias);
+            Assert.AreEqual(contentType.Description, result.Description);
+            Assert.AreEqual(contentType.Icon, result.Icon);
+            Assert.AreEqual(contentType.Id, result.Id);
+            Assert.AreEqual(contentType.Name, result.Name);
+            Assert.AreEqual(contentType.ParentId, result.ParentId);
+            Assert.AreEqual(contentType.Path, result.Path);
+            Assert.AreEqual(contentType.Thumbnail, result.Thumbnail);
+            Assert.AreEqual(contentType.IsContainer, result.IsContainer);
+            Assert.AreEqual(contentType.CreateDate, result.CreateDate);
+            Assert.AreEqual(contentType.UpdateDate, result.UpdateDate);
+            Assert.AreEqual(contentType.DefaultTemplate.Alias, result.DefaultTemplate.Alias);
+
+            //TODO: Now we need to assert all of the more complicated parts
+
+            Assert.AreEqual(contentType.CompositionPropertyGroups.Select(x => x.Name).Distinct().Count(), result.Groups.Count(x => x.Id != -666));
+            Assert.AreEqual(1, result.Groups.Count(x => x.Id == -666));
+            Assert.AreEqual(contentType.PropertyGroups.Count(), result.Groups.Count(x => x.Inherited == false && x.Id != -666));
+
+            var allPropertiesMapped = result.Groups.SelectMany(x => x.Properties).ToArray();
+            var allPropertyIdsMapped = allPropertiesMapped.Select(x => x.Id).ToArray();
+            var allSourcePropertyIds = contentType.CompositionPropertyTypes.Select(x => x.Id).ToArray();
+
+            Assert.AreEqual(contentType.PropertyTypes.Count(), allPropertiesMapped.Count(x => x.Inherited == false));
+            Assert.AreEqual(allPropertyIdsMapped.Count(), allSourcePropertyIds.Count());
+            Assert.IsTrue(allPropertyIdsMapped.ContainsAll(allSourcePropertyIds));
+
+            Assert.AreEqual(2, result.Groups.Count(x => x.ParentTabContentTypes.Any()));
+            Assert.IsTrue(result.Groups.SelectMany(x => x.ParentTabContentTypes).ContainsAll(new[] {ctMain.Id, ctChild1.Id}));
+
+            Assert.AreEqual(contentType.AllowedTemplates.Count(), result.AllowedTemplates.Count());
+            for (var i = 0; i < contentType.AllowedTemplates.Count(); i++)
+            {
+                Assert.AreEqual(contentType.AllowedTemplates.ElementAt(i).Id, result.AllowedTemplates.ElementAt(i).Id);
+            }
+
+            Assert.AreEqual(contentType.AllowedContentTypes.Count(), result.AllowedContentTypes.Count());
+            for (var i = 0; i < contentType.AllowedContentTypes.Count(); i++)
+            {
+                Assert.AreEqual(contentType.AllowedContentTypes.ElementAt(i).Id.Value, result.AllowedContentTypes.ElementAt(i));
+            }
+
+        }
+
 
         private ContentTypeDisplay CreateSimpleContentTypeDisplay()
         {            
@@ -357,6 +471,113 @@ namespace Umbraco.Tests.Models.Mapping
                                 View = "blah"
                             }
                         }
+                    }
+                }
+            };
+        }
+
+        private ContentTypeDisplay CreateCompositionContentTypeDisplay()
+        {
+            return new ContentTypeDisplay
+            {
+                Alias = "test",
+                AllowAsRoot = true,
+                AllowedTemplates = new List<EntityBasic>
+                {
+                    new EntityBasic
+                    {
+                        Id = 555,
+                        Alias = "template1",
+                        Name = "Template1"
+                    },
+                    new EntityBasic
+                    {
+                        Id = 556,
+                        Alias = "template2",
+                        Name = "Template2"
+                    }
+                },
+                AllowedContentTypes = new[] { 666, 667 },
+                AvailableCompositeContentTypes = new List<EntityBasic>(),
+                DefaultTemplate = new EntityBasic() { Alias = "test" },
+                Description = "hello world",
+                Icon = "tree-icon",
+                Id = 1234,
+                Key = new Guid("8A60656B-3866-46AB-824A-48AE85083070"),
+                Name = "My content type",
+                Path = "-1,1234",
+                ParentId = -1,
+                Thumbnail = "tree-thumb",
+                IsContainer = true,
+                Groups = new List<PropertyGroupDisplay>()
+                {
+                    new PropertyGroupDisplay
+                    {
+                        Id = 987,
+                        Name = "Tab 1",
+                        ParentGroupId = -1,
+                        SortOrder = 0,
+                        Inherited = false,                        
+                        Properties = new List<PropertyTypeDisplay>
+                        {
+                            new PropertyTypeDisplay
+                            {                                
+                                Alias = "property1",
+                                Description = "this is property 1",
+                                Inherited = false,
+                                Label = "Property 1",
+                                Validation = new PropertyTypeValidation
+                                {
+                                    Mandatory = false,
+                                    Pattern = ""
+                                },
+                                Editor = "myPropertyType",
+                                Value = "value 1",
+                                //View = ??? - isn't this the same as editor?
+                                Config = new Dictionary<string, object>
+                                {
+                                    {"item1", "value1"},
+                                    {"item2", "value2"}
+                                },
+                                SortOrder = 0,
+                                DataTypeId = 555,
+                                View = "blah"
+                            }
+                        }
+                    },
+                    new PropertyGroupDisplay
+                    {
+                        Id = 894,
+                        Name = "Tab 2",
+                        ParentGroupId = -1,
+                        SortOrder = 0,
+                        Inherited = true,                        
+                        Properties = new List<PropertyTypeDisplay>
+                        {
+                            new PropertyTypeDisplay
+                            {                                
+                                Alias = "parentProperty",
+                                Description = "this is a property from the parent",
+                                Inherited = true,
+                                Label = "Parent property",
+                                Validation = new PropertyTypeValidation
+                                {
+                                    Mandatory = false,
+                                    Pattern = ""
+                                },
+                                Editor = "myPropertyType",
+                                Value = "parent value",
+                                //View = ??? - isn't this the same as editor?
+                                Config = new Dictionary<string, object>
+                                {
+                                    {"item1", "value1"}
+                                },
+                                SortOrder = 0,
+                                DataTypeId = 555,
+                                View = "blah"
+                            }
+                        }
+                        
                     }
                 }
 
