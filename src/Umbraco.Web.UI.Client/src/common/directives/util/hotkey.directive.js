@@ -17,7 +17,7 @@ angular.module("umbraco.directives")
           keyboardService.bind(keyCombo, function() {
               var element = $(el);
 
-              if(element.is("a,button,input[type='button'],input[type='submit']") && !element.is(':disabled') ){
+              if(element.is("a,div,button,input[type='button'],input[type='submit'],input[type='checkbox']") && !element.is(':disabled') ){
                 element.click();
               }else{
                 element.focus();
