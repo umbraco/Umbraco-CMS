@@ -49,15 +49,17 @@ namespace Umbraco.Web.Models.Mapping
                 //mapped in aftermap
                 .ForMember(dto => dto.AllowedContentTypes, expression => expression.Ignore())
                 .ForMember(dto => dto.AllowedTemplates, expression => expression.Ignore())
-
-
+                
                 //ignore, we'll do this in after map
                 .ForMember(dto => dto.PropertyGroups, expression => expression.Ignore())
                 .AfterMap((source, dest) =>
                 {
                     var addedProperties = new List<string>();
-                    //get all properties from groups that are not generic properties (-666 id)
-                    foreach (var groupDisplay in source.Groups.Where(x => x.Id != -666))
+
+                    //get all properties from groups that are not generic properties or inhertied (-666 id)
+                    var selfNonGenericGroups = source.Groups.Where(x => x.Inherited == false && x.Id != -666).ToArray();
+
+                    foreach (var groupDisplay in selfNonGenericGroups)
                     {
                         //use underlying logic to add the property group which should wire most things up for us
                         dest.AddPropertyGroup(groupDisplay.Name);
@@ -70,12 +72,19 @@ namespace Umbraco.Web.Models.Mapping
                             dest.AddPropertyType(Mapper.Map<PropertyType>(propertyTypeDisplay), groupDisplay.Name);
                             addedProperties.Add(propertyTypeDisplay.Alias);
                         }
-                            
+                    }
+
+                    //Groups to remove
+                    var groupsToRemove = dest.PropertyGroups.Select(x => x.Name).Except(selfNonGenericGroups.Select(x => x.Name)).ToArray();
+                    foreach (var toRemove in groupsToRemove)
+                    {
+                        dest.RemovePropertyGroup(toRemove);
                     }
 
                     //add generic properties
                     var genericProperties = source.Groups.FirstOrDefault(x => x.Id == -666);
-                    if(genericProperties != null){
+                    if(genericProperties != null)
+                    {
                         foreach (var propertyTypeDisplay in genericProperties.Properties.Where(x => x.Inherited == false))
                         {
                             dest.AddPropertyType(Mapper.Map<PropertyType>(propertyTypeDisplay));

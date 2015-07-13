@@ -58,6 +58,10 @@ namespace Umbraco.Web.Models.Mapping
                 {
                     Id = tab.Id, Inherited = false, Name = tab.Name, SortOrder = tab.SortOrder, ContentTypeId = source.Id
                 };
+
+                if (tab.ParentId.HasValue)
+                    group.ParentGroupId = tab.ParentId.Value;
+
                 group.Properties = MapProperties(tab.PropertyTypes, source, tab.Id, false);
                 groups.Add(tab.Id, group);
             }         
@@ -73,7 +77,7 @@ namespace Umbraco.Web.Models.Mapping
 
                 var group = new PropertyGroupDisplay()
                 {
-                    Id = tab.Id, Inherited = false, Name = tab.Name, SortOrder = tab.SortOrder, ContentTypeId = composition.Id,
+                    Id = tab.Id, Inherited = true, Name = tab.Name, SortOrder = tab.SortOrder, ContentTypeId = composition.Id,
                     ParentTabContentTypes = new[] {composition.Id},
                     ParentTabContentTypeNames = new[] {composition.Name}
                 };
@@ -87,9 +91,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //process generic properties assigned to this content item (without a group)
 
-            //NOTE: -666 is just a thing that is checked for on the front-end... I'm not a fan of this for the mapping
-            // since this is just for front-end, this could probably be updated to be -666 in the controller which is associated
-            // with giving the front-end it's data
+            //NOTE: -666 is just a thing that is checked during mapping the other direction, it's a 'special' id 
 
             var entityGenericProperties = source.PropertyTypes.Where(x => x.PropertyGroupId == null);
             genericProperties.AddRange(MapProperties(entityGenericProperties, source, -666, false));
