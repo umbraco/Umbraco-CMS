@@ -42,6 +42,47 @@
 			}
 		];
 
+		vm.page.keyboardShortcutsOverview = [
+		{
+			"name": "Design",
+			"shortcuts": [
+				{
+					"description": "Add tab",
+					"keys": [{"key": "alt"},{"key": "shift"},{"key": "t"}]
+				},
+				{
+					"description": "Add property",
+					"keys": [{"key": "alt"},{"key": "shift"},{"key": "p"}]
+				},
+				{
+					"description": "Add editor",
+					"keys": [{"key": "alt"},{"key": "shift"},{"key": "e"}]
+				},
+				{
+					"description": "Edit data type",
+					"keys": [{"key": "alt"},{"key": "shift"},{"key": "d"}]
+				}
+			]
+		},
+		{
+			"name": "List view",
+			"shortcuts": [
+				{
+					"description": "Toggle list view",
+					"keys": [{"key": "alt"},{"key": "shift"},{"key": "l"}]
+				}
+			]
+		},
+		{
+			"name": "Permissions",
+			"shortcuts": [
+				{
+					"description": "Toggle allow as root",
+					"keys": [{"key": "alt"},{"key": "shift"},{"key": "r"}]
+				}
+			]
+		}
+	];
 
 		if ($routeParams.create) {
 			//we are creating so get an empty data type item

@@ -1,0 +1,51 @@
+<div class="umb-keyboard-shortcuts-overview">
+
+  <div class="umb-keyboard-shortcuts-overview__keyboard-shortcut" data-hotkey="alt+shift+k" ng-click="toggleShortcutsOverlay()">
+    <div class="umb-keyboard-shortcuts-overview__description">show shortcuts</div>
+    <div class="umb-keyboard-keys">
+      <div class="umb-keyboard-key-wrapper">
+        <div class="umb-keyboard-key">alt</div>
+        <div>+</div>
+      </div>
+      <div class="umb-keyboard-key-wrapper">
+        <div class="umb-keyboard-key">shift</div>
+        <div>+</div>
+      </div>
+      <div class="umb-keyboard-key-wrapper">
+        <div class="umb-keyboard-key">k</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="umb-keyboard-shortcuts-overview__overlay" ng-if="shortcutOverlay">
+
+    <a href="" ng-click="toggleShortcutsOverlay()">
+      <i class="umb-keyboard-shortcuts-overview__overlay-close icon-delete"></i>
+    </a>
+
+    <div class="umb-keyboard-shortcuts-overview__overlay-content">
+
+      <div class="umb-keyboard-shortcuts-overview__keyboard-shortcuts-group" ng-repeat="keyboardShortcutGroup in model">
+
+        <h5 class="umb-keyboard-shortcuts-overview__keyboard-shortcuts-group-name">{{ keyboardShortcutGroup.name }}</h5>
+
+        <div class="umb-keyboard-shortcuts-overview__keyboard-shortcuts">
+
+          <div class="umb-keyboard-shortcuts-overview__keyboard-shortcut" ng-repeat="keyboardShortcut in keyboardShortcutGroup.shortcuts">
+            <div class="umb-keyboard-shortcuts-overview__description">{{ keyboardShortcut.description }}</div>
+            <div class="umb-keyboard-keys">
+              <div class="umb-keyboard-key-wrapper" ng-repeat="key in keyboardShortcut.keys">
+                <div class="umb-keyboard-key">{{ key.key }}</div>
+                <div ng-if="!$last">+</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+</div>

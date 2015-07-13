@@ -26,9 +26,17 @@
 
 
             <umb-editor-footer>
+
+              <umb-keyboard-shortcuts-overview
+                model="vm.page.keyboardShortcutsOverview">
+              </umb-keyboard-shortcuts-overview>
+
+              <div class="btn-group">
                 <button type="submit" data-hotkey="ctrl+s" class="btn btn-success">
-                    <localize key="buttons_save">Save</localize>
+                  <localize key="buttons_save">Save</localize>
                 </button>
+              </div>
+
             </umb-editor-footer>
 
         </umb-editor-view>
