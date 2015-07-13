@@ -24,6 +24,25 @@ namespace Umbraco.Web.Models.Mapping
             _propertyEditorResolver = propertyEditorResolver;
         }
 
+        /// <summary>
+        /// Will recursively check all compositions (of compositions) to find the content type that contains the 
+        /// tabId being searched for.
+        /// </summary>
+        /// <param name="ct"></param>
+        /// <param name="tabId"></param>
+        /// <returns></returns>
+        private IContentTypeComposition GetContentTypeFromTabId(IContentTypeComposition ct, int tabId)
+        {
+            if (ct.PropertyGroups.Any(x => x.Id == tabId)) return ct;
+
+            foreach (var composition in ct.ContentTypeComposition)
+            {
+                var found = GetContentTypeFromTabId(composition, tabId);
+                if (found != null) return found;
+            }
+
+            return null;
+        }
 
         protected override IEnumerable<PropertyGroupDisplay> ResolveCore(IContentTypeComposition source)
         {
@@ -32,77 +51,68 @@ namespace Umbraco.Web.Models.Mapping
             //for storing generic properties
             var genericProperties = new List<PropertyTypeDisplay>();
 
-            
-            //iterate through all composite types
-            foreach (var ct in source.ContentTypeComposition)
+            //add groups directly assigned to this content type
+            foreach (var tab in source.PropertyGroups)
             {
-                //process each tab
-                foreach(var tab in ct.CompositionPropertyGroups){
-                    var group = new PropertyGroupDisplay() { Id = tab.Id, Inherited = true, Name = tab.Name, SortOrder = tab.SortOrder };
-                    group.ContentTypeId = ct.Id;
-                    group.ParentTabContentTypes = new[] { ct.Id };
-                    group.ParentTabContentTypeNames = new[] { ct.Name };
-
-                    if (tab.ParentId.HasValue)
-                        group.ParentGroupId = tab.ParentId.Value;
-
-                    group.Properties = MapProperties(tab.PropertyTypes, ct, tab.Id, true);
-                    groups.Add(tab.Id, group);
-                }
-
-                //process inherited generic properties
-                var inheritedGenProperties = ct.CompositionPropertyTypes.Where(x => x.PropertyGroupId == null);
-                if (inheritedGenProperties.Any())
-                    genericProperties.AddRange(MapProperties(inheritedGenProperties, ct, 0, true));
-            }
-
-
-
-            //pull from own groups
-            foreach (var ownTab in source.CompositionPropertyGroups)
-            {
-                PropertyGroupDisplay group;
-                
-                //if already added
-                if (groups.ContainsKey(ownTab.Id))
-                    group = groups[ownTab.Id];
-
-                //if parent
-                else if (ownTab.ParentId.HasValue && groups.ContainsKey(ownTab.ParentId.Value))
-                    group = groups[ownTab.ParentId.Value];
-
-                else
+                var group = new PropertyGroupDisplay()
                 {
-                    //if own
-                    group = new PropertyGroupDisplay() { Id = ownTab.Id, Inherited = false, Name = ownTab.Name, SortOrder = ownTab.SortOrder, ContentTypeId = source.Id };
-                    groups.Add(ownTab.Id, group);
-                }
+                    Id = tab.Id, Inherited = false, Name = tab.Name, SortOrder = tab.SortOrder, ContentTypeId = source.Id
+                };
+                group.Properties = MapProperties(tab.PropertyTypes, source, tab.Id, false);
+                groups.Add(tab.Id, group);
+            }         
 
-                //merge the properties
-                var mergedProperties = new List<PropertyTypeDisplay>();
-                mergedProperties.AddRange(group.Properties);
+            //add groups not assigned to this content type (via compositions)
+            foreach (var tab in source.CompositionPropertyGroups)
+            {
+                if (groups.ContainsKey(tab.Id)) continue;
 
-                var newproperties = MapProperties( ownTab.PropertyTypes , source, ownTab.Id, false).Where(x => mergedProperties.Any( y => y.Id == x.Id ) == false);
-                mergedProperties.AddRange(newproperties);
+                var composition = GetContentTypeFromTabId(source, tab.Id);
+                if (composition == null) 
+                    throw new InvalidOperationException("The tabId " + tab.Id + " was not found on any of the content type's compositions");
 
-                group.Properties = mergedProperties.OrderBy(x => x.SortOrder);
+                var group = new PropertyGroupDisplay()
+                {
+                    Id = tab.Id, Inherited = false, Name = tab.Name, SortOrder = tab.SortOrder, ContentTypeId = composition.Id,
+                    ParentTabContentTypes = new[] {composition.Id},
+                    ParentTabContentTypeNames = new[] {composition.Name}
+                };
+
+                if (tab.ParentId.HasValue)
+                    group.ParentGroupId = tab.ParentId.Value;
+
+                group.Properties = MapProperties(tab.PropertyTypes, composition, tab.Id, true);
+                groups.Add(tab.Id, group);
             }
 
+            //process generic properties assigned to this content item (without a group)
 
-            //get all generic properties not already mapped to the generic props collection 
-            var ownGenericProperties = source.CompositionPropertyTypes.Where(x => x.PropertyGroupId == null && !genericProperties.Any(y => y.Id == x.Id));
-            genericProperties.AddRange(MapProperties(ownGenericProperties, source, 0, false));
+            //NOTE: -666 is just a thing that is checked for on the front-end... I'm not a fan of this for the mapping
+            // since this is just for front-end, this could probably be updated to be -666 in the controller which is associated
+            // with giving the front-end it's data
 
+            var entityGenericProperties = source.PropertyTypes.Where(x => x.PropertyGroupId == null);
+            genericProperties.AddRange(MapProperties(entityGenericProperties, source, -666, false));
+
+            //process generic properties from compositions (ensures properties are flagged as inherited)
+            var currentGenericPropertyIds = genericProperties.Select(x => x.Id).ToArray();
+            var compositionGenericProperties = source.CompositionPropertyTypes
+                .Where(x => x.PropertyGroupId == null && currentGenericPropertyIds.Contains(x.Id) == false);
+            genericProperties.AddRange(MapProperties(compositionGenericProperties, source, -666, true));
+
+            //now add the group if there are any generic props
             if (genericProperties.Any())
             {
-                var genericTab = new PropertyGroupDisplay() { Id = -666, Name = "Generic properties", ParentGroupId = 0, ContentTypeId = source.Id, SortOrder = 999, Inherited = false };
-                genericTab.Properties = genericProperties;
+                var genericTab = new PropertyGroupDisplay
+                {
+                    Id = -666, Name = "Generic properties", ParentGroupId = 0, ContentTypeId = source.Id, SortOrder = 999, Inherited = false, Properties = genericProperties
+                };
                 groups.Add(0, genericTab);
             }
 
 
             //merge tabs based on names (magic and insanity)
-            var nameGroupedGroups = groups.Values.GroupBy(x => x.Name);
+            var nameGroupedGroups = groups.Values.GroupBy(x => x.Name).ToArray();
             if (nameGroupedGroups.Any(x => x.Count() > 1))
             {
                 var sortedGroups = new List<PropertyGroupDisplay>();
@@ -110,16 +120,16 @@ namespace Umbraco.Web.Models.Mapping
                 foreach (var groupOfGroups in nameGroupedGroups)
                 {
                     //single name groups
-                    if(groupOfGroups.Count() == 1)
+                    if (groupOfGroups.Count() == 1)
+                    {
                         sortedGroups.Add(groupOfGroups.First());
-                    else{
+                    }
+                    else
+                    {
                         //multiple name groups
 
                         //find the mother tab - if we have our own use it. otherwise pick a random inherited one - since it wont matter
-                        var mainTab = groupOfGroups.FirstOrDefault(x => x.Inherited == false);
-                        if (mainTab == null)
-                            mainTab = groupOfGroups.First();
-
+                        var mainTab = groupOfGroups.FirstOrDefault(x => x.Inherited == false) ?? groupOfGroups.First();
 
                         //take all properties from all the other tabs and merge into one tab
                         var properties = new List<PropertyTypeDisplay>();
@@ -132,8 +142,8 @@ namespace Umbraco.Web.Models.Mapping
 
                         //collect all the involved content types
                         var parents = groupOfGroups.Where(x => x.ContentTypeId != source.Id).ToList();
-                        mainTab.ParentTabContentTypes = parents.Select(x => x.ContentTypeId);
-                        mainTab.ParentTabContentTypeNames = parents.SelectMany(x => x.ParentTabContentTypeNames);
+                        mainTab.ParentTabContentTypes = parents.SelectMany(x => x.ParentTabContentTypes).ToArray();
+                        mainTab.ParentTabContentTypeNames = parents.SelectMany(x => x.ParentTabContentTypeNames).ToArray();
                         sortedGroups.Add(mainTab);
                     }
                 }

@@ -126,6 +126,7 @@ namespace Umbraco.Web.Models.Mapping
 
             config.CreateMap<IContentType, ContentTypeDisplay>()
                 .ForMember(display => display.AllowAsRoot, expression => expression.MapFrom(type => type.AllowedAsRoot))
+                .ForMember(display => display.ListViewEditorName, expression => expression.Ignore())
                 //Ignore because this is not actually used for content types
                 .ForMember(display => display.Trashed, expression => expression.Ignore())
 

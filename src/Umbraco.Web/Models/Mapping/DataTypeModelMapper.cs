@@ -34,20 +34,28 @@ namespace Umbraco.Web.Models.Mapping
                 Constants.System.DefaultMembersListViewDataTypeId
             };
 
-            config.CreateMap<PropertyEditor, DataTypeBasic>();
+            config.CreateMap<PropertyEditor, DataTypeBasic>()
+                .ForMember(x => x.IsSystemDataType, expression => expression.Ignore())
+                .ForMember(x => x.Id, expression => expression.Ignore())
+                .ForMember(x => x.Trashed, expression => expression.Ignore())
+                .ForMember(x => x.Key, expression => expression.Ignore())
+                .ForMember(x => x.ParentId, expression => expression.Ignore())
+                .ForMember(x => x.Path, expression => expression.Ignore())
+                .ForMember(x => x.AdditionalData, expression => expression.Ignore());
 
             config.CreateMap<IDataTypeDefinition, DataTypeBasic>()
                 .ForMember(x => x.Icon, expression => expression.Ignore())
                 .ForMember(x => x.Alias, expression => expression.Ignore())
+                .ForMember(x => x.Group, expression => expression.Ignore())
                 .ForMember(x => x.IsSystemDataType, expression => expression.MapFrom(definition => systemIds.Contains(definition.Id)))
-                .AfterMap( (def,basic) =>
+                .AfterMap((def, basic) =>
                 {
                     var editor = PropertyEditorResolver.Current.GetByAlias(def.PropertyEditorAlias);
-                    if(editor != null){
+                    if (editor != null)
+                    {
                         basic.Group = editor.Group;
                         basic.Icon = editor.Icon;
                     }
-
                 });
 
             config.CreateMap<IDataTypeDefinition, DataTypeDisplay>()
@@ -59,7 +67,17 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.Notifications, expression => expression.Ignore())
                 .ForMember(x => x.Icon, expression => expression.Ignore())
                 .ForMember(x => x.Alias, expression => expression.Ignore())
-                .ForMember(x => x.IsSystemDataType, expression => expression.MapFrom(definition => systemIds.Contains(definition.Id)));
+                .ForMember(x => x.Group, expression => expression.Ignore())
+                .ForMember(x => x.IsSystemDataType, expression => expression.MapFrom(definition => systemIds.Contains(definition.Id)))
+                .AfterMap((def, basic) =>
+                {
+                    var editor = PropertyEditorResolver.Current.GetByAlias(def.PropertyEditorAlias);
+                    if (editor != null)
+                    {
+                        basic.Group = editor.Group;
+                        basic.Icon = editor.Icon;
+                    }
+                });
 
             //gets a list of PreValueFieldDisplay objects from the data type definition
             config.CreateMap<IDataTypeDefinition, IEnumerable<PreValueFieldDisplay>>()
