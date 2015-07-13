@@ -288,7 +288,10 @@ namespace Umbraco.Web.Editors
 
             datatypes.AddRange(editors.Select(Mapper.Map<DataTypeBasic>));
 
-            var grouped = datatypes.GroupBy(x => x.Group.ToLower()).ToDictionary(group => group.Key, group => group.AsEnumerable());
+            var grouped = datatypes
+                .GroupBy(x => x.Group.IsNullOrWhiteSpace() ? "" : x.Group.ToLower())
+                .ToDictionary(group => group.Key, group => group.AsEnumerable());
+
             return grouped;
         }
 
