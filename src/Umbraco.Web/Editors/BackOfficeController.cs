@@ -105,7 +105,7 @@ namespace Umbraco.Web.Editors
         {
             var cultureInfo = string.IsNullOrWhiteSpace(culture)
                 //if the user is logged in, get their culture, otherwise default to 'en'
-                ? User.Identity.IsAuthenticated
+                ? Security.IsAuthenticated()
                     ? Security.CurrentUser.GetUserCulture(Services.TextService) 
                     : CultureInfo.GetCultureInfo("en")
                 : CultureInfo.GetCultureInfo(culture);
