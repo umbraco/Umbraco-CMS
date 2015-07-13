@@ -828,14 +828,6 @@ namespace Umbraco.Tests.Scheduling
             }
 
             public override bool RunsOnShutdown { get { return false; } }
-
-            protected override void Dispose(bool disposing)
-            {
-                Disposed = true;
-                base.Dispose(disposing);
-            }
-
-            public bool Disposed { get; private set; }
         }
 
         private class MyTask : BaseTask

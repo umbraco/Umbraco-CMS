@@ -24,7 +24,6 @@ namespace Umbraco.Web.Scheduling
             _settings = settings;
         }
 
-        // maximum age, in minutes
         private static int GetLogScrubbingMaximumAge(IUmbracoSettingsSection settings)
         {
             var maximumAge = 24 * 60; // 24 hours, in minutes
@@ -64,6 +63,13 @@ namespace Umbraco.Web.Scheduling
             {
                 LogHelper.Debug<LogScrubber>("Does not run on slave servers.");
                 return false; // do NOT repeat, server status comes from config and will NOT change
+            }
+
+            // ensure we do not run if not main domain, but do NOT lock it
+            if (_appContext.MainDom.IsMainDom == false)
+            {
+                LogHelper.Debug<LogScrubber>("Does not run if not MainDom.");
+                return false; // do NOT repeat, going down
             }
 
             using (DisposableTimer.DebugDuration<LogScrubber>("Log scrubbing executing", "Log scrubbing complete"))

@@ -101,6 +101,13 @@ namespace Umbraco.Web.Scheduling
                 return false; // do NOT repeat, server status comes from config and will NOT change
             }
 
+            // ensure we do not run if not main domain, but do NOT lock it
+            if (_appContext.MainDom.IsMainDom == false)
+            {
+                LogHelper.Debug<ScheduledTasks>("Does not run if not MainDom.");
+                return false; // do NOT repeat, going down
+            }
+
             using (DisposableTimer.DebugDuration<ScheduledTasks>(() => "Scheduled tasks executing", () => "Scheduled tasks complete"))
             {
                 try

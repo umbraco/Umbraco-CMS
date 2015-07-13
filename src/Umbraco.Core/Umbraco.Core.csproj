@@ -327,6 +327,7 @@
     <Compile Include="Events\SaveEventArgs.cs" />
     <Compile Include="Events\SendToPublishEventArgs.cs" />
     <Compile Include="Exceptions\InvalidCompositionException.cs" />
+    <Compile Include="Exceptions\UmbracoStartupFailedException.cs" />
     <Compile Include="HideFromTypeFinderAttribute.cs" />
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="IApplicationEventHandler.cs" />
@@ -334,6 +335,7 @@
     <Compile Include="Logging\AsyncForwardingAppenderBase.cs" />
     <Compile Include="Logging\LoggingEventContext.cs" />
     <Compile Include="Logging\LoggingEventHelper.cs" />
+    <Compile Include="MainDom.cs" />
     <Compile Include="Logging\OwinLogger.cs" />
     <Compile Include="Logging\OwinLoggerFactory.cs" />
     <Compile Include="Logging\ParallelForwardingAppender.cs" />
@@ -1327,6 +1329,7 @@
     <Compile Include="UriExtensions.cs" />
     <Compile Include="SystemUtilities.cs" />
     <Compile Include="VersionExtensions.cs" />
+    <Compile Include="WaitHandleExtensions.cs" />
     <Compile Include="WriteLock.cs" />
     <Compile Include="XmlExtensions.cs" />
     <Compile Include="XmlHelper.cs" />

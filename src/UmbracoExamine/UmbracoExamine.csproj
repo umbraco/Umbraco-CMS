@@ -111,6 +111,7 @@
   <ItemGroup>
     <Compile Include="BaseUmbracoIndexer.cs" />
     <Compile Include="Config\IndexSetExtensions.cs" />
+    <Compile Include="Config\LazyIndexCriteria.cs" />
     <Compile Include="DataServices\IContentService.cs" />
     <Compile Include="DataServices\IDataService.cs" />
     <Compile Include="DataServices\ILogService.cs" />
