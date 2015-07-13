@@ -34,6 +34,11 @@ namespace Umbraco.Web.Editors
     [EnableOverrideAuthorization]
     public class DataTypeController : UmbracoAuthorizedJsonController
     {
+        /// <summary>
+        /// Gets data type by name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public DataTypeDisplay GetByName(string name)
         {
             var dataType = Services.DataTypeService.GetDataTypeDefinitionByName(name);
@@ -45,10 +50,6 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        /// <remarks>
-        /// Permission is granted to this method if the user has access to any of these trees: DataTypes, Content or Media
-        /// </remarks>
-        [UmbracoTreeAuthorize(Constants.Trees.DataTypes, Constants.Trees.Content, Constants.Trees.Media)]
         public DataTypeDisplay GetById(int id)
         {
             var dataType = Services.DataTypeService.GetDataTypeDefinitionById(id);
@@ -57,98 +58,6 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
             return Mapper.Map<IDataTypeDefinition, DataTypeDisplay>(dataType);
-        }
-
-        /// <summary>
-        /// Gets the content json for all data types
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// Permission is granted to this method if the user has access to any of these trees: DataTypes, Content or Media
-        /// </remarks>
-        [UmbracoTreeAuthorize(Constants.Trees.DataTypes, Constants.Trees.Content, Constants.Trees.Media)]
-        public IEnumerable<DataTypeBasic> GetAll()
-        {
-            return Services.DataTypeService
-                     .GetAllDataTypeDefinitions()
-                     .Select(x => Mapper.Map<IDataTypeDefinition, DataTypeBasic>(x)).Where(x => x.IsSystemDataType == false);
-        }
-
-        /// <summary>
-        /// Gets the content json for all data types added by the user
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// Permission is granted to this method if the user has access to any of these trees: DataTypes, Content or Media
-        /// </remarks>
-        [UmbracoTreeAuthorize(Constants.Trees.DataTypes, Constants.Trees.Content, Constants.Trees.Media)]
-        public IEnumerable<DataTypeBasic> GetAllUserConfigured()
-        {
-            //find all user configured for re-reference
-            return Services.DataTypeService
-                     .GetAllDataTypeDefinitions()
-                     .Where(x => x.Id > 1045)
-                     .Select(x => Mapper.Map<IDataTypeDefinition, DataTypeBasic>(x)).Where(x => x.IsSystemDataType == false);
-
-            //find all custom editors added by non-core manifests
-
-            //find the rest
-        }
-
-        /// <summary>
-        /// Gets the content json for all user added property editors
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// Permission is granted to this method if the user has access to any of these trees: DataTypes, Content or Media
-        /// </remarks>
-        [UmbracoTreeAuthorize(Constants.Trees.DataTypes, Constants.Trees.Content, Constants.Trees.Media)]
-        public IEnumerable<PropertyEditorBasic> GetAllUserPropertyEditors()
-        {
-            return PropertyEditorResolver.Current.PropertyEditors
-                .OrderBy(x => x.Name)
-                .Where(x => x.ValueEditor.View.IndexOf("app_plugins", StringComparison.InvariantCultureIgnoreCase) >= 0) 
-                .Select(Mapper.Map<PropertyEditorBasic>);
-        }
-
-
-        [UmbracoTreeAuthorize(Constants.Trees.DataTypes, Constants.Trees.Content, Constants.Trees.Media)]
-        public IDictionary<string, IEnumerable<DataTypeBasic>> GetAllDataTypesAndEditors()
-        {  
-            var datadefs = Services.DataTypeService
-                                    .GetAllDataTypeDefinitions();
-             var editors = PropertyEditorResolver.Current.PropertyEditors.Where(x => datadefs.Any(y => y.PropertyEditorAlias == x.Alias) == false);
-
-            var datatypes = new List<DataTypeBasic>();
-
-            foreach (var datadef in datadefs)
-                datatypes.Add(Mapper.Map<DataTypeBasic>(datadef));
-
-            foreach (var unusedEditor in editors)
-                datatypes.Add(Mapper.Map<DataTypeBasic>(unusedEditor));
-
-            var grouped = datatypes.GroupBy(x => x.Group.ToLower()).ToDictionary(group => group.Key, group => group.AsEnumerable());
-            return grouped;
-        }
-
-
-        /// <summary>
-        /// Gets the content json for all property editors
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// Permission is granted to this method if the user has access to any of these trees: DataTypes, Content or Media
-        /// </remarks>
-        [UmbracoTreeAuthorize(Constants.Trees.DataTypes, Constants.Trees.Content, Constants.Trees.Media)]
-        public IEnumerable<PropertyEditorBasic> GetAllPropertyEditors()
-        {
-            return PropertyEditorResolver.Current.PropertyEditors
-                .OrderBy(x => x.Name)
-                .Select(Mapper.Map<PropertyEditorBasic>);
         }
 
         /// <summary>
@@ -297,5 +206,109 @@ namespace Umbraco.Web.Editors
             //now return the updated model
             return display;
         }
+
+        #region ReadOnly actions to return basic data - allow access for: content ,media, members, settings, developer
+        /// <summary>
+        /// Gets the content json for all data types
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members
+        /// </remarks>    
+        [UmbracoApplicationAuthorize(
+            Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
+            Constants.Applications.Settings, Constants.Applications.Developer)]
+        public IEnumerable<DataTypeBasic> GetAll()
+        {
+            return Services.DataTypeService
+                     .GetAllDataTypeDefinitions()
+                     .Select(Mapper.Map<IDataTypeDefinition, DataTypeBasic>).Where(x => x.IsSystemDataType == false);
+        }
+
+        /// <summary>
+        /// Gets the content json for all data types added by the user
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members
+        /// </remarks>        
+        [UmbracoApplicationAuthorize(
+            Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
+            Constants.Applications.Settings, Constants.Applications.Developer)]
+        public IEnumerable<DataTypeBasic> GetAllUserConfigured()
+        {
+            //find all user configured for re-reference
+            return Services.DataTypeService
+                .GetAllDataTypeDefinitions()
+                //TODO: This is pretty nasty :(
+                .Where(x => x.Id > 1045)
+                .Select(Mapper.Map<IDataTypeDefinition, DataTypeBasic>).Where(x => x.IsSystemDataType == false);
+
+            //find all custom editors added by non-core manifests
+
+            //find the rest
+        }
+
+        /// <summary>
+        /// Gets the content json for all user added property editors
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members
+        /// </remarks>    
+        [UmbracoTreeAuthorize(
+            Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
+            Constants.Applications.Settings, Constants.Applications.Developer)]
+        public IEnumerable<PropertyEditorBasic> GetAllUserPropertyEditors()
+        {
+            return PropertyEditorResolver.Current.PropertyEditors
+                .OrderBy(x => x.Name)
+                .Where(x => x.ValueEditor.View.IndexOf("app_plugins", StringComparison.InvariantCultureIgnoreCase) >= 0)
+                .Select(Mapper.Map<PropertyEditorBasic>);
+        }
+
+        /// <summary>
+        /// Returns all configured data types and all potential data types that could exist based on unused property editors grouped
+        /// by their property editor defined group.
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members
+        /// </remarks>    
+        [UmbracoTreeAuthorize(
+            Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
+            Constants.Applications.Settings, Constants.Applications.Developer)]
+        public IDictionary<string, IEnumerable<DataTypeBasic>> GetAllDataTypesAndEditors()
+        {
+            var datadefs = Services.DataTypeService
+                                    .GetAllDataTypeDefinitions();
+            var editors = PropertyEditorResolver.Current.PropertyEditors.Where(x => datadefs.Any(y => y.PropertyEditorAlias == x.Alias) == false);
+
+            var datatypes = datadefs.Select(Mapper.Map<DataTypeBasic>).ToList();
+
+            datatypes.AddRange(editors.Select(Mapper.Map<DataTypeBasic>));
+
+            var grouped = datatypes.GroupBy(x => x.Group.ToLower()).ToDictionary(group => group.Key, group => group.AsEnumerable());
+            return grouped;
+        }
+
+
+        /// <summary>
+        /// Gets all property editors defined
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members
+        /// </remarks>    
+        [UmbracoTreeAuthorize(
+            Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
+            Constants.Applications.Settings, Constants.Applications.Developer)]
+        public IEnumerable<PropertyEditorBasic> GetAllPropertyEditors()
+        {
+            return PropertyEditorResolver.Current.PropertyEditors
+                .OrderBy(x => x.Name)
+                .Select(Mapper.Map<PropertyEditorBasic>);
+        }
+        #endregion
     }
 }
