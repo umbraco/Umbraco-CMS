@@ -207,7 +207,7 @@ namespace umbraco
                 var node = GetPreviewOrPublishedNode(d, xmlContentCopy, false);
                 var attr = ((XmlElement)node).GetAttributeNode("sortOrder");
                 attr.Value = d.sortOrder.ToString();
-                AddOrUpdateXmlNode(xmlContentCopy, d.Id, d.Level, parentId, node);
+                xmlContentCopy = AddOrUpdateXmlNode(xmlContentCopy, d.Id, d.Level, parentId, node);
 
                 // update sitemapprovider
                 if (updateSitemapProvider && SiteMap.Provider is UmbracoSiteMapProvider)
@@ -371,7 +371,7 @@ namespace umbraco
             {
                 foreach (Document d in Documents)
                 {
-                    PublishNodeDo(d, safeXml.Xml, true);
+                    safeXml.Xml = PublishNodeDo(d, safeXml.Xml, true);
                 }
             }
 
@@ -804,7 +804,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
             return xmlDoc == null ? null : (XmlDocument) xmlDoc.CloneNode(true);
         }
 
-        private static void EnsureSchema(string contentTypeAlias, XmlDocument xml)
+        private static XmlDocument EnsureSchema(string contentTypeAlias, XmlDocument xml)
         {
             string subset = null;
 
@@ -817,15 +817,22 @@ order by umbracoNode.level, umbracoNode.sortOrder";
 
             // ensure it contains the content type
             if (subset != null && subset.Contains(string.Format("<!ATTLIST {0} id ID #REQUIRED>", contentTypeAlias)))
-                return;
+                return xml;
 
-            // remove current doctype
-            xml.RemoveChild(n);
+            // alas, that does not work, replacing a doctype is ignored and GetElementById fails
+            //
+            //// remove current doctype, set new doctype
+            //xml.RemoveChild(n);
+            //subset = string.Format("<!ELEMENT {1} ANY>{0}<!ATTLIST {1} id ID #REQUIRED>{0}{2}", Environment.NewLine, contentTypeAlias, subset);
+            //var doctype = xml.CreateDocumentType("root", null, null, subset);
+            //xml.InsertAfter(doctype, xml.FirstChild);
 
-            // set new doctype
+            var xml2 = new XmlDocument();
             subset = string.Format("<!ELEMENT {1} ANY>{0}<!ATTLIST {1} id ID #REQUIRED>{0}{2}", Environment.NewLine, contentTypeAlias, subset);
-            var doctype = xml.CreateDocumentType("root", null, null, subset);
-            xml.InsertAfter(doctype, xml.FirstChild);
+            var doctype = xml2.CreateDocumentType("root", null, null, subset);
+            xml2.AppendChild(doctype);
+            xml2.AppendChild(xml2.ImportNode(xml.DocumentElement, true));
+            return xml2;
         }
 
         private static void InitializeXml(XmlDocument xml, string dtd)
@@ -1272,7 +1279,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         #region Manage change
 
         // adds or updates a node (docNode) into a cache (xml)
-        public static void AddOrUpdateXmlNode(XmlDocument xml, int id, int level, int parentId, XmlNode docNode)
+        public static XmlDocument AddOrUpdateXmlNode(XmlDocument xml, int id, int level, int parentId, XmlNode docNode)
         {
             // sanity checks
             if (id != docNode.AttributeValue<int>("id"))
@@ -1286,7 +1293,12 @@ order by umbracoNode.level, umbracoNode.sortOrder";
             // if the document is not there already then it's a new document
             // we must make sure that its document type exists in the schema
             if (currentNode == null && UseLegacySchema == false)
-                EnsureSchema(docNode.Name, xml);
+            {
+                var xml2 = EnsureSchema(docNode.Name, xml);
+                if (ReferenceEquals(xml, xml2) == false)
+                    docNode = xml2.ImportNode(docNode, true);
+                xml = xml2;
+            }
 
             // find the parent
             XmlNode parentNode = level == 1
@@ -1295,7 +1307,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
 
             // no parent = cannot do anything
             if (parentNode == null)
-                return;
+                return xml;
 
             // insert/move the node under the parent
             if (currentNode == null)
@@ -1363,6 +1375,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
             // then we just need to ensure that currentNode is at the right position.
             // should be faster that moving all the nodes around.
             XmlHelper.SortNode(parentNode, ChildNodesXPath, currentNode, x => x.AttributeValue<int>("sortOrder"));
+            return xml;
         }
 
         private static void TransferValuesFromDocumentXmlToPublishedXml(XmlNode documentNode, XmlNode publishedNode)
