@@ -129,14 +129,14 @@ namespace Umbraco.Core
 	    /// </remarks>
         public static ApplicationContext EnsureContext(DatabaseContext dbContext, ServiceContext serviceContext, CacheHelper cache, ProfilingLogger logger, bool replaceContext)
         {
-            if (ApplicationContext.Current != null)
+            if (Current != null)
             {
                 if (!replaceContext)
-                    return ApplicationContext.Current;
+                    return Current;
             }
             var ctx = new ApplicationContext(dbContext, serviceContext, cache, logger);
-            ApplicationContext.Current = ctx;
-            return ApplicationContext.Current;
+            Current = ctx;
+            return Current;
         }
 
 	    /// <summary>
@@ -256,7 +256,6 @@ namespace Umbraco.Core
 	            _umbracoApplicationUrl = value;
             }
         }
-        /// </summary>
 
 	    internal string _umbracoApplicationUrl; // internal for tests
 
@@ -265,7 +264,7 @@ namespace Umbraco.Core
        
 	    private void Init()
 		{
-            MainDom = new MainDom();
+            MainDom = new MainDom(ProfilingLogger.Logger);
             MainDom.Acquire();
             
             //Create the lazy value to resolve whether or not the application is 'configured'

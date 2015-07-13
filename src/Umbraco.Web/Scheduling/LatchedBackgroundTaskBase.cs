@@ -71,8 +71,7 @@ namespace Umbraco.Web.Scheduling
             {
                 if (_disposed) return;
                 _disposed = true;
-
-                _latch.Dispose();                
+                _latch.Dispose();
                 DisposeResources();
             }
         }

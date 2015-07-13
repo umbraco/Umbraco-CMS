@@ -24,6 +24,7 @@ namespace Umbraco.Web.Scheduling
             _settings = settings;
         }
 
+        // maximum age, in minutes
         private static int GetLogScrubbingMaximumAge(IUmbracoSettingsSection settings)
         {
             var maximumAge = 24 * 60; // 24 hours, in minutes
