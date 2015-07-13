@@ -23,6 +23,10 @@ angular.module("umbraco.directives")
                 element.focus();
               }
           });
-          
+
+          el.on('$destroy', function(){
+            keyboardService.unbind(keyCombo);
+          });
+
       };
   });
