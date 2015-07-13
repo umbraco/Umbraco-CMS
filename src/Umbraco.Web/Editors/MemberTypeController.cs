@@ -24,6 +24,8 @@ namespace Umbraco.Web.Editors
     /// An API controller used for dealing with content types
     /// </summary>
     [PluginController("UmbracoApi")]
+    [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
+    [EnableOverrideAuthorization]
     public class MemberTypeController : UmbracoAuthorizedJsonController
     {
         /// <summary>
@@ -47,7 +49,7 @@ namespace Umbraco.Web.Editors
 
         private readonly MembershipProvider _provider;
 
-        public Umbraco.Web.Models.ContentEditing.MemberTypeDisplay GetById(int id)
+        public MemberTypeDisplay GetById(int id)
         {
             var ct = Services.MemberTypeService.Get(id);
             if (ct == null)
@@ -55,19 +57,19 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var dto = Mapper.Map<IMemberType, Umbraco.Web.Models.ContentEditing.MemberTypeDisplay>(ct);
+            var dto = Mapper.Map<IMemberType, MemberTypeDisplay>(ct);
             return dto;
         }
 
-        public Umbraco.Web.Models.ContentEditing.MemberTypeDisplay GetEmpty()
+        public MemberTypeDisplay GetEmpty()
         {
             var ct = new MemberType(-1);
-            var dto = Mapper.Map<IMemberType, Umbraco.Web.Models.ContentEditing.MemberTypeDisplay>(ct);
+            var dto = Mapper.Map<IMemberType, MemberTypeDisplay>(ct);
             return dto;
         }
 
 
-        /// TODO: Move to base content type controller
+        // TODO: Move to base content type controller
         public ContentPropertyDisplay GetPropertyTypeScaffold(int id)
         {
             var dataTypeDiff = Services.DataTypeService.GetDataTypeDefinitionById(id);
@@ -89,7 +91,6 @@ namespace Umbraco.Web.Editors
             };
         }
 
-
         /// <summary>
         /// Returns all member types
         /// </summary>
@@ -109,10 +110,10 @@ namespace Umbraco.Web.Editors
 
             var ctService = ApplicationContext.Services.MemberTypeService;
 
-            ///TODO: warn on content type alias conflicts
-            ///TODO: warn on property alias conflicts
+            //TODO: warn on content type alias conflicts
+            //TODO: warn on property alias conflicts
 
-            ///TODO: Validate the submitted model
+            //TODO: Validate the submitted model
 
             //filter out empty properties
             contentType.Groups = contentType.Groups.Where(x => x.Name.IsNullOrWhiteSpace() == false).ToList();

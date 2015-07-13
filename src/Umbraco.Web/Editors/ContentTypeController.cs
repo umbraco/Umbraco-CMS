@@ -28,6 +28,8 @@ namespace Umbraco.Web.Editors
     /// An API controller used for dealing with content types
     /// </summary>
     [PluginController("UmbracoApi")]
+    [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
+    [EnableOverrideAuthorization]
     public class ContentTypeController : ContentTypeControllerBase
     {
         private ICultureDictionary _cultureDictionary;
@@ -150,6 +152,7 @@ namespace Umbraco.Web.Editors
         /// Returns the allowed child content type objects for the content item id passed in
         /// </summary>
         /// <param name="contentId"></param>
+        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes, Constants.Trees.Content)]
         public IEnumerable<ContentTypeBasic> GetAllowedChildren(int contentId)
         {
             if (contentId == Constants.System.RecycleBinContent)
@@ -169,7 +172,7 @@ namespace Umbraco.Web.Editors
                 var contentItem = Services.ContentService.GetById(contentId);
                 if (contentItem == null)
                 {
-                    throw new HttpResponseException(HttpStatusCode.NotFound);
+                    return Enumerable.Empty<ContentTypeBasic>();
                 }
 
                 var ids = contentItem.ContentType.AllowedContentTypes.Select(x => x.Id.Value).ToArray();

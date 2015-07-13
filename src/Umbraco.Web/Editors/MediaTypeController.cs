@@ -9,6 +9,8 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
+using Umbraco.Web.WebApi.Filters;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
@@ -21,6 +23,8 @@ namespace Umbraco.Web.Editors
     /// An API controller used for dealing with media types
     /// </summary>
     [PluginController("UmbracoApi")]
+    [UmbracoTreeAuthorize(Constants.Trees.MediaTypes)]
+    [EnableOverrideAuthorization]
     public class MediaTypeController : ContentTypeControllerBase
     {
         /// <summary>
@@ -44,6 +48,7 @@ namespace Umbraco.Web.Editors
         /// Returns the allowed child content type objects for the content item id passed in
         /// </summary>
         /// <param name="contentId"></param>
+        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes, Constants.Trees.Content, Constants.Trees.Media)]
         public IEnumerable<ContentTypeBasic> GetAllowedChildren(int contentId)
         {
             if (contentId == Core.Constants.System.RecycleBinMedia)
@@ -59,7 +64,7 @@ namespace Umbraco.Web.Editors
             var contentItem = Services.MediaService.GetById(contentId);
             if (contentItem == null)
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                return Enumerable.Empty<ContentTypeBasic>();
             }
 
             var ids = contentItem.ContentType.AllowedContentTypes.Select(x => x.Id.Value).ToArray();
