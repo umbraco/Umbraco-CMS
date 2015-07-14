@@ -123,9 +123,9 @@ namespace Umbraco.Core
 
             InitializeModelMappers();
 
-	        using (DisposableTimer.DebugDuration<CoreBootManager>(
-                () => string.Format("Executing {0} IApplicationEventHandler.OnApplicationInitialized", ApplicationEventsResolver.Current.ApplicationEventHandlers.Count()),
-                () => "Finished executing IApplicationEventHandler.OnApplicationInitialized"))
+            using (_profilingLogger.DebugDuration<CoreBootManager>(
+                string.Format("Executing {0} IApplicationEventHandler.OnApplicationInitialized", ApplicationEventsResolver.Current.ApplicationEventHandlers.Count()),
+                "Finished executing IApplicationEventHandler.OnApplicationInitialized"))
 	        {
                 //now we need to call the initialize methods
                 ApplicationEventsResolver.Current.ApplicationEventHandlers
@@ -137,7 +137,7 @@ namespace Umbraco.Core
                         }
                         catch (Exception ex)
                         {
-                            LogHelper.Error<CoreBootManager>("An error occurred running OnApplicationInitialized for handler " + x.GetType(), ex);
+                            _profilingLogger.Logger.Error<CoreBootManager>("An error occurred running OnApplicationInitialized for handler " + x.GetType(), ex);
                             throw;
                         }
                     });
@@ -246,7 +246,7 @@ namespace Umbraco.Core
         /// <param name="rootPath">Absolute</param>
         protected virtual void InitializeApplicationRootPath(string rootPath)
         {
-            Umbraco.Core.IO.IOHelper.SetRootDirectory(rootPath);
+            IOHelper.SetRootDirectory(rootPath);
         }
 
         /// <summary>
@@ -260,9 +260,9 @@ namespace Umbraco.Core
             if (_isStarted)
                 throw new InvalidOperationException("The boot manager has already been initialized");
 
-            using (DisposableTimer.DebugDuration<CoreBootManager>(
-                () => string.Format("Executing {0} IApplicationEventHandler.OnApplicationStarting", ApplicationEventsResolver.Current.ApplicationEventHandlers.Count()),
-                () => "Finished executing IApplicationEventHandler.OnApplicationStarting"))
+            using (_profilingLogger.DebugDuration<CoreBootManager>(
+                string.Format("Executing {0} IApplicationEventHandler.OnApplicationStarting", ApplicationEventsResolver.Current.ApplicationEventHandlers.Count()),
+                "Finished executing IApplicationEventHandler.OnApplicationStarting"))
 		    {
 		        //call OnApplicationStarting of each application events handler
 		        ApplicationEventsResolver.Current.ApplicationEventHandlers
@@ -274,7 +274,7 @@ namespace Umbraco.Core
 		                }
 		                catch (Exception ex)
 		                {
-		                    LogHelper.Error<CoreBootManager>("An error occurred running OnApplicationStarting for handler " + x.GetType(), ex);
+                            _profilingLogger.Logger.Error<CoreBootManager>("An error occurred running OnApplicationStarting for handler " + x.GetType(), ex);
 		                    throw;
 		                }
 		            });
@@ -305,9 +305,9 @@ namespace Umbraco.Core
             //Here we need to make sure the db can be connected to
 		    EnsureDatabaseConnection();
 
-            using (DisposableTimer.DebugDuration<CoreBootManager>(
-                () => string.Format("Executing {0} IApplicationEventHandler.OnApplicationStarted", ApplicationEventsResolver.Current.ApplicationEventHandlers.Count()),
-                () => "Finished executing IApplicationEventHandler.OnApplicationStarted"))
+            using (_profilingLogger.DebugDuration<CoreBootManager>(
+                string.Format("Executing {0} IApplicationEventHandler.OnApplicationStarted", ApplicationEventsResolver.Current.ApplicationEventHandlers.Count()),
+                "Finished executing IApplicationEventHandler.OnApplicationStarted"))
             {
                 //call OnApplicationStarting of each application events handler
                 ApplicationEventsResolver.Current.ApplicationEventHandlers
@@ -319,7 +319,7 @@ namespace Umbraco.Core
                         }
                         catch (Exception ex)
                         {
-                            LogHelper.Error<CoreBootManager>("An error occurred running OnApplicationStarted for handler " + x.GetType(), ex);
+                            _profilingLogger.Logger.Error<CoreBootManager>("An error occurred running OnApplicationStarted for handler " + x.GetType(), ex);
                             throw;
                         }
                     }); 
