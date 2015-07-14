@@ -160,7 +160,7 @@ namespace Umbraco.Core
         /// - has the SystemDirectories.Umbraco path
         /// - does not end with a slash
         /// It is initialized on the first request made to the server, by UmbracoModule.EnsureApplicationUrl:
-        /// - if umbracoSettings:settings/web.routing/@appUrl is set, use the value (new setting)
+        /// - if umbracoSettings:settings/web.routing/@umbracoApplicationUrl is set, use the value (new setting)
         /// - if umbracoSettings:settings/scheduledTasks/@baseUrl is set, use the value (backward compatibility)
         /// - otherwise, use the url of the (first) request.
         /// Not locking, does not matter if several threads write to this.
