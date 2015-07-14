@@ -203,10 +203,9 @@
           scope.dialogModel.view = "views/documentType/dialogs/editPropertySettings/editPropertySettings.html";
           scope.showDialog = true;
 
-          // set indicator on property to tell the dialog is open - is used to set focus on the element
+          // set property states
           property.dialogIsOpen = true;
-
-          // set property to active
+          property.inherited = false;
           property.propertyState = "active";
 
           scope.dialogModel.changePropertyEditor = function(property) {
