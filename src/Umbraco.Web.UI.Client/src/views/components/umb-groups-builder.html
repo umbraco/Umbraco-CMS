@@ -42,7 +42,7 @@
 
                 </div>
 
-                <ul class="umb-group-builder__properties" ui-sortable="sortableOptionsProperty" ng-model="tab.properties" ng-class="{'-no-properties': tab.properties.length <= 1}">
+                <ul class="umb-group-builder__properties" ui-sortable="sortableOptionsProperty" ng-model="tab.properties">
 
                     <li ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}" ng-repeat="property in tab.properties">
 

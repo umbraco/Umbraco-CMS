@@ -7,6 +7,7 @@
 }
 
 .umb-group-builder__group {
+  min-height: 86px;
   margin: 50px 0 0 0;
   border: 2px solid #CCCCCC;
   border-radius: 0 10px 10px 10px;
@@ -28,7 +29,7 @@
 }
 
 .umb-group-builder__group.-placeholder {
-  min-height: 100px;
+  min-height: 86px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -145,9 +146,6 @@ input.umb-group-builder__group-title-input {
   list-style: none;
   margin: 0;
   padding: 0;
-}
-
-.umb-group-builder__properties.-no-properties {
   min-height: 35px; // the height of a sortable property
 }
 
@@ -188,7 +186,7 @@ input.umb-group-builder__group-title-input {
 
 .umb-group-builder__property.-sortable,
 .umb-group-builder__property.-sortable-locked {
-    height: 35px;
+    min-height: 35px;
     border-radius: 5px;
     border: none;
     animation: none;
