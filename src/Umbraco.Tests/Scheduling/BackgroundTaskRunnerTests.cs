@@ -547,7 +547,7 @@ namespace Umbraco.Tests.Scheduling
                 runner.Shutdown(false, true);
 
                 // check that task has been disposed (timer has been killed, etc)
-                Assert.IsTrue(task.Disposed);
+                Assert.IsTrue(task.IsDisposed);
             }
         }
 
