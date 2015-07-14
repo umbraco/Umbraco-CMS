@@ -104,8 +104,8 @@
 
 		function save() {
 
-			//perform any pre-save logic here
-			vm.contentType.allowedContentTypes = contentTypeHelper.reformatAllowedContentTypes(vm.contentType.allowedContentTypes);
+			// reformat allowed content types to array if id's
+			vm.contentType.allowedContentTypes = contentTypeHelper.createIdArray(vm.contentType.allowedContentTypes);
 
 			// update template holder on new content types
 			if( vm.contentType.id === 0) {

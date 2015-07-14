@@ -16,7 +16,6 @@
         var vm = this;
 
         vm.contentTypes = [];
-        vm.parent = {};
 
         /* ---------- INIT ---------- */
 
@@ -30,12 +29,6 @@
 
                 // convert legacy icons
                 iconHelper.formatContentTypeIcons(vm.contentTypes);
-
-                // set parent
-                vm.parent = {
-                    "name": $scope.model.name,
-                    "icon": $scope.model.icon
-                };
 
             });
 

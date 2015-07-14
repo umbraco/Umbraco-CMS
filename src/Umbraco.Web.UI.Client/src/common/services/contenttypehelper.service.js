@@ -7,30 +7,21 @@ function contentTypeHelper(contentTypeResource, dataTypeResource) {
 
     var contentTypeHelperService = {
 
-        reformatAllowedContentTypes: function(allowedContentTypes) {
+        createIdArray: function(array) {
 
-            var allowedContentTypesCopy = angular.copy(allowedContentTypes);
+          var newArray = [];
 
-            allowedContentTypes = [];
+          angular.forEach(array, function(arrayItem){
 
-            angular.forEach(allowedContentTypesCopy, function(allowedContentTypeCopy){
+            if(angular.isObject(arrayItem)) {
+              newArray.push(arrayItem.id);
+            } else {
+              newArray.push(arrayItem);
+            }
 
-                var reformattedAllowedContentType = {
-                    "name": allowedContentTypeCopy.name,
-                    "id": {
-                        "m_boxed": {
-                            "m_value": allowedContentTypeCopy.id
-                        }
-                    },
-                    "icon": allowedContentTypeCopy.icon,
-                    "key": allowedContentTypeCopy.key,
-                    "alias": allowedContentTypeCopy.alias
-                };
+          });
 
-                allowedContentTypes.push(reformattedAllowedContentType);
-            });
-
-            return allowedContentTypes;
+          return newArray;
 
         },
 
@@ -195,7 +186,7 @@ function contentTypeHelper(contentTypeResource, dataTypeResource) {
         },
 
         insertDefaultTemplateHolder: function(contentType) {
-          
+
           var template = contentTypeHelperService.makeTemplateHolder(contentType);
 
           contentType.defaultTemplate = template;

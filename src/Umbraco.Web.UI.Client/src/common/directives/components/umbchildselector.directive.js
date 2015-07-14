@@ -24,7 +24,16 @@
                 scope.showDialog = true;
 
                 scope.dialogModel.chooseItem = function(selectedChild) {
-                    scope.selectedChildren.push(selectedChild);
+
+                    var child = {
+                      "id": selectedChild.id,
+                      "name": selectedChild.name,
+                      "icon": selectedChild.icon,
+                      "alias": selectedChild.alias
+                    };
+
+                    scope.selectedChildren.push(child);
+
                     scope.showDialog = false;
                     scope.dialogModel = null;
                 };
@@ -35,6 +44,137 @@
                 };
             };
 
+            function syncParentName() {
+
+              // update name on available item
+              angular.forEach(scope.availableChildren, function(availableChild){
+                if(availableChild.id === scope.parentId) {
+                  availableChild.name = scope.parentName;
+                }
+              });
+
+              // update name on selected child
+              angular.forEach(scope.selectedChildren, function(selectedChild){
+                if(selectedChild.id === scope.parentId) {
+                  selectedChild.name = scope.parentName;
+                }
+              });
+
+            }
+
+            function syncParentIcon() {
+
+              // update icon on available item
+              angular.forEach(scope.availableChildren, function(availableChild){
+                if(availableChild.id === scope.parentId) {
+                  availableChild.icon = scope.parentIcon;
+                }
+              });
+
+              // update icon on selected child
+              angular.forEach(scope.selectedChildren, function(selectedChild){
+                if(selectedChild.id === scope.parentId) {
+                  selectedChild.icon = scope.parentIcon;
+                }
+              });
+
+            }
+
+            function insertParentPlaceholder() {
+
+              var placeholderExists = false;
+              var placeholder = {
+                "name": scope.parentName,
+                "icon": scope.parentIcon,
+                "id": scope.parentId,
+                "alias": "umbChildNodePlaceholder"
+              };
+
+              angular.forEach(scope.availableChildren, function(availableChild){
+                if(availableChild.id !== placeholder.id && !placeholderExists) {
+                  scope.availableChildren.push(placeholder);
+                  placeholderExists = true;
+                }
+              });
+
+            }
+
+            function createSelectedChildrenObjectArray(selectedChildren, availableChildren) {
+
+              if( selectedChildren.length > 0 && availableChildren.length > 0 && !angular.isObject(selectedChildren[0])) {
+
+                var newArray = [];
+
+                angular.forEach(selectedChildren, function(selectedChild){
+
+                    var selectedChildId = selectedChild;
+
+                    angular.forEach(availableChildren, function(availableChild){
+
+                      if(selectedChildId === availableChild.id) {
+
+                        var selectedChild = {};
+
+                        selectedChild.id = availableChild.id;
+                        selectedChild.name = availableChild.name;
+                        selectedChild.icon = availableChild.icon;
+                        selectedChild.alias = availableChild.alias;
+
+                        newArray.push(selectedChild);
+
+                      }
+
+                    });
+
+                });
+                return newArray;
+
+              } else {
+
+                return selectedChildren;
+
+              }
+
+            }
+
+            scope.$watch('parentName', function(newValue, oldValue){
+
+              if (newValue === oldValue) { return; }
+              if ( oldValue === undefined || newValue === undefined) { return; }
+
+              syncParentName();
+
+            });
+
+            scope.$watch('parentIcon', function(newValue, oldValue){
+
+              if (newValue === oldValue) { return; }
+              if ( oldValue === undefined || newValue === undefined) { return; }
+
+              syncParentIcon();
+            });
+
+            scope.$watch('availableChildren', function(newValue, oldValue){
+
+              if (newValue === oldValue) { return; }
+              if ( oldValue === undefined || newValue === undefined) { return; }
+
+              scope.selectedChildren = createSelectedChildrenObjectArray(scope.selectedChildren, scope.availableChildren);
+
+              if(scope.parentId === 0) {
+                insertParentPlaceholder();
+              }
+
+            });
+
+            scope.$watch('selectedChildren', function(newValue, oldValue){
+
+              if (newValue === oldValue) { return; }
+              if ( oldValue === undefined || newValue === undefined) { return; }
+
+              scope.selectedChildren = createSelectedChildrenObjectArray(scope.selectedChildren, scope.availableChildren);
+            });
+
         }
 
         var directive = {
@@ -44,7 +184,9 @@
             scope: {
                 selectedChildren: '=',
                 availableChildren: "=",
-                parent: "="
+                parentName: "=",
+                parentIcon: "=",
+                parentId: "="
             },
             link: link
         };
