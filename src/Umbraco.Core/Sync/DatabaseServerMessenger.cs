@@ -35,12 +35,12 @@ namespace Umbraco.Core.Sync
         private readonly DatabaseServerMessengerOptions _options;
         private readonly ManualResetEvent _syncIdle;
         private readonly object _locko = new object();
+        private readonly ILogger _logger;
         private int _lastId = -1;
         private DateTime _lastSync;
         private bool _initialized;
         private bool _syncing;
         private bool _released;
-        private ILogger _logger;
 
         protected ApplicationContext ApplicationContext { get { return _appContext; } }
 
@@ -122,8 +122,9 @@ namespace Umbraco.Core.Sync
             if (registered == false)
                 return;
 
-            ReadLastSynced();
-            Initialize();
+            ReadLastSynced(); // get _lastId
+            EnsureInstructions(); // reset _lastId if instrs are missing
+            Initialize(); // boot
         }
 
         /// <summary>
@@ -277,6 +278,23 @@ namespace Umbraco.Core.Sync
                 new { pruneDate = DateTime.UtcNow.AddDays(-_options.DaysToRetainInstructions) });
         }
 
+        /// <summary>
+        /// Ensure that the last instruction that was processed is still in the database.
+        /// </summary>
+        /// <remarks>If the last instruction is not in the database anymore, then the messenger
+        /// should not try to process any instructions, because some instructions might be lost,
+        /// and it should instead cold-boot.</remarks>
+        private void EnsureInstructions()
+        {
+            var sql = new Sql().Select("*")
+                .From<CacheInstructionDto>()
+                .Where<CacheInstructionDto>(dto => dto.Id == _lastId);
+
+            var dtos = _appContext.DatabaseContext.Database.Fetch<CacheInstructionDto>(sql);
+            if (dtos.Count == 0)
+                _lastId = -1;
+        }
+    
         /// <summary>
         /// Reads the last-synced id from file into memory.
         /// </summary>
