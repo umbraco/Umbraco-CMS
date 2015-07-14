@@ -40,6 +40,7 @@ namespace Umbraco.Core.Sync
         private bool _initialized;
         private bool _syncing;
         private bool _released;
+        private ILogger _logger;
 
         protected ApplicationContext ApplicationContext { get { return _appContext; } }
 
@@ -52,8 +53,8 @@ namespace Umbraco.Core.Sync
             _appContext = appContext;
             _options = options;
             _lastSync = DateTime.UtcNow;
-
             _syncIdle = new ManualResetEvent(true);
+            _logger = appContext.ProfilingLogger.Logger;
         }
 
         #region Messenger
@@ -142,7 +143,7 @@ namespace Umbraco.Core.Sync
                 {
                     // we haven't synced - in this case we aren't going to sync the whole thing, we will assume this is a new 
                     // server and it will need to rebuild it's own caches, eg Lucene or the xml cache file.
-                    LogHelper.Warn<DatabaseServerMessenger>("No last synced Id found, this generally means this is a new server/install. The server will rebuild its caches and indexes and then adjust it's last synced id to the latest found in the database and will start maintaining cache updates based on that id");
+                    _logger.Warn<DatabaseServerMessenger>("No last synced Id found, this generally means this is a new server/install. The server will rebuild its caches and indexes and then adjust it's last synced id to the latest found in the database and will start maintaining cache updates based on that id");
 
                     // go get the last id in the db and store it
                     // note: do it BEFORE initializing otherwise some instructions might get lost
@@ -244,7 +245,7 @@ namespace Umbraco.Core.Sync
                 }
                 catch (JsonException ex)
                 {
-                    LogHelper.Error<DatabaseServerMessenger>(string.Format("Failed to deserialize instructions ({0}: \"{1}\").", dto.Id, dto.Instructions), ex);
+                    _logger.Error<DatabaseServerMessenger>(string.Format("Failed to deserialize instructions ({0}: \"{1}\").", dto.Id, dto.Instructions), ex);
                     lastId = dto.Id; // skip
                     continue;
                 }
@@ -257,8 +258,8 @@ namespace Umbraco.Core.Sync
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error<DatabaseServerMessenger>(string.Format("Failed to execute instructions ({0}: \"{1}\").", dto.Id, dto.Instructions), ex);
-                    LogHelper.Warn<DatabaseServerMessenger>("BEWARE - DISTRIBUTED CACHE IS NOT UPDATED.");
+                    _logger.Error<DatabaseServerMessenger>(string.Format("Failed to execute instructions ({0}: \"{1}\").", dto.Id, dto.Instructions), ex);
+                    _logger.Warn<DatabaseServerMessenger>("BEWARE - DISTRIBUTED CACHE IS NOT UPDATED.");
                     throw;
                  }
             }
