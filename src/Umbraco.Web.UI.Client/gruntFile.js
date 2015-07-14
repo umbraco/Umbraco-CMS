@@ -457,7 +457,8 @@ module.exports = function (grunt) {
                             files: ['tmhDynamicLocale.min.js', 'tmhDynamicLocale.min.js.map']
                         },
                         'bootstrap-tabdrop': {
-                            keepExpandedHierarchy: false
+                            keepExpandedHierarchy: false,
+                            files: ['build/js/bootstrap-tabdrop.min.js']
                         },
                         'codemirror': {
                             files: [
