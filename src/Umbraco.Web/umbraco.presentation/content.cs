@@ -192,7 +192,7 @@ namespace umbraco
                 var node = GetPreviewOrPublishedNode(d, xmlContentCopy, false);
                 var attr = ((XmlElement)node).GetAttributeNode("sortOrder");
                 attr.Value = d.sortOrder.ToString();
-                xmlContentCopy = AddOrUpdateXmlNode(xmlContentCopy, d.Id, d.Level, parentId, node);
+                xmlContentCopy = GetAddOrUpdateXmlNode(xmlContentCopy, d.Id, d.Level, parentId, node);
 
                 // update sitemapprovider
                 if (updateSitemapProvider && SiteMap.Provider is UmbracoSiteMapProvider)
@@ -1183,8 +1183,15 @@ order by umbracoNode.level, umbracoNode.sortOrder";
 
         #region Manage change
 
+        //TODO remove as soon as we can break backward compatibility
+        [Obsolete("Use GetAddOrUpdateXmlNode which returns an updated Xml document.", false)]
+        public static void AddOrUpdateXmlNode(XmlDocument xml, int id, int level, int parentId, XmlNode docNode)
+        {
+            GetAddOrUpdateXmlNode(xml, id, level, parentId, docNode);
+        }
+
         // adds or updates a node (docNode) into a cache (xml)
-        public static XmlDocument AddOrUpdateXmlNode(XmlDocument xml, int id, int level, int parentId, XmlNode docNode)
+        public static XmlDocument GetAddOrUpdateXmlNode(XmlDocument xml, int id, int level, int parentId, XmlNode docNode)
         {
             // sanity checks
             if (id != docNode.AttributeValue<int>("id"))
