@@ -261,10 +261,14 @@ namespace Umbraco.Core.Sync
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error<DatabaseServerMessenger>(string.Format("Failed to execute instructions ({0}: \"{1}\").", dto.Id, dto.Instructions), ex);
-                    _logger.Warn<DatabaseServerMessenger>("BEWARE - DISTRIBUTED CACHE IS NOT UPDATED.");
-                    throw;
-                 }
+                    _logger.Error<DatabaseServerMessenger>(
+                        string.Format("DISTRIBUTED CACHE IS NOT UPDATED. Failed to execute instructions ({0}: \"{1}\"). Instruction is being skipped/ignored", dto.Id, dto.Instructions), ex);
+
+                    //we cannot throw here because this invalid instruction will just keep getting processed over and over and errors
+                    // will be thrown over and over. The only thing we can do is ignore and move on.
+                    lastId = dto.Id;
+                    continue; continue;
+                }
             }
 
             if (lastId > 0)
