@@ -340,7 +340,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Can_Get_Tags_For_Content()
+        public void Can_Get_Tags_For_Content_By_Id()
         {
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
@@ -380,6 +380,54 @@ namespace Umbraco.Tests.Persistence.Repositories
                             }, false);
 
                     var result = repository.GetTagsForEntity(content2.Id);
+                    Assert.AreEqual(2, result.Count());
+
+                }
+            }
+        }
+
+        [Test]
+        public void Can_Get_Tags_For_Content_By_Key()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository))
+            {
+                //create data to relate to
+                var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
+                contentTypeRepository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
+                var content1 = MockedContent.CreateSimpleContent(contentType);
+                contentRepository.AddOrUpdate(content1);
+                var content2 = MockedContent.CreateSimpleContent(contentType);
+                contentRepository.AddOrUpdate(content2);
+                unitOfWork.Commit();
+
+                using (var repository = CreateRepository(unitOfWork))
+                {
+                    repository.AssignTagsToProperty(
+                        content1.Id,
+                        contentType.PropertyTypes.First().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test"},
+                                new Tag {Text = "tag3", Group = "test"},
+                                new Tag {Text = "tag4", Group = "test"}
+                            }, false);
+
+                    repository.AssignTagsToProperty(
+                        content2.Id,
+                        contentType.PropertyTypes.First().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test"}
+                            }, false);
+                    
+                    //get by key
+                    var result = repository.GetTagsForEntity(content2.Key);
                     Assert.AreEqual(2, result.Count());
                 }
             }
@@ -511,7 +559,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Can_Get_Tags_For_Property()
+        public void Can_Get_Tags_For_Property_By_Id()
         {
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
@@ -550,6 +598,53 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                     var result1 = repository.GetTagsForProperty(content1.Id, contentType.PropertyTypes.First().Alias).ToArray();
                     var result2 = repository.GetTagsForProperty(content1.Id, contentType.PropertyTypes.Last().Alias).ToArray();
+                    Assert.AreEqual(4, result1.Count());
+                    Assert.AreEqual(2, result2.Count());
+                }
+            }
+
+        }
+
+        [Test]
+        public void Can_Get_Tags_For_Property_By_Key()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository))
+            {
+                //create data to relate to
+                var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
+                contentTypeRepository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
+                var content1 = MockedContent.CreateSimpleContent(contentType);
+                contentRepository.AddOrUpdate(content1);
+                unitOfWork.Commit();
+
+                using (var repository = CreateRepository(unitOfWork))
+                {
+                    repository.AssignTagsToProperty(
+                        content1.Id,
+                        contentType.PropertyTypes.First().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test"},
+                                new Tag {Text = "tag3", Group = "test"},
+                                new Tag {Text = "tag4", Group = "test"}
+                            }, false);
+
+                    repository.AssignTagsToProperty(
+                        content1.Id,
+                        contentType.PropertyTypes.Last().Id,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test"}
+                            }, false);
+
+                    var result1 = repository.GetTagsForProperty(content1.Key, contentType.PropertyTypes.First().Alias).ToArray();
+                    var result2 = repository.GetTagsForProperty(content1.Key, contentType.PropertyTypes.Last().Alias).ToArray();
                     Assert.AreEqual(4, result1.Count());
                     Assert.AreEqual(2, result2.Count());
                 }
