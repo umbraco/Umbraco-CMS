@@ -103,6 +103,12 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Packages
 
                 //Ouput files
                 var oFiles = oDirInfo.GetFiles();
+                
+                Array.Sort(oFiles, delegate(FileInfo file1, FileInfo file2)
+                {
+                    return file1.Name.CompareTo(file2.Name);
+                });
+
                 foreach (var oFile in oFiles.Where(oFile => oFile.Name.ToLower() != _lsScriptName))
                 {
                     decimal iLen = oFile.Length;
