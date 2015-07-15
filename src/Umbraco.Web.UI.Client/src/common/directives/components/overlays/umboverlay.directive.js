@@ -17,30 +17,38 @@ angular.module("umbraco.directives")
 
             transclude: true,
             restrict: 'E',
-            replace: true,        
+            replace: true,
             templateUrl: 'views/components/overlays/umb-overlay.html',
             link: function(scope, element, attrs) {
 
-                var cssClass = "umb-overlay-center";
-                if(scope.position)
-                {
-                    cssClass = "umb-overlay-" + scope.position;
+                function activate() {
+                  var cssClass = "umb-overlay-center";
+                  if(scope.position)
+                  {
+                      cssClass = "umb-overlay-" + scope.position;
+                  }
+
+                  if(scope.animation){
+                      cssClass += " " + scope.animation;
+                  }
+
+                  var shadow = "shadow-depth-3";
+                  if(scope.shadow){
+                      shadow =  "shadow-depth-" + scope.shadow;
+                  }
+                  cssClass += " " + shadow;
+
+                  scope.overlayCssClass = cssClass;
                 }
-
-                if(scope.animation){
-                    cssClass += " " + scope.animation;
-                }
-
-                var shadow = "shadow-depth-3";
-                if(scope.shadow){
-                    shadow =  "shadow-depth-" + scope.shadow;
-                }
-                cssClass += " " + shadow;
-
-                scope.overlayCssClass = cssClass;
-
 
                 function setTargetPosition() {
+
+                    var viewportWidth = null;
+                    var viewportHeight = null;
+                    var mousePositionClickX = null;
+                    var mousePositionClickY = null;
+                    var elementHeight = null;
+                    var elementWidth = null;
 
                     var position = {
                         right: "inherit",
@@ -49,40 +57,51 @@ angular.module("umbraco.directives")
                         bottom: "inherit"
                     };
 
-                    // viewport size
-                    var viewportWidth = $(window).innerWidth();
-                    var viewportHeight = $(window).innerHeight();
+                    // if mouse click position is know place element with mouse in center
+                    if(scope.model.event.pageX && scope.model.event.pageY) {
 
-                    // mouse click position
-                    var mousePositionClickX = scope.model.event.pageX;
-                    var mousePositionClickY = scope.model.event.pageY;
+                      // viewport size
+                      viewportWidth = $(window).innerWidth();
+                      viewportHeight = $(window).innerHeight();
 
-                    // element size
-                    var elementHeight = element.context.clientHeight;
-                    var elementWidth = element.context.clientWidth;
+                      // click position
+                      mousePositionClickX = scope.model.event.pageX;
+                      mousePositionClickY = scope.model.event.pageY;
 
-                    // move element to this position
-                    position.left = mousePositionClickX - (elementWidth / 2);
-                    position.top = mousePositionClickY - (elementHeight / 2);
+                      // element size
+                      elementHeight = element.context.clientHeight;
+                      elementWidth = element.context.clientWidth;
 
-                    // check to see if element is outside screen
-                    // outside right
-                    if( position.left + elementWidth > viewportWidth) {
-                        position.right = 0;
-                        position.left = "inherit";
+                      // move element to this position
+                      position.left = mousePositionClickX - (elementWidth / 2);
+                      position.top = mousePositionClickY - (elementHeight / 2);
+
+                      // check to see if element is outside screen
+                      // outside right
+                      if( position.left + elementWidth > viewportWidth) {
+                          position.right = 0;
+                          position.left = "inherit";
+                      }
+
+                      // outside bottom
+                      if( position.top + elementHeight > viewportHeight ) {
+                          position.bottom = 0;
+                          position.top = "inherit";
+                      }
+
+                      element.css(position);
+
+                    // else change overlay to center position
+                    } else {
+
+                      scope.position = "center";
+                      activate();
+
                     }
-
-                    // outside bottom
-                    if( position.top + elementHeight > viewportHeight ) {
-                        position.bottom = 0;
-                        position.top = "inherit";
-                    }
-
-                    element.css(position);
-
 
                 }
 
+                activate();
 
                 $timeout(function() {
                     if(scope.position === "target") {
@@ -95,7 +114,7 @@ angular.module("umbraco.directives")
                         scope.model.close(scope.model);
                     }else{
                         scope.model = null;
-                    }    
+                    }
                 };
 
             }
