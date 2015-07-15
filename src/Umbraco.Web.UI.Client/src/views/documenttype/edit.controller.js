@@ -43,9 +43,19 @@
 		];
 
 		vm.page.keyboardShortcutsOverview = [
-		{
-			"name": "Design",
-			"shortcuts": [
+			{
+				"name": "Sections",
+				"shortcuts": [
+					{
+						"description": "Navigate sections",
+						"keys": [{"key": "1"}, {"key": "4"}],
+						"keyRange": true
+					}
+				]
+			},
+			{
+				"name": "Design",
+				"shortcuts": [
 				{
 					"description": "Add tab",
 					"keys": [{"key": "alt"},{"key": "shift"},{"key": "t"}]
