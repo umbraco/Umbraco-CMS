@@ -89,6 +89,19 @@
 				{
 					"description": "Toggle allow as root",
 					"keys": [{"key": "alt"},{"key": "shift"},{"key": "r"}]
+				},
+				{
+					"description": "Add child node",
+					"keys": [{"key": "alt"},{"key": "shift"},{"key": "c"}]
+				}
+			]
+		},
+		{
+			"name": "Templates",
+			"shortcuts": [
+				{
+					"description": "Add template",
+					"keys": [{"key": "alt"},{"key": "shift"},{"key": "t"}]
 				}
 			]
 		}
