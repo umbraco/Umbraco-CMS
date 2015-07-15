@@ -329,32 +329,60 @@ namespace Umbraco.Web
             //set the default RenderMvcController
             DefaultRenderMvcControllerResolver.Current = new DefaultRenderMvcControllerResolver(typeof(RenderMvcController));
 
-            ServerMessengerResolver.Current.SetServerMessenger(new BatchedWebServiceServerMessenger(() =>
+            //Override the default server messenger, we need to check if the legacy dist calls is enabled, if that is the
+            // case, then we'll set the default messenger to be the old one, otherwise we'll set it to the db messenger
+            // which will always be on.
+            if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled)
             {
-                //we should not proceed to change this if the app/database is not configured since there will 
-                // be no user, plus we don't need to have server messages sent if this is the case.
-                if (ApplicationContext.IsConfigured && ApplicationContext.DatabaseContext.IsDatabaseConfigured)
+                //set the legacy one by default - this maintains backwards compat
+                ServerMessengerResolver.Current.SetServerMessenger(new BatchedWebServiceServerMessenger(() =>
                 {
-                    //disable if they are not enabled
-                    if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled == false)
+                    //we should not proceed to change this if the app/database is not configured since there will 
+                    // be no user, plus we don't need to have server messages sent if this is the case.
+                    if (ApplicationContext.IsConfigured && ApplicationContext.DatabaseContext.IsDatabaseConfigured)
                     {
-                        return null;
-                    }
+                        //disable if they are not enabled
+                        if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled == false)
+                        {
+                            return null;
+                        }
 
-                    try
-                    {
-                        var user = User.GetUser(UmbracoConfig.For.UmbracoSettings().DistributedCall.UserId);
-                        return new System.Tuple<string, string>(user.LoginName, user.GetPassword());
+                        try
+                        {
+                            var user = ApplicationContext.Services.UserService.GetUserById(UmbracoConfig.For.UmbracoSettings().DistributedCall.UserId);
+                            return new Tuple<string, string>(user.Username, user.RawPasswordValue);
+                        }
+                        catch (Exception e)
+                        {
+                            LoggerResolver.Current.Logger.Error<WebBootManager>("An error occurred trying to set the IServerMessenger during application startup", e);
+                            return null;
+                        }
                     }
-                    catch (Exception e)
+                    LoggerResolver.Current.Logger.Warn<WebBootManager>("Could not initialize the DefaultServerMessenger, the application is not configured or the database is not configured");
+                    return null;
+                }));
+            }
+            else
+            {
+                ServerMessengerResolver.Current.SetServerMessenger(new BatchedDatabaseServerMessenger(
+                ApplicationContext,
+                true,
+                    //Default options for web including the required callbacks to build caches
+                new DatabaseServerMessengerOptions
+                {
+                    //These callbacks will be executed if the server has not been synced
+                    // (i.e. it is a new server or the lastsynced.txt file has been removed)
+                    InitializingCallbacks = new Action[]
                     {
-                        LoggerResolver.Current.Logger.Error<WebBootManager>("An error occurred trying to set the IServerMessenger during application startup", e);
-                        return null;
+                        //rebuild the xml cache file if the server is not synced
+                        () => global::umbraco.content.Instance.RefreshContentFromDatabase(),
+                        //rebuild indexes if the server is not synced
+                        // NOTE: This will rebuild ALL indexes including the members, if developers want to target specific 
+                        // indexes then they can adjust this logic themselves.
+                        () => Examine.ExamineManager.Instance.RebuildIndex()
                     }
-                }
-                LoggerResolver.Current.Logger.Warn<WebBootManager>("Could not initialize the DefaultServerMessenger, the application is not configured or the database is not configured");
-                return null;
-            }));
+                }));
+            }
 
             SurfaceControllerResolver.Current = new SurfaceControllerResolver(
                 ServiceProvider, LoggerResolver.Current.Logger,

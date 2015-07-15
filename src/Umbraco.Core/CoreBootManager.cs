@@ -404,18 +404,16 @@ namespace Umbraco.Core
             ServerRegistrarResolver.Current = new ServerRegistrarResolver(
                 new ConfigServerRegistrar());
 
-            //by default (outside of the web) we'll use the default server messenger without
-            //supplying a username/password, this will automatically disable distributed calls
-            // .. we'll override this in the WebBootManager
+            //by default we'll use the database server messenger with default options (no callbacks),
+            // this will be overridden in the web startup
             ServerMessengerResolver.Current = new ServerMessengerResolver(
-                new WebServiceServerMessenger());
+                new DatabaseServerMessenger(ApplicationContext, true, new DatabaseServerMessengerOptions()));
 
             MappingResolver.Current = new MappingResolver(
                 ServiceProvider, LoggerResolver.Current.Logger,
                 () => PluginManager.ResolveAssignedMapperTypes());
 
            
-
             //RepositoryResolver.Current = new RepositoryResolver(
             //    new RepositoryFactory(ApplicationCache));
 

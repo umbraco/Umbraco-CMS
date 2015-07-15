@@ -1238,7 +1238,6 @@
     <Compile Include="Strategies\RelateOnTrashHandler.cs" />
     <Compile Include="Strings\ContentBaseExtensions.cs" />
     <Compile Include="Strings\Diff.cs" />
-    <Compile Include="Sync\BatchedDatabaseServerMessenger.cs" />
     <Compile Include="Sync\BatchedWebServiceServerMessenger.cs" />
     <Compile Include="Sync\CurrentServerEnvironmentStatus.cs" />
     <Compile Include="Sync\DatabaseServerMessenger.cs" />

@@ -21,15 +21,11 @@ namespace Umbraco.Core.Sync
     /// An <see cref="IServerMessenger"/> that works by storing messages in the database.
     /// </summary>
     //
-    // abstract because it needs to be inherited by a class that will
-    // - trigger Boot() when appropriate
-    // - trigger Sync() when appropriate
-    //
     // this messenger writes ALL instructions to the database,
     // but only processes instructions coming from remote servers,
     // thus ensuring that instructions run only once
     //
-    public abstract class DatabaseServerMessenger : ServerMessengerBase
+    public class DatabaseServerMessenger : ServerMessengerBase
     {
         private readonly ApplicationContext _appContext;
         private readonly DatabaseServerMessengerOptions _options;
@@ -45,7 +41,7 @@ namespace Umbraco.Core.Sync
 
         protected ApplicationContext ApplicationContext { get { return _appContext; } }
 
-        protected DatabaseServerMessenger(ApplicationContext appContext, bool distributedEnabled, DatabaseServerMessengerOptions options)
+        public DatabaseServerMessenger(ApplicationContext appContext, bool distributedEnabled, DatabaseServerMessengerOptions options)
             : base(distributedEnabled)
         {
             if (appContext == null) throw new ArgumentNullException("appContext");
