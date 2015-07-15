@@ -125,9 +125,7 @@ namespace Umbraco.Web.Security
                     .Where(p => member.ContentType.PropertyTypeExists(p.Alias))
                     .Where(property => member.Properties.Contains(property.Alias))
                     //needs to be editable
-                    .Where(p => member.ContentType.MemberCanEditProperty(p.Alias))
-                    //needs to have a value
-                    .Where(p => p.Value != null))
+                    .Where(p => member.ContentType.MemberCanEditProperty(p.Alias)))
                 {
                     member.Properties[property.Alias].Value = property.Value;
                 }
