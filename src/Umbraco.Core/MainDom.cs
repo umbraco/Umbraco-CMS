@@ -43,7 +43,10 @@ namespace Umbraco.Core
         // initializes a new instance of MainDom
         public MainDom()
         {
-            var appId = HostingEnvironment.ApplicationID.ReplaceNonAlphanumericChars(string.Empty);
+            var appId = string.Empty;
+            // HostingEnvironment.ApplicationID is null in unit tests, making ReplaceNonAlphanumericChars fail
+            if (HostingEnvironment.ApplicationID != null)
+                appId = HostingEnvironment.ApplicationID.ReplaceNonAlphanumericChars(string.Empty);
 
             var lockName = "UMBRACO-" + appId + "-MAINDOM-LCK";
             _asyncLock = new AsyncLock(lockName);
