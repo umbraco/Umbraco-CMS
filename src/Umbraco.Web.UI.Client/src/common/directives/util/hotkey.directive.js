@@ -6,23 +6,30 @@ angular.module("umbraco.directives")
   .directive('hotkey', function ($window, keyboardService, $log) {
 
       return function (scope, el, attrs) {
-          
-          //support data binding
-    
-          var keyCombo = scope.$eval(attrs["hotkey"]);
+
+          var options = {};
+          var keyCombo = attrs.hotkey;
+
           if (!keyCombo) {
-              keyCombo = attrs["hotkey"];
+            //support data binding
+            keyCombo = scope.$eval(attrs["hotkey"]);
           }
 
-          keyboardService.bind(keyCombo, function() {
-              var element = $(el);
+          // disable shortcuts in input fields if keycombo is 1 character
+          if(keyCombo.length === 1) {
+            options = {
+              inputDisabled: true
+            };
+          }
 
+          keyboardService.bind(keyCombo, function(){
+              var element = $(el);
               if(element.is("a,div,button,input[type='button'],input[type='submit'],input[type='checkbox']") && !element.is(':disabled') ){
                 element.click();
               }else{
                 element.focus();
               }
-          });
+          }, options);
 
           el.on('$destroy', function(){
             keyboardService.unbind(keyCombo);
