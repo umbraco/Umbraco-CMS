@@ -12,6 +12,7 @@ using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Tests.TestHelpers;
 using umbraco.interfaces;
+using Umbraco.Core.Persistence;
 
 namespace Umbraco.Tests.BootManagers
 {
@@ -34,6 +35,18 @@ namespace Umbraco.Tests.BootManagers
             base.TearDown();
 
             _testApp = null;            
+        }
+
+        /// <summary>
+        /// Inheritors can override this if they wish to create a custom application context
+        /// </summary>
+        protected override void SetupApplicationContext()
+        {
+            base.SetupApplicationContext();
+
+            var dbContextMock = new Mock<DatabaseContext>(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test");
+            dbContextMock.Setup(x => x.CanConnect).Returns(true);
+            ApplicationContext.DatabaseContext = dbContextMock.Object;
         }
 
         protected override void FreezeResolution()

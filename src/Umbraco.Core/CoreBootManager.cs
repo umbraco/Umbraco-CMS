@@ -457,7 +457,7 @@ namespace Umbraco.Core
             // use the new DefaultShortStringHelper
             ShortStringHelperResolver.Current = new ShortStringHelperResolver(
                 //new LegacyShortStringHelper());
-                new DefaultShortStringHelper().WithDefaultConfig());
+                new DefaultShortStringHelper(UmbracoConfig.For.UmbracoSettings()).WithDefaultConfig());
 
             UrlSegmentProviderResolver.Current = new UrlSegmentProviderResolver(
                 ServiceProvider, LoggerResolver.Current.Logger,

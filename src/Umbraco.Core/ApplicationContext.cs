@@ -31,6 +31,7 @@ namespace Umbraco.Core
             if (dbContext == null) throw new ArgumentNullException("dbContext");
             if (serviceContext == null) throw new ArgumentNullException("serviceContext");
             if (cache == null) throw new ArgumentNullException("cache");
+            if (logger == null) throw new ArgumentNullException("logger");
             _databaseContext = dbContext;
             _services = serviceContext;
             ApplicationCache = cache;
@@ -45,7 +46,7 @@ namespace Umbraco.Core
         /// <param name="dbContext"></param>
         /// <param name="serviceContext"></param>
         /// <param name="cache"></param>
-        [Obsolete("Use the other constructor specifying an ILogger instead")]
+        [Obsolete("Use the other constructor specifying a ProfilingLogger instead")]
         public ApplicationContext(DatabaseContext dbContext, ServiceContext serviceContext, CacheHelper cache)
             : this(dbContext, serviceContext, cache, 
                 new ProfilingLogger(LoggerResolver.Current.Logger, ProfilerResolver.Current.Profiler))
@@ -56,10 +57,25 @@ namespace Umbraco.Core
         /// Creates a basic app context
         /// </summary>
         /// <param name="cache"></param>
+        [Obsolete("Use the other constructor specifying a ProfilingLogger instead")]
         public ApplicationContext(CacheHelper cache)
         {
             ApplicationCache = cache;
+            ProfilingLogger = new ProfilingLogger(LoggerResolver.Current.Logger, ProfilerResolver.Current.Profiler);
+            Init();
+        }
 
+	    /// <summary>
+	    /// Creates a basic app context
+	    /// </summary>
+	    /// <param name="cache"></param>
+	    /// <param name="logger"></param>
+	    public ApplicationContext(CacheHelper cache, ProfilingLogger logger)
+        {
+	        if (cache == null) throw new ArgumentNullException("cache");
+	        if (logger == null) throw new ArgumentNullException("logger");
+	        ApplicationCache = cache;
+	        ProfilingLogger = logger;
             Init();
         }
 

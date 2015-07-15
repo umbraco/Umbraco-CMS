@@ -71,7 +71,7 @@ namespace Umbraco.Tests.TestHelpers
             TestHelper.CleanContentDirectories();
             TestHelper.CleanUmbracoSettingsConfig();
             //reset the app context, this should reset most things that require resetting like ALL resolvers
-            ObjectExtensions.DisposeIfDisposable(ApplicationContext.Current);
+            ApplicationContext.Current.DisposeIfDisposable();
             ApplicationContext.Current = null;
             ResetPluginManager();
 

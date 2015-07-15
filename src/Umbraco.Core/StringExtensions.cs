@@ -948,7 +948,7 @@ namespace Umbraco.Core
                 // as the ShortStringHelper is too important, so as long as it's not there
                 // already, we use a default one. That should never happen, but...
                 Logging.LogHelper.Warn<IShortStringHelper>("ShortStringHelperResolver.HasCurrent == false, fallback to default.");
-                _helper = new DefaultShortStringHelper().WithDefaultConfig();
+                _helper = new DefaultShortStringHelper(UmbracoConfig.For.UmbracoSettings()).WithDefaultConfig();
                 _helper.Freeze();
                 return _helper;
             }
