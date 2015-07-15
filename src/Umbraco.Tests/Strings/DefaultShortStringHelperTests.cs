@@ -129,7 +129,7 @@ namespace Umbraco.Tests.Strings
 
             const string input = "ÆØÅ and æøå and 中文测试 and  אודות האתר and größer БбДдЖж page";
 
-            var helper = new DefaultShortStringHelper(SettingsForTests.GetDefault()).WithDefaultConfig(); // unicode
+            var helper = new DefaultShortStringHelper(settings).WithDefaultConfig(); // unicode
             var output = helper.CleanStringForUrlSegment(input);
             Assert.AreEqual("æøå-and-æøå-and-中文测试-and-אודות-האתר-and-größer-ббдджж-page", output);
 
@@ -413,7 +413,7 @@ namespace Umbraco.Tests.Strings
             contentMock.Setup(x => x.ConvertUrlsToAscii).Returns(false);
             SettingsForTests.ConfigureSettings(settings);
 
-            var helper = new DefaultShortStringHelper(SettingsForTests.GetDefault()).WithDefaultConfig();
+            var helper = new DefaultShortStringHelper(settings).WithDefaultConfig();
 
             const string input = "0123 中文测试 中文测试 léger ZÔRG (2) a?? *x";
 
