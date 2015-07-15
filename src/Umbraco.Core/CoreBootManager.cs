@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Web;
 using AutoMapper;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Mapping;
@@ -66,7 +68,9 @@ namespace Umbraco.Core
 
 	        InitializeProfilerResolver();
 
-            _timer = DisposableTimer.TraceDuration<CoreBootManager>("Umbraco application starting", "Umbraco application startup complete");
+	        _timer = DisposableTimer.TraceDuration<CoreBootManager>(
+	            string.Format("Umbraco {0} application starting on {1}", UmbracoVersion.Current, NetworkHelper.MachineName),
+	            "Umbraco application startup complete");
             
 	        CreateApplicationCache();
 
@@ -95,9 +99,25 @@ namespace Umbraco.Core
 
             InitializeModelMappers();
 
-            //now we need to call the initialize methods
-            ApplicationEventsResolver.Current.ApplicationEventHandlers
-                .ForEach(x => x.OnApplicationInitialized(UmbracoApplication, ApplicationContext));
+	        using (DisposableTimer.DebugDuration<CoreBootManager>(
+                () => string.Format("Executing {0} IApplicationEventHandler.OnApplicationInitialized", ApplicationEventsResolver.Current.ApplicationEventHandlers.Count()),
+                () => "Finished executing IApplicationEventHandler.OnApplicationInitialized"))
+	        {
+                //now we need to call the initialize methods
+                ApplicationEventsResolver.Current.ApplicationEventHandlers
+                    .ForEach(x =>
+                    {
+                        try
+                        {
+                            x.OnApplicationInitialized(UmbracoApplication, ApplicationContext);
+                        }
+                        catch (Exception ex)
+                        {
+                            LogHelper.Error<CoreBootManager>("An error occurred running OnApplicationInitialized for handler " + x.GetType(), ex);
+                            throw;
+                        }
+                    });
+	        }
 
 			_isInitialized = true;
 
@@ -201,11 +221,27 @@ namespace Umbraco.Core
 			if (_isStarted)
 				throw new InvalidOperationException("The boot manager has already been initialized");
 
-            //call OnApplicationStarting of each application events handler
-            ApplicationEventsResolver.Current.ApplicationEventHandlers
-                .ForEach(x => x.OnApplicationStarting(UmbracoApplication, ApplicationContext));
+            using (DisposableTimer.DebugDuration<CoreBootManager>(
+                () => string.Format("Executing {0} IApplicationEventHandler.OnApplicationStarting", ApplicationEventsResolver.Current.ApplicationEventHandlers.Count()),
+                () => "Finished executing IApplicationEventHandler.OnApplicationStarting"))
+		    {
+		        //call OnApplicationStarting of each application events handler
+		        ApplicationEventsResolver.Current.ApplicationEventHandlers
+		            .ForEach(x =>
+		            {
+		                try
+		                {
+		                    x.OnApplicationStarting(UmbracoApplication, ApplicationContext);
+		                }
+		                catch (Exception ex)
+		                {
+		                    LogHelper.Error<CoreBootManager>("An error occurred running OnApplicationStarting for handler " + x.GetType(), ex);
+		                    throw;
+		                }
+		            });
+		    }
 
-            if (afterStartup != null)
+		    if (afterStartup != null)
             {
                 afterStartup(ApplicationContext.Current);
             }
@@ -226,10 +262,29 @@ namespace Umbraco.Core
 				throw new InvalidOperationException("The boot manager has already been completed");
 
 		    FreezeResolution();
-            
-            //call OnApplicationStarting of each application events handler
-            ApplicationEventsResolver.Current.ApplicationEventHandlers
-                .ForEach(x => x.OnApplicationStarted(UmbracoApplication, ApplicationContext));
+
+            //Here we need to make sure the db can be connected to
+		    EnsureDatabaseConnection();
+
+            using (DisposableTimer.DebugDuration<CoreBootManager>(
+                () => string.Format("Executing {0} IApplicationEventHandler.OnApplicationStarted", ApplicationEventsResolver.Current.ApplicationEventHandlers.Count()),
+                () => "Finished executing IApplicationEventHandler.OnApplicationStarted"))
+            {
+                //call OnApplicationStarting of each application events handler
+                ApplicationEventsResolver.Current.ApplicationEventHandlers
+                    .ForEach(x =>
+                    {
+                        try
+                        {
+                            x.OnApplicationStarted(UmbracoApplication, ApplicationContext);
+                        }
+                        catch (Exception ex)
+                        {
+                            LogHelper.Error<CoreBootManager>("An error occurred running OnApplicationStarted for handler " + x.GetType(), ex);
+                            throw;
+                        }
+                    }); 
+            }
 
             //Now, startup all of our legacy startup handler
             ApplicationEventsResolver.Current.InstantiateLegacyStartupHandlers();
@@ -248,6 +303,32 @@ namespace Umbraco.Core
             _timer.Dispose();
 			return this;
 		}
+
+        /// <summary>
+        /// We cannot continue if the db cannot be connected to
+        /// </summary>
+        private void EnsureDatabaseConnection()
+        {
+            if (ApplicationContext.IsConfigured == false) return;
+            if (ApplicationContext.DatabaseContext.IsDatabaseConfigured == false) return;
+
+            var currentTry = 0;
+            while (currentTry < 5)
+            {
+                if (ApplicationContext.DatabaseContext.CanConnect)
+                    break;
+
+                //wait and retry
+                Thread.Sleep(1000);
+                currentTry++;
+            }
+
+            if (currentTry == 5)
+            {
+                throw new UmbracoStartupFailedException("Umbraco cannot start. A connection string is configured but the Umbraco cannot connect to the database.");
+            }
+
+        }
 
         /// <summary>
         /// Freeze resolution to not allow Resolvers to be modified

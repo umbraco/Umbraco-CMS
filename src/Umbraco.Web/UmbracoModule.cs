@@ -36,37 +36,46 @@ namespace Umbraco.Web
 	{
 		#region HttpModule event handlers
 
+	    private static void EnsureApplicationUrl(HttpRequestBase request)
+	    {
+	        var appctx = ApplicationContext.Current;
+
+            // already initialized = ok
+            // note that getting ApplicationUrl will ALSO try the various settings
+            if (appctx.UmbracoApplicationUrl.IsNullOrWhiteSpace() == false) return;
+
+            // so if we reach that point, nothing was configured
+            // use the current request as application url
+
+            // if (HTTP and SSL not required) or (HTTPS and SSL required),
+            //  use ports from request
+            // otherwise,
+            //  if non-standard ports used,
+            //  user may need to set umbracoApplicationUrl manually per 
+            //  http://our.umbraco.org/documentation/Using-Umbraco/Config-files/umbracoSettings/#ScheduledTasks
+	        var port = (request.IsSecureConnection == false && GlobalSettings.UseSSL == false)
+	                    || (request.IsSecureConnection && GlobalSettings.UseSSL)
+                ? ":" + request.ServerVariables["SERVER_PORT"]
+	            : "";
+
+	        var ssl = GlobalSettings.UseSSL ? "s" : ""; // force, whatever the first request
+            var url = "http" + ssl + "://" + request.ServerVariables["SERVER_NAME"] + port + IOHelper.ResolveUrl(SystemDirectories.Umbraco);
+
+            appctx.UmbracoApplicationUrl = UriUtility.TrimPathEndSlash(url);
+            LogHelper.Info<ApplicationContext>("ApplicationUrl: " + appctx.UmbracoApplicationUrl + " (UmbracoModule request)");
+        }
+
+
 		/// <summary>
 		/// Begins to process a request.
 		/// </summary>
 		/// <param name="httpContext"></param>
         static void BeginRequest(HttpContextBase httpContext)
 		{
+            // ensure application url is initialized
+            EnsureApplicationUrl(httpContext.Request);
 
-            //we need to set the initial url in our ApplicationContext, this is so our keep alive service works and this must
-            //exist on a global context because the keep alive service doesn't run in a web context.
-            //we are NOT going to put a lock on this because locking will slow down the application and we don't really care
-            //if two threads write to this at the exact same time during first page hit.
-            //see: http://issues.umbraco.org/issue/U4-2059
-            if (ApplicationContext.Current.OriginalRequestUrl.IsNullOrWhiteSpace())
-            {
-                // If (HTTP and SSL not required) or (HTTPS and SSL required), use ports from request to configure OriginalRequestUrl.
-                // Otherwise, user may need to set baseUrl manually per http://our.umbraco.org/documentation/Using-Umbraco/Config-files/umbracoSettings/#ScheduledTasks if non-standard ports used.
-                if ((!httpContext.Request.IsSecureConnection && !GlobalSettings.UseSSL) || (httpContext.Request.IsSecureConnection && GlobalSettings.UseSSL))
-                {
-                    // Use port from request.
-                    ApplicationContext.Current.OriginalRequestUrl = string.Format("{0}:{1}{2}", httpContext.Request.ServerVariables["SERVER_NAME"], httpContext.Request.ServerVariables["SERVER_PORT"], IOHelper.ResolveUrl(SystemDirectories.Umbraco));
-                }
-                else
-                {
-                    // Omit port entirely.
-                    ApplicationContext.Current.OriginalRequestUrl = string.Format("{0}{1}", httpContext.Request.ServerVariables["SERVER_NAME"], IOHelper.ResolveUrl(SystemDirectories.Umbraco));
-                }
-
-                LogHelper.Info<UmbracoModule>("Setting OriginalRequestUrl: " + ApplicationContext.Current.OriginalRequestUrl);
-            }
-
-			// do not process if client-side request
+            // do not process if client-side request
 			if (httpContext.Request.Url.IsClientSideRequest())
 				return;
 

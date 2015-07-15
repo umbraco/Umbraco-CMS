@@ -49,7 +49,7 @@ namespace Umbraco.Core
             var urlPath = fullUrlPath.TrimStart(appPath).EnsureStartsWith('/');
             
             //check if this is in the umbraco back office
-            var isUmbracoPath = urlPath.InvariantStartsWith(GlobalSettings.Path.EnsureStartsWith('/'));
+            var isUmbracoPath = urlPath.InvariantStartsWith(GlobalSettings.Path.EnsureStartsWith('/').TrimStart(appPath.EnsureStartsWith('/')).EnsureStartsWith('/'));
             //if not, then def not back office
             if (isUmbracoPath == false) return false;
 

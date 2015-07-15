@@ -14,6 +14,7 @@ using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.member;
 using System.Linq;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Publishing;
 using Content = Umbraco.Core.Models.Content;
 using ApplicationTree = Umbraco.Core.Models.ApplicationTree;
@@ -30,7 +31,9 @@ namespace Umbraco.Web.Cache
     public class CacheRefresherEventHandler : ApplicationEventHandler
     {
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
-        {   
+        {
+            LogHelper.Info<CacheRefresherEventHandler>("Initializing Umbraco internal event handlers for cache refreshing");
+
             //bind to application tree events
             ApplicationTreeService.Deleted += ApplicationTreeDeleted;
             ApplicationTreeService.Updated += ApplicationTreeUpdated;

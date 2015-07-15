@@ -312,10 +312,12 @@
     <Compile Include="Events\SaveEventArgs.cs" />
     <Compile Include="Events\SendToPublishEventArgs.cs" />
     <Compile Include="Exceptions\InvalidCompositionException.cs" />
+    <Compile Include="Exceptions\UmbracoStartupFailedException.cs" />
     <Compile Include="HideFromTypeFinderAttribute.cs" />
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="IApplicationEventHandler.cs" />
     <Compile Include="IDisposeOnRequestEnd.cs" />
+    <Compile Include="MainDom.cs" />
     <Compile Include="Manifest\GridEditorConverter.cs" />
     <Compile Include="Media\Exif\BitConverterEx.cs" />
     <Compile Include="Media\Exif\ExifBitConverter.cs" />
@@ -1214,6 +1216,7 @@
     <Compile Include="UriExtensions.cs" />
     <Compile Include="SystemUtilities.cs" />
     <Compile Include="UrlHelperExtensions.cs" />
+    <Compile Include="WaitHandleExtensions.cs" />
     <Compile Include="WriteLock.cs" />
     <Compile Include="XmlExtensions.cs" />
     <Compile Include="XmlHelper.cs" />

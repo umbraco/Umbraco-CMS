@@ -418,7 +418,7 @@ module.exports = function (grunt) {
                         //this is the same as 'byComponent', however we will not allow
                         // folders with '.' in them since the grunt copy task does not like that
                         var componentWithoutPeriod = component.replace(".", "-");
-                        return path.join(componentWithoutPeriod, type);
+                        return path.join(componentWithoutPeriod, type);                        
                     }
                 }
             }

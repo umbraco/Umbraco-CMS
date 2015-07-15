@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Configuration;
 using System.Threading;
-using System.Web;
-using System.Web.Caching;
-using Umbraco.Core.Cache;
+using System.Threading.Tasks;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Services;
-
+using Umbraco.Core.Sync;
 
 namespace Umbraco.Core
 {
@@ -36,6 +33,8 @@ namespace Umbraco.Core
             _databaseContext = dbContext;
             _services = serviceContext;
             ApplicationCache = cache;
+
+            Init();
         }
 
         /// <summary>
@@ -45,6 +44,8 @@ namespace Umbraco.Core
         public ApplicationContext(CacheHelper cache)
         {
             ApplicationCache = cache;
+
+            Init();
         }
 
 	    /// <summary>
@@ -60,13 +61,13 @@ namespace Umbraco.Core
 	    /// </remarks>
 	    public static ApplicationContext EnsureContext(ApplicationContext appContext, bool replaceContext)
 	    {
-            if (ApplicationContext.Current != null)
+            if (Current != null)
             {
                 if (!replaceContext)
-                    return ApplicationContext.Current;
+                    return Current;
             }
-            ApplicationContext.Current = appContext;
-            return ApplicationContext.Current;
+            Current = appContext;
+            return Current;
 	    }
 
 	    /// <summary>
@@ -85,14 +86,14 @@ namespace Umbraco.Core
 	    /// </remarks>
 	    public static ApplicationContext EnsureContext(DatabaseContext dbContext, ServiceContext serviceContext, CacheHelper cache, bool replaceContext)
         {
-            if (ApplicationContext.Current != null)
+            if (Current != null)
             {
                 if (!replaceContext)
-                    return ApplicationContext.Current;
+                    return Current;
             }
             var ctx = new ApplicationContext(dbContext, serviceContext, cache);
-            ApplicationContext.Current = ctx;
-            return ApplicationContext.Current;
+            Current = ctx;
+            return Current;
         }
 
 	    /// <summary>
@@ -141,61 +142,75 @@ namespace Umbraco.Core
         //   GlobalSettings.CurrentVersion returns the hard-coded "current version"
         //   the system is configured if they match
         //   if they don't, install runs, updates web.config (presumably) and updates GlobalSettings.ConfiguredStatus
-        //
-        //   then there is Application["umbracoNeedConfiguration"] which makes no sense... getting rid of it... SD: I have actually remove that now!
-        //
+        
         public bool IsConfigured
         {
-            // todo - we should not do this - ok for now
-            get
-            {
-            	return Configured;
-            }
+            get { return _configured.Value; }
         }
 
 	    /// <summary>
-        /// The original/first url that the web application executes
+        /// The application url.
         /// </summary>
         /// <remarks>
-        /// we need to set the initial url in our ApplicationContext, this is so our keep alive service works and this must
-        /// exist on a global context because the keep alive service doesn't run in a web context.
-        /// we are NOT going to put a lock on this because locking will slow down the application and we don't really care
-        /// if two threads write to this at the exact same time during first page hit.
-        /// see: http://issues.umbraco.org/issue/U4-2059
+        /// The application url is the url that should be used by services to talk to the application,
+        /// eg keep alive or scheduled publishing services. It must exist on a global context because
+        /// some of these services may not run within a web context.
+        /// The format of the application url is:
+        /// - has a scheme (http or https)
+        /// - has the SystemDirectories.Umbraco path
+        /// - does not end with a slash
+        /// It is initialized on the first request made to the server, by UmbracoModule.EnsureApplicationUrl:
+        /// - if umbracoSettings:settings/web.routing/@umbracoApplicationUrl is set, use the value (new setting)
+        /// - if umbracoSettings:settings/scheduledTasks/@baseUrl is set, use the value (backward compatibility)
+        /// - otherwise, use the url of the (first) request.
+        /// Not locking, does not matter if several threads write to this.
+        /// See also issues:
+        /// - http://issues.umbraco.org/issue/U4-2059
+        /// - http://issues.umbraco.org/issue/U4-6788
+        /// - http://issues.umbraco.org/issue/U4-5728
+        /// - http://issues.umbraco.org/issue/U4-5391
         /// </remarks>
-        internal string OriginalRequestUrl { get; set; }
+        internal string UmbracoApplicationUrl
+        {
+            get
+            {
+                // if initialized, return
+                if (_umbracoApplicationUrl != null) return _umbracoApplicationUrl;
 
-	    private bool _versionsDifferenceReported;
+                // try settings
+                ServerEnvironmentHelper.TrySetApplicationUrlFromSettings(this, UmbracoConfig.For.UmbracoSettings());
 
-        /// <summary>
-        /// Checks if the version configured matches the assembly version
-        /// </summary>
-		private bool Configured
-		{
-			get
-			{
-				try
-				{
-					var configStatus = ConfigurationStatus;
-					var currentVersion = UmbracoVersion.Current.ToString(3);
-				    var ok = configStatus == currentVersion;
+                // and return what we have, may be null
+                return _umbracoApplicationUrl;
+            }
+            set
+            {
+                _umbracoApplicationUrl = value;
+            }
+        }
 
-					if (ok == false && _versionsDifferenceReported == false)
-					{
-                        // remember it's been reported so we don't flood the log
-                        // no thread-safety so there may be a few log entries, doesn't matter
-                        _versionsDifferenceReported = true;
-                        LogHelper.Info<ApplicationContext>("CurrentVersion different from configStatus: '" + currentVersion + "','" + configStatus + "'");
-					}
-						
-					return ok;
-				}
-				catch
-				{
-					return false;
-				}
-			}
-		}
+        internal string _umbracoApplicationUrl; // internal for tests
+
+        private Lazy<bool> _configured;
+        internal MainDom MainDom { get; private set; }
+       
+        private void Init()
+        {
+            MainDom = new MainDom();
+            MainDom.Acquire();
+            //Create the lazy value to resolve whether or not the application is 'configured'
+            _configured = new Lazy<bool>(() =>
+            {
+                var configStatus = ConfigurationStatus;
+                var currentVersion = UmbracoVersion.Current.ToString(3);
+                var ok = configStatus == currentVersion;
+                if (ok == false)
+                {
+                    LogHelper.Debug<ApplicationContext>("CurrentVersion different from configStatus: '" + currentVersion + "','" + configStatus + "'");
+                }
+                return ok;
+            });
+        }
 
 		private string ConfigurationStatus
 		{
@@ -211,12 +226,6 @@ namespace Umbraco.Core
 				}
 			}			
 		}
-
-        private void AssertIsReady()
-        {
-            if (!this.IsReady)
-                throw new Exception("ApplicationContext is not ready yet.");
-        }
 
         private void AssertIsNotReady()
         {

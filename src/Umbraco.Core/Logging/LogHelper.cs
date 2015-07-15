@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Web;
@@ -40,8 +41,11 @@ namespace Umbraco.Core.Logging
 		/// <returns></returns>
 		private static string PrefixThreadId(string generateMessageFormat)
 		{
-            return "[T" + Thread.CurrentThread.ManagedThreadId + "/D" + AppDomain.CurrentDomain.Id + "] " + generateMessageFormat;
-        }
+		    return (_prefixThreadId ?? (_prefixThreadId = "[P" + Process.GetCurrentProcess().Id + "/T" + Thread.CurrentThread.ManagedThreadId + "/D" + AppDomain.CurrentDomain.Id + "] "))
+		           + generateMessageFormat;
+		}
+
+	    private static string _prefixThreadId = null;
 
 		#region Error
 		/// <summary>
