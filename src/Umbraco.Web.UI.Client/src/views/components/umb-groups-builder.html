@@ -7,7 +7,7 @@
         <li ng-repeat="tab in model.groups" ng-class="{'umb-group-builder__group-sortable': sortingMode && !tab.inherited}">
 
             <!-- TAB INIT STATE -->
-            <div class="umb-group-builder__group -placeholder" hotkey="alt+shift+t" ng-click="addGroup(tab)" ng-if="tab.tabState=='init' && !sortingMode">
+            <a href="" class="umb-group-builder__group -placeholder" hotkey="alt+shift+t" ng-click="addGroup(tab)" ng-if="tab.tabState=='init' && !sortingMode">
 
                 <div class="umb-group-builder__group-title-wrapper -placeholder">
                   <div class="umb-group-builder__group-title -placeholder"></div>
@@ -16,7 +16,7 @@
                 <div ng-if="model.groups.length === 1">Add new tab</div>
                 <div ng-if="model.groups.length > 1">Add another tab</div>
 
-            </div>
+            </a>
 
             <!-- TAB ACTIVE OR INACTIVE STATE -->
             <div class="umb-group-builder__group" ng-if="tab.tabState !== 'init'" ng-class="{'-active':tab.tabState=='active', '-inherited': tab.inherited, 'umb-group-builder__group-handle -sortable': sortingMode && !tab.inherited}" ng-click="activateGroup(tab)">
@@ -47,7 +47,7 @@
                     <li ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}" ng-repeat="property in tab.properties">
 
                         <!-- Init property / Property placeholder / add new property -->
-                        <div class="umb-group-builder__property -placeholder" ng-if="property.propertyState=='init' && !sortingMode" ng-class="{'-placeholder': property.propertyState=='init'}" hotkey="alt+shift+p" ng-click="editPropertyTypeSettings(property)">
+                        <a href="" class="umb-group-builder__property -placeholder" ng-if="property.propertyState=='init' && !sortingMode" ng-class="{'-placeholder': property.propertyState=='init'}" hotkey="alt+shift+p" ng-click="editPropertyTypeSettings(property)">
 
                             <div class="umb-group-builder__property-meta">
                                 <div class="umb-group-builder__placeholder-box -input-small"></div>
@@ -65,7 +65,7 @@
 
                             <div class="umb-group-builder__property-actions"></div>
 
-                        </div>
+                        </a>
 
                         <div class="umb-group-builder__property" ng-if="property.propertyState!=='init'" ng-class="{'-active': property.dialogIsOpen, '-active': property.propertyState=='active', '-inherited': property.inherited, 'umb-group-builder__property-handle -sortable': sortingMode && !property.inherited, '-sortable-locked': sortingMode && property.inherited}">
 
