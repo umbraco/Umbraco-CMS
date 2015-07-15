@@ -128,6 +128,8 @@ function contentTypeHelper(contentTypeResource, dataTypeResource) {
 
         splitCompositeContentType: function (contentType, compositeContentType) {
 
+            var groups = [];
+
             angular.forEach(contentType.groups, function(contentTypeGroup){
 
                 if( contentTypeGroup.tabState !== "init" ) {
@@ -161,15 +163,22 @@ function contentTypeHelper(contentTypeResource, dataTypeResource) {
                         }
 
                         // remove group if there are no properties left
-                        if(contentTypeGroup.properties.length <= 1) {
-                            contentType.groups.splice(groupIndex, 1);
+                        if(contentTypeGroup.properties.length > 1) {
+                            //contentType.groups.splice(groupIndex, 1);
+                            groups.push(contentTypeGroup);
                         }
 
+                    } else {
+                      groups.push(contentTypeGroup);
                     }
 
+                } else {
+                  groups.push(contentTypeGroup);
                 }
 
             });
+
+            contentType.groups = groups;
 
         },
 
