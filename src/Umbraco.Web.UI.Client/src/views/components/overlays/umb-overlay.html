@@ -12,7 +12,7 @@
     <div class="umb-overlay-drawer" ng-if="model.close || model.submit">
 		<div class="umb-overlay-drawer-content">
     		<button  ng-if="model.close" ng-click="model.close(model)" hotkey="esc" class="btn btn-link">Cancel</button>
-    		<button ng-click="model.submit(model)" ng-if="model.submit" hotkey="enter" class="btn btn-success">Submit</button>
+    		<button ng-click="model.submit(model)" ng-if="model.submit" hotkey="alt+shift+s" class="btn btn-success">Submit</button>
 			<umb-button-group model="model.dataType" actions="model.multiActions" ng-if="model.multiActions"></umb-button-group>
 		</div>
     </div>
