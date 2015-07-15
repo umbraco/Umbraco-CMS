@@ -26,9 +26,9 @@
             </div>
         </div>
 
-        <div class="umb-child-selector__child -placeholder" ng-if="(availableChildren | compareArrays:selectedChildren:'alias').length > 0" ng-click="openItemPicker($event)">
+        <a href="" class="umb-child-selector__child -placeholder" ng-if="(availableChildren | compareArrays:selectedChildren:'alias').length > 0" ng-click="openItemPicker($event)" hotkey="alt+shift+c">
             <div class="umb-child-selector__child-name -blue"><strong>Add child</strong></div>
-        </div>
+        </a>
 
         <div class="text-center" ng-if="(availableChildren | compareArrays:selectedChildren:'alias').length === 0">
             <small>All children are added</small>
