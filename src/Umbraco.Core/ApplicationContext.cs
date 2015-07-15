@@ -60,6 +60,7 @@ namespace Umbraco.Core
         [Obsolete("Use the other constructor specifying a ProfilingLogger instead")]
         public ApplicationContext(CacheHelper cache)
         {
+            if (cache == null) throw new ArgumentNullException("cache");
             ApplicationCache = cache;
             ProfilingLogger = new ProfilingLogger(LoggerResolver.Current.Logger, ProfilerResolver.Current.Profiler);
             Init();

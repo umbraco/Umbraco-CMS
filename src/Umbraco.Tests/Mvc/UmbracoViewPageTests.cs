@@ -431,7 +431,12 @@ namespace Umbraco.Tests.Mvc
                 urlProvider);
             umbracoContext.RoutingContext = routingContext;
 
-            var request = new PublishedContentRequest(new Uri("http://localhost/dang"), routingContext);
+            var request = new PublishedContentRequest(
+                new Uri("http://localhost/dang"), 
+                routingContext,
+               settings.WebRouting,
+                s => Enumerable.Empty<string>());
+
             request.Culture = CultureInfo.InvariantCulture;
             umbracoContext.PublishedContentRequest = request;
 
