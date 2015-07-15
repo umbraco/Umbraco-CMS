@@ -40,7 +40,8 @@ namespace Umbraco.Core.Sync
         private bool _initialized;
         private bool _syncing;
         private bool _released;
-        private ILogger _logger;
+        private readonly ILogger _logger;
+        private readonly ProfilingLogger _profilingLogger;
 
         protected ApplicationContext ApplicationContext { get { return _appContext; } }
 
@@ -54,6 +55,7 @@ namespace Umbraco.Core.Sync
             _options = options;
             _lastSync = DateTime.UtcNow;
             _syncIdle = new ManualResetEvent(true);
+            _profilingLogger = appContext.ProfilingLogger;
             _logger = appContext.ProfilingLogger.Logger;
         }
 
@@ -185,7 +187,7 @@ namespace Umbraco.Core.Sync
 
             try
             {
-                using (DisposableTimer.DebugDuration<DatabaseServerMessenger>("Syncing from database..."))
+                using (_profilingLogger.DebugDuration<DatabaseServerMessenger>("Syncing from database..."))
                 {
                     ProcessDatabaseInstructions();
                     PruneOldInstructions();
