@@ -51,7 +51,9 @@ namespace umbraco.cms.presentation.Trees
             }
 
             DirectoryInfo dirInfo = new DirectoryInfo(path);
-            DirectoryInfo[] dirInfos = dirInfo.GetDirectories();
+
+
+            DirectoryInfo[] dirInfos = dirInfo.Exists ? dirInfo.GetDirectories() : new DirectoryInfo[] {};
 
             var args = new TreeEventArgs(tree);
             OnBeforeTreeRender(dirInfo, args);
