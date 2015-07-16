@@ -9,6 +9,7 @@ using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
 using System.Collections.Generic;
+using Property = umbraco.NodeFactory.Property;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -70,7 +71,17 @@ namespace Umbraco.Web.Models.Mapping
                         
                         foreach (var propertyTypeDisplay in groupDisplay.Properties.Where(x => x.Inherited == false))
                         {
-                            dest.AddPropertyType(Mapper.Map<PropertyType>(propertyTypeDisplay), groupDisplay.Name);
+                            //update existing
+                            if(propertyTypeDisplay.Id > 0)
+                            {
+                                var currentPropertyType = dest.PropertyTypes.FirstOrDefault(x => x.Id == propertyTypeDisplay.Id);
+                                Mapper.Map(propertyTypeDisplay, currentPropertyType);
+                            }else
+                            {//add new
+                                var mapped = Mapper.Map<PropertyType>(propertyTypeDisplay);
+                                dest.AddPropertyType(mapped, groupDisplay.Name);
+                            }
+                            
                             addedProperties.Add(propertyTypeDisplay.Alias);
                         }   
                     }
