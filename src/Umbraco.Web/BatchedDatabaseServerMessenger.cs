@@ -30,15 +30,18 @@ namespace Umbraco.Web
 
         private void Application_Started(object sender, EventArgs eventArgs)
         {
-            if (ApplicationContext.IsConfigured  == false 
-                || ApplicationContext.DatabaseContext.IsDatabaseConfigured  == false
+            if (ApplicationContext.IsConfigured == false
+                || ApplicationContext.DatabaseContext.IsDatabaseConfigured == false
                 || ApplicationContext.DatabaseContext.CanConnect == false)
+            {
 
-                LogHelper.Warn<BatchedDatabaseServerMessenger>("The app is not configured or cannot connect to the database, this server cannot be initialized with " 
-                    + typeof(BatchedDatabaseServerMessenger) + ", distributed calls will not be enabled for this server");
-
-            // because .ApplicationStarted triggers only once, this is thread-safe
-            Boot();
+                LogHelper.Warn<BatchedDatabaseServerMessenger>("The app is not configured or cannot connect to the database, this server cannot be initialized with "
+                                                               + typeof (BatchedDatabaseServerMessenger) + ", distributed calls will not be enabled for this server");
+            }
+            else
+            {
+                Boot();    
+            }
         }
 
         private void UmbracoModule_RouteAttempt(object sender, RoutableAttemptEventArgs e)
