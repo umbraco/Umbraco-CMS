@@ -7,6 +7,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.FaultHandling;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -121,7 +122,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 var factory = new DomainModelFactory();
                 return factory.BuildDomainEntity(
-                    repo.GetByQuery(new Query<CacheableDomain>().Where(x => x.DomainName.InvariantEquals(domainName))).FirstOrDefault(),
+                    repo.GetAll().FirstOrDefault(x => x.DomainName.InvariantEquals(domainName)),
                     _contentRepository, _languageRepository);
             }
         }
@@ -130,8 +131,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             using (var repo = new CachedDomainRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax))
             {
-                var query = new Query<CacheableDomain>().Where(x => x.DomainName.InvariantEquals(domainName));
-                return repo.GetByQuery(query).Any();
+                return repo.GetAll().Any(x => x.DomainName.InvariantEquals(domainName));
             }
         }
 
@@ -151,9 +151,9 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 var factory = new DomainModelFactory();
 
-                var query = new Query<CacheableDomain>().Where(x => x.RootContentId == contentId);
-
-                return factory.BuildDomainEntities(repo.GetByQuery(query).ToArray(), _contentRepository, _languageRepository)
+                return factory.BuildDomainEntities(
+                    repo.GetAll().Where(x => x.RootContentId == contentId).ToArray(), 
+                    _contentRepository, _languageRepository)
                     .Where(x => includeWildcards || x.IsWildcard == false);
             }
         }
@@ -183,32 +183,39 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// Inner repository responsible for CRUD for domains that allows caching simple data
         /// </summary>
+        /// <remarks>
+        /// Since there's never very many domains, any query against this repo, should query against the result of GetAll
+        /// </remarks>
         private class CachedDomainRepository : PetaPocoRepositoryBase<int, CacheableDomain>
         {
             private readonly DomainRepository _domainRepo;
+            private readonly RepositoryCacheOptions _cacheOptions;
 
             public CachedDomainRepository(DomainRepository domainRepo, IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
                 : base(work, cache, logger, sqlSyntax)
             {
                 _domainRepo = domainRepo;
+
+                //Custom cache options for better performance
+                _cacheOptions = new RepositoryCacheOptions
+                {
+                    GetAllCacheAllowZeroCount = true,
+                    GetAllCacheValidateCount = false
+                };
+            }
+
+            /// <summary>
+            /// Returns the repository cache options
+            /// </summary>
+            protected override RepositoryCacheOptions RepositoryCacheOptions
+            {
+                get { return _cacheOptions; }
             }
 
             protected override CacheableDomain PerformGet(int id)
             {
-                var sql = GetBaseQuery(false);
-                sql.Where(GetBaseWhereClause(), new { Id = id });
-
-                var dto = Database.FirstOrDefault<DomainDto>(sql);
-                if (dto == null)
-                    return null;
-
-                var entity = ConvertFromDto(dto);
-
-                //on initial construction we don't want to have dirty properties tracked
-                // http://issues.umbraco.org/issue/U4-1946
-                ((Entity)entity).ResetDirtyProperties(false);
-
-                return entity;
+                //use the underlying GetAll which will force cache all domains
+                return GetAll().FirstOrDefault(x => x.Id == id);
             }
 
             protected override IEnumerable<CacheableDomain> PerformGetAll(params int[] ids)
@@ -224,10 +231,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             protected override IEnumerable<CacheableDomain> PerformGetByQuery(IQuery<CacheableDomain> query)
             {
-                var sqlClause = GetBaseQuery(false);
-                var translator = new SqlTranslator<CacheableDomain>(sqlClause, query);
-                var sql = translator.Translate();
-                return Database.Fetch<DomainDto>(sql).Select(ConvertFromDto);
+                throw new NotSupportedException("This repository does not support this method");
             }
 
             protected override Sql GetBaseQuery(bool isCount)
