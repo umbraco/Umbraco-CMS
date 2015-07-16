@@ -241,6 +241,7 @@ namespace Umbraco.Web.Editors
                 if (string.IsNullOrEmpty(contentType.Alias))
                     contentType.Alias = contentType.Name.ToSafeAlias();
 
+                //set id to null to ensure its handled as a new type
                 contentType.Id = null;
 
                 
@@ -261,9 +262,25 @@ namespace Umbraco.Web.Editors
                         found.Id = template.Id;
                 }
                 
+                //check if the type is trying to allow type 0 below itself - id zero refers to the currently unsaved type
+                //always filter these 0 types out
+                var allowItselfAsChild = false;            
+                if(contentType.AllowedContentTypes != null)
+                {
+                    allowItselfAsChild = contentType.AllowedContentTypes.Any(x => x == 0);
+                    contentType.AllowedContentTypes = contentType.AllowedContentTypes.Where(x => x > 0).ToList();
+                }
+                
                 //save as new
                 var newCt = Mapper.Map<IContentType>(contentType);
                 ctService.Save(newCt);
+
+                //we need to save it twice to allow itself under itself.
+                if(allowItselfAsChild)
+                {
+                    newCt.AddContentType(newCt);
+                    ctService.Save(newCt);
+                }
 
                 //map the saved item back to the content type (it should now get id etc set)
                 Mapper.Map(newCt, contentType);
