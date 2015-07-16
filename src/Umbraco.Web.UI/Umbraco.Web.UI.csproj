@@ -2386,7 +2386,6 @@
     <Content Include="Config\log4net.config" />
     <Content Include="Config\FileSystemProviders.config" />
     <Content Include="Config\EmbeddedMedia.config" />
-    <Content Include="Xslt\Web.config" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Code\" />

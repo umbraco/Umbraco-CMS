@@ -26,7 +26,6 @@
     <file src="..\_BuildOutput\WebApp\Global.asax" target="Content\Global.asax" />
     <file src="..\_BuildOutput\WebApp\Web.config" target="UmbracoFiles\Web.config" />
     <file src="..\_BuildOutput\WebApp\App_Browsers\**" target="UmbracoFiles\App_Browsers" />
-    <file src="..\_BuildOutput\WebApp\App_Plugins\**" target="UmbracoFiles\App_Plugins" />
     <file src="..\_BuildOutput\WebApp\bin\amd64\**" target="UmbracoFiles\bin\amd64" />
     <file src="..\_BuildOutput\WebApp\bin\x86\**" target="UmbracoFiles\bin\x86" />
     <file src="..\_BuildOutput\WebApp\config\splashes\**" target="UmbracoFiles\Config\splashes" />

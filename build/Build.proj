@@ -97,15 +97,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <SystemFolders Include="$(WebAppFolder)App_Plugins" />
-    <SystemFolders Include="$(WebAppFolder)App_Code" />
     <SystemFolders Include="$(WebAppFolder)App_Data" />
     <SystemFolders Include="$(WebAppFolder)Media" />
-    <SystemFolders Include="$(WebAppFolder)Masterpages" />
-    <SystemFolders Include="$(WebAppFolder)Scripts" />
-    <SystemFolders Include="$(WebAppFolder)Css" />
-    <SystemFolders Include="$(WebAppFolder)Xslt" />
-    <SystemFolders Include="$(WebAppFolder)UserControls" />
     <SystemFolders Include="$(WebAppFolder)Views" />
   </ItemGroup>
 

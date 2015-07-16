@@ -42,8 +42,10 @@ namespace Umbraco.Web.Install
         {
             errorReport = new List<string>();
             bool succes = true;
-            foreach (string dir in PermissionDirs)
+            foreach (string dir in directories)
             {
+                if (Directory.Exists(dir) == false) continue;
+
                 bool result = SaveAndDeleteFile(IOHelper.MapPath(dir + "/configWizardPermissionTest.txt"));
 
                 if (result == false)

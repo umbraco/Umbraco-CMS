@@ -328,6 +328,11 @@
     <Compile Include="Events\SendToPublishEventArgs.cs" />
     <Compile Include="Exceptions\InvalidCompositionException.cs" />
     <Compile Include="Exceptions\UmbracoStartupFailedException.cs" />
+    <Compile Include="FileResources\Files.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Files.resx</DependentUpon>
+    </Compile>
     <Compile Include="HideFromTypeFinderAttribute.cs" />
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="IApplicationEventHandler.cs" />
@@ -1347,6 +1352,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="FileResources\BlockingWeb.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -1358,7 +1364,12 @@
   <ItemGroup>
     <Content Include="Strings\Notes.txt" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="FileResources\Files.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Files.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" />
