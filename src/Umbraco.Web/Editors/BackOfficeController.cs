@@ -475,7 +475,7 @@ namespace Umbraco.Web.Editors
                     if (isValid)
                     {
                         //it is a valid URL add to Url list
-                        urlList.Add(jsFile);
+                        urlList.Add(IOHelper.ResolveUrl(jsFile));
                     }
                 }
                 else

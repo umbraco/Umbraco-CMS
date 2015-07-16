@@ -89,7 +89,7 @@ namespace umbraco.BusinessLogic.Actions
         {
         	return ActionsResolver.Current.Actions
 				.Where(x => !string.IsNullOrWhiteSpace(x.JsSource))
-                .Select(x => IOHelper.ResolveUrl(x.JsSource)).ToList();
+                .Select(x => x.JsSource).ToList();
         	//return ActionJsReference;
         }
 
