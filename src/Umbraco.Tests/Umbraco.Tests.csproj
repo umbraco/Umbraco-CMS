@@ -169,6 +169,7 @@
     <Compile Include="AttemptTests.cs" />
     <Compile Include="Cache\CacheRefresherTests.cs" />
     <Compile Include="CoreStrings\StringValidationTests.cs" />
+    <Compile Include="Controllers\BackOfficeControllerUnitTests.cs" />
     <Compile Include="FrontEnd\UmbracoHelperTests.cs" />
     <Compile Include="Integration\GetCultureTests.cs" />
     <Compile Include="Membership\DynamicMemberContentTests.cs" />

@@ -445,19 +445,16 @@ namespace Umbraco.Web.Editors
             return JavaScript(result);
         }
 
-        /// <summary>
-        /// Renders out all JavaScript references that have bee declared in IActions
-        /// </summary>
-        private static IEnumerable<string> GetLegacyActionJs(LegacyJsActionType type)
+        internal static IEnumerable<string> GetLegacyActionJsForActions(LegacyJsActionType type, IEnumerable<string> values)
         {
             var blockList = new List<string>();
             var urlList = new List<string>();
-            foreach (var jsFile in global::umbraco.BusinessLogic.Actions.Action.GetJavaScriptFileReferences())
+            foreach (var jsFile in values)
             {
                 //validate that this is a url, if it is not, we'll assume that it is a text block and render it as a text
                 //block instead.
                 var isValid = true;
-                
+
                 if (Uri.IsWellFormedUriString(jsFile, UriKind.RelativeOrAbsolute))
                 {
                     //ok it validates, but so does alert('hello'); ! so we need to do more checks
@@ -486,7 +483,7 @@ namespace Umbraco.Web.Editors
                 if (isValid == false)
                 {
                     //it isn't a valid URL, must be a js block
-                    blockList.Add(jsFile);                     
+                    blockList.Add(jsFile);
                 }
             }
 
@@ -500,8 +497,16 @@ namespace Umbraco.Web.Editors
 
             return blockList;
         }
-        
-        private enum LegacyJsActionType
+
+        /// <summary>
+        /// Renders out all JavaScript references that have bee declared in IActions
+        /// </summary>
+        private static IEnumerable<string> GetLegacyActionJs(LegacyJsActionType type)
+        {
+            return GetLegacyActionJsForActions(type, global::umbraco.BusinessLogic.Actions.Action.GetJavaScriptFileReferences());
+        }
+
+        internal enum LegacyJsActionType
         {
             JsBlock,
             JsUrl
