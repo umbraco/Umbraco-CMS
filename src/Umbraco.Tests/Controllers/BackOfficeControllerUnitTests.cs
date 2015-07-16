@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Controllers
 
             Assert.That(jsBlocks.Count() == 4);
             Assert.That(jsUrls.Count() == 3);
-            Assert.That(!jsUrls.Last().StartsWith("~/"));
+            Assert.That(jsUrls.Last().StartsWith("~/") == false);
         }
     }
 }
