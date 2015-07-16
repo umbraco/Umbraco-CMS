@@ -2388,17 +2388,11 @@
     <Content Include="Config\EmbeddedMedia.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Code\" />
     <Folder Include="App_Data\" />
-    <Folder Include="App_Plugins\" />
-    <Folder Include="Css\" />
-    <Folder Include="MasterPages\" />
     <Folder Include="Media\" />
-    <Folder Include="Scripts\" />
     <Folder Include="Umbraco\preview\" />
     <Folder Include="Umbraco_Client\FolderBrowser\Images\" />
     <Folder Include="Umbraco_Client\Tags\images\" />
-    <Folder Include="UserControls\" />
     <Folder Include="Views\MacroPartials\" />
   </ItemGroup>
   <PropertyGroup>
