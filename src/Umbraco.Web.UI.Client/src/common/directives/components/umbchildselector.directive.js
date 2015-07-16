@@ -90,12 +90,20 @@
                 "alias": "umbChildNodePlaceholder"
               };
 
-              angular.forEach(scope.availableChildren, function(availableChild){
-                if(availableChild.id !== placeholder.id && !placeholderExists) {
-                  scope.availableChildren.push(placeholder);
-                  placeholderExists = true;
-                }
-              });
+              if(scope.availableChildren.length === 0) {
+
+                scope.availableChildren.push(placeholder);
+
+              } else {
+
+                angular.forEach(scope.availableChildren, function(availableChild){
+                  if(availableChild.id !== placeholder.id && !placeholderExists) {
+                    scope.availableChildren.push(placeholder);
+                    placeholderExists = true;
+                  }
+                });
+
+              }
 
             }
 
