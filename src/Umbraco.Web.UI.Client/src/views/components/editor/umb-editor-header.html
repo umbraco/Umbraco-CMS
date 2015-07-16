@@ -4,7 +4,7 @@
 
         <div class="umb-panel-meta">
 
-            <div class="umb-panel-header-icon" ng-if="icon!==undefined" ng-click="openIconPicker()" ng-class="{'-placeholder': icon==='' || icon===null}">
+            <div class="umb-panel-header-icon" ng-show="icon!==undefined" ng-click="openIconPicker()" ng-class="{'-placeholder': icon==='' || icon===null}">
                 <i class="icon {{icon}}"  ng-if="icon!=='' && icon!==null"></i>
                 <div class="umb-panel-header-icon-text" ng-if="icon==='' || icon===null">Add icon</div>
             </div>
@@ -18,11 +18,11 @@
                 </umb-content-name>
                 -->
                 <div class="umb-panel-header-name-wrapper">
-                    <input ng-if="name!==undefined" type="text" class="umb-panel-header-name" ng-model="$parent.name" placeholder="Enter name..." ng-class="{'name-is-empty': name===null || name===''}" umb-auto-resize umb-auto-focus />
-                    <umb-generate-alias ng-if="alias!==undefined" alias="$parent.alias" alias-from="$parent.name" enable-lock="true"></umb-generate-alias>
+                    <input ng-show="name!==undefined" type="text" class="umb-panel-header-name" ng-model="name" placeholder="Enter name..." ng-class="{'name-is-empty': name===null || name===''}" umb-auto-resize umb-auto-focus />
+                    <umb-generate-alias ng-show="alias!==undefined" alias="alias" alias-from="name" enable-lock="true"></umb-generate-alias>
                 </div>
 
-                <input type="text" class="umb-panel-header-description" placeholder="Enter description..." ng-if="description!==undefined" ng-model="description" />
+                <input type="text" class="umb-panel-header-description" placeholder="Enter description..." ng-show="description!==undefined" ng-model="description" />
             </div>
 
         </div>
