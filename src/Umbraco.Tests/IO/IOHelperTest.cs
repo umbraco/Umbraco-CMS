@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Tests.IO
@@ -13,11 +14,20 @@ namespace Umbraco.Tests.IO
     public class IOHelperTest
     {
 
-		[Test]
-		public void IOHelper_ResolveUrl()
+        [TestCase("~/Scripts", "/Scripts", null)]
+        [TestCase("/Scripts", "/Scripts", null)]
+        [TestCase("../Scripts", "/Scripts", typeof(ArgumentException))]
+		public void IOHelper_ResolveUrl(string input, string expected, Type expectedExceptionType)
 		{
-			var result = IOHelper.ResolveUrl("~/Scripts");
-			Assert.AreEqual("/Scripts", result);
+            if (expectedExceptionType != null)
+            {
+                Assert.Throws(expectedExceptionType, () => IOHelper.ResolveUrl(input));
+            }
+            else
+            {
+                var result = IOHelper.ResolveUrl(input);
+                Assert.AreEqual(expected, result);                
+            }
 		}
 
         /// <summary>

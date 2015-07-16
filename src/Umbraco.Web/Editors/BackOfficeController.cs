@@ -451,39 +451,14 @@ namespace Umbraco.Web.Editors
             var urlList = new List<string>();
             foreach (var jsFile in values)
             {
-                //validate that this is a url, if it is not, we'll assume that it is a text block and render it as a text
-                //block instead.
-                var isValid = true;
-
-                if (Uri.IsWellFormedUriString(jsFile, UriKind.RelativeOrAbsolute))
+                var isJsPath = jsFile.DetectIsJavaScriptPath();
+                if (isJsPath.Success)
                 {
-                    //ok it validates, but so does alert('hello'); ! so we need to do more checks
-
-                    //here are the valid chars in a url without escaping
-                    if (Regex.IsMatch(jsFile, @"[^a-zA-Z0-9-._~:/?#\[\]@!$&'\(\)*\+,%;=]"))
-                        isValid = false;
-
-                    //we'll have to be smarter and just check for certain js patterns now too!
-                    var jsPatterns = new string[] {@"\+\s*\=", @"\);", @"function\s*\(", @"!=", @"=="};
-                    if (jsPatterns.Any(p => Regex.IsMatch(jsFile, p)))
-                    {
-                        isValid = false;
-                    }
-                    if (isValid)
-                    {
-                        //it is a valid URL add to Url list
-                        urlList.Add(jsFile.StartsWith("~/") ? IOHelper.ResolveUrl(jsFile) : jsFile);
-                    }
+                    urlList.Add(isJsPath.Result);
                 }
                 else
                 {
-                    isValid = false;
-                }
-
-                if (isValid == false)
-                {
-                    //it isn't a valid URL, must be a js block
-                    blockList.Add(jsFile);
+                    blockList.Add(isJsPath.Result);
                 }
             }
 

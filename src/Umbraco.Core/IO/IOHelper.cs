@@ -51,7 +51,23 @@ namespace Umbraco.Core.IO
                 return VirtualPathUtility.ToAbsolute(virtualPath, SystemDirectories.Root);
         }
 
-		[Obsolete("Use Umbraco.Web.Templates.TemplateUtilities.ResolveUrlsFromTextString instead, this method on this class will be removed in future versions")]
+        public static Attempt<string> TryResolveUrl(string virtualPath)
+        {
+            try
+            {
+                if (virtualPath.StartsWith("~"))
+                    return Attempt.Succeed(virtualPath.Replace("~", SystemDirectories.Root).Replace("//", "/"));
+                if (Uri.IsWellFormedUriString(virtualPath, UriKind.Absolute))
+                    return Attempt.Succeed(virtualPath);
+                return Attempt.Succeed(VirtualPathUtility.ToAbsolute(virtualPath, SystemDirectories.Root));
+            }
+            catch (Exception ex)
+            {
+                return Attempt.Fail(virtualPath, ex);
+            }
+        }
+
+	    [Obsolete("Use Umbraco.Web.Templates.TemplateUtilities.ResolveUrlsFromTextString instead, this method on this class will be removed in future versions")]
         internal static string ResolveUrlsFromTextString(string text)
         {
             if (UmbracoConfig.For.UmbracoSettings().Content.ResolveUrlsFromTextString)
