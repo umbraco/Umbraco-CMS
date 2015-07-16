@@ -27,8 +27,8 @@
                 </a>
 
                 <div class="editor-details">
-                    <div class="editor-name">{{ model.property.dataTypeName }}</div>
-                    <div class="editor-editor">{{ model.property.editor }}</div>
+                    <a href="" class="editor-name" ng-click="model.changePropertyEditor(model.property)">{{ model.property.dataTypeName }}</a>
+                    <a href="" class="editor-editor" ng-click="model.changePropertyEditor(model.property)">{{ model.property.editor }}</a>
                 </div>
 
                 <a href class="pull-right" style="padding-top: 15px"
