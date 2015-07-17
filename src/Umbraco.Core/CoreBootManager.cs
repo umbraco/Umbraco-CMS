@@ -400,9 +400,20 @@ namespace Umbraco.Core
                     new Lazy<Type>(() => typeof (IntegerValidator)),
                 });
 
-            //by default we'll use the standard configuration based sync
-            ServerRegistrarResolver.Current = new ServerRegistrarResolver(
-                new ConfigServerRegistrar());
+            //by default we'll use the db server registrar unless the developer has the legacy
+            // dist calls enabled, in which case we'll use the config server registrar
+            if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled)
+            {
+                ServerRegistrarResolver.Current = new ServerRegistrarResolver(new ConfigServerRegistrar());
+            }
+            else
+            {
+                ServerRegistrarResolver.Current = new ServerRegistrarResolver(
+                    new DatabaseServerRegistrar(
+                        new Lazy<IServerRegistrationService>(() => ApplicationContext.Services.ServerRegistrationService),
+                        new DatabaseServerRegistrarOptions()));
+            }
+            
 
             //by default we'll use the database server messenger with default options (no callbacks),
             // this will be overridden in the web startup
