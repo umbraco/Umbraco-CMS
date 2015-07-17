@@ -263,7 +263,6 @@ namespace Umbraco.Core.Sync
                     //we cannot throw here because this invalid instruction will just keep getting processed over and over and errors
                     // will be thrown over and over. The only thing we can do is ignore and move on.
                     lastId = dto.Id;
-                    continue; continue;
                 }
             }
 
