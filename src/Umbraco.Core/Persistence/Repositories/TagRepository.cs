@@ -162,7 +162,7 @@ namespace Umbraco.Core.Persistence.Repositories
         //TODO: We need to add lookups for parentId or path! (i.e. get content in tag group that are descendants of x)
 
 
-        public TaggedEntity GetTaggedEntityByKey(TaggableObjectTypes objectType, Guid key)
+        public TaggedEntity GetTaggedEntityByKey(Guid key)
         {
             var sql = new Sql()
                 .Select("cmsTagRelationship.nodeId, cmsPropertyType.Alias, cmsPropertyType.id as propertyTypeId, cmsTags.tag, cmsTags.id as tagId, cmsTags." + SqlSyntax.GetQuotedColumnName("group"))
@@ -177,17 +177,10 @@ namespace Umbraco.Core.Persistence.Repositories
                 .On<NodeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
                 .Where<NodeDto>(dto => dto.UniqueId == key);
 
-            if (objectType != TaggableObjectTypes.All)
-            {
-                var nodeObjectType = GetNodeObjectType(objectType);
-                sql = sql
-                    .Where<NodeDto>(dto => dto.NodeObjectType == nodeObjectType);
-            }
-
             return CreateTaggedEntityCollection(Database.Fetch<dynamic>(sql)).FirstOrDefault();
         }
 
-        public TaggedEntity GetTaggedEntityById(TaggableObjectTypes objectType, int id)
+        public TaggedEntity GetTaggedEntityById(int id)
         {
             var sql = new Sql()
                 .Select("cmsTagRelationship.nodeId, cmsPropertyType.Alias, cmsPropertyType.id as propertyTypeId, cmsTags.tag, cmsTags.id as tagId, cmsTags." + SqlSyntax.GetQuotedColumnName("group"))
@@ -201,13 +194,6 @@ namespace Umbraco.Core.Persistence.Repositories
                 .InnerJoin<NodeDto>(SqlSyntax)
                 .On<NodeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
                 .Where<NodeDto>(dto => dto.NodeId == id);
-
-            if (objectType != TaggableObjectTypes.All)
-            {
-                var nodeObjectType = GetNodeObjectType(objectType);
-                sql = sql
-                    .Where<NodeDto>(dto => dto.NodeObjectType == nodeObjectType);
-            }
 
             return CreateTaggedEntityCollection(Database.Fetch<dynamic>(sql)).FirstOrDefault();
         }

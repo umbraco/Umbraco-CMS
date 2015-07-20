@@ -7,8 +7,8 @@ namespace Umbraco.Core.Persistence.Repositories
     public interface ITagRepository : IRepositoryQueryable<int, ITag>
     {
 
-        TaggedEntity GetTaggedEntityByKey(TaggableObjectTypes objectType, Guid key);
-        TaggedEntity GetTaggedEntityById(TaggableObjectTypes objectType, int id);
+        TaggedEntity GetTaggedEntityByKey(Guid key);
+        TaggedEntity GetTaggedEntityById(int id);
 
         IEnumerable<TaggedEntity> GetTaggedEntitiesByTagGroup(TaggableObjectTypes objectType, string tagGroup);
 

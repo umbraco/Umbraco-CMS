@@ -16,12 +16,8 @@ namespace Umbraco.Core.Services
     public interface ITagService : IService
     {
 
-        TaggedEntity GetTaggedEntityByContentId(int id);
-        TaggedEntity GetTaggedEntityByContentKey(Guid key);
-        TaggedEntity GetTaggedEntityByMediaId(int id);
-        TaggedEntity GetTaggedEntityByMediaKey(Guid key);
-        TaggedEntity GetTaggedEntityByMemberId(int id);
-        TaggedEntity GetTaggedEntityByMemberKey(Guid key);
+        TaggedEntity GetTaggedEntityById(int id);
+        TaggedEntity GetTaggedEntityByKey(Guid key);
 
         /// <summary>
         /// Gets tagged Content by a specific 'Tag Group'.
