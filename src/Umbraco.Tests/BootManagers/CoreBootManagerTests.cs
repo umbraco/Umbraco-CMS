@@ -13,11 +13,12 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Tests.TestHelpers;
 using umbraco.interfaces;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Tests.BootManagers
 {
     [TestFixture]
-    public class CoreBootManagerTests : BaseUmbracoApplicationTest
+    public class CoreBootManagerTests : BaseUmbracoConfigurationTest
     {
 
         private TestApp _testApp;
@@ -37,23 +38,7 @@ namespace Umbraco.Tests.BootManagers
             _testApp = null;            
         }
 
-        /// <summary>
-        /// Inheritors can override this if they wish to create a custom application context
-        /// </summary>
-        protected override void SetupApplicationContext()
-        {
-            base.SetupApplicationContext();
-
-            var dbContextMock = new Mock<DatabaseContext>(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test");
-            dbContextMock.Setup(x => x.CanConnect).Returns(true);
-            ApplicationContext.DatabaseContext = dbContextMock.Object;
-        }
-
-        protected override void FreezeResolution()
-        {
-            //don't freeze resolution, we'll do that in the boot manager
-        }
-
+     
         /// <summary>
         /// test application using a CoreBootManager instance to boot
         /// </summary>
@@ -73,6 +58,20 @@ namespace Umbraco.Tests.BootManagers
             public TestBootManager(UmbracoApplicationBase umbracoApplication)
                 : base(umbracoApplication)
             {
+            }
+
+            /// <summary>
+            /// Creates and assigns the application context singleton
+            /// </summary>
+            /// <param name="dbContext"></param>
+            /// <param name="serviceContext"></param>
+            protected override void CreateApplicationContext(DatabaseContext dbContext, ServiceContext serviceContext)
+            {
+                base.CreateApplicationContext(dbContext, serviceContext);
+
+                var dbContextMock = new Mock<DatabaseContext>(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test");
+                dbContextMock.Setup(x => x.CanConnect).Returns(true);
+                ApplicationContext.DatabaseContext = dbContextMock.Object;
             }
 
             protected override void InitializeApplicationEventsResolver()
