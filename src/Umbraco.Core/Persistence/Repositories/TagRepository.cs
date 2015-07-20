@@ -162,6 +162,56 @@ namespace Umbraco.Core.Persistence.Repositories
         //TODO: We need to add lookups for parentId or path! (i.e. get content in tag group that are descendants of x)
 
 
+        public TaggedEntity GetTaggedEntityByKey(TaggableObjectTypes objectType, Guid key)
+        {
+            var sql = new Sql()
+                .Select("cmsTagRelationship.nodeId, cmsPropertyType.Alias, cmsPropertyType.id as propertyTypeId, cmsTags.tag, cmsTags.id as tagId, cmsTags." + SqlSyntax.GetQuotedColumnName("group"))
+                .From<TagDto>(SqlSyntax)
+                .InnerJoin<TagRelationshipDto>(SqlSyntax)
+                .On<TagRelationshipDto, TagDto>(SqlSyntax, left => left.TagId, right => right.Id)
+                .InnerJoin<ContentDto>(SqlSyntax)
+                .On<ContentDto, TagRelationshipDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .InnerJoin<PropertyTypeDto>(SqlSyntax)
+                .On<PropertyTypeDto, TagRelationshipDto>(SqlSyntax, left => left.Id, right => right.PropertyTypeId)
+                .InnerJoin<NodeDto>(SqlSyntax)
+                .On<NodeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(dto => dto.UniqueId == key);
+
+            if (objectType != TaggableObjectTypes.All)
+            {
+                var nodeObjectType = GetNodeObjectType(objectType);
+                sql = sql
+                    .Where<NodeDto>(dto => dto.NodeObjectType == nodeObjectType);
+            }
+
+            return CreateTaggedEntityCollection(Database.Fetch<dynamic>(sql)).FirstOrDefault();
+        }
+
+        public TaggedEntity GetTaggedEntityById(TaggableObjectTypes objectType, int id)
+        {
+            var sql = new Sql()
+                .Select("cmsTagRelationship.nodeId, cmsPropertyType.Alias, cmsPropertyType.id as propertyTypeId, cmsTags.tag, cmsTags.id as tagId, cmsTags." + SqlSyntax.GetQuotedColumnName("group"))
+                .From<TagDto>(SqlSyntax)
+                .InnerJoin<TagRelationshipDto>(SqlSyntax)
+                .On<TagRelationshipDto, TagDto>(SqlSyntax, left => left.TagId, right => right.Id)
+                .InnerJoin<ContentDto>(SqlSyntax)
+                .On<ContentDto, TagRelationshipDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .InnerJoin<PropertyTypeDto>(SqlSyntax)
+                .On<PropertyTypeDto, TagRelationshipDto>(SqlSyntax, left => left.Id, right => right.PropertyTypeId)
+                .InnerJoin<NodeDto>(SqlSyntax)
+                .On<NodeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(dto => dto.NodeId == id);
+
+            if (objectType != TaggableObjectTypes.All)
+            {
+                var nodeObjectType = GetNodeObjectType(objectType);
+                sql = sql
+                    .Where<NodeDto>(dto => dto.NodeObjectType == nodeObjectType);
+            }
+
+            return CreateTaggedEntityCollection(Database.Fetch<dynamic>(sql)).FirstOrDefault();
+        }
+
         public IEnumerable<TaggedEntity> GetTaggedEntitiesByTagGroup(TaggableObjectTypes objectType, string tagGroup)
         {
             var sql = new Sql()
@@ -185,7 +235,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             return CreateTaggedEntityCollection(
-                ApplicationContext.Current.DatabaseContext.Database.Fetch<dynamic>(sql));
+                Database.Fetch<dynamic>(sql));
         }
 
         public IEnumerable<TaggedEntity> GetTaggedEntitiesByTag(TaggableObjectTypes objectType, string tag, string tagGroup = null)
@@ -216,12 +266,11 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             return CreateTaggedEntityCollection(
-                ApplicationContext.Current.DatabaseContext.Database.Fetch<dynamic>(sql));
+                Database.Fetch<dynamic>(sql));
         }
 
         private IEnumerable<TaggedEntity> CreateTaggedEntityCollection(IEnumerable<dynamic> dbResult)
         {
-            var list = new List<TaggedEntity>();
             foreach (var node in dbResult.GroupBy(x => (int)x.nodeId))
             {
                 var properties = new List<TaggedProperty>();
@@ -230,9 +279,8 @@ namespace Umbraco.Core.Persistence.Repositories
                     var tags = propertyType.Select(x => new Tag((int)x.tagId, (string)x.tag, (string)x.group));
                     properties.Add(new TaggedProperty(propertyType.Key.id, propertyType.Key.alias, tags));
                 }
-                list.Add(new TaggedEntity(node.Key, properties));
+                yield return new TaggedEntity(node.Key, properties);
             }
-            return list;
         }
 
         public IEnumerable<ITag> GetTagsForEntityType(TaggableObjectTypes objectType, string group = null)

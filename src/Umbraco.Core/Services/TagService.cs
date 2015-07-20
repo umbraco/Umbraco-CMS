@@ -45,6 +45,54 @@ namespace Umbraco.Core.Services
         {
         }
 
+        public TaggedEntity GetTaggedEntityByContentId(int id)
+        {
+            using (var repository = RepositoryFactory.CreateTagRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.GetTaggedEntityById(TaggableObjectTypes.Content, id);
+            } 
+        }
+
+        public TaggedEntity GetTaggedEntityByContentKey(Guid key)
+        {
+            using (var repository = RepositoryFactory.CreateTagRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.GetTaggedEntityByKey(TaggableObjectTypes.Content, key);
+            } 
+        }
+
+        public TaggedEntity GetTaggedEntityByMediaId(int id)
+        {
+            using (var repository = RepositoryFactory.CreateTagRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.GetTaggedEntityById(TaggableObjectTypes.Media, id);
+            } 
+        }
+
+        public TaggedEntity GetTaggedEntityByMediaKey(Guid key)
+        {
+            using (var repository = RepositoryFactory.CreateTagRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.GetTaggedEntityByKey(TaggableObjectTypes.Media, key);
+            } 
+        }
+
+        public TaggedEntity GetTaggedEntityByMemberId(int id)
+        {
+            using (var repository = RepositoryFactory.CreateTagRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.GetTaggedEntityById(TaggableObjectTypes.Member, id);
+            } 
+        }
+
+        public TaggedEntity GetTaggedEntityByMemberKey(Guid key)
+        {
+            using (var repository = RepositoryFactory.CreateTagRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.GetTaggedEntityByKey(TaggableObjectTypes.Member, key);
+            } 
+        }
+
         /// <summary>
         /// Gets tagged Content by a specific 'Tag Group'.
         /// </summary>
