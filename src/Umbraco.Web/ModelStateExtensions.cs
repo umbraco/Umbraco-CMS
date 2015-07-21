@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -8,24 +7,51 @@ namespace Umbraco.Web
 {
 	internal static class ModelStateExtensions
 	{
+        /// <summary>
+        /// Safely merges ModelState
+        /// </summary>
+        /// <param name="state"></param>
+        /// <param name="dictionary"></param>
+        /// <remarks>The MVC5 System.Web.Mvc.ModelStateDictionary.Merge method is not safe</remarks>
+        public static void MergeSafe(this ModelStateDictionary state, ModelStateDictionary dictionary)
+        {
+            if (dictionary == null)
+                return;
+            // Need to stuff this into a temporary new dictionary that we're allowed to alter, 
+            // if we alter "state" in this enumeration, it fails with 
+            // "Collection was modified; enumeration operation may not execute"
+            var tempDictionary = new ModelStateDictionary(state);
+	        foreach (var entryKey in dictionary.Keys)
+            {
+                tempDictionary[entryKey] = dictionary[entryKey];
+            }
+            // Update state with updated dictionary
+	        state = tempDictionary;
+	    }
 
-		/// <summary>
-		/// Merges ModelState that has names matching the prefix
-		/// </summary>
-		/// <param name="state"></param>
-		/// <param name="dictionary"></param>
-		/// <param name="prefix"></param>
-		public static void Merge(this ModelStateDictionary state, ModelStateDictionary dictionary, string prefix)
+	    /// <summary>
+        /// Merges ModelState that has names matching the prefix
+        /// </summary>
+        /// <param name="state"></param>
+        /// <param name="dictionary"></param>
+        /// <param name="prefix"></param>
+        public static void Merge(this ModelStateDictionary state, ModelStateDictionary dictionary, string prefix)
 		{
-			if (dictionary == null)
-				return;
-			foreach (var keyValuePair in dictionary
+            if (dictionary == null)
+                return;
+            // Need to stuff this into a temporary new dictionary that we're allowed to alter, 
+            // if we alter "state" in this enumeration, it fails with 
+            // "Collection was modified; enumeration operation may not execute"
+            var tempDictionary = new ModelStateDictionary(state);
+            foreach (var keyValuePair in dictionary
                 //It can either equal the prefix exactly (model level errors) or start with the prefix. (property level errors)
                 .Where(keyValuePair => keyValuePair.Key == prefix || keyValuePair.Key.StartsWith(prefix + ".")))
 			{
-				state[keyValuePair.Key] = keyValuePair.Value;
+                tempDictionary[keyValuePair.Key] = keyValuePair.Value;
 			}
-		}
+            // Update state with updated dictionary
+            state = tempDictionary;
+        }
 
 		/// <summary>
 		/// Checks if there are any model errors on any fields containing the prefix

@@ -143,7 +143,7 @@ namespace Umbraco.Web.Macros
 				//bubble up the model state from the main view context to our custom controller.
 				//when merging we'll create a new dictionary, otherwise you might run into an enumeration error
 				// caused from ModelStateDictionary
-				controller.ModelState.Merge(new ModelStateDictionary(viewContext.ViewData.ModelState));
+				controller.ModelState.MergeSafe(new ModelStateDictionary(viewContext.ViewData.ModelState));
 				controller.ControllerContext = new ControllerContext(request, controller);
 				//call the action to render
                 var result = controller.Index();

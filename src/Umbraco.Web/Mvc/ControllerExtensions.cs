@@ -140,7 +140,7 @@ namespace Umbraco.Web.Mvc
         {
 			//when merging we'll create a new dictionary, otherwise you might run into an enumeration error
 			// caused from ModelStateDictionary
-			result.ViewData.ModelState.Merge(new ModelStateDictionary(controller.ViewData.ModelState));
+			result.ViewData.ModelState.MergeSafe(new ModelStateDictionary(controller.ViewData.ModelState));
 
             // Temporarily copy the dictionary to avoid enumerator-modification errors
             var newViewDataDict = new ViewDataDictionary(controller.ViewData);

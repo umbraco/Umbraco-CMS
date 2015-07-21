@@ -32,7 +32,7 @@ namespace Umbraco.Web.Mvc
 			{
 				if (filterContext.Controller.ControllerContext.IsChildAction)
 				{
-					filterContext.Controller.ViewData.ModelState.Merge(
+					filterContext.Controller.ViewData.ModelState.MergeSafe(
 						filterContext.Controller.ControllerContext.ParentActionViewContext.ViewData.ModelState);
 				}
 			}
