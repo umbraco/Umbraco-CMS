@@ -122,6 +122,32 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
+        [Test]
+        public void Can_Get_Member_Types_By_Guid_Id()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var memberType1 = MockedContentTypes.CreateSimpleMemberType();
+                repository.AddOrUpdate(memberType1);
+                unitOfWork.Commit();
+
+                var memberType2 = MockedContentTypes.CreateSimpleMemberType();
+                memberType2.Name = "AnotherType";
+                memberType2.Alias = "anotherType";
+                repository.AddOrUpdate(memberType2);
+                unitOfWork.Commit();
+
+                var result = repository.Get(memberType1.Key);
+
+                //there are 3 because of the Member type created for init data
+                Assert.IsNotNull(result);
+                Assert.AreEqual(memberType1.Key, result.Key);
+            }
+        }
+
+
         //NOTE: This tests for left join logic (rev 7b14e8eacc65f82d4f184ef46c23340c09569052)
         [Test]
         public void Can_Get_All_Members_When_No_Properties_Assigned()

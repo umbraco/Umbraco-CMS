@@ -63,6 +63,19 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Gets an <see cref="IMemberType"/> object by its Key
+        /// </summary>
+        /// <param name="key">Key of the <see cref="IMemberType"/> to retrieve</param>
+        /// <returns><see cref="IMemberType"/></returns>
+        public IMemberType Get(Guid key)
+        {
+            using (var repository = RepositoryFactory.CreateMemberTypeRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.Get(key);
+            }
+        }
+
+        /// <summary>
         /// Gets an <see cref="IMemberType"/> object by its Alias
         /// </summary>
         /// <param name="alias">Alias of the <see cref="IMemberType"/> to retrieve</param>
