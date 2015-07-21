@@ -138,17 +138,18 @@ namespace Umbraco.Web.Mvc
         /// <param name="controller"></param>
         internal static void EnsureViewObjectDataOnResult(this ControllerBase controller, ViewResultBase result)
         {
-			//when merging we'll create a new dictionary, otherwise you might run into an enumeration error
-			// caused from ModelStateDictionary
-			result.ViewData.ModelState.MergeSafe(new ModelStateDictionary(controller.ViewData.ModelState));
-
-            // Temporarily copy the dictionary to avoid enumerator-modification errors
-            var newViewDataDict = new ViewDataDictionary(controller.ViewData);
-            foreach (var d in newViewDataDict)
-                result.ViewData[d.Key] = d.Value;
-
             result.TempData = controller.TempData;
 
+            var newViewDataDict = new ViewDataDictionary(controller.ViewData);
+            var viewDataDictionary = result.ViewData;
+            foreach (var d in newViewDataDict)
+                viewDataDictionary[d.Key] = d.Value;
+
+            result.ViewData = viewDataDictionary;
+
+            foreach (var keyValuePair in controller.ViewData.ModelState.Keys)
+                result.ViewData[keyValuePair] = keyValuePair;
+            
             if (result.View != null) return;
 
             if (string.IsNullOrEmpty(result.ViewName))
