@@ -71,7 +71,7 @@ namespace Umbraco.Core
         internal CoreBootManager(UmbracoApplicationBase umbracoApplication, ProfilingLogger logger)
         {
             if (umbracoApplication == null) throw new ArgumentNullException("umbracoApplication");
-            if (logger == null) throw new ArgumentNullException(nameof(logger));
+            if (logger == null) throw new ArgumentNullException("logger");
             _umbracoApplication = umbracoApplication;
             ProfilingLogger = logger;
         }
