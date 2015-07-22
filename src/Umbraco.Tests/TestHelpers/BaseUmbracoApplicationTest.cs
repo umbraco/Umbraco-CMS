@@ -63,8 +63,7 @@ namespace Umbraco.Tests.TestHelpers
         public override void TearDown()
         {
             base.TearDown();
-
-            LoggerResolver.Reset();
+            
             //reset settings
             SettingsForTests.Reset();
             UmbracoContext.Current = null;

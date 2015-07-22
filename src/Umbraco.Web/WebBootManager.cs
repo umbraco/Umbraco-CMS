@@ -54,18 +54,19 @@ namespace Umbraco.Web
         private readonly List<IIndexer> _indexesToRebuild = new List<IIndexer>(); 
 
         public WebBootManager(UmbracoApplicationBase umbracoApplication)
-            : this(umbracoApplication, false)
+            : base(umbracoApplication)
         {
-
+            _isForTesting = false;
         }
 
         /// <summary>
         /// Constructor for unit tests, ensures some resolvers are not initialized
         /// </summary>
         /// <param name="umbracoApplication"></param>
+        /// <param name="logger"></param>
         /// <param name="isForTesting"></param>
-        internal WebBootManager(UmbracoApplicationBase umbracoApplication, bool isForTesting)
-            : base(umbracoApplication)
+        internal WebBootManager(UmbracoApplicationBase umbracoApplication, ProfilingLogger logger, bool isForTesting)
+            : base(umbracoApplication, logger)
         {
             _isForTesting = isForTesting;
         }
@@ -140,7 +141,10 @@ namespace Umbraco.Web
             UmbracoContext.EnsureContext(
                 httpContext,
                 ApplicationContext,
-                new WebSecurity(httpContext, ApplicationContext));
+                new WebSecurity(httpContext, ApplicationContext),
+                UmbracoConfig.For.UmbracoSettings(), 
+                UrlProviderResolver.Current.Providers, 
+                false);
         }
 
         /// <summary>
