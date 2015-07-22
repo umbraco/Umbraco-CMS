@@ -15,7 +15,7 @@ namespace Umbraco.Core.Models
         {
             var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
             var descendants = contentTypeService.GetContentTypeChildren(contentType.Id)
-                                                .FlattenList(type => contentTypeService.GetContentTypeChildren(type.Id));
+                                                .SelectRecursive(type => contentTypeService.GetContentTypeChildren(type.Id));
             return descendants;
         }
 

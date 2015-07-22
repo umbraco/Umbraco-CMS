@@ -139,10 +139,6 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateDictionaryRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.Get(id);
-                //var query = Query<IDictionaryItem>.Builder.Where(x => x.Key == id);
-                //var items = repository.GetByQuery(query);
-
-                //return items.FirstOrDefault();
             }
         }
 
@@ -156,10 +152,6 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateDictionaryRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.Get(key);
-                //var query = Query<IDictionaryItem>.Builder.Where(x => x.ItemKey == key);
-                //var items = repository.GetByQuery(query);
-
-                //return items.FirstOrDefault();
             }
         }
 
@@ -176,6 +168,19 @@ namespace Umbraco.Core.Services
                 var items = repository.GetByQuery(query);
 
                 return items;
+            }
+        }
+
+        /// <summary>
+        /// Gets a list of descendants for a <see cref="IDictionaryItem"/>
+        /// </summary>
+        /// <param name="parentId">Id of the parent, null will return all dictionary items</param>
+        /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
+        public IEnumerable<IDictionaryItem> GetDictionaryItemDescendants(Guid? parentId)
+        {
+            using (var repository = RepositoryFactory.CreateDictionaryRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.GetDictionaryItemDescendants(parentId);
             }
         }
 
@@ -204,10 +209,6 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateDictionaryRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.Get(key) != null;
-                //var query = Query<IDictionaryItem>.Builder.Where(x => x.ItemKey == key);
-                //var items = repository.GetByQuery(query);
-
-                //return items.Any();
             }
         }
 
