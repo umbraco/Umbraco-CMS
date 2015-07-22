@@ -130,26 +130,13 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Normally in MVC the way that the View object gets assigned to the result is to Execute the ViewResult, this however
         /// will write to the Response output stream which isn't what we want. Instead, this method will use the same logic inside
-        /// of MVC to assign the View object to the result but without executing it. This also ensures that the ViewData and the TempData
-        /// is assigned from the controller.
+        /// of MVC to assign the View object to the result but without executing it.
         /// This is only relavent for view results of PartialViewResult or ViewResult.
         /// </summary>
         /// <param name="result"></param>
         /// <param name="controller"></param>
-        internal static void EnsureViewObjectDataOnResult(this ControllerBase controller, ViewResultBase result)
-        {
-            result.TempData = controller.TempData;
-
-            var newViewDataDict = new ViewDataDictionary(controller.ViewData);
-            var viewDataDictionary = result.ViewData;
-            foreach (var d in newViewDataDict)
-                viewDataDictionary[d.Key] = d.Value;
-
-            result.ViewData = viewDataDictionary;
-
-            foreach (var keyValuePair in controller.ViewData.ModelState.Keys)
-                result.ViewData[keyValuePair] = keyValuePair;
-            
+        private static void EnsureViewObjectDataOnResult(this ControllerBase controller, ViewResultBase result)
+        {            
             if (result.View != null) return;
 
             if (string.IsNullOrEmpty(result.ViewName))
