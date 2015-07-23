@@ -38,6 +38,10 @@ using Umbraco.Web.Scheduling;
 using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Publishing;
+using Umbraco.Core.Services;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using ProfilingViewEngine = Umbraco.Core.Profiling.ProfilingViewEngine;
 
@@ -69,6 +73,25 @@ namespace Umbraco.Web
             : base(umbracoApplication, logger)
         {
             _isForTesting = isForTesting;
+        }
+
+        /// <summary>
+        /// Creates and returns the service context for the app
+        /// </summary>
+        /// <param name="dbContext"></param>
+        /// <param name="dbFactory"></param>
+        /// <returns></returns>
+        protected override ServiceContext CreateServiceContext(DatabaseContext dbContext, IDatabaseFactory dbFactory)
+        {
+            return new ServiceContext(
+                new RepositoryFactory(ApplicationCache, ProfilingLogger.Logger, dbContext.SqlSyntax, UmbracoConfig.For.UmbracoSettings()),
+                new PetaPocoUnitOfWorkProvider(dbFactory),
+                new FileUnitOfWorkProvider(),
+                new PublishingStrategy(),
+                ApplicationCache,
+                ProfilingLogger.Logger,
+                //use a request based messaging factory
+                new RequestLifespanMessagesFactory(new SingletonUmbracoContextAccessor()));
         }
 
         /// <summary>
@@ -157,15 +180,7 @@ namespace Umbraco.Web
             //Set the profiler to be the web profiler
             ProfilerResolver.Current.SetProfiler(new WebProfiler());
         }
-
-        /// <summary>
-        /// Adds custom types to the ApplicationEventsResolver
-        /// </summary>
-        protected override void InitializeApplicationEventsResolver()
-        {
-            base.InitializeApplicationEventsResolver();
-        }
-
+        
         /// <summary>
         /// Ensure that the OnApplicationStarted methods of the IApplicationEvents are called
         /// </summary>
@@ -285,7 +300,6 @@ namespace Umbraco.Web
             }
         }
 
-
         private void RouteLocalApiController(Type controller, string umbracoPath)
         {
             var meta = PluginController.GetMetadata(controller);
@@ -307,6 +321,7 @@ namespace Umbraco.Web
             }
             route.DataTokens.Add("umbraco", "api"); //ensure the umbraco token is set
         }
+
         private void RouteLocalSurfaceController(Type controller, string umbracoPath)
         {
             var meta = PluginController.GetMetadata(controller);
@@ -472,7 +487,6 @@ namespace Umbraco.Web
             CultureDictionaryFactoryResolver.Current = new CultureDictionaryFactoryResolver(
                 new DefaultCultureDictionaryFactory());
         }
-
 
         private void OnInstanceOnBuildingEmptyIndexOnStartup(object sender, BuildingEmptyIndexOnStartupEventArgs args)
         {

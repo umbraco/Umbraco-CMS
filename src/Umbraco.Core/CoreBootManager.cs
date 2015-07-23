@@ -7,6 +7,7 @@ using System.Web;
 using AutoMapper;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -164,7 +165,9 @@ namespace Umbraco.Core
                 new FileUnitOfWorkProvider(),
                 new PublishingStrategy(),
                 ApplicationCache,
-                ProfilingLogger.Logger);
+                ProfilingLogger.Logger,
+                //default transient factory
+                new TransientMessagesFactory());
         }
 
         /// <summary>

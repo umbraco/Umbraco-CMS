@@ -3,6 +3,7 @@ using System.Diagnostics;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
@@ -62,7 +63,8 @@ namespace Umbraco.Web.Standalone
                         new FileUnitOfWorkProvider(),
                         new PublishingStrategy(),
                         cacheHelper,
-                        new DebugDiagnosticsLogger());
+                        new DebugDiagnosticsLogger(),
+                        new TransientMessagesFactory());
 
                     //initialize the DatabaseContext
                     dbContext.Initialize(_providerName);

@@ -313,10 +313,16 @@
     <Compile Include="Events\CancellableObjectEventArgs.cs" />
     <Compile Include="Events\DeleteRevisionsEventArgs.cs" />
     <Compile Include="Events\EventExtensions.cs" />
+    <Compile Include="Events\EventMessage.cs" />
+    <Compile Include="Events\EventMessages.cs" />
+    <Compile Include="Events\EventMessagesFactoryResolver.cs" />
     <Compile Include="Events\ExportEventArgs.cs" />
+    <Compile Include="Events\IEventMessagesFactory.cs" />
     <Compile Include="Events\ImportEventArgs.cs" />
     <Compile Include="Events\ImportPackageEventArgs.cs" />
+    <Compile Include="Events\MessageType.cs" />
     <Compile Include="Events\MigrationEventArgs.cs" />
+    <Compile Include="Events\MoveEventInfo.cs" />
     <Compile Include="Events\PublishEventArgs.cs" />
     <Compile Include="Events\RecycleBinEventArgs.cs" />
     <Compile Include="Events\TypedEventHandler.cs" />

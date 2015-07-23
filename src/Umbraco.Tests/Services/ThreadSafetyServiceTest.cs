@@ -18,6 +18,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using umbraco.editorControls.tinyMCE3;
 using umbraco.interfaces;
+using Umbraco.Core.Events;
 
 namespace Umbraco.Tests.Services
 {
@@ -55,7 +56,8 @@ namespace Umbraco.Tests.Services
                 new FileUnitOfWorkProvider(), 
                 new PublishingStrategy(), 
                 cacheHelper, 
-                Logger);
+                Logger,
+                new TransientMessagesFactory());
 
 			CreateTestData();
 		}

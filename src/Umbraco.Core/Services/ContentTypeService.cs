@@ -32,28 +32,8 @@ namespace Umbraco.Core.Services
         //for example, the Move method needs to be locked but this calls the Save method which also needs to be locked.
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public ContentTypeService(IContentService contentService, IMediaService mediaService)
-			: this(new PetaPocoUnitOfWorkProvider(LoggerResolver.Current.Logger), new RepositoryFactory(), contentService, mediaService)
-        {}
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public ContentTypeService( RepositoryFactory repositoryFactory, IContentService contentService, IMediaService mediaService)
-            : this(new PetaPocoUnitOfWorkProvider(), repositoryFactory, contentService, mediaService)
-        { }
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public ContentTypeService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IContentService contentService, IMediaService mediaService)
-            : base(provider, repositoryFactory, LoggerResolver.Current.Logger)
-        {
-            if (contentService == null) throw new ArgumentNullException("contentService");
-            if (mediaService == null) throw new ArgumentNullException("mediaService");
-	        _contentService = contentService;
-            _mediaService = mediaService;
-        }
-
-        public ContentTypeService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IContentService contentService, IMediaService mediaService)
-            : base(provider, repositoryFactory, logger)
+        public ContentTypeService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory, IContentService contentService, IMediaService mediaService)
+            : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
             if (contentService == null) throw new ArgumentNullException("contentService");
             if (mediaService == null) throw new ArgumentNullException("mediaService");

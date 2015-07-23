@@ -38,37 +38,15 @@ namespace Umbraco.Core.Services
         //for example, the Move method needs to be locked but this calls the Save method which also needs to be locked.
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public ContentService()
-            : this(new RepositoryFactory(ApplicationContext.Current.ApplicationCache, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider, UmbracoConfig.For.UmbracoSettings()))
-        { }
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public ContentService(RepositoryFactory repositoryFactory)
-            : this(new PetaPocoUnitOfWorkProvider(LoggerResolver.Current.Logger), repositoryFactory, new PublishingStrategy())
-        { }
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public ContentService(IDatabaseUnitOfWorkProvider provider)
-            : this(provider, new RepositoryFactory(ApplicationContext.Current.ApplicationCache, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider, UmbracoConfig.For.UmbracoSettings()), new PublishingStrategy())
-        { }
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public ContentService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory)
-            : this(provider, repositoryFactory, new PublishingStrategy())
-        { }
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public ContentService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IPublishingStrategy publishingStrategy)
-            : base(provider, repositoryFactory, LoggerResolver.Current.Logger)
-        {
-            if (publishingStrategy == null) throw new ArgumentNullException("publishingStrategy");
-            _dataTypeService = new DataTypeService(UowProvider, RepositoryFactory);
-            _userService = new UserService(UowProvider, RepositoryFactory);
-        }
-
-        public ContentService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IPublishingStrategy publishingStrategy, IDataTypeService dataTypeService, IUserService userService)
-            : base(provider, repositoryFactory, logger)
+        public ContentService(
+            IDatabaseUnitOfWorkProvider provider, 
+            RepositoryFactory repositoryFactory, 
+            ILogger logger,
+            IEventMessagesFactory eventMessagesFactory,
+            IPublishingStrategy publishingStrategy, 
+            IDataTypeService dataTypeService, 
+            IUserService userService)
+            : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
             if (publishingStrategy == null) throw new ArgumentNullException("publishingStrategy");
             if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");

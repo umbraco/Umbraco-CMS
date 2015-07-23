@@ -17,25 +17,8 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class UserService : RepositoryService, IUserService
     {
-      
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public UserService(RepositoryFactory repositoryFactory)
-            : this(new PetaPocoUnitOfWorkProvider(), repositoryFactory)
-        { }
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public UserService(IDatabaseUnitOfWorkProvider provider)
-            : this(provider, new RepositoryFactory())
-        { }
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public UserService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory)
-            : base(provider, repositoryFactory, LoggerResolver.Current.Logger)
-        {
-        }
-
-        public UserService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger)
-            : base(provider, repositoryFactory, logger)
+        public UserService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+            : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
         }
 
