@@ -127,7 +127,16 @@ namespace Umbraco.Core.Services
             if (publicAccessService != null) _publicAccessService = new Lazy<IPublicAccessService>(() => publicAccessService);
         }
 
-        internal ServiceContext(
+        /// <summary>
+        /// Creates a service context with a RepositoryFactory which is used to construct Services
+        /// </summary>
+        /// <param name="repositoryFactory"></param>
+        /// <param name="dbUnitOfWorkProvider"></param>
+        /// <param name="fileUnitOfWorkProvider"></param>
+        /// <param name="publishingStrategy"></param>
+        /// <param name="cache"></param>
+        /// <param name="logger"></param>
+        public ServiceContext(
             RepositoryFactory repositoryFactory,
             IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider, 
             IUnitOfWorkProvider fileUnitOfWorkProvider, 
