@@ -18,31 +18,45 @@ namespace Umbraco.Web
     /// <remarks>
     /// This binds to appropriate umbraco events in order to trigger the Boot(), Sync() & FlushBatch() calls
     /// </remarks>
-    public class BatchedDatabaseServerMessenger : Core.Sync.DatabaseServerMessenger
+    public class BatchedDatabaseServerMessenger : DatabaseServerMessenger, IApplicationEventHandler
     {
         public BatchedDatabaseServerMessenger(ApplicationContext appContext, bool enableDistCalls, DatabaseServerMessengerOptions options)
             : base(appContext, enableDistCalls, options)
-        {
-            UmbracoApplicationBase.ApplicationStarted += Application_Started;
-            UmbracoModule.EndRequest += UmbracoModule_EndRequest;
-            UmbracoModule.RouteAttempt += UmbracoModule_RouteAttempt;
+        {   
         }
 
-        private void Application_Started(object sender, EventArgs eventArgs)
-        {
-            if (ApplicationContext.IsConfigured == false
-                || ApplicationContext.DatabaseContext.IsDatabaseConfigured == false
-                || ApplicationContext.DatabaseContext.CanConnect == false)
-            {
+        #region Application Event Handler implementation
 
-                LogHelper.Warn<BatchedDatabaseServerMessenger>("The app is not configured or cannot connect to the database, this server cannot be initialized with "
-                                                               + typeof (BatchedDatabaseServerMessenger) + ", distributed calls will not be enabled for this server");
+        public void OnApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        {
+        }
+
+        public void OnApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        {
+        }
+
+        /// <summary>
+        /// Bootup is completed, this will not execute if the application is not configured
+        /// </summary>
+        /// <param name="umbracoApplication"></param>
+        /// <param name="applicationContext"></param>
+        public void OnApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        {
+            UmbracoModule.EndRequest += UmbracoModule_EndRequest;
+            UmbracoModule.RouteAttempt += UmbracoModule_RouteAttempt;
+
+            if (applicationContext.DatabaseContext.IsDatabaseConfigured == false || applicationContext.DatabaseContext.CanConnect == false)
+            {
+                applicationContext.ProfilingLogger.Logger.Warn<BatchedDatabaseServerMessenger>(
+                    "The app cannot connect to the database, this server cannot be initialized with "
+                    + typeof(BatchedDatabaseServerMessenger) + ", distributed calls will not be enabled for this server");
             }
             else
             {
-                Boot();    
+                Boot();
             }
         }
+        #endregion
 
         private void UmbracoModule_RouteAttempt(object sender, RoutableAttemptEventArgs e)
         {
@@ -137,5 +151,7 @@ namespace Umbraco.Web
             batch.Add(new RefreshInstructionEnvelope(servers, refresher,
                 RefreshInstruction.GetInstructions(refresher, messageType, ids, idType, json)));
         }
+
+        
     }
 }
