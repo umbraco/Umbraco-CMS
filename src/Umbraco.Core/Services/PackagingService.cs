@@ -1219,7 +1219,7 @@ namespace Umbraco.Core.Services
                         sortOrder = int.Parse(sortOrderAttribute.Value);
                     }
 
-                    if (macro.Properties.Any(x => x.Alias == propertyAlias)) continue;
+                    if (macro.Properties.Any(x => string.Equals(x.Alias, propertyAlias, StringComparison.OrdinalIgnoreCase))) continue;
                     macro.Properties.Add(new MacroProperty(propertyAlias, propertyName, sortOrder, editorAlias));
                     sortOrder++;
                 }
