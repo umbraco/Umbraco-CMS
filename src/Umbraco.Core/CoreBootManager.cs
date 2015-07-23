@@ -48,8 +48,8 @@ namespace Umbraco.Core
         private bool _isComplete = false;
         private readonly IServiceProvider _serviceProvider = new ActivatorServiceProvider();
         private readonly UmbracoApplicationBase _umbracoApplication;
-        protected ApplicationContext ApplicationContext { get; set; }
-        protected CacheHelper ApplicationCache { get; set; }
+        protected ApplicationContext ApplicationContext { get; private set; }
+        protected CacheHelper ApplicationCache { get; private set; }
         protected PluginManager PluginManager { get; private set; }
 
         protected UmbracoApplicationBase UmbracoApplication
@@ -90,7 +90,7 @@ namespace Umbraco.Core
                 string.Format("Umbraco {0} application starting on {1}", UmbracoVersion.GetSemanticVersion().ToSemanticString(), NetworkHelper.MachineName),
                 "Umbraco application startup complete");
 
-            CreateApplicationCache();
+            ApplicationCache = CreateApplicationCache();
 
             //create and set the plugin manager (I'd much prefer to not use this singleton anymore but many things are using it unfortunately and
             // the way that it is setup, there must only ever be one per app so without IoC it would be hard to make this not a singleton)
@@ -112,22 +112,16 @@ namespace Umbraco.Core
 
             //initialize the DatabaseContext
             dbContext.Initialize();
-            
-            var serviceContext = new ServiceContext(
-                new RepositoryFactory(ApplicationCache, ProfilingLogger.Logger, dbContext.SqlSyntax, UmbracoConfig.For.UmbracoSettings()), 
-                new PetaPocoUnitOfWorkProvider(dbFactory),
-                new FileUnitOfWorkProvider(),
-                new PublishingStrategy(),
-                ApplicationCache,
-                ProfilingLogger.Logger);
 
-            CreateApplicationContext(dbContext, serviceContext);
+            //get the service context
+            var serviceContext = CreateServiceContext(dbContext, dbFactory);
+
+            //set property and singleton from response
+            ApplicationContext.Current = ApplicationContext = CreateApplicationContext(dbContext, serviceContext);
 
             InitializeApplicationEventsResolver();
 
             InitializeResolvers();
-
-            
 
             InitializeModelMappers();
 
@@ -157,28 +151,45 @@ namespace Umbraco.Core
         }
 
         /// <summary>
-        /// Creates and assigns the application context singleton
+        /// Creates and returns the service context for the app
         /// </summary>
         /// <param name="dbContext"></param>
-        /// <param name="serviceContext"></param>
-        protected virtual void CreateApplicationContext(DatabaseContext dbContext, ServiceContext serviceContext)
+        /// <param name="dbFactory"></param>
+        /// <returns></returns>
+        protected virtual ServiceContext CreateServiceContext(DatabaseContext dbContext, IDatabaseFactory dbFactory)
         {
-            //create the ApplicationContext
-            ApplicationContext = ApplicationContext.Current = new ApplicationContext(dbContext, serviceContext, ApplicationCache, ProfilingLogger);
+            return new ServiceContext(
+                new RepositoryFactory(ApplicationCache, ProfilingLogger.Logger, dbContext.SqlSyntax, UmbracoConfig.For.UmbracoSettings()),
+                new PetaPocoUnitOfWorkProvider(dbFactory),
+                new FileUnitOfWorkProvider(),
+                new PublishingStrategy(),
+                ApplicationCache,
+                ProfilingLogger.Logger);
         }
 
         /// <summary>
-        /// Creates and assigns the ApplicationCache based on a new instance of System.Web.Caching.Cache
+        /// Creates and returns the application context for the app
         /// </summary>
-        protected virtual void CreateApplicationCache()
+        /// <param name="dbContext"></param>
+        /// <param name="serviceContext"></param>
+        protected virtual ApplicationContext CreateApplicationContext(DatabaseContext dbContext, ServiceContext serviceContext)
+        {
+            //create the ApplicationContext
+            return new ApplicationContext(dbContext, serviceContext, ApplicationCache, ProfilingLogger);
+        }
+
+        /// <summary>
+        /// Creates and returns the CacheHelper for the app
+        /// </summary>
+        protected virtual CacheHelper CreateApplicationCache()
         {
             var cacheHelper = new CacheHelper(
-                        new ObjectCacheRuntimeCacheProvider(),
-                        new StaticCacheProvider(),
+                new ObjectCacheRuntimeCacheProvider(),
+                new StaticCacheProvider(),
                 //we have no request based cache when not running in web-based context
-                        new NullCacheProvider());
+                new NullCacheProvider());
 
-            ApplicationCache = cacheHelper;
+            return cacheHelper;
         }
 
         /// <summary>

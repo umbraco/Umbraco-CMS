@@ -63,17 +63,19 @@ namespace Umbraco.Tests.BootManagers
             }
 
             /// <summary>
-            /// Creates and assigns the application context singleton
+            /// Creates and returns the application context singleton
             /// </summary>
             /// <param name="dbContext"></param>
             /// <param name="serviceContext"></param>
-            protected override void CreateApplicationContext(DatabaseContext dbContext, ServiceContext serviceContext)
+            protected override ApplicationContext CreateApplicationContext(DatabaseContext dbContext, ServiceContext serviceContext)
             {
-                base.CreateApplicationContext(dbContext, serviceContext);
+                var appContext = base.CreateApplicationContext(dbContext, serviceContext);
 
                 var dbContextMock = new Mock<DatabaseContext>(Mock.Of<IDatabaseFactory>(), ProfilingLogger.Logger, Mock.Of<ISqlSyntaxProvider>(), "test");
                 dbContextMock.Setup(x => x.CanConnect).Returns(true);
-                ApplicationContext.DatabaseContext = dbContextMock.Object;
+                appContext.DatabaseContext = dbContextMock.Object;
+
+                return appContext;
             }
 
             protected override void InitializeApplicationEventsResolver()
