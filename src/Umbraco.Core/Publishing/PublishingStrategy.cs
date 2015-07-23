@@ -8,6 +8,7 @@ using Umbraco.Core;
 
 namespace Umbraco.Core.Publishing
 {
+    //TODO: Do we need this anymore??
     /// <summary>
     /// Currently acts as an interconnection between the new public api and the legacy api for publishing
     /// </summary>
