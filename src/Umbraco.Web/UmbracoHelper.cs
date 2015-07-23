@@ -317,7 +317,7 @@ namespace Umbraco.Web
             bool formatAsDateWithTime = false,
             string formatAsDateWithTimeSeparator = "")
 		{			
-            return _componentRenderer.Field(AssignedContentItem, fieldAlias, altFieldAlias,
+            return UmbracoComponentRenderer.Field(AssignedContentItem, fieldAlias, altFieldAlias,
                 altText, insertBefore, insertAfter, recursive, convertLineBreaks, removeParagraphTags,
                 casing, encoding, formatAsDate, formatAsDateWithTime, formatAsDateWithTimeSeparator);
 		}
@@ -350,7 +350,7 @@ namespace Umbraco.Web
             bool formatAsDateWithTime = false,
             string formatAsDateWithTimeSeparator = "")
 		{
-            return _componentRenderer.Field(currentPage, fieldAlias, altFieldAlias,
+            return UmbracoComponentRenderer.Field(currentPage, fieldAlias, altFieldAlias,
                 altText, insertBefore, insertAfter, recursive, convertLineBreaks, removeParagraphTags,
                 casing, encoding, formatAsDate, formatAsDateWithTime, formatAsDateWithTimeSeparator);
 		}
