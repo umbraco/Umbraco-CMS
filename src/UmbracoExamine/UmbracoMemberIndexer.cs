@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Linq;
 using System.Xml.Linq;
 using Examine.LuceneEngine.Config;
@@ -15,8 +16,33 @@ using Lucene.Net.Analysis;
 
 namespace UmbracoExamine
 {
+    internal class LazyEnumerableXmlCollection : IEnumerable<XElement>
+    {
+        /// <summary>
+        /// Returns an enumerator that iterates through the collection.
+        /// </summary>
+        /// <returns>
+        /// An enumerator that can be used to iterate through the collection.
+        /// </returns>
+        public IEnumerator<XElement> GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Returns an enumerator that iterates through a collection.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="T:System.Collections.IEnumerator"/> object that can be used to iterate through the collection.
+        /// </returns>
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+    }
+
 	/// <summary>
-    /// 
+    /// Custom indexer for members
     /// </summary>
     public class UmbracoMemberIndexer : UmbracoContentIndexer
     {
@@ -126,30 +152,26 @@ namespace UmbracoExamine
             //This only supports members
             if (SupportedTypes.Contains(type) == false)
                 return;
-
-            //Re-index all members in batches of 5000
-	        int memberCount = 0;
+            
             const int pageSize = 1000;
             var pageIndex = 0;
-            var serializer = new EntityXmlSerializer();
 
-	        if (IndexerData.IncludeNodeTypes.Any())
+            IMember[] members;
+
+            if (IndexerData.IncludeNodeTypes.Any())
 	        {
                 //if there are specific node types then just index those
                 foreach (var nodeType in IndexerData.IncludeNodeTypes)
 	            {
                     do
                     {
-                        int total;
-                        var members = _memberService.GetAll(pageIndex, pageSize, out total, "LoginName", Direction.Ascending, nodeType);
-                        memberCount = 0;
-                        foreach (var member in members)
-                        {
-                            AddNodesToIndex(new[] { serializer.Serialize(_dataTypeService, member) }, type);
-                            memberCount++;
-                        }
+                        long total;
+                        members = _memberService.GetAll(pageIndex, pageSize, out total, "LoginName", Direction.Ascending, nodeType).ToArray();
+
+                        AddNodesToIndex(GetSerializedMembers(members), type);
+
                         pageIndex++;
-                    } while (memberCount == pageSize);
+                    } while (members.Length == pageSize);
 	            }
 	        }
 	        else
@@ -158,17 +180,20 @@ namespace UmbracoExamine
                 do
                 {
                     int total;
-                    var members = _memberService.GetAll(pageIndex, pageSize, out total);
-                    memberCount = 0;
-                    foreach (var member in members)
-                    {
-                        AddNodesToIndex(new[] {serializer.Serialize(_dataTypeService, member)}, type);
-                        memberCount++;
-                    }
+                    members = _memberService.GetAll(pageIndex, pageSize, out total).ToArray();
+
+                    AddNodesToIndex(GetSerializedMembers(members), type);
+
                     pageIndex++;
-                } while (memberCount == pageSize);
+                } while (members.Length == pageSize);
 	        }
 	    }
+
+        private IEnumerable<XElement> GetSerializedMembers(IEnumerable<IMember> members)
+        {
+            var serializer = new EntityXmlSerializer();
+            return members.Select(member => serializer.Serialize(_dataTypeService, member));
+        }
 
 	    protected override XDocument GetXDocument(string xPath, string type)
 	    {

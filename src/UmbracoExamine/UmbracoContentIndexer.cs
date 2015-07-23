@@ -348,7 +348,7 @@ namespace UmbracoExamine
         protected override void PerformIndexAll(string type)
         {
             
-            const int pageSize = 5000;
+            const int pageSize = 1000;
             var pageIndex = 0;
 
             switch (type)
@@ -370,7 +370,7 @@ namespace UmbracoExamine
 
                         do
                         {
-                            int total;
+                            long total;
                             var descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total);
 
                             //if specific types are declared we need to post filter them
@@ -386,6 +386,8 @@ namespace UmbracoExamine
 
                             AddNodesToIndex(GetSerializedContent(content), type);
                             pageIndex++;
+
+
                         } while (content.Length == pageSize);
 
                     }
@@ -401,7 +403,7 @@ namespace UmbracoExamine
                     
                     do
                     {
-                        int total;
+                        long total;
                         var descendants = _mediaService.GetPagedDescendants(mediaParentId, pageIndex, pageSize, out total);
 
                         //if specific types are declared we need to post filter them
