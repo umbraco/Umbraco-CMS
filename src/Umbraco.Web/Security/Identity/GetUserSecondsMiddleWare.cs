@@ -1,7 +1,9 @@
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.Owin;
+using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.Cookies;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -21,15 +23,20 @@ namespace Umbraco.Web.Security.Identity
     {
         private readonly UmbracoBackOfficeCookieAuthOptions _authOptions;
         private readonly ISecuritySection _security;
+        private readonly ILogger _logger;
 
         public GetUserSecondsMiddleWare(
             OwinMiddleware next,
             UmbracoBackOfficeCookieAuthOptions authOptions,
-            ISecuritySection security)
+            ISecuritySection security,
+            ILogger logger)
             : base(next)
         {
+            if (authOptions == null) throw new ArgumentNullException("authOptions");
+            if (logger == null) throw new ArgumentNullException("logger");
             _authOptions = authOptions;
             _security = security;
+            _logger = logger;
         }
 
         public override async Task Invoke(IOwinContext context)
@@ -88,6 +95,17 @@ namespace Umbraco.Web.Security.Identity
                                 _authOptions.CookieName,
                                 cookieValue,
                                 cookieOptions);
+
+                            remainingSeconds = (ticket.Properties.ExpiresUtc.Value - DateTime.Now.ToUniversalTime()).TotalSeconds;
+                        }
+                        else if (remainingSeconds <=30) 
+                        {
+                            //NOTE: We are using 30 seconds because that is what is coded into angular to force logout to give some headway in
+                            // the timeout process.
+
+                            _logger.WriteCore(TraceEventType.Information, 0,
+                                string.Format("User logged will be logged out due to timeout: {0}, IP Address: {1}", ticket.Identity.Name, request.RemoteIpAddress), 
+                                null, null);
                         }
 
                         await response.WriteAsync(remainingSeconds.ToString(CultureInfo.InvariantCulture));

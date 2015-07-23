@@ -3,44 +3,36 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Security.Claims;
-using System.ServiceModel.Security;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Mvc;
 using System.Web.UI;
-using dotless.Core.Parser.Tree;
+using ClientDependency.Core.Config;
 using Microsoft.AspNet.Identity;
-using Microsoft.Owin;
+using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
-using Umbraco.Core.Manifest;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Manifest;
 using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.PropertyEditors;
+using Umbraco.Web.Security.Identity;
 using Umbraco.Web.Trees;
 using Umbraco.Web.UI.JavaScript;
-using Umbraco.Web.PropertyEditors;
-using Umbraco.Web.Models;
-using Umbraco.Web.WebServices;
 using Umbraco.Web.WebApi.Filters;
-using System.Web;
-using AutoMapper;
-using Microsoft.AspNet.Identity.Owin;
-using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Security;
-using Task = System.Threading.Tasks.Task;
-using Umbraco.Web.Security.Identity;
+using Umbraco.Web.WebServices;
+using Action = umbraco.BusinessLogic.Actions.Action;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
@@ -417,7 +409,7 @@ namespace Umbraco.Web.Editors
         public async Task<ActionResult> ExternalLinkLoginCallback()
         {
             var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync(
-                Core.Constants.Security.BackOfficeExternalAuthenticationType,
+                Constants.Security.BackOfficeExternalAuthenticationType,
                 XsrfKey, User.Identity.GetUserId());
             
             if (loginInfo == null)
@@ -459,7 +451,7 @@ namespace Umbraco.Web.Editors
 
             //First check if there's external login info, if there's not proceed as normal
             var loginInfo = await OwinContext.Authentication.GetExternalLoginInfoAsync(
-                Core.Constants.Security.BackOfficeExternalAuthenticationType);
+                Constants.Security.BackOfficeExternalAuthenticationType);
 
             if (loginInfo == null || loginInfo.ExternalIdentity.IsAuthenticated == false)
             {
@@ -496,9 +488,9 @@ namespace Umbraco.Web.Editors
                 }
 
                 //Remove the cookie otherwise this message will keep appearing
-                if (Response.Cookies[Core.Constants.Security.BackOfficeExternalCookieName] != null)
+                if (Response.Cookies[Constants.Security.BackOfficeExternalCookieName] != null)
                 {
-                    Response.Cookies[Core.Constants.Security.BackOfficeExternalCookieName].Expires = DateTime.MinValue;    
+                    Response.Cookies[Constants.Security.BackOfficeExternalCookieName].Expires = DateTime.MinValue;    
                 }
             }
 
@@ -620,7 +612,7 @@ namespace Umbraco.Web.Editors
             var version = UmbracoVersion.GetSemanticVersion().ToSemanticString();
 
             app.Add("version", version);
-            app.Add("cdf", ClientDependency.Core.Config.ClientDependencySettings.Instance.Version);
+            app.Add("cdf", ClientDependencySettings.Instance.Version);
             //useful for dealing with virtual paths on the client side when hosted in virtual directories especially
             app.Add("applicationPath", HttpContext.Request.ApplicationPath.EnsureEndsWith('/'));
             return app;
@@ -719,7 +711,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         private static IEnumerable<string> GetLegacyActionJs(LegacyJsActionType type)
         {
-            return GetLegacyActionJsForActions(type, global::umbraco.BusinessLogic.Actions.Action.GetJavaScriptFileReferences());
+            return GetLegacyActionJsForActions(type, Action.GetJavaScriptFileReferences());
         }
 
         internal enum LegacyJsActionType

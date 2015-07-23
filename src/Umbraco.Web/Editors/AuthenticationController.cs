@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Security.Claims;
+using System.ServiceModel.Channels;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -244,7 +245,11 @@ namespace Umbraco.Web.Editors
         [ClearAngularAntiForgeryToken]
         [ValidateAngularAntiForgeryToken]
         public HttpResponseMessage PostLogout()
-        {           
+        {
+            Logger.Info<AuthenticationController>("User {0} from IP address {1} has logged out",
+                            () => User.Identity == null ? "UNKNOWN" : User.Identity.Name,
+                            () => TryGetOwinContext().Result.Request.RemoteIpAddress);
+
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 

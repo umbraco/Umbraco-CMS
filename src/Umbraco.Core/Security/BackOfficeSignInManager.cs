@@ -1,9 +1,11 @@
 using System;
+using System.Diagnostics;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
+using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Identity;
@@ -12,9 +14,16 @@ namespace Umbraco.Core.Security
 {
     public class BackOfficeSignInManager : SignInManager<BackOfficeIdentityUser, int>
     {
-        public BackOfficeSignInManager(BackOfficeUserManager userManager, IAuthenticationManager authenticationManager)
+        private readonly ILogger _logger;
+        private readonly IOwinRequest _request;
+
+        public BackOfficeSignInManager(BackOfficeUserManager userManager, IAuthenticationManager authenticationManager, ILogger logger, IOwinRequest request)
             : base(userManager, authenticationManager)
         {
+            if (logger == null) throw new ArgumentNullException("logger");
+            if (request == null) throw new ArgumentNullException("request");
+            _logger = logger;
+            _request = request;
             AuthenticationType = Constants.Security.BackOfficeAuthenticationType;
         }
 
@@ -23,9 +32,54 @@ namespace Umbraco.Core.Security
             return user.GenerateUserIdentityAsync((BackOfficeUserManager)UserManager);
         }
 
-        public static BackOfficeSignInManager Create(IdentityFactoryOptions<BackOfficeSignInManager> options, IOwinContext context)
+        public static BackOfficeSignInManager Create(IdentityFactoryOptions<BackOfficeSignInManager> options, IOwinContext context, ILogger logger)
         {
-            return new BackOfficeSignInManager(context.GetUserManager<BackOfficeUserManager>(), context.Authentication);
+            return new BackOfficeSignInManager(
+                context.GetUserManager<BackOfficeUserManager>(), 
+                context.Authentication,
+                logger,
+                context.Request);
+        }
+
+        /// <summary>
+        /// Sign in the user in using the user name and password
+        /// </summary>
+        /// <param name="userName"/><param name="password"/><param name="isPersistent"/><param name="shouldLockout"/>
+        /// <returns/>
+        public async override Task<SignInStatus> PasswordSignInAsync(string userName, string password, bool isPersistent, bool shouldLockout)
+        {
+            var result = await base.PasswordSignInAsync(userName, password, isPersistent, shouldLockout);
+
+            switch (result)
+            {
+                case SignInStatus.Success:
+                    break;
+                case SignInStatus.LockedOut:
+                    _logger.WriteCore(TraceEventType.Information, 0,
+                        string.Format(
+                            "Login attempt failed for username {0} from IP address {1}, the user is locked",
+                            userName,
+                            _request.RemoteIpAddress), null, null);
+                    break;
+                case SignInStatus.RequiresVerification:
+                    _logger.WriteCore(TraceEventType.Information, 0,
+                        string.Format(
+                            "Login attempt failed for username {0} from IP address {1}, the user requires verification",
+                            userName,
+                            _request.RemoteIpAddress), null, null);
+                    break;
+                case SignInStatus.Failure:
+                    _logger.WriteCore(TraceEventType.Information, 0,
+                        string.Format(
+                            "Login attempt failed for username {0} from IP address {1}",
+                            userName,
+                            _request.RemoteIpAddress), null, null);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -67,6 +121,12 @@ namespace Umbraco.Core.Security
                     ExpiresUtc = nowUtc.AddMinutes(GlobalSettings.TimeOutInMinutes)
                 }, userIdentity);
             }
+
+            _logger.WriteCore(TraceEventType.Information, 0,
+                string.Format(
+                    "Login attempt succeeded for username {0} from IP address {1}",
+                    user.UserName,
+                    _request.RemoteIpAddress), null, null);
         }
     }
 }
