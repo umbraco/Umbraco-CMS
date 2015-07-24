@@ -896,6 +896,8 @@ namespace Umbraco.Core.Services
             Audit(AuditType.Delete, "Delete Media performed by user", userId, media.Id);
         }
 
+        
+
         /// <summary>
         /// Permanently deletes versions from an <see cref="IMedia"/> object prior to a specific date.
         /// This method will never delete the latest version of a content item.
@@ -955,14 +957,14 @@ namespace Umbraco.Core.Services
         /// Saves a single <see cref="IMedia"/> object
         /// </summary>
         /// <param name="media">The <see cref="IMedia"/> to save</param>
-        /// <param name="userId">Id of the User saving the Content</param>
+        /// <param name="userId">Id of the User saving the Media</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        public void Save(IMedia media, int userId = 0, bool raiseEvents = true)
+        public Attempt<OperationStatus> SaveWithStatus(IMedia media, int userId = 0, bool raiseEvents = true)
         {
             if (raiseEvents)
             {
                 if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMedia>(media), this))
-                    return;
+                    return Attempt.Fail(OperationStatus.Cancelled);
             }
 
             var uow = UowProvider.GetUnitOfWork();
@@ -984,22 +986,24 @@ namespace Umbraco.Core.Services
                 Saved.RaiseEvent(new SaveEventArgs<IMedia>(media, false), this);
 
             Audit(AuditType.Save, "Save Media performed by user", userId, media.Id);
+
+            return Attempt.Succeed(OperationStatus.Success);
         }
 
         /// <summary>
         /// Saves a collection of <see cref="IMedia"/> objects
         /// </summary>
         /// <param name="medias">Collection of <see cref="IMedia"/> to save</param>
-        /// <param name="userId">Id of the User saving the Content</param>
+        /// <param name="userId">Id of the User saving the Media</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        public void Save(IEnumerable<IMedia> medias, int userId = 0, bool raiseEvents = true)
+        public Attempt<OperationStatus> SaveWithStatus(IEnumerable<IMedia> medias, int userId = 0, bool raiseEvents = true)
         {
             var asArray = medias.ToArray();
 
             if (raiseEvents)
             {
                 if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMedia>(asArray), this))
-                    return;
+                    return Attempt.Fail(OperationStatus.Cancelled);
             }
 
             var uow = UowProvider.GetUnitOfWork();
@@ -1025,6 +1029,30 @@ namespace Umbraco.Core.Services
                 Saved.RaiseEvent(new SaveEventArgs<IMedia>(asArray, false), this);
 
             Audit(AuditType.Save, "Save Media items performed by user", userId, -1);
+
+            return Attempt.Succeed(OperationStatus.Success);
+        }
+
+        /// <summary>
+        /// Saves a single <see cref="IMedia"/> object
+        /// </summary>
+        /// <param name="media">The <see cref="IMedia"/> to save</param>
+        /// <param name="userId">Id of the User saving the Content</param>
+        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
+        public void Save(IMedia media, int userId = 0, bool raiseEvents = true)
+        {
+            SaveWithStatus(media, userId, raiseEvents);
+        }
+
+        /// <summary>
+        /// Saves a collection of <see cref="IMedia"/> objects
+        /// </summary>
+        /// <param name="medias">Collection of <see cref="IMedia"/> to save</param>
+        /// <param name="userId">Id of the User saving the Content</param>
+        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
+        public void Save(IEnumerable<IMedia> medias, int userId = 0, bool raiseEvents = true)
+        {
+            SaveWithStatus(medias, userId, raiseEvents);
         }
 
         /// <summary>

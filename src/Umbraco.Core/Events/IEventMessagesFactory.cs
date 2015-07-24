@@ -2,19 +2,11 @@ using System.Collections.Generic;
 
 namespace Umbraco.Core.Events
 {
+    /// <summary>
+    /// Event messages factory
+    /// </summary>
     public interface IEventMessagesFactory
     {
-        EventMessages CreateMessages();
-    }
-
-    /// <summary>
-    /// A simple/default transient messages factory
-    /// </summary>
-    internal class TransientMessagesFactory : IEventMessagesFactory
-    {
-        public EventMessages CreateMessages()
-        {
-            return new EventMessages();
-        }
+        EventMessages Get();
     }
 }

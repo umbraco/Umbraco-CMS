@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Net.Http.Formatting;
 using System.Web.Http.Controllers;
-using System.Web.Http.Filters;
 using Umbraco.Core;
 
 namespace Umbraco.Web.WebApi.Filters
@@ -10,7 +9,7 @@ namespace Umbraco.Web.WebApi.Filters
     /// <summary>
     /// Sets the json outgoing/serialized datetime format
     /// </summary>
-    internal sealed class OutgoingDateTimeFormatAttribute :  Attribute, IControllerConfiguration
+    internal sealed class OutgoingDateTimeFormatAttribute : Attribute, IControllerConfiguration
     {
         private readonly string _format = "yyyy-MM-dd HH:mm:ss";
 
@@ -27,8 +26,9 @@ namespace Umbraco.Web.WebApi.Filters
         /// <summary>
         /// Will use the standard ISO format
         /// </summary>
-        public OutgoingDateTimeFormatAttribute(){
-            
+        public OutgoingDateTimeFormatAttribute()
+        {
+
         }
 
         public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)

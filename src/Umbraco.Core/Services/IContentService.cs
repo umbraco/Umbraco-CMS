@@ -195,6 +195,24 @@ namespace Umbraco.Core.Services
         /// <param name="content">The <see cref="IContent"/> to save</param>
         /// <param name="userId">Optional Id of the User saving the Content</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
+        Attempt<OperationStatus> SaveWithStatus(IContent content, int userId = 0, bool raiseEvents = true);
+
+        /// <summary>
+        /// Saves a collection of <see cref="IContent"/> objects.
+        /// </summary>        
+        /// <param name="contents">Collection of <see cref="IContent"/> to save</param>
+        /// <param name="userId">Optional Id of the User saving the Content</param>
+        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>        
+        Attempt<OperationStatus> SaveWithStatus(IEnumerable<IContent> contents, int userId = 0, bool raiseEvents = true);
+
+        /// <summary>
+        /// Saves a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to save</param>
+        /// <param name="userId">Optional Id of the User saving the Content</param>
+        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use SaveWithStatus instead, that method will provide more detailed information on the outcome")]
         void Save(IContent content, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
@@ -203,6 +221,8 @@ namespace Umbraco.Core.Services
         /// <param name="contents">Collection of <see cref="IContent"/> to save</param>
         /// <param name="userId">Optional Id of the User saving the Content</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use SaveWithStatus instead, that method will provide more detailed information on the outcome")]
         void Save(IEnumerable<IContent> contents, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
@@ -347,6 +367,7 @@ namespace Umbraco.Core.Services
         /// <param name="content">The <see cref="IContent"/> to publish along with its children</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("Use PublishWithChildrenWithStatus instead, that method will provide more detailed information on the outcome and also allows the includeUnpublished flag")]
         bool PublishWithChildren(IContent content, int userId = 0);
 
@@ -375,6 +396,7 @@ namespace Umbraco.Core.Services
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise save events.</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
         [Obsolete("Use SaveAndPublishWithStatus instead, that method will provide more detailed information on the outcome")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         bool SaveAndPublish(IContent content, int userId = 0, bool raiseEvents = true);
 
         /// <summary>

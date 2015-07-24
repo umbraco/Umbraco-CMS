@@ -1,3 +1,5 @@
+using Umbraco.Core.Logging;
+
 namespace Umbraco.Core.Services
 {
     /// <summary>
@@ -5,6 +7,6 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IService
     {
-         
+
     }
 }

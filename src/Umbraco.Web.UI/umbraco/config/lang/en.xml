@@ -774,7 +774,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="sortPleaseWait"><![CDATA[ Please wait. Items are being sorted, this can take a while.<br/> <br/> Do not close this window during sorting]]></key>
   </area>
   <area alias="speechBubbles">
-    <key alias="contentPublishedFailedByEvent">Publishing was cancelled by a 3rd party add-in</key>
+	<key alias="operationCancelledHeader">Cancelled</key>
+	<key alias="operationCancelledText">Operation was cancelled by a 3rd party add-in</key>
+	<key alias="contentPublishedFailedByEvent">Publishing was cancelled by a 3rd party add-in</key>
     <key alias="contentTypeDublicatePropertyType">Property type already exists</key>
     <key alias="contentTypePropertyTypeCreated">Property type created</key>
     <key alias="contentTypePropertyTypeCreatedText"><![CDATA[Name: %0% <br /> DataType: %1%]]></key>

@@ -16,7 +16,7 @@ namespace Umbraco.Web
             _ctxAccessor = ctxAccessor;
         }
 
-        public EventMessages CreateMessages()
+        public EventMessages Get()
         {
             if (_ctxAccessor.Value.HttpContext.Items[typeof (RequestLifespanMessagesFactory).Name] == null)
             {
