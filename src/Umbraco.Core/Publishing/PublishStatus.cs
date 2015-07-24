@@ -21,6 +21,12 @@ namespace Umbraco.Core.Publishing
             StatusType = statusType;
         }
 
+        public PublishStatus(IContent content, PublishStatusType statusType, string customMessage)
+            : this(content, statusType)
+        {
+            CustomMessage = customMessage;
+        }
+
         /// <summary>
         /// Creates a successful publish status
         /// </summary>
@@ -36,5 +42,7 @@ namespace Umbraco.Core.Publishing
         /// Gets sets the invalid properties if the status failed due to validation.
         /// </summary>
         public IEnumerable<Property> InvalidProperties { get; set; }
+
+        public string CustomMessage { get; set; }
     }
 }

@@ -22,11 +22,12 @@ namespace Umbraco.Core.Publishing
         /// <param name="userId">Id of the User issueing the publish operation</param>        
         internal Attempt<PublishStatus> PublishInternal(IContent content, int userId)
         {
-            if (Publishing.IsRaisedEventCancelled(new PublishEventArgs<IContent>(content), this))
+            string customMessage;
+            if (Publishing.IsRaisedEventCancelled(new PublishEventArgs<IContent>(content), this, out customMessage))
             {
                 LogHelper.Info<PublishingStrategy>(
                         string.Format("Content '{0}' with Id '{1}' will not be published, the event was cancelled.", content.Name, content.Id));
-                return Attempt<PublishStatus>.Fail(new PublishStatus(content, PublishStatusType.FailedCancelledByEvent));
+                return Attempt<PublishStatus>.Fail(new PublishStatus(content, PublishStatusType.FailedCancelledByEvent, customMessage));
             }
                 
 

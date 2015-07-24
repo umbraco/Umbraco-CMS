@@ -1800,9 +1800,12 @@ namespace Umbraco.Core.Services
         {
             if (raiseEvents)
             {
-                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this))
+                string customMessage;
+                var isRaisedEventCancelled = Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this, out customMessage);
+
+                if (isRaisedEventCancelled)
                 {
-                    return Attempt.Fail(new PublishStatus(content, PublishStatusType.FailedCancelledByEvent));
+                    return Attempt.Fail(new PublishStatus(content, PublishStatusType.FailedCancelledByEvent, customMessage));
                 }
             }
 
@@ -1828,8 +1831,9 @@ namespace Umbraco.Core.Services
                     var internalStrategy = (PublishingStrategy)_publishingStrategy;
                     //Publish and then update the database with new status
                     var publishResult = internalStrategy.PublishInternal(content, userId);
-                    //set the status type to the publish result
+                    //set the status type and message to the publish result
                     publishStatus.StatusType = publishResult.Result.StatusType;
+                    publishStatus.CustomMessage = publishResult.Result.CustomMessage;
                 }
 
                 //we are successfully published if our publishStatus is still Successful

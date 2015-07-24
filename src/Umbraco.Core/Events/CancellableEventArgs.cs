@@ -47,5 +47,7 @@ namespace Umbraco.Core.Events
 				_cancel = value;
 			}
 		}
+
+	    public string CustomMessage { get; set; }
 	}
 }
