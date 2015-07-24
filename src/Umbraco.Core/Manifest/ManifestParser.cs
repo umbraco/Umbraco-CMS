@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
@@ -17,15 +18,29 @@ namespace Umbraco.Core.Manifest
     internal class ManifestParser
     {
         private readonly DirectoryInfo _pluginsDir;
-        
+        private readonly IRuntimeCacheProvider _cache;
+
         //used to strip comments
         private static readonly Regex CommentsSurround = new Regex(@"/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/", RegexOptions.Compiled);
-        private static readonly Regex CommentsLine = new Regex(@"//.*?$", RegexOptions.Compiled | RegexOptions.Multiline);
+        private static readonly Regex CommentsLine = new Regex(@"^\s*//.*?$", RegexOptions.Compiled | RegexOptions.Multiline);
 
-        public ManifestParser(DirectoryInfo pluginsDir)
+        public ManifestParser(DirectoryInfo pluginsDir, IRuntimeCacheProvider cache)
         {
             if (pluginsDir == null) throw new ArgumentNullException("pluginsDir");
             _pluginsDir = pluginsDir;
+            _cache = cache;
+        }
+
+        /// <summary>
+        /// Parse the grid editors from the json array
+        /// </summary>
+        /// <param name="jsonEditors"></param>
+        /// <returns></returns>
+        internal static IEnumerable<GridEditor> GetGridEditors(JArray jsonEditors)
+        {
+            return JsonConvert.DeserializeObject<IEnumerable<GridEditor>>(
+                jsonEditors.ToString(),
+                new GridEditorConverter());
         }
 
         /// <summary>
@@ -57,11 +72,17 @@ namespace Umbraco.Core.Manifest
         /// Get all registered manifests
         /// </summary>
         /// <returns></returns>
+        /// <remarks>
+        /// This ensures that we only build and look for all manifests once per Web app (based on the IRuntimeCache)
+        /// </remarks>
         public IEnumerable<PackageManifest> GetManifests()
         {
-            //get all Manifest.js files in the appropriate folders
-            var manifestFileContents = GetAllManifestFileContents(_pluginsDir);
-            return CreateManifests(manifestFileContents.ToArray());
+            return _cache.GetCacheItem<IEnumerable<PackageManifest>>(typeof (ManifestParser) + "GetManifests", () =>
+            {
+                //get all Manifest.js files in the appropriate folders
+                var manifestFileContents = GetAllManifestFileContents(_pluginsDir);
+                return CreateManifests(manifestFileContents.ToArray());
+            }, new TimeSpan(0, 10, 0));
         }
 
         /// <summary>
@@ -75,11 +96,15 @@ namespace Umbraco.Core.Manifest
             
             if (depth < 1)
             {
-                var dirs = currDir.GetDirectories();
                 var result = new List<string>();
-                foreach (var d in dirs)
+                if (currDir.Exists)
                 {
-                    result.AddRange(GetAllManifestFileContents(d));
+                    var dirs = currDir.GetDirectories();
+
+                    foreach (var d in dirs)
+                    {
+                        result.AddRange(GetAllManifestFileContents(d));
+                    }    
                 }
                 return result;
             }
@@ -154,6 +179,20 @@ namespace Umbraco.Core.Manifest
                     throw new FormatException("The manifest is not formatted correctly contains more than one 'propertyEditors' element");
                 }
 
+                //validate the parameterEditors section
+                var paramEditors = deserialized.Properties().Where(x => x.Name == "parameterEditors").ToArray();
+                if (paramEditors.Length > 1)
+                {
+                    throw new FormatException("The manifest is not formatted correctly contains more than one 'parameterEditors' element");
+                }
+
+                //validate the gridEditors section
+                var gridEditors = deserialized.Properties().Where(x => x.Name == "gridEditors").ToArray();
+                if (gridEditors.Length > 1)
+                {
+                    throw new FormatException("The manifest is not formatted correctly contains more than one 'gridEditors' element");
+                }
+
                 var jConfig = init.Any() ? (JArray)deserialized["javascript"] : new JArray();
                 ReplaceVirtualPaths(jConfig);
 
@@ -175,13 +214,30 @@ namespace Umbraco.Core.Manifest
                         }
                     }
                 }
+
+                //replace virtual paths for each property editor
+                if (deserialized["gridEditors"] != null)
+                {
+                    foreach (JObject p in deserialized["gridEditors"])
+                    {
+                        if (p["view"] != null)
+                        {
+                            ReplaceVirtualPaths(p["view"]);
+                        }
+                        if (p["render"] != null)
+                        {
+                            ReplaceVirtualPaths(p["render"]);
+                        }
+                    }
+                }
                 
                 var manifest = new PackageManifest()
                     {
                         JavaScriptInitialize = jConfig,
                         StylesheetInitialize = cssConfig,
                         PropertyEditors = propEditors.Any() ? (JArray)deserialized["propertyEditors"] : new JArray(),
-                        ParameterEditors = propEditors.Any() ? (JArray)deserialized["parameterEditors"] : new JArray()
+                        ParameterEditors = paramEditors.Any() ? (JArray)deserialized["parameterEditors"] : new JArray(),
+                        GridEditors = gridEditors.Any() ? (JArray)deserialized["gridEditors"] : new JArray()
                     };
                 result.Add(manifest);
             }

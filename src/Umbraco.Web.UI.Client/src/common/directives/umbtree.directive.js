@@ -33,7 +33,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                 '<h5>' +
                 '<i ng-if="enablecheckboxes == \'true\'" ng-class="selectEnabledNodeClass(tree.root)"></i>' +
                 '<a href="#/{{section}}" ng-click="select(tree.root, $event)"  class="root-link">{{tree.name}}</a></h5>' +
-                '<a href class="umb-options" ng-hide="tree.root.isContainer || !tree.root.menuUrl" ng-click="options(tree.root, $event)" ng-swipe-right="options(tree.root, $event)"><i></i><i></i><i></i></a>' +
+                '<a class="umb-options" ng-hide="tree.root.isContainer || !tree.root.menuUrl" ng-click="options(tree.root, $event)" ng-swipe-right="options(tree.root, $event)"><i></i><i></i><i></i></a>' +
                 '</div>';
             template += '<ul>' +
                 '<umb-tree-item ng-repeat="child in tree.root.children" eventhandler="eventhandler" node="child" current-node="currentNode" tree="this" section="{{section}}" ng-animate="animation()"></umb-tree-item>' +
@@ -205,8 +205,8 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                     function doLoad(tree) {
                         var childrenAndSelf = [tree].concat(tree.children);
                         scope.activeTree = _.find(childrenAndSelf, function (node) {
-                            if(node && node.metaData){
-                                return node.metaData.treeAlias === treeAlias;
+                            if(node && node.metaData && node.metaData.treeAlias) {
+                                return node.metaData.treeAlias.toUpperCase() === treeAlias.toUpperCase();
                             }
                             return false;
                         });

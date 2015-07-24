@@ -16,25 +16,11 @@ namespace umbraco.presentation
         {
             base.ApplicationInitialized(umbracoApplication, applicationContext);
 
-            EnsurePathExists("~/App_Code");
-            EnsurePathExists("~/App_Data");
-            EnsurePathExists(SystemDirectories.AppPlugins);
-            EnsurePathExists(SystemDirectories.Css);            
-            EnsurePathExists(SystemDirectories.Masterpages);
-            EnsurePathExists(SystemDirectories.Media);
-            EnsurePathExists(SystemDirectories.Scripts);
-            EnsurePathExists(SystemDirectories.UserControls);
-            EnsurePathExists(SystemDirectories.Xslt);
-            EnsurePathExists(SystemDirectories.MvcViews);
-            EnsurePathExists(SystemDirectories.MvcViews + "/Partials");
-            EnsurePathExists(SystemDirectories.MvcViews + "/MacroPartials");
-        }
-        
-        public void EnsurePathExists(string path)
-        {
-            var absolutePath = IOHelper.MapPath(path);
-            if (!Directory.Exists(absolutePath))
-                Directory.CreateDirectory(absolutePath);
+            IOHelper.EnsurePathExists("~/App_Data");
+            IOHelper.EnsurePathExists(SystemDirectories.Media);
+            IOHelper.EnsurePathExists(SystemDirectories.MvcViews);
+            IOHelper.EnsurePathExists(SystemDirectories.MvcViews + "/Partials");
+            IOHelper.EnsurePathExists(SystemDirectories.MvcViews + "/MacroPartials");
         }
     }
 }

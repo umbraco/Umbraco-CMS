@@ -1,91 +1,62 @@
 using System;
-using System.Data;
+using System.Collections.Generic;
 using System.Globalization;
-using System.Threading;
-using System.Web;
+using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
-using System.Xml.XPath;
-using System.Collections;
-using System.IO;
-
 using System.Web.Security;
 using Umbraco.Core;
-using Umbraco.Core.IO;
+using Umbraco.Core.Models;
 using Umbraco.Core.Security;
+using Umbraco.Core.Services;
 
 namespace umbraco.cms.businesslogic.web
 {
     /// <summary>
     /// Summary description for Access.
     /// </summary>
+    [Obsolete("Use Umbraco.Core.Service.IPublicAccessService instead")]
     public class Access
     {
-        static private readonly Hashtable CheckedPages = new Hashtable();
-
-        static private volatile XmlDocument _accessXmlContent;
-        static private string _accessXmlFilePath;
-        private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
-        private static readonly object LoadLocker = new object();
 
         [Obsolete("Do not access this property directly, it is not thread safe, use GetXmlDocumentCopy instead")]
         public static XmlDocument AccessXml
         {
-            get { return GetXmlDocument(); }
+            get { return GetXmlDocumentCopy(); }
         }
 
-        //private method to initialize and return the in-memory xmldocument
-        private static XmlDocument GetXmlDocument()
-        {
-            if (_accessXmlContent == null)
-            {
-                lock (LoadLocker)
-                {
-                    if (_accessXmlContent == null)
-                    {
-                        if (_accessXmlFilePath == null)
-                        {
-                            //if we pop it here it'll make for better stack traces ;)
-                            _accessXmlFilePath = IOHelper.MapPath(SystemFiles.AccessXml);
-                        }
-
-                        _accessXmlContent = new XmlDocument();
-
-                        if (File.Exists(_accessXmlFilePath) == false)
-                        {
-                            var file = new FileInfo(_accessXmlFilePath);
-                            if (Directory.Exists(file.DirectoryName) == false)
-                            {
-                                Directory.CreateDirectory(file.Directory.FullName); //ensure the folder exists!	
-                            }
-                            var f = File.Open(_accessXmlFilePath, FileMode.Create);
-                            var sw = new StreamWriter(f);
-                            sw.WriteLine("<access/>");
-                            sw.Close();
-                            f.Close();
-                        }
-                        _accessXmlContent.Load(_accessXmlFilePath);
-                    }
-                }
-            }
-            return _accessXmlContent;
-        }
-
-        //used by all other methods in this class to read and write the document which 
-        // is thread safe and only clones once per request so it's still fast.
+        //NOTE: This is here purely for backwards compat
+        [Obsolete("This should never be used, the data is stored in the database now")]
         public static XmlDocument GetXmlDocumentCopy()
         {
-            if (HttpContext.Current == null)
+            var allAccessEntries = ApplicationContext.Current.Services.PublicAccessService.GetAll().ToArray();
+
+            var xml = XDocument.Parse("<access/>");
+            foreach (var entry in allAccessEntries)
             {
-                return (XmlDocument)GetXmlDocument().Clone();    
+                var pageXml = new XElement("page",
+                    new XAttribute("id", entry.ProtectedNodeId),
+                    new XAttribute("loginPage", entry.LoginNodeId),
+                    new XAttribute("noRightsPage", entry.NoAccessNodeId));
+
+                foreach (var rule in entry.Rules)
+                {
+                    if (rule.RuleType == Constants.Conventions.PublicAccess.MemberUsernameRuleType)
+                    {
+                        //if there is a member id claim then it is 'simple' (this is how legacy worked)
+                        pageXml.Add(new XAttribute("simple", "True"));
+                        pageXml.Add(new XAttribute("memberId", rule.RuleValue));
+                    }
+                    else if (rule.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType)
+                    {
+                        pageXml.Add(new XElement("group", new XAttribute("id", rule.RuleValue)));
+                    }
+                }
+
+                xml.Root.Add(pageXml);
             }
 
-            if (HttpContext.Current.Items.Contains(typeof (Access)) == false)
-            {
-                HttpContext.Current.Items.Add(typeof (Access), GetXmlDocument().Clone());
-            }
-
-            return (XmlDocument)HttpContext.Current.Items[typeof(Access)];
+            return xml.ToXmlDocument();
         }
 
         #region Manipulation methods
@@ -93,212 +64,167 @@ namespace umbraco.cms.businesslogic.web
         public static void AddMembershipRoleToDocument(int documentId, string role)
         {
             //event
+            var doc = new Document(documentId);
             var e = new AddMemberShipRoleToDocumentEventArgs();
-            new Access().FireBeforeAddMemberShipRoleToDocument(new Document(documentId), role, e);
+            new Access().FireBeforeAddMemberShipRoleToDocument(doc, role, e);
 
             if (e.Cancel) return;
 
-            using (new WriteLock(Locker))
+
+            var entry = ApplicationContext.Current.Services.PublicAccessService.AddOrUpdateRule(
+                doc.ContentEntity,
+                Constants.Conventions.PublicAccess.MemberRoleRuleType,
+                role);
+
+            if (entry == null)
             {
-                var x = (XmlElement)GetPage(documentId);
-
-                if (x == null)
-                    throw new Exception("Document is not protected!");
-
-                if (x.SelectSingleNode("group [@id = '" + role + "']") == null)
-                {
-                    var groupXml = (XmlElement)x.OwnerDocument.CreateNode(XmlNodeType.Element, "group", "");
-                    groupXml.SetAttribute("id", role);
-                    x.AppendChild(groupXml);
-                    Save(x.OwnerDocument);
-                }
+                throw new Exception("Document is not protected!");
             }
 
-            new Access().FireAfterAddMemberShipRoleToDocument(new Document(documentId), role, e);
+            Save();
+
+            new Access().FireAfterAddMemberShipRoleToDocument(doc, role, e);
         }
         
-        /// <summary>
-        /// Used to refresh cache among servers in an LB scenario
-        /// </summary>
-        /// <param name="newDoc"></param>
-        internal static void UpdateInMemoryDocument(XmlDocument newDoc)
-        {
-            //NOTE: This would be better to use our normal ReaderWriter lock but because we are emitting an 
-            // event inside of the WriteLock and code can then listen to the event and call this method we end
-            // up in a dead-lock. This specifically happens in the PublicAccessCacheRefresher.
-            //So instead we use the load locker which is what is used for the static XmlDocument instance, we'll 
-            // lock that, set the doc to null which will cause any reader threads to block for the AccessXml instance
-            // then save the doc and re-load it, then all blocked threads can carry on.
-            lock (LoadLocker)
-            {
-                _accessXmlContent = null;
-                //do a real clone
-                _accessXmlContent = new XmlDocument();
-                _accessXmlContent.LoadXml(newDoc.OuterXml);
-                ClearCheckPages();
-            }
-        }
 
         [Obsolete("This method is no longer supported. Use the ASP.NET MemberShip methods instead", true)]
         public static void AddMemberGroupToDocument(int DocumentId, int MemberGroupId)
         {
-            var x = (XmlElement)GetPage(DocumentId);
+            var content = ApplicationContext.Current.Services.ContentService.GetById(DocumentId);
 
-            if (x == null)
-                throw new Exception("Document is not protected!");
+            if (content == null)
+                throw new Exception("No content found with document id " + DocumentId);
 
-            using (new WriteLock(Locker))
-            {
-                if (x.SelectSingleNode("group [@id = '" + MemberGroupId + "']") == null)
-                {
-                    var groupXml = (XmlElement)x.OwnerDocument.CreateNode(XmlNodeType.Element, "group", "");
-                    groupXml.SetAttribute("id", MemberGroupId.ToString(CultureInfo.InvariantCulture));
-                    x.AppendChild(groupXml);
-                    Save(x.OwnerDocument);
-                }
-            }
+            var entry = ApplicationContext.Current.Services.PublicAccessService.AddOrUpdateRule(
+                content, 
+                Constants.Conventions.PublicAccess.MemberGroupIdRuleType, 
+                MemberGroupId.ToString(CultureInfo.InvariantCulture));
+
+            Save();
         }
 
         [Obsolete("This method is no longer supported. Use the ASP.NET MemberShip methods instead", true)]
         public static void AddMemberToDocument(int DocumentId, int MemberId)
         {
-            var x = (XmlElement)GetPage(DocumentId);
+            var content = ApplicationContext.Current.Services.ContentService.GetById(DocumentId);
 
-            if (x == null)
-                throw new Exception("Document is not protected!");
+            if (content == null)
+                throw new Exception("No content found with document id " + DocumentId);
 
-            using (new WriteLock(Locker))
-            {
-                if (x.Attributes.GetNamedItem("memberId") != null)
-                {
-                    x.Attributes.GetNamedItem("memberId").Value = MemberId.ToString(CultureInfo.InvariantCulture);
-                }
-                else
-                {
-                    x.SetAttribute("memberId", MemberId.ToString(CultureInfo.InvariantCulture));
-                }
-                Save(x.OwnerDocument);
-            }
+            ApplicationContext.Current.Services.PublicAccessService.AddOrUpdateRule(
+                content, 
+                Constants.Conventions.PublicAccess.MemberIdRuleType, 
+                MemberId.ToString(CultureInfo.InvariantCulture));
+
+            Save();
         }
 
         public static void AddMembershipUserToDocument(int documentId, string membershipUserName)
         {
             //event
+            var doc = new Document(documentId);
             var e = new AddMembershipUserToDocumentEventArgs();
-            new Access().FireBeforeAddMembershipUserToDocument(new Document(documentId), membershipUserName, e);
+            new Access().FireBeforeAddMembershipUserToDocument(doc, membershipUserName, e);
 
             if (e.Cancel) return;
 
-            using (new WriteLock(Locker))
+            var entry = ApplicationContext.Current.Services.PublicAccessService.AddOrUpdateRule(
+                doc.ContentEntity, 
+                Constants.Conventions.PublicAccess.MemberUsernameRuleType, 
+                membershipUserName);
+
+            if (entry == null)
             {
-                var x = (XmlElement)GetPage(documentId);
-
-                if (x == null)
-                    throw new Exception("Document is not protected!");
-
-                if (x.Attributes.GetNamedItem("memberId") != null)
-                    x.Attributes.GetNamedItem("memberId").Value = membershipUserName;
-                else
-                    x.SetAttribute("memberId", membershipUserName);
-                Save(x.OwnerDocument);
+                throw new Exception("Document is not protected!");
             }
 
-            new Access().FireAfterAddMembershipUserToDocument(new Document(documentId), membershipUserName, e);
+            Save();
+   
+            new Access().FireAfterAddMembershipUserToDocument(doc, membershipUserName, e);
         }
 
         [Obsolete("This method is no longer supported. Use the ASP.NET MemberShip methods instead", true)]
         public static void RemoveMemberGroupFromDocument(int DocumentId, int MemberGroupId)
         {
-            using (new WriteLock(Locker))
+            var doc = new Document(DocumentId);
+
+            var entry = ApplicationContext.Current.Services.PublicAccessService.AddOrUpdateRule(
+                doc.ContentEntity, 
+                Constants.Conventions.PublicAccess.MemberGroupIdRuleType, 
+                MemberGroupId.ToString(CultureInfo.InvariantCulture));
+
+            if (entry == null)
             {
-                var x = (XmlElement)GetPage(DocumentId);
-
-                if (x == null)
-                    throw new Exception("Document is not protected!");
-
-                var xGroup = x.SelectSingleNode("group [@id = '" + MemberGroupId + "']");
-                if (xGroup == null) return;
-
-                x.RemoveChild(xGroup);
-                Save(x.OwnerDocument);
+                throw new Exception("Document is not protected!");
             }
+            Save();
         }
 
         public static void RemoveMembershipRoleFromDocument(int documentId, string role)
         {
+            var doc = new Document(documentId);
             var e = new RemoveMemberShipRoleFromDocumentEventArgs();
-            new Access().FireBeforeRemoveMemberShipRoleFromDocument(new Document(documentId), role, e);
+            new Access().FireBeforeRemoveMemberShipRoleFromDocument(doc, role, e);
 
             if (e.Cancel) return;
 
-            using (new WriteLock(Locker))
-            {
-                var x = (XmlElement)GetPage(documentId);
-                if (x == null)
-                    throw new Exception("Document is not protected!");
-                var xGroup = x.SelectSingleNode("group [@id = '" + role + "']");
+            ApplicationContext.Current.Services.PublicAccessService.RemoveRule(
+                doc.ContentEntity,
+                Constants.Conventions.PublicAccess.MemberRoleRuleType,
+                role);
 
-                if (xGroup != null)
-                {
-                    x.RemoveChild(xGroup);
-                    Save(x.OwnerDocument);
-                }
-            }
+            Save();
 
-            new Access().FireAfterRemoveMemberShipRoleFromDocument(new Document(documentId), role, e);
+            new Access().FireAfterRemoveMemberShipRoleFromDocument(doc, role, e);
         }
 
         public static bool RenameMemberShipRole(string oldRolename, string newRolename)
         {
-            var hasChange = false;
-            if (oldRolename == newRolename) return false;
-
-            using (new WriteLock(Locker))
-            {
-                var xDoc = GetXmlDocumentCopy();
-                oldRolename = oldRolename.Replace("'", "&apos;");
-                foreach (XmlNode x in xDoc.SelectNodes("//group [@id = '" + oldRolename + "']"))
-                {
-                    x.Attributes["id"].Value = newRolename;
-                    hasChange = true;
-                }
-                if (hasChange)
-                    Save(xDoc);
-            }
+            var hasChange = ApplicationContext.Current.Services.PublicAccessService.RenameMemberGroupRoleRules(oldRolename, newRolename);
+            
+            if (hasChange)
+                Save();
 
             return hasChange;
         }
 
         public static void ProtectPage(bool Simple, int DocumentId, int LoginDocumentId, int ErrorDocumentId)
         {
+            var doc = new Document(DocumentId);
             var e = new AddProtectionEventArgs();
-            new Access().FireBeforeAddProtection(new Document(DocumentId), e);
+            new Access().FireBeforeAddProtection(doc, e);
 
             if (e.Cancel) return;
 
-            using (new WriteLock(Locker))
+            var loginContent = ApplicationContext.Current.Services.ContentService.GetById(LoginDocumentId);
+            if (loginContent == null) throw new NullReferenceException("No content item found with id " + LoginDocumentId);
+            var noAccessContent = ApplicationContext.Current.Services.ContentService.GetById(ErrorDocumentId);
+            if (noAccessContent == null) throw new NullReferenceException("No content item found with id " + ErrorDocumentId);
+
+            var entry = ApplicationContext.Current.Services.PublicAccessService.GetEntryForContent(doc.ContentEntity);
+            if (entry != null)
             {
-                var x = (XmlElement)GetPage(DocumentId);
-
-                if (x == null)
+                if (Simple)
                 {
-                    var xDoc = GetXmlDocumentCopy();
-
-                    x = (XmlElement)xDoc.CreateNode(XmlNodeType.Element, "page", "");
-                    x.OwnerDocument.DocumentElement.AppendChild(x);
+                    // if using simple mode, make sure that all existing groups are removed
+                    entry.ClearRules();    
                 }
-                // if using simple mode, make sure that all existing groups are removed
-                else if (Simple)
-                {
-                    x.RemoveAll();
-                }
-                x.SetAttribute("id", DocumentId.ToString());
-                x.SetAttribute("loginPage", LoginDocumentId.ToString());
-                x.SetAttribute("noRightsPage", ErrorDocumentId.ToString());
-                x.SetAttribute("simple", Simple.ToString());
-                Save(x.OwnerDocument);
-                ClearCheckPages();
+                
+                //ensure the correct ids are applied
+                entry.LoginNodeId = loginContent.Id;
+                entry.NoAccessNodeId = noAccessContent.Id;
             }
+            else
+            {
+                entry = new PublicAccessEntry(doc.ContentEntity, 
+                    ApplicationContext.Current.Services.ContentService.GetById(LoginDocumentId),
+                    ApplicationContext.Current.Services.ContentService.GetById(ErrorDocumentId),
+                    new List<PublicAccessRule>());
+            }
+
+            ApplicationContext.Current.Services.PublicAccessService.Save(entry);
+
+            Save();
 
             new Access().FireAfterAddProtection(new Document(DocumentId), e);
         }
@@ -306,22 +232,21 @@ namespace umbraco.cms.businesslogic.web
         public static void RemoveProtection(int DocumentId)
         {
             //event
+            var doc = new Document(DocumentId);
             var e = new RemoveProtectionEventArgs();
-            new Access().FireBeforeRemoveProtection(new Document(DocumentId), e);
+            new Access().FireBeforeRemoveProtection(doc, e);
 
             if (e.Cancel) return;
 
-            using (new WriteLock(Locker))
+            var entry = ApplicationContext.Current.Services.PublicAccessService.GetEntryForContent(doc.ContentEntity);
+            if (entry != null)
             {
-                var x = (XmlElement)GetPage(DocumentId);
-                if (x == null) return;
-
-                x.ParentNode.RemoveChild(x);
-                Save(x.OwnerDocument);
-                ClearCheckPages();
+                ApplicationContext.Current.Services.PublicAccessService.Delete(entry);
             }
 
-            new Access().FireAfterRemoveProtection(new Document(DocumentId), e);
+            Save();
+
+            new Access().FireAfterRemoveProtection(doc, e);
         } 
         #endregion
 
@@ -330,168 +255,109 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("This method is no longer supported. Use the ASP.NET MemberShip methods instead", true)]
         public static bool IsProtectedByGroup(int DocumentId, int GroupId)
         {
-            bool isProtected = false;
-
             var d = new Document(DocumentId);
 
-            using (new ReadLock(Locker))
-            {
-                if (IsProtectedInternal(DocumentId, d.Path))
-                {
-                    var currentNode = GetPage(GetProtectedPage(d.Path));
-                    if (currentNode.SelectSingleNode("./group [@id=" + GroupId + "]") != null)
-                    {
-                        isProtected = true;
-                    }
-                }
-            }
+            var entry = ApplicationContext.Current.Services.PublicAccessService.GetEntryForContent(d.ContentEntity);
+            if (entry == null) return false;
 
-            return isProtected;
+            return entry.Rules
+                .Any(x => x.RuleType == Constants.Conventions.PublicAccess.MemberGroupIdRuleType 
+                    && x.RuleValue == GroupId.ToString(CultureInfo.InvariantCulture));
+
         }
 
         public static bool IsProtectedByMembershipRole(int documentId, string role)
         {
-            bool isProtected = false;
+            var content = ApplicationContext.Current.Services.ContentService.GetById(documentId);
 
-            var d = new CMSNode(documentId);
+            var entry = ApplicationContext.Current.Services.PublicAccessService.GetEntryForContent(content);
+            if (entry == null) return false;
 
-            using (new ReadLock(Locker))
-            {
-                if (IsProtectedInternal(documentId, d.Path))
-                {
-                    var currentNode = GetPage(GetProtectedPage(d.Path));
-                    if (currentNode.SelectSingleNode("./group [@id='" + role + "']") != null)
-                    {
-                        isProtected = true;
-                    }
-                }
-            }
+            return entry.Rules
+                .Any(x => x.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType
+                    && x.RuleValue == role);
 
-            return isProtected;
         }
 
         public static string[] GetAccessingMembershipRoles(int documentId, string path)
         {
-            var roles = new ArrayList();
+            var entry = ApplicationContext.Current.Services.PublicAccessService.GetEntryForContent(path.EnsureEndsWith("," + documentId));
+            if (entry == null) return new string[] { };
 
-            using (new ReadLock(Locker))
-            {
-                if (IsProtectedInternal(documentId, path) == false)
-                    return null;
+            var memberGroupRoleRules = entry.Rules.Where(x => x.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType);
+            return memberGroupRoleRules.Select(x => x.RuleValue).ToArray();
 
-                var currentNode = GetPage(GetProtectedPage(path));
-                foreach (XmlNode n in currentNode.SelectNodes("./group"))
-                {
-                    roles.Add(n.Attributes.GetNamedItem("id").Value);
-                }
-            }
-
-            return (string[])roles.ToArray(typeof(string));
         }
 
         [Obsolete("This method is no longer supported. Use the ASP.NET MemberShip methods instead", true)]
         public static member.MemberGroup[] GetAccessingGroups(int DocumentId)
         {
-            var d = new Document(DocumentId);
+            var content = ApplicationContext.Current.Services.ContentService.GetById(DocumentId);
+            if (content == null) return null;
 
-            using (new ReadLock(Locker))
-            {
-                if (IsProtectedInternal(DocumentId, d.Path) == false)
-                    return null;
+            var entry = ApplicationContext.Current.Services.PublicAccessService.GetEntryForContent(content);
+            if (entry == null) return null;
 
-                var currentNode = GetPage(GetProtectedPage(d.Path));
-                var mg = new member.MemberGroup[currentNode.SelectNodes("./group").Count];
-                int count = 0;
-                foreach (XmlNode n in currentNode.SelectNodes("./group"))
-                {
-                    mg[count] = new member.MemberGroup(int.Parse(n.Attributes.GetNamedItem("id").Value));
-                    count++;
-                }
-                return mg;
-            }
+            var memberGroupIdRules = entry.Rules.Where(x => x.RuleType == Constants.Conventions.PublicAccess.MemberGroupIdRuleType);
+
+            return memberGroupIdRules.Select(x => new member.MemberGroup(int.Parse(x.RuleValue))).ToArray();
 
         }
 
         [Obsolete("This method is no longer supported. Use the ASP.NET MemberShip methods instead", true)]
         public static member.Member GetAccessingMember(int DocumentId)
         {
-            var d = new Document(DocumentId);
+            var content = ApplicationContext.Current.Services.ContentService.GetById(DocumentId);
+            if (content == null) return null;
 
-            using (new ReadLock(Locker))
+            var entry = ApplicationContext.Current.Services.PublicAccessService.GetEntryForContent(content);
+            if (entry == null) return null;
+
+            //legacy would throw an exception here if it was not 'simple' and simple means based on a member id in this case
+            if (entry.Rules.All(x => x.RuleType != Constants.Conventions.PublicAccess.MemberIdRuleType))
             {
-                if (IsProtectedInternal(DocumentId, d.Path) == false)
-                    return null;
-
-                if (GetProtectionTypeInternal(DocumentId) != ProtectionType.Simple)
-                    throw new Exception("Document isn't protected using Simple mechanism. Use GetAccessingMemberGroups instead");
-
-                var currentNode = GetPage(GetProtectedPage(d.Path));
-                if (currentNode.Attributes.GetNamedItem("memberId") != null)
-                    return new member.Member(int.Parse(
-                        currentNode.Attributes.GetNamedItem("memberId").Value));
+                throw new Exception("Document isn't protected using Simple mechanism. Use GetAccessingMemberGroups instead");
             }
+            
+            var memberIdRule = entry.Rules.First(x => x.RuleType == Constants.Conventions.PublicAccess.MemberIdRuleType);
+            return new member.Member(int.Parse(memberIdRule.RuleValue));
 
-            throw new Exception("Document doesn't contain a memberId. This might be caused if document is protected using umbraco RC1 or older.");
         }
 
         public static MembershipUser GetAccessingMembershipUser(int documentId)
         {
-            var d = new CMSNode(documentId);
+            var content = ApplicationContext.Current.Services.ContentService.GetById(documentId);
+            if (content == null) return null;
 
-            using (new ReadLock(Locker))
-            {
-                if (IsProtectedInternal(documentId, d.Path) == false)
-                    return null;
+            var entry = ApplicationContext.Current.Services.PublicAccessService.GetEntryForContent(content);
+            if (entry == null) return null;
 
-                if (GetProtectionTypeInternal(documentId) != ProtectionType.Simple)
-                    throw new Exception("Document isn't protected using Simple mechanism. Use GetAccessingMemberGroups instead");
-
-                var currentNode = GetPage(GetProtectedPage(d.Path));
-                if (currentNode.Attributes.GetNamedItem("memberId") != null)
-                {
-                    var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
-
-                    return provider.GetUser(currentNode.Attributes.GetNamedItem("memberId").Value, false);
-                }
+            //legacy would throw an exception here if it was not 'simple' and simple means based on a username
+            if (entry.Rules.All(x => x.RuleType != Constants.Conventions.PublicAccess.MemberUsernameRuleType))
+            {                
+                throw new Exception("Document isn't protected using Simple mechanism. Use GetAccessingMemberGroups instead");
             }
 
-            throw new Exception("Document doesn't contain a memberId. This might be caused if document is protected using umbraco RC1 or older.");
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+            var usernameRule = entry.Rules.First(x => x.RuleType == Constants.Conventions.PublicAccess.MemberUsernameRuleType);
+            return provider.GetUser(usernameRule.RuleValue, false);
+
         }
 
 
         [Obsolete("This method is no longer supported. Use the ASP.NET MemberShip methods instead", true)]
         public static bool HasAccess(int DocumentId, member.Member Member)
         {
-            bool hasAccess = false;
+            var content = ApplicationContext.Current.Services.ContentService.GetById(DocumentId);
+            if (content == null) return true;
 
-            var d = new Document(DocumentId);
+            var entry = ApplicationContext.Current.Services.PublicAccessService.GetEntryForContent(content);
+            if (entry == null) return true;
 
-            using (new ReadLock(Locker))
-            {
-                if (IsProtectedInternal(DocumentId, d.Path) == false)
-                {
-                    hasAccess = true;
-                }
-                else
-                {
-                    var currentNode = GetPage(GetProtectedPage(d.Path));
-                    if (Member != null)
-                    {
-                        var ide = Member.Groups.GetEnumerator();
-                        while (ide.MoveNext())
-                        {
-                            var mg = (member.MemberGroup)ide.Value;
-                            if (currentNode.SelectSingleNode("./group [@id=" + mg.Id.ToString() + "]") != null)
-                            {
-                                hasAccess = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
+            var memberGroupIds = Member.Groups.Values.Cast<MemberGroup>().Select(x => x.Id.ToString(CultureInfo.InvariantCulture)).ToArray();
+            return entry.Rules.Any(x => x.RuleType == Constants.Conventions.PublicAccess.MemberGroupIdRuleType
+                                        && memberGroupIds.Contains(x.RuleValue));
 
-            return hasAccess;
         }
 
         [Obsolete("This method has been replaced because of a spelling mistake. Use the HasAccess method instead.", false)]
@@ -503,204 +369,76 @@ namespace umbraco.cms.businesslogic.web
 
         public static bool HasAccess(int documentId, object memberId)
         {
-            bool hasAccess = false;
-            var node = new CMSNode(documentId);
-
-            using (new ReadLock(Locker))
-            {
-                if (IsProtectedInternal(documentId, node.Path) == false)
-                    return true;
-
-                var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
-
-                var member = provider.GetUser(memberId, false);
-                var currentNode = GetPage(GetProtectedPage(node.Path));
-
-                if (member != null)
-                {
-                    foreach (string role in Roles.GetRolesForUser(member.UserName))
-                    {
-                        if (currentNode.SelectSingleNode("./group [@id='" + role + "']") != null)
-                        {
-                            hasAccess = true;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            return hasAccess;
+            return ApplicationContext.Current.Services.PublicAccessService.HasAccess(
+                documentId, 
+                memberId, 
+                ApplicationContext.Current.Services.ContentService,
+                MembershipProviderExtensions.GetMembersMembershipProvider(),
+                //TODO: This should really be targeting a specific provider by name!!
+                Roles.Provider);
         }
 
         public static bool HasAccess(int documentId, string path, MembershipUser member)
         {
-            bool hasAccess = false;
-
-            using (new ReadLock(Locker))
-            {
-                if (IsProtectedInternal(documentId, path) == false)
-                {
-                    hasAccess = true;
-                }
-                else
-                {
-                    XmlNode currentNode = GetPage(GetProtectedPage(path));
-                    if (member != null)
-                    {
-                        string[] roles = Roles.GetRolesForUser(member.UserName);
-                        foreach (string role in roles)
-                        {
-                            if (currentNode.SelectSingleNode("./group [@id='" + role + "']") != null)
-                            {
-                                hasAccess = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            return hasAccess;
+            return ApplicationContext.Current.Services.PublicAccessService.HasAccess(
+                 path,
+                 member,
+                //TODO: This should really be targeting a specific provider by name!!
+                 Roles.Provider);
         }
 
         public static ProtectionType GetProtectionType(int DocumentId)
         {
-            using (new ReadLock(Locker))
-            {
-                XmlNode x = GetPage(DocumentId);
-                try
-                {
-                    return bool.Parse(x.Attributes.GetNamedItem("simple").Value)
-                        ? ProtectionType.Simple
-                        : ProtectionType.Advanced;
-                }
-                catch
-                {
-                    return ProtectionType.NotProtected;
-                }
-            }
+            var content = ApplicationContext.Current.Services.ContentService.GetById(DocumentId);
+            if (content == null) return ProtectionType.NotProtected;
+
+            var entry = ApplicationContext.Current.Services.PublicAccessService.GetEntryForContent(content);
+            if (entry == null) return ProtectionType.NotProtected;
+
+            //legacy states that if it is protected by a member id then it is 'simple'
+            return entry.Rules.Any(x => x.RuleType == Constants.Conventions.PublicAccess.MemberIdRuleType)
+                ? ProtectionType.Simple 
+                : ProtectionType.Advanced;
 
         }
 
         public static bool IsProtected(int DocumentId, string Path)
         {
-            using (new ReadLock(Locker))
-            {
-                return IsProtectedInternal(DocumentId, Path);
-            }
+            return ApplicationContext.Current.Services.PublicAccessService.IsProtected(Path.EnsureEndsWith("," + DocumentId));             
         }
 
         public static int GetErrorPage(string Path)
         {
-            using (new ReadLock(Locker))
-            {
-                return int.Parse(GetPage(GetProtectedPage(Path)).Attributes.GetNamedItem("noRightsPage").Value);
-            }
+            var entry = ApplicationContext.Current.Services.PublicAccessService.GetEntryForContent(Path);
+            if (entry == null) return -1;
+            var entity = ApplicationContext.Current.Services.EntityService.Get(entry.NoAccessNodeId, UmbracoObjectTypes.Document, false);
+            return entity.Id;
+
         }
 
         public static int GetLoginPage(string Path)
         {
-            using (new ReadLock(Locker))
-            {
-                return int.Parse(GetPage(GetProtectedPage(Path)).Attributes.GetNamedItem("loginPage").Value);
-            }
+            var entry = ApplicationContext.Current.Services.PublicAccessService.GetEntryForContent(Path);
+            if (entry == null) return -1;
+            var entity = ApplicationContext.Current.Services.EntityService.Get(entry.LoginNodeId, UmbracoObjectTypes.Document, false);
+            return entity.Id;
+
         } 
         #endregion
 
-        private static ProtectionType GetProtectionTypeInternal(int DocumentId)
+
+        //NOTE: This is purely here for backwards compat for events
+        private static void Save()
         {
-            //NOTE: No locks here! the locking is done in callers to this method
-
-            XmlNode x = GetPage(DocumentId);
-            try
-            {
-                return bool.Parse(x.Attributes.GetNamedItem("simple").Value)
-                    ? ProtectionType.Simple
-                    : ProtectionType.Advanced;
-            }
-            catch
-            {
-                return ProtectionType.NotProtected;
-            }
-        }
-
-        private static bool IsProtectedInternal(int DocumentId, string Path)
-        {
-            //NOTE: No locks here! the locking is done in callers to this method
-
-            bool isProtected = false;
-
-            if (CheckedPages.ContainsKey(DocumentId) == false)
-            {
-                foreach (string id in Path.Split(','))
-                {
-                    if (GetPage(int.Parse(id)) != null)
-                    {
-                        isProtected = true;
-                        break;
-                    }
-                }
-
-                if (CheckedPages.ContainsKey(DocumentId) == false)
-                {
-                    CheckedPages.Add(DocumentId, isProtected);
-                }
-            }
-            else
-            {
-                isProtected = (bool)CheckedPages[DocumentId];
-            }
-
-            return isProtected;
-        }
-
-        private static void Save(XmlDocument newDoc)
-        {
-            //NOTE: No locks here! the locking is done in callers to this method
-
             var e = new SaveEventArgs();
 
             new Access().FireBeforeSave(e);
 
             if (e.Cancel) return;
 
-            using (var f = File.Open(_accessXmlFilePath, FileMode.Create))
-            {
-                newDoc.Save(f);
-                f.Close();
-                //set the underlying in-mem object to null so it gets re-read
-                _accessXmlContent = null;
-            }
-
             new Access().FireAfterSave(e);
         }
 
-        private static int GetProtectedPage(string Path)
-        {
-            //NOTE: No locks here! the locking is done in callers to this method
-
-            int protectedPage = 0;
-
-            foreach (string id in Path.Split(','))
-                if (GetPage(int.Parse(id)) != null)
-                    protectedPage = int.Parse(id);
-
-            return protectedPage;
-        }
-
-        private static XmlNode GetPage(int documentId)
-        {
-            //NOTE: No locks here! the locking is done in callers to this method
-            var xDoc = GetXmlDocumentCopy();
-
-            var x = xDoc.SelectSingleNode("/access/page [@id=" + documentId + "]");
-            return x;
-        }
-
-        private static void ClearCheckPages()
-        {
-            CheckedPages.Clear();
-        }
 
         //Event delegates
         public delegate void SaveEventHandler(Access sender, SaveEventArgs e);

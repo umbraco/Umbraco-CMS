@@ -19,7 +19,7 @@ namespace Umbraco.Web.Models
         [DataMember(Name = "group")]
         public string Group { get; set; }
 
-        [DataMember(Name = "nodeCount`")]
+        [DataMember(Name = "nodeCount")]
         public int NodeCount { get; set; }
     }
 }

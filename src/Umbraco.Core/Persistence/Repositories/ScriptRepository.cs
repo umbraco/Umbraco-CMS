@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -13,14 +15,13 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class ScriptRepository : FileRepository<string, Script>, IScriptRepository
     {
-		internal ScriptRepository(IUnitOfWork work, IFileSystem fileSystem)
-			: base(work, fileSystem)
-	    {		    
-	    }
+        private readonly IContentSection _contentConfig;
 
-        public ScriptRepository(IUnitOfWork work)
-			: this(work, new PhysicalFileSystem(SystemDirectories.Scripts))
+        public ScriptRepository(IUnitOfWork work, IFileSystem fileSystem, IContentSection contentConfig)
+			: base(work, fileSystem)
         {
+            if (contentConfig == null) throw new ArgumentNullException("contentConfig");
+            _contentConfig = contentConfig;
         }
 
         #region Implementation of IRepository<string,Script>
@@ -77,12 +78,39 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                var files = FindAllFiles("");
+                var files = FindAllFiles("", "*.*");
                 foreach (var file in files)
                 {
                     yield return Get(file);
                 }
             }
+        }
+
+        public bool ValidateScript(Script script)
+        {
+            //NOTE Since a script file can be both JS, Razor Views, Razor Macros and Xslt
+            //it might be an idea to create validations for all 3 and divide the validation 
+            //into 4 private methods.
+            //See codeEditorSave.asmx.cs for reference.
+
+            var exts = _contentConfig.ScriptFileTypes.ToList();
+            /*if (UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
+            {
+                exts.Add("cshtml");
+                exts.Add("vbhtml");
+            }*/
+
+            var dirs = SystemDirectories.Scripts;
+            /*if (UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
+                dirs += "," + SystemDirectories.MvcViews;*/
+
+            //Validate file
+            var validFile = IOHelper.VerifyEditPath(script.VirtualPath, dirs.Split(','));
+
+            //Validate extension
+            var validExtension = IOHelper.VerifyFileExtension(script.VirtualPath, exts);
+
+            return validFile && validExtension;
         }
 
         #endregion

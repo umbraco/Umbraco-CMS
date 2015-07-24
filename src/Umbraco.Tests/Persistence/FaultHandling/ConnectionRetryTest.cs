@@ -1,5 +1,7 @@
 ﻿using System.Data.SqlClient;
+using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 
 namespace Umbraco.Tests.Persistence.FaultHandling
@@ -13,7 +15,7 @@ namespace Umbraco.Tests.Persistence.FaultHandling
             // Arrange
             const string providerName = "System.Data.SqlClient";
             const string connectionString = @"server=.\SQLEXPRESS;database=EmptyForTest;user id=x;password=umbraco";
-            var factory = new DefaultDatabaseFactory(connectionString, providerName);
+            var factory = new DefaultDatabaseFactory(connectionString, providerName, Mock.Of<ILogger>());
             var database = factory.CreateDatabase();
 
             //Act
@@ -27,7 +29,7 @@ namespace Umbraco.Tests.Persistence.FaultHandling
             // Arrange
             const string providerName = "System.Data.SqlClient";
             const string connectionString = @"server=.\SQLEXPRESS;database=EmptyForTest;user id=umbraco;password=umbraco";
-            var factory = new DefaultDatabaseFactory(connectionString, providerName);
+            var factory = new DefaultDatabaseFactory(connectionString, providerName, Mock.Of<ILogger>());
             var database = factory.CreateDatabase();
 
             //Act

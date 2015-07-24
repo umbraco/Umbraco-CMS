@@ -24,6 +24,9 @@ function fixNumber($parse) {
 
             //always return an int to the model
             ctrl.$parsers.push(function (value) {
+                if (value === 0) {
+                    return 0;
+                }
                 return parseFloat(value || '', 10);
             });
 

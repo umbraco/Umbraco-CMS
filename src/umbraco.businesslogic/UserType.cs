@@ -122,7 +122,7 @@ namespace umbraco.BusinessLogic
         /// </summary>
         public string DefaultPermissions
         {
-            get { return string.Join("", UserTypeItem.Permissions); }
+            get { return UserTypeItem.Permissions == null ? string.Empty : string.Join("", UserTypeItem.Permissions); }
             set { UserTypeItem.Permissions = value.ToCharArray().Select(x => x.ToString(CultureInfo.InvariantCulture)); }
         }
 
@@ -184,7 +184,6 @@ namespace umbraco.BusinessLogic
         /// <param name="name"></param>
         /// <param name="defaultPermissions"></param>
         /// <param name="alias"></param>
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public static UserType MakeNew(string name, string defaultPermissions, string alias)
         {
             //ensure that the current alias does not exist

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web.UI.Pages;
@@ -19,7 +20,7 @@ namespace umbraco.dialogs
             base.OnLoad(e);
 
             var nodeId = GetNodeId();
-            var node = ApplicationContext.Current.Services.ContentService.GetById(nodeId);
+            var node = Services.ContentService.GetById(nodeId);
 
             if (node == null)
             {
@@ -30,7 +31,7 @@ namespace umbraco.dialogs
                 return;
             }
 
-            if (!UmbracoUser.GetPermissions(node.Path).Contains(BusinessLogic.Actions.ActionAssignDomain.Instance.Letter))
+            if (UmbracoUser.GetPermissions(node.Path).Contains(ActionAssignDomain.Instance.Letter) == false)
             {
                 feedback.Text = ui.Text("assignDomain", "permissionDenied");
                 pane_language.Visible = false;
@@ -43,7 +44,7 @@ namespace umbraco.dialogs
             pane_domains.Title = ui.Text("assignDomain", "setDomains");
             prop_language.Text = ui.Text("assignDomain", "language");
 
-            var nodeDomains = DomainHelper.GetNodeDomains(nodeId, true);
+            var nodeDomains = Services.DomainService.GetAssignedDomains(nodeId, true).ToArray();
             var wildcard = nodeDomains.FirstOrDefault(d => d.IsWildcard);
 
             var sb = new StringBuilder();
@@ -53,12 +54,12 @@ namespace umbraco.dialogs
                 sb.AppendFormat("{0}{{ \"Id\": {1}, \"Code\": \"{2}\" }}", (i++ == 0 ? "" : ","), language.Id, language.IsoCode);
             sb.Append("]\r\n");
 
-            sb.AppendFormat(",language: {0}", wildcard == null ? "undefined" : wildcard.Language.id.ToString());
+            sb.AppendFormat(",language: {0}", wildcard == null ? "undefined" : wildcard.Language.Id.ToString());
 
             sb.Append(",domains: [");
             i = 0;
-            foreach (var domain in nodeDomains.Where(d => !d.IsWildcard))
-                sb.AppendFormat("{0}{{ \"Name\": \"{1}\", \"Lang\": \"{2}\" }}", (i++ == 0 ? "" :","), domain.Name, domain.Language.id);
+            foreach (var domain in nodeDomains.Where(d => d.IsWildcard == false))
+                sb.AppendFormat("{0}{{ \"Name\": \"{1}\", \"Lang\": \"{2}\" }}", (i++ == 0 ? "" :","), domain.DomainName, domain.Language.Id);
             sb.Append("]\r\n");
 
             data.Text = sb.ToString();
@@ -67,7 +68,7 @@ namespace umbraco.dialogs
         protected int GetNodeId()
         {
             int nodeId;
-            if (!int.TryParse(Request.QueryString["id"], out nodeId))
+            if (int.TryParse(Request.QueryString["id"], out nodeId) == false)
                 nodeId = -1;
             return nodeId;
         }

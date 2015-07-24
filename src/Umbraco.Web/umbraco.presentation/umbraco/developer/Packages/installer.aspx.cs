@@ -13,6 +13,7 @@ using System.Web.UI.HtmlControls;
 using System.Xml;
 using System.Xml.XPath;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Web;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
@@ -220,7 +221,7 @@ namespace umbraco.presentation.developer.packages
             var packageId = 0;
             int.TryParse(Request.GetItemAsString("pId"), out packageId);
 
-            switch (currentStep)
+            switch (currentStep.ToLowerInvariant())
             {
                 case "businesslogic":
                     //first load in the config from the temporary directory
@@ -241,7 +242,7 @@ namespace umbraco.presentation.developer.packages
                         Response.Redirect("installer.aspx?installing=refresh&dir=" + dir + "&pId=" + packageId.ToString() + "&customUrl=" + Server.UrlEncode(_installer.Url));
                     }
                     break;
-                case "customInstaller":
+                case "custominstaller":
                     var customControl = Request.GetItemAsString("customControl");
 
                     if (customControl.IsNullOrWhiteSpace() == false)
@@ -355,7 +356,7 @@ namespace umbraco.presentation.developer.packages
             _installer.InstallCleanUp(packageId, dir);
 
             // Update ClientDependency version
-            var clientDependencyConfig = new Umbraco.Core.Configuration.ClientDependencyConfiguration();
+            var clientDependencyConfig = new Umbraco.Core.Configuration.ClientDependencyConfiguration(LoggerResolver.Current.Logger);
             var clientDependencyUpdated = clientDependencyConfig.IncreaseVersionNumber();
             
             //clear the tree cache - we'll do this here even though the browser will reload, but just in case it doesn't can't hurt.

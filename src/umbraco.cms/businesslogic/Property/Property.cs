@@ -6,6 +6,7 @@ using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.datatype;
@@ -137,20 +138,9 @@ namespace umbraco.cms.businesslogic.property
         }
         public XmlNode ToXml(XmlDocument xd)
         {
-            string nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "data" : helpers.Casing.SafeAlias(PropertyType.Alias);
-            XmlNode x = xd.CreateNode(XmlNodeType.Element, nodeName, "");
-
-            // Alias
-            if (UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema)
-            {
-                XmlAttribute alias = xd.CreateAttribute("alias");
-                alias.Value = this.PropertyType.Alias;
-                x.Attributes.Append(alias);
-            }
-
-            x.AppendChild(_data.ToXMl(xd));
-
-            return x;
+            var serializer = new EntityXmlSerializer();
+            var xml = serializer.Serialize(ApplicationContext.Current.Services.DataTypeService, this._property);
+            return xml.GetXmlNode(xd);
         }
 
 

@@ -1,79 +1,95 @@
 using System;
-using System.Diagnostics;
-using System.Net;
-using System.Text;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Publishing;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web.Scheduling
 {
-    internal class ScheduledPublishing : DisposableObject, IBackgroundTask
+    internal class ScheduledPublishing : RecurringTaskBase
     {
         private readonly ApplicationContext _appContext;
         private readonly IUmbracoSettingsSection _settings;
 
-        private static bool _isPublishingRunning = false;
-
-        public ScheduledPublishing(ApplicationContext appContext, IUmbracoSettingsSection settings)
+        public ScheduledPublishing(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
+            ApplicationContext appContext, IUmbracoSettingsSection settings)
+            : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _appContext = appContext;
             _settings = settings;
         }
 
-
-        /// <summary>
-        /// Handles the disposal of resources. Derived from abstract class <see cref="DisposableObject"/> which handles common required locking logic.
-        /// </summary>
-        protected override void DisposeResources()
+        public override bool PerformRun()
         {
+            throw new NotImplementedException();
         }
 
-        public void Run()
-        {
-            if (_appContext == null) return;
+        public override async Task<bool> PerformRunAsync(CancellationToken token)
+        {            
+            if (_appContext == null) return true; // repeat...
+
+            if (ServerEnvironmentHelper.GetStatus(_settings) == CurrentServerEnvironmentStatus.Slave)
+            {
+                LogHelper.Debug<ScheduledPublishing>("Does not run on slave servers.");
+                return false; // do NOT repeat, server status comes from config and will NOT change
+            }
+
+            // ensure we do not run if not main domain, but do NOT lock it
+            if (_appContext.MainDom.IsMainDom == false)
+            {
+                LogHelper.Debug<ScheduledPublishing>("Does not run if not MainDom.");
+                return false; // do NOT repeat, going down
+            }
 
             using (DisposableTimer.DebugDuration<ScheduledPublishing>(() => "Scheduled publishing executing", () => "Scheduled publishing complete"))
             {
-                if (_isPublishingRunning) return;
-
-                _isPublishingRunning = true;
-
-                var umbracoBaseUrl = ServerEnvironmentHelper.GetCurrentServerUmbracoBaseUrl(_appContext, _settings);
+                string umbracoAppUrl = null;
 
                 try
-                {                    
-
-                    if (string.IsNullOrWhiteSpace(umbracoBaseUrl))
+                {
+                    umbracoAppUrl = _appContext.UmbracoApplicationUrl;
+                    if (umbracoAppUrl.IsNullOrWhiteSpace())
                     {
                         LogHelper.Warn<ScheduledPublishing>("No url for service (yet), skip.");
+                        return true; // repeat
                     }
-                    else
-                    {
-                        var url = string.Format("{0}RestServices/ScheduledPublish/Index", umbracoBaseUrl.EnsureEndsWith('/'));
-                        using (var wc = new WebClient())
-                        {
-                            //pass custom the authorization header
-                            wc.Headers.Set("Authorization", AdminTokenAuthorizeAttribute.GetAuthHeaderTokenVal(_appContext));
 
-                            var result = wc.UploadString(url, "");
-                        }                        
+                    var url = umbracoAppUrl + "/RestServices/ScheduledPublish/Index";
+                    using (var wc = new HttpClient())
+                    {
+                        var request = new HttpRequestMessage()
+                        {
+                            RequestUri = new Uri(url),
+                            Method = HttpMethod.Post,
+                            Content = new StringContent(string.Empty)
+                        };
+                        //pass custom the authorization header
+                        request.Headers.Authorization = AdminTokenAuthorizeAttribute.GetAuthenticationHeaderValue(_appContext);
+
+                        var result = await wc.SendAsync(request, token);
                     }
                 }
-                catch (Exception ee)
+                catch (Exception e)
                 {
-                    LogHelper.Error<ScheduledPublishing>(
-                        string.Format("An error occurred with the scheduled publishing. The base url used in the request was: {0}, see http://our.umbraco.org/documentation/Using-Umbraco/Config-files/umbracoSettings/#ScheduledTasks documentation for details on setting a baseUrl if this is in error", umbracoBaseUrl)
-                        , ee);
+                    LogHelper.Error<ScheduledPublishing>(string.Format("Failed (at \"{0}\").", umbracoAppUrl), e);
                 }
-                finally
-                {
-                    _isPublishingRunning = false;
-                }
-            }            
+            }
+
+            return true; // repeat
+        }
+
+        public override bool IsAsync
+        {
+            get { return true; }
+        }
+    
+        public override bool RunsOnShutdown
+        {
+            get { return false; }
         }
     }
 }

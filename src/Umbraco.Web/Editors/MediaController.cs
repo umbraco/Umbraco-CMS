@@ -32,6 +32,7 @@ using umbraco;
 using umbraco.BusinessLogic.Actions;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Persistence.FaultHandling;
 
 namespace Umbraco.Web.Editors
 {
@@ -247,7 +248,7 @@ namespace Umbraco.Web.Editors
             }
 
             //save the item
-            Services.MediaService.Save(contentItem.PersistedContent, (int)Security.CurrentUser.Id);
+            var saveStatus = Services.MediaService.SaveWithStatus(contentItem.PersistedContent, (int)Security.CurrentUser.Id);
 
             //return the updated model
             var display = Mapper.Map<IMedia, MediaItemDisplay>(contentItem.PersistedContent);
@@ -260,7 +261,19 @@ namespace Umbraco.Web.Editors
             {
                 case ContentSaveAction.Save:
                 case ContentSaveAction.SaveNew:
-                    display.AddSuccessNotification(ui.Text("speechBubbles", "editMediaSaved"), ui.Text("speechBubbles", "editMediaSavedText"));
+                    if (saveStatus.Success)
+                    {
+                        display.AddSuccessNotification(
+                            Services.TextService.Localize("speechBubbles/editMediaSaved"),
+                            Services.TextService.Localize("speechBubbles/editMediaSavedText"));
+                    }
+                    else
+                    {
+                        display.AddWarningNotification(
+                            Services.TextService.Localize("speechBubbles/operationCancelledHeader"),
+                            Services.TextService.Localize("speechBubbles/operationCancelledText"));
+                    }
+                    
                     break;                
             }
 
@@ -336,7 +349,7 @@ namespace Umbraco.Web.Editors
         {
             var mediaService = ApplicationContext.Services.MediaService;
             var f = mediaService.CreateMedia(folder.Name, folder.ParentId, Constants.Conventions.MediaTypes.Folder);
-            mediaService.Save(f);
+            mediaService.Save(f, Security.CurrentUser.Id);
 
             return Mapper.Map<IMedia, MediaItemDisplay>(f);
         }
@@ -403,13 +416,17 @@ namespace Umbraco.Web.Editors
                         mediaType = Constants.Conventions.MediaTypes.Image;
 
                     var mediaService = ApplicationContext.Services.MediaService;
-                    var f = mediaService.CreateMedia(fileName, parentId, mediaType);
-                    using (var fs = System.IO.File.OpenRead(file.LocalFileName))
+                    var f = mediaService.CreateMedia(fileName, parentId, mediaType, Security.CurrentUser.Id);
+
+                    var fileInfo = new FileInfo(file.LocalFileName);
+                    var fs = fileInfo.OpenReadWithRetry();
+                    if (fs == null) throw new InvalidOperationException("Could not acquire file stream");
+                    using (fs)
                     {
                         f.SetValue(Constants.Conventions.Media.File, fileName, fs);
                     }
 
-                    mediaService.Save(f);
+                    mediaService.Save(f, Security.CurrentUser.Id);
                 }
                 else
                 {
@@ -422,6 +439,25 @@ namespace Umbraco.Web.Editors
                     PropertyAlias = Constants.Conventions.Media.File,
                     TempFilePath = file.LocalFileName
                 });
+            }
+
+            //Different response if this is a 'blueimp' request
+            if (Request.GetQueryNameValuePairs().Any(x => x.Key == "origin"))
+            {
+                var origin = Request.GetQueryNameValuePairs().First(x => x.Key == "origin");
+                if (origin.Value == "blueimp")
+                {
+                    return Request.CreateResponse(HttpStatusCode.OK,
+                        tempFiles.UploadedFiles.Select(x => new
+                        {
+                            name = x.FileName,
+                            size = "",
+                            url = "",
+                            thumbnailUrl = ""
+                        }), 
+                        //Don't output the angular xsrf stuff, blue imp doesn't like that
+                        new JsonMediaTypeFormatter());
+                }
             }
 
             return Request.CreateResponse(HttpStatusCode.OK, tempFiles);

@@ -78,9 +78,8 @@ namespace Umbraco.Tests.PublishedContent
             var mType = MockedContentTypes.CreateImageMediaType("image2");
             //lets add an RTE to this
             mType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType("test", DataTypeDatabaseType.Nvarchar)
+                new PropertyType("test", DataTypeDatabaseType.Nvarchar, "content")
                     {
-                        Alias = "content", 
                         Name = "Rich Text",
                         DataTypeDefinitionId = -87 //tiny mce
                     });
@@ -446,7 +445,8 @@ namespace Umbraco.Tests.PublishedContent
 
             var nav = node.CreateNavigator();
 
-            var converted = publishedMedia.ConvertFromXPathNodeIterator(nav.Select("/node"), nodeId);
+            var converted = publishedMedia.CreateFromCacheValues(
+                publishedMedia.ConvertFromXPathNodeIterator(nav.Select("/node"), nodeId));
 
             Assert.AreEqual(nodeId, converted.Id);
             Assert.AreEqual(3, converted.Level);
@@ -487,7 +487,8 @@ namespace Umbraco.Tests.PublishedContent
 
             var nav = node.CreateNavigator();
 
-            var converted = publishedMedia.ConvertFromXPathNodeIterator(nav.Select("/Image"), nodeId);
+            var converted = publishedMedia.CreateFromCacheValues(
+                publishedMedia.ConvertFromXPathNodeIterator(nav.Select("/Image"), nodeId));
 
             Assert.AreEqual(nodeId, converted.Id);
             Assert.AreEqual(3, converted.Level);

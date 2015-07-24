@@ -10,7 +10,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence.Caching;
+
 using umbraco.cms.businesslogic.cache;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
@@ -880,7 +880,7 @@ namespace umbraco.cms.businesslogic
                     foreach (var i in value)
                     {
                         int id = i;
-                        list.Add(new ContentTypeSort { Id = new Lazy<int>(() => id), SortOrder = sort });
+                        list.Add(new ContentTypeSort(id, sort));
                         sort++;
                     }
 
@@ -1203,9 +1203,7 @@ namespace umbraco.cms.businesslogic
         /// <param name="id">The id.</param>
         public static void FlushFromCache(int id)
         {
-            //Ensure that MediaTypes are reloaded from db by clearing cache
-            InMemoryCacheProvider.Current.Clear();
-
+            
             var ct = new ContentType(id);
             ApplicationContext.Current.ApplicationCache.ClearCacheItem(string.Format("{0}{1}", CacheKeys.ContentTypeCacheKey, id));
             ApplicationContext.Current.ApplicationCache.ClearCacheItem(ct.GetPropertiesCacheKey());

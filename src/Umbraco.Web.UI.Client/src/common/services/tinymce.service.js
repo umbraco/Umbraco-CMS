@@ -111,9 +111,10 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                                 if (img) {
 
                                     var data = {
-                                        alt: img.altText,
+                                        alt: img.altText || "",
                                         src: (img.url) ? img.url : "nothing.jpg",
                                         rel: img.id,
+                                        'data-id': img.id,
                                         id: '__mcenew'
                                     };
 

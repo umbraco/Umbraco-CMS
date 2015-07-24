@@ -24,7 +24,10 @@ namespace Umbraco.Tests.Models
 
         protected override void FreezeResolution()
         {
-            UrlSegmentProviderResolver.Current = new UrlSegmentProviderResolver(typeof(DefaultUrlSegmentProvider));
+            UrlSegmentProviderResolver.Current = new UrlSegmentProviderResolver(
+                new ActivatorServiceProvider(),
+                Logger,
+                typeof(DefaultUrlSegmentProvider));
             base.FreezeResolution();
         }
 

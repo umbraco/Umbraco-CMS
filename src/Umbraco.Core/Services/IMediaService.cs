@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
@@ -71,6 +72,11 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         IEnumerable<IMedia> GetChildren(int id);
 
+        [Obsolete("Use the overload with 'long' parameter types instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        IEnumerable<IMedia> GetPagedChildren(int id, int pageIndex, int pageSize, out int totalRecords,
+            string orderBy = "SortOrder", Direction orderDirection = Direction.Ascending, string filter = "");
+
         /// <summary>
         /// Gets a collection of <see cref="IMedia"/> objects by Parent Id
         /// </summary>
@@ -82,8 +88,13 @@ namespace Umbraco.Core.Services
         /// <param name="orderDirection">Direction to order by</param>
         /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        IEnumerable<IMedia> GetPagedChildren(int id, int pageIndex, int pageSize, out int totalRecords,
+        IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords,
             string orderBy = "SortOrder", Direction orderDirection = Direction.Ascending, string filter = "");
+
+        [Obsolete("Use the overload with 'long' parameter types instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        IEnumerable<IMedia> GetPagedDescendants(int id, int pageIndex, int pageSize, out int totalRecords,
+            string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "");
 
         /// <summary>
         /// Gets a collection of <see cref="IMedia"/> objects by Parent Id
@@ -96,7 +107,7 @@ namespace Umbraco.Core.Services
         /// <param name="orderDirection">Direction to order by</param>
         /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        IEnumerable<IMedia> GetPagedDescendants(int id, int pageIndex, int pageSize, out int totalRecords,
+        IEnumerable<IMedia> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
             string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "");
 
         /// <summary>
@@ -170,6 +181,24 @@ namespace Umbraco.Core.Services
         /// <param name="media">The <see cref="IMedia"/> to save</param>
         /// <param name="userId">Id of the User saving the Media</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
+        Attempt<OperationStatus> SaveWithStatus(IMedia media, int userId = 0, bool raiseEvents = true);
+
+        /// <summary>
+        /// Saves a collection of <see cref="IMedia"/> objects
+        /// </summary>
+        /// <param name="medias">Collection of <see cref="IMedia"/> to save</param>
+        /// <param name="userId">Id of the User saving the Media</param>
+        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
+        Attempt<OperationStatus> SaveWithStatus(IEnumerable<IMedia> medias, int userId = 0, bool raiseEvents = true);
+
+        /// <summary>
+        /// Saves a single <see cref="IMedia"/> object
+        /// </summary>
+        /// <param name="media">The <see cref="IMedia"/> to save</param>
+        /// <param name="userId">Id of the User saving the Media</param>
+        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use SaveWithStatus instead, that method will provide more detailed information on the outcome")]
         void Save(IMedia media, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
@@ -178,6 +207,8 @@ namespace Umbraco.Core.Services
         /// <param name="medias">Collection of <see cref="IMedia"/> to save</param>
         /// <param name="userId">Id of the User saving the Media</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use SaveWithStatus instead, that method will provide more detailed information on the outcome")]
         void Save(IEnumerable<IMedia> medias, int userId = 0, bool raiseEvents = true);
 
         /// <summary>

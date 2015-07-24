@@ -64,7 +64,9 @@ namespace umbraco
             {
 
                 var attempt = fileService.CreatePartialViewMacro(model, /*ParentID == 1,*/ snippetName, User.Id);
-                if (attempt)
+                // if ParentId = 0 then that means that the "Create macro" checkbox was OFF, so don't try to create an actual macro
+                // See PartialViewMacro.ascx.cs and PartialView.ascx.cs: SubmitButton_Click
+                if (attempt && ParentID != 0)
                 {
                     //The partial view path to be saved with the macro must be a fully qualified virtual path
                     var virtualPath = string.Format("{0}/{1}/{2}", SystemDirectories.MvcViews, "MacroPartials", attempt.Result.Path);

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Web.Routing;
 using NUnit.Framework;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
@@ -13,7 +14,7 @@ namespace Umbraco.Tests.TestHelpers
 {
 	[TestFixture, RequiresSTA]
 	public abstract class BaseRoutingTest : BaseWebTest
-	{		
+	{
 	    ///  <summary>
 	    ///  Return a new RoutingContext
 	    ///  </summary>
@@ -24,11 +25,17 @@ namespace Umbraco.Tests.TestHelpers
 	    /// </param>
 	    ///  <param name="routeData"></param>
 	    /// <param name="setUmbracoContextCurrent">set to true to also set the singleton UmbracoContext.Current to the context created with this method</param>
+	    /// <param name="umbracoSettings"></param>
 	    /// <returns></returns>
-	    protected RoutingContext GetRoutingContext(string url, int templateId, RouteData routeData = null, bool setUmbracoContextCurrent = false)
-		{
+	    protected RoutingContext GetRoutingContext(string url, int templateId, RouteData routeData = null, bool setUmbracoContextCurrent = false, IUmbracoSettingsSection umbracoSettings = null)
+	    {
+	        if (umbracoSettings == null) umbracoSettings = SettingsForTests.GetDefault();
+
 			var umbracoContext = GetUmbracoContext(url, templateId, routeData);
-            var urlProvider = new UrlProvider(umbracoContext, new IUrlProvider[] { new DefaultUrlProvider() });
+            var urlProvider = new UrlProvider(umbracoContext, umbracoSettings.WebRouting, new IUrlProvider[]
+            {
+                new DefaultUrlProvider(umbracoSettings.RequestHandler)
+            });
 			var routingContext = new RoutingContext(
 				umbracoContext,
 				Enumerable.Empty<IContentFinder>(),

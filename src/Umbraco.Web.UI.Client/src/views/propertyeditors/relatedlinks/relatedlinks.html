@@ -1,4 +1,5 @@
 ﻿<div class="umb-editor umb-relatedlinks" ng-controller="Umbraco.PropertyEditors.RelatedLinksController">
+    
     <table class="table table-striped">
         <thead>
             <tr>
@@ -46,8 +47,7 @@
                         <button type="button" class="btn btn-default" ng-click="delete($index)"><localize key="delete">Delete</localize></button>
                     </div>
                     <div class="btn-group" ng-show="link.edit">
-                        <button type="button" class="btn btn-default" ng-click="cancelEdit($index)"><localize key="cancel">Cancel</localize></button>
-                        <button type="button" class="btn btn-default" ng-click="cancelEdit($index)"><localize key="buttons_save">Save</localize></button>
+                        <button type="button" class="btn btn-default" ng-click="saveEdit($index)"><localize key="buttons_save">Save</localize></button>
                     </div>
 
                 </td>

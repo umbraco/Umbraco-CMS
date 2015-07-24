@@ -1,6 +1,8 @@
 ﻿using System;
+using System.ComponentModel;
 using Umbraco.Core;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Routing
 {
@@ -13,30 +15,47 @@ namespace Umbraco.Web.Routing
     /// </remarks>
     public class DomainAndUri
     {
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DomainAndUri"/> class with a Domain and a uri scheme.
         /// </summary>
         /// <param name="domain">The domain.</param>
         /// <param name="scheme">The uri scheme.</param>
-        public DomainAndUri(Domain domain, string scheme)
+        public DomainAndUri(IDomain domain, string scheme)
         {
-            Domain = domain;
+            UmbracoDomain = domain;
             try
             {
-                Uri = new Uri(UriUtility.TrimPathEndSlash(UriUtility.StartWithScheme(domain.Name, scheme)));
+                Uri = new Uri(UriUtility.TrimPathEndSlash(UriUtility.StartWithScheme(domain.DomainName, scheme)));
             }
             catch (UriFormatException)
             {
-                var name = domain.Name.ToCSharpString();
+                var name = domain.DomainName.ToCSharpString();
                 throw new ArgumentException(string.Format("Failed to parse invalid domain: node id={0}, hostname=\"{1}\"."
-                    + " Hostname should be a valid uri.", domain.RootNodeId, name), "domain");
+                    + " Hostname should be a valid uri.", domain.RootContent.Id, name), "domain");
             }
         }
 
+        [Obsolete("This should not be used, use the other contructor specifying the non legacy IDomain instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public DomainAndUri(Domain domain, string scheme)
+            : this(domain.DomainEntity, scheme)
+        {
+            
+        }
+
+        
+        [Obsolete("This should not be used, use the non-legacy property called UmbracoDomain instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public Domain Domain
+        {
+            get { return new Domain(UmbracoDomain); }
+        }
+
         /// <summary>
-        /// Gets or sets the Umbraco domain.
+        /// Gets the Umbraco domain.
         /// </summary>
-        public Domain Domain { get; private set; }
+        public IDomain UmbracoDomain { get; private set; }
 
         /// <summary>
         /// Gets or sets the normalized uri of the domain.
@@ -49,7 +68,7 @@ namespace Umbraco.Web.Routing
         /// <returns>A string that represents the current <see cref="DomainAndUri"/> instance.</returns>
         public override string ToString()
         {
-            return string.Format("{{ \"{0}\", \"{1}\" }}", Domain.Name, Uri);
+            return string.Format("{{ \"{0}\", \"{1}\" }}", UmbracoDomain.DomainName, Uri);
         }
     }
 }

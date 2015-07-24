@@ -13,7 +13,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
-using Umbraco.Core.Models;
+
 
 namespace Umbraco.Web.Editors
 {
@@ -21,7 +21,7 @@ namespace Umbraco.Web.Editors
     /// An abstract base controller used for media/content (and probably members) to try to reduce code replication.
     /// </summary>
     [OutgoingDateTimeFormat]
-    public abstract class ContentControllerBase : UmbracoAuthorizedJsonController
+    public abstract class ContentControllerBase : BackOfficeNotificationsController
     {
         /// <summary>
         /// Constructor

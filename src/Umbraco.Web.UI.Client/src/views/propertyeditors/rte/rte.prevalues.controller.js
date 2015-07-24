@@ -58,12 +58,16 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
             }
         };
 
-        $scope.$on("formSubmitting", function (ev, args) {
+        var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
 
             var commands = _.where($scope.tinyMceConfig.commands, {selected: true});
             $scope.model.value.toolbar = _.pluck(commands, "frontEndCommand");
-
             
+        });
+
+        //when the scope is destroyed we need to unsubscribe
+        $scope.$on('$destroy', function () {
+            unsubscribe();
         });
 
     });

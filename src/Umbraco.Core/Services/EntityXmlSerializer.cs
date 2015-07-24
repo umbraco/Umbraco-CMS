@@ -5,6 +5,7 @@ using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Strings;
 using umbraco.interfaces;
@@ -172,6 +173,27 @@ namespace Umbraco.Core.Services
                     new XAttribute("LanguageId", translation.Language.Id),
                     new XAttribute("LanguageCultureAlias", translation.Language.IsoCode),
                     new XCData(translation.Value)));
+            }
+
+            return xml;
+        }
+
+        public XElement Serialize(Stylesheet stylesheet)
+        {
+            var xml = new XElement("Stylesheet",
+                new XElement("Name", stylesheet.Alias),
+                new XElement("FileName", stylesheet.Path),
+                new XElement("Content", new XCData(stylesheet.Content)));
+
+            var props = new XElement("Properties");
+            xml.Add(props);
+
+            foreach (var prop in stylesheet.Properties)
+            {
+                props.Add(new XElement("Property",
+                    new XElement("Name", prop.Name),
+                    new XElement("Alias", prop.Alias),
+                    new XElement("Value", prop.Value)));
             }
 
             return xml;

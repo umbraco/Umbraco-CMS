@@ -321,7 +321,7 @@ namespace umbraco.controls
 
                     int i = 0;
                     var ids = SaveAllowedChildTypes();
-                    _contentType.ContentTypeItem.AllowedContentTypes = ids.Select(x => new ContentTypeSort {Id = new Lazy<int>(() => x), SortOrder = i++});
+                    _contentType.ContentTypeItem.AllowedContentTypes = ids.Select(x => new ContentTypeSort(x, i++));
 
                     // figure out whether compositions are locked
                     var allContentTypes = Request.Path.ToLowerInvariant().Contains("editmediatype.aspx")
@@ -391,16 +391,21 @@ namespace umbraco.controls
                         }
                     }
 
-                    var tabs = SaveTabs();
+                    var tabs = SaveTabs(); // returns { TabId, TabName, TabSortOrder }
                     foreach (var tab in tabs)
                     {
-                        if (_contentType.ContentTypeItem.PropertyGroups.Contains(tab.Item2))
+                        var group = _contentType.ContentTypeItem.PropertyGroups.FirstOrDefault(x => x.Id == tab.Item1);
+                        if (group == null)
                         {
-                            _contentType.ContentTypeItem.PropertyGroups[tab.Item2].SortOrder = tab.Item3;
+                            // creating a group
+                            group = new PropertyGroup {Id = tab.Item1, Name = tab.Item2, SortOrder = tab.Item3};
+                            _contentType.ContentTypeItem.PropertyGroups.Add(group);
                         }
                         else
                         {
-                            _contentType.ContentTypeItem.PropertyGroups.Add(new PropertyGroup {Id = tab.Item1, Name = tab.Item2, SortOrder = tab.Item3});
+                            // updating an existing group
+                            group.Name = tab.Item2;
+                            group.SortOrder = tab.Item3;
                         }
                     }
 
@@ -837,7 +842,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
         {
             var tabs = _contentType.getVirtualTabs;
             var propertyTypeGroups = _contentType.PropertyTypeGroups.ToList();
-            var dtds = cms.businesslogic.datatype.DataTypeDefinition.GetAll();
+            var dtds = cms.businesslogic.datatype.DataTypeDefinition.GetAll().OrderBy(d => d.Text).ToArray();
 
             PropertyTypes.Controls.Clear();
 
@@ -1106,7 +1111,8 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                                                Name = gpData.Name.Trim(),
                                                Mandatory = gpData.Mandatory,
                                                ValidationRegExp = gpData.Validation,
-                                               Description = gpData.Description
+                                               Description = gpData.Description,
+                                               Key = Guid.NewGuid()
                                            };
                     //gpData.Tab == 0 Generic Properties / No Group
                     if (gpData.Tab == 0)

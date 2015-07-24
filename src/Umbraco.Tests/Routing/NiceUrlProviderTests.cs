@@ -140,12 +140,14 @@ namespace Umbraco.Tests.Routing
 		[Test]
 		public void Get_Nice_Url_Relative_Or_Absolute()
 		{
-			var routingContext = GetRoutingContext("http://example.com/test", 1111);
-
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = false;
             var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
+
+            var routingContext = GetRoutingContext("http://example.com/test", 1111, umbracoSettings: _umbracoSettings);
+
+            
 
 			Assert.AreEqual("/home/sub1/custom-sub-1/", routingContext.UrlProvider.GetUrl(1177));
             

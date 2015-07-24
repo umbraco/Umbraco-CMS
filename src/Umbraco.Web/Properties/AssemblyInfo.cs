@@ -30,9 +30,9 @@ using System.Security;
 [assembly: InternalsVisibleTo("Umbraco.Tests")]
 [assembly: InternalsVisibleTo("umbraco.MacroEngines")]
 [assembly: InternalsVisibleTo("Umbraco.Web.UI")]
-[assembly: InternalsVisibleTo("Umbraco.Courier.Persistence")]
 [assembly: InternalsVisibleTo("umbraco.webservices")]
 [assembly: InternalsVisibleTo("Concorde.Sync")]
+[assembly: InternalsVisibleTo("Umbraco.Courier.Core")]
 [assembly: InternalsVisibleTo("Umbraco.Belle")]
 
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

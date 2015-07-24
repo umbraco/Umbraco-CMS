@@ -73,13 +73,12 @@ namespace umbraco.webservices
 		{
 		}
 
+        [Obsolete("This doesn't do anything and will be removed in future versions")]
         [WebMethod]
         public void SaveXmlCacheToDisk()
         {
             if (!AuthorizeRequest(DefaultApps.content.ToString()))
                 return;
-
-            content.Instance.PersistXmlToFile();
         }
 
 		

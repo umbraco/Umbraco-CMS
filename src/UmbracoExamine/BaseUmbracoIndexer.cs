@@ -70,6 +70,20 @@ namespace UmbracoExamine
 
         #region Properties
 
+        public bool UseTempStorage
+        {
+            get { return _localTempStorageHelper.LuceneDirectory != null; }
+        }
+
+        public string TempStorageLocation
+        {
+            get
+            {
+                if (UseTempStorage == false) return string.Empty;
+                return _localTempStorageHelper.TempPath;
+            }
+        }
+
         /// <summary>
         /// If true, the IndexingActionHandler will be run to keep the default index up to date.
         /// </summary>
@@ -142,12 +156,7 @@ namespace UmbracoExamine
                 EnableDefaultEventHandler = enabled;
             }         
 
-            DataService.LogService.AddVerboseLog(-1, string.Format("{0} indexer initializing", name));
-            
-            //Before we initialize the base provider which is going to setup all of the directory structures based on the index
-            // set, we want to dynamically override the index working folder based on a given token. Currently we only support one
-            // and that is {machinename}
-            ExamineHelper.ReplaceTokensInIndexPath(name, config, "Indexer", () => IndexerData != null);
+            DataService.LogService.AddVerboseLog(-1, string.Format("{0} indexer initializing", name));               
 
             base.Initialize(name, config);
 
@@ -174,7 +183,7 @@ namespace UmbracoExamine
             get
             {
                 //if temp local storage is configured use that, otherwise return the default
-                if (_localTempStorageHelper.LuceneDirectory != null)
+                if (UseTempStorage)
                 {
                     //create one if one has not been created already
                     return _internalTempStorageSearcher 
@@ -188,7 +197,7 @@ namespace UmbracoExamine
         public override Lucene.Net.Store.Directory GetLuceneDirectory()
         {
             //if temp local storage is configured use that, otherwise return the default
-            if (_localTempStorageHelper.LuceneDirectory != null)
+            if (UseTempStorage)
             {
                 return _localTempStorageHelper.LuceneDirectory;
             }
@@ -200,10 +209,10 @@ namespace UmbracoExamine
         protected override IndexWriter CreateIndexWriter()
         {
             //if temp local storage is configured use that, otherwise return the default
-            if (_localTempStorageHelper.LuceneDirectory != null)
+            if (UseTempStorage)
             {
                 var directory = GetLuceneDirectory();
-                return new IndexWriter(directory, IndexingAnalyzer,
+                return new IndexWriter(GetLuceneDirectory(), IndexingAnalyzer,
                     DeletePolicyTracker.Current.GetPolicy(directory),
                     IndexWriter.MaxFieldLength.UNLIMITED);
             }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
 
@@ -19,13 +20,14 @@ namespace Umbraco.Core.Services
         bool DeletePartialViewMacro(string path, int userId = 0);
         Attempt<IPartialView> SavePartialView(IPartialView partialView, int userId = 0);
         Attempt<IPartialView> SavePartialViewMacro(IPartialView partialView, int userId = 0);
+        bool ValidatePartialView(PartialView partialView);
 
         /// <summary>
         /// Gets a list of all <see cref="Stylesheet"/> objects
         /// </summary>
         /// <returns>An enumerable list of <see cref="Stylesheet"/> objects</returns>
         IEnumerable<Stylesheet> GetStylesheets(params string[] names);
-
+        
         /// <summary>
         /// Gets a <see cref="Stylesheet"/> object by its name
         /// </summary>
@@ -108,6 +110,12 @@ namespace Umbraco.Core.Services
         IEnumerable<ITemplate> GetTemplates(params string[] aliases);
 
         /// <summary>
+        /// Gets a list of all <see cref="ITemplate"/> objects
+        /// </summary>
+        /// <returns>An enumerable list of <see cref="ITemplate"/> objects</returns>
+        IEnumerable<ITemplate> GetTemplates(int masterTemplateId);
+
+        /// <summary>
         /// Gets a <see cref="ITemplate"/> object by its alias
         /// </summary>
         /// <param name="alias">Alias of the template</param>
@@ -143,6 +151,8 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user saving the template</param>
         void SaveTemplate(ITemplate template, int userId = 0);
 
+        ITemplate CreateTemplateWithIdentity(string name, string content, ITemplate masterTemplate = null, int userId = 0);
+
         /// <summary>
         /// Deletes a template by its alias
         /// </summary>
@@ -163,5 +173,20 @@ namespace Umbraco.Core.Services
         /// <param name="templates">List of <see cref="Template"/> to save</param>
         /// <param name="userId">Optional id of the user</param>
         void SaveTemplate(IEnumerable<ITemplate> templates, int userId = 0);
+
+        /// <summary>
+        /// This checks what the default rendering engine is set in config but then also ensures that there isn't already 
+        /// a template that exists in the opposite rendering engine's template folder, then returns the appropriate 
+        /// rendering engine to use.
+        /// </summary> 
+        /// <returns></returns>
+        /// <remarks>
+        /// The reason this is required is because for example, if you have a master page file already existing under ~/masterpages/Blah.aspx
+        /// and then you go to create a template in the tree called Blah and the default rendering engine is MVC, it will create a Blah.cshtml 
+        /// empty template in ~/Views. This means every page that is using Blah will go to MVC and render an empty page. 
+        /// This is mostly related to installing packages since packages install file templates to the file system and then create the 
+        /// templates in business logic. Without this, it could cause the wrong rendering engine to be used for a package.
+        /// </remarks>
+        RenderingEngine DetermineTemplateRenderingEngine(ITemplate template);
     }
 }

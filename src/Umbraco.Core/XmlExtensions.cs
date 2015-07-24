@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -13,6 +16,31 @@ namespace Umbraco.Core
 	/// </summary>
 	internal static class XmlExtensions
 	{
+        /// <summary>
+        /// Saves the xml document async
+        /// </summary>
+        /// <param name="xdoc"></param>
+        /// <param name="filename"></param>
+        /// <returns></returns>
+	    public static async Task SaveAsync(this XmlDocument xdoc, string filename)
+	    {
+            if (xdoc.DocumentElement == null)
+                throw new XmlException("Cannot save xml document, there is no root element");
+
+            using (var fs = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.Read, bufferSize: 4096, useAsync: true))
+            using (var xmlWriter = XmlWriter.Create(fs, new XmlWriterSettings
+            {
+                Async = true,
+                Encoding = Encoding.UTF8,
+                Indent = true
+            }))
+            {
+                //NOTE: There are no nice methods to write it async, only flushing it async. We
+                // could implement this ourselves but it'd be a very manual process.
+                xdoc.WriteTo(xmlWriter);
+                await xmlWriter.FlushAsync().ConfigureAwait(false);
+            }
+	    }
 
         public static bool HasAttribute(this XmlAttributeCollection attributes, string attributeName)
         {
@@ -289,5 +317,25 @@ namespace Umbraco.Core
             }
         }
 
+        // this exists because
+        // new XElement("root", "a\nb").Value is "a\nb" but
+        // .ToString(SaveOptions.*) is "a\r\nb" and cannot figure out how to get rid of "\r"
+        // and when saving data we want nothing to change
+        // this method will produce a string that respects the \r and \n in the data value
+	    public static string ToDataString(this XElement xml)
+	    {
+	        var settings = new XmlWriterSettings
+	        {
+                OmitXmlDeclaration = true,
+	            NewLineHandling = NewLineHandling.None,
+                Indent = false
+	        };
+	        var output = new StringBuilder();
+	        using (var writer = XmlWriter.Create(output, settings))
+	        {
+                xml.WriteTo(writer);
+            }
+	        return output.ToString();
+	    }
 	}
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Umbraco.Core.Models.Membership;
@@ -6,7 +7,7 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class UserFactory : IEntityFactory<IUser, UserDto>
+    internal class UserFactory 
     {
         private readonly IUserType _userType;
 
@@ -33,8 +34,11 @@ namespace Umbraco.Core.Persistence.Factories
                     IsApproved = dto.Disabled == false,
                     Email = dto.Email,
                     Language = dto.UserLanguage,
-                    //NOTE: The default permission come from the user type's default permissions
-                    DefaultPermissions = _userType.Permissions
+                    SecurityStamp = dto.SecurityStampToken,
+                    FailedPasswordAttempts = dto.FailedLoginAttempts ?? 0,
+                    LastLockoutDate = dto.LastLockoutDate ?? DateTime.MinValue,
+                    LastLoginDate = dto.LastLoginDate ?? DateTime.MinValue,
+                    LastPasswordChangeDate = dto.LastPasswordChangeDate ?? DateTime.MinValue
                 };
 
             foreach (var app in dto.User2AppDtos)
@@ -63,7 +67,12 @@ namespace Umbraco.Core.Persistence.Factories
                               UserLanguage = entity.Language,
                               UserName = entity.Name,
                               Type = short.Parse(entity.UserType.Id.ToString(CultureInfo.InvariantCulture)),
-                              User2AppDtos = new List<User2AppDto>()
+                              User2AppDtos = new List<User2AppDto>(),
+                              SecurityStampToken = entity.SecurityStamp,
+                              FailedLoginAttempts = entity.FailedPasswordAttempts,
+                              LastLockoutDate = entity.LastLockoutDate == DateTime.MinValue ? (DateTime?)null : entity.LastLockoutDate,
+                              LastLoginDate = entity.LastLoginDate == DateTime.MinValue ? (DateTime?)null : entity.LastLoginDate,
+                              LastPasswordChangeDate = entity.LastPasswordChangeDate == DateTime.MinValue ? (DateTime?)null : entity.LastPasswordChangeDate,
                           };
 
             foreach (var app in entity.AllowedSections)

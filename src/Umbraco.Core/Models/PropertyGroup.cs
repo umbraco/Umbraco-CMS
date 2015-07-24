@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
@@ -105,6 +106,13 @@ namespace Umbraco.Core.Models
             set
             {
                 _propertyTypes = value;
+
+                //since we're adding this collection to this group, we need to ensure that all the lazy values are set.
+                foreach (var propertyType in _propertyTypes)
+                {
+                    propertyType.PropertyGroupId = new Lazy<int>(() => this.Id);
+                }
+                
                 _propertyTypes.CollectionChanged += PropertyTypesChanged;
             }
         }
@@ -120,27 +128,22 @@ namespace Umbraco.Core.Models
 
         public bool Equals(PropertyGroup other)
         {
-            //Check whether the compared object is null. 
-            if (Object.ReferenceEquals(other, null)) return false;
-
-            //Check whether the compared object references the same data. 
-            if (Object.ReferenceEquals(this, other)) return true;
+            if (base.Equals(other)) return true;
 
             //Check whether the PropertyGroup's properties are equal. 
-            return Id.Equals(other.Id) && Name.Equals(other.Name);
+            return Name.InvariantEquals(other.Name);
         }
 
         public override int GetHashCode()
         {
-
             //Get hash code for the Name field if it is not null. 
-            int hashName = Name == null ? 0 : Name.GetHashCode();
+            int baseHash = base.GetHashCode();
 
-            //Get hash code for the Id field. 
-            int hashId = Id.GetHashCode();
+            //Get hash code for the Alias field. 
+            int nameHash = Name.ToLowerInvariant().GetHashCode();
 
             //Calculate the hash code for the product. 
-            return hashName ^ hashId;
+            return baseHash ^ nameHash;
         }
 
     }

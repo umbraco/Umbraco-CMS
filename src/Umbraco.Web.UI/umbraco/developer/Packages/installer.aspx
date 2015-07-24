@@ -107,7 +107,7 @@
                     <p>
                         <strong>Please note:</strong> Installing a package containing several items and
                         files can take some time. Do not refresh the page or navigate away before, the installer
-                        notifies you the install is completed.
+                        notifies you once the install is completed.
                     </p>
                 </div>
 
@@ -280,9 +280,9 @@
             <cc1:PropertyPanel runat="server">
               
                 <p>
-                    All items in the package has been installed</p>
+                    All items in the package have been installed</p>
                 <p>
-                    Overview of what was installed can found under "installed package" in the developer
+                    Overview of what was installed can be found under "installed package" in the developer
                     section.</p>
                 <p>
                     Uninstall is available at the same location.</p>

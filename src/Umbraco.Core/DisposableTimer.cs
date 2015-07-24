@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Web;
 using Umbraco.Core.Logging;
@@ -9,32 +10,65 @@ namespace Umbraco.Core
 	/// <summary>
 	/// Starts the timer and invokes a  callback upon disposal. Provides a simple way of timing an operation by wrapping it in a <code>using</code> (C#) statement.
 	/// </summary>
-	/// <example>
-	/// <code>
-	/// 
-	/// using (DisposableTimer.TraceDuration{MyType}("starting", "finished"))
-	/// {
-    ///     Thread.Sleep(567);
-	/// }
-	/// 
-	/// Console.WriteLine("Testing Stopwatchdisposable, should be 567:");
-	/// using (var timer = new DisposableTimer(result => Console.WriteLine("Took {0}ms", result)))
-	/// {
-	///     Thread.Sleep(567);
-	/// }
-	/// </code>
-	/// </example>
 	public class DisposableTimer : DisposableObject
 	{
-		private readonly Stopwatch _stopwatch = Stopwatch.StartNew();
+	    private readonly Stopwatch _stopwatch = Stopwatch.StartNew();
 		private readonly Action<long> _callback;
 
-		protected DisposableTimer(Action<long> callback)
-		{
-			_callback = callback;
-		}        
+	    internal enum LogType
+	    {
+	        Debug, Info
+	    }
 
-		public Stopwatch Stopwatch
+        internal DisposableTimer(ILogger logger, LogType logType, IProfiler profiler, Type loggerType, string startMessage, string endMessage)
+        {
+            if (logger == null) throw new ArgumentNullException("logger");
+            if (loggerType == null) throw new ArgumentNullException("loggerType");
+
+            _callback = x =>
+            {
+                if (profiler != null)
+                {
+                    profiler.DisposeIfDisposable();
+                }
+                switch (logType)
+                {
+                    case LogType.Debug:
+                        logger.Debug(loggerType, () => endMessage + " (took " + x + "ms)");
+                        break;
+                    case LogType.Info:
+                        logger.Info(loggerType, () => endMessage + " (took " + x + "ms)");
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException("logType");
+                }
+                
+            };
+            switch (logType)
+            {
+                case LogType.Debug:
+                    logger.Debug(loggerType, startMessage);
+                    break;
+                case LogType.Info:
+                    logger.Info(loggerType, startMessage);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("logType");
+            }
+            
+            if (profiler != null)
+            {
+                profiler.Step(loggerType, startMessage);    
+            }
+        }
+
+	    protected internal DisposableTimer(Action<long> callback)
+	    {
+	        if (callback == null) throw new ArgumentNullException("callback");
+	        _callback = callback;
+	    }
+
+	    public Stopwatch Stopwatch
 		{
 			get { return _stopwatch; }
 		}
@@ -51,25 +85,25 @@ namespace Umbraco.Core
 		}
 
         #region TraceDuration
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use the other methods that specify strings instead of Func")]
         public static DisposableTimer TraceDuration<T>(Func<string> startMessage, Func<string> completeMessage)
         {
             return TraceDuration(typeof(T), startMessage, completeMessage);
         }
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use the other methods that specify strings instead of Func")]
         public static DisposableTimer TraceDuration(Type loggerType, Func<string> startMessage, Func<string> completeMessage)
         {
-            var startMsg = startMessage();
-            LogHelper.Info(loggerType, startMsg);
-            if (HttpContext.Current != null)
-                HttpContext.Current.Trace.Write("Start: " + startMsg);
-            var profiler = ActivateProfiler(loggerType, startMsg);
-            return new DisposableTimer(x =>
-                {
-                    profiler.DisposeIfDisposable();
-                    LogHelper.Info(loggerType, () => completeMessage() + " (took " + x + "ms)");
-                    if (HttpContext.Current != null)
-                        HttpContext.Current.Trace.Write("End: " + startMsg);
-                });
+            return new DisposableTimer(
+                LoggerResolver.Current.Logger, 
+                LogType.Info, 
+                ProfilerResolver.HasCurrent ? ProfilerResolver.Current.Profiler : null,
+                loggerType, 
+                startMessage(), 
+                completeMessage());
         }
 
         /// <summary>
@@ -79,11 +113,19 @@ namespace Umbraco.Core
         /// <param name="startMessage"></param>
         /// <param name="completeMessage"></param>
         /// <returns></returns>
+        [Obsolete("Use the Umbraco.Core.Logging.ProfilingLogger to create instances of DisposableTimer")]
         public static DisposableTimer TraceDuration<T>(string startMessage, string completeMessage)
         {
             return TraceDuration(typeof(T), startMessage, completeMessage);
         }
 
+        /// <summary>
+        /// Adds a start and end log entry as Info and tracks how long it takes until disposed.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="startMessage"></param>
+        /// <returns></returns>
+        [Obsolete("Use the Umbraco.Core.Logging.ProfilingLogger to create instances of DisposableTimer")]
         public static DisposableTimer TraceDuration<T>(string startMessage)
         {
             return TraceDuration(typeof(T), startMessage, "Complete");
@@ -96,20 +138,18 @@ namespace Umbraco.Core
         /// <param name="startMessage"></param>
         /// <param name="completeMessage"></param>
         /// <returns></returns>
+        [Obsolete("Use the Umbraco.Core.Logging.ProfilingLogger to create instances of DisposableTimer")]
         public static DisposableTimer TraceDuration(Type loggerType, string startMessage, string completeMessage)
         {
-            LogHelper.Info(loggerType, startMessage);
-            if (HttpContext.Current != null)
-                HttpContext.Current.Trace.Write("Start: " + startMessage);
-            var profiler = ActivateProfiler(loggerType, startMessage);
-            return new DisposableTimer(x =>
-                {
-                    profiler.DisposeIfDisposable();
-                    LogHelper.Info(loggerType, () => completeMessage + " (took " + x + "ms)");
-                    if (HttpContext.Current != null)
-                        HttpContext.Current.Trace.Write("End: " + startMessage);
-                });
-        } 
+            return new DisposableTimer(
+                LoggerResolver.Current.Logger,
+                LogType.Info, 
+                ProfilerResolver.HasCurrent ? ProfilerResolver.Current.Profiler : null,
+                loggerType,
+                startMessage,
+                completeMessage);
+        }
+
         #endregion
 
         #region DebugDuration
@@ -120,14 +160,10 @@ namespace Umbraco.Core
         /// <param name="startMessage"></param>
         /// <param name="completeMessage"></param>
         /// <returns></returns>
+        [Obsolete("Use the Umbraco.Core.Logging.ProfilingLogger to create instances of DisposableTimer")]
         public static DisposableTimer DebugDuration<T>(string startMessage, string completeMessage)
         {
             return DebugDuration(typeof(T), startMessage, completeMessage);
-        }
-
-        public static DisposableTimer DebugDuration<T>(string startMessage)
-        {
-            return DebugDuration(typeof(T), startMessage, "Complete");
         }
 
         /// <summary>
@@ -135,8 +171,15 @@ namespace Umbraco.Core
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="startMessage"></param>
-        /// <param name="completeMessage"></param>
         /// <returns></returns>
+        [Obsolete("Use the Umbraco.Core.Logging.ProfilingLogger to create instances of DisposableTimer")]
+        public static DisposableTimer DebugDuration<T>(string startMessage)
+        {
+            return DebugDuration(typeof(T), startMessage, "Complete");
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use the other methods that specify strings instead of Func")]
         public static DisposableTimer DebugDuration<T>(Func<string> startMessage, Func<string> completeMessage)
         {
             return DebugDuration(typeof(T), startMessage, completeMessage);
@@ -149,42 +192,29 @@ namespace Umbraco.Core
         /// <param name="startMessage"></param>
         /// <param name="completeMessage"></param>
         /// <returns></returns>
+        [Obsolete("Use the Umbraco.Core.Logging.ProfilingLogger to create instances of DisposableTimer")]
         public static DisposableTimer DebugDuration(Type loggerType, string startMessage, string completeMessage)
         {
-            LogHelper.Debug(loggerType, startMessage);
-            if (HttpContext.Current != null)
-                HttpContext.Current.Trace.Write("Start: " + startMessage);
-            var profiler = ActivateProfiler(loggerType, startMessage);
-            return new DisposableTimer(x =>
-                {
-                    profiler.DisposeIfDisposable();
-                    LogHelper.Debug(loggerType, () => completeMessage + " (took " + x + "ms)");
-                    if (HttpContext.Current != null)
-                        HttpContext.Current.Trace.Write("End: " + startMessage);
-                });
+            return new DisposableTimer(
+                LoggerResolver.Current.Logger,
+                LogType.Debug,
+                ProfilerResolver.HasCurrent ? ProfilerResolver.Current.Profiler : null,
+                loggerType,
+                startMessage,
+                completeMessage);
         }
 
-        /// <summary>
-        /// Adds a start and end log entry as Debug and tracks how long it takes until disposed.
-        /// </summary>
-        /// <param name="loggerType"></param>
-        /// <param name="startMessage"></param>
-        /// <param name="completeMessage"></param>
-        /// <returns></returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use the other methods that specify strings instead of Func")]
         public static DisposableTimer DebugDuration(Type loggerType, Func<string> startMessage, Func<string> completeMessage)
         {
-            var msg = startMessage();
-            LogHelper.Debug(loggerType, msg);
-            if (HttpContext.Current != null)
-                HttpContext.Current.Trace.Write("Start: " + startMessage);
-            var profiler = ActivateProfiler(loggerType, msg);
-            return new DisposableTimer(x =>
-                {
-                    profiler.DisposeIfDisposable();
-                    LogHelper.Debug(loggerType, () => completeMessage() + " (took " + x + "ms)");
-                    if (HttpContext.Current != null)
-                        HttpContext.Current.Trace.Write("End: " + startMessage);
-                });
+            return new DisposableTimer(
+                LoggerResolver.Current.Logger,
+                LogType.Debug,
+                ProfilerResolver.HasCurrent ? ProfilerResolver.Current.Profiler : null,
+                loggerType,
+                startMessage(),
+                completeMessage());
         } 
         #endregion
 
@@ -196,18 +226,5 @@ namespace Umbraco.Core
 			_callback.Invoke(Stopwatch.ElapsedMilliseconds);
 		}
 
-        private static IDisposable ActivateProfiler(Type loggerType, string profileName)
-        {
-            try
-            {
-                return ProfilerResolver.Current.Profiler.Step(loggerType, profileName);
-            }
-            catch (InvalidOperationException)
-            {
-                //swallow this exception, it will occur if the ProfilerResolver is not initialized... generally only in 
-                // unit tests.
-            }
-            return null;
-        }
 	}
 }

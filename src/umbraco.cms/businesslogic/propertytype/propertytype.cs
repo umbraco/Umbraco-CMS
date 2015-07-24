@@ -5,16 +5,17 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Persistence.Caching;
+using Umbraco.Core.Models;
+
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.cache;
-using umbraco.cms.businesslogic.datatype;
-using umbraco.cms.businesslogic.language;
 using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.helpers;
 using umbraco.DataLayer;
 using umbraco.interfaces;
+using DataTypeDefinition = umbraco.cms.businesslogic.datatype.DataTypeDefinition;
+using Language = umbraco.cms.businesslogic.language.Language;
 
 namespace umbraco.cms.businesslogic.propertytype
 {
@@ -464,8 +465,12 @@ namespace umbraco.cms.businesslogic.propertytype
 
             //Ensure that DocumentTypes are reloaded from db by clearing cache - this similar to the Save method on DocumentType.
             //NOTE Would be nice if we could clear cache by type instead of emptying the entire cache.
-            InMemoryCacheProvider.Current.Clear();
-            RuntimeCacheProvider.Current.Clear();
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IContent>();
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IContentType>();
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IMedia>();
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IMediaType>();
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IMember>();
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IMemberType>();
         }
 
         public static PropertyType GetPropertyType(int id)

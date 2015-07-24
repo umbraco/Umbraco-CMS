@@ -16,7 +16,5 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "selector")]
         public string Selector { get; set; }
 
-        [DataMember(Name = "id")]
-        public int Id { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using Umbraco.Core;
+using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -15,14 +16,9 @@ namespace Umbraco.Web.Strategies.Migrations
     /// 
     /// * If current is less than or equal to 7.0.0
     /// </remarks>
-    public class ClearMediaXmlCacheForDeletedItemsAfterUpgrade : IApplicationStartupHandler
-    {
-        public ClearMediaXmlCacheForDeletedItemsAfterUpgrade()
-        {
-            MigrationRunner.Migrated += MigrationRunner_Migrated;
-        }
-
-        void MigrationRunner_Migrated(MigrationRunner sender, Core.Events.MigrationEventArgs e)
+    public class ClearMediaXmlCacheForDeletedItemsAfterUpgrade : MigrationStartupHander
+    {       
+        protected override void AfterMigration(MigrationRunner sender, MigrationEventArgs e)
         {
             var target70 = new Version(7, 0, 0);
 
@@ -34,7 +30,7 @@ namespace Umbraco.Web.Strategies.Migrations
                 var sql = @"DELETE FROM cmsContentXml WHERE nodeId IN
     (SELECT nodeId FROM (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml 
     INNER JOIN umbracoNode ON cmsContentXml.nodeId = umbracoNode.id
-    WHERE nodeObjectType = '" + Constants.ObjectTypes.Media +"' AND " + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("path") + " LIKE '%-21%') x)";
+    WHERE nodeObjectType = '" + Constants.ObjectTypes.Media + "' AND " + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("path") + " LIKE '%-21%') x)";
 
                 var count = e.MigrationContext.Database.Execute(sql);
 

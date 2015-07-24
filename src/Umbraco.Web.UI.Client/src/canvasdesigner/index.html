@@ -4,7 +4,7 @@
     <title>Umbraco Canvas Designer</title>
     <link href="/Umbraco/assets/css/canvasdesigner.css" type="text/css" rel="stylesheet" />
     <link href="/Umbraco/lib/spectrum/spectrum.css" type="text/css" rel="stylesheet" />
-    <link href="/Umbraco/lib/jquery/jquery-ui-1.10.4.custom.min.css" type="text/css" rel="stylesheet" />
+    <link href="/Umbraco/lib/jquery-ui/jquery-ui-1.10.4.custom.min.css" type="text/css" rel="stylesheet" />
 </head>
 
 <body id="canvasdesignerPanel" ng-mouseover="outlinePositionHide()" ng-class="{ leftOpen: (showStyleEditor || showPalettePicker) && !showDevicesPreview }" ng-controller="Umbraco.canvasdesignerController">
@@ -25,7 +25,7 @@
 
             <ul class="sections" ng-class="{selected: showDevicesPreview}">
                 <li ng-repeat="device in devices" ng-class="{ current:previewDevice==device }" ng-click="updatePreviewDevice(device)">
-                    <a href="#"><i class="icon {{device.icon}}"></i><span></span></a>
+                    <a href="#"><i class="icon {{device.icon}}" title="{{device.title}}"></i><span></span></a>
                 </li>
                 <li ng-click="closePreviewDevice()" ng-if="enableCanvasdesigner > 0">
                     <a href="" class="more-options">
@@ -34,6 +34,9 @@
                         <i></i>
                     </a>
                 </li>
+                <li ng-click="exitPreview()">
+                    <a href="#" title="Exit Preview"><i class="icon icon-wrong"></i><span> </span></a>
+                </li>                
             </ul>
 
             <ul class="sections" ng-class="{selected: !showDevicesPreview}" ng-if="enableCanvasdesigner > 0">

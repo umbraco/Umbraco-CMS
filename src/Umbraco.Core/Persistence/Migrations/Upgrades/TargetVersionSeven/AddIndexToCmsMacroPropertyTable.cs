@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -14,19 +15,19 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     {
         private readonly bool _skipIndexCheck;
 
-        internal AddIndexToCmsMacroPropertyTable(bool skipIndexCheck)
+        internal AddIndexToCmsMacroPropertyTable(bool skipIndexCheck, ISqlSyntaxProvider sqlSyntax, ILogger logger)
+            : base(sqlSyntax, logger)
         {
             _skipIndexCheck = skipIndexCheck;
         }
 
-        public AddIndexToCmsMacroPropertyTable()
+        public AddIndexToCmsMacroPropertyTable(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
         {
-            
         }
 
         public override void Up()
         {
-            var dbIndexes = _skipIndexCheck ? new DbIndexDefinition[]{} : SqlSyntaxContext.SqlSyntaxProvider.GetDefinedIndexes(Context.Database)
+            var dbIndexes = _skipIndexCheck ? new DbIndexDefinition[]{} : SqlSyntax.GetDefinedIndexes(Context.Database)
                 .Select(x => new DbIndexDefinition()
                 {
                     TableName = x.Item1,

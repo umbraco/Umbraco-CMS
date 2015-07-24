@@ -1,14 +1,26 @@
 <div class="umb-editor umb-datepicker" ng-controller="Umbraco.PropertyEditors.DatepickerController">
-    <div class="input-append date datepicker" style="position: relative;" id="datepicker{{model.alias}}">        
-        <input  name="datepicker" data-format="{{model.config.format}}" type="text" 
-                ng-model="model.value"   
-                ng-required="model.validation.mandatory"   
-                val-server="value" />
-        <span class="add-on">
-            <i class="icon-calendar"></i>
-        </span>        
-    </div>
+    <ng-form name="datePickerForm">
+        <div class="input-append date datepicker" style="position: relative;" id="datepicker{{model.alias}}">
+            
+            <input name="datepicker" data-format="{{model.config.format}}" type="text"
+                   ng-model="datetimePickerValue"
+                   ng-required="model.validation.mandatory"
+                   val-server="value"
+                   class="datepickerinput" />
 
-    <span class="help-inline" val-msg-for="datepicker" val-toggle-msg="required">Required</span>
-    <span class="help-inline" val-msg-for="datepicker" val-toggle-msg="valServer">{{propertyForm.datepicker.errorMsg}}</span>
+            <span class="add-on">
+                <i class="icon-calendar"></i>
+            </span>
+            
+        </div>
+
+        <span class="help-inline" val-msg-for="datepicker" val-toggle-msg="required">Required</span>
+        <span class="help-inline" val-msg-for="datepicker" val-toggle-msg="valServer">{{datePickerForm.datepicker.errorMsg}}</span>
+        <span class="help-inline" val-msg-for="datepicker" val-toggle-msg="pickerError">Invalid date</span>
+        
+        <p ng-show="hasDatetimePickerValue === true || datePickerForm.datepicker.$error.pickerError === true">
+            <a href ng-click="clearDate()"><i class="icon-delete"></i><small><localize key="content_removeDate">Clear date</localize></small></a>
+        </p>
+         
+    </ng-form>
 </div>

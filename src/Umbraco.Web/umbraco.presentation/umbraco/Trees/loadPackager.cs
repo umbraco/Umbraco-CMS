@@ -93,7 +93,7 @@ namespace umbraco
         /// <param name="tree">The tree.</param>
         public override void Render(ref XmlTree tree)
         {            
-            string[,] items = { { "BrowseRepository.aspx", "Install from repository" }, { "CreatePackage.aspx", "Createdjjj Packages" }, { "installedPackages.aspx", "Installedjj packages" }, { "StarterKits.aspx", "Starter kit" }, { "installer.aspx", "Install local package" } };
+            string[,] items = { { "BrowseRepository.aspx", "Install from repository" }, { "CreatePackage.aspx", "Created Packages" }, { "installedPackages.aspx", "Installed packages" }, { "StarterKits.aspx", "Starter kit" }, { "installer.aspx", "Install local package" } };
 
 
             for (int i = 0; i <= items.GetUpperBound(0); i++)

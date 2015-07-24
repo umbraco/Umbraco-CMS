@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Caching;
+
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
@@ -35,43 +39,30 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private ContentRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
         {
-            var templateRepository = new TemplateRepository(unitOfWork, NullCacheProvider.Current);
-            var tagRepository = new TagRepository(unitOfWork, NullCacheProvider.Current);
-            contentTypeRepository = new ContentTypeRepository(unitOfWork, NullCacheProvider.Current, templateRepository);
-            var repository = new ContentRepository(unitOfWork, NullCacheProvider.Current, contentTypeRepository, templateRepository, tagRepository, CacheHelper.CreateDisabledCacheHelper());
+            var templateRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
+            var tagRepository = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
+            contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, templateRepository);
+            var repository = new ContentRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
             return repository;
         }
 
         private ContentTypeRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            var templateRepository = new TemplateRepository(unitOfWork, NullCacheProvider.Current);
-            var contentTypeRepository = new ContentTypeRepository(unitOfWork, NullCacheProvider.Current, templateRepository);
+            var templateRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
+            var contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, templateRepository);
             return contentTypeRepository;
         }
 
         //TODO Add test to verify SetDefaultTemplates updates both AllowedTemplates and DefaultTemplate(id).
 
-        [Test]
-        public void Can_Instantiate_Repository_From_Resolver()
-        {
-            // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-
-            // Act
-            var repository = RepositoryResolver.Current.ResolveByType<IContentTypeRepository>(unitOfWork);
-
-            // Assert
-            Assert.That(repository, Is.Not.Null);
-        }
 
         [Test]
         public void Maps_Templates_Correctly()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var templateRepo = new TemplateRepository(unitOfWork))
+            using (var templateRepo = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>()))
             using (var repository = CreateRepository(unitOfWork))
             {
                 var templates = new[]
@@ -105,7 +96,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_On_ContentTypeRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = CreateRepository(unitOfWork))
             {
@@ -118,7 +109,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(contentType.HasIdentity, Is.True);
                 Assert.That(contentType.PropertyGroups.All(x => x.HasIdentity), Is.True);
                 Assert.That(contentType.Path.Contains(","), Is.True);
-                Assert.That(contentType.SortOrder, Is.GreaterThan(0));    
+                Assert.That(contentType.SortOrder, Is.GreaterThan(0));
+
+                foreach (var propertyType in contentType.PropertyTypes)
+                {
+                    Assert.AreNotEqual(propertyType.Key, Guid.Empty);
+                }
             }
             
         }
@@ -127,7 +123,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_On_ContentTypeRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = CreateRepository(unitOfWork))
             {
@@ -135,12 +131,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
 
                 contentType.Thumbnail = "Doc2.png";
-            contentType.PropertyGroups["Content"].PropertyTypes.Add(new PropertyType("test", DataTypeDatabaseType.Ntext)
+            contentType.PropertyGroups["Content"].PropertyTypes.Add(new PropertyType("test", DataTypeDatabaseType.Ntext, "subtitle")
                 {
-                    Alias = "subtitle",
                     Name = "Subtitle",
                     Description = "Optional Subtitle",
-                    HelpText = "",
                     Mandatory = false,
                     SortOrder = 1,
                     DataTypeDefinitionId = -88
@@ -164,7 +158,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_On_ContentTypeRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = CreateRepository(unitOfWork))
             {
@@ -188,7 +182,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_With_Heirarchy_On_ContentTypeRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = CreateRepository(unitOfWork))
             {                
@@ -218,7 +212,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_On_ContentTypeRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = CreateRepository(unitOfWork))
             {
@@ -233,10 +227,29 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Can_Perform_Get_By_Guid_On_ContentTypeRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
+
+                // Act
+                contentType = repository.Get(contentType.Key);
+
+                // Assert
+                Assert.That(contentType, Is.Not.Null);
+                Assert.That(contentType.Id, Is.EqualTo(NodeDto.NodeIdSeed + 1));
+            }
+        }
+
+        [Test]
         public void Can_Perform_GetAll_On_ContentTypeRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = CreateRepository(unitOfWork))
             {
@@ -255,10 +268,33 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Can_Perform_GetAll_By_Guid_On_ContentTypeRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var allGuidIds = repository.GetAll().Select(x => x.Key).ToArray();
+
+                // Act
+                var contentTypes = repository.GetAll(allGuidIds);
+                int count =
+                    DatabaseContext.Database.ExecuteScalar<int>(
+                        "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
+                        new { NodeObjectType = new Guid(Constants.ObjectTypes.DocumentType) });
+
+                // Assert
+                Assert.That(contentTypes.Any(), Is.True);
+                Assert.That(contentTypes.Count(), Is.EqualTo(count));
+            }
+        }
+
+        [Test]
         public void Can_Perform_Exists_On_ContentTypeRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = CreateRepository(unitOfWork))
             {
@@ -275,7 +311,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Update_ContentType_With_PropertyType_Removed()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = CreateRepository(unitOfWork))
             {
@@ -299,7 +335,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Verify_PropertyTypes_On_SimpleTextpage()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = CreateRepository(unitOfWork))
             {
@@ -317,7 +353,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Verify_PropertyTypes_On_Textpage()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = CreateRepository(unitOfWork))
             {
@@ -335,19 +371,17 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Verify_PropertyType_With_No_Group()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = CreateRepository(unitOfWork))
             {
                 var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
 
                 // Act
-            var urlAlias = new PropertyType("test", DataTypeDatabaseType.Nvarchar)
+                var urlAlias = new PropertyType("test", DataTypeDatabaseType.Nvarchar, "urlAlias")
                     {
-                        Alias = "urlAlias",
                         Name = "Url Alias",
                         Description = "",
-                        HelpText = "",
                         Mandatory = false,
                         SortOrder = 1,
                         DataTypeDefinitionId = -88
@@ -371,7 +405,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Verify_AllowedChildContentTypes_On_ContentType()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = CreateRepository(unitOfWork))
             {
@@ -386,18 +420,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var contentType = repository.Get(NodeDto.NodeIdSeed);
                 contentType.AllowedContentTypes = new List<ContentTypeSort>
                     {
-                        new ContentTypeSort
-                            {
-                                Alias = subpageContentType.Alias,
-                                Id = new Lazy<int>(() => subpageContentType.Id),
-                                SortOrder = 0
-                            },
-                        new ContentTypeSort
-                            {
-                                Alias = simpleSubpageContentType.Alias,
-                                Id = new Lazy<int>(() => simpleSubpageContentType.Id),
-                                SortOrder = 1
-                            }
+                        new ContentTypeSort(new Lazy<int>(() => subpageContentType.Id), 0, subpageContentType.Alias),
+                        new ContentTypeSort(new Lazy<int>(() => simpleSubpageContentType.Id), 1, simpleSubpageContentType.Alias)
                     };
                 repository.AddOrUpdate(contentType);
                 unitOfWork.Commit();
@@ -415,7 +439,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Verify_Removal_Of_Used_PropertyType_From_ContentType()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             ContentTypeRepository repository;
             using (var contentRepository = CreateRepository(unitOfWork, out repository))
@@ -442,7 +466,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Verify_Addition_Of_PropertyType_After_ContentType_Is_Used()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             ContentTypeRepository repository;
             using (var contentRepository = CreateRepository(unitOfWork, out repository))
@@ -455,7 +479,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 var propertyGroup = contentType.PropertyGroups.First(x => x.Name == "Meta");
-            propertyGroup.PropertyTypes.Add(new PropertyType("test", DataTypeDatabaseType.Ntext) { Alias = "metaAuthor", Name = "Meta Author", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
+                propertyGroup.PropertyTypes.Add(new PropertyType("test", DataTypeDatabaseType.Ntext, "metaAuthor") { Name = "Meta Author", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
                 repository.AddOrUpdate(contentType);
                 unitOfWork.Commit();
 
@@ -470,7 +494,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Verify_Usage_Of_New_PropertyType_On_Content()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             ContentTypeRepository repository;
             using (var contentRepository = CreateRepository(unitOfWork, out repository))
@@ -482,7 +506,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Commit();
 
                 var propertyGroup = contentType.PropertyGroups.First(x => x.Name == "Meta");
-            propertyGroup.PropertyTypes.Add(new PropertyType("test", DataTypeDatabaseType.Ntext) { Alias = "metaAuthor", Name = "Meta Author", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
+                propertyGroup.PropertyTypes.Add(new PropertyType("test", DataTypeDatabaseType.Ntext, "metaAuthor") { Name = "Meta Author", Description = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
                 repository.AddOrUpdate(contentType);
                 unitOfWork.Commit();
 
@@ -506,7 +530,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             ContentTypeRepository repository;
             using (var contentRepository = CreateRepository(unitOfWork, out repository))
@@ -521,7 +545,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 contentType.RemovePropertyType("keywords");
                 //Add PropertyType
                 var propertyGroup = contentType.PropertyGroups.First(x => x.Name == "Meta");
-            propertyGroup.PropertyTypes.Add(new PropertyType("test", DataTypeDatabaseType.Ntext) { Alias = "metaAuthor", Name = "Meta Author", Description = "", HelpText = "", Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
+                propertyGroup.PropertyTypes.Add(new PropertyType("test", DataTypeDatabaseType.Ntext, "metaAuthor") { Name = "Meta Author", Description = "",  Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 });
                 repository.AddOrUpdate(contentType);
                 unitOfWork.Commit();
 

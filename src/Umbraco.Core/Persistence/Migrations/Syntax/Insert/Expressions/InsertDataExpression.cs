@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -43,7 +44,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Insert.Expressions
                 foreach (var keyVal in item)
                 {
                     cols += keyVal.Key + ",";
-                    vals += keyVal.Value + ",";
+                    vals += GetQuotedValue(keyVal.Value) + ",";
                 }
                 cols = cols.TrimEnd(',');
                 vals = vals.TrimEnd(',');
@@ -58,5 +59,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Insert.Expressions
 
             return string.Join(",", insertItems);
         }
+
+        
     }
 }

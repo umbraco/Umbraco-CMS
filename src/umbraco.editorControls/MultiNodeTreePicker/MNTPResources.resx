@@ -136,7 +136,7 @@
     <value>Define the starting node that should be rendered for the picker. This will ensure that the correct security measures are in place by checking the defined start node ID for the user accessing the picker. In some cases, if the user is not able to view the node, then the picker will render an error message.</value>
   </data>
   <data name="Desc_StoreAsComma" xml:space="preserve">
-    <value>You can specify to store the data in Umbraco as comma seperated or as XML. By default it is stored as XML which makes it easier to use the saved value in XSLT, however, storing it as comma seperated makes it easier to work with the data using the API such as Node factory.</value>
+    <value>You can specify to store the data in Umbraco as comma separated or as XML. By default it is stored as XML which makes it easier to use the saved value in XSLT, however, storing it as comma separated makes it easier to work with the data using the API such as Node factory.</value>
   </data>
   <data name="Desc_XPathExpression" xml:space="preserve">
     <value>This XPath expression is used to select a starting node and depends on the XPath expression type chosen (global or from current). &lt;u&gt;IMPORTANT&lt;/u&gt;: This XPath expression should be written to match &lt;b&gt;ONE&lt;/b&gt; node, if the expression matches more than one node, then the first node matched will be used as the start node.</value>

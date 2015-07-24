@@ -23,6 +23,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Macros;
+using Umbraco.Core.Models;
 using Umbraco.Core.Xml.XPath;
 using Umbraco.Core.Profiling;
 using umbraco.interfaces;
@@ -33,7 +34,6 @@ using Umbraco.Web.Models;
 using Umbraco.Web.Templates;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.macro;
-using umbraco.cms.businesslogic.member;
 using umbraco.DataLayer;
 using umbraco.NodeFactory;
 using umbraco.presentation.templateControls;
@@ -42,6 +42,9 @@ using Content = umbraco.cms.businesslogic.Content;
 using Macro = umbraco.cms.businesslogic.macro.Macro;
 using MacroErrorEventArgs = Umbraco.Core.Events.MacroErrorEventArgs;
 using System.Linq;
+using File = System.IO.File;
+using MacroTypes = umbraco.cms.businesslogic.macro.MacroTypes;
+using Member = umbraco.cms.businesslogic.member.Member;
 
 namespace umbraco
 {
@@ -534,8 +537,8 @@ namespace umbraco
         /// <returns></returns>
         private Control AddMacroResultToCache(Control macroControl)
         {
-            // Add result to cache if successful
-            if (Model.CacheDuration > 0)
+            // Add result to cache if successful (and cache is enabled)
+            if (UmbracoContext.Current.InPreviewMode == false && Model.CacheDuration > 0)
             {
                 // do not add to cache if there's no member and it should cache by personalization
                 if (!Model.CacheByMember || (Model.CacheByMember && Member.IsLoggedOn()))
@@ -1575,7 +1578,7 @@ namespace umbraco
             //Trace out to profiling... doesn't actually profile, just for informational output.
             if (excludeProfiling == false)
             {
-                using (ProfilerResolver.Current.Profiler.Step(string.Format("{0}", message)))
+                using (ApplicationContext.Current.ProfilingLogger.TraceDuration<macro>(string.Format("{0}", message)))
                 {
                 }
             }
@@ -1589,7 +1592,7 @@ namespace umbraco
             //Trace out to profiling... doesn't actually profile, just for informational output.
             if (excludeProfiling == false)
             {
-                using (ProfilerResolver.Current.Profiler.Step(string.Format("Warning: {0}", message)))
+                using (ApplicationContext.Current.ProfilingLogger.TraceDuration<macro>(string.Format("Warning: {0}", message)))
                 {
                 }
             }
@@ -1603,7 +1606,7 @@ namespace umbraco
             //Trace out to profiling... doesn't actually profile, just for informational output.
             if (excludeProfiling == false)
             {
-                using (ProfilerResolver.Current.Profiler.Step(string.Format("{0}, Error: {1}", message, ex)))
+                using (ApplicationContext.Current.ProfilingLogger.TraceDuration<macro>(string.Format("{0}, Error: {1}", message, ex)))
                 {
                 }
             }
@@ -1849,10 +1852,19 @@ namespace umbraco
         {
             //Get the current content request
 
-            var content = UmbracoContext.Current.PublishedContentRequest != null
+            IPublishedContent content;
+            if (UmbracoContext.Current.IsFrontEndUmbracoRequest)
+            {
+                content = UmbracoContext.Current.PublishedContentRequest != null
                     ? UmbracoContext.Current.PublishedContentRequest.PublishedContent
                     : null;
-        
+            }
+            else
+            {
+                var pageId = UmbracoContext.Current.PageId;
+                content = pageId.HasValue ? UmbracoContext.Current.ContentCache.GetById(pageId.Value) : null;
+            }
+                    
             return content == null ? null : LegacyNodeHelper.ConvertToNode(content);
         }
 

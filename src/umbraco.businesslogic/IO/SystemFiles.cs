@@ -12,7 +12,7 @@ namespace umbraco.IO
 	[Obsolete("Use Umbraco.Core.UI.SystemFiles instead")]
 	public class SystemFiles
 	{
-
+        [Obsolete("This file is no longer used and should not be accessed!")]
 		public static string AccessXml
 		{
 			get { return Umbraco.Core.IO.SystemFiles.AccessXml; }

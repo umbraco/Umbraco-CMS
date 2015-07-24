@@ -29,6 +29,8 @@ namespace Umbraco.Core.Cache
         public const string MemberBusinessLogicCacheKey = "MemberCacheItem_";
         
         public const string TemplateFrontEndCacheKey = "template";
+
+        [Obsolete("This is no longer used and will be removed from the codebase in the future")]
         public const string TemplateBusinessLogicCacheKey = "UmbracoTemplateCache";
 
         public const string UserContextCacheKey = "UmbracoUserContext";
@@ -45,14 +47,21 @@ namespace Umbraco.Core.Cache
         
         public const string PropertyTypeCacheKey = "UmbracoPropertyTypeCache";
 
+        [Obsolete("This is no longer used and will be removed from the codebase in the future")]
         public const string LanguageCacheKey = "UmbracoLanguageCache";
 
+        [Obsolete("This is no longer used and will be removed from the codebase in the future")]
         public const string DomainCacheKey = "UmbracoDomainList";
 
+        [Obsolete("This is no longer used and will be removed from the codebase in the future")]
         public const string StylesheetCacheKey = "UmbracoStylesheet";
+        [Obsolete("This is no longer used and will be removed from the codebase in the future")]
         public const string StylesheetPropertyCacheKey = "UmbracoStylesheetProperty";
 
         public const string DataTypeCacheKey = "UmbracoDataTypeDefinition";
         public const string DataTypePreValuesCacheKey = "UmbracoPreVal";
+
+        public const string IdToKeyCacheKey = "UI2K";
+        public const string KeyToIdCacheKey = "UK2I";
     }
 }

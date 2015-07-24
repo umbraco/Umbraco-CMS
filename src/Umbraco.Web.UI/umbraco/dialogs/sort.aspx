@@ -48,7 +48,7 @@
                         <thead>
                             <tr>
                                 <th style="width: 100%">Name</th>
-                                <th class="nowrap">Creation date</th>
+                                <th class="nowrap" style="display: <%=HideDateColumn ? "none;" : "block;" %>">Creation date</th>
                                 <th class="nowrap">Sort order</th>
                             </tr>
                         </thead>

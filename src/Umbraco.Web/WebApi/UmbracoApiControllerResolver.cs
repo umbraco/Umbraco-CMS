@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
+using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Web.WebApi
 {
     internal sealed class UmbracoApiControllerResolver : ManyObjectsResolverBase<UmbracoApiControllerResolver, UmbracoApiController>
     {
-        public UmbracoApiControllerResolver(IEnumerable<Type> apiControllers)
-            : base(apiControllers)
+        public UmbracoApiControllerResolver(IServiceProvider serviceProvider, ILogger logger, IEnumerable<Type> apiControllers)
+            : base(serviceProvider, logger, apiControllers)
         {
 
         }

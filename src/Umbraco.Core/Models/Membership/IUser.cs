@@ -20,7 +20,8 @@ namespace Umbraco.Core.Models.Membership
         /// Gets/sets the user type for the user
         /// </summary>
         IUserType UserType { get; set; }
-        
+
+        //TODO: This should be a private set 
         /// <summary>
         /// The default permission set for the user
         /// </summary>
@@ -37,5 +38,10 @@ namespace Umbraco.Core.Models.Membership
         /// Exposes the basic profile data
         /// </summary>
         IProfile ProfileData { get; }
+
+        /// <summary>
+        /// The security stamp used by ASP.Net identity
+        /// </summary>
+        string SecurityStamp { get; set; }
     }
 }

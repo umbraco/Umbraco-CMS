@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Web;
 using System.Web.Hosting;
@@ -22,7 +23,7 @@ namespace Umbraco.Web
 	/// </summary>
     public class UmbracoApplication : UmbracoApplicationBase
 	{
-        private readonly ManifestWatcher _mw = new ManifestWatcher();
+	    private ManifestWatcher _mw;
 
 	    protected override void OnApplicationStarted(object sender, EventArgs e)
 	    {
@@ -30,6 +31,7 @@ namespace Umbraco.Web
 
 	        if (ApplicationContext.Current.IsConfigured && GlobalSettings.DebugMode)
 	        {   
+                _mw = new ManifestWatcher(LoggerResolver.Current.Logger);
 	            _mw.Start(Directory.GetDirectories(IOHelper.MapPath("~/App_Plugins/")));
 	        }
 	    }
@@ -38,7 +40,10 @@ namespace Umbraco.Web
 	    {
 	        base.OnApplicationEnd(sender, e);
 
-            _mw.Dispose();
+	        if (_mw != null)
+	        {
+                _mw.Dispose();    
+	        }
 	    }
 
 	    protected override IBootManager GetBootManager()

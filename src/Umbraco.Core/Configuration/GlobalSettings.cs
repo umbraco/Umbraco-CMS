@@ -174,7 +174,7 @@ namespace Umbraco.Core.Configuration
         /// We also make sure that the virtual directory (SystemDirectories.Root) is stripped off first, otherwise we'd end up with something
         /// like "MyVirtualDirectory-Umbraco" instead of just "Umbraco".
         /// </remarks>
-        internal static string UmbracoMvcArea
+        public static string UmbracoMvcArea
         {
             get
             {
@@ -242,6 +242,7 @@ namespace Umbraco.Core.Configuration
             }
         }
 
+        //TODO: Move these to constants!
         public const string UmbracoConnectionName = "umbracoDbDSN";
         public const string UmbracoMigrationName = "Umbraco";
 
@@ -420,14 +421,15 @@ namespace Umbraco.Core.Configuration
         /// Gets a value indicating whether the current version of umbraco is configured.
         /// </summary>
         /// <value><c>true</c> if configured; otherwise, <c>false</c>.</value>
-        public static bool Configured
+        [Obsolete("Do not use this, it is no longer in use and will be removed from the codebase in future versions")]
+        internal static bool Configured
         {
             get
             {
                 try
                 {
                     string configStatus = ConfigurationStatus;
-                    string currentVersion = UmbracoVersion.Current.ToString(3);
+                    string currentVersion = UmbracoVersion.GetSemanticVersion().ToSemanticString();
 
 
                     if (currentVersion != configStatus)
@@ -594,10 +596,7 @@ namespace Umbraco.Core.Configuration
         [Obsolete("Use Umbraco.Core.Configuration.UmbracoVersion.Current instead", false)]
         public static string CurrentVersion
         {
-            get
-            {
-                return UmbracoVersion.Current.ToString(3);
-            }
+            get { return UmbracoVersion.GetSemanticVersion().ToSemanticString(); }
         }
 
         /// <summary>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Umbraco.Core.Events;
 
 namespace Umbraco.Web
 {
@@ -10,20 +11,18 @@ namespace Umbraco.Web
     /// </summary>
     public static class UmbracoContextExtensions
     {
+
         /// <summary>
-        /// Informs the context that content has changed.
+        /// If there are event messages in the current request this will return them , otherwise it will return null
         /// </summary>
-        /// <param name="context">The context.</param>
-        /// <remarks>
-        /// <para>The contextual caches may, although that is not mandatory, provide an immutable snapshot of
-        /// the content over the duration of the context. If you make changes to the content and do want to have
-        /// the caches update their snapshot, you have to explicitely ask them to do so by calling ContentHasChanged.</para>
-        /// <para>The context informs the contextual caches that content has changed.</para>
-        /// </remarks>
-        public static void ContentHasChanged(this UmbracoContext context)
+        /// <param name="umbracoContext"></param>
+        /// <returns></returns>
+        public static EventMessages GetCurrentEventMessages(this UmbracoContext umbracoContext)
         {
-            context.ContentCache.ContentHasChanged();
-            context.MediaCache.ContentHasChanged();
+            var msgs = umbracoContext.HttpContext.Items[typeof (RequestLifespanMessagesFactory).Name];
+            if (msgs == null) return null;
+            return (EventMessages) msgs;
         }
+
     }
 }

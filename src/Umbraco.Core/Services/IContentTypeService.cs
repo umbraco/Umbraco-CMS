@@ -67,6 +67,13 @@ namespace Umbraco.Core.Services
         IContentType GetContentType(string alias);
 
         /// <summary>
+        /// Gets an <see cref="IContentType"/> object by its Key
+        /// </summary>
+        /// <param name="id">Alias of the <see cref="IContentType"/> to retrieve</param>
+        /// <returns><see cref="IContentType"/></returns>
+        IContentType GetContentType(Guid id);
+
+        /// <summary>
         /// Gets a list of all available <see cref="IContentType"/> objects
         /// </summary>
         /// <param name="ids">Optional list of ids</param>
@@ -74,11 +81,25 @@ namespace Umbraco.Core.Services
         IEnumerable<IContentType> GetAllContentTypes(params int[] ids);
 
         /// <summary>
+        /// Gets a list of all available <see cref="IContentType"/> objects
+        /// </summary>
+        /// <param name="ids">Optional list of ids</param>
+        /// <returns>An Enumerable list of <see cref="IContentType"/> objects</returns>
+        IEnumerable<IContentType> GetAllContentTypes(IEnumerable<Guid> ids);
+
+        /// <summary>
         /// Gets a list of children for a <see cref="IContentType"/> object
         /// </summary>
         /// <param name="id">Id of the Parent</param>
         /// <returns>An Enumerable list of <see cref="IContentType"/> objects</returns>
         IEnumerable<IContentType> GetContentTypeChildren(int id);
+
+        /// <summary>
+        /// Gets a list of children for a <see cref="IContentType"/> object
+        /// </summary>
+        /// <param name="id">Id of the Parent</param>
+        /// <returns>An Enumerable list of <see cref="IContentType"/> objects</returns>
+        IEnumerable<IContentType> GetContentTypeChildren(Guid id);
 
         /// <summary>
         /// Saves a single <see cref="IContentType"/> object
@@ -125,6 +146,13 @@ namespace Umbraco.Core.Services
         IMediaType GetMediaType(string alias);
 
         /// <summary>
+        /// Gets an <see cref="IMediaType"/> object by its Id
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IMediaType"/> to retrieve</param>
+        /// <returns><see cref="IMediaType"/></returns>
+        IMediaType GetMediaType(Guid id);
+
+        /// <summary>
         /// Gets a list of all available <see cref="IMediaType"/> objects
         /// </summary>
         /// <param name="ids">Optional list of ids</param>
@@ -132,11 +160,25 @@ namespace Umbraco.Core.Services
         IEnumerable<IMediaType> GetAllMediaTypes(params int[] ids);
 
         /// <summary>
+        /// Gets a list of all available <see cref="IMediaType"/> objects
+        /// </summary>
+        /// <param name="ids">Optional list of ids</param>
+        /// <returns>An Enumerable list of <see cref="IMediaType"/> objects</returns>
+        IEnumerable<IMediaType> GetAllMediaTypes(IEnumerable<Guid> ids);
+
+        /// <summary>
         /// Gets a list of children for a <see cref="IMediaType"/> object
         /// </summary>
         /// <param name="id">Id of the Parent</param>
         /// <returns>An Enumerable list of <see cref="IMediaType"/> objects</returns>
         IEnumerable<IMediaType> GetMediaTypeChildren(int id);
+
+        /// <summary>
+        /// Gets a list of children for a <see cref="IMediaType"/> object
+        /// </summary>
+        /// <param name="id">Id of the Parent</param>
+        /// <returns>An Enumerable list of <see cref="IMediaType"/> objects</returns>
+        IEnumerable<IMediaType> GetMediaTypeChildren(Guid id);
 
         /// <summary>
         /// Saves a single <see cref="IMediaType"/> object
@@ -188,10 +230,24 @@ namespace Umbraco.Core.Services
         bool HasChildren(int id);
 
         /// <summary>
+        /// Checks whether an <see cref="IContentType"/> item has any children
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IContentType"/></param>
+        /// <returns>True if the content type has any children otherwise False</returns>
+        bool HasChildren(Guid id);
+
+        /// <summary>
         /// Checks whether an <see cref="IMediaType"/> item has any children
         /// </summary>
         /// <param name="id">Id of the <see cref="IMediaType"/></param>
         /// <returns>True if the media type has any children otherwise False</returns>
         bool MediaTypeHasChildren(int id);
+
+        /// <summary>
+        /// Checks whether an <see cref="IMediaType"/> item has any children
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IMediaType"/></param>
+        /// <returns>True if the media type has any children otherwise False</returns>
+        bool MediaTypeHasChildren(Guid id);
     }
 }

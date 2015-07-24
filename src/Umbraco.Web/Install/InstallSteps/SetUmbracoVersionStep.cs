@@ -34,10 +34,10 @@ namespace Umbraco.Web.Install.InstallSteps
             DistributedCache.Instance.RefreshAllPageCache();
 
             // Update configurationStatus
-            GlobalSettings.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
+            GlobalSettings.ConfigurationStatus = UmbracoVersion.GetSemanticVersion().ToSemanticString();
 
             // Update ClientDependency version
-            var clientDependencyConfig = new ClientDependencyConfiguration();
+            var clientDependencyConfig = new ClientDependencyConfiguration(_applicationContext.ProfilingLogger.Logger);
             var clientDependencyUpdated = clientDependencyConfig.IncreaseVersionNumber();
 
             var security = new WebSecurity(_httpContext, _applicationContext);

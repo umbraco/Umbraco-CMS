@@ -33,5 +33,19 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <returns></returns>
         IEnumerable<CultureInfo> GetSupportedCultures();
+
+        /// <summary>
+        /// Tries to resolve a full 4 letter culture from a 2 letter culture name
+        /// </summary>
+        /// <param name="currentCulture">
+        /// The culture to determine if it is only a 2 letter culture, if so we'll try to convert it, otherwise it will just be returned
+        /// </param>
+        /// <returns></returns>
+        /// <remarks>
+        /// TODO: This is just a hack due to the way we store the language files, they should be stored with 4 letters since that 
+        /// is what they reference but they are stored with 2, further more our user's languages are stored with 2. So this attempts
+        /// to resolve the full culture if possible.
+        /// </remarks>
+        CultureInfo ConvertToSupportedCultureWithRegionCode(CultureInfo currentCulture);
     }
 }

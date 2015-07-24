@@ -2,6 +2,8 @@ using System;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Web.Routing
 {
@@ -13,13 +15,31 @@ namespace Umbraco.Web.Routing
 	/// </remarks>
 	public class ContentFinderByIdPath : IContentFinder
     {
-		/// <summary>
+	    private readonly IWebRoutingSection _webRoutingSection;
+
+	    public ContentFinderByIdPath()
+            : this(UmbracoConfig.For.UmbracoSettings().WebRouting)
+	    {
+	        
+	    }
+
+	    public ContentFinderByIdPath(IWebRoutingSection webRoutingSection)
+	    {
+	        _webRoutingSection = webRoutingSection;
+	    }
+
+	    /// <summary>
 		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
 		/// </summary>
 		/// <param name="docRequest">The <c>PublishedContentRequest</c>.</param>		
 		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
 		public bool TryFindContent(PublishedContentRequest docRequest)
         {
+
+            if (docRequest.RoutingContext.UmbracoContext != null && docRequest.RoutingContext.UmbracoContext.InPreviewMode == false
+                && _webRoutingSection.DisableFindContentByIdPath)
+                return false;
+
             IPublishedContent node = null;
 			var path = docRequest.Uri.GetAbsolutePathDecoded();
 

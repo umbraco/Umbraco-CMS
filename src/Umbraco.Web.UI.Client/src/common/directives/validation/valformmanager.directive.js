@@ -48,23 +48,25 @@ function valFormManager(serverValidationManager, $rootScope, $log, $timeout, not
                 element.addClass(className);
             }
 
+            var unsubscribe = [];
+
             //listen for the forms saving event
-            scope.$on(savingEventName, function (ev, args) {
+            unsubscribe.push(scope.$on(savingEventName, function(ev, args) {
                 element.addClass(className);
 
                 //set the flag so we can check to see if we should display the error.
                 isSavingNewItem = $routeParams.create;
-            });
+            }));
 
             //listen for the forms saved event
-            scope.$on(savedEvent, function (ev, args) {
+            unsubscribe.push(scope.$on(savedEvent, function(ev, args) {
                 //remove validation class
                 element.removeClass(className);
 
                 //clear form state as at this point we retrieve new data from the server
                 //and all validation will have cleared at this point    
                 formCtrl.$setPristine();
-            });
+            }));
 
             //This handles the 'unsaved changes' dialog which is triggered when a route is attempting to be changed but
             // the form has pending changes
@@ -92,10 +94,12 @@ function valFormManager(serverValidationManager, $rootScope, $log, $timeout, not
                 }
 
             });
+            unsubscribe.push(locationEvent);
+
             //Ensure to remove the event handler when this instance is destroyted
             scope.$on('$destroy', function() {
-                if(locationEvent){
-                    locationEvent();
+                for (var u in unsubscribe) {
+                    unsubscribe[u]();
                 }
             });
 

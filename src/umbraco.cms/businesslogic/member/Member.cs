@@ -12,7 +12,6 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Css;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Querying;
@@ -218,7 +217,6 @@ namespace umbraco.cms.businesslogic.member
         /// <param name="u">The umbraco usercontext</param>
         /// <param name="Email">The email of the user</param>
         /// <returns>The new member</returns>
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public static Member MakeNew(string Name, string LoginName, string Email, MemberType mbt, User u)
         {
             if (mbt == null) throw new ArgumentNullException("mbt");            

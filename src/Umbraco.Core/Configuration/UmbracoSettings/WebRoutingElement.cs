@@ -16,11 +16,27 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (bool) base["internalRedirectPreservesTemplate"]; }
         }
 
+        [ConfigurationProperty("disableAlternativeTemplates", DefaultValue = "false")]
+        public bool DisableAlternativeTemplates
+        {
+            get { return (bool) base["disableAlternativeTemplates"]; }
+        }
+        [ConfigurationProperty("disableFindContentByIdPath", DefaultValue = "false")]
+        public bool DisableFindContentByIdPath
+        {
+            get { return (bool) base["disableFindContentByIdPath"]; }
+        }
+
         [ConfigurationProperty("urlProviderMode", DefaultValue = "AutoLegacy")]
         public string UrlProviderMode
         {
-            get { return (string)base["urlProviderMode"]; }
+            get { return (string) base["urlProviderMode"]; }
         }
 
+        [ConfigurationProperty("umbracoApplicationUrl", DefaultValue = null)]
+        public string UmbracoApplicationUrl
+        {
+            get { return (string)base["umbracoApplicationUrl"]; }
+        }
     }
 }
