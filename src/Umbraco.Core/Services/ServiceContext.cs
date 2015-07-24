@@ -153,7 +153,7 @@ namespace Umbraco.Core.Services
             if (publishingStrategy == null) throw new ArgumentNullException("publishingStrategy");
             if (cache == null) throw new ArgumentNullException("cache");
             if (logger == null) throw new ArgumentNullException("logger");
-            if (eventMessagesFactory == null) throw new ArgumentNullException(nameof(eventMessagesFactory));
+            if (eventMessagesFactory == null) throw new ArgumentNullException("eventMessagesFactory");
 
             BuildServiceCache(dbUnitOfWorkProvider, fileUnitOfWorkProvider, publishingStrategy, cache,
                               repositoryFactory,
