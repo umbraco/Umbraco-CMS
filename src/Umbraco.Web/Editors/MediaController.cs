@@ -349,7 +349,7 @@ namespace Umbraco.Web.Editors
         {
             var mediaService = ApplicationContext.Services.MediaService;
             var f = mediaService.CreateMedia(folder.Name, folder.ParentId, Constants.Conventions.MediaTypes.Folder);
-            mediaService.Save(f);
+            mediaService.Save(f, Security.CurrentUser.Id);
 
             return Mapper.Map<IMedia, MediaItemDisplay>(f);
         }
@@ -416,7 +416,7 @@ namespace Umbraco.Web.Editors
                         mediaType = Constants.Conventions.MediaTypes.Image;
 
                     var mediaService = ApplicationContext.Services.MediaService;
-                    var f = mediaService.CreateMedia(fileName, parentId, mediaType);
+                    var f = mediaService.CreateMedia(fileName, parentId, mediaType, Security.CurrentUser.Id);
 
                     var fileInfo = new FileInfo(file.LocalFileName);
                     var fs = fileInfo.OpenReadWithRetry();
@@ -426,7 +426,7 @@ namespace Umbraco.Web.Editors
                         f.SetValue(Constants.Conventions.Media.File, fileName, fs);
                     }
 
-                    mediaService.Save(f);
+                    mediaService.Save(f, Security.CurrentUser.Id);
                 }
                 else
                 {

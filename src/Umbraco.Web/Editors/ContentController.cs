@@ -558,8 +558,8 @@ namespace Umbraco.Web.Editors
 
             if (foundContent == null)
                 HandleContentNotFound(id);
-
-            Services.ContentService.UnPublish(foundContent);
+            
+            Services.ContentService.UnPublish(foundContent, Security.CurrentUser.Id);
             var content = Mapper.Map<IContent, ContentItemDisplay>(foundContent);
 
             content.AddSuccessNotification(Services.TextService.Localize("content/unPublish"), Services.TextService.Localize("speechBubbles/contentUnpublished"));
