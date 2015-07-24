@@ -963,8 +963,14 @@ namespace Umbraco.Core.Services
         {
             if (raiseEvents)
             {
-                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMedia>(media), this))
+                if (Saving.IsRaisedEventCancelled(
+                    EventMessagesFactory.Get(),
+                    messages => new SaveEventArgs<IMedia>(media, messages), 
+                    this))
+                {
                     return Attempt.Fail(OperationStatus.Cancelled);
+                }
+                    
             }
 
             var uow = UowProvider.GetUnitOfWork();
@@ -1002,8 +1008,13 @@ namespace Umbraco.Core.Services
 
             if (raiseEvents)
             {
-                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMedia>(asArray), this))
+                if (Saving.IsRaisedEventCancelled(
+                    EventMessagesFactory.Get(), 
+                    messages => new SaveEventArgs<IMedia>(asArray, messages), 
+                    this))
+                {
                     return Attempt.Fail(OperationStatus.Cancelled);
+                }
             }
 
             var uow = UowProvider.GetUnitOfWork();
