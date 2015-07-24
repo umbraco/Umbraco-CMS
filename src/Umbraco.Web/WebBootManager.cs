@@ -383,10 +383,31 @@ namespace Umbraco.Web
             }
             else
             {
+
+                // NOTE: This is IMPORTANT! ... we don't want to rebuild any index that is already flagged to be re-indexed 
+                // on startup based on our _indexesToRebuild variable and how Examine auto-rebuilds when indexes are empty
+                // this callback is used below for the DatabaseServerMessenger startup options
+                Action rebuildIndexes = () =>
+                {
+                    if (_indexesToRebuild.Any())
+                    {
+                        var otherIndexes = ExamineManager.Instance.IndexProviderCollection.Except(_indexesToRebuild);
+                        foreach (var otherIndex in otherIndexes)
+                        {
+                            otherIndex.RebuildIndex();
+                        }
+                    }
+                    else
+                    {
+                        //rebuild them all
+                        ExamineManager.Instance.RebuildIndex();
+                    }
+                };
+
                 ServerMessengerResolver.Current.SetServerMessenger(new BatchedDatabaseServerMessenger(
                 ApplicationContext,
                 true,
-                    //Default options for web including the required callbacks to build caches
+                //Default options for web including the required callbacks to build caches
                 new DatabaseServerMessengerOptions
                 {
                     //These callbacks will be executed if the server has not been synced
@@ -397,8 +418,8 @@ namespace Umbraco.Web
                         () => global::umbraco.content.Instance.RefreshContentFromDatabase(),
                         //rebuild indexes if the server is not synced
                         // NOTE: This will rebuild ALL indexes including the members, if developers want to target specific 
-                        // indexes then they can adjust this logic themselves.
-                        () => Examine.ExamineManager.Instance.RebuildIndex()
+                        // indexes then they can adjust this logic themselves.                        
+                        rebuildIndexes
                     }
                 }));
             }
