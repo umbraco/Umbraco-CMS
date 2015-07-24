@@ -100,7 +100,7 @@ namespace Umbraco.Core.Sync
         /// Thread safety: this is NOT thread safe. Because it is NOT meant to run multi-threaded.
         /// Callers MUST ensure thread-safety.
         /// </remarks>
-        protected void Boot()
+        internal protected void Boot()
         {
             // weight:10, must release *before* the facade service, because once released
             // the service will *not* be able to properly handle our notifications anymore
