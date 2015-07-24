@@ -11,6 +11,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using ClientDependency.Core.Config;
 using Examine;
+using Examine.Config;
 using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -389,6 +390,11 @@ namespace Umbraco.Web
                 // this callback is used below for the DatabaseServerMessenger startup options
                 Action rebuildIndexes = () =>
                 {
+                    //If the developer has explicitly opted out of rebuilding indexes on startup then we 
+                    // should adhere to that and not do it, this means that if they are load balancing things will be
+                    // out of sync if they are auto-scaling but there's not much we can do about that.
+                    if (ExamineSettings.Instance.RebuildOnAppStart == false) return;
+
                     if (_indexesToRebuild.Any())
                     {
                         var otherIndexes = ExamineManager.Instance.IndexProviderCollection.Except(_indexesToRebuild);
