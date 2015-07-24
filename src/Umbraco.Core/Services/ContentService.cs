@@ -1002,7 +1002,7 @@ namespace Umbraco.Core.Services
                 }
 
                 if (raiseEvents)
-                    Saved.RaiseEvent(new SaveEventArgs<IContent>(asArray, false), this);
+                    Saved.RaiseEvent(EventMessagesFactory.Get(), messages => new SaveEventArgs<IContent>(asArray, false, messages), this);
 
                 Audit(AuditType.Save, "Bulk Save content performed by user", userId == -1 ? 0 : userId, Constants.System.Root);
 
@@ -1868,7 +1868,7 @@ namespace Umbraco.Core.Services
                 }
 
                 if (raiseEvents)
-                    Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
+                    Saved.RaiseEvent(EventMessagesFactory.Get(), messages => new SaveEventArgs<IContent>(content, false, messages), this);
 
                 //Save xml to db and call following method to fire event through PublishingStrategy to update cache
                 if (published)
@@ -1934,7 +1934,7 @@ namespace Umbraco.Core.Services
                 }
 
                 if (raiseEvents)
-                    Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
+                    Saved.RaiseEvent(EventMessagesFactory.Get(), messages => new SaveEventArgs<IContent>(content, false, messages), this);
 
                 Audit(AuditType.Save, "Save Content performed by user", userId, content.Id);
 

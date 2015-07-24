@@ -989,7 +989,7 @@ namespace Umbraco.Core.Services
             }
 
             if (raiseEvents)
-                Saved.RaiseEvent(new SaveEventArgs<IMedia>(media, false), this);
+                Saved.RaiseEvent(EventMessagesFactory.Get(), messages => new SaveEventArgs<IMedia>(media, false, messages), this);
 
             Audit(AuditType.Save, "Save Media performed by user", userId, media.Id);
 
@@ -1037,7 +1037,7 @@ namespace Umbraco.Core.Services
             }
 
             if (raiseEvents)
-                Saved.RaiseEvent(new SaveEventArgs<IMedia>(asArray, false), this);
+                Saved.RaiseEvent(EventMessagesFactory.Get(), messages => new SaveEventArgs<IMedia>(asArray, false, messages), this);
 
             Audit(AuditType.Save, "Save Media items performed by user", userId, -1);
 
