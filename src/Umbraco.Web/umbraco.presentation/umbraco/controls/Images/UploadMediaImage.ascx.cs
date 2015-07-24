@@ -81,7 +81,7 @@ namespace umbraco.controls.Images
             //this seems real ugly since we apparently already have the properties above (props)... but this data layer is insane and undecipherable:)
             string mainImage = media.getProperty(Constants.Conventions.Media.File).Value.ToString();
             string extension = mainImage.Substring(mainImage.LastIndexOf(".") + 1, mainImage.Length - mainImage.LastIndexOf(".") - 1);            
-            var thumbnail = mainImage.Remove(mainImage.Length - extension.Length - 1, extension.Length + 1) + "_thumb.jpg";
+            var thumbnail = mainImage.Remove(mainImage.Length - extension.Length - 1, extension.Length + 1) + "_thumb." + extension;
             string width = media.getProperty(Constants.Conventions.Media.Width).Value.ToString();
             string height = media.getProperty(Constants.Conventions.Media.Height).Value.ToString();
             int id = media.Id;

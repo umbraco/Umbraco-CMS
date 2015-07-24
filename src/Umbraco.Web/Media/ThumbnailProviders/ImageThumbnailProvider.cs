@@ -33,7 +33,7 @@ namespace Umbraco.Web.Media.ThumbnailProviders
                 return false;
 
             // Make sure the thumbnail exists
-            var tmpThumbUrl = fileUrl.Replace(ext, "_thumb.jpg");
+            var tmpThumbUrl = fileUrl.Replace(ext, "_thumb" + ext);
 
             try
             {

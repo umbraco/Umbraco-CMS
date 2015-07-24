@@ -122,8 +122,8 @@ namespace Umbraco.Core.Media
         private static ResizedImage Resize(IFileSystem fileSystem, string path, string extension, int maxWidthHeight, string fileNameAddition, Image originalImage)
         {
             var fileNameThumb = String.IsNullOrEmpty(fileNameAddition)
-                                            ? string.Format("{0}_UMBRACOSYSTHUMBNAIL.jpg", path.Substring(0, path.LastIndexOf(".")))
-                                            : string.Format("{0}_{1}.jpg", path.Substring(0, path.LastIndexOf(".")), fileNameAddition);
+                                            ? string.Format("{0}_UMBRACOSYSTHUMBNAIL." + extension, path.Substring(0, path.LastIndexOf(".")))
+                                            : string.Format("{0}_{1}." + extension, path.Substring(0, path.LastIndexOf(".")), fileNameAddition);
 
             var thumb = GenerateThumbnail(
                 originalImage,
@@ -202,10 +202,16 @@ namespace Umbraco.Core.Media
 
                     // Copy metadata
                     var imageEncoders = ImageCodecInfo.GetImageEncoders();
-
-                    var codec = extension.ToLower() == "png" || extension.ToLower() == "gif"
-                        ? imageEncoders.Single(t => t.MimeType.Equals("image/png"))
-                        : imageEncoders.Single(t => t.MimeType.Equals("image/jpeg"));
+                    var codec = imageEncoders.Single(t => t.MimeType.Equals("image/jpeg")); // default "jpg"
+                    switch (extension.ToLower())
+                    {
+                        case "png": codec = imageEncoders.Single(t => t.MimeType.Equals("image/png")); break;
+                        case "gif": codec = imageEncoders.Single(t => t.MimeType.Equals("image/gif")); break;
+                        case "tif":
+                        case "tiff": codec = imageEncoders.Single(t => t.MimeType.Equals("image/tiff")); break;
+                        case "bmp": codec = imageEncoders.Single(t => t.MimeType.Equals("image/bmp")); break;
+                        default: break;
+                    }
 
                     // Set compresion ratio to 90%
                     var ep = new EncoderParameters();

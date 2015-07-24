@@ -76,7 +76,7 @@ namespace umbraco.dialogs
 				        }
 				        var fileNameOrg = fileName;
 				        var ext = fileNameOrg.Substring(fileNameOrg.LastIndexOf(".") + 1, fileNameOrg.Length - fileNameOrg.LastIndexOf(".") - 1);
-				        var fileNameThumb = SystemDirectories.Root + fileNameOrg.Replace("." + ext, "_thumb.jpg");
+                        var fileNameThumb = SystemDirectories.Root + fileNameOrg.Replace("." + ext, "_thumb." + ext);
 				        image.Controls.Add(new LiteralControl("<a href=\"" + SystemDirectories.Root + fileNameOrg + "\" title=\"Zoom\"><img src=\"" + fileNameThumb + "\" border=\"0\"/></a>"));
 				    }
 				    catch
