@@ -1262,7 +1262,7 @@ AND umbracoNode.id <> @id",
         /// <returns></returns>
         public IEnumerable<TEntity> GetAll(params Guid[] ids)
         {
-            return _guidRepo.GetAll(ids);
+            return ids.Length == 0 ? Enumerable.Empty<TEntity>() : _guidRepo.GetAll(ids);
         }
 
         /// <summary>

@@ -820,12 +820,13 @@ namespace Umbraco.Core.Persistence.Repositories
             var contentTypes = _contentTypeRepository.GetAll(dtos.Select(x => x.ContentVersionDto.ContentDto.ContentTypeId).ToArray())
                 .ToArray();
 
+            
+            var ids = dtos
+                .Where(dto => dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
+                .Select(x => x.TemplateId.Value).ToArray();
+            
             //NOTE: This should be ok for an SQL 'IN' statement, there shouldn't be an insane amount of content types
-            var templates = _templateRepository.GetAll(
-                dtos
-                    .Where(dto => dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
-                    .Select(x => x.TemplateId.Value).ToArray())
-                .ToArray();
+            var templates = ids.Length == 0 ? Enumerable.Empty<ITemplate>() : _templateRepository.GetAll(ids).ToArray();
 
             var dtosWithContentTypes = dtos
                 //This select into and null check are required because we don't have a foreign damn key on the contentType column

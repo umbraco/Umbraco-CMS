@@ -333,6 +333,8 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IContent"/></returns>
         public IEnumerable<IContent> GetByIds(IEnumerable<int> ids)
         {
+            if (ids.Any() == false) return Enumerable.Empty<IContent>();
+
             using (var repository = RepositoryFactory.CreateContentRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.GetAll(ids.ToArray());

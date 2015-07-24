@@ -273,6 +273,8 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IMedia"/></returns>
         public IEnumerable<IMedia> GetByIds(IEnumerable<int> ids)
         {
+            if (ids.Any() == false) return Enumerable.Empty<IMedia>();
+
             using (var repository = RepositoryFactory.CreateMediaRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.GetAll(ids.ToArray());

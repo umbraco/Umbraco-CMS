@@ -53,7 +53,10 @@ namespace Umbraco.Core.Persistence.Repositories
             using (var repo = new CachedDomainRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax))
             {
                 var factory = new DomainModelFactory();
-                return factory.BuildDomainEntities(repo.GetAll(ids).ToArray(), _contentRepository, _languageRepository);
+                return factory.BuildDomainEntities(
+                    ids.Length == 0 ? Enumerable.Empty<CacheableDomain>().ToArray() : repo.GetAll(ids).ToArray(), 
+                    _contentRepository, 
+                    _languageRepository);
             }
         }
 
@@ -300,8 +303,10 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 var contentIds = cacheableDomains.Select(x => x.RootContentId).Where(x => x.HasValue).Select(x => x.Value).Distinct().ToArray();
                 var langIds = cacheableDomains.Select(x => x.DefaultLanguageId).Where(x => x.HasValue).Select(x => x.Value).Distinct().ToArray();
-                var contentItems = contentRepository.GetAll(contentIds);
-                var langItems = languageRepository.GetAll(langIds);
+
+                //Ensure to not look anything up if there are no items, otherwise this will look up ALL items!!! :( which would be terrible
+                var contentItems = contentIds.Length == 0 ? Enumerable.Empty<IContent>() : contentRepository.GetAll(contentIds);
+                var langItems = langIds.Length == 0 ? Enumerable.Empty<ILanguage>(): languageRepository.GetAll(langIds);
 
                 return cacheableDomains
                     .WhereNotNull()
