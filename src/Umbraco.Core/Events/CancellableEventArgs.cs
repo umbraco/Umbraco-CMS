@@ -64,6 +64,17 @@ namespace Umbraco.Core.Events
 		}
 
         /// <summary>
+        /// if this instance supports cancellation, this will set Cancel to true with an affiliated cancellation message
+        /// </summary>
+        /// <param name="cancelationMessage"></param>
+        public void CancelOperation(EventMessage cancelationMessage)
+        {
+            Cancel = true;
+            cancelationMessage.IsDefaultEventMessage = true;
+            Messages.Add(cancelationMessage);
+        }
+
+        /// <summary>
         /// Returns the EventMessages object which is used to add messages to the message collection for this event
         /// </summary>
         public EventMessages Messages { get; private set; }

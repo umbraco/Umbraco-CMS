@@ -269,9 +269,7 @@ namespace Umbraco.Web.Editors
                     }
                     else
                     {
-                        display.AddWarningNotification(
-                            Services.TextService.Localize("speechBubbles/operationCancelledHeader"),
-                            Services.TextService.Localize("speechBubbles/operationCancelledText"));
+                        AddCancelMessage(display);
                     }
                     
                     break;                

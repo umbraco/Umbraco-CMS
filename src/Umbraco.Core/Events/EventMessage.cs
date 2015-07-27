@@ -18,5 +18,10 @@ namespace Umbraco.Core.Events
         public string Category { get; private set; }
         public string Message { get; private set; }
         public EventMessageType MessageType { get; private set; }
+
+        /// <summary>
+        /// This is used to track if this message should be used as a default message so that Umbraco doesn't also append it's own default messages
+        /// </summary>
+        internal bool IsDefaultEventMessage { get; set; }
     }
 }

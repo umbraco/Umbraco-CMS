@@ -288,9 +288,7 @@ namespace Umbraco.Web.Editors
                     }
                     else
                     {
-                        display.AddWarningNotification(
-                            Services.TextService.Localize("speechBubbles/operationCancelledHeader"),
-                            Services.TextService.Localize("speechBubbles/operationCancelledText"));
+                        AddCancelMessage(display);
                     }
                     break;
                 case ContentSaveAction.SendPublish:
@@ -303,9 +301,7 @@ namespace Umbraco.Web.Editors
                     }
                     else
                     {
-                        display.AddWarningNotification(
-                            Services.TextService.Localize("speechBubbles/operationCancelledHeader"),
-                            Services.TextService.Localize("speechBubbles/operationCancelledText"));
+                        AddCancelMessage(display);
                     }
                     break;
                 case ContentSaveAction.Publish:
@@ -319,57 +315,7 @@ namespace Umbraco.Web.Editors
             return display;
         }
 
-        /// <summary>
-        /// Checks if the user is currently in preview mode and if so will update the preview content for this item
-        /// </summary>
-        /// <param name="contentId"></param>
-        private void UpdatePreviewContext(int contentId)
-        {
-            var previewId = Request.GetPreviewCookieValue();
-            if (previewId.IsNullOrWhiteSpace()) return;
-            Guid id;
-            if (Guid.TryParse(previewId, out id))
-            {
-                var d = new Document(contentId);
-                var pc = new PreviewContent(UmbracoUser, id, false);
-                pc.PrepareDocument(UmbracoUser, d, true);
-                pc.SavePreviewSet();
-            }          
-        }
-
-        /// <summary>
-        /// Maps the dto property values to the persisted model
-        /// </summary>
-        /// <param name="contentItem"></param>
-        private void MapPropertyValues(ContentItemSave contentItem)
-        {
-            UpdateName(contentItem);
-
-            //TODO: We need to support 'send to publish'
-
-            contentItem.PersistedContent.ExpireDate = contentItem.ExpireDate;
-            contentItem.PersistedContent.ReleaseDate = contentItem.ReleaseDate;
-            //only set the template if it didn't change
-            var templateChanged = (contentItem.PersistedContent.Template == null && contentItem.TemplateAlias.IsNullOrWhiteSpace() == false)
-                                  || (contentItem.PersistedContent.Template != null && contentItem.PersistedContent.Template.Alias != contentItem.TemplateAlias)
-                                  || (contentItem.PersistedContent.Template != null && contentItem.TemplateAlias.IsNullOrWhiteSpace());
-            if (templateChanged)
-            {
-                var template = Services.FileService.GetTemplate(contentItem.TemplateAlias);
-                if (template == null && contentItem.TemplateAlias.IsNullOrWhiteSpace() == false)
-                {
-                    //ModelState.AddModelError("Template", "No template exists with the specified alias: " + contentItem.TemplateAlias);
-                    LogHelper.Warn<ContentController>("No template exists with the specified alias: " + contentItem.TemplateAlias);
-                }
-                else
-                {
-                    //NOTE: this could be null if there was a template and the posted template is null, this should remove the assigned template
-                    contentItem.PersistedContent.Template = template;
-                }
-            }
-
-            base.MapPropertyValues(contentItem);
-        }
+        
 
         /// <summary>
         /// Publishes a document with a given ID
@@ -568,6 +514,58 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Checks if the user is currently in preview mode and if so will update the preview content for this item
+        /// </summary>
+        /// <param name="contentId"></param>
+        private void UpdatePreviewContext(int contentId)
+        {
+            var previewId = Request.GetPreviewCookieValue();
+            if (previewId.IsNullOrWhiteSpace()) return;
+            Guid id;
+            if (Guid.TryParse(previewId, out id))
+            {
+                var d = new Document(contentId);
+                var pc = new PreviewContent(UmbracoUser, id, false);
+                pc.PrepareDocument(UmbracoUser, d, true);
+                pc.SavePreviewSet();
+            }
+        }
+
+        /// <summary>
+        /// Maps the dto property values to the persisted model
+        /// </summary>
+        /// <param name="contentItem"></param>
+        private void MapPropertyValues(ContentItemSave contentItem)
+        {
+            UpdateName(contentItem);
+
+            //TODO: We need to support 'send to publish'
+
+            contentItem.PersistedContent.ExpireDate = contentItem.ExpireDate;
+            contentItem.PersistedContent.ReleaseDate = contentItem.ReleaseDate;
+            //only set the template if it didn't change
+            var templateChanged = (contentItem.PersistedContent.Template == null && contentItem.TemplateAlias.IsNullOrWhiteSpace() == false)
+                                  || (contentItem.PersistedContent.Template != null && contentItem.PersistedContent.Template.Alias != contentItem.TemplateAlias)
+                                  || (contentItem.PersistedContent.Template != null && contentItem.TemplateAlias.IsNullOrWhiteSpace());
+            if (templateChanged)
+            {
+                var template = Services.FileService.GetTemplate(contentItem.TemplateAlias);
+                if (template == null && contentItem.TemplateAlias.IsNullOrWhiteSpace() == false)
+                {
+                    //ModelState.AddModelError("Template", "No template exists with the specified alias: " + contentItem.TemplateAlias);
+                    LogHelper.Warn<ContentController>("No template exists with the specified alias: " + contentItem.TemplateAlias);
+                }
+                else
+                {
+                    //NOTE: this could be null if there was a template and the posted template is null, this should remove the assigned template
+                    contentItem.PersistedContent.Template = template;
+                }
+            }
+
+            base.MapPropertyValues(contentItem);
+        }
+
+        /// <summary>
         /// Ensures the item can be moved/copied to the new location
         /// </summary>
         /// <param name="model"></param>
@@ -638,9 +636,7 @@ namespace Umbraco.Web.Editors
                             new[] {string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id)}).Trim());
                     break;
                 case PublishStatusType.FailedCancelledByEvent:
-                    display.AddWarningNotification(
-                        Services.TextService.Localize("publish"),
-                        Services.TextService.Localize("speechBubbles/contentPublishedFailedByEvent"));
+                    AddCancelMessage(display, "publish", "speechBubbles/contentPublishedFailedByEvent");
                     break;                
                 case PublishStatusType.FailedAwaitingRelease:
                     display.AddWarningNotification(

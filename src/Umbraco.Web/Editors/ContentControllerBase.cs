@@ -172,5 +172,15 @@ namespace Umbraco.Web.Editors
             return (action.ToString().EndsWith("New"));
         }
 
+        protected void AddCancelMessage(INotificationModel display, string header = "speechBubbles/operationCancelledHeader", string message = "speechBubbles/operationCancelledText")
+        {
+            //if there's already a default event message, don't add our default one
+            var msgs = UmbracoContext.GetCurrentEventMessages();
+            if (msgs != null && msgs.GetAll().Any(x => x.IsDefaultEventMessage)) return;
+
+            display.AddWarningNotification(
+                Services.TextService.Localize(header),
+                Services.TextService.Localize(message));
+        }
     }
 }
