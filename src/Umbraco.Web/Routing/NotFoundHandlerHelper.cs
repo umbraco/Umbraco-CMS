@@ -230,28 +230,30 @@ namespace Umbraco.Web.Routing
         /// <param name="entityService"></param>
         /// <param name="publishedContentQuery"></param>
         /// <param name="domainService"></param>
+        /// <param name="localizationService"></param>
         /// <returns></returns>
         internal static int? GetCurrentNotFoundPageId(
             IContentErrorPage[] error404Collection, 
             string requestServerName, 
             IEntityService entityService,
             ITypedPublishedContentQuery publishedContentQuery,
-            IDomainService domainService)
+            IDomainService domainService,
+            ILocalizationService localizationService)
         {
             if (error404Collection.Count() > 1)
             {
                 // try to get the 404 based on current culture (via domain)
                 IContentErrorPage cultureErr;
 
-                //TODO: Remove the dependency on this legacy Domain service, 
-                // in 7.3 the real domain service should be passed in as a parameter.
-                if (domainService.Exists(requestServerName))
+                var d = domainService.GetByName(requestServerName);
+
+                if (d != null && d.LanguageId.HasValue)
                 {
-                    var d = domainService.GetByName(requestServerName);
+                    var lang = localizationService.GetLanguageById(d.LanguageId.Value);
 
                     // test if a 404 page exists with current culture
                     cultureErr = error404Collection
-                        .FirstOrDefault(x => x.Culture == d.Language.IsoCode);
+                        .FirstOrDefault(x => x.Culture == lang.IsoCode);
 
                     if (cultureErr != null)
                     {

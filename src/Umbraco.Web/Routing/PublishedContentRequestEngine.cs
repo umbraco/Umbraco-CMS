@@ -242,26 +242,39 @@ namespace Umbraco.Web.Routing
             var domainAndUri = DomainHelper.DomainForUri(Services.DomainService.GetAll(false), _pcr.Uri);
 
 			// handle domain
-			if (domainAndUri != null)
+			if (domainAndUri != null && domainAndUri.UmbracoDomain.LanguageId.HasValue)
 			{
-				// matching an existing domain
-				ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Matches domain=\"{1}\", rootId={2}, culture=\"{3}\"",
-												 () => tracePrefix,
-												 () => domainAndUri.UmbracoDomain.DomainName,
-												 () => domainAndUri.UmbracoDomain.RootContent.Id,
-                                                 () => domainAndUri.UmbracoDomain.Language.IsoCode);
+                var lang = Services.LocalizationService.GetLanguageById(domainAndUri.UmbracoDomain.LanguageId.Value);
 
-                _pcr.UmbracoDomain = domainAndUri.UmbracoDomain;
-				_pcr.DomainUri = domainAndUri.Uri;
-                _pcr.Culture = new CultureInfo(domainAndUri.UmbracoDomain.Language.IsoCode);
+			    if (lang != null)
+			    {
+			        // matching an existing domain
+			        ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Matches domain=\"{1}\", rootId={2}, culture=\"{3}\"",
+			            () => tracePrefix,
+			            () => domainAndUri.UmbracoDomain.DomainName,
+			            () => domainAndUri.UmbracoDomain.RootContentId,
+			            () => lang.IsoCode);
 
-				// canonical? not implemented at the moment
-				// if (...)
-				// {
-				//  _pcr.RedirectUrl = "...";
-				//  return true;
-				// }
-			}
+			        _pcr.UmbracoDomain = domainAndUri.UmbracoDomain;
+			        _pcr.DomainUri = domainAndUri.Uri;
+			        _pcr.Culture = new CultureInfo(lang.IsoCode);
+
+			        // canonical? not implemented at the moment
+			        // if (...)
+			        // {
+			        //  _pcr.RedirectUrl = "...";
+			        //  return true;
+			        // }
+			    }
+			    else
+			    {
+                    // not matching any language
+                    ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}No language with id {1}", () => tracePrefix, () => domainAndUri.UmbracoDomain.LanguageId.Value);
+
+                    var defaultLanguage = Services.LocalizationService.GetAllLanguages().FirstOrDefault();
+                    _pcr.Culture = defaultLanguage == null ? CultureInfo.CurrentUICulture : new CultureInfo(defaultLanguage.IsoCode);
+                }
+            }
 			else
 			{
 				// not matching any existing domain
@@ -288,14 +301,23 @@ namespace Umbraco.Web.Routing
 
 			var nodePath = _pcr.PublishedContent.Path;
 			ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Path=\"{1}\"", () => tracePrefix, () => nodePath);
-            var rootNodeId = _pcr.HasDomain ? _pcr.UmbracoDomain.RootContent.Id : (int?)null;
+            var rootNodeId = _pcr.HasDomain ? _pcr.UmbracoDomain.RootContentId : (int?)null;
             var domain = DomainHelper.FindWildcardDomainInPath(Services.DomainService.GetAll(true), nodePath, rootNodeId);
 
-			if (domain != null)
+			if (domain != null && domain.LanguageId.HasValue)
 			{
-				_pcr.Culture = new CultureInfo(domain.Language.IsoCode);
-				ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Got domain on node {1}, set culture to \"{2}\".", () => tracePrefix,
-                    () => domain.RootContent.Id, () => _pcr.Culture.Name);
+			    var lang = Services.LocalizationService.GetLanguageById(domain.LanguageId.Value);
+
+			    if (lang != null)
+			    {
+			        _pcr.Culture = new CultureInfo(lang.IsoCode);
+			        ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Got domain on node {1}, set culture to \"{2}\".", () => tracePrefix,
+			            () => domain.RootContentId, () => _pcr.Culture.Name);
+			    }
+			    else
+			    {
+                    ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}No language with id {1}", () => tracePrefix, () => domain.LanguageId.Value);
+                }
 			}
 			else
 			{

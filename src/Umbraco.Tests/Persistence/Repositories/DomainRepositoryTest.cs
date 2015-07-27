@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, templateRepository);
             contentRepository = new ContentRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
             languageRepository = new LanguageRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax);
-            var domainRepository = new DomainRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, contentRepository, languageRepository);
+            var domainRepository = new DomainRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax);
             return domainRepository;
         }
 
@@ -72,7 +72,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var lang = langRepo.GetByIsoCode("en-AU");
                 var content = contentRepo.Get(contentId);
 
-                var domain = (IDomain)new UmbracoDomain("test.com") { RootContent = content, Language = lang };
+                var domain = (IDomain)new UmbracoDomain("test.com") { RootContentId = content.Id, LanguageId = lang.Id };
                 repo.AddOrUpdate(domain);
                 unitOfWork.Commit();
 
@@ -83,8 +83,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.IsTrue(domain.HasIdentity);
                 Assert.Greater(domain.Id, 0);
                 Assert.AreEqual("test.com", domain.DomainName);
-                Assert.AreEqual(content.Id, domain.RootContent.Id);
-                Assert.AreEqual(lang.Id, domain.Language.Id);
+                Assert.AreEqual(content.Id, domain.RootContentId);
+                Assert.AreEqual(lang.Id, domain.LanguageId);
             }
 
 
@@ -108,11 +108,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var lang = langRepo.GetByIsoCode("en-AU");
                 var content = contentRepo.Get(contentId);
 
-                var domain1 = (IDomain)new UmbracoDomain("test.com") { RootContent = content, Language = lang };
+                var domain1 = (IDomain)new UmbracoDomain("test.com") { RootContentId = content.Id, LanguageId = lang.Id };
                 repo.AddOrUpdate(domain1);
                 unitOfWork.Commit();
 
-                var domain2 = (IDomain)new UmbracoDomain("test.com") { RootContent = content, Language = lang };
+                var domain2 = (IDomain)new UmbracoDomain("test.com") { RootContentId = content.Id, LanguageId = lang.Id };
                 repo.AddOrUpdate(domain2);
 
                 Assert.Throws<DuplicateNameException>(unitOfWork.Commit);
@@ -141,7 +141,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var lang = langRepo.GetByIsoCode("en-AU");
                 var content = contentRepo.Get(contentId);
 
-                var domain = (IDomain)new UmbracoDomain("test.com") { RootContent = content, Language = lang };
+                var domain = (IDomain)new UmbracoDomain("test.com") { RootContentId = content.Id, LanguageId = lang.Id };
                 repo.AddOrUpdate(domain);
                 unitOfWork.Commit();
 
@@ -184,7 +184,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Commit();
 
 
-                var domain = (IDomain)new UmbracoDomain("test.com") { RootContent = content1, Language = lang1 };
+                var domain = (IDomain)new UmbracoDomain("test.com") { RootContentId = content1.Id, LanguageId = lang1.Id };
                 repo.AddOrUpdate(domain);
                 unitOfWork.Commit();
 
@@ -192,8 +192,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 domain = repo.Get(domain.Id);
 
                 domain.DomainName = "blah.com";
-                domain.RootContent = content2;
-                domain.Language = lang2;
+                domain.RootContentId = content2.Id;
+                domain.LanguageId = lang2.Id;
                 repo.AddOrUpdate(domain);
                 unitOfWork.Commit();
 
@@ -201,8 +201,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 domain = repo.Get(domain.Id);
 
                 Assert.AreEqual("blah.com", domain.DomainName);
-                Assert.AreEqual(content2.Id, domain.RootContent.Id);
-                Assert.AreEqual(lang2.Id, domain.Language.Id);
+                Assert.AreEqual(content2.Id, domain.RootContentId);
+                Assert.AreEqual(lang2.Id, domain.LanguageId);
             }
 
 
@@ -228,7 +228,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 for (int i = 0; i < 10; i++)
                 {
-                    var domain = (IDomain)new UmbracoDomain("test" + i + ".com") { RootContent = content, Language = lang };
+                    var domain = (IDomain)new UmbracoDomain("test" + i + ".com") { RootContentId = content.Id, LanguageId = lang.Id };
                     repo.AddOrUpdate(domain);
                     unitOfWork.Commit();
                 }
@@ -259,7 +259,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 for (int i = 0; i < 10; i++)
                 {
-                    var domain = (IDomain)new UmbracoDomain("test" + i + ".com") { RootContent = content, Language = lang };
+                    var domain = (IDomain)new UmbracoDomain("test" + i + ".com") { RootContentId = content.Id, LanguageId = lang.Id };
                     repo.AddOrUpdate(domain);
                     unitOfWork.Commit();
                 }
@@ -290,7 +290,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 for (int i = 0; i < 10; i++)
                 {
-                    var domain = (IDomain)new UmbracoDomain("test " + i + ".com") { RootContent = content, Language = lang };
+                    var domain = (IDomain)new UmbracoDomain("test " + i + ".com") { RootContentId = content.Id, LanguageId = lang.Id };
                     repo.AddOrUpdate(domain);
                     unitOfWork.Commit();
                 }
@@ -322,7 +322,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var ids = new List<int>();
                 for (int i = 0; i < 10; i++)
                 {
-                    var domain = (IDomain)new UmbracoDomain("test " + i + ".com") { RootContent = content, Language = lang };
+                    var domain = (IDomain)new UmbracoDomain("test " + i + ".com") { RootContentId = content.Id, LanguageId = lang.Id };
                     repo.AddOrUpdate(domain);
                     unitOfWork.Commit();
                     ids.Add(domain.Id);
@@ -356,8 +356,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     var domain = (IDomain)new UmbracoDomain((i % 2 == 0) ? "test " + i + ".com" : ("*" + i))
                     {
-                        RootContent = content,
-                        Language = lang
+                        RootContentId = content.Id,
+                        LanguageId = lang.Id
                     };
                     repo.AddOrUpdate(domain);
                     unitOfWork.Commit();
@@ -402,8 +402,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     var domain = (IDomain)new UmbracoDomain((i % 2 == 0) ? "test " + i + ".com" : ("*" + i))
                     {
-                        RootContent = (i % 2 == 0) ? contentItems[0] : contentItems[1],
-                        Language = lang
+                        RootContentId = ((i % 2 == 0) ? contentItems[0] : contentItems[1]).Id,
+                        LanguageId = lang.Id
                     };
                     repo.AddOrUpdate(domain);
                     unitOfWork.Commit();
@@ -453,8 +453,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     var domain = (IDomain)new UmbracoDomain((i % 2 == 0) ? "test " + i + ".com" : ("*" + i))
                     {
-                        RootContent = (i % 2 == 0) ? contentItems[0] : contentItems[1],
-                        Language = lang
+                        RootContentId = ((i % 2 == 0) ? contentItems[0] : contentItems[1]).Id,
+                        LanguageId = lang.Id
                     };
                     repo.AddOrUpdate(domain);
                     unitOfWork.Commit();
