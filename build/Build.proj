@@ -228,7 +228,7 @@
         SkipUnchangedFiles="false" />
 
     <Copy SourceFiles="@(CustomLanguageFiles)"
-      DestinationFiles="$(ConfigsFolder)->'$(ConfigsFolder)\Lang\%(RecursiveDir)%(Filename)%(Extension)')"
+      DestinationFiles="@(CustomLanguageFiles->'$(ConfigsFolder)Lang\%(RecursiveDir)%(Filename)%(Extension)')"
       OverwriteReadOnlyFiles="true"
       SkipUnchangedFiles="false" />
 	  
