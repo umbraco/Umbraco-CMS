@@ -6,7 +6,7 @@
             ui-sortable
             ng-model="model.value">
             <li ng-repeat="node in model.value">
-                <i class="icon icon-delete red hover-show pull-right" ng-click="remove(node, $event)"></i>
+                <a href=""><i class="icon icon-delete red hover-show pull-right" ng-click="remove(node, $event)"></i></a>
                 <i class="icon icon-picture handle hover-hide"></i>
 
                 <a href prevent-default ng-click="edit(node, $event)">{{node.alias}}</a>
