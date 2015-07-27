@@ -140,8 +140,12 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
     /*Pagination is done by an array of objects, due angularJS's funky way of monitoring state
     with simple values */
 
-    $scope.reloadView = function(id) {
+    $scope.reloadView = function (id) {
+
         getListResultsCallback(id, $scope.options).then(function (data) {
+
+            $scope.actionInProgress = false;
+
             $scope.listViewResultSet = data;
 
             //update all values for display
@@ -203,11 +207,17 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         });
     };
 
-    //assign debounce method to the search to limit the queries
-    $scope.search = _.debounce(function() {
-        $scope.options.pageNumber = 1;
-        $scope.reloadView($scope.contentId);
-    }, 100);
+    $scope.$watch(function() {
+        return $scope.options.filter;
+    }, _.debounce(function(newVal, oldVal) {
+        $scope.$apply(function() {
+            if (newVal !== null && newVal !== undefined && newVal !== oldVal) {
+                $scope.options.pageNumber = 1;
+                $scope.actionInProgress = true;
+                $scope.reloadView($scope.contentId);
+            }
+        });
+    }, 200));
 
     $scope.enterSearch = function($event) {
         $($event.target).next().focus();
