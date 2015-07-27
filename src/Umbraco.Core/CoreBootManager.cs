@@ -321,11 +321,17 @@ namespace Umbraco.Core
         {
             if (_isComplete)
                 throw new InvalidOperationException("The boot manager has already been completed");
-
+            
             FreezeResolution();
 
             //Here we need to make sure the db can be connected to
 		    EnsureDatabaseConnection();
+
+
+            //This is a special case for the user service, we need to tell it if it's an upgrade, if so we need to ensure that
+            // exceptions are bubbled up if a user is attempted to be persisted during an upgrade (i.e. when they auth to login)
+            ((UserService) ApplicationContext.Services.UserService).IsUpgrading = true;
+
 
             using (ProfilingLogger.DebugDuration<CoreBootManager>(
                 string.Format("Executing {0} IApplicationEventHandler.OnApplicationStarted", ApplicationEventsResolver.Current.ApplicationEventHandlers.Count()),

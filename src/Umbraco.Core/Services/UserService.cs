@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data.Common;
+using System.Data.SqlClient;
 using System.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
@@ -17,9 +19,16 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class UserService : RepositoryService, IUserService
     {
+
+        //TODO: We need to change the isUpgrading flag to use an app state enum as described here: http://issues.umbraco.org/issue/U4-6816
+        // in the meantime, we will use a boolean which we are currently using during upgrades to ensure that a user object is not persisted during this phase, otherwise
+        // exceptions can occur if the db is not in it's correct state.
+        internal bool IsUpgrading { get; set; }
+
         public UserService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
+            IsUpgrading = false;
         }
 
         #region Implementation of IMembershipUserService
@@ -303,7 +312,18 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateUserRepository(uow))
             {
                 repository.AddOrUpdate(entity);
-                uow.Commit();
+                try
+                {
+                    uow.Commit();
+                }
+                catch (DbException ex)
+                {
+                    //Special case, if we are upgrading and an exception occurs, just continue
+                    if (IsUpgrading == false) throw;
+
+                    Logger.WarnWithException<UserService>("An error occurred attempting to save a user instance during upgrade, normally this warning can be ignored", ex);
+                    return;
+                }
             }
 
             if (raiseEvents)
