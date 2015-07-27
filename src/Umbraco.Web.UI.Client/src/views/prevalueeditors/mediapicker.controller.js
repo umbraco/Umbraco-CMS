@@ -31,7 +31,8 @@ function mediaPickerController($scope, dialogService, entityResource, $log, icon
         var d = dialogService.treePicker(dialogOptions);
     };
 
-    $scope.remove =function(index){
+    $scope.remove =function(index, event){
+        event.preventDefault();
         $scope.renderModel.splice(index, 1);
     };
 
