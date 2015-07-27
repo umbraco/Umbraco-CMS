@@ -17,20 +17,14 @@
  */
 function navigationService($rootScope, $routeParams, $log, $location, $q, $timeout, $injector, dialogService, umbModelMapper, treeService, notificationsService, historyService, appState, angularHelper) {
 
-    var minScreenSize = 1100;
+    
     //used to track the current dialog object
     var currentDialog = null;
-    //tracks the screen size as a tablet
-    var isTablet = false;
+    
     //the main tree event handler, which gets assigned via the setupTreeEvents method
     var mainTreeEventHandler = null;
     //tracks the user profile dialog
     var userDialog = null;
-
-    function setTreeMode() {
-        isTablet = ($(window).width() <= minScreenSize);
-        appState.setGlobalState("showNavigation", !isTablet);
-    }
 
     function setMode(mode) {
         switch (mode) {
@@ -80,7 +74,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             appState.setGlobalState("stickyNavigation", false);
             appState.setGlobalState("showTray", false);
 
-            if (isTablet) {
+            if (appState.getGlobalState("isTablet") === true) {
                 appState.setGlobalState("showNavigation", false);
             }
 
@@ -93,8 +87,6 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
         /** initializes the navigation service */
         init: function() {
 
-            setTreeMode();
-            
             //keep track of the current section - initially this will always be undefined so 
             // no point in setting it now until it changes.
             $rootScope.$watch(function () {
@@ -103,10 +95,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 appState.setSectionState("currentSection", newVal);
             });
 
-            //TODO: This does not belong here - would be much better off in a directive
-            $(window).bind("resize", function() {
-                setTreeMode();
-            });
+            
         },
 
         /**
@@ -353,7 +342,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
          */
         hideTree: function() {
 
-            if (isTablet && !appState.getGlobalState("stickyNavigation")) {
+            if (appState.getGlobalState("isTablet") === true && !appState.getGlobalState("stickyNavigation")) {
                 //reset it to whatever is in the url
                 appState.setSectionState("currentSection", $routeParams.section);
                 setMode("default-hidesectiontree");

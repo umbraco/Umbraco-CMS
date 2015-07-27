@@ -120,6 +120,7 @@ body {
     right: 0px;
     padding-top: 100px;
     border-right: 1px solid @grayLight;
+    z-index: 100;
 }
 
 #dialog {
@@ -165,6 +166,19 @@ body {
   border: none;
   background: none;
   border-radius: 0;
+}
+
+.ui-resizable-e { 
+    cursor: e-resize; 
+    width: 4px; 
+    right: -5px; 
+    top: 0; 
+    bottom: 0; 
+    background-color: @grayLighter;
+    border: solid 1px @grayLight;
+    position:absolute;
+    z-index:9999 !important;
+
 }
 
 @media (min-width: 1101px) {
