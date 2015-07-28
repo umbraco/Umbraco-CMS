@@ -23,12 +23,24 @@ angular.module("umbraco.directives")
           }
 
           keyboardService.bind(keyCombo, function(){
+
               var element = $(el);
+              var activeElementType = document.activeElement.tagName;
+              var clickableElements = ["A", "BUTTON"];
+
               if(element.is("a,div,button,input[type='button'],input[type='submit'],input[type='checkbox']") && !element.is(':disabled') ){
-                element.click();
+
+                // when keycombo is enter and a link or button has focus - click the link or button instead of using the hotkey
+                if(keyCombo === "enter" && clickableElements.indexOf(activeElementType) === 0) {
+                  document.activeElement.click();
+                } else {
+                  element.click();
+                }
+
               }else{
                 element.focus();
               }
+
           }, options);
 
           el.on('$destroy', function(){
