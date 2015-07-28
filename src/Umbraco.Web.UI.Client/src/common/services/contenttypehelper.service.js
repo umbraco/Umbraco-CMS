@@ -3,7 +3,7 @@
  * @name umbraco.services.contentTypeHelper
  * @description A helper service for the content type editor
  **/
-function contentTypeHelper(contentTypeResource, dataTypeResource) {
+function contentTypeHelper(contentTypeResource, dataTypeResource, $filter) {
 
     var contentTypeHelperService = {
 
@@ -81,6 +81,9 @@ function contentTypeHelper(contentTypeResource, dataTypeResource) {
                             // push id to array of merged composite content types
                             contentTypeGroup.parentTabContentTypes.push(compositeContentType.id);
 
+                            // get sort order from composition
+                            contentTypeGroup.sortOrder = compositionGroup.sortOrder;
+
                             // splice group to the top of the array
                             var contentTypeGroupCopy = angular.copy(contentTypeGroup);
                             var index = contentType.groups.indexOf(contentTypeGroup);
@@ -119,6 +122,9 @@ function contentTypeHelper(contentTypeResource, dataTypeResource) {
                     }
 
                 });
+
+                // sort all groups by sortOrder property
+                contentType.groups = $filter('orderBy')(contentType.groups, 'sortOrder');
 
                 return contentType;
 

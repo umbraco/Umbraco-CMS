@@ -1,7 +1,7 @@
 (function() {
   'use strict';
 
-  function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, dataTypeHelper, dataTypeResource) {
+  function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, dataTypeHelper, dataTypeResource, $filter) {
 
     function link(scope, el, attr, ctrl) {
 
@@ -72,7 +72,54 @@
           items: ".umb-group-builder__group-sortable",
           start: function(e, ui) {
             ui.placeholder.height(ui.item.height());
-          }
+          },
+          stop: function(e, ui) {
+
+            var first = true;
+            var prevSortOrder = 0;
+
+            scope.model.groups.map(function(group){
+
+              var index = scope.model.groups.indexOf(group);
+
+              if(group.tabState !== "init") {
+
+                // set the first not inherited tab to sort order 0
+                if(!group.inherited && first) {
+
+                  // set the first tab sort order to 0 if prev is 0
+                  if( prevSortOrder === 0 ) {
+                    group.sortOrder = 0;
+                  // when the first tab is inherited and sort order is not 0
+                  } else {
+                    group.sortOrder = prevSortOrder + 1;
+                  }
+
+                  first = false;
+
+                } else if(!group.inherited && !first) {
+
+                    // find next group
+                    var nextGroup = scope.model.groups[index + 1];
+
+                    // if a groups is dropped in the middle of to groups with
+                    // same sort order. Give it the dropped group same sort order
+                    if( prevSortOrder === nextGroup.sortOrder ) {
+                      group.sortOrder = prevSortOrder;
+                    } else {
+                      group.sortOrder = prevSortOrder + 1;
+                    }
+
+                }
+
+                // store this tabs sort order as reference for the next
+                prevSortOrder = group.sortOrder;
+
+              }
+
+            });
+
+          },
         };
 
         scope.sortableOptionsProperty = {
@@ -135,6 +182,20 @@
 
       scope.addGroup = function(group) {
 
+        // set group sort order
+        var index = scope.model.groups.indexOf(group);
+        var prevGroup = scope.model.groups[index - 1];
+
+        if( index > 0) {
+          // set index to 1 higher than the previous groups sort order
+          group.sortOrder = prevGroup.sortOrder + 1;
+
+        } else {
+          // first group - sort order will be 0
+          group.sortOrder = 0;
+        }
+
+        // activate group
         scope.activateGroup(group);
 
         // push new init tab to the scope
@@ -164,6 +225,10 @@
         if (group.properties.length === 0) {
           addInitProperty(group);
         }
+      };
+
+      scope.changeSortOrderValue = function() {
+        scope.model.groups = $filter('orderBy')(scope.model.groups, 'sortOrder');
       };
 
       function addInitGroup(groups) {
