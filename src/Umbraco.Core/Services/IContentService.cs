@@ -431,6 +431,18 @@ namespace Umbraco.Core.Services
         IContent Copy(IContent content, int parentId, bool relateToOriginal, int userId = 0);
 
         /// <summary>
+        /// Copies an <see cref="IContent"/> object by creating a new Content object of the same type and copies all data from the current 
+        /// to the new copy which is returned.
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to copy</param>
+        /// <param name="parentId">Id of the Content's new Parent</param>
+        /// <param name="relateToOriginal">Boolean indicating whether the copy should be related to the original</param>
+		/// <param name="recursive">Boolean indicating whether to copy children too or not</param>
+        /// <param name="userId">Optional Id of the User copying the Content</param>
+        /// <returns>The newly created <see cref="IContent"/> object</returns>
+        IContent Copy(IContent content, int parentId, bool relateToOriginal, bool recursive, int userId = 0);
+
+        /// <summary>
         /// Checks if the passed in <see cref="IContent"/> can be published based on the anscestors publish state.
         /// </summary>
         /// <param name="content"><see cref="IContent"/> to check if anscestors are published</param>
