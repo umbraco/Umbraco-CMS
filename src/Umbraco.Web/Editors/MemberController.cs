@@ -80,7 +80,7 @@ namespace Umbraco.Web.Editors
             string filter = "",
             string memberTypeAlias = null)
         {
-            int totalRecords;
+            
             if (pageNumber <= 0 || pageSize <= 0)
             {
                 throw new NotSupportedException("Both pageNumber and pageSize must be greater than zero");
@@ -88,6 +88,7 @@ namespace Umbraco.Web.Editors
 
             if (MembershipScenario == MembershipScenario.NativeUmbraco)
             {
+                long totalRecords;
                 var members = Services.MemberService.GetAll((pageNumber - 1), pageSize, out totalRecords, orderBy, orderDirection, memberTypeAlias, filter).ToArray();
                 if (totalRecords == 0)
                 {
@@ -100,6 +101,7 @@ namespace Umbraco.Web.Editors
             }
             else
             {
+                int totalRecords;
                 var members = _provider.GetAllUsers((pageNumber - 1), pageSize, out totalRecords);
                 if (totalRecords == 0)
                 {
