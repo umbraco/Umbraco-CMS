@@ -25,6 +25,10 @@ namespace Umbraco.Core.Services
         {
             return (IContentServiceOperations)contentService;
         }
+        public static IMediaServiceOperations WithResult(this IMediaService mediaService)
+        {
+            return (IMediaServiceOperations)mediaService;
+        }
     }
 
     /// <summary>

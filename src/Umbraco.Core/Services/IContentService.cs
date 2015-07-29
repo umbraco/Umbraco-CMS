@@ -16,6 +16,8 @@ namespace Umbraco.Core.Services
     {
         //TODO: Remove this class in v8
 
+        //TODO: There's probably more that needs to be added like the EmptyRecycleBin, etc...
+
         /// <summary>
         /// Saves a single <see cref="IContent"/> object
         /// </summary>

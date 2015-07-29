@@ -182,11 +182,23 @@ namespace Umbraco.Web.Editors
             //if the current item is in the recycle bin
             if (foundMedia.IsInRecycleBin() == false)
             {
-                Services.MediaService.MoveToRecycleBin(foundMedia, (int)Security.CurrentUser.Id);
+                var moveResult = Services.MediaService.WithResult().MoveToRecycleBin(foundMedia, (int)Security.CurrentUser.Id);
+                if (moveResult == false)
+                {
+                    //returning an object of INotificationModel will ensure that any pending 
+                    // notification messages are added to the response.
+                    return Request.CreateValidationErrorResponse(new SimpleNotificationModel());
+                }
             }
             else
             {
-                Services.MediaService.Delete(foundMedia, (int)Security.CurrentUser.Id);
+                var deleteResult = Services.MediaService.WithResult().Delete(foundMedia, (int)Security.CurrentUser.Id);
+                if (deleteResult == false)
+                {
+                    //returning an object of INotificationModel will ensure that any pending 
+                    // notification messages are added to the response.
+                    return Request.CreateValidationErrorResponse(new SimpleNotificationModel());
+                }
             }
 
             return Request.CreateResponse(HttpStatusCode.OK);
@@ -234,7 +246,7 @@ namespace Umbraco.Web.Editors
             //      then we cannot continue saving, we can only display errors
             // * If there are validation errors and they were attempting to publish, we can only save, NOT publish and display 
             //      a message indicating this
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid == false)
             {
                 if (ValidationHelper.ModelHasRequiredForPersistenceErrors(contentItem)
                     && (contentItem.Action == ContentSaveAction.SaveNew))
@@ -248,7 +260,7 @@ namespace Umbraco.Web.Editors
             }
 
             //save the item
-            var saveStatus = Services.MediaService.SaveWithStatus(contentItem.PersistedContent, (int)Security.CurrentUser.Id);
+            var saveStatus = Services.MediaService.WithResult().Save(contentItem.PersistedContent, (int)Security.CurrentUser.Id);
 
             //return the updated model
             var display = Mapper.Map<IMedia, MediaItemDisplay>(contentItem.PersistedContent);
