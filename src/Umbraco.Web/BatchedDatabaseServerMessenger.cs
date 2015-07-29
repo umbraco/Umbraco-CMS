@@ -21,10 +21,28 @@ namespace Umbraco.Web
     {
         public BatchedDatabaseServerMessenger(ApplicationContext appContext, bool enableDistCalls, DatabaseServerMessengerOptions options)
             : base(appContext, enableDistCalls, options)
-        {   
+        { }
+
+        // invoked by BatchedDatabaseServerMessengerStartup which is an ApplicationEventHandler
+        // with default "ShouldExecute", so that method will run if app IsConfigured and database
+        // context IsDatabaseConfigured - we still want to check CanConnect though to be safe
+        internal void Startup()
+        {
+            UmbracoModule.EndRequest += UmbracoModule_EndRequest;
+            UmbracoModule.RouteAttempt += UmbracoModule_RouteAttempt;
+
+            if (ApplicationContext.DatabaseContext.CanConnect == false)
+            {
+                ApplicationContext.ProfilingLogger.Logger.Warn<BatchedDatabaseServerMessenger>(
+                    "Cannot connect to the database, distributed calls will not be enabled for this server.");
+            }
+            else
+            {
+                Boot();
+            }
         }
 
-        internal void UmbracoModule_RouteAttempt(object sender, RoutableAttemptEventArgs e)
+        private void UmbracoModule_RouteAttempt(object sender, RoutableAttemptEventArgs e)
         {
             switch (e.Outcome)
             {
@@ -47,7 +65,7 @@ namespace Umbraco.Web
             }
         }
 
-        internal void UmbracoModule_EndRequest(object sender, EventArgs e)
+        private void UmbracoModule_EndRequest(object sender, EventArgs e)
         {
             // will clear the batch - will remain in HttpContext though - that's ok
             FlushBatch();
@@ -116,8 +134,6 @@ namespace Umbraco.Web
 
             batch.Add(new RefreshInstructionEnvelope(servers, refresher,
                 RefreshInstruction.GetInstructions(refresher, messageType, ids, idType, json)));
-        }
-
-        
+        }        
     }
 }
