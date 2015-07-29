@@ -1,26 +1,54 @@
+using Umbraco.Core.Models;
+
 namespace Umbraco.Core.Services
 {
     /// <summary>
     /// The status returned by many of the service methods
     /// </summary>
-    public class OperationStatus
+    public class OperationStatus<TEntity, TStatus> : OperationStatus<TStatus>
+        where TStatus : struct
     {
-        //TODO: This is a pretty simple class atm, but is 'future' proofed in case we need to add more detail here
+        public OperationStatus(TEntity entity, TStatus statusType) : base(statusType)
+        {
+            Entity = entity;
+        }
 
+        public TEntity Entity { get; private set; }
+
+    }
+
+    public class OperationStatus<TStatus>
+        where TStatus : struct
+    {
+        public OperationStatus(TStatus statusType)
+        {
+            StatusType = statusType;
+        }
+
+        public TStatus StatusType { get; internal set; }
+    }
+
+    /// <summary>
+    /// The default operation status
+    /// </summary>
+    public class OperationStatus : OperationStatus<OperationStatusType>
+    {
+        public OperationStatus(OperationStatusType statusType) : base(statusType)
+        {
+        }
+
+
+        #region Static Helper methods
         internal static OperationStatus Cancelled
         {
-            get { return new OperationStatus(OperationStatusType.FailedCancelledByEvent);}
+            get { return new OperationStatus(OperationStatusType.FailedCancelledByEvent); }
         }
 
         internal static OperationStatus Success
         {
             get { return new OperationStatus(OperationStatusType.Success); }
-        }
-
-        public OperationStatus(OperationStatusType statusType)         
-        {
-            StatusType = statusType;
-        }
-        public OperationStatusType StatusType { get; internal set; }
+        } 
+        #endregion
     }
+
 }

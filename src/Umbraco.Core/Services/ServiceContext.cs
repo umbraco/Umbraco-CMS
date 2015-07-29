@@ -13,6 +13,21 @@ using Umbraco.Core.Events;
 namespace Umbraco.Core.Services
 {
     /// <summary>
+    /// These are used currently to return the temporary 'operation' interfaces for services
+    /// which are used to return a status from operational methods so we can determine if things are
+    /// cancelled, etc...
+    /// 
+    /// These will be obsoleted in v8 since all real services methods will be changed to have the correct result.
+    /// </summary>
+    public static class ServiceWithResultExtensions
+    {
+        public static IContentServiceOperations WithResult(this IContentService contentService)
+        {
+            return (IContentServiceOperations)contentService;
+        }
+    }
+
+    /// <summary>
     /// The Umbraco ServiceContext, which provides access to the following services:
     /// <see cref="IContentService"/>, <see cref="IContentTypeService"/>, <see cref="IDataTypeService"/>,
     /// <see cref="IFileService"/>, <see cref="ILocalizationService"/> and <see cref="IMediaService"/>.

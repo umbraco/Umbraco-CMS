@@ -26,7 +26,7 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Represents the Content Service, which is an easy access to operations involving <see cref="IContent"/>
     /// </summary>
-    public class ContentService : RepositoryService, IContentService
+    public class ContentService : RepositoryService, IContentService, IContentServiceOperations
     {
         private readonly IPublishingStrategy _publishingStrategy;
         private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();
@@ -38,18 +38,18 @@ namespace Umbraco.Core.Services
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
         public ContentService(
-            IDatabaseUnitOfWorkProvider provider, 
-            RepositoryFactory repositoryFactory, 
+            IDatabaseUnitOfWorkProvider provider,
+            RepositoryFactory repositoryFactory,
             ILogger logger,
             IEventMessagesFactory eventMessagesFactory,
-            IPublishingStrategy publishingStrategy, 
-            IDataTypeService dataTypeService, 
+            IPublishingStrategy publishingStrategy,
+            IDataTypeService dataTypeService,
             IUserService userService)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
             if (publishingStrategy == null) throw new ArgumentNullException("publishingStrategy");
             if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
-            if (userService == null) throw new ArgumentNullException("userService");         
+            if (userService == null) throw new ArgumentNullException("userService");
             _publishingStrategy = publishingStrategy;
             _dataTypeService = dataTypeService;
             _userService = userService;
@@ -747,7 +747,7 @@ namespace Umbraco.Core.Services
             }
         }
 
-       
+
 
         /// <summary>
         /// Checks whether an <see cref="IContent"/> item has any children
@@ -858,6 +858,109 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Publishes a <see cref="IContent"/> object and all its children
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to publish along with its children</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <param name="includeUnpublished"></param>
+        /// <returns>The list of statuses for all published items</returns>
+        IEnumerable<Attempt<PublishStatus>> IContentServiceOperations.PublishWithChildren(IContent content, int userId, bool includeUnpublished)
+        {
+            return PublishWithChildrenDo(content, userId, includeUnpublished);
+        }
+
+        /// <summary>
+        /// Saves and Publishes a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to save and publish</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise save events.</param>
+        /// <returns>True if publishing succeeded, otherwise False</returns>
+        Attempt<PublishStatus> IContentServiceOperations.SaveAndPublish(IContent content, int userId, bool raiseEvents)
+        {
+            return SaveAndPublishDo(content, userId, raiseEvents);
+        }
+
+        /// <summary>
+        /// Deletes an <see cref="IContent"/> object by moving it to the Recycle Bin
+        /// </summary>
+        /// <remarks>Move an item to the Recycle Bin will result in the item being unpublished</remarks>
+        /// <param name="content">The <see cref="IContent"/> to delete</param>
+        /// <param name="userId">Optional Id of the User deleting the Content</param>
+        Attempt<OperationStatus> IContentServiceOperations.MoveToRecycleBin(IContent content, int userId)
+        {
+            using (new WriteLock(Locker))
+            {
+                var originalPath = content.Path;
+
+                if (Trashing.IsRaisedEventCancelled(
+                  EventMessagesFactory.Get(),
+                  messages => new MoveEventArgs<IContent>(messages, new MoveEventInfo<IContent>(content, originalPath, Constants.System.RecycleBinContent)),
+                  this))
+                {
+                    return Attempt.Fail(OperationStatus.Cancelled);
+                }
+
+                var moveInfo = new List<MoveEventInfo<IContent>>
+                {
+                    new MoveEventInfo<IContent>(content, originalPath, Constants.System.RecycleBinContent)
+                };
+
+                //Make sure that published content is unpublished before being moved to the Recycle Bin
+                if (HasPublishedVersion(content.Id))
+                {
+                    //TODO: this shouldn't be a 'sub operation', and if it needs to be it cannot raise events and cannot be cancelled!
+                    UnPublish(content, userId);
+                }
+
+                //Unpublish descendents of the content item that is being moved to trash
+                var descendants = GetDescendants(content).OrderBy(x => x.Level).ToList();
+                foreach (var descendant in descendants)
+                {
+                    //TODO: this shouldn't be a 'sub operation', and if it needs to be it cannot raise events and cannot be cancelled!
+                    UnPublish(descendant, userId);
+                }
+
+                var uow = UowProvider.GetUnitOfWork();
+                using (var repository = RepositoryFactory.CreateContentRepository(uow))
+                {
+                    content.WriterId = userId;
+                    content.ChangeTrashedState(true);
+                    repository.AddOrUpdate(content);
+
+                    //Loop through descendants to update their trash state, but ensuring structure by keeping the ParentId
+                    foreach (var descendant in descendants)
+                    {
+                        moveInfo.Add(new MoveEventInfo<IContent>(descendant, descendant.Path, descendant.ParentId));
+
+                        descendant.WriterId = userId;
+                        descendant.ChangeTrashedState(true, descendant.ParentId);
+                        repository.AddOrUpdate(descendant);
+                    }
+
+                    uow.Commit();
+                }
+
+                Trashed.RaiseEvent(EventMessagesFactory.Get(), messages => new MoveEventArgs<IContent>(false, messages, moveInfo.ToArray()), this);
+
+                Audit(AuditType.Move, "Move Content to Recycle Bin performed by user", userId, content.Id);
+
+                return Attempt.Succeed(OperationStatus.Success);
+            }
+        }
+
+        /// <summary>
+        /// UnPublishes a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to publish</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <returns>True if unpublishing succeeded, otherwise False</returns>
+        Attempt<UnPublishStatus> IContentServiceOperations.UnPublish(IContent content, int userId)
+        {
+            return UnPublishDo(content, false, userId);
+        }
+
+        /// <summary>
         /// Publishes a single <see cref="IContent"/> object
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to publish</param>
@@ -865,7 +968,7 @@ namespace Umbraco.Core.Services
         /// <returns>True if publishing succeeded, otherwise False</returns>
         public Attempt<PublishStatus> PublishWithStatus(IContent content, int userId = 0)
         {
-            return SaveAndPublishDo(content, userId);
+            return ((IContentServiceOperations)this).Publish(content, userId);
         }
 
         /// <summary>
@@ -881,7 +984,7 @@ namespace Umbraco.Core.Services
 
             //This used to just return false only when the parent content failed, otherwise would always return true so we'll
             // do the same thing for the moment
-            if (!result.Any(x => x.Result.ContentItem.Id == content.Id))
+            if (result.All(x => x.Result.ContentItem.Id != content.Id))
                 return false;
 
             return result.Single(x => x.Result.ContentItem.Id == content.Id).Success;
@@ -896,7 +999,7 @@ namespace Umbraco.Core.Services
         /// <returns>True if publishing succeeded, otherwise False</returns>
         public IEnumerable<Attempt<PublishStatus>> PublishWithChildrenWithStatus(IContent content, int userId = 0, bool includeUnpublished = false)
         {
-            return PublishWithChildrenDo(content, userId, includeUnpublished);
+            return ((IContentServiceOperations)this).PublishWithChildren(content, userId, includeUnpublished);
         }
 
         /// <summary>
@@ -907,7 +1010,7 @@ namespace Umbraco.Core.Services
         /// <returns>True if unpublishing succeeded, otherwise False</returns>
         public bool UnPublish(IContent content, int userId = 0)
         {
-            return UnPublishDo(content, false, userId);
+            return ((IContentServiceOperations) this).UnPublish(content, userId).Success;
         }
 
         /// <summary>
@@ -933,7 +1036,7 @@ namespace Umbraco.Core.Services
         /// <returns>True if publishing succeeded, otherwise False</returns>
         public Attempt<PublishStatus> SaveAndPublishWithStatus(IContent content, int userId = 0, bool raiseEvents = true)
         {
-            return SaveAndPublishDo(content, userId, raiseEvents);
+            return ((IContentServiceOperations)this).SaveAndPublish(content, userId, raiseEvents);
         }
 
         /// <summary>
@@ -942,9 +1045,9 @@ namespace Umbraco.Core.Services
         /// <param name="content">The <see cref="IContent"/> to save</param>
         /// <param name="userId">Optional Id of the User saving the Content</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        public Attempt<OperationStatus> SaveWithStatus(IContent content, int userId = 0, bool raiseEvents = true)
+        public void Save(IContent content, int userId = 0, bool raiseEvents = true)
         {
-            return Save(content, true, userId, raiseEvents);
+            ((IContentServiceOperations)this).Save(content, userId, raiseEvents);
         }
 
         /// <summary>
@@ -953,7 +1056,7 @@ namespace Umbraco.Core.Services
         /// <param name="contents">Collection of <see cref="IContent"/> to save</param>
         /// <param name="userId">Optional Id of the User saving the Content</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>        
-        public Attempt<OperationStatus> SaveWithStatus(IEnumerable<IContent> contents, int userId = 0, bool raiseEvents = true)
+        Attempt<OperationStatus> IContentServiceOperations.Save(IEnumerable<IContent> contents, int userId, bool raiseEvents)
         {
             var asArray = contents.ToArray();
 
@@ -1013,14 +1116,79 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Permanently deletes an <see cref="IContent"/> object.
+        /// </summary>
+        /// <remarks>
+        /// This method will also delete associated media files, child content and possibly associated domains.
+        /// </remarks>
+        /// <remarks>Please note that this method will completely remove the Content from the database</remarks>
+        /// <param name="content">The <see cref="IContent"/> to delete</param>
+        /// <param name="userId">Optional Id of the User deleting the Content</param>
+        Attempt<OperationStatus> IContentServiceOperations.Delete(IContent content, int userId)
+        {
+            using (new WriteLock(Locker))
+            {
+                if (Deleting.IsRaisedEventCancelled(
+                  EventMessagesFactory.Get(),
+                  messages => new DeleteEventArgs<IContent>(content, messages),
+                  this))
+                {
+                    return Attempt.Fail(OperationStatus.Cancelled);
+                }
+
+                //Make sure that published content is unpublished before being deleted
+                if (HasPublishedVersion(content.Id))
+                {
+                    UnPublish(content, userId);
+                }
+
+                //Delete children before deleting the 'possible parent'
+                var children = GetChildren(content.Id);
+                foreach (var child in children)
+                {
+                    Delete(child, userId);
+                }
+
+                var uow = UowProvider.GetUnitOfWork();
+                using (var repository = RepositoryFactory.CreateContentRepository(uow))
+                {
+                    repository.Delete(content);
+                    uow.Commit();
+
+                    var evtMsgs = EventMessagesFactory.Get();
+                    var args = new DeleteEventArgs<IContent>(content, false, evtMsgs);
+                    Deleted.RaiseEvent(evtMsgs, messages => args, this);
+                    
+                    //remove any flagged media files
+                    repository.DeleteMediaFiles(args.MediaFilesToDelete);
+                }
+
+                Audit(AuditType.Delete, "Delete Content performed by user", userId, content.Id);
+
+                return Attempt.Succeed(OperationStatus.Success);
+            }
+        }
+
+        /// <summary>
+        /// Publishes a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to publish</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <returns>The published status attempt</returns>
+        Attempt<PublishStatus> IContentServiceOperations.Publish(IContent content, int userId)
+        {
+            return SaveAndPublishDo(content, userId);
+        }
+
+        /// <summary>
         /// Saves a single <see cref="IContent"/> object
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to save</param>
         /// <param name="userId">Optional Id of the User saving the Content</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        public void Save(IContent content, int userId = 0, bool raiseEvents = true)
+        Attempt<OperationStatus> IContentServiceOperations.Save(IContent content, int userId, bool raiseEvents)
         {
-            SaveWithStatus(content, userId, raiseEvents);
+            return Save(content, true, userId, raiseEvents);
         }
 
         /// <summary>
@@ -1035,7 +1203,7 @@ namespace Umbraco.Core.Services
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
         public void Save(IEnumerable<IContent> contents, int userId = 0, bool raiseEvents = true)
         {
-            SaveWithStatus(contents, userId, raiseEvents);
+            ((IContentServiceOperations)this).Save(contents, userId, raiseEvents);
         }
 
         /// <summary>
@@ -1093,39 +1261,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the User deleting the Content</param>
         public void Delete(IContent content, int userId = 0)
         {
-            using (new WriteLock(Locker))
-            {
-                if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IContent>(content), this))
-                    return;
-
-                //Make sure that published content is unpublished before being deleted
-                if (HasPublishedVersion(content.Id))
-                {
-                    UnPublish(content, userId);
-                }
-
-                //Delete children before deleting the 'possible parent'
-                var children = GetChildren(content.Id);
-                foreach (var child in children)
-                {
-                    Delete(child, userId);
-                }
-
-                var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateContentRepository(uow))
-                {
-                    repository.Delete(content);
-                    uow.Commit();
-
-                    var args = new DeleteEventArgs<IContent>(content, false);
-                    Deleted.RaiseEvent(args, this);
-
-                    //remove any flagged media files
-                    repository.DeleteMediaFiles(args.MediaFilesToDelete);
-                }
-
-                Audit(AuditType.Delete, "Delete Content performed by user", userId, content.Id);
-            }
+            ((IContentServiceOperations)this).Delete(content, userId);
         }
 
         /// <summary>
@@ -1194,59 +1330,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the User deleting the Content</param>
         public void MoveToRecycleBin(IContent content, int userId = 0)
         {
-            using (new WriteLock(Locker))
-            {
-                var originalPath = content.Path;
-
-                if (Trashing.IsRaisedEventCancelled(
-                    new MoveEventArgs<IContent>(
-                        new MoveEventInfo<IContent>(content, originalPath, Constants.System.RecycleBinContent)), this))
-                {
-                    return;
-                }
-
-                var moveInfo = new List<MoveEventInfo<IContent>>
-                {
-                    new MoveEventInfo<IContent>(content, originalPath, Constants.System.RecycleBinContent)
-                };
-
-                //Make sure that published content is unpublished before being moved to the Recycle Bin
-                if (HasPublishedVersion(content.Id))
-                {
-                    UnPublish(content, userId);
-                }
-
-                //Unpublish descendents of the content item that is being moved to trash
-                var descendants = GetDescendants(content).OrderBy(x => x.Level).ToList();
-                foreach (var descendant in descendants)
-                {
-                    UnPublish(descendant, userId);
-                }
-
-                var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateContentRepository(uow))
-                {
-                    content.WriterId = userId;
-                    content.ChangeTrashedState(true);
-                    repository.AddOrUpdate(content);
-
-                    //Loop through descendants to update their trash state, but ensuring structure by keeping the ParentId
-                    foreach (var descendant in descendants)
-                    {
-                        moveInfo.Add(new MoveEventInfo<IContent>(descendant, descendant.Path, descendant.ParentId));
-
-                        descendant.WriterId = userId;
-                        descendant.ChangeTrashedState(true, descendant.ParentId);
-                        repository.AddOrUpdate(descendant);
-                    }
-
-                    uow.Commit();
-                }
-
-                Trashed.RaiseEvent(new MoveEventArgs<IContent>(false, moveInfo.ToArray()), this);
-
-                Audit(AuditType.Move, "Move Content to Recycle Bin performed by user", userId, content.Id);
-            }
+            ((IContentServiceOperations) this).MoveToRecycleBin(content, userId);
         }
 
         /// <summary>
@@ -1414,7 +1498,7 @@ namespace Umbraco.Core.Services
             SentToPublish.RaiseEvent(new SendToPublishEventArgs<IContent>(content, false), this);
 
             Audit(AuditType.SendToPublish, "Send to Publish performed by user", content.WriterId, content.Id);
-            
+
             return true;
         }
 
@@ -1504,6 +1588,7 @@ namespace Umbraco.Core.Services
 
                         if (content.Published)
                         {
+                            //TODO: This should not be an inner operation, but if we do this, it cannot raise events and cannot be cancellable!
                             var published = _publishingStrategy.Publish(content, userId);
                             shouldBePublished.Add(content);
                         }
@@ -1529,7 +1614,11 @@ namespace Umbraco.Core.Services
                 Saved.RaiseEvent(new SaveEventArgs<IContent>(asArray, false), this);
 
             if (shouldBePublished.Any())
+            {
+                //TODO: This should not be an inner operation, but if we do this, it cannot raise events and cannot be cancellable!
                 _publishingStrategy.PublishingFinalized(shouldBePublished, false);
+            }
+            
 
             Audit(AuditType.Sort, "Sorting content performed by user", userId, 0);
 
@@ -1707,9 +1796,9 @@ namespace Umbraco.Core.Services
                     result.Add(
                         Attempt.Fail(
                             new PublishStatus(content, PublishStatusType.FailedContentInvalid)
-                                {
-                                    InvalidProperties = ((ContentBase)content).LastInvalidProperties
-                                }));
+                            {
+                                InvalidProperties = ((ContentBase)content).LastInvalidProperties
+                            }));
                     return result;
                 }
 
@@ -1763,38 +1852,39 @@ namespace Umbraco.Core.Services
         /// <param name="omitCacheRefresh">Optional boolean to avoid having the cache refreshed when calling this Unpublish method. By default this method will update the cache.</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <returns>True if unpublishing succeeded, otherwise False</returns>
-        private bool UnPublishDo(IContent content, bool omitCacheRefresh = false, int userId = 0)
+        private Attempt<UnPublishStatus> UnPublishDo(IContent content, bool omitCacheRefresh = false, int userId = 0)
         {
             var newest = GetById(content.Id); // ensure we have the newest version
             if (content.Version != newest.Version) // but use the original object if it's already the newest version
                 content = newest;
             var published = content.Published ? content : GetPublishedVersion(content.Id); // get the published version
             if (published == null)
-                return false; // already unpublished
-
-            var unpublished = _publishingStrategy.UnPublish(content, userId);
-            if (unpublished)
             {
-                var uow = UowProvider.GetUnitOfWork();
-                using (var repository = RepositoryFactory.CreateContentRepository(uow))
-                {
-                    content.WriterId = userId;
-                    repository.AddOrUpdate(content);
-                    // is published is not newest, reset the published flag on published version
-                    if (published.Version != content.Version)
-                        repository.ClearPublished(published);
-                    repository.DeleteContentXml(content);
-
-                    uow.Commit();
-                }
-                //Delete xml from db? and call following method to fire event through PublishingStrategy to update cache
-                if (omitCacheRefresh == false)
-                    _publishingStrategy.UnPublishingFinalized(content);
-
-                Audit(AuditType.UnPublish, "UnPublish performed by user", userId, content.Id);
+                return Attempt.Succeed(new UnPublishStatus(content, UnPublishedStatusType.SuccessAlreadyUnPublished)); // already unpublished
             }
+            
+            var unpublished = _publishingStrategy.UnPublish(content, userId);
+            if (unpublished == false) return Attempt.Fail(new UnPublishStatus(content, UnPublishedStatusType.FailedCancelledByEvent));
 
-            return unpublished;
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateContentRepository(uow))
+            {
+                content.WriterId = userId;
+                repository.AddOrUpdate(content);
+                // is published is not newest, reset the published flag on published version
+                if (published.Version != content.Version)
+                    repository.ClearPublished(published);
+                repository.DeleteContentXml(content);
+
+                uow.Commit();
+            }
+            //Delete xml from db? and call following method to fire event through PublishingStrategy to update cache
+            if (omitCacheRefresh == false)
+                _publishingStrategy.UnPublishingFinalized(content);
+
+            Audit(AuditType.UnPublish, "UnPublish performed by user", userId, content.Id);
+
+            return Attempt.Succeed(new UnPublishStatus(content, UnPublishedStatusType.Success));
         }
 
         /// <summary>
@@ -1903,13 +1993,13 @@ namespace Umbraco.Core.Services
         {
             if (raiseEvents)
             {
-                  if (Saving.IsRaisedEventCancelled(
-                    EventMessagesFactory.Get(),
-                    messages => new SaveEventArgs<IContent>(content, messages),
-                    this))
+                if (Saving.IsRaisedEventCancelled(
+                  EventMessagesFactory.Get(),
+                  messages => new SaveEventArgs<IContent>(content, messages),
+                  this))
                 {
                     return Attempt.Fail(OperationStatus.Cancelled);
-                }              
+                }
             }
 
             using (new WriteLock(Locker))

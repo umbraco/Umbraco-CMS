@@ -91,6 +91,27 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         }
     });
 
+    function showNotificationsAndReset(err, reload) {
+
+        //check if response is ysod
+        if(err.status && err.status >= 500) {
+            dialogService.ysodDialog(err);
+        }
+
+        $scope.bulkStatus = "";        
+        $scope.actionInProgress = false;
+
+        if (reload === true) {
+            $scope.reloadView($scope.contentId);
+        }
+
+        if (err.data && angular.isArray(err.data.notifications)) {
+            for (var i = 0; i < err.data.notifications.length; i++) {
+                notificationsService.showNotification(err.data.notifications[i]);
+            }
+        }
+    }
+
     $scope.isSortDirection = function (col, direction) {
         return $scope.options.orderBy.toUpperCase() == col.toUpperCase() && $scope.options.orderDirection == direction;
     }
@@ -276,12 +297,13 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
                 $scope.bulkStatus = "Deleted item " + current + " out of " + total + " item" + pluralSuffix;
                 deleteItemCallback(getIdCallback(selected[i])).then(function (data) {
                     if (current === total) {
+                        //TODO: Should probably add notifications on the server side
                         notificationsService.success("Bulk action", "Deleted " + total + " item" + pluralSuffix);
-                        $scope.bulkStatus = "";
-                        $scope.reloadView($scope.contentId);
-                        $scope.actionInProgress = false;
+                        showNotificationsAndReset(data, true);
                     }
                     current++;
+                }, function (err) {
+                    showNotificationsAndReset(err, false);
                 });
             }
         }
@@ -310,26 +332,12 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
                 .then(function(content) {
                     if (current == total) {
                         notificationsService.success("Bulk action", "Published " + total + " document" + pluralSuffix);
-                        $scope.bulkStatus = "";
-                        $scope.reloadView($scope.contentId);
-                        $scope.actionInProgress = false;
+                        showNotificationsAndReset(content, true);
                     }
                     current++;
                 }, function(err) {
-
-                    $scope.bulkStatus = "";
-                    $scope.reloadView($scope.contentId);
-                    $scope.actionInProgress = false;
-
-                    //if there are validation errors for publishing then we need to show them
-                    if (err.status === 400 && err.data && err.data.Message) {
-                        notificationsService.error("Publish error", err.data.Message);
-                    }
-                    else {
-                        dialogService.ysodDialog(err);
-                    }
+                    showNotificationsAndReset(err, false);
                 });
-
         }
     };
 
@@ -356,12 +364,12 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
 
                     if (current == total) {
                         notificationsService.success("Bulk action", "Unpublished " + total + " document" + pluralSuffix);
-                        $scope.bulkStatus = "";
-                        $scope.reloadView($scope.contentId);
-                        $scope.actionInProgress = false;
+                        showNotificationsAndReset(content, true);
                     }
 
                     current++;
+                }, function(err) {
+                    showNotificationsAndReset(err, false);
                 });
         }
     };

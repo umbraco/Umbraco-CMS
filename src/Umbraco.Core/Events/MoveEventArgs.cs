@@ -10,6 +10,49 @@ namespace Umbraco.Core.Events
         /// Constructor accepting a collection of MoveEventInfo objects
         /// </summary>
         /// <param name="canCancel"></param>
+        /// <param name="eventMessages"></param>
+        /// <param name="moveInfo">
+        /// A colleciton of MoveEventInfo objects that exposes all entities that have been moved during a single move operation
+        /// </param>
+        public MoveEventArgs(bool canCancel, EventMessages eventMessages, params MoveEventInfo<TEntity>[] moveInfo)
+            : base(default(TEntity), canCancel, eventMessages)
+        {
+            if (moveInfo.FirstOrDefault() == null)
+            {
+                throw new ArgumentException("moveInfo argument must contain at least one item");
+            }
+
+            MoveInfoCollection = moveInfo;
+            //assign the legacy props
+            EventObject = moveInfo.First().Entity;
+            ParentId = moveInfo.First().NewParentId;
+        }
+
+        /// <summary>
+        /// Constructor accepting a collection of MoveEventInfo objects
+        /// </summary>
+        /// <param name="eventMessages"></param>
+        /// <param name="moveInfo">
+        /// A colleciton of MoveEventInfo objects that exposes all entities that have been moved during a single move operation
+        /// </param>
+        public MoveEventArgs(EventMessages eventMessages, params MoveEventInfo<TEntity>[] moveInfo)
+            : base(default(TEntity), eventMessages)
+        {
+            if (moveInfo.FirstOrDefault() == null)
+            {
+                throw new ArgumentException("moveInfo argument must contain at least one item");
+            }
+
+            MoveInfoCollection = moveInfo;
+            //assign the legacy props
+            EventObject = moveInfo.First().Entity;
+            ParentId = moveInfo.First().NewParentId;
+        }
+
+        /// <summary>
+        /// Constructor accepting a collection of MoveEventInfo objects
+        /// </summary>
+        /// <param name="canCancel"></param>
         /// <param name="moveInfo">
         /// A colleciton of MoveEventInfo objects that exposes all entities that have been moved during a single move operation
         /// </param>

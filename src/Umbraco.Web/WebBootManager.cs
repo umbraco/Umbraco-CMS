@@ -84,15 +84,16 @@ namespace Umbraco.Web
         /// <returns></returns>
         protected override ServiceContext CreateServiceContext(DatabaseContext dbContext, IDatabaseFactory dbFactory)
         {
+            //use a request based messaging factory
+            var evtMsgs = new RequestLifespanMessagesFactory(new SingletonUmbracoContextAccessor());
             return new ServiceContext(
                 new RepositoryFactory(ApplicationCache, ProfilingLogger.Logger, dbContext.SqlSyntax, UmbracoConfig.For.UmbracoSettings()),
                 new PetaPocoUnitOfWorkProvider(dbFactory),
                 new FileUnitOfWorkProvider(),
-                new PublishingStrategy(),
+                new PublishingStrategy(evtMsgs, ProfilingLogger.Logger),
                 ApplicationCache,
                 ProfilingLogger.Logger,
-                //use a request based messaging factory
-                new RequestLifespanMessagesFactory(new SingletonUmbracoContextAccessor()));
+                evtMsgs);
         }
 
         /// <summary>

@@ -5,6 +5,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Publishing
 {
@@ -14,6 +15,16 @@ namespace Umbraco.Core.Publishing
     /// </summary>
     public class PublishingStrategy : BasePublishingStrategy
     {
+        private readonly IEventMessagesFactory _eventMessagesFactory;
+        private readonly ILogger _logger;
+
+        public PublishingStrategy(IEventMessagesFactory eventMessagesFactory, ILogger logger)
+        {
+            if (eventMessagesFactory == null) throw new ArgumentNullException("eventMessagesFactory");
+            if (logger == null) throw new ArgumentNullException("logger");
+            _eventMessagesFactory = eventMessagesFactory;
+            _logger = logger;
+        }
 
         /// <summary>
         /// Publishes a single piece of Content
@@ -22,18 +33,20 @@ namespace Umbraco.Core.Publishing
         /// <param name="userId">Id of the User issueing the publish operation</param>        
         internal Attempt<PublishStatus> PublishInternal(IContent content, int userId)
         {
-            if (Publishing.IsRaisedEventCancelled(new PublishEventArgs<IContent>(content), this))
+
+            if (Publishing.IsRaisedEventCancelled(
+                _eventMessagesFactory.Get(),
+                messages => new PublishEventArgs<IContent>(content), this))
             {
-                LogHelper.Info<PublishingStrategy>(
+                _logger.Info<PublishingStrategy>(
                         string.Format("Content '{0}' with Id '{1}' will not be published, the event was cancelled.", content.Name, content.Id));
                 return Attempt<PublishStatus>.Fail(new PublishStatus(content, PublishStatusType.FailedCancelledByEvent));
             }
-                
 
             //Check if the Content is Expired to verify that it can in fact be published
             if (content.Status == ContentStatus.Expired)
             {
-                LogHelper.Info<PublishingStrategy>(
+                _logger.Info<PublishingStrategy>(
                     string.Format("Content '{0}' with Id '{1}' has expired and could not be published.",
                                   content.Name, content.Id));
                 return Attempt<PublishStatus>.Fail(new PublishStatus(content, PublishStatusType.FailedHasExpired));
@@ -42,7 +55,7 @@ namespace Umbraco.Core.Publishing
             //Check if the Content is Awaiting Release to verify that it can in fact be published
             if (content.Status == ContentStatus.AwaitingRelease)
             {
-                LogHelper.Info<PublishingStrategy>(
+                _logger.Info<PublishingStrategy>(
                     string.Format("Content '{0}' with Id '{1}' is awaiting release and could not be published.",
                                   content.Name, content.Id));
                 return Attempt<PublishStatus>.Fail(new PublishStatus(content, PublishStatusType.FailedAwaitingRelease));
@@ -51,7 +64,7 @@ namespace Umbraco.Core.Publishing
             //Check if the Content is Trashed to verify that it can in fact be published
             if (content.Status == ContentStatus.Trashed)
             {
-                LogHelper.Info<PublishingStrategy>(
+                _logger.Info<PublishingStrategy>(
                     string.Format("Content '{0}' with Id '{1}' is trashed and could not be published.",
                                   content.Name, content.Id));
                 return Attempt<PublishStatus>.Fail(new PublishStatus(content, PublishStatusType.FailedIsTrashed));
@@ -59,7 +72,7 @@ namespace Umbraco.Core.Publishing
 
             content.ChangePublishedState(PublishedState.Published);
 
-            LogHelper.Info<PublishingStrategy>(
+            _logger.Info<PublishingStrategy>(
                 string.Format("Content '{0}' with Id '{1}' has been published.",
                               content.Name, content.Id));
 
@@ -122,7 +135,7 @@ namespace Umbraco.Core.Publishing
             // much difference because we iterate over them all anyways?? Morten?       
             // Because we're grouping I think this will execute all the queries anyways so need to fetch it all first.
             var fetchedContent = content.ToArray();
-            
+
             //We're going to populate the statuses with all content that is already published because below we are only going to iterate over
             // content that is not published. We'll set the status to "AlreadyPublished"
             statuses.AddRange(fetchedContent.Where(x => x.Published)
@@ -138,7 +151,7 @@ namespace Umbraco.Core.Publishing
                 //be published regardless of the rules mentioned in the remarks.
                 if (!firstLevel.HasValue)
                 {
-                    firstLevel = level.Key;    
+                    firstLevel = level.Key;
                 }
 
                 /* Only update content thats not already been published - we want to loop through
@@ -149,7 +162,7 @@ namespace Umbraco.Core.Publishing
                     //Check if this item should be excluded because it's parent's publishing has failed/cancelled
                     if (parentsIdsCancelled.Contains(item.ParentId))
                     {
-                        LogHelper.Info<PublishingStrategy>(
+                        _logger.Info<PublishingStrategy>(
                             string.Format("Content '{0}' with Id '{1}' will not be published because it's parent's publishing action failed or was cancelled.", item.Name, item.Id));
                         //if this cannot be published, ensure that it's children can definitely not either!
                         parentsIdsCancelled.Add(item.Id);
@@ -165,23 +178,25 @@ namespace Umbraco.Core.Publishing
                     }
 
                     //Fire Publishing event
-                    if (Publishing.IsRaisedEventCancelled(new PublishEventArgs<IContent>(item), this))
+                    if (Publishing.IsRaisedEventCancelled(
+                        _eventMessagesFactory.Get(),
+                        messages => new PublishEventArgs<IContent>(item, messages), this))
                     {
                         //the publishing has been cancelled.
-                        LogHelper.Info<PublishingStrategy>(
+                        _logger.Info<PublishingStrategy>(
                             string.Format("Content '{0}' with Id '{1}' will not be published, the event was cancelled.", item.Name, item.Id));
                         statuses.Add(Attempt.Fail(new PublishStatus(item, PublishStatusType.FailedCancelledByEvent)));
 
                         //Does this document apply to our rule to cancel it's children being published?
                         CheckCancellingOfChildPublishing(item, parentsIdsCancelled, includeUnpublishedDocuments);
-                        
+
                         continue;
                     }
 
                     //Check if the content is valid if the flag is set to check
                     if (!item.IsValid())
                     {
-                        LogHelper.Info<PublishingStrategy>(
+                        _logger.Info<PublishingStrategy>(
                             string.Format("Content '{0}' with Id '{1}' will not be published because some of it's content is not passing validation rules.",
                                           item.Name, item.Id));
                         statuses.Add(Attempt.Fail(new PublishStatus(item, PublishStatusType.FailedContentInvalid)));
@@ -195,21 +210,21 @@ namespace Umbraco.Core.Publishing
                     //Check if the Content is Expired to verify that it can in fact be published
                     if (item.Status == ContentStatus.Expired)
                     {
-                        LogHelper.Info<PublishingStrategy>(
+                        _logger.Info<PublishingStrategy>(
                             string.Format("Content '{0}' with Id '{1}' has expired and could not be published.",
                                           item.Name, item.Id));
                         statuses.Add(Attempt.Fail(new PublishStatus(item, PublishStatusType.FailedHasExpired)));
-                        
+
                         //Does this document apply to our rule to cancel it's children being published?
                         CheckCancellingOfChildPublishing(item, parentsIdsCancelled, includeUnpublishedDocuments);
-                        
+
                         continue;
                     }
 
                     //Check if the Content is Awaiting Release to verify that it can in fact be published
                     if (item.Status == ContentStatus.AwaitingRelease)
                     {
-                        LogHelper.Info<PublishingStrategy>(
+                        _logger.Info<PublishingStrategy>(
                             string.Format("Content '{0}' with Id '{1}' is awaiting release and could not be published.",
                                           item.Name, item.Id));
                         statuses.Add(Attempt.Fail(new PublishStatus(item, PublishStatusType.FailedAwaitingRelease)));
@@ -223,7 +238,7 @@ namespace Umbraco.Core.Publishing
                     //Check if the Content is Trashed to verify that it can in fact be published
                     if (item.Status == ContentStatus.Trashed)
                     {
-                        LogHelper.Info<PublishingStrategy>(
+                        _logger.Info<PublishingStrategy>(
                             string.Format("Content '{0}' with Id '{1}' is trashed and could not be published.",
                                           item.Name, item.Id));
                         statuses.Add(Attempt.Fail(new PublishStatus(item, PublishStatusType.FailedIsTrashed)));
@@ -236,13 +251,13 @@ namespace Umbraco.Core.Publishing
 
                     item.ChangePublishedState(PublishedState.Published);
 
-                    LogHelper.Info<PublishingStrategy>(
+                    _logger.Info<PublishingStrategy>(
                         string.Format("Content '{0}' with Id '{1}' has been published.",
                                       item.Name, item.Id));
 
                     statuses.Add(Attempt.Succeed(new PublishStatus(item)));
                 }
-    
+
             }
 
             return statuses;
@@ -263,7 +278,7 @@ namespace Umbraco.Core.Publishing
             //TODO: We're going back to the service layer here... not sure how to avoid this? And this will add extra overhead to 
             // any document that fails to publish...
             var hasPublishedVersion = ApplicationContext.Current.Services.ContentService.HasPublishedVersion(content.Id);
-            
+
             if (hasPublishedVersion && !includeUnpublishedDocuments)
             {
                 //it has a published version but our flag tells us to not include un-published documents and therefore we should
@@ -273,7 +288,7 @@ namespace Umbraco.Core.Publishing
             else if (!hasPublishedVersion)
             {
                 //it doesn't have a published version so we certainly cannot publish it's children.
-                parentsIdsCancelled.Add(content.Id);                
+                parentsIdsCancelled.Add(content.Id);
             }
         }
 
@@ -327,9 +342,11 @@ namespace Umbraco.Core.Publishing
             // at the moment it's done by the content service
 
             //Fire UnPublishing event
-            if (UnPublishing.IsRaisedEventCancelled(new PublishEventArgs<IContent>(content), this))
+            if (UnPublishing.IsRaisedEventCancelled(
+                _eventMessagesFactory.Get(),
+                messages => new PublishEventArgs<IContent>(content, messages), this))
             {
-                LogHelper.Info<PublishingStrategy>(
+                _logger.Info<PublishingStrategy>(
                     string.Format("Content '{0}' with Id '{1}' will not be unpublished, the event was cancelled.", content.Name, content.Id));
                 return Attempt.Fail(new PublishStatus(content, PublishStatusType.FailedCancelledByEvent));
             }
@@ -340,7 +357,7 @@ namespace Umbraco.Core.Publishing
             {
                 content.ReleaseDate = null;
 
-                LogHelper.Info<PublishingStrategy>(
+                _logger.Info<PublishingStrategy>(
                     string.Format("Content '{0}' with Id '{1}' had its release date removed, because it was unpublished.",
                                   content.Name, content.Id));
             }
@@ -349,7 +366,7 @@ namespace Umbraco.Core.Publishing
             if (content.Published)
                 content.ChangePublishedState(PublishedState.Unpublished);
 
-            LogHelper.Info<PublishingStrategy>(
+            _logger.Info<PublishingStrategy>(
                 string.Format("Content '{0}' with Id '{1}' has been unpublished.",
                               content.Name, content.Id));
 
@@ -385,7 +402,9 @@ namespace Umbraco.Core.Publishing
         /// <param name="content"><see cref="IContent"/> thats being published</param>
         public override void PublishingFinalized(IContent content)
         {
-            Published.RaiseEvent(new PublishEventArgs<IContent>(content, false, false), this);
+            Published.RaiseEvent(
+                _eventMessagesFactory.Get(),
+                messages => new PublishEventArgs<IContent>(content, false, false, messages), this);
         }
 
         /// <summary>
@@ -395,7 +414,9 @@ namespace Umbraco.Core.Publishing
         /// <param name="isAllRepublished">Boolean indicating whether its all content that is republished</param>
         public override void PublishingFinalized(IEnumerable<IContent> content, bool isAllRepublished)
         {
-            Published.RaiseEvent(new PublishEventArgs<IContent>(content, false, isAllRepublished), this);
+            Published.RaiseEvent(
+                _eventMessagesFactory.Get(),
+                messages => new PublishEventArgs<IContent>(content, false, isAllRepublished, messages), this);
 
         }
 
@@ -405,7 +426,9 @@ namespace Umbraco.Core.Publishing
         /// <param name="content"><see cref="IContent"/> thats being unpublished</param>
         public override void UnPublishingFinalized(IContent content)
         {
-            UnPublished.RaiseEvent(new PublishEventArgs<IContent>(content, false, false), this);
+            UnPublished.RaiseEvent(
+                _eventMessagesFactory.Get(),
+                messages => new PublishEventArgs<IContent>(content, false, false, messages), this);
         }
 
         /// <summary>
@@ -414,7 +437,9 @@ namespace Umbraco.Core.Publishing
         /// <param name="content">An enumerable list of <see cref="IContent"/> thats being unpublished</param>
         public override void UnPublishingFinalized(IEnumerable<IContent> content)
         {
-            UnPublished.RaiseEvent(new PublishEventArgs<IContent>(content, false, false), this);
+            UnPublished.RaiseEvent(
+                _eventMessagesFactory.Get(),
+                messages => new PublishEventArgs<IContent>(content, false, false, messages), this);
         }
 
         /// <summary>

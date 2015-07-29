@@ -159,15 +159,16 @@ namespace Umbraco.Core
         /// <returns></returns>
         protected virtual ServiceContext CreateServiceContext(DatabaseContext dbContext, IDatabaseFactory dbFactory)
         {
+            //default transient factory
+            var msgFactory = new TransientMessagesFactory();
             return new ServiceContext(
                 new RepositoryFactory(ApplicationCache, ProfilingLogger.Logger, dbContext.SqlSyntax, UmbracoConfig.For.UmbracoSettings()),
                 new PetaPocoUnitOfWorkProvider(dbFactory),
                 new FileUnitOfWorkProvider(),
-                new PublishingStrategy(),
+                new PublishingStrategy(msgFactory, ProfilingLogger.Logger),
                 ApplicationCache,
                 ProfilingLogger.Logger,
-                //default transient factory
-                new TransientMessagesFactory());
+                msgFactory);
         }
 
         /// <summary>

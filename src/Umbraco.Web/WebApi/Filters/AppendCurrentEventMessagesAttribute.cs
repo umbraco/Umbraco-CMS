@@ -17,7 +17,6 @@ namespace Umbraco.Web.WebApi.Filters
         public override void OnActionExecuted(HttpActionExecutedContext context)
         {
             if (context.Response == null) return;
-            if (context.Response.IsSuccessStatusCode == false) return;
             if (context.Request.Method == HttpMethod.Get) return;
             if (UmbracoContext.Current == null) return;
 

@@ -445,6 +445,8 @@
     <Compile Include="Persistence\Repositories\TaskRepository.cs" />
     <Compile Include="Persistence\Repositories\TaskTypeRepository.cs" />
     <Compile Include="PropertyEditors\ValueConverters\GridValueConverter.cs" />
+    <Compile Include="Publishing\UnPublishedStatusType.cs" />
+    <Compile Include="Publishing\UnPublishStatus.cs" />
     <Compile Include="Security\BackOfficeClaimsIdentityFactory.cs" />
     <Compile Include="Security\BackOfficeSignInManager.cs" />
     <Compile Include="Security\BackOfficeUserManager.cs" />
@@ -1246,9 +1248,6 @@
     <Compile Include="Services\UserService.cs" />
     <Compile Include="Services\UserServiceExtensions.cs" />
     <Compile Include="IO\ViewHelper.cs" />
-    <Compile Include="Standalone\ServiceContextManager.cs" />
-    <Compile Include="Standalone\StandaloneCoreApplication.cs" />
-    <Compile Include="Standalone\StandaloneCoreBootManager.cs" />
     <Compile Include="Strategies\RelateOnCopyHandler.cs" />
     <Compile Include="Strategies\RelateOnTrashHandler.cs" />
     <Compile Include="Strings\ContentBaseExtensions.cs" />

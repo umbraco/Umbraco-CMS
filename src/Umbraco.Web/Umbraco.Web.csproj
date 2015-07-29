@@ -305,6 +305,7 @@
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
     <Compile Include="Media\EmbedProviders\Flickr.cs" />
+    <Compile Include="Models\ContentEditing\SimpleNotificationModel.cs" />
     <Compile Include="PropertyEditors\DatePreValueEditor.cs" />
     <Compile Include="RequestLifespanMessagesFactory.cs" />
     <Compile Include="Scheduling\LatchedBackgroundTaskBase.cs" />
@@ -743,7 +744,6 @@
     <Compile Include="Security\Providers\UmbracoMembershipProvider.cs" />
     <Compile Include="Security\Providers\UsersMembershipProvider.cs" />
     <Compile Include="Trees\ContentTreeController.cs" />
-    <Compile Include="Standalone\PowershellAssemblyResolver.cs" />
     <Compile Include="Trees\TreeRenderingEventArgs.cs" />
     <Compile Include="Trees\UrlHelperExtensions.cs" />
     <Compile Include="UI\JavaScript\JsInitialization.cs" />
@@ -755,10 +755,6 @@
     <Compile Include="Models\ContentEditing\ContentPropertyBasic.cs" />
     <Compile Include="Models\ContentEditing\ContentPropertyDisplay.cs" />
     <Compile Include="Models\ContentEditing\ContentPropertyDto.cs" />
-    <Compile Include="Standalone\ServiceContextManager.cs" />
-    <Compile Include="Standalone\StandaloneApplication.cs" />
-    <Compile Include="Standalone\StandaloneBootManager.cs" />
-    <Compile Include="Standalone\StandaloneHttpContext.cs" />
     <Compile Include="Dynamics\DynamicExpression.cs" />
     <Compile Include="Dynamics\DynamicGrouping.cs" />
     <Compile Include="Dynamics\DynamicPublishedContentIdEqualityComparer.cs" />
@@ -813,7 +809,6 @@
     <Compile Include="Search\LuceneIndexerExtensions.cs" />
     <Compile Include="Security\ValidateRequestAttempt.cs" />
     <Compile Include="Security\WebSecurity.cs" />
-    <Compile Include="Standalone\WriteableConfigSystem.cs" />
     <Compile Include="UI\JavaScript\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

@@ -30,7 +30,9 @@ using Umbraco.Core.Dynamics;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.preview;
+using Umbraco.Web.UI;
 using Constants = Umbraco.Core.Constants;
+using Notification = Umbraco.Web.Models.ContentEditing.Notification;
 
 namespace Umbraco.Web.Editors
 {
@@ -255,7 +257,8 @@ namespace Umbraco.Web.Editors
             if (contentItem.Action == ContentSaveAction.Save || contentItem.Action == ContentSaveAction.SaveNew)
             {
                 //save the item
-                var saveResult = Services.ContentService.SaveWithStatus(contentItem.PersistedContent, Security.CurrentUser.Id);
+                var saveResult = Services.ContentService.WithResult().Save(contentItem.PersistedContent, Security.CurrentUser.Id);
+
                 wasCancelled = saveResult.Success == false && saveResult.Result.StatusType == OperationStatusType.FailedCancelledByEvent;
             }
             else if (contentItem.Action == ContentSaveAction.SendPublish || contentItem.Action == ContentSaveAction.SendPublishNew)
@@ -337,30 +340,12 @@ namespace Umbraco.Web.Editors
                 return HandleContentNotFound(id, false);
             }
 
-            var publishResult = Services.ContentService.PublishWithStatus(foundContent, UmbracoUser.Id);
+            var publishResult = Services.ContentService.PublishWithStatus(foundContent, Security.GetUserId());
             if (publishResult.Success == false)
             {
-                switch (publishResult.Result.StatusType)
-                {
-                    case PublishStatusType.FailedPathNotPublished:
-                        return Request.CreateValidationErrorResponse(
-                            Services.TextService.Localize("publish/contentPublishedFailedByParent",
-                                new[] {string.Format("{0} ({1})", publishResult.Result.ContentItem.Name, publishResult.Result.ContentItem.Id)}).Trim());
-                    case PublishStatusType.FailedCancelledByEvent:
-                        return Request.CreateValidationErrorResponse(
-                            Services.TextService.Localize("speechBubbles/contentPublishedFailedByEvent"));
-                    case PublishStatusType.FailedHasExpired:
-                    case PublishStatusType.FailedAwaitingRelease:
-                    case PublishStatusType.FailedIsTrashed:
-                    case PublishStatusType.FailedContentInvalid:
-                        return Request.CreateValidationErrorResponse(
-                            Services.TextService.Localize("publish/contentPublishedFailedInvalid",
-                                new[]
-                                {
-                                    string.Format("{0} ({1})", publishResult.Result.ContentItem.Name, publishResult.Result.ContentItem.Id),
-                                    string.Join(",", publishResult.Result.InvalidProperties.Select(x => x.Alias))
-                                }));
-                }
+                var notificationModel = new SimpleNotificationModel();
+                ShowMessageForPublishStatus(publishResult.Result, notificationModel);
+                return Request.CreateValidationErrorResponse(notificationModel);               
             }
 
             //return ok
@@ -392,11 +377,23 @@ namespace Umbraco.Web.Editors
             //if the current item is in the recycle bin
             if (foundContent.IsInRecycleBin() == false)
             {
-                Services.ContentService.MoveToRecycleBin(foundContent, UmbracoUser.Id);                
+                var moveResult = Services.ContentService.WithResult().MoveToRecycleBin(foundContent, Security.GetUserId());
+                if (moveResult == false)
+                {
+                    //returning an object of INotificationModel will ensure that any pending 
+                    // notification messages are added to the response.
+                    return Request.CreateValidationErrorResponse(new SimpleNotificationModel());
+                }
             }
             else
             {
-                Services.ContentService.Delete(foundContent, UmbracoUser.Id);
+                var deleteResult = Services.ContentService.WithResult().Delete(foundContent, Security.GetUserId());
+                if (deleteResult == false)
+                {
+                    //returning an object of INotificationModel will ensure that any pending 
+                    // notification messages are added to the response.
+                    return Request.CreateValidationErrorResponse(new SimpleNotificationModel());
+                } 
             }
 
             return Request.CreateResponse(HttpStatusCode.OK);
@@ -505,12 +502,20 @@ namespace Umbraco.Web.Editors
             if (foundContent == null)
                 HandleContentNotFound(id);
             
-            Services.ContentService.UnPublish(foundContent, Security.CurrentUser.Id);
+            var unpublishResult = Services.ContentService.WithResult().UnPublish(foundContent, Security.CurrentUser.Id);
+
             var content = Mapper.Map<IContent, ContentItemDisplay>(foundContent);
 
-            content.AddSuccessNotification(Services.TextService.Localize("content/unPublish"), Services.TextService.Localize("speechBubbles/contentUnpublished"));
-
-            return content;
+            if (unpublishResult == false)
+            {
+                AddCancelMessage(content);
+                throw new HttpResponseException(Request.CreateValidationErrorResponse(content));
+            }
+            else
+            {                
+                content.AddSuccessNotification(Services.TextService.Localize("content/unPublish"), Services.TextService.Localize("speechBubbles/contentUnpublished"));
+                return content;
+            }
         }
 
         /// <summary>
@@ -619,7 +624,7 @@ namespace Umbraco.Web.Editors
             return toMove;
         }
 
-        private void ShowMessageForPublishStatus(PublishStatus status, ContentItemDisplay display)
+        private void ShowMessageForPublishStatus(PublishStatus status, INotificationModel display)
         {
             switch (status.StatusType)
             {

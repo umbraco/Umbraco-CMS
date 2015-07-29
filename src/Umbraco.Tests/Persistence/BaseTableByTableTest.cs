@@ -56,11 +56,12 @@ namespace Umbraco.Tests.Persistence
 
             var repositoryFactory = new RepositoryFactory(cacheHelper, _logger, SqlSyntaxProvider, SettingsForTests.GenerateMockSettings());
 
+            var evtMsgs = new TransientMessagesFactory();
             ApplicationContext.Current = new ApplicationContext(
                 //assign the db context
                 dbContext,
                 //assign the service context
-                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(_logger), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, _logger, new TransientMessagesFactory()),                
+                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(_logger), new FileUnitOfWorkProvider(), new PublishingStrategy(evtMsgs, _logger), cacheHelper, _logger, evtMsgs),
                 cacheHelper,
                 new ProfilingLogger(_logger, Mock.Of<IProfiler>()))
                 {

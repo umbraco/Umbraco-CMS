@@ -9,6 +9,84 @@ using Umbraco.Core.Publishing;
 namespace Umbraco.Core.Services
 {
     /// <summary>
+    /// A temporary interface until we are in v8, this is used to return a different result for the same method and this interface gets implemented
+    /// explicitly. These methods will replace the normal ones in IContentService in v8 and this will be removed.
+    /// </summary>
+    public interface IContentServiceOperations
+    {
+        //TODO: Remove this class in v8
+
+        /// <summary>
+        /// Saves a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to save</param>
+        /// <param name="userId">Optional Id of the User saving the Content</param>
+        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
+        Attempt<OperationStatus> Save(IContent content, int userId = 0, bool raiseEvents = true);
+
+        /// <summary>
+        /// Saves a collection of <see cref="IContent"/> objects.
+        /// </summary>        
+        /// <param name="contents">Collection of <see cref="IContent"/> to save</param>
+        /// <param name="userId">Optional Id of the User saving the Content</param>
+        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>        
+        Attempt<OperationStatus> Save(IEnumerable<IContent> contents, int userId = 0, bool raiseEvents = true);
+
+        /// <summary>
+        /// Permanently deletes an <see cref="IContent"/> object.
+        /// </summary>
+        /// <remarks>
+        /// This method will also delete associated media files, child content and possibly associated domains.
+        /// </remarks>
+        /// <remarks>Please note that this method will completely remove the Content from the database</remarks>
+        /// <param name="content">The <see cref="IContent"/> to delete</param>
+        /// <param name="userId">Optional Id of the User deleting the Content</param>
+        Attempt<OperationStatus> Delete(IContent content, int userId = 0);
+
+        /// <summary>
+        /// Publishes a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to publish</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <returns>The published status attempt</returns>
+        Attempt<PublishStatus> Publish(IContent content, int userId = 0);
+
+        /// <summary>
+        /// Publishes a <see cref="IContent"/> object and all its children
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to publish along with its children</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <param name="includeUnpublished"></param>
+        /// <returns>The list of statuses for all published items</returns>
+        IEnumerable<Attempt<PublishStatus>> PublishWithChildren(IContent content, int userId = 0, bool includeUnpublished = false);
+
+        /// <summary>
+        /// Saves and Publishes a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to save and publish</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise save events.</param>
+        /// <returns>True if publishing succeeded, otherwise False</returns>
+        Attempt<PublishStatus> SaveAndPublish(IContent content, int userId = 0, bool raiseEvents = true);
+
+        /// <summary>
+        /// Deletes an <see cref="IContent"/> object by moving it to the Recycle Bin
+        /// </summary>
+        /// <remarks>Move an item to the Recycle Bin will result in the item being unpublished</remarks>
+        /// <param name="content">The <see cref="IContent"/> to delete</param>
+        /// <param name="userId">Optional Id of the User deleting the Content</param>
+        Attempt<OperationStatus> MoveToRecycleBin(IContent content, int userId = 0);
+
+        /// <summary>
+        /// UnPublishes a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to publish</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <returns>True if unpublishing succeeded, otherwise False</returns>
+        Attempt<UnPublishStatus> UnPublish(IContent content, int userId = 0);
+    }
+
+    /// <summary>
     /// Defines the ContentService, which is an easy access to operations involving <see cref="IContent"/>
     /// </summary>
     public interface IContentService : IService
@@ -188,31 +266,13 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IContent> GetContentInRecycleBin();
-
+        
         /// <summary>
         /// Saves a single <see cref="IContent"/> object
         /// </summary>
         /// <param name="content">The <see cref="IContent"/> to save</param>
         /// <param name="userId">Optional Id of the User saving the Content</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        Attempt<OperationStatus> SaveWithStatus(IContent content, int userId = 0, bool raiseEvents = true);
-
-        /// <summary>
-        /// Saves a collection of <see cref="IContent"/> objects.
-        /// </summary>        
-        /// <param name="contents">Collection of <see cref="IContent"/> to save</param>
-        /// <param name="userId">Optional Id of the User saving the Content</param>
-        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>        
-        Attempt<OperationStatus> SaveWithStatus(IEnumerable<IContent> contents, int userId = 0, bool raiseEvents = true);
-
-        /// <summary>
-        /// Saves a single <see cref="IContent"/> object
-        /// </summary>
-        /// <param name="content">The <see cref="IContent"/> to save</param>
-        /// <param name="userId">Optional Id of the User saving the Content</param>
-        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use SaveWithStatus instead, that method will provide more detailed information on the outcome")]
         void Save(IContent content, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
@@ -221,8 +281,6 @@ namespace Umbraco.Core.Services
         /// <param name="contents">Collection of <see cref="IContent"/> to save</param>
         /// <param name="userId">Optional Id of the User saving the Content</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use SaveWithStatus instead, that method will provide more detailed information on the outcome")]
         void Save(IEnumerable<IContent> contents, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
@@ -407,7 +465,7 @@ namespace Umbraco.Core.Services
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise save events.</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
         Attempt<PublishStatus> SaveAndPublishWithStatus(IContent content, int userId = 0, bool raiseEvents = true);
-
+        
         /// <summary>
         /// Permanently deletes an <see cref="IContent"/> object.
         /// </summary>
@@ -416,7 +474,7 @@ namespace Umbraco.Core.Services
         /// </remarks>
         /// <remarks>Please note that this method will completely remove the Content from the database</remarks>
         /// <param name="content">The <see cref="IContent"/> to delete</param>
-        /// <param name="userId">Optional Id of the User deleting the Content</param>
+        /// <param name="userId">Optional Id of the User deleting the Content</param>        
         void Delete(IContent content, int userId = 0);
 
         /// <summary>
