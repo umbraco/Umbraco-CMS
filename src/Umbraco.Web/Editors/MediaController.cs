@@ -26,6 +26,7 @@ using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using System.Linq;
+using System.Runtime.Serialization;
 using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
 using umbraco;
@@ -457,20 +458,33 @@ namespace Umbraco.Web.Editors
                 var origin = Request.GetQueryNameValuePairs().First(x => x.Key == "origin");
                 if (origin.Value == "blueimp")
                 {
+                    var blueImpResult = new BlueImpPostedFileResult()
+                    {
+                        UploadedFiles = tempFiles.UploadedFiles
+                    };
+                    blueImpResult.AddRange(tempFiles.UploadedFiles.Select(x => new
+                    {
+                        name = x.FileName,
+                        size = "",
+                        url = "",
+                        thumbnailUrl = ""
+                    }));
+
                     return Request.CreateResponse(HttpStatusCode.OK,
-                        tempFiles.UploadedFiles.Select(x => new
-                        {
-                            name = x.FileName,
-                            size = "",
-                            url = "",
-                            thumbnailUrl = ""
-                        }), 
+                        blueImpResult, 
                         //Don't output the angular xsrf stuff, blue imp doesn't like that
                         new JsonMediaTypeFormatter());
                 }
             }
 
             return Request.CreateResponse(HttpStatusCode.OK, tempFiles);
+        }
+
+        [DataContract]
+        private class BlueImpPostedFileResult : List<dynamic>, IHaveUploadedFiles
+        {
+            [IgnoreDataMember]
+            public List<ContentItemFile> UploadedFiles { get; set; }
         }
 
         /// <summary>
