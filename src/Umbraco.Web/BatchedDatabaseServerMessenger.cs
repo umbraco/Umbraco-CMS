@@ -8,6 +8,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Routing;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Web
 {
