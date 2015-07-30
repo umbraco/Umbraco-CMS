@@ -1,5 +1,14 @@
+/**
+* @ngdoc directive
+* @name umbraco.directives.directive:umbHeader 
+* @restrict E
+* @function
+* @deprecated since version 7.3 - use umbTabHeader instead
+* @description 
+* The header on an editor that contains tabs using bootstrap tabs - THIS IS OBSOLETE, use umbTabHeader instead
+**/
 angular.module("umbraco.directives")
-.directive('umbHeader', function($parse, $timeout){
+.directive('umbHeader', function ($parse, $timeout) {
     return {
         restrict: 'E',
         replace: true,

@@ -74,23 +74,25 @@ angular.module("umbraco.directives")
                     }
                 }));
 
-                $(window).bind("resize", function () {
+                var resizeCallback = function() {
+                    _.debounce(function() {
+                        //set the global app state
+                        appState.setGlobalState("isTablet", ($(window).width() <= minScreenSize));
+                        setTreeMode();
+                    }, 100);
+                };
 
-                    //set the global app state
-                    appState.setGlobalState("isTablet", ($(window).width() <= minScreenSize));
-
-                    setTreeMode();
-                });
+                $(window).bind("resize", resizeCallback);
 
                 //ensure to unregister from all events and kill jquery plugins
                 scope.$on('$destroy', function () {
+                    $(window).unbind("resize", resizeCallback);
                     for (var e in evts) {
                         eventsService.unsubscribe(evts[e]);                        
                     }
                     var navInnerContainer = element.find(".navigation-inner-container");
                     navInnerContainer.resizable("destroy");
                 });
-
 
                 //init
                 //set the global app state

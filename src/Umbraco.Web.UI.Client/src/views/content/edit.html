@@ -4,8 +4,8 @@
     ng-submit="save()"
     val-form-manager>
     
-    <umb-panel ng-class="{'editor-breadcrumb': ancestors && ancestors.length > 0}">
-        <umb-header tabs="content.tabs">
+    <umb-panel umb-tabs="content.tabs" ng-class="{'editor-breadcrumb': ancestors && ancestors.length > 0}">
+        <umb-tab-header>
 
             <div class="span7">
                 <umb-content-name placeholder="@placeholders_entername"
@@ -25,7 +25,7 @@
 
                 </div>
             </div>
-        </umb-header>
+        </umb-tab-header>
 
         <umb-tab-view>
             <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" ng-repeat="tab in content.tabs">
@@ -34,9 +34,8 @@
                                   ng-repeat="property in tab.properties">
                         <umb-editor model="property"></umb-editor>
                     </umb-property>
-
-
-                    <div class="umb-tab-buttons" detect-fold ng-class="{'umb-dimmed': busy}">
+                    
+                    <umb-editor-buttons>
 
                         <div class="btn-group" ng-show="listViewPath">
                             <a class="btn" href="#{{listViewPath}}">
@@ -72,11 +71,12 @@
                             </ul>
 
                         </div>
-                    </div>
+
+                    </umb-editor-buttons>
+                    
                 </div>
             </umb-tab>
         </umb-tab-view>
-
 
         <ul class="umb-panel-footer-nav nav nav-pills" ng-if="ancestors && ancestors.length > 0">
             <li ng-repeat="ancestor in ancestors">

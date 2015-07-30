@@ -12,7 +12,10 @@ angular.module("umbraco.directives.html")
 				var state = false,
 					parent = $(".umb-panel-body"),
 					winHeight = $(window).height(),
-					calculate = _.throttle(function(){
+					calculate = _.debounce(function () {
+
+					    console.log("calculating...");
+
 						if(el && el.is(":visible") && !el.hasClass("umb-bottom-bar")){
 							//var parent = el.parent();
 							var hasOverflow = parent.innerHeight() < parent[0].scrollHeight;
@@ -22,7 +25,7 @@ angular.module("umbraco.directives.html")
 							}
 						}
 						return state;
-					}, 1000);
+					}, 500);
 
 				scope.$watch(calculate, function(newVal, oldVal) {
 					if(newVal !== oldVal){
@@ -34,12 +37,19 @@ angular.module("umbraco.directives.html")
 					}
 				});
 
-				$(window).bind("resize", function () {
-				   winHeight = $(window).height();
-				   el.removeClass("umb-bottom-bar");
-				   state = false;
-				   calculate();
-				});
+			    var resizeCallback = function() {
+			        winHeight = $(window).height();
+			        el.removeClass("umb-bottom-bar");
+			        state = false;
+			        calculate();
+			    };
+                
+                $(window).bind("resize", resizeCallback);
+
+                //ensure to unbind!
+                scope.$on('$destroy', function () {
+                    $(window).unbind("resize", resizeCallback);
+                });
 
 				$('a[data-toggle="tab"]').on('shown', function (e) {
 					calculate();
