@@ -78,7 +78,7 @@ namespace Umbraco.Core.Persistence
             catch (DbException)
             {
                 // Don't swallow this error, the exception is super handy for knowing "why" its not available
-                LogHelper.Info<DatabaseContext>("Configured database is reporting as not being available!", DbException );
+                LogHelper.WarnWithException<DbConnectionExtensions>("Configured database is reporting as not being available!", DbException );
                 return false;
             }
 
