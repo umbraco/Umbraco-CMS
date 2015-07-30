@@ -16,7 +16,8 @@ angular.module("umbraco.directives")
 			templateUrl: 'views/components/umb-locked-field.html',
 			scope: {
 				model: '=ngModel',
-				locked: "=?"
+				locked: "=?",
+				placeholderText: "=?"
 			},
 
 			link: function(scope, element, attrs, ngModel) {
@@ -24,6 +25,11 @@ angular.module("umbraco.directives")
 				// if locked state is not defined as an attr set default state
 				if(scope.locked === undefined || scope.locked === null) {
 					scope.locked = true;
+				}
+
+				// if locked state is not defined as an attr set default state
+				if(scope.placeholderText === undefined || scope.placeholderText === null) {
+					scope.placeholderText = "Enter value...";
 				}
 
 				scope.toggleLock = function(){

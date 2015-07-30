@@ -16,28 +16,9 @@ angular.module("umbraco.directives")
                 var generateAliasTimeout = "";
 
                 scope.locked = true;
+                scope.placeholderText = "Enter alias...";
 
                 function generateAlias(value) {
-
-                    var str = value;
-
-                    // replace special characters with spaces
-                    str = str.replace(/[^a-zA-Z0-9]/g, ' ');
-
-                    // camel case string
-                    str = str.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, function(match, index) {
-                      if (+match === 0) { return "";}
-                      return index === 0 ? match.toLowerCase() : match.toUpperCase();
-                    });
-
-                    scope.alias = str;
-
-                    // get safe alias from server
-                    validateAlias(scope.aliasFrom, scope.alias);
-
-                }
-
-                function validateAlias(value) {
 
                   if (generateAliasTimeout) {
                     $timeout.cancel(generateAliasTimeout);
@@ -45,12 +26,17 @@ angular.module("umbraco.directives")
 
                   if( value !== undefined && value !== "") {
 
+                    scope.alias = "Generating Alias...";
+
                     generateAliasTimeout = $timeout(function () {
-                      contentTypeResource.getSafeAlias(value, true).then(function(safeAlias){
+                      contentTypeResource.getSafeAlias(value, false).then(function(safeAlias){
                         scope.alias = safeAlias.alias;
                       });
-                    }, 1000);
+                    }, 500);
 
+                  } else {
+                    scope.alias = "";
+                    scope.placeholderText = "Enter alias...";
                   }
 
                 }
@@ -75,9 +61,6 @@ angular.module("umbraco.directives")
                     });
                   }
 
-                  if(scope.locked === false && newValue !== undefined && newValue !== null) {
-                    validateAlias(newValue);
-                  }
                 });
 
             }

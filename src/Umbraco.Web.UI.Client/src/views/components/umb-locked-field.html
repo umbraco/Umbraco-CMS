@@ -3,9 +3,12 @@
 	<a href="" ng-click="toggleLock()">
 		<i class="icon" ng-class="{'icon-lock': locked, 'icon-unlocked': !locked}"></i>
 	</a>
-			
-	<span ng-if="locked">{{model}}</span>
 
-	<input type="text" ng-if="!locked" ng-model="$parent.model" placeholder="Enter value..." umb-auto-resize />
+	<span ng-if="locked">
+		<span ng-if="model">{{model}}</span>
+		<span ng-if="!model">{{ placeholderText }}</span>
+	</span>
+
+	<input type="text" ng-if="!locked" ng-model="$parent.model" placeholder="{{ $parent.placeholderText }}" umb-auto-resize />
 
 </div>
