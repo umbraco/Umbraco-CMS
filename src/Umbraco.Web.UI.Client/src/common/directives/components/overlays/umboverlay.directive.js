@@ -4,7 +4,7 @@
 * @restrict E
 **/
 angular.module("umbraco.directives")
-    .directive('umbOverlay', function ($timeout) {
+    .directive('umbOverlay', function ($timeout, formHelper) {
         return {
 
             scope: {
@@ -108,6 +108,18 @@ angular.module("umbraco.directives")
                         setTargetPosition();
                     }
                 });
+
+                scope.submitForm = function(model) {
+
+                  if (formHelper.submitForm({ scope: scope })) {
+
+                      formHelper.resetForm({ scope: scope });
+
+                      scope.model.submit(model);
+
+                  }
+
+                };
 
                 scope.closeOverLay = function(){
                     if(scope.model.close){

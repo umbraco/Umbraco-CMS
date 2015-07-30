@@ -1,12 +1,16 @@
 <div class="content-type-editor-dialog edit-property-settings" ng-controller="Umbraco.Editors.DocumentType.EditPropertySettingsController">
 
-    <form>
-
         <div class="umb-control-group clearfix">
 
             <input class="editor-label"
-                   ng-model="model.property.label"
-                   placeholder="Enter a name..." umb-auto-focus />
+                  name="propertyLabel"
+                  ng-model="model.property.label"
+                  placeholder="Enter a name..."
+                  umb-auto-focus
+                  required
+                  />
+
+            <span class="help-inline" val-msg-for="propertyLabel" val-toggle-msg="required"><localize key="required" /></span>
 
             <umb-generate-alias enable-lock="true" alias-from="model.property.label" alias="model.property.alias"></umb-generate-alias>
 
@@ -53,7 +57,5 @@
             <textarea class="editor-validation-pattern" placeholder="Enter a regular expression" ng-model="model.property.validation.pattern" ng-if="propertySettings.showValidationPattern" umb-auto-resize></textarea>
 
         </div>
-
-    </form>
 
 </div>
