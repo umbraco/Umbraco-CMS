@@ -93,6 +93,11 @@ namespace umbraco.presentation.webservices
             throw new ArgumentException("User not logged in");
         }
 
+        public void UpdateSortOrder(int ParentId, string SortOrder)
+        {
+            UpdateSortOrder(ParentId.ToString(), SortOrder);
+        }
+
         [WebMethod]
         public void UpdateSortOrder(string ParentId, string SortOrder)
         {
