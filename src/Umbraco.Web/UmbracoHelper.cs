@@ -32,7 +32,7 @@ namespace Umbraco.Web
         private IUmbracoComponentRenderer _componentRenderer;        
         private PublishedContentQuery _query;
         private MembershipHelper _membershipHelper;
-        private ITagQuery _tag;
+        private TagQuery _tag;
         private IDataTypeService _dataTypeService;
         private UrlProvider _urlProvider;
         private ICultureDictionary _cultureDictionary;
@@ -40,8 +40,12 @@ namespace Umbraco.Web
         /// <summary>
         /// Lazy instantiates the tag context
         /// </summary>
-        public ITagQuery TagQuery
+        public TagQuery TagQuery
         {
+            //TODO: Unfortunately we cannot change this return value to be ITagQuery
+            // since it's a breaking change, need to fix it for v8
+            // http://issues.umbraco.org/issue/U4-6899
+
             get
             {
                 return _tag ??
@@ -159,7 +163,7 @@ namespace Umbraco.Web
             if (membershipHelper == null) throw new ArgumentNullException("membershipHelper");
 
             _umbracoContext = umbracoContext;
-            _tag = tagQuery;
+            _tag = new TagQuery(tagQuery);
             _dataTypeService = dataTypeService;
             _urlProvider = urlProvider;
             _cultureDictionary = cultureDictionary;
