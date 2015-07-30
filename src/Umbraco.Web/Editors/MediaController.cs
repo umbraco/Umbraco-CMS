@@ -34,6 +34,8 @@ using umbraco.BusinessLogic.Actions;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence.FaultHandling;
+using Umbraco.Web.UI;
+using Notification = Umbraco.Web.Models.ContentEditing.Notification;
 
 namespace Umbraco.Web.Editors
 {
@@ -397,9 +399,7 @@ namespace Umbraco.Web.Editors
             int parentId;
             if (int.TryParse(result.FormData["currentFolder"], out parentId) == false)
             {
-                var response = Request.CreateResponse(HttpStatusCode.BadRequest);
-                response.ReasonPhrase = "The request was not formatted correctly, the currentFolder is not an integer";
-                throw new HttpResponseException(response);
+                return Request.CreateValidationErrorResponse("The request was not formatted correctly, the currentFolder is not an integer");
             }
 
             //ensure the user has access to this folder by parent id!
@@ -408,7 +408,12 @@ namespace Umbraco.Web.Editors
                Security.CurrentUser,
                Services.MediaService, parentId) == false)
             {
-                return Request.CreateResponse(HttpStatusCode.Unauthorized);
+                return Request.CreateResponse(
+                    HttpStatusCode.Unauthorized,
+                    new SimpleNotificationModel(new Notification(
+                        Services.TextService.Localize("speechBubbles/operationFailedHeader"),
+                        Services.TextService.Localize("speechBubbles/invalidUserPermissionsText"),
+                        SpeechBubbleIcon.Warning)));
             }
 
             var tempFiles = new PostedFiles();
@@ -419,7 +424,7 @@ namespace Umbraco.Web.Editors
                 var fileName = file.Headers.ContentDisposition.FileName.Trim(new[] { '\"' });
                 var ext = fileName.Substring(fileName.LastIndexOf('.')+1).ToLower();
 
-                if (!UmbracoConfig.For.UmbracoSettings().Content.DisallowedUploadFiles.Contains(ext))
+                if (UmbracoConfig.For.UmbracoSettings().Content.DisallowedUploadFiles.Contains(ext) == false)
                 {
                     var mediaType = Constants.Conventions.MediaTypes.File;
 
@@ -437,19 +442,30 @@ namespace Umbraco.Web.Editors
                         f.SetValue(Constants.Conventions.Media.File, fileName, fs);
                     }
 
-                    mediaService.Save(f, Security.CurrentUser.Id);
+                    var saveResult = mediaService.WithResult().Save(f, Security.CurrentUser.Id);
+                    if (saveResult == false)
+                    {
+                        AddCancelMessage(tempFiles,
+                            message: Services.TextService.Localize("speechBubbles/operationCancelledText") + " -- " + fileName,
+                            localizeMessage: false);
+                    }
+                    else
+                    {
+                        tempFiles.UploadedFiles.Add(new ContentItemFile
+                        {
+                            FileName = fileName,
+                            PropertyAlias = Constants.Conventions.Media.File,
+                            TempFilePath = file.LocalFileName
+                        });
+                    }
                 }
                 else
                 {
-                    LogHelper.Warn<MediaController>("Cannot upload file " + file + ", it is not an approved file type");
+                    tempFiles.Notifications.Add(new Notification(
+                        Services.TextService.Localize("speechBubbles/operationFailedHeader"),
+                        "Cannot upload file " + file + ", it is not an approved file type",
+                        SpeechBubbleIcon.Warning));
                 }
-
-                tempFiles.UploadedFiles.Add(new ContentItemFile
-                {
-                    FileName = fileName,
-                    PropertyAlias = Constants.Conventions.Media.File,
-                    TempFilePath = file.LocalFileName
-                });
             }
 
             //Different response if this is a 'blueimp' request
@@ -458,20 +474,8 @@ namespace Umbraco.Web.Editors
                 var origin = Request.GetQueryNameValuePairs().First(x => x.Key == "origin");
                 if (origin.Value == "blueimp")
                 {
-                    var blueImpResult = new BlueImpPostedFileResult()
-                    {
-                        UploadedFiles = tempFiles.UploadedFiles
-                    };
-                    blueImpResult.AddRange(tempFiles.UploadedFiles.Select(x => new
-                    {
-                        name = x.FileName,
-                        size = "",
-                        url = "",
-                        thumbnailUrl = ""
-                    }));
-
                     return Request.CreateResponse(HttpStatusCode.OK,
-                        blueImpResult, 
+                        tempFiles, 
                         //Don't output the angular xsrf stuff, blue imp doesn't like that
                         new JsonMediaTypeFormatter());
                 }
@@ -480,24 +484,22 @@ namespace Umbraco.Web.Editors
             return Request.CreateResponse(HttpStatusCode.OK, tempFiles);
         }
 
-        [DataContract]
-        private class BlueImpPostedFileResult : List<dynamic>, IHaveUploadedFiles
-        {
-            [IgnoreDataMember]
-            public List<ContentItemFile> UploadedFiles { get; set; }
-        }
-
         /// <summary>
         /// This is used for the response of PostAddFile so that we can analyze the response in a filter and remove the 
         /// temporary files that were created.
         /// </summary>
-        private class PostedFiles : IHaveUploadedFiles
+        [DataContract]
+        private class PostedFiles : IHaveUploadedFiles, INotificationModel
         {
             public PostedFiles()
             {
                 UploadedFiles = new List<ContentItemFile>();
+                Notifications = new List<Notification>();
             }
             public List<ContentItemFile> UploadedFiles { get; private set; }
+
+            [DataMember(Name = "notifications")]
+            public List<Notification> Notifications { get; private set; }
         }
 
         /// <summary>
