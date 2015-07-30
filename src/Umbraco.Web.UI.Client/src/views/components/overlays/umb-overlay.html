@@ -1,21 +1,25 @@
-<form ng-submit="submitForm(model)" name="overlayForm" val-form-manager novalidate>
-	<div class="umb-overlay {{overlayCssClass}}" on-outside-click="closeOverLay()">
+<div class="umb-overlay {{overlayCssClass}}" on-outside-click="closeOverLay()">
+  <form name="overlayForm" ng-submit="submitForm(model)" novalidate val-form-manager>
 
-		<div class="umb-overlay-header" ng-if="model.title">
-		    <h4>{{model.title}} <a href ng-click="closeOverLay()" hotkey="esc" class="pull-right"> <i class="icon-delete"></i> </a> </h4>
-		</div>
+    <div class="umb-overlay-header" ng-if="model.title">
+      <h4>{{model.title}}
+        <a class="pull-right" hotkey="esc" href ng-click="closeOverLay()">
+          <i class="icon-delete"></i>
+        </a>
+      </h4>
+    </div>
 
-		<div class="umb-overlay-container">
-		    <div ng-if="view" ng-include="view"></div>
-		    <div ng-if="!view" ng-transclude></div>
-	    </div>
+    <div class="umb-overlay-container">
+      <div ng-if="view" ng-include="view"></div>
+      <div ng-if="!view" ng-transclude></div>
+    </div>
 
-	    <div class="umb-overlay-drawer" ng-if="model.close || model.submit">
-			<div class="umb-overlay-drawer-content">
-	    		<button ng-if="model.close" ng-click="model.close(model)" hotkey="esc" class="btn btn-link">Cancel</button>
-	    		<button type="submit" ng-if="model.submit" hotkey="enter" class="btn btn-success">Submit</button>
-				<umb-button-group model="model.dataType" actions="model.multiActions" ng-if="model.multiActions"></umb-button-group>
-			</div>
-	    </div>
-	</div>
-</form>
+    <div class="umb-overlay-drawer" ng-if="model.close || model.submit">
+      <div class="umb-overlay-drawer-content">
+        <button class="btn btn-link" hotkey="esc" ng-click="model.close(model)" ng-if="model.close">Cancel</button>
+        <button class="btn btn-success" hotkey="enter" ng-if="model.submit" type="submit">Submit</button>
+        <umb-button-group actions="model.multiActions" model="model.dataType" ng-if="model.multiActions"></umb-button-group>
+      </div>
+    </div>
+  </form>
+</div>
