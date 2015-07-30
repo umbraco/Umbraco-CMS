@@ -9,7 +9,7 @@
 (function() {
 	"use strict";
 
-	function DocumentTypeEditController($scope, $routeParams, contentTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService) {
+	function DocumentTypeEditController($scope, $routeParams, contentTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter) {
 
 		var vm = this;
 
@@ -182,6 +182,11 @@
 				contentType.allowedTemplates = contentTypeHelper.insertTemplateHolder(contentType, contentType.allowedTemplates);
 
 			}
+
+			// sort properties after sort order
+			angular.forEach(contentType.groups, function(group){
+				group.properties = $filter('orderBy')(group.properties, 'sortOrder');
+			});
 
 			//set a shared state
 			editorState.set(contentType);

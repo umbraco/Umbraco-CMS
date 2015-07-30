@@ -135,8 +135,21 @@
           items: ".umb-group-builder__property-sortable",
           start: function(e, ui) {
             ui.placeholder.height(ui.item.height());
+          },
+          stop: function(e, ui) {
+            updatePropertiesSortOrder();
           }
         };
+
+      }
+
+      function updatePropertiesSortOrder() {
+
+        angular.forEach(scope.model.groups, function(group){
+          if( group.tabState !== "init" ) {
+            group.properties = contentTypeHelper.updatePropertiesSortOrder(group.properties);
+          }
+        });
 
       }
 
@@ -257,6 +270,26 @@
       }
 
       /* ---------- PROPERTIES ---------- */
+
+      scope.addProperty = function(property, properties) {
+
+        // set property sort order
+        var index = properties.indexOf(property);
+        var prevProperty = properties[index - 1];
+
+        if( index > 0) {
+          // set index to 1 higher than the previous property sort order
+          property.sortOrder = prevProperty.sortOrder + 1;
+
+        } else {
+          // first property - sort order will be 0
+          property.sortOrder = 0;
+        }
+
+        // open property settings dialog
+        scope.editPropertyTypeSettings(property);
+
+      };
 
       scope.editPropertyTypeSettings = function(property) {
 

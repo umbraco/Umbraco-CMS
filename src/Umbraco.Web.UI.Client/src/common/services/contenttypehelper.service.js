@@ -31,6 +31,9 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter) {
 
                 angular.forEach(composition.groups, function(compositionGroup){
 
+                    // order composition groups based on sort order
+                    compositionGroup.properties = $filter('orderBy')(compositionGroup.properties, 'sortOrder');
+
                     // get data type details
                     angular.forEach(compositionGroup.properties, function(property){
                       dataTypeResource.getById(property.dataTypeId)
@@ -64,6 +67,9 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter) {
 
                             // add properties to the top of the array
                             contentTypeGroup.properties = compositionGroup.properties.concat(contentTypeGroup.properties);
+
+                            // update sort order on all properties in merged group
+                            contentTypeGroup.properties = contentTypeHelperService.updatePropertiesSortOrder(contentTypeGroup.properties);
 
                             // make parentTabContentTypeNames to an array so we can push values
                             if(contentTypeGroup.parentTabContentTypeNames === null || contentTypeGroup.parentTabContentTypeNames === undefined) {
@@ -182,9 +188,27 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter) {
                   groups.push(contentTypeGroup);
                 }
 
+                // update sort order on properties
+                contentTypeGroup.properties = contentTypeHelperService.updatePropertiesSortOrder(contentTypeGroup.properties);
+
             });
 
             contentType.groups = groups;
+
+        },
+
+        updatePropertiesSortOrder: function (properties) {
+
+          var sortOrder = 0;
+
+          angular.forEach(properties, function(property) {
+            if( !property.inherited && property.propertyState !== "init") {
+              property.sortOrder = sortOrder;
+            }
+            sortOrder++;
+          });
+
+          return properties;
 
         },
 
