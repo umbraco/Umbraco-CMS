@@ -167,7 +167,12 @@
         scope.dialogModel.view = "views/documentType/dialogs/compositions/compositions.html";
         scope.showDialog = true;
 
-        scope.dialogModel.close = function() {
+        scope.dialogModel.submit = function(model) {
+          scope.showDialog = false;
+          scope.dialogModel = null;
+        };
+
+        scope.dialogModel.close = function(model) {
           scope.showDialog = false;
           scope.dialogModel = null;
         };
