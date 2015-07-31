@@ -8,7 +8,7 @@
 **/
 angular.module("umbraco.directives").directive('umbTabHeader', function($parse, $timeout) {
     return {
-        require: "^umbTabs",
+        require: "?^umbTabs",
         restrict: 'E',
         replace: true,
         transclude: 'true',
@@ -19,23 +19,24 @@ angular.module("umbraco.directives").directive('umbTabHeader', function($parse, 
             scope.activeTabId = null;
             scope.tabs = [];
 
-            tabsCtrl.onTabCollectionChanged(function (tabs) {
-                scope.tabs = tabs;
-                scope.showTabs = scope.tabs.length > 0;
-            });
+            if (tabsCtrl) {
+                tabsCtrl.onTabCollectionChanged(function (tabs) {
+                    scope.tabs = tabs;
+                    scope.showTabs = scope.tabs.length > 0;
+                });
 
-            tabsCtrl.onActiveTabChanged(function (tabId) {
-                scope.activeTabId = tabId;
-            });
-            
-            scope.changeTab = function(tabId) {
-                tabsCtrl.setActiveTab(tabId);
-            };
+                tabsCtrl.onActiveTabChanged(function (tabId) {
+                    scope.activeTabId = tabId;
+                });
 
-            $timeout(function() {                
+                scope.changeTab = function (tabId) {
+                    tabsCtrl.setActiveTab(tabId);
+                };
+
                 //TODO: We'll need to destroy this I'm assuming!
-                $('.nav-pills, .nav-tabs').tabdrop();
-            }, 500);
+                iElement.find('.nav-pills, .nav-tabs').tabdrop();
+            }
+           
         }
     };
 });

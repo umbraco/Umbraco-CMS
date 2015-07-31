@@ -3,8 +3,8 @@
       ng-show="loaded" 
       ng-submit="save()"
       val-form-manager>
-    <umb-panel>   
-        <umb-header tabs="content.tabs">
+    <umb-panel umb-tabs="content.tabs">
+        <umb-tab-header>
             
             <div class="span7" ng-if="content.membershipScenario == 0">
                <umb-content-name
@@ -28,7 +28,7 @@
 
                 </div>
             </div>
-        </umb-header>
+        </umb-tab-header>
 
         <umb-tab-view>
             <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" ng-repeat="tab in content.tabs">

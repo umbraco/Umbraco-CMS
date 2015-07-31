@@ -47,7 +47,7 @@ angular.module("umbraco.directives")
                 $scope.$watch(function() {
                     return tabsValueGet($scope);
                 }, function (newValue, oldValue) {
-                    if (newValue !== oldValue || (angular.isArray(newValue) && angular.isArray(oldValue) && newValue.length !== oldValue.length)) {
+                    if ((angular.isArray(newValue) && angular.isArray(oldValue) && newValue.length !== oldValue.length|| (newValue !== undefined && oldValue === undefined))) {
 
                         tabs = []; //reset first
                         for (var val in newValue) {

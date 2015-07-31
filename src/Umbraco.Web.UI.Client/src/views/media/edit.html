@@ -3,8 +3,8 @@
       ng-show="loaded" 
       ng-submit="save()"
       val-form-manager>
-    <umb-panel ng-class="{'editor-breadcrumb': ancestors && ancestors.length > 0}">
-        <umb-header tabs="content.tabs">
+    <umb-panel umb-tabs="content.tabs" ng-class="{'editor-breadcrumb': ancestors && ancestors.length > 0}">
+        <umb-tab-header>
 
             <div class="span7">
                 <umb-content-name placeholder="@placeholders_entername"
@@ -23,7 +23,7 @@
                     </umb-options-menu>
                 </div>
             </div>
-        </umb-header>
+        </umb-tab-header>
 
         <umb-tab-view>
             <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" ng-repeat="tab in content.tabs">

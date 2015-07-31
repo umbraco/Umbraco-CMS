@@ -50,7 +50,8 @@ angular.module("umbraco.directives")
 
                 });
 
-                $('.nav-pills, .nav-tabs').tabdrop();
+                //TODO: We'll need to destroy this I'm assuming!
+                iElement.find('.nav-pills, .nav-tabs').tabdrop();
             }
 
             scope.showTabs = iAttrs.tabs ? true : false;
