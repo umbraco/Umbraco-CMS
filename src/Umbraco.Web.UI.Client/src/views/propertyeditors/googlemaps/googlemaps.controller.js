@@ -58,8 +58,14 @@ angular.module("umbraco")
                 });
             });
 
-            $('a[data-toggle="tab"]').on('shown', function (e) {
+            var tabShown = function(e) {
                 google.maps.event.trigger(map, 'resize');
+            };
+
+            $('a[data-toggle="tab"]').on('shown', tabShown);
+
+            $scope.$on('$destroy', function () {
+                $('a[data-toggle="tab"]').off('shown', tabShown);
             });
         }
 

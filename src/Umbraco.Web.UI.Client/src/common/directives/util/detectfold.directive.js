@@ -6,7 +6,8 @@
 **/
 angular.module("umbraco.directives.html")
 	.directive('detectFold', function ($timeout, $log, windowResizeListener) {
-		return {
+	    return {
+	        require: "^?umbTabs",
 			restrict: 'A',
 			link: function (scope, el, attrs) {
 
@@ -33,15 +34,14 @@ angular.module("umbraco.directives.html")
 
 			    windowResizeListener.register(resizeCallback);
 
-			    //TODO: Need to listen for tabs
-
-				$('a[data-toggle="tab"]').on('shown', function (e) {
-					calculate();
-				});
+			    
+                //Required for backwards compat for bootstrap tabs
+			    $('a[data-toggle="tab"]').on('shown', calculate);
 
                 //ensure to unregister
 			    scope.$on('$destroy', function() {
 			        windowResizeListener.unregister(resizeCallback);
+			        $('a[data-toggle="tab"]').off('shown', calculate);
 			    });
 			}
 		};

@@ -27,7 +27,7 @@ angular.module("umbraco.directives")
             $('a[data-toggle="tab"]').on('shown', update);
             
             scope.$on('$destroy', function() {
-                $('a[data-toggle="tab"]').unbind("shown", update);
+                $('a[data-toggle="tab"]').off("shown", update);
             });
     };
 });
