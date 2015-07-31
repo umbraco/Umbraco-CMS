@@ -1,59 +1,48 @@
 /**
 * @ngdoc directive
 * @name umbraco.directives.directive:umbPanel
-* @restrict E
+* @description This is used for the editor buttons to ensure they are displayed correctly if the horizontal overflow of the editor
+ * exceeds the height of the window
 **/
 angular.module("umbraco.directives.html")
-	.directive('detectFold', function($timeout, $log){
+	.directive('detectFold', function ($timeout, $log, windowResizeListener) {
 		return {
 			restrict: 'A',
 			link: function (scope, el, attrs) {
-				
-				var state = false,
-					parent = $(".umb-panel-body"),
-					winHeight = $(window).height(),
-					calculate = _.debounce(function () {
 
-					    console.log("calculating...");
+			    var state = false;
+			    var parent = $(".umb-panel-body");
+			    var winHeight = $(window).height();
+			    var calculate = function() {
+			        if (el && el.is(":visible") && !el.hasClass("umb-bottom-bar")) {
+			            //var parent = el.parent();
+			            var hasOverflow = parent.innerHeight() < parent[0].scrollHeight;
+			            //var belowFold = (el.offset().top + el.height()) > winHeight;
+			            if (hasOverflow) {
+			                el.addClass("umb-bottom-bar");
+			            }
+			        }
+			    };
 
-						if(el && el.is(":visible") && !el.hasClass("umb-bottom-bar")){
-							//var parent = el.parent();
-							var hasOverflow = parent.innerHeight() < parent[0].scrollHeight;
-							//var belowFold = (el.offset().top + el.height()) > winHeight;
-							if(hasOverflow){
-								el.addClass("umb-bottom-bar");
-							}
-						}
-						return state;
-					}, 500);
-
-				scope.$watch(calculate, function(newVal, oldVal) {
-					if(newVal !== oldVal){
-						if(newVal){
-							el.addClass("umb-bottom-bar");
-						}else{
-							el.removeClass("umb-bottom-bar");
-						}	
-					}
-				});
-
-			    var resizeCallback = function() {
-			        winHeight = $(window).height();
+			    var resizeCallback = function(size) {
+			        winHeight = size.height;
 			        el.removeClass("umb-bottom-bar");
-			        state = false;
+			        //state = false;
 			        calculate();
 			    };
-                
-                $(window).bind("resize", resizeCallback);
 
-                //ensure to unbind!
-                scope.$on('$destroy', function () {
-                    $(window).unbind("resize", resizeCallback);
-                });
+			    windowResizeListener.register(resizeCallback);
+
+			    //TODO: Need to listen for tabs
 
 				$('a[data-toggle="tab"]').on('shown', function (e) {
 					calculate();
 				});
+
+                //ensure to unregister
+			    scope.$on('$destroy', function() {
+			        windowResizeListener.unregister(resizeCallback);
+			    });
 			}
 		};
 	});

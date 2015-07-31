@@ -7,7 +7,7 @@
  * Handles how the navigation responds to window resizing and controls how the draggable resize panel works
 **/
 angular.module("umbraco.directives")
-    .directive('navResize', function (appState, eventsService) {
+    .directive('navResize', function (appState, eventsService, windowResizeListener) {
         return {
             restrict: 'A',
             link: function (scope, element, attrs, ctrl) {
@@ -74,19 +74,17 @@ angular.module("umbraco.directives")
                     }
                 }));
 
-                var resizeCallback = function() {
-                    _.debounce(function() {
-                        //set the global app state
-                        appState.setGlobalState("isTablet", ($(window).width() <= minScreenSize));
-                        setTreeMode();
-                    }, 100);
+                var resizeCallback = function(size) {
+                    //set the global app state
+                    appState.setGlobalState("isTablet", (size.width <= minScreenSize));
+                    setTreeMode();
                 };
 
-                $(window).bind("resize", resizeCallback);
+                windowResizeListener.register(resizeCallback);
 
                 //ensure to unregister from all events and kill jquery plugins
                 scope.$on('$destroy', function () {
-                    $(window).unbind("resize", resizeCallback);
+                    windowResizeListener.unregister(resizeCallback);
                     for (var e in evts) {
                         eventsService.unsubscribe(evts[e]);                        
                     }
