@@ -6,24 +6,40 @@
  * @description
  * The controller for the content type editor property dialog
  */
-function EditDataTypeController($scope, dataTypeResource) {
+function EditDataTypeController($scope, dataTypeResource, dataTypeHelper) {
 
-    var dataTypeCopy = {};
+    var dataTypeNameCopy = "";
 
-    getDataType($scope.model.property.dataTypeId);
+    $scope.model.multiActions = [
+      {
+        key: "save",
+        label: "Save",
+        defaultAction: true,
+        action: function(model) {
+          saveDataType($scope.model.dataType, false);
+        }
+      },
+      {
+        key: "saveAsNew",
+        label: "Save as new",
+        action: function(model) {
+          saveDataType($scope.model.dataType, true);
+        }
+      }
+    ];
 
-    function getDataType(dataTypeId) {
-        dataTypeResource.getById(dataTypeId)
-            .then(function(dataType) {
-                dataTypeCopy = angular.copy(dataType);
-                $scope.model.dataType = dataType;
-            });
+    function activate() {
+      makeDataTypeNameCopy()
+    }
+
+    function makeDataTypeNameCopy() {
+      dataTypeNameCopy = angular.copy($scope.model.dataType.name);
     }
 
     $scope.dateTypeNameChange = function() {
 
       // change default button to save as new when data type name changes
-      if( $scope.model.dataType.name !== dataTypeCopy.name) {
+      if( $scope.model.dataType.name !== dataTypeNameCopy) {
         setDefaultMultiAction($scope.model.multiActions, "saveAsNew");
       } else {
         setDefaultMultiAction($scope.model.multiActions, "save");
@@ -42,6 +58,22 @@ function EditDataTypeController($scope, dataTypeResource) {
       });
 
     }
+
+    function saveDataType(dataType, isNew) {
+
+      var preValues = dataTypeHelper.createPreValueProps(dataType.preValues);
+
+      dataTypeResource.save(dataType, preValues, isNew).then(function(dataType) {
+
+        $scope.model.dataType = dataType;
+
+        $scope.model.submit($scope.model, isNew);
+
+      });
+
+    }
+
+    activate();
 
 }
 

@@ -149,10 +149,38 @@
 
     <umb-overlay
             ng-style="{'width': '500px'}"
-            ng-if="showDialog"
-            model="dialogModel"
+            ng-if="compositionsDialogModel.show"
+            model="compositionsDialogModel"
             animation="slide-in-right"
             position="right"
-            view="dialogModel.view">
+            view="compositionsDialogModel.view">
     </umb-overlay>
+
+    <umb-overlay
+            ng-style="{'width': '500px'}"
+            ng-if="propertySettingsDialogModel.show"
+            model="propertySettingsDialogModel"
+            animation="slide-in-right"
+            position="right"
+            view="propertySettingsDialogModel.view">
+    </umb-overlay>
+
+    <umb-overlay
+            ng-style="{'width': '500px'}"
+            ng-if="propertyEditorDialogModel.show"
+            model="propertyEditorDialogModel"
+            animation="slide-in-right"
+            position="right"
+            view="propertyEditorDialogModel.view">
+    </umb-overlay>
+
+    <umb-overlay
+            ng-style="{'width': '500px'}"
+            ng-if="dataTypeSettingsDialogModel.show"
+            model="dataTypeSettingsDialogModel"
+            animation="slide-in-right"
+            position="right"
+            view="dataTypeSettingsDialogModel.view">
+    </umb-overlay>
+
 </div>

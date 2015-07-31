@@ -160,35 +160,38 @@
       };
 
       scope.openCompositionsDialog = function() {
-        scope.dialogModel = {};
-        scope.dialogModel.title = "Compositions";
-        scope.dialogModel.availableCompositeContentTypes = scope.model.availableCompositeContentTypes;
-        scope.dialogModel.compositeContentTypes = scope.model.compositeContentTypes;
-        scope.dialogModel.view = "views/documentType/dialogs/compositions/compositions.html";
-        scope.showDialog = true;
+        scope.compositionsDialogModel = {};
+        scope.compositionsDialogModel.title = "Compositions";
+        scope.compositionsDialogModel.contentType = scope.model;
+        scope.compositionsDialogModel.availableCompositeContentTypes = scope.model.availableCompositeContentTypes;
+        scope.compositionsDialogModel.compositeContentTypes = scope.model.compositeContentTypes;
+        scope.compositionsDialogModel.view = "views/documentType/dialogs/compositions/compositions.html";
+        scope.compositionsDialogModel.show = true;
 
-        scope.dialogModel.submit = function(model) {
-          scope.showDialog = false;
-          scope.dialogModel = null;
+        scope.compositionsDialogModel.submit = function(model) {
+          // remove overlay
+          scope.compositionsDialogModel.show = false;
+          scope.compositionsDialogModel = null;
         };
 
-        scope.dialogModel.close = function(model) {
-          scope.showDialog = false;
-          scope.dialogModel = null;
+        scope.compositionsDialogModel.close = function(oldModel) {
+          // reset composition changes
+          scope.model.groups = oldModel.contentType.groups;
+          scope.model.compositeContentTypes = oldModel.contentType.compositeContentTypes;
+
+          // remove overlay
+          scope.compositionsDialogModel.show = false;
+          scope.compositionsDialogModel = null;
         };
 
-        scope.dialogModel.selectCompositeContentType = function(compositeContentType) {
+        scope.compositionsDialogModel.selectCompositeContentType = function(compositeContentType) {
 
           if (scope.model.compositeContentTypes.indexOf(compositeContentType.alias) === -1) {
-
             //merge composition with content type
             contentTypeHelper.mergeCompositeContentType(scope.model, compositeContentType);
-
           } else {
-
             // split composition from content type
             contentTypeHelper.splitCompositeContentType(scope.model, compositeContentType);
-
           }
 
         };
@@ -300,43 +303,65 @@
 
         if (!property.inherited) {
 
-          scope.dialogModel = {};
-          scope.dialogModel.title = "Edit property type settings";
-          scope.dialogModel.property = property;
-          scope.dialogModel.view = "views/documentType/dialogs/editPropertySettings/editPropertySettings.html";
-          scope.showDialog = true;
+          scope.propertySettingsDialogModel = {};
+          scope.propertySettingsDialogModel.title = "Edit property type settings";
+          scope.propertySettingsDialogModel.property = property;
+          scope.propertySettingsDialogModel.view = "views/documentType/dialogs/editPropertySettings/editPropertySettings.html";
+          scope.propertySettingsDialogModel.show = true;
+
+          // set state to active to access the preview
+          property.propertyState = "active";
 
           // set property states
           property.dialogIsOpen = true;
-          property.inherited = false;
-          property.propertyState = "active";
 
-          scope.dialogModel.changePropertyEditor = function(property) {
+          scope.propertySettingsDialogModel.changePropertyEditor = function(property) {
             scope.choosePropertyType(property);
           };
 
-          scope.dialogModel.editDataType = function(property) {
+          scope.propertySettingsDialogModel.editDataType = function(property) {
             scope.configDataType(property);
           };
 
-          scope.dialogModel.submit = function(model) {
+          scope.propertySettingsDialogModel.submit = function(model) {
 
+            property.inherited = false;
             property.dialogIsOpen = false;
 
-            scope.showDialog = false;
-            scope.dialogModel = null;
+            // remove dialog
+            scope.propertySettingsDialogModel.show = false;
+            scope.propertySettingsDialogModel = null;
 
             // push new init property to scope
             addInitPropertyOnActiveGroup(scope.model.groups);
 
           };
 
-          scope.dialogModel.close = function(model) {
-            scope.showDialog = false;
-            scope.dialogModel = null;
+          scope.propertySettingsDialogModel.close = function(oldModel) {
 
-            // push new init property to scope
-            addInitPropertyOnActiveGroup(scope.model.groups);
+            // reset all property changes
+            property.label = oldModel.property.label;
+            property.alias = oldModel.property.alias;
+            property.description = oldModel.property.description;
+            property.config = oldModel.property.config;
+            property.editor = oldModel.property.editor;
+            property.view = oldModel.property.view;
+            property.dataTypeId = oldModel.property.dataTypeId;
+            property.dataTypeIcon = oldModel.property.dataTypeIcon;
+            property.dataTypeName = oldModel.property.dataTypeName;
+
+            // because we set state to active, to show a preview, we have to check if has been filled out
+            // label is required so if it is not filled we know it is a placeholder
+            if(oldModel.property.label === undefined || oldModel.property.label === null || oldModel.property.label === "") {
+              property.propertyState = "init";
+            } else {
+              property.propertyState = oldModel.property.propertyState;
+            }
+
+            // remove dialog
+            scope.propertySettingsDialogModel.show = false;
+            scope.propertySettingsDialogModel = null;
+
           };
 
         }
@@ -344,14 +369,12 @@
 
       scope.choosePropertyType = function(property) {
 
-        scope.dialogModel = {};
-        scope.dialogModel.title = "Choose property type";
-        scope.dialogModel.view = "views/documentType/dialogs/property.html";
-        scope.showDialog = true;
+        scope.propertyEditorDialogModel = {};
+        scope.propertyEditorDialogModel.title = "Choose property type";
+        scope.propertyEditorDialogModel.view = "views/documentType/dialogs/property.html";
+        scope.propertyEditorDialogModel.show = true;
 
-        property.dialogIsOpen = true;
-
-        scope.dialogModel.selectDataType = function(selectedDataType) {
+        scope.propertyEditorDialogModel.selectDataType = function(selectedDataType) {
 
           if( selectedDataType.id !== null ) {
 
@@ -398,79 +421,63 @@
 
           }
 
-          property.propertyState = "active";
-
-          // open data type configuration
-          scope.editPropertyTypeSettings(property);
-
-          // push new init tab to scope
-          addInitGroup(scope.model.groups);
+          // remove dialog
+          scope.propertyEditorDialogModel.show = false;
+          scope.propertyEditorDialogModel = null;
 
         };
 
-        scope.dialogModel.close = function(model) {
-          scope.editPropertyTypeSettings(property);
+        scope.propertyEditorDialogModel.close = function(oldModel) {
+          // remove dialog
+          scope.propertyEditorDialogModel.show = false;
+          scope.propertyEditorDialogModel = null;
+
         };
 
       };
 
       scope.configDataType = function(property) {
 
-        scope.dialogModel = {};
-        scope.dialogModel.title = "Edit data type";
-        scope.dialogModel.dataType = {};
-        scope.dialogModel.property = property;
-        scope.dialogModel.view = "views/documentType/dialogs/editDataType/editDataType.html";
-        scope.dialogModel.multiActions = [
-        {
-          key: "save",
-          label: "Save",
-          defaultAction: true,
-          action: function(dataType) {
-            saveDataType(dataType, false);
-          }
-        },
-        {
-          key: "saveAsNew",
-          label: "Save as new",
-          action: function(dataType) {
-            saveDataType(dataType, true);
-          }
-        }
-        ];
-        scope.showDialog = true;
+        scope.dataTypeSettingsDialogModel = {};
+        scope.dataTypeSettingsDialogModel.title = "Edit data type";
+        scope.dataTypeSettingsDialogModel.dataType = {};
+        scope.dataTypeSettingsDialogModel.view = "views/documentType/dialogs/editDataType/editDataType.html";
 
-        function saveDataType(dataType, isNew) {
-
-          var preValues = dataTypeHelper.createPreValueProps(dataType.preValues);
-
-          dataTypeResource.save(dataType, preValues, isNew).then(function(dataType) {
-
-            contentTypeResource.getPropertyTypeScaffold(dataType.id).then(function(propertyType) {
-
-              property.config = propertyType.config;
-              property.editor = propertyType.editor;
-              property.view = propertyType.view;
-              property.dataTypeId = dataType.id;
-              property.dataTypeIcon = dataType.icon;
-              property.dataTypeName = dataType.name;
-
-              // change all chosen datatypes to updated config
-              if(!isNew) {
-                updateSameDataTypes(property);
-              }
-
-              // open settings dialog
-              scope.editPropertyTypeSettings(property);
-
+        dataTypeResource.getById(property.dataTypeId)
+            .then(function(dataType) {
+                scope.dataTypeSettingsDialogModel.dataType = dataType;
+                scope.dataTypeSettingsDialogModel.show = true;
             });
+
+        scope.dataTypeSettingsDialogModel.submit = function(model, isNew) {
+
+          contentTypeResource.getPropertyTypeScaffold(model.dataType.id).then(function(propertyType) {
+
+            property.config = propertyType.config;
+            property.editor = propertyType.editor;
+            property.view = propertyType.view;
+            property.dataTypeId = model.dataType.id;
+            property.dataTypeIcon = model.dataType.icon;
+            property.dataTypeName = model.dataType.name;
+
+            // change all chosen datatypes to updated config
+            if(!isNew) {
+              updateSameDataTypes(property);
+            }
+
+            // remove dialog
+            scope.dataTypeSettingsDialogModel.show = false;
+            scope.dataTypeSettingsDialogModel = null;
 
           });
 
-        }
+        };
 
-        scope.dialogModel.close = function(model) {
-          scope.editPropertyTypeSettings(property);
+        scope.dataTypeSettingsDialogModel.close = function(oldModel) {
+          // remove dialog
+          scope.dataTypeSettingsDialogModel.show = false;
+          scope.dataTypeSettingsDialogModel = null;
+
         };
 
       };

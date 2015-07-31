@@ -145,15 +145,16 @@ angular.module('umbraco.directives')
 
 .directive('onOutsideClick', function ($timeout) {
     return function (scope, element, attrs) {
-        
+
         function oneTimeClick(event) {
                 var el = event.target.nodeName;
                 //ignore link and button clicks
                 var els = ["INPUT","A","BUTTON"];
                 if(els.indexOf(el) >= 0){return;}
 
-                //ignore children of links and buttons
-                var parents = $(event.target).parents("a,button");
+                // ignore children of links and buttons
+                // ignore clicks on new overlay
+                var parents = $(event.target).parents("a,button,.umb-overlay");
                 if(parents.length > 0){
                     return;
                 }
@@ -167,7 +168,7 @@ angular.module('umbraco.directives')
                 //ignore clicks inside this element
                 if( $(element).has( $(event.target) ).length > 0 ){
                     return;
-                } 
+                }
 
                 scope.$apply(attrs.onOutsideClick);
         }
@@ -177,21 +178,21 @@ angular.module('umbraco.directives')
 
             scope.$on("$destroy", function() {
                 $(document).off("click", oneTimeClick);
-            }); 
+            });
         }); // Temp removal of 1 sec timeout to prevent bug where overlay does not open. We need to find a better solution.
 
     };
 })
 
 .directive('onRightClick',function(){
-    
+
     document.oncontextmenu = function (e) {
        if(e.target.hasAttribute('on-right-click')) {
            e.preventDefault();
-           e.stopPropagation(); 
+           e.stopPropagation();
            return false;
        }
-    };  
+    };
 
     return function(scope,el,attrs){
         el.on('contextmenu',function(e){
@@ -207,7 +208,7 @@ angular.module('umbraco.directives')
         return {
 
             restrict: 'A',
-            
+
             link: function (scope, element, attrs, ctrl) {
                 var active = false;
                 var fn = $parse(attrs.delayedMouseleave);

@@ -16,9 +16,9 @@
 
     <div class="umb-overlay-drawer" ng-if="model.close || model.submit">
       <div class="umb-overlay-drawer-content">
-        <button class="btn btn-link" hotkey="esc" ng-click="model.close(model)" ng-if="model.close">Cancel</button>
-        <button class="btn btn-success" hotkey="enter" ng-if="model.submit" type="submit">Submit</button>
-        <umb-button-group actions="model.multiActions" model="model.dataType" ng-if="model.multiActions"></umb-button-group>
+        <button class="btn btn-link" hotkey="esc" ng-click="closeOverLay()" ng-if="model.close">Cancel</button>
+        <button class="btn btn-success" hotkey="enter" ng-if="model.submit && !model.multiActions" type="submit">Submit</button>
+        <umb-button-group actions="model.multiActions" model="model" ng-if="model.multiActions"></umb-button-group>
       </div>
     </div>
   </form>

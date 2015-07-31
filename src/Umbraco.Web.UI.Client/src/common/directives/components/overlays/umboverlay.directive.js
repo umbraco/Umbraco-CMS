@@ -21,6 +21,8 @@ angular.module("umbraco.directives")
             templateUrl: 'views/components/overlays/umb-overlay.html',
             link: function(scope, element, attrs) {
 
+                var modelCopy = {};
+
                 function activate() {
                   var cssClass = "umb-overlay-center";
                   if(scope.position)
@@ -39,6 +41,23 @@ angular.module("umbraco.directives")
                   cssClass += " " + shadow;
 
                   scope.overlayCssClass = cssClass;
+
+                  modelCopy = makeModelCopy(scope.model);
+
+                }
+
+                function makeModelCopy(object) {
+
+                  var newObject = {};
+
+                  for (var key in object) {
+                    if(key !== "event") {
+                      newObject[key] = angular.copy(object[key]);
+                    }
+                  }
+
+                  return newObject;
+
                 }
 
                 function setTargetPosition() {
@@ -123,9 +142,10 @@ angular.module("umbraco.directives")
 
                 scope.closeOverLay = function(){
                     if(scope.model.close){
-                        scope.model.close(scope.model);
-                    }else{
-                        scope.model = null;
+                      scope.model = modelCopy;
+                      scope.model.close(scope.model);
+                    } else {
+                      scope.model = null;
                     }
                 };
 
