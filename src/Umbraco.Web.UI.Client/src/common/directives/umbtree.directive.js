@@ -3,7 +3,7 @@
 * @name umbraco.directives.directive:umbTree
 * @restrict E
 **/
-function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificationsService, $timeout, userService) {
+function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificationsService, $timeout, userService, $injector) {
 
     return {
         restrict: 'E',
@@ -24,7 +24,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
             enablelistviewsearch: '@'
         },
 
-        compile: function(element, attrs) {
+        compile: function (element, attrs) {
             //config
             //var showheader = (attrs.showheader !== 'false');
             var hideoptions = (attrs.hideoptions === 'true') ? "hide-options" : "";
@@ -35,15 +35,15 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                 '<a href="#/{{section}}" ng-click="select(tree.root, $event)"  class="root-link">{{tree.name}}</a></h5>' +
                 '<a class="umb-options" ng-hide="tree.root.isContainer || !tree.root.menuUrl" ng-click="options(tree.root, $event)" ng-swipe-right="options(tree.root, $event)"><i></i><i></i><i></i></a>' +
                 '</div>';
-            template += '<ul>' +
-                '<umb-tree-item ng-repeat="child in tree.root.children" eventhandler="eventhandler" node="child" current-node="currentNode" tree="this" section="{{section}}" ng-animate="animation()"></umb-tree-item>' +
+            template += '<ul ui-sortable="sortableOptions" class="item" ng-model="tree.root.children">' +
+                '<umb-tree-item ng-repeat="child in tree.root.children" eventhandler="eventhandler" node="child" current-node="currentNode" tree="this" section="{{section}}" ng-animate="animation()"  sortable-options="sortableOptions"></umb-tree-item>' +
                 '</ul>' +
                 '</li>' +
                 '</ul>';
 
             element.replaceWith(template);
 
-            return function(scope, elem, attr, controller) {
+            return function (scope, elem, attr, controller) {
 
                 //flag to track the last loaded section when the tree 'un-loads'. We use this to determine if we should
                 // re-load the tree again. For example, if we hover over 'content' the content tree is shown. Then we hover
@@ -52,7 +52,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                 // reload it. This saves a lot on processing if someone is navigating in and out of the same section many times
                 // since it saves on data retreival and DOM processing.
                 var lastSection = "";
-                
+
                 //setup a default internal handler
                 if (!scope.eventhandler) {
                     scope.eventhandler = $({});
@@ -68,7 +68,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                         $(scope.eventhandler).trigger(eventName, args);
                     }
                 }
-                
+
                 /** This will deleteAnimations to true after the current digest */
                 function enableDeleteAnimations() {
                     //do timeout so that it re-enables them after this digest
@@ -83,16 +83,16 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                 function setupExternalEvents() {
                     if (scope.eventhandler) {
 
-                        scope.eventhandler.clearCache = function(section) {
+                        scope.eventhandler.clearCache = function (section) {
                             treeService.clearCache({ section: section });
                         };
 
-                        scope.eventhandler.load = function(section) {
+                        scope.eventhandler.load = function (section) {
                             scope.section = section;
                             loadTree();
                         };
 
-                        scope.eventhandler.reloadNode = function(node) {
+                        scope.eventhandler.reloadNode = function (node) {
 
                             if (!node) {
                                 node = scope.currentNode;
@@ -102,19 +102,19 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                                 scope.loadChildren(node, true);
                             }
                         };
-                        
+
                         /** 
                             Used to do the tree syncing. If the args.tree is not specified we are assuming it has been 
                             specified previously using the _setActiveTreeType
                         */
-                        scope.eventhandler.syncTree = function(args) {
+                        scope.eventhandler.syncTree = function (args) {
                             if (!args) {
                                 throw "args cannot be null";
                             }
                             if (!args.path) {
                                 throw "args.path cannot be null";
                             }
-                            
+
                             var deferred = $q.defer();
 
                             //this is super complex but seems to be working in other places, here we're listening for our
@@ -145,7 +145,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                             // and previous so that the tree syncs properly. The tree syncs from the top down and if there are parts
                             // of the tree's path in there that don't actually exist in the dom/model then syncing will not work.
 
-                            userService.getCurrentUser().then(function(userData) {
+                            userService.getCurrentUser().then(function (userData) {
 
                                 var startNodes = [userData.startContentId, userData.startMediaId];
                                 _.each(startNodes, function (i) {
@@ -162,7 +162,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
 
                             });
 
-                            
+
 
                             return deferred.promise;
                         };
@@ -174,7 +174,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                             node's children - this is synonymous with the legacy refreshTree method - again should not be used
                             and should only be used for the legacy code to work.
                         */
-                        scope.eventhandler._setActiveTreeType = function(treeAlias, loadChildren) {
+                        scope.eventhandler._setActiveTreeType = function (treeAlias, loadChildren) {
                             loadActiveTree(treeAlias, loadChildren);
                         };
                     }
@@ -194,7 +194,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                     }
                 }
 
-                
+
                 //given a tree alias, this will search the current section tree for the specified tree alias and
                 //set that to the activeTree
                 //NOTE: loadChildren is ONLY used for legacy purposes, do not use this when syncing the tree as it will cause problems
@@ -205,12 +205,12 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                     function doLoad(tree) {
                         var childrenAndSelf = [tree].concat(tree.children);
                         scope.activeTree = _.find(childrenAndSelf, function (node) {
-                            if(node && node.metaData){
+                            if (node && node.metaData) {
                                 return node.metaData.treeAlias === treeAlias;
                             }
                             return false;
                         });
-                        
+
                         if (!scope.activeTree) {
                             throw "Could not find the tree " + treeAlias + ", activeTree has not been set";
                         }
@@ -218,7 +218,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                         //This is only used for the legacy tree method refreshTree!
                         if (loadChildren) {
                             scope.activeTree.expanded = true;
-                            scope.loadChildren(scope.activeTree, false).then(function() {
+                            scope.loadChildren(scope.activeTree, false).then(function () {
                                 emitEvent("activeTreeLoaded", { tree: scope.activeTree });
                             });
                         }
@@ -231,7 +231,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                         doLoad(scope.tree.root);
                     }
                     else {
-                        scope.eventhandler.one("treeLoaded", function(e, args) {
+                        scope.eventhandler.one("treeLoaded", function (e, args) {
                             doLoad(args.tree.root);
                         });
                     }
@@ -256,10 +256,11 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                         }
 
                         treeService.getTree(args)
-                            .then(function(data) {
+                            .then(function (data) {
                                 //set the data once we have it
                                 scope.tree = data;
-                                
+                                scope.node = scope.tree.root;
+
                                 enableDeleteAnimations();
 
                                 scope.loading = false;
@@ -268,8 +269,8 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                                 scope.activeTree = scope.tree.root;
                                 emitEvent("treeLoaded", { tree: scope.tree });
                                 emitEvent("treeNodeExpanded", { tree: scope.tree, node: scope.tree.root, children: scope.tree.root.children });
-                           
-                            }, function(reason) {
+
+                            }, function (reason) {
                                 scope.loading = false;
                                 notificationsService.error("Tree Error", reason);
                             });
@@ -290,9 +291,9 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                         if (activate === undefined || activate === true) {
                             scope.currentNode = data;
                         }
-                        
+
                         emitEvent("treeSynced", { node: data, activate: activate });
-                        
+
                         enableDeleteAnimations();
                     });
 
@@ -310,7 +311,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                  *  This changes dynamically based on if we are changing sections or just loading normal tree data. 
                  *  When changing sections we don't want all of the tree-ndoes to do their 'leave' animations.
                  */
-                scope.animation = function() {
+                scope.animation = function () {
                     if (deleteAnimations && scope.tree && scope.tree.root && scope.tree.root.expanded) {
                         return { leave: 'tree-node-delete-leave' };
                     }
@@ -320,7 +321,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                 };
 
                 /* helper to force reloading children of a tree node */
-                scope.loadChildren = function(node, forceReload) {
+                scope.loadChildren = function (node, forceReload) {
                     var deferred = $q.defer();
 
                     //emit treeNodeExpanding event, if a callback object is set on the tree
@@ -334,10 +335,10 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                     if (forceReload || (node.hasChildren && node.children.length === 0)) {
                         //get the children from the tree service
                         treeService.loadNodeChildren({ node: node, section: scope.section })
-                            .then(function(data) {
+                            .then(function (data) {
                                 //emit expanded event
                                 emitEvent("treeNodeExpanded", { tree: scope.tree, node: node, children: data });
-                                
+
                                 enableDeleteAnimations();
 
                                 deferred.resolve(data);
@@ -346,7 +347,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                     else {
                         emitEvent("treeNodeExpanded", { tree: scope.tree, node: node, children: node.children });
                         node.expanded = true;
-                        
+
                         enableDeleteAnimations();
 
                         deferred.resolve(node.children);
@@ -360,7 +361,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                   The tree doesnt know about this, so it raises an event to tell the parent controller
                   about it.
                 */
-                scope.options = function(n, ev) {
+                scope.options = function (n, ev) {
                     emitEvent("treeOptionsClick", { element: elem, node: n, event: ev });
                 };
 
@@ -379,12 +380,12 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                     emitEvent("treeNodeSelect", { element: elem, node: n, event: ev });
                 };
 
-                scope.altSelect = function(n, ev) {
+                scope.altSelect = function (n, ev) {
                     emitEvent("treeNodeAltSelect", { element: elem, tree: scope.tree, node: n, event: ev });
                 };
-                
+
                 //watch for section changes
-                scope.$watch("section", function(newVal, oldVal) {
+                scope.$watch("section", function (newVal, oldVal) {
 
                     if (!scope.tree) {
                         loadTree();
@@ -404,7 +405,159 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                         lastSection = newVal;
                     }
                 });
-                
+                scope.sortableOptions = {
+                    connectWith: ".item",
+                    cursor: "move",
+                    items: '>li',
+                    axis: 'y',
+                    tolerance: 'pointer',
+                    containment: '.umb-tree .root>ul',
+                    disabled: !scope.section.match("content|media") || scope.isdialog === "true",
+                    update: function (e, ui) {
+                        var node = ui.item.scope() ? ui.item.scope().node : scope.dragCurrentNode;
+
+                        scope.newParentNode = $(e.target.parentElement).scope().node;
+
+                        // Ignore if this is just a sort order change.
+                        if (node.parentId == scope.newParentNode.id) {
+                            scope.dragCurrentNode = node;
+                            return;
+                        }
+                        //console.log("id:" + node.id + "; parent:" + node.parentId + "; newParent:" + $(e.target.parentElement).scope().node.id);
+
+                        //Now we need to check if this is for media or content because that will depend on the resources we use
+                        var contentResource, contentTypeResource;
+                        if (scope.section === "media") {
+                            contentResource = $injector.get('mediaResource');
+                            contentTypeResource = $injector.get('mediaTypeResource');
+                        }
+                        else if (scope.section === "content") {
+                            contentResource = $injector.get('contentResource');
+                            contentTypeResource = $injector.get('contentTypeResource');
+                        } else {
+                            return;
+                        }
+
+                        if (scope.newParentNode.id == -20 || scope.newParentNode.id == -21)
+                            // Delete the node
+                            contentResource.deleteById(node.id)
+                                .then(function () {
+                                    scope.loadChildren(scope.newParentNode, true);
+                                });
+                        else
+                            // Move node, this will automaticaly validate the move.
+                            contentResource.move({ parentId: scope.newParentNode.id, id: node.id })
+                                .then(function () {
+                                    // Sync client side ui changes.  Tis will relaod the relevent part of the tree.  It could probubly jsut update the new with the new values instead and simplify the back and forth a bit.
+                                    scope.dragMoved = true;
+
+                                    // Reload collapsed destination.
+                                    if ($(e.target.parentElement).children("ul.item").is(".collapsed")) {
+                                        scope.loadChildren(scope.newParentNode, true);
+                                    }
+                                }, function (err) {
+                                    // Reload source and destination on a invalide move.
+                                    scope.loadChildren(scope.newParentNode, true);
+                                    scope.loadChildren(ui.item.scope().node.parent(), true);
+                                })
+                    },
+                    start: function (e, ui) {
+                        // Store the original sort order.
+                        scope.newParentNode = ui.item.scope().node.parent();
+                        scope.originalSort = _.map(
+                            _.filter(
+                                scope.newParentNode.children,
+                                function (item) {
+                                    return parseInt(item.id) > -1;
+                                }),
+                            function (item) {
+                                return item.id;
+                            });
+
+                        // Tempararily enable collapsed nodes as valid targets for putting items inside them without expanding them.
+                        ui.item.parents(".umb-tree").addClass("ui-dragging")
+                    },
+                    stop: function (e, ui) {
+                        // Remove extra elements for child dropping.
+                        ui.item.parents(".umb-tree").removeClass("ui-dragging")
+
+                        // Update sort order for all children of the parent node.
+                        var sortOrder = _.map(
+                            _.filter(
+                               scope.newParentNode.children
+                                , function (item) {
+                                    return parseInt(item.id) > -1;
+                                })
+                            , function (item) {
+                                return item.id;
+                            });
+
+                        // Don't do anything if there are no changes.
+                        if (sortOrder.join() === scope.originalSort.join()) {
+                            return;
+                        }
+
+                        // Don't do anything if this is moved to a collapsed node.
+                        if (sortOrder.join() == "") {
+                            return;
+                        }
+
+
+                        //Now we need to check if this is for media or content because that will depend on the resources we use
+                        /*var contentResource, contentTypeResource;
+                        if (scope.section === "media") {
+                            contentResource = $injector.get('mediaResource');
+                            contentTypeResource = $injector.get('mediaTypeResource');
+                        }
+                        else if (scope.section === "content") {
+                            contentResource = $injector.get('contentResource');
+                            contentTypeResource = $injector.get('contentTypeResource');
+                        } else {
+                            return;
+                        }*/
+
+                        // Post new sort order
+                        $timeout(function () {
+                            //console.log("id:" + scope.newParentNode.id + "; sort:" + sortOrder.join());
+
+                            // Use custom UpdateSortOrder service privided by native Sort tool as the contentResource.sort() service doesn't appear to save changes properly.
+                            $.ajax({
+                                type: "POST",
+                                url: "/umbraco/WebServices/NodeSorter.asmx/UpdateSortOrder?app=" + scope.section,
+                                data: '{ "ParentId": ' + parseInt(scope.newParentNode.id) + ', "SortOrder": "' + sortOrder.join() + '"}',
+                                contentType: "application/json; charset=utf-8",
+                                dataType: "json",
+                                success: function (msg) {
+                                    scope.complete = true;
+
+                                    // reload parent to get a clean node.
+                                    if (scope.dragMoved) {
+                                        scope.loadChildren(scope.newParentNode, true);
+                                        scope.dragMoved = false;
+                                    }
+                                }
+                            });
+
+
+                            /* // This is a more direct way to save sort changes but it appears to be non-functinal in 7.2.8
+                            contentResource.sort({ parentId: scope.newParentNode.id, sortedIds: sortOrder })
+                                .then(function () {
+                                    console.log("Sort Done");
+                                    scope.complete = true;
+
+                                    // reload parent to get a clean node.
+                                    if (scope.dragMoved) {
+                                        scope.loadChildren(scope.newParentNode, true);
+                                        //$(e.target.parentElement).scope().loadChildren(scope.newParentNode, true);
+                                        scope.dragMoved = false;
+                                    }
+                                });*/
+                            // This delay is to allow the move to finish before we resort.  We can get the sort index untill the stop() 
+                            //  so we can't attach it to the move promise, thus the short delay.
+                        }, 250, false);
+                    }
+                };
+
                 setupExternalEvents();
                 loadTree();
             };

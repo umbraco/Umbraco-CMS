@@ -28,7 +28,8 @@ angular.module("umbraco.directives")
             eventhandler: '=',
             currentNode: '=',
             node: '=',
-            tree: '='
+            tree: '=',
+            sortableOptions: '='
         },
 
         //TODO: Remove more of the binding from this template and move the DOM manipulation to be manually done in the link function,
@@ -47,7 +48,7 @@ angular.module("umbraco.directives")
             '<div ng-show="node.loading" class="l"><div></div></div>' +
             '</div>' +
             '</li>',
-        
+
         link: function (scope, element, attrs) {
 
             localizationService.localize("general_search").then(function (value) {
@@ -67,7 +68,7 @@ angular.module("umbraco.directives")
 
             // updates the node's DOM/styles
             function setupNodeDom(node, tree) {
-                
+
                 //get the first div element
                 element.children(":first")
                     //set the padding
@@ -112,9 +113,9 @@ angular.module("umbraco.directives")
                 if (!node) {
                     return '';
                 }
-                var css = [];                
+                var css = [];
                 if (node.cssClasses) {
-                    _.each(node.cssClasses, function(c) {
+                    _.each(node.cssClasses, function (c) {
                         css.push(c);
                     });
                 }
@@ -149,7 +150,7 @@ angular.module("umbraco.directives")
               and emits it as a treeNodeSelect element if there is a callback object
               defined on the tree
             */
-            scope.select = function(n, ev) {
+            scope.select = function (n, ev) {
                 emitEvent("treeNodeSelect", { element: element, tree: scope.tree, node: n, event: ev });
             };
 
@@ -214,13 +215,15 @@ angular.module("umbraco.directives")
                     node.expanded = true;
                     enableDeleteAnimations();
                 }
-            };            
+            };
 
             //if the current path contains the node id, we will auto-expand the tree item children
 
             setupNodeDom(scope.node, scope.tree);
 
-            var template = '<ul ng-class="{collapsed: !node.expanded}"><umb-tree-item  ng-repeat="child in node.children" eventhandler="eventhandler" tree="tree" current-node="currentNode" node="child" section="{{section}}" ng-animate="animation()"></umb-tree-item></ul>';
+            var isSortable = (attrs.isdialog === 'true') ? "" : " ui-sortable=\"sortableOptions\"";
+
+            var template = '<ul ' + isSortable + ' class="item" ng-model="node.children" ng-class="{collapsed: !node.expanded}" ><umb-tree-item  ng-repeat="child in node.children" eventhandler="eventhandler" tree="tree" current-node="currentNode" node="child" section="{{section}}" ng-animate="animation()" sortable-options="sortableOptions"></umb-tree-item></ul>';
             var newElement = angular.element(template);
             $compile(newElement)(scope);
             element.append(newElement);
