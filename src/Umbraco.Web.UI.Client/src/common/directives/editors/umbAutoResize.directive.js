@@ -23,7 +23,6 @@ angular.module("umbraco.directives")
 
 
             //I hate bootstrap tabs
-            //TODO: This is legacy since we aren't using bootstrap tabs anymore
             $('a[data-toggle="tab"]').on('shown', update);
             
             scope.$on('$destroy', function() {

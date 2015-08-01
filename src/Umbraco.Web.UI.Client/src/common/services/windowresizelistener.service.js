@@ -36,11 +36,9 @@ function windowResizeListener($rootScope) {
                 }
             },
             unregister: function (fn) {
-                for (var i = 0, cnt = registered.length; i < cnt; i++) {
-                    if (registered[i] === fn) {
-                        delete registered[i];
-                        break;
-                    }
+                var index = registered.indexOf(fn);
+                if (index > -1) {
+                    registered.splice(index, 1);
                 }
             }
         };

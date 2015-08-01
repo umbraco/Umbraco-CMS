@@ -7,15 +7,25 @@
 angular.module("umbraco.directives.html")
 	.directive('detectFold', function ($timeout, $log, windowResizeListener) {
 	    return {
-	        require: "^?umbTabs",
 			restrict: 'A',
 			link: function (scope, el, attrs) {
 
-			    var state = false;
+			    var firstRun = false;
 			    var parent = $(".umb-panel-body");
 			    var winHeight = $(window).height();
-			    var calculate = function() {
+			    var calculate = function () {
+
+			        console.log("calculating...");
+
 			        if (el && el.is(":visible") && !el.hasClass("umb-bottom-bar")) {
+
+			            //now that the element is visible, set the flag in a couple of seconds, 
+			            // this will ensure that loading time of a current tab get's completed and that
+			            // we eventually stop watching to save on CPU time
+			            $timeout(function() {
+			                firstRun = true;
+			            }, 4000);
+
 			            //var parent = el.parent();
 			            var hasOverflow = parent.innerHeight() < parent[0].scrollHeight;
 			            //var belowFold = (el.offset().top + el.height()) > winHeight;
@@ -23,20 +33,41 @@ angular.module("umbraco.directives.html")
 			                el.addClass("umb-bottom-bar");
 			            }
 			        }
+			        return firstRun;
 			    };
 
 			    var resizeCallback = function(size) {
 			        winHeight = size.height;
 			        el.removeClass("umb-bottom-bar");
-			        //state = false;
 			        calculate();
 			    };
 
 			    windowResizeListener.register(resizeCallback);
 
+			    //Only execute the watcher if this tab is the active (first) tab on load, otherwise there's no reason to execute
+			    // the watcher since it will be recalculated when the tab changes!
+                if (el.closest(".umb-tab-pane").index() === 0) {
+                    //run a watcher to ensure that the calculation occurs until it's firstRun but ensure
+                    // the calculations are throttled to save a bit of CPU
+                    var listener = scope.$watch(_.throttle(calculate, 1000), function (newVal, oldVal) {
+                        if (newVal !== oldVal) {
+                            //cancel the watch
+                            console.log("WATCH CANCEL");
+                            listener();
+                        }
+                    });
+                }
 			    
                 //Required for backwards compat for bootstrap tabs
 			    $('a[data-toggle="tab"]').on('shown', calculate);
+
+			    $('.nav-tabs a').on('shown', function (event) {
+			        console.log("TAB SHOWN 1");
+			    });
+
+			    $('.nav-tabs a').on('shown.bs.tab', function (event) {
+			        console.log("TAB SHOWN");
+			    });
 
                 //ensure to unregister
 			    scope.$on('$destroy', function() {
