@@ -13,9 +13,12 @@ angular.module("umbraco.directives")
                         element.height(domEl.scrollHeight);
                     }
                 };
+                var blur = function() {
+                    update(true);
+                };
 
                 element.bind('keyup keydown keypress change', update);
-                element.bind('blur', function() { update(true); });
+                element.bind('blur', blur);
 
                 $timeout(function() {
                     update(true);
@@ -28,6 +31,11 @@ angular.module("umbraco.directives")
                         update();
                     });
                 }
+
+                scope.$on('$destroy', function () {
+                    element.unbind('keyup keydown keypress change', update);
+                    element.unbind('blur', blur);
+                });
             }
         };
     });
