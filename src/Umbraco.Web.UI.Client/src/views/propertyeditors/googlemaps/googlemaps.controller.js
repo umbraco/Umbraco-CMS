@@ -1,6 +1,6 @@
 angular.module("umbraco")
 .controller("Umbraco.PropertyEditors.GoogleMapsController",
-    function ($rootScope, $scope, notificationsService, dialogService, assetsService, $log, $timeout) {
+    function ($element, $rootScope, $scope, notificationsService, dialogService, assetsService, $log, $timeout) {
 
         assetsService.loadJs('http://www.google.com/jsapi')
             .then(function () {
@@ -62,10 +62,17 @@ angular.module("umbraco")
                 google.maps.event.trigger(map, 'resize');
             };
 
-            $('a[data-toggle="tab"]').on('shown', tabShown);
+            //listen for tab changes
+            if (tabsCtrl != null) {
+                tabsCtrl.onTabShown(function (args) {
+                    tabShown();
+                });
+            }
+
+            $element.closest('.umb-panel.tabbable').on('shown', '.nav-tabs a', tabShown);
 
             $scope.$on('$destroy', function () {
-                $('a[data-toggle="tab"]').off('shown', tabShown);
+                $element.closest('.umb-panel.tabbable').off('shown', '.nav-tabs a', tabShown);
             });
         }
 
