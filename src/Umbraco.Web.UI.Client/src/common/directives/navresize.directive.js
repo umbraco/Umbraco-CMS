@@ -31,10 +31,13 @@ angular.module("umbraco.directives")
                                 var wrapper = $("#mainwrapper");
                                 var contentPanel = $("#leftcolumn").next();
                                 var apps = $("#applications");
+                                var bottomBar = contentPanel.find(".umb-bottom-bar");
                                 var navOffeset = ui.element.next();
                                 var leftPanelWidth = ui.element.width() + apps.width();
 
                                 contentPanel.css({ left: leftPanelWidth });
+                                bottomBar.css({ left: leftPanelWidth });
+
                                 navOffeset.css({ "margin-left": ui.element.outerWidth() });
                             },
                             stop: function(e, ui) {

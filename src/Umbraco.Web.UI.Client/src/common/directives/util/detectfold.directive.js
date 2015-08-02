@@ -29,6 +29,16 @@ angular.module("umbraco.directives.html")
 			            //var belowFold = (el.offset().top + el.height()) > winHeight;
 			            if (hasOverflow) {
 			                el.addClass("umb-bottom-bar");
+
+			                //I wish we didn't have to put this logic here but unfortunately we 
+			                // do. This needs to calculate the left offest to place the bottom bar
+			                // depending on if the left column splitter has been moved by the user
+                            // (based on the nav-resize directive)
+			                var wrapper = $("#mainwrapper");
+			                var contentPanel = $("#leftcolumn").next();
+			                var contentPanelLeftPx = contentPanel.css("left");
+
+			                el.css({ left: contentPanelLeftPx });
 			            }
 			        }
 			        return firstRun;
