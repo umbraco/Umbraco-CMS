@@ -145,7 +145,7 @@
 
             }
 
-            scope.$watch('parentName', function(newValue, oldValue){
+            var unbindParentNameWatch = scope.$watch('parentName', function(newValue, oldValue){
 
               if (newValue === oldValue) { return; }
               if ( oldValue === undefined || newValue === undefined) { return; }
@@ -154,7 +154,7 @@
 
             });
 
-            scope.$watch('parentIcon', function(newValue, oldValue){
+            var unbindParentIconWatch = scope.$watch('parentIcon', function(newValue, oldValue){
 
               if (newValue === oldValue) { return; }
               if ( oldValue === undefined || newValue === undefined) { return; }
@@ -162,7 +162,7 @@
               syncParentIcon();
             });
 
-            scope.$watch('availableChildren', function(newValue, oldValue){
+            var unbindAvailableChildrenWatch = scope.$watch('availableChildren', function(newValue, oldValue){
 
               if (newValue === oldValue) { return; }
               if ( oldValue === undefined || newValue === undefined) { return; }
@@ -175,12 +175,21 @@
 
             });
 
-            scope.$watch('selectedChildren', function(newValue, oldValue){
+            var unbindSelectedChildrenWatch = scope.$watch('selectedChildren', function(newValue, oldValue){
 
               if (newValue === oldValue) { return; }
               if ( oldValue === undefined || newValue === undefined) { return; }
 
               scope.selectedChildren = createSelectedChildrenObjectArray(scope.selectedChildren, scope.availableChildren);
+            });
+
+            // clean up
+            scope.$on('$destroy', function(){
+              // unbind watchers
+              unbindParentNameWatch();
+              unbindParentIconWatch();
+              unbindAvailableChildrenWatch();
+              unbindSelectedChildrenWatch();
             });
 
         }
