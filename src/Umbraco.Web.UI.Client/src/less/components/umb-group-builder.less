@@ -383,10 +383,29 @@ input.umb-group-builder__group-sort-value {
 
 /* ---------- DIALOGS ---------- */
 
+.show-validation .editor-wrapper.ng-invalid-val-required-component .editor-placeholder {
+  border-color: @red;
+  color: @red;
+}
+
 .content-type-editor-dialog.edit-property-settings {
 
-  .editor-label {
+  .validation-wrapper {
+    position: relative;
+  }
+
+  .validation-label {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    font-size: 12px;
+    color: @red;
+    transform: translate(0, -50%);
+  }
+
+  input.editor-label {
     border: none;
+    box-shadow: none;
     width: 100%;
     box-sizing: border-box;
     padding: 10px 0 0 0;
@@ -395,6 +414,7 @@ input.umb-group-builder__group-sort-value {
     font-weight: bold;
     &:focus {
       outline: none;
+      box-shadow: none !important;
     }
   }
 

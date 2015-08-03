@@ -2,15 +2,16 @@
 
         <div class="umb-control-group clearfix">
 
-            <input class="editor-label"
-                  name="propertyLabel"
-                  ng-model="model.property.label"
-                  placeholder="Enter a name..."
-                  umb-auto-focus
-                  required
-                  />
-
-            <span class="help-inline" val-msg-for="propertyLabel" val-toggle-msg="required"><localize key="required" /></span>
+            <div class="validation-wrapper">
+              <input class="editor-label"
+                    name="propertyLabel"
+                    ng-model="model.property.label"
+                    placeholder="Enter a name..."
+                    umb-auto-focus
+                    required
+                    />
+              <span class="validation-label" val-msg-for="propertyLabel" val-toggle-msg="required"><localize key="required" /></span>
+            </div>
 
             <umb-generate-alias enable-lock="true" alias-from="model.property.label" alias="model.property.alias"></umb-generate-alias>
 
@@ -20,7 +21,7 @@
             <textarea class="editor-description" ng-model="model.property.description" placeholder="Add your description here..." umb-auto-resize></textarea>
         </div>
 
-        <div class="umb-control-group clearfix">
+        <div class="editor-wrapper umb-control-group clearfix" ng-model="model.property.editor" val-require-component>
 
             <a href="" ng-if="!model.property.editor" class="editor-placeholder" hotkey="alt+shift+e" ng-click="model.changePropertyEditor(model.property)">Add Editor</a>
 
