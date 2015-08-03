@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+  <configSections>
+    <sectionGroup name="system.web.webPages.razor" type="System.Web.WebPages.Razor.Configuration.RazorWebSectionGroup, System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35"
+		xdt:Locator="Match(name)" 
+		xdt:Transform="SetAttributes(type)">
+      <section name="host" type="System.Web.WebPages.Razor.Configuration.HostSection, System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35"
+		xdt:Locator="Match(name)" 
+		xdt:Transform="SetAttributes(type)" />
+      <section name="pages" type="System.Web.WebPages.Razor.Configuration.RazorPagesSection, System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35"
+		xdt:Locator="Match(name)" 
+		xdt:Transform="SetAttributes(type)" />
+    </sectionGroup>
+  </configSections>
+  
+  <system.web.webPages.razor>
+    <host factoryType="System.Web.Mvc.MvcWebRazorHostFactory, System.Web.Mvc, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35"
+		xdt:Locator="Match(factoryType)" 
+		xdt:Transform="SetAttributes(factoryType)" />
+  </system.web.webPages.razor>
+  
+  <system.web>
+      <pages
+        pageParserFilterType="System.Web.Mvc.ViewTypeParserFilter, System.Web.Mvc, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35"
+        pageBaseType="System.Web.Mvc.ViewPage, System.Web.Mvc, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35"
+        userControlBaseType="System.Web.Mvc.ViewUserControl, System.Web.Mvc, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35"
+			xdt:Locator="Match(pageParserFilterType,pageBaseType,userControlBaseType)" 
+			xdt:Transform="SetAttributes(pageParserFilterType,pageBaseType,userControlBaseType)">
+      <controls>
+        <add assembly="System.Web.Mvc, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" namespace="System.Web.Mvc" 
+			xdt:Locator="Match(namespace)" 
+			xdt:Transform="SetAttributes(assembly)" />
+      </controls>
+    </pages>
+  </system.web>
+  
+</configuration>
