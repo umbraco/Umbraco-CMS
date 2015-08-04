@@ -88,15 +88,14 @@ namespace Umbraco.Web.Models
             // in the repository and since the language lookup is cached it should be ok. If we want however we could create
             // another method on the DomainService to return domains with their culture info on them
             var wcDomain = DomainHelper.FindWildcardDomainInPath(domainService.GetAll(true), contentPath, domain.RootContentId);
-            if (wcDomain != null && wcDomain.LanguageId.HasValue)
-            {
-                var lang = localizationService.GetLanguageById(wcDomain.LanguageId.Value);
-                if (lang != null) return new CultureInfo(lang.IsoCode);
+            if (wcDomain != null && wcDomain.LanguageIsoCode.IsNullOrWhiteSpace() == false)
+            {                
+                return new CultureInfo(wcDomain.LanguageIsoCode);
             }
-            else if (domain.LanguageId.HasValue)
+
+            if (domain.LanguageIsoCode.IsNullOrWhiteSpace() == false)
             {
-                var lang = localizationService.GetLanguageById(domain.LanguageId.Value);
-                if (lang != null) return new CultureInfo(lang.IsoCode);
+                return new CultureInfo(domain.LanguageIsoCode);
             }
 
             return GetDefaultCulture(localizationService);

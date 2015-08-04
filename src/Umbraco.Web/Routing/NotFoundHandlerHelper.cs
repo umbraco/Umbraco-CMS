@@ -249,11 +249,9 @@ namespace Umbraco.Web.Routing
 
                 if (d != null && d.LanguageId.HasValue)
                 {
-                    var lang = localizationService.GetLanguageById(d.LanguageId.Value);
-
                     // test if a 404 page exists with current culture
                     cultureErr = error404Collection
-                        .FirstOrDefault(x => x.Culture == lang.IsoCode);
+                        .FirstOrDefault(x => x.Culture == d.LanguageIsoCode);
 
                     if (cultureErr != null)
                     {
