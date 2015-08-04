@@ -14,6 +14,8 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
+    //TODO: We need to get a readonly ISO code for the domain assigned
+
     internal class DomainRepository : PetaPocoRepositoryBase<int, IDomain>, IDomainRepository
     {
         private readonly RepositoryCacheOptions _cacheOptions;
@@ -62,7 +64,18 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sql = new Sql();
-            sql.Select(isCount ? "COUNT(*)" : "*").From<DomainDto>(SqlSyntax);
+            if (isCount)
+            {
+                sql.Select("COUNT(*)").From<DomainDto>(SqlSyntax);
+            }
+            else
+            {
+                sql.Select("umbracoDomains.*, umbracoLanguage.languageISOCode")
+                    .From<DomainDto>(SqlSyntax)
+                    .LeftJoin<LanguageDto>(SqlSyntax)
+                    .On<DomainDto, LanguageDto>(SqlSyntax, dto => dto.DefaultLanguage, dto => dto.Id);
+            }
+            
             return sql;
         }
 
@@ -110,6 +123,12 @@ namespace Umbraco.Core.Persistence.Repositories
             var id = Convert.ToInt32(Database.Insert(dto));
             entity.Id = id;
 
+            //if the language changed, we need to resolve the ISO code!
+            if (entity.LanguageId.HasValue)
+            {
+                ((UmbracoDomain)entity).LanguageIsoCode = Database.ExecuteScalar<string>("SELECT languageISOCode FROM umbracoLanguage WHERE id=@langId", new { langId = entity.LanguageId });
+            }
+
             entity.ResetDirtyProperties();
         }
 
@@ -138,6 +157,12 @@ namespace Umbraco.Core.Persistence.Repositories
             var dto = factory.BuildDto(entity);
 
             Database.Update(dto);
+
+            //if the language changed, we need to resolve the ISO code!
+            if (entity.WasPropertyDirty("LanguageId"))
+            {
+                ((UmbracoDomain)entity).LanguageIsoCode = Database.ExecuteScalar<string>("SELECT languageISOCode FROM umbracoLanguage WHERE id=@langId", new {langId = entity.LanguageId});
+            }
 
             entity.ResetDirtyProperties();
         }
@@ -176,7 +201,12 @@ namespace Umbraco.Core.Persistence.Repositories
            
             public IDomain BuildEntity(DomainDto dto)
             {
-                var domain = new UmbracoDomain(dto.DomainName) { Id = dto.Id, LanguageId = dto.DefaultLanguage, RootContentId = dto.RootStructureId };
+                var domain = new UmbracoDomain(dto.DomainName, dto.IsoCode)
+                {
+                    Id = dto.Id,
+                    LanguageId = dto.DefaultLanguage,
+                    RootContentId = dto.RootStructureId
+                };
                 //on initial construction we don't want to have dirty properties tracked
                 // http://issues.umbraco.org/issue/U4-1946
                 domain.ResetDirtyProperties(false);

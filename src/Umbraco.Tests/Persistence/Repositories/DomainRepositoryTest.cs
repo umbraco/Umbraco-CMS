@@ -85,9 +85,41 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual("test.com", domain.DomainName);
                 Assert.AreEqual(content.Id, domain.RootContentId);
                 Assert.AreEqual(lang.Id, domain.LanguageId);
+                Assert.AreEqual(lang.IsoCode, domain.LanguageIsoCode);
             }
+        }
 
+        [Test]
+        public void Can_Create_And_Get_By_Id_Empty_lang()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
 
+            ContentType ct;
+            var contentId = CreateTestData("en-AU", out ct);
+
+            ContentRepository contentRepo;
+            LanguageRepository langRepo;
+            ContentTypeRepository contentTypeRepo;
+
+            using (var repo = CreateRepository(unitOfWork, out contentTypeRepo, out contentRepo, out langRepo))
+            {
+                var content = contentRepo.Get(contentId);
+
+                var domain = (IDomain)new UmbracoDomain("test.com") { RootContentId = content.Id };
+                repo.AddOrUpdate(domain);
+                unitOfWork.Commit();
+
+                //re-get
+                domain = repo.Get(domain.Id);
+
+                Assert.NotNull(domain);
+                Assert.IsTrue(domain.HasIdentity);
+                Assert.Greater(domain.Id, 0);
+                Assert.AreEqual("test.com", domain.DomainName);
+                Assert.AreEqual(content.Id, domain.RootContentId);
+                Assert.IsFalse(domain.LanguageId.HasValue);
+            }
         }
 
         [Test]
@@ -203,10 +235,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual("blah.com", domain.DomainName);
                 Assert.AreEqual(content2.Id, domain.RootContentId);
                 Assert.AreEqual(lang2.Id, domain.LanguageId);
+                Assert.AreEqual(lang2.IsoCode, domain.LanguageIsoCode);
             }
 
 
         }
+
 
         [Test]
         public void Exists()

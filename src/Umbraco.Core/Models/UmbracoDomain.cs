@@ -14,6 +14,12 @@ namespace Umbraco.Core.Models
             _domainName = domainName;
         }
 
+        public UmbracoDomain(string domainName, string languageIsoCode)
+            : this(domainName)
+        {
+            LanguageIsoCode = languageIsoCode;
+        }
+
         private int? _contentId;
         private int? _languageId;
         private string _domainName;
@@ -70,9 +76,9 @@ namespace Umbraco.Core.Models
             get { return string.IsNullOrWhiteSpace(DomainName) || DomainName.StartsWith("*"); }
         }
 
-        public string IsoCode
-        {
-            get { throw new NotImplementedException(); }
-        }
+        /// <summary>
+        /// Readonly value of the language ISO code for the domain
+        /// </summary>
+        public string LanguageIsoCode { get; internal set; }
     }
 }
