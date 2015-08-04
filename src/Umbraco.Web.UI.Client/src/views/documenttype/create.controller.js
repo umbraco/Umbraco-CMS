@@ -2,7 +2,7 @@
  * @ngdoc controller
  * @name Umbraco.Editors.DocumentType.CreateController
  * @function
- * 
+ *
  * @description
  * The controller for the doc type creation dialog
  */
@@ -41,8 +41,17 @@ function contentTypeCreateController($scope, $location, navigationService, conte
     }
 
     $scope.createDocType = function() {
+        $location.search('create', null);
+        $location.search('notemplate', null);
         $location.path("/settings/documenttype/edit/" + node.id).search("create", true);
         navigationService.hideMenu();
+    }
+
+    $scope.createComponent = function() {
+      $location.search('create', null);
+      $location.search('notemplate', null);
+      $location.path("/settings/documenttype/edit/" + node.id).search("create", true).search("notemplate", true);
+      navigationService.hideMenu();
     }
 }
 
