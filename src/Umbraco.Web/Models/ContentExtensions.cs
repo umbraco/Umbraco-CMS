@@ -83,10 +83,22 @@ namespace Umbraco.Web.Models
             if (domain == null)
                 return GetDefaultCulture(localizationService);
 
-            var wcDomain = DomainHelper.FindWildcardDomainInPath(domainService.GetAll(true), contentPath, domain.RootContent.Id);
-            return wcDomain == null
-                ? new CultureInfo(domain.Language.IsoCode)
-                : new CultureInfo(wcDomain.Language.IsoCode);
+            //NOTE: The domain service IDomain model has changed and no longer holds a reference to IContent or ILanguage to 
+            // improve performance, this means that we need to lookup the language  below, but this was already the case previously
+            // in the repository and since the language lookup is cached it should be ok. If we want however we could create
+            // another method on the DomainService to return domains with their culture info on them
+            var wcDomain = DomainHelper.FindWildcardDomainInPath(domainService.GetAll(true), contentPath, domain.RootContentId);
+            if (wcDomain != null && wcDomain.LanguageIsoCode.IsNullOrWhiteSpace() == false)
+            {                
+                return new CultureInfo(wcDomain.LanguageIsoCode);
+            }
+
+            if (domain.LanguageIsoCode.IsNullOrWhiteSpace() == false)
+            {
+                return new CultureInfo(domain.LanguageIsoCode);
+            }
+
+            return GetDefaultCulture(localizationService);
         }
 
         private static CultureInfo GetDefaultCulture(ILocalizationService localizationService)

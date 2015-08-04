@@ -24,6 +24,19 @@ namespace Umbraco.Tests.Strings
             ShortStringHelperResolver.Reset();
         }
 
+        [TestCase("alert('hello');", false)]
+        [TestCase("~/Test.js", true)]
+        [TestCase("../Test.js", true)]
+        [TestCase("/Test.js", true)]
+        [TestCase("Test.js", true)]
+        [TestCase("Test.js==", false)]
+        [TestCase("/Test.js function(){return true;}", false)]
+        public void Detect_Is_JavaScript_Path(string input, bool result)
+        {
+            var output = input.DetectIsJavaScriptPath();
+            Assert.AreEqual(result, output.Success);
+        }
+
         [TestCase("hello.txt", "hello")]
         [TestCase("this.is.a.Txt", "this.is.a")]
         [TestCase("this.is.not.a. Txt", "this.is.not.a. Txt")]

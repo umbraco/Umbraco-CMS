@@ -1,38 +1,47 @@
 angular.module("umbraco.directives")
     .directive('umbAutoResize', function($timeout) {
-
-        return function(scope, element, attr){
-            var domEl = element[0];
-            var update = function(force) {
-
-                if(force === true){
-                    element.height(0);
+        return {
+            require: "^?umbTabs",
+            link: function(scope, element, attr, tabsCtrl) {
+                var domEl = element[0];
+                var update = function(force) {
+                    if (force === true) {
+                        element.height(0);
                     element.width(0);
-                }
+                    }
 
-                if(domEl.scrollHeight !== domEl.clientHeight){
-                    element.height(domEl.scrollHeight);
-                }
+                    if (domEl.scrollHeight !== domEl.clientHeight) {
+                        element.height(domEl.scrollHeight);
+                    }
 
                 if(domEl.scrollWidth !== domEl.clientWidth) {
                     element.width(domEl.scrollWidth);
                 }
 
-            };
+                };
+                var blur = function() {
+                    update(true);
+                };
 
-            element.bind('keyup keydown keypress change', update);
-            element.bind('blur', function(){ update(true); });
+                element.bind('keyup keydown keypress change', update);
+                element.bind('blur', blur);
 
-            $timeout(function() {
-                update(true);
-            }, 500);
+                $timeout(function() {
+                    update(true);
+                }, 200);
 
 
-            //I hate bootstrap tabs
-            $('a[data-toggle="tab"]').on('shown', update);
+                //listen for tab changes
+                if (tabsCtrl != null) {
+                    tabsCtrl.onTabShown(function(args) {
+                        update();
+                    });
+                }
 
-            scope.$on('$destroy', function() {
-                $('a[data-toggle="tab"]').unbind("shown", update);
-            });
-    };
-});
+                scope.$on('$destroy', function () {
+                    element.unbind('keyup keydown keypress change', update);
+                    element.unbind('blur', blur);
+                });
+            }
+        };
+    });

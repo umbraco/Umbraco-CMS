@@ -30,7 +30,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
             Create.Table("umbracoCacheInstruction")
                 .WithColumn("id").AsInt32().Identity().NotNullable()
                 .WithColumn("utcStamp").AsDateTime().NotNullable()
-                .WithColumn("jsonInstruction").AsCustom(textType).NotNullable();
+                .WithColumn("jsonInstruction").AsCustom(textType).NotNullable()
+                .WithColumn("originated").AsString(500).NotNullable();
 
             Create.PrimaryKey("PK_umbracoCacheInstruction")
                 .OnTable("umbracoCacheInstruction")

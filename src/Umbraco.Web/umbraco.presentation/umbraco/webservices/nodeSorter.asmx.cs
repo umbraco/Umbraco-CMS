@@ -31,54 +31,75 @@ namespace umbraco.presentation.webservices
     public class nodeSorter : UmbracoAuthorizedWebService
     {
         [WebMethod]
-        public SortNode GetNodes(int ParentId, string App)
+        public SortNode GetNodes(string ParentId, string App)
         {
             if (BasePage.ValidateUserContextID(BasePage.umbracoUserContextID))
             {
-                var parent = new SortNode { Id = ParentId };
                 var nodes = new List<SortNode>();
-                var entityService = base.ApplicationContext.Services.EntityService;
 
-                // Root nodes?
-                if (ParentId == -1)
+                // "hack for stylesheet"
+                if (App == "settings")
                 {
-                    if (App == "media")
+                    var stylesheet = Services.FileService.GetStylesheetByName(ParentId.EnsureEndsWith(".css"));
+                    if (stylesheet == null) throw new InvalidOperationException("No stylesheet found by name " + ParentId);
+
+                    var sort = 0;
+                    foreach (var child in stylesheet.Properties)
                     {
-                        var rootMedia = entityService.GetRootEntities(UmbracoObjectTypes.Media);
-                        nodes.AddRange(rootMedia.Select(media => new SortNode(media.Id, media.SortOrder, media.Name, media.CreateDate)));
+                        nodes.Add(new SortNode(child.Name.GetHashCode(), sort, child.Name, DateTime.Now));
+                        sort++;
                     }
-                    else
+
+                    return new SortNode()
                     {
-                        var rootContent = entityService.GetRootEntities(UmbracoObjectTypes.Document);
-                        nodes.AddRange(rootContent.Select(content => new SortNode(content.Id, content.SortOrder, content.Name, content.CreateDate)));
-                    }
+                        SortNodes = nodes.ToArray()
+                    };
                 }
                 else
                 {
-                    // "hack for stylesheet"
-                    if (App == "settings")
+                    var asInt = int.Parse(ParentId);
+
+                    var parent = new SortNode { Id = asInt };
+
+                    var entityService = base.ApplicationContext.Services.EntityService;
+
+                    // Root nodes?
+                    if (asInt == -1)
                     {
-                        var cmsNode = new cms.businesslogic.CMSNode(ParentId);
-                        var styleSheet = new StyleSheet(cmsNode.Id);
-                        nodes.AddRange(styleSheet.Properties.Select(child => new SortNode(child.Id, child.sortOrder, child.Text, child.CreateDateTime)));
+                        if (App == "media")
+                        {
+                            var rootMedia = entityService.GetRootEntities(UmbracoObjectTypes.Media);
+                            nodes.AddRange(rootMedia.Select(media => new SortNode(media.Id, media.SortOrder, media.Name, media.CreateDate)));
+                        }
+                        else
+                        {
+                            var rootContent = entityService.GetRootEntities(UmbracoObjectTypes.Document);
+                            nodes.AddRange(rootContent.Select(content => new SortNode(content.Id, content.SortOrder, content.Name, content.CreateDate)));
+                        }
                     }
                     else
                     {
-                        var children = entityService.GetChildren(ParentId);
+                        var children = entityService.GetChildren(asInt);
                         nodes.AddRange(children.Select(child => new SortNode(child.Id, child.SortOrder, child.Name, child.CreateDate)));
                     }
+
+
+                    parent.SortNodes = nodes.ToArray();
+
+                    return parent;
                 }
-
-                parent.SortNodes = nodes.ToArray();
-
-                return parent;
             }
 
             throw new ArgumentException("User not logged in");
         }
 
-        [WebMethod]
         public void UpdateSortOrder(int ParentId, string SortOrder)
+        {
+            UpdateSortOrder(ParentId.ToString(), SortOrder);
+        }
+
+        [WebMethod]
+        public void UpdateSortOrder(string ParentId, string SortOrder)
         {
             if (AuthorizeRequest() == false) return;
             if (SortOrder.Trim().Length <= 0) return;
@@ -92,13 +113,17 @@ namespace umbraco.presentation.webservices
 
             var ids = SortOrder.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
             if (isContent)
-                SortContent(ids, ParentId);
-
-            if (isMedia)
+            {
+                SortContent(ids, int.Parse(ParentId));
+            }
+            else if (isMedia)
+            {
                 SortMedia(ids);
-
-            if (isContent == false && isMedia == false)
-                SortStylesheetProperties(ids);
+            }
+            else
+            {
+                SortStylesheetProperties(ParentId, ids);
+            }
         }
 
         private void SortMedia(string[] ids)
@@ -123,20 +148,27 @@ namespace umbraco.presentation.webservices
             }
         }
 
-        private void SortStylesheetProperties(string[] ids)
+
+        private void SortStylesheetProperties(string stylesheetName, string[] names)
         {
-            try
+            var stylesheet = Services.FileService.GetStylesheetByName(stylesheetName.EnsureEndsWith(".css"));
+            if (stylesheet == null) throw new InvalidOperationException("No stylesheet found by name " + stylesheetName);
+
+            var currProps = stylesheet.Properties.ToArray();
+            //remove them all first
+            foreach (var prop in currProps)
             {
-                for (var i = 0; i < ids.Length; i++)
-                {
-                    var id = int.Parse(ids[i]);
-                    new cms.businesslogic.CMSNode(id).sortOrder = i;
-                }   
+                stylesheet.RemoveProperty(prop.Name);
             }
-            catch (Exception ex)
+
+            //re-add them in the right order
+            for (var i = 0; i < names.Length; i++)
             {
-                LogHelper.Error<nodeSorter>("Could not update stylesheet property sort order", ex);
+                var found = currProps.Single(x => x.Name == names[i]);
+                stylesheet.AddProperty(found);
             }
+
+            Services.FileService.SaveStylesheet(stylesheet);
         }
 
         private void SortContent(string[] ids, int parentId)
@@ -168,7 +200,7 @@ namespace umbraco.presentation.webservices
                 LogHelper.Error<nodeSorter>("Could not update content sort order", ex);
             }
         }
-        
+
     }
 
     [Serializable]

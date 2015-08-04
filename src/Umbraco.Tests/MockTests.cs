@@ -30,7 +30,9 @@ namespace Umbraco.Tests
         [Test]
         public void Can_Create_Empty_App_Context()
         {
-            var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper());
+            var appCtx = new ApplicationContext(
+               CacheHelper.CreateDisabledCacheHelper(),
+               new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
             Assert.Pass();
         }
 
@@ -63,7 +65,9 @@ namespace Umbraco.Tests
         [Test]
         public void Can_Assign_App_Context_Singleton()
         {
-            var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper());
+            var appCtx = new ApplicationContext(
+                CacheHelper.CreateDisabledCacheHelper(),
+                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
             var result = ApplicationContext.EnsureContext(appCtx, true);
             Assert.AreEqual(appCtx, result);
         }
@@ -71,8 +75,14 @@ namespace Umbraco.Tests
         [Test]
         public void Does_Not_Overwrite_App_Context_Singleton()
         {
-            ApplicationContext.EnsureContext(new ApplicationContext(CacheHelper.CreateDisabledCacheHelper()), true);
-            var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper());
+            ApplicationContext.EnsureContext(
+                new ApplicationContext(
+                    CacheHelper.CreateDisabledCacheHelper(), 
+                    new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())), true);
+
+            var appCtx = new ApplicationContext(
+               CacheHelper.CreateDisabledCacheHelper(),
+               new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
             var result = ApplicationContext.EnsureContext(appCtx, false);
             Assert.AreNotEqual(appCtx, result);
         }
@@ -80,7 +90,9 @@ namespace Umbraco.Tests
         [Test]
         public void Can_Get_Umbraco_Context()
         {
-            var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper());
+            var appCtx = new ApplicationContext(
+               CacheHelper.CreateDisabledCacheHelper(),
+               new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
             
             var umbCtx = UmbracoContext.EnsureContext(
                 Mock.Of<HttpContextBase>(),
@@ -96,7 +108,9 @@ namespace Umbraco.Tests
         [Test]
         public void Can_Mock_Umbraco_Helper()
         {
-            var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper());
+            var appCtx = new ApplicationContext(
+               CacheHelper.CreateDisabledCacheHelper(),
+               new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
             var umbCtx = UmbracoContext.EnsureContext(
                 Mock.Of<HttpContextBase>(),
@@ -122,7 +136,9 @@ namespace Umbraco.Tests
         [Test]
         public void Can_Mock_Umbraco_Helper_Get_Url()
         {
-            var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper());
+            var appCtx = new ApplicationContext(
+               CacheHelper.CreateDisabledCacheHelper(),
+               new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
             
             var umbCtx = UmbracoContext.EnsureContext(
                 Mock.Of<HttpContextBase>(),

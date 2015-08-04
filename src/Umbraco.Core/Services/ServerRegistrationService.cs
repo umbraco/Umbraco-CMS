@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
@@ -20,8 +21,9 @@ namespace Umbraco.Core.Services
         /// <param name="uowProvider">A UnitOfWork provider.</param>
         /// <param name="repositoryFactory">A repository factory.</param>
         /// <param name="logger">A logger.</param>
-        public ServerRegistrationService(IDatabaseUnitOfWorkProvider uowProvider, RepositoryFactory repositoryFactory, ILogger logger)
-            : base(uowProvider, repositoryFactory, logger)
+        /// <param name="eventMessagesFactory"></param>
+        public ServerRegistrationService(IDatabaseUnitOfWorkProvider uowProvider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+            : base(uowProvider, repositoryFactory, logger, eventMessagesFactory)
         { }
 
         /// <summary>

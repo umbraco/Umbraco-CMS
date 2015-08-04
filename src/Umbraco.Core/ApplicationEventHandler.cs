@@ -74,7 +74,7 @@ namespace Umbraco.Core
         /// <returns></returns>
         private bool ShouldExecute(ApplicationContext applicationContext)
         {
-            if (applicationContext.IsConfigured && applicationContext.DatabaseContext.CanConnect)
+            if (applicationContext.IsConfigured && applicationContext.DatabaseContext.IsDatabaseConfigured)
             {
                 return true;
             }
@@ -84,7 +84,7 @@ namespace Umbraco.Core
                 return true;
             }
 
-            if (!applicationContext.DatabaseContext.CanConnect && ExecuteWhenDatabaseNotConfigured)
+            if (!applicationContext.DatabaseContext.IsDatabaseConfigured && ExecuteWhenDatabaseNotConfigured)
             {
                 return true;
             }

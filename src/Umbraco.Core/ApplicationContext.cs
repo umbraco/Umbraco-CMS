@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Configuration;
 using System.Threading;
-using System.Web;
-using System.Web.Caching;
-using Umbraco.Core.Cache;
+using System.Threading.Tasks;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
-
 
 namespace Umbraco.Core
 {
@@ -35,6 +31,7 @@ namespace Umbraco.Core
             if (dbContext == null) throw new ArgumentNullException("dbContext");
             if (serviceContext == null) throw new ArgumentNullException("serviceContext");
             if (cache == null) throw new ArgumentNullException("cache");
+            if (logger == null) throw new ArgumentNullException("logger");
             _databaseContext = dbContext;
             _services = serviceContext;
             ApplicationCache = cache;
@@ -49,7 +46,7 @@ namespace Umbraco.Core
         /// <param name="dbContext"></param>
         /// <param name="serviceContext"></param>
         /// <param name="cache"></param>
-        [Obsolete("Use the other constructor specifying an ILogger instead")]
+        [Obsolete("Use the other constructor specifying a ProfilingLogger instead")]
         public ApplicationContext(DatabaseContext dbContext, ServiceContext serviceContext, CacheHelper cache)
             : this(dbContext, serviceContext, cache, 
                 new ProfilingLogger(LoggerResolver.Current.Logger, ProfilerResolver.Current.Profiler))
@@ -60,10 +57,26 @@ namespace Umbraco.Core
         /// Creates a basic app context
         /// </summary>
         /// <param name="cache"></param>
+        [Obsolete("Use the other constructor specifying a ProfilingLogger instead")]
         public ApplicationContext(CacheHelper cache)
         {
+            if (cache == null) throw new ArgumentNullException("cache");
             ApplicationCache = cache;
+            ProfilingLogger = new ProfilingLogger(LoggerResolver.Current.Logger, ProfilerResolver.Current.Profiler);
+            Init();
+        }
 
+	    /// <summary>
+	    /// Creates a basic app context
+	    /// </summary>
+	    /// <param name="cache"></param>
+	    /// <param name="logger"></param>
+	    public ApplicationContext(CacheHelper cache, ProfilingLogger logger)
+        {
+	        if (cache == null) throw new ArgumentNullException("cache");
+	        if (logger == null) throw new ArgumentNullException("logger");
+	        ApplicationCache = cache;
+	        ProfilingLogger = logger;
             Init();
         }
 
@@ -80,13 +93,13 @@ namespace Umbraco.Core
 	    /// </remarks>
 	    public static ApplicationContext EnsureContext(ApplicationContext appContext, bool replaceContext)
 	    {
-            if (ApplicationContext.Current != null)
+            if (Current != null)
             {
                 if (!replaceContext)
-                    return ApplicationContext.Current;
+                    return Current;
             }
-            ApplicationContext.Current = appContext;
-            return ApplicationContext.Current;
+            Current = appContext;
+            return Current;
 	    }
 
 	    /// <summary>
@@ -106,14 +119,14 @@ namespace Umbraco.Core
         [Obsolete("Use the other method specifying an ProfilingLogger instead")]
 	    public static ApplicationContext EnsureContext(DatabaseContext dbContext, ServiceContext serviceContext, CacheHelper cache, bool replaceContext)
         {
-            if (ApplicationContext.Current != null)
+            if (Current != null)
             {
                 if (!replaceContext)
-                    return ApplicationContext.Current;
+                    return Current;
             }
             var ctx = new ApplicationContext(dbContext, serviceContext, cache);
-            ApplicationContext.Current = ctx;
-            return ApplicationContext.Current;
+            Current = ctx;
+            return Current;
         }
 
 	    /// <summary>
@@ -133,14 +146,14 @@ namespace Umbraco.Core
 	    /// </remarks>
         public static ApplicationContext EnsureContext(DatabaseContext dbContext, ServiceContext serviceContext, CacheHelper cache, ProfilingLogger logger, bool replaceContext)
         {
-            if (ApplicationContext.Current != null)
+            if (Current != null)
             {
                 if (!replaceContext)
-                    return ApplicationContext.Current;
+                    return Current;
             }
             var ctx = new ApplicationContext(dbContext, serviceContext, cache, logger);
-            ApplicationContext.Current = ctx;
-            return ApplicationContext.Current;
+            Current = ctx;
+            return Current;
         }
 
 	    /// <summary>
@@ -232,7 +245,7 @@ namespace Umbraco.Core
         /// - has the SystemDirectories.Umbraco path
         /// - does not end with a slash
         /// It is initialized on the first request made to the server, by UmbracoModule.EnsureApplicationUrl:
-        /// - if umbracoSettings:settings/web.routing/@appUrl is set, use the value (new setting)
+        /// - if umbracoSettings:settings/web.routing/@umbracoApplicationUrl is set, use the value (new setting)
         /// - if umbracoSettings:settings/scheduledTasks/@baseUrl is set, use the value (backward compatibility)
         /// - otherwise, use the url of the (first) request.
         /// Not locking, does not matter if several threads write to this.
@@ -242,9 +255,10 @@ namespace Umbraco.Core
         /// - http://issues.umbraco.org/issue/U4-5728
         /// - http://issues.umbraco.org/issue/U4-5391
         /// </remarks>
-        internal string UmbracoApplicationUrl {
-	        get
-	        {
+        internal string UmbracoApplicationUrl
+        {
+            get
+            {
                 // if initialized, return
 	            if (_umbracoApplicationUrl != null) return _umbracoApplicationUrl;
 
@@ -261,11 +275,15 @@ namespace Umbraco.Core
         }
 
 	    internal string _umbracoApplicationUrl; // internal for tests
-	    private Lazy<bool> _configured;
 
+        private Lazy<bool> _configured;
+        internal MainDom MainDom { get; private set; }
+       
 	    private void Init()
-	    {
-
+		{
+            MainDom = new MainDom(ProfilingLogger.Logger);
+            MainDom.Acquire();
+            
             //Create the lazy value to resolve whether or not the application is 'configured'
             _configured = new Lazy<bool>(() =>
             {
@@ -304,7 +322,7 @@ namespace Umbraco.Core
                 }
 
             }); 
-	    }
+		}
 
 		private string ConfigurationStatus
 		{
@@ -320,12 +338,6 @@ namespace Umbraco.Core
 				}
 			}			
 		}
-
-        private void AssertIsReady()
-        {
-            if (!this.IsReady)
-                throw new Exception("ApplicationContext is not ready yet.");
-        }
 
         private void AssertIsNotReady()
         {

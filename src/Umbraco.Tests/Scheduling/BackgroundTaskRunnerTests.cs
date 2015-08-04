@@ -547,7 +547,7 @@ namespace Umbraco.Tests.Scheduling
                 runner.Shutdown(false, true);
 
                 // check that task has been disposed (timer has been killed, etc)
-                Assert.IsTrue(task.Disposed);
+                Assert.IsTrue(task.IsDisposed);
             }
         }
 
@@ -828,14 +828,6 @@ namespace Umbraco.Tests.Scheduling
             }
 
             public override bool RunsOnShutdown { get { return false; } }
-
-            protected override void Dispose(bool disposing)
-            {
-                Disposed = true;
-                base.Dispose(disposing);
-            }
-
-            public bool Disposed { get; private set; }
         }
 
         private class MyTask : BaseTask

@@ -17,6 +17,7 @@ using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.helpers;
 using umbraco.DataLayer;
+using Umbraco.Core.Events;
 using Property = umbraco.cms.businesslogic.property.Property;
 using Umbraco.Core.Strings;
 
@@ -894,7 +895,7 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Don't use! Only used internally to support the legacy events", false)]
         internal Attempt<PublishStatus> SaveAndPublish(int userId)
         {
-            var result = Attempt.Fail(new PublishStatus(ContentEntity, PublishStatusType.FailedCancelledByEvent));
+            var result = Attempt.Fail(new PublishStatus(ContentEntity, PublishStatusType.FailedCancelledByEvent, new EventMessages()));
             foreach (var property in GenericProperties)
             {
                 ContentEntity.SetValue(property.PropertyType.Alias, property.Value);
@@ -1019,10 +1020,10 @@ namespace umbraco.cms.businesslogic.web
                     return result;
                 }
 
-                return new Attempt<PublishStatus>(false, new PublishStatus(ContentEntity, PublishStatusType.FailedCancelledByEvent));
+                return new Attempt<PublishStatus>(false, new PublishStatus(ContentEntity, PublishStatusType.FailedCancelledByEvent, new EventMessages()));
             }
 
-            return new Attempt<PublishStatus>(false, new PublishStatus(ContentEntity, PublishStatusType.FailedCancelledByEvent));
+            return new Attempt<PublishStatus>(false, new PublishStatus(ContentEntity, PublishStatusType.FailedCancelledByEvent, new EventMessages()));
         }
 
         /// <summary>

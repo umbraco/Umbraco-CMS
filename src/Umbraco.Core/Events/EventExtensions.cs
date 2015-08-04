@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 namespace Umbraco.Core.Events
 {
@@ -7,16 +8,16 @@ namespace Umbraco.Core.Events
 	/// </summary>
 	public static class EventExtensions
 	{
-		/// <summary>
-		/// Raises the event and returns a boolean value indicating if the event was cancelled
-		/// </summary>
-		/// <typeparam name="TSender"></typeparam>
-		/// <typeparam name="TArgs"></typeparam>
-		/// <param name="eventHandler"></param>
-		/// <param name="args"></param>
-		/// <param name="sender"></param>
-		/// <returns></returns>
-		public static bool IsRaisedEventCancelled<TSender, TArgs>(
+        /// <summary>
+        /// Raises the event and returns a boolean value indicating if the event was cancelled
+        /// </summary>
+        /// <typeparam name="TSender"></typeparam>
+        /// <typeparam name="TArgs"></typeparam>
+        /// <param name="eventHandler"></param>
+        /// <param name="args"></param>
+        /// <param name="sender"></param>
+        /// <returns></returns>
+        public static bool IsRaisedEventCancelled<TSender, TArgs>(
 			this TypedEventHandler<TSender, TArgs> eventHandler,
 			TArgs args,
 			TSender sender)
@@ -27,16 +28,16 @@ namespace Umbraco.Core.Events
 
 			return args.Cancel;
 		}
-
-		/// <summary>
-		/// Raises the event
-		/// </summary>
-		/// <typeparam name="TSender"></typeparam>
-		/// <typeparam name="TArgs"></typeparam>
-		/// <param name="eventHandler"></param>
-		/// <param name="args"></param>
-		/// <param name="sender"></param>
-		public static void RaiseEvent<TSender, TArgs>(
+        
+        /// <summary>
+        /// Raises the event
+        /// </summary>
+        /// <typeparam name="TSender"></typeparam>
+        /// <typeparam name="TArgs"></typeparam>
+        /// <param name="eventHandler"></param>
+        /// <param name="args"></param>
+        /// <param name="sender"></param>
+        public static void RaiseEvent<TSender, TArgs>(
 			this TypedEventHandler<TSender, TArgs> eventHandler,
 			TArgs args,
 			TSender sender)

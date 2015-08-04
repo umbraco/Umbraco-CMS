@@ -433,7 +433,8 @@ module.exports = function (grunt) {
                     ignorePackages: ['bootstrap'],
                     packageSpecific: {
                         'typeahead.js': {
-                            keepExpandedHierarchy: false
+                            keepExpandedHierarchy: false,
+                            files: ['dist/typeahead.bundle.min.js']
                         },
                         'underscore': {
                             files: ['underscore-min.js', 'underscore-min.map']
@@ -462,10 +463,7 @@ module.exports = function (grunt) {
                         },
                         'angular-dynamic-locale': {
                             files: ['tmhDynamicLocale.min.js', 'tmhDynamicLocale.min.js.map']
-                        },
-                        'bootstrap-tabdrop': {
-                            keepExpandedHierarchy: false
-                        },
+                        },                        
                         'ng-file-upload': {
                             keepExpandedHierarchy: false,
                             files: ['angular-file-upload.min.js']

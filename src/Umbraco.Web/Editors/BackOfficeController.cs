@@ -3,44 +3,36 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Security.Claims;
-using System.ServiceModel.Security;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Mvc;
 using System.Web.UI;
-using dotless.Core.Parser.Tree;
+using ClientDependency.Core.Config;
 using Microsoft.AspNet.Identity;
-using Microsoft.Owin;
+using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
-using Umbraco.Core.Manifest;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Manifest;
 using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.PropertyEditors;
+using Umbraco.Web.Security.Identity;
 using Umbraco.Web.Trees;
 using Umbraco.Web.UI.JavaScript;
-using Umbraco.Web.PropertyEditors;
-using Umbraco.Web.Models;
-using Umbraco.Web.WebServices;
 using Umbraco.Web.WebApi.Filters;
-using System.Web;
-using AutoMapper;
-using Microsoft.AspNet.Identity.Owin;
-using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Security;
-using Task = System.Threading.Tasks.Task;
-using Umbraco.Web.Security.Identity;
+using Umbraco.Web.WebServices;
+using Action = umbraco.BusinessLogic.Actions.Action;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
@@ -417,7 +409,7 @@ namespace Umbraco.Web.Editors
         public async Task<ActionResult> ExternalLinkLoginCallback()
         {
             var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync(
-                Core.Constants.Security.BackOfficeExternalAuthenticationType,
+                Constants.Security.BackOfficeExternalAuthenticationType,
                 XsrfKey, User.Identity.GetUserId());
             
             if (loginInfo == null)
@@ -459,7 +451,7 @@ namespace Umbraco.Web.Editors
 
             //First check if there's external login info, if there's not proceed as normal
             var loginInfo = await OwinContext.Authentication.GetExternalLoginInfoAsync(
-                Core.Constants.Security.BackOfficeExternalAuthenticationType);
+                Constants.Security.BackOfficeExternalAuthenticationType);
 
             if (loginInfo == null || loginInfo.ExternalIdentity.IsAuthenticated == false)
             {
@@ -496,9 +488,9 @@ namespace Umbraco.Web.Editors
                 }
 
                 //Remove the cookie otherwise this message will keep appearing
-                if (Response.Cookies[Core.Constants.Security.BackOfficeExternalCookieName] != null)
+                if (Response.Cookies[Constants.Security.BackOfficeExternalCookieName] != null)
                 {
-                    Response.Cookies[Core.Constants.Security.BackOfficeExternalCookieName].Expires = DateTime.MinValue;    
+                    Response.Cookies[Constants.Security.BackOfficeExternalCookieName].Expires = DateTime.MinValue;    
                 }
             }
 
@@ -620,7 +612,7 @@ namespace Umbraco.Web.Editors
             var version = UmbracoVersion.GetSemanticVersion().ToSemanticString();
 
             app.Add("version", version);
-            app.Add("cdf", ClientDependency.Core.Config.ClientDependencySettings.Instance.Version);
+            app.Add("cdf", ClientDependencySettings.Instance.Version);
             //useful for dealing with virtual paths on the client side when hosted in virtual directories especially
             app.Add("applicationPath", HttpContext.Request.ApplicationPath.EnsureEndsWith('/'));
             return app;
@@ -685,48 +677,21 @@ namespace Umbraco.Web.Editors
             return JavaScript(result);
         }
 
-        /// <summary>
-        /// Renders out all JavaScript references that have bee declared in IActions
-        /// </summary>
-        private static IEnumerable<string> GetLegacyActionJs(LegacyJsActionType type)
+        internal static IEnumerable<string> GetLegacyActionJsForActions(LegacyJsActionType type, IEnumerable<string> values)
         {
             var blockList = new List<string>();
             var urlList = new List<string>();
-            foreach (var jsFile in global::umbraco.BusinessLogic.Actions.Action.GetJavaScriptFileReferences())
+            foreach (var jsFile in values)
             {
-                //validate that this is a url, if it is not, we'll assume that it is a text block and render it as a text
-                //block instead.
-                var isValid = true;
-                
-                if (Uri.IsWellFormedUriString(jsFile, UriKind.RelativeOrAbsolute))
+                var isJsPath = jsFile.DetectIsJavaScriptPath();
+                if (isJsPath.Success)
+
                 {
-                    //ok it validates, but so does alert('hello'); ! so we need to do more checks
-
-                    //here are the valid chars in a url without escaping
-                    if (Regex.IsMatch(jsFile, @"[^a-zA-Z0-9-._~:/?#\[\]@!$&'\(\)*\+,%;=]"))
-                        isValid = false;
-
-                    //we'll have to be smarter and just check for certain js patterns now too!
-                    var jsPatterns = new string[] {@"\+\s*\=", @"\);", @"function\s*\(", @"!=", @"=="};
-                    if (jsPatterns.Any(p => Regex.IsMatch(jsFile, p)))
-                    {
-                        isValid = false;
-                    }
-                    if (isValid)
-                    {
-                        //it is a valid URL add to Url list
-                        urlList.Add(jsFile);
-                    }
+                    urlList.Add(isJsPath.Result);
                 }
                 else
                 {
-                    isValid = false;
-                }
-
-                if (isValid == false)
-                {
-                    //it isn't a valid URL, must be a js block
-                    blockList.Add(jsFile);                     
+                    blockList.Add(isJsPath.Result);
                 }
             }
 
@@ -740,8 +705,16 @@ namespace Umbraco.Web.Editors
 
             return blockList;
         }
-        
-        private enum LegacyJsActionType
+
+        /// <summary>
+        /// Renders out all JavaScript references that have bee declared in IActions
+        /// </summary>
+        private static IEnumerable<string> GetLegacyActionJs(LegacyJsActionType type)
+        {
+            return GetLegacyActionJsForActions(type, Action.GetJavaScriptFileReferences());
+        }
+
+        internal enum LegacyJsActionType
         {
             JsBlock,
             JsUrl

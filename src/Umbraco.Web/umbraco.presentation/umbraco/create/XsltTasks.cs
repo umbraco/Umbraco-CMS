@@ -1,5 +1,6 @@
 using System;
 using System.Data;
+using System.IO;
 using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.IO;
@@ -9,6 +10,7 @@ using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.BasePages;
 using umbraco.cms.businesslogic.member;
+using Umbraco.Core.FileResources;
 
 namespace umbraco
 {
@@ -22,14 +24,17 @@ namespace umbraco
 
         public override bool PerformSave()
         {
+            IOHelper.EnsurePathExists(SystemDirectories.Xslt);
+            IOHelper.EnsureFileExists(Path.Combine(IOHelper.MapPath(SystemDirectories.Xslt), "web.config"), Files.BlockingWebConfig);
+
             var template = Alias.Substring(0, Alias.IndexOf("|||"));
             var fileName = Alias.Substring(Alias.IndexOf("|||") + 3, Alias.Length - Alias.IndexOf("|||") - 3).Replace(" ", "");
-            if (!fileName.ToLowerInvariant().EndsWith(".xslt"))
+            if (fileName.ToLowerInvariant().EndsWith(".xslt") == false)
                 fileName += ".xslt";
             var xsltTemplateSource = IOHelper.MapPath(SystemDirectories.Umbraco + "/xslt/templates/" + template);
             var xsltNewFilename = IOHelper.MapPath(SystemDirectories.Xslt + "/" + fileName);
             
-			if (!System.IO.File.Exists(xsltNewFilename))
+			if (File.Exists(xsltNewFilename) == false)
 			{
 				if (fileName.Contains("/")) //if there's a / create the folder structure for it
 				{

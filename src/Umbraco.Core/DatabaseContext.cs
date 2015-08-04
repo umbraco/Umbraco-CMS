@@ -30,8 +30,6 @@ namespace Umbraco.Core
         private readonly ILogger _logger;
         private readonly SqlSyntaxProviders _syntaxProviders;
         private bool _configured;
-        private bool _canConnect;
-        private volatile bool _connectCheck = false;
         private readonly object _locker = new object();
         private string _connectionString;
         private string _providerName;
@@ -113,21 +111,9 @@ namespace Umbraco.Core
             get
             {
                 if (IsDatabaseConfigured == false) return false;
-
-                //double check lock so that it is only checked once and is fast
-                if (_connectCheck == false)
-                {
-                    lock (_locker)
-                    {
-                        if (_canConnect == false)
-                        {
-                            _canConnect = DbConnectionExtensions.IsConnectionAvailable(ConnectionString, DatabaseProvider);
-                            _connectCheck = true;
-                        }
-                    }
-                }
-
-                return _canConnect;
+                var canConnect = DbConnectionExtensions.IsConnectionAvailable(ConnectionString, DatabaseProvider);
+                LogHelper.Info<DatabaseContext>("CanConnect = " + canConnect);
+                return canConnect;
             }
         }
 
