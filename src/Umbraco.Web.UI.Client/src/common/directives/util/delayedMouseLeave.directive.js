@@ -5,21 +5,31 @@ angular.module("umbraco.directives")
             link: function (scope, element, attrs, ctrl) {
                 var active = false;
                 var fn = $parse(attrs.delayedMouseleave);
-                element.on("mouseleave", function(event) {
-                    var callback = function() {
-                        fn(scope, {$event:event});
+
+                function mouseLeave(event) {
+                    var callback = function () {
+                        fn(scope, { $event: event });
                     };
 
                     active = false;
-                    $timeout(function(){
-                        if(active === false){
+                    $timeout(function () {
+                        if (active === false) {
                             scope.$apply(callback);
                         }
                     }, 650);
-                });
+                }
 
-                element.on("mouseenter", function(event, args){
+                function mouseEnter(event, args){
                     active = true;
+                }
+
+                element.on("mouseleave", mouseLeave);
+                element.on("mouseenter", mouseEnter);
+
+                //unbind!!
+                scope.$on('$destroy', function () {
+                    element.off("mouseleave", mouseLeave);
+                    element.off("mouseenter", mouseEnter);
                 });
             }
         };
