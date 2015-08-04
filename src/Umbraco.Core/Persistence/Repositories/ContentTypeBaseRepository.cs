@@ -713,7 +713,7 @@ AND umbracoNode.id <> @id",
                 var sql = @"SELECT cmsContentType.pk as ctPk, cmsContentType.alias as ctAlias, cmsContentType.allowAtRoot as ctAllowAtRoot, cmsContentType.description as ctDesc,
                                 cmsContentType.icon as ctIcon, cmsContentType.isContainer as ctIsContainer, cmsContentType.nodeId as ctId, cmsContentType.thumbnail as ctThumb,
                                 AllowedTypes.allowedId as ctaAllowedId, AllowedTypes.SortOrder as ctaSortOrder, AllowedTypes.alias as ctaAlias,		                        
-                                ParentTypes.parentContentTypeId as chtParentId,
+                                ParentTypes.parentContentTypeId as chtParentId, ParentTypes.parentContentTypeKey as chtParentKey,
                                 umbracoNode.createDate as nCreateDate, umbracoNode." + sqlSyntax.GetQuotedColumnName("level") + @" as nLevel, umbracoNode.nodeObjectType as nObjectType, umbracoNode.nodeUser as nUser,
 		                        umbracoNode.parentID as nParentId, umbracoNode." + sqlSyntax.GetQuotedColumnName("path") + @" as nPath, umbracoNode.sortOrder as nSortOrder, umbracoNode." + sqlSyntax.GetQuotedColumnName("text") + @" as nName, umbracoNode.trashed as nTrashed,
                                 umbracoNode.uniqueID as nUniqueId
@@ -727,7 +727,12 @@ AND umbracoNode.id <> @id",
                             ON cmsContentTypeAllowedContentType.AllowedId = cmsContentType.nodeId
                         ) AllowedTypes
                         ON AllowedTypes.Id = cmsContentType.nodeId
-                        LEFT JOIN cmsContentType2ContentType as ParentTypes
+                        LEFT JOIN (
+                            SELECT cmsContentType2ContentType.parentContentTypeId, umbracoNode.uniqueID AS parentContentTypeKey, cmsContentType2ContentType.childContentTypeId
+                            FROM cmsContentType2ContentType	
+                            INNER JOIN umbracoNode
+                            ON cmsContentType2ContentType.parentContentTypeId = umbracoNode." + sqlSyntax.GetQuotedColumnName("id") + @"
+                        ) ParentTypes                        
                         ON ParentTypes.childContentTypeId = cmsContentType.nodeId	
                         WHERE (umbracoNode.nodeObjectType = @nodeObjectType)";
 
@@ -842,7 +847,7 @@ AND umbracoNode.id <> @id",
                                 cmsContentType.pk as ctPk, cmsContentType.alias as ctAlias, cmsContentType.allowAtRoot as ctAllowAtRoot, cmsContentType.description as ctDesc,
                                 cmsContentType.icon as ctIcon, cmsContentType.isContainer as ctIsContainer, cmsContentType.nodeId as ctId, cmsContentType.thumbnail as ctThumb,
                                 AllowedTypes.allowedId as ctaAllowedId, AllowedTypes.SortOrder as ctaSortOrder, AllowedTypes.alias as ctaAlias,		                        
-                                ParentTypes.parentContentTypeId as chtParentId,
+                                ParentTypes.parentContentTypeId as chtParentId,ParentTypes.parentContentTypeKey as chtParentKey,
                                 umbracoNode.createDate as nCreateDate, umbracoNode." + sqlSyntax.GetQuotedColumnName("level") + @" as nLevel, umbracoNode.nodeObjectType as nObjectType, umbracoNode.nodeUser as nUser,
 		                        umbracoNode.parentID as nParentId, umbracoNode." + sqlSyntax.GetQuotedColumnName("path") + @" as nPath, umbracoNode.sortOrder as nSortOrder, umbracoNode." + sqlSyntax.GetQuotedColumnName("text") + @" as nName, umbracoNode.trashed as nTrashed,
                                 umbracoNode.uniqueID as nUniqueId,                                
@@ -865,7 +870,12 @@ AND umbracoNode.id <> @id",
                             ON cmsTemplate.nodeId = umbracoNode.id
                         ) as Template
                         ON Template.nodeId = cmsDocumentType.templateNodeId
-                        LEFT JOIN cmsContentType2ContentType as ParentTypes
+                        LEFT JOIN (
+                            SELECT cmsContentType2ContentType.parentContentTypeId, umbracoNode.uniqueID AS parentContentTypeKey, cmsContentType2ContentType.childContentTypeId
+                            FROM cmsContentType2ContentType	
+                            INNER JOIN umbracoNode
+                            ON cmsContentType2ContentType.parentContentTypeId = umbracoNode." + sqlSyntax.GetQuotedColumnName("id") + @"
+                        ) ParentTypes 
                         ON ParentTypes.childContentTypeId = cmsContentType.nodeId	
                         WHERE (umbracoNode.nodeObjectType = @nodeObjectType)";
 
@@ -1043,7 +1053,14 @@ AND umbracoNode.id <> @id",
                             ? x.ctId == currentCtId
                             : x.nUniqueId == currentCtId;
                     })
-                    .Select(x => (TId?)x.chtParentId)
+                    .Select(x =>
+                    {
+                        //TODO: This is a bit hacky right now but don't have time to do a nice refactor to support both GUID and Int queries, so this is
+                        // how it is for now.
+                        return (typeof(TId) == typeof(int))
+                            ? (TId?)x.chtParentId
+                            : (TId?)x.chtParentKey;                        
+                    })
                     .Where(x => x.HasValue)
                     .Distinct()
                     .Select(x => x.Value).ToList());
