@@ -1,3 +1,5 @@
+using System;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Services
@@ -8,7 +10,7 @@ namespace Umbraco.Core.Services
     public class OperationStatus<TEntity, TStatus> : OperationStatus<TStatus>
         where TStatus : struct
     {
-        public OperationStatus(TEntity entity, TStatus statusType) : base(statusType)
+        public OperationStatus(TEntity entity, TStatus statusType, EventMessages eventMessages) : base(statusType, eventMessages)
         {
             Entity = entity;
         }
@@ -20,12 +22,15 @@ namespace Umbraco.Core.Services
     public class OperationStatus<TStatus>
         where TStatus : struct
     {
-        public OperationStatus(TStatus statusType)
+        public OperationStatus(TStatus statusType, EventMessages eventMessages)
         {
+            if (eventMessages == null) throw new ArgumentNullException("eventMessages");
             StatusType = statusType;
+            EventMessages = eventMessages;
         }
 
         public TStatus StatusType { get; internal set; }
+        public EventMessages EventMessages { get; private set; }
     }
 
     /// <summary>
@@ -33,21 +38,23 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class OperationStatus : OperationStatus<OperationStatusType>
     {
-        public OperationStatus(OperationStatusType statusType) : base(statusType)
+        public OperationStatus(OperationStatusType statusType, EventMessages eventMessages) : base(statusType, eventMessages)
         {
         }
 
 
         #region Static Helper methods
-        internal static OperationStatus Cancelled
+
+        internal static OperationStatus Cancelled(EventMessages eventMessages)
         {
-            get { return new OperationStatus(OperationStatusType.FailedCancelledByEvent); }
+            return new OperationStatus(OperationStatusType.FailedCancelledByEvent, eventMessages);
         }
 
-        internal static OperationStatus Success
+        internal static OperationStatus Success(EventMessages eventMessages)
         {
-            get { return new OperationStatus(OperationStatusType.Success); }
-        } 
+            return new OperationStatus(OperationStatusType.Success, eventMessages);
+        }
+
         #endregion
     }
 

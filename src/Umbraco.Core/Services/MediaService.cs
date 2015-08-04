@@ -741,12 +741,12 @@ namespace Umbraco.Core.Services
         Attempt<OperationStatus> IMediaServiceOperations.Delete(IMedia media, int userId)
         {
             //TODO: IT would be much nicer to mass delete all in one trans in the repo level!
+            var evtMsgs = EventMessagesFactory.Get();
 
-            if (Deleting.IsRaisedEventCancelled(
-                EventMessagesFactory.Get(),
-                messages => new DeleteEventArgs<IMedia>(media, messages), this))
+            if (Deleting.IsRaisedEventCancelled(                
+                new DeleteEventArgs<IMedia>(media, evtMsgs), this))
             {
-                return Attempt.Fail(OperationStatus.Cancelled);
+                return Attempt.Fail(OperationStatus.Cancelled(evtMsgs));
             }
 
             //Delete children before deleting the 'possible parent'
@@ -762,9 +762,8 @@ namespace Umbraco.Core.Services
                 repository.Delete(media);
                 uow.Commit();
 
-                var msgs = EventMessagesFactory.Get();
-                var args = new DeleteEventArgs<IMedia>(media, false, msgs);
-                Deleted.RaiseEvent(msgs, messages =>  args, this);
+                var args = new DeleteEventArgs<IMedia>(media, false, evtMsgs);
+                Deleted.RaiseEvent(args, this);
 
                 //remove any flagged media files
                 repository.DeleteMediaFiles(args.MediaFilesToDelete);
@@ -772,7 +771,7 @@ namespace Umbraco.Core.Services
 
             Audit(AuditType.Delete, "Delete Media performed by user", userId, media.Id);
 
-            return Attempt.Succeed(OperationStatus.Success);
+            return Attempt.Succeed(OperationStatus.Success(evtMsgs));
         }
 
         /// <summary>
@@ -783,14 +782,15 @@ namespace Umbraco.Core.Services
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
         Attempt<OperationStatus> IMediaServiceOperations.Save(IMedia media, int userId, bool raiseEvents)
         {
+            var evtMsgs = EventMessagesFactory.Get();
+
             if (raiseEvents)
             {
                 if (Saving.IsRaisedEventCancelled(
-                    EventMessagesFactory.Get(),
-                    messages => new SaveEventArgs<IMedia>(media, messages),
+                    new SaveEventArgs<IMedia>(media, evtMsgs),
                     this))
                 {
-                    return Attempt.Fail(OperationStatus.Cancelled);
+                    return Attempt.Fail(OperationStatus.Cancelled(evtMsgs));
                 }
 
             }
@@ -811,11 +811,11 @@ namespace Umbraco.Core.Services
             }
 
             if (raiseEvents)
-                Saved.RaiseEvent(EventMessagesFactory.Get(), messages => new SaveEventArgs<IMedia>(media, false, messages), this);
+                Saved.RaiseEvent(new SaveEventArgs<IMedia>(media, false, evtMsgs), this);
 
             Audit(AuditType.Save, "Save Media performed by user", userId, media.Id);
 
-            return Attempt.Succeed(OperationStatus.Success);
+            return Attempt.Succeed(OperationStatus.Success(evtMsgs));
         }
 
         /// <summary>
@@ -827,15 +827,15 @@ namespace Umbraco.Core.Services
         Attempt<OperationStatus> IMediaServiceOperations.Save(IEnumerable<IMedia> medias, int userId, bool raiseEvents)
         {
             var asArray = medias.ToArray();
+            var evtMsgs = EventMessagesFactory.Get();
 
             if (raiseEvents)
             {
                 if (Saving.IsRaisedEventCancelled(
-                    EventMessagesFactory.Get(),
-                    messages => new SaveEventArgs<IMedia>(asArray, messages),
+                    new SaveEventArgs<IMedia>(asArray, evtMsgs),
                     this))
                 {
-                    return Attempt.Fail(OperationStatus.Cancelled);
+                    return Attempt.Fail(OperationStatus.Cancelled(evtMsgs));
                 }
             }
 
@@ -859,11 +859,11 @@ namespace Umbraco.Core.Services
             }
 
             if (raiseEvents)
-                Saved.RaiseEvent(EventMessagesFactory.Get(), messages => new SaveEventArgs<IMedia>(asArray, false, messages), this);
+                Saved.RaiseEvent(new SaveEventArgs<IMedia>(asArray, false, evtMsgs), this);
 
             Audit(AuditType.Save, "Save Media items performed by user", userId, -1);
 
-            return Attempt.Succeed(OperationStatus.Success);
+            return Attempt.Succeed(OperationStatus.Success(evtMsgs));
         }
 
         /// <summary>
@@ -960,11 +960,12 @@ namespace Umbraco.Core.Services
 
             var originalPath = media.Path;
 
+            var evtMsgs = EventMessagesFactory.Get();
+
             if (Trashing.IsRaisedEventCancelled(
-                EventMessagesFactory.Get(),
-                messages => new MoveEventArgs<IMedia>(messages, new MoveEventInfo<IMedia>(media, originalPath, Constants.System.RecycleBinMedia)), this))
+                new MoveEventArgs<IMedia>(new MoveEventInfo<IMedia>(media, originalPath, Constants.System.RecycleBinMedia)), this))
             {
-                return Attempt.Fail(OperationStatus.Cancelled);
+                return Attempt.Fail(OperationStatus.Cancelled(evtMsgs));
             }
 
             var moveInfo = new List<MoveEventInfo<IMedia>>
@@ -1002,12 +1003,11 @@ namespace Umbraco.Core.Services
             }
 
             Trashed.RaiseEvent(
-                EventMessagesFactory.Get(),
-                messages => new MoveEventArgs<IMedia>(false, messages, moveInfo.ToArray()), this);
+                new MoveEventArgs<IMedia>(false, evtMsgs, moveInfo.ToArray()), this);
 
             Audit(AuditType.Move, "Move Media to Recycle Bin performed by user", userId, media.Id);
 
-            return Attempt.Succeed(OperationStatus.Success);
+            return Attempt.Succeed(OperationStatus.Success(evtMsgs));
         }
 
         /// <summary>

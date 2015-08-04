@@ -1,3 +1,4 @@
+using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 
@@ -8,16 +9,16 @@ namespace Umbraco.Core.Publishing
     /// </summary>
     public class UnPublishStatus : OperationStatus<IContent, UnPublishedStatusType>
     {
-        public UnPublishStatus(IContent content, UnPublishedStatusType statusType)
-            : base(content, statusType)
+        public UnPublishStatus(IContent content, UnPublishedStatusType statusType, EventMessages eventMessages)
+            : base(content, statusType, eventMessages)
         {
         }
 
         /// <summary>
         /// Creates a successful unpublish status
         /// </summary>
-        public UnPublishStatus(IContent content)
-            : this(content, UnPublishedStatusType.Success)
+        public UnPublishStatus(IContent content, EventMessages eventMessages)
+            : this(content, UnPublishedStatusType.Success, eventMessages)
         {
         }
 

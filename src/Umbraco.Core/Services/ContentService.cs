@@ -889,16 +889,17 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the User deleting the Content</param>
         Attempt<OperationStatus> IContentServiceOperations.MoveToRecycleBin(IContent content, int userId)
         {
+            var evtMsgs = EventMessagesFactory.Get();
+
             using (new WriteLock(Locker))
             {
                 var originalPath = content.Path;
 
-                if (Trashing.IsRaisedEventCancelled(
-                  EventMessagesFactory.Get(),
-                  messages => new MoveEventArgs<IContent>(messages, new MoveEventInfo<IContent>(content, originalPath, Constants.System.RecycleBinContent)),
+                if (Trashing.IsRaisedEventCancelled(                  
+                  new MoveEventArgs<IContent>(evtMsgs, new MoveEventInfo<IContent>(content, originalPath, Constants.System.RecycleBinContent)),
                   this))
                 {
-                    return Attempt.Fail(OperationStatus.Cancelled);
+                    return Attempt.Fail(OperationStatus.Cancelled(evtMsgs));
                 }
 
                 var moveInfo = new List<MoveEventInfo<IContent>>
@@ -941,11 +942,11 @@ namespace Umbraco.Core.Services
                     uow.Commit();
                 }
 
-                Trashed.RaiseEvent(EventMessagesFactory.Get(), messages => new MoveEventArgs<IContent>(false, messages, moveInfo.ToArray()), this);
+                Trashed.RaiseEvent(new MoveEventArgs<IContent>(false, evtMsgs, moveInfo.ToArray()), this);
 
                 Audit(AuditType.Move, "Move Content to Recycle Bin performed by user", userId, content.Id);
 
-                return Attempt.Succeed(OperationStatus.Success);
+                return Attempt.Succeed(OperationStatus.Success(evtMsgs));
             }
         }
 
@@ -1060,14 +1061,15 @@ namespace Umbraco.Core.Services
         {
             var asArray = contents.ToArray();
 
+            var evtMsgs = EventMessagesFactory.Get();
+
             if (raiseEvents)
             {
                 if (Saving.IsRaisedEventCancelled(
-                    EventMessagesFactory.Get(),
-                    messages => new SaveEventArgs<IContent>(asArray, messages),
+                    new SaveEventArgs<IContent>(asArray, evtMsgs),
                     this))
                 {
-                    return Attempt.Fail(OperationStatus.Cancelled);
+                    return Attempt.Fail(OperationStatus.Cancelled(evtMsgs));
                 }
             }
             using (new WriteLock(Locker))
@@ -1107,11 +1109,11 @@ namespace Umbraco.Core.Services
                 }
 
                 if (raiseEvents)
-                    Saved.RaiseEvent(EventMessagesFactory.Get(), messages => new SaveEventArgs<IContent>(asArray, false, messages), this);
+                    Saved.RaiseEvent(new SaveEventArgs<IContent>(asArray, false, evtMsgs), this);
 
                 Audit(AuditType.Save, "Bulk Save content performed by user", userId == -1 ? 0 : userId, Constants.System.Root);
 
-                return Attempt.Succeed(OperationStatus.Success);
+                return Attempt.Succeed(OperationStatus.Success(evtMsgs));
             }
         }
 
@@ -1126,14 +1128,15 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the User deleting the Content</param>
         Attempt<OperationStatus> IContentServiceOperations.Delete(IContent content, int userId)
         {
+            var evtMsgs = EventMessagesFactory.Get();
+
             using (new WriteLock(Locker))
             {
-                if (Deleting.IsRaisedEventCancelled(
-                  EventMessagesFactory.Get(),
-                  messages => new DeleteEventArgs<IContent>(content, messages),
+                if (Deleting.IsRaisedEventCancelled(                  
+                  new DeleteEventArgs<IContent>(content, evtMsgs),
                   this))
                 {
-                    return Attempt.Fail(OperationStatus.Cancelled);
+                    return Attempt.Fail(OperationStatus.Cancelled(evtMsgs));
                 }
 
                 //Make sure that published content is unpublished before being deleted
@@ -1154,10 +1157,9 @@ namespace Umbraco.Core.Services
                 {
                     repository.Delete(content);
                     uow.Commit();
-
-                    var evtMsgs = EventMessagesFactory.Get();
+                    
                     var args = new DeleteEventArgs<IContent>(content, false, evtMsgs);
-                    Deleted.RaiseEvent(evtMsgs, messages => args, this);
+                    Deleted.RaiseEvent(args, this);
                     
                     //remove any flagged media files
                     repository.DeleteMediaFiles(args.MediaFilesToDelete);
@@ -1165,7 +1167,7 @@ namespace Umbraco.Core.Services
 
                 Audit(AuditType.Delete, "Delete Content performed by user", userId, content.Id);
 
-                return Attempt.Succeed(OperationStatus.Success);
+                return Attempt.Succeed(OperationStatus.Success(evtMsgs));
             }
         }
 
@@ -1772,6 +1774,8 @@ namespace Umbraco.Core.Services
         {
             if (content == null) throw new ArgumentNullException("content");
 
+            var evtMsgs = EventMessagesFactory.Get();
+
             using (new WriteLock(Locker))
             {
                 var result = new List<Attempt<PublishStatus>>();
@@ -1783,7 +1787,7 @@ namespace Umbraco.Core.Services
                         string.Format(
                             "Content '{0}' with Id '{1}' could not be published because its parent or one of its ancestors is not published.",
                             content.Name, content.Id));
-                    result.Add(Attempt.Fail(new PublishStatus(content, PublishStatusType.FailedPathNotPublished)));
+                    result.Add(Attempt.Fail(new PublishStatus(content, PublishStatusType.FailedPathNotPublished, evtMsgs)));
                     return result;
                 }
 
@@ -1795,7 +1799,7 @@ namespace Umbraco.Core.Services
                                       content.Name, content.Id));
                     result.Add(
                         Attempt.Fail(
-                            new PublishStatus(content, PublishStatusType.FailedContentInvalid)
+                            new PublishStatus(content, PublishStatusType.FailedContentInvalid, evtMsgs)
                             {
                                 InvalidProperties = ((ContentBase)content).LastInvalidProperties
                             }));
@@ -1857,14 +1861,17 @@ namespace Umbraco.Core.Services
             var newest = GetById(content.Id); // ensure we have the newest version
             if (content.Version != newest.Version) // but use the original object if it's already the newest version
                 content = newest;
+
+            var evtMsgs = EventMessagesFactory.Get();
+               
             var published = content.Published ? content : GetPublishedVersion(content.Id); // get the published version
             if (published == null)
             {
-                return Attempt.Succeed(new UnPublishStatus(content, UnPublishedStatusType.SuccessAlreadyUnPublished)); // already unpublished
+                return Attempt.Succeed(new UnPublishStatus(content, UnPublishedStatusType.SuccessAlreadyUnPublished, evtMsgs)); // already unpublished
             }
             
             var unpublished = _publishingStrategy.UnPublish(content, userId);
-            if (unpublished == false) return Attempt.Fail(new UnPublishStatus(content, UnPublishedStatusType.FailedCancelledByEvent));
+            if (unpublished == false) return Attempt.Fail(new UnPublishStatus(content, UnPublishedStatusType.FailedCancelledByEvent, evtMsgs));
 
             var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateContentRepository(uow))
@@ -1884,7 +1891,7 @@ namespace Umbraco.Core.Services
 
             Audit(AuditType.UnPublish, "UnPublish performed by user", userId, content.Id);
 
-            return Attempt.Succeed(new UnPublishStatus(content, UnPublishedStatusType.Success));
+            return Attempt.Succeed(new UnPublishStatus(content, UnPublishedStatusType.Success, evtMsgs));
         }
 
         /// <summary>
@@ -1896,13 +1903,14 @@ namespace Umbraco.Core.Services
         /// <returns>True if publishing succeeded, otherwise False</returns>
         private Attempt<PublishStatus> SaveAndPublishDo(IContent content, int userId = 0, bool raiseEvents = true)
         {
+            var evtMsgs = EventMessagesFactory.Get();
+
             if (raiseEvents)
             {
                 if (Saving.IsRaisedEventCancelled(
-                    EventMessagesFactory.Get(),
-                    messages => new SaveEventArgs<IContent>(content, messages), this))
+                    new SaveEventArgs<IContent>(content, evtMsgs), this))
                 {
-                    return Attempt.Fail(new PublishStatus(content, PublishStatusType.FailedCancelledByEvent));
+                    return Attempt.Fail(new PublishStatus(content, PublishStatusType.FailedCancelledByEvent, evtMsgs));
                 }
             }
 
@@ -1910,7 +1918,7 @@ namespace Umbraco.Core.Services
             {
                 //Has this content item previously been published? If so, we don't need to refresh the children
                 var previouslyPublished = content.HasIdentity && HasPublishedVersion(content.Id); //content might not have an id
-                var publishStatus = new PublishStatus(content, PublishStatusType.Success); //initially set to success
+                var publishStatus = new PublishStatus(content, PublishStatusType.Success, evtMsgs); //initially set to success
 
                 //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
                 publishStatus.StatusType = CheckAndLogIsPublishable(content);
@@ -1960,7 +1968,7 @@ namespace Umbraco.Core.Services
                 }
 
                 if (raiseEvents)
-                    Saved.RaiseEvent(EventMessagesFactory.Get(), messages => new SaveEventArgs<IContent>(content, false, messages), this);
+                    Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false, evtMsgs), this);
 
                 //Save xml to db and call following method to fire event through PublishingStrategy to update cache
                 if (published)
@@ -1991,14 +1999,15 @@ namespace Umbraco.Core.Services
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
         private Attempt<OperationStatus> Save(IContent content, bool changeState, int userId = 0, bool raiseEvents = true)
         {
+            var evtMsgs = EventMessagesFactory.Get();
+
             if (raiseEvents)
             {
-                if (Saving.IsRaisedEventCancelled(
-                  EventMessagesFactory.Get(),
-                  messages => new SaveEventArgs<IContent>(content, messages),
+                if (Saving.IsRaisedEventCancelled(                  
+                  new SaveEventArgs<IContent>(content, evtMsgs),
                   this))
                 {
-                    return Attempt.Fail(OperationStatus.Cancelled);
+                    return Attempt.Fail(OperationStatus.Cancelled(evtMsgs));
                 }
             }
 
@@ -2026,11 +2035,11 @@ namespace Umbraco.Core.Services
                 }
 
                 if (raiseEvents)
-                    Saved.RaiseEvent(EventMessagesFactory.Get(), messages => new SaveEventArgs<IContent>(content, false, messages), this);
+                    Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false, evtMsgs), this);
 
                 Audit(AuditType.Save, "Save Content performed by user", userId, content.Id);
 
-                return Attempt.Succeed(OperationStatus.Success);
+                return Attempt.Succeed(OperationStatus.Success(evtMsgs));
             }
         }
 
