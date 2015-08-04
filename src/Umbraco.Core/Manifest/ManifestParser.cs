@@ -96,11 +96,15 @@ namespace Umbraco.Core.Manifest
             
             if (depth < 1)
             {
-                var dirs = currDir.GetDirectories();
                 var result = new List<string>();
-                foreach (var d in dirs)
+                if (currDir.Exists)
                 {
-                    result.AddRange(GetAllManifestFileContents(d));
+                    var dirs = currDir.GetDirectories();
+
+                    foreach (var d in dirs)
+                    {
+                        result.AddRange(GetAllManifestFileContents(d));
+                    }    
                 }
                 return result;
             }

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -20,27 +21,27 @@ namespace Umbraco.Core.Sync
     /// An <see cref="IServerMessenger"/> that works by storing messages in the database.
     /// </summary>
     //
-    // abstract because it needs to be inherited by a class that will
-    // - trigger Boot() when appropriate
-    // - trigger Sync() when appropriate
-    //
     // this messenger writes ALL instructions to the database,
     // but only processes instructions coming from remote servers,
     // thus ensuring that instructions run only once
     //
-    public abstract class DatabaseServerMessenger : ServerMessengerBase
+    public class DatabaseServerMessenger : ServerMessengerBase
     {
         private readonly ApplicationContext _appContext;
         private readonly DatabaseServerMessengerOptions _options;
-        private readonly object _lock = new object();
+        private readonly ManualResetEvent _syncIdle;
+        private readonly object _locko = new object();
+        private readonly ILogger _logger;
         private int _lastId = -1;
-        private volatile bool _syncing;
         private DateTime _lastSync;
         private bool _initialized;
+        private bool _syncing;
+        private bool _released;
+        private readonly ProfilingLogger _profilingLogger;
 
         protected ApplicationContext ApplicationContext { get { return _appContext; } }
 
-        protected DatabaseServerMessenger(ApplicationContext appContext, bool distributedEnabled, DatabaseServerMessengerOptions options)
+        public DatabaseServerMessenger(ApplicationContext appContext, bool distributedEnabled, DatabaseServerMessengerOptions options)
             : base(distributedEnabled)
         {
             if (appContext == null) throw new ArgumentNullException("appContext");
@@ -49,6 +50,9 @@ namespace Umbraco.Core.Sync
             _appContext = appContext;
             _options = options;
             _lastSync = DateTime.UtcNow;
+            _syncIdle = new ManualResetEvent(true);
+            _profilingLogger = appContext.ProfilingLogger;
+            _logger = appContext.ProfilingLogger.Logger;
         }
 
         #region Messenger
@@ -98,8 +102,27 @@ namespace Umbraco.Core.Sync
         /// </remarks>
         protected void Boot()
         {
-            ReadLastSynced();
-            Initialize();
+            // weight:10, must release *before* the facade service, because once released
+            // the service will *not* be able to properly handle our notifications anymore
+            const int weight = 10;
+
+            var registered = ApplicationContext.MainDom.Register(
+                () =>
+                {
+                    lock (_locko)
+                    {
+                        _released = true; // no more syncs
+                    }
+                    _syncIdle.WaitOne(); // wait for pending sync
+                },
+                weight);
+
+            if (registered == false)
+                return;
+
+            ReadLastSynced(); // get _lastId
+            EnsureInstructions(); // reset _lastId if instrs are missing
+            Initialize(); // boot
         }
 
         /// <summary>
@@ -111,26 +134,31 @@ namespace Umbraco.Core.Sync
         /// </remarks>
         private void Initialize()
         {
-            if (_lastId < 0) // never synced before
+            lock (_locko)
             {
-                // we haven't synced - in this case we aren't going to sync the whole thing, we will assume this is a new 
-                // server and it will need to rebuild it's own caches, eg Lucene or the xml cache file.
-                LogHelper.Warn<DatabaseServerMessenger>("No last synced Id found, this generally means this is a new server/install. The server will rebuild its caches and indexes and then adjust it's last synced id to the latest found in the database and will start maintaining cache updates based on that id");
+                if (_released) return;
 
-                // go get the last id in the db and store it
-                // note: do it BEFORE initializing otherwise some instructions might get lost
-                // when doing it before, some instructions might run twice - not an issue
-                var lastId = _appContext.DatabaseContext.Database.ExecuteScalar<int>("SELECT MAX(id) FROM umbracoCacheInstruction");
-                if (lastId > 0)
-                    SaveLastSynced(lastId);
+                if (_lastId < 0) // never synced before
+                {
+                    // we haven't synced - in this case we aren't going to sync the whole thing, we will assume this is a new 
+                    // server and it will need to rebuild it's own caches, eg Lucene or the xml cache file.
+                    _logger.Warn<DatabaseServerMessenger>("No last synced Id found, this generally means this is a new server/install. The server will rebuild its caches and indexes and then adjust it's last synced id to the latest found in the database and will start maintaining cache updates based on that id");
 
-                // execute initializing callbacks
-                if (_options.InitializingCallbacks != null)
-                    foreach (var callback in _options.InitializingCallbacks)
-                        callback();
+                    // go get the last id in the db and store it
+                    // note: do it BEFORE initializing otherwise some instructions might get lost
+                    // when doing it before, some instructions might run twice - not an issue
+                    var lastId = _appContext.DatabaseContext.Database.ExecuteScalar<int>("SELECT MAX(id) FROM umbracoCacheInstruction");
+                    if (lastId > 0)
+                        SaveLastSynced(lastId);
+
+                    // execute initializing callbacks
+                    if (_options.InitializingCallbacks != null)
+                        foreach (var callback in _options.InitializingCallbacks)
+                            callback();
+                }
+
+                _initialized = true;
             }
-
-            _initialized = true;
         }
 
         /// <summary>
@@ -138,25 +166,34 @@ namespace Umbraco.Core.Sync
         /// </summary>
         protected void Sync()
         {
-            if ((DateTime.UtcNow - _lastSync).Seconds <= _options.ThrottleSeconds)
-                return;
-
-            if (_syncing) return;
-
-            lock (_lock)
+            lock (_locko)
             {
-                if (_syncing) return;
+                if (_syncing) 
+                    return;
 
-                _syncing = true; // lock other threads out
+                if (_released)
+                    return;
+
+                if ((DateTime.UtcNow - _lastSync).Seconds <= _options.ThrottleSeconds)
+                    return;
+
+                _syncing = true;
+                _syncIdle.Reset();
                 _lastSync = DateTime.UtcNow;
+            }
 
-                using (DisposableTimer.DebugDuration<DatabaseServerMessenger>("Syncing from database..."))
+            try
+            {
+                using (_profilingLogger.DebugDuration<DatabaseServerMessenger>("Syncing from database..."))
                 {
                     ProcessDatabaseInstructions();
                     PruneOldInstructions();
                 }
-
-                _syncing = false; // release
+            }
+            finally
+            {
+                _syncing = false;
+                _syncIdle.Set();
             }
         }
 
@@ -207,7 +244,7 @@ namespace Umbraco.Core.Sync
                 }
                 catch (JsonException ex)
                 {
-                    LogHelper.Error<DatabaseServerMessenger>(string.Format("Failed to deserialize instructions ({0}: \"{1}\").", dto.Id, dto.Instructions), ex);
+                    _logger.Error<DatabaseServerMessenger>(string.Format("Failed to deserialize instructions ({0}: \"{1}\").", dto.Id, dto.Instructions), ex);
                     lastId = dto.Id; // skip
                     continue;
                 }
@@ -220,10 +257,13 @@ namespace Umbraco.Core.Sync
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error<DatabaseServerMessenger>(string.Format("Failed to execute instructions ({0}: \"{1}\").", dto.Id, dto.Instructions), ex);
-                    LogHelper.Warn<DatabaseServerMessenger>("BEWARE - DISTRIBUTED CACHE IS NOT UPDATED.");
-                    throw;
-                 }
+                    _logger.Error<DatabaseServerMessenger>(
+                        string.Format("DISTRIBUTED CACHE IS NOT UPDATED. Failed to execute instructions ({0}: \"{1}\"). Instruction is being skipped/ignored", dto.Id, dto.Instructions), ex);
+
+                    //we cannot throw here because this invalid instruction will just keep getting processed over and over and errors
+                    // will be thrown over and over. The only thing we can do is ignore and move on.
+                    lastId = dto.Id;
+                }
             }
 
             if (lastId > 0)
@@ -239,6 +279,23 @@ namespace Umbraco.Core.Sync
                 new { pruneDate = DateTime.UtcNow.AddDays(-_options.DaysToRetainInstructions) });
         }
 
+        /// <summary>
+        /// Ensure that the last instruction that was processed is still in the database.
+        /// </summary>
+        /// <remarks>If the last instruction is not in the database anymore, then the messenger
+        /// should not try to process any instructions, because some instructions might be lost,
+        /// and it should instead cold-boot.</remarks>
+        private void EnsureInstructions()
+        {
+            var sql = new Sql().Select("*")
+                .From<CacheInstructionDto>()
+                .Where<CacheInstructionDto>(dto => dto.Id == _lastId);
+
+            var dtos = _appContext.DatabaseContext.Database.Fetch<CacheInstructionDto>(sql);
+            if (dtos.Count == 0)
+                _lastId = -1;
+        }
+    
         /// <summary>
         /// Reads the last-synced id from file into memory.
         /// </summary>

@@ -96,7 +96,8 @@ namespace Umbraco.Web.Scheduling
             _logPrefix = "[" + name + "] ";
             _logger = logger;
 
-            HostingEnvironment.RegisterObject(this);
+            if (options.Hosted)
+                HostingEnvironment.RegisterObject(this);
 
             if (options.AutoStart)
                 StartUp();

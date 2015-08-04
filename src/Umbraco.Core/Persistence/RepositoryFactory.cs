@@ -294,7 +294,7 @@ namespace Umbraco.Core.Persistence
 
         public IDomainRepository CreateDomainRepository(IDatabaseUnitOfWork uow)
         {
-            return new DomainRepository(uow, _cacheHelper, _logger, _sqlSyntax, CreateContentRepository(uow), CreateLanguageRepository(uow));
+            return new DomainRepository(uow, _cacheHelper, _logger, _sqlSyntax);
         }
 
         public ITaskTypeRepository CreateTaskTypeRepository(IDatabaseUnitOfWork uow)

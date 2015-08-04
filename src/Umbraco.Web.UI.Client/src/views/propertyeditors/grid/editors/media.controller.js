@@ -44,7 +44,7 @@ angular.module("umbraco")
         $timeout(function(){
             if($scope.control.$initializing){
                 $scope.setImage();
-            }else{
+            }else if($scope.control.value){
                 $scope.setUrl();
             }
         }, 200);

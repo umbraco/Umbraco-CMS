@@ -33,11 +33,11 @@ namespace Umbraco.Core.Models
                 //re-parse it so we can check what properties are different and adjust the event handlers
                 var parsed = StylesheetHelper.ParseRules(Content).ToArray();
                 var names = parsed.Select(x => x.Name).ToArray();
-                var existing = _properties.Value.Where(x => names.Contains(x.Name)).ToArray();
+                var existing = _properties.Value.Where(x => names.InvariantContains(x.Name)).ToArray();
                 //update existing
                 foreach (var stylesheetProperty in existing)
                 {
-                    var updateFrom = parsed.Single(x => x.Name == stylesheetProperty.Name);
+                    var updateFrom = parsed.Single(x => x.Name.InvariantEquals(stylesheetProperty.Name));
                     //remove current event handler while we update, we'll reset it after
                     stylesheetProperty.PropertyChanged -= Property_PropertyChanged;
                     stylesheetProperty.Alias = updateFrom.Selector;
@@ -46,14 +46,14 @@ namespace Umbraco.Core.Models
                     stylesheetProperty.PropertyChanged += Property_PropertyChanged;
                 }
                 //remove no longer existing
-                var nonExisting = _properties.Value.Where(x => names.Contains(x.Name) == false).ToArray();
+                var nonExisting = _properties.Value.Where(x => names.InvariantContains(x.Name) == false).ToArray();
                 foreach (var stylesheetProperty in nonExisting)
                 {
                     stylesheetProperty.PropertyChanged -= Property_PropertyChanged;
                     _properties.Value.Remove(stylesheetProperty);
                 }
                 //add new ones
-                var newItems = parsed.Where(x => _properties.Value.Select(p => p.Name).Contains(x.Name) == false);
+                var newItems = parsed.Where(x => _properties.Value.Select(p => p.Name).InvariantContains(x.Name) == false);
                 foreach (var stylesheetRule in newItems)
                 {
                     var prop = new StylesheetProperty(stylesheetRule.Name, stylesheetRule.Selector, stylesheetRule.Styles);
@@ -128,7 +128,7 @@ namespace Umbraco.Core.Models
         /// <param name="property"></param>
         public void AddProperty(StylesheetProperty property)
         {
-            if (Properties.Any(x => x.Name == property.Name))
+            if (Properties.Any(x => x.Name.InvariantEquals(property.Name)))
             {
                 throw new DuplicateNameException("The property with the name " + property.Name + " already exists in the collection");
             }
@@ -151,7 +151,7 @@ namespace Umbraco.Core.Models
         /// <param name="name"></param>
         public void RemoveProperty(string name)
         {
-            if (Properties.Any(x => x.Name == name))
+            if (Properties.Any(x => x.Name.InvariantEquals(name)))
             {
                 Content = StylesheetHelper.ReplaceRule(Content, name, null);
             }

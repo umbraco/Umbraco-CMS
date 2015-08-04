@@ -18,26 +18,10 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class LocalizationService : RepositoryService, ILocalizationService
     {
+        
 
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public LocalizationService()
-            : this(new RepositoryFactory(ApplicationContext.Current.ApplicationCache, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider, UmbracoConfig.For.UmbracoSettings()))
-        { }
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public LocalizationService(RepositoryFactory repositoryFactory)
-            : this(new PetaPocoUnitOfWorkProvider(LoggerResolver.Current.Logger), repositoryFactory, LoggerResolver.Current.Logger)
-        {
-        }
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public LocalizationService(IDatabaseUnitOfWorkProvider provider)
-            : this(provider, new RepositoryFactory(ApplicationContext.Current.ApplicationCache, LoggerResolver.Current.Logger, SqlSyntaxContext.SqlSyntaxProvider, UmbracoConfig.For.UmbracoSettings()), LoggerResolver.Current.Logger)
-        {
-        }
-
-        public LocalizationService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger)
-            : base(provider, repositoryFactory, logger)
+        public LocalizationService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+            : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
         }
 
@@ -139,10 +123,6 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateDictionaryRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.Get(id);
-                //var query = Query<IDictionaryItem>.Builder.Where(x => x.Key == id);
-                //var items = repository.GetByQuery(query);
-
-                //return items.FirstOrDefault();
             }
         }
 
@@ -156,10 +136,6 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateDictionaryRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.Get(key);
-                //var query = Query<IDictionaryItem>.Builder.Where(x => x.ItemKey == key);
-                //var items = repository.GetByQuery(query);
-
-                //return items.FirstOrDefault();
             }
         }
 
@@ -176,6 +152,19 @@ namespace Umbraco.Core.Services
                 var items = repository.GetByQuery(query);
 
                 return items;
+            }
+        }
+
+        /// <summary>
+        /// Gets a list of descendants for a <see cref="IDictionaryItem"/>
+        /// </summary>
+        /// <param name="parentId">Id of the parent, null will return all dictionary items</param>
+        /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
+        public IEnumerable<IDictionaryItem> GetDictionaryItemDescendants(Guid? parentId)
+        {
+            using (var repository = RepositoryFactory.CreateDictionaryRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.GetDictionaryItemDescendants(parentId);
             }
         }
 
@@ -204,10 +193,6 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateDictionaryRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.Get(key) != null;
-                //var query = Query<IDictionaryItem>.Builder.Where(x => x.ItemKey == key);
-                //var items = repository.GetByQuery(query);
-
-                //return items.Any();
             }
         }
 

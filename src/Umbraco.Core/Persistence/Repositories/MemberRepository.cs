@@ -674,8 +674,10 @@ namespace Umbraco.Core.Persistence.Repositories
             //NOTE: This doesn't allow properties to be part of the query
             var dtos = Database.Fetch<MemberDto, ContentVersionDto, ContentDto, NodeDto>(sql);
 
+            var ids = dtos.Select(x => x.ContentVersionDto.ContentDto.ContentTypeId).ToArray();
+
             //content types
-            var contentTypes = _memberTypeRepository.GetAll(dtos.Select(x => x.ContentVersionDto.ContentDto.ContentTypeId).ToArray()).ToArray();
+            var contentTypes = ids.Length == 0 ? Enumerable.Empty<IMemberType>() : _memberTypeRepository.GetAll(ids).ToArray();
 
             var dtosWithContentTypes = dtos
                 //This select into and null check are required because we don't have a foreign damn key on the contentType column

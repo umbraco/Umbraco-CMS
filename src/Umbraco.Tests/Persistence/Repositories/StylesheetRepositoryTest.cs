@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Moq;
@@ -116,6 +117,26 @@ namespace Umbraco.Tests.Persistence.Repositories
 /**umb_name:Test*/
 p{font-size:2em;}"));
             Assert.AreEqual(1, stylesheet.Properties.Count());
+        }
+
+        [Test]
+        public void Throws_When_Adding_Duplicate_Properties()
+        {
+            // Arrange
+            var provider = new FileUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+
+            var repository = new StylesheetRepository(unitOfWork, _fileSystem);
+
+            // Act
+            var stylesheet = new Stylesheet("test-update.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
+            repository.AddOrUpdate(stylesheet);
+            unitOfWork.Commit();
+
+            stylesheet.AddProperty(new StylesheetProperty("Test", "p", "font-size:2em;"));
+
+            Assert.Throws<DuplicateNameException>(() => stylesheet.AddProperty(new StylesheetProperty("test", "p", "font-size:2em;")));
+
         }
 
         [Test]

@@ -29,6 +29,7 @@ namespace Umbraco.Core.ObjectResolution
 		{
             //create the legacy resolver and only include the legacy types
 	        _legacyResolver = new LegacyStartupHandlerResolver(
+                serviceProvider, logger,
 	            applicationEventHandlers.Where(x => !TypeHelper.IsTypeAssignableFrom<IApplicationEventHandler>(x)));
 		}
 
@@ -70,8 +71,8 @@ namespace Umbraco.Core.ObjectResolution
 
 	    private class LegacyStartupHandlerResolver : ManyObjectsResolverBase<ApplicationEventsResolver, IApplicationStartupHandler>, IDisposable
 	    {
-	        internal LegacyStartupHandlerResolver(IEnumerable<Type> legacyStartupHandlers)
-                : base(legacyStartupHandlers)
+	        internal LegacyStartupHandlerResolver(IServiceProvider serviceProvider, ILogger logger, IEnumerable<Type> legacyStartupHandlers)
+                : base(serviceProvider, logger, legacyStartupHandlers)
 	        {
 
 	        }

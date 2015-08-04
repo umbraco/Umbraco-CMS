@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Cache;
 using Umbraco.Core.CodeAnnotations;
+using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -19,10 +20,10 @@ namespace Umbraco.Core.Services
         private readonly Dictionary<string, Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>> _supportedObjectTypes;
         
 
-        public EntityService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger,
+        public EntityService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory,
            IContentService contentService, IContentTypeService contentTypeService, IMediaService mediaService, IDataTypeService dataTypeService,
            IMemberService memberService, IMemberTypeService memberTypeService, IRuntimeCacheProvider runtimeCache)
-            : base(provider, repositoryFactory, logger)
+            : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
             _runtimeCache = runtimeCache;
             IContentTypeService contentTypeService1 = contentTypeService;

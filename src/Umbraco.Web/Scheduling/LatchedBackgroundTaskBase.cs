@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Scheduling
 {
-    internal abstract class LatchedBackgroundTaskBase : ILatchedBackgroundTask
+    internal abstract class LatchedBackgroundTaskBase : DisposableObject, ILatchedBackgroundTask
     {
         private readonly ManualResetEventSlim _latch;
-        private bool _disposed;
 
         protected LatchedBackgroundTaskBase()
         {
@@ -51,27 +51,13 @@ namespace Umbraco.Web.Scheduling
 
         public abstract bool RunsOnShutdown { get; }
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        // the task is going to be disposed again after execution,
+        // the task is going to be disposed after execution,
         // unless it is latched again, thus indicating it wants to
         // remain active
 
-        protected virtual void Dispose(bool disposing)
+        protected override void DisposeResources()
         {
-            // lock on _latch instead of creating a new object as _timer is
-            // private, non-null, readonly - so safe here
-            lock (_latch)
-            {
-                if (_disposed) return;
-                _disposed = true;
-
-                _latch.Dispose();                
-            }
+            _latch.Dispose();
         }
     }
 }

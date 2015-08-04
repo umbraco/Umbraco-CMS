@@ -39,11 +39,15 @@
                 </a>
             </div>
             <span ng-bind="bulkStatus" ng-show="isAnythingSelected()"></span>
+            
+            <div class="umb-loader-wrapper" ng-show="actionInProgress">
+                <div class="umb-loader"></div>
+            </div>
 
             <form class="form-search pull-right" novalidate>
                 <div class="inner-addon left-addon">
                     <i class="icon icon-search" ng-click="enterSearch($event)"></i>
-                    <input type="text" class="form-control" localize="placeholder" placeholder="@general_typeToSearch" ng-model="options.filter" on-keyup="search()" prevent-enter-submit no-dirty-check>
+                    <input type="text" class="form-control" localize="placeholder" placeholder="@general_typeToSearch" ng-model="options.filter" prevent-enter-submit no-dirty-check>
                 </div>
             </form>
         </div>

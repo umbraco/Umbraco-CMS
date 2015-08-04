@@ -38,7 +38,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         private const int MaxWaitMilliseconds = 30000; // save the cache after some time (ie no more than 30s of changes)
 
         // save the cache when the app goes down
-        public override bool RunsOnShutdown { get { return true; } }
+        public override bool RunsOnShutdown { get { return _timer != null; } }
 
         // initialize the first instance, which is inactive (not touched yet)
         public XmlCacheFilePersister(IBackgroundTaskRunner<XmlCacheFilePersister> runner, content content, ProfilingLogger logger)
@@ -142,13 +142,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             lock (_locko)
             {
                 _logger.Logger.Debug<XmlCacheFilePersister>("Timer: release.");
-                if (_timer != null)
-                    _timer.Dispose();
-                _timer = null;
                 _released = true;
 
-                // if running (because of shutdown) this will have no effect
-                // else it tells the runner it is time to run the task
                 Release();
             }
         }
@@ -196,6 +191,16 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             {
                 _content.SaveXmlToFile();
             }
+        }
+
+        protected override void DisposeResources()
+        {
+            base.DisposeResources();
+
+            // stop the timer
+            if (_timer == null) return;
+            _timer.Change(Timeout.Infinite, Timeout.Infinite);
+            _timer.Dispose();
         }
     }
 }

@@ -51,9 +51,8 @@ namespace Umbraco.Web
             //  use ports from request
             // otherwise,
             //  if non-standard ports used,
-            //  user may need to set baseUrl manually per 
+            //  user may need to set umbracoApplicationUrl manually per 
             //  http://our.umbraco.org/documentation/Using-Umbraco/Config-files/umbracoSettings/#ScheduledTasks
-            // TODO update the doc, prefer web.routing/@appUrl to scheduledTasks/@baseUrl
 	        var port = (request.IsSecureConnection == false && GlobalSettings.UseSSL == false)
 	                    || (request.IsSecureConnection && GlobalSettings.UseSSL)
                 ? ":" + request.ServerVariables["SERVER_PORT"]

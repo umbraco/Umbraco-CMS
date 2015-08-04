@@ -13,6 +13,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic;
+using Umbraco.Core.Profiling;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Tests.Routing
@@ -28,7 +29,7 @@ namespace Umbraco.Tests.Routing
 
 		    SettingsForTests.UmbracoPath = "~/umbraco";
             
-			var webBoot = new WebBootManager(new UmbracoApplication(), true);
+			var webBoot = new WebBootManager(new UmbracoApplication(), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()),  true);
 			//webBoot.Initialize();
 			//webBoot.Startup(null); -> don't call startup, we don't want any other application event handlers to bind for this test.
 			//webBoot.Complete(null);

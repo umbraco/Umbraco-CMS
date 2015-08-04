@@ -83,6 +83,8 @@ namespace Umbraco.Web.Editors
             {
                 var targetNode = umbraco.TypedContent(model.Source.Id);
 
+                //TODO: Null check!!!!!!!!!!!!
+
                 var aliases = this.GetChildContentTypeAliases(targetNode, currentPage).Reverse();
                 
                 foreach (var contentTypeAlias in aliases)

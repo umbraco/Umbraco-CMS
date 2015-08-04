@@ -29,14 +29,18 @@ namespace Umbraco.Tests
         [Test]
         public void SetApplicationUrlWhenNoSettings()
         {
-            var appContext = new ApplicationContext(null)
+            var appCtx = new ApplicationContext(
+                CacheHelper.CreateDisabledCacheHelper(),
+                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()))
             {
                 UmbracoApplicationUrl = null // NOT set
             };
 
+            
+
             ConfigurationManager.AppSettings.Set("umbracoUseSSL", "true"); // does not make a diff here
 
-            ServerEnvironmentHelper.TrySetApplicationUrlFromSettings(appContext, _logger,
+            ServerEnvironmentHelper.TrySetApplicationUrlFromSettings(appCtx, _logger,
                 Mock.Of<IUmbracoSettingsSection>(
                     section =>
                         section.DistributedCall == Mock.Of<IDistributedCallSection>(callSection => callSection.Servers == Enumerable.Empty<IServer>())
@@ -45,17 +49,19 @@ namespace Umbraco.Tests
 
 
             // still NOT set
-            Assert.IsNull(appContext._umbracoApplicationUrl);
+            Assert.IsNull(appCtx._umbracoApplicationUrl);
         }
 
         [Test]
         public void SetApplicationUrlFromDcSettingsNoSsl()
         {
-            var appContext = new ApplicationContext(null);
+            var appCtx = new ApplicationContext(
+               CacheHelper.CreateDisabledCacheHelper(),
+               new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
             ConfigurationManager.AppSettings.Set("umbracoUseSSL", "false");
 
-            ServerEnvironmentHelper.TrySetApplicationUrlFromSettings(appContext, _logger,
+            ServerEnvironmentHelper.TrySetApplicationUrlFromSettings(appCtx, _logger,
                 Mock.Of<IUmbracoSettingsSection>(
                     section =>
                         section.DistributedCall == Mock.Of<IDistributedCallSection>(callSection => callSection.Servers == Enumerable.Empty<IServer>())
@@ -63,17 +69,19 @@ namespace Umbraco.Tests
                         && section.ScheduledTasks == Mock.Of<IScheduledTasksSection>(tasksSection => tasksSection.BaseUrl == "mycoolhost.com/hello/world/")));
 
 
-            Assert.AreEqual("http://mycoolhost.com/hello/world", appContext._umbracoApplicationUrl);
+            Assert.AreEqual("http://mycoolhost.com/hello/world", appCtx._umbracoApplicationUrl);
         }
 
         [Test]
         public void SetApplicationUrlFromDcSettingsSsl()
         {
-            var appContext = new ApplicationContext(null);
+            var appCtx = new ApplicationContext(
+               CacheHelper.CreateDisabledCacheHelper(),
+               new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
             ConfigurationManager.AppSettings.Set("umbracoUseSSL", "true");
 
-            ServerEnvironmentHelper.TrySetApplicationUrlFromSettings(appContext, _logger,
+            ServerEnvironmentHelper.TrySetApplicationUrlFromSettings(appCtx, _logger,
                 Mock.Of<IUmbracoSettingsSection>(
                     section =>
                         section.DistributedCall == Mock.Of<IDistributedCallSection>(callSection => callSection.Servers == Enumerable.Empty<IServer>())
@@ -81,17 +89,19 @@ namespace Umbraco.Tests
                         && section.ScheduledTasks == Mock.Of<IScheduledTasksSection>(tasksSection => tasksSection.BaseUrl == "mycoolhost.com/hello/world")));
 
 
-            Assert.AreEqual("https://mycoolhost.com/hello/world", appContext._umbracoApplicationUrl);
+            Assert.AreEqual("https://mycoolhost.com/hello/world", appCtx._umbracoApplicationUrl);
         }
 
         [Test]
         public void SetApplicationUrlFromWrSettingsSsl()
         {
-            var appContext = new ApplicationContext(null);
+            var appCtx = new ApplicationContext(
+               CacheHelper.CreateDisabledCacheHelper(),
+               new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
             ConfigurationManager.AppSettings.Set("umbracoUseSSL", "true"); // does not make a diff here
 
-            ServerEnvironmentHelper.TrySetApplicationUrlFromSettings(appContext, _logger,
+            ServerEnvironmentHelper.TrySetApplicationUrlFromSettings(appCtx, _logger,
                 Mock.Of<IUmbracoSettingsSection>(
                     section =>
                         section.DistributedCall == Mock.Of<IDistributedCallSection>(callSection => callSection.Servers == Enumerable.Empty<IServer>())
@@ -99,7 +109,7 @@ namespace Umbraco.Tests
                         && section.ScheduledTasks == Mock.Of<IScheduledTasksSection>(tasksSection => tasksSection.BaseUrl == "mycoolhost.com/hello/world")));
 
 
-            Assert.AreEqual("httpx://whatever.com/hello/world", appContext._umbracoApplicationUrl);
+            Assert.AreEqual("httpx://whatever.com/hello/world", appCtx._umbracoApplicationUrl);
         }
     }
 }

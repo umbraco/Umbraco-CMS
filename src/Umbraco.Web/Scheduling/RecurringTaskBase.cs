@@ -84,19 +84,13 @@ namespace Umbraco.Web.Scheduling
         /// and returning a value indicating whether to repeat the task.</returns>
         public abstract Task<bool> PerformRunAsync(CancellationToken token);
 
-        protected override void Dispose(bool disposing)
+        protected override void DisposeResources()
         {
-            // lock on _timer instead of creating a new object as _timer is
-            // private, non-null, readonly - so safe here
-            lock (_timer)
-            {
-                if (_disposed) return;
-                _disposed = true;
+            base.DisposeResources();
 
-                // stop the timer
-                _timer.Change(Timeout.Infinite, Timeout.Infinite);
-                _timer.Dispose();
-            }
+            // stop the timer
+            _timer.Change(Timeout.Infinite, Timeout.Infinite);
+            _timer.Dispose();
         }
     }
 }
