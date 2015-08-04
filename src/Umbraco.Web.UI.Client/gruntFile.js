@@ -418,7 +418,8 @@ module.exports = function (grunt) {
                     ignorePackages: ['blueimp-canvas-to-blob', 'blueimp-tmpl', 'bootstrap'],
                     packageSpecific: {
                         'typeahead.js': {                            
-                            keepExpandedHierarchy: false
+                            keepExpandedHierarchy: false,
+                            files: ['dist/typeahead.bundle.min.js']
                         },
                         'underscore': {
                             files: ['underscore-min.js', 'underscore-min.map']
@@ -455,11 +456,7 @@ module.exports = function (grunt) {
                         },
                         'angular-dynamic-locale': {
                             files: ['tmhDynamicLocale.min.js', 'tmhDynamicLocale.min.js.map']
-                        },
-                        'bootstrap-tabdrop': {
-                            keepExpandedHierarchy: false,
-                            files: ['build/js/bootstrap-tabdrop.min.js']
-                        },
+                        },                        
                         'codemirror': {
                             files: [
                                 'lib/codemirror.js',

@@ -22,17 +22,19 @@ angular.module("umbraco.directives")
                 function enableResize() {
                     //only enable when the size is correct and it's not already enabled
                     if (!resizeEnabled && appState.getGlobalState("isTablet") === false) {
-                        element.find(".navigation-inner-container").resizable(
+                        element.resizable(
                         {
                             containment: $("#mainwrapper"),
                             autoHide: true,
-                            handles: 'e',
+                            handles: "e",
+                            alsoResize: ".navigation-inner-container",
                             resize: function(e, ui) {
                                 var wrapper = $("#mainwrapper");
-                                var contentPanel = $("#leftcolumn").next();
+                                var contentPanel = $("#contentwrapper");
                                 var apps = $("#applications");
                                 var bottomBar = contentPanel.find(".umb-bottom-bar");
-                                var navOffeset = ui.element.next();
+                                var navOffeset = $("#navOffset");
+
                                 var leftPanelWidth = ui.element.width() + apps.width();
 
                                 contentPanel.css({ left: leftPanelWidth });
@@ -40,7 +42,8 @@ angular.module("umbraco.directives")
 
                                 navOffeset.css({ "margin-left": ui.element.outerWidth() });
                             },
-                            stop: function(e, ui) {
+                            stop: function (e, ui) {
+                             
                             }
                         });
 
@@ -50,14 +53,14 @@ angular.module("umbraco.directives")
 
                 function resetResize() {
                     if (resizeEnabled) {
-                        var navInnerContainer = element.find(".navigation-inner-container");
-
                         //kill the resize
-                        navInnerContainer.resizable("destroy");
+                        element.resizable("destroy");
 
+                        element.css("width", "");
+                        var navInnerContainer = element.find(".navigation-inner-container");
                         navInnerContainer.css("width", "");
-                        $("#leftcolumn").next().css("left", "");
-                        navInnerContainer.next().css("margin-left", "");
+                        $("#contentwrapper").css("left", "");
+                        $("#navOffset").css("margin-left", "");
 
                         resizeEnabled = false;
                     }
