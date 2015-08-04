@@ -22,8 +22,8 @@
 
         <a href="" class="umb-grid-selector__item -placeholder" ng-if="(availableItems | compareArrays:selectedItems:'alias').length > 0" ng-click="openItemPicker($event)" hotkey="alt+shift+t">
             <div>
-                <div class="umb-grid-selector__item-label -blue" ng-if="defaultItem !== null">Choose {{ name }}</div>
-                <div class="umb-grid-selector__item-label -blue" ng-if="defaultItem === null">Choose default {{ name }}</div>
+                <div class="umb-grid-selector__item-label -blue" ng-if="defaultItem !== null">Choose {{ itemLabel }}</div>
+                <div class="umb-grid-selector__item-label -blue" ng-if="defaultItem === null">Choose default {{ itemLabel }}</div>
             </div>
         </a>
 
@@ -43,4 +43,3 @@
     </umb-overlay>
 
 </div>
-

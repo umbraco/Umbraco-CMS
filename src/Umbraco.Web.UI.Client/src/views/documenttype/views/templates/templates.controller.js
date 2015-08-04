@@ -9,13 +9,14 @@
 (function() {
     'use strict';
 
-    function TemplatesController($scope, entityResource, contentTypeHelper) {
+    function TemplatesController($scope, entityResource, contentTypeHelper, $routeParams) {
 
         /* ----------- SCOPE VARIABLES ----------- */
 
         var vm = this;
 
-        vm.availableTemplates =[];
+        vm.availableTemplates = [];
+        vm.updateTemplatePlaceholder = false;
 
 
         /* ---------- INIT ---------- */
@@ -25,26 +26,13 @@
         function init() {
 
             entityResource.getAll("Template").then(function(templates){
+
                 vm.availableTemplates = templates;
 
-                if($scope.model.id === 0) {
-
-                  // update template placeholder name
-                  $scope.model = contentTypeHelper.updateTemplateHolder($scope.model, true);
-
-                  // add template placeholder to available templates
-                  vm.availableTemplates = contentTypeHelper.insertTemplateHolder($scope.model, vm.availableTemplates);
-
-                  // watch for changes in content type name change
-                  $scope.$watch('model.name', function(newValue, oldValue){
-
-                    // update template placeholder name
-                    $scope.model = contentTypeHelper.updateTemplateHolder($scope.model, true);
-
-                    vm.availableTemplates = contentTypeHelper.insertTemplateHolder($scope.model, vm.availableTemplates);
-
-                  });
-
+                // update placeholder template information on new doc types
+                if (!$routeParams.notemplate && $scope.model.id === 0) {
+                  vm.updateTemplatePlaceholder = true;
+                  vm.availableTemplates = contentTypeHelper.insertTemplatePlaceholder(vm.availableTemplates);
                 }
 
             });

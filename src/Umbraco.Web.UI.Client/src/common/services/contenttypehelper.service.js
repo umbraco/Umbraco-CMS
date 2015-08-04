@@ -212,95 +212,58 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter) {
 
         },
 
-        makeTemplateHolder: function(contentType) {
+        getTemplatePlaceholder: function() {
 
-          var template = {
-            "name": contentType.name,
+          var templatePlaceholder = {
+            "name": "",
             "icon": "icon-layout",
-            "alias": "templateHolder"
+            "alias": "templatePlaceholder",
+            "placeholder": true
           };
 
-          return template;
+          return templatePlaceholder;
 
         },
 
-        insertDefaultTemplateHolder: function(contentType) {
+        insertDefaultTemplatePlaceholder: function(defaultTemplate) {
 
-          var template = contentTypeHelperService.makeTemplateHolder(contentType);
+          // get template placeholder
+          var templatePlaceholder = contentTypeHelperService.getTemplatePlaceholder();
 
-          contentType.defaultTemplate = template;
+          // add as default template
+          defaultTemplate = templatePlaceholder;
 
-          return contentType;
+          return defaultTemplate;
 
         },
 
-        insertTemplateHolder: function(contentType, array) {
+        insertTemplatePlaceholder: function(array) {
 
-          var template = contentTypeHelperService.makeTemplateHolder(contentType);
-          var templateExists = false;
+          // get template placeholder
+          var templatePlaceholder = contentTypeHelperService.getTemplatePlaceholder();
 
-          angular.forEach(array, function(arrayItem) {
-
-            // update existing template
-            if(arrayItem.alias === template.alias){
-
-              // set flag
-              templateExists = true;
-
-              // get new template holder
-              template = contentTypeHelperService.makeTemplateHolder(contentType);
-
-              // update name
-              arrayItem.name = template.name;
-
-            }
-
-          });
-
-          // push template placeholder
-          if(!templateExists) {
-            array.push(template);
-          }
+          // add as selected item
+          array.push(templatePlaceholder);
 
           return array;
 
         },
 
-        updateTemplateHolder: function(contentType, updateName, updateAlias) {
+        updateTemplatePlaceholder: function(contentType) {
 
-          var template = {"alias": "templateHolder"};
-
-          if (contentType.name !== null && contentType.alias !== null) {
-
-            // update from default template
-            if (contentType.defaultTemplate !== null && contentType.defaultTemplate.alias === template.alias) {
-
-              if(updateName) {
-                contentType.defaultTemplate.name = contentType.name;
-              }
-
-              if(updateAlias) {
-                contentType.defaultTemplate.alias = contentType.alias;
-              }
-
-            }
-
-            // update from allowed templates
-            angular.forEach(contentType.allowedTemplates, function(allowedTemplate) {
-              if (allowedTemplate.alias === template.alias) {
-
-                if(updateName) {
-                  allowedTemplate.name = contentType.name;
-                }
-
-                if(updateAlias) {
-                  allowedTemplate.alias = contentType.alias;
-                }
-
-              }
-            });
-
+          // update default template
+          if(contentType.defaultTemplate !== null && contentType.defaultTemplate.placeholder) {
+            contentType.defaultTemplate.name = contentType.name;
+            contentType.defaultTemplate.alias = contentType.alias;
           }
+
+          // update allowed template
+          angular.forEach(contentType.allowedTemplates, function(allowedTemplate){
+            if(allowedTemplate.placeholder) {
+              allowedTemplate.name = contentType.name;
+              allowedTemplate.alias = contentType.alias;
+            }
+          });
 
           return contentType;
 

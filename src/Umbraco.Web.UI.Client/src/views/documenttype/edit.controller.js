@@ -130,9 +130,9 @@
 			// reformat allowed content types to array if id's
 			vm.contentType.allowedContentTypes = contentTypeHelper.createIdArray(vm.contentType.allowedContentTypes);
 
-			// update template holder on new content types
-			if( vm.contentType.id === 0) {
-				vm.contentType = contentTypeHelper.updateTemplateHolder(vm.contentType, true, true);
+			// update placeholder template information on new doc types
+			if (!$routeParams.notemplate && vm.contentType.id === 0) {
+				vm.contentType = contentTypeHelper.updateTemplatePlaceholder(vm.contentType);
 			}
 
 			contentTypeResource.save(vm.contentType).then(function(dt){
@@ -172,21 +172,16 @@
 			// convert legacy icons
 			convertLegacyIcons(contentType);
 
-			// insert template holder on new content types
-			if(contentType.id === 0) {
-
-				// insert template placeholder as default template
-				contentType = contentTypeHelper.insertDefaultTemplateHolder(contentType);
-
-				// insert template placeholder as allowed template
-				contentType.allowedTemplates = contentTypeHelper.insertTemplateHolder(contentType, contentType.allowedTemplates);
-
-			}
-
 			// sort properties after sort order
 			angular.forEach(contentType.groups, function(group){
 				group.properties = $filter('orderBy')(group.properties, 'sortOrder');
 			});
+
+			// insert template on new doc types
+			if (!$routeParams.notemplate && contentType.id === 0) {
+				contentType.defaultTemplate = contentTypeHelper.insertDefaultTemplatePlaceholder(contentType.defaultTemplate);
+				contentType.allowedTemplates = contentTypeHelper.insertTemplatePlaceholder(contentType.allowedTemplates);
+			}
 
 			//set a shared state
 			editorState.set(contentType);

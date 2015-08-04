@@ -5,15 +5,16 @@
 
         function link(scope, el, attr, ctrl) {
 
+            var eventBindings = [];
             scope.dialogModel = {};
             scope.showDialog = false;
-            scope.name = "";
+            scope.itemLabel = "";
 
             // set default item name
             if(!scope.itemName){
-                scope.name = "item";
+                scope.itemLabel = "item";
             } else {
-                scope.name = scope.itemName;
+                scope.itemLabel = scope.itemName;
             }
 
             scope.removeItem = function(selectedItem) {
@@ -33,7 +34,7 @@
 
             scope.openItemPicker = function($event){
                 scope.dialogModel = {};
-                scope.dialogModel.title = "Choose " + scope.name;
+                scope.dialogModel.title = "Choose " + scope.itemLabel;
                 scope.dialogModel.availableItems = scope.availableItems;
                 scope.dialogModel.selectedItems = scope.selectedItems;
                 scope.dialogModel.event = $event;
@@ -61,9 +62,81 @@
             };
 
             scope.setAsDefaultItem = function(selectedItem) {
+
+                // clear default item
                 scope.defaultItem = {};
+
+                // set as default item
                 scope.defaultItem = selectedItem;
             };
+
+            function updatePlaceholders() {
+
+              // update default item
+              if(scope.defaultItem !== null && scope.defaultItem.placeholder) {
+
+                scope.defaultItem.name = scope.name;
+
+                if(scope.alias !== null && scope.alias !== undefined) {
+                  scope.defaultItem.alias = scope.alias;
+                }
+
+              }
+
+              // update selected items
+              angular.forEach(scope.selectedItems, function(selectedItem) {
+                if(selectedItem.placeholder) {
+
+                  selectedItem.name = scope.name;
+
+                  if(scope.alias !== null && scope.alias !== undefined) {
+                    selectedItem.alias = scope.alias;
+                  }
+
+                }
+              });
+
+              // update availableItems
+              angular.forEach(scope.availableItems, function(availableItem) {
+                if(availableItem.placeholder) {
+
+                  availableItem.name = scope.name;
+
+                  if(scope.alias !== null && scope.alias !== undefined) {
+                    availableItem.alias = scope.alias;
+                  }
+
+                }
+              });
+
+            }
+
+            function activate() {
+
+              // add watchers for updating placeholde name and alias
+              if(scope.updatePlaceholder) {
+                eventBindings.push(scope.$watch('name', function(newValue, oldValue){
+                  updatePlaceholders();
+                }));
+
+                eventBindings.push(scope.$watch('alias', function(newValue, oldValue){
+                  updatePlaceholders();
+                }));
+              }
+
+            }
+
+            activate();
+
+            // clean up
+            scope.$on('$destroy', function(){
+
+              // clear watchers
+              for(var e in eventBindings) {
+                eventBindings[e]();
+               }
+
+            });
 
         }
 
@@ -72,10 +145,13 @@
             replace: true,
             templateUrl: 'views/components/umb-grid-selector.html',
             scope: {
-                selectedItems: '=',
-                availableItems: "=",
-                defaultItem: "=",
-                itemName: "@"
+              name: "=",
+              alias: "=",
+              selectedItems: '=',
+              availableItems: "=",
+              defaultItem: "=",
+              itemName: "@",
+              updatePlaceholder: "="
             },
             link: link
         };
