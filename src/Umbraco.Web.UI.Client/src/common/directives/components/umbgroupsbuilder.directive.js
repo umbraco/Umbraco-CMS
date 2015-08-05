@@ -74,51 +74,7 @@
             ui.placeholder.height(ui.item.height());
           },
           stop: function(e, ui) {
-
-            var first = true;
-            var prevSortOrder = 0;
-
-            scope.model.groups.map(function(group){
-
-              var index = scope.model.groups.indexOf(group);
-
-              if(group.tabState !== "init") {
-
-                // set the first not inherited tab to sort order 0
-                if(!group.inherited && first) {
-
-                  // set the first tab sort order to 0 if prev is 0
-                  if( prevSortOrder === 0 ) {
-                    group.sortOrder = 0;
-                  // when the first tab is inherited and sort order is not 0
-                  } else {
-                    group.sortOrder = prevSortOrder + 1;
-                  }
-
-                  first = false;
-
-                } else if(!group.inherited && !first) {
-
-                    // find next group
-                    var nextGroup = scope.model.groups[index + 1];
-
-                    // if a groups is dropped in the middle of to groups with
-                    // same sort order. Give it the dropped group same sort order
-                    if( prevSortOrder === nextGroup.sortOrder ) {
-                      group.sortOrder = prevSortOrder;
-                    } else {
-                      group.sortOrder = prevSortOrder + 1;
-                    }
-
-                }
-
-                // store this tabs sort order as reference for the next
-                prevSortOrder = group.sortOrder;
-
-              }
-
-            });
-
+            updateTabsSortOrder();
           },
         };
 
@@ -140,6 +96,54 @@
             updatePropertiesSortOrder();
           }
         };
+
+      }
+
+      function updateTabsSortOrder() {
+
+        var first = true;
+        var prevSortOrder = 0;
+
+        scope.model.groups.map(function(group){
+
+          var index = scope.model.groups.indexOf(group);
+
+          if(group.tabState !== "init") {
+
+            // set the first not inherited tab to sort order 0
+            if(!group.inherited && first) {
+
+              // set the first tab sort order to 0 if prev is 0
+              if( prevSortOrder === 0 ) {
+                group.sortOrder = 0;
+              // when the first tab is inherited and sort order is not 0
+              } else {
+                group.sortOrder = prevSortOrder + 1;
+              }
+
+              first = false;
+
+            } else if(!group.inherited && !first) {
+
+                // find next group
+                var nextGroup = scope.model.groups[index + 1];
+
+                // if a groups is dropped in the middle of to groups with
+                // same sort order. Give it the dropped group same sort order
+                if( prevSortOrder === nextGroup.sortOrder ) {
+                  group.sortOrder = prevSortOrder;
+                } else {
+                  group.sortOrder = prevSortOrder + 1;
+                }
+
+            }
+
+            // store this tabs sort order as reference for the next
+            prevSortOrder = group.sortOrder;
+
+          }
+
+        });
 
       }
 
