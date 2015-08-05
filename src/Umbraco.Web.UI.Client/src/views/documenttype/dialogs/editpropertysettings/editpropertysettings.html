@@ -51,7 +51,7 @@
                 <input type="checkbox" ng-model="model.property.validation.mandatory"> Field is mandatory
             </label>
 
-            <select class="umb-dropdown" ng-options="validationType as validationType.name for validationType in validationTypes" ng-model="selectedValidationType" ng-change="changeValidationType(selectedValidationType)">
+            <select class="umb-dropdown" ng-options="validationType.name for validationType in validationTypes" ng-model="selectedValidationType" ng-change="changeValidationType(selectedValidationType)">
                 <option value="">Validation</option>
             </select>
 
