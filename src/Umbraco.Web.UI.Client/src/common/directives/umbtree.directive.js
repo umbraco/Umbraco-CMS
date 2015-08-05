@@ -412,6 +412,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                     axis: 'y',
                     tolerance: 'pointer',
                     containment: '.umb-tree .root>ul',
+                    delay: 300,
                     disabled: !scope.section.match("content|media") || scope.isdialog === "true",
                     update: function (e, ui) {
                         var node = ui.item.scope() ? ui.item.scope().node : scope.dragCurrentNode;
