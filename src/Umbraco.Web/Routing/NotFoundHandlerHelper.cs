@@ -230,15 +230,13 @@ namespace Umbraco.Web.Routing
         /// <param name="entityService"></param>
         /// <param name="publishedContentQuery"></param>
         /// <param name="domainService"></param>
-        /// <param name="localizationService"></param>
         /// <returns></returns>
         internal static int? GetCurrentNotFoundPageId(
             IContentErrorPage[] error404Collection, 
             string requestServerName, 
             IEntityService entityService,
             ITypedPublishedContentQuery publishedContentQuery,
-            IDomainService domainService,
-            ILocalizationService localizationService)
+            IDomainService domainService)
         {
             if (error404Collection.Count() > 1)
             {

@@ -80,8 +80,8 @@ namespace Umbraco.Tests.Routing
 		{
             SetupDomainServiceMock(new[]
             {
-                new UmbracoDomain("http://domain1.com/") {Id = 1, LanguageId = LangEngId, RootContentId = 1001},
-                new UmbracoDomain("http://domain2.com/") {Id = 1, LanguageId = LangEngId, RootContentId = 10011}
+                new UmbracoDomain("http://domain1.com/") {Id = 1, LanguageId = LangEngId, RootContentId = 1001, LanguageIsoCode = "en-US"},
+                new UmbracoDomain("http://domain2.com/") {Id = 1, LanguageId = LangEngId, RootContentId = 10011, LanguageIsoCode = "en-US"}
             });
 
 		}

@@ -13,7 +13,7 @@ namespace Umbraco.Tests.Routing
 		{
 		    SetupDomainServiceMock(new[]
 		    {
-		        new UmbracoDomain("domain1.com/") {Id = 1, LanguageId = LangDeId, RootContentId = 1001}
+		        new UmbracoDomain("domain1.com/") {Id = 1, LanguageId = LangDeId, RootContentId = 1001, LanguageIsoCode = "de-DE"}
 		    });
 
 		}
@@ -22,12 +22,12 @@ namespace Umbraco.Tests.Routing
 		{
 		    SetupDomainServiceMock(new[]
 		    {
-		        new UmbracoDomain("domain1.com/") {Id = 1, LanguageId = LangEngId, RootContentId = 1001},
-		        new UmbracoDomain("domain1.com/en") {Id = 1, LanguageId = LangEngId, RootContentId = 10011},
-		        new UmbracoDomain("domain1.com/fr") {Id = 1, LanguageId = LangFrId, RootContentId =  10012},
-		        new UmbracoDomain("http://domain3.com/") {Id = 1, LanguageId = LangEngId, RootContentId = 1003},
-		        new UmbracoDomain("http://domain3.com/en") {Id = 1, LanguageId = LangEngId, RootContentId = 10031},
-		        new UmbracoDomain("http://domain3.com/fr") {Id = 1, LanguageId = LangFrId, RootContentId = 10032}
+		        new UmbracoDomain("domain1.com/") {Id = 1, LanguageId = LangEngId, RootContentId = 1001, LanguageIsoCode = "en-US"},
+		        new UmbracoDomain("domain1.com/en") {Id = 1, LanguageId = LangEngId, RootContentId = 10011, LanguageIsoCode = "en-US"},
+		        new UmbracoDomain("domain1.com/fr") {Id = 1, LanguageId = LangFrId, RootContentId =  10012, LanguageIsoCode = "fr-FR"},
+		        new UmbracoDomain("http://domain3.com/") {Id = 1, LanguageId = LangEngId, RootContentId = 1003, LanguageIsoCode = "en-US"},
+		        new UmbracoDomain("http://domain3.com/en") {Id = 1, LanguageId = LangEngId, RootContentId = 10031, LanguageIsoCode = "en-US"},
+		        new UmbracoDomain("http://domain3.com/fr") {Id = 1, LanguageId = LangFrId, RootContentId = 10032, LanguageIsoCode = "fr-FR"}
 		    });
 
 		}

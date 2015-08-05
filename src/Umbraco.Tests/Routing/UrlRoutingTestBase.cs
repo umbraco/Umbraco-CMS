@@ -42,19 +42,10 @@ namespace Umbraco.Tests.Routing
             domainService.Setup(service => service.GetAll(It.IsAny<bool>()))
                 .Returns((bool incWildcards) => new[]
                 {
-                    new UmbracoDomain("domain1.com/"){Id = 1, LanguageId = 333, RootContentId = 1001}, 
-                    new UmbracoDomain("domain1.com/en"){Id = 1, LanguageId = 334, RootContentId = 10011}, 
-                    new UmbracoDomain("domain1.com/fr"){Id = 1, LanguageId = 335, RootContentId = 10012}
-                });
-
-            var langService = Mock.Get(svcCtx.LocalizationService);
-            //setup mock domain service
-            langService.Setup(service => service.GetLanguageById(LangDeId)).Returns(new Language("de-DE") {Id = LangDeId });
-            langService.Setup(service => service.GetLanguageById(LangEngId)).Returns(new Language("en-US") { Id = LangEngId });
-            langService.Setup(service => service.GetLanguageById(LangFrId)).Returns(new Language("fr-FR") { Id = LangFrId });
-            langService.Setup(service => service.GetLanguageById(LangCzId)).Returns(new Language("cs-CZ") { Id = LangCzId });
-            langService.Setup(service => service.GetLanguageById(LangNlId)).Returns(new Language("nl-NL") { Id = LangNlId });
-            langService.Setup(service => service.GetLanguageById(LangDkId)).Returns(new Language("da-DK") { Id = LangDkId });
+                    new UmbracoDomain("domain1.com/"){Id = 1, LanguageId = LangDeId, RootContentId = 1001, LanguageIsoCode = "de-DE"}, 
+                    new UmbracoDomain("domain1.com/en"){Id = 1, LanguageId = LangEngId, RootContentId = 10011, LanguageIsoCode = "en-US"}, 
+                    new UmbracoDomain("domain1.com/fr"){Id = 1, LanguageId = LangFrId, RootContentId = 10012, LanguageIsoCode = "fr-FR"}
+                });            
 
             return svcCtx;
         }

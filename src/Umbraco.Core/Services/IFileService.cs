@@ -130,10 +130,38 @@ namespace Umbraco.Core.Services
         ITemplate GetTemplate(int id);
 
         /// <summary>
-        /// Returns a template as a template node which can be traversed (parent, children)
+        /// Gets the template descendants
         /// </summary>
         /// <param name="alias"></param>
         /// <returns></returns>
+        IEnumerable<ITemplate> GetTemplateDescendants(string alias);
+
+        /// <summary>
+        /// Gets the template descendants
+        /// </summary>
+        /// <param name="masterTemplateId"></param>
+        /// <returns></returns>
+        IEnumerable<ITemplate> GetTemplateDescendants(int masterTemplateId);
+
+        /// <summary>
+        /// Gets the template children
+        /// </summary>
+        /// <param name="alias"></param>
+        /// <returns></returns>
+        IEnumerable<ITemplate> GetTemplateChildren(string alias);
+
+        /// <summary>
+        /// Gets the template children
+        /// </summary>
+        /// <param name="masterTemplateId"></param>
+        /// <returns></returns>
+        IEnumerable<ITemplate> GetTemplateChildren(int masterTemplateId);
+
+        /// <summary>
+        /// Returns a template as a template node which can be traversed (parent, children)
+        /// </summary>
+        /// <param name="alias"></param>
+        /// <returns></returns>        
         TemplateNode GetTemplateNode(string alias);
 
         /// <summary>
