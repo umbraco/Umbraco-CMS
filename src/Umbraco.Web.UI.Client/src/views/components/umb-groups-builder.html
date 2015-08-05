@@ -49,7 +49,7 @@
                     <li ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}" ng-repeat="property in tab.properties">
 
                         <!-- Init property / Property placeholder / add new property -->
-                        <a href="" class="umb-group-builder__property -placeholder" ng-if="property.propertyState=='init' && !sortingMode" ng-class="{'-placeholder': property.propertyState=='init'}" hotkey="alt+shift+p" ng-click="addProperty(property, tab.properties)">
+                        <a href="" class="umb-group-builder__property -placeholder" ng-if="property.propertyState=='init' && !sortingMode" ng-class="{'-placeholder': property.propertyState=='init'}" hotkey="alt+shift+p" ng-click="addProperty(property, tab)">
 
                             <div class="umb-group-builder__property-meta">
                                 <div class="umb-group-builder__placeholder-box -input-small"></div>
@@ -101,7 +101,7 @@
                             </div>
 
 
-                            <div tabindex="-1" class="umb-group-builder__property-preview" ng-click="editPropertyTypeSettings(property)" ng-if="!sortingMode" ng-class="{'-not-clickable': !sortingMode && property.inherited}">
+                            <div tabindex="-1" class="umb-group-builder__property-preview" ng-click="editPropertyTypeSettings(property, tab)" ng-if="!sortingMode" ng-class="{'-not-clickable': !sortingMode && property.inherited}">
 
                                 <span class="umb-group-builder__property-preview-overlay"></span>
 
@@ -125,7 +125,7 @@
                                     </div>
 
                                     <!-- settings for property -->
-                                    <a href="" class="umb-group-builder__property-action" ng-click="editPropertyTypeSettings(property)">
+                                    <a href="" class="umb-group-builder__property-action" ng-click="editPropertyTypeSettings(property, tab)">
                                         <i class="icon icon-settings"></i>
                                     </a>
 

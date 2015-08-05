@@ -119,9 +119,6 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter) {
                         // push id to array of merged composite content types
                         compositionGroup.parentTabContentTypes.push(compositeContentType.id);
 
-                        //push init property to group
-                        compositionGroup.properties.push({propertyState: "init"});
-
                         // push group before placeholder tab
                         contentType.groups.unshift(compositionGroup);
 

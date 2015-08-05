@@ -74,51 +74,7 @@
             ui.placeholder.height(ui.item.height());
           },
           stop: function(e, ui) {
-
-            var first = true;
-            var prevSortOrder = 0;
-
-            scope.model.groups.map(function(group){
-
-              var index = scope.model.groups.indexOf(group);
-
-              if(group.tabState !== "init") {
-
-                // set the first not inherited tab to sort order 0
-                if(!group.inherited && first) {
-
-                  // set the first tab sort order to 0 if prev is 0
-                  if( prevSortOrder === 0 ) {
-                    group.sortOrder = 0;
-                  // when the first tab is inherited and sort order is not 0
-                  } else {
-                    group.sortOrder = prevSortOrder + 1;
-                  }
-
-                  first = false;
-
-                } else if(!group.inherited && !first) {
-
-                    // find next group
-                    var nextGroup = scope.model.groups[index + 1];
-
-                    // if a groups is dropped in the middle of to groups with
-                    // same sort order. Give it the dropped group same sort order
-                    if( prevSortOrder === nextGroup.sortOrder ) {
-                      group.sortOrder = prevSortOrder;
-                    } else {
-                      group.sortOrder = prevSortOrder + 1;
-                    }
-
-                }
-
-                // store this tabs sort order as reference for the next
-                prevSortOrder = group.sortOrder;
-
-              }
-
-            });
-
+            updateTabsSortOrder();
           },
         };
 
@@ -140,6 +96,54 @@
             updatePropertiesSortOrder();
           }
         };
+
+      }
+
+      function updateTabsSortOrder() {
+
+        var first = true;
+        var prevSortOrder = 0;
+
+        scope.model.groups.map(function(group){
+
+          var index = scope.model.groups.indexOf(group);
+
+          if(group.tabState !== "init") {
+
+            // set the first not inherited tab to sort order 0
+            if(!group.inherited && first) {
+
+              // set the first tab sort order to 0 if prev is 0
+              if( prevSortOrder === 0 ) {
+                group.sortOrder = 0;
+              // when the first tab is inherited and sort order is not 0
+              } else {
+                group.sortOrder = prevSortOrder + 1;
+              }
+
+              first = false;
+
+            } else if(!group.inherited && !first) {
+
+                // find next group
+                var nextGroup = scope.model.groups[index + 1];
+
+                // if a groups is dropped in the middle of to groups with
+                // same sort order. Give it the dropped group same sort order
+                if( prevSortOrder === nextGroup.sortOrder ) {
+                  group.sortOrder = prevSortOrder;
+                } else {
+                  group.sortOrder = prevSortOrder + 1;
+                }
+
+            }
+
+            // store this tabs sort order as reference for the next
+            prevSortOrder = group.sortOrder;
+
+          }
+
+        });
 
       }
 
@@ -169,6 +173,14 @@
         scope.compositionsDialogModel.show = true;
 
         scope.compositionsDialogModel.submit = function(model) {
+
+          // make sure that all tabs has an init property
+          if (scope.model.groups.length !== 0) {
+            angular.forEach(scope.model.groups, function(group) {
+              addInitProperty(group);
+            });
+          }
+
           // remove overlay
           scope.compositionsDialogModel.show = false;
           scope.compositionsDialogModel = null;
@@ -189,6 +201,7 @@
           if (scope.model.compositeContentTypes.indexOf(compositeContentType.alias) === -1) {
             //merge composition with content type
             contentTypeHelper.mergeCompositeContentType(scope.model, compositeContentType);
+
           } else {
             // split composition from content type
             contentTypeHelper.splitCompositeContentType(scope.model, compositeContentType);
@@ -279,11 +292,11 @@
 
       /* ---------- PROPERTIES ---------- */
 
-      scope.addProperty = function(property, properties) {
+      scope.addProperty = function(property, group) {
 
         // set property sort order
-        var index = properties.indexOf(property);
-        var prevProperty = properties[index - 1];
+        var index = group.properties.indexOf(property);
+        var prevProperty = group.properties[index - 1];
 
         if( index > 0) {
           // set index to 1 higher than the previous property sort order
@@ -295,11 +308,11 @@
         }
 
         // open property settings dialog
-        scope.editPropertyTypeSettings(property);
+        scope.editPropertyTypeSettings(property, group);
 
       };
 
-      scope.editPropertyTypeSettings = function(property) {
+      scope.editPropertyTypeSettings = function(property, group) {
 
         if (!property.inherited) {
 
@@ -332,8 +345,8 @@
             scope.propertySettingsDialogModel.show = false;
             scope.propertySettingsDialogModel = null;
 
-            // push new init property to scope
-            addInitPropertyOnActiveGroup(scope.model.groups);
+            // push new init property to group
+            addInitProperty(group);
 
           };
 
@@ -490,6 +503,15 @@
       function addInitProperty(group) {
 
         var addInitPropertyBool = true;
+        var initProperty = {
+          label: null,
+          alias: null,
+          propertyState: "init",
+          validation: {
+            mandatory: false,
+            pattern: null
+          }
+        };
 
         // check if there already is an init property
         angular.forEach(group.properties, function(property) {
@@ -499,38 +521,10 @@
         });
 
         if (addInitPropertyBool) {
-          group.properties.push({
-            propertyState: "init"
-          });
+          group.properties.push(initProperty);
         }
 
         return group;
-      }
-
-      function addInitPropertyOnActiveGroup(groups) {
-
-        var addInitPropertyBool = true;
-
-        angular.forEach(groups, function(group) {
-
-          if (group.tabState === 'active') {
-
-            angular.forEach(group.properties, function(property) {
-              if (property.propertyState === "init") {
-                addInitPropertyBool = false;
-              }
-            });
-
-            if (addInitPropertyBool) {
-              group.properties.push({
-                propertyState: "init"
-              });
-            }
-
-          }
-        });
-
-        return groups;
       }
 
       function updateSameDataTypes(newProperty) {
