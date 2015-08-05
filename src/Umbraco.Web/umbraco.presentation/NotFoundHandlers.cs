@@ -326,8 +326,7 @@ namespace umbraco {
 			        HttpContext.Current.Request.ServerVariables["SERVER_NAME"],
 			        ApplicationContext.Current.Services.EntityService,
 			        new PublishedContentQuery(UmbracoContext.Current.ContentCache, UmbracoContext.Current.MediaCache),
-                    ApplicationContext.Current.Services.DomainService,
-                    ApplicationContext.Current.Services.LocalizationService);
+                    ApplicationContext.Current.Services.DomainService);
 
 			    if (error404.HasValue)
 			    {

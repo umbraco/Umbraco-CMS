@@ -28,8 +28,7 @@ namespace Umbraco.Web.Routing
 		        pcr.RoutingContext.UmbracoContext.HttpContext.Request.ServerVariables["SERVER_NAME"],
                 pcr.RoutingContext.UmbracoContext.Application.Services.EntityService,
                 new PublishedContentQuery(pcr.RoutingContext.UmbracoContext.ContentCache, pcr.RoutingContext.UmbracoContext.MediaCache),
-                pcr.RoutingContext.UmbracoContext.Application.Services.DomainService,
-                pcr.RoutingContext.UmbracoContext.Application.Services.LocalizationService);
+                pcr.RoutingContext.UmbracoContext.Application.Services.DomainService);
 
 			IPublishedContent content = null;
 
