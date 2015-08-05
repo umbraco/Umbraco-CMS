@@ -48,7 +48,6 @@ namespace Umbraco.Core.Persistence.Factories
                 template.IsMasterTemplate = true;
             }
 
-            //TODO: Change this to ParentId: http://issues.umbraco.org/issue/U4-5846
             if(dto.NodeDto.ParentId > 0)
                 template.MasterTemplateId = new Lazy<int>(() => dto.NodeDto.ParentId);
 
