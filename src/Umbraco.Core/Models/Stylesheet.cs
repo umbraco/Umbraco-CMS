@@ -17,7 +17,7 @@ namespace Umbraco.Core.Models
     public class Stylesheet : File
     {
         public Stylesheet(string path) 
-            : base(path)
+            : base(path.EnsureEndsWith(".css"))
         {          
             InitializeProperties();
         }

@@ -264,7 +264,11 @@ namespace Umbraco.Core.Persistence.Repositories
 
             Database.Update(dto.NodeDto);
             Database.Update(dto);
-            
+
+            //re-update if this is a master template, since it could have changed!
+            var axisDefs = GetAxisDefinitions(dto);
+            template.IsMasterTemplate = axisDefs.Any(x => x.ParentId == dto.NodeId);
+
             //now do the file work
 
             if (DetermineTemplateRenderingEngine(entity) == RenderingEngine.Mvc)
@@ -295,34 +299,27 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistDeletedItem(ITemplate entity)
         {
+            var deletes = GetDeleteClauses().ToArray();
 
-            //TODO: This isn't the most ideal way to delete a template tree, because below it will actually end up 
-            // recursing back to this method for each descendant and re-looking up the template list causing an extrac
-            // SQL call - not ideal but there shouldn't ever be a heaping list of descendant templates.
-            //The easiest way to overcome this is to expose the underlying cache upwards so that the repository has access
-            // to it, then in the PersistDeletedTemplate we wouldn't recurse the underlying function, we'd just call 
-            // PersistDeletedItem with a Template object and clear it's cache.
+            var descendants = GetDescendants(entity.Id).ToList();
 
-            var sql = GetBaseQuery(false).Where<NodeDto>(dto => dto.ParentId > 0 || dto.NodeId == entity.Id);
-
-            var dtos = Database.Fetch<TemplateDto, NodeDto>(sql);
-
-            var self = dtos.Single(x => x.NodeId == entity.Id);
-            var allChildren = dtos.Except(new[] { self });
-            var hierarchy = GenerateTemplateHierarchy(self, allChildren);
-            //remove ourselves
-            hierarchy.Remove(self);
-            //change the order so it goes bottom up!
-            hierarchy.Reverse();
+            //change the order so it goes bottom up! (deepest level first)
+            descendants.Reverse();
 
             //delete the hierarchy
-            foreach (var descendant in hierarchy)
+            foreach (var descendant in descendants)
             {
-                PersistDeletedTemplate(descendant);
+                foreach (var delete in deletes)
+                {
+                    Database.Execute(delete, new { Id = GetEntityId(descendant) });
+                }
             }
 
             //now we can delete this one
-            base.PersistDeletedItem(entity);
+            foreach (var delete in deletes)
+            {
+                Database.Execute(delete, new { Id = GetEntityId(entity) });
+            }
 
             if (DetermineTemplateRenderingEngine(entity) == RenderingEngine.Mvc)
             {
@@ -333,8 +330,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 var masterpageName = string.Concat(entity.Alias, ".master");
                 _masterpagesFileSystem.DeleteFile(masterpageName);
-            }
-
+            }         
         }
 
         #endregion
@@ -411,36 +407,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return template;
         }
-
-
-        private void PersistDeletedTemplate(TemplateDto dto)
-        {
-            //we need to get the real template for this item unfortunately to remove it
-            var template = Get(dto.NodeId);
-            if (template != null)
-            {
-                //NOTE: We must cast here so that it goes to the outter method to
-                // ensure the cache is updated.
-                PersistDeletedItem((IEntity)template);
-            }
-        }
-
-        /// <summary>
-        /// Returns a list of templates in order of descendants from the parent
-        /// </summary>
-        /// <param name="template"></param>
-        /// <param name="allChildTemplates"></param>
-        /// <returns></returns>
-        private static List<TemplateDto> GenerateTemplateHierarchy(TemplateDto template, IEnumerable<TemplateDto> allChildTemplates)
-        {
-            var hierarchy = new List<TemplateDto> { template };
-            foreach (var t in allChildTemplates.Where(x => x.NodeDto.ParentId == template.NodeId))
-            {
-                hierarchy.AddRange(GenerateTemplateHierarchy(t, allChildTemplates));
-            }
-            return hierarchy;
-        }
-
+        
         private void PopulateViewTemplate(ITemplate template, string fileName)
         {
             string content;
@@ -494,6 +461,8 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             var dtos = Database.Fetch<TemplateDto, NodeDto>(sql).ToArray();
+            if (dtos.Length == 0) return Enumerable.Empty<ITemplate>();
+
             var axisDefos = GetAxisDefinitions(dtos).ToArray();
             return dtos.Select(x => MapFromDto(x, axisDefos));
         }
@@ -511,6 +480,8 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             var dtos = Database.Fetch<TemplateDto, NodeDto>(sql).ToArray();
+            if (dtos.Length == 0) return Enumerable.Empty<ITemplate>();
+
             var axisDefos = GetAxisDefinitions(dtos).ToArray();
             return dtos.Select(x => MapFromDto(x, axisDefos));
         }
@@ -533,6 +504,8 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             var dtos = Database.Fetch<TemplateDto, NodeDto>(sql).ToArray();
+            if (dtos.Length == 0) return Enumerable.Empty<ITemplate>();
+
             var axisDefos = GetAxisDefinitions(dtos).ToArray();
             return dtos.Select(x => MapFromDto(x, axisDefos));
         }
@@ -556,7 +529,11 @@ namespace Umbraco.Core.Persistence.Repositories
                 sql.Where(@"(umbracoNode." + SqlSyntax.GetQuotedColumnName("path") + @" LIKE @query)", new { query = path + ",%" });
             }
 
+            sql.OrderBy("umbracoNode." + SqlSyntax.GetQuotedColumnName("level"));
+
             var dtos = Database.Fetch<TemplateDto, NodeDto>(sql).ToArray();
+            if (dtos.Length == 0) return Enumerable.Empty<ITemplate>();
+
             var axisDefos = GetAxisDefinitions(dtos).ToArray();
             return dtos.Select(x => MapFromDto(x, axisDefos));
 
@@ -577,7 +554,11 @@ namespace Umbraco.Core.Persistence.Repositories
                 sql.Where(@"(umbracoNode." + SqlSyntax.GetQuotedColumnName("path") + @" LIKE @query)", new {query = path + ",%" });
             }
 
+            sql.OrderBy("umbracoNode." + SqlSyntax.GetQuotedColumnName("level"));
+
             var dtos = Database.Fetch<TemplateDto, NodeDto>(sql).ToArray();
+            if (dtos.Length == 0) return Enumerable.Empty<ITemplate>();
+
             var axisDefos = GetAxisDefinitions(dtos).ToArray();
             return dtos.Select(x => MapFromDto(x, axisDefos));
         }
