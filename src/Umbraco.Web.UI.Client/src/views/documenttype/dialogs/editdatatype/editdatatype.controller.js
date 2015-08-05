@@ -12,8 +12,8 @@ function EditDataTypeController($scope, dataTypeResource, dataTypeHelper) {
 
     $scope.model.multiActions = [
       {
-        key: "save",
-        label: "Save",
+        key: "overwrite",
+        label: "Overwrite",
         defaultAction: true,
         action: function(model) {
           saveDataType($scope.model.dataType, false);
@@ -42,7 +42,7 @@ function EditDataTypeController($scope, dataTypeResource, dataTypeHelper) {
       if( $scope.model.dataType.name !== dataTypeNameCopy) {
         setDefaultMultiAction($scope.model.multiActions, "saveAsNew");
       } else {
-        setDefaultMultiAction($scope.model.multiActions, "save");
+        setDefaultMultiAction($scope.model.multiActions, "overwrite");
       }
 
     };
