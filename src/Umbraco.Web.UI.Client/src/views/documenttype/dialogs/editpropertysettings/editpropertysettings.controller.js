@@ -21,7 +21,7 @@ function EditPropertySettingsController($scope, contentTypeResource) {
         },
         {
             "name": "Validate as a number",
-            "pattern": "^[1-9]\d*$",
+            "pattern": "^[0-9]*$",
             "enableEditing": true
         },
         {
