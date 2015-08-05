@@ -319,6 +319,53 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public IEnumerable<ITemplate> GetTemplateDescendants(string alias)
+        {
+            using (var repository = _repositoryFactory.CreateTemplateRepository(_dataUowProvider.GetUnitOfWork()))
+            {
+                return repository.GetDescendants(alias);
+            }
+        }
+
+        /// <summary>
+        /// Gets the template descendants
+        /// </summary>
+        /// <param name="masterTemplateId"></param>
+        /// <returns></returns>
+        public IEnumerable<ITemplate> GetTemplateDescendants(int masterTemplateId)
+        {
+            using (var repository = _repositoryFactory.CreateTemplateRepository(_dataUowProvider.GetUnitOfWork()))
+            {
+                return repository.GetDescendants(masterTemplateId);
+            }
+        }
+
+        /// <summary>
+        /// Gets the template children
+        /// </summary>
+        /// <param name="alias"></param>
+        /// <returns></returns>
+        public IEnumerable<ITemplate> GetTemplateChildren(string alias)
+        {
+            using (var repository = _repositoryFactory.CreateTemplateRepository(_dataUowProvider.GetUnitOfWork()))
+            {
+                return repository.GetChildren(alias);
+            }
+        }
+
+        /// <summary>
+        /// Gets the template children
+        /// </summary>
+        /// <param name="masterTemplateId"></param>
+        /// <returns></returns>
+        public IEnumerable<ITemplate> GetTemplateChildren(int masterTemplateId)
+        {
+            using (var repository = _repositoryFactory.CreateTemplateRepository(_dataUowProvider.GetUnitOfWork()))
+            {
+                return repository.GetChildren(masterTemplateId);
+            }
+        }
+
         /// <summary>
         /// Returns a template as a template node which can be traversed (parent, children)
         /// </summary>
