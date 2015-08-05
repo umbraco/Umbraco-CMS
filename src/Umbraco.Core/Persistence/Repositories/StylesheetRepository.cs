@@ -25,6 +25,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public override Stylesheet Get(string id)
         {
+            id = id.EnsureEndsWith(".css");
+
             if (FileSystem.FileExists(id) == false)
             {
                 return null;
@@ -63,7 +65,10 @@ namespace Umbraco.Core.Persistence.Repositories
         public override IEnumerable<Stylesheet> GetAll(params string[] ids)
         {
             //ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
-            ids = ids.Distinct().ToArray();
+            ids = ids
+                .Select(x => x.EnsureEndsWith(".css"))
+                .Distinct()
+                .ToArray();
 
             if (ids.Any())
             {
