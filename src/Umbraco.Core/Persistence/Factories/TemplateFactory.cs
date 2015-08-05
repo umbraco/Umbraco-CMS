@@ -43,10 +43,7 @@ namespace Umbraco.Core.Persistence.Factories
                                    Path = dto.NodeDto.Path
                                };
 
-            if (childDefinitions.Any(x => x.ParentId == dto.NodeId))
-            {
-                template.IsMasterTemplate = true;
-            }
+            template.IsMasterTemplate = childDefinitions.Any(x => x.ParentId == dto.NodeId);
 
             if(dto.NodeDto.ParentId > 0)
                 template.MasterTemplateId = new Lazy<int>(() => dto.NodeDto.ParentId);

@@ -44,7 +44,13 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private ContentRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
         {
-            var templateRepository = new TemplateRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
+            TemplateRepository tr;
+            return CreateRepository(unitOfWork, out contentTypeRepository, out tr);
+        }
+
+        private ContentRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository, out TemplateRepository templateRepository)
+        {
+            templateRepository = new TemplateRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
             var tagRepository = new TagRepository(unitOfWork, CacheHelper, Logger, SqlSyntax);
             contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, templateRepository);
             var repository = new ContentRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
@@ -217,6 +223,37 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.That(contentType.HasIdentity, Is.True);
                 Assert.That(textpage.HasIdentity, Is.True);
+                
+            }
+        }
+
+        [Test]
+        public void Can_Perform_Add_With_Default_Template()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            TemplateRepository templateRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository, out templateRepository))
+            {
+                var template = new Template("hello", "hello");
+                templateRepository.AddOrUpdate(template);
+                unitOfWork.Commit();
+
+                ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage2", "Textpage");                
+                contentType.SetDefaultTemplate(template);
+                Content textpage = MockedContent.CreateSimpleContent(contentType);
+
+                // Act
+                
+                contentTypeRepository.AddOrUpdate(contentType);
+                repository.AddOrUpdate(textpage);
+                unitOfWork.Commit();
+
+                // Assert
+                Assert.That(textpage.Template, Is.Not.Null);
+                Assert.That(textpage.Template, Is.EqualTo(contentType.DefaultTemplate));
             }
         }
 
@@ -323,6 +360,28 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.That(updatedContent.Id, Is.EqualTo(content.Id));
                 Assert.That(updatedContent.Name, Is.EqualTo(content.Name));
+            }
+
+        }
+
+        [Test]
+        public void Can_Update_With_Null_Template()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
+            {
+                // Act
+                var content = repository.Get(NodeDto.NodeIdSeed + 2);
+                content.Template = null;
+                repository.AddOrUpdate(content);
+                unitOfWork.Commit();
+                var updatedContent = repository.Get(NodeDto.NodeIdSeed + 2);
+
+                // Assert
+                Assert.That(updatedContent.Template, Is.Null);
             }
 
         }

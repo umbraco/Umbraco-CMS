@@ -340,6 +340,12 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             ((Content)entity).AddingEntity();
 
+            //ensure the default template is assigned
+            if (entity.Template == null)
+            {
+                entity.Template = entity.ContentType.DefaultTemplate;
+            }
+
             //Ensure unique name on the same level
             entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name);
 
@@ -855,7 +861,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// Private method to create a content object from a DocumentDto, which is used by Get and GetByVersion.
         /// </summary>
-        /// <param name="d"></param>
+        /// <param name="dto"></param>
         /// <param name="contentType"></param>
         /// <param name="template"></param>
         /// <param name="propCollection"></param>
@@ -872,6 +878,11 @@ namespace Umbraco.Core.Persistence.Repositories
             if (dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
             {
                 content.Template = template ?? _templateRepository.Get(dto.TemplateId.Value);
+            }
+            else
+            {
+                //ensure there isn't one set.
+                content.Template = null;
             }
 
             content.Properties = propCollection;

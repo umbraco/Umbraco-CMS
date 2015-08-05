@@ -264,7 +264,11 @@ namespace Umbraco.Core.Persistence.Repositories
 
             Database.Update(dto.NodeDto);
             Database.Update(dto);
-            
+
+            //re-update if this is a master template, since it could have changed!
+            var axisDefs = GetAxisDefinitions(dto);
+            template.IsMasterTemplate = axisDefs.Any(x => x.ParentId == dto.NodeId);
+
             //now do the file work
 
             if (DetermineTemplateRenderingEngine(entity) == RenderingEngine.Mvc)
@@ -326,14 +330,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 var masterpageName = string.Concat(entity.Alias, ".master");
                 _masterpagesFileSystem.DeleteFile(masterpageName);
-            }
-
-            //It is important that we clear ALL template cache, this is because templates have a couple of readonly
-            // flags that will get cached which will become stale if other templates change:
-            // * MasterTemplateAlias
-            // * IsMasterTemplate
-
-            RuntimeCache.ClearCacheObjectTypes<ITemplate>();
+            }         
         }
 
         #endregion
