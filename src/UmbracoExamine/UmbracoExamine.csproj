@@ -128,6 +128,8 @@
     <Compile Include="LocalStorage\LocalTempStorageDirectory.cs" />
     <Compile Include="LocalStorage\LocalTempStorageDirectoryTracker.cs" />
     <Compile Include="LocalStorage\LocalTempStorageIndexer.cs" />
+    <Compile Include="LocalStorage\MultiIndexLock.cs" />
+    <Compile Include="LocalStorage\MultiIndexLockFactory.cs" />
     <Compile Include="LocalStorage\MultiIndexOutput.cs" />
     <Compile Include="LoggingLevel.cs" />
     <Compile Include="StaticField.cs" />
