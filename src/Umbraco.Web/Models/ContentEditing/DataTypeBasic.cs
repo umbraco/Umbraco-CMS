@@ -19,5 +19,9 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "group")]
         [ReadOnly(true)]
         public string Group { get; set; }
+
+        [DataMember(Name = "hasPrevalues")]
+        [ReadOnly(true)]
+        public bool HasPrevalues { get; set; }
     }
 }
