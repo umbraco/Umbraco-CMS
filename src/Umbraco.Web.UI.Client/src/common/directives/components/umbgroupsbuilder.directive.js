@@ -232,9 +232,6 @@
         // activate group
         scope.activateGroup(group);
 
-        // push new init tab to the scope
-        addInitGroup(scope.model.groups);
-
       };
 
       scope.activateGroup = function(selectedGroup) {
@@ -317,7 +314,7 @@
         if (!property.inherited) {
 
           scope.propertySettingsDialogModel = {};
-          scope.propertySettingsDialogModel.title = "Edit property type settings";
+          scope.propertySettingsDialogModel.title = "Property settings";
           scope.propertySettingsDialogModel.property = property;
           scope.propertySettingsDialogModel.view = "views/documentType/dialogs/editPropertySettings/editPropertySettings.html";
           scope.propertySettingsDialogModel.show = true;
@@ -347,6 +344,9 @@
 
             // push new init property to group
             addInitProperty(group);
+
+            // push new init tab to the scope
+            addInitGroup(scope.model.groups);
 
           };
 
@@ -383,7 +383,7 @@
       scope.choosePropertyType = function(property) {
 
         scope.propertyEditorDialogModel = {};
-        scope.propertyEditorDialogModel.title = "Choose property type";
+        scope.propertyEditorDialogModel.title = "Choose editor";
         scope.propertyEditorDialogModel.view = "views/documentType/dialogs/property.html";
         scope.propertyEditorDialogModel.show = true;
 
@@ -496,8 +496,22 @@
       };
 
 
-      scope.deleteProperty = function(tab, propertyIndex) {
+      scope.deleteProperty = function(tab, propertyIndex, group) {
+
+        // remove property
         tab.properties.splice(propertyIndex, 1);
+
+        // if the last property in group is an placeholder - remove add new tab placeholder
+        if(group.properties.length === 1 && group.properties[0].propertyState === "init") {
+
+          angular.forEach(scope.model.groups, function(group, index, groups){
+            if(group.tabState === 'init') {
+              groups.splice(index, 1);
+            }
+          });
+
+        }
+
       };
 
       function addInitProperty(group) {
