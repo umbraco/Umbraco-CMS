@@ -278,16 +278,33 @@ namespace Umbraco.Web.Editors
         [UmbracoTreeAuthorize(
             Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
             Constants.Applications.Settings, Constants.Applications.Developer)]
-        public IDictionary<string, IEnumerable<DataTypeBasic>> GetAllDataTypesAndEditors()
+        public IDictionary<string, IEnumerable<DataTypeBasic>> GetGroupedPropertyEditors()
         {
             var datadefs = Services.DataTypeService
-                                    .GetAllDataTypeDefinitions();
-            var editors = PropertyEditorResolver.Current.PropertyEditors.Where(x => datadefs.Any(y => y.PropertyEditorAlias == x.Alias) == false);
+                                    .GetAllDataTypeDefinitions()
+                                    .ToArray();
 
-            var datatypes = datadefs.Select(Mapper.Map<DataTypeBasic>).ToList();
+            var datatypes = new List<DataTypeBasic>();
 
-            datatypes.AddRange(editors.Select(Mapper.Map<DataTypeBasic>));
+            //this is a very specific map - if a property editor does not have prevalue - and there is a datatype already using this type, return that.
+            var propertyEditors = PropertyEditorResolver.Current.PropertyEditors;
+            foreach (var propertyEditor in propertyEditors)
+            {
+                var hasPrevalues = propertyEditor.PreValueEditor.Fields.Any();
+                //if no prevalues and a datatype available
+                if(hasPrevalues == false && datadefs.Any(x => x.PropertyEditorAlias == propertyEditor.Alias))
+                {
+                    datatypes.Add( Mapper.Map<DataTypeBasic>( datadefs.First(x => x.PropertyEditorAlias == propertyEditor.Alias) ));
+                }else{
 
+                    //else, just add a clean property editor
+                    var basic = Mapper.Map<DataTypeBasic>(propertyEditor);
+                    basic.HasPrevalues = hasPrevalues;
+                    datatypes.Add(basic);
+                }
+            }
+
+            
             var grouped = datatypes
                 .GroupBy(x => x.Group.IsNullOrWhiteSpace() ? "" : x.Group.ToLower())
                 .ToDictionary(group => group.Key, group => group.AsEnumerable());
