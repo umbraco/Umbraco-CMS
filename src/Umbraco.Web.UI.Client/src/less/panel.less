@@ -121,10 +121,12 @@
     line-height: 22px;
 }
 
+/*
 .umb-panel-header i {
     font-size: 13px;
     vertical-align: middle;
 }
+*/
 
 .umb-panel-header-meta {
     height: 50px;
@@ -362,15 +364,14 @@
 .umb-panel-meta {
   display: flex;
   align-items: center;
+  flex: 1;
 }
-
-// icon
 
 .umb-panel-header-icon {
   cursor: pointer;
   margin-right: 5px;
-  width: 50px;
-  height: 50px;
+  //width: 50px;
+  height: 55px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -378,6 +379,19 @@
   border: 1px solid #ECECEC;
   border-radius: 5px;
   animation: fadeIn 0.5s;
+  flex: 0 0 55px;
+}
+
+.umb-panel-header-title-wrapper {
+  flex: 1;
+  margin-right: 70px;
+  position: relative;
+}
+
+.umb-panel-header-alias {
+  position: absolute;
+  top: 5px;
+  right: 10px;
 }
 
 .umb-panel-header-icon.-placeholder {
@@ -395,24 +409,16 @@
   font-size: 10px;
 }
 
-.umb-panel-header-name-wrapper {
-  display: flex;
-  align-items: center;
-}
-
 input.umb-panel-header-name {
-  height: 35px !important;
-  min-width: 0;
-  line-height: 35px;
-  padding-top: 0;
-  padding-bottom: 0;
-  box-sizing: border-box;
-  border: 1px solid transparent;
-  background: transparent;
-  font-size: 16px;
+  border-color: #ECECEC;
+  font-size: 15px;
   color: #000000;
-  margin: 0 5px 0 0;
+  margin-bottom: 0;
   font-weight: bold;
+  box-sizing: border-box;
+  height: 30px;
+  line-height: 30px;
+  width: 100%;
   &:hover {
     background: #ffffff;
     border: 1px solid #cccccc;
@@ -420,29 +426,19 @@ input.umb-panel-header-name {
 }
 
 input.umb-panel-header-name.name-is-empty {
-  min-width: 200px;
   border: 1px dashed @grayLight;
   background: #ffffff;
-}
-
-.umb-panel-header-alias {
-  font-size: 13px;
-  color: #cccccc;
-  cursor: pointer;
-  .icon {
-    margin-right: 5px;
-  }
 }
 
 input.umb-panel-header-description {
   background: transparent;
   border-color: transparent;
-  width: 35%;
-  min-width: 300px;
-  margin: 0;
-  padding-top: 1px;
-  padding-bottom: 1px;
+  margin-bottom: 0;
   font-size: 12px;
+  box-sizing: border-box;
+  height: 25px;
+  line-height: 25px;
+  width: 100%;
   &:hover {
     background: #ffffff;
     border-color: #cccccc;
