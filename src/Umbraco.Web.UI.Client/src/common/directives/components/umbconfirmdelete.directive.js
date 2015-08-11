@@ -11,6 +11,10 @@
         scope.confirmOverlayOpen = !scope.confirmOverlayOpen;
       };
 
+      scope.closeOverlay = function() {
+        scope.confirmOverlayOpen = false;
+      };
+
     }
 
     var directive = {

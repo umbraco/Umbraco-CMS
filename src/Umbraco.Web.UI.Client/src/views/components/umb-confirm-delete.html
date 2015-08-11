@@ -1,4 +1,4 @@
-<div class="umb-confirm-delete">
+<div class="umb-confirm-delete" on-outside-click="closeOverlay()">
 
   <a href="" ng-click="toggleOverlay()">
     <i class="icon-trash"></i>
@@ -8,7 +8,7 @@
     <i class="icon-check"></i>
   </a>
 
-  <a class="umb_confirm-delete__overlay-action -cancel" href="" ng-click="toggleOverlay()" ng-if="confirmOverlayOpen">
+  <a class="umb_confirm-delete__overlay-action -cancel" href="" ng-click="closeOverlay()" ng-if="confirmOverlayOpen">
     <i class="icon-delete"></i>
   </a>
 
