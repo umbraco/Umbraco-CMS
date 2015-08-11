@@ -2,6 +2,8 @@
 
     <umb-editor-toolbar tools="toolbar"></umb-editor-toolbar>
 
+    <div ng-if="sortingMode && model.groups.length <= 1" class="umb-group-builder__no-data-text">You have not added any tabs to reorder</div>
+
     <ul class="umb-group-builder__groups" ui-sortable="sortableOptionsGroup" ng-model="model.groups">
 
         <li ng-repeat="tab in model.groups" ng-class="{'umb-group-builder__group-sortable': sortingMode}">
