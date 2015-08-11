@@ -80,7 +80,13 @@ namespace Umbraco.Core.Services
 
                     try
                     {
-                        SendNotification(operatingUser, u, content, allVersions, actionName, http, createSubject, createBody);
+                        SendNotification(
+                            operatingUser, u, content,
+                            //Ensure they are sorted: http://issues.umbraco.org/issue/U4-5180
+                            allVersions.OrderBy(x => x.UpdateDate).ToArray(), 
+                            actionName, http, createSubject, createBody);
+
+
                         _logger.Debug<NotificationService>(string.Format("Notification type: {0} sent to {1} ({2})", action, u.Name, u.Email));
                     }
                     catch (Exception ex)
@@ -203,9 +209,7 @@ namespace Umbraco.Core.Services
             if (http == null) throw new ArgumentNullException("http");
             if (createSubject == null) throw new ArgumentNullException("createSubject");
             if (createBody == null) throw new ArgumentNullException("createBody");
-
-            allVersions = allVersions.OrderBy(x => x.UpdateDate).ToArray();
-
+            
             int versionCount = (allVersions.Length > 1) ? (allVersions.Length - 2) : (allVersions.Length - 1);
             var oldDoc = _contentService.GetByVersion(allVersions[versionCount].Version);
 
