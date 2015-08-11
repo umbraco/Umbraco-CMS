@@ -204,6 +204,8 @@ namespace Umbraco.Core.Services
             if (createSubject == null) throw new ArgumentNullException("createSubject");
             if (createBody == null) throw new ArgumentNullException("createBody");
 
+            allVersions = allVersions.OrderBy(x => x.UpdateDate).ToArray();
+
             int versionCount = (allVersions.Length > 1) ? (allVersions.Length - 2) : (allVersions.Length - 1);
             var oldDoc = _contentService.GetByVersion(allVersions[versionCount].Version);
 
