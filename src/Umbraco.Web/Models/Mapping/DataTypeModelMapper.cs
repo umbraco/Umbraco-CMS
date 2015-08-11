@@ -53,6 +53,7 @@ namespace Umbraco.Web.Models.Mapping
                     var editor = PropertyEditorResolver.Current.GetByAlias(def.PropertyEditorAlias);
                     if (editor != null)
                     {
+                        basic.Alias = editor.Alias;
                         basic.Group = editor.Group;
                         basic.Icon = editor.Icon;
                     }
