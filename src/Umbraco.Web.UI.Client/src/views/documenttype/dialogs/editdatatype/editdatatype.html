@@ -1,9 +1,13 @@
 <div ng-controller="Umbraco.Editors.DocumentType.EditDataTypeController">
 
-    <h5>Details</h5>
-
-    <label>Name</label>
-    <input type="text" ng-model="model.dataType.name" ng-change="dateTypeNameChange()" />
+    <div class="control-group umb-control-group">
+      <div class="umb-el-wrap">
+        <label class="control-label" for="dataTypeName">Name</label>
+        <div class="controls">
+          <input type="text" ng-model="model.dataType.name" ng-change="dateTypeNameChange()" class="umb-editor" />
+        </div>
+      </div>
+    </div>
 
     <h5>Configuration</h5>
 
