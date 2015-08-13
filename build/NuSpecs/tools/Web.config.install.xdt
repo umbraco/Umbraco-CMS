@@ -51,6 +51,8 @@
   <system.web xdt:Transform="InsertIfMissing" />
   <system.web>
     <siteMap xdt:Transform="Remove" />
+    <httpRuntime xdt:Transform="InsertIfMissing" />
+    <httpRuntime targetFramework="4.5" xdt:Transform="SetAttributes(targetFramework)" />
     <membership defaultProvider="DefaultMembershipProvider" xdt:Locator="Match(defaultProvider)" xdt:Transform="Remove" />
     <roleManager defaultProvider="DefaultRoleProvider" xdt:Locator="Match(defaultProvider)" xdt:Transform="Remove"/>
     <profile defaultProvider="DefaultProfileProvider" xdt:Locator="Match(defaultProvider)" xdt:Transform="Remove"/>>
