@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.IO;
-using Directory = Lucene.Net.Store.Directory;
+using Lucene.Net.Store;
 
 namespace UmbracoExamine.LocalStorage
 {
@@ -14,7 +14,7 @@ namespace UmbracoExamine.LocalStorage
             get { return Instance; }
         }
 
-        public LocalTempStorageDirectory GetDirectory(DirectoryInfo dir, Directory realDir, bool disable = false)
+        public LocalTempStorageDirectory GetDirectory(DirectoryInfo dir, FSDirectory realDir, bool disable = false)
         {
             var resolved = _directories.GetOrAdd(dir.FullName, s => new LocalTempStorageDirectory(dir, realDir));
 
