@@ -8,44 +8,60 @@
  */
 function DocumentTypePropertyController($scope, dataTypeResource) {
 
-	$scope.dataTypes = {
-		"userConfigured": [],
-		"userPropertyEditors": [],
-		"system": []
-	};
+	$scope.showTabs = false;
+	var tabsLoaded = 0;
 
-	//getAllUserConfiguredDataTypes();
-	//getAllUserPropertyEditors();
-	getAllDatatypes();
+	$scope.tabs = [
+		{
+			active: true,
+			id: 1,
+			label: "Default",
+			alias: "Default",
+			typesAndEditors: []
+		},
+		{
+			active: false,
+			id: 2,
+			label: "Reuse",
+			alias: "Reuse",
+			userConfigured: []
+		}
+	];
 
+	function activate() {
 
-	function getAllDatatypes() {
+		getAllUserConfiguredDataTypes();
+		getAllTypesAndEditors();
+
+	}
+
+	function getAllTypesAndEditors() {
 
 		dataTypeResource.getAllTypesAndEditors().then(function(data){
-			$scope.dataTypes.system = data;
+			$scope.tabs[0].typesAndEditors = data;
+			tabsLoaded = tabsLoaded + 1;
+			checkIfTabContentIsLoaded();
 		});
-
-//		dataTypeResource.getAll().then(function(data){
-//			$scope.dataTypes.system = data;
-//		});
 
 	}
 
 	function getAllUserConfiguredDataTypes() {
 
 		dataTypeResource.getAllUserConfigured().then(function(data){
-			$scope.dataTypes.userConfigured = data;
+			$scope.tabs[1].userConfigured = data;
+			tabsLoaded = tabsLoaded + 1;
+			checkIfTabContentIsLoaded();
 		});
 
 	}
 
-	function getAllUserPropertyEditors() {
-
-		dataTypeResource.getAllUserPropertyEditors().then(function(data){
-			$scope.dataTypes.userPropertyEditors = data;
-		});
-
+	function checkIfTabContentIsLoaded() {
+		if(tabsLoaded === 2) {
+			$scope.showTabs = true;
+		}
 	}
+
+	activate();
 
 }
 

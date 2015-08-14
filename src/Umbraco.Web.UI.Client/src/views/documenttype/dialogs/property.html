@@ -1,6 +1,6 @@
 <div class="umb-overlay-body" ng-controller="Umbraco.Editors.DocumentType.PropertyController">
 
-	<div class="umb-control-group">
+	<div class="umb-control-group -no-border">
 		<div class="form-search">
 			<i class="icon-search"></i>
 			<input type="text"
@@ -12,46 +12,52 @@
 		</div>
 	</div>
 
-	<!--
-	<div ng-if="(dataTypes.userConfigured | filter:searchTerm).length > 0">
-		<h5>Your configurations</h5>
-		<ul class="umb-card-grid">
-			<li ng-repeat="configuredDataType in dataTypes.userConfigured | orderBy:'name' | filter: searchTerm">
-				<a href="" ng-click="model.selectDataType(configuredDataType)">
-					<i class="{{ configuredDataType.icon }}" ng-class="{'icon-autofill': configuredDataType.icon == null}"></i>
-					{{ configuredDataType.name }}
-				</a>
-			</li>
-		</ul>
-	</div>
+	<div ng-if="showTabs">
 
-	<div ng-if="(dataTypes.userPropertyEditors | filter:searchTerm).length > 0">
-		<h5>Custom property editors</h5>
+		<umb-tabs-nav model="tabs"></umb-tabs-nav>
 
-		<ul class="umb-card-grid">
-			<li ng-repeat="customEditor in dataTypes.userPropertyEditors | orderBy:'name' | filter: searchTerm">
-				<a href="" ng-click="model.selectDataType(customEditor)">
-					<i class="{{ customEditor.icon }}" ng-class="{'icon-autofill': customEditor.icon == null}"></i>
-					{{ customEditor.name }}
-				</a>
-			</li>
-		</ul>
-	</div>
-	-->
+		<umb-tabs-content>
 
-	<div ng-repeat="(key,value) in dataTypes.system">
-		<div ng-if="(value | filter:searchTerm).length > 0">
-			<h5>{{key}}</h5>
-			<ul class="umb-card-grid">
-				<li ng-repeat="systemDataType in value | orderBy:'name' | filter: searchTerm">
-					<a href="" ng-click="model.selectDataType(systemDataType)">
-						<i class="{{ systemDataType.icon }}"
-							ng-class="{'icon-autofill': systemDataType.icon == null}"></i>
-						{{ systemDataType.name }}
-					</a>
-				</li>
-			</ul>
-		</div>
+		  <umb-tab id="tab{{tab.id}}" ng-repeat="tab in tabs" rel="{{tab.id}}">
+
+		    <div ng-if="tab.alias==='Default'">
+
+		      <div ng-repeat="(key,value) in tab.typesAndEditors">
+		        <div ng-if="(value | filter:searchTerm).length > 0">
+		          <h5>{{key}}</h5>
+		          <ul class="umb-card-grid">
+		            <li ng-repeat="systemDataType in value | orderBy:'name' | filter: searchTerm">
+
+		              <a href="" ng-click="model.selectDataType(systemDataType)">
+		                <i class="{{ systemDataType.icon }}" ng-class="{'icon-autofill': systemDataType.icon == null}"></i>
+		                {{ systemDataType.name }}
+		              </a>
+
+		            </li>
+		          </ul>
+		        </div>
+		      </div>
+
+		    </div>
+
+		    <div ng-if="tab.alias==='Reuse'">
+
+		      <h5>Your configurations</h5>
+		      <ul class="umb-card-grid">
+		        <li ng-repeat="configuredDataType in tab.userConfigured | orderBy:'name' | filter: searchTerm">
+		          <a href="" ng-click="model.selectDataType(configuredDataType)">
+		            <i class="{{ configuredDataType.icon }}" ng-class="{'icon-autofill': configuredDataType.icon == null}"></i>
+		            {{ configuredDataType.name }}
+		          </a>
+		        </li>
+		      </ul>
+
+		    </div>
+
+		  </umb-tab>
+
+		</umb-tabs-content>
+
 	</div>
 
 </div>
