@@ -75,13 +75,6 @@
     color: @red;
 }
 
-.umb-panel-header .umb-nav-tabs {
-    bottom: -1px;
-    position: absolute;
-    padding: 0px 0px 0px 20px;
-}
-
-
 .umb-panel-header p {
     margin: 0px 20px;
 }
@@ -355,16 +348,20 @@
 
 .umb-panel-content {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   height: 100px;
   padding: 0 20px;
-  justify-content: space-between;
 }
 
 .umb-panel-meta {
   display: flex;
   align-items: center;
   flex: 1;
+}
+
+.umb-panel-meta.-top-position {
+  position: relative;
+  top: -20px;
 }
 
 .umb-panel-header-icon {
@@ -384,7 +381,7 @@
 
 .umb-panel-header-title-wrapper {
   flex: 1;
-  margin-right: 70px;
+  //margin-right: 70px;
   position: relative;
 }
 
@@ -407,6 +404,10 @@
   color: @blue;
   font-weight: bold;
   font-size: 10px;
+}
+
+.umb-panel-header .umb-nav-tabs {
+  bottom: -1px;
 }
 
 input.umb-panel-header-name {

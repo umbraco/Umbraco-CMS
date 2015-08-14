@@ -2,7 +2,7 @@
 
     <div class="umb-panel-content">
 
-        <div class="umb-panel-meta">
+        <div class="umb-panel-meta" ng-class="{'-top-position': tabs }">
 
             <div class="umb-panel-header-icon" ng-show="icon!==undefined" ng-click="openIconPicker()" ng-class="{'-placeholder': icon==='' || icon===null}">
                 <i class="icon {{icon}}"  ng-if="icon!=='' && icon!==null"></i>
@@ -25,14 +25,13 @@
 
             </div>
 
-        </div>
-
-
-        <div class="umb-panel-header-actions">
             <umb-editor-actions ng-if="actions" actions="actions"></umb-editor-actions>
             <umb-editor-menu ng-if="menu" menu="menu"></umb-editor-menu>
             <umb-editor-navigation ng-if="navigation" navigation="navigation"></umb-editor-navigation>
+
         </div>
+
+        <umb-tabs-nav ng-if="tabs" model="tabs"></umb-tabs-nav>
 
     </div>
 
