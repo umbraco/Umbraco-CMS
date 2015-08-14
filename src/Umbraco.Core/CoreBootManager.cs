@@ -380,14 +380,19 @@ namespace Umbraco.Core
             if (ApplicationContext.IsConfigured == false) return;
             if (ApplicationContext.DatabaseContext.IsDatabaseConfigured == false) return;
 
+            //try now
+            if (ApplicationContext.DatabaseContext.CanConnect)
+                return;
+
             var currentTry = 0;
             while (currentTry < 5)
             {
+                //first wait, then retry
+                Thread.Sleep(1000);
+
                 if (ApplicationContext.DatabaseContext.CanConnect)
                     break;
 
-                //wait and retry
-                Thread.Sleep(1000);
                 currentTry++;
             }
 
@@ -395,7 +400,6 @@ namespace Umbraco.Core
             {
                 throw new UmbracoStartupFailedException("Umbraco cannot start. A connection string is configured but the Umbraco cannot connect to the database.");
             }
-
         }
 
         /// <summary>

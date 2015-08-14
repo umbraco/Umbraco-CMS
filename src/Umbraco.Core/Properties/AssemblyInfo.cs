@@ -38,9 +38,9 @@ using System.Security.Permissions;
 [assembly: InternalsVisibleTo("UmbracoExamine")]
 
 [assembly: InternalsVisibleTo("Concorde.Sync")]
-[assembly: InternalsVisibleTo("Umbraco.Belle")]
 [assembly: InternalsVisibleTo("Umbraco.VisualStudio")]
 [assembly: InternalsVisibleTo("Umbraco.Courier.Core")]
+[assembly: InternalsVisibleTo("Umbraco.Courier.Persistence")]
 [assembly: InternalsVisibleTo("umbraco.providers")]
 
 //allow this to be mocked in our unit tests
