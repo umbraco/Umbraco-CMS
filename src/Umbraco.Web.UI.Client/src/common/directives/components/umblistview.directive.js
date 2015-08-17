@@ -59,7 +59,7 @@
 
       scope.createCustomListViewDataType = function() {
 
-          dataTypeResource.createCustomListView(scope.modelName).then(function(dataType) {
+          dataTypeResource.createCustomListView(scope.modelAlias).then(function(dataType) {
 
               // store data type
               scope.dataType = dataType;
@@ -119,7 +119,7 @@
       /* ----------- METHODS ---------- */
 
       function checkForCustomListView() {
-          return scope.dataType.name === "List View - " + scope.modelName;
+          return scope.dataType.name === "List View - " + scope.modelAlias;
       }
 
     }
@@ -131,7 +131,7 @@
       scope: {
         enableListView: "=",
         listViewName: "=",
-        modelName: "="
+        modelAlias: "="
       },
       link: link
     };
