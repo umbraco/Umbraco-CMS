@@ -103,12 +103,17 @@
       };
 
       /* ----------- SCOPE WATCHERS ----------- */
-      scope.$watch('enableListView', function(newValue, oldValue){
+      var unbindEnableListViewWatcher = scope.$watch('enableListView', function(newValue, oldValue){
 
         if(newValue !== undefined) {
           activate();
         }
 
+      });
+
+      // clean up
+      scope.$on('$destroy', function(){
+        unbindEnableListViewWatcher();
       });
 
       /* ----------- METHODS ---------- */
