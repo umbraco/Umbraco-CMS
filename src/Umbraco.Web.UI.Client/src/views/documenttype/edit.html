@@ -1,6 +1,6 @@
 <div ng-controller="Umbraco.Editors.DocumentType.EditController as vm">
     <form novalidate name="contentTypeForm"
-          ng-if="vm.contentType"
+          ng-show="vm.contentType"
           ng-submit="vm.save()"
           val-form-manager>
         <umb-editor-view>
