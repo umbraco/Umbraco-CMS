@@ -135,13 +135,30 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 			            $scope.model.value = null;
 			        }
 			    });
+			    //unbind doc click event!
+			    $scope.$on('$destroy', function () {
+			        unsubscribe();
+			    });
 
 
 			});
         });
         
     });
-    
+
+    var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
+        if ($scope.hasDatetimePickerValue) {
+            if ($scope.model.config.pickTime) {
+                $scope.model.value = $element.find("div:first").data().DateTimePicker.getDate().format("YYYY-MM-DD HH:mm:ss");
+            }
+            else {
+                $scope.model.value = $element.find("div:first").data().DateTimePicker.getDate().format("YYYY-MM-DD");
+            }
+        }
+        else {
+            $scope.model.value = null;
+        }
+    });
 
     //unbind doc click event!
     $scope.$on('$destroy', function () {

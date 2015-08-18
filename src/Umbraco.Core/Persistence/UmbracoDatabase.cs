@@ -20,6 +20,8 @@ namespace Umbraco.Core.Persistence
     {
         private readonly ILogger _logger;
         private readonly Guid _instanceId = Guid.NewGuid();
+        private bool _enableCount;
+
         /// <summary>
         /// Used for testing
         /// </summary>
@@ -27,6 +29,33 @@ namespace Umbraco.Core.Persistence
         {
             get { return _instanceId; }
         }
+
+        /// <summary>
+        /// Generally used for testing, will output all SQL statements executed to the logger
+        /// </summary>
+        internal bool EnableSqlTrace { get; set; }
+
+        /// <summary>
+        /// Used for testing
+        /// </summary>
+        internal void EnableSqlCount()
+        {
+            _enableCount = true;
+        }
+
+        /// <summary>
+        /// Used for testing
+        /// </summary>
+        internal void DisableSqlCount()
+        {
+            _enableCount = false;
+            SqlCount = 0;
+        }
+
+        /// <summary>
+        /// Used for testing
+        /// </summary>
+        internal int SqlCount { get; private set; }
 
         [Obsolete("Use the other constructor specifying an ILogger instead")]
         public UmbracoDatabase(IDbConnection connection)
@@ -56,24 +85,28 @@ namespace Umbraco.Core.Persistence
             : base(connection)
         {
             _logger = logger;
+            EnableSqlTrace = false;
         }
 
         public UmbracoDatabase(string connectionString, string providerName, ILogger logger)
             : base(connectionString, providerName)
         {
             _logger = logger;
+            EnableSqlTrace = false;
         }
 
         public UmbracoDatabase(string connectionString, DbProviderFactory provider, ILogger logger)
             : base(connectionString, provider)
         {
             _logger = logger;
+            EnableSqlTrace = false;
         }
 
         public UmbracoDatabase(string connectionStringName, ILogger logger)
             : base(connectionStringName)
         {
             _logger = logger;
+            EnableSqlTrace = false;
         }
 
         public override IDbConnection OnConnectionOpened(IDbConnection connection)
@@ -86,6 +119,19 @@ namespace Umbraco.Core.Persistence
         {
             _logger.Info<UmbracoDatabase>(x.StackTrace);
             base.OnException(x);
+        }
+
+        public override void OnExecutedCommand(IDbCommand cmd)
+        {
+            if (EnableSqlTrace)
+            {
+                _logger.Debug<UmbracoDatabase>(cmd.CommandText);
+            }
+            if (_enableCount)
+            {
+                SqlCount++;
+            }
+            base.OnExecutedCommand(cmd);
         }
     }
 }

@@ -60,29 +60,6 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Insert.Expressions
             return string.Join(",", insertItems);
         }
 
-        private string GetQuotedValue(object val)
-        {
-            var type = val.GetType();
-
-            switch (Type.GetTypeCode(type))
-            {                
-                case TypeCode.Boolean:
-                    return ((bool) val) ? "1" : "0";
-                case TypeCode.Single:
-                case TypeCode.Double:
-                case TypeCode.Decimal:             
-                case TypeCode.SByte:
-                case TypeCode.Int16:
-                case TypeCode.Int32:
-                case TypeCode.Int64:
-                case TypeCode.Byte:
-                case TypeCode.UInt16:
-                case TypeCode.UInt32:
-                case TypeCode.UInt64:
-                    return val.ToString();
-                default:
-                    return SqlSyntaxContext.SqlSyntaxProvider.GetQuotedValue(val.ToString());
-            }
-        }
+        
     }
 }

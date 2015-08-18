@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -106,6 +107,60 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Can_Get_Dictionary_Item_Descendants()
+        {
+            try
+            {
+                var en = ServiceContext.LocalizationService.GetLanguageById(_englishLangId);
+                var dk = ServiceContext.LocalizationService.GetLanguageById(_danishLangId);
+
+                var currParentId = _childItemGuidId;
+                for (int i = 0; i < 25; i++)
+                {
+                    //Create 2 per level
+                    var desc1 = new DictionaryItem(currParentId, "D1" + i)
+                    {
+                        Translations = new List<IDictionaryTranslation>
+                        {
+                            new DictionaryTranslation(en, "ChildValue1 " + i),
+                            new DictionaryTranslation(dk, "BørnVærdi1 " + i)
+                        }
+                    };
+                    var desc2 = new DictionaryItem(currParentId, "D2" + i)
+                    {
+                        Translations = new List<IDictionaryTranslation>
+                        {
+                            new DictionaryTranslation(en, "ChildValue2 " + i),
+                            new DictionaryTranslation(dk, "BørnVærdi2 " + i)
+                        }
+                    };
+                    ServiceContext.LocalizationService.Save(desc1);
+                    ServiceContext.LocalizationService.Save(desc2);
+
+                    currParentId = desc1.Key;
+                }
+
+                DatabaseContext.Database.EnableSqlTrace = true;
+                DatabaseContext.Database.EnableSqlCount();
+
+                var items = ServiceContext.LocalizationService.GetDictionaryItemDescendants(_parentItemGuidId)
+                    .ToArray();
+
+                Debug.WriteLine("SQL CALLS: " + DatabaseContext.Database.SqlCount);
+
+                Assert.AreEqual(51, items.Length);
+                //there's a call or two to get languages, so apart from that there should only be one call per level
+                Assert.Less(DatabaseContext.Database.SqlCount, 30);
+            }
+            finally
+            {
+                DatabaseContext.Database.EnableSqlTrace = false;
+                DatabaseContext.Database.DisableSqlCount();
+            }
+           
+        }
+
+        [Test]
         public void Can_Get_Language_By_Culture_Code()
         {
             var danish = ServiceContext.LocalizationService.GetLanguageByCultureCode("Danish");
@@ -179,7 +234,7 @@ namespace Umbraco.Tests.Services
 
             Assert.Greater(item.Id, 0);
             Assert.IsTrue(item.HasIdentity);
-            Assert.AreEqual(new Guid(Constants.Conventions.Localization.DictionaryItemRootId), item.ParentId);
+            Assert.IsFalse(item.ParentId.HasValue);
             Assert.AreEqual("Testing123", item.ItemKey);
             Assert.AreEqual(1, item.Translations.Count());
         }
@@ -197,7 +252,7 @@ namespace Umbraco.Tests.Services
             Assert.IsNotNull(item);
             Assert.Greater(item.Id, 0);
             Assert.IsTrue(item.HasIdentity);
-            Assert.AreEqual(new Guid(Constants.Conventions.Localization.DictionaryItemRootId), item.ParentId);
+            Assert.IsFalse(item.ParentId.HasValue);
             Assert.AreEqual("Testing12345", item.ItemKey);
             var allLangs = ServiceContext.LocalizationService.GetAllLanguages();
             Assert.Greater(allLangs.Count(), 0);

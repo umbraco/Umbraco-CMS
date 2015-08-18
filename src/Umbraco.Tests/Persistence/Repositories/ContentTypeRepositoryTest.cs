@@ -42,7 +42,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var templateRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
             var tagRepository = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
             contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, templateRepository);
-            var repository = new ContentRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, contentTypeRepository, templateRepository, tagRepository);
+            var repository = new ContentRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
             return repository;
         }
 
@@ -227,6 +227,28 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Can_Perform_Get_By_Guid_On_ContentTypeRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
+                var childContentType = MockedContentTypes.CreateSimpleContentType("blah", "Blah", contentType, randomizeAliases:true);
+                repository.AddOrUpdate(childContentType);
+                unitOfWork.Commit();
+
+                // Act
+                var result = repository.Get(childContentType.Key);
+
+                // Assert
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.Id, Is.EqualTo(childContentType.Id));
+            }
+        }
+
+        [Test]
         public void Can_Perform_GetAll_On_ContentTypeRepository()
         {
             // Arrange
@@ -241,6 +263,29 @@ namespace Umbraco.Tests.Persistence.Repositories
                     DatabaseContext.Database.ExecuteScalar<int>(
                         "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
                         new {NodeObjectType = new Guid(Constants.ObjectTypes.DocumentType)});
+
+                // Assert
+                Assert.That(contentTypes.Any(), Is.True);
+                Assert.That(contentTypes.Count(), Is.EqualTo(count));
+            }
+        }
+
+        [Test]
+        public void Can_Perform_GetAll_By_Guid_On_ContentTypeRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var allGuidIds = repository.GetAll().Select(x => x.Key).ToArray();
+
+                // Act
+                var contentTypes = repository.GetAll(allGuidIds);
+                int count =
+                    DatabaseContext.Database.ExecuteScalar<int>(
+                        "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
+                        new { NodeObjectType = new Guid(Constants.ObjectTypes.DocumentType) });
 
                 // Assert
                 Assert.That(contentTypes.Any(), Is.True);

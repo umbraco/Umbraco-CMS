@@ -81,9 +81,9 @@ namespace Umbraco.Web.Templates
 			//set the doc that was found by id
 			contentRequest.PublishedContent = doc;
 			//set the template, either based on the AltTemplate found or the standard template of the doc
-			contentRequest.TemplateModel = UmbracoConfig.For.UmbracoSettings().WebRouting.DisableAlternativeTemplates || AltTemplate.HasValue == false 
-				? ApplicationContext.Current.Services.FileService.GetTemplate(doc.TemplateId)
-				: ApplicationContext.Current.Services.FileService.GetTemplate(AltTemplate.Value);
+			contentRequest.TemplateModel = UmbracoConfig.For.UmbracoSettings().WebRouting.DisableAlternativeTemplates || AltTemplate.HasValue == false
+                ? _umbracoContext.Application.Services.FileService.GetTemplate(doc.TemplateId)
+                : _umbracoContext.Application.Services.FileService.GetTemplate(AltTemplate.Value);
 
 			//if there is not template then exit
 			if (!contentRequest.HasTemplate)
@@ -103,14 +103,20 @@ namespace Umbraco.Web.Templates
 			//after this page has rendered.
 			SaveExistingItems();
 
-			//set the new items on context objects for this templates execution
-			SetNewItemsOnContextObjects(contentRequest);
+            try
+            {
+                //set the new items on context objects for this templates execution
+                SetNewItemsOnContextObjects(contentRequest);
 
-			//Render the template
-			ExecuteTemplateRendering(writer, contentRequest);
-
-			//restore items on context objects to continuing rendering the parent template
-			RestoreItems();
+                //Render the template
+                ExecuteTemplateRendering(writer, contentRequest);
+            }
+            finally
+            {
+                //restore items on context objects to continuing rendering the parent template
+                RestoreItems();
+            }
+			
 		}
 
 		private void ExecuteTemplateRendering(TextWriter sw, PublishedContentRequest contentRequest)

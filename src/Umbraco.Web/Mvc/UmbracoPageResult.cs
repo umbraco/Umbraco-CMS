@@ -110,7 +110,7 @@ namespace Umbraco.Web.Mvc
             tempDataDictionary.Save(context, new SessionStateTempDataProvider());
             var viewCtx = new ViewContext(context, new DummyView(), new ViewDataDictionary(), tempDataDictionary, new StringWriter());
 
-            viewCtx.ViewData.ModelState.Merge(context.Controller.ViewData.ModelState);
+            viewCtx.ViewData.ModelState.Merge(new ModelStateDictionary(context.Controller.ViewData.ModelState));
 
             foreach (var d in context.Controller.ViewData)
                 viewCtx.ViewData[d.Key] = d.Value;

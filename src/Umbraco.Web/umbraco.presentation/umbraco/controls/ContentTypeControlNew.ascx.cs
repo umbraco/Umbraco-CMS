@@ -842,7 +842,7 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
         {
             var tabs = _contentType.getVirtualTabs;
             var propertyTypeGroups = _contentType.PropertyTypeGroups.ToList();
-            var dtds = cms.businesslogic.datatype.DataTypeDefinition.GetAll();
+            var dtds = cms.businesslogic.datatype.DataTypeDefinition.GetAll().OrderBy(d => d.Text).ToArray();
 
             PropertyTypes.Controls.Clear();
 

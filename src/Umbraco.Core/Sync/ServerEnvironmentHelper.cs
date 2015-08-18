@@ -1,10 +1,9 @@
-using System;
 using System.Linq;
 using System.Web;
-using System.Xml;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Sync
 {
@@ -13,58 +12,73 @@ namespace Umbraco.Core.Sync
     /// </summary>
     internal static class ServerEnvironmentHelper
     {
-        /// <summary>
-        /// Returns the current umbraco base url for the current server depending on it's environment 
-        /// status. This will attempt to determine the internal umbraco base url that can be used by the current
-        /// server to send a request to itself if it is in a load balanced environment.
-        /// </summary>
-        /// <returns>The full base url including schema (i.e. http://myserver:80/umbraco ) - or <c>null</c> if the url
-        /// cannot be determined at the moment (usually because the first request has not properly completed yet).</returns>
-        public static string GetCurrentServerUmbracoBaseUrl(ApplicationContext appContext, IUmbracoSettingsSection settings)
+        public static void TrySetApplicationUrlFromSettings(ApplicationContext appContext, ILogger logger, IUmbracoSettingsSection settings)
         {
+            // try umbracoSettings:settings/web.routing/@umbracoApplicationUrl
+            // which is assumed to:
+            // - end with SystemDirectories.Umbraco
+            // - contain a scheme
+            // - end or not with a slash, it will be taken care of
+            // eg "http://www.mysite.com/umbraco"
+            var url = settings.WebRouting.UmbracoApplicationUrl;
+            if (url.IsNullOrWhiteSpace() == false)
+            {
+                appContext.UmbracoApplicationUrl = url.TrimEnd('/');
+                logger.Info<ApplicationContext>("ApplicationUrl: " + appContext.UmbracoApplicationUrl + " (using web.routing/@umbracoApplicationUrl)");
+                return;
+            }
+
+            // try umbracoSettings:settings/scheduledTasks/@baseUrl
+            // which is assumed to:
+            // - end with SystemDirectories.Umbraco
+            // - NOT contain any scheme (because, legacy)
+            // - end or not with a slash, it will be taken care of
+            // eg "mysite.com/umbraco"
+            url = settings.ScheduledTasks.BaseUrl;
+            if (url.IsNullOrWhiteSpace() == false)
+            {
+                var ssl = GlobalSettings.UseSSL ? "s" : "";
+                url = "http" + ssl + "://" + url;
+                appContext.UmbracoApplicationUrl = url.TrimEnd('/');
+                logger.Info<ApplicationContext>("ApplicationUrl: " + appContext.UmbracoApplicationUrl + " (using scheduledTasks/@baseUrl)");
+                return;
+            }
+
+            // try servers
             var status = GetStatus(settings);
-
             if (status == CurrentServerEnvironmentStatus.Single)
-            {
-                // single install, return null if no config/original url, else use config/original url as base
-                // use http or https as appropriate
-                return GetBaseUrl(appContext, settings);
-            }
+                return;
 
+            // no server, nothing we can do
             var servers = settings.DistributedCall.Servers.ToArray();
+            if (servers.Length == 0)
+                return;
 
-            if (servers.Any() == false)
-            {
-                // cannot be determined, return null if no config/original url, else use config/original url as base
-                // use http or https as appropriate
-                return GetBaseUrl(appContext, settings);
-            }
-
+            // we have servers, look for this server
             foreach (var server in servers)
             {
                 var appId = server.AppId;
                 var serverName = server.ServerName;
 
+                // skip if no data
                 if (appId.IsNullOrWhiteSpace() && serverName.IsNullOrWhiteSpace())
-                {
                     continue;
-                }
 
+                // if this server, build and return the url
                 if ((appId.IsNullOrWhiteSpace() == false && appId.Trim().InvariantEquals(HttpRuntime.AppDomainAppId))
                     || (serverName.IsNullOrWhiteSpace() == false && serverName.Trim().InvariantEquals(NetworkHelper.MachineName)))
                 {
-                    //match by appId or computer name! return the url configured
-                    return string.Format("{0}://{1}:{2}/{3}",
+                    // match by appId or computer name, return the url configured
+                    url = string.Format("{0}://{1}:{2}/{3}",
                         server.ForceProtocol.IsNullOrWhiteSpace() ? "http" : server.ForceProtocol,
                         server.ServerAddress,
                         server.ForcePortnumber.IsNullOrWhiteSpace() ? "80" : server.ForcePortnumber,
                         IOHelper.ResolveUrl(SystemDirectories.Umbraco).TrimStart('/'));
+
+                    appContext.UmbracoApplicationUrl = url.TrimEnd('/');
+                    logger.Info<ApplicationContext>("ApplicationUrl: " + appContext.UmbracoApplicationUrl + " (using distributedCall/servers)");
                 }
             }
-
-            // cannot be determined, return null if no config/original url, else use config/original url as base
-            // use http or https as appropriate
-            return GetBaseUrl(appContext, settings);
         }
 
         /// <summary>
@@ -112,22 +126,6 @@ namespace Umbraco.Core.Sync
             }
 
             return CurrentServerEnvironmentStatus.Slave;
-        }
-
-        private static string GetBaseUrl(ApplicationContext appContext, IUmbracoSettingsSection settings)
-        {
-            return (
-                // is config empty?
-                settings.ScheduledTasks.BaseUrl.IsNullOrWhiteSpace()
-                    // is the orig req empty?
-                    ? appContext.OriginalRequestUrl.IsNullOrWhiteSpace()
-                        // we've got nothing
-                        ? null
-                        //the orig req url is not null, use that
-                        : string.Format("http{0}://{1}", GlobalSettings.UseSSL ? "s" : "", appContext.OriginalRequestUrl)
-                    // the config has been specified, use that
-                    : string.Format("http{0}://{1}", GlobalSettings.UseSSL ? "s" : "", settings.ScheduledTasks.BaseUrl))
-                .EnsureEndsWith('/');
         }
     }
 }

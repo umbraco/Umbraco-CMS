@@ -6,6 +6,7 @@ using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.Security;
+using System.Web.UI;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
@@ -181,7 +182,14 @@ namespace umbraco.BasePages
         /// <returns></returns>
         public static int GetUserId()
         {
-            var identity = HttpContext.Current.GetCurrentIdentity(true);
+            var identity = HttpContext.Current.GetCurrentIdentity(
+                //DO NOT AUTO-AUTH UNLESS THE CURRENT HANDLER IS WEBFORMS!
+                // Without this check, anything that is using this legacy API, like ui.Text will
+                // automatically log the back office user in even if it is a front-end request (if there is 
+                // a back office user logged in. This can cause problems becaues the identity is changing mid
+                // request. For example: http://issues.umbraco.org/issue/U4-4010
+                HttpContext.Current.CurrentHandler is Page);
+
             if (identity == null)
                 return -1;
             return Convert.ToInt32(identity.Id);
@@ -205,7 +213,14 @@ namespace umbraco.BasePages
         /// <returns></returns>
         public static bool ValidateCurrentUser()
         {
-            var identity = HttpContext.Current.GetCurrentIdentity(true);
+            var identity = HttpContext.Current.GetCurrentIdentity(
+                //DO NOT AUTO-AUTH UNLESS THE CURRENT HANDLER IS WEBFORMS!
+                // Without this check, anything that is using this legacy API, like ui.Text will
+                // automatically log the back office user in even if it is a front-end request (if there is 
+                // a back office user logged in. This can cause problems becaues the identity is changing mid
+                // request. For example: http://issues.umbraco.org/issue/U4-4010
+                HttpContext.Current.CurrentHandler is Page);
+
             if (identity != null)
             {
                 return true;
@@ -232,7 +247,14 @@ namespace umbraco.BasePages
         {
             get
             {
-                var identity = HttpContext.Current.GetCurrentIdentity(true);
+                var identity = HttpContext.Current.GetCurrentIdentity(
+                    //DO NOT AUTO-AUTH UNLESS THE CURRENT HANDLER IS WEBFORMS!
+                    // Without this check, anything that is using this legacy API, like ui.Text will
+                    // automatically log the back office user in even if it is a front-end request (if there is 
+                    // a back office user logged in. This can cause problems becaues the identity is changing mid
+                    // request. For example: http://issues.umbraco.org/issue/U4-4010
+                    HttpContext.Current.CurrentHandler is Page);
+
                 return identity == null ? "" : identity.SessionId;
             }
             set

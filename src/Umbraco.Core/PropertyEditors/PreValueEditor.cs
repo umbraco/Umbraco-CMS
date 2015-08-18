@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 
@@ -84,7 +85,7 @@ namespace Umbraco.Core.PropertyEditors
                     Name = att.Name,
                     Description = att.Description,
                     HideLabel = att.HideLabel,
-                    View = att.View
+                    View = att.View.StartsWith("~/") ? IOHelper.ResolveUrl(att.View) : att.View
                 };
         }
 

@@ -61,7 +61,7 @@ namespace Umbraco.Core.Services
             }
             var content = (IContent) entity;
             //we'll lazily get these if we need to send notifications
-            IContent[] allVersions = null;
+            IEnumerable<IContent> allVersions = null;
 
             int totalUsers;
             var allUsers = _userService.GetAll(0, int.MaxValue, out totalUsers);
@@ -75,12 +75,17 @@ namespace Umbraco.Core.Services
                     //lazy load versions if notifications are required
                     if (allVersions == null)
                     {
-                        allVersions = _contentService.GetVersions(entity.Id).ToArray();
+                        allVersions = _contentService.GetVersions(entity.Id);
                     }
 
                     try
                     {
-                        SendNotification(operatingUser, u, content, allVersions, actionName, http, createSubject, createBody);
+                        SendNotification(
+                            operatingUser, u, content,                            
+                            allVersions, 
+                            actionName, http, createSubject, createBody);
+
+
                         _logger.Debug<NotificationService>(string.Format("Notification type: {0} sent to {1} ({2})", action, u.Name, u.Email));
                     }
                     catch (Exception ex)
@@ -192,7 +197,7 @@ namespace Umbraco.Core.Services
         /// <param name="http"></param>
         /// <param name="createSubject">Callback to create the mail subject</param>
         /// <param name="createBody">Callback to create the mail body</param>
-        private void SendNotification(IUser performingUser, IUser mailingUser, IContent content, IContent[] allVersions, string actionName, HttpContextBase http, 
+        private void SendNotification(IUser performingUser, IUser mailingUser, IContent content, IEnumerable<IContent> allVersions, string actionName, HttpContextBase http, 
             Func<IUser, string[], string> createSubject,
             Func<IUser, string[], string> createBody)
         {
@@ -204,8 +209,11 @@ namespace Umbraco.Core.Services
             if (createSubject == null) throw new ArgumentNullException("createSubject");
             if (createBody == null) throw new ArgumentNullException("createBody");
 
-            int versionCount = (allVersions.Length > 1) ? (allVersions.Length - 2) : (allVersions.Length - 1);
-            var oldDoc = _contentService.GetByVersion(allVersions[versionCount].Version);
+            //Ensure they are sorted: http://issues.umbraco.org/issue/U4-5180
+            var allVersionsAsArray = allVersions.OrderBy(x => x.UpdateDate).ToArray();
+
+            int versionCount = (allVersionsAsArray.Length > 1) ? (allVersionsAsArray.Length - 2) : (allVersionsAsArray.Length - 1);
+            var oldDoc = _contentService.GetByVersion(allVersionsAsArray[versionCount].Version);
 
             // build summary
             var summary = new StringBuilder();

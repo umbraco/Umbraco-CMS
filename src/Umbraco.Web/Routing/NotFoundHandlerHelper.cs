@@ -243,15 +243,13 @@ namespace Umbraco.Web.Routing
                 // try to get the 404 based on current culture (via domain)
                 IContentErrorPage cultureErr;
 
-                //TODO: Remove the dependency on this legacy Domain service, 
-                // in 7.3 the real domain service should be passed in as a parameter.
-                if (domainService.Exists(requestServerName))
-                {
-                    var d = domainService.GetByName(requestServerName);
+                var d = domainService.GetByName(requestServerName);
 
+                if (d != null && d.LanguageId.HasValue)
+                {
                     // test if a 404 page exists with current culture
                     cultureErr = error404Collection
-                        .FirstOrDefault(x => x.Culture == d.Language.IsoCode);
+                        .FirstOrDefault(x => x.Culture == d.LanguageIsoCode);
 
                     if (cultureErr != null)
                     {

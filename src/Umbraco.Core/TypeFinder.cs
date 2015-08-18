@@ -137,7 +137,7 @@ namespace Umbraco.Core
                 }
 
                 return _allAssemblies;
-            }            
+            }
         }
 
         /// <summary>
@@ -226,7 +226,7 @@ namespace Umbraco.Core
                 }
 
                 return LocalFilteredAssemblyCache;
-            }            
+            }
         }
 
         /// <summary>
@@ -451,7 +451,7 @@ namespace Umbraco.Core
                 var allTypes = GetTypesWithFormattedException(a)
                     .ToArray();
 
-                var attributedTypes = new Type[] {};
+                var attributedTypes = new Type[] { };
                 try
                 {
                     //now filter the types based on the onlyConcreteClasses flag, not interfaces, not static classes but have
@@ -480,7 +480,8 @@ namespace Umbraco.Core
 
                 //now we need to include types that may be inheriting from sub classes of the attribute type being searched for
                 //so we will search in assemblies that reference those types too.
-                foreach (var subTypesInAssembly in allAttributeTypes.GroupBy(x => x.Assembly)){
+                foreach (var subTypesInAssembly in allAttributeTypes.GroupBy(x => x.Assembly))
+                {
 
                     //So that we are not scanning too much, we need to group the sub types:    
                     // * if there is more than 1 sub type in the same assembly then we should only search on the 'lowest base' type.
@@ -610,7 +611,7 @@ namespace Umbraco.Core
                 catch (TypeLoadException ex)
                 {
                     LogHelper.Error(typeof(TypeFinder), string.Format("Could not query types on {0} assembly, this is most likely due to this assembly not being compatible with the current Umbraco version", a), ex);
-                    continue; 
+                    continue;
                 }
 
                 //add the types to our list to return
@@ -618,7 +619,7 @@ namespace Umbraco.Core
                 {
                     foundAssignableTypes.Add(t);
                 }
-                
+
                 //now we need to include types that may be inheriting from sub classes of the type being searched for
                 //so we will search in assemblies that reference those types too.
                 foreach (var subTypesInAssembly in allSubTypes.GroupBy(x => x.Assembly))
@@ -699,6 +700,10 @@ namespace Umbraco.Core
 
         #endregion
 
+        //TODO: This isn't very elegant, and will have issues since the AppDomain.CurrentDomain
+        // doesn't actualy load in all assemblies, only the types that have been referenced so far.
+        // However, in a web context, the BuildManager will have executed which will force all assemblies
+        // to be loaded so it's fine for now.
         public static Type GetTypeByName(string typeName)
         {
             var type = Type.GetType(typeName);

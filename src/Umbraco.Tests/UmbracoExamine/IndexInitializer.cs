@@ -49,7 +49,7 @@ namespace Umbraco.Tests.UmbracoExamine
 		    }
             if (mediaService == null)
             {
-                int totalRecs;
+                long totalRecs;
 
                 var allRecs = dataService.MediaService.GetLatestMediaByXpath("//node")
                     .Root
@@ -74,7 +74,7 @@ namespace Umbraco.Tests.UmbracoExamine
 
                 mediaService = Mock.Of<IMediaService>(
                     x => x.GetPagedDescendants(
-                        It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), out totalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<string>()) 
+                        It.IsAny<int>(), It.IsAny<long>(), It.IsAny<int>(), out totalRecs, It.IsAny<string>(), It.IsAny<Direction>(), It.IsAny<string>()) 
                         ==
                         allRecs);
             }

@@ -32,7 +32,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Update.Expressions
             {
                 updateItems.Add(string.Format("{0} = {1}",
                                               SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(item.Key),
-                                              SqlSyntaxContext.SqlSyntaxProvider.GetQuotedValue(item.Value.ToString())));
+                                              GetQuotedValue(item.Value)));
             }
 
             if (IsAllRows)
@@ -46,7 +46,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Update.Expressions
                     whereClauses.Add(string.Format("{0} {1} {2}",
                                                    SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(item.Key),
                                                    item.Value == null ? "IS" : "=",
-                                                   SqlSyntaxContext.SqlSyntaxProvider.GetQuotedValue(item.Value.ToString())));
+                                                   GetQuotedValue(item.Value)));
                 }
             }
             return string.Format(SqlSyntaxContext.SqlSyntaxProvider.UpdateData,

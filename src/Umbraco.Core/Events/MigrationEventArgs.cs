@@ -77,7 +77,7 @@ namespace Umbraco.Core.Events
 			get { return EventObject; }
 		}
 
-        [Obsolete("Use ConfiguredUmbracoVersion instead")]
+        [Obsolete("Use ConfiguredSemVersion instead")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public Version ConfiguredVersion
         {

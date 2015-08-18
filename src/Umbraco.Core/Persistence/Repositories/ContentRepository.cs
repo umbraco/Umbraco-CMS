@@ -20,6 +20,7 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
@@ -37,8 +38,8 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ContentPreviewRepository<IContent> _contentPreviewRepository;
         private readonly ContentXmlRepository<IContent> _contentXmlRepository;
 
-        public ContentRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider syntaxProvider, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository)
-            : base(work, cacheHelper, logger, syntaxProvider)
+        public ContentRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider syntaxProvider, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, IContentSection contentSection)
+            : base(work, cacheHelper, logger, syntaxProvider, contentSection)
         {
             if (contentTypeRepository == null) throw new ArgumentNullException("contentTypeRepository");
             if (templateRepository == null) throw new ArgumentNullException("templateRepository");
@@ -237,7 +238,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 var xmlItems = (from descendant in descendants
                                 let xml = serializer(descendant)
-                                select new ContentXmlDto { NodeId = descendant.Id, Xml = xml.ToString(SaveOptions.None) }).ToArray();
+                                select new ContentXmlDto { NodeId = descendant.Id, Xml = xml.ToDataString() }).ToArray();
 
                 //bulk insert it into the database
                 Database.BulkInsertRecords(xmlItems, tr);
@@ -339,6 +340,12 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             ((Content)entity).AddingEntity();
 
+            //ensure the default template is assigned
+            if (entity.Template == null)
+            {
+                entity.Template = entity.ContentType.DefaultTemplate;
+            }
+
             //Ensure unique name on the same level
             entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name);
 
@@ -351,11 +358,10 @@ namespace Umbraco.Core.Persistence.Repositories
             //NOTE Should the logic below have some kind of fallback for empty parent ids ?
             //Logic for setting Path, Level and SortOrder
             var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
-            int level = parent.Level + 1;
-            var maxSortOrder =
-                    Database.ExecuteScalar<int>(
-                        "SELECT coalesce(max(sortOrder),0) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType",
-                        new { ParentId = entity.ParentId, NodeObjectType = NodeObjectTypeId });
+            var level = parent.Level + 1;
+            var maxSortOrder = Database.ExecuteScalar<int>(
+                "SELECT coalesce(max(sortOrder),-1) FROM umbracoNode WHERE parentid = @ParentId AND nodeObjectType = @NodeObjectType",
+                new { /*ParentId =*/ entity.ParentId, NodeObjectType = NodeObjectTypeId });
             var sortOrder = maxSortOrder + 1;
 
             //Create the (base) node data - umbracoNode
@@ -820,12 +826,13 @@ namespace Umbraco.Core.Persistence.Repositories
             var contentTypes = _contentTypeRepository.GetAll(dtos.Select(x => x.ContentVersionDto.ContentDto.ContentTypeId).ToArray())
                 .ToArray();
 
+            
+            var ids = dtos
+                .Where(dto => dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
+                .Select(x => x.TemplateId.Value).ToArray();
+            
             //NOTE: This should be ok for an SQL 'IN' statement, there shouldn't be an insane amount of content types
-            var templates = _templateRepository.GetAll(
-                dtos
-                    .Where(dto => dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
-                    .Select(x => x.TemplateId.Value).ToArray())
-                .ToArray();
+            var templates = ids.Length == 0 ? Enumerable.Empty<ITemplate>() : _templateRepository.GetAll(ids).ToArray();
 
             var dtosWithContentTypes = dtos
                 //This select into and null check are required because we don't have a foreign damn key on the contentType column
@@ -854,7 +861,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// Private method to create a content object from a DocumentDto, which is used by Get and GetByVersion.
         /// </summary>
-        /// <param name="d"></param>
+        /// <param name="dto"></param>
         /// <param name="contentType"></param>
         /// <param name="template"></param>
         /// <param name="propCollection"></param>
@@ -871,6 +878,11 @@ namespace Umbraco.Core.Persistence.Repositories
             if (dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
             {
                 content.Template = template ?? _templateRepository.Get(dto.TemplateId.Value);
+            }
+            else
+            {
+                //ensure there isn't one set.
+                content.Template = null;
             }
 
             content.Properties = propCollection;

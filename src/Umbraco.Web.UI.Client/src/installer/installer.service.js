@@ -28,7 +28,7 @@ angular.module("umbraco.install").factory('installerService', function($rootScop
 					'Umbraco is the best of both worlds: 100% free and open source, and backed by a professional and profitable company',
 					"There's a pretty big chance, you've visited a website powered by Umbraco today",
 					"'Umbraco-spotting' is the game of spotting big brands running Umbraco",
-					"At least 2 people have the Umbraco logo tattooed on them",
+					"At least 4 people have the Umbraco logo tattooed on them",
 					"'Umbraco' is the danish name for an allen key",
 					"Umbraco has been around since 2005, that's a looong time in IT",
 					"More than 400 people from all over the world meet each year in Denmark in June for our annual conference <a target='_blank' href='http://codegarden14.com'>CodeGarden</a>", 

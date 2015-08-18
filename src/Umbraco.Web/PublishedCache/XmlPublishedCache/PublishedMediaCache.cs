@@ -218,7 +218,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				}	
 			}
 
-            LogHelper.Debug<PublishedMediaCache>(
+            LogHelper.Warn<PublishedMediaCache>(
                 "Could not retrieve media {0} from Examine index, reverting to looking up media via legacy library.GetMedia method",
                 () => id);
 
@@ -236,7 +236,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     : ConvertFromXPathNavigator(media.Current);
             }
 
-            LogHelper.Debug<PublishedMediaCache>(
+            LogHelper.Warn<PublishedMediaCache>(
                 "Could not retrieve media {0} from Examine index or from legacy library.GetMedia method",
                 () => id);
 

@@ -87,7 +87,7 @@ namespace umbraco
         private void RenderTemplateFolderItems(string folder, string folderPath, ref XmlTree tree)
         {
             string relPath = SystemDirectories.Masterpages + "/" + folder;
-            if (!string.IsNullOrEmpty(folderPath))
+            if (string.IsNullOrEmpty(folderPath) == false)
                 relPath += folderPath;
 
             string fullPath = IOHelper.MapPath(relPath);
@@ -160,26 +160,31 @@ namespace umbraco
         {
             if (base.m_id == -1)
             {
-                foreach (string s in Directory.GetDirectories(IOHelper.MapPath(SystemDirectories.Masterpages)))
+                var dir = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Masterpages));
+                if (dir.Exists)
                 {
-                    var _s = Path.GetFileNameWithoutExtension(s);
-
-                    XmlTreeNode xNode = XmlTreeNode.Create(this);
-                    xNode.NodeID = _s;
-                    xNode.Text = _s;
-                    xNode.Icon = "icon-folder";
-                    xNode.OpenIcon = "icon-folder";
-                    xNode.Source = GetTreeServiceUrl(_s) + "&folder=" + _s;
-                    xNode.HasChildren = true;
-                    xNode.Menu.Clear();
-                    xNode.Menu.Add(ActionRefresh.Instance);
-
-                    OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
-                    if (xNode != null)
+                    foreach (var s in dir.GetDirectories())
                     {
-                        tree.Add(xNode);
-                        OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                        var _s = Path.GetFileNameWithoutExtension(s.FullName);
+
+                        XmlTreeNode xNode = XmlTreeNode.Create(this);
+                        xNode.NodeID = _s;
+                        xNode.Text = _s;
+                        xNode.Icon = "icon-folder";
+                        xNode.OpenIcon = "icon-folder";
+                        xNode.Source = GetTreeServiceUrl(_s) + "&folder=" + _s;
+                        xNode.HasChildren = true;
+                        xNode.Menu.Clear();
+                        xNode.Menu.Add(ActionRefresh.Instance);
+
+                        OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                        if (xNode != null)
+                        {
+                            tree.Add(xNode);
+                            OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                        }
                     }
+
                 }
             }
         }

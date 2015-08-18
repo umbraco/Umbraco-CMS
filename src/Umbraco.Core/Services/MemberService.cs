@@ -30,37 +30,9 @@ namespace Umbraco.Core.Services
         private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();
         private readonly IDataTypeService _dataTypeService;
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public MemberService(RepositoryFactory repositoryFactory, IMemberGroupService memberGroupService)
-            : this(new PetaPocoUnitOfWorkProvider(), repositoryFactory, memberGroupService)
-        {
-        }
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public MemberService(IDatabaseUnitOfWorkProvider provider, IMemberGroupService memberGroupService)
-            : this(provider, new RepositoryFactory(), memberGroupService)
-        {
-        }
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public MemberService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IMemberGroupService memberGroupService)
-            : base(provider, repositoryFactory, LoggerResolver.Current.Logger)
-        {
-            if (memberGroupService == null) throw new ArgumentNullException("memberGroupService");
-            _memberGroupService = memberGroupService;
-            _dataTypeService = new DataTypeService(provider, repositoryFactory);
-        }
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public MemberService(IDatabaseUnitOfWorkProvider provider, IMemberGroupService memberGroupService, IDataTypeService dataTypeService)
-            : this(provider, new RepositoryFactory(), LoggerResolver.Current.Logger, memberGroupService, dataTypeService)
-        {
-
-        }
-
-        public MemberService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IMemberGroupService memberGroupService, IDataTypeService dataTypeService)
-            : base(provider, repositoryFactory, logger)
+        
+        public MemberService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory, IMemberGroupService memberGroupService, IDataTypeService dataTypeService)
+            : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
             if (memberGroupService == null) throw new ArgumentNullException("memberGroupService");
             if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
@@ -80,7 +52,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateMemberTypeRepository(UowProvider.GetUnitOfWork()))
             {
-                var types = repository.GetAll().Select(x => x.Alias).ToArray();
+                var types = repository.GetAll(new int[]{}).Select(x => x.Alias).ToArray();
 
                 if (types.Any() == false)
                 {
@@ -132,11 +104,11 @@ namespace Umbraco.Core.Services
 
             //go re-fetch the member and update the properties that may have changed
             var result = GetByUsername(member.Username);
-            
+
             //should never be null but it could have been deleted by another thread.
-            if (result == null) 
+            if (result == null)
                 return;
-            
+
             member.RawPasswordValue = result.RawPasswordValue;
             member.LastPasswordChangeDate = result.LastPasswordChangeDate;
             member.UpdateDate = member.UpdateDate;
@@ -975,9 +947,13 @@ namespace Umbraco.Core.Services
             {
                 repository.Delete(member);
                 uow.Commit();
-            }
 
-            Deleted.RaiseEvent(new DeleteEventArgs<IMember>(member, false), this);
+                var args = new DeleteEventArgs<IMember>(member, false);
+                Deleted.RaiseEvent(args, this);
+
+                //remove any flagged media files
+                repository.DeleteMediaFiles(args.MediaFilesToDelete);
+            }
         }
 
         /// <summary>
@@ -1169,7 +1145,7 @@ namespace Umbraco.Core.Services
                 repository.DissociateRoles(usernames, roleNames);
             }
         }
-        
+
         public void AssignRole(int memberId, string roleName)
         {
             AssignRoles(new[] { memberId }, new[] { roleName });
@@ -1198,7 +1174,7 @@ namespace Umbraco.Core.Services
             }
         }
 
-        
+
 
         #endregion
 
@@ -1233,7 +1209,7 @@ namespace Umbraco.Core.Services
                 uow.Commit();
             }
         }
-        
+
         #region Event Handlers
 
         /// <summary>
@@ -1250,7 +1226,7 @@ namespace Umbraco.Core.Services
         /// Occurs before Save
         /// </summary>
         public static event TypedEventHandler<IMemberService, SaveEventArgs<IMember>> Saving;
-        
+
         /// <summary>
         /// Occurs after Create
         /// </summary>

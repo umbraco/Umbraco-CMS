@@ -55,6 +55,9 @@ namespace Umbraco.Web.Security.Identity
                     appContext.Services.UserService,
                     appContext.Services.ExternalLoginService,
                     userMembershipProvider));
+
+            //Create a sign in manager per request
+            app.CreatePerOwinContext<BackOfficeSignInManager>((options, context) => BackOfficeSignInManager.Create(options, context, app.CreateLogger<BackOfficeSignInManager>()));
         }
 
         /// <summary>
@@ -82,6 +85,9 @@ namespace Umbraco.Web.Security.Identity
                     options,
                     customUserStore,
                     userMembershipProvider));
+
+            //Create a sign in manager per request
+            app.CreatePerOwinContext<BackOfficeSignInManager>((options, context) => BackOfficeSignInManager.Create(options, context, app.CreateLogger(typeof(BackOfficeSignInManager).FullName)));
         }
 
         /// <summary>
@@ -104,6 +110,9 @@ namespace Umbraco.Web.Security.Identity
 
             //Configure Umbraco user manager to be created per request
             app.CreatePerOwinContext<TManager>(userManager);
+
+            //Create a sign in manager per request
+            app.CreatePerOwinContext<BackOfficeSignInManager>((options, context) => BackOfficeSignInManager.Create(options, context, app.CreateLogger(typeof(BackOfficeSignInManager).FullName)));
         }
 
         /// <summary>
@@ -139,7 +148,10 @@ namespace Umbraco.Web.Security.Identity
             };
 
             //This is a custom middleware, we need to return the user's remaining logged in seconds
-            app.Use<GetUserSecondsMiddleWare>(authOptions, UmbracoConfig.For.UmbracoSettings().Security);
+            app.Use<GetUserSecondsMiddleWare>(
+                authOptions,
+                UmbracoConfig.For.UmbracoSettings().Security,
+                app.CreateLogger<GetUserSecondsMiddleWare>());
 
             app.UseCookieAuthentication(authOptions);
 

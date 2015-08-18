@@ -101,6 +101,7 @@ namespace Umbraco.Core
         /// <param name="f">The select child.</param>
         /// <typeparam name="T">Item type</typeparam>
         /// <returns>list of TItem</returns>
+        [Obsolete("Do not use, use SelectRecursive instead which has far less potential of re-iterating an iterator which may cause significantly more SQL queries")]
         public static IEnumerable<T> FlattenList<T>(this IEnumerable<T> e, Func<T, IEnumerable<T>> f)
         {
             return e.SelectMany(c => f(c).FlattenList(f)).Concat(e);
