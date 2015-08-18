@@ -34,7 +34,7 @@
 
         var compositionTool = {
           "name": "Compositions",
-          "icon": "merge",
+          "icon": "icon-merge",
           "action": function() {
             scope.openCompositionsDialog();
           }
@@ -42,7 +42,7 @@
 
         var sortingTool = {
           "name": "Reorder",
-          "icon": "navigation",
+          "icon": "icon-navigation",
           "action": function() {
             scope.toggleSortingMode();
           }
