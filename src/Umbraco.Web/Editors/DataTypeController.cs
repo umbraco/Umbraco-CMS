@@ -287,14 +287,19 @@ namespace Umbraco.Web.Editors
             var datatypes = new List<DataTypeBasic>();
 
             //this is a very specific map - if a property editor does not have prevalue - and there is a datatype already using this type, return that.
+            //also, we exclude all the system listviews from the list
             var propertyEditors = PropertyEditorResolver.Current.PropertyEditors;
             foreach (var propertyEditor in propertyEditors)
             {
                 var hasPrevalues = propertyEditor.PreValueEditor.Fields.Any();
+
                 //if no prevalues and a datatype available
-                if(hasPrevalues == false && datadefs.Any(x => x.PropertyEditorAlias == propertyEditor.Alias))
+                var dataDef = datadefs.FirstOrDefault(x => x.PropertyEditorAlias == propertyEditor.Alias);
+                if(hasPrevalues == false && dataDef != null)
                 {
-                    datatypes.Add( Mapper.Map<DataTypeBasic>( datadefs.First(x => x.PropertyEditorAlias == propertyEditor.Alias) ));
+                    if (propertyEditor.Alias != Constants.PropertyEditors.ListViewAlias)
+                        datatypes.Add( Mapper.Map<DataTypeBasic>( dataDef ));
+
                 }else{
 
                     //else, just add a clean property editor
