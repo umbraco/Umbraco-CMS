@@ -21,23 +21,23 @@
 		vm.page.navigation = [
 			{
 				"name": "Design",
-				"icon": "document-dashed-line",
+				"icon": "icon-document-dashed-line",
 				"view": "views/documentType/views/design/design.html",
 				"active": true
 			},
 			{
 				"name": "List view",
-				"icon": "list",
+				"icon": "icon-list",
 				"view": "views/documentType/views/listview/listview.html"
 			},
 			{
 				"name": "Permissions",
-				"icon": "keychain",
+				"icon": "icon-keychain",
 				"view": "views/documentType/views/permissions/permissions.html"
 			},
 			{
 				"name": "Templates",
-				"icon": "layout",
+				"icon": "icon-layout",
 				"view": "views/documentType/views/templates/templates.html"
 			}
 		];

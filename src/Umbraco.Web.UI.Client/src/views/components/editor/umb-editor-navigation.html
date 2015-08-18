@@ -1,7 +1,7 @@
 <ul class="umb-sub-views-nav">
     <li ng-repeat="item in navigation">
       <a class="umb-sub-views-nav-item" href="" ng-click="clickNavigationItem(item)" hotkey="{{$index+1}}" ng-class="{'is-active': item.active}">
-        <i class="icon icon-{{ item.icon }}"></i>
+        <i class="icon {{ item.icon }}"></i>
         <span class="umb-sub-views-nav-item-text">{{ item.name }}</span>
       </a>
     </li>
