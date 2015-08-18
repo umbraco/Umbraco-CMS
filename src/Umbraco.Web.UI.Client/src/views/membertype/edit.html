@@ -1,40 +1,44 @@
-<div ng-controller="Umbraco.Editors.MemberType.EditController">
+<div ng-controller="Umbraco.Editors.MemberType.EditController as vm">
     <form novalidate name="contentTypeForm"
-          ng-submit="save()"
+          ng-show="vm.contentType"
+          ng-submit="vm.save()"
           val-form-manager>
-
         <umb-editor-view>
 
             <umb-editor-header
-                    name="contentType.name"
-                    alias="contentType.alias"
-                    description="contentType.description"
-                    navigation="page.navigation"
-                    icon="contentType.icon">
+                    name="vm.contentType.name"
+                    alias="vm.contentType.alias"
+                    description="vm.contentType.description"
+                    navigation="vm.page.navigation"
+                    icon="vm.contentType.icon">
             </umb-editor-header>
 
             <umb-editor-container class="editors-document-type-container">
-                <div class="editors-document-type-canvas" ng-class="{'is-in-sorting-mode': sortingMode}">
-                    <umb-editor-sub-views></umb-editor-sub-views>
+
+                <div class="editors-document-type-canvas">
+                    <umb-editor-sub-views sub-views="vm.page.navigation" model="vm.contentType"></umb-editor-sub-views>
                 </div>
+
             </umb-editor-container>
 
+
             <umb-editor-footer>
+
+              <umb-keyboard-shortcuts-overview
+                model="vm.page.keyboardShortcutsOverview">
+              </umb-keyboard-shortcuts-overview>
+
+              <div class="btn-group">
                 <button type="submit" data-hotkey="ctrl+s" class="btn btn-success">
-                    <localize key="buttons_save">Save</localize>
+                  <localize key="buttons_save">Save</localize>
                 </button>
+              </div>
+
             </umb-editor-footer>
 
         </umb-editor-view>
+
+
     </form>
 
-    <!-- overlay for change property editor -->
-    <umb-overlay
-            ng-style="{'width': '500px'}"
-            ng-if="showDialog"
-            model="dialogModel"
-            animation="slide-in-right"
-            position="right"
-            view="dialogModel.view">
-    </umb-overlay>
 </div>
