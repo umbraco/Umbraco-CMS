@@ -52,7 +52,7 @@ angular.module("umbraco.directives")
                 // validate custom entered alias
                 scope.$watch('alias', function(newValue, oldValue){
 
-                  if(scope.alias === undefined && bindWatcher === true|| scope.alias === "" && bindWatcher === true || scope.alias === null && bindWatcher === true) {
+                  if(scope.alias === "" && bindWatcher === true || scope.alias === null && bindWatcher === true) {
                     // add watcher
                     unbindWatcher = scope.$watch('aliasFrom', function(newValue, oldValue) {
                       if (newValue !== undefined && newValue !== null) {
