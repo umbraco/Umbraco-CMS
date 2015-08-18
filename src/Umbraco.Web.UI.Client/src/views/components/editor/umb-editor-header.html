@@ -19,7 +19,7 @@
                 -->
                 <input type="text" class="umb-panel-header-name" placeholder="Enter name..." ng-show="name!==undefined" ng-disabled="content.isSystem == 1" ng-model="name"  ng-class="{'name-is-empty': name===null || name===''}" umb-auto-focus />
 
-                <umb-generate-alias class="umb-panel-header-alias" ng-show="alias!==undefined" alias="alias" alias-from="name" enable-lock="true"></umb-generate-alias>
+                <umb-generate-alias class="umb-panel-header-alias" ng-if="alias!==undefined" alias="$parent.alias" alias-from="$parent.name" enable-lock="true"></umb-generate-alias>
 
                 <input type="text" class="umb-panel-header-description" placeholder="Enter description..." ng-show="description!==undefined" ng-model="description" />
 
