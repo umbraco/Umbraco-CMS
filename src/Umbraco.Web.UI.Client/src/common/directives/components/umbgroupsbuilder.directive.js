@@ -369,7 +369,7 @@
 
             // because we set state to active, to show a preview, we have to check if has been filled out
             // label is required so if it is not filled we know it is a placeholder
-            if(oldModel.property.label === undefined || oldModel.property.label === null || oldModel.property.label === "") {
+            if(oldModel.property.editor === undefined || oldModel.property.editor === null || oldModel.property.editor === "") {
               property.propertyState = "init";
             } else {
               property.propertyState = oldModel.property.propertyState;
