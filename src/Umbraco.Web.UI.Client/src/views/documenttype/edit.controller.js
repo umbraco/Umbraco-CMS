@@ -127,6 +127,20 @@
 
 		function save() {
 
+			// validate form
+			if (formHelper.submitForm({ scope: $scope })) {
+
+				formHelper.resetForm({ scope: $scope });
+
+				// if form validates - perform save
+				performSave();
+
+			}
+
+		}
+
+		function performSave() {
+
 			// reformat allowed content types to array if id's
 			vm.contentType.allowedContentTypes = contentTypeHelper.createIdArray(vm.contentType.allowedContentTypes);
 
@@ -152,6 +166,7 @@
 
 				syncTreeNode(vm.contentType, dt.path);
 			});
+
 		}
 
 
