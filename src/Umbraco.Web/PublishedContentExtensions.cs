@@ -1734,7 +1734,7 @@ namespace Umbraco.Web
 
         public static IPublishedContent FirstChild(this IPublishedContent content)
         {
-            return content.Children().First();
+            return content.Children().FirstOrDefault();
         }
 
         public static IPublishedContent FirstChild(this IPublishedContent content, Func<IPublishedContent, bool> predicate)
