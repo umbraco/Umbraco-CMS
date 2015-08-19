@@ -48,11 +48,11 @@
           }
         };
 
-        if(scope.allowCompositions || scope.allowCompositions === undefined) {
+        if(scope.compositions || scope.compositions === undefined) {
           scope.toolbar.push(compositionTool);
         }
 
-        if(scope.allowSorting || scope.allowSorting === undefined) {
+        if(scope.sorting || scope.sorting === undefined) {
           scope.toolbar.push(sortingTool);
         }
 
@@ -591,8 +591,8 @@
       templateUrl: "views/components/umb-groups-builder.html",
       scope: {
         model: "=",
-        allowCompositions: "=",
-        allowSorting: "="
+        compositions: "=",
+        sorting: "="
       },
       link: link
     };
