@@ -9,6 +9,8 @@ angular.module("umbraco.directives")
             templateUrl: 'views/components/editor/umb-editor-navigation.html',
             link: function (scope, element, attrs, ctrl) {
 
+                scope.showNavigation = true;
+
                 scope.clickNavigationItem = function(selectedItem) {
                     setItemToActive(selectedItem);
                     runItemAction(selectedItem);
@@ -34,6 +36,17 @@ angular.module("umbraco.directives")
 
                     }
                 }
+
+                function activate() {
+
+                  // hide navigation if there is only 1 item
+                  if(scope.navigation.length <= 1) {
+                    scope.showNavigation = false;
+                  }
+
+                }
+
+                activate();
 
             }
         };
