@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using NUnit.Framework;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -460,13 +461,15 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
             var content2 = "{javascript: []}";
             var content3 = "{javascript: ['~/test.js', '~/test2.js']}";
             var content4 = "{propertyEditors: [], javascript: ['~/test.js', '~/test2.js']}";
+            var content5 = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble()) + "{propertyEditors: [], javascript: ['~/test.js', '~/test2.js']}";
 
-            var result = ManifestParser.CreateManifests(null, content1, content2, content3, content4);
+            var result = ManifestParser.CreateManifests(null, content1, content2, content3, content4, content5);
 
-            Assert.AreEqual(4, result.Count());
+            Assert.AreEqual(5, result.Count());
             Assert.AreEqual(0, result.ElementAt(1).JavaScriptInitialize.Count);
             Assert.AreEqual(2, result.ElementAt(2).JavaScriptInitialize.Count);
             Assert.AreEqual(2, result.ElementAt(3).JavaScriptInitialize.Count);
+            Assert.AreEqual(2, result.ElementAt(4).JavaScriptInitialize.Count);
         }
 
         [Test]

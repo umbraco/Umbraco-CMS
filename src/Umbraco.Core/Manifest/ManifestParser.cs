@@ -141,12 +141,17 @@ namespace Umbraco.Core.Manifest
         {
             var result = new List<PackageManifest>();
             foreach (var m in manifestFileContents)
-            {
-                // Strip byte object marker, JSON.NET does not like it
+            { 
                 var manifestContent = m;
-                var preAmble = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
-                if (manifestContent.StartsWith(preAmble))
-                    manifestContent = manifestContent.Remove(0, preAmble.Length);
+
+                if (manifestContent.IsNullOrWhiteSpace()) continue;
+
+                // Strip byte object marker, JSON.NET does not like it
+                var preamble = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
+
+                // Strangely StartsWith(preamble) would always return true
+                if (manifestContent.Substring(0, 1) == preamble)
+                    manifestContent = manifestContent.Remove(0, preamble.Length);
 
                 if (manifestContent.IsNullOrWhiteSpace()) continue;
 
