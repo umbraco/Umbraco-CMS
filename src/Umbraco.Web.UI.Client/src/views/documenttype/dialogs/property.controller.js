@@ -9,6 +9,7 @@
 function DocumentTypePropertyController($scope, dataTypeResource) {
 
 	$scope.showTabs = false;
+
 	var tabsLoaded = 0;
 
 	$scope.tabs = [
@@ -59,6 +60,20 @@ function DocumentTypePropertyController($scope, dataTypeResource) {
 		if(tabsLoaded === 2) {
 			$scope.showTabs = true;
 		}
+	}
+
+	$scope.showDetailsOverlay = function(property) {
+
+		var propertyDetails = {};
+		propertyDetails.icon = property.icon;
+		propertyDetails.title = property.name;
+
+		$scope.model.itemDetails = propertyDetails;
+
+	};
+
+	$scope.hideDetailsOverlay = function() {
+		$scope.model.itemDetails = null;
 	}
 
 	activate();

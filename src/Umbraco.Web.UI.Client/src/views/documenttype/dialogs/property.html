@@ -25,8 +25,8 @@
 		      <div ng-repeat="(key,value) in tab.typesAndEditors">
 		        <div ng-if="(value | filter:searchTerm).length > 0">
 		          <h5>{{key}}</h5>
-		          <ul class="umb-card-grid">
-		            <li ng-repeat="systemDataType in value | orderBy:'name' | filter: searchTerm">
+		          <ul class="umb-card-grid" ng-mouseleave="hideDetailsOverlay()">
+		            <li ng-repeat="systemDataType in value | orderBy:'name' | filter: searchTerm" ng-mouseover="showDetailsOverlay(systemDataType)">
 
 		              <a href="" ng-click="model.selectDataType(systemDataType)">
 		                <i class="{{ systemDataType.icon }}" ng-class="{'icon-autofill': systemDataType.icon == null}"></i>
@@ -43,8 +43,8 @@
 		    <div ng-if="tab.alias==='Reuse'">
 
 		      <h5>Your configurations</h5>
-		      <ul class="umb-card-grid">
-		        <li ng-repeat="configuredDataType in tab.userConfigured | orderBy:'name' | filter: searchTerm">
+		      <ul class="umb-card-grid" ng-mouseleave="hideDetailsOverlay()">
+		        <li ng-repeat="configuredDataType in tab.userConfigured | orderBy:'name' | filter: searchTerm" ng-mouseover="showDetailsOverlay(configuredDataType)">
 		          <a href="" ng-click="model.selectDataType(configuredDataType)">
 		            <i class="{{ configuredDataType.icon }}" ng-class="{'icon-autofill': configuredDataType.icon == null}"></i>
 		            {{ configuredDataType.name }}
