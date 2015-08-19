@@ -577,10 +577,15 @@
       }
 
 
-      scope.$watch('model', function(newValue, oldValue) {
+      var unbindModelWatcher = scope.$watch('model', function(newValue, oldValue) {
         if (newValue !== undefined && newValue.groups !== undefined) {
           activate();
         }
+      });
+
+      // clean up
+      scope.$on('$destroy', function(){
+        unbindModelWatcher();
       });
 
     }
