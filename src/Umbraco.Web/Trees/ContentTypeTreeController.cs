@@ -52,8 +52,6 @@ namespace Umbraco.Web.Trees
             return nodes;
         }
 
-       
-
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
             var menu = new MenuItemCollection();
