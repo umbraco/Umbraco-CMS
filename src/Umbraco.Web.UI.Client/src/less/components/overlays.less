@@ -89,14 +89,51 @@
 }
 
 .umb-overlay.umb-overlay-right .umb-overlay-header {
-     height: 64px;
-     padding: 15px 10px 20px 20px;
+     height: 100px;
+     padding: 20px;
+     box-sizing: border-box;
 }
 
 .umb-overlay.umb-overlay-right .umb-overlay-container {
      top: 100px;
      left: 0;
      right: 0;
-     bottom: 50px;
+     bottom: 51px;
      padding: 20px;
+}
+
+/* ---------- OVERLAY ITEM DETAILS ---------- */
+
+.umb-overlay__item-details {
+  position: absolute;
+  left: 0;
+  bottom: 51px;
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  border-bottom: 1px solid @grayLight;
+  background: @grayLighter;
+}
+
+.umb-overlay__item-details-title-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.umb-overlay__item-details-icon {
+  font-size: 16px;
+  margin-right: 10px;
+  vertical-align: middle;
+  color: #999;
+}
+
+.umb-overlay__item-details-title {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.umb-overlay__item-details-description {
+  margin-top: 10px;
+  font-size: 12px;
 }

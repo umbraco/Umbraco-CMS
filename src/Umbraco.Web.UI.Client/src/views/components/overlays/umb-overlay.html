@@ -14,6 +14,17 @@
       <div ng-if="!view" ng-transclude></div>
     </div>
 
+    <div class="umb-overlay__item-details" ng-if="model.itemDetails">
+
+      <div class="umb-overlay__item-details-title-wrapper" ng-if="model.itemDetails.icon || model.itemDetails.title">
+        <i ng-if="model.itemDetails.icon" class="{{ model.itemDetails.icon }} umb-overlay__item-details-icon"></i>
+        <h5 ng-if="model.itemDetails.title" class="umb-overlay__item-details-title">{{ model.itemDetails.title }}</h5>
+      </div>
+
+      <div ng-if="model.itemDetails.description" class="umb-overlay__item-details-description">{{ model.itemDetails.description }}</div>
+
+    </div>
+
     <div class="umb-overlay-drawer" ng-if="model.close || model.submit">
       <div class="umb-overlay-drawer-content">
         <button class="btn btn-link" hotkey="esc" ng-click="closeOverLay()" ng-if="model.close">Cancel</button>
