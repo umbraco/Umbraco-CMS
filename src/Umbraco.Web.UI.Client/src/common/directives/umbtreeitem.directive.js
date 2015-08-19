@@ -86,7 +86,7 @@ angular.module("umbraco.directives")
                 icon.addClass(node.cssClass);
                 icon.attr("title", node.routePath);
 
-                element.find("a:first").html(node.name);
+                element.find("a:first").text(node.name);
 
                 if (!node.menuUrl) {
                     element.find("a.umb-options").remove();
