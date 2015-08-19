@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -141,10 +142,16 @@ namespace Umbraco.Core.Manifest
             var result = new List<PackageManifest>();
             foreach (var m in manifestFileContents)
             {
-                if (m.IsNullOrWhiteSpace()) continue;
+                // Strip byte object marker, JSON.NET does not like it
+                var manifestContent = m;
+                var preAmble = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
+                if (manifestContent.StartsWith(preAmble))
+                    manifestContent = manifestContent.Remove(0, preAmble.Length);
+
+                if (manifestContent.IsNullOrWhiteSpace()) continue;
 
                 //remove any comments first
-                var replaced = CommentsSurround.Replace(m, match => " ");
+                var replaced = CommentsSurround.Replace(manifestContent, match => " ");
                 replaced = CommentsLine.Replace(replaced, match => "");
 
                 JObject deserialized;
@@ -154,7 +161,7 @@ namespace Umbraco.Core.Manifest
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error<ManifestParser>("An error occurred parsing manifest with contents: " + m, ex);
+                    LogHelper.Error<ManifestParser>("An error occurred parsing manifest with contents: " + manifestContent, ex);
                     continue;
                 }
 
