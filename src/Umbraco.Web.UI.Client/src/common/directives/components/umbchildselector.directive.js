@@ -5,6 +5,7 @@
 
         function link(scope, el, attr, ctrl) {
 
+            var eventBindings = [];
             scope.dialogModel = {};
             scope.showDialog = false;
 
@@ -145,24 +146,24 @@
 
             }
 
-            var unbindParentNameWatch = scope.$watch('parentName', function(newValue, oldValue){
+            eventBindings.push(scope.$watch('parentName', function(newValue, oldValue){
 
               if (newValue === oldValue) { return; }
               if ( oldValue === undefined || newValue === undefined) { return; }
 
               syncParentName();
 
-            });
+            }));
 
-            var unbindParentIconWatch = scope.$watch('parentIcon', function(newValue, oldValue){
+            eventBindings.push(scope.$watch('parentIcon', function(newValue, oldValue){
 
               if (newValue === oldValue) { return; }
               if ( oldValue === undefined || newValue === undefined) { return; }
 
               syncParentIcon();
-            });
+            }));
 
-            var unbindAvailableChildrenWatch = scope.$watch('availableChildren', function(newValue, oldValue){
+            eventBindings.push(scope.$watch('availableChildren', function(newValue, oldValue){
 
               if (newValue === oldValue) { return; }
               if ( oldValue === undefined || newValue === undefined) { return; }
@@ -173,23 +174,22 @@
                 insertParentPlaceholder();
               }
 
-            });
+            }));
 
-            var unbindSelectedChildrenWatch = scope.$watch('selectedChildren', function(newValue, oldValue){
+            eventBindings.push(scope.$watch('selectedChildren', function(newValue, oldValue){
 
               if (newValue === oldValue) { return; }
               if ( oldValue === undefined || newValue === undefined) { return; }
 
               scope.selectedChildren = createSelectedChildrenObjectArray(scope.selectedChildren, scope.availableChildren);
-            });
+            }));
 
             // clean up
             scope.$on('$destroy', function(){
               // unbind watchers
-              unbindParentNameWatch();
-              unbindParentIconWatch();
-              unbindAvailableChildrenWatch();
-              unbindSelectedChildrenWatch();
+              for(var e in eventBindings) {
+                eventBindings[e]();
+               }
             });
 
         }
