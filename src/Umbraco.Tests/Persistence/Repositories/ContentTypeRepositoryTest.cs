@@ -136,7 +136,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 // Act
                 var contentType = (IContentType)MockedContentTypes.CreateSimpleContentType("test", "Test", propertyGroupName: "testGroup");
-                var display = Mapper.Map<ContentTypeDisplay>(contentType);
+                var display = Mapper.Map<ContentTypeCompositionDisplay>(contentType);
                 //simulate what would happen in the controller, we'd never map to a 'existing' content type,
                 // we'd map to an new content type when updating.
                 var mapped = Mapper.Map<IContentType>(display);
@@ -207,7 +207,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
 
-                var display = Mapper.Map<ContentTypeDisplay>(contentType);
+                var display = Mapper.Map<ContentTypeCompositionDisplay>(contentType);
 
                 display.Thumbnail = "Doc2.png";
                 var contentGroup = display.Groups.Single(x => x.Name == "Content");
