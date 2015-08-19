@@ -93,7 +93,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Returns all member types
         /// </summary>
-        public IEnumerable<ContentTypeBasic> GetAll()
+        public IEnumerable<ContentTypeBasic> GetAllTypes()
         {
             if (_provider.IsUmbracoMembershipProvider())
             {
