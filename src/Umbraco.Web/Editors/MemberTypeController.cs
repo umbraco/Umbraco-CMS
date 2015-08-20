@@ -13,6 +13,8 @@ using System.Web.Http;
 using System.Net;
 using Umbraco.Core.PropertyEditors;
 using System;
+using System.Net.Http;
+using ContentType = System.Net.Mime.ContentType;
 
 namespace Umbraco.Web.Editors
 {
@@ -26,7 +28,7 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
     [EnableOverrideAuthorization]
-    public class MemberTypeController : UmbracoAuthorizedJsonController
+    public class MemberTypeController : ContentTypeControllerBase
     {
         /// <summary>
         /// Constructor
@@ -49,7 +51,7 @@ namespace Umbraco.Web.Editors
 
         private readonly MembershipProvider _provider;
 
-        public MemberTypeDisplay GetById(int id)
+        public ContentTypeCompositionDisplay GetById(int id)
         {
             var ct = Services.MemberTypeService.Get(id);
             if (ct == null)
@@ -57,40 +59,37 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var dto = Mapper.Map<IMemberType, MemberTypeDisplay>(ct);
+            var dto = Mapper.Map<IMemberType, ContentTypeCompositionDisplay>(ct);
             return dto;
         }
 
-        public MemberTypeDisplay GetEmpty()
+        /// <summary>
+        /// Deletes a document type wth a given ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [HttpPost]
+        public HttpResponseMessage DeleteById(int id)
         {
-            var ct = new MemberType(-1);
-            var dto = Mapper.Map<IMemberType, MemberTypeDisplay>(ct);
-            return dto;
-        }
-
-
-        // TODO: Move to base content type controller
-        public ContentPropertyDisplay GetPropertyTypeScaffold(int id)
-        {
-            var dataTypeDiff = Services.DataTypeService.GetDataTypeDefinitionById(id);
-
-            if (dataTypeDiff == null)
+            var foundType = Services.MemberTypeService.Get(id);
+            if (foundType == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var preVals = UmbracoContext.Current.Application.Services.DataTypeService.GetPreValuesCollectionByDataTypeId(id);
-            var editor = PropertyEditorResolver.Current.GetByAlias(dataTypeDiff.PropertyEditorAlias);
-
-            return new ContentPropertyDisplay()
-            {
-                Editor = dataTypeDiff.PropertyEditorAlias,
-                Validation = new PropertyTypeValidation() { },
-                View = editor.ValueEditor.View,
-                Config = editor.PreValueEditor.ConvertDbToEditor(editor.DefaultPreValues, preVals)
-            };
+            Services.MemberTypeService.Delete(foundType, Security.CurrentUser.Id);
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
+        public ContentTypeCompositionDisplay GetEmpty()
+        {
+            var ct = new MemberType(-1);
+            var dto = Mapper.Map<IMemberType, ContentTypeCompositionDisplay>(ct);
+            return dto;
+        }
+
+       
         /// <summary>
         /// Returns all member types
         /// </summary>
@@ -102,10 +101,9 @@ namespace Umbraco.Web.Editors
                                .Select(Mapper.Map<IMemberType, ContentTypeBasic>);    
             }
             return Enumerable.Empty<ContentTypeBasic>();
-
         }
 
-        public MemberTypeDisplay PostSave(MemberTypeDisplay contentType)
+        public ContentTypeCompositionDisplay PostSave(ContentTypeCompositionDisplay contentType)
         {
 
             var ctService = ApplicationContext.Services.MemberTypeService;

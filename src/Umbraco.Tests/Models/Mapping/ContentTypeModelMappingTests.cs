@@ -424,6 +424,7 @@ namespace Umbraco.Tests.Models.Mapping
                         Name = "Template2"
                     }
                 },
+
                 AllowedContentTypes = new [] {666, 667},
                 AvailableCompositeContentTypes = new List<EntityBasic>(),
                 DefaultTemplate = new EntityBasic(){ Alias = "test" },

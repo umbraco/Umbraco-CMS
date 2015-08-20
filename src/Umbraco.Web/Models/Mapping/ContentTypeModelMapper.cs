@@ -34,12 +34,24 @@ namespace Umbraco.Web.Models.Mapping
 
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
-            config.CreateMap<IMediaType, ContentTypeBasic>();
-            config.CreateMap<IContentType, ContentTypeBasic>();
-          
             config.CreateMap<ContentTypeDisplay, IContentType>()
                 .ConstructUsing((ContentTypeDisplay source) => new ContentType(source.ParentId))
 
+                .ForMember(dto => dto.AllowedTemplates, expression => expression.Ignore())
+                .ForMember(dto => dto.DefaultTemplate, expression => expression.Ignore())
+
+                .AfterMap((source, dest) =>
+                {
+                    //sync templates
+                    dest.AllowedTemplates = source.AllowedTemplates.Select(x => Mapper.Map<ITemplate>(x));
+
+                    if (source.DefaultTemplate != null)
+                        dest.SetDefaultTemplate(Mapper.Map<ITemplate>(source.DefaultTemplate)); 
+                });
+
+
+            config.CreateMap<ContentTypeCompositionDisplay, IContentTypeComposition>()
+                .Include<ContentTypeDisplay, IContentType>()
                 //only map id if set to something higher then zero
                 .ForMember(dto => dto.Id, expression => expression.Condition(display => (Convert.ToInt32(display.Id) > 0)))
                 .ForMember(dto => dto.Id, expression => expression.MapFrom(display => Convert.ToInt32(display.Id)))
@@ -47,12 +59,13 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.CreatorId, expression => expression.Ignore())
                 .ForMember(dto => dto.Level, expression => expression.Ignore())
                 .ForMember(dto => dto.SortOrder, expression => expression.Ignore())
+
                 //mapped in aftermap
                 .ForMember(dto => dto.AllowedContentTypes, expression => expression.Ignore())
-                .ForMember(dto => dto.AllowedTemplates, expression => expression.Ignore())
                 
                 //ignore, we'll do this in after map
                 .ForMember(dto => dto.PropertyGroups, expression => expression.Ignore())
+
                 .AfterMap((source, dest) =>
                 {
 
@@ -135,18 +148,21 @@ namespace Umbraco.Web.Models.Mapping
                         if (addCt != null)
                             dest.AddContentType(addCt);
                     }
-
-                    //sync templates
-                    dest.AllowedTemplates = source.AllowedTemplates.Select(x => Mapper.Map<ITemplate>(x));
-                    if(source.DefaultTemplate != null)
-                        dest.SetDefaultTemplate(Mapper.Map<ITemplate>(source.DefaultTemplate)); 
+                   
                 });
+
+
 
 
             config.CreateMap<ContentTypeSort, int>().ConvertUsing(x => x.Id.Value);
             config.CreateMap<IContentTypeComposition, string>().ConvertUsing(x => x.Alias);
 
-            config.CreateMap<IContentType, ContentTypeDisplay>()
+            config.CreateMap<IContentTypeComposition, ContentTypeCompositionDisplay>()
+                .Include<IContentType, ContentTypeDisplay>()
+
+                .Include<IMemberType, ContentTypeCompositionDisplay>()
+                .Include<IMediaType, ContentTypeCompositionDisplay>()
+
                 .ForMember(display => display.AllowAsRoot, expression => expression.MapFrom(type => type.AllowedAsRoot))
                 .ForMember(display => display.ListViewEditorName, expression => expression.Ignore())
                 //Ignore because this is not actually used for content types
@@ -167,6 +183,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(
                     dto => dto.Groups,
                     expression => expression.ResolveUsing(new PropertyTypeGroupResolver(applicationContext, _propertyEditorResolver)))
+                
                 .AfterMap(((type, display) =>
                 {
                     //default
@@ -179,6 +196,23 @@ namespace Umbraco.Web.Models.Mapping
                     }    
                     
                 }));
+
+            config.CreateMap<IMemberType, ContentTypeCompositionDisplay>();
+            config.CreateMap<IMediaType, ContentTypeCompositionDisplay>();
+
+            config.CreateMap<IContentType, ContentTypeDisplay>()
+                .ForMember(dto => dto.AllowedTemplates, expression => expression.Ignore())
+                .ForMember(dto => dto.DefaultTemplate, expression => expression.Ignore())
+
+                .AfterMap((source, dest) =>
+                {
+                    //sync templates
+                    dest.AllowedTemplates = source.AllowedTemplates.Select(Mapper.Map<EntityBasic>);
+
+                    if (source.DefaultTemplate != null)
+                        dest.DefaultTemplate = Mapper.Map<EntityBasic>(source.DefaultTemplate);
+                });
+
 
             config.CreateMap<PropertyGroupDisplay, PropertyGroup>()
                 .ForMember(dest => dest.Id, expression => expression.Condition(source => source.Id > 0))
