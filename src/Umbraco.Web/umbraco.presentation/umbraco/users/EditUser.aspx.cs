@@ -28,6 +28,7 @@ using umbraco.providers;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core.IO;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 
 namespace umbraco.cms.presentation.user
 {
@@ -106,37 +107,25 @@ namespace umbraco.cms.presentation.user
                 }
             }
 
+            var userCulture = Services.TextService.ConvertToSupportedCultureWithRegionCode(new CultureInfo(u.Language));
+
             // Populate ui language lsit
-            foreach (
-                string f in
-                    Directory.GetFiles(IOHelper.MapPath(SystemDirectories.Umbraco + "/config/lang"), "*.xml")
-                )
+            foreach (var lang in Services.TextService.GetSupportedCultures())
             {
-                XmlDocument x = new XmlDocument();
-                x.Load(f);
+                var regionCode = Services.TextService.ConvertToRegionCodeFromSupportedCulture(lang);
+                
+                var li = new ListItem(lang.DisplayName, regionCode);
 
-                var alias = x.DocumentElement.Attributes.GetNamedItem("alias").Value;
+                if (Equals(lang, userCulture))
+                    li.Selected = true;
 
-                //ensure that only unique languages are added
-                if (userLanguage.Items.FindByValue(alias) == null)
-                {
-                    ListItem li =
-                   new ListItem(x.DocumentElement.Attributes.GetNamedItem("intName").Value,
-                                alias);
-
-
-                    if (x.DocumentElement.Attributes.GetNamedItem("alias").Value == u.Language)
-                        li.Selected = true;
-
-                    userLanguage.Items.Add(li);
-                }
-               
+                userLanguage.Items.Add(li);
             }
 
             // Console access and disabling
             NoConsole.Checked = u.NoConsole;
             Disabled.Checked = u.Disabled;
-            
+
             PlaceHolder medias = new PlaceHolder();
             mediaPicker.AppAlias = Constants.Applications.Media;
             mediaPicker.TreeAlias = "media";
@@ -161,19 +150,19 @@ namespace umbraco.cms.presentation.user
 
 
             // Add password changer
-            var passwordChanger = (passwordChanger) LoadControl(SystemDirectories.Umbraco + "/controls/passwordChanger.ascx");
+            var passwordChanger = (passwordChanger)LoadControl(SystemDirectories.Umbraco + "/controls/passwordChanger.ascx");
             passwordChanger.MembershipProviderName = UmbracoSettings.DefaultBackofficeProvider;
-            
+
             //Add a custom validation message for the password changer
             var passwordValidation = new CustomValidator
-                {
-                    ID = "PasswordChangerValidator"
-                };
+            {
+                ID = "PasswordChangerValidator"
+            };
             var validatorContainer = new HtmlGenericControl("div")
-                {
-                    Visible = false,
-                    EnableViewState = false
-                };
+            {
+                Visible = false,
+                EnableViewState = false
+            };
             validatorContainer.Attributes["class"] = "alert alert-error";
             validatorContainer.Style.Add(HtmlTextWriterStyle.MarginTop, "10px");
             validatorContainer.Style.Add(HtmlTextWriterStyle.Width, "300px");
@@ -194,7 +183,7 @@ namespace umbraco.cms.presentation.user
             Pane ppNodes = new Pane();
             ppNodes.addProperty(ui.Text("user", "startnode", UmbracoUser), content);
             ppNodes.addProperty(ui.Text("user", "mediastartnode", UmbracoUser), medias);
-            
+
             //Generel umrbaco access
             Pane ppAccess = new Pane();
             ppAccess.addProperty(ui.Text("user", "noConsole", UmbracoUser), NoConsole);
@@ -208,12 +197,12 @@ namespace umbraco.cms.presentation.user
             TabPage userInfo = UserTabs.NewTabPage(u.Name);
 
             userInfo.Controls.Add(pp);
-            
+
             userInfo.Controls.Add(ppAccess);
             userInfo.Controls.Add(ppNodes);
 
             userInfo.Controls.Add(ppModules);
-            
+
             userInfo.HasMenu = true;
 
             var save = userInfo.Menu.NewButton();
@@ -227,7 +216,7 @@ namespace umbraco.cms.presentation.user
             sectionValidator.ControlToValidate = lapps.ID;
             sectionValidator.ErrorMessage = ui.Text("errorHandling", "errorMandatoryWithoutTab", ui.Text("user", "modules", UmbracoUser), UmbracoUser);
             sectionValidator.CssClass = "error";
-            sectionValidator.Style.Add("color", "red"); 
+            sectionValidator.Style.Add("color", "red");
 
             SetupForm();
             SetupChannel();
@@ -414,7 +403,7 @@ namespace umbraco.cms.presentation.user
 
                 //now do the actual change
                 var changePassResult = _membershipHelper.ChangePassword(
-                    membershipUser.UserName, changePasswordModel, BackOfficeProvider);    
+                    membershipUser.UserName, changePasswordModel, BackOfficeProvider);
 
                 if (changePassResult.Success)
                 {
@@ -449,8 +438,8 @@ namespace umbraco.cms.presentation.user
                         throw new ProviderException("Could not find user in the membership provider with login name " + u.LoginName);
                     }
 
-                    var passwordChangerControl = (passwordChanger) passw.Controls[0];
-                    var passwordChangerValidator = (CustomValidator) passw.Controls[1].Controls[0].Controls[0];
+                    var passwordChangerControl = (passwordChanger)passw.Controls[0];
+                    var passwordChangerValidator = (CustomValidator)passw.Controls[1].Controls[0].Controls[0];
 
                     //perform the changing password logic
                     ChangePassword(passwordChangerControl, membershipUser, passwordChangerValidator);
@@ -463,7 +452,7 @@ namespace umbraco.cms.presentation.user
                     u.Name = uname.Text.Trim();
                     u.Language = userLanguage.SelectedValue;
                     u.UserType = UserType.GetUserType(int.Parse(userType.SelectedValue));
-                    u.Email = email.Text.Trim();                    
+                    u.Email = email.Text.Trim();
                     u.LoginName = lname.Text;
                     u.Disabled = Disabled.Checked;
                     u.NoConsole = NoConsole.Checked;
@@ -477,9 +466,9 @@ namespace umbraco.cms.presentation.user
                         else
                             startNode = -1;
                     }
-                    u.StartNodeId = startNode;                                        
-                    
-                    
+                    u.StartNodeId = startNode;
+
+
                     int mstartNode;
                     if (int.TryParse(mediaPicker.Value, out mstartNode) == false)
                     {
