@@ -207,7 +207,7 @@
         {
             if (string.IsNullOrEmpty(imageUrl) == false)
             {
-                var imageResizerUrl = new StringBuilder();
+                var imageProcessorUrl = new StringBuilder();
 
                 if (string.IsNullOrEmpty(imageCropperValue) == false && imageCropperValue.DetectIsJson() && (imageCropMode == ImageCropMode.Crop || imageCropMode == null))
                 {
@@ -216,12 +216,12 @@
                     {
                         var crop = cropDataSet.GetCrop(cropAlias);
 
-                        imageResizerUrl.Append(cropDataSet.Src);
+                        imageProcessorUrl.Append(cropDataSet.Src);
 
                         var cropBaseUrl = cropDataSet.GetCropBaseUrl(cropAlias, preferFocalPoint);
                         if (cropBaseUrl != null)
                         {
-                            imageResizerUrl.Append(cropBaseUrl);
+                            imageProcessorUrl.Append(cropBaseUrl);
                         }
                         else
                         {
@@ -238,47 +238,47 @@
                         if (crop != null && crop.Coordinates == null && ratioMode == null && width != null && height == null)
                         {
                             var heightRatio = (decimal)crop.Height / (decimal)crop.Width;
-                            imageResizerUrl.Append("&heightratio=" + heightRatio.ToString(CultureInfo.InvariantCulture));
+                            imageProcessorUrl.Append("&heightratio=" + heightRatio.ToString(CultureInfo.InvariantCulture));
                         }
 
                         // If a predefined crop has been specified & there are no coordinates & no ratio mode, but a height parameter has been passed we can get the crop ratio for the width
                         if (crop != null && crop.Coordinates == null && ratioMode == null && width == null && height != null)
                         {
                             var widthRatio = (decimal)crop.Width / (decimal)crop.Height;
-                            imageResizerUrl.Append("&widthratio=" + widthRatio.ToString(CultureInfo.InvariantCulture));
+                            imageProcessorUrl.Append("&widthratio=" + widthRatio.ToString(CultureInfo.InvariantCulture));
                         }
                     }
                 }
                 else
                 {
-                    imageResizerUrl.Append(imageUrl);
+                    imageProcessorUrl.Append(imageUrl);
 
                     if (imageCropMode == null)
                     {
                         imageCropMode = ImageCropMode.Pad;
                     }
 
-                    imageResizerUrl.Append("?mode=" + imageCropMode.ToString().ToLower());
+                    imageProcessorUrl.Append("?mode=" + imageCropMode.ToString().ToLower());
 
                     if (imageCropAnchor != null)
                     {
-                        imageResizerUrl.Append("&anchor=" + imageCropAnchor.ToString().ToLower());
+                        imageProcessorUrl.Append("&anchor=" + imageCropAnchor.ToString().ToLower());
                     }
                 }
 
                 if (quality != null)
                 {
-                    imageResizerUrl.Append("&quality=" + quality);
+                    imageProcessorUrl.Append("&quality=" + quality);
                 }
 
                 if (width != null && ratioMode != ImageCropRatioMode.Width)
                 {
-                    imageResizerUrl.Append("&width=" + width);
+                    imageProcessorUrl.Append("&width=" + width);
                 }
 
                 if (height != null && ratioMode != ImageCropRatioMode.Height)
                 {
-                    imageResizerUrl.Append("&height=" + height);
+                    imageProcessorUrl.Append("&height=" + height);
                 }
 
                 if (ratioMode == ImageCropRatioMode.Width && height != null)
@@ -290,7 +290,7 @@
                     }
 
                     var widthRatio = (decimal)width / (decimal)height;
-                    imageResizerUrl.Append("&widthratio=" + widthRatio.ToString(CultureInfo.InvariantCulture));
+                    imageProcessorUrl.Append("&widthratio=" + widthRatio.ToString(CultureInfo.InvariantCulture));
                 }
 
                 if (ratioMode == ImageCropRatioMode.Height && width != null)
@@ -302,25 +302,25 @@
                     }
 
                     var heightRatio = (decimal)height / (decimal)width;
-                    imageResizerUrl.Append("&heightratio=" + heightRatio.ToString(CultureInfo.InvariantCulture));
+                    imageProcessorUrl.Append("&heightratio=" + heightRatio.ToString(CultureInfo.InvariantCulture));
                 }
 
                 if (upScale == false)
                 {
-                    imageResizerUrl.Append("&upscale=false");                    
+                    imageProcessorUrl.Append("&upscale=false");                    
                 }
 
                 if (furtherOptions != null)
                 {
-                    imageResizerUrl.Append(furtherOptions);
+                    imageProcessorUrl.Append(furtherOptions);
                 }
 
                 if (cacheBusterValue != null)
                 {
-                    imageResizerUrl.Append("&rnd=").Append(cacheBusterValue);
+                    imageProcessorUrl.Append("&rnd=").Append(cacheBusterValue);
                 }
 
-                return imageResizerUrl.ToString();
+                return imageProcessorUrl.ToString();
             }
 
             return string.Empty;
