@@ -17,6 +17,10 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 
     //map the user config
     $scope.model.config = angular.extend(config, $scope.model.config);
+    //ensure the format doesn't get overwritten with an empty string
+    if ($scope.model.config.format === "" || $scope.model.config.format === undefined || $scope.model.config.format === null) {
+        $scope.model.config.format = "YYYY-MM-DD HH:mm:ss";
+    }
 
     $scope.hasDatetimePickerValue = $scope.model.value ? true : false;
     $scope.datetimePickerValue = null;
