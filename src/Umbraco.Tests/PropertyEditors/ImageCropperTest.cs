@@ -182,5 +182,29 @@ namespace Umbraco.Tests.PropertyEditors
             var urlString = mediaPath.GetCropUrl(imageCropperValue: cropperJson, cropAlias: "home", height: 200);
             Assert.AreEqual(mediaPath + "?anchor=center&mode=crop&widthratio=1.6770186335403726708074534161&height=200", urlString);
         }
+
+        /// <summary>
+        /// Test to check result when only a width parameter is passed, effectivly a resize only
+        /// </summary>
+        [Test]
+        public void GetCropUrl_WidthOnlyParameter()
+        {
+            var cropperJson = "{\"focalPoint\": {\"left\": 0.5,\"top\": 0.5},\"src\": \"/media/1005/img_0671.jpg\",\"crops\": [{\"alias\": \"home\",\"width\": 270,\"height\": 161}]}";
+
+            var urlString = mediaPath.GetCropUrl(imageCropperValue: cropperJson, width: 200);
+            Assert.AreEqual(mediaPath + "?anchor=center&mode=crop&width=200", urlString);
+        }
+
+        /// <summary>
+        /// Test to check result when only a height parameter is passed, effectivly a resize only
+        /// </summary>
+        [Test]
+        public void GetCropUrl_HeightOnlyParameter()
+        {
+            var cropperJson = "{\"focalPoint\": {\"left\": 0.5,\"top\": 0.5},\"src\": \"/media/1005/img_0671.jpg\",\"crops\": [{\"alias\": \"home\",\"width\": 270,\"height\": 161}]}";
+
+            var urlString = mediaPath.GetCropUrl(imageCropperValue: cropperJson, height: 200);
+            Assert.AreEqual(mediaPath + "?anchor=center&mode=crop&height=200", urlString);
+        }
     }
 }

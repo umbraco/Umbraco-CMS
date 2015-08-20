@@ -234,14 +234,14 @@
                         }
 
                         // If a predefined crop has been specified & there are no coordinates & no ratio mode, but a width parameter has been passed we can get the crop ratio for the height
-                        if (crop != null && crop.Coordinates == null && ratioMode == null && width != null && height == null)
+                        if (crop != null && string.IsNullOrEmpty(cropAlias) == false && crop.Coordinates == null && ratioMode == null && width != null && height == null)
                         {
                             var heightRatio = (decimal)crop.Height / (decimal)crop.Width;
                             imageProcessorUrl.Append("&heightratio=" + heightRatio.ToString(CultureInfo.InvariantCulture));
                         }
 
                         // If a predefined crop has been specified & there are no coordinates & no ratio mode, but a height parameter has been passed we can get the crop ratio for the width
-                        if (crop != null && crop.Coordinates == null && ratioMode == null && width == null && height != null)
+                        if (crop != null && string.IsNullOrEmpty(cropAlias) == false && crop.Coordinates == null && ratioMode == null && width == null && height != null)
                         {
                             var widthRatio = (decimal)crop.Width / (decimal)crop.Height;
                             imageProcessorUrl.Append("&widthratio=" + widthRatio.ToString(CultureInfo.InvariantCulture));
