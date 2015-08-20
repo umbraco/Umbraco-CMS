@@ -110,9 +110,8 @@
              bool useCropDimensions = false,
              bool cacheBuster = true, 
              string furtherOptions = null,
-             ImageCropRatioMode? ratioMode = null,     
-             bool upScale = true
-            )
+             ImageCropRatioMode? ratioMode = null,
+             bool upScale = true)
         {
             string imageCropperValue = null;
 
