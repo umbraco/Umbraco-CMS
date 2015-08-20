@@ -242,18 +242,19 @@ angular.module('umbraco.services')
 
                 _.each(assets, function (asset) {
                     LazyLoad.js(appendRnd(asset.path), function () {
+                        asset.state = "loaded";
                         if (!scope) {
-                            asset.state = "loaded";
                             asset.deferred.resolve(true);
-                        } else {
-                            asset.state = "loaded";
+                        }
+                        else {
                             angularHelper.safeApply(scope, function () {
                                 asset.deferred.resolve(true);
                             });
                         }
                     });
                 });
-            } else {
+            }
+            else {
                 //return and resolve
                 var deferred = $q.defer();
                 promise = deferred.promise;
