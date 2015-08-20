@@ -21,6 +21,16 @@ namespace Umbraco.Tests.PropertyEditors
             Assert.AreEqual(mediaPath + "?crop=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&cropmode=percentage&width=100&height=100", urlString);
         }
 
+        /// <summary>
+        /// Test to ensure useCropDimensions is observed
+        /// </summary>
+        [Test]
+        public void GetCropUrl_CropAliasIgnoreWidthHeightTest()
+        {
+            var urlString = mediaPath.GetCropUrl(imageCropperValue: cropperJson, cropAlias: "Thumb", useCropDimensions: true, width: 50, height: 50);
+            Assert.AreEqual(mediaPath + "?crop=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&cropmode=percentage&width=100&height=100", urlString);
+        }
+
         [Test]
         public void GetCropUrl_WidthHeightTest()
         {
@@ -125,6 +135,9 @@ namespace Umbraco.Tests.PropertyEditors
             Assert.AreEqual(mediaPath + "?anchor=center&mode=crop&width=300&height=150", urlString);
         }
 
+        /// <summary>
+        /// Test to check if height ratio is returned for a predefined crop without coordinates and focal point in centre when a width parameter is passed
+        /// </summary>
         [Test]
         public void GetCropUrl_PreDefinedCropNoCoordinatesWithWidth()
         {
@@ -134,6 +147,9 @@ namespace Umbraco.Tests.PropertyEditors
             Assert.AreEqual(mediaPath + "?anchor=center&mode=crop&heightratio=0.5962962962962962962962962963&width=200", urlString);
         }
 
+        /// <summary>
+        /// Test to check if height ratio is returned for a predefined crop without coordinates and focal point is custom when a width parameter is passed
+        /// </summary>
         [Test]
         public void GetCropUrl_PreDefinedCropNoCoordinatesWithWidthAndFocalPoint()
         {
@@ -143,6 +159,21 @@ namespace Umbraco.Tests.PropertyEditors
             Assert.AreEqual(mediaPath + "?center=0.41,0.4275&mode=crop&heightratio=0.5962962962962962962962962963&width=200", urlString);
         }
 
+        /// <summary>
+        /// Test to check if crop ratio is ignored if useCropDimensions is true
+        /// </summary>
+        [Test]
+        public void GetCropUrl_PreDefinedCropNoCoordinatesWithWidthAndFocalPointIgnore()
+        {
+            var cropperJson = "{\"focalPoint\": {\"left\": 0.4275,\"top\": 0.41},\"src\": \"/media/1005/img_0671.jpg\",\"crops\": [{\"alias\": \"home\",\"width\": 270,\"height\": 161}]}";
+
+            var urlString = mediaPath.GetCropUrl(imageCropperValue: cropperJson, cropAlias: "home", width: 200, useCropDimensions: true);
+            Assert.AreEqual(mediaPath + "?center=0.41,0.4275&mode=crop&width=270&height=161", urlString);
+        }
+
+        /// <summary>
+        /// Test to check if width ratio is returned for a predefined crop without coordinates and focal point in centre when a height parameter is passed
+        /// </summary>
         [Test]
         public void GetCropUrl_PreDefinedCropNoCoordinatesWithHeight()
         {
