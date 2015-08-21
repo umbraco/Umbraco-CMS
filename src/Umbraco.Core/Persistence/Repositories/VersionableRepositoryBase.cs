@@ -513,6 +513,8 @@ WHERE EXISTS(
             // of ContentItemBasic instances) to the database field names.
             switch (orderBy.ToUpperInvariant())
             {
+                case "UPDATEDATE":
+                    return "cmsContentVersion.VersionDate";
                 case "NAME":
                     return "umbracoNode.text";
                 case "OWNER":
