@@ -11,6 +11,7 @@ using Umbraco.Core;
 
 namespace Umbraco.Web.Controllers
 {
+    [MemberAuthorize(AllowAll = true)]
     public class UmbProfileController : SurfaceController
     {
         [HttpPost]
