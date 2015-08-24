@@ -11,7 +11,7 @@ module.exports = function (grunt) {
     //TODO: Too much watching, this brings windows to it's knees when in dev mode
     //run by the watch task
     grunt.registerTask('watch-js', ['jshint:dev', 'concat', 'copy:app', 'copy:mocks', 'copy:canvasdesigner', 'copy:vs', 'karma:unit']);
-    grunt.registerTask('watch-less', ['recess:build', 'recess:installer', 'recess:canvasdesigner', 'copy:canvasdesigner', 'copy:assets', 'copy:vs']);
+    grunt.registerTask('watch-less', ['recess:build', 'recess:installer', 'recess:canvasdesigner', 'postcss', 'copy:canvasdesigner', 'copy:assets', 'copy:vs']);
     grunt.registerTask('watch-html', ['copy:views', 'copy:vs']);
     grunt.registerTask('watch-installer', ['concat:install', 'concat:installJs', 'copy:installer', 'copy:vs']);
     grunt.registerTask('watch-canvasdesigner', ['copy:canvasdesigner', 'concat:canvasdesignerJs', 'copy:vs']);
