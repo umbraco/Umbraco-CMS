@@ -49,7 +49,7 @@ function EditPropertySettingsController($scope, contentTypeResource) {
 
     function matchValidationType() {
 
-      if($scope.model.property.validation.pattern !== null) {
+      if($scope.model.property.validation.pattern !== null && $scope.model.property.validation.pattern !== "" && $scope.model.property.validation.pattern !== undefined) {
 
         var match = false;
 
