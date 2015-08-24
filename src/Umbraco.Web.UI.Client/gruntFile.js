@@ -17,11 +17,11 @@ module.exports = function (grunt) {
     grunt.registerTask('watch-canvasdesigner', ['copy:canvasdesigner', 'concat:canvasdesignerJs', 'copy:vs']);
     grunt.registerTask('watch-test', ['jshint:dev', 'karma:unit']);
 
-    //triggered from grunt dev or grunt
-    grunt.registerTask('build', ['clean', 'concat', 'recess:min', 'recess:installer', 'recess:canvasdesigner', 'bower-install-simple', 'bower', 'copy']);
+    //triggered from grunt
+    grunt.registerTask('build', ['clean', 'concat', 'recess:build', 'recess:installer', 'recess:canvasdesigner', 'postcss', 'bower-install-simple', 'bower', 'copy']);
 
-    //build-dev doesn't min - we are trying to speed this up and we don't want minified stuff when we are in dev mode
-    grunt.registerTask('build-dev', ['clean', 'concat', 'recess:build', 'recess:installer', 'bower-install-simple', 'bower', 'copy']);
+    //triggered from grunt dev vs or grunt vs
+    grunt.registerTask('build-dev', ['clean', 'concat', 'recess:build', 'recess:installer', 'postcss', 'bower-install-simple', 'bower', 'copy']);
 
     //utillity tasks
     grunt.registerTask('docs', ['ngdocs']);
@@ -281,7 +281,8 @@ module.exports = function (grunt) {
                     ['<%= src.less %>']
                 },
                 options: {
-                    compile: true
+                    compile: true,
+                    compress: true
                 }
             },
             installer: {
@@ -290,7 +291,8 @@ module.exports = function (grunt) {
                     ['src/less/installer.less']
                 },
                 options: {
-                    compile: true
+                    compile: true,
+                    compress: true
                 }
             },
             canvasdesigner: {
@@ -299,20 +301,25 @@ module.exports = function (grunt) {
                     ['src/less/canvas-designer.less', 'src/less/helveticons.less']
                 },
                 options: {
-                    compile: true
-                }
-            },
-            min: {
-                files: {
-                    '<%= distdir %>/assets/css/<%= pkg.name %>.css': ['<%= src.less %>']
-                },
-                options: {
                     compile: true,
                     compress: true
                 }
             }
         },
 
+        postcss: {
+           options: {
+              processors: [
+                 // add vendor prefixes
+                 require('autoprefixer-core')({
+                    browsers: 'last 2 versions'
+                 })
+              ]
+           },
+           dist: {
+              src: '<%= distdir %>/assets/css/<%= pkg.name %>.css'
+           }
+        },
 
         watch: {
             docs: {
@@ -509,6 +516,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-recess');
+    grunt.loadNpmTasks('grunt-postcss');
 
     grunt.loadNpmTasks('grunt-karma');
 

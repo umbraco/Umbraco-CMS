@@ -21,6 +21,7 @@
   },
   "dependencies": {},
   "devDependencies": {
+    "autoprefixer-core": "~5.2.1",
     "bower": "^1.4.1",
     "eslint": "^0.23.0",
     "eslint-plugin-angular": "0.0.13",
@@ -39,6 +40,7 @@
     "grunt-karma": "~0.5",
     "grunt-ngdocs": "~0.1.2",
     "grunt-open": "~0.2.0",
+    "grunt-postcss": "~0.6.0",
     "grunt-recess": "~0.3",
     "karma": "~0.9",
     "karma-chrome-launcher": "0.0.2",
