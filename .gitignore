@@ -130,3 +130,4 @@ src/*.boltdata/
 src/umbraco.sln.ide/*
 build/UmbracoCms.*/
 src/.vs/
+/src/.localhistory
