@@ -12,7 +12,7 @@ function EditPropertySettingsController($scope, contentTypeResource) {
     $scope.propertySettings.validationTypes = [];
     $scope.propertySettings.showValidationPattern = false;
 
-    //$scope.selectedValidationType = {};
+    $scope.selectedValidationType = {};
 
     $scope.validationTypes = [
         {
@@ -77,8 +77,12 @@ function EditPropertySettingsController($scope, contentTypeResource) {
     }
 
     $scope.changeValidationType = function(selectedValidationType) {
-        $scope.model.property.validation.pattern = selectedValidationType.pattern;
-        $scope.propertySettings.showValidationPattern = true;
+      if(selectedValidationType) {
+         $scope.model.property.validation.pattern = selectedValidationType.pattern;
+         $scope.propertySettings.showValidationPattern = true;
+      } else {
+         $scope.propertySettings.showValidationPattern = false;
+      }
     }
 
     activate();
