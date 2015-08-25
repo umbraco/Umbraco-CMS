@@ -11,6 +11,7 @@ function EditPropertySettingsController($scope, contentTypeResource) {
     $scope.propertySettings = {};
     $scope.propertySettings.validationTypes = [];
     $scope.propertySettings.showValidationPattern = false;
+    $scope.propertySettings.focusOnPatternField = false;
 
     $scope.selectedValidationType = {};
 
@@ -80,6 +81,12 @@ function EditPropertySettingsController($scope, contentTypeResource) {
       if(selectedValidationType) {
          $scope.model.property.validation.pattern = selectedValidationType.pattern;
          $scope.propertySettings.showValidationPattern = true;
+
+         // set focus on textarea
+         if(selectedValidationType.key === "custom") {
+            $scope.propertySettings.focusOnPatternField = true;
+         }
+
       } else {
          $scope.propertySettings.showValidationPattern = false;
       }

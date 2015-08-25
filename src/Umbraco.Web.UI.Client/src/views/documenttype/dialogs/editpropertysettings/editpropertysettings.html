@@ -56,7 +56,7 @@
                 <option value="">Validation</option>
             </select>
 
-            <textarea class="editor-validation-pattern" placeholder="Enter a regular expression" ng-model="model.property.validation.pattern" ng-if="propertySettings.showValidationPattern" umb-auto-resize></textarea>
+            <textarea class="editor-validation-pattern" placeholder="Enter a regular expression" ng-model="model.property.validation.pattern" ng-if="propertySettings.showValidationPattern" umb-auto-resize focus-when="{{propertySettings.focusOnPatternField}}"></textarea>
 
         </div>
 
