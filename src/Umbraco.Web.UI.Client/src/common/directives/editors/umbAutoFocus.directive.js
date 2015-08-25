@@ -4,7 +4,7 @@ angular.module("umbraco.directives")
         return function(scope, element, attr){
             var update = function() {
                 //if it uses its default naming
-                if(element.val() === ""){
+                if(element.val() === "" || attr.focusOnFilled){
                     element.focus();
                 }
             };
