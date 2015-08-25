@@ -33,8 +33,24 @@ angular.module("umbraco.directives")
 				}
 
 				scope.toggleLock = function(){
+
 					scope.locked = !scope.locked;
+
+					if(scope.locked === false) {
+						autoFocusField();
+					}
+
 				};
+
+				function autoFocusField() {
+
+					// timeout to make sure dom has updated from a disabled field
+					$timeout(function() {
+						var input = element.children('.umb-locked-field__input');
+						input.focus();
+					});
+
+				}
 
 			}
 
