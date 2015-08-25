@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
@@ -259,22 +260,13 @@ namespace Umbraco.Core
         {
             get
             {
-                // if initialized, return
-	            if (_umbracoApplicationUrl != null) return _umbracoApplicationUrl;
-
-                // try settings
-                ServerEnvironmentHelper.TrySetApplicationUrlFromSettings(this, ProfilingLogger.Logger, UmbracoConfig.For.UmbracoSettings());
-
-                // and return what we have, may be null
+                ApplicationUrlHelper.EnsureApplicationUrl(this);
                 return _umbracoApplicationUrl;
-            }
-	        set
-	        {
-	            _umbracoApplicationUrl = value;
             }
         }
 
-	    internal string _umbracoApplicationUrl; // internal for tests
+	    // ReSharper disable once InconsistentNaming
+	    internal string _umbracoApplicationUrl;
 
         private Lazy<bool> _configured;
         internal MainDom MainDom { get; private set; }
@@ -379,6 +371,11 @@ namespace Umbraco.Core
 			internal set { _services = value; }
 		}
 
+	    internal ServerRole GetCurrentServerRole()
+	    {
+	        var registrar = ServerRegistrarResolver.Current.Registrar as IServerRegistrar2;
+            return registrar == null ? ServerRole.Unknown : registrar.GetCurrentServerRole();
+	    }
 
         private volatile bool _disposed;
         private readonly ReaderWriterLockSlim _disposalLocker = new ReaderWriterLockSlim();

@@ -117,10 +117,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public void DeactiveStaleServers(TimeSpan staleTimeout)
         {
-            var timeoutDate = DateTime.UtcNow.Subtract(staleTimeout);
+            var timeoutDate = DateTime.Now.Subtract(staleTimeout);
 
-            Database.Update<ServerRegistrationDto>("SET isActive=0 WHERE lastNotifiedDate < @timeoutDate", new { timeoutDate = timeoutDate });
+            Database.Update<ServerRegistrationDto>("SET isActive=0, isMaster=0 WHERE lastNotifiedDate < @timeoutDate", new { timeoutDate = timeoutDate });
         }
-
     }
 }
