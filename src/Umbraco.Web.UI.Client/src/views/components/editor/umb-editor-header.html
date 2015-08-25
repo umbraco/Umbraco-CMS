@@ -4,9 +4,9 @@
 
         <div class="umb-panel-meta" ng-class="{'-top-position': tabs }">
 
-            <div class="umb-panel-header-icon" ng-show="icon!==undefined" ng-click="openIconPicker()" ng-class="{'-placeholder': icon==='' || icon===null}">
-                <i class="icon {{icon}}"  ng-if="icon!=='' && icon!==null"></i>
-                <div class="umb-panel-header-icon-text" ng-if="icon==='' || icon===null">Add icon</div>
+            <div class="umb-panel-header-icon" ng-if="icon!==undefined" ng-click="openIconPicker()" ng-class="{'-placeholder': $parent.icon==='' || $parent.icon===null}">
+                <i class="icon {{$parent.icon}}"  ng-if="$parent.icon!=='' && $parent.icon!==null"></i>
+                <div class="umb-panel-header-icon-text" ng-if="$parent.icon==='' || $parent.icon===null">Add icon</div>
             </div>
 
             <div class="umb-panel-header-title-wrapper">
@@ -17,11 +17,11 @@
                         ng-model="name">
                 </umb-content-name>
                 -->
-                <input type="text" class="umb-panel-header-name" placeholder="Enter name..." ng-show="name!==undefined" ng-disabled="content.isSystem == 1" ng-model="name"  ng-class="{'name-is-empty': name===null || name===''}" umb-auto-focus />
+                <input type="text" class="umb-panel-header-name" placeholder="Enter name..." ng-if="name!==undefined" ng-disabled="content.isSystem == 1" ng-model="$parent.name"  ng-class="{'name-is-empty': $parent.name===null || $parent.name===''}" umb-auto-focus />
 
                 <umb-generate-alias class="umb-panel-header-alias" ng-if="alias!==undefined" alias="$parent.alias" alias-from="$parent.name" enable-lock="true"></umb-generate-alias>
 
-                <input type="text" class="umb-panel-header-description" placeholder="Enter description..." ng-show="description!==undefined" ng-model="description" />
+                <input type="text" class="umb-panel-header-description" placeholder="Enter description..." ng-if="description!==undefined" ng-model="$parent.description" />
 
             </div>
 
