@@ -61,10 +61,8 @@ namespace Umbraco.Web.Scheduling
                     var url = umbracoAppUrl + "/RestServices/ScheduledPublish/Index";
                     using (var wc = new HttpClient())
                     {
-                        var request = new HttpRequestMessage()
+                        var request = new HttpRequestMessage(HttpMethod.Post, url)
                         {
-                            RequestUri = new Uri(url),
-                            Method = HttpMethod.Post,
                             Content = new StringContent(string.Empty)
                         };
                         //pass custom the authorization header

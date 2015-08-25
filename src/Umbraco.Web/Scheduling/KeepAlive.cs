@@ -52,12 +52,7 @@ namespace Umbraco.Web.Scheduling
                     var url = umbracoAppUrl + "/ping.aspx";
                     using (var wc = new HttpClient())
                     {
-                        var request = new HttpRequestMessage()
-                        {
-                            RequestUri = new Uri(url),
-                            Method = HttpMethod.Get
-                        };
-
+                        var request = new HttpRequestMessage(HttpMethod.Get, url);
                         var result = await wc.SendAsync(request, token);
                     }
                 }
