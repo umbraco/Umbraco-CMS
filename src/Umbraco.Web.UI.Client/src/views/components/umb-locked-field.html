@@ -1,7 +1,7 @@
 <div class="umb-locked-field">
 
 	<a href="" ng-click="toggleLock()" class="umb-locked-field__toggle">
-		<i class="umb-locked-field__lock-icon" ng-class="{'icon-lock': locked, 'icon-unlocked': !locked}"></i>
+		<i class="umb-locked-field__lock-icon" ng-class="{'icon-lock': locked, 'icon-unlocked': !locked, '-unlocked': !locked}"></i>
 	</a>
 
 	<input
@@ -10,6 +10,7 @@
 		name="lockedField"
 		ng-model="model"
 		ng-disabled="locked"
+		ng-class="{'-unlocked': !locked}"
 		placeholder="{{placeholderText}}"
 		umb-auto-resize
 	/>
