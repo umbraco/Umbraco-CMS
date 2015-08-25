@@ -63,12 +63,7 @@ namespace Umbraco.Web.Scheduling
         {
             using (var wc = new HttpClient())
             {
-                var request = new HttpRequestMessage()
-                {
-                    RequestUri = new Uri(url),
-                    Method = HttpMethod.Get,
-                    Content = new StringContent(string.Empty)
-                };
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
 
                 //TODO: pass custom the authorization header, currently these aren't really secured!
                 //request.Headers.Authorization = AdminTokenAuthorizeAttribute.GetAuthenticationHeaderValue(_appContext);
