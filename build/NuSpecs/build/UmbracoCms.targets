@@ -7,7 +7,8 @@
     <ItemGroup>
       <UmbracoFiles Include="$(UmbracoFilesFolder)**\*" />
     </ItemGroup>
-    <Copy SourceFiles="%(UmbracoFiles.FullPath)" DestinationFiles="%(RecursiveDir)%(Filename)%(Extension)" Condition="!Exists('%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Message Text="Copying UmbracoFiles from $(UmbracoFilesFolder)" />
+    <Copy SourceFiles="%(UmbracoFiles.FullPath)"  DestinationFiles="%(RecursiveDir)%(Filename)%(Extension)" Condition="!Exists('%(RecursiveDir)%(Filename)%(Extension)') AND $([System.DateTime]::Parse('%(ModifiedTime)').Ticks) &gt; $([System.IO.File]::GetLastWriteTime('%(RecursiveDir)%(Filename)%(Extension)').Ticks)" />
   </Target>
   <Target Name="AddUmbracoFilesToOutput">
     <!-- With help from: http://blog.samstephens.co.nz/2010-10-18/msbuild-including-extra-files-multiple-builds/ -->
