@@ -10,7 +10,7 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class AvailableCompositeContentTypesResolver : ValueResolver<IContentType, IEnumerable<EntityBasic>>
+    internal class AvailableCompositeContentTypesResolver : ValueResolver<IContentTypeComposition, IEnumerable<EntityBasic>>
     {
         private ApplicationContext _context;
         private bool _mediaType;
@@ -20,14 +20,29 @@ namespace Umbraco.Web.Models.Mapping
             _mediaType = mediaType;
         }
 
-        protected override IEnumerable<EntityBasic> ResolveCore(IContentType source)
+        protected override IEnumerable<EntityBasic> ResolveCore(IContentTypeComposition source)
         {
+
             //below is all ported from the old doc type editor and comes with the same weaknesses /insanity / magic
 
-            //get all types
-            var allContentTypes = _mediaType
-                    ? _context.Services.ContentTypeService.GetAllMediaTypes().Cast<IContentTypeComposition>().ToArray()
-                    : _context.Services.ContentTypeService.GetAllContentTypes().Cast<IContentTypeComposition>().ToArray();
+            var s = source;
+            var type = _context.Services.EntityService.GetObjectType(source.Id);
+            IContentTypeComposition[] allContentTypes = new IContentTypeComposition[0];
+
+            switch (type)
+            {
+                    case UmbracoObjectTypes.DocumentType:
+                    allContentTypes = _context.Services.ContentTypeService.GetAllContentTypes().Cast<IContentTypeComposition>().ToArray();
+                    break;
+
+                    case UmbracoObjectTypes.MediaType:
+                    allContentTypes = _context.Services.ContentTypeService.GetAllMediaTypes().Cast<IContentTypeComposition>().ToArray();
+                    break;
+
+                    case UmbracoObjectTypes.MemberType:
+                    allContentTypes = _context.Services.MemberTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
+                    break;
+            }
 
             // note: there are many sanity checks missing here and there ;-((
             // make sure once and for all

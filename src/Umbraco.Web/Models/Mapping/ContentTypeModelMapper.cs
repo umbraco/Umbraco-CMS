@@ -9,6 +9,7 @@ using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
 using System.Collections.Generic;
+using AutoMapper.Internal;
 using Property = umbraco.NodeFactory.Property;
 
 namespace Umbraco.Web.Models.Mapping
@@ -34,24 +35,11 @@ namespace Umbraco.Web.Models.Mapping
 
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
-            config.CreateMap<ContentTypeDisplay, IContentType>()
-                .ConstructUsing((ContentTypeDisplay source) => new ContentType(source.ParentId))
-
-                .ForMember(dto => dto.AllowedTemplates, expression => expression.Ignore())
-                .ForMember(dto => dto.DefaultTemplate, expression => expression.Ignore())
-
-                .AfterMap((source, dest) =>
-                {
-                    //sync templates
-                    dest.AllowedTemplates = source.AllowedTemplates.Select(x => Mapper.Map<ITemplate>(x));
-
-                    if (source.DefaultTemplate != null)
-                        dest.SetDefaultTemplate(Mapper.Map<ITemplate>(source.DefaultTemplate)); 
-                });
-
-
             config.CreateMap<ContentTypeCompositionDisplay, IContentTypeComposition>()
                 .Include<ContentTypeDisplay, IContentType>()
+                .Include<ContentTypeCompositionDisplay, IMemberType>()
+                .Include<ContentTypeCompositionDisplay, IMediaType>()
+
                 //only map id if set to something higher then zero
                 .ForMember(dto => dto.Id, expression => expression.Condition(display => (Convert.ToInt32(display.Id) > 0)))
                 .ForMember(dto => dto.Id, expression => expression.MapFrom(display => Convert.ToInt32(display.Id)))
@@ -60,9 +48,10 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.Level, expression => expression.Ignore())
                 .ForMember(dto => dto.SortOrder, expression => expression.Ignore())
 
-                //mapped in aftermap
-                .ForMember(dto => dto.AllowedContentTypes, expression => expression.Ignore())
-                
+                .ForMember(
+                    dto => dto.AllowedContentTypes,
+                    expression => expression.MapFrom(dto => dto.AllowedContentTypes.Select( (t, i) => new ContentTypeSort(t, i) )))
+
                 //ignore, we'll do this in after map
                 .ForMember(dto => dto.PropertyGroups, expression => expression.Ignore())
 
@@ -123,11 +112,24 @@ namespace Umbraco.Web.Models.Mapping
                     {
                         dest.RemovePropertyType(removedType.Alias);
                     }
+                    
 
+                });
 
-                    //Sync allowed child types
-                    var allowedTypes = source.AllowedContentTypes.Select((t, i) => new ContentTypeSort(t, i));
-                    dest.AllowedContentTypes = allowedTypes.ToArray();
+            config.CreateMap<ContentTypeDisplay, IContentType>()
+                .ConstructUsing((source) => new ContentType(source.ParentId))
+
+                .ForMember(dto => dto.AllowedTemplates, expression => expression.Ignore())
+                .ForMember(dto => dto.DefaultTemplate, expression => expression.Ignore())
+
+                .AfterMap((source, dest) =>
+                {
+                    //sync templates
+                    dest.AllowedTemplates = source.AllowedTemplates.Select(x => Mapper.Map<ITemplate>(x));
+
+                    if (source.DefaultTemplate != null)
+                        dest.SetDefaultTemplate(Mapper.Map<ITemplate>(source.DefaultTemplate));
+
 
                     //sync compositions
                     var current = dest.CompositionAliases().ToArray();
@@ -143,23 +145,66 @@ namespace Umbraco.Web.Models.Mapping
 
                     foreach (var a in add)
                     {
+
                         //TODO: Remove N+1 lookup
                         var addCt = applicationContext.Services.ContentTypeService.GetContentType(a);
                         if (addCt != null)
                             dest.AddContentType(addCt);
                     }
-                   
                 });
 
+            config.CreateMap<ContentTypeCompositionDisplay, IMemberType>()
+                .AfterMap((source, dest) =>
+                 {
+                   
+                     //sync compositions
+                     var current = dest.CompositionAliases().ToArray();
+                     var proposed = source.CompositeContentTypes;
+
+                     var remove = current.Where(x => proposed.Contains(x) == false);
+                     var add = proposed.Where(x => current.Contains(x) == false);
+
+                     foreach (var rem in remove)
+                         dest.RemoveContentType(rem);
+                     
+                     foreach (var a in add)
+                     {
+                         //TODO: Remove N+1 lookup
+                         var addCt = applicationContext.Services.MemberTypeService.Get(a);
+                         if (addCt != null)
+                             dest.AddContentType(addCt);
+                     }
+                 });
 
 
+            config.CreateMap<ContentTypeCompositionDisplay, IMediaType>()
+                .AfterMap((source, dest) =>
+                 {
+                     //sync compositions
+                     var current = dest.CompositionAliases().ToArray();
+                     var proposed = source.CompositeContentTypes;
 
-            config.CreateMap<ContentTypeSort, int>().ConvertUsing(x => x.Id.Value);
+                     var remove = current.Where(x => proposed.Contains(x) == false);
+                     var add = proposed.Where(x => current.Contains(x) == false);
+
+                     foreach (var rem in remove)
+                         dest.RemoveContentType(rem);
+                     
+                     foreach (var a in add)
+                     {
+                         //TODO: Remove N+1 lookup
+                         var addCt = applicationContext.Services.ContentTypeService.GetMediaType(a);
+                         if (addCt != null)
+                             dest.AddContentType(addCt);
+                     }
+                 });
+
+            
             config.CreateMap<IContentTypeComposition, string>().ConvertUsing(x => x.Alias);
+            
 
             config.CreateMap<IContentTypeComposition, ContentTypeCompositionDisplay>()
                 .Include<IContentType, ContentTypeDisplay>()
-
                 .Include<IMemberType, ContentTypeCompositionDisplay>()
                 .Include<IMediaType, ContentTypeCompositionDisplay>()
 
@@ -197,9 +242,9 @@ namespace Umbraco.Web.Models.Mapping
                     
                 }));
 
+
             config.CreateMap<IMemberType, ContentTypeCompositionDisplay>();
             config.CreateMap<IMediaType, ContentTypeCompositionDisplay>();
-
             config.CreateMap<IContentType, ContentTypeDisplay>()
                 .ForMember(dto => dto.AllowedTemplates, expression => expression.Ignore())
                 .ForMember(dto => dto.DefaultTemplate, expression => expression.Ignore())
@@ -212,6 +257,10 @@ namespace Umbraco.Web.Models.Mapping
                     if (source.DefaultTemplate != null)
                         dest.DefaultTemplate = Mapper.Map<EntityBasic>(source.DefaultTemplate);
                 });
+
+            config.CreateMap<IMemberType, ContentTypeBasic>();
+            config.CreateMap<IMediaType, ContentTypeBasic>();
+            config.CreateMap<IContentType, ContentTypeBasic>();
 
 
             config.CreateMap<PropertyGroupDisplay, PropertyGroup>()
