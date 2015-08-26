@@ -33,6 +33,7 @@ namespace Umbraco.Core.Models.Rdbms
         [Index(IndexTypes.NonClustered)]
         public bool IsActive { get; set; }
 
-
+        [Column("isMaster")]
+        public bool IsMaster { get; set; }
     }
 }

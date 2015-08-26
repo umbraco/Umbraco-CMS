@@ -12,7 +12,7 @@ namespace Umbraco.Core.Sync
         /// </summary>
         public DatabaseServerRegistrarOptions()
         {
-            StaleServerTimeout = new TimeSpan(1,0,0); // 1 day
+            StaleServerTimeout = TimeSpan.FromMinutes(2); // 2 minutes
             ThrottleSeconds = 30; // 30 seconds
         }
 
