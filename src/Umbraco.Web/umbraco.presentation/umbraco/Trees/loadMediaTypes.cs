@@ -12,7 +12,7 @@ using Umbraco.Web.umbraco.presentation.umbraco.Trees;
 
 namespace umbraco
 {
-    [Tree(Constants.Applications.Settings, "mediaTypes", "Media Types", sortOrder: 5)]
+    [Obsolete("This class is no longer used and will be removed from the codebase in future versions")]
     public class loadMediaTypes : BaseTree
     {
         public loadMediaTypes(string application) : base(application) { }
