@@ -48,6 +48,16 @@ function mediaTypeResource($q, $http, umbRequestHelper) {
                'Failed to retrieve content type');
         },
 
+        getAll: function () {
+
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "mediaTypeApiBaseUrl",
+                       "GetAll")),
+               'Failed to retrieve all content types');
+        },
+
         getScaffold: function (parentId) {
 
             return umbRequestHelper.resourcePromise(
