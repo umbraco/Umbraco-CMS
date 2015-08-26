@@ -22,18 +22,18 @@
 			{
 				"name": "Design",
 				"icon": "icon-document-dashed-line",
-				"view": "views/documentType/views/design/design.html",
+				"view": "views/mediaType/views/design/design.html",
 				"active": true
 			},
 			{
 				"name": "List view",
 				"icon": "icon-list",
-				"view": "views/documentType/views/listview/listview.html"
+				"view": "views/mediaType/views/listview/listview.html"
 			},
 			{
 				"name": "Permissions",
 				"icon": "icon-keychain",
-				"view": "views/documentType/views/permissions/permissions.html"
+				"view": "views/mediaType/views/permissions/permissions.html"
 			}
 		];
 
