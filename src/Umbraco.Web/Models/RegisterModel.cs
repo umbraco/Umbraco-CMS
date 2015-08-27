@@ -28,7 +28,6 @@ namespace Umbraco.Web.Models
         {
             MemberTypeAlias = Constants.Conventions.MemberTypes.DefaultAlias;
             RedirectOnSucces = false;
-            RedirectUrl = "/";
             UsernameIsEmail = true;
             MemberProperties = new List<UmbracoProperty>();
             LoginOnSuccess = true;

@@ -36,14 +36,15 @@ namespace Umbraco.Web.Controllers
                 return CurrentUmbracoPage();
             }
 
+            TempData["ProfileUpdateSuccess"] = true;
+
             //if there is a specified path to redirect to then use it
             if (model.RedirectUrl.IsNullOrWhiteSpace() == false)
             {
                 return Redirect(model.RedirectUrl);
             }
 
-            //redirect to current page by default
-            TempData["ProfileUpdateSuccess"] = true;            
+            //redirect to current page by default                  
             return RedirectToCurrentUmbracoPage();
         }
     }
