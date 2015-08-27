@@ -6,10 +6,45 @@
 * @description 
 * Used by editors that require naming an entity. Shows a textbox/headline with a required validator within it's own form.
 **/
+(function() {
+	'use strict';
 
-angular.module("umbraco.directives")
-	.directive('umbLockedField', function ($timeout, localizationService) {
-	    return {
+	function LockedFieldDirective($timeout, localizationService) {
+
+		function link(scope, el, attr, ngModel) {
+
+			// if locked state is not defined as an attr set default state
+			if (scope.locked === undefined || scope.locked === null) {
+				scope.locked = true;
+			}
+
+			// if locked state is not defined as an attr set default state
+			if (scope.placeholderText === undefined || scope.placeholderText === null) {
+				scope.placeholderText = "Enter value...";
+			}
+
+			scope.toggleLock = function() {
+
+				scope.locked = !scope.locked;
+
+				if (scope.locked === false) {
+					autoFocusField();
+				}
+
+			};
+
+			function autoFocusField() {
+
+				// timeout to make sure dom has updated from a disabled field
+				$timeout(function() {
+					var input = element.children('.umb-locked-field__input');
+					input.focus();
+				});
+
+			}
+		}
+
+		var directive = {
 			require: "ngModel",
 			restrict: 'E',
 			replace: true,
@@ -18,41 +53,13 @@ angular.module("umbraco.directives")
 				model: '=ngModel',
 				locked: "=?",
 				placeholderText: "=?"
-			},
+			};
 
-			link: function(scope, element, attrs, ngModel) {
-
-				// if locked state is not defined as an attr set default state
-				if(scope.locked === undefined || scope.locked === null) {
-					scope.locked = true;
-				}
-
-				// if locked state is not defined as an attr set default state
-				if(scope.placeholderText === undefined || scope.placeholderText === null) {
-					scope.placeholderText = "Enter value...";
-				}
-
-				scope.toggleLock = function(){
-
-					scope.locked = !scope.locked;
-
-					if(scope.locked === false) {
-						autoFocusField();
-					}
-
-				};
-
-				function autoFocusField() {
-
-					// timeout to make sure dom has updated from a disabled field
-					$timeout(function() {
-						var input = element.children('.umb-locked-field__input');
-						input.focus();
-					});
-
-				}
-
-			}
-
+			return directive;
 		};
-		});
+
+	}
+
+	angular.module('umbraco.directives').directive('umbLockedField', LockedFieldDirective);
+
+})();
