@@ -80,7 +80,7 @@ namespace Umbraco.Tests.Services
             publicAccessService.Save(entry);
 
             // Act
-            var updated = publicAccessService.AddOrUpdateRule(c, "TestType", "AnotherVal");
+            var updated = publicAccessService.AddOrUpdateRule(c, "TestType2", "AnotherVal");
             //re-get
             entry = publicAccessService.GetEntryForContent(c);
 
