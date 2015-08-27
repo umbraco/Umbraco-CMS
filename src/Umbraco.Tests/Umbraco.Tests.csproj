@@ -188,6 +188,7 @@
     <Compile Include="Resolvers\ResolverBaseTest.cs" />
     <Compile Include="Routing\UrlRoutingTestBase.cs" />
     <Compile Include="Security\UmbracoBackOfficeIdentityTests.cs" />
+    <Compile Include="Services\PublicAccessServiceTests.cs" />
     <Compile Include="StringNewlineExtensions.cs" />
     <Compile Include="Strings\StylesheetHelperTests.cs" />
     <Compile Include="Strings\StringValidationTests.cs" />
