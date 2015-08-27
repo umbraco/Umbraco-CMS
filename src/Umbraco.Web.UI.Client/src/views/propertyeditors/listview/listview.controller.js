@@ -308,11 +308,9 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
 
         serial(selected, fn, getStatusMsg, 0).then(function (result) {
             // executes once the whole selection has been processed
-            // in case of an error, result will be the error
+            // in case of an error (caught by serial), result will be the error
             if (!(result.data && angular.isArray(result.data.notifications)))
                 showNotificationsAndReset(result, true, getSuccessMsg(selected.length));
-        }, function (err) {
-            // never executes, err is caught by serial()
         });
     };
 
