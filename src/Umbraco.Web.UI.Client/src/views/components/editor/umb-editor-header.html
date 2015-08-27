@@ -1,27 +1,25 @@
 ﻿<div class="umb-panel-header">
 
-    <div class="umb-panel-content">
+    <div class="umb-panel-header-content-wrapper">
 
-        <div class="umb-panel-meta" ng-class="{'-top-position': tabs }">
+        <div class="umb-panel-header-content" ng-class="{'-top-position': tabs }">
 
-            <div class="umb-panel-header-icon" ng-if="icon!==undefined" ng-click="openIconPicker()" ng-class="{'-placeholder': $parent.icon==='' || $parent.icon===null}">
-                <i class="icon {{$parent.icon}}"  ng-if="$parent.icon!=='' && $parent.icon!==null"></i>
-                <div class="umb-panel-header-icon-text" ng-if="$parent.icon==='' || $parent.icon===null">Add icon</div>
-            </div>
+            <div class="umb-panel-header-meta">
 
-            <div class="umb-panel-header-title-wrapper">
-                <!--
-                <umb-content-name
-                        ng-disabled="content.isSystem == 1"
-                        placeholder="@placeholders_entername"
-                        ng-model="name">
-                </umb-content-name>
-                -->
-                <input type="text" class="umb-panel-header-name" placeholder="Enter name..." ng-if="name!==undefined" ng-disabled="content.isSystem == 1" ng-model="$parent.name"  ng-class="{'name-is-empty': $parent.name===null || $parent.name===''}" umb-auto-focus focus-on-filled="true" />
+               <div class="umb-panel-header-icon" ng-if="icon!==undefined" ng-click="openIconPicker()" ng-class="{'-placeholder': $parent.icon==='' || $parent.icon===null}">
+                   <i class="icon {{$parent.icon}}"  ng-if="$parent.icon!=='' && $parent.icon!==null"></i>
+                   <div class="umb-panel-header-icon-text" ng-if="$parent.icon==='' || $parent.icon===null">Add icon</div>
+               </div>
 
-                <umb-generate-alias class="umb-panel-header-alias" ng-if="alias!==undefined" alias="$parent.alias" alias-from="$parent.name" enable-lock="true"></umb-generate-alias>
+               <div class="umb-panel-header-title-wrapper">
 
-                <input type="text" class="umb-panel-header-description" placeholder="Enter description..." ng-if="description!==undefined" ng-model="$parent.description" />
+                  <input type="text" class="umb-panel-header-name" placeholder="Enter name..." ng-if="name!==undefined" ng-disabled="content.isSystem == 1" ng-model="$parent.name"  ng-class="{'name-is-empty': $parent.name===null || $parent.name===''}" umb-auto-focus focus-on-filled="true" />
+
+                  <umb-generate-alias class="umb-panel-header-alias" ng-if="alias!==undefined" alias="$parent.alias" alias-from="$parent.name" enable-lock="true"></umb-generate-alias>
+
+                  <input type="text" class="umb-panel-header-description" placeholder="Enter description..." ng-if="description!==undefined" ng-model="$parent.description" />
+
+               </div>
 
             </div>
 

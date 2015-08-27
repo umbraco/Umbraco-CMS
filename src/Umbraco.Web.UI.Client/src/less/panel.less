@@ -346,28 +346,33 @@
 
 /* --------- UMB PANEL HEADER ---------- */
 
-.umb-panel-content {
+.umb-panel-header-content-wrapper {
   display: flex;
   flex-direction: column;
   height: 100px;
   padding: 0 20px;
 }
 
-.umb-panel-meta {
+.umb-panel-header-content {
   display: flex;
   align-items: center;
   flex: 1;
 }
 
-.umb-panel-meta.-top-position {
+.umb-panel-header-content.-top-position {
   position: relative;
   top: -20px;
+}
+
+.umb-panel-header-meta {
+   display: flex;
+   flex: 1;
+   flex-direction: row;
 }
 
 .umb-panel-header-icon {
   cursor: pointer;
   margin-right: 5px;
-  //width: 50px;
   height: 55px;
   display: flex;
   justify-content: center;
@@ -380,9 +385,8 @@
 }
 
 .umb-panel-header-title-wrapper {
-  flex: 1;
-  //margin-right: 70px;
-  position: relative;
+   position: relative;
+   width: 80%;
 }
 
 .umb-panel-header-alias {
