@@ -53,10 +53,11 @@
 				model: '=ngModel',
 				locked: "=?",
 				placeholderText: "=?"
-			};
-
-			return directive;
+			},
+			link: link
 		};
+
+		return directive;
 
 	}
 
