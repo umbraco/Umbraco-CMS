@@ -25,113 +25,109 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter) {
 
         },
 
-        mergeCompositeContentType: function (contentType, compositeContentType) {
+        mergeCompositeContentType: function(contentType, compositeContentType) {
 
-            contentTypeResource.getById(compositeContentType.id).then(function(composition){
+           angular.forEach(compositeContentType.groups, function(compositionGroup) {
 
-                angular.forEach(composition.groups, function(compositionGroup){
+              // order composition groups based on sort order
+              compositionGroup.properties = $filter('orderBy')(compositionGroup.properties, 'sortOrder');
 
-                    // order composition groups based on sort order
-                    compositionGroup.properties = $filter('orderBy')(compositionGroup.properties, 'sortOrder');
-
-                    // get data type details
-                    angular.forEach(compositionGroup.properties, function(property){
-                      dataTypeResource.getById(property.dataTypeId)
-                        .then(function(dataType) {
-                          property.dataTypeIcon = dataType.icon;
-                          property.dataTypeName = dataType.name;
-                        });
+              // get data type details
+              angular.forEach(compositionGroup.properties, function(property) {
+                 dataTypeResource.getById(property.dataTypeId)
+                    .then(function(dataType) {
+                       property.dataTypeIcon = dataType.icon;
+                       property.dataTypeName = dataType.name;
                     });
+              });
 
-                    // set inherited state on tab
-                    compositionGroup.inherited = true;
+              // set inherited state on tab
+              compositionGroup.inherited = true;
 
-                    // set inherited state on properties
-                    angular.forEach(compositionGroup.properties, function(compositionProperty){
-                        compositionProperty.inherited = true;
-                    });
+              // set inherited state on properties
+              angular.forEach(compositionGroup.properties, function(compositionProperty) {
+                 compositionProperty.inherited = true;
+              });
 
-                    // set tab state
-                    compositionGroup.tabState = "inActive";
+              // set tab state
+              compositionGroup.tabState = "inActive";
 
-                    // if groups are named the same - merge the groups
-                    angular.forEach(contentType.groups, function(contentTypeGroup){
+              // if groups are named the same - merge the groups
+              angular.forEach(contentType.groups, function(contentTypeGroup) {
 
-                        if( contentTypeGroup.name === compositionGroup.name ) {
+                 if (contentTypeGroup.name === compositionGroup.name) {
 
-                            // set flag to show if properties has been merged into a tab
-                            compositionGroup.groupIsMerged = true;
+                    // set flag to show if properties has been merged into a tab
+                    compositionGroup.groupIsMerged = true;
 
-                            // make group inherited
-                            contentTypeGroup.inherited = true;
+                    // make group inherited
+                    contentTypeGroup.inherited = true;
 
-                            // add properties to the top of the array
-                            contentTypeGroup.properties = compositionGroup.properties.concat(contentTypeGroup.properties);
+                    // add properties to the top of the array
+                    contentTypeGroup.properties = compositionGroup.properties.concat(contentTypeGroup.properties);
 
-                            // update sort order on all properties in merged group
-                            contentTypeGroup.properties = contentTypeHelperService.updatePropertiesSortOrder(contentTypeGroup.properties);
+                    // update sort order on all properties in merged group
+                    contentTypeGroup.properties = contentTypeHelperService.updatePropertiesSortOrder(contentTypeGroup.properties);
 
-                            // make parentTabContentTypeNames to an array so we can push values
-                            if(contentTypeGroup.parentTabContentTypeNames === null || contentTypeGroup.parentTabContentTypeNames === undefined) {
-                                contentTypeGroup.parentTabContentTypeNames = [];
-                            }
-
-                            // push name to array of merged composite content types
-                            contentTypeGroup.parentTabContentTypeNames.push(compositeContentType.name);
-
-                            // make parentTabContentTypes to an array so we can push values
-                            if(contentTypeGroup.parentTabContentTypes === null || contentTypeGroup.parentTabContentTypes === undefined) {
-                                contentTypeGroup.parentTabContentTypes = [];
-                            }
-
-                            // push id to array of merged composite content types
-                            contentTypeGroup.parentTabContentTypes.push(compositeContentType.id);
-
-                            // get sort order from composition
-                            contentTypeGroup.sortOrder = compositionGroup.sortOrder;
-
-                            // splice group to the top of the array
-                            var contentTypeGroupCopy = angular.copy(contentTypeGroup);
-                            var index = contentType.groups.indexOf(contentTypeGroup);
-                            contentType.groups.splice(index,1);
-                            contentType.groups.unshift(contentTypeGroupCopy);
-
-                        }
-
-                    });
-
-                    // if group is not merged - push it to the end of the array - before init tab
-                    if( compositionGroup.groupIsMerged === false || compositionGroup.groupIsMerged === undefined ) {
-
-                        // make parentTabContentTypeNames to an array so we can push values
-                        if(compositionGroup.parentTabContentTypeNames === null || compositionGroup.parentTabContentTypeNames === undefined) {
-                            compositionGroup.parentTabContentTypeNames = [];
-                        }
-
-                        // push name to array of merged composite content types
-                        compositionGroup.parentTabContentTypeNames.push(compositeContentType.name);
-
-                        // make parentTabContentTypes to an array so we can push values
-                        if(compositionGroup.parentTabContentTypes === null || compositionGroup.parentTabContentTypes === undefined) {
-                            compositionGroup.parentTabContentTypes = [];
-                        }
-
-                        // push id to array of merged composite content types
-                        compositionGroup.parentTabContentTypes.push(compositeContentType.id);
-
-                        // push group before placeholder tab
-                        contentType.groups.unshift(compositionGroup);
-
+                    // make parentTabContentTypeNames to an array so we can push values
+                    if (contentTypeGroup.parentTabContentTypeNames === null || contentTypeGroup.parentTabContentTypeNames === undefined) {
+                       contentTypeGroup.parentTabContentTypeNames = [];
                     }
 
-                });
+                    // push name to array of merged composite content types
+                    contentTypeGroup.parentTabContentTypeNames.push(compositeContentType.name);
 
-                // sort all groups by sortOrder property
-                contentType.groups = $filter('orderBy')(contentType.groups, 'sortOrder');
+                    // make parentTabContentTypes to an array so we can push values
+                    if (contentTypeGroup.parentTabContentTypes === null || contentTypeGroup.parentTabContentTypes === undefined) {
+                       contentTypeGroup.parentTabContentTypes = [];
+                    }
 
-                return contentType;
+                    // push id to array of merged composite content types
+                    contentTypeGroup.parentTabContentTypes.push(compositeContentType.id);
 
-            });
+                    // get sort order from composition
+                    contentTypeGroup.sortOrder = compositionGroup.sortOrder;
+
+                    // splice group to the top of the array
+                    var contentTypeGroupCopy = angular.copy(contentTypeGroup);
+                    var index = contentType.groups.indexOf(contentTypeGroup);
+                    contentType.groups.splice(index, 1);
+                    contentType.groups.unshift(contentTypeGroupCopy);
+
+                 }
+
+              });
+
+              // if group is not merged - push it to the end of the array - before init tab
+              if (compositionGroup.groupIsMerged === false || compositionGroup.groupIsMerged === undefined) {
+
+                 // make parentTabContentTypeNames to an array so we can push values
+                 if (compositionGroup.parentTabContentTypeNames === null || compositionGroup.parentTabContentTypeNames === undefined) {
+                    compositionGroup.parentTabContentTypeNames = [];
+                 }
+
+                 // push name to array of merged composite content types
+                 compositionGroup.parentTabContentTypeNames.push(compositeContentType.name);
+
+                 // make parentTabContentTypes to an array so we can push values
+                 if (compositionGroup.parentTabContentTypes === null || compositionGroup.parentTabContentTypes === undefined) {
+                    compositionGroup.parentTabContentTypes = [];
+                 }
+
+                 // push id to array of merged composite content types
+                 compositionGroup.parentTabContentTypes.push(compositeContentType.id);
+
+                 // push group before placeholder tab
+                 contentType.groups.unshift(compositionGroup);
+
+              }
+
+           });
+
+           // sort all groups by sortOrder property
+           contentType.groups = $filter('orderBy')(contentType.groups, 'sortOrder');
+
+           return contentType;
 
         },
 

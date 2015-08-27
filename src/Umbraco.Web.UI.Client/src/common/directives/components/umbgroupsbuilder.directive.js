@@ -1,7 +1,7 @@
 (function() {
   'use strict';
 
-  function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, dataTypeHelper, dataTypeResource, $filter) {
+  function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource, dataTypeHelper, dataTypeResource, $filter) {
 
     function link(scope, el, attr, ctrl) {
 
@@ -200,7 +200,22 @@
 
           if (scope.model.compositeContentTypes.indexOf(compositeContentType.alias) === -1) {
             //merge composition with content type
-            contentTypeHelper.mergeCompositeContentType(scope.model, compositeContentType);
+
+            if(scope.contentType === "documentType") {
+
+               contentTypeResource.getById(compositeContentType.id).then(function(composition){
+                  contentTypeHelper.mergeCompositeContentType(scope.model, composition);
+               });
+
+
+            } else if(scope.contentType === "mediaType") {
+
+               mediaTypeResource.getById(compositeContentType.id).then(function(composition){
+                  contentTypeHelper.mergeCompositeContentType(scope.model, composition);
+               });
+
+            }
+
 
           } else {
             // split composition from content type
@@ -597,7 +612,8 @@
       scope: {
         model: "=",
         compositions: "=",
-        sorting: "="
+        sorting: "=",
+        contentType: "@"
       },
       link: link
     };
