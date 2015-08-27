@@ -3,6 +3,7 @@ using System.Web;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
+using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Core.Sync
 {
@@ -14,14 +15,32 @@ namespace Umbraco.Core.Sync
         // because we cannot logger.Info<ApplicationUrlHelper> because type is static
         private static readonly Type TypeOfApplicationUrlHelper = typeof(ApplicationUrlHelper);
 
+        private static Func<HttpRequestBase, string> _applicationUrlProvider;
+
         /// <summary>
         /// Gets or sets a custom provider for the umbraco application url.
         /// </summary>
-        /// <remarks>Receives the current request as a parameter, and it may be null. Must return a properly
+        /// <remarks>
+        /// <para>Receives the current request as a parameter, and it may be null. Must return a properly
         /// formatted url with scheme and umbraco dir and no trailing slash eg "http://www.mysite.com/umbraco",
         /// or <c>null</c>. To be used in auto-load-balancing scenarios where the application url is not
-        /// in config files but is determined programmatically.</remarks>
-        public static Func<HttpRequestBase, string> ApplicationUrlProvider { get; set; } 
+        /// in config files but is determined programmatically.</para>
+        /// <para>Must be assigned before resolution is frozen.</para>
+        /// </remarks>
+        public static Func<HttpRequestBase, string> ApplicationUrlProvider 
+        {
+            get
+            {
+                return _applicationUrlProvider;
+            }
+            set
+            {
+                using (Resolution.Configuration)
+                {
+                    _applicationUrlProvider = value;
+                }
+            } 
+        } 
 
         // request: will be null if called from ApplicationContext
         // settings: for unit tests only
@@ -37,9 +56,9 @@ namespace Umbraco.Core.Sync
                 return;
 
             // try custom provider
-            if (ApplicationUrlProvider != null)
+            if (_applicationUrlProvider != null)
             {
-                var url = ApplicationUrlProvider(request);
+                var url = _applicationUrlProvider(request);
                 if (url.IsNullOrWhiteSpace() == false)
                 {
                     appContext._umbracoApplicationUrl = url.TrimEnd('/');
