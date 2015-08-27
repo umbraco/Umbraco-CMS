@@ -1,4 +1,4 @@
-<div class="content-type-editor-dialog edit-property-settings" ng-controller="Umbraco.Editors.DocumentType.EditPropertySettingsController">
+<div class="content-type-editor-dialog edit-property-settings" ng-controller="Umbraco.Editors.DocumentType.EditPropertySettingsController as vm">
 
    <div class="umb-control-group clearfix">
 
@@ -53,11 +53,11 @@
          <input type="checkbox" ng-model="model.property.validation.mandatory"> Field is mandatory
       </label>
 
-      <select class="umb-dropdown" ng-options="validationType.name for validationType in validationTypes" ng-model="selectedValidationType" ng-change="changeValidationType(selectedValidationType)">
+      <select class="umb-dropdown" ng-options="validationType.name for validationType in vm.validationTypes" ng-model="vm.selectedValidationType" ng-change="vm.changeValidationType(vm.selectedValidationType)">
          <option value="">Validation</option>
       </select>
 
-      <textarea class="editor-validation-pattern" placeholder="Enter a regular expression" ng-model="model.property.validation.pattern" ng-if="propertySettings.showValidationPattern" umb-auto-resize focus-when="{{propertySettings.focusOnPatternField}}"></textarea>
+      <textarea class="editor-validation-pattern" placeholder="Enter a regular expression" ng-model="model.property.validation.pattern" ng-if="vm.showValidationPattern" umb-auto-resize focus-when="{{vm.focusOnPatternField}}"></textarea>
 
    </div>
 
