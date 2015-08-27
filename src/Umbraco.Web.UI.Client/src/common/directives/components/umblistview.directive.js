@@ -85,7 +85,15 @@
           dataTypeResource.deleteById(scope.dataType.id).then(function(dataType) {
 
               // set list view name on scope
-              scope.listViewName = "List View - Content";
+              if(scope.contentType === "documentType") {
+
+                 scope.listViewName = "List View - Content";
+
+              } else if(scope.contentType === "mediaType") {
+
+                 scope.listViewName = "List View - Media";
+
+              }
 
               // get default data type
               dataTypeResource.getByName(scope.listViewName)
@@ -131,7 +139,8 @@
       scope: {
         enableListView: "=",
         listViewName: "=",
-        modelAlias: "="
+        modelAlias: "=",
+        contentType: "@"
       },
       link: link
     };
