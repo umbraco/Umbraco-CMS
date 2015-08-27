@@ -37,7 +37,7 @@
 
 				// timeout to make sure dom has updated from a disabled field
 				$timeout(function() {
-					var input = element.children('.umb-locked-field__input');
+					var input = el.children('.umb-locked-field__input');
 					input.focus();
 				});
 
