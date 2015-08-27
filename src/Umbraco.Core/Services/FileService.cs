@@ -703,13 +703,11 @@ namespace Umbraco.Core.Services
             {
                 repository.AddOrUpdate(partialView);
                 uow.Commit();
-
-                SavedPartialView.RaiseEvent(new SaveEventArgs<IPartialView>(partialView, false), this);
             }
 
             Audit(AuditType.Save, string.Format("Save {0} performed by user", partialViewType), userId, -1);
 
-            SavedPartialView.RaiseEvent(new SaveEventArgs<IPartialView>(partialView), this);
+            SavedPartialView.RaiseEvent(new SaveEventArgs<IPartialView>(partialView, false), this);
 
             return Attempt.Succeed(partialView);
         }
