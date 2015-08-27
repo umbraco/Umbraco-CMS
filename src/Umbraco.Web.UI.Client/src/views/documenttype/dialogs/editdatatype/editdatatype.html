@@ -1,19 +1,14 @@
-<div ng-controller="Umbraco.Editors.DocumentType.EditDataTypeController">
-
-    <div class="control-group umb-control-group">
-      <div class="umb-el-wrap">
-        <label class="control-label" for="dataTypeName">Name</label>
-        <div class="controls">
-          <!-- ng-change="dateTypeNameChange()" -->
-          <input type="text" ng-model="model.dataType.name" class="umb-editor" umb-auto-focus focus-on-filled="true" />
-        </div>
+<div class="control-group umb-control-group">
+   <div class="umb-el-wrap">
+      <label class="control-label" for="dataTypeName">Name</label>
+      <div class="controls">
+         <input type="text" ng-model="model.dataType.name" class="umb-editor" umb-auto-focus focus-on-filled="true" />
       </div>
-    </div>
-
-    <h5>Configuration</h5>
-
-    <umb-property property="preValue" ng-repeat="preValue in model.dataType.preValues">
-        <umb-editor model="preValue" is-pre-value="true"></umb-editor>
-    </umb-property>
-
+   </div>
 </div>
+
+<h5>Configuration</h5>
+
+<umb-property property="preValue" ng-repeat="preValue in model.dataType.preValues">
+   <umb-editor model="preValue" is-pre-value="true"></umb-editor>
+</umb-property>
