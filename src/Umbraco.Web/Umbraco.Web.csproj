@@ -312,6 +312,7 @@
     <Compile Include="Media\EmbedProviders\OEmbedResponse.cs" />
     <Compile Include="Media\EmbedProviders\OEmbedPhoto.cs" />
     <Compile Include="Security\Identity\IUmbracoBackOfficeTwoFactorOptions.cs" />
+    <Compile Include="Strategies\Migrations\EnsureServerLockNodeExists.cs" />
     <Compile Include="UmbracoDefaultOwinStartup.cs" />
     <Compile Include="IUmbracoContextAccessor.cs" />
     <Compile Include="Models\ContentEditing\Relation.cs" />
