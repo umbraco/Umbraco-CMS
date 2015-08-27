@@ -42,6 +42,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                        cfg.stylesheets = [];
                        cfg.dimensions = { height: 500 };
                        cfg.maxImageSize = 500;
+                      cfg.useAbsoluteUrls = false;
                 return cfg;
         },
 

@@ -119,7 +119,7 @@ angular.module("umbraco")
                     maxImageSize: editorConfig.maxImageSize,
                     toolbar: toolbar,
                     content_css: stylesheets.join(','),
-                    relative_urls: false,
+                    relative_urls: editorConfig.useAbsoluteUrls,
                     style_formats: styleFormats
                 };
 
