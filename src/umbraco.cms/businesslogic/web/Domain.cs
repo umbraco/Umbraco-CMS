@@ -107,9 +107,10 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel) 
             {
-                ApplicationContext.Current.Services.DomainService.Save(DomainEntity);
-
-                FireAfterSave(e);
+                if (ApplicationContext.Current.Services.DomainService.Save(DomainEntity))
+                {
+                    FireAfterSave(e);
+                }
             }
         }
 
@@ -165,11 +166,13 @@ namespace umbraco.cms.businesslogic.web
                 RootContentId = RootNodeId,
                 LanguageId = LanguageId
             };
-            ApplicationContext.Current.Services.DomainService.Save(domain);
-
-            var e = new NewEventArgs();
-            var legacyModel = new Domain(domain);
-            legacyModel.OnNew(e);
+            if (ApplicationContext.Current.Services.DomainService.Save(domain))
+            {
+                var e = new NewEventArgs();
+                var legacyModel = new Domain(domain);
+                legacyModel.OnNew(e);
+            }
+            
         }
 
         #endregion
