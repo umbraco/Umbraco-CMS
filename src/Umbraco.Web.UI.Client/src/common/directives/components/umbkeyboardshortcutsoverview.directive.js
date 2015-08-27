@@ -1,7 +1,7 @@
 (function() {
   'use strict';
 
-  function KeyboardShortcutsOverview() {
+  function KeyboardShortcutsOverviewDirective() {
 
     function link(scope, el, attr, ctrl) {
 
@@ -26,6 +26,6 @@
     return directive;
   }
 
-  angular.module('umbraco.directives').directive('umbKeyboardShortcutsOverview', KeyboardShortcutsOverview);
+  angular.module('umbraco.directives').directive('umbKeyboardShortcutsOverview', KeyboardShortcutsOverviewDirective);
 
 })();
