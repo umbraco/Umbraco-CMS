@@ -1,7 +1,7 @@
 (function() {
   'use strict';
 
-  function ListView(contentTypeResource, dataTypeResource, dataTypeHelper) {
+  function ListViewDirective(contentTypeResource, dataTypeResource, dataTypeHelper) {
 
     function link(scope, el, attr, ctrl) {
 
@@ -148,6 +148,6 @@
     return directive;
   }
 
-  angular.module('umbraco.directives').directive('umbListView', ListView);
+  angular.module('umbraco.directives').directive('umbListView', ListViewDirective);
 
 })();
