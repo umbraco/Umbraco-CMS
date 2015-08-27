@@ -1,156 +1,171 @@
 /**
-* @ngdoc directive
-* @name umbraco.directives.directive:umbProperty
-* @restrict E
-**/
-angular.module("umbraco.directives")
-    .directive('umbOverlay', function ($timeout, formHelper) {
-        return {
+ * @ngdoc directive
+ * @name umbraco.directives.directive:umbProperty
+ * @restrict E
+ **/
 
-            scope: {
-                model: "=",
-                view: "=",
-                position: "@",
-                animation: "@",
-                shadow: "@"
-            },
+(function() {
+   'use strict';
 
-            transclude: true,
-            restrict: 'E',
-            replace: true,
-            templateUrl: 'views/components/overlays/umb-overlay.html',
-            link: function(scope, element, attrs) {
+   function OverlayDirective($timeout) {
 
-                var modelCopy = {};
+      function link(scope, el, attr, ctrl) {
 
-                function activate() {
-                  var cssClass = "umb-overlay-center";
-                  if(scope.position)
-                  {
-                      cssClass = "umb-overlay-" + scope.position;
-                  }
+         var modelCopy = {};
 
-                  if(scope.animation){
-                      cssClass += " " + scope.animation;
-                  }
+         function activate() {
 
-                  var shadow = "shadow-depth-3";
-                  if(scope.shadow){
-                      shadow =  "shadow-depth-" + scope.shadow;
-                  }
-                  cssClass += " " + shadow;
+            var cssClass = "umb-overlay-center";
 
-                  scope.overlayCssClass = cssClass;
+            if (scope.position) {
+               cssClass = "umb-overlay-" + scope.position;
+            }
 
-                  modelCopy = makeModelCopy(scope.model);
+            if (scope.animation) {
+               cssClass += " " + scope.animation;
+            }
 
-                }
+            var shadow = "shadow-depth-3";
 
-                function makeModelCopy(object) {
+            if (scope.shadow) {
+               shadow = "shadow-depth-" + scope.shadow;
+            }
 
-                  var newObject = {};
+            cssClass += " " + shadow;
 
-                  for (var key in object) {
-                    if(key !== "event") {
-                      newObject[key] = angular.copy(object[key]);
-                    }
-                  }
+            scope.overlayCssClass = cssClass;
 
-                  return newObject;
+            modelCopy = makeModelCopy(scope.model);
 
-                }
+         }
 
-                function setTargetPosition() {
+         function makeModelCopy(object) {
 
-                    var viewportWidth = null;
-                    var viewportHeight = null;
-                    var mousePositionClickX = null;
-                    var mousePositionClickY = null;
-                    var elementHeight = null;
-                    var elementWidth = null;
+            var newObject = {};
 
-                    var position = {
-                        right: "inherit",
-                        left: "inherit",
-                        top: "inherit",
-                        bottom: "inherit"
-                    };
+            for (var key in object) {
+               if (key !== "event") {
+                  newObject[key] = angular.copy(object[key]);
+               }
+            }
 
-                    // if mouse click position is know place element with mouse in center
-                    if(scope.model.event.pageX && scope.model.event.pageY) {
+            return newObject;
 
-                      // viewport size
-                      viewportWidth = $(window).innerWidth();
-                      viewportHeight = $(window).innerHeight();
+         }
 
-                      // click position
-                      mousePositionClickX = scope.model.event.pageX;
-                      mousePositionClickY = scope.model.event.pageY;
+         function setTargetPosition() {
 
-                      // element size
-                      elementHeight = element.context.clientHeight;
-                      elementWidth = element.context.clientWidth;
+            var viewportWidth = null;
+            var viewportHeight = null;
+            var mousePositionClickX = null;
+            var mousePositionClickY = null;
+            var elementHeight = null;
+            var elementWidth = null;
 
-                      // move element to this position
-                      position.left = mousePositionClickX - (elementWidth / 2);
-                      position.top = mousePositionClickY - (elementHeight / 2);
+            var position = {
+               right: "inherit",
+               left: "inherit",
+               top: "inherit",
+               bottom: "inherit"
+            };
 
-                      // check to see if element is outside screen
-                      // outside right
-                      if( position.left + elementWidth > viewportWidth) {
-                          position.right = 0;
-                          position.left = "inherit";
-                      }
+            // if mouse click position is know place element with mouse in center
+            if (scope.model.event.pageX && scope.model.event.pageY) {
 
-                      // outside bottom
-                      if( position.top + elementHeight > viewportHeight ) {
-                          position.bottom = 0;
-                          position.top = "inherit";
-                      }
+               // viewport size
+               viewportWidth = $(window).innerWidth();
+               viewportHeight = $(window).innerHeight();
 
-                      element.css(position);
+               // click position
+               mousePositionClickX = scope.model.event.pageX;
+               mousePositionClickY = scope.model.event.pageY;
 
-                    // else change overlay to center position
-                    } else {
+               // element size
+               elementHeight = el.context.clientHeight;
+               elementWidth = el.context.clientWidth;
 
-                      scope.position = "center";
-                      activate();
+               // move element to this position
+               position.left = mousePositionClickX - (elementWidth / 2);
+               position.top = mousePositionClickY - (elementHeight / 2);
 
-                    }
+               // check to see if element is outside screen
+               // outside right
+               if (position.left + elementWidth > viewportWidth) {
+                  position.right = 0;
+                  position.left = "inherit";
+               }
 
-                }
+               // outside bottom
+               if (position.top + elementHeight > viewportHeight) {
+                  position.bottom = 0;
+                  position.top = "inherit";
+               }
 
-                activate();
+               el.css(position);
 
-                $timeout(function() {
-                    if(scope.position === "target") {
-                        setTargetPosition();
-                    }
-                });
+               // else change overlay to center position
+            } else {
 
-                scope.submitForm = function(model) {
-
-                  if (formHelper.submitForm({ scope: scope })) {
-
-                      formHelper.resetForm({ scope: scope });
-
-                      scope.model.submit(model);
-
-                  }
-
-                };
-
-                scope.closeOverLay = function(){
-                    if(scope.model.close){
-                      scope.model = modelCopy;
-                      scope.model.close(scope.model);
-                    } else {
-                      scope.model = null;
-                    }
-                };
+               scope.position = "center";
+               activate();
 
             }
 
+         }
 
-        };
-    });
+         activate();
+
+         $timeout(function() {
+            if (scope.position === "target") {
+               setTargetPosition();
+            }
+         });
+
+         scope.submitForm = function(model) {
+
+            if (formHelper.submitForm({
+                  scope: scope
+               })) {
+
+               formHelper.resetForm({
+                  scope: scope
+               });
+
+               scope.model.submit(model);
+
+            }
+
+         };
+
+         scope.closeOverLay = function() {
+            if (scope.model.close) {
+               scope.model = modelCopy;
+               scope.model.close(scope.model);
+            } else {
+               scope.model = null;
+            }
+         };
+
+      }
+
+      var directive = {
+         transclude: true,
+         restrict: 'E',
+         replace: true,
+         templateUrl: 'views/components/overlays/umb-overlay.html',
+         scope: {
+            model: "=",
+            view: "=",
+            position: "@",
+            animation: "@",
+            shadow: "@"
+         },
+         link: link
+      };
+
+      return directive;
+   }
+
+   angular.module('umbraco.directives').directive('umbOverlay', OverlayDirective);
+
+})();
