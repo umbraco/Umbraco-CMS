@@ -43,7 +43,7 @@ namespace Umbraco.Core.Sync
         /// </summary>
         public ServerRole GetCurrentServerRole()
         {
-            var service = _registrationService.Value as ServerRegistrationService;
+            var service = _registrationService.Value;
             return service.GetCurrentServerRole();
         }
 

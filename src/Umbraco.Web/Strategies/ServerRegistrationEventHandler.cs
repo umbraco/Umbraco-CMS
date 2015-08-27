@@ -75,7 +75,7 @@ namespace Umbraco.Web.Strategies
                 _lastUpdated = DateTime.Now;
             }
 
-            var svc = e.UmbracoContext.Application.Services.ServerRegistrationService as ServerRegistrationService;
+            var svc = e.UmbracoContext.Application.Services.ServerRegistrationService;
 
             // because
             // - ApplicationContext.UmbracoApplicationUrl is initialized by UmbracoModule in BeginRequest

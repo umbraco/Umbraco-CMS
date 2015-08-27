@@ -33,19 +33,15 @@ namespace Umbraco.Core.Services
         /// <returns>All active servers.</returns>
         IEnumerable<IServerRegistration> GetActiveServers();
 
-        // note: cannot add this because of backward compatibility
-        //
-        ///// <summary>
-        ///// Gets the current server identity.
-        ///// </summary>
-        //string CurrentServerIdentity { get; }
+        /// <summary>
+        /// Gets the current server identity.
+        /// </summary>
+        string CurrentServerIdentity { get; }
 
-        // note: cannot add this because of backward compatibility
-        //
-        ///// <summary>
-        ///// Gets the role of the current server.
-        ///// </summary>
-        ///// <returns>The role of the current server.</returns>
-        //ServerRole GetCurrentServerRole();
+        /// <summary>
+        /// Gets the role of the current server.
+        /// </summary>
+        /// <returns>The role of the current server.</returns>
+        ServerRole GetCurrentServerRole();
     }
 }
