@@ -1,32 +1,32 @@
-<div class="umb-overlay-body" ng-controller="Umbraco.Editors.DocumentType.PropertyController">
+<div class="umb-overlay-body" ng-controller="Umbraco.Editors.DocumentType.PropertyController as vm">
 
 	<div class="umb-control-group -no-border">
 		<div class="form-search">
 			<i class="icon-search"></i>
 			<input type="text"
 				  style="width: 100%"
-				  ng-model="searchTerm"
+				  ng-model="vm.searchTerm"
 				  class="umb-search-field search-query input-block-level"
 				  placeholder="Filter..."
 					umb-auto-focus>
 		</div>
 	</div>
 
-	<div ng-if="showTabs">
+	<div ng-if="vm.showTabs">
 
-		<umb-tabs-nav model="tabs"></umb-tabs-nav>
+		<umb-tabs-nav model="vm.tabs"></umb-tabs-nav>
 
 		<umb-tabs-content>
 
-		  <umb-tab id="tab{{tab.id}}" ng-repeat="tab in tabs" rel="{{tab.id}}">
+		  <umb-tab id="tab{{tab.id}}" ng-repeat="tab in vm.tabs" rel="{{tab.id}}">
 
 		    <div ng-if="tab.alias==='Default'">
 
 		      <div ng-repeat="(key,value) in tab.typesAndEditors">
-		        <div ng-if="(value | filter:searchTerm).length > 0">
+		        <div ng-if="(value | filter:vm.searchTerm).length > 0">
 		          <h5>{{key}}</h5>
 		          <ul class="umb-card-grid" ng-mouseleave="hideDetailsOverlay()">
-		            <li ng-repeat="systemDataType in value | orderBy:'name' | filter: searchTerm" ng-mouseover="showDetailsOverlay(systemDataType)">
+		            <li ng-repeat="systemDataType in value | orderBy:'name' | filter: vm.searchTerm" ng-mouseover="vm.showDetailsOverlay(systemDataType)">
 
 		              <a href="" ng-click="model.selectDataType(systemDataType)">
 		                <i class="{{ systemDataType.icon }}" ng-class="{'icon-autofill': systemDataType.icon == null}"></i>
@@ -43,8 +43,8 @@
 		    <div ng-if="tab.alias==='Reuse'">
 
 		      <h5>Your configurations</h5>
-		      <ul class="umb-card-grid" ng-mouseleave="hideDetailsOverlay()">
-		        <li ng-repeat="configuredDataType in tab.userConfigured | orderBy:'name' | filter: searchTerm" ng-mouseover="showDetailsOverlay(configuredDataType)">
+		      <ul class="umb-card-grid" ng-mouseleave="vm.hideDetailsOverlay()">
+		        <li ng-repeat="configuredDataType in tab.userConfigured | orderBy:'name' | filter: vm.searchTerm" ng-mouseover="vm.showDetailsOverlay(configuredDataType)">
 		          <a href="" ng-click="model.selectDataType(configuredDataType)">
 		            <i class="{{ configuredDataType.icon }}" ng-class="{'icon-autofill': configuredDataType.icon == null}"></i>
 		            {{ configuredDataType.name }}
