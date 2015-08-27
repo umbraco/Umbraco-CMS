@@ -84,10 +84,18 @@
      display: block;
      padding: 0;
      margin: 0;
+	  list-style: none;
  }
 
+// clearfix floats
+ .umb-card-grid:after {
+  content:"";
+  display:table;
+  clear:both;
+}
+
 .umb-card-grid li{
-     display: inline-block;
+	  float: left;
      width: 90px;
      height: 80px;
      margin: 5px;
