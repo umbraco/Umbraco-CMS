@@ -437,6 +437,12 @@
   <area alias="headers">
     <key alias="page">Страница</key>
   </area>
+  <area alias="help">
+    <key alias="goTo">перейти к</key>
+    <key alias="helpTopicsFor">Разделы справки для</key>
+    <key alias="videoChaptersFor">Обучающие видео для</key>
+    <key alias="theBestUmbracoVideoTutorials">Лучшие обучающие видеокурсы по Umbraco</key>
+  </area>
   <area alias="imagecropper">
     <key alias="reset">Сбросить</key>
   </area>
@@ -587,6 +593,10 @@
   <area alias="media">
     <key alias="clickToUpload">Нажмите, чтобы загрузить</key>
     <key alias="dropFilesHere">Перетащите файлы сюда...</key>
+  </area>
+  <area alias="member">
+    <key alias="createNewMember">Создать нового участника</key>
+    <key alias="allMembers">Все участники</key>
   </area>
   <area alias="moveOrCopy">
     <key alias="choose">Выберите страницу...</key>
