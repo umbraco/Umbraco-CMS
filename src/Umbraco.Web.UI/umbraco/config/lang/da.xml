@@ -918,9 +918,9 @@ Mange hilsner fra Umbraco robotten
     <key alias="searchAllChildren">Søg alle 'børn'</key>
     <key alias="startnode">Start node</key>
     <key alias="username">Navn</key>
-    <key alias="userPermissions">Bruger tilladelser</key>
+    <key alias="userPermissions">Brugertilladelser</key>
     <key alias="usertype">Brugertype</key>
-    <key alias="userTypes">Bruger typer</key>
+    <key alias="userTypes">Brugertyper</key>
     <key alias="writer">Forfatter</key>
     <key alias="translator">Oversætter</key>
     <key alias="yourProfile">Din profil</key>
