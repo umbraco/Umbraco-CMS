@@ -8,9 +8,12 @@
  */
 function iconPickerController($scope, iconHelper) {
 
-    iconHelper.getIcons().then(function(icons){
-        $scope.icons = icons;
-    });
+   $scope.loading = true;
+
+   iconHelper.getIcons().then(function(icons) {
+      $scope.icons = icons;
+      $scope.loading = false;
+   });
 
 }
 
