@@ -37,6 +37,8 @@
 
             modelCopy = makeModelCopy(scope.model);
 
+            setOverlayIndent();
+
          }
 
          function makeModelCopy(object) {
@@ -50,6 +52,29 @@
             }
 
             return newObject;
+
+         }
+
+         function setOverlayIndent() {
+
+            var firstOverlayWidth = null;
+
+            $timeout(function() {
+               $(".umb-overlay").each(function(index) {
+
+                  var overlay = $(this);
+                  var subtract = index * 20;
+
+                  if (index === 0) {
+                     firstOverlayWidth = overlay.context.clientWidth;
+                  }
+
+                  var overlayNewWidth = Math.floor(firstOverlayWidth - (index * 20));
+
+                  overlay.css('width', overlayNewWidth);
+
+               });
+            });
 
          }
 

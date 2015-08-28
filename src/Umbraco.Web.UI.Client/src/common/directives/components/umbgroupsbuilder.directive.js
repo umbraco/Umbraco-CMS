@@ -416,8 +416,8 @@
               scope.configDataType(property, dataType, false);
 
               // remove dialog
-              scope.propertyEditorDialogModel.show = false;
-              scope.propertyEditorDialogModel = null;
+              //scope.propertyEditorDialogModel.show = false;
+              //scope.propertyEditorDialogModel = null;
 
             });
 
@@ -456,8 +456,8 @@
                 scope.configDataType(property, dataType, true);
 
                 // remove dialog
-                scope.propertyEditorDialogModel.show = false;
-                scope.propertyEditorDialogModel = null;
+                //scope.propertyEditorDialogModel.show = false;
+                //scope.propertyEditorDialogModel = null;
 
               });
 
@@ -507,6 +507,12 @@
               // remove dialog
               scope.dataTypeSettingsDialogModel.show = false;
               scope.dataTypeSettingsDialogModel = null;
+
+              // remove choose editor picker dialog
+              if(scope.propertyEditorDialogModel) {
+                 scope.propertyEditorDialogModel.show = false;
+                 scope.propertyEditorDialogModel = null;
+              }
 
             });
 
