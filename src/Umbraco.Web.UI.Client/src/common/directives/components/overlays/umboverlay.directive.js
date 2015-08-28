@@ -7,7 +7,7 @@
 (function() {
    'use strict';
 
-   function OverlayDirective($timeout) {
+   function OverlayDirective($timeout, formHelper) {
 
       function link(scope, el, attr, ctrl) {
 
