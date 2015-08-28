@@ -2,10 +2,19 @@ angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.Grid.MediaController",
     function ($scope, $rootScope, $timeout, dialogService) {
 
+        var startNodeId = undefined;
+        if ($scope.control.editor.config && $scope.control.editor.config.startNodeId) {
+            startNodeId = $scope.control.editor.config.startNodeId;
+        } else {
+            userService.getCurrentUser().then(function (userData) {
+                startNodeId = userData.startMediaId;
+            });
+        }
+        
         $scope.setImage = function(){
 
             dialogService.mediaPicker({
-                startNodeId: $scope.control.editor.config && $scope.control.editor.config.startNodeId ? $scope.control.editor.config.startNodeId : undefined,
+                startNodeId: startNodeId,
                 multiPicker: false,
                 cropSize:  $scope.control.editor.config && $scope.control.editor.config.size ? $scope.control.editor.config.size : undefined,
                 showDetails: true,
