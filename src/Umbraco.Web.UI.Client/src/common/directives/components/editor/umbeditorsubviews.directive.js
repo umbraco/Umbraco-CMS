@@ -1,37 +1,48 @@
-angular.module("umbraco.directives")
-    .directive('umbEditorSubViews', function () {
-        return {
-            restrict: 'E',
-            replace: true,
-            templateUrl: 'views/components/editor/umb-editor-sub-views.html',
-            scope: {
-                subViews: "=",
-                model: "="
-            },
-            link: function (scope, element, attrs, ctrl) {
+(function() {
+   'use strict';
 
-                scope.activeView = {};
+   function EditorSubViewsDirective() {
 
-                // set toolbar from selected navigation item
-                function setActiveView(items) {
+      function link(scope, el, attr, ctrl) {
 
-                    for (var index = 0; index < items.length; index++) {
+         scope.activeView = {};
 
-                        var item = items[index];
+         // set toolbar from selected navigation item
+         function setActiveView(items) {
 
-                        if(item.active && item.view) {
-                            scope.activeView = item;
-                        }
-                    }
-                }
+            for (var index = 0; index < items.length; index++) {
 
-                // watch for navigation changes
-                scope.$watch('subViews', function(newValue, oldValue) {
-                    if (newValue) {
-                        setActiveView(newValue);
-                    }
-                },true);
+               var item = items[index];
 
+               if (item.active && item.view) {
+                  scope.activeView = item;
+               }
             }
-        };
-    });
+         }
+
+         // watch for navigation changes
+         scope.$watch('subViews', function(newValue, oldValue) {
+            if (newValue) {
+               setActiveView(newValue);
+            }
+         }, true);
+
+      }
+
+      var directive = {
+         restrict: 'E',
+         replace: true,
+         templateUrl: 'views/components/editor/umb-editor-sub-views.html',
+         scope: {
+            subViews: "=",
+            model: "="
+         },
+         link: link
+      };
+
+      return directive;
+   }
+
+   angular.module('umbraco.directives').directive('umbEditorSubViews', EditorSubViewsDirective);
+
+})();
