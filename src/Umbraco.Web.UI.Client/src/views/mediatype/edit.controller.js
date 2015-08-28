@@ -18,6 +18,7 @@
 		vm.currentNode = null;
 		vm.contentType = {};
 		vm.page = {};
+		vm.page.loading = false;
 		vm.page.navigation = [
 			{
 				"name": "Design",
@@ -94,17 +95,27 @@
 	];
 
 		if ($routeParams.create) {
+
+			vm.page.loading = true;
+
 			//we are creating so get an empty data type item
 			mediaTypeResource.getScaffold($routeParams.id)
 				.then(function(dt) {
 					init(dt);
+
+					vm.page.loading = false;
 				});
 		}
 		else {
+
+			vm.page.loading = true;
+
 			mediaTypeResource.getById($routeParams.id).then(function(dt){
 				init(dt);
 
 				syncTreeNode(vm.contentType, dt.path, true);
+
+				vm.page.loading = false;
 			});
 		}
 
