@@ -1,6 +1,9 @@
 <div ng-controller="Umbraco.Editors.MemberType.EditController as vm">
+
+   <umb-load-indicator ng-if="vm.page.loading"></umb-load-indicator>
+
     <form novalidate name="contentTypeForm"
-          ng-show="vm.contentType"
+          ng-show="!vm.page.loading"
           ng-submit="vm.save()"
           val-form-manager>
         <umb-editor-view>
