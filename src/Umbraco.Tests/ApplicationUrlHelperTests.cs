@@ -57,6 +57,8 @@ namespace Umbraco.Tests
                 && section.WebRouting == Mock.Of<IWebRoutingSection>(wrSection => wrSection.UmbracoApplicationUrl == (string)null)
                 && section.ScheduledTasks == Mock.Of<IScheduledTasksSection>());
 
+            ApplicationUrlHelper.ApplicationUrlProvider = request => "http://server1.com/umbraco";
+
             Initialize(settings);
 
             var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper(),
@@ -64,7 +66,6 @@ namespace Umbraco.Tests
 
             ConfigurationManager.AppSettings.Set("umbracoUseSSL", "true"); // does not make a diff here
 
-            ApplicationUrlHelper.ApplicationUrlProvider = request => "http://server1.com/umbraco";
             ApplicationUrlHelper.EnsureApplicationUrl(appCtx, settings: settings);
 
             Assert.AreEqual("http://server1.com/umbraco", appCtx._umbracoApplicationUrl);

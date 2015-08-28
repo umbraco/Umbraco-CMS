@@ -53,8 +53,7 @@ namespace Umbraco.Core.Services
             {
                 var regs = xr.Repository.GetAll().ToArray(); // faster to query only once
                 var hasMaster = regs.Any(x => ((ServerRegistration)x).IsMaster);
-                var iserver = regs.FirstOrDefault(x => x.ServerIdentity.InvariantEquals(serverIdentity));
-                var server = iserver as ServerRegistration; // because IServerRegistration is missing IsMaster
+                var server = regs.FirstOrDefault(x => x.ServerIdentity.InvariantEquals(serverIdentity));
                 var hasServer = server != null;
 
                 if (server == null)
@@ -96,8 +95,7 @@ namespace Umbraco.Core.Services
             _lrepo.WithWriteLocked(xr =>
             {
                 var query = Query<IServerRegistration>.Builder.Where(x => x.ServerIdentity.ToUpper() == serverIdentity.ToUpper());
-                var iserver = xr.Repository.GetByQuery(query).FirstOrDefault();
-                var server = iserver as ServerRegistration; // because IServerRegistration is missing IsMaster
+                var server = xr.Repository.GetByQuery(query).FirstOrDefault();
                 if (server == null) return;
 
                 server.IsActive = false;
