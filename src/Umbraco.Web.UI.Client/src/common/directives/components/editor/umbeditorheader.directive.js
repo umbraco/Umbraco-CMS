@@ -1,49 +1,60 @@
-angular.module("umbraco.directives.html")
-    .directive('umbEditorHeader', function (iconHelper) {
-        return {
-            transclude: true,
-            restrict: 'E',
-            replace: true,
-            scope: {
-                tabs: "=",
-                actions: "=",
-                name: "=",
-                menu: "=",
-                icon: "=",
-                alias: "=",
-                description: "=",
-                navigation: "="
-            },
-            templateUrl: 'views/components/editor/umb-editor-header.html',
-            link: function(scope, elem, attrs, ctrl) {
+(function() {
+   'use strict';
 
-                scope.openIconPicker = function() {
+   function EditorHeaderDirective(iconHelper) {
 
-                    scope.dialogModel = {};
-                    scope.dialogModel.title = "Choose icon";
-                    scope.dialogModel.view = "views/documenttype/dialogs/iconpicker/iconpicker.html";
-                    scope.showDialog = true;
+      function link(scope, el, attr, ctrl) {
 
-                    scope.dialogModel.pickIcon = function(icon, color) {
+         scope.openIconPicker = function() {
 
-                        if(color) {
-                            scope.icon = icon + " " + color;
-                        } else {
-                            scope.icon = icon;
-                        }
+            scope.dialogModel = {};
+            scope.dialogModel.title = "Choose icon";
+            scope.dialogModel.view = "views/documenttype/dialogs/iconpicker/iconpicker.html";
+            scope.showDialog = true;
 
-                        scope.showDialog = false;
-                        scope.dialogModel = null;
+            scope.dialogModel.pickIcon = function(icon, color) {
 
-                    };
+               if (color) {
+                  scope.icon = icon + " " + color;
+               } else {
+                  scope.icon = icon;
+               }
 
-                    scope.dialogModel.close = function(){
-                        scope.showDialog = false;
-                        scope.dialogModel = null;
-                    };
+               scope.showDialog = false;
+               scope.dialogModel = null;
 
-                };
+            };
 
-            }
-        };
-    });
+            scope.dialogModel.close = function() {
+               scope.showDialog = false;
+               scope.dialogModel = null;
+            };
+
+         };
+
+      }
+
+      var directive = {
+         transclude: true,
+         restrict: 'E',
+         replace: true,
+         templateUrl: 'views/components/editor/umb-editor-header.html',
+         scope: {
+            tabs: "=",
+            actions: "=",
+            name: "=",
+            menu: "=",
+            icon: "=",
+            alias: "=",
+            description: "=",
+            navigation: "="
+         },
+         link: link
+      };
+
+      return directive;
+   }
+
+   angular.module('umbraco.directives').directive('umbEditorHeader', EditorHeaderDirective);
+
+})();
