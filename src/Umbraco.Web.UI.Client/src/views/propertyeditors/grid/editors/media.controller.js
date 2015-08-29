@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.Grid.MediaController",
-    function ($scope, $rootScope, $timeout, dialogService) {
+    function ($scope, $rootScope, $timeout, dialogService, userService) {
 
         var startNodeId = undefined;
         if ($scope.control.editor.config && $scope.control.editor.config.startNodeId) {
