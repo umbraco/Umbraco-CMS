@@ -2,18 +2,13 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Runtime.Serialization;
-using System.Threading;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using AutoMapper;
-using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Trees;
@@ -142,8 +137,18 @@ namespace Umbraco.Web.Models.Mapping
                 TabsAndPropertiesResolver.AddListView(display, "content", dataTypeService);
             }
 
+            var currentDocumentType = UmbracoContext.Current.Application.Services.ContentTypeService.GetContentType(display.ContentTypeAlias);
+
             TabsAndPropertiesResolver.MapGenericProperties(
                 content, display,
+                new ContentPropertyDisplay
+                    {
+                        Alias = string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                        Label = ui.Text("content", "documentType"),
+                        Value = string.Format("#/settings/framed/%252Fumbraco%252Fsettings%252FeditNodeTypeNew.aspx%253Fid%253D{0}", currentDocumentType.Id),
+                        LinkText = currentDocumentType.Name,
+                        View = "urllist" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
+                    },
                 new ContentPropertyDisplay
                     {
                         Alias = string.Format("{0}releasedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),

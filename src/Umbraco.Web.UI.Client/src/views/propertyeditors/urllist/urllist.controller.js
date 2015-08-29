@@ -5,6 +5,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.UrlListController"
             $scope.renderModel = _.map($scope.model.value.split(","), function (item) {
                 return {
                     url: item,
+                    linkText: $scope.model.linkText,
                     urlTarget: ($scope.config && $scope.config.target) ? $scope.config.target : "_blank"
                 };
             });
