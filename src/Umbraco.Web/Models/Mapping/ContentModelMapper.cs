@@ -73,7 +73,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Tabs, expression => expression.ResolveUsing<TabsAndPropertiesResolver>())
                 .ForMember(display => display.AllowedActions, expression => expression.ResolveUsing(
                     new ActionButtonsResolver(new Lazy<IUserService>(() => applicationContext.Services.UserService))))
-                .AfterMap((media, display) => AfterMap(media, display, applicationContext.Services.DataTypeService, applicationContext.Services.TextService));
+                .AfterMap((media, display) => AfterMap(media, display, applicationContext.Services.DataTypeService, applicationContext.Services.TextService, applicationContext.Services.ContentTypeService));
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
             config.CreateMap<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>()
@@ -114,7 +114,8 @@ namespace Umbraco.Web.Models.Mapping
         /// <param name="display"></param>
         /// <param name="dataTypeService"></param>
         /// <param name="localizedText"></param>
-        private static void AfterMap(IContent content, ContentItemDisplay display, IDataTypeService dataTypeService, ILocalizedTextService localizedText)
+        /// <param name="contentTypeService"></param>
+        private static void AfterMap(IContent content, ContentItemDisplay display, IDataTypeService dataTypeService, ILocalizedTextService localizedText, IContentTypeService contentTypeService)
         {
             //map the tree node url
             if (HttpContext.Current != null)
@@ -137,7 +138,9 @@ namespace Umbraco.Web.Models.Mapping
                 TabsAndPropertiesResolver.AddListView(display, "content", dataTypeService);
             }
 
-            var currentDocumentType = UmbracoContext.Current.Application.Services.ContentTypeService.GetContentType(display.ContentTypeAlias);
+            var currentDocumentType = contentTypeService.GetContentType(display.ContentTypeAlias);
+            var currentDocumentTypeId = currentDocumentType == null ? String.Empty : currentDocumentType.Id.ToString(CultureInfo.InvariantCulture);
+            var currentDocumentTypeName = currentDocumentType == null ? String.Empty : currentDocumentType.Name;
 
             TabsAndPropertiesResolver.MapGenericProperties(
                 content, display,
@@ -145,8 +148,8 @@ namespace Umbraco.Web.Models.Mapping
                     {
                         Alias = string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                         Label = ui.Text("content", "documentType"),
-                        Value = string.Format("#/settings/framed/%252Fumbraco%252Fsettings%252FeditNodeTypeNew.aspx%253Fid%253D{0}", currentDocumentType.Id),
-                        LinkText = currentDocumentType.Name,
+                        Value = string.Format("#/settings/framed/%252Fumbraco%252Fsettings%252FeditNodeTypeNew.aspx%253Fid%253D{0}", currentDocumentTypeId),
+                        LinkText = currentDocumentTypeName,
                         View = "urllist" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
                     },
                 new ContentPropertyDisplay
