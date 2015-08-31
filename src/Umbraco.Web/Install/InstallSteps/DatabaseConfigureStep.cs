@@ -7,6 +7,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence;
 using Umbraco.Web.Install.Models;
@@ -91,8 +92,9 @@ namespace Umbraco.Web.Install.InstallSteps
                     result.DetermineInstalledVersion();
                     return false;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    _applicationContext.ProfilingLogger.Logger.Error<DatabaseConfigureStep>("An error occurred, reconfiguring...", ex);
                     //something went wrong, could not connect so probably need to reconfigure
                     return true;
                 }

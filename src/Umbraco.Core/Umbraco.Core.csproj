@@ -456,6 +456,7 @@
     <Compile Include="Security\BackOfficeSignInManager.cs" />
     <Compile Include="Security\BackOfficeUserManager.cs" />
     <Compile Include="Security\BackOfficeUserStore.cs" />
+    <Compile Include="Security\MachineKeyGenerator.cs" />
     <Compile Include="Security\MembershipPasswordHasher.cs" />
     <Compile Include="SemVersionExtensions.cs" />
     <Compile Include="ServiceProviderExtensions.cs" />
