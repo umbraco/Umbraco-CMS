@@ -17,6 +17,10 @@
         {
             Response.Redirect("/", true);
         }
+        if (Request.QueryString["redir"].StartsWith("//"))
+        {
+            Response.Redirect("/", true);
+        }
 
         Response.Redirect(url.ToString(), true);
     }
