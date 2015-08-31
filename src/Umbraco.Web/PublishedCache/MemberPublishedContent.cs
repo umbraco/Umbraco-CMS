@@ -19,7 +19,7 @@ namespace Umbraco.Web.PublishedCache
     /// <summary>
     /// Exposes a member object as IPublishedContent
     /// </summary>
-    public sealed class MemberPublishedContent : PublishedContentBase
+    public sealed class MemberPublishedContent : PublishedContentWithKeyBase
     {
 
         private readonly IMember _member;
@@ -148,6 +148,11 @@ namespace Umbraco.Web.PublishedCache
         public override int Id
         {
             get { return _member.Id; }
+        }
+
+        public override Guid Key
+        {
+            get { return _member.Key; }
         }
 
         public override int TemplateId

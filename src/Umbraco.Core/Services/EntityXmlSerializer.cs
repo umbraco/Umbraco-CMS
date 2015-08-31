@@ -440,6 +440,7 @@ namespace Umbraco.Core.Services
 
             var xml = new XElement(nodeName,
                 new XAttribute("id", contentBase.Id),
+                new XAttribute("key", contentBase.Key),
                 new XAttribute("parentID", contentBase.Level > 1 ? contentBase.ParentId : -1),
                 new XAttribute("level", contentBase.Level),
                 new XAttribute("creatorID", contentBase.CreatorId),
