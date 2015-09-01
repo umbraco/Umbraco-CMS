@@ -8,9 +8,12 @@
  */
 function DataTypeEditController($scope, $routeParams, $location, appState, navigationService, treeService, dataTypeResource, notificationsService,  angularHelper, serverValidationManager, contentEditingHelper, formHelper, editorState) {
 
-    //setup scope vars    
-    $scope.currentSection = appState.getSectionState("currentSection");
-    $scope.currentNode = null; //the editors affiliated node
+    //setup scope vars
+    $scope.page = {};
+    $scope.page.nameLocked = false;
+    $scope.page.menu = {};
+    $scope.page.menu.currentSection = appState.getSectionState("currentSection");
+    $scope.page.menu.currentNode = null;
 
     //method used to configure the pre-values when we retrieve them from the server
     function createPreValueProps(preVals) {
@@ -51,6 +54,8 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
                 $scope.preValuesLoaded = true;
                 $scope.content = data;
 
+                setHeaderNameState($scope.content);
+
                 //set a shared state
                 editorState.set($scope.content);
             });
@@ -64,7 +69,9 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
                 $scope.content = data;
 
                 createPreValueProps($scope.content.preValues);
-                
+
+                setHeaderNameState($scope.content);
+
                 //share state
                 editorState.set($scope.content);
 
@@ -75,7 +82,7 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
                 serverValidationManager.executeAndClearAllSubscriptions();
                 
                 navigationService.syncTree({ tree: "datatype", path: [String(data.id)] }).then(function (syncArgs) {
-                    $scope.currentNode = syncArgs.node;
+                    $scope.page.menu.currentNode = syncArgs.node;
                 });
             });
     }
@@ -91,12 +98,22 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
                     $scope.preValuesLoaded = true;
                     $scope.content.preValues = data;
                     createPreValueProps($scope.content.preValues);
-                    
+
+                    setHeaderNameState($scope.content);
+
                     //share state
                     editorState.set($scope.content);
                 });
         }
     });
+
+    function setHeaderNameState(content) {
+
+      if(content.isSystem == 1) {
+         $scope.page.nameLocked = true;
+      }
+
+    }
 
     $scope.save = function() {
 
@@ -115,11 +132,13 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
                         }
                     });
 
+                    setHeaderNameState($scope.content);
+
                     //share state
                     editorState.set($scope.content);
 
                     navigationService.syncTree({ tree: "datatype", path: [String(data.id)], forceReload: true }).then(function (syncArgs) {
-                        $scope.currentNode = syncArgs.node;
+                        $scope.page.menu.currentNode = syncArgs.node;
                     });
                     
                 }, function(err) {

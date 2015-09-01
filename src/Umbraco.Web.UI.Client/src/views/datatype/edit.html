@@ -1,68 +1,62 @@
-<form novalidate name="contentForm" 
-      ng-controller="Umbraco.Editors.DataType.EditController" 
-      ng-show="loaded" 
-      ng-submit="save()"
-      val-form-manager>
-    <umb-panel>
+<form name="contentForm"
+   ng-controller="Umbraco.Editors.DataType.EditController"
+   ng-show="loaded"
+   ng-submit="save()"
+   novalidate
+   val-form-manager>
 
-        <umb-header>
+   <umb-editor-view>
 
-            <div class="span7">                
-                <umb-content-name
-                    ng-disabled="content.isSystem == 1"
-                    placeholder="@placeholders_entername"
-                    ng-model="content.name"/>
+      <umb-editor-header
+         menu="page.menu"
+         name="content.name"
+         name-locked="page.nameLocked">
+      </umb-editor-header>
+
+
+      <umb-editor-container class="form-horizontal">
+
+         <umb-property property="properties.selectedEditor">
+             <div>
+                 <select name="selectedEditor"
+                        ng-model="content.selectedEditor"
+                        required
+                        ng-options="e.alias as e.name for e in content.availableEditors"></select>
+                 <span class="help-inline" val-msg-for="selectedEditor" val-toggle-msg="required">Required</span>
+             </div>
+
+         </umb-property>
+
+         <umb-property property="properties.selectedEditorId">
+             <div>{{content.selectedEditor}}</div>
+         </umb-property>
+
+
+         <umb-property
+             property="preValue"
+             ng-repeat="preValue in preValues">
+
+             <umb-editor model="preValue" is-pre-value="true"></umb-editor>
+         </umb-property>
+
+      </umb-editor-container>
+
+
+      <umb-editor-footer>
+
+         <umb-editor-footer-content-right>
+
+            <div class="btn-group">
+                <button type="submit" data-hotkey="ctrl+s" class="btn btn-success">
+                    <localize key="buttons_save">Save</localize>
+                </button>
             </div>
 
-            <div class="span5">
-                <div class="btn-toolbar pull-right umb-btn-toolbar">
-                    <umb-options-menu ng-show="currentNode"
-                        current-node="currentNode" 
-                        current-section="{{currentSection}}">                        
-                    </umb-options-menu>
-                </div>
-            </div>
-        </umb-header>
-        
-        <div class="umb-panel-body umb-scrollable row-fluid">
-            <div class="tab-content form-horizontal" style="padding-bottom: 90px">
-                <div class="umb-pane">
-                    
-                    <umb-property property="properties.selectedEditor">                        
-                        <div>
-                            <select name="selectedEditor"
-                                    ng-model="content.selectedEditor" 
-                                    required  
-                                    ng-options="e.alias as e.name for e in content.availableEditors"></select>
-                            <span class="help-inline" val-msg-for="selectedEditor" val-toggle-msg="required">Required</span>
-                        </div>
+         </umb-editor-footer-content-right>
 
-                    </umb-property>
-                    
-                    <umb-property property="properties.selectedEditorId">
-                        <div>{{content.selectedEditor}}</div>
-                    </umb-property>
-                    
-                    
-                    <umb-property 
-                        property="preValue" 
-                        ng-repeat="preValue in preValues">
-                        
-                        <umb-editor model="preValue" is-pre-value="true"></umb-editor>
-                    </umb-property>
+      </umb-editor-footer>
 
 
-                    <div class="umb-tab-buttons" detect-fold>
-                        <div class="btn-group">
-                            <button type="submit" data-hotkey="ctrl+s" class="btn btn-success">
-                                <localize key="buttons_save">Save</localize>
-                            </button>
-                        </div>
-                    </div>
+   </umb-editor-view>
 
-                </div>
-            </div>
-        </div>
-
-    </umb-panel>
 </form>
