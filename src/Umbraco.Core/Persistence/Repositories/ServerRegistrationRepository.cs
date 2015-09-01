@@ -15,14 +15,23 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class ServerRegistrationRepository : PetaPocoRepositoryBase<int, IServerRegistration>, IServerRegistrationRepository
     {
-        // create a new disabled cache helper, as we don't want runtime caching,
-        // and yet we want the static cache so we can statically cache all regs in PerformGetAll.
         private readonly ICacheProvider _staticCache;
 
-        public ServerRegistrationRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        public ServerRegistrationRepository(IDatabaseUnitOfWork work, ICacheProvider staticCache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax)
         {
-            _staticCache = cache.StaticCache;
+            _staticCache = staticCache;
+        }
+
+        protected override int PerformCount(IQuery<IServerRegistration> query)
+        {
+            throw new NotSupportedException("This repository does not support this method");
+        }
+
+        protected override bool PerformExists(int id)
+        {
+            // use the underlying GetAll which force-caches all registrations
+            return GetAll().Any(x => x.Id == id);
         }
 
         protected override IServerRegistration PerformGet(int id)
