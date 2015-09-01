@@ -10,11 +10,14 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
 
     //setup scope vars
     $scope.defaultButton = null;
-    $scope.subButtons = [];    
-    $scope.currentSection = appState.getSectionState("currentSection");
-    $scope.currentNode = null; //the editors affiliated node
+    $scope.subButtons = [];
     $scope.isNew = $routeParams.create;
-    
+
+    $scope.page = {};
+    $scope.page.menu = {};
+    $scope.page.menu.currentNode = null;
+    $scope.page.menu.currentSection = appState.getSectionState("currentSection");
+
     function init(content) {
 
         var buttons = contentEditingHelper.configureContentEditorButtons({
@@ -48,7 +51,7 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
 
         if (!$scope.content.isChildOfListView) {
             navigationService.syncTree({ tree: "content", path: path.split(","), forceReload: initialLoad !== true }).then(function (syncArgs) {
-                $scope.currentNode = syncArgs.node;
+                $scope.page.menu.currentNode = syncArgs.node;
             });
         }
         else if (initialLoad === true) {
@@ -61,7 +64,7 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
             umbRequestHelper.resourcePromise(
                 $http.get(content.treeNodeUrl),
                 'Failed to retrieve data for child node ' + content.id).then(function (node) {
-                    $scope.currentNode = node;
+                    $scope.page.menu.currentNode = node;
                 });
         }
     }
