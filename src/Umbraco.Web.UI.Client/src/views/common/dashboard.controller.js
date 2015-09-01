@@ -9,6 +9,10 @@
  */
  
 function DashboardController($scope, $routeParams, dashboardResource, localizationService) {
+
+   $scope.page = {};
+   $scope.page.nameLocked = true;
+
     $scope.dashboard = {};
     localizationService.localize("sections_" + $routeParams.section).then(function(name){
     	$scope.dashboard.name = name;
