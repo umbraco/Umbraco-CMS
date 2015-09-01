@@ -11,7 +11,10 @@ function MemberListController($scope, $routeParams, $location, $q, $window, appS
     //setup scope vars
     $scope.currentSection = appState.getSectionState("currentSection");
     $scope.currentNode = null; //the editors affiliated node
-    
+
+    $scope.page = {};
+    $scope.page.lockedName = true;
+
     //we are editing so get the content item from the server
     memberResource.getListNode($routeParams.id)
         .then(function (data) {

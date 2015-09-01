@@ -1,27 +1,30 @@
-﻿<form novalidate name="contentForm"
-      ng-controller="Umbraco.Editors.Member.ListController"
-      ng-show="loaded">
-    <umb-panel>
-        <umb-header tabs="content.tabs">
-            
-            <div class="umb-headline-editor-wrapper span12">
-                <h1>{{content.name}}</h1>
-            </div>
+<form novalidate name="contentForm"
+   ng-controller="Umbraco.Editors.Member.ListController"
+   ng-show="loaded">
 
-        </umb-header>
+   <umb-editor-view umb-tabs>
 
-        <umb-tab-view>
+      <umb-editor-header
+         name="content.name"
+         name-locked="page.lockedName"
+         tabs="content.tabs"
+         menu="page.menu">
+      </umb-editor-header>
+
+      <umb-editor-container>
+
+         <umb-tabs-content view="true" class="form-horizontal">
             <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" ng-repeat="tab in content.tabs">
-                <div class="umb-pane">
-                    <umb-property property="property"
-                                  ng-repeat="property in tab.properties">
 
-                        <umb-editor model="property"></umb-editor>
-                    </umb-property>
+               <umb-property property="property" ng-repeat="property in tab.properties">
+                  <umb-editor model="property"></umb-editor>
+               </umb-property>
 
-                </div>
             </umb-tab>
+         </umb-tabs-content>
 
-        </umb-tab-view>
-    </umb-panel>
+      </umb-editor-container>
+
+   </umb-editor-view>
+
 </form>
