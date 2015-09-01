@@ -12,12 +12,17 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
     $scope.currentSection = appState.getSectionState("currentSection");
     $scope.currentNode = null; //the editors affiliated node
 
+    $scope.page = {};
+    $scope.page.menu = {};
+    $scope.page.menu.currentSection = appState.getSectionState("currentSection");
+    $scope.page.menu.currentNode = null; //the editors affiliated node
+
     /** Syncs the content item to it's tree node - this occurs on first load and after saving */
     function syncTreeNode(content, path, initialLoad) {
 
         if (!$scope.content.isChildOfListView) {
             navigationService.syncTree({ tree: "media", path: path.split(","), forceReload: initialLoad !== true }).then(function (syncArgs) {
-                $scope.currentNode = syncArgs.node;
+                $scope.page.menu.currentNode = syncArgs.node;
             });
         }
         else if (initialLoad === true) {
@@ -30,7 +35,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
             umbRequestHelper.resourcePromise(
                 $http.get(content.treeNodeUrl),
                 'Failed to retrieve data for child node ' + content.id).then(function (node) {
-                    $scope.currentNode = node;
+                    $scope.page.menu.currentNode = node;
                 });
         }
     }

@@ -1,64 +1,58 @@
-﻿<form novalidate name="contentForm" 
-      ng-controller="Umbraco.Editors.Media.EditController" 
-      ng-show="loaded" 
-      ng-submit="save()"
-      val-form-manager>
-    <umb-panel umb-tabs ng-class="{'editor-breadcrumb': ancestors && ancestors.length > 0}">
-        <umb-header tabs="content.tabs">
+<form novalidate name="contentForm"
+   ng-controller="Umbraco.Editors.Media.EditController"
+   ng-show="loaded"
+   ng-submit="save()"
+   val-form-manager>
 
-            <div class="span7">
-                <umb-content-name placeholder="@placeholders_entername"
-                                  ng-model="content.name" />
-            </div>
+   <umb-editor-view umb-tabs>
 
-            <div class="span5">
-                <div class="btn-toolbar pull-right umb-btn-toolbar">
-                    <div class="btn-group" ng-animate="'fade'" ng-show="formStatus">
-                        <p class="btn btn-link umb-status-label">{{formStatus}}</p>
-                    </div>
+      <umb-editor-header
+         name="content.name"
+         tabs="content.tabs"
+         menu="page.menu">
+      </umb-editor-header>
 
-                    <umb-options-menu ng-show="currentNode"
-                                      current-node="currentNode"
-                                      current-section="{{currentSection}}">
-                    </umb-options-menu>
-                </div>
-            </div>
-        </umb-header>
+      <umb-editor-container>
 
-        <umb-tab-view>
+         <umb-tabs-content view="true" class="form-horizontal">
             <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" ng-repeat="tab in content.tabs">
 
-                <div class="umb-pane">
-                    <umb-property property="property"
-                                  ng-repeat="property in tab.properties">
-
-                        <umb-editor model="property"></umb-editor>
-                    </umb-property>
-
-                    <div class="umb-tab-buttons" detect-fold ng-class="{'umb-dimmed': busy}">
-
-                        <div class="btn-group" ng-show="listViewPath">
-                            <a class="btn" href="#{{listViewPath}}">
-                                <localize key="buttons_returnToList">Return to list</localize>
-                            </a>
-                        </div>
-
-                        <div class="btn-group">
-                            <button type="submit" data-hotkey="ctrl+s" class="btn btn-success">
-                                <localize key="buttons_save">Save</localize>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+               <umb-property property="property" ng-repeat="property in tab.properties">
+                  <umb-editor model="property"></umb-editor>
+               </umb-property>
 
             </umb-tab>
-        </umb-tab-view>
+         </umb-tabs-content>
 
-        <ul class="umb-panel-footer-nav nav nav-pills" ng-if="ancestors && ancestors.length > 0">
-            <li ng-repeat="ancestor in ancestors">
-                <a href="#/media/media/edit/{{ancestor.id}}">{{ancestor.name}}</a>
-            </li>
-            <li></li>
-        </ul>
-    </umb-panel>
+      </umb-editor-container>
+
+      <umb-editor-footer>
+
+         <umb-editor-footer-content-left>
+            <umb-breadcrumbs ng-if="ancestors && ancestors.length > 0" ancestors="ancestors"></umb-breadcrumbs>
+         </umb-editor-footer-content-left>
+
+
+         <umb-editor-footer-content-right ng-class="{'umb-dimmed': busy}">
+
+            <div class="btn-group" ng-show="listViewPath">
+                <a class="btn" href="#{{listViewPath}}">
+                    <localize key="buttons_returnToList">Return to list</localize>
+                </a>
+            </div>
+
+            <div class="btn-group">
+                <button type="submit" data-hotkey="ctrl+s" class="btn btn-success">
+                    <localize key="buttons_save">Save</localize>
+                </button>
+            </div>
+
+         </umb-editor-footer-content-right>
+
+
+      </umb-editor-footer>
+
+
+   </umb-editor-view>
+
 </form>
