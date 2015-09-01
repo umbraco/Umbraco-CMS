@@ -24,7 +24,7 @@
 
             </div>
 
-            <umb-editor-menu ng-if="menu" menu="menu"></umb-editor-menu>
+            <umb-editor-menu ng-if="menu.currentNode" current-node="menu.currentNode" current-section="{{menu.currentSection}}"></umb-editor-menu>
             <umb-editor-navigation ng-if="navigation" navigation="navigation"></umb-editor-navigation>
 
         </div>
