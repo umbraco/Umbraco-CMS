@@ -3,11 +3,18 @@
 
   function UmbTabsContentDirective() {
 
+    function link(scope, el, attr, ctrl) {
+
+      scope.view = attr.view;
+
+   }
+
     var directive = {
       restrict: "E",
       replace: true,
       transclude: 'true',
-      templateUrl: "views/directives/umb-tabs-content.html"
+      templateUrl: "views/directives/umb-tabs-content.html",
+      link: link
     };
 
     return directive;
