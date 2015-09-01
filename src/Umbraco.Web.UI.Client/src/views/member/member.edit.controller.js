@@ -9,8 +9,11 @@
 function MemberEditController($scope, $routeParams, $location, $q, $window, appState, memberResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, formHelper, umbModelMapper, editorState, umbRequestHelper, $http) {
     
     //setup scope vars
-    $scope.currentSection = appState.getSectionState("currentSection");
-    $scope.currentNode = null; //the editors affiliated node
+    $scope.page = {};
+    $scope.page.menu = {};
+    $scope.page.menu.currentSection = appState.getSectionState("currentSection");
+    $scope.page.menu.currentNode = null; //the editors affiliated node
+    $scope.page.nameLocked = false;
 
     $scope.listViewPath = ($routeParams.page && $routeParams.listName)
         ? "/member/member/list/" + $routeParams.listName + "?page=" + $routeParams.page
@@ -32,6 +35,8 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                     $scope.loaded = true;
                     $scope.content = data;
 
+                    setHeaderNameState($scope.content);
+
                     editorState.set($scope.content);
                 });
         }
@@ -41,10 +46,12 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                     $scope.loaded = true;
                     $scope.content = data;
 
+                    setHeaderNameState($scope.content);
+
                     editorState.set($scope.content);
                 });
         }
-        
+
     }
     else {
         //so, we usually refernce all editors with the Int ID, but with members we have
@@ -65,6 +72,8 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                     $scope.loaded = true;
                     $scope.content = data;
 
+                    setHeaderNameState($scope.content);
+
                     editorState.set($scope.content);
                     
                     var path = buildTreePath(data);
@@ -77,7 +86,7 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                     umbRequestHelper.resourcePromise(
                         $http.get(data.treeNodeUrl),
                         'Failed to retrieve data for child node ' + data.key).then(function (node) {
-                            $scope.currentNode = node;
+                            $scope.page.menu.currentNode = node;
                         });
 
                     //in one particular special case, after we've created a new item we redirect back to the edit
@@ -89,7 +98,15 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
         }
 
     }
-    
+
+    function setHeaderNameState(content) {
+
+      if(content.membershipScenario === 0) {
+         $scope.page.nameLocked = true;
+      }
+
+    }
+
     $scope.save = function() {
 
         if (!$scope.busy && formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {
