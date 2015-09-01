@@ -230,7 +230,7 @@ namespace Umbraco.Core.Persistence
         {
             return new ServerRegistrationRepository(
                 uow,
-                CacheHelper.CreateDisabledCacheHelper(), //never cache
+                _cacheHelper,
                 _logger, _sqlSyntax);
         }
 
