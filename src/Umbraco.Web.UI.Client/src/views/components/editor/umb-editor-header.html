@@ -13,7 +13,8 @@
 
                <div class="umb-panel-header-title-wrapper">
 
-                  <input type="text" class="umb-panel-header-name" placeholder="Enter name..." ng-if="name!==undefined" ng-disabled="content.isSystem == 1" ng-model="$parent.name"  ng-class="{'name-is-empty': $parent.name===null || $parent.name===''}" umb-auto-focus focus-on-filled="true" />
+                  <input type="text" class="umb-panel-header-name-input" placeholder="Enter name..." ng-if="name!==undefined && !nameLocked" ng-model="$parent.name"  ng-class="{'name-is-empty': $parent.name===null || $parent.name===''}" umb-auto-focus focus-on-filled="true" />
+                  <div class="umb-panel-header-name" ng-if="name!==undefined && nameLocked">{{ name }}</div>
 
                   <umb-generate-alias class="umb-panel-header-alias" ng-if="alias!==undefined" alias="$parent.alias" alias-from="$parent.name" enable-lock="true"></umb-generate-alias>
 

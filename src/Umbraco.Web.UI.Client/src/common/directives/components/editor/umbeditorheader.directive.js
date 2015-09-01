@@ -43,6 +43,7 @@
             tabs: "=",
             actions: "=",
             name: "=",
+            nameLocked: "=",
             menu: "=",
             icon: "=",
             alias: "=",
