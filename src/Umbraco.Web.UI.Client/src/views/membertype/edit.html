@@ -27,15 +27,23 @@
 
             <umb-editor-footer>
 
-              <umb-keyboard-shortcuts-overview
-                model="vm.page.keyboardShortcutsOverview">
-              </umb-keyboard-shortcuts-overview>
+               <umb-editor-footer-content-left>
 
-              <div class="btn-group">
-                <button type="submit" data-hotkey="ctrl+s" class="btn btn-success">
-                  <localize key="buttons_save">Save</localize>
-                </button>
-              </div>
+                  <umb-keyboard-shortcuts-overview
+                    model="vm.page.keyboardShortcutsOverview">
+                  </umb-keyboard-shortcuts-overview>
+
+               </umb-editor-footer-content-left>
+
+               <umb-editor-footer-content-right>
+
+                  <div class="btn-group">
+                    <button type="submit" data-hotkey="ctrl+s" class="btn btn-success">
+                      <localize key="buttons_save">Save</localize>
+                    </button>
+                  </div>
+
+               </umb-editor-footer-content-right>
 
             </umb-editor-footer>
 
