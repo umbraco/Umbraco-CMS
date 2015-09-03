@@ -14,18 +14,17 @@
   position: relative;
   padding: 10px 10px 5px 10px;
   box-sizing: border-box;
-  animation: fadeIn 0.5s;
-  //transition: height 0.5s;
-  //-webkit-transition: height 0.5s;
 }
 
 .umb-group-builder__group.-active {
   border-color: @blue;
+  animation: fadeIn 0.5s;
 }
 
 .umb-group-builder__group.-inherited {
   background: #FDFDFD;
   border-color: #F2F2F2;
+  animation: fadeIn 0.5s;
 }
 
 .umb-group-builder__group.-placeholder {
@@ -165,9 +164,6 @@ input.umb-group-builder__group-sort-value {
   border-radius: 5px;
   padding: 5px;
   box-sizing: border-box;
-  animation: fadeIn 0.5s;
-  transition: height 0.5s;
-  -webkit-transition: height 0.5s;
 }
 
 .umb-group-builder__property:hover {
@@ -180,11 +176,13 @@ input.umb-group-builder__group-sort-value {
   border-radius: 5px;
   cursor: pointer;
   align-items: center;
+  animation: fadeIn 0.5s;
 }
 
 .umb-group-builder__property.-inherited {
   border: transparent;
   background: #FDFDFD;
+  animation: fadeIn 0.5s;
 }
 
 .umb-group-builder__property.-inherited:hover {
