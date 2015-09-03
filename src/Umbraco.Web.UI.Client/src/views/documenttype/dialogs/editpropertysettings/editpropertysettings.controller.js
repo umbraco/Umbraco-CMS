@@ -92,6 +92,7 @@
             }
 
          } else {
+            $scope.model.property.validation.pattern = "";
             vm.showValidationPattern = false;
          }
 
