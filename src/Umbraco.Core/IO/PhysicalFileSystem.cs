@@ -33,6 +33,16 @@ namespace Umbraco.Core.IO
 			if (rootPath.StartsWith("~/"))
 				throw new ArgumentException("The rootPath argument cannot be a virtual path and cannot start with '~/'");
 
+            // rootPath should be... rooted, as in, it's a root path!
+            // but the test suite App.config cannot really "root" anything so we'll have to do it here
+
+            //var localRoot = AppDomain.CurrentDomain.BaseDirectory;
+            var localRoot = IOHelper.GetRootDirectorySafe();
+            if (Path.IsPathRooted(rootPath) == false)
+            {
+                rootPath = Path.Combine(localRoot, rootPath);
+            }
+
             RootPath = rootPath;
             _rootUrl = rootUrl;
         }
