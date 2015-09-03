@@ -152,12 +152,7 @@ namespace Umbraco.Core.IO
         /// <returns>A value indicating whether the filepath is valid.</returns>
         internal static bool VerifyEditPath(string filePath, string validDir)
         {
-            if (filePath.StartsWith(MapPath(SystemDirectories.Root)) == false)
-                filePath = MapPath(filePath);
-            if (validDir.StartsWith(MapPath(SystemDirectories.Root)) == false)
-                validDir = MapPath(validDir);
-
-            return filePath.StartsWith(validDir);
+            return VerifyEditPath(filePath, new[] { validDir });
         }
 
         /// <summary>
@@ -182,12 +177,17 @@ namespace Umbraco.Core.IO
         /// <returns>A value indicating whether the filepath is valid.</returns>
         internal static bool VerifyEditPath(string filePath, IEnumerable<string> validDirs)
         {
+            var mappedRoot = MapPath(SystemDirectories.Root);
+            if (filePath.StartsWith(mappedRoot) == false)
+                filePath = MapPath(filePath);
+
+            // don't trust what we get, it may contain relative segments
+            filePath = Path.GetFullPath(filePath);
+
             foreach (var dir in validDirs)
             {
                 var validDir = dir;
-                if (filePath.StartsWith(MapPath(SystemDirectories.Root)) == false)
-                    filePath = MapPath(filePath);
-                if (validDir.StartsWith(MapPath(SystemDirectories.Root)) == false)
+                if (validDir.StartsWith(mappedRoot) == false)
                     validDir = MapPath(validDir);
 
                 if (filePath.StartsWith(validDir))
@@ -219,11 +219,8 @@ namespace Umbraco.Core.IO
         /// <returns>A value indicating whether the filepath is valid.</returns>
         internal static bool VerifyFileExtension(string filePath, List<string> validFileExtensions)
         {
-            if (filePath.StartsWith(MapPath(SystemDirectories.Root)) == false)
-                filePath = MapPath(filePath);
-            var f = new FileInfo(filePath);
-            
-            return validFileExtensions.Contains(f.Extension.Substring(1));
+            var ext = Path.GetExtension(filePath);
+            return ext != null && validFileExtensions.Contains(ext.TrimStart('.'));
         }
 
         /// <summary>

@@ -177,9 +177,23 @@ namespace Umbraco.Core.IO
                 path = GetRelativePath(path);
             }
 
-            return !path.StartsWith(RootPath) 
-                ? Path.Combine(RootPath, path)
-                : path;
+            // if already a full path, return
+            if (path.StartsWith(RootPath))
+                return path;
+
+            // else combine and sanitize, ie GetFullPath will take care of any relative
+            // segments in path, eg '../../foo.tmp' - it may throw a SecurityException
+            // if the combined path reaches illegal parts of the filesystem
+            var fpath = Path.Combine(RootPath, path);
+            fpath = Path.GetFullPath(fpath);
+
+            // at that point, path is within legal parts of the filesystem, ie we have
+            // permissions to reach that path, but it may nevertheless be outside of
+            // our root path, due to relative segments, so better check
+            if (fpath.StartsWith(RootPath))
+                return fpath;
+
+            throw new FileSecurityException("File '" + path + "' is outside this filesystem's root.");
         }
 
         public string GetUrl(string path)

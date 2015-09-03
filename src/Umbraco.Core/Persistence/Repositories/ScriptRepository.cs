@@ -105,12 +105,22 @@ namespace Umbraco.Core.Persistence.Repositories
                 dirs += "," + SystemDirectories.MvcViews;*/
 
             //Validate file
-            var validFile = IOHelper.VerifyEditPath(script.VirtualPath, dirs.Split(','));
+            string fullPath;
+            try
+            {
+                // may throw for security reasons
+                fullPath = FileSystem.GetFullPath(script.Path);
+            }
+            catch
+            {
+                return false;
+            }
+            var isValidPath = IOHelper.VerifyEditPath(fullPath, dirs.Split(','));
 
             //Validate extension
-            var validExtension = IOHelper.VerifyFileExtension(script.VirtualPath, exts);
+            var isValidExtension = IOHelper.VerifyFileExtension(script.Path, exts);
 
-            return validFile && validExtension;
+            return isValidPath && isValidExtension;
         }
 
         #endregion
