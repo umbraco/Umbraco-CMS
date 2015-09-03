@@ -12,8 +12,9 @@ using Umbraco.Web.Mvc;
 using umbraco;
 using umbraco.cms.businesslogic.macro;
 using System.Collections.Generic;
+using umbraco.cms.helpers;
 using Umbraco.Core;
-
+using Umbraco.Core.Configuration;
 using Template = umbraco.cms.businesslogic.template.Template;
 
 namespace Umbraco.Web.WebServices
@@ -214,6 +215,42 @@ namespace Umbraco.Web.WebServices
             {
                 return Failed(ui.Text("speechBubbles", "templateErrorText"), ui.Text("speechBubbles", "templateErrorHeader"), ex);
             }
+        }
+
+        [HttpPost]
+        public JsonResult SaveScript(string filename, string oldName, string contents)
+        {
+            filename = filename.TrimStart(System.IO.Path.DirectorySeparatorChar);
+
+            var svce = (FileService) Services.FileService;
+            var script = svce.GetScriptByName(oldName);
+            if (script == null)
+                script = new Script(filename);
+            else
+                script.Path = filename;
+            script.Content = contents;
+
+            try
+            {
+                if (svce.ValidateScript(script) == false)
+                    return Failed(ui.Text("speechBubbles", "scriptErrorText"), ui.Text("speechBubbles", "scriptErrorHeader"),
+                                    new FileSecurityException("File '" + filename + "' is not a valid script file."));
+                
+                svce.SaveScript(script);
+            }
+            catch (Exception e)
+            {
+                return Failed(ui.Text("speechBubbles", "scriptErrorText"), ui.Text("speechBubbles", "scriptErrorHeader"), e);
+            }
+
+            return Success(ui.Text("speechBubbles", "scriptSavedText"), ui.Text("speechBubbles", "scriptSavedHeader"),
+                new
+                {
+                    path = DeepLink.GetTreePathFromFilePath(script.Path),
+                    name = script.Path,
+                    url = script.VirtualPath,
+                    contents = script.Content
+                });
         }
 
         /// <summary>

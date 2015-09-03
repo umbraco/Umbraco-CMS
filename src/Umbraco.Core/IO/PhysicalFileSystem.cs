@@ -33,6 +33,16 @@ namespace Umbraco.Core.IO
 			if (rootPath.StartsWith("~/"))
 				throw new ArgumentException("The rootPath argument cannot be a virtual path and cannot start with '~/'");
 
+            // rootPath should be... rooted, as in, it's a root path!
+            // but the test suite App.config cannot really "root" anything so we'll have to do it here
+
+            //var localRoot = AppDomain.CurrentDomain.BaseDirectory;
+            var localRoot = IOHelper.GetRootDirectorySafe();
+            if (Path.IsPathRooted(rootPath) == false)
+            {
+                rootPath = Path.Combine(localRoot, rootPath);
+            }
+
             RootPath = rootPath;
             _rootUrl = rootUrl;
         }
@@ -177,9 +187,23 @@ namespace Umbraco.Core.IO
                 path = GetRelativePath(path);
             }
 
-            return !path.StartsWith(RootPath) 
-                ? Path.Combine(RootPath, path)
-                : path;
+            // if already a full path, return
+            if (path.StartsWith(RootPath))
+                return path;
+
+            // else combine and sanitize, ie GetFullPath will take care of any relative
+            // segments in path, eg '../../foo.tmp' - it may throw a SecurityException
+            // if the combined path reaches illegal parts of the filesystem
+            var fpath = Path.Combine(RootPath, path);
+            fpath = Path.GetFullPath(fpath);
+
+            // at that point, path is within legal parts of the filesystem, ie we have
+            // permissions to reach that path, but it may nevertheless be outside of
+            // our root path, due to relative segments, so better check
+            if (fpath.StartsWith(RootPath))
+                return fpath;
+
+            throw new FileSecurityException("File '" + path + "' is outside this filesystem's root.");
         }
 
         public string GetUrl(string path)

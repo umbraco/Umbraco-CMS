@@ -99,19 +99,29 @@ namespace Umbraco.Core.Persistence.Repositories
             return FileSystem.GetFiles(rootPath ?? string.Empty, "*.css").Select(Get);
         }
 
+        private static readonly List<string> ValidExtensions = new List<string> { "css" };
+
         public bool ValidateStylesheet(Stylesheet stylesheet)
         {
             var dirs = SystemDirectories.Css;
 
             //Validate file
-            var validFile = IOHelper.VerifyEditPath(stylesheet.VirtualPath, dirs.Split(','));
+            string fullPath;
+            try
+            {
+                // may throw for security reasons
+                fullPath = FileSystem.GetFullPath(stylesheet.Path);
+            }
+            catch
+            {
+                return false;
+            }
+            var isValidPath = IOHelper.VerifyEditPath(fullPath, dirs.Split(','));
 
             //Validate extension
-            var validExtension = IOHelper.VerifyFileExtension(stylesheet.VirtualPath, new List<string> { "css" });
+            var isValidExtension = IOHelper.VerifyFileExtension(stylesheet.Path, ValidExtensions);
 
-            var fileValid = validFile && validExtension;
-
-            return fileValid;
+            return isValidPath && isValidExtension;
         }
 
         #endregion

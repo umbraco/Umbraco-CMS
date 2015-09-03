@@ -364,10 +364,14 @@
     <Compile Include="Models\Identity\BackOfficeIdentityUser.cs" />
     <Compile Include="Models\Identity\IIdentityUserLogin.cs" />
     <Compile Include="Models\IMigrationEntry.cs" />
+    <Compile Include="Models\IPublishedContentWithKey.cs" />
     <Compile Include="Models\IServerRegistration.cs" />
     <Compile Include="Models\MigrationEntry.cs" />
     <Compile Include="Models\PublicAccessEntry.cs" />
     <Compile Include="Models\PublicAccessRule.cs" />
+    <Compile Include="Models\PublishedContent\PublishedContentWithKeyExtended.cs" />
+    <Compile Include="Models\PublishedContent\PublishedContentWithKeyModel.cs" />
+    <Compile Include="Models\PublishedContent\PublishedContentWithKeyWrapped.cs" />
     <Compile Include="Models\Rdbms\AccessDto.cs" />
     <Compile Include="Media\Exif\BitConverterEx.cs" />
     <Compile Include="Media\Exif\ExifBitConverter.cs" />

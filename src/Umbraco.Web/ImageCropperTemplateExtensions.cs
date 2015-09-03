@@ -110,9 +110,8 @@
              bool useCropDimensions = false,
              bool cacheBuster = true, 
              string furtherOptions = null,
-             ImageCropRatioMode? ratioMode = null,     
-             bool upScale = true
-            )
+             ImageCropRatioMode? ratioMode = null,
+             bool upScale = true)
         {
             string imageCropperValue = null;
 
@@ -153,6 +152,12 @@
         /// <param name="height">
         /// The height of the output image.
         /// </param>
+        /// <param name="imageCropperValue">
+        /// The Json data from the Umbraco Core Image Cropper property editor
+        /// </param>
+        /// <param name="cropAlias">
+        /// The crop alias.
+        /// </param>
         /// <param name="quality">
         /// Quality percentage of the output image.
         /// </param>
@@ -162,17 +167,11 @@
         /// <param name="imageCropAnchor">
         /// The image crop anchor.
         /// </param>
-        /// <param name="imageCropperValue">
-        /// The Json data from the Umbraco Core Image Cropper property editor
-        /// </param>
-        /// <param name="cropAlias">
-        /// The crop alias.
-        /// </param>
         /// <param name="preferFocalPoint">
         /// Use focal point to generate an output image using the focal point instead of the predefined crop if there is one
         /// </param>
         /// <param name="useCropDimensions">
-        /// Use crop dimensions to have the output image sized according to the predefined crop sizes, this will override the width and height parameters>.
+        /// Use crop dimensions to have the output image sized according to the predefined crop sizes, this will override the width and height parameters
         /// </param>
         /// <param name="cacheBusterValue">
         /// Add a serialised date of the last edit of the item to ensure client cache refresh when updated
@@ -182,10 +181,10 @@
         /// </param>
         /// <param name="ratioMode">
         /// Use a dimension as a ratio
-        /// </param>  
+        /// </param>
         /// <param name="upScale">
         /// If the image should be upscaled to requested dimensions
-        /// </param>         
+        /// </param>
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
@@ -203,12 +202,11 @@
             string cacheBusterValue = null, 
             string furtherOptions = null,
             ImageCropRatioMode? ratioMode = null,
-            bool upScale = true
-        )
+            bool upScale = true)
         {
             if (string.IsNullOrEmpty(imageUrl) == false)
             {
-                var imageResizerUrl = new StringBuilder();
+                var imageProcessorUrl = new StringBuilder();
 
                 if (string.IsNullOrEmpty(imageCropperValue) == false && imageCropperValue.DetectIsJson() && (imageCropMode == ImageCropMode.Crop || imageCropMode == null))
                 {
@@ -217,95 +215,111 @@
                     {
                         var crop = cropDataSet.GetCrop(cropAlias);
 
-                        imageResizerUrl.Append(cropDataSet.Src);
+                        imageProcessorUrl.Append(cropDataSet.Src);
 
                         var cropBaseUrl = cropDataSet.GetCropBaseUrl(cropAlias, preferFocalPoint);
                         if (cropBaseUrl != null)
                         {
-                            imageResizerUrl.Append(cropBaseUrl);
+                            imageProcessorUrl.Append(cropBaseUrl);
                         }
                         else
                         {
                             return null;
                         }
 
-                        if (crop!= null & useCropDimensions)
+                        if (crop != null & useCropDimensions)
                         {
                             width = crop.Width;
                             height = crop.Height;
+                        }
+
+                        // If a predefined crop has been specified & there are no coordinates & no ratio mode, but a width parameter has been passed we can get the crop ratio for the height
+                        if (crop != null && string.IsNullOrEmpty(cropAlias) == false && crop.Coordinates == null && ratioMode == null && width != null && height == null)
+                        {
+                            var heightRatio = (decimal)crop.Height / (decimal)crop.Width;
+                            imageProcessorUrl.Append("&heightratio=" + heightRatio.ToString(CultureInfo.InvariantCulture));
+                        }
+
+                        // If a predefined crop has been specified & there are no coordinates & no ratio mode, but a height parameter has been passed we can get the crop ratio for the width
+                        if (crop != null && string.IsNullOrEmpty(cropAlias) == false && crop.Coordinates == null && ratioMode == null && width == null && height != null)
+                        {
+                            var widthRatio = (decimal)crop.Width / (decimal)crop.Height;
+                            imageProcessorUrl.Append("&widthratio=" + widthRatio.ToString(CultureInfo.InvariantCulture));
                         }
                     }
                 }
                 else
                 {
-                    imageResizerUrl.Append(imageUrl);
+                    imageProcessorUrl.Append(imageUrl);
 
                     if (imageCropMode == null)
                     {
                         imageCropMode = ImageCropMode.Pad;
                     }
 
-                    imageResizerUrl.Append("?mode=" + imageCropMode.ToString().ToLower());
+                    imageProcessorUrl.Append("?mode=" + imageCropMode.ToString().ToLower());
 
                     if (imageCropAnchor != null)
                     {
-                        imageResizerUrl.Append("&anchor=" + imageCropAnchor.ToString().ToLower());
+                        imageProcessorUrl.Append("&anchor=" + imageCropAnchor.ToString().ToLower());
                     }
                 }
 
                 if (quality != null)
                 {
-                    imageResizerUrl.Append("&quality=" + quality);
+                    imageProcessorUrl.Append("&quality=" + quality);
                 }
 
                 if (width != null && ratioMode != ImageCropRatioMode.Width)
                 {
-                    imageResizerUrl.Append("&width=" + width);
+                    imageProcessorUrl.Append("&width=" + width);
                 }
 
                 if (height != null && ratioMode != ImageCropRatioMode.Height)
                 {
-                    imageResizerUrl.Append("&height=" + height);
+                    imageProcessorUrl.Append("&height=" + height);
                 }
 
                 if (ratioMode == ImageCropRatioMode.Width && height != null)
                 {
-                    //if only height specified then assume a sqaure
+                    // if only height specified then assume a sqaure
                     if (width == null)
                     {
                         width = height;
                     }
-                    var widthRatio = (decimal)width/(decimal)height;
-                    imageResizerUrl.Append("&widthratio=" + widthRatio.ToString(CultureInfo.InvariantCulture));                    
+
+                    var widthRatio = (decimal)width / (decimal)height;
+                    imageProcessorUrl.Append("&widthratio=" + widthRatio.ToString(CultureInfo.InvariantCulture));
                 }
 
                 if (ratioMode == ImageCropRatioMode.Height && width != null)
                 {
-                    //if only width specified then assume a sqaure
+                    // if only width specified then assume a sqaure
                     if (height == null)
                     {
                         height = width;
                     }
-                    var heightRatio = (decimal)height/(decimal)width;
-                    imageResizerUrl.Append("&heightratio=" + heightRatio.ToString(CultureInfo.InvariantCulture));
+
+                    var heightRatio = (decimal)height / (decimal)width;
+                    imageProcessorUrl.Append("&heightratio=" + heightRatio.ToString(CultureInfo.InvariantCulture));
                 }
 
                 if (upScale == false)
                 {
-                    imageResizerUrl.Append("&upscale=false");                    
+                    imageProcessorUrl.Append("&upscale=false");                    
                 }
 
                 if (furtherOptions != null)
                 {
-                    imageResizerUrl.Append(furtherOptions);
+                    imageProcessorUrl.Append(furtherOptions);
                 }
 
                 if (cacheBusterValue != null)
                 {
-                    imageResizerUrl.Append("&rnd=").Append(cacheBusterValue);
+                    imageProcessorUrl.Append("&rnd=").Append(cacheBusterValue);
                 }
 
-                return imageResizerUrl.ToString();
+                return imageProcessorUrl.ToString();
             }
 
             return string.Empty;
