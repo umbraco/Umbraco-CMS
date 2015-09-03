@@ -49,7 +49,7 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
         $scope.originalValue = $scope.model.value;
 
         //create the property to show the list of files currently saved
-        if ($scope.model.value != "") {
+        if ($scope.model.value != "" && $scope.model.value != undefined) {
 
             var images = $scope.model.value.split(",");
 
@@ -171,4 +171,4 @@ angular.module("umbraco")
                 }
             });
         }
-    });
+    });
