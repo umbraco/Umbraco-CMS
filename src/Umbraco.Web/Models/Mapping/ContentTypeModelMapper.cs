@@ -201,7 +201,7 @@ namespace Umbraco.Web.Models.Mapping
 
             
             config.CreateMap<IContentTypeComposition, string>().ConvertUsing(x => x.Alias);
-            
+
 
             config.CreateMap<IContentTypeComposition, ContentTypeCompositionDisplay>()
                 .Include<IContentType, ContentTypeDisplay>()
@@ -227,24 +227,25 @@ namespace Umbraco.Web.Models.Mapping
 
                 .ForMember(
                     dto => dto.Groups,
-                    expression => expression.ResolveUsing(new PropertyTypeGroupResolver(applicationContext, _propertyEditorResolver)))
-                
-                .AfterMap(((type, display) =>
-                {
-                    //default
-                    display.ListViewEditorName = Constants.Conventions.DataTypes.ListViewPrefix +  "Content";
-                    if (string.IsNullOrEmpty(type.Name) == false)
-                    {
-                        var name = Constants.Conventions.DataTypes.ListViewPrefix + type.Name;
-                        if(applicationContext.Services.DataTypeService.GetDataTypeDefinitionByName(name) != null)
-                            display.ListViewEditorName = name;
-                    }    
-                    
-                }));
+                    expression => expression.ResolveUsing(new PropertyTypeGroupResolver(applicationContext, _propertyEditorResolver)));
 
 
             config.CreateMap<IMemberType, ContentTypeCompositionDisplay>();
-            config.CreateMap<IMediaType, ContentTypeCompositionDisplay>();
+            config.CreateMap<IMediaType, ContentTypeCompositionDisplay>()
+                .AfterMap((source, dest) =>
+                 {
+                  
+                     //default listview
+                     dest.ListViewEditorName = Constants.Conventions.DataTypes.ListViewPrefix + "Media";
+
+                     if (string.IsNullOrEmpty(source.Name) == false)
+                     {
+                         var name = Constants.Conventions.DataTypes.ListViewPrefix + source.Name;
+                         if (applicationContext.Services.DataTypeService.GetDataTypeDefinitionByName(name) != null)
+                             dest.ListViewEditorName = name;
+                     }
+                 });
+
             config.CreateMap<IContentType, ContentTypeDisplay>()
                 .ForMember(dto => dto.AllowedTemplates, expression => expression.Ignore())
                 .ForMember(dto => dto.DefaultTemplate, expression => expression.Ignore())
@@ -256,6 +257,17 @@ namespace Umbraco.Web.Models.Mapping
 
                     if (source.DefaultTemplate != null)
                         dest.DefaultTemplate = Mapper.Map<EntityBasic>(source.DefaultTemplate);
+
+                    //default listview
+                    dest.ListViewEditorName = Constants.Conventions.DataTypes.ListViewPrefix + "Content";
+                    
+                    if (string.IsNullOrEmpty(source.Name) == false)
+                    {
+                        var name = Constants.Conventions.DataTypes.ListViewPrefix + source.Name;
+                        if (applicationContext.Services.DataTypeService.GetDataTypeDefinitionByName(name) != null)
+                            dest.ListViewEditorName = name;
+                    }
+
                 });
 
             config.CreateMap<IMemberType, ContentTypeBasic>();
