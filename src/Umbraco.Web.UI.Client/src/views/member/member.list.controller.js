@@ -14,11 +14,12 @@ function MemberListController($scope, $routeParams, $location, $q, $window, appS
 
     $scope.page = {};
     $scope.page.lockedName = true;
+    $scope.page.loading = true;
 
     //we are editing so get the content item from the server
     memberResource.getListNode($routeParams.id)
         .then(function (data) {
-            $scope.loaded = true;
+
             $scope.content = data;
 
             editorState.set($scope.content);
@@ -32,6 +33,9 @@ function MemberListController($scope, $routeParams, $location, $q, $window, appS
             // after the redirect, so we will bind all subscriptions which will show the server validation errors
             // if there are any and then clear them so the collection no longer persists them.
             serverValidationManager.executeAndClearAllSubscriptions();
+
+            $scope.page.loading = false;
+
         });
 }
 

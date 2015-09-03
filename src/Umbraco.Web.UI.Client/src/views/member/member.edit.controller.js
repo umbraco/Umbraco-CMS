@@ -10,6 +10,7 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
     
     //setup scope vars
     $scope.page = {};
+    $scope.page.loading = false;
     $scope.page.menu = {};
     $scope.page.menu.currentSection = appState.getSectionState("currentSection");
     $scope.page.menu.currentNode = null; //the editors affiliated node
@@ -29,26 +30,37 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
         //if there is no doc type specified then we are going to assume that 
         // we are not using the umbraco membership provider
         if ($routeParams.doctype) {
+
+           $scope.page.loading = true;
+
             //we are creating so get an empty member item
             memberResource.getScaffold($routeParams.doctype)
                 .then(function(data) {
-                    $scope.loaded = true;
+
                     $scope.content = data;
 
                     setHeaderNameState($scope.content);
 
                     editorState.set($scope.content);
+
+                    $scope.page.loading = false;
+
                 });
         }
         else {
+
+           $scope.page.loading = true;
+
             memberResource.getScaffold()
                 .then(function (data) {
-                    $scope.loaded = true;
                     $scope.content = data;
 
                     setHeaderNameState($scope.content);
 
                     editorState.set($scope.content);
+
+                    $scope.page.loading = false;
+
                 });
         }
 
@@ -66,10 +78,13 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
             });
         }
         else {
+
+           $scope.page.loading = true;
+
             //we are editing so get the content item from the server
             memberResource.getByKey($routeParams.id)
                 .then(function(data) {
-                    $scope.loaded = true;
+
                     $scope.content = data;
 
                     setHeaderNameState($scope.content);
@@ -94,6 +109,9 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                     // after the redirect, so we will bind all subscriptions which will show the server validation errors
                     // if there are any and then clear them so the collection no longer persists them.
                     serverValidationManager.executeAndClearAllSubscriptions();
+
+                    $scope.page.loading = false;
+
                 });
         }
 

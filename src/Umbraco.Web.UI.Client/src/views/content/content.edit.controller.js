@@ -14,6 +14,7 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
     $scope.isNew = $routeParams.create;
 
     $scope.page = {};
+    $scope.page.loading = false;
     $scope.page.menu = {};
     $scope.page.menu.currentNode = null;
     $scope.page.menu.currentSection = appState.getSectionState("currentSection");
@@ -105,22 +106,31 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
     }
 
     if ($routeParams.create) {
+
+      $scope.page.loading = true;
+
         //we are creating so get an empty content item
         contentResource.getScaffold($routeParams.id, $routeParams.doctype)
             .then(function (data) {
-                $scope.loaded = true;
+
                 $scope.content = data;
 
                 init($scope.content);                
 
                 resetLastListPageNumber($scope.content);
+
+                $scope.page.loading = false;
+
             });
     }
     else {
+
+        $scope.page.loading = true;
+
         //we are editing so get the content item from the server
         contentResource.getById($routeParams.id)
             .then(function (data) {
-                $scope.loaded = true;
+
                 $scope.content = data;
 
                 if (data.isChildOfListView && data.trashed === false) {
@@ -140,6 +150,9 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
                 syncTreeNode($scope.content, data.path, true);
 
                 resetLastListPageNumber($scope.content);
+
+                $scope.page.loading = false;
+
             });
     }
 

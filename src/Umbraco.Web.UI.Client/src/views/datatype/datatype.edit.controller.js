@@ -10,6 +10,7 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
 
     //setup scope vars
     $scope.page = {};
+    $scope.page.loading = false;
     $scope.page.nameLocked = false;
     $scope.page.menu = {};
     $scope.page.menu.currentSection = appState.getSectionState("currentSection");
@@ -47,10 +48,13 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
     $scope.preValues = [];
 
     if ($routeParams.create) {
+
+        $scope.page.loading = true;
+
         //we are creating so get an empty data type item
         dataTypeResource.getScaffold()
             .then(function(data) {
-                $scope.loaded = true;
+
                 $scope.preValuesLoaded = true;
                 $scope.content = data;
 
@@ -58,13 +62,19 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
 
                 //set a shared state
                 editorState.set($scope.content);
+
+                $scope.page.loading = false;
+
             });
     }
     else {
+
+        $scope.page.loading = true;
+
         //we are editing so get the content item from the server
         dataTypeResource.getById($routeParams.id)
             .then(function(data) {
-                $scope.loaded = true;
+
                 $scope.preValuesLoaded = true;
                 $scope.content = data;
 
@@ -84,6 +94,9 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
                 navigationService.syncTree({ tree: "datatype", path: [String(data.id)] }).then(function (syncArgs) {
                     $scope.page.menu.currentNode = syncArgs.node;
                 });
+
+                $scope.page.loading = false;
+
             });
     }
     

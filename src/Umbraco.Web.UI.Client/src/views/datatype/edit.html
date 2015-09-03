@@ -1,62 +1,66 @@
-<form name="contentForm"
-   ng-controller="Umbraco.Editors.DataType.EditController"
-   ng-show="loaded"
-   ng-submit="save()"
-   novalidate
-   val-form-manager>
+<div ng-controller="Umbraco.Editors.DataType.EditController">
 
-   <umb-editor-view>
+   <umb-load-indicator ng-if="page.loading"></umb-load-indicator>
 
-      <umb-editor-header
-         menu="page.menu"
-         name="content.name"
-         name-locked="page.nameLocked">
-      </umb-editor-header>
+   <form name="contentForm"
+      ng-show="!page.loading"
+      ng-submit="save()"
+      novalidate
+      val-form-manager>
 
+      <umb-editor-view>
 
-      <umb-editor-container class="form-horizontal">
-
-         <umb-property property="properties.selectedEditor">
-             <div>
-                 <select name="selectedEditor"
-                        ng-model="content.selectedEditor"
-                        required
-                        ng-options="e.alias as e.name for e in content.availableEditors"></select>
-                 <span class="help-inline" val-msg-for="selectedEditor" val-toggle-msg="required">Required</span>
-             </div>
-
-         </umb-property>
-
-         <umb-property property="properties.selectedEditorId">
-             <div>{{content.selectedEditor}}</div>
-         </umb-property>
+         <umb-editor-header
+            menu="page.menu"
+            name="content.name"
+            name-locked="page.nameLocked">
+         </umb-editor-header>
 
 
-         <umb-property
-             property="preValue"
-             ng-repeat="preValue in preValues">
+         <umb-editor-container class="form-horizontal">
 
-             <umb-editor model="preValue" is-pre-value="true"></umb-editor>
-         </umb-property>
+            <umb-property property="properties.selectedEditor">
+                <div>
+                    <select name="selectedEditor"
+                           ng-model="content.selectedEditor"
+                           required
+                           ng-options="e.alias as e.name for e in content.availableEditors"></select>
+                    <span class="help-inline" val-msg-for="selectedEditor" val-toggle-msg="required">Required</span>
+                </div>
 
-      </umb-editor-container>
+            </umb-property>
 
-
-      <umb-editor-footer>
-
-         <umb-editor-footer-content-right>
-
-            <div class="btn-group">
-                <button type="submit" data-hotkey="ctrl+s" class="btn btn-success">
-                    <localize key="buttons_save">Save</localize>
-                </button>
-            </div>
-
-         </umb-editor-footer-content-right>
-
-      </umb-editor-footer>
+            <umb-property property="properties.selectedEditorId">
+                <div>{{content.selectedEditor}}</div>
+            </umb-property>
 
 
-   </umb-editor-view>
+            <umb-property
+                property="preValue"
+                ng-repeat="preValue in preValues">
 
-</form>
+                <umb-editor model="preValue" is-pre-value="true"></umb-editor>
+            </umb-property>
+
+         </umb-editor-container>
+
+
+         <umb-editor-footer>
+
+            <umb-editor-footer-content-right>
+
+               <div class="btn-group">
+                   <button type="submit" data-hotkey="ctrl+s" class="btn btn-success">
+                       <localize key="buttons_save">Save</localize>
+                   </button>
+               </div>
+
+            </umb-editor-footer-content-right>
+
+         </umb-editor-footer>
+
+
+      </umb-editor-view>
+
+   </form>
+</div>

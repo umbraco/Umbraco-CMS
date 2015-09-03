@@ -1,81 +1,85 @@
-<form name="contentForm"
-   ng-controller="Umbraco.Editors.Content.EditController"
-   ng-show="loaded"
-   ng-submit="save()"
-   novalidate
-   val-form-manager>
+<div ng-controller="Umbraco.Editors.Content.EditController">
 
-   <umb-editor-view umb-tabs>
+   <umb-load-indicator ng-if="page.loading"></umb-load-indicator>
 
-      <umb-editor-header
-         menu="page.menu"
-         name="content.name"
-         tabs="content.tabs">
-      </umb-editor-header>
+   <form name="contentForm"
+      ng-show="!page.loading"
+      ng-submit="save()"
+      novalidate
+      val-form-manager>
 
+      <umb-editor-view umb-tabs>
 
-      <umb-editor-container>
-
-         <umb-tabs-content class="form-horizontal" view="true">
-            <umb-tab id="tab{{tab.id}}" ng-repeat="tab in content.tabs" rel="{{tab.id}}">
-
-               <umb-property ng-repeat="property in tab.properties" property="property">
-                  <umb-editor model="property"></umb-editor>
-               </umb-property>
-
-            </umb-tab>
-         </umb-tabs-content>
-
-      </umb-editor-container>
+         <umb-editor-header
+            menu="page.menu"
+            name="content.name"
+            tabs="content.tabs">
+         </umb-editor-header>
 
 
-      <umb-editor-footer>
+         <umb-editor-container>
 
-         <umb-editor-footer-content-left>
-            <umb-breadcrumbs ancestors="ancestors" ng-if="ancestors && ancestors.length > 0"></umb-breadcrumbs>
-         </umb-editor-footer-content-left>
+            <umb-tabs-content class="form-horizontal" view="true">
+               <umb-tab id="tab{{tab.id}}" ng-repeat="tab in content.tabs" rel="{{tab.id}}">
+
+                  <umb-property ng-repeat="property in tab.properties" property="property">
+                     <umb-editor model="property"></umb-editor>
+                  </umb-property>
+
+               </umb-tab>
+            </umb-tabs-content>
+
+         </umb-editor-container>
 
 
-         <umb-editor-footer-content-right ng-class="{'umb-dimmed': busy}">
+         <umb-editor-footer>
 
-            <div class="btn-group" ng-show="listViewPath">
-               <a class="btn" href="#{{listViewPath}}">
-                  <localize key="buttons_returnToList">Return to list</localize>
-               </a>
-            </div>
+            <umb-editor-footer-content-left>
+               <umb-breadcrumbs ancestors="ancestors" ng-if="ancestors && ancestors.length > 0"></umb-breadcrumbs>
+            </umb-editor-footer-content-left>
 
-            <div class="btn-group" ng-show="!isNew">
-               <a class="btn" ng-click="preview(content)">
-                  <localize key="buttons_showPage">Preview page</localize>
-               </a>
-            </div>
 
-            <div class="btn-group dropup" ng-if="defaultButton">
+            <umb-editor-footer-content-right ng-class="{'umb-dimmed': busy}">
 
-               <a class="btn btn-success" href="#" ng-click="performAction(defaultButton)" prevent-default>
-                  <localize key="{{defaultButton.labelKey}}">{{defaultButton.labelKey}}</localize>
-               </a>
+               <div class="btn-group" ng-show="listViewPath">
+                  <a class="btn" href="#{{listViewPath}}">
+                     <localize key="buttons_returnToList">Return to list</localize>
+                  </a>
+               </div>
 
-               <a class="btn btn-success dropdown-toggle" data-toggle="dropdown" ng-if="subButtons.length > 0">
-                  <span class="caret"></span>
-               </a>
+               <div class="btn-group" ng-show="!isNew">
+                  <a class="btn" ng-click="preview(content)">
+                     <localize key="buttons_showPage">Preview page</localize>
+                  </a>
+               </div>
 
-               <a href="#">Return to list</a>
+               <div class="btn-group dropup" ng-if="defaultButton">
 
-               <ul aria-labelledby="dLabel" class="dropdown-menu bottom-up" ng-if="subButtons.length > 0" role="menu">
-                  <li ng-repeat="btn in subButtons">
-                     <a href="#" ng-click="performAction(btn)" prevent-default>
-                        <localize key="{{btn.labelKey}}">{{btn.labelKey}}</localize>
-                     </a>
-                  </li>
-               </ul>
+                  <a class="btn btn-success" href="#" ng-click="performAction(defaultButton)" prevent-default>
+                     <localize key="{{defaultButton.labelKey}}">{{defaultButton.labelKey}}</localize>
+                  </a>
 
-            </div>
+                  <a class="btn btn-success dropdown-toggle" data-toggle="dropdown" ng-if="subButtons.length > 0">
+                     <span class="caret"></span>
+                  </a>
 
-         </umb-editor-footer-content-right>
+                  <a href="#">Return to list</a>
 
-      </umb-editor-footer>
+                  <ul aria-labelledby="dLabel" class="dropdown-menu bottom-up" ng-if="subButtons.length > 0" role="menu">
+                     <li ng-repeat="btn in subButtons">
+                        <a href="#" ng-click="performAction(btn)" prevent-default>
+                           <localize key="{{btn.labelKey}}">{{btn.labelKey}}</localize>
+                        </a>
+                     </li>
+                  </ul>
 
-   </umb-editor-view>
+               </div>
 
-</form>
+            </umb-editor-footer-content-right>
+
+         </umb-editor-footer>
+
+      </umb-editor-view>
+
+   </form>
+</div>

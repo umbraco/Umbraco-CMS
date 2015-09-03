@@ -13,6 +13,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
     $scope.currentNode = null; //the editors affiliated node
 
     $scope.page = {};
+    $scope.page.loading = false;
     $scope.page.menu = {};
     $scope.page.menu.currentSection = appState.getSectionState("currentSection");
     $scope.page.menu.currentNode = null; //the editors affiliated node
@@ -42,18 +43,25 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
 
     if ($routeParams.create) {
 
+        $scope.page.loading = true;
+
         mediaResource.getScaffold($routeParams.id, $routeParams.doctype)
             .then(function (data) {
-                $scope.loaded = true;
                 $scope.content = data;
 
                 editorState.set($scope.content);
+
+                $scope.page.loading = false;
+
             });
     }
     else {
+
+        $scope.page.loading = true;
+
         mediaResource.getById($routeParams.id)
             .then(function (data) {
-                $scope.loaded = true;
+
                 $scope.content = data;
                 
                 if (data.isChildOfListView && data.trashed === false) {
@@ -80,7 +88,9 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
                         });
                 }
 
-            });  
+                $scope.page.loading = false;
+
+            });
     }
     
     $scope.save = function () {

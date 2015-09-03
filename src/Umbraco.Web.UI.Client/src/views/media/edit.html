@@ -1,58 +1,62 @@
-<form novalidate name="contentForm"
-   ng-controller="Umbraco.Editors.Media.EditController"
-   ng-show="loaded"
-   ng-submit="save()"
-   val-form-manager>
+<div ng-controller="Umbraco.Editors.Media.EditController">
 
-   <umb-editor-view umb-tabs>
+   <umb-load-indicator ng-if="page.loading"></umb-load-indicator>
 
-      <umb-editor-header
-         name="content.name"
-         tabs="content.tabs"
-         menu="page.menu">
-      </umb-editor-header>
+   <form novalidate name="contentForm"
+      ng-show="!page.loading"
+      ng-submit="save()"
+      val-form-manager>
 
-      <umb-editor-container>
+      <umb-editor-view umb-tabs>
 
-         <umb-tabs-content view="true" class="form-horizontal">
-            <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" ng-repeat="tab in content.tabs">
+         <umb-editor-header
+            name="content.name"
+            tabs="content.tabs"
+            menu="page.menu">
+         </umb-editor-header>
 
-               <umb-property property="property" ng-repeat="property in tab.properties">
-                  <umb-editor model="property"></umb-editor>
-               </umb-property>
+         <umb-editor-container>
 
-            </umb-tab>
-         </umb-tabs-content>
+            <umb-tabs-content view="true" class="form-horizontal">
+               <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" ng-repeat="tab in content.tabs">
 
-      </umb-editor-container>
+                  <umb-property property="property" ng-repeat="property in tab.properties">
+                     <umb-editor model="property"></umb-editor>
+                  </umb-property>
 
-      <umb-editor-footer>
+               </umb-tab>
+            </umb-tabs-content>
 
-         <umb-editor-footer-content-left>
-            <umb-breadcrumbs ng-if="ancestors && ancestors.length > 0" ancestors="ancestors"></umb-breadcrumbs>
-         </umb-editor-footer-content-left>
+         </umb-editor-container>
 
+         <umb-editor-footer>
 
-         <umb-editor-footer-content-right ng-class="{'umb-dimmed': busy}">
-
-            <div class="btn-group" ng-show="listViewPath">
-                <a class="btn" href="#{{listViewPath}}">
-                    <localize key="buttons_returnToList">Return to list</localize>
-                </a>
-            </div>
-
-            <div class="btn-group">
-                <button type="submit" data-hotkey="ctrl+s" class="btn btn-success">
-                    <localize key="buttons_save">Save</localize>
-                </button>
-            </div>
-
-         </umb-editor-footer-content-right>
+            <umb-editor-footer-content-left>
+               <umb-breadcrumbs ng-if="ancestors && ancestors.length > 0" ancestors="ancestors"></umb-breadcrumbs>
+            </umb-editor-footer-content-left>
 
 
-      </umb-editor-footer>
+            <umb-editor-footer-content-right ng-class="{'umb-dimmed': busy}">
+
+               <div class="btn-group" ng-show="listViewPath">
+                   <a class="btn" href="#{{listViewPath}}">
+                       <localize key="buttons_returnToList">Return to list</localize>
+                   </a>
+               </div>
+
+               <div class="btn-group">
+                   <button type="submit" data-hotkey="ctrl+s" class="btn btn-success">
+                       <localize key="buttons_save">Save</localize>
+                   </button>
+               </div>
+
+            </umb-editor-footer-content-right>
 
 
-   </umb-editor-view>
+         </umb-editor-footer>
 
-</form>
+
+      </umb-editor-view>
+
+   </form>
+<div>

@@ -1,41 +1,46 @@
-<form
-   ng-controller="Umbraco.DashboardController"
-   class="umb-dashboard"
-   val-form-manager>
+<div ng-controller="Umbraco.DashboardController">
 
-   <umb-editor-view umb-tabs>
+   <umb-load-indicator ng-if="page.loading"></umb-load-indicator>
 
-      <umb-editor-header
-         name="dashboard.name"
-         name-locked="page.nameLocked"
-         tabs="dashboard.tabs">
-      </umb-editor-header>
+   <form
+      ng-show="!page.loading"
+      class="umb-dashboard"
+      val-form-manager>
 
-      <umb-editor-container>
+      <umb-editor-view umb-tabs>
 
-         <umb-tabs-content view="true">
-            <umb-tab id="tab{{tab.id}}" ng-repeat="tab in dashboard.tabs" rel="{{tab.id}}">
+         <umb-editor-header
+            name="dashboard.name"
+            name-locked="page.nameLocked"
+            tabs="dashboard.tabs">
+         </umb-editor-header>
 
-               <div ng-repeat="property in tab.properties" ng-switch on="property.serverSide">
+         <umb-editor-container>
 
-                  <div class="span12 umb-dashboard-control clearfix" ng-switch-when="false">
-                     <h3 ng-show="property.caption">{{property.caption}}</h3>
-                     <div ng-include="property.path"></div>
+            <umb-tabs-content view="true">
+               <umb-tab id="tab{{tab.id}}" ng-repeat="tab in dashboard.tabs" rel="{{tab.id}}">
+
+                  <div ng-repeat="property in tab.properties" ng-switch on="property.serverSide">
+
+                     <div class="span12 umb-dashboard-control clearfix" ng-switch-when="false">
+                        <h3 ng-show="property.caption">{{property.caption}}</h3>
+                        <div ng-include="property.path"></div>
+                     </div>
+
+                     <div class="span12 umb-dashboard-control clearfix" ng-switch-when="true">
+                        <h3 ng-show="property.caption">{{property.caption}}</h3>
+
+                        <iframe ng-src="dashboard/usercontrolproxy.aspx?ctrl={{ property.path}}"></iframe>
+                     </div>
+
                   </div>
 
-                  <div class="span12 umb-dashboard-control clearfix" ng-switch-when="true">
-                     <h3 ng-show="property.caption">{{property.caption}}</h3>
+               </umb-tab>
+            </umb-tabs-content>
 
-                     <iframe ng-src="dashboard/usercontrolproxy.aspx?ctrl={{ property.path}}"></iframe>
-                  </div>
+         </umb-editor-container>
 
-               </div>
+      </umb-editor-view>
 
-            </umb-tab>
-         </umb-tabs-content>
-
-      </umb-editor-container>
-
-   </umb-editor-view>
-
-</form>﻿
+   </form>﻿
+</div>
