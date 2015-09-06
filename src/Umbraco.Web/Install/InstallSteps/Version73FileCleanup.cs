@@ -11,8 +11,8 @@ using Umbraco.Web.Install.Models;
 namespace Umbraco.Web.Install.InstallSteps
 {
     [InstallSetupStep(InstallationType.Upgrade,
-        "Version73FileCleanup", 2, 
-        "Performing some housecleaning...", 
+        "Version73FileCleanup", 2,
+        "Performing some housecleaning...",
         PerformsAppRestart = true)]
     internal class Version73FileCleanup : InstallSetupStep<object>
     {
@@ -36,7 +36,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             var root = new DirectoryInfo(_httpContext.Server.MapPath("~/"));
             ProcessWebConfigs(root);
-            
+
             //now remove the dll 
 
             var bin = root.GetDirectories("bin", SearchOption.TopDirectoryOnly);
