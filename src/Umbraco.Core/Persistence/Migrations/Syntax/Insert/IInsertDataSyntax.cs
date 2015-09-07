@@ -2,6 +2,7 @@
 {
     public interface IInsertDataSyntax : IFluentSyntax
     {
+        IInsertDataSyntax EnableIdentityInsert();
         IInsertDataSyntax Row(object dataAsAnonymousType);
     }
 }
