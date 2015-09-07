@@ -219,6 +219,15 @@ namespace Umbraco.Core.Persistence.Repositories
             return list;
         }
 
+        protected string GetFileContent(string filename)
+        {
+            using (var stream = FileSystem.OpenFile(filename))
+            using (var reader = new StreamReader(stream, Encoding.UTF8, true))
+            {
+                return reader.ReadToEnd();
+            }
+        }
+
 		/// <summary>
 		/// Dispose any disposable properties
 		/// </summary>

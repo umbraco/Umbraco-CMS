@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
 using Umbraco.Core.IO;
 using Umbraco.Core.Strings.Css;
 
@@ -16,12 +16,16 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class Stylesheet : File
     {
-        public Stylesheet(string path) 
-            : base(path.EnsureEndsWith(".css"))
-        {          
+        public Stylesheet(string path)
+            : this(path, null)
+        { }
+
+        internal Stylesheet(string path, Func<File, string> getFileContent)
+            : base(path.EnsureEndsWith(".css"), getFileContent)
+        {
             InitializeProperties();
         }
-      
+
         private Lazy<List<StylesheetProperty>> _properties;
 
         private void InitializeProperties()
@@ -81,7 +85,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void Property_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        void Property_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             var prop = (StylesheetProperty) sender;
 

@@ -20,6 +20,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {
         }
 
+        protected virtual PartialViewType ViewType { get { return PartialViewType.PartialView; } }
+
         public override IPartialView Get(string id)
         {
             if (FileSystem.FileExists(id) == false)
@@ -27,29 +29,19 @@ namespace Umbraco.Core.Persistence.Repositories
                 return null;
             }
 
-            string content;
-            using (var stream = FileSystem.OpenFile(id))
-            {
-                var bytes = new byte[stream.Length];
-                stream.Position = 0;
-                stream.Read(bytes, 0, (int)stream.Length);
-                content = Encoding.UTF8.GetString(bytes);
-            }
-
             var path = FileSystem.GetRelativePath(id);
             var created = FileSystem.GetCreated(path).UtcDateTime;
             var updated = FileSystem.GetLastModified(path).UtcDateTime;
 
-
-            var script = new PartialView(path)
+            var script = new PartialView(path, file => GetFileContent(file.Path))
             {
                 //id can be the hash
                 Id = path.GetHashCode(),
-                Content = content,
                 Key = path.EncodeAsGuid(),
                 CreateDate = created,
                 UpdateDate = updated,
-                VirtualPath = FileSystem.GetUrl(id)
+                VirtualPath = FileSystem.GetUrl(id),
+                ViewType = ViewType
             };
 
             //on initial construction we don't want to have dirty properties tracked
@@ -57,6 +49,19 @@ namespace Umbraco.Core.Persistence.Repositories
             script.ResetDirtyProperties(false);
 
             return script;
+        }
+
+        public override void AddOrUpdate(IPartialView entity)
+        {
+            var partialView = entity as PartialView;
+            if (partialView != null)
+                partialView.ViewType = ViewType;
+
+            base.AddOrUpdate(entity);
+
+            // ensure that from now on, content is lazy-loaded
+            if (partialView != null && partialView.GetFileContent == null)
+                partialView.GetFileContent = file => GetFileContent(file.Path);
         }
 
         public override IEnumerable<IPartialView> GetAll(params string[] ids)

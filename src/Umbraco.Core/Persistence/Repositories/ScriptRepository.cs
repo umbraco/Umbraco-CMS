@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
@@ -28,33 +26,27 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public override Script Get(string id)
         {
-            if(FileSystem.FileExists(id) == false)
-            {
-                return null;
-            }
-
-            string content;
-            using (var stream = FileSystem.OpenFile(id))
-            {
-                var bytes = new byte[stream.Length];
-                stream.Position = 0;
-                stream.Read(bytes, 0, (int)stream.Length);
-                content = Encoding.UTF8.GetString(bytes);
-            }
-
+            // get the relative path within the filesystem
+            // (though... id should be relative already)
             var path = FileSystem.GetRelativePath(id);
+
+            if (FileSystem.FileExists(path) == false)
+                return null;
+
+            // content will be lazy-loaded when required
             var created = FileSystem.GetCreated(path).UtcDateTime;
             var updated = FileSystem.GetLastModified(path).UtcDateTime;
+            //var content = GetFileContent(path);
 
-            var script = new Script(path)
+            var script = new Script(path, file => GetFileContent(file.Path))
             {
                 //id can be the hash
                 Id = path.GetHashCode(),
-                Content = content,
                 Key = path.EncodeAsGuid(),
+                //Content = content,
                 CreateDate = created,
                 UpdateDate = updated,
-                VirtualPath = FileSystem.GetUrl(id)
+                VirtualPath = FileSystem.GetUrl(path)
             };
 
             //on initial construction we don't want to have dirty properties tracked
@@ -62,6 +54,15 @@ namespace Umbraco.Core.Persistence.Repositories
             script.ResetDirtyProperties(false);
 
             return script;
+        }
+
+        public override void AddOrUpdate(Script entity)
+        {
+            base.AddOrUpdate(entity);
+
+            // ensure that from now on, content is lazy-loaded
+            if (entity.GetFileContent == null)
+                entity.GetFileContent = file => GetFileContent(file.Path);
         }
 
         public override IEnumerable<Script> GetAll(params string[] ids)

@@ -227,6 +227,10 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             template.ResetDirtyProperties();
+
+            // ensure that from now on, content is lazy-loaded
+            if (template.GetFileContent == null)
+                template.GetFileContent = file => GetFileContent((Template) file, false);
         }
 
         protected override void PersistUpdatedItem(ITemplate entity)
@@ -295,6 +299,10 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             entity.ResetDirtyProperties();
+
+            // ensure that from now on, content is lazy-loaded
+            if (template.GetFileContent == null)
+                template.GetFileContent = file => GetFileContent((Template) file, false);
         }
 
         protected override void PersistDeletedItem(ITemplate entity)
@@ -368,12 +376,8 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         private ITemplate MapFromDto(TemplateDto dto, IUmbracoEntity[] axisDefinitions)
         {
-            string csViewName = string.Concat(dto.Alias, ".cshtml");
-            string vbViewName = string.Concat(dto.Alias, ".vbhtml");
-            string masterpageName = string.Concat(dto.Alias, ".master");
-
             var factory = new TemplateFactory();
-            var template = factory.BuildEntity(dto, axisDefinitions);
+            var template = factory.BuildEntity(dto, axisDefinitions, file => GetFileContent((Template) file, false));
 
             if (dto.NodeDto.ParentId > 0)
             {
@@ -385,21 +389,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
 
-            if (_viewsFileSystem.FileExists(csViewName))
-            {
-                PopulateViewTemplate(template, csViewName);
-            }
-            else if (_viewsFileSystem.FileExists(vbViewName))
-            {
-                PopulateViewTemplate(template, vbViewName);
-            }
-            else
-            {
-                if (_masterpagesFileSystem.FileExists(masterpageName))
-                {
-                    PopulateMasterpageTemplate(template, masterpageName);
-                }
-            }
+            // get the infos (update date and virtual path) that will change only if
+            // path changes - but do not get content, will get loaded only when required
+            GetFileContent(template, true);
 
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946
@@ -407,34 +399,41 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return template;
         }
-        
-        private void PopulateViewTemplate(ITemplate template, string fileName)
-        {
-            string content;
 
-            using (var stream = _viewsFileSystem.OpenFile(fileName))
-            using (var reader = new StreamReader(stream, Encoding.UTF8, true))
-            {
-                content = reader.ReadToEnd();
-            }
-            template.UpdateDate = _viewsFileSystem.GetLastModified(fileName).UtcDateTime;
-            template.Content = content;
-            template.VirtualPath = _viewsFileSystem.GetUrl(fileName);
+        private string GetFileContent(ITemplate template, bool init)
+        {
+            var fsname = string.Concat(template.Alias, ".cshtml");
+            if (_viewsFileSystem.FileExists(fsname))
+                return GetFileContent(template, _viewsFileSystem, fsname, init);
+            fsname = string.Concat(template.Alias, ".vbhtml");
+            if (_viewsFileSystem.FileExists(fsname))
+                return GetFileContent(template, _viewsFileSystem, fsname, init);
+            fsname = string.Concat(template.Alias, ".master");
+            if (_masterpagesFileSystem.FileExists(fsname))
+                return GetFileContent(template, _masterpagesFileSystem, fsname, init);
+            return string.Empty;
         }
 
-        private void PopulateMasterpageTemplate(ITemplate template, string fileName)
+        private string GetFileContent(ITemplate template, IFileSystem fs, string filename, bool init)
         {
-            string content;
-            
-            using (var stream = _masterpagesFileSystem.OpenFile(fileName))
+            // do not update .UpdateDate as that would make it dirty (side-effect)
+            // unless initializing, because we have to do it once
+            if (init)
+            {
+                template.UpdateDate = fs.GetLastModified(filename).UtcDateTime;
+            }
+            template.VirtualPath = fs.GetUrl(filename);
+
+            return init ? null : GetFileContent(fs, filename);
+        }
+
+        private string GetFileContent(IFileSystem fs, string filename)
+        {
+            using (var stream = fs.OpenFile(filename))
             using (var reader = new StreamReader(stream, Encoding.UTF8, true))
             {
-                content = reader.ReadToEnd();
+                return reader.ReadToEnd();
             }
-
-            template.UpdateDate = _masterpagesFileSystem.GetLastModified(fileName).UtcDateTime;
-            template.Content = content;
-            template.VirtualPath = _masterpagesFileSystem.GetUrl(fileName);
         }
 
         #region Implementation of ITemplateRepository

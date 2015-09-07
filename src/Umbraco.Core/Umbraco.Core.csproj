@@ -367,6 +367,7 @@
     <Compile Include="Models\IPublishedContentWithKey.cs" />
     <Compile Include="Models\IServerRegistration.cs" />
     <Compile Include="Models\MigrationEntry.cs" />
+    <Compile Include="Models\PartialViewType.cs" />
     <Compile Include="Models\PublicAccessEntry.cs" />
     <Compile Include="Models\PublicAccessRule.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentWithKeyExtended.cs" />

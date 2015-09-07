@@ -15,7 +15,6 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class StylesheetRepository : FileRepository<string, Stylesheet>, IStylesheetRepository
     {
-        
         public StylesheetRepository(IUnitOfWork work, IFileSystem fileSystem)
             : base(work, fileSystem)
         {
@@ -25,33 +24,28 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public override Stylesheet Get(string id)
         {
-            id = id.EnsureEndsWith(".css");
-
-            if (FileSystem.FileExists(id) == false)
-            {
-                return null;
-            }
-
-            string content;
-
-            using (var stream = FileSystem.OpenFile(id))
-            using (var reader = new StreamReader(stream, Encoding.UTF8))
-            {
-                content = reader.ReadToEnd();
-            }
-
+            // get the relative path within the filesystem
+            // (though... id should be relative already)
             var path = FileSystem.GetRelativePath(id);
+
+            path = path.EnsureEndsWith(".css");
+
+            if (FileSystem.FileExists(path) == false)
+                return null;
+
+            // content will be lazy-loaded when required
             var created = FileSystem.GetCreated(path).UtcDateTime;
             var updated = FileSystem.GetLastModified(path).UtcDateTime;
+            //var content = GetFileContent(path);
 
-            var stylesheet = new Stylesheet(path)
+            var stylesheet = new Stylesheet(path, file => GetFileContent(file.Path))
             {
-                Content = content,
+                //Content = content,
                 Key = path.EncodeAsGuid(),
                 CreateDate = created,
                 UpdateDate = updated,
                 Id = path.GetHashCode(),
-                VirtualPath = FileSystem.GetUrl(id)
+                VirtualPath = FileSystem.GetUrl(path)
             };
 
             //on initial construction we don't want to have dirty properties tracked
@@ -60,6 +54,15 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return stylesheet;
 
+        }
+
+        public override void AddOrUpdate(Stylesheet entity)
+        {
+            base.AddOrUpdate(entity);
+
+            // ensure that from now on, content is lazy-loaded
+            if (entity.GetFileContent == null)
+                entity.GetFileContent = file => GetFileContent(file.Path);
         }
 
         public override IEnumerable<Stylesheet> GetAll(params string[] ids)
