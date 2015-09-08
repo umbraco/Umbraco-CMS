@@ -228,10 +228,21 @@ namespace Umbraco.Tests.Persistence.Repositories
             _fileSystem = null;
             //Delete all files
 	        var fs = new PhysicalFileSystem(SystemDirectories.Scripts);
-            var files = fs.GetFiles("", "*.js");
+            Purge(fs, "");
+        }
+
+        private void Purge(PhysicalFileSystem fs, string path)
+        {
+            var files = fs.GetFiles(path, "*.js");
             foreach (var file in files)
             {
                 fs.DeleteFile(file);
+            }
+            var dirs = fs.GetDirectories(path);
+            foreach (var dir in dirs)
+            {
+                Purge(fs, dir);
+                fs.DeleteDirectory(dir);
             }
         }
 
