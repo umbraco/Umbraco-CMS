@@ -45,11 +45,16 @@
       ];
 
       vm.changeValidationType = changeValidationType;
+      vm.changeValidationPattern = changeValidationPattern;
 
       function activate() {
 
          matchValidationType();
 
+      }
+
+      function changeValidationPattern() {
+         matchValidationType();
       }
 
       function matchValidationType() {
