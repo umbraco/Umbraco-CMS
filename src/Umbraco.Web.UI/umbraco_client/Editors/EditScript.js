@@ -76,19 +76,37 @@
                 UmbEditor.SetCode(args.contents);
             }
 
-            top.UmbSpeechBubble.ShowMessage("save", header, msg);
             UmbClientMgr.mainTree().setActiveTreeType("scripts");
             if (pathChanged) {
-                UmbClientMgr.mainTree().moveNode(this._opts.originalFileName, path);
-                this._opts.treeSyncPath = args.path;
-                this._opts.lttPathElement.prop("href", args.url).html(args.url);
+                // no! file is used in url so we need to redirect
+                //UmbClientMgr.mainTree().moveNode(this._opts.originalFileName, path);
+                //this._opts.treeSyncPath = args.path;
+                //this._opts.lttPathElement.prop("href", args.url).html(args.url);
+
+                var qs = window.location.search;
+                if (qs.startsWith("?")) qs = qs.substring("?".length);
+                var qp1 = qs.split("&");
+                var qp2 = [];
+                for (var i = 0; i < qp1.length; i++)
+                    if (!qp1[i].startsWith("file="))
+                        qp2.push(qp1[i]);
+
+                var location = window.location.pathname + "?" + qp2.join("&") + "&file=" + args.name;
+                UmbClientMgr.contentFrame(location);
+
+                // need to do it after we navigate otherwise the navigation waits until the message timeout is done
+                top.UmbSpeechBubble.ShowMessage("save", header, msg);
             }
             else {
+                top.UmbSpeechBubble.ShowMessage("save", header, msg);
+                this._opts.lttPathElement.prop("href", args.url).html(args.url);
+                this._opts.originalFileName = args.name;
+                this._opts.treeSyncPath = args.path;
                 UmbClientMgr.mainTree().syncTree(path, true);
             }
 
-            this._opts.lttPathElement.prop("href", args.url).html(args.url);
-            this._opts.originalFileName = args.name;
+            //this._opts.lttPathElement.prop("href", args.url).html(args.url);
+            //this._opts.originalFileName = args.name;
         },
 
         submitFailure: function(err, header) {

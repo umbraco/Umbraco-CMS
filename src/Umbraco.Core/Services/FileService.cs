@@ -687,10 +687,20 @@ namespace Umbraco.Core.Services
 
         public bool ValidatePartialView(PartialView partialView)
         {
-            var validatePath = IOHelper.ValidateEditPath(partialView.Path, new[] { SystemDirectories.MvcViews + "/Partials/", SystemDirectories.MvcViews + "/MacroPartials/" });
-            var verifyFileExtension = IOHelper.VerifyFileExtension(partialView.Path, new List<string> { "cshtml" });
+            var uow = _dataUowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreatePartialViewRepository(uow))
+            {
+                return repository.ValidatePartialView(partialView);
+            }
+        }
 
-            return validatePath && verifyFileExtension;
+        public bool ValidatePartialViewMacro(PartialView partialView)
+        {
+            var uow = _dataUowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreatePartialViewMacroRepository(uow))
+            {
+                return repository.ValidatePartialView(partialView);
+            }
         }
 
         internal string StripPartialViewHeader(string contents)

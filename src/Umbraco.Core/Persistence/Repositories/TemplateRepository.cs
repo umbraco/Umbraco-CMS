@@ -402,6 +402,36 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private string GetFileContent(ITemplate template, bool init)
         {
+            var path = template.OriginalPath;
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                // we need to discover the path
+                path = string.Concat(template.Alias, ".cshtml");
+                if (_viewsFileSystem.FileExists(path))
+                    return GetFileContent(template, _viewsFileSystem, path, init);
+                path = string.Concat(template.Alias, ".vbhtml");
+                if (_viewsFileSystem.FileExists(path))
+                    return GetFileContent(template, _viewsFileSystem, path, init);
+                path = string.Concat(template.Alias, ".master");
+                if (_masterpagesFileSystem.FileExists(path))
+                    return GetFileContent(template, _masterpagesFileSystem, path, init);
+            }
+            else
+            {
+                // we know the path already
+                var ext = Path.GetExtension(path);
+                switch (ext)
+                {
+                    case ".cshtml":
+                    case ".vbhtml":
+                        return GetFileContent(template, _viewsFileSystem, path, init);
+                    case ".master":
+                        return GetFileContent(template, _masterpagesFileSystem, path, init);
+                    default:
+                        return string.Empty;
+                }
+            }
+
             var fsname = string.Concat(template.Alias, ".cshtml");
             if (_viewsFileSystem.FileExists(fsname))
                 return GetFileContent(template, _viewsFileSystem, fsname, init);
@@ -422,6 +452,15 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 template.UpdateDate = fs.GetLastModified(filename).UtcDateTime;
             }
+
+            // TODO
+            //  see if this could enable us to update UpdateDate without messing with change tracking
+            //  and then we'd want to do it for scripts, stylesheets and partial views too (ie files)
+            //var xtemplate = template as Template;
+            //xtemplate.DisableChangeTracking();
+            //template.UpdateDate = fs.GetLastModified(filename).UtcDateTime;
+            //xtemplate.EnableChangeTracking();
+
             template.VirtualPath = fs.GetUrl(filename);
 
             return init ? null : GetFileContent(fs, filename);
@@ -682,27 +721,32 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns>True if Script is valid, otherwise false</returns>
         public bool ValidateTemplate(ITemplate template)
         {
-            var exts = new List<string>();
+            // get path
+            // TODO
+            //  templates should have a real Path somehow - but anyways
+            //  are we using Path for something else?!
+            var path = template.VirtualPath;
+
+            // get valid paths
+            var validDirs = _templateConfig.DefaultRenderingEngine == RenderingEngine.Mvc
+                ? new[] { SystemDirectories.Masterpages, SystemDirectories.MvcViews }
+                : new[] { SystemDirectories.Masterpages };
+
+            // get valid extensions
+            var validExts = new List<string>();
             if (_templateConfig.DefaultRenderingEngine == RenderingEngine.Mvc)
             {
-                exts.Add("cshtml");
-                exts.Add("vbhtml");
+                validExts.Add("cshtml");
+                validExts.Add("vbhtml");
             }
             else
             {
-                exts.Add(_templateConfig.UseAspNetMasterPages ? "master" : "aspx");
+                validExts.Add(_templateConfig.UseAspNetMasterPages ? "master" : "aspx");
             }
 
-            var dirs = SystemDirectories.Masterpages;
-            if (_templateConfig.DefaultRenderingEngine == RenderingEngine.Mvc)
-                dirs += "," + SystemDirectories.MvcViews;
-
-            //Validate file
-            var validFile = IOHelper.VerifyEditPath(template.VirtualPath, dirs.Split(','));
-
-            //Validate extension
-            var validExtension = IOHelper.VerifyFileExtension(template.VirtualPath, exts);
-
+            // validate path and extension
+            var validFile = IOHelper.VerifyEditPath(path, validDirs);
+            var validExtension = IOHelper.VerifyFileExtension(path, validExts);
             return validFile && validExtension;
         }
 

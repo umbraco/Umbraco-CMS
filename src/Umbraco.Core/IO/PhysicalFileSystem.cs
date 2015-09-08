@@ -186,14 +186,14 @@ namespace Umbraco.Core.IO
         {
             // test url
             var path = EnsureUrlSeparatorChar(fullPathOrUrl);
-            if (PathStartsWith(path, _rootUrl, '/'))
+            if (IOHelper.PathStartsWith(path, _rootUrl, '/'))
                 return path.Substring(_rootUrl.Length)  
                     .Replace('/', Path.DirectorySeparatorChar)
                     .TrimStart(Path.DirectorySeparatorChar);
 
             // test path
             path = EnsureDirectorySeparatorChar(fullPathOrUrl);
-            if (PathStartsWith(path, _rootPath, Path.DirectorySeparatorChar))
+            if (IOHelper.PathStartsWith(path, _rootPath, Path.DirectorySeparatorChar))
                 return path.Substring(_rootPath.Length)
                     .TrimStart(Path.DirectorySeparatorChar);
 
@@ -231,7 +231,7 @@ namespace Umbraco.Core.IO
                 path = GetRelativePath(path);
 
             // if already a full path, return
-            if (PathStartsWith(path, _rootPath, Path.DirectorySeparatorChar))
+            if (IOHelper.PathStartsWith(path, _rootPath, Path.DirectorySeparatorChar))
                 return path;
 
             // else combine and sanitize, ie GetFullPath will take care of any relative
@@ -243,21 +243,10 @@ namespace Umbraco.Core.IO
             // at that point, path is within legal parts of the filesystem, ie we have
             // permissions to reach that path, but it may nevertheless be outside of
             // our root path, due to relative segments, so better check
-            if (PathStartsWith(fpath, _rootPath, Path.DirectorySeparatorChar))
+            if (IOHelper.PathStartsWith(fpath, _rootPath, Path.DirectorySeparatorChar))
                 return fpath;
 
             throw new FileSecurityException("File '" + opath + "' is outside this filesystem's root.");
-        }
-
-        private static bool PathStartsWith(string path, string root, char separator)
-        {
-            // either it is identical to root,
-            // or it is root + separator + anything
-
-            if (path.StartsWith(root, StringComparison.OrdinalIgnoreCase) == false) return false;
-            if (path.Length == root.Length) return true;
-            if (path.Length < root.Length) return false;
-            return path[root.Length] == separator;
         }
 
         public string GetUrl(string path)

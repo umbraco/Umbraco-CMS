@@ -24,20 +24,24 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public override IPartialView Get(string id)
         {
-            if (FileSystem.FileExists(id) == false)
-            {
-                return null;
-            }
-
+            // get the relative path within the filesystem
+            // (though... id should be relative already)
             var path = FileSystem.GetRelativePath(id);
+
+            if (FileSystem.FileExists(path) == false)
+                return null;
+
+            // content will be lazy-loaded when required
             var created = FileSystem.GetCreated(path).UtcDateTime;
             var updated = FileSystem.GetLastModified(path).UtcDateTime;
+            //var content = GetFileContent(path);
 
-            var script = new PartialView(path, file => GetFileContent(file.Path))
+            var view = new PartialView(path, file => GetFileContent(file.OriginalPath))
             {
                 //id can be the hash
                 Id = path.GetHashCode(),
                 Key = path.EncodeAsGuid(),
+                //Content = content,
                 CreateDate = created,
                 UpdateDate = updated,
                 VirtualPath = FileSystem.GetUrl(id),
@@ -46,9 +50,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946
-            script.ResetDirtyProperties(false);
+            view.ResetDirtyProperties(false);
 
-            return script;
+            return view;
         }
 
         public override void AddOrUpdate(IPartialView entity)
@@ -61,7 +65,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // ensure that from now on, content is lazy-loaded
             if (partialView != null && partialView.GetFileContent == null)
-                partialView.GetFileContent = file => GetFileContent(file.Path);
+                partialView.GetFileContent = file => GetFileContent(file.OriginalPath);
         }
 
         public override IEnumerable<IPartialView> GetAll(params string[] ids)
@@ -84,6 +88,29 @@ namespace Umbraco.Core.Persistence.Repositories
                     yield return Get(file);
                 }
             }
+        }
+
+        private static readonly List<string> ValidExtensions = new List<string> { "cshtml" };
+
+        public virtual bool ValidatePartialView(IPartialView partialView)
+        {
+            // get full path
+            string fullPath;
+            try
+            {
+                // may throw for security reasons
+                fullPath = FileSystem.GetFullPath(partialView.Path);
+            }
+            catch
+            {
+                return false;
+            }
+
+            // validate path & extension
+            var validDir = SystemDirectories.MvcViews;
+            var isValidPath = IOHelper.VerifyEditPath(fullPath, validDir);
+            var isValidExtension = IOHelper.VerifyFileExtension(fullPath, ValidExtensions);
+            return isValidPath && isValidExtension;
         }
 
         /// <summary>

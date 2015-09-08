@@ -114,28 +114,23 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 					NameTxt.Text = _template.GetRawText();
 					AliasTxt.Text = _template.Alias;
 					editorSource.Text = _template.Design;
-
+				    PathPrefix.Visible = false;
 				}
 				else
 				{
 					//configure editor for editing a file....
 
 					NameTxt.Text = OriginalFileName;
-					var file = IOHelper.MapPath(SystemDirectories.MvcViews.EnsureEndsWith('/') + OriginalFileName);
+				    var svce = ApplicationContext.Current.Services.FileService;
+                    var file = EditorType == ViewEditorType.PartialView
+				        ? svce.GetPartialView(OriginalFileName)
+                        : svce.GetPartialViewMacro(OriginalFileName);
+				    editorSource.Text = file.Content;
 
-                    // validate file path
-                    if (file.StartsWith(IOHelper.MapPath(SystemDirectories.MvcViews.EnsureEndsWith('/')))) {
-
-					using (var sr = File.OpenText(file))
-					{
-						var s = sr.ReadToEnd();
-						editorSource.Text = s;
-					}
-                    } else
-                    {
-                        throw new ArgumentException("Couldn't open file - illegal path");
-                    }
-				
+                    const string prefixFormat = "<span style=\"display: inline-block; height: 20px; line-height: 20px; margin-bottom: 0px; padding: 4px 6px;\">{0}</span>";
+                    PathPrefix.Text = string.Format(prefixFormat, EditorType == ViewEditorType.PartialView
+				        ? "Partials/"
+				        : "MacroPartials/");
 				}							
 			}
             

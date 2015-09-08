@@ -38,7 +38,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var updated = FileSystem.GetLastModified(path).UtcDateTime;
             //var content = GetFileContent(path);
 
-            var script = new Script(path, file => GetFileContent(file.Path))
+            var script = new Script(path, file => GetFileContent(file.OriginalPath))
             {
                 //id can be the hash
                 Id = path.GetHashCode(),
@@ -62,7 +62,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // ensure that from now on, content is lazy-loaded
             if (entity.GetFileContent == null)
-                entity.GetFileContent = file => GetFileContent(file.Path);
+                entity.GetFileContent = file => GetFileContent(file.OriginalPath);
         }
 
         public override IEnumerable<Script> GetAll(params string[] ids)
@@ -89,23 +89,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public bool ValidateScript(Script script)
         {
-            //NOTE Since a script file can be both JS, Razor Views, Razor Macros and Xslt
-            //it might be an idea to create validations for all 3 and divide the validation 
-            //into 4 private methods.
-            //See codeEditorSave.asmx.cs for reference.
-
-            var exts = _contentConfig.ScriptFileTypes.ToList();
-            /*if (UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
-            {
-                exts.Add("cshtml");
-                exts.Add("vbhtml");
-            }*/
-
-            var dirs = SystemDirectories.Scripts;
-            /*if (UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc)
-                dirs += "," + SystemDirectories.MvcViews;*/
-
-            //Validate file
+            // get full path
             string fullPath;
             try
             {
@@ -116,11 +100,12 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 return false;
             }
-            var isValidPath = IOHelper.VerifyEditPath(fullPath, dirs.Split(','));
 
-            //Validate extension
-            var isValidExtension = IOHelper.VerifyFileExtension(script.Path, exts);
-
+            // validate path & extension
+            var validDir = SystemDirectories.Scripts;
+            var isValidPath = IOHelper.VerifyEditPath(fullPath, validDir);
+            var validExts = _contentConfig.ScriptFileTypes.ToList();
+            var isValidExtension = IOHelper.VerifyFileExtension(script.Path, validExts);
             return isValidPath && isValidExtension;
         }
 

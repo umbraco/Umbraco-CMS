@@ -188,6 +188,38 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.That(exists, Is.True);
         }
 
+        [Test]
+        public void Can_Perform_Move_On_ScriptRepository()
+        {
+            const string content = "/// <reference name=\"MicrosoftAjax.js\"/>";
+
+            // Arrange
+            var provider = new FileUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
+
+            var script = new Script("test-move-script.js") { Content = content };
+            repository.AddOrUpdate(script);
+            unitOfWork.Commit();
+
+            // Act
+            script = repository.Get("test-move-script.js");
+            script.Path = "moved/test-move-script.js";
+            repository.AddOrUpdate(script);
+            unitOfWork.Commit();
+
+            var existsOld = repository.Exists("test-move-script.js");
+            var existsNew = repository.Exists("moved/test-move-script.js");
+
+            script = repository.Get("moved/test-move-script.js");
+
+            // Assert
+            Assert.IsNotNull(script);
+            Assert.IsFalse(existsOld);
+            Assert.IsTrue(existsNew);
+            Assert.AreEqual(content, script.Content);
+        }
+
         [TearDown]
         public override void TearDown()
         {

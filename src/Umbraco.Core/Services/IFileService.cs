@@ -21,6 +21,7 @@ namespace Umbraco.Core.Services
         Attempt<IPartialView> SavePartialView(IPartialView partialView, int userId = 0);
         Attempt<IPartialView> SavePartialViewMacro(IPartialView partialView, int userId = 0);
         bool ValidatePartialView(PartialView partialView);
+        bool ValidatePartialViewMacro(PartialView partialView);
 
         /// <summary>
         /// Gets a list of all <see cref="Stylesheet"/> objects

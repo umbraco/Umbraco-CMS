@@ -38,7 +38,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var updated = FileSystem.GetLastModified(path).UtcDateTime;
             //var content = GetFileContent(path);
 
-            var stylesheet = new Stylesheet(path, file => GetFileContent(file.Path))
+            var stylesheet = new Stylesheet(path, file => GetFileContent(file.OriginalPath))
             {
                 //Content = content,
                 Key = path.EncodeAsGuid(),
@@ -62,7 +62,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // ensure that from now on, content is lazy-loaded
             if (entity.GetFileContent == null)
-                entity.GetFileContent = file => GetFileContent(file.Path);
+                entity.GetFileContent = file => GetFileContent(file.OriginalPath);
         }
 
         public override IEnumerable<Stylesheet> GetAll(params string[] ids)
@@ -106,9 +106,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public bool ValidateStylesheet(Stylesheet stylesheet)
         {
-            var dirs = SystemDirectories.Css;
-
-            //Validate file
+            // get full path
             string fullPath;
             try
             {
@@ -119,11 +117,11 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 return false;
             }
-            var isValidPath = IOHelper.VerifyEditPath(fullPath, dirs.Split(','));
 
-            //Validate extension
+            // validate path and extension
+            var validDir = SystemDirectories.Css;
+            var isValidPath = IOHelper.VerifyEditPath(fullPath, validDir);
             var isValidExtension = IOHelper.VerifyFileExtension(stylesheet.Path, ValidExtensions);
-
             return isValidPath && isValidExtension;
         }
 
