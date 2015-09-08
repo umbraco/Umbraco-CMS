@@ -13,35 +13,53 @@
 
 		function link(scope, el, attr, ngModel) {
 
-			// if locked state is not defined as an attr set default state
-			if (scope.locked === undefined || scope.locked === null) {
-				scope.locked = true;
-			}
+			var input = el.children('.umb-locked-field__input');
 
-			// if locked state is not defined as an attr set default state
-			if (scope.placeholderText === undefined || scope.placeholderText === null) {
-				scope.placeholderText = "Enter value...";
-			}
+			function activate() {
 
-			scope.toggleLock = function() {
-
-				scope.locked = !scope.locked;
-
-				if (scope.locked === false) {
-					autoFocusField();
+				// if locked state is not defined as an attr set default state
+				if (scope.locked === undefined || scope.locked === null) {
+					scope.locked = true;
 				}
 
+				// if locked state is not defined as an attr set default state
+				if (scope.placeholderText === undefined || scope.placeholderText === null) {
+					scope.placeholderText = "Enter value...";
+				}
+
+			}
+
+			scope.lock = function() {
+				scope.locked = true;
+				input.unbind("blur");
+			};
+
+			scope.unlock = function() {
+				scope.locked = false;
+				autoFocusField();
 			};
 
 			function autoFocusField() {
 
-				// timeout to make sure dom has updated from a disabled field
+				var onBlurHandler = function() {
+					scope.$apply(function(){
+						scope.lock();
+					});
+				};
+
 				$timeout(function() {
-					var input = el.children('.umb-locked-field__input');
 					input.focus();
+					input.on("blur", onBlurHandler);
 				});
 
 			}
+
+			activate();
+
+			scope.$on('$destroy', function() {
+				input.unbind('blur');
+			});
+
 		}
 
 		var directive = {
