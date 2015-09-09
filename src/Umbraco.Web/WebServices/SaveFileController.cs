@@ -187,7 +187,7 @@ namespace Umbraco.Web.WebServices
         [HttpPost]
         public JsonResult SaveScript(string filename, string oldName, string contents)
         {
-            filename = filename.TrimStart(System.IO.Path.DirectorySeparatorChar);
+            filename = filename.TrimStart('/', '\\');
 
             var svce = (FileService) Services.FileService;
             var script = svce.GetScriptByName(oldName);
@@ -217,6 +217,42 @@ namespace Umbraco.Web.WebServices
                     name = script.Path,
                     url = script.VirtualPath,
                     contents = script.Content
+                });
+        }
+
+        [HttpPost]
+        public JsonResult SaveStylesheet(string filename, string oldName, string contents)
+        {
+            filename = filename.TrimStart('/', '\\');
+
+            var svce = (FileService) Services.FileService;
+            var stylesheet = svce.GetStylesheetByName(oldName);
+            if (stylesheet == null)
+                stylesheet = new Stylesheet(filename);
+            else
+                stylesheet.Path = filename;
+            stylesheet.Content = contents;
+
+            try
+            {
+                if (svce.ValidateStylesheet(stylesheet) == false)
+                    return Failed(ui.Text("speechBubbles", "cssErrorText"), ui.Text("speechBubbles", "cssErrorHeader"),
+                                    new FileSecurityException("File '" + filename + "' is not a valid stylesheet file."));
+
+                svce.SaveStylesheet(stylesheet);
+            }
+            catch (Exception e)
+            {
+                return Failed(ui.Text("speechBubbles", "cssErrorText"), ui.Text("speechBubbles", "cssErrorHeader"), e);
+            }
+
+            return Success(ui.Text("speechBubbles", "cssSavedText"), ui.Text("speechBubbles", "cssSavedHeader"),
+                new
+                {
+                    path = DeepLink.GetTreePathFromFilePath(stylesheet.Path),
+                    name = stylesheet.Path,
+                    url = stylesheet.VirtualPath,
+                    contents = stylesheet.Content
                 });
         }
 
