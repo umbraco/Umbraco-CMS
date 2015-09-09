@@ -76,6 +76,9 @@ namespace umbraco.cms.presentation.settings.stylesheet
             base.OnPreRender(e);
             ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/codeEditorSave.asmx"));
             ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/legacyAjaxCalls.asmx"));
+
+            //Clean the name field for xss
+            NameTxt.Text = NameTxt.Text.CleanForXss();
         }
 
         /// <summary>

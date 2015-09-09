@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using System.Reflection;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Serialization;
@@ -40,9 +42,16 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone.Name, item.Name);
             Assert.AreEqual(clone.UpdateDate, item.UpdateDate);
 
-            //This double verifies by reflection
+            // clone.Content should be null but getting it would lazy-load
+            var type = clone.GetType();
+            var contentField = type.BaseType.GetField("_content", BindingFlags.Instance | BindingFlags.NonPublic);
+            var value = contentField.GetValue(clone);
+            Assert.IsNull(value);
+
+            // this double verifies by reflection
+            // need to exclude content else it would lazy-load
             var allProps = clone.GetType().GetProperties();
-            foreach (var propertyInfo in allProps)
+            foreach (var propertyInfo in allProps.Where(x => x.Name != "Content"))
             {
                 Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(item, null));
             }

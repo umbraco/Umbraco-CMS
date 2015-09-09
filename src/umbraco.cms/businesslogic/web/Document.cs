@@ -1288,6 +1288,7 @@ namespace umbraco.cms.businesslogic.web
 
             // attributes
             x.Attributes.Append(addAttribute(xd, "id", Id.ToString()));
+            x.Attributes.Append(addAttribute(xd, "key", UniqueId.ToString()));
             //            x.Attributes.Append(addAttribute(xd, "version", Version.ToString()));
             if (Level > 1)
                 x.Attributes.Append(addAttribute(xd, "parentID", Parent.Id.ToString()));

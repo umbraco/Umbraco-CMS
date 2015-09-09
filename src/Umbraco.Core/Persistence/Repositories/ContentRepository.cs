@@ -654,8 +654,8 @@ namespace Umbraco.Core.Persistence.Repositories
             var translator = new SqlTranslator<IContent>(sqlClause, query);
             var sql = translator.Translate()
                                 .Where<DocumentDto>(x => x.Published)
-                                .OrderBy<NodeDto>(x => x.Level)
-                                .OrderBy<NodeDto>(x => x.SortOrder);
+                                .OrderBy<NodeDto>(x => x.Level, SqlSyntax)
+                                .OrderBy<NodeDto>(x => x.SortOrder, SqlSyntax);
 
             //NOTE: This doesn't allow properties to be part of the query
             var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sql);
@@ -896,7 +896,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// Private method to create a content object from a DocumentDto, which is used by Get and GetByVersion.
         /// </summary>
-        /// <param name="d"></param>
+        /// <param name="dto"></param>
         /// <param name="versionId"></param>
         /// <param name="docSql"></param>
         /// <returns></returns>

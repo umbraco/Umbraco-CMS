@@ -19,6 +19,11 @@ namespace Umbraco.Core.Models
         bool IsActive { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the server is master.
+        /// </summary>
+        bool IsMaster { get; set; }
+
+        /// <summary>
         /// Gets the date and time the registration was created.
         /// </summary>
         DateTime Registered { get; set; }

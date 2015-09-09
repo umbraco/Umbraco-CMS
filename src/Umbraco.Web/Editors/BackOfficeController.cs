@@ -59,7 +59,7 @@ namespace Umbraco.Web.Editors
         protected IAuthenticationManager AuthenticationManager
         {
             get { return OwinContext.Authentication; }
-        } 
+        }
 
         /// <summary>
         /// Render the default view
@@ -98,7 +98,7 @@ namespace Umbraco.Web.Editors
             var cultureInfo = string.IsNullOrWhiteSpace(culture)
                 //if the user is logged in, get their culture, otherwise default to 'en'
                 ? Security.IsAuthenticated()
-                    ? Security.CurrentUser.GetUserCulture(Services.TextService) 
+                    ? Security.CurrentUser.GetUserCulture(Services.TextService)
                     : CultureInfo.GetCultureInfo("en")
                 : CultureInfo.GetCultureInfo(culture);
 
@@ -125,10 +125,10 @@ namespace Umbraco.Web.Editors
 
             //get the legacy ActionJs file references to append as well
             var legacyActionJsRef = new JArray(GetLegacyActionJs(LegacyJsActionType.JsUrl));
-            
+
             var result = initJs.GetJavascriptInitialization(HttpContext, JsInitialization.GetDefaultInitialization(), legacyActionJsRef);
             result += initCss.GetStylesheetInitialization(HttpContext);
-           
+
             return JavaScript(result);
         }
 
@@ -156,13 +156,13 @@ namespace Umbraco.Web.Editors
             var result = HttpContext.IsDebuggingEnabled
                 ? getResult()
                 : ApplicationContext.ApplicationCache.RuntimeCache.GetCacheItem<JArray>(
-                    typeof (BackOfficeController) + "GetManifestAssetList",
+                    typeof(BackOfficeController) + "GetManifestAssetList",
                     () => getResult(),
                     new TimeSpan(0, 10, 0));
 
             return new JsonNetResult { Data = result, Formatting = Formatting.Indented };
         }
-        
+
         [UmbracoAuthorize(Order = 0)]
         [HttpGet]
         public JsonNetResult GetGridConfig()
@@ -182,18 +182,23 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [UmbracoAuthorize(Order = 0)]
-        [MinifyJavaScriptResult(Order = 1)] 
+        [MinifyJavaScriptResult(Order = 1)]
         public JavaScriptResult ServerVariables()
         {
             Func<string> getResult = () =>
-            {                
+            {
                 var defaultVals = new Dictionary<string, object>
                 {
                     {
                         "umbracoUrls", new Dictionary<string, object>
                         {
-                        {"externalLoginsUrl", Url.Action("ExternalLogin", "BackOffice")},
-                        {"externalLinkLoginsUrl", Url.Action("LinkLogin", "BackOffice")},
+                            //TODO: Add 'umbracoApiControllerBaseUrl' which people can use in JS
+                            // to prepend their URL. We could then also use this in our own resources instead of
+                            // having each url defined here explicitly - we can do that in v8! for now
+                            // for umbraco services we'll stick to explicitly defining the endpoints.
+
+                            {"externalLoginsUrl", Url.Action("ExternalLogin", "BackOffice")},
+                            {"externalLinkLoginsUrl", Url.Action("LinkLogin", "BackOffice")},
                             {"legacyTreeJs", Url.Action("LegacyTreeJs", "BackOffice")},
                             {"manifestAssetList", Url.Action("GetManifestAssetList", "BackOffice")},
                             {"gridConfig", Url.Action("GetGridConfig", "BackOffice")},
@@ -276,10 +281,10 @@ namespace Umbraco.Web.Editors
                                     controller => controller.Fetch(string.Empty))
                             },
                             {
-                            "relationApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<RelationController>(
-                                controller => controller.GetById(0))
-                        },
-                        {
+                                "relationApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<RelationController>(
+                                    controller => controller.GetById(0))
+                            },
+                            {
                                 "rteApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<RichTextPreValueController>(
                                     controller => controller.GetConfiguration())
                             },
@@ -345,25 +350,25 @@ namespace Umbraco.Web.Editors
                         }
                     },
                     {"isDebuggingEnabled", HttpContext.IsDebuggingEnabled},
-                {
-                    "application", GetApplicationState()
-                },
-                {
-                    "externalLogins", new Dictionary<string, object>
                     {
+                        "application", GetApplicationState()
+                    },
+                    {
+                        "externalLogins", new Dictionary<string, object>
                         {
-                            "providers", HttpContext.GetOwinContext().Authentication.GetExternalAuthenticationTypes()
-                                .Where(p => p.Properties.ContainsKey("UmbracoBackOffice"))
-                                .Select(p => new
-                                {
-                                    authType = p.AuthenticationType, caption = p.Caption,
-                                    //TODO: Need to see if this exposes any sensitive data!
-                                    properties = p.Properties
-                                })
-                                .ToArray()
+                            {
+                                "providers", HttpContext.GetOwinContext().Authentication.GetExternalAuthenticationTypes()
+                                    .Where(p => p.Properties.ContainsKey("UmbracoBackOffice"))
+                                    .Select(p => new
+                                    {
+                                        authType = p.AuthenticationType, caption = p.Caption,
+                                        //TODO: Need to see if this exposes any sensitive data!
+                                        properties = p.Properties
+                                    })
+                                    .ToArray()
+                            }
                         }
                     }
-                }
                 };
 
                 //Parse the variables to a string
@@ -380,7 +385,7 @@ namespace Umbraco.Web.Editors
 
             return JavaScript(result);
         }
-        
+
         [HttpPost]
         public ActionResult ExternalLogin(string provider, string redirectUrl = null)
         {
@@ -403,7 +408,7 @@ namespace Umbraco.Web.Editors
                 User.Identity.GetUserId());
         }
 
-        
+
 
         [HttpGet]
         public async Task<ActionResult> ExternalLinkLoginCallback()
@@ -411,7 +416,7 @@ namespace Umbraco.Web.Editors
             var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync(
                 Constants.Security.BackOfficeExternalAuthenticationType,
                 XsrfKey, User.Identity.GetUserId());
-            
+
             if (loginInfo == null)
             {
                 //Add error and redirect for it to be displayed
@@ -484,13 +489,13 @@ namespace Umbraco.Web.Editors
             {
                 if (await AutoLinkAndSignInExternalAccount(loginInfo) == false)
                 {
-                    ViewBag.ExternalSignInError = new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not been linked to to an account" };        
+                    ViewBag.ExternalSignInError = new[] { "The requested provider (" + loginInfo.Login.LoginProvider + ") has not been linked to to an account" };
                 }
 
                 //Remove the cookie otherwise this message will keep appearing
                 if (Response.Cookies[Constants.Security.BackOfficeExternalCookieName] != null)
                 {
-                    Response.Cookies[Constants.Security.BackOfficeExternalCookieName].Expires = DateTime.MinValue;    
+                    Response.Cookies[Constants.Security.BackOfficeExternalCookieName].Expires = DateTime.MinValue;
                 }
             }
 
@@ -540,7 +545,7 @@ namespace Umbraco.Web.Editors
                             }
                             else
                             {
-                                
+
                                 var autoLinkUser = new BackOfficeIdentityUser()
                                 {
                                     Email = loginInfo.Email,
@@ -594,7 +599,7 @@ namespace Umbraco.Web.Editors
 
             return false;
         }
-        
+
         /// <summary>
         /// Returns the server variables regarding the application state
         /// </summary>
@@ -617,17 +622,18 @@ namespace Umbraco.Web.Editors
             app.Add("applicationPath", HttpContext.Request.ApplicationPath.EnsureEndsWith('/'));
             return app;
         }
-        
+
         private IEnumerable<Dictionary<string, string>> GetTreePluginsMetaData()
         {
             var treeTypes = PluginManager.Current.ResolveAttributedTreeControllers();
             //get all plugin trees with their attributes
             var treesWithAttributes = treeTypes.Select(x => new
-                {
-                    tree = x, attributes =                     
+            {
+                tree = x,
+                attributes =
                     x.GetCustomAttributes(false)
-                }).ToArray();
-            
+            }).ToArray();
+
             var pluginTreesWithAttributes = treesWithAttributes
                 //don't resolve any tree decorated with CoreTreeAttribute
                 .Where(x => x.attributes.All(a => (a is CoreTreeAttribute) == false))

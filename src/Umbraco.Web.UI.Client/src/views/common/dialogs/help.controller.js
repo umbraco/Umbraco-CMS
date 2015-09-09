@@ -1,14 +1,21 @@
 angular.module("umbraco")
-    .controller("Umbraco.Dialogs.HelpController", function ($scope, $location, $routeParams, helpService, userService) {
+    .controller("Umbraco.Dialogs.HelpController", function ($scope, $location, $routeParams, helpService, userService, localizationService) {
         $scope.section = $routeParams.section;
         $scope.version = Umbraco.Sys.ServerVariables.application.version + " assembly: " + Umbraco.Sys.ServerVariables.application.assemblyVersion;
         
         if(!$scope.section){
-            $scope.section ="content";
+            $scope.section = "content";
         }
+
+        $scope.sectionName = $scope.section;
 
         var rq = {};
         rq.section = $scope.section;
+
+        //translate section name
+        localizationService.localize("sections_" + rq.section).then(function (value) {
+            $scope.sectionName = value;
+        });
         
         userService.getCurrentUser().then(function(user){
         	

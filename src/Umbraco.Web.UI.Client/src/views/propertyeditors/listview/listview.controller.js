@@ -1,4 +1,4 @@
-function listViewController($rootScope, $scope, $routeParams, $injector, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState) {
+function listViewController($rootScope, $scope, $routeParams, $injector, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q) {
 
     //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content 
     // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -91,15 +91,17 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         }
     });
 
-    function showNotificationsAndReset(err, reload) {
+    function showNotificationsAndReset(err, reload, successMsg) {
 
         //check if response is ysod
         if(err.status && err.status >= 500) {
             dialogService.ysodDialog(err);
         }
 
-        $scope.bulkStatus = "";        
-        $scope.actionInProgress = false;
+        $timeout(function() {
+            $scope.bulkStatus = "";
+            $scope.actionInProgress = false;
+        }, 500);
 
         if (reload === true) {
             $scope.reloadView($scope.contentId);
@@ -109,6 +111,9 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
             for (var i = 0; i < err.data.notifications.length; i++) {
                 notificationsService.showNotification(err.data.notifications[i]);
             }
+        }
+        else if (successMsg) {
+            notificationsService.success("Done", successMsg);
         }
     }
 
@@ -277,101 +282,58 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         return iconHelper.convertFromLegacyIcon(entry.icon);
     };
 
-    $scope.delete = function() {
-        var selected = _.filter($scope.listViewResultSet.items, function(item) {
+    function serial(selected, fn, getStatusMsg, index) {
+        return fn(selected, index).then(function (content) {
+            index++;
+            $scope.bulkStatus = getStatusMsg(index, selected.length);
+            return index < selected.length ? serial(selected, fn, getStatusMsg, index) : content;
+        }, function (err) {
+            var reload = index > 0;
+            showNotificationsAndReset(err, reload);
+            return err;
+        });
+    }
+
+    function applySelected(fn, getStatusMsg, getSuccessMsg, confirmMsg) {
+        var selected = _.filter($scope.listViewResultSet.items, function (item) {
             return item.selected;
         });
-        var total = selected.length;
-        if (total === 0) {
+        if (selected.length === 0)
             return;
-        }
-
-        if (confirm("Sure you want to delete?") == true) {
-            $scope.actionInProgress = true;
-            $scope.bulkStatus = "Starting with delete";
-            var current = 1;
-
-            var pluralSuffix = total == 1 ? "" : "s";
-
-            for (var i = 0; i < selected.length; i++) {
-                $scope.bulkStatus = "Deleted item " + current + " out of " + total + " item" + pluralSuffix;
-                deleteItemCallback(getIdCallback(selected[i])).then(function (data) {
-                    if (current === total) {
-                        //TODO: Should probably add notifications on the server side
-                        notificationsService.success("Bulk action", "Deleted " + total + " item" + pluralSuffix);
-                        showNotificationsAndReset(data, true);
-                    }
-                    current++;
-                }, function (err) {
-                    showNotificationsAndReset(err, false);
-                });
-            }
-        }
-
-    };
-
-    $scope.publish = function() {
-        var selected = _.filter($scope.listViewResultSet.items, function(item) {
-            return item.selected;
-        });
-        var total = selected.length;
-        if (total === 0) {
+        if (confirmMsg && !confirm(confirmMsg))
             return;
-        }
 
         $scope.actionInProgress = true;
-        $scope.bulkStatus = "Starting with publish";
-        var current = 1;
+        $scope.bulkStatus = getStatusMsg(0, selected.length);
 
-        var pluralSuffix = total == 1 ? "" : "s";
+        serial(selected, fn, getStatusMsg, 0).then(function (result) {
+            // executes once the whole selection has been processed
+            // in case of an error (caught by serial), result will be the error
+            if (!(result.data && angular.isArray(result.data.notifications)))
+                showNotificationsAndReset(result, true, getSuccessMsg(selected.length));
+        });
+    };
 
-        for (var i = 0; i < selected.length; i++) {
-            $scope.bulkStatus = "Publishing " + current + " out of " + total + " document" + pluralSuffix;
+    $scope.delete = function () {
+        applySelected(
+            function (selected, index) { return deleteItemCallback(getIdCallback(selected[index])) },
+            function (count, total) { return "Deleted " + count + " out of " + total + " document" + (total > 1 ? "s" : "") },
+            function (total) { return "Deleted " + total + " document" + (total > 1 ? "s" : "") },
+            "Sure you want to delete?");
+    };
 
-            contentResource.publishById(getIdCallback(selected[i]))
-                .then(function(content) {
-                    if (current == total) {
-                        notificationsService.success("Bulk action", "Published " + total + " document" + pluralSuffix);
-                        showNotificationsAndReset(content, true);
-                    }
-                    current++;
-                }, function(err) {
-                    showNotificationsAndReset(err, false);
-                });
-        }
+    $scope.publish = function () {
+        applySelected(
+            function (selected, index) { return contentResource.publishById(getIdCallback(selected[index])); },
+            function (count, total) { return "Published " + count + " out of " + total + " document" + (total > 1 ? "s" : "") },
+            function (total) { return "Published " + total + " document" + (total > 1 ? "s" : "") });
     };
 
     $scope.unpublish = function() {
-        var selected = _.filter($scope.listViewResultSet.items, function(item) {
-            return item.selected;
-        });
-        var total = selected.length;
-        if (total === 0) {
-            return;
-        }
-
-        $scope.actionInProgress = true;
-        $scope.bulkStatus = "Starting with publish";
-        var current = 1;
-
-        var pluralSuffix = total == 1 ? "" : "s";
-
-        for (var i = 0; i < selected.length; i++) {
-            $scope.bulkStatus = "Unpublishing " + current + " out of " + total + " document" + pluralSuffix;
-
-            contentResource.unPublish(getIdCallback(selected[i]))
-                .then(function(content) {
-
-                    if (current == total) {
-                        notificationsService.success("Bulk action", "Unpublished " + total + " document" + pluralSuffix);
-                        showNotificationsAndReset(content, true);
-                    }
-
-                    current++;
-                }, function(err) {
-                    showNotificationsAndReset(err, false);
-                });
-        }
+        applySelected(
+            function (selected, index) { return contentResource.unPublish(getIdCallback(selected[index])); },
+            function (count, total) { return "Unpublished " + count + " out of " + total + " document" + (total > 1 ? "s" : "") },
+            function (total) { return "Unpublished " + total + " document" + (total > 1 ? "s" : "") });
     };
 
     function getCustomPropertyValue(alias, properties) {

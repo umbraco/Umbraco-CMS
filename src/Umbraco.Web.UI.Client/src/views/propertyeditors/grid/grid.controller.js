@@ -424,7 +424,7 @@ angular.module("umbraco")
         };
 
         $scope.percentage = function (spans) {
-            return ((spans / $scope.model.config.items.columns) * 100).toFixed(1);
+            return ((spans / $scope.model.config.items.columns) * 100).toFixed(8);
         };
 
 

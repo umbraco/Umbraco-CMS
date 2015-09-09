@@ -19,7 +19,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 	/// </summary>
 	[Serializable]
 	[XmlType(Namespace = "http://umbraco.org/webservices/")]
-	internal class XmlPublishedContent : PublishedContentBase
+	internal class XmlPublishedContent : PublishedContentWithKeyBase
 	{
 		/// <summary>
 		/// Initializes a new instance of the <c>XmlPublishedContent</c> class with an Xml node.
@@ -64,6 +64,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		private IPublishedContent _parent;
 
 		private int _id;
+	    private Guid _key;
 		private int _template;
 		private string _name;
 		private string _docTypeAlias;
@@ -149,6 +150,16 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				return _id;
 			}
 		}
+
+	    public override Guid Key
+	    {
+	        get
+	        {
+	            if (_initialized == false)
+                    Initialize();
+	            return _key;
+	        }
+	    }
 
 		public override int TemplateId
 		{
@@ -348,6 +359,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		    if (_xmlNode.Attributes != null)
 		    {
 		        _id = int.Parse(_xmlNode.Attributes.GetNamedItem("id").Value);
+                if (_xmlNode.Attributes.GetNamedItem("key") != null) // because, migration
+    		        _key = Guid.Parse(_xmlNode.Attributes.GetNamedItem("key").Value);
 		        if (_xmlNode.Attributes.GetNamedItem("template") != null)
 		            _template = int.Parse(_xmlNode.Attributes.GetNamedItem("template").Value);
 		        if (_xmlNode.Attributes.GetNamedItem("sortOrder") != null)

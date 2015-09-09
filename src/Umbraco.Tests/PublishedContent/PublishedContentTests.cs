@@ -455,6 +455,20 @@ namespace Umbraco.Tests.PublishedContent
 		}
 
 		[Test]
+		public void FirstChild()
+		{
+			var doc = GetNode(1173); // has child nodes
+			Assert.IsNotNull(doc.FirstChild());
+			Assert.IsNotNull(doc.FirstChild(x => true));
+			Assert.IsNotNull(doc.FirstChild<IPublishedContent>());
+
+			doc = GetNode(1175); // does not have child nodes
+			Assert.IsNull(doc.FirstChild());
+			Assert.IsNull(doc.FirstChild(x => true));
+			Assert.IsNull(doc.FirstChild<IPublishedContent>());
+		}
+
+		[Test]
 		public void HasProperty()
 		{
 			var doc = GetNode(1173);
