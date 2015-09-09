@@ -15,12 +15,12 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     [Migration("7.0.0", 4, GlobalSettings.UmbracoMigrationName)]
     public class AddIndexToCmsMacroTable : MigrationBase
     {
-        private readonly bool _skipIndexCheck;
+        private readonly bool _forTesting;
 
-        internal AddIndexToCmsMacroTable(bool skipIndexCheck, ISqlSyntaxProvider sqlSyntax, ILogger logger)
+        internal AddIndexToCmsMacroTable(bool forTesting, ISqlSyntaxProvider sqlSyntax, ILogger logger)
             : base(sqlSyntax, logger)
         {
-            _skipIndexCheck = skipIndexCheck;
+            _forTesting = forTesting;
         }
 
         public AddIndexToCmsMacroTable(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
@@ -29,7 +29,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 
         public override void Up()
         {
-            var dbIndexes = _skipIndexCheck ? new DbIndexDefinition[] { } : SqlSyntax.GetDefinedIndexes(Context.Database)
+            var dbIndexes = _forTesting ? new DbIndexDefinition[] { } : SqlSyntax.GetDefinedIndexes(Context.Database)
                 .Select(x => new DbIndexDefinition()
                 {
                     TableName = x.Item1,
@@ -45,21 +45,25 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                 // So we'll remove any duplicates based on alias and only keep the one with the smallest id since I'm pretty sure we'd always choose the 'first' one
                 // when running a query.
 
-                //NOTE: Using full SQL statement here in case the DTO has changed between versions
-                var macros = Context.Database.Fetch<MacroDto>("SELECT * FROM cmsMacro")
-                    .GroupBy(x => x.Alias)
-                    .Where(x => x.Count() > 1);
-
-                foreach (var m in macros)
+                if (_forTesting == false)
                 {
-                    //get the min id (to keep)
-                    var minId = m.Min(x => x.Id);
-                    //delete all the others
-                    foreach (var macroDto in m.Where(x => x.Id != minId))
+                    //NOTE: Using full SQL statement here in case the DTO has changed between versions
+                    var macros = Context.Database.Fetch<MacroDto>("SELECT * FROM cmsMacro")
+                        .GroupBy(x => x.Alias)
+                        .Where(x => x.Count() > 1);
+
+                    foreach (var m in macros)
                     {
-                        Delete.FromTable("cmsMacro").Row(new { id = macroDto.Id });
+                        //get the min id (to keep)
+                        var minId = m.Min(x => x.Id);
+                        //delete all the others
+                        foreach (var macroDto in m.Where(x => x.Id != minId))
+                        {
+                            Delete.FromTable("cmsMacro").Row(new { id = macroDto.Id });
+                        }
                     }
                 }
+                
 
                 Create.Index("IX_cmsMacro_Alias").OnTable("cmsMacro").OnColumn("macroAlias").Unique();            
             }
