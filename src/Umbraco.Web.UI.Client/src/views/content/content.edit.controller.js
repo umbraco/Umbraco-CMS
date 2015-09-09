@@ -11,13 +11,15 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
     //setup scope vars
     $scope.defaultButton = null;
     $scope.subButtons = [];
-    $scope.isNew = $routeParams.create;
 
     $scope.page = {};
     $scope.page.loading = false;
     $scope.page.menu = {};
     $scope.page.menu.currentNode = null;
     $scope.page.menu.currentSection = appState.getSectionState("currentSection");
+    $scope.page.listViewPath = null;
+    $scope.page.isNew = $routeParams.create;
+    $scope.page.buttonGroupState = "init";
 
     function init(content) {
 
@@ -74,6 +76,8 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
     function performSave(args) {
         var deferred = $q.defer();
 
+        $scope.page.buttonGroupState = "busy";
+
         contentEditingHelper.contentEditorPerformSave({
             statusMessage: args.statusMessage,
             saveMethod: args.saveMethod,
@@ -84,12 +88,17 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
             init($scope.content);
             syncTreeNode($scope.content, data.path);
 
+            $scope.page.buttonGroupState = "success";
+
             deferred.resolve(data);
         }, function (err) {
             //error
             if (err) {
                 editorState.set($scope.content);
             }
+
+            $scope.page.buttonGroupState = "error";
+
             deferred.reject(err);
         });
 
@@ -134,7 +143,7 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
                 $scope.content = data;
 
                 if (data.isChildOfListView && data.trashed === false) {
-                    $scope.listViewPath = ($routeParams.page)
+                    $scope.page.listViewPath = ($routeParams.page)
                         ? "/content/content/edit/" + data.parentId + "?page=" + $routeParams.page
                         : "/content/content/edit/" + data.parentId;
                 }
@@ -161,6 +170,8 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
 
         if (formHelper.submitForm({ scope: $scope, statusMessage: "Unpublishing...", skipValidation: true })) {
 
+           $scope.page.buttonGroupState = "busy";
+
             contentResource.unPublish($scope.content.id)
                 .then(function (data) {
 
@@ -175,6 +186,8 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
                     init($scope.content);
 
                     syncTreeNode($scope.content, data.path);
+
+                    $scope.page.buttonGroupState = "success";
 
                 });
         }
@@ -210,19 +223,7 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
 
 
         }
- 
-    };
 
-    // this method is called for all action buttons and then we proxy based on the btn definition
-    $scope.performAction = function (btn) {
-
-        if (!btn || !angular.isFunction(btn.handler)) {
-            throw "btn.handler must be a function reference";
-        }
-
-        if (!$scope.busy) {
-            btn.handler.apply(this);
-        }
     };
 
 }

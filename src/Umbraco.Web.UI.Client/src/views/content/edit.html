@@ -39,41 +39,33 @@
             </umb-editor-footer-content-left>
 
 
-            <umb-editor-footer-content-right ng-class="{'umb-dimmed': busy}">
+            <umb-editor-footer-content-right>
 
-               <div class="btn-group" ng-show="listViewPath">
-                  <a class="btn" href="#{{listViewPath}}">
-                     <localize key="buttons_returnToList">Return to list</localize>
-                  </a>
-               </div>
+               <umb-button
+                  ng-if="page.listViewPath"
+                  type="link"
+                  href="#{{page.listViewPath}}"
+                  label="Return to list"
+                  label-key="buttons_returnToList">
+               </umb-button>
 
-               <div class="btn-group" ng-show="!isNew">
-                  <a class="btn" ng-click="preview(content)">
-                     <localize key="buttons_showPage">Preview page</localize>
-                  </a>
-               </div>
+               <umb-button
+                  ng-if="!page.isNew"
+                  type="button"
+                  action="preview(content)"
+                  label="Preview page"
+                  label-key="buttons_showPage">
+               </umb-button>
 
-               <div class="btn-group dropup" ng-if="defaultButton">
+               <umb-button-group
+                  ng-if="defaultButton"
+                  default-button="defaultButton"
+                  sub-buttons="subButtons"
+                  state="page.buttonGroupState"
+                  direction="up"
+                  float="right">
+               </umb-button-group>
 
-                  <a class="btn btn-success" href="#" ng-click="performAction(defaultButton)" prevent-default>
-                     <localize key="{{defaultButton.labelKey}}">{{defaultButton.labelKey}}</localize>
-                  </a>
-
-                  <a class="btn btn-success dropdown-toggle" data-toggle="dropdown" ng-if="subButtons.length > 0">
-                     <span class="caret"></span>
-                  </a>
-
-                  <a href="#">Return to list</a>
-
-                  <ul aria-labelledby="dLabel" class="dropdown-menu bottom-up" ng-if="subButtons.length > 0" role="menu">
-                     <li ng-repeat="btn in subButtons">
-                        <a href="#" ng-click="performAction(btn)" prevent-default>
-                           <localize key="{{btn.labelKey}}">{{btn.labelKey}}</localize>
-                        </a>
-                     </li>
-                  </ul>
-
-               </div>
 
             </umb-editor-footer-content-right>
 
