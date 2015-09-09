@@ -19,6 +19,7 @@
 		vm.contentType = {};
 		vm.page = {};
       vm.page.loading = false;
+      vm.page.saveButtonState = "init";
 		vm.page.navigation = [
 			{
 				"name": "Design",
@@ -92,6 +93,8 @@
 
 		function performSave() {
 
+         vm.page.saveButtonState = "busy";
+
 			memberTypeResource.save(vm.contentType).then(function(dt){
 
 				formHelper.resetForm({ scope: $scope, notifications: dt.notifications });
@@ -108,6 +111,10 @@
 				init(dt);
 
 				syncTreeNode(vm.contentType, dt.path);
+
+            vm.page.saveButtonState = "success";
+
+
 			});
 
 		}
