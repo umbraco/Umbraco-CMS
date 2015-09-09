@@ -78,7 +78,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
             ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/legacyAjaxCalls.asmx"));
 
             //Clean the name field for xss
-            NameTxt.Text = NameTxt.Text.CleanForXss();
+            NameTxt.Text = NameTxt.Text.CleanForXss(ignoreFromClean:'\\');
         }
 
         /// <summary>
