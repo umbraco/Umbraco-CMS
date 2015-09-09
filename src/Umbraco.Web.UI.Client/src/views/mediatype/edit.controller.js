@@ -19,6 +19,7 @@
 		vm.contentType = {};
 		vm.page = {};
 		vm.page.loading = false;
+		vm.page.saveButtonState = "init";
 		vm.page.navigation = [
 			{
 				"name": "Design",
@@ -138,6 +139,8 @@
 
 		function performSave() {
 
+			vm.page.saveButtonState = "busy";
+
 			// reformat allowed content types to array if id's
 			vm.contentType.allowedContentTypes = contentTypeHelper.createIdArray(vm.contentType.allowedContentTypes);
 
@@ -157,6 +160,9 @@
 				init(dt);
 
 				syncTreeNode(vm.contentType, dt.path);
+
+				vm.page.saveButtonState = "success";
+
 			});
 
 		}
