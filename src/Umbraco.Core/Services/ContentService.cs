@@ -1408,8 +1408,6 @@ namespace Umbraco.Core.Services
                     if (success)
                         repository.DeleteMediaFiles(files);
                 }
-
-
             }
             Audit(AuditType.Delete, "Empty Content Recycle Bin performed by user", 0, Constants.System.RecycleBinContent);
         }
