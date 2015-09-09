@@ -49,11 +49,14 @@
 
             <umb-editor-footer-content-right>
 
-               <div class="btn-group">
-                   <button type="submit" data-hotkey="ctrl+s" class="btn btn-success">
-                       <localize key="buttons_save">Save</localize>
-                   </button>
-               </div>
+               <umb-button
+                  type="submit"
+                  button-style="success"
+                  state="page.saveButtonState"
+                  shortcut="ctrl+s"
+                  label="Save"
+                  label-key="buttons_save">
+               </umb-button>
 
             </umb-editor-footer-content-right>
 

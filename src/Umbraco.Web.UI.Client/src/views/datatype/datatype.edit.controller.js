@@ -130,6 +130,8 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
 
     $scope.save = function() {
 
+        $scope.page.saveButtonState = "busy";
+
         if (formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {
             
             dataTypeResource.save($scope.content, $scope.preValues, $routeParams.create)
@@ -154,6 +156,8 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
                         $scope.page.menu.currentNode = syncArgs.node;
                     });
                     
+                    $scope.page.saveButtonState = "success";
+
                 }, function(err) {
 
                     //NOTE: in the case of data type values we are setting the orig/new props 
@@ -163,6 +167,8 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
                         err: err
                     });
                     
+                    $scope.page.saveButtonState = "error";
+
                     //share state
                     editorState.set($scope.content);
                 });
