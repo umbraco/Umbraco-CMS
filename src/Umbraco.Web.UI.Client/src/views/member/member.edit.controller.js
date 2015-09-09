@@ -15,8 +15,10 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
     $scope.page.menu.currentSection = appState.getSectionState("currentSection");
     $scope.page.menu.currentNode = null; //the editors affiliated node
     $scope.page.nameLocked = false;
+    $scope.page.listViewPath = null;
+    $scope.page.saveButtonState = "init";
 
-    $scope.listViewPath = ($routeParams.page && $routeParams.listName)
+    $scope.page.listViewPath = ($routeParams.page && $routeParams.listName)
         ? "/member/member/list/" + $routeParams.listName + "?page=" + $routeParams.page
         : null;
 
@@ -130,6 +132,7 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
         if (!$scope.busy && formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {
             
             $scope.busy = true;
+            $scope.page.saveButtonState = "busy";
 
             memberResource.save($scope.content, $routeParams.create, fileManager.getFiles())
                 .then(function(data) {
@@ -146,7 +149,8 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                     
                     editorState.set($scope.content);
                     $scope.busy = false;
-                    
+                    $scope.page.saveButtonState = "success";
+
                     var path = buildTreePath(data);
 
                     //sync the tree (only for ui purposes)
@@ -162,6 +166,8 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                     
                     editorState.set($scope.content);
                     $scope.busy = false;
+                    $scope.page.saveButtonState = "error";
+
                 });
         }else{
             $scope.busy = false;

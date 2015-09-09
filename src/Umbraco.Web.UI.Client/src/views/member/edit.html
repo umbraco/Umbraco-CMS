@@ -37,19 +37,24 @@
             </umb-editor-footer-content-left>
 
 
-            <umb-editor-footer-content-right ng-class="{'umb-dimmed': busy}">
+            <umb-editor-footer-content-right>
 
-               <div class="btn-group" ng-if="listViewPath">
-                   <a class="btn" href="#{{listViewPath}}">
-                       <localize key="buttons_returnToList">Return to list</localize>
-                   </a>
-               </div>
+               <umb-button
+                  ng-if="page.listViewPath"
+                  type="link"
+                  href="#{{page.listViewPath}}"
+                  label="Return to list"
+                  label-key="buttons_returnToList">
+               </umb-button>
 
-               <div class="btn-group">
-                   <button type="submit" data-hotkey="ctrl+s" class="btn btn-success">
-                       <localize key="buttons_save">Save</localize>
-                   </button>
-               </div>
+               <umb-button
+                  type="submit"
+                  label="Save"
+                  label-key="buttons_save"
+                  button-style="success"
+                  shortcut="ctrl+s"
+                  state="page.saveButtonState">
+               </umb-button>
 
             </umb-editor-footer-content-right>
 
