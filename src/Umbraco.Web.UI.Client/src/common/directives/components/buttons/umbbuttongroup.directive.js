@@ -8,8 +8,11 @@
          replace: true,
          templateUrl: 'views/components/buttons/umb-button-group.html',
          scope: {
-            actions: "=",
-            model: "="
+            defaultButton: "=",
+            subButtons: "=",
+            state: "=?",
+            direction: "@?",
+            float: "@?"
          }
       };
 
