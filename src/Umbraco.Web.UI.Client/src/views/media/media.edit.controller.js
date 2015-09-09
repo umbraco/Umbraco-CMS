@@ -17,6 +17,8 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
     $scope.page.menu = {};
     $scope.page.menu.currentSection = appState.getSectionState("currentSection");
     $scope.page.menu.currentNode = null; //the editors affiliated node
+    $scope.page.listViewPath = null;
+    $scope.page.saveButtonState = "init";
 
     /** Syncs the content item to it's tree node - this occurs on first load and after saving */
     function syncTreeNode(content, path, initialLoad) {
@@ -65,7 +67,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
                 $scope.content = data;
                 
                 if (data.isChildOfListView && data.trashed === false) {
-                    $scope.listViewPath = ($routeParams.page)
+                    $scope.page.listViewPath = ($routeParams.page)
                         ? "/media/media/edit/" + data.parentId + "?page=" + $routeParams.page
                         : "/media/media/edit/" + data.parentId;
                 }
@@ -98,6 +100,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
         if (!$scope.busy && formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {
 
             $scope.busy = true;
+            $scope.page.saveButtonState = "busy";
 
             mediaResource.save($scope.content, $routeParams.create, fileManager.getFiles())
                 .then(function(data) {
@@ -115,6 +118,8 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
 
                     syncTreeNode($scope.content, data.path);
 
+                    $scope.page.saveButtonState = "success";
+
                 }, function(err) {
 
                     contentEditingHelper.handleSaveError({
@@ -125,6 +130,8 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
                     
                     editorState.set($scope.content);
                     $scope.busy = false;
+                    $scope.page.saveButtonState = "error";
+
                 });
         }else{
             $scope.busy = false;
