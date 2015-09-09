@@ -16,36 +16,40 @@ angular.module("umbraco.directives")
           }
 
           // disable shortcuts in input fields if keycombo is 1 character
-          if(keyCombo.length === 1) {
-            options = {
-              inputDisabled: true
-            };
-          }
+          if(keyCombo) {
 
-          keyboardService.bind(keyCombo, function(){
+             if(keyCombo.length === 1) {
+               options = {
+                 inputDisabled: true
+               };
+             }
 
-              var element = $(el);
-              var activeElementType = document.activeElement.tagName;
-              var clickableElements = ["A", "BUTTON"];
+             keyboardService.bind(keyCombo, function(){
 
-              if(element.is("a,div,button,input[type='button'],input[type='submit'],input[type='checkbox']") && !element.is(':disabled') ){
+                var element = $(el);
+                var activeElementType = document.activeElement.tagName;
+                var clickableElements = ["A", "BUTTON"];
 
-                // when keycombo is enter and a link or button has focus - click the link or button instead of using the hotkey
-                if(keyCombo === "enter" && clickableElements.indexOf(activeElementType) === 0) {
-                  document.activeElement.click();
-                } else {
-                  element.click();
+                if(element.is("a,div,button,input[type='button'],input[type='submit'],input[type='checkbox']") && !element.is(':disabled') ){
+
+                  // when keycombo is enter and a link or button has focus - click the link or button instead of using the hotkey
+                  if(keyCombo === "enter" && clickableElements.indexOf(activeElementType) === 0) {
+                    document.activeElement.click();
+                  } else {
+                    element.click();
+                  }
+
+                }else{
+                  element.focus();
                 }
 
-              }else{
-                element.focus();
-              }
+            }, options);
 
-          }, options);
+            el.on('$destroy', function(){
+              keyboardService.unbind(keyCombo);
+            });
 
-          el.on('$destroy', function(){
-            keyboardService.unbind(keyCombo);
-          });
+          }
 
       };
   });
