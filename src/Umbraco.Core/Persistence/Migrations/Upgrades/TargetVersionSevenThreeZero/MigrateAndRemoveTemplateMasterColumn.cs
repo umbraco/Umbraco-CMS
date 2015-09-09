@@ -48,7 +48,7 @@ ON t1.id = t2.nodeId");
             Execute.Code(database =>
             {
                 //NOTE: we are using dynamic because we need to get the data in a column that no longer exists in the schema
-                var templates = Context.Database.Fetch<dynamic>(new Sql().Select("*").From<TemplateDto>());
+                var templates = database.Fetch<dynamic>(new Sql().Select("*").From<TemplateDto>());
                 foreach (var template in templates)
                 {
                     var sql = string.Format(SqlSyntax.UpdateData,
