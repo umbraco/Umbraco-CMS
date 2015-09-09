@@ -8,6 +8,7 @@ using Umbraco.Core;
 
 namespace Umbraco.Web.Controllers
 {
+    [MemberAuthorize]
     public class UmbLoginStatusController : SurfaceController
     {
         [HttpPost]
@@ -23,6 +24,8 @@ namespace Umbraco.Web.Controllers
                 FormsAuthentication.SignOut();
             }
 
+            TempData["LogoutSuccess"] = true;
+
             //if there is a specified path to redirect to then use it
             if (model.RedirectUrl.IsNullOrWhiteSpace() == false)
             {
@@ -30,7 +33,7 @@ namespace Umbraco.Web.Controllers
             }
 
             //redirect to current page by default
-            TempData["LogoutSuccess"] = true;            
+            
             return RedirectToCurrentUmbracoPage();
         }
     }

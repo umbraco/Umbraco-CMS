@@ -34,7 +34,7 @@ namespace Umbraco.Web.Install.InstallSteps
             DistributedCache.Instance.RefreshAllPageCache();
 
             // Update configurationStatus
-            GlobalSettings.ConfigurationStatus = UmbracoVersion.GetSemanticVersion().ToString();
+            GlobalSettings.ConfigurationStatus = UmbracoVersion.GetSemanticVersion().ToSemanticString();
 
             // Update ClientDependency version
             var clientDependencyConfig = new ClientDependencyConfiguration(_applicationContext.ProfilingLogger.Logger);

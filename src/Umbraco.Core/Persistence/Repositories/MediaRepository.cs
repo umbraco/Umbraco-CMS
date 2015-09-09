@@ -236,7 +236,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 var xmlItems = (from descendant in descendants
                                 let xml = serializer(descendant)
-                                select new ContentXmlDto { NodeId = descendant.Id, Xml = xml.ToString(SaveOptions.None) }).ToArray();
+                                select new ContentXmlDto { NodeId = descendant.Id, Xml = xml.ToDataString() }).ToArray();
 
                 //bulk insert it into the database
                 Database.BulkInsertRecords(xmlItems, tr);
@@ -468,10 +468,11 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             //NOTE: This doesn't allow properties to be part of the query
             var dtos = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sql);
+            
+            var ids = dtos.Select(x => x.ContentDto.ContentTypeId).ToArray();
 
             //content types
-            var contentTypes = _mediaTypeRepository.GetAll(dtos.Select(x => x.ContentDto.ContentTypeId).ToArray())
-                .ToArray();
+            var contentTypes = ids.Length == 0 ? Enumerable.Empty<IMediaType>() : _mediaTypeRepository.GetAll(ids).ToArray();
 
             var dtosWithContentTypes = dtos
                 //This select into and null check are required because we don't have a foreign damn key on the contentType column

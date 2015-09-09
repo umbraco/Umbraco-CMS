@@ -6,5 +6,6 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         void AddFolder(string folderPath);
         void DeleteFolder(string folderPath);
+        bool ValidatePartialView(IPartialView partialView);
     }
 }

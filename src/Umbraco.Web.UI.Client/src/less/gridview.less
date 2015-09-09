@@ -5,7 +5,7 @@
          overflow-y:hidden!important;
       }
 
-IFRAME {overflow:hidden;}
+.usky-grid IFRAME {overflow:hidden;}
 
 
  // Sortabel
@@ -279,12 +279,12 @@ IFRAME {overflow:hidden;}
 
 .usky-grid .usky-control-inner.selectedControl , .usky-grid .usky-row-inner.selectedRow{
     border: 1px dashed @grayLight;
-    
+
     > ins.item-label {
         display: block;
         z-index:100000;
     }
-} 
+}
 
 
 
@@ -322,12 +322,12 @@ IFRAME {overflow:hidden;}
     padding-bottom: 30px;
     position: relative;
     background-color: white;
-    border: 4px dashed @grayLight;
+    border: 4px dashed @grayLighter;
     text-align: center;
     text-align: -moz-center;
 }
 .usky-grid .usky-editor-placeholder i{
-    color: @grayLight;
+    color: @grayLighter;
     font-size: 85px;
     line-height: 85px;
     display: block;
@@ -380,7 +380,7 @@ IFRAME {overflow:hidden;}
      border-radius: 200px;
      background: rgba(255,255,255, 1);
      border:1px solid rgb(182, 182, 182);
-     margin: 2px;    
+     margin: 2px;
  }
 
   .usky-grid  .iconBox span.prompt {
@@ -464,7 +464,7 @@ IFRAME {overflow:hidden;}
  // TINYMCE EDITOR
  // -------------------------
  .usky-grid .mce-panel {
-     border:none !important;
+     border: none !important;
      clear:both;
  }
 
@@ -499,6 +499,9 @@ IFRAME {overflow:hidden;}
      background-color: #F7F7F7 !important;
  }
 
+.usky-cell-rte{
+    border: 1px solid @grayLighter;
+}
 
  // MEDIA EDITOR
  // -------------------------

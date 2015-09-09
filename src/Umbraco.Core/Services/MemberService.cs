@@ -30,37 +30,9 @@ namespace Umbraco.Core.Services
         private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();
         private readonly IDataTypeService _dataTypeService;
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public MemberService(RepositoryFactory repositoryFactory, IMemberGroupService memberGroupService)
-            : this(new PetaPocoUnitOfWorkProvider(), repositoryFactory, memberGroupService)
-        {
-        }
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public MemberService(IDatabaseUnitOfWorkProvider provider, IMemberGroupService memberGroupService)
-            : this(provider, new RepositoryFactory(), memberGroupService)
-        {
-        }
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public MemberService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IMemberGroupService memberGroupService)
-            : base(provider, repositoryFactory, LoggerResolver.Current.Logger)
-        {
-            if (memberGroupService == null) throw new ArgumentNullException("memberGroupService");
-            _memberGroupService = memberGroupService;
-            _dataTypeService = new DataTypeService(provider, repositoryFactory);
-        }
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public MemberService(IDatabaseUnitOfWorkProvider provider, IMemberGroupService memberGroupService, IDataTypeService dataTypeService)
-            : this(provider, new RepositoryFactory(), LoggerResolver.Current.Logger, memberGroupService, dataTypeService)
-        {
-
-        }
-
-        public MemberService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IMemberGroupService memberGroupService, IDataTypeService dataTypeService)
-            : base(provider, repositoryFactory, logger)
+        
+        public MemberService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory, IMemberGroupService memberGroupService, IDataTypeService dataTypeService)
+            : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
             if (memberGroupService == null) throw new ArgumentNullException("memberGroupService");
             if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
@@ -80,7 +52,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateMemberTypeRepository(UowProvider.GetUnitOfWork()))
             {
-                var types = repository.GetAll().Select(x => x.Alias).ToArray();
+                var types = repository.GetAll(new int[]{}).Select(x => x.Alias).ToArray();
 
                 if (types.Any() == false)
                 {

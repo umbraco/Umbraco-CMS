@@ -27,13 +27,16 @@ namespace Umbraco.Web.Controllers
             switch (status)
             {
                 case MembershipCreateStatus.Success:
+
+                    TempData["FormSuccess"] = true;
+
                     //if there is a specified path to redirect to then use it
                     if (model.RedirectUrl.IsNullOrWhiteSpace() == false)
                     {
                         return Redirect(model.RedirectUrl);
                     }
                     //redirect to current page by default
-                    TempData["FormSuccess"] = true;            
+                    
                     return RedirectToCurrentUmbracoPage();
                 case MembershipCreateStatus.InvalidUserName:
                     ModelState.AddModelError((model.UsernameIsEmail || model.Username == null)

@@ -56,7 +56,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IEnumerable<TEntity> PerformGetAll(params TId[] ids)
         {
-            var sql = new Sql().From<TEntity>();
+            var sql = new Sql().From<TEntity>(SqlSyntax);
 
             if (ids.Any())
             {

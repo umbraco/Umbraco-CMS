@@ -11,6 +11,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using ClientDependency.Core.Config;
 using Examine;
+using Examine.Config;
 using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -38,6 +39,10 @@ using Umbraco.Web.Scheduling;
 using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Publishing;
+using Umbraco.Core.Services;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using ProfilingViewEngine = Umbraco.Core.Profiling.ProfilingViewEngine;
 
@@ -54,20 +59,41 @@ namespace Umbraco.Web
         private readonly List<IIndexer> _indexesToRebuild = new List<IIndexer>(); 
 
         public WebBootManager(UmbracoApplicationBase umbracoApplication)
-            : this(umbracoApplication, false)
+            : base(umbracoApplication)
         {
-
+            _isForTesting = false;
         }
 
         /// <summary>
         /// Constructor for unit tests, ensures some resolvers are not initialized
         /// </summary>
         /// <param name="umbracoApplication"></param>
+        /// <param name="logger"></param>
         /// <param name="isForTesting"></param>
-        internal WebBootManager(UmbracoApplicationBase umbracoApplication, bool isForTesting)
-            : base(umbracoApplication)
+        internal WebBootManager(UmbracoApplicationBase umbracoApplication, ProfilingLogger logger, bool isForTesting)
+            : base(umbracoApplication, logger)
         {
             _isForTesting = isForTesting;
+        }
+
+        /// <summary>
+        /// Creates and returns the service context for the app
+        /// </summary>
+        /// <param name="dbContext"></param>
+        /// <param name="dbFactory"></param>
+        /// <returns></returns>
+        protected override ServiceContext CreateServiceContext(DatabaseContext dbContext, IDatabaseFactory dbFactory)
+        {
+            //use a request based messaging factory
+            var evtMsgs = new RequestLifespanMessagesFactory(new SingletonUmbracoContextAccessor());
+            return new ServiceContext(
+                new RepositoryFactory(ApplicationCache, ProfilingLogger.Logger, dbContext.SqlSyntax, UmbracoConfig.For.UmbracoSettings()),
+                new PetaPocoUnitOfWorkProvider(dbFactory),
+                new FileUnitOfWorkProvider(),
+                new PublishingStrategy(evtMsgs, ProfilingLogger.Logger),
+                ApplicationCache,
+                ProfilingLogger.Logger,
+                evtMsgs);
         }
 
         /// <summary>
@@ -140,7 +166,10 @@ namespace Umbraco.Web
             UmbracoContext.EnsureContext(
                 httpContext,
                 ApplicationContext,
-                new WebSecurity(httpContext, ApplicationContext));
+                new WebSecurity(httpContext, ApplicationContext),
+                UmbracoConfig.For.UmbracoSettings(), 
+                UrlProviderResolver.Current.Providers, 
+                false);
         }
 
         /// <summary>
@@ -153,15 +182,7 @@ namespace Umbraco.Web
             //Set the profiler to be the web profiler
             ProfilerResolver.Current.SetProfiler(new WebProfiler());
         }
-
-        /// <summary>
-        /// Adds custom types to the ApplicationEventsResolver
-        /// </summary>
-        protected override void InitializeApplicationEventsResolver()
-        {
-            base.InitializeApplicationEventsResolver();
-        }
-
+        
         /// <summary>
         /// Ensure that the OnApplicationStarted methods of the IApplicationEvents are called
         /// </summary>
@@ -214,10 +235,10 @@ namespace Umbraco.Web
         /// <summary>
         /// Creates the application cache based on the HttpRuntime cache
         /// </summary>
-        protected override void CreateApplicationCache()
+        protected override CacheHelper CreateApplicationCache()
         {
             //create a web-based cache helper
-            ApplicationCache = new CacheHelper();
+            return new CacheHelper();
         }
 
         /// <summary>
@@ -281,7 +302,6 @@ namespace Umbraco.Web
             }
         }
 
-
         private void RouteLocalApiController(Type controller, string umbracoPath)
         {
             var meta = PluginController.GetMetadata(controller);
@@ -303,6 +323,7 @@ namespace Umbraco.Web
             }
             route.DataTokens.Add("umbraco", "api"); //ensure the umbraco token is set
         }
+
         private void RouteLocalSurfaceController(Type controller, string umbracoPath)
         {
             var meta = PluginController.GetMetadata(controller);
@@ -329,32 +350,86 @@ namespace Umbraco.Web
             //set the default RenderMvcController
             DefaultRenderMvcControllerResolver.Current = new DefaultRenderMvcControllerResolver(typeof(RenderMvcController));
 
-            ServerMessengerResolver.Current.SetServerMessenger(new BatchedWebServiceServerMessenger(() =>
+            //Override the default server messenger, we need to check if the legacy dist calls is enabled, if that is the
+            // case, then we'll set the default messenger to be the old one, otherwise we'll set it to the db messenger
+            // which will always be on.
+            if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled)
             {
-                //we should not proceed to change this if the app/database is not configured since there will 
-                // be no user, plus we don't need to have server messages sent if this is the case.
-                if (ApplicationContext.IsConfigured && ApplicationContext.DatabaseContext.IsDatabaseConfigured)
+                //set the legacy one by default - this maintains backwards compat
+                ServerMessengerResolver.Current.SetServerMessenger(new BatchedWebServiceServerMessenger(() =>
                 {
-                    //disable if they are not enabled
-                    if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled == false)
+                    //we should not proceed to change this if the app/database is not configured since there will 
+                    // be no user, plus we don't need to have server messages sent if this is the case.
+                    if (ApplicationContext.IsConfigured && ApplicationContext.DatabaseContext.IsDatabaseConfigured)
                     {
-                        return null;
-                    }
+                        //disable if they are not enabled
+                        if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled == false)
+                        {
+                            return null;
+                        }
 
-                    try
-                    {
-                        var user = User.GetUser(UmbracoConfig.For.UmbracoSettings().DistributedCall.UserId);
-                        return new System.Tuple<string, string>(user.LoginName, user.GetPassword());
+                        try
+                        {
+                            var user = ApplicationContext.Services.UserService.GetUserById(UmbracoConfig.For.UmbracoSettings().DistributedCall.UserId);
+                            return new Tuple<string, string>(user.Username, user.RawPasswordValue);
+                        }
+                        catch (Exception e)
+                        {
+                            LoggerResolver.Current.Logger.Error<WebBootManager>("An error occurred trying to set the IServerMessenger during application startup", e);
+                            return null;
+                        }
                     }
-                    catch (Exception e)
+                    LoggerResolver.Current.Logger.Warn<WebBootManager>("Could not initialize the DefaultServerMessenger, the application is not configured or the database is not configured");
+                    return null;
+                }));
+            }
+            else
+            {
+
+                // NOTE: This is IMPORTANT! ... we don't want to rebuild any index that is already flagged to be re-indexed 
+                // on startup based on our _indexesToRebuild variable and how Examine auto-rebuilds when indexes are empty
+                // this callback is used below for the DatabaseServerMessenger startup options
+                Action rebuildIndexes = () =>
+                {
+                    //If the developer has explicitly opted out of rebuilding indexes on startup then we 
+                    // should adhere to that and not do it, this means that if they are load balancing things will be
+                    // out of sync if they are auto-scaling but there's not much we can do about that.
+                    if (ExamineSettings.Instance.RebuildOnAppStart == false) return;
+
+                    if (_indexesToRebuild.Any())
                     {
-                        LoggerResolver.Current.Logger.Error<WebBootManager>("An error occurred trying to set the IServerMessenger during application startup", e);
-                        return null;
+                        var otherIndexes = ExamineManager.Instance.IndexProviderCollection.Except(_indexesToRebuild);
+                        foreach (var otherIndex in otherIndexes)
+                        {
+                            otherIndex.RebuildIndex();
+                        }
                     }
-                }
-                LoggerResolver.Current.Logger.Warn<WebBootManager>("Could not initialize the DefaultServerMessenger, the application is not configured or the database is not configured");
-                return null;
-            }));
+                    else
+                    {
+                        //rebuild them all
+                        ExamineManager.Instance.RebuildIndex();
+                    }
+                };
+
+                ServerMessengerResolver.Current.SetServerMessenger(new BatchedDatabaseServerMessenger(
+                ApplicationContext,
+                true,
+                //Default options for web including the required callbacks to build caches
+                new DatabaseServerMessengerOptions
+                {
+                    //These callbacks will be executed if the server has not been synced
+                    // (i.e. it is a new server or the lastsynced.txt file has been removed)
+                    InitializingCallbacks = new Action[]
+                    {
+                        //rebuild the xml cache file if the server is not synced
+                        () => global::umbraco.content.Instance.RefreshContentFromDatabase(),
+                        //rebuild indexes if the server is not synced
+                        // NOTE: This will rebuild ALL indexes including the members, if developers want to target specific 
+                        // indexes then they can adjust this logic themselves.                        
+                        rebuildIndexes
+                    }
+                }));
+            }
 
             SurfaceControllerResolver.Current = new SurfaceControllerResolver(
                 ServiceProvider, LoggerResolver.Current.Logger,
@@ -440,7 +515,6 @@ namespace Umbraco.Web
             CultureDictionaryFactoryResolver.Current = new CultureDictionaryFactoryResolver(
                 new DefaultCultureDictionaryFactory());
         }
-
 
         private void OnInstanceOnBuildingEmptyIndexOnStartup(object sender, BuildingEmptyIndexOnStartupEventArgs args)
         {

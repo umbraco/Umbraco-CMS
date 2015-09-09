@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Routing
             domainService.Setup(service => service.GetAll(It.IsAny<bool>()))
                 .Returns((bool incWildcards) => incWildcards ? allDomains : allDomains.Where(d => d.IsWildcard == false));
             domainService.Setup(service => service.GetAssignedDomains(It.IsAny<int>(), It.IsAny<bool>()))
-                .Returns((int id, bool incWildcards) => allDomains.Where(d => d.RootContent.Id == id && (incWildcards || d.IsWildcard == false)));
+                .Returns((int id, bool incWildcards) => allDomains.Where(d => d.RootContentId == id && (incWildcards || d.IsWildcard == false)));
             return domainService.Object;
         }
 
@@ -36,17 +36,26 @@ namespace Umbraco.Tests.Routing
         {
             //get the mocked service context to get the mocked domain service
             var svcCtx = MockHelper.GetMockedServiceContext();
+
             var domainService = Mock.Get(svcCtx.DomainService);
             //setup mock domain service
             domainService.Setup(service => service.GetAll(It.IsAny<bool>()))
                 .Returns((bool incWildcards) => new[]
                 {
-                    new UmbracoDomain("domain1.com/"){Id = 1, Language = new Language("de-DE"), RootContent = new Content("test1", -1, new ContentType(-1)){ Id = 1001}}, 
-                    new UmbracoDomain("domain1.com/en"){Id = 1, Language = new Language("en-US"), RootContent = new Content("test2", -1, new ContentType(-1)){ Id = 10011}}, 
-                    new UmbracoDomain("domain1.com/fr"){Id = 1, Language = new Language("fr-FR"), RootContent = new Content("test3", -1, new ContentType(-1)){ Id = 10012}}
-                });
+                    new UmbracoDomain("domain1.com/"){Id = 1, LanguageId = LangDeId, RootContentId = 1001, LanguageIsoCode = "de-DE"}, 
+                    new UmbracoDomain("domain1.com/en"){Id = 1, LanguageId = LangEngId, RootContentId = 10011, LanguageIsoCode = "en-US"}, 
+                    new UmbracoDomain("domain1.com/fr"){Id = 1, LanguageId = LangFrId, RootContentId = 10012, LanguageIsoCode = "fr-FR"}
+                });            
+
             return svcCtx;
         }
+
+        public const int LangDeId = 333;
+        public const int LangEngId = 334;
+        public const int LangFrId = 335;
+        public const int LangCzId = 336;
+        public const int LangNlId = 337;
+        public const int LangDkId = 338;
 
         protected override void SetupApplicationContext()
         {

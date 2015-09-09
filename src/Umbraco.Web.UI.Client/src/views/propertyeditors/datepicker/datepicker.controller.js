@@ -17,6 +17,10 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 
     //map the user config
     $scope.model.config = angular.extend(config, $scope.model.config);
+    //ensure the format doesn't get overwritten with an empty string
+    if ($scope.model.config.format === "" || $scope.model.config.format === undefined || $scope.model.config.format === null) {
+        $scope.model.config.format = $scope.model.config.pickTime ? "YYYY-MM-DD HH:mm:ss" : "YYYY-MM-DD";
+    }
 
     $scope.hasDatetimePickerValue = $scope.model.value ? true : false;
     $scope.datetimePickerValue = null;
@@ -39,12 +43,7 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
             if (e.date && e.date.isValid()) {
                 $scope.datePickerForm.datepicker.$setValidity("pickerError", true);
                 $scope.hasDatetimePickerValue = true;
-                if (!$scope.model.config.format) {
-                    $scope.datetimePickerValue = e.date;
-                }
-                else {
-                    $scope.datetimePickerValue = e.date.format($scope.model.config.format);
-                }
+                $scope.datetimePickerValue = e.date.format($scope.model.config.format);
             }
             else {
                 $scope.hasDatetimePickerValue = false;
@@ -78,8 +77,8 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 		$scope.model.config.language = user.locale;
 		
 
-		assetsService.load(filesToLoad).then(
-			function () {
+		assetsService.load(filesToLoad, $scope).then(
+            function () {
 				//The Datepicker js and css files are available and all components are ready to use.
 
 				// Get the id of the datepicker button that was clicked
@@ -98,15 +97,10 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 
 			    if ($scope.hasDatetimePickerValue) {
 
-                    //assign value to plugin/picker
-			        element.datetimepicker("setValue", $scope.model.value ? new Date($scope.model.value) : moment());
-
-			        if (!$scope.model.config.format) {
-			            $scope.datetimePickerValue = moment($scope.model.value);
-			        }
-			        else {
-			            $scope.datetimePickerValue = moment($scope.model.value).format($scope.model.config.format);
-			        }
+			        //assign value to plugin/picker
+			        var dateVal = $scope.model.value ? moment($scope.model.value, $scope.model.config.format) : moment();
+			        element.datetimepicker("setValue", dateVal);
+			        $scope.datetimePickerValue = moment($scope.model.value).format($scope.model.config.format);
 			    }
 
 			    element.find("input").bind("blur", function() {
@@ -146,9 +140,24 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
         
     });
 
+    var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
+        if ($scope.hasDatetimePickerValue) {
+            if ($scope.model.config.pickTime) {
+                $scope.model.value = $element.find("div:first").data().DateTimePicker.getDate().format("YYYY-MM-DD HH:mm:ss");
+            }
+            else {
+                $scope.model.value = $element.find("div:first").data().DateTimePicker.getDate().format("YYYY-MM-DD");
+            }
+        }
+        else {
+            $scope.model.value = null;
+        }
+    });
+
     //unbind doc click event!
     $scope.$on('$destroy', function () {
         $(document).unbind("click", $scope.hidePicker);
+        unsubscribe();
     });
 }
 

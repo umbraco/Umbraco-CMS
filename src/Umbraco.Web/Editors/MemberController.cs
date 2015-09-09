@@ -80,7 +80,7 @@ namespace Umbraco.Web.Editors
             string filter = "",
             string memberTypeAlias = null)
         {
-            int totalRecords;
+            
             if (pageNumber <= 0 || pageSize <= 0)
             {
                 throw new NotSupportedException("Both pageNumber and pageSize must be greater than zero");
@@ -88,6 +88,7 @@ namespace Umbraco.Web.Editors
 
             if (MembershipScenario == MembershipScenario.NativeUmbraco)
             {
+                long totalRecords;
                 var members = Services.MemberService.GetAll((pageNumber - 1), pageSize, out totalRecords, orderBy, orderDirection, memberTypeAlias, filter).ToArray();
                 if (totalRecords == 0)
                 {
@@ -100,6 +101,7 @@ namespace Umbraco.Web.Editors
             }
             else
             {
+                int totalRecords;
                 var members = _provider.GetAllUsers((pageNumber - 1), pageSize, out totalRecords);
                 if (totalRecords == 0)
                 {
@@ -385,6 +387,7 @@ namespace Umbraco.Web.Editors
             }
 
             var shouldReFetchMember = false;
+            var providedUserName = contentItem.PersistedContent.Username;
 
             //Update the membership user if it has changed
             try
@@ -444,7 +447,9 @@ namespace Umbraco.Web.Editors
                 if (shouldReFetchMember)
                 {
                     RefetchMemberData(contentItem, LookupType.ByKey);
+                    RestoreProvidedUserName(contentItem, providedUserName);
                 }
+
                 return null;
             }
 
@@ -456,6 +461,7 @@ namespace Umbraco.Web.Editors
                 if (shouldReFetchMember)
                 {
                     RefetchMemberData(contentItem, LookupType.ByKey);
+                    RestoreProvidedUserName(contentItem, providedUserName);
                 }
 
                 //even if we weren't resetting this, it is the correct value (null), otherwise if we were resetting then it will contain the new pword
@@ -466,7 +472,6 @@ namespace Umbraco.Web.Editors
             ModelState.AddPropertyError(
                 passwordChangeResult.Result.ChangeError,
                 string.Format("{0}password", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
-
 
             return null;
         }
@@ -526,6 +531,17 @@ namespace Umbraco.Web.Editors
                     p.TagSupport.Tags = valueMapped.TagSupport.Tags;
                 }
             }            
+        }
+
+        /// <summary>
+        /// Following a refresh of member data called during an update if the membership provider has changed some underlying data, 
+        /// we don't want to lose the provided, and potentiallly changed, username
+        /// </summary>
+        /// <param name="contentItem"></param>
+        /// <param name="providedUserName"></param>
+        private static void RestoreProvidedUserName(MemberSave contentItem, string providedUserName)
+        {
+            contentItem.PersistedContent.Username = providedUserName;
         }
 
         /// <summary>

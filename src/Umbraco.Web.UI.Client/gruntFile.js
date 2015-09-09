@@ -18,10 +18,10 @@ module.exports = function (grunt) {
     grunt.registerTask('watch-test', ['jshint:dev', 'karma:unit']);
 
     //triggered from grunt dev or grunt
-    grunt.registerTask('build', ['clean', 'concat', 'recess:min', 'recess:installer', 'recess:canvasdesigner', 'bower-install-simple', 'bower', 'copy']);
+    grunt.registerTask('build', ['clean:pre', 'concat', 'recess:min', 'recess:installer', 'recess:canvasdesigner', 'bower-install-simple', 'bower', 'copy', 'clean:post']);
 
     //build-dev doesn't min - we are trying to speed this up and we don't want minified stuff when we are in dev mode
-    grunt.registerTask('build-dev', ['clean', 'concat', 'recess:build', 'recess:installer', 'bower-install-simple', 'bower', 'copy']);
+    grunt.registerTask('build-dev', ['clean:pre', 'concat', 'recess:build', 'recess:installer', 'bower-install-simple', 'bower', 'copy']);
 
     //utillity tasks
     grunt.registerTask('docs', ['ngdocs']);
@@ -108,7 +108,10 @@ module.exports = function (grunt) {
             prod: ['<%= distdir %>/js/*.js']
         },
 
-        clean: ['<%= distdir %>/*'],
+        clean: {
+            pre: ['<%= distdir %>/*'],
+            post: ['<%= distdir %>/js/*.dev.js']
+        },
 
         copy: {
             assets: {
@@ -418,7 +421,8 @@ module.exports = function (grunt) {
                     ignorePackages: ['blueimp-canvas-to-blob', 'blueimp-tmpl', 'bootstrap'],
                     packageSpecific: {
                         'typeahead.js': {                            
-                            keepExpandedHierarchy: false
+                            keepExpandedHierarchy: false,
+                            files: ['dist/typeahead.bundle.min.js']
                         },
                         'underscore': {
                             files: ['underscore-min.js', 'underscore-min.map']
@@ -455,10 +459,7 @@ module.exports = function (grunt) {
                         },
                         'angular-dynamic-locale': {
                             files: ['tmhDynamicLocale.min.js', 'tmhDynamicLocale.min.js.map']
-                        },
-                        'bootstrap-tabdrop': {
-                            keepExpandedHierarchy: false
-                        },
+                        },                        
                         'codemirror': {
                             files: [
                                 'lib/codemirror.js',

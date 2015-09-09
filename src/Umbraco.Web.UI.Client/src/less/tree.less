@@ -3,14 +3,13 @@
 
 
 .umb-item-list {
-	margin: 0px;
+	margin: 0;
 	width: auto;
 	display: block
 }
 .umb-item-list li {
 	display: block;
 	width: auto;
-	display: block
 }
 
 
@@ -20,7 +19,7 @@
 // -------------------------
 
 .umb-tree {
-	margin: 0px;
+	margin: 0;
 	min-width: 100%;
 	width: auto;
 }
@@ -29,17 +28,17 @@
 	display: block;
 	min-width: 100%;
 	width: auto;
-	display: block
 }
 .umb-tree li.current > div, .umb-tree div.selected {
 	background: @blue;
 }
-.umb-tree li.current > div a.umb-options i, .umb-tree div.selected i{
+.umb-tree li.current > div a.umb-options i, .umb-tree div.selected i {
 	background: #fff;
 	border-color: @blue;
 }
 .umb-tree li.current > div a,
-.umb-tree li.current > div i.icon{
+.umb-tree li.current > div i.icon,
+.umb-tree li.current > div ins {
 	color: white !important;
 	background: @blue;
 	border-color: @blue;
@@ -57,8 +56,8 @@
 	white-space: nowrap
 }
 .umb-tree ul {
-	padding: 0px;
-	margin: 0px;
+	padding: 0;
+	margin: 0;
 	min-width: 100%;
 	width: 100%;
 	//display: table
@@ -111,21 +110,19 @@
 	display: inline-block;
 	visibility: hidden;
 	text-decoration: none;
+    font-size: 12px;
 }
+
 .umb-tree li:hover ins {
 	visibility: visible;
 	cursor: pointer
-}
-
-.umb-tree ins {
-	font-size: 12px;
 }
 
 .umb-tree .icon {
 	vertical-align: middle;
 	margin: 1px 13px 1px 0px;
 	color: #21201C;
-	font-size: 15px;
+	font-size: 20px;
 }
 .umb-tree i.noSpr {
 	display: inline-block;
@@ -434,7 +431,7 @@ overflow:hidden;
 }
 
 
-body.touch .umb-tree .icon{font-size: 17px;}
+/*body.touch .umb-tree .icon{font-size: 19px;}*/
 body.touch .umb-tree ins{font-size: 14px; visibility: visible; padding: 7px;}
 body.touch .umb-tree li div {
 	padding-top: 8px;

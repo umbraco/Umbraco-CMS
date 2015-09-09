@@ -238,7 +238,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 var xmlItems = (from descendant in descendants
                                 let xml = serializer(descendant)
-                                select new ContentXmlDto { NodeId = descendant.Id, Xml = xml.ToString(SaveOptions.None) }).ToArray();
+                                select new ContentXmlDto { NodeId = descendant.Id, Xml = xml.ToDataString() }).ToArray();
 
                 //bulk insert it into the database
                 Database.BulkInsertRecords(xmlItems, tr);
@@ -339,6 +339,12 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override void PersistNewItem(IContent entity)
         {
             ((Content)entity).AddingEntity();
+
+            //ensure the default template is assigned
+            if (entity.Template == null)
+            {
+                entity.Template = entity.ContentType.DefaultTemplate;
+            }
 
             //Ensure unique name on the same level
             entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name);
@@ -648,8 +654,8 @@ namespace Umbraco.Core.Persistence.Repositories
             var translator = new SqlTranslator<IContent>(sqlClause, query);
             var sql = translator.Translate()
                                 .Where<DocumentDto>(x => x.Published)
-                                .OrderBy<NodeDto>(x => x.Level)
-                                .OrderBy<NodeDto>(x => x.SortOrder);
+                                .OrderBy<NodeDto>(x => x.Level, SqlSyntax)
+                                .OrderBy<NodeDto>(x => x.SortOrder, SqlSyntax);
 
             //NOTE: This doesn't allow properties to be part of the query
             var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sql);
@@ -820,12 +826,13 @@ namespace Umbraco.Core.Persistence.Repositories
             var contentTypes = _contentTypeRepository.GetAll(dtos.Select(x => x.ContentVersionDto.ContentDto.ContentTypeId).ToArray())
                 .ToArray();
 
+            
+            var ids = dtos
+                .Where(dto => dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
+                .Select(x => x.TemplateId.Value).ToArray();
+            
             //NOTE: This should be ok for an SQL 'IN' statement, there shouldn't be an insane amount of content types
-            var templates = _templateRepository.GetAll(
-                dtos
-                    .Where(dto => dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
-                    .Select(x => x.TemplateId.Value).ToArray())
-                .ToArray();
+            var templates = ids.Length == 0 ? Enumerable.Empty<ITemplate>() : _templateRepository.GetAll(ids).ToArray();
 
             var dtosWithContentTypes = dtos
                 //This select into and null check are required because we don't have a foreign damn key on the contentType column
@@ -854,7 +861,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// Private method to create a content object from a DocumentDto, which is used by Get and GetByVersion.
         /// </summary>
-        /// <param name="d"></param>
+        /// <param name="dto"></param>
         /// <param name="contentType"></param>
         /// <param name="template"></param>
         /// <param name="propCollection"></param>
@@ -872,6 +879,11 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 content.Template = template ?? _templateRepository.Get(dto.TemplateId.Value);
             }
+            else
+            {
+                //ensure there isn't one set.
+                content.Template = null;
+            }
 
             content.Properties = propCollection;
 
@@ -884,7 +896,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// Private method to create a content object from a DocumentDto, which is used by Get and GetByVersion.
         /// </summary>
-        /// <param name="d"></param>
+        /// <param name="dto"></param>
         /// <param name="versionId"></param>
         /// <param name="docSql"></param>
         /// <returns></returns>

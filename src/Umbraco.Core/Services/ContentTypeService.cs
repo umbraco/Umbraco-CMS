@@ -32,28 +32,8 @@ namespace Umbraco.Core.Services
         //for example, the Move method needs to be locked but this calls the Save method which also needs to be locked.
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public ContentTypeService(IContentService contentService, IMediaService mediaService)
-			: this(new PetaPocoUnitOfWorkProvider(LoggerResolver.Current.Logger), new RepositoryFactory(), contentService, mediaService)
-        {}
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public ContentTypeService( RepositoryFactory repositoryFactory, IContentService contentService, IMediaService mediaService)
-            : this(new PetaPocoUnitOfWorkProvider(), repositoryFactory, contentService, mediaService)
-        { }
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public ContentTypeService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IContentService contentService, IMediaService mediaService)
-            : base(provider, repositoryFactory, LoggerResolver.Current.Logger)
-        {
-            if (contentService == null) throw new ArgumentNullException("contentService");
-            if (mediaService == null) throw new ArgumentNullException("mediaService");
-	        _contentService = contentService;
-            _mediaService = mediaService;
-        }
-
-        public ContentTypeService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IContentService contentService, IMediaService mediaService)
-            : base(provider, repositoryFactory, logger)
+        public ContentTypeService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory, IContentService contentService, IMediaService mediaService)
+            : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
             if (contentService == null) throw new ArgumentNullException("contentService");
             if (mediaService == null) throw new ArgumentNullException("mediaService");
@@ -186,6 +166,19 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Gets an <see cref="IContentType"/> object by its Key
+        /// </summary>
+        /// <param name="id">Alias of the <see cref="IContentType"/> to retrieve</param>
+        /// <returns><see cref="IContentType"/></returns>
+        public IContentType GetContentType(Guid id)
+        {
+            using (var repository = RepositoryFactory.CreateContentTypeRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.Get(id);
+            }
+        }
+
+        /// <summary>
         /// Gets a list of all available <see cref="IContentType"/> objects
         /// </summary>
         /// <param name="ids">Optional list of ids</param>
@@ -195,6 +188,19 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateContentTypeRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.GetAll(ids);
+            }
+        }
+
+        /// <summary>
+        /// Gets a list of all available <see cref="IContentType"/> objects
+        /// </summary>
+        /// <param name="ids">Optional list of ids</param>
+        /// <returns>An Enumerable list of <see cref="IContentType"/> objects</returns>
+        public IEnumerable<IContentType> GetAllContentTypes(IEnumerable<Guid> ids)
+        {
+            using (var repository = RepositoryFactory.CreateContentTypeRepository(UowProvider.GetUnitOfWork()))
+            {                
+                return repository.GetAll(ids.ToArray());
             }
         }
 
@@ -213,25 +219,22 @@ namespace Umbraco.Core.Services
             }
         }
 
-        ///// <summary>
-        ///// Returns the content type descendant Ids for the content type specified
-        ///// </summary>
-        ///// <param name="contentTypeId"></param>
-        ///// <returns></returns>
-        //internal IEnumerable<int> GetDescendantContentTypeIds(int contentTypeId)
-        //{            
-        //    using (var uow = UowProvider.GetUnitOfWork())
-        //    {
-        //        //method to return the child content type ids for the id specified
-        //        Func<int, int[]> getChildIds =
-        //            parentId =>
-        //            uow.Database.Fetch<ContentType2ContentTypeDto>("WHERE parentContentTypeId = @Id", new {Id = parentId})
-        //               .Select(x => x.ChildId).ToArray();
-
-        //        //recursively get all descendant ids
-        //        return getChildIds(contentTypeId).FlattenList(getChildIds);                
-        //    }
-        //} 
+        /// <summary>
+        /// Gets a list of children for a <see cref="IContentType"/> object
+        /// </summary>
+        /// <param name="id">Id of the Parent</param>
+        /// <returns>An Enumerable list of <see cref="IContentType"/> objects</returns>
+        public IEnumerable<IContentType> GetContentTypeChildren(Guid id)
+        {
+            using (var repository = RepositoryFactory.CreateContentTypeRepository(UowProvider.GetUnitOfWork()))
+            {
+                var found = GetContentType(id);
+                if (found == null) return Enumerable.Empty<IContentType>();
+                var query = Query<IContentType>.Builder.Where(x => x.ParentId == found.Id);
+                var contentTypes = repository.GetByQuery(query);
+                return contentTypes;
+            }
+        }
 
         /// <summary>
         /// Checks whether an <see cref="IContentType"/> item has any children
@@ -243,6 +246,23 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateContentTypeRepository(UowProvider.GetUnitOfWork()))
             {
                 var query = Query<IContentType>.Builder.Where(x => x.ParentId == id);
+                int count = repository.Count(query);
+                return count > 0;
+            }
+        }
+
+        /// <summary>
+        /// Checks whether an <see cref="IContentType"/> item has any children
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IContentType"/></param>
+        /// <returns>True if the content type has any children otherwise False</returns>
+        public bool HasChildren(Guid id)
+        {
+            using (var repository = RepositoryFactory.CreateContentTypeRepository(UowProvider.GetUnitOfWork()))
+            {
+                var found = GetContentType(id);
+                if (found == null) return false;
+                var query = Query<IContentType>.Builder.Where(x => x.ParentId == found.Id);
                 int count = repository.Count(query);
                 return count > 0;
             }
@@ -519,6 +539,19 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Gets an <see cref="IMediaType"/> object by its Id
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IMediaType"/> to retrieve</param>
+        /// <returns><see cref="IMediaType"/></returns>
+        public IMediaType GetMediaType(Guid id)
+        {
+            using (var repository = RepositoryFactory.CreateMediaTypeRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.Get(id);
+            }
+        }
+
+        /// <summary>
         /// Gets a list of all available <see cref="IMediaType"/> objects
         /// </summary>
         /// <param name="ids">Optional list of ids</param>
@@ -528,6 +561,19 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateMediaTypeRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.GetAll(ids);
+            }
+        }
+
+        /// <summary>
+        /// Gets a list of all available <see cref="IMediaType"/> objects
+        /// </summary>
+        /// <param name="ids">Optional list of ids</param>
+        /// <returns>An Enumerable list of <see cref="IMediaType"/> objects</returns>
+        public IEnumerable<IMediaType> GetAllMediaTypes(IEnumerable<Guid> ids)
+        {
+            using (var repository = RepositoryFactory.CreateMediaTypeRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.GetAll(ids.ToArray());
             }
         }
 
@@ -547,6 +593,23 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Gets a list of children for a <see cref="IMediaType"/> object
+        /// </summary>
+        /// <param name="id">Id of the Parent</param>
+        /// <returns>An Enumerable list of <see cref="IMediaType"/> objects</returns>
+        public IEnumerable<IMediaType> GetMediaTypeChildren(Guid id)
+        {
+            using (var repository = RepositoryFactory.CreateMediaTypeRepository(UowProvider.GetUnitOfWork()))
+            {
+                var found = GetMediaType(id);
+                if (found == null) return Enumerable.Empty<IMediaType>();
+                var query = Query<IMediaType>.Builder.Where(x => x.ParentId == found.Id);
+                var contentTypes = repository.GetByQuery(query);
+                return contentTypes;
+            }
+        }
+
+        /// <summary>
         /// Checks whether an <see cref="IMediaType"/> item has any children
         /// </summary>
         /// <param name="id">Id of the <see cref="IMediaType"/></param>
@@ -556,6 +619,23 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateMediaTypeRepository(UowProvider.GetUnitOfWork()))
             {
                 var query = Query<IMediaType>.Builder.Where(x => x.ParentId == id);
+                int count = repository.Count(query);
+                return count > 0;
+            }
+        }
+
+        /// <summary>
+        /// Checks whether an <see cref="IMediaType"/> item has any children
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IMediaType"/></param>
+        /// <returns>True if the media type has any children otherwise False</returns>
+        public bool MediaTypeHasChildren(Guid id)
+        {
+            using (var repository = RepositoryFactory.CreateMediaTypeRepository(UowProvider.GetUnitOfWork()))
+            {
+                var found = GetMediaType(id);
+                if (found == null) return false;
+                var query = Query<IMediaType>.Builder.Where(x => x.ParentId == found.Id);
                 int count = repository.Count(query);
                 return count > 0;
             }

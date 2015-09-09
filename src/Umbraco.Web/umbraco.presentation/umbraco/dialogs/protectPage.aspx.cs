@@ -12,6 +12,7 @@ using umbraco.cms.businesslogic.web;
 using umbraco.controls;
 using umbraco.cms.helpers;
 using umbraco.BasePages;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Security;
 
 namespace umbraco.presentation.umbraco.dialogs
@@ -262,8 +263,9 @@ namespace umbraco.presentation.umbraco.dialogs
                 p_buttons.Visible = false;
                 pane_advanced.Visible = false;
                 pane_simple.Visible = false;
-
-                ClientTools.ReloadActionNode(true, false);
+                
+                var content = ApplicationContext.Current.Services.ContentService.GetById(pageId);
+                ClientTools.SyncTree(content.Path, true);
 
                 feedback.type = global::umbraco.uicontrols.Feedback.feedbacktype.success;
             }
@@ -281,7 +283,8 @@ namespace umbraco.presentation.umbraco.dialogs
 
             feedback.Text = ui.Text("publicAccess", "paIsRemoved", new cms.businesslogic.CMSNode(pageId).Text) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
 
-            ClientTools.ReloadActionNode(true, false);
+            var content = ApplicationContext.Current.Services.ContentService.GetById(pageId);
+            ClientTools.SyncTree(content.Path, true);
 
             feedback.type = global::umbraco.uicontrols.Feedback.feedbacktype.success;
         }

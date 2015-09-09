@@ -32,7 +32,7 @@ namespace Umbraco.Web
         private IUmbracoComponentRenderer _componentRenderer;        
         private PublishedContentQuery _query;
         private MembershipHelper _membershipHelper;
-        private ITagQuery _tag;
+        private TagQuery _tag;
         private IDataTypeService _dataTypeService;
         private UrlProvider _urlProvider;
         private ICultureDictionary _cultureDictionary;
@@ -40,9 +40,18 @@ namespace Umbraco.Web
         /// <summary>
         /// Lazy instantiates the tag context
         /// </summary>
-        public ITagQuery TagQuery
+        public TagQuery TagQuery
         {
-            get { return _tag ?? (_tag = new TagQuery(UmbracoContext.Application.Services.TagService, _typedQuery)); }
+            //TODO: Unfortunately we cannot change this return value to be ITagQuery
+            // since it's a breaking change, need to fix it for v8
+            // http://issues.umbraco.org/issue/U4-6899
+
+            get
+            {
+                return _tag ??
+                       (_tag = new TagQuery(UmbracoContext.Application.Services.TagService,
+                           _typedQuery ?? ContentQuery));
+            }
         }
 
         /// <summary>
@@ -154,7 +163,7 @@ namespace Umbraco.Web
             if (membershipHelper == null) throw new ArgumentNullException("membershipHelper");
 
             _umbracoContext = umbracoContext;
-            _tag = tagQuery;
+            _tag = new TagQuery(tagQuery);
             _dataTypeService = dataTypeService;
             _urlProvider = urlProvider;
             _cultureDictionary = cultureDictionary;
@@ -312,7 +321,7 @@ namespace Umbraco.Web
             bool formatAsDateWithTime = false,
             string formatAsDateWithTimeSeparator = "")
 		{			
-            return _componentRenderer.Field(AssignedContentItem, fieldAlias, altFieldAlias,
+            return UmbracoComponentRenderer.Field(AssignedContentItem, fieldAlias, altFieldAlias,
                 altText, insertBefore, insertAfter, recursive, convertLineBreaks, removeParagraphTags,
                 casing, encoding, formatAsDate, formatAsDateWithTime, formatAsDateWithTimeSeparator);
 		}
@@ -345,7 +354,7 @@ namespace Umbraco.Web
             bool formatAsDateWithTime = false,
             string formatAsDateWithTimeSeparator = "")
 		{
-            return _componentRenderer.Field(currentPage, fieldAlias, altFieldAlias,
+            return UmbracoComponentRenderer.Field(currentPage, fieldAlias, altFieldAlias,
                 altText, insertBefore, insertAfter, recursive, convertLineBreaks, removeParagraphTags,
                 casing, encoding, formatAsDate, formatAsDateWithTime, formatAsDateWithTimeSeparator);
 		}
@@ -575,27 +584,57 @@ namespace Umbraco.Web
             return ContentQuery.TypedContent(ConvertIdsObjectToInts(ids));
 		}
 
+        /// <summary>
+        /// Gets the contents corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The content identifiers.</param>
+        /// <returns>The existing contents corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
 		public IEnumerable<IPublishedContent> TypedContent(params int[] ids)
 		{
             return ContentQuery.TypedContent(ids);
 		}
 
-		public IEnumerable<IPublishedContent> TypedContent(params string[] ids)
+        /// <summary>
+        /// Gets the contents corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The content identifiers.</param>
+        /// <returns>The existing contents corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
+        public IEnumerable<IPublishedContent> TypedContent(params string[] ids)
 		{
             return ContentQuery.TypedContent(ConvertIdsObjectToInts(ids));
 		}
 
-		public IEnumerable<IPublishedContent> TypedContent(IEnumerable<object> ids)
+        /// <summary>
+        /// Gets the contents corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The content identifiers.</param>
+        /// <returns>The existing contents corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
+        public IEnumerable<IPublishedContent> TypedContent(IEnumerable<object> ids)
 		{
             return ContentQuery.TypedContent(ConvertIdsObjectToInts(ids));
 		}
 
-		public IEnumerable<IPublishedContent> TypedContent(IEnumerable<string> ids)
+        /// <summary>
+        /// Gets the contents corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The content identifiers.</param>
+        /// <returns>The existing contents corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
+        public IEnumerable<IPublishedContent> TypedContent(IEnumerable<string> ids)
 		{
             return ContentQuery.TypedContent(ConvertIdsObjectToInts(ids));
 		}
 
-		public IEnumerable<IPublishedContent> TypedContent(IEnumerable<int> ids)
+        /// <summary>
+        /// Gets the contents corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The content identifiers.</param>
+        /// <returns>The existing contents corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
+        public IEnumerable<IPublishedContent> TypedContent(IEnumerable<int> ids)
 		{
             return ContentQuery.TypedContent(ids);
 		}
@@ -642,32 +681,68 @@ namespace Umbraco.Web
             return ContentQuery.ContentSingleAtXPath(xpath, vars);
         }
 
+        /// <summary>
+        /// Gets the contents corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The content identifiers.</param>
+        /// <returns>The existing contents corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
         public dynamic Content(params object[] ids)
 		{
             return ContentQuery.Content(ConvertIdsObjectToInts(ids));
 		}
 
-		public dynamic Content(params int[] ids)
+        /// <summary>
+        /// Gets the contents corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The content identifiers.</param>
+        /// <returns>The existing contents corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
+        public dynamic Content(params int[] ids)
 		{
             return ContentQuery.Content(ids);
 		}
 
-		public dynamic Content(params string[] ids)
+        /// <summary>
+        /// Gets the contents corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The content identifiers.</param>
+        /// <returns>The existing contents corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
+        public dynamic Content(params string[] ids)
 		{
             return ContentQuery.Content(ConvertIdsObjectToInts(ids));
 		}
 
-		public dynamic Content(IEnumerable<object> ids)
+        /// <summary>
+        /// Gets the contents corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The content identifiers.</param>
+        /// <returns>The existing contents corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
+        public dynamic Content(IEnumerable<object> ids)
 		{
             return ContentQuery.Content(ConvertIdsObjectToInts(ids));
 		}
 
-		public dynamic Content(IEnumerable<int> ids)
+        /// <summary>
+        /// Gets the contents corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The content identifiers.</param>
+        /// <returns>The existing contents corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
+        public dynamic Content(IEnumerable<int> ids)
 		{
             return ContentQuery.Content(ids);
 		}
 
-		public dynamic Content(IEnumerable<string> ids)
+        /// <summary>
+        /// Gets the contents corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The content identifiers.</param>
+        /// <returns>The existing contents corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
+        public dynamic Content(IEnumerable<string> ids)
 		{
             return ContentQuery.Content(ConvertIdsObjectToInts(ids));
 		}
@@ -749,32 +824,68 @@ namespace Umbraco.Web
             return ConvertIdObjectToInt(id, out intId) ? ContentQuery.TypedMedia(intId) : null;
 		}
 
-		public IEnumerable<IPublishedContent> TypedMedia(params object[] ids)
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public IEnumerable<IPublishedContent> TypedMedia(params object[] ids)
 		{
             return ContentQuery.TypedMedia(ConvertIdsObjectToInts(ids));
 		}
 
-		public IEnumerable<IPublishedContent> TypedMedia(params int[] ids)
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public IEnumerable<IPublishedContent> TypedMedia(params int[] ids)
 		{
             return ContentQuery.TypedMedia(ids);
 		}
 
-		public IEnumerable<IPublishedContent> TypedMedia(params string[] ids)
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public IEnumerable<IPublishedContent> TypedMedia(params string[] ids)
 		{
             return ContentQuery.TypedMedia(ConvertIdsObjectToInts(ids));
 		}
 
-		public IEnumerable<IPublishedContent> TypedMedia(IEnumerable<object> ids)
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public IEnumerable<IPublishedContent> TypedMedia(IEnumerable<object> ids)
 		{
             return ContentQuery.TypedMedia(ConvertIdsObjectToInts(ids));
 		}
 
-		public IEnumerable<IPublishedContent> TypedMedia(IEnumerable<int> ids)
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public IEnumerable<IPublishedContent> TypedMedia(IEnumerable<int> ids)
 		{
             return ContentQuery.TypedMedia(ids);
 		}
 
-		public IEnumerable<IPublishedContent> TypedMedia(IEnumerable<string> ids)
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public IEnumerable<IPublishedContent> TypedMedia(IEnumerable<string> ids)
 		{
             return ContentQuery.TypedMedia(ConvertIdsObjectToInts(ids));
 		}
@@ -801,32 +912,68 @@ namespace Umbraco.Web
             return ConvertIdObjectToInt(id, out intId) ? ContentQuery.Media(intId) : DynamicNull.Null;
 		}
 
-		public dynamic Media(params object[] ids)
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public dynamic Media(params object[] ids)
 		{
             return ContentQuery.Media(ConvertIdsObjectToInts(ids));
 		}
 
-		public dynamic Media(params int[] ids)
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public dynamic Media(params int[] ids)
 		{
             return ContentQuery.Media(ids);
 		}
 
-		public dynamic Media(params string[] ids)
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public dynamic Media(params string[] ids)
 		{
             return ContentQuery.Media(ConvertIdsObjectToInts(ids));
 		}
 
-		public dynamic Media(IEnumerable<object> ids)
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public dynamic Media(IEnumerable<object> ids)
 		{
             return ContentQuery.Media(ConvertIdsObjectToInts(ids));
 		}
 
-		public dynamic Media(IEnumerable<int> ids)
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public dynamic Media(IEnumerable<int> ids)
 		{
             return ContentQuery.Media(ids);
 		}
 
-		public dynamic Media(IEnumerable<string> ids)
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public dynamic Media(IEnumerable<string> ids)
 		{
             return ContentQuery.Media(ConvertIdsObjectToInts(ids));
 		}

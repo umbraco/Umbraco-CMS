@@ -15,7 +15,6 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class StylesheetRepository : FileRepository<string, Stylesheet>, IStylesheetRepository
     {
-        
         public StylesheetRepository(IUnitOfWork work, IFileSystem fileSystem)
             : base(work, fileSystem)
         {
@@ -25,31 +24,28 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public override Stylesheet Get(string id)
         {
-            if (FileSystem.FileExists(id) == false)
-            {
-                return null;
-            }
-
-            string content;
-
-            using (var stream = FileSystem.OpenFile(id))
-            using (var reader = new StreamReader(stream, Encoding.UTF8))
-            {
-                content = reader.ReadToEnd();
-            }
-
+            // get the relative path within the filesystem
+            // (though... id should be relative already)
             var path = FileSystem.GetRelativePath(id);
+
+            path = path.EnsureEndsWith(".css");
+
+            if (FileSystem.FileExists(path) == false)
+                return null;
+
+            // content will be lazy-loaded when required
             var created = FileSystem.GetCreated(path).UtcDateTime;
             var updated = FileSystem.GetLastModified(path).UtcDateTime;
+            //var content = GetFileContent(path);
 
-            var stylesheet = new Stylesheet(path)
+            var stylesheet = new Stylesheet(path, file => GetFileContent(file.OriginalPath))
             {
-                Content = content,
+                //Content = content,
                 Key = path.EncodeAsGuid(),
                 CreateDate = created,
                 UpdateDate = updated,
                 Id = path.GetHashCode(),
-                VirtualPath = FileSystem.GetUrl(id)
+                VirtualPath = FileSystem.GetUrl(path)
             };
 
             //on initial construction we don't want to have dirty properties tracked
@@ -60,10 +56,22 @@ namespace Umbraco.Core.Persistence.Repositories
 
         }
 
+        public override void AddOrUpdate(Stylesheet entity)
+        {
+            base.AddOrUpdate(entity);
+
+            // ensure that from now on, content is lazy-loaded
+            if (entity.GetFileContent == null)
+                entity.GetFileContent = file => GetFileContent(file.OriginalPath);
+        }
+
         public override IEnumerable<Stylesheet> GetAll(params string[] ids)
         {
             //ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries
-            ids = ids.Distinct().ToArray();
+            ids = ids
+                .Select(x => x.EnsureEndsWith(".css"))
+                .Distinct()
+                .ToArray();
 
             if (ids.Any())
             {
@@ -94,19 +102,27 @@ namespace Umbraco.Core.Persistence.Repositories
             return FileSystem.GetFiles(rootPath ?? string.Empty, "*.css").Select(Get);
         }
 
+        private static readonly List<string> ValidExtensions = new List<string> { "css" };
+
         public bool ValidateStylesheet(Stylesheet stylesheet)
         {
-            var dirs = SystemDirectories.Css;
+            // get full path
+            string fullPath;
+            try
+            {
+                // may throw for security reasons
+                fullPath = FileSystem.GetFullPath(stylesheet.Path);
+            }
+            catch
+            {
+                return false;
+            }
 
-            //Validate file
-            var validFile = IOHelper.VerifyEditPath(stylesheet.VirtualPath, dirs.Split(','));
-
-            //Validate extension
-            var validExtension = IOHelper.VerifyFileExtension(stylesheet.VirtualPath, new List<string> { "css" });
-
-            var fileValid = validFile && validExtension;
-
-            return fileValid;
+            // validate path and extension
+            var validDir = SystemDirectories.Css;
+            var isValidPath = IOHelper.VerifyEditPath(fullPath, validDir);
+            var isValidExtension = IOHelper.VerifyFileExtension(stylesheet.Path, ValidExtensions);
+            return isValidPath && isValidExtension;
         }
 
         #endregion

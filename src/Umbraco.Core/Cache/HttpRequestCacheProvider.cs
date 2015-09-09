@@ -102,7 +102,7 @@ namespace Umbraco.Core.Cache
                 // cannot create value within the lock, so if result.IsValueCreated is false, just
                 // do nothing here - means that if creation throws, a race condition could cause
                 // more than one thread to reach the return statement below and throw - accepted.
-                
+
                 if (result == null || GetSafeLazyValue(result, true) == null) // get non-created as NonCreatedValue & exceptions as null
                 {
                     result = GetSafeLazy(getCacheItem);
@@ -122,7 +122,7 @@ namespace Umbraco.Core.Cache
             if (eh != null) throw eh.Exception; // throw once!
             return value;
         }
-        
+
         #endregion
 
         #region Insert

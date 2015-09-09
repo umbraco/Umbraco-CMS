@@ -54,16 +54,24 @@ namespace Umbraco.Web.WebServices
             {
                 var wildcard = domains.FirstOrDefault(d => d.IsWildcard);
                 if (wildcard != null)
-                    wildcard.Language = language;
+                    wildcard.LanguageId = language.Id;
                 else
                 {
                     // yet there is a race condition here...
                     var newDomain = new UmbracoDomain("*" + model.NodeId)
                     {
-                        Language = Services.LocalizationService.GetLanguageById(model.Language),
-                        RootContent = Services.ContentService.GetById(model.NodeId)
+                        LanguageId = model.Language,
+                        RootContentId = model.NodeId
                     };
-                    Services.DomainService.Save(newDomain);
+
+                    var saveAttempt = Services.DomainService.Save(newDomain);
+                    if (saveAttempt == false)
+                    {
+                        var response = Request.CreateResponse(HttpStatusCode.BadRequest);
+                        response.Content = new StringContent("Saving new domain failed");
+                        response.ReasonPhrase = saveAttempt.Result.StatusType.ToString();
+                        throw new HttpResponseException(response);
+                    }
                 }
                     
             }
@@ -103,7 +111,7 @@ namespace Umbraco.Web.WebServices
                 names.Add(name);
                 var domain = domains.FirstOrDefault(d => d.DomainName.InvariantEquals(domainModel.Name));
                 if (domain != null)
-                    domain.Language = language;
+                    domain.LanguageId = language.Id;
                 else if (Services.DomainService.Exists(domainModel.Name))
                     domainModel.Duplicate = true;
                 else
@@ -111,10 +119,17 @@ namespace Umbraco.Web.WebServices
                     // yet there is a race condition here...
                     var newDomain = new UmbracoDomain(name)
                     {
-                        Language = Services.LocalizationService.GetLanguageById(domainModel.Lang),
-                        RootContent = Services.ContentService.GetById(model.NodeId)
+                        LanguageId = domainModel.Lang,
+                        RootContentId = model.NodeId
                     };
-                    Services.DomainService.Save(newDomain);
+                    var saveAttempt = Services.DomainService.Save(newDomain);
+                    if (saveAttempt == false)
+                    {
+                        var response = Request.CreateResponse(HttpStatusCode.BadRequest);
+                        response.Content = new StringContent("Saving new domain failed");
+                        response.ReasonPhrase = saveAttempt.Result.StatusType.ToString();
+                        throw new HttpResponseException(response);
+                    }
                 } 
             }
 

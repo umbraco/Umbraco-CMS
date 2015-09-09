@@ -28,7 +28,9 @@ namespace Umbraco.Tests.Persistence
                 Mock.Of<ILogger>(), new SqlCeSyntaxProvider(), "System.Data.SqlServerCe.4.0");
 
 			//unfortunately we have to set this up because the PetaPocoExtensions require singleton access
-			ApplicationContext.Current = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper())
+			ApplicationContext.Current = new ApplicationContext(
+                CacheHelper.CreateDisabledCacheHelper(),
+                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()))
 				{
 					DatabaseContext = _dbContext,
 					IsReady = true

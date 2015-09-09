@@ -96,7 +96,8 @@ namespace Umbraco.Web.Scheduling
             _logPrefix = "[" + name + "] ";
             _logger = logger;
 
-            HostingEnvironment.RegisterObject(this);
+            if (options.Hosted)
+                HostingEnvironment.RegisterObject(this);
 
             if (options.AutoStart)
                 StartUp();
@@ -391,6 +392,7 @@ namespace Umbraco.Web.Scheduling
                     // still latched & not running on shutdown = stop here
                     if (dbgTask.IsLatched && dbgTask.RunsOnShutdown == false)
                     {
+                        dbgTask.Dispose(); // will not run
                         TaskSourceCompleted(taskSource, token);
                         return;
                     }
@@ -448,13 +450,19 @@ namespace Umbraco.Web.Scheduling
 
                 try
                 {
-                    using (bgTask) // ensure it's disposed
+                    try
                     {
                         if (bgTask.IsAsync)
                             //configure await = false since we don't care about the context, we're on a background thread.
                             await bgTask.RunAsync(token).ConfigureAwait(false);
                         else
                             bgTask.Run();
+                    }
+                    finally // ensure we disposed - unless latched (again)
+                    {
+                        var lbgTask = bgTask as ILatchedBackgroundTask;
+                        if (lbgTask == null || lbgTask.IsLatched == false)
+                            bgTask.Dispose();
                     }
                 }
                 catch (Exception e)

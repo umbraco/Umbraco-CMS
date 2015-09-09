@@ -120,7 +120,6 @@ namespace Umbraco.Core.Persistence.Repositories
                                "DELETE FROM cmsTask WHERE parentUserId = @Id",
                                "DELETE FROM umbracoUser2NodePermission WHERE userId = @Id",
                                "DELETE FROM umbracoUser2NodeNotify WHERE userId = @Id",
-                               "DELETE FROM umbracoUserLogins WHERE userID = @Id",
                                "DELETE FROM umbracoUser2app WHERE " + SqlSyntax.GetQuotedColumnName("user") + "=@Id",
                                "DELETE FROM umbracoUser WHERE id = @Id",
                                "DELETE FROM umbracoExternalLogin WHERE id = @Id"
@@ -359,7 +358,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 return Enumerable.Empty<IUser>();
             }
 
-            var result = GetAll(pagedResult.Items.Select(x => x.Id).ToArray());
+            var ids = pagedResult.Items.Select(x => x.Id).ToArray();
+            var result = ids.Length == 0 ? Enumerable.Empty<IUser>() : GetAll(ids);
 
             //now we need to ensure this result is also ordered by the same order by clause
             return result.OrderBy(orderBy.Compile());
@@ -406,7 +406,8 @@ namespace Umbraco.Core.Persistence.Repositories
         private IEnumerable<IUser> ConvertFromDtos(IEnumerable<UserDto> dtos)
         {
             var userTypeIds = dtos.Select(x => Convert.ToInt32(x.Type)).ToArray();
-            var allUserTypes = _userTypeRepository.GetAll(userTypeIds);
+
+            var allUserTypes = userTypeIds.Length == 0 ? Enumerable.Empty<IUserType>() : _userTypeRepository.GetAll(userTypeIds);
 
             return dtos.Select(dto =>
                 {   

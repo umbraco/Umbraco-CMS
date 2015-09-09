@@ -68,7 +68,6 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                               {27, typeof (StylesheetPropertyDto)},
                                                                               {28, typeof (TagDto)},
                                                                               {29, typeof (TagRelationshipDto)},
-                                                                              {30, typeof (UserLoginDto)},
                                                                               {31, typeof (UserTypeDto)},
                                                                               {32, typeof (UserDto)},
                                                                               {33, typeof (TaskTypeDto)},

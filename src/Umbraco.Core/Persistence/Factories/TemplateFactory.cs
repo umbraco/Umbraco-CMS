@@ -33,9 +33,9 @@ namespace Umbraco.Core.Persistence.Factories
 
         #region Implementation of IEntityFactory<ITemplate,TemplateDto>
 
-        public Template BuildEntity(TemplateDto dto, IEnumerable<IUmbracoEntity> childDefinitions)
+        public Template BuildEntity(TemplateDto dto, IEnumerable<IUmbracoEntity> childDefinitions, Func<File, string> getFileContent)
         {
-            var template = new Template(dto.NodeDto.Text, dto.Alias)
+            var template = new Template(dto.NodeDto.Text, dto.Alias, getFileContent)
                                {
                                    CreateDate = dto.NodeDto.CreateDate,
                                    Id = dto.NodeId,
@@ -43,12 +43,8 @@ namespace Umbraco.Core.Persistence.Factories
                                    Path = dto.NodeDto.Path
                                };
 
-            if (childDefinitions.Any(x => x.ParentId == dto.NodeId))
-            {
-                template.IsMasterTemplate = true;
-            }
+            template.IsMasterTemplate = childDefinitions.Any(x => x.ParentId == dto.NodeId);
 
-            //TODO: Change this to ParentId: http://issues.umbraco.org/issue/U4-5846
             if(dto.NodeDto.ParentId > 0)
                 template.MasterTemplateId = new Lazy<int>(() => dto.NodeDto.ParentId);
 

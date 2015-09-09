@@ -429,7 +429,7 @@ namespace Umbraco.Core.Configuration
                 try
                 {
                     string configStatus = ConfigurationStatus;
-                    string currentVersion = UmbracoVersion.GetSemanticVersion().ToString();
+                    string currentVersion = UmbracoVersion.GetSemanticVersion().ToSemanticString();
 
 
                     if (currentVersion != configStatus)
@@ -596,7 +596,7 @@ namespace Umbraco.Core.Configuration
         [Obsolete("Use Umbraco.Core.Configuration.UmbracoVersion.Current instead", false)]
         public static string CurrentVersion
         {
-            get { return UmbracoVersion.GetSemanticVersion().ToString(); }
+            get { return UmbracoVersion.GetSemanticVersion().ToSemanticString(); }
         }
 
         /// <summary>

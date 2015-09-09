@@ -27,6 +27,7 @@
     <key alias="publish">Опубликовать</key>
     <key alias="refreshNode">Обновить узлы</key>
     <key alias="republish">Опубликовать весь сайт</key>
+    <key alias="restore" version="7.3.0">Восстановить</key>
     <key alias="rights">Разрешения</key>
     <key alias="rollback">Откатить</key>
     <key alias="sendtopublish">Направить на публикацию</key>
@@ -81,6 +82,7 @@
     <key alias="macroInsert">Вставить макрос</key>
     <key alias="pictureInsert">Вставить изображение</key>
     <key alias="relations">Править связи</key>
+    <key alias="returnToList">Вернуться к списку</key>
     <key alias="save">Сохранить</key>
     <key alias="saveAndPublish">Сохранить и опубликовать</key>
     <key alias="saveToPublish">Сохранить и направить на публикацию</key>
@@ -99,7 +101,8 @@
     <key alias="contentRepublished">Узел переопубликован.</key>
     <key alias="currentProperty">Текущее свойство</key>
     <key alias="currentType">Текущий тип</key>
-    <key alias="docTypeCannotBeChanged">Тип документа не может быть изменен, так как для данного расположения нет разрешенных альтернатив.</key>
+    <key alias="docTypeCannotBeChanged">Тип документа не может быть изменен, так как для данного расположения нет разрешенных альтернатив.
+		Альтернативный тип станет доступным, если его разрешить как тип, пригодный для создания дочерних узлов внутри родительского узла данного документа.</key>
     <key alias="docTypeChanged">Тип документа изменен</key>
     <key alias="mapProperties">Сопоставление свойств</key>
     <key alias="mapToProperty">Сопоставлено свойству</key>
@@ -121,7 +124,8 @@
     <key alias="alias">Алиас</key>
     <key alias="alternativeTextHelp">(как бы Вы описали изображение по телефону)</key>
     <key alias="alternativeUrls">Альтернативные ссылки</key>
-    <key alias="childItems" version="7.0">Дочерние узлы</key>
+    <key alias="altTextOptional">Альтернативный текст (необязательно)</key>
+    <key alias="childItems" version="7.0">Элементы списка</key>
     <key alias="clickToEdit">Нажмите для правки этого элемента</key>
     <key alias="createBy">Создано пользователем</key>
     <key alias="createByDesc" version="7.0">Исходный автор</key>
@@ -130,9 +134,11 @@
     <key alias="documentType">Тип документа</key>
     <key alias="editing">Редактирование</key>
     <key alias="expireDate">Скрыть</key>
+    <key alias="isPublished" version="7.2">Опубликовано</key>
     <key alias="itemChanged">Этот документ был изменен после публикации</key>
     <key alias="itemNotPublished">Этот документ не опубликован</key>
     <key alias="lastPublished">Документ опубликован</key>
+    <key alias="listViewNoItems" version="7.1.5">В этом списке пока нет элементов.</key>
     <key alias="mediaLinks">Ссылка на медиа-элементы</key>
     <key alias="mediatype">Тип медиа-контента</key>
     <key alias="membergroup">Группа участников</key>
@@ -165,9 +171,9 @@
   </area>
   <area alias="create">
     <key alias="chooseNode">Где вы хотите создать новый %0%</key>
-    <key alias="createUnder">Создать в</key>
-    <key alias="noDocumentTypes" version="7.0"><![CDATA[There are no allowed document types available. You must enable these in the settings section under <strong>"document types"</strong>.]]></key>
-    <key alias="noMediaTypes" version="7.0"><![CDATA[There are no allowed media types available. You must enable these in the settings section under <strong>"media types"</strong>.]]></key>
+    <key alias="createUnder">Создать в узле</key>
+    <key alias="noDocumentTypes" version="7.0"><![CDATA[Нет ни одного разрешенного типа документов для создания. Необходимо разрешить нужные Вам типы в секции "Установки" в дереве <strong>"Типы документов"</strong>.]]></key>
+    <key alias="noMediaTypes" version="7.0"><![CDATA[Нет ни одного разрешенного типа медиа-материалов для создания. Необходимо разрешить нужные Вам типы в секции "Установки" в дереве <strong>"Типы медиа-материалов"</strong>.]]></key>
     <key alias="updateData">Выберите тип и заголовок</key>
   </area>
   <area alias="dashboard">
@@ -234,12 +240,20 @@
     <key alias="displayName">Название языка (культуры)</key>
   </area>
   <area alias="editcontenttype">
+    <key alias="allowAtRoot" version="7.2">Допустим как корневой</key>
+    <key alias="allowAtRootDesc" version="7.2">Только узлы таких типов (с установленным флагом) могут быть созданы в корневом уровне дерева содержимого или медиа-библиотеки</key>
     <key alias="allowedchildnodetypes">Допустимые типы дочерних узлов</key>
+    <key alias="contenttypecompositions">Составные типы документов</key>
     <key alias="create">Создать</key>
+    <key alias="createListView" version="7.2">Создать пользовательский список</key>
+    <key alias="currentListView" version="7.2">Текущий список</key>
+    <key alias="currentListViewDesc" version="7.2">Текущий тип данных в виде списка</key>
     <key alias="deletetab">Удалить вкладку</key>
     <key alias="description">Описание</key>
     <key alias="hasListView">Включить представление в виде списка</key>
+    <key alias="hasListViewDesc" version="7.2">Включает представление узлов, дочерних к узлу данного типа, в виде сортируемого списка с функцией фильтра и поиска. Такие дочерние узлы при этом перестают быть видимыми в дереве.</key>
     <key alias="newtab">Новая вкладка</key>
+    <key alias="removeListView" version="7.2">Удалить пользовательский список</key>
     <key alias="tab">Вкладка</key>
     <key alias="thumbnail">Миниатюра</key>
   </area>
@@ -266,7 +280,7 @@
     <key alias="errorIntegerWithoutTab">%0% должно быть целочисленным значением</key>
     <key alias="errorMandatory">%0% в %1% является обязательным полем</key>
     <key alias="errorMandatoryWithoutTab">%0% является обязательным полем</key>
-    <key alias="errorRegExp">%0% в %1%: данные введены в некорректном формате</key>
+    <key alias="errorRegExp">%0% в %1%: данные в некорректном формате</key>
     <key alias="errorRegExpWithoutTab">%0% - данные в некорректном формате</key>
   </area>
   <area alias="errors">
@@ -394,8 +408,43 @@
     <key alias="font">Шрифт</key>
     <key alias="text">Текст</key>
   </area>
+  <area alias="grid">
+    <key alias="addElement"><![CDATA[Чтобы начать, кликните иконку <i class="icon icon-add blue"></i> снизу и добавьте Ваш первый элемент]]></key>
+    <key alias="addGridLayout">Добавить шаблон сетки</key>
+    <key alias="addGridLayoutDetail">Настройте шаблон, задавая ширину колонок или добавляя дополнительные секции</key>
+    <key alias="addRowConfiguration">Добавить конфигурацию строки</key>
+    <key alias="addRowConfigurationDetail">Настройте строку, задавая ширину ячеек или добавляя дополнительные ячейки</key>
+    <key alias="addRows">Добавить новые строки</key>
+    <key alias="allowAllEditors">Доступны все редакторы</key>
+    <key alias="allowAllRowConfigurations">Доступны все конфигурации строк</key>
+    <key alias="clickToEmbed">Кликните для встраивания</key>
+    <key alias="clickToInsertImage">Кликните для вставки изображения</key>
+    <key alias="columns">Колонки</key>
+    <key alias="columnsDetails">Суммарное число колонок в шаблоне сетки</key>
+    <key alias="gridLayouts">Шаблоны сетки</key>
+    <key alias="gridLayoutsDetail">Шаблоны являются рабочим пространством для редактора сетки, обычно Вам понадобится не более одного или двух шаблонов</key>
+    <key alias="insertControl">Вставить элемент</key>
+    <key alias="placeholderImageCaption">Заголовок для изображения...</key>
+    <key alias="placeholderWriteHere">Напишите...</key>
+    <key alias="rowConfigurations">Конфигурации строк</key>
+    <key alias="rowConfigurationsDetail">Строки - это последовательности ячеек с горизонтальным расположением</key>
+    <key alias="settingDialogDetails">Установки будут сохранены только если они указаны в корректном формате json</key>
+    <key alias="settings">Установки</key>
+    <key alias="settingsDetails">Задайте установки, доступные редакторам для изменения</key>
+    <key alias="styles">Стили</key>
+    <key alias="stylesDetails">Задайте стили, доступные редакторам для изменения</key>
+  </area>
   <area alias="headers">
     <key alias="page">Страница</key>
+  </area>
+  <area alias="help">
+    <key alias="goTo">перейти к</key>
+    <key alias="helpTopicsFor">Разделы справки для</key>
+    <key alias="videoChaptersFor">Обучающие видео для</key>
+    <key alias="theBestUmbracoVideoTutorials">Лучшие обучающие видеокурсы по Umbraco</key>
+  </area>
+  <area alias="imagecropper">
+    <key alias="reset">Сбросить</key>
   </area>
   <area alias="installer">
     <key alias="databaseErrorCannotConnect">Программа установки не может установить подключение к базе данных.</key>
@@ -533,7 +582,7 @@
     <key alias="greeting4">Рыбный день</key>
     <key alias="greeting5">Слава Богу, сегодня пятница</key>
     <key alias="greeting6">Понедельник начинается в субботу</key>
-    <key alias="instruction">Введите имя пользователя и пароль</key>
+    <key alias="instruction">Укажите имя пользователя и пароль</key>
     <key alias="timeout">Время сессии истекло</key>
   </area>
   <area alias="main">
@@ -544,6 +593,10 @@
   <area alias="media">
     <key alias="clickToUpload">Нажмите, чтобы загрузить</key>
     <key alias="dropFilesHere">Перетащите файлы сюда...</key>
+  </area>
+  <area alias="member">
+    <key alias="createNewMember">Создать нового участника</key>
+    <key alias="allMembers">Все участники</key>
   </area>
   <area alias="moveOrCopy">
     <key alias="choose">Выберите страницу...</key>
@@ -643,11 +696,12 @@
     <key alias="removeSpecialFormattering">Вставить с очисткой форматирования (рекомендуется)</key>
   </area>
   <area alias="placeholders">
-    <key alias="entername">Введите имя...</key>
-    <key alias="filter">Введите фильтр...</key>
+    <key alias="entername">Укажите имя...</key>
+    <key alias="enterTags">Укажите теги (нажимайте Enter после каждого тега)...</key>
+    <key alias="filter">Укажите фильтр...</key>
     <key alias="nameentity">Назовите %0%...</key>
     <key alias="password">Пароль</key>
-    <key alias="search">Введите для поиска...</key>
+    <key alias="search">Что искать...</key>
     <key alias="username">Имя пользователя</key>
   </area>
   <area alias="publicAccess">
@@ -692,16 +746,13 @@
 		]]></key>
   </area>
   <area alias="relatedlinks">
-    <key alias="addExternal">Добавить внешнюю ссылку</key>
-    <key alias="addInternal">Добавить внутреннюю ссылку</key>
-    <key alias="addlink">Добавить ссылку</key>
     <key alias="caption">Заголовок</key>
-    <key alias="internalPage">Внутренняя страница</key>
-    <key alias="linkurl">Внешний URL</key>
-    <key alias="modeDown">Переместить вниз</key>
-    <key alias="modeUp">Переместить вверх</key>
-    <key alias="newWindow">Открывать в новом окне</key>
-    <key alias="removeLink">Удалить ссылку</key>
+    <key alias="captionPlaceholder">Укажите заголовок</key>
+    <key alias="chooseInternal">выбрать страницу сайта</key>
+    <key alias="enterExternal">указать внешнюю ссылку</key>
+    <key alias="externalLinkPlaceholder">Укажите ссылку</key>
+    <key alias="link">Ссылка</key>
+    <key alias="newWindow">В новом окне</key>
   </area>
   <area alias="rollback">
     <key alias="currentVersion">Текущая версия</key>
@@ -716,10 +767,12 @@
     <key alias="editscript">Править файл скрипта</key>
   </area>
   <area alias="sections">
+    <key alias="analytics">Аналитика</key>
     <key alias="concierge">Смотритель</key>
     <key alias="content">Содержимое</key>
     <key alias="courier">Курьер</key>
     <key alias="developer">Для Разработчиков</key>
+    <key alias="forms">Формы</key>
     <key alias="help" version="7.0">Помощь</key>
     <key alias="installer">Мастер конфигурирования Umbraco</key>
     <key alias="media">Медиа-материалы</key>
@@ -734,9 +787,11 @@
     <key alias="asAContentMasterType">в качестве родительского типа. Вкладки родительского типа не показаны и могут быть изменены непосредственно в родительском типе</key>
     <key alias="contentTypeEnabled">Родительский тип контента разрешен</key>
     <key alias="contentTypeUses">Данный тип контента использует</key>
+    <key alias="createMatchingTemplate">Создать шаблон для документов этого типа</key>
     <key alias="defaulttemplate">Шаблон по-умолчанию</key>
     <key alias="dictionary editor egenskab">Словарная статья</key>
     <key alias="importDocumentTypeHelp">Чтобы импортировать тип документа, найдите файл ".udt" на своем компьютере, нажав на кнопку "Обзор", затем нажмите "Импортировать" (на следующем экране будет запрошено подтверждение для этой операции).</key>
+    <key alias="masterDocumentType">Родительский тип документа</key>
     <key alias="newtabname">Заголовок новой вкладки</key>
     <key alias="nodetype">Тип узла (документа)</key>
     <key alias="noPropertiesDefinedOnTab">Для данной вкладки не определены свойства. Кликните по ссылке "Click here to add a new property" сверху, чтобы создать новое свойство.</key>
@@ -906,6 +961,7 @@
     <key alias="uploadTranslationXml">Загрузить переведенный xml</key>
   </area>
   <area alias="treeHeaders">
+    <key alias="analytics">Аналитика</key>
     <key alias="cacheBrowser">Обзор кэша</key>
     <key alias="contentRecycleBin">Корзина</key>
     <key alias="createdPackages">Созданные пакеты</key>
@@ -975,6 +1031,7 @@
     <key alias="searchAllChildren">Поиск всех дочерних документов</key>
     <key alias="sessionExpires" version="7.0">Сессия истекает через</key>
     <key alias="startnode">Начальный узел содержимого </key>
+    <key alias="translator">Переводчик</key>
     <key alias="username">Имя пользователя</key>
     <key alias="userPermissions">Разрешения для пользователя</key>
     <key alias="usertype">Тип пользователя</key>

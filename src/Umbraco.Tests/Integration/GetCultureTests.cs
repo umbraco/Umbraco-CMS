@@ -51,9 +51,9 @@ namespace Umbraco.Tests.Integration
             foreach (var d in ServiceContext.DomainService.GetAll(true).ToArray())
                 ServiceContext.DomainService.Delete(d);
 
-            ServiceContext.DomainService.Save(new UmbracoDomain("domain1.com") {DomainName="domain1.com", RootContent = c1, Language = l0});
-            ServiceContext.DomainService.Save(new UmbracoDomain("domain1.fr") { DomainName = "domain1.fr", RootContent = c1, Language = l1 });
-            ServiceContext.DomainService.Save(new UmbracoDomain("*100112") { DomainName = "*100112", RootContent = c3, Language = l2 });
+            ServiceContext.DomainService.Save(new UmbracoDomain("domain1.com") {DomainName="domain1.com", RootContentId = c1.Id, LanguageId = l0.Id});
+            ServiceContext.DomainService.Save(new UmbracoDomain("domain1.fr") { DomainName = "domain1.fr", RootContentId = c1.Id, LanguageId = l1.Id });
+            ServiceContext.DomainService.Save(new UmbracoDomain("*100112") { DomainName = "*100112", RootContentId = c3.Id, LanguageId = l2.Id });
 
             var content = c2;
             var culture = Web.Models.ContentExtensions.GetCulture(null,

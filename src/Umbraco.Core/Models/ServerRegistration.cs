@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.Reflection;
 using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Sync;
 
 namespace Umbraco.Core.Models
 {
@@ -14,10 +13,12 @@ namespace Umbraco.Core.Models
         private string _serverAddress;
         private string _serverIdentity;
         private bool _isActive;
+        private bool _isMaster;
 
         private static readonly PropertyInfo ServerAddressSelector = ExpressionHelper.GetPropertyInfo<ServerRegistration, string>(x => x.ServerAddress);
         private static readonly PropertyInfo ServerIdentitySelector = ExpressionHelper.GetPropertyInfo<ServerRegistration, string>(x => x.ServerIdentity);
         private static readonly PropertyInfo IsActiveSelector = ExpressionHelper.GetPropertyInfo<ServerRegistration, bool>(x => x.IsActive);
+        private static readonly PropertyInfo IsMasterSelector = ExpressionHelper.GetPropertyInfo<ServerRegistration, bool>(x => x.IsMaster);
 
         /// <summary>
         /// Initialiazes a new instance of the <see cref="ServerRegistration"/> class.
@@ -34,7 +35,8 @@ namespace Umbraco.Core.Models
         /// <param name="registered">The date and time the registration was created.</param>
         /// <param name="accessed">The date and time the registration was last accessed.</param>
         /// <param name="isActive">A value indicating whether the registration is active.</param>
-        public ServerRegistration(int id, string serverAddress, string serverIdentity, DateTime registered, DateTime accessed, bool isActive)
+        /// <param name="isMaster">A value indicating whether the registration is master.</param>
+        public ServerRegistration(int id, string serverAddress, string serverIdentity, DateTime registered, DateTime accessed, bool isActive, bool isMaster)
         {
             UpdateDate = accessed;
             CreateDate = registered;
@@ -43,6 +45,7 @@ namespace Umbraco.Core.Models
             ServerAddress = serverAddress;
             ServerIdentity = serverIdentity;
             IsActive = isActive;
+            IsMaster = isMaster;
         }
 
         /// <summary>
@@ -109,6 +112,22 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the server is master.
+        /// </summary>
+        public bool IsMaster
+        {
+            get { return _isMaster; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _isMaster = value;
+                    return _isMaster;
+                }, _isMaster, IsMasterSelector);
+            }
+        }
+
+        /// <summary>
         /// Gets the date and time the registration was created.
         /// </summary>
         public DateTime Registered { get { return CreateDate; } set { CreateDate = value; }}
@@ -124,7 +143,7 @@ namespace Umbraco.Core.Models
         /// <returns></returns>
         public override string ToString()
         {
-            return string.Format("{{\"{0}\", \"{1}\", {2}active}}", ServerAddress, ServerIdentity, IsActive ? "" : "!");
+            return string.Format("{{\"{0}\", \"{1}\", {2}active, {3}master}}", ServerAddress, ServerIdentity, IsActive ? "" : "!", IsMaster ? "" : "!");
         }
     }
 }

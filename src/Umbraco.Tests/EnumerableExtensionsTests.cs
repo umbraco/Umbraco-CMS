@@ -54,8 +54,12 @@ namespace Umbraco.Tests
                 };
 
             var flattened = hierarchy.Children.FlattenList(x => x.Children);
+            var selectRecursive = hierarchy.Children.SelectRecursive(x => x.Children);
 
             Assert.AreEqual(3, flattened.Count());
+            Assert.AreEqual(3, selectRecursive.Count());
+
+            Assert.IsTrue(flattened.SequenceEqual(selectRecursive));
         }
 
         [Test]
@@ -115,8 +119,12 @@ namespace Umbraco.Tests
                 };
 
             var flattened = hierarchy.Children.FlattenList(x => x.Children);
+            var selectRecursive = hierarchy.Children.FlattenList(x => x.Children);
 
             Assert.AreEqual(10, flattened.Count());
+            Assert.AreEqual(10, selectRecursive.Count());
+
+            Assert.IsTrue(flattened.SequenceEqual(selectRecursive));
         }
 
         private class TestItem
