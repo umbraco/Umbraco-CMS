@@ -30,16 +30,46 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
             }
 
             //update the parentId column for all templates to be correct so it matches the current 'master' template
-            //NOTE: we are using dynamic because we need to get the data in a column that no longer exists in the schema
-            var templates = Context.Database.Fetch<dynamic>(new Sql().Select("*").From<TemplateDto>());
-            foreach (var template in templates)
-            {
-                Update.Table("umbracoNode").Set(new {parentID = template.master ?? -1}).Where(new {id = template.nodeId});
 
-                //now build the correct path for the template
-                Update.Table("umbracoNode").Set(new { path = BuildPath (template, templates)}).Where(new { id = template.nodeId });
-                
-            }
+            //In some old corrupted databases, the information will not be correct in the master column so we need to fix that
+            //first by nulling out the master column where the id doesn't actually exist
+            Execute.Sql(@"UPDATE cmsTemplate SET master = NULL WHERE " + 
+                SqlSyntax.GetQuotedColumnName("master") + @" IS NOT NULL AND " + 
+                SqlSyntax.GetQuotedColumnName("master") + @" NOT IN (SELECT nodeId FROM cmsTemplate)");
+
+            //Now we can bulk update the parentId column
+            Execute.Sql(@"UPDATE umbracoNode
+SET parentID = COALESCE(t2." + SqlSyntax.GetQuotedColumnName("master")  +  @", -1)
+FROM umbracoNode t1
+INNER JOIN cmsTemplate t2
+ON t1.id = t2.nodeId");
+
+            //Now we can update the path, but this needs to be done in a delegate callback so that the query runs after the updates just completed
+            Execute.Code(database =>
+            {
+                //NOTE: we are using dynamic because we need to get the data in a column that no longer exists in the schema
+                var templates = Context.Database.Fetch<dynamic>(new Sql().Select("*").From<TemplateDto>());
+                foreach (var template in templates)
+                {
+                    var sql = string.Format(SqlSyntax.UpdateData,
+                        SqlSyntax.GetQuotedTableName("umbracoNode"),
+                        "path=@buildPath",
+                        "id=@nodeId");
+
+                    LogHelper.Info<MigrateAndRemoveTemplateMasterColumn>("Executing sql statement: " + sql);
+
+                    //now build the correct path for the template
+                    database.Execute(sql, new
+                    {
+                        buildPath = BuildPath(template, templates),
+                        nodeId = template.nodeId
+                    });
+                }
+
+                return string.Empty;
+            });
+
+            
 
             //now remove the master column and key
             if (this.Context.CurrentDatabaseProvider == DatabaseProviders.MySql)
