@@ -23,22 +23,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                 Create.Column("isMaster").OnTable("umbracoServer").AsBoolean().NotNullable().WithDefaultValue(0);
             }
 
-            // wrap in a transaction so that everything runs on the same connection
-            // and the IDENTITY_INSERT stuff is effective for all inserts.
-            using (var tr = Context.Database.GetTransaction())
-            {
-                // turn on identity insert if db provider is not mysql
-                if (SqlSyntax.SupportsIdentityInsert())
-                    Context.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON", SqlSyntax.GetQuotedTableName("umbracoNode"))));
-
-                InsertLockObject(Constants.System.ServersLock, "0AF5E610-A310-4B6F-925F-E928D5416AF7", "LOCK: Servers");
-
-                // turn off identity insert if db provider is not mysql
-                if (SqlSyntax.SupportsIdentityInsert())
-                    Context.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF", SqlSyntax.GetQuotedTableName("umbracoNode"))));
-
-                tr.Complete();
-            }
+            EnsureLockObject(Constants.System.ServersLock, "0AF5E610-A310-4B6F-925F-E928D5416AF7", "LOCK: Servers");
         }
 
         public override void Down()
@@ -46,25 +31,28 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
             // not implemented
         }
 
-        private void InsertLockObject(int id, string uniqueId, string text)
+        private void EnsureLockObject(int id, string uniqueId, string text)
         {
             var exists = Context.Database.Exists<NodeDto>(id);
             if (exists) return;
 
-            Context.Database.Insert("umbracoNode", "id", false, new NodeDto
-            {
-                NodeId = id,
-                Trashed = false,
-                ParentId = -1,
-                UserId = 0,
-                Level = 1,
-                Path = "-1," + id,
-                SortOrder = 0,
-                UniqueId = new Guid(uniqueId),
-                Text = text,
-                NodeObjectType = new Guid(Constants.ObjectTypes.LockObject),
-                CreateDate = DateTime.Now
-            });
+            Insert
+                .IntoTable("umbracoNode")
+                .EnableIdentityInsert()
+                .Row(new
+                {
+                    id = id, // NodeId
+                    trashed = false,
+                    parentId = -1,
+                    nodeUser = 0,
+                    level = 1,
+                    path = "-1," + id,
+                    sortOrder = 0,
+                    uniqueId = new Guid(uniqueId),
+                    text = text,
+                    nodeObjectType = new Guid(Constants.ObjectTypes.LockObject),
+                    createDate = DateTime.Now
+                });
         }
     }
 }
