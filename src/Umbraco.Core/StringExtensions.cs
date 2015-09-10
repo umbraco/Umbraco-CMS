@@ -166,6 +166,8 @@ namespace Umbraco.Core
             return new string(outputArray);
         }
 
+        private static readonly char[] CleanForXssChars = "*?(){}[];:%<>/\\|&'\"".ToCharArray();
+
         /// <summary>
         /// Cleans string to aid in preventing xss attacks.
         /// </summary>
@@ -177,7 +179,7 @@ namespace Umbraco.Core
             //remove any html
             input = input.StripHtml();
             //strip out any potential chars involved with XSS
-            return input.ExceptChars(new HashSet<char>("*?(){}[];:%<>/\\|&'\"".ToCharArray().Except(ignoreFromClean)));
+            return input.ExceptChars(new HashSet<char>(CleanForXssChars.Except(ignoreFromClean)));
         }
 
         public static string ExceptChars(this string str, HashSet<char> toExclude)

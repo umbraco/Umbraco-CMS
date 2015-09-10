@@ -60,7 +60,8 @@ namespace umbraco.cms.presentation.settings.stylesheet
 
             if (IsPostBack == false)
             {
-                NameTxt.Text = _sheet.Path.TrimEnd(".css");
+                // name derives from path, without the .css extension, clean for xss
+                NameTxt.Text = _sheet.Path.TrimEnd(".css").CleanForXss('\\', '/');
                 editorSource.Text = _sheet.Content;
 
                 ClientTools
@@ -76,9 +77,6 @@ namespace umbraco.cms.presentation.settings.stylesheet
             base.OnPreRender(e);
             ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/codeEditorSave.asmx"));
             ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/legacyAjaxCalls.asmx"));
-
-            //Clean the name field for xss
-            NameTxt.Text = NameTxt.Text.CleanForXss(ignoreFromClean:'\\');
         }
 
         /// <summary>

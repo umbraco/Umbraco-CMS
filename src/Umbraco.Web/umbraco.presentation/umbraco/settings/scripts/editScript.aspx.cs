@@ -49,7 +49,6 @@ namespace umbraco.cms.presentation.settings.scripts
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-            NameTxt.Text = filename;
 
             // get the script, ensure it exists (not null) and validate (because
             // the file service ensures that it loads scripts from the proper location
@@ -67,6 +66,9 @@ namespace umbraco.cms.presentation.settings.scripts
             lttPath.Text = "<a id=\"" + lttPath.ClientID + "\" target=\"_blank\" href=\"" + script.VirtualPath + "\">" + script.VirtualPath + "</a>";
             editorSource.Text = script.Content;
             ScriptTreeSyncPath = DeepLink.GetTreePathFromFilePath(filename);
+
+            // name derives from filename, clean for xss
+            NameTxt.Text = filename.CleanForXss('\\', '/');
 
             Panel1.Text = ui.Text("editscript", base.getUser());
             pp_name.Text = ui.Text("name", base.getUser());
@@ -143,9 +145,6 @@ namespace umbraco.cms.presentation.settings.scripts
             base.OnPreRender(e);
             ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/codeEditorSave.asmx"));
             ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/legacyAjaxCalls.asmx"));
-
-            //Clean the name field for xss
-            NameTxt.Text = NameTxt.Text.CleanForXss('\\', '/');
         }
 
     }
