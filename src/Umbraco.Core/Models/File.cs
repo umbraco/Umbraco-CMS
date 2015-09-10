@@ -27,7 +27,7 @@ namespace Umbraco.Core.Models
 
         protected File(string path, Func<File, string> getFileContent = null)
         {
-            _path = path;
+            _path = SanitizePath(path);
             _originalPath = _path;
             GetFileContent = getFileContent;
             _content = getFileContent != null ? null : string.Empty;
@@ -37,6 +37,14 @@ namespace Umbraco.Core.Models
         private static readonly PropertyInfo PathSelector = ExpressionHelper.GetPropertyInfo<File, string>(x => x.Path);
         private string _alias;
         private string _name;
+
+        private static string SanitizePath(string path)
+        {
+            return path
+                .Replace('\\', System.IO.Path.DirectorySeparatorChar)
+                .Replace('/', System.IO.Path.DirectorySeparatorChar);
+                //.TrimStart(System.IO.Path.DirectorySeparatorChar);
+        }
 
         /// <summary>
         /// Gets or sets the Name of the File including extension
@@ -81,7 +89,7 @@ namespace Umbraco.Core.Models
 
                 SetPropertyValueAndDetectChanges(o =>
                 {
-                    _path = value;
+                    _path = SanitizePath(value);
                     return _path;
                 }, _path, PathSelector);
             }
