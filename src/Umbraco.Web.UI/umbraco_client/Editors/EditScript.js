@@ -61,7 +61,7 @@
                     });
         },
 
-        submitSuccess: function(args) {
+        submitSuccess: function (args) {
             var msg = args.message;
             var header = args.header;
             var path = this._opts.treeSyncPath;
