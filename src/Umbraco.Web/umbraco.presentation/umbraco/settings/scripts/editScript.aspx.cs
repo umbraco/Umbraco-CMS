@@ -42,7 +42,9 @@ namespace umbraco.cms.presentation.settings.scripts
         protected MenuButton SaveButton;
 
         private string filename;
+
         protected string ScriptTreeSyncPath { get; private set; }
+        protected int ScriptId { get; private set; }
 
         protected override void OnLoad(EventArgs e)
         {
@@ -82,7 +84,7 @@ namespace umbraco.cms.presentation.settings.scripts
         {
             base.OnInit(e);
 
-            filename = Request.QueryString["file"].Replace('\\', '/').TrimStart('/');
+            filename = Request.QueryString["file"].TrimStart('/');
 
             //need to change the editor type if it is XML
             if (filename.EndsWith("xml"))

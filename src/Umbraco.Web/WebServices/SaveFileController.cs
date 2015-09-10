@@ -223,7 +223,7 @@ namespace Umbraco.Web.WebServices
         [HttpPost]
         public JsonResult SaveStylesheet(string filename, string oldName, string contents)
         {
-            filename = filename.TrimStart('/', '\\').EnsureEndsWith(".css");
+            filename = filename.TrimStart('/', '\\');
 
             var svce = (FileService) Services.FileService;
             var stylesheet = svce.GetStylesheetByName(oldName);

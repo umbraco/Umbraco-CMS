@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Web.UI;
 using Umbraco.Core.IO;
@@ -7,7 +6,6 @@ using Umbraco.Web;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.web;
-using umbraco.cms.helpers;
 using umbraco.cms.presentation.Trees;
 using umbraco.uicontrols;
 using Umbraco.Core;
@@ -19,10 +17,9 @@ namespace umbraco.cms.presentation.settings.stylesheet
     /// </summary>
     public partial class editstylesheet : UmbracoEnsuredPage
     {
-        protected MenuButton SaveButton;
+        private Umbraco.Core.Models.Stylesheet _sheet;
 
-        private string filename;
-        protected string TreeSyncPath { get; private set; }
+        protected MenuButton SaveButton;
 
         public editstylesheet()
         {
@@ -33,13 +30,13 @@ namespace umbraco.cms.presentation.settings.stylesheet
         {
             base.OnInit(e);
 
-            filename = Request.QueryString["id"].Replace('\\', '/').TrimStart('/');
 
             var editor = Panel1.NewTabPage(ui.Text("stylesheet"));
             editor.Controls.Add(Pane7);
 
             var props = Panel1.NewTabPage(ui.Text("properties"));
             props.Controls.Add(Pane8);
+
 
             SaveButton = Panel1.Menu.NewButton();
             SaveButton.Text = ui.Text("save");
@@ -49,26 +46,28 @@ namespace umbraco.cms.presentation.settings.stylesheet
         }
 
         protected void Page_Load(object sender, EventArgs e)
-        {           
+        {
+            
             Panel1.Text = ui.Text("stylesheet", "editstylesheet", UmbracoUser);
             pp_name.Text = ui.Text("name", UmbracoUser);
             pp_path.Text = ui.Text("path", UmbracoUser);
 
-            var stylesheet = Services.FileService.GetStylesheetByName(filename);
-            if (stylesheet == null) // not found
-                throw new FileNotFoundException("Could not find file '" + filename + "'.");
+            _sheet = Services.FileService.GetStylesheetByName(Request.QueryString["id"]);
+            if (_sheet == null) throw new InvalidOperationException("No stylesheet found with name: " + Request.QueryString["id"]);
 
-            lttPath.Text = "<a id=\"" + lttPath.ClientID + "\" target=\"_blank\" href=\"" + stylesheet.VirtualPath + "\">" + stylesheet.VirtualPath + "</a>";
-            editorSource.Text = stylesheet.Content;
-            TreeSyncPath = DeepLink.GetTreePathFromFilePath(filename);
+            lttPath.Text = "<a target='_blank' href='" + _sheet.VirtualPath + "'>" + _sheet.VirtualPath + "</a>";
 
-            NameTxt.Text = stylesheet.Path.TrimEnd(".css");
 
             if (IsPostBack == false)
             {
+                NameTxt.Text = _sheet.Path.TrimEnd(".css");
+                editorSource.Text = _sheet.Content;
+
                 ClientTools
                     .SetActiveTreeType(Constants.Trees.Stylesheets)
-                    .SyncTree(TreeSyncPath, false);
+                    .SyncTree("-1,init," + _sheet.Path
+                        //needs a double escape to work with JS
+                        .Replace("\\", "\\\\").TrimEnd(".css"), false);
             }
         }
 
@@ -79,7 +78,6 @@ namespace umbraco.cms.presentation.settings.stylesheet
             ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/legacyAjaxCalls.asmx"));
 
             //Clean the name field for xss
-            // fixme - NOT on preRender !
             NameTxt.Text = NameTxt.Text.CleanForXss(ignoreFromClean:'\\');
         }
 
