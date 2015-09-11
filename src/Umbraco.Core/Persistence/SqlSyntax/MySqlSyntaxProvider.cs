@@ -191,6 +191,21 @@ ORDER BY TABLE_NAME, INDEX_NAME",
             return false;
         }
 
+        /// <summary>
+        /// This is used ONLY if we need to format datetime without using SQL parameters (i.e. during migrations)
+        /// </summary>
+        /// <param name="date"></param>
+        /// <param name="includeTime"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// MySQL has a DateTime standard that is unambiguous and works on all servers:
+        /// YYYYMMDDHHMMSS
+        /// </remarks>
+        public override string FormatDateTime(DateTime date, bool includeTime = true)
+        {
+            return includeTime ? date.ToString("YYYYMMDDHHmmss") : date.ToString("YYYYMMDD");
+        }
+
         public override string GetQuotedTableName(string tableName)
         {
             return string.Format("`{0}`", tableName);

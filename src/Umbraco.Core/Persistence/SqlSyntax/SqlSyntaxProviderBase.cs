@@ -251,6 +251,21 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return true;
         }
 
+        /// <summary>
+        /// This is used ONLY if we need to format datetime without using SQL parameters (i.e. during migrations)
+        /// </summary>
+        /// <param name="date"></param>
+        /// <param name="includeTime"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// MSSQL has a DateTime standard that is unambiguous and works on all servers:
+        /// YYYYMMDD HH:mm:ss
+        /// </remarks>
+        public virtual string FormatDateTime(DateTime date, bool includeTime = true)
+        {
+            return includeTime ? date.ToString("YYYYMMDD HH:mm:ss") : date.ToString("YYYYMMDD");
+        }
+
         public virtual string Format(TableDefinition table)
         {
             var statement = string.Format(CreateTable, GetQuotedTableName(table.Name), Format(table.Columns));
