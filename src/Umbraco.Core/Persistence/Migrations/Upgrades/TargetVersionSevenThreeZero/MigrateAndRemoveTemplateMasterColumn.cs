@@ -38,11 +38,30 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                 SqlSyntax.GetQuotedColumnName("master") + @" NOT IN (SELECT nodeId FROM cmsTemplate)");
 
             //Now we can bulk update the parentId column
-            Execute.Sql(@"UPDATE umbracoNode
-SET parentID = COALESCE(t2." + SqlSyntax.GetQuotedColumnName("master")  +  @", -1)
-FROM umbracoNode t1
-INNER JOIN cmsTemplate t2
-ON t1.id = t2.nodeId");
+
+            //NOTE: This single statement should be used but stupid SQLCE doesn't support Update with a FROM !!
+            // so now we have to do this by individual rows :(
+                    //Execute.Sql(@"UPDATE umbracoNode
+                    //SET parentID = COALESCE(t2." + SqlSyntax.GetQuotedColumnName("master")  +  @", -1)
+                    //FROM umbracoNode t1
+                    //INNER JOIN cmsTemplate t2
+                    //ON t1.id = t2.nodeId");
+            Execute.Code(database =>
+            {
+                var templateData = database.Fetch<dynamic>("SELECT * FROM cmsTemplate");
+
+                foreach (var template in templateData)
+                {
+                    var sql = "SET parentID=@parentId WHERE id=@nodeId";
+
+                    LogHelper.Info<MigrateAndRemoveTemplateMasterColumn>("Executing sql statement: UPDATE umbracoNode " + sql);
+
+                    database.Update<NodeDto>(sql,
+                        new {parentId = template.master ?? -1, nodeId = template.nodeId});
+                }
+
+                return string.Empty;
+            });
 
             //Now we can update the path, but this needs to be done in a delegate callback so that the query runs after the updates just completed
             Execute.Code(database =>

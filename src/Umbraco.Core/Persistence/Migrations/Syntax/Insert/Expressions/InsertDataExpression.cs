@@ -41,13 +41,16 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Insert.Expressions
         {
             if (IsExpressionSupported() == false)
                 return string.Empty;
-
-            var insertItems = new List<string>();
+            
             var sb = new StringBuilder();
 
             if (EnabledIdentityInsert && SqlSyntax.SupportsIdentityInsert())
             {
                 sb.AppendLine(string.Format("SET IDENTITY_INSERT {0} ON;", SqlSyntax.GetQuotedTableName(TableName)));
+                if (SqlSyntax.GetType() != typeof (MySqlSyntaxProvider))
+                {
+                    sb.AppendLine("GO");
+                }
             }
 
             try
@@ -69,16 +72,22 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Insert.Expressions
                                   SqlSyntax.GetQuotedTableName(TableName),
                                   cols, vals);
 
-                    insertItems.Add(sql);
+                    sb.AppendLine(string.Format("{0};", sql));
+                    if (SqlSyntax.GetType() != typeof(MySqlSyntaxProvider))
+                    {
+                        sb.AppendLine("GO");
+                    }
                 }
-
-                sb.AppendLine(string.Join(",", insertItems));
             }
             finally
             {
                 if (EnabledIdentityInsert && SqlSyntax.SupportsIdentityInsert())
                 {
-                    sb.AppendLine(string.Format(";SET IDENTITY_INSERT {0} OFF;", SqlSyntax.GetQuotedTableName(TableName)));
+                    sb.AppendLine(string.Format("SET IDENTITY_INSERT {0} OFF;", SqlSyntax.GetQuotedTableName(TableName)));
+                    if (SqlSyntax.GetType() != typeof(MySqlSyntaxProvider))
+                    {
+                        sb.AppendLine("GO");
+                    }
                 }
             }
 

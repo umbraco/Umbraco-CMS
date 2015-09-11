@@ -203,7 +203,7 @@ ORDER BY TABLE_NAME, INDEX_NAME",
         /// </remarks>
         public override string FormatDateTime(DateTime date, bool includeTime = true)
         {
-            return includeTime ? date.ToString("YYYYMMDDHHmmss") : date.ToString("YYYYMMDD");
+            return includeTime ? date.ToString("yyyyMMddHHmmss") : date.ToString("yyyyMMdd");
         }
 
         public override string GetQuotedTableName(string tableName)

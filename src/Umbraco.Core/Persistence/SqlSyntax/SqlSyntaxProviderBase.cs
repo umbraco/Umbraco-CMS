@@ -263,7 +263,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         /// </remarks>
         public virtual string FormatDateTime(DateTime date, bool includeTime = true)
         {
-            return includeTime ? date.ToString("YYYYMMDD HH:mm:ss") : date.ToString("YYYYMMDD");
+            return includeTime ? date.ToString("yyyyMMdd HH:mm:ss") : date.ToString("yyyyMMdd");
         }
 
         public virtual string Format(TableDefinition table)
