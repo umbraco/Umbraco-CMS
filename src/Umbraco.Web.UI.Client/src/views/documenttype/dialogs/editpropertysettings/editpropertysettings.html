@@ -3,13 +3,14 @@
    <div class="umb-control-group clearfix">
 
       <div class="validation-wrapper">
-         <input class="editor-label"
+         <textarea class="editor-label"
             name="propertyLabel"
             ng-model="model.property.label"
             placeholder="Enter a name..."
             umb-auto-focus
             focus-on-filled="true"
-            required/>
+            umb-auto-resize
+            required/></textarea>
          <span class="validation-label" val-msg-for="propertyLabel" val-toggle-msg="required"><localize key="required" /></span>
       </div>
 
