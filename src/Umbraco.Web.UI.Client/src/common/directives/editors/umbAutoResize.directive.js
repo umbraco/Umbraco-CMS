@@ -131,13 +131,6 @@ angular.module("umbraco.directives")
 
             activate();
 
-            element.bind('keyup keydown keypress change', update);
-            element.bind('blur', update(true));
-
-            $timeout(function() {
-               update(true);
-            }, 200);
-
             //listen for tab changes
             if (umbTabsController != null) {
                umbTabsController.onTabShown(function(args) {
