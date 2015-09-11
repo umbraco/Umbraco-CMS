@@ -2,6 +2,7 @@
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Migrations.Syntax.Create.Expressions;
 using Umbraco.Core.Persistence.Migrations.Syntax.Expressions;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
 {
@@ -14,7 +15,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
 
         public CreateTableBuilder(CreateTableExpression expression, IMigrationContext context)
             : base(expression)
-        {
+        {            
             _context = context;
         }
 
@@ -62,7 +63,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
         {
             CurrentColumn.IsIndexed = true;
 
-            var index = new CreateIndexExpression
+            var index = new CreateIndexExpression(Expression.SqlSyntax)
                             {
                                 Index = new IndexDefinition
                                             {
@@ -86,15 +87,25 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
         {
             CurrentColumn.IsPrimaryKey = true;
 
-            var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey)
+            //For MySQL, the PK will be created WITH the create table expression, however for 
+            // SQL Server, the PK get's created in a different Alter table expression afterwords.
+            // MySQL will choke if the same constraint is again added afterword
+            // TODO: This is a super hack, I'd rather not add another property like 'CreatesPkInCreateTableDefinition' to check
+            // for this, but I don't see another way around. MySQL doesn't support checking for a constraint before creating
+            // it... except in a very strange way but it doesn't actually provider error feedback if it doesn't work so we cannot use
+            // it.  For now, this is what I'm doing
+            if (Expression.CurrentDatabaseProvider == DatabaseProviders.MySql)
             {
-                Constraint =
+                var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey)
+                {
+                    Constraint =
                 {
                     TableName = CurrentColumn.TableName,
                     Columns = new[] { CurrentColumn.Name }
                 }
-            };
-            _context.Expressions.Add(expression);
+                };
+                _context.Expressions.Add(expression);
+            }
 
             return this;
         }
@@ -104,16 +115,27 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
             CurrentColumn.IsPrimaryKey = true;
             CurrentColumn.PrimaryKeyName = primaryKeyName;
 
-            var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey)
+            //For MySQL, the PK will be created WITH the create table expression, however for 
+            // SQL Server, the PK get's created in a different Alter table expression afterwords.
+            // MySQL will choke if the same constraint is again added afterword
+            // TODO: This is a super hack, I'd rather not add another property like 'CreatesPkInCreateTableDefinition' to check
+            // for this, but I don't see another way around. MySQL doesn't support checking for a constraint before creating
+            // it... except in a very strange way but it doesn't actually provider error feedback if it doesn't work so we cannot use
+            // it.  For now, this is what I'm doing
+
+            if (Expression.CurrentDatabaseProvider == DatabaseProviders.MySql)
             {
-                Constraint =
+                var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey)
+                {
+                    Constraint =
                 {
                     ConstraintName = primaryKeyName,
                     TableName = CurrentColumn.TableName,
                     Columns = new[] { CurrentColumn.Name }
                 }
-            };
-            _context.Expressions.Add(expression);
+                };
+                _context.Expressions.Add(expression);
+            }
             
             return this;
         }
@@ -139,7 +161,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
         {
             CurrentColumn.IsUnique = true;
 
-            var index = new CreateIndexExpression
+            var index = new CreateIndexExpression(Expression.SqlSyntax)
                             {
                                 Index = new IndexDefinition
                                             {

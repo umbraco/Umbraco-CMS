@@ -23,12 +23,6 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete
             _databaseProviders = databaseProviders;
         }
 
-        [Obsolete("Use the other constructor specifying an ISqlSyntaxProvider instead")]
-        public DeleteBuilder(IMigrationContext context, params DatabaseProviders[] databaseProviders)
-            : this(context, SqlSyntaxContext.SqlSyntaxProvider, databaseProviders)
-        {
-        }
-
         public void Table(string tableName)
         {
             var expression = new DeleteTableExpression { TableName = tableName };

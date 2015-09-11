@@ -24,12 +24,6 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create
             _databaseProviders = databaseProviders;
         }
 
-        [Obsolete("Use alternate ctor specifying ISqlSyntaxProvider instead")]
-        public CreateBuilder(IMigrationContext context, params DatabaseProviders[] databaseProviders)
-            :this(context, SqlSyntaxContext.SqlSyntaxProvider, databaseProviders)
-        {
-        }
-
         public ICreateTableWithColumnSyntax Table(string tableName)
         {
             var expression = new CreateTableExpression { TableName = tableName };

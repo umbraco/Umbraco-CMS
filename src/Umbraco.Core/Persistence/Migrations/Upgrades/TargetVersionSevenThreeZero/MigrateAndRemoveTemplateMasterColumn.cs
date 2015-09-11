@@ -23,11 +23,13 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
         {
 
             //Don't execute anything if there is no 'master' column - this might occur if the db is already upgraded
-            var cols = SqlSyntax.GetColumnsInSchema(Context.Database);
+            var cols = SqlSyntax.GetColumnsInSchema(Context.Database).ToArray();
             if (cols.Any(x => x.ColumnName.InvariantEquals("master") && x.TableName.InvariantEquals("cmsTemplate")) == false)
             {
                 return;
             }
+            
+            var constraints = SqlSyntax.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
 
             //update the parentId column for all templates to be correct so it matches the current 'master' template
 
@@ -35,7 +37,11 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
             //first by nulling out the master column where the id doesn't actually exist
             Execute.Sql(@"UPDATE cmsTemplate SET master = NULL WHERE " + 
                 SqlSyntax.GetQuotedColumnName("master") + @" IS NOT NULL AND " + 
-                SqlSyntax.GetQuotedColumnName("master") + @" NOT IN (SELECT nodeId FROM cmsTemplate)");
+                SqlSyntax.GetQuotedColumnName("master") + @" NOT IN (" +
+                //Stupid MySQL... needs this stupid syntax because it can do an update with a sub query of itself,
+                // yet it can do one with a sub sub query
+                // ... this will work in all dbs too
+                @"SELECT nodeId FROM (SELECT * FROM cmsTemplate a) b)");
 
             //Now we can bulk update the parentId column
 
@@ -93,13 +99,16 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
             //now remove the master column and key
             if (this.Context.CurrentDatabaseProvider == DatabaseProviders.MySql)
             {
-                Delete.ForeignKey().FromTable("cmsTemplate").ForeignColumn("master").ToTable("umbracoUser").PrimaryColumn("id");
+                //Because MySQL doesn't name keys with what you want, we need to query for the one that is associated
+                // this is required for this specific case because there are 2 foreign keys on the cmsTemplate table
+                var fkName = constraints.FirstOrDefault(x => x.Item1.InvariantEquals("cmsTemplate") && x.Item2.InvariantEquals("master"));
+                if (fkName != null)
+                {
+                    Delete.ForeignKey(fkName.Item3).OnTable("cmsTemplate");
+                }
             }
             else
             {
-                //These are the old aliases, before removing them, check they exist
-                var constraints = SqlSyntax.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
-
                 if (constraints.Any(x => x.Item1.InvariantEquals("cmsTemplate") && x.Item3.InvariantEquals("FK_cmsTemplate_cmsTemplate")))
                 {
                     Delete.ForeignKey("FK_cmsTemplate_cmsTemplate").OnTable("cmsTemplate");                   
@@ -108,8 +117,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                 //TODO: Hopefully it's not named something else silly in some crazy old versions
             }
 
-            var columns = SqlSyntax.GetColumnsInSchema(Context.Database).Distinct().ToArray();
-            if (columns.Any(x => x.ColumnName.InvariantEquals("master") && x.TableName.InvariantEquals("cmsTemplate")))
+
+            if (cols.Any(x => x.ColumnName.InvariantEquals("master") && x.TableName.InvariantEquals("cmsTemplate")))
             {
                 Delete.Column("master").FromTable("cmsTemplate");    
             }

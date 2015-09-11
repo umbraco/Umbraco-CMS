@@ -61,7 +61,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Insert.Expressions
                     var vals = "";
                     foreach (var keyVal in item)
                     {
-                        cols += keyVal.Key + ",";
+                        cols += SqlSyntax.GetQuotedColumnName(keyVal.Key) + ",";
                         vals += GetQuotedValue(keyVal.Value) + ",";
                     }
                     cols = cols.TrimEnd(',');
@@ -73,7 +73,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Insert.Expressions
                                   cols, vals);
 
                     sb.AppendLine(string.Format("{0};", sql));
-                    if (SqlSyntax.GetType() != typeof(MySqlSyntaxProvider))
+                    if (CurrentDatabaseProvider == DatabaseProviders.SqlServer || CurrentDatabaseProvider == DatabaseProviders.SqlServerCE)
                     {
                         sb.AppendLine("GO");
                     }
@@ -84,7 +84,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Insert.Expressions
                 if (EnabledIdentityInsert && SqlSyntax.SupportsIdentityInsert())
                 {
                     sb.AppendLine(string.Format("SET IDENTITY_INSERT {0} OFF;", SqlSyntax.GetQuotedTableName(TableName)));
-                    if (SqlSyntax.GetType() != typeof(MySqlSyntaxProvider))
+                    if (CurrentDatabaseProvider == DatabaseProviders.SqlServer || CurrentDatabaseProvider == DatabaseProviders.SqlServerCE)
                     {
                         sb.AppendLine("GO");
                     }

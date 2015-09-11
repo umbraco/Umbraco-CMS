@@ -16,13 +16,7 @@ namespace Umbraco.Core.Persistence.Migrations
     {
         public ISqlSyntaxProvider SqlSyntax { get; private set; }
         public ILogger Logger { get; private set; }
-
-        [Obsolete("Use the other constructor specifying all dependencies instead")]
-        protected MigrationBase()
-            : this(SqlSyntaxContext.SqlSyntaxProvider, LoggerResolver.Current.Logger)
-        {                
-        }
-
+        
         protected MigrationBase(ISqlSyntaxProvider sqlSyntax, ILogger logger)
         {
             SqlSyntax = sqlSyntax;
@@ -83,7 +77,7 @@ namespace Umbraco.Core.Persistence.Migrations
 
         public IIfDatabaseBuilder IfDatabase(params DatabaseProviders[] databaseProviders)
         {
-            return new IfDatabaseBuilder(Context, databaseProviders);
+            return new IfDatabaseBuilder(Context, SqlSyntax, databaseProviders);
         }
     }
 }

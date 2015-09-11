@@ -32,7 +32,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
             InitColumnTypeMap();
 
-            DefaultValueFormat = "DEFAULT '{0}'";
+            DefaultValueFormat = "DEFAULT {0}";
         }
 
         public override IEnumerable<string> GetTablesInSchema(Database db)
@@ -300,6 +300,10 @@ ORDER BY TABLE_NAME, INDEX_NAME",
             if (column.DefaultValue == null)
                 return string.Empty;
 
+            //hack - probably not needed with latest changes
+            if (column.DefaultValue.ToString().ToLower().Equals("getdate()".ToLower()))
+                column.DefaultValue = SystemMethods.CurrentDateTime;
+
             // see if this is for a system method
             if (column.DefaultValue is SystemMethods)
             {
@@ -310,10 +314,8 @@ ORDER BY TABLE_NAME, INDEX_NAME",
                 return string.Format(DefaultValueFormat, method);
             }
 
-            if (column.DefaultValue.ToString().ToLower().Equals("getdate()".ToLower()))
-                return "DEFAULT CURRENT_TIMESTAMP";
-
-            return string.Format(DefaultValueFormat, column.DefaultValue);
+            //needs quote
+            return string.Format(DefaultValueFormat, string.Format("'{0}'", column.DefaultValue));
         }
 
         protected override string FormatPrimaryKey(ColumnDefinition column)
@@ -326,13 +328,14 @@ ORDER BY TABLE_NAME, INDEX_NAME",
             switch (systemMethod)
             {
                 case SystemMethods.NewGuid:
-                    return "NEWID()";
-                case SystemMethods.NewSequentialId:
-                    return "NEWSEQUENTIALID()";
+                    return null; // NOT SUPPORTED!
+                    //return "NEWID()";                
                 case SystemMethods.CurrentDateTime:
-                    return "GETDATE()";
-                case SystemMethods.CurrentUTCDateTime:
-                    return "GETUTCDATE()";
+                    return "CURRENT_TIMESTAMP";
+                //case SystemMethods.NewSequentialId:
+                //    return "NEWSEQUENTIALID()";
+                //case SystemMethods.CurrentUTCDateTime:
+                //    return "GETUTCDATE()";
             }
 
             return null;
