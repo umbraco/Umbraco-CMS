@@ -94,7 +94,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
             // for this, but I don't see another way around. MySQL doesn't support checking for a constraint before creating
             // it... except in a very strange way but it doesn't actually provider error feedback if it doesn't work so we cannot use
             // it.  For now, this is what I'm doing
-            if (Expression.CurrentDatabaseProvider == DatabaseProviders.MySql)
+            if (Expression.CurrentDatabaseProvider != DatabaseProviders.MySql)
             {
                 var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey)
                 {
@@ -123,7 +123,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
             // it... except in a very strange way but it doesn't actually provider error feedback if it doesn't work so we cannot use
             // it.  For now, this is what I'm doing
 
-            if (Expression.CurrentDatabaseProvider == DatabaseProviders.MySql)
+            if (Expression.CurrentDatabaseProvider != DatabaseProviders.MySql)
             {
                 var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey)
                 {
