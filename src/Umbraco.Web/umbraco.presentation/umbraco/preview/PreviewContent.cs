@@ -191,10 +191,11 @@ namespace umbraco.presentation.preview
             {
                 DeletePreviewFile(userId, file);
             }
-            // also delete any files accessed more than one hour ago
+            // also delete any files accessed more than 10 minutes ago
+            var now = DateTime.Now;
             foreach (FileInfo file in dir.GetFiles("*.config"))
             {
-                if ((DateTime.Now - file.LastAccessTime).TotalMinutes > 1)
+                if ((now - file.LastAccessTime).TotalMinutes > 10)
                     DeletePreviewFile(userId, file);
             }
         }
