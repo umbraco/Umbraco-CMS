@@ -25,8 +25,6 @@ namespace Umbraco.Web.Trees
 
 		public override void RenderJS(ref StringBuilder javascript)
 		{
-			//NOTE: Notice the Partials%2f string below, this is a URLEncoded string of "Partials/" so that the editor knows
-			// to load the file from the correct location
 			javascript.Append(
                 @"
 		                 function openPartialView(id) {
