@@ -9,22 +9,9 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Insert.Expressions
     public class InsertDataExpression : MigrationExpressionBase
     {
         private readonly List<InsertionDataDefinition> _rows = new List<InsertionDataDefinition>();
-
-        [Obsolete("Use the other constructors specifying an ISqlSyntaxProvider instead")]
-        public InsertDataExpression()
-        {
-        }
-
-        [Obsolete("Use the other constructors specifying an ISqlSyntaxProvider instead")]
-        public InsertDataExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders) : base(current, databaseProviders)
-        {
-        }
-
-        public InsertDataExpression(ISqlSyntaxProvider sqlSyntax) : base(sqlSyntax)
-        {
-        }
-
-        public InsertDataExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax) : base(current, databaseProviders, sqlSyntax)
+        
+        public InsertDataExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax) 
+            : base(current, databaseProviders, sqlSyntax)
         {
         }
 
@@ -47,7 +34,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Insert.Expressions
             if (EnabledIdentityInsert && SqlSyntax.SupportsIdentityInsert())
             {
                 sb.AppendLine(string.Format("SET IDENTITY_INSERT {0} ON;", SqlSyntax.GetQuotedTableName(TableName)));
-                if (SqlSyntax.GetType() != typeof (MySqlSyntaxProvider))
+                if (CurrentDatabaseProvider == DatabaseProviders.SqlServer || CurrentDatabaseProvider == DatabaseProviders.SqlServerCE)
                 {
                     sb.AppendLine("GO");
                 }

@@ -5,20 +5,16 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Expressions
 {
     public class CreateColumnExpression : MigrationExpressionBase
     {
-        public CreateColumnExpression()
+
+        public CreateColumnExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax)
+            : base(current, databaseProviders, sqlSyntax)
         {
             Column = new ColumnDefinition { ModificationType = ModificationType.Create };
         }
 
-        public CreateColumnExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders)
-            : base(current, databaseProviders)
-        {
-            Column = new ColumnDefinition { ModificationType = ModificationType.Create };
-        }
-
-        public virtual string SchemaName { get; set; }
-        public virtual string TableName { get; set; }
-        public virtual ColumnDefinition Column { get; set; }
+        public string SchemaName { get; set; }
+        public string TableName { get; set; }
+        public ColumnDefinition Column { get; set; }
 
         public override string ToString()
         {
@@ -28,9 +24,9 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Expressions
             if (string.IsNullOrEmpty(Column.TableName))
                 Column.TableName = TableName;
 
-            return string.Format(SqlSyntaxContext.SqlSyntaxProvider.AddColumn,
-                                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(Column.TableName),
-                                 SqlSyntaxContext.SqlSyntaxProvider.Format(Column));
+            return string.Format(SqlSyntax.AddColumn,
+                                 SqlSyntax.GetQuotedTableName(Column.TableName),
+                                 SqlSyntax.Format(Column));
         }
     }
 }

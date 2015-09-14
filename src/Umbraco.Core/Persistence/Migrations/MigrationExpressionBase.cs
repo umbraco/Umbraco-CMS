@@ -7,22 +7,22 @@ namespace Umbraco.Core.Persistence.Migrations
 {
     public abstract class MigrationExpressionBase : IMigrationExpression
     {
-        [Obsolete("Use the other constructors specifying an ISqlSyntaxProvider instead")]
-        protected MigrationExpressionBase()
-            : this(SqlSyntaxContext.SqlSyntaxProvider)
-        {
-        }
+        //[Obsolete("Use the other constructors specifying an ISqlSyntaxProvider instead")]
+        //protected MigrationExpressionBase()
+        //    : this(SqlSyntaxContext.SqlSyntaxProvider)
+        //{
+        //}
 
-        [Obsolete("Use the other constructors specifying an ISqlSyntaxProvider instead")]
-        protected MigrationExpressionBase(DatabaseProviders current, DatabaseProviders[] databaseProviders)
-            : this(current, databaseProviders, SqlSyntaxContext.SqlSyntaxProvider)
-        {
-        }
+        //[Obsolete("Use the other constructors specifying an ISqlSyntaxProvider instead")]
+        //protected MigrationExpressionBase(DatabaseProviders current, DatabaseProviders[] databaseProviders)
+        //    : this(current, databaseProviders, SqlSyntaxContext.SqlSyntaxProvider)
+        //{
+        //}
 
-        protected MigrationExpressionBase(ISqlSyntaxProvider sqlSyntax)
-        {
-            SqlSyntax = sqlSyntax;
-        }
+        //protected MigrationExpressionBase(ISqlSyntaxProvider sqlSyntax)
+        //{
+        //    SqlSyntax = sqlSyntax;
+        //}
 
         protected MigrationExpressionBase(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax)
         {
