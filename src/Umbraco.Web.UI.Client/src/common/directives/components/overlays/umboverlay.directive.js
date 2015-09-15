@@ -58,9 +58,16 @@
 
                   if(numberOfOverlays === overlayNumber) {
 
-                     scope.$apply(function () {
-                        scope.submitForm(scope.model);
-                     });
+                     var activeElementType = document.activeElement.tagName;
+                     var clickableElements = ["A", "BUTTON"];
+
+                     if(clickableElements.indexOf(activeElementType) === 0) {
+                        document.activeElement.click();
+                     } else {
+                        scope.$apply(function () {
+                           scope.submitForm(scope.model);
+                        });
+                     }
 
                   }
 
