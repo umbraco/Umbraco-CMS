@@ -51,6 +51,22 @@
 
                   event.preventDefault();
                }
+
+               if (event.which === 13) {
+
+                  numberOfOverlays = overlayHelper.getNumberOfOverlays();
+
+                  if(numberOfOverlays === overlayNumber) {
+
+                     scope.$apply(function () {
+                        scope.submitForm(scope.model);
+                     });
+
+                  }
+
+                  event.preventDefault();
+               }
+
             });
 
             isRegistered = true;
