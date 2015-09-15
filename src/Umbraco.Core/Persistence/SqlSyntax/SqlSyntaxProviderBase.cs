@@ -266,7 +266,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         {
             // need CultureInfo.InvariantCulture because ":" here is the "time separator" and
             // may be converted to something else in different cultures (eg "." in DK).
-            return includeTime ? date.ToString("yyyyMMdd HH:mm:ss", CultureInfo.InvariantCulture) : date.ToString("yyyyMMdd");
+            return date.ToString(includeTime ? "yyyyMMdd HH:mm:ss" : "yyyyMMdd", CultureInfo.InvariantCulture);
         }
 
         public virtual string Format(TableDefinition table)
