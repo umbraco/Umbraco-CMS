@@ -1,7 +1,7 @@
 (function() {
    'use strict';
 
-   function EditorContainerDirective(overlayHelper) {
+   function OverlayBackdropDirective(overlayHelper) {
 
       function link(scope, el, attr, ctrl) {
 
@@ -16,16 +16,16 @@
       }
 
       var directive = {
-         transclude: true,
          restrict: 'E',
          replace: true,
-         templateUrl: 'views/components/editor/umb-editor-container.html',
+         templateUrl: 'views/components/overlays/umb-overlay-backdrop.html',
          link: link
       };
 
       return directive;
+
    }
 
-   angular.module('umbraco.directives').directive('umbEditorContainer', EditorContainerDirective);
+   angular.module('umbraco.directives').directive('umbOverlayBackdrop', OverlayBackdropDirective);
 
 })();

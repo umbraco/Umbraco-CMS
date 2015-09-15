@@ -1,9 +1,9 @@
-<div class="umb-overlay {{overlayCssClass}}" on-outside-click="closeOverLay()">
+<div class="umb-overlay umb-overlay-{{position}}" on-outside-click="closeOverLay()">
   <form name="overlayForm" ng-submit="submitForm(model)" novalidate val-form-manager>
 
     <div class="umb-overlay-header" ng-if="model.title">
       <h4>{{model.title}}
-        <a class="pull-right" hotkey="esc" href ng-click="closeOverLay()">
+        <a class="pull-right" href ng-click="closeOverLay()">
           <i class="icon-delete"></i>
         </a>
       </h4>
@@ -27,9 +27,8 @@
 
     <div class="umb-overlay-drawer" ng-if="model.close || model.submit">
       <div class="umb-overlay-drawer-content">
-        <button class="btn btn-link" hotkey="esc" ng-click="closeOverLay()" ng-if="model.close">Cancel</button>
-        <button class="btn btn-success" hotkey="enter" ng-if="model.submit && !model.multiActions" type="submit">Submit</button>
-        <umb-button-group actions="model.multiActions" model="model" ng-if="model.multiActions"></umb-button-group>
+        <umb-button ng-if="model.close" type="button" label="Cancel" action="closeOverLay()" button-style="link"></umb-button>
+        <umb-button ng-if="model.submit" type="submit" label="Submit" button-style="success"></umb-button>
       </div>
     </div>
   </form>

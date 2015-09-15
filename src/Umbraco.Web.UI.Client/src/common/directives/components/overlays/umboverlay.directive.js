@@ -7,37 +7,66 @@
 (function() {
    'use strict';
 
-   function OverlayDirective($timeout, formHelper) {
+   function OverlayDirective($timeout, formHelper, overlayHelper) {
 
       function link(scope, el, attr, ctrl) {
+
+         var overlayNumber = 0;
+         var numberOfOverlays = 0;
+         var isRegistered = false;
 
          var modelCopy = {};
 
          function activate() {
 
-            var cssClass = "umb-overlay-center";
-
-            if (scope.position) {
-               cssClass = "umb-overlay-" + scope.position;
-            }
-
-            if (scope.animation) {
-               cssClass += " " + scope.animation;
-            }
-
-            var shadow = "shadow-depth-3";
-
-            if (scope.shadow) {
-               shadow = "shadow-depth-" + scope.shadow;
-            }
-
-            cssClass += " " + shadow;
-
-            scope.overlayCssClass = cssClass;
+            registerOverlay();
 
             modelCopy = makeModelCopy(scope.model);
 
-            setOverlayIndent();
+            $timeout(function() {
+
+               if (scope.position === "target") {
+                  setTargetPosition();
+               }
+
+               setOverlayIndent();
+
+            });
+
+         }
+
+         function registerOverlay() {
+
+            overlayNumber = overlayHelper.registerOverlay();
+
+            $(document).bind("keydown.overlay-" + overlayNumber, function(event) {
+
+               if (event.which === 27) {
+
+                  numberOfOverlays = overlayHelper.getNumberOfOverlays();
+
+                  if(numberOfOverlays === overlayNumber) {
+                     scope.closeOverLay();
+                  }
+
+                  event.preventDefault();
+               }
+            });
+
+            isRegistered = true;
+
+         }
+
+         function unregisterOverlay() {
+
+            if(isRegistered) {
+
+               overlayHelper.unregisterOverlay();
+
+               $(document).unbind("keydown.overlay-" + overlayNumber);
+
+               isRegistered = false;
+            }
 
          }
 
@@ -57,24 +86,16 @@
 
          function setOverlayIndent() {
 
-            var firstOverlayWidth = null;
+            var overlayIndex = overlayNumber - 1;
+            var indentSize = overlayIndex * 20;
+            var overlayWidth = el.context.clientWidth;
 
-            $timeout(function() {
-               $(".umb-overlay").each(function(index) {
+            el.css('width', overlayWidth - indentSize);
 
-                  var overlay = $(this);
-                  var subtract = index * 20;
-
-                  if (index === 0) {
-                     firstOverlayWidth = overlay.context.clientWidth;
-                  }
-
-                  var overlayNewWidth = Math.floor(firstOverlayWidth - (index * 20));
-
-                  overlay.css('width', overlayNewWidth);
-
-               });
-            });
+            if(scope.position === "center" || scope.position === "target") {
+               var overlayTopPosition = el.context.offsetTop;
+               el.css('top', overlayTopPosition + indentSize);
+            }
 
          }
 
@@ -95,7 +116,7 @@
             };
 
             // if mouse click position is know place element with mouse in center
-            if (scope.model.event.pageX && scope.model.event.pageY) {
+            if (scope.model.event && scope.model.event) {
 
                // viewport size
                viewportWidth = $(window).innerWidth();
@@ -128,48 +149,46 @@
 
                el.css(position);
 
-               // else change overlay to center position
-            } else {
-
-               scope.position = "center";
-               activate();
-
             }
 
          }
 
          activate();
 
-         $timeout(function() {
-            if (scope.position === "target") {
-               setTargetPosition();
-            }
-         });
-
          scope.submitForm = function(model) {
 
-            if (formHelper.submitForm({
-                  scope: scope
-               })) {
+            if(scope.model.submit) {
 
-               formHelper.resetForm({
-                  scope: scope
-               });
+               if (formHelper.submitForm({scope: scope})) {
 
-               scope.model.submit(model);
+                  formHelper.resetForm({ scope: scope });
+
+                  unregisterOverlay();
+
+                  scope.model.submit(model);
+
+               }
 
             }
 
          };
 
          scope.closeOverLay = function() {
+
+            unregisterOverlay();
+
             if (scope.model.close) {
                scope.model = modelCopy;
                scope.model.close(scope.model);
             } else {
                scope.model = null;
             }
+
          };
+
+         scope.$on('$destroy', function(){
+            unregisterOverlay();
+         });
 
       }
 
@@ -181,9 +200,7 @@
          scope: {
             model: "=",
             view: "=",
-            position: "@",
-            animation: "@",
-            shadow: "@"
+            position: "@"
          },
          link: link
       };

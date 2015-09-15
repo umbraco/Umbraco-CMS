@@ -3,8 +3,8 @@
      overflow: hidden;
      background: white;
      z-index: 996660;
-     border: 1px solid #ccc;
      animation: fadeIn 0.2s;
+     box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
 }
 
 .umb-overlay .umb-overlay-header {
@@ -32,6 +32,7 @@
      height: 31px;
      padding: 10px;
      margin: 0;
+     background: #ffffff;
 }
 
 .umb-overlay .umb-overlay-drawer .umb-overlay-drawer-content {
@@ -47,11 +48,12 @@
 /* ---------- OVERLAY CENTER ---------- */
 
 .umb-overlay.umb-overlay-center {
-     width: 460px;
-     height: 400px;
-     top: 50%;
+     position: absolute;
+     width: 600px;
+     height: 500px;
+     top: 10px;
      left: 50%;
-     transform: translate(-50%, -50%);
+     transform: translate(-50%, 0);
  }
 
 .umb-overlay.umb-overlay-center .umb-overlay-header {
@@ -60,6 +62,7 @@
 
 .umb-overlay.umb-overlay-center .umb-overlay-container {
      top: 68px;
+     padding: 20px;
 }
 
 /* ---------- OVERLAY TARGET ---------- */
@@ -81,11 +84,12 @@
 /* ---------- OVERLAY RIGHT ---------- */
 
 .umb-overlay.umb-overlay-right {
-     width: 460px;
+     width: 500px;
      top: 0;
      right: 0;
      bottom: 0;
      border: none;
+     box-shadow: 0 0 20px rgba(0,0,0,0.19), 0 0 6px rgba(0,0,0,0.23);
 }
 
 .umb-overlay.umb-overlay-right .umb-overlay-header {
