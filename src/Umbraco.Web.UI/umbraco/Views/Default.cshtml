@@ -60,11 +60,10 @@
         <section id="contentwrapper">
             <div id="contentcolumn" ng-view>
             </div>
+            <umb-notifications></umb-notifications>
         </section>
 
     </div>
-
-    <umb-notifications></umb-notifications>
 
     @Html.BareMinimumServerVariablesScript(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewBag.UmbracoPath }))
 
@@ -75,7 +74,7 @@
 
         }
     </script>
-    
+
 
     @*And finally we can load in our angular app*@
     <script type="text/javascript" src="lib/rgrove-lazyload/lazyload.js"></script>
