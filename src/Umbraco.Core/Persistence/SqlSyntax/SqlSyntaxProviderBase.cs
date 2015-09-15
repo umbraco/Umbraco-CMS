@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
@@ -263,7 +264,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         /// </remarks>
         public virtual string FormatDateTime(DateTime date, bool includeTime = true)
         {
-            return includeTime ? date.ToString("yyyyMMdd HH:mm:ss") : date.ToString("yyyyMMdd");
+            // need CultureInfo.InvariantCulture because ":" here is the "time separator" and
+            // may be converted to something else in different cultures (eg "." in DK).
+            return includeTime ? date.ToString("yyyyMMdd HH:mm:ss", CultureInfo.InvariantCulture) : date.ToString("yyyyMMdd");
         }
 
         public virtual string Format(TableDefinition table)
