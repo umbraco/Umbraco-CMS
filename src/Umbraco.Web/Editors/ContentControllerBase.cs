@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -28,7 +29,13 @@ namespace Umbraco.Web.Editors
         /// </summary>
         protected ContentControllerBase()
             : this(UmbracoContext.Current)
-        {            
+        {
+            var cultureInfo = Security.IsAuthenticated()
+                    ? Security.CurrentUser.GetUserCulture(Services.TextService)
+                    : CultureInfo.GetCultureInfo("en");
+
+            System.Threading.Thread.CurrentThread.CurrentUICulture = cultureInfo;
+            System.Threading.Thread.CurrentThread.CurrentCulture = cultureInfo;
         }
 
         /// <summary>
@@ -38,6 +45,12 @@ namespace Umbraco.Web.Editors
         protected ContentControllerBase(UmbracoContext umbracoContext)
             : base(umbracoContext)
         {
+            var cultureInfo = Security.IsAuthenticated()
+                       ? Security.CurrentUser.GetUserCulture(Services.TextService)
+                       : CultureInfo.GetCultureInfo("en");
+
+            System.Threading.Thread.CurrentThread.CurrentUICulture = cultureInfo;
+            System.Threading.Thread.CurrentThread.CurrentCulture = cultureInfo;
         }
 
         protected HttpResponseMessage HandleContentNotFound(object id, bool throwException = true)
