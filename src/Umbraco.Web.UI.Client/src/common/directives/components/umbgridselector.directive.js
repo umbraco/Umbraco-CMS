@@ -38,7 +38,7 @@
                 scope.dialogModel.availableItems = scope.availableItems;
                 scope.dialogModel.selectedItems = scope.selectedItems;
                 scope.dialogModel.event = $event;
-                scope.dialogModel.view = "views/common/dialogs/itempicker/itempicker.html";
+                scope.dialogModel.view = "itemPicker";
                 scope.showDialog = true;
 
                 scope.dialogModel.chooseItem = function(selectedItem) {

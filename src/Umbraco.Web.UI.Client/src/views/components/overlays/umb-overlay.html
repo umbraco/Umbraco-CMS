@@ -13,6 +13,7 @@
 
       <div ng-if="view" ng-switch="view">
          <div ng-switch-when="memberGroupPicker"><ng-include src="'views/common/overlays/membergrouppicker/membergrouppicker.html'"></ng-include></div>
+         <div ng-switch-when="itemPicker"><ng-include src="'views/common/overlays/itempicker/itempicker.html'"></ng-include></div>
          <div ng-switch-default ng-include="view"></div>
       </div>
 
