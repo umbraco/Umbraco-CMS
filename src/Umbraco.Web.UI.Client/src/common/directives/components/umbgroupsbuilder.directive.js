@@ -35,16 +35,16 @@
         var compositionTool = {
           "name": "Compositions",
           "icon": "icon-merge",
-          "action": function() {
-            scope.openCompositionsDialog();
+          "action": function(tool) {
+            scope.openCompositionsDialog(tool);
           }
         };
 
         var sortingTool = {
           "name": "Reorder",
           "icon": "icon-navigation",
-          "action": function() {
-            scope.toggleSortingMode();
+          "action": function(tool) {
+            scope.toggleSortingMode(tool);
           }
         };
 
@@ -159,8 +159,16 @@
 
       /* ---------- TOOLBAR ---------- */
 
-      scope.toggleSortingMode = function() {
-        scope.sortingMode = !scope.sortingMode;
+      scope.toggleSortingMode = function(tool) {
+
+         scope.sortingMode = !scope.sortingMode;
+
+         if(scope.sortingMode === true) {
+            tool.name = "I'm done reordering";
+         } else {
+            tool.name = "Reorder";
+         }
+
       };
 
       scope.openCompositionsDialog = function() {
