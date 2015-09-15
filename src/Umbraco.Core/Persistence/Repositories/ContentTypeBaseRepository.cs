@@ -574,7 +574,10 @@ AND umbracoNode.id <> @id",
                 var mediaTypes = MapMediaTypes(mediaTypeIds, db, sqlSyntax, out allParentMediaTypeIds)
                     .ToArray();
 
-                MapContentTypeChildren(mediaTypes, db, sqlSyntax, contentTypeRepository, allParentMediaTypeIds);
+                if (mediaTypes.Any())
+                {
+                    MapContentTypeChildren(mediaTypes, db, sqlSyntax, contentTypeRepository, allParentMediaTypeIds);
+                }
 
                 return mediaTypes;
             }
