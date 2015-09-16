@@ -18,10 +18,10 @@ module.exports = function (grunt) {
     grunt.registerTask('watch-test', ['jshint:dev', 'karma:unit']);
 
     //triggered from grunt
-    grunt.registerTask('build', ['clean', 'concat', 'recess:build', 'recess:installer', 'recess:canvasdesigner', 'postcss', 'bower-install-simple', 'bower', 'copy']);
+    grunt.registerTask('build', ['clean:pre', 'concat', 'recess:build', 'recess:installer', 'recess:canvasdesigner', 'postcss', 'bower-install-simple', 'bower', 'copy', 'clean:post']);
 
     //triggered from grunt dev vs or grunt vs
-    grunt.registerTask('build-dev', ['clean', 'concat', 'recess:build', 'recess:installer', 'postcss', 'bower-install-simple', 'bower', 'copy']);
+    grunt.registerTask('build-dev', ['clean:pre', 'concat', 'recess:build', 'recess:installer', 'postcss', 'bower-install-simple', 'bower', 'copy']);
 
     //utillity tasks
     grunt.registerTask('docs', ['ngdocs']);
@@ -111,7 +111,10 @@ module.exports = function (grunt) {
             prod: ['<%= distdir %>/js/*.js']
         },
 
-        clean: ['<%= distdir %>/*'],
+        clean: {
+            pre: ['<%= distdir %>/*'],
+            post: ['<%= distdir %>/js/*.dev.js']
+        },
 
         copy: {
             assets: {

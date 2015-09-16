@@ -152,12 +152,7 @@ namespace Umbraco.Core.IO
         /// <returns>A value indicating whether the filepath is valid.</returns>
         internal static bool VerifyEditPath(string filePath, string validDir)
         {
-            if (filePath.StartsWith(MapPath(SystemDirectories.Root)) == false)
-                filePath = MapPath(filePath);
-            if (validDir.StartsWith(MapPath(SystemDirectories.Root)) == false)
-                validDir = MapPath(validDir);
-
-            return filePath.StartsWith(validDir);
+            return VerifyEditPath(filePath, new[] { validDir });
         }
 
         /// <summary>
@@ -182,15 +177,31 @@ namespace Umbraco.Core.IO
         /// <returns>A value indicating whether the filepath is valid.</returns>
         internal static bool VerifyEditPath(string filePath, IEnumerable<string> validDirs)
         {
+            // this is called from ScriptRepository, PartialViewRepository, etc.
+            // filePath is the fullPath (rooted, filesystem path, can be trusted)
+            // validDirs are virtual paths (eg ~/Views)
+            //
+            // except that for templates, filePath actually is a virtual path
+
+            //TODO
+            // what's below is dirty, there are too many ways to get the root dir, etc.
+            // not going to fix everything today
+
+            var mappedRoot = MapPath(SystemDirectories.Root);
+            if (filePath.StartsWith(mappedRoot) == false)
+                filePath = MapPath(filePath);
+
+            // yes we can (see above)
+            //// don't trust what we get, it may contain relative segments
+            //filePath = Path.GetFullPath(filePath);
+
             foreach (var dir in validDirs)
             {
                 var validDir = dir;
-                if (filePath.StartsWith(MapPath(SystemDirectories.Root)) == false)
-                    filePath = MapPath(filePath);
-                if (validDir.StartsWith(MapPath(SystemDirectories.Root)) == false)
+                if (validDir.StartsWith(mappedRoot) == false)
                     validDir = MapPath(validDir);
 
-                if (filePath.StartsWith(validDir))
+                if (PathStartsWith(filePath, validDir, Path.DirectorySeparatorChar))
                     return true;
             }
 
@@ -219,11 +230,8 @@ namespace Umbraco.Core.IO
         /// <returns>A value indicating whether the filepath is valid.</returns>
         internal static bool VerifyFileExtension(string filePath, List<string> validFileExtensions)
         {
-            if (filePath.StartsWith(MapPath(SystemDirectories.Root)) == false)
-                filePath = MapPath(filePath);
-            var f = new FileInfo(filePath);
-            
-            return validFileExtensions.Contains(f.Extension.Substring(1));
+            var ext = Path.GetExtension(filePath);
+            return ext != null && validFileExtensions.Contains(ext.TrimStart('.'));
         }
 
         /// <summary>
@@ -240,6 +248,16 @@ namespace Umbraco.Core.IO
             return true;
         }
 
+        public static bool PathStartsWith(string path, string root, char separator)
+        {
+            // either it is identical to root,
+            // or it is root + separator + anything
+
+            if (path.StartsWith(root, StringComparison.OrdinalIgnoreCase) == false) return false;
+            if (path.Length == root.Length) return true;
+            if (path.Length < root.Length) return false;
+            return path[root.Length] == separator;
+        }
 
         /// <summary>
         /// Returns the path to the root of the application, by getting the path to where the assembly where this

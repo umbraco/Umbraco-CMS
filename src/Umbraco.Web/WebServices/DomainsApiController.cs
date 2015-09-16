@@ -63,7 +63,15 @@ namespace Umbraco.Web.WebServices
                         LanguageId = model.Language,
                         RootContentId = model.NodeId
                     };
-                    Services.DomainService.Save(newDomain);
+
+                    var saveAttempt = Services.DomainService.Save(newDomain);
+                    if (saveAttempt == false)
+                    {
+                        var response = Request.CreateResponse(HttpStatusCode.BadRequest);
+                        response.Content = new StringContent("Saving new domain failed");
+                        response.ReasonPhrase = saveAttempt.Result.StatusType.ToString();
+                        throw new HttpResponseException(response);
+                    }
                 }
                     
             }
@@ -114,7 +122,14 @@ namespace Umbraco.Web.WebServices
                         LanguageId = domainModel.Lang,
                         RootContentId = model.NodeId
                     };
-                    Services.DomainService.Save(newDomain);
+                    var saveAttempt = Services.DomainService.Save(newDomain);
+                    if (saveAttempt == false)
+                    {
+                        var response = Request.CreateResponse(HttpStatusCode.BadRequest);
+                        response.Content = new StringContent("Saving new domain failed");
+                        response.ReasonPhrase = saveAttempt.Result.StatusType.ToString();
+                        throw new HttpResponseException(response);
+                    }
                 } 
             }
 

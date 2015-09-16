@@ -22,8 +22,8 @@ namespace Umbraco.Core.Logging
         private CancellationTokenSource _loggingCancelationTokenSource;
         private CancellationToken _loggingCancelationToken;
         private Task _loggingTask;
-        private Double _shutdownFlushTimeout = 5;
-        private TimeSpan _shutdownFlushTimespan = TimeSpan.FromSeconds(5);
+        private Double _shutdownFlushTimeout = 1;
+        private TimeSpan _shutdownFlushTimespan = TimeSpan.FromSeconds(1);
         private static readonly Type ThisType = typeof(ParallelForwardingAppender);
         private volatile bool _shutDownRequested;
         private int? _bufferSize = DefaultBufferSize;

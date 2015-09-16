@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
+using Umbraco.Core.Sync;
 
 namespace Umbraco.Core.Services
 {
@@ -29,7 +30,18 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Return all active servers.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>All active servers.</returns>
         IEnumerable<IServerRegistration> GetActiveServers();
+
+        /// <summary>
+        /// Gets the current server identity.
+        /// </summary>
+        string CurrentServerIdentity { get; }
+
+        /// <summary>
+        /// Gets the role of the current server.
+        /// </summary>
+        /// <returns>The role of the current server.</returns>
+        ServerRole GetCurrentServerRole();
     }
 }

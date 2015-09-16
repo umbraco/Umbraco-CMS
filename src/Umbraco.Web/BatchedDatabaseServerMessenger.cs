@@ -45,22 +45,16 @@ namespace Umbraco.Web
 
         private void UmbracoModule_RouteAttempt(object sender, RoutableAttemptEventArgs e)
         {
+            // as long as umbraco is ready & configured, sync
             switch (e.Outcome)
             {
                 case EnsureRoutableOutcome.IsRoutable:
-                    Sync();
-                    break;
                 case EnsureRoutableOutcome.NotDocumentRequest:
-                    //so it's not a document request, we'll check if it's a back office request
-                    if (e.HttpContext.Request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath))
-                    {
-                        //it's a back office request, we should sync!
-                        Sync();
-                    }
+                case EnsureRoutableOutcome.NoContent:
+                    Sync();
                     break;
                 //case EnsureRoutableOutcome.NotReady:
                 //case EnsureRoutableOutcome.NotConfigured:
-                //case EnsureRoutableOutcome.NoContent:
                 //default:
                 //    break;
             }

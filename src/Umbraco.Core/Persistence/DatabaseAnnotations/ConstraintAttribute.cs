@@ -20,6 +20,6 @@ namespace Umbraco.Core.Persistence.DatabaseAnnotations
         /// <summary>
         /// Gets or sets the Default value
         /// </summary>
-        public string Default { get; set; }
+        public object Default { get; set; }
     }
 }

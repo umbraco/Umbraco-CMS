@@ -270,6 +270,7 @@ namespace Umbraco.Web.Editors
             {
                 //publish the item and check if it worked, if not we will show a diff msg below
                 publishStatus = Services.ContentService.SaveAndPublishWithStatus(contentItem.PersistedContent, Security.CurrentUser.Id);
+                wasCancelled = publishStatus.Result.StatusType == PublishStatusType.FailedCancelledByEvent;
             }
 
             //return the updated model
@@ -314,6 +315,14 @@ namespace Umbraco.Web.Editors
             }
 
             UpdatePreviewContext(contentItem.PersistedContent.Id);
+
+            //If the item is new and the operation was cancelled, we need to return a different
+            // status code so the UI can handle it since it won't be able to redirect since there
+            // is no Id to redirect to!
+            if (wasCancelled && IsCreatingAction(contentItem.Action))
+            {
+                throw new HttpResponseException(Request.CreateValidationErrorResponse(display));
+            }
 
             return display;
         }

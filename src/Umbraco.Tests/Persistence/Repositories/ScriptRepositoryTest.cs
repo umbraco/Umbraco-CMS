@@ -188,18 +188,125 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.That(exists, Is.True);
         }
 
+        [Test]
+        public void Can_Perform_Move_On_ScriptRepository()
+        {
+            const string content = "/// <reference name=\"MicrosoftAjax.js\"/>";
+
+            // Arrange
+            var provider = new FileUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
+
+            var script = new Script("test-move-script.js") { Content = content };
+            repository.AddOrUpdate(script);
+            unitOfWork.Commit();
+
+            // Act
+            script = repository.Get("test-move-script.js");
+            script.Path = "moved/test-move-script.js";
+            repository.AddOrUpdate(script);
+            unitOfWork.Commit();
+
+            var existsOld = repository.Exists("test-move-script.js");
+            var existsNew = repository.Exists("moved/test-move-script.js");
+
+            script = repository.Get("moved/test-move-script.js");
+
+            // Assert
+            Assert.IsNotNull(script);
+            Assert.IsFalse(existsOld);
+            Assert.IsTrue(existsNew);
+            Assert.AreEqual(content, script.Content);
+        }
+
+        [Test]
+        public void PathTests()
+        {
+            // unless noted otherwise, no changes / 7.2.8
+
+            var provider = new FileUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
+
+            var script = new Script("test-path-1.js") { Content = "// script" };
+            repository.AddOrUpdate(script);
+            unitOfWork.Commit();
+            Assert.IsTrue(_fileSystem.FileExists("test-path-1.js"));
+            Assert.AreEqual("test-path-1.js", script.Path);
+            Assert.AreEqual("/scripts/test-path-1.js", script.VirtualPath);
+
+            script = new Script("path-2/test-path-2.js") { Content = "// script" };
+            repository.AddOrUpdate(script);
+            unitOfWork.Commit();
+            Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-2.js"));
+            Assert.AreEqual("path-2\\test-path-2.js", script.Path); // fixed in 7.3 - 7.2.8 does not update the path
+            Assert.AreEqual("/scripts/path-2/test-path-2.js", script.VirtualPath);
+
+            script = repository.Get("path-2/test-path-2.js");
+            Assert.IsNotNull(script);
+            Assert.AreEqual("path-2\\test-path-2.js", script.Path);
+            Assert.AreEqual("/scripts/path-2/test-path-2.js", script.VirtualPath);
+
+            script = new Script("path-2\\test-path-3.js") { Content = "// script" };
+            repository.AddOrUpdate(script);
+            unitOfWork.Commit();
+            Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-3.js"));
+            Assert.AreEqual("path-2\\test-path-3.js", script.Path);
+            Assert.AreEqual("/scripts/path-2/test-path-3.js", script.VirtualPath);
+
+            script = repository.Get("path-2/test-path-3.js");
+            Assert.IsNotNull(script);
+            Assert.AreEqual("path-2\\test-path-3.js", script.Path);
+            Assert.AreEqual("/scripts/path-2/test-path-3.js", script.VirtualPath);
+
+            script = repository.Get("path-2\\test-path-3.js");
+            Assert.IsNotNull(script);
+            Assert.AreEqual("path-2\\test-path-3.js", script.Path);
+            Assert.AreEqual("/scripts/path-2/test-path-3.js", script.VirtualPath);
+
+            script = new Script("\\test-path-4.js") { Content = "// script" };
+            Assert.Throws<FileSecurityException>(() => // fixed in 7.3 - 7.2.8 used to strip the \
+            {
+                repository.AddOrUpdate(script);
+            });
+
+            script = repository.Get("missing.js");
+            Assert.IsNull(script);
+
+            // fixed in 7.3 - 7.2.8 used to...
+            Assert.Throws<FileSecurityException>(() =>
+            {
+                script = repository.Get("\\test-path-4.js"); // outside the filesystem, does not exist
+            });
+            Assert.Throws<FileSecurityException>(() =>
+            {
+                script = repository.Get("../packages.config"); // outside the filesystem, exists
+            });
+        }
+
         [TearDown]
         public override void TearDown()
         {
             base.TearDown();
 
-            _fileSystem = null;
             //Delete all files
-	        var fs = new PhysicalFileSystem(SystemDirectories.Scripts);
-            var files = fs.GetFiles("", "*.js");
+            Purge((PhysicalFileSystem) _fileSystem, "");
+            _fileSystem = null;
+        }
+
+        private void Purge(PhysicalFileSystem fs, string path)
+        {
+            var files = fs.GetFiles(path, "*.js");
             foreach (var file in files)
             {
                 fs.DeleteFile(file);
+            }
+            var dirs = fs.GetDirectories(path);
+            foreach (var dir in dirs)
+            {
+                Purge(fs, dir);
+                fs.DeleteDirectory(dir);
             }
         }
 

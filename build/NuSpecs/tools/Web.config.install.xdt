@@ -22,10 +22,7 @@
   <appSettings>
     <add key="owin:appStartup" value="UmbracoDefaultOwinStartup" xdt:Locator="Match(key)" xdt:Transform="InsertIfMissing" />
   </appSettings>
-  <appSettings>
-    <add key="owin:appStartup" value="UmbracoDefaultOwinStartup" xdt:Locator="Match(key)" xdt:Transform="SetAttributes" />
-  </appSettings>
-
+  
   <umbracoConfiguration xdt:Transform="InsertIfMissing">
     <settings configSource="config\umbracoSettings.config" xdt:Locator="Match(configSource)" xdt:Transform="InsertIfMissing" />
     <BaseRestExtensions configSource="config\BaseRestExtensions.config" xdt:Locator="Match(configSource)" xdt:Transform="InsertIfMissing" />
@@ -51,6 +48,8 @@
   <system.web xdt:Transform="InsertIfMissing" />
   <system.web>
     <siteMap xdt:Transform="Remove" />
+    <httpRuntime xdt:Transform="InsertIfMissing" />
+    <httpRuntime targetFramework="4.5" xdt:Transform="SetAttributes(targetFramework)" />
     <membership defaultProvider="DefaultMembershipProvider" xdt:Locator="Match(defaultProvider)" xdt:Transform="Remove" />
     <roleManager defaultProvider="DefaultRoleProvider" xdt:Locator="Match(defaultProvider)" xdt:Transform="Remove"/>
     <profile defaultProvider="DefaultProfileProvider" xdt:Locator="Match(defaultProvider)" xdt:Transform="Remove"/>>

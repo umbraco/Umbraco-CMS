@@ -273,10 +273,10 @@ namespace Umbraco.Web.Models.Mapping
             var result = new Dictionary<string, bool>();
             foreach (var role in Roles.GetAllRoles().Distinct())
             {
-                result.Add(role, false);
                 // if a role starts with __umbracoRole we won't show it as it's an internal role used for public access
                 if (role.StartsWith(Constants.Conventions.Member.InternalRolePrefix) == false)
                 {
+                    result.Add(role, false);
                     if (username.IsNullOrWhiteSpace()) continue;
                     if (Roles.IsUserInRole(username, role))
                     {
