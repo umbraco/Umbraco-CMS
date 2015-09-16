@@ -49,11 +49,9 @@ namespace Umbraco.Tests.Migrations
             {
                 CanResolveBeforeFrozen = true
             };
-            //SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
-
+           
 			Resolution.Freeze();
-
-            //SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
+            
         }
 
         [Test]
