@@ -1070,6 +1070,11 @@ AND umbracoNode.id <> @id",
                 out IDictionary<int, PropertyTypeCollection> allPropertyTypeCollection,
                 out IDictionary<int, PropertyGroupCollection> allPropertyGroupCollection)
             {
+                allPropertyGroupCollection = new Dictionary<int, PropertyGroupCollection>();
+                allPropertyTypeCollection = new Dictionary<int, PropertyTypeCollection>();
+
+                // query below is not safe + pointless if array is empty
+                if (contentTypeIds.Length == 0) return;
 
                 // first part Gets all property groups including property type data even when no property type exists on the group
                 // second part Gets all property types including ones that are not on a group
@@ -1105,10 +1110,8 @@ AND umbracoNode.id <> @id",
                         INNER JOIN cmsDataType as DT
                         ON PT.dataTypeId = DT.nodeId
                         LEFT JOIN cmsPropertyTypeGroup as PG
-                        ON PG.id = PT.propertyTypeGroupId");
-
-                if (contentTypeIds.Any())
-                    sqlBuilder.AppendLine(" WHERE (PT.contentTypeId in (@contentTypeIds))");
+                        ON PG.id = PT.propertyTypeGroupId
+                        WHERE (PT.contentTypeId in (@contentTypeIds))");
 
                 sqlBuilder.AppendLine(" ORDER BY (pgId)");
 
@@ -1118,9 +1121,6 @@ AND umbracoNode.id <> @id",
                     throw new InvalidOperationException("Cannot perform this lookup, too many sql parameters");
 
                 var result = db.Fetch<dynamic>(sqlBuilder.ToString(), new { contentTypeIds = contentTypeIds });
-
-                allPropertyGroupCollection = new Dictionary<int, PropertyGroupCollection>();
-                allPropertyTypeCollection = new Dictionary<int, PropertyTypeCollection>();
 
                 foreach (var contentTypeId in contentTypeIds)
                 {
