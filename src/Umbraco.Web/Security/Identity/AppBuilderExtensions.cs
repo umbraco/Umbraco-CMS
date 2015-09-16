@@ -134,7 +134,7 @@ namespace Umbraco.Web.Security.Identity
                 GlobalSettings.TimeOutInMinutes,
                 GlobalSettings.UseSSL)
             {
-                Provider = new CookieAuthenticationProvider
+                Provider = new BackOfficeCookieAuthenticationProvider
                 {
                     // Enables the application to validate the security stamp when the user 
                     // logs in. This is a security feature which is used when you 
@@ -143,7 +143,7 @@ namespace Umbraco.Web.Security.Identity
                         .OnValidateIdentity<BackOfficeUserManager, BackOfficeIdentityUser, int>(
                             TimeSpan.FromMinutes(30),
                             (manager, user) => user.GenerateUserIdentityAsync(manager),
-                            identity => identity.GetUserId<int>())
+                            identity => identity.GetUserId<int>()),                    
                 }
             };
 
