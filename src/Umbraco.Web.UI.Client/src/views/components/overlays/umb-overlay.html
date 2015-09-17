@@ -9,7 +9,7 @@
       </h4>
     </div>
 
-    <div class="umb-overlay-container">
+    <div class="umb-overlay-container" ng-transclude>
 
       <div ng-if="view" ng-switch="view">
          <div ng-switch-when="memberGroupPicker"><ng-include src="'views/common/overlays/membergrouppicker/membergrouppicker.html'"></ng-include></div>
@@ -17,8 +17,6 @@
          <div ng-switch-when="iconPicker"><ng-include src="'views/common/overlays/iconpicker/iconpicker.html'"></ng-include></div>
          <div ng-switch-default ng-include="view"></div>
       </div>
-
-      <div ng-if="!view" ng-transclude></div>
 
     </div>
 
