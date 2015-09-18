@@ -15,10 +15,18 @@
 
 
 	<ul class="umb-sortable-thumbnails" ng-if="showAdd()">
-		<li style="border: none">	
+		<li style="border: none">
 			<a href="#" class="add-link" ng-click="add()" prevent-default>
-				<i class="icon icon-add large"></i> 
+				<i class="icon icon-add large"></i>
 			</a>
 		</li>
 	</ul>
+
+	<umb-overlay
+		ng-if="mediaPickerOverlay.show"
+		model="mediaPickerOverlay"
+		position="right"
+		view="mediaPickerOverlay.view">
+	</umb-overlay>
+
 </div>

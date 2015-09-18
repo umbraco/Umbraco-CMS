@@ -51,6 +51,29 @@
 
                   event.preventDefault();
                }
+
+               if (event.which === 13) {
+
+                  numberOfOverlays = overlayHelper.getNumberOfOverlays();
+
+                  if(numberOfOverlays === overlayNumber) {
+
+                     var activeElementType = document.activeElement.tagName;
+                     var clickableElements = ["A", "BUTTON"];
+
+                     if(clickableElements.indexOf(activeElementType) === 0) {
+                        document.activeElement.click();
+                     } else {
+                        scope.$apply(function () {
+                           scope.submitForm(scope.model);
+                        });
+                     }
+
+                  }
+
+                  event.preventDefault();
+               }
+
             });
 
             isRegistered = true;

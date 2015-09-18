@@ -9,7 +9,7 @@
 
             scope.dialogModel = {};
             scope.dialogModel.title = "Choose icon";
-            scope.dialogModel.view = "views/documenttype/dialogs/iconpicker/iconpicker.html";
+            scope.dialogModel.view = "iconPicker";
             scope.showDialog = true;
 
             scope.dialogModel.pickIcon = function(icon, color) {
