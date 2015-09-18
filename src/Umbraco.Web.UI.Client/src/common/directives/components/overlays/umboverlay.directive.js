@@ -19,6 +19,8 @@
 
          function activate() {
 
+            setOptions();
+
             registerOverlay();
 
             modelCopy = makeModelCopy(scope.model);
@@ -33,6 +35,27 @@
 
             });
 
+         }
+
+         function setOptions() {
+
+            switch (scope.view) {
+
+               case "memberPicker":
+
+                  scope.model.section = "member";
+                  scope.model.treeAlias = "member";
+
+                  break;
+
+               case "contentPicker":
+
+                  scope.model.treeAlias = "content";
+                  scope.model.section = "content";
+
+                  break;
+
+            }
          }
 
          function registerOverlay() {
