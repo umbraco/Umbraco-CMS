@@ -176,8 +176,6 @@
 
          }
 
-         activate();
-
          scope.submitForm = function(model) {
 
             if(scope.model.submit) {
@@ -209,6 +207,22 @@
 
          };
 
+         // angular does not support ng-show on custom directives
+         // width isolated scopes. So we have to make our own.
+         if (attr.hasOwnProperty("ngShow")) {
+            scope.$watch("ngShow", function(value) {
+               if (value) {
+                  el.show();
+                  activate();
+               } else {
+                  unregisterOverlay();
+                  el.hide();
+               }
+            });
+         } else {
+            activate();
+         }
+
          scope.$on('$destroy', function(){
             unregisterOverlay();
          });
@@ -221,6 +235,7 @@
          replace: true,
          templateUrl: 'views/components/overlays/umb-overlay.html',
          scope: {
+            ngShow: "=",
             model: "=",
             view: "=",
             position: "@"
