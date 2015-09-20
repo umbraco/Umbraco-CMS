@@ -1,12 +1,12 @@
-﻿namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Expressions
+﻿using Umbraco.Core.Persistence.SqlSyntax;
+
+namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Expressions
 {
     public class AlterTableExpression : MigrationExpressionBase
     {
-        public AlterTableExpression()
-        {
-        }
 
-        public AlterTableExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders) : base(current, databaseProviders)
+        public AlterTableExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax) 
+            : base(current, databaseProviders, sqlSyntax)
         {
         }
 

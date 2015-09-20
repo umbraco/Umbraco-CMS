@@ -14,6 +14,12 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Insert
             _expression = expression;
         }
 
+        public IInsertDataSyntax EnableIdentityInsert()
+        {
+            _expression.EnabledIdentityInsert = true;
+            return this;
+        }
+
         public IInsertDataSyntax Row(object dataAsAnonymousType)
         {
             _expression.Rows.Add(GetData(dataAsAnonymousType));

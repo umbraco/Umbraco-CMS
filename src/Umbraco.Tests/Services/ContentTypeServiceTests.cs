@@ -146,6 +146,19 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Get_With_Missing_Guid()
+        {
+            // Arrange
+            var contentTypeService = ServiceContext.ContentTypeService;
+
+            //Act
+            var result = contentTypeService.GetMediaType(Guid.NewGuid());
+
+            //Assert
+            Assert.IsNull(result);
+        }
+
+        [Test]
         public void Can_Bulk_Save_New_Hierarchy_Content_Types()
         {
             // Arrange

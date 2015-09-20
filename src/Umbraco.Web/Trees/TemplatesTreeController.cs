@@ -52,8 +52,7 @@ namespace Umbraco.Web.Trees
                 queryStrings,
                 template.Name,
                 template.IsMasterTemplate ? "icon-newspaper" : "icon-newspaper-alt",
-                template.IsMasterTemplate,
-                GetEditorPath(template, queryStrings))));
+                template.IsMasterTemplate)));
 
             return nodes;
         }

@@ -59,8 +59,8 @@
       <HintPath>..\packages\AutoMapper.3.0.0\lib\net40\AutoMapper.Net4.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Examine, Version=0.1.67.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Examine.0.1.67.0\lib\Examine.dll</HintPath>
+    <Reference Include="Examine, Version=0.1.68.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Examine.0.1.68.0\lib\Examine.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
@@ -177,17 +177,20 @@
     <Compile Include="Models\Mapping\ContentTypeModelMappingTests.cs" />
     <Compile Include="Cache\DeepCloneRuntimeCacheProviderTests.cs" />
     <Compile Include="Controllers\BackOfficeControllerUnitTests.cs" />
+    <Compile Include="DelegateExtensionsTests.cs" />
     <Compile Include="Logging\AsyncRollingFileAppenderTest.cs" />
     <Compile Include="Logging\DebugAppender.cs" />
     <Compile Include="Logging\ParallelForwarderTest.cs" />
     <Compile Include="Persistence\Repositories\AuditRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\DomainRepositoryTest.cs" />
+    <Compile Include="Persistence\Repositories\PartialViewRepositoryTests.cs" />
     <Compile Include="Persistence\Repositories\PublicAccessRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\TaskRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\TaskTypeRepositoryTest.cs" />
     <Compile Include="Resolvers\ResolverBaseTest.cs" />
     <Compile Include="Routing\UrlRoutingTestBase.cs" />
     <Compile Include="Security\UmbracoBackOfficeIdentityTests.cs" />
+    <Compile Include="Services\PublicAccessServiceTests.cs" />
     <Compile Include="StringNewlineExtensions.cs" />
     <Compile Include="Strings\StylesheetHelperTests.cs" />
     <Compile Include="Strings\StringValidationTests.cs" />
@@ -342,7 +345,7 @@
     <Compile Include="PublishedContent\StronglyTypedModels\TypedModelBase.cs" />
     <Compile Include="PublishedContent\StronglyTypedModels\UmbracoTemplatePage`T.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunnerTests.cs" />
-    <Compile Include="ServerEnvironmentHelperTests.cs" />
+    <Compile Include="ApplicationUrlHelperTests.cs" />
     <Compile Include="Services\FileServiceTests.cs" />
     <Compile Include="Services\LocalizedTextServiceTests.cs" />
     <Compile Include="Services\TagServiceTests.cs" />

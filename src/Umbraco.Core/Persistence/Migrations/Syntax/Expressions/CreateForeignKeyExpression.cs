@@ -5,25 +5,26 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Expressions
 {
     public class CreateForeignKeyExpression : MigrationExpressionBase
     {
-        public CreateForeignKeyExpression()
+        public CreateForeignKeyExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax, ForeignKeyDefinition fkDef)
+            : base(current, databaseProviders, sqlSyntax)
+        {
+            ForeignKey = fkDef;
+        }
+
+        public CreateForeignKeyExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax)
+            : base(current, databaseProviders, sqlSyntax)
         {
             ForeignKey = new ForeignKeyDefinition();
         }
 
-        public CreateForeignKeyExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders)
-            : base(current, databaseProviders)
-        {
-            ForeignKey = new ForeignKeyDefinition();
-        }
-
-        public virtual ForeignKeyDefinition ForeignKey { get; set; }
+        public ForeignKeyDefinition ForeignKey { get; set; }
 
         public override string ToString()
         {
             if (IsExpressionSupported() == false)
                 return string.Empty;
 
-            return SqlSyntaxContext.SqlSyntaxProvider.Format(ForeignKey);
+            return SqlSyntax.Format(ForeignKey);
         }
     }
 }

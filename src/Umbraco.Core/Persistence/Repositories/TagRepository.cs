@@ -477,7 +477,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                                           tagSetSql,
                                                           " inner join cmsTags as NewTags on (TagSet.Tag = NewTags.Tag and TagSet.",
                                                           SqlSyntax.GetQuotedColumnName("group"),
-                                                          " = TagSet.",
+                                                          " = NewTags.",
                                                           SqlSyntax.GetQuotedColumnName("group"),
                                                           ") ",
                                                           ") as NewTagsSet ",

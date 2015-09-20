@@ -4,12 +4,8 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 {
     public class DeleteDefaultConstraintExpression : MigrationExpressionBase
     {
-        public DeleteDefaultConstraintExpression()
-        {
-        }
-
-        public DeleteDefaultConstraintExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders)
-            : base(current, databaseProviders)
+        public DeleteDefaultConstraintExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax)
+            : base(current, databaseProviders, sqlSyntax)
         {
         }
 
@@ -22,7 +18,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
             if (IsExpressionSupported() == false)
                 return string.Empty;
 
-            return string.Format(SqlSyntaxContext.SqlSyntaxProvider.DeleteDefaultConstraint,
+            return string.Format(SqlSyntax.DeleteDefaultConstraint,
                                  TableName,
                                  ColumnName);
         }

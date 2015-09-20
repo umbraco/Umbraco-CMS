@@ -158,7 +158,7 @@ namespace Umbraco.Core.Services
         //TODO: See other notes in this class, this is purely a hack because we store 2 letter culture file names that contain 4 letter cultures :(
         public Attempt<CultureInfo> TryConvert2LetterCultureTo4Letter(string twoLetterCulture)
         {
-            if (twoLetterCulture.Length != 2) Attempt<CultureInfo>.Fail();
+            if (twoLetterCulture.Length != 2) return Attempt<CultureInfo>.Fail();
 
             //This needs to be resolved before continuing so that the _twoLetterCultureConverter cache is initialized
             var resolved = _xmlSources.Value;
@@ -166,6 +166,19 @@ namespace Umbraco.Core.Services
             return _twoLetterCultureConverter.ContainsKey(twoLetterCulture)
                 ? Attempt.Succeed(_twoLetterCultureConverter[twoLetterCulture])
                 : Attempt<CultureInfo>.Fail();
+        }
+
+        //TODO: See other notes in this class, this is purely a hack because we store 2 letter culture file names that contain 4 letter cultures :(
+        public Attempt<string> TryConvert4LetterCultureTo2Letter(CultureInfo culture)
+        {
+            if (culture == null) throw new ArgumentNullException("culture");
+
+            //This needs to be resolved before continuing so that the _twoLetterCultureConverter cache is initialized
+            var resolved = _xmlSources.Value;
+
+            return _twoLetterCultureConverter.Values.Contains(culture)
+                ? Attempt.Succeed(culture.Name.Substring(0, 2))
+                : Attempt<string>.Fail();
         }
 
         private void MergeSupplementaryFiles(CultureInfo culture, XDocument xMasterDoc)

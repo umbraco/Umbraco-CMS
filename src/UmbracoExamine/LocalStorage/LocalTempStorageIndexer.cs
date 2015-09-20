@@ -18,6 +18,7 @@ namespace UmbracoExamine.LocalStorage
     internal enum InitializeDirectoryFlags
     {
         Success = 0,
+        SuccessNoIndexExists = 1,
 
         FailedCorrupt = 100,
         FailedLocked = 101,
@@ -56,24 +57,41 @@ namespace UmbracoExamine.LocalStorage
                         baseLuceneDirectory,
                         //flag to disable the mirrored folder if not successful
                         (int)success >= 100);
-                    
+
+                    //If the master index simply doesn't exist, we don't continue to try to open anything since there will
+                    // actually be nothing there.
+                    if (success == InitializeDirectoryFlags.SuccessNoIndexExists)
+                    {
+                        return;
+                    }
 
                     //Try to open the reader, this will fail if the index is corrupt and we'll need to handle that
-
-                    try
+                    var result = DelegateExtensions.RetryUntilSuccessOrMaxAttempts(i =>
                     {
-                        using (IndexReader.Open(
-                            LuceneDirectory,
-                            DeletePolicyTracker.Current.GetPolicy(LuceneDirectory),
-                            true))
+                        try
                         {
+                            using (IndexReader.Open(
+                                LuceneDirectory,
+                                DeletePolicyTracker.Current.GetPolicy(LuceneDirectory),
+                                true))
+                            {
+                            }
+
+                            return Attempt.Succeed(true);
                         }
-                    }
-                    catch (Exception ex)
+                        catch (Exception ex)
+                        {
+                            LogHelper.WarnWithException<LocalTempStorageIndexer>(
+                                string.Format("Could not open an index reader, local temp storage index is empty or corrupt... retrying... {0}", configuredPath),
+                                ex);
+                        }
+                        return Attempt.Fail(false);
+                    }, 5, TimeSpan.FromSeconds(1));
+
+                    if (result.Success == false)
                     {
-                        LogHelper.WarnWithException<LocalTempStorageIndexer>(
-                            string.Format("Could not open an index reader, local temp storage index is empty or corrupt... attempting to clear index files in local temp storage, will operate from main storage only {0}", configuredPath), 
-                            ex);
+                        LogHelper.Warn<LocalTempStorageIndexer>(
+                                string.Format("Could not open an index reader, local temp storage index is empty or corrupt... attempting to clear index files in local temp storage, will operate from main storage only {0}", configuredPath));
 
                         ClearFilesInPath(TempPath);
 
@@ -83,7 +101,7 @@ namespace UmbracoExamine.LocalStorage
                             baseLuceneDirectory,
                             //Disable mirrored index, we're kind of screwed here only use master index
                             true);
-                    }
+                    }                   
 
                     break;
                 case LocalStorageType.LocalOnly:
@@ -181,69 +199,47 @@ namespace UmbracoExamine.LocalStorage
         /// <returns></returns>
         private Attempt<IndexWriter> TryCreateWriterWithRetry(Lucene.Net.Store.Directory baseLuceneDirectory, Analyzer analyzer)
         {
-            var maxTries = 50;
+            var maxTries = 5;
 
-            //try now
-            var writerAttempt = TryCreateWriter(baseLuceneDirectory, analyzer);
-            if (writerAttempt) return writerAttempt;
-
-            var currentTry = 0;
-            while (currentTry < maxTries)
+            var result = DelegateExtensions.RetryUntilSuccessOrMaxAttempts((currentTry) =>
             {
-                LogHelper.Info<LocalTempStorageIndexer>("Could not create writer on {0}, retrying ....", baseLuceneDirectory.ToString);
-
-                //first wait then retry
-                Thread.Sleep(1000);
-
                 //last try...
-                if (currentTry == (maxTries - 1))
+                if (currentTry == maxTries)
                 {
                     LogHelper.Info<LocalTempStorageIndexer>("Could not acquire index lock, attempting to force unlock it...");
                     //unlock it!
                     IndexWriter.Unlock(baseLuceneDirectory);
                 }
 
-                writerAttempt = TryCreateWriter(baseLuceneDirectory, analyzer);
+                var writerAttempt = TryCreateWriter(baseLuceneDirectory, analyzer);
+                if (writerAttempt) return writerAttempt;
+                LogHelper.Info<LocalTempStorageIndexer>("Could not create writer on {0}, retrying ....", baseLuceneDirectory.ToString);
+                return Attempt<IndexWriter>.Fail();
+            }, 5, TimeSpan.FromSeconds(1));
 
-                //if successful, exit loop
-                if (writerAttempt) break;
-
-                currentTry++;
-            }
-
-            return writerAttempt;
+            return result;
         }
 
         private bool TryWaitForDirectoryUnlock(Lucene.Net.Store.Directory dir)
         {
-            var maxTries = 50;
+            var maxTries = 5;
 
-            //try now
-            if (IndexWriter.IsLocked(dir) == false) return true;
-            
-            var currentTry = 0;
-            while (currentTry < maxTries)
+            var result = DelegateExtensions.RetryUntilSuccessOrMaxAttempts((currentTry) =>
             {
-                LogHelper.Info<LocalTempStorageIndexer>("Could not acquire directory lock for {0} writer, retrying ....", dir.ToString);
-                
-                //first wait then retry
-                Thread.Sleep(1000);
-
                 //last try...
-                if (currentTry == (maxTries-1))
+                if (currentTry == maxTries)
                 {
                     LogHelper.Info<LocalTempStorageIndexer>("Could not acquire directory lock, attempting to force unlock it...");
                     //unlock it!
                     IndexWriter.Unlock(dir);
                 }
 
-                //try again
-                if (IndexWriter.IsLocked(dir) == false) return true;
+                if (IndexWriter.IsLocked(dir) == false) return Attempt.Succeed(true);                
+                LogHelper.Info<LocalTempStorageIndexer>("Could not acquire directory lock for {0} writer, retrying ....", dir.ToString);
+                return Attempt<bool>.Fail();
+            }, 5, TimeSpan.FromSeconds(1));
 
-                currentTry++;
-            }
-
-            return false;
+            return result;
         }
 
         private InitializeDirectoryFlags InitializeLocalIndexAndDirectory(Lucene.Net.Store.Directory baseLuceneDirectory, Analyzer analyzer, string configuredPath)
@@ -256,7 +252,7 @@ namespace UmbracoExamine.LocalStorage
                 }
 
                 //copy index if it exists, don't do anything if it's not there
-                if (IndexReader.IndexExists(baseLuceneDirectory) == false) return InitializeDirectoryFlags.Success;
+                if (IndexReader.IndexExists(baseLuceneDirectory) == false) return InitializeDirectoryFlags.SuccessNoIndexExists;
 
                 var writerAttempt = TryCreateWriterWithRetry(baseLuceneDirectory, analyzer);
 
@@ -269,6 +265,7 @@ namespace UmbracoExamine.LocalStorage
                 //Try to open the reader from the source, this will fail if the index is corrupt and we'll need to handle that
                 try
                 {
+                    //NOTE: To date I've not seen this error occur
                     using (writerAttempt.Result.GetReader())
                     {                        
                     }

@@ -27,6 +27,11 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                 }).ToArray();
             
             //add a foreign key to the parent id column too!
+
+            //In some cases in very old corrupted db's this will fail, so it means we need to clean the data first
+            //set the parentID to NULL where it doesn't actually exist in the normal ids
+            Execute.Sql(@"UPDATE cmsTags SET parentId = NULL WHERE parentId IS NOT NULL AND parentId NOT IN (SELECT id FROM cmsTags)");
+
             Create.ForeignKey("FK_cmsTags_cmsTags")
                   .FromTable("cmsTags")
                   .ForeignColumn("ParentId")

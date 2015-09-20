@@ -80,10 +80,11 @@ namespace umbraco.uicontrols
                 ClientDependencyLoader.Instance.RegisterDependency(2, "lib/CodeMirror/mode/" + CodeBase.ToString().ToLower() + "/" + CodeBase.ToString().ToLower() + ".js", "UmbracoRoot", ClientDependencyType.Javascript);
                 if (CodeBase == EditorType.HtmlMixed)
                 {
+                    ClientDependencyLoader.Instance.RegisterDependency(1, "lib/CodeMirror/mode/xml/xml.js", "UmbracoRoot", ClientDependencyType.Javascript);
+                    ClientDependencyLoader.Instance.RegisterDependency(1, "lib/CodeMirror/mode/javascript/javascript.js", "UmbracoRoot", ClientDependencyType.Javascript);
+                    ClientDependencyLoader.Instance.RegisterDependency(1, "lib/CodeMirror/mode/css/css.js", "UmbracoRoot", ClientDependencyType.Javascript);
                     ClientDependencyLoader.Instance.RegisterDependency(1, "lib/CodeMirror/mode/htmlmixed/htmlmixed.js", "UmbracoRoot", ClientDependencyType.Javascript);
-                    //ClientDependencyLoader.Instance.RegisterDependency(1, "lib/CodeMirror/mode/xml/xml.js", "UmbracoRoot", ClientDependencyType.Javascript);
-                    //ClientDependencyLoader.Instance.RegisterDependency(1, "lib/CodeMirror/mode/javascript/javascript.js", "UmbracoRoot", ClientDependencyType.Javascript);
-                    //ClientDependencyLoader.Instance.RegisterDependency(1, "lib/CodeMirror/mode/css/css.js", "UmbracoRoot", ClientDependencyType.Javascript);
+                    
                 }
 
                 ClientDependencyLoader.Instance.RegisterDependency(2, "lib/CodeMirror/addon/search/search.js", "UmbracoRoot", ClientDependencyType.Javascript);
