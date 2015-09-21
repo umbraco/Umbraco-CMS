@@ -120,26 +120,38 @@ angular.module("umbraco")
             Row
         *****************/
 
-        $scope.configureLayout = function(layout){
+        $scope.configureLayout = function(layout) {
 
-            if(layout === undefined){
-                 layout = {
-                     name: "",
-                     areas:[
+           var layoutsCopy = angular.copy($scope.model.value.layouts);
 
-                     ]
-                 };
-                 $scope.model.value.layouts.push(layout);
-            }
+           if(layout === undefined){
+                layout = {
+                    name: "",
+                    areas:[
 
-            dialogService.open(
-                {
-                    template: "views/propertyEditors/grid/dialogs/rowconfig.html",
-                    currentRow: layout,
-                    editors: $scope.editors,
-                    columns: $scope.model.value.columns
-                }
-            );
+                    ]
+                };
+                $scope.model.value.layouts.push(layout);
+           }
+
+           $scope.rowConfigOverlay = {};
+           $scope.rowConfigOverlay.view = "views/propertyEditors/grid/dialogs/rowconfig.html";
+           $scope.rowConfigOverlay.currentRow = layout;
+           $scope.rowConfigOverlay.editors = $scope.editors;
+           $scope.rowConfigOverlay.columns = $scope.model.value.columns;
+           $scope.rowConfigOverlay.show = true;
+
+           $scope.rowConfigOverlay.submit = function(model) {
+             $scope.rowConfigOverlay.show = false;
+             $scope.rowConfigOverlay = null;
+           };
+
+           $scope.rowConfigOverlay.close = function(oldModel) {
+             $scope.model.value.layouts = layoutsCopy;
+             $scope.rowConfigOverlay.show = false;
+             $scope.rowConfigOverlay = null;
+           };
+
         };
 
         //var rowDeletesPending = false;
