@@ -155,25 +155,29 @@ angular.module("umbraco")
         };
 
         //var rowDeletesPending = false;
-        $scope.deleteLayout = function (index) {
-            //rowDeletesPending = true;
+        $scope.deleteLayout = function(index) {
 
-            //show ok/cancel dialog
-            var confirmDialog = dialogService.open(
-               {
-                   template: "views/propertyEditors/grid/dialogs/rowdeleteconfirm.html",
-                   show: true,
-                   callback: function() {
-                       $scope.model.value.layouts.splice(index, 1);
-                   },
-                   dialogData: {
-                       rowName: $scope.model.value.layouts[index].name
-                   }
-               }
-           );
-            
+           $scope.rowDeleteOverlay = {};
+           $scope.rowDeleteOverlay.view = "views/propertyEditors/grid/dialogs/rowdeleteconfirm.html";
+           $scope.rowDeleteOverlay.dialogData = {
+             rowName: $scope.model.value.layouts[index].name
+           };
+           $scope.rowDeleteOverlay.show = true;
+
+           $scope.rowDeleteOverlay.submit = function(model) {
+
+             $scope.model.value.layouts.splice(index, 1);
+
+             $scope.rowDeleteOverlay.show = false;
+             $scope.rowDeleteOverlay = null;
+           };
+
+           $scope.rowDeleteOverlay.close = function(oldModel) {
+             $scope.rowDeleteOverlay.show = false;
+             $scope.rowDeleteOverlay = null;
+           };
+
         };
-        
 
 
         /****************
