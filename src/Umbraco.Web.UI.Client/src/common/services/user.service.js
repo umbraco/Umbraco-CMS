@@ -250,7 +250,7 @@ angular.module('umbraco.services')
                             }
 
                             setCurrentUser(data);
-                            currentUser.avatar = '//www.gravatar.com/avatar/' + data.emailHash + '?s=40&d=404';
+                            currentUser.avatar = 'https://www.gravatar.com/avatar/' + data.emailHash + '?s=40&d=404';
                             deferred.resolve(currentUser);
                         });
 

@@ -12,7 +12,6 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete
         void Table(string tableName);
         IDeleteColumnFromTableSyntax Column(string columnName);
         IDeleteForeignKeyFromTableSyntax ForeignKey();
-        [Obsolete("Do not use this construct as it does not work with MySql, use the syntax: Delete.ForeignKey().FromTable(\"umbracoUser2app\").ForeignColumn(... instead")]
         IDeleteForeignKeyOnTableSyntax ForeignKey(string foreignKeyName);
         IDeleteDataSyntax FromTable(string tableName);
         IDeleteIndexForTableSyntax Index();

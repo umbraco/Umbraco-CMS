@@ -75,6 +75,11 @@ namespace Umbraco.Web.WebServices
             Func<IFileService, IPartialView, bool> validate,
             Func<IFileService, IPartialView, Attempt<IPartialView>> save)
         {
+            // sanitize input - partial view names have an extension
+            filename = filename
+                .Replace('\\', '/')
+                .TrimStart('/');
+
             // sharing the editor with partial views & partial view macros,
             // using path prefix to differenciate,
             // but the file service manages different filesystems,
@@ -85,8 +90,12 @@ namespace Umbraco.Web.WebServices
             if (filename.InvariantStartsWith(pathPrefix))
                 filename = filename.TrimStart(pathPrefix);
 
-            if (oldname != null && oldname.InvariantStartsWith(pathPrefix))
-                oldname = oldname.TrimStart(pathPrefix);
+            if (oldname != null)
+            {
+                oldname = oldname.TrimStart('/', '\\');
+                if (oldname.InvariantStartsWith(pathPrefix))
+                    oldname = oldname.TrimStart(pathPrefix);
+            }
 
             var view = get(svce, oldname);
             if (view == null)
@@ -187,7 +196,10 @@ namespace Umbraco.Web.WebServices
         [HttpPost]
         public JsonResult SaveScript(string filename, string oldName, string contents)
         {
-            filename = filename.TrimStart(System.IO.Path.DirectorySeparatorChar);
+            // sanitize input - script names have an extension
+            filename = filename
+                .Replace('\\', '/')
+                .TrimStart('/');
 
             var svce = (FileService) Services.FileService;
             var script = svce.GetScriptByName(oldName);
@@ -217,6 +229,46 @@ namespace Umbraco.Web.WebServices
                     name = script.Path,
                     url = script.VirtualPath,
                     contents = script.Content
+                });
+        }
+
+        [HttpPost]
+        public JsonResult SaveStylesheet(string filename, string oldName, string contents)
+        {
+            // sanitize input - stylesheet names have no extension
+            filename = filename
+                .Replace('\\', '/')
+                .TrimStart('/')
+                .EnsureEndsWith(".css");
+
+            var svce = (FileService) Services.FileService;
+            var stylesheet = svce.GetStylesheetByName(oldName);
+            if (stylesheet == null)
+                stylesheet = new Stylesheet(filename);
+            else
+                stylesheet.Path = filename;
+            stylesheet.Content = contents;
+
+            try
+            {
+                if (svce.ValidateStylesheet(stylesheet) == false)
+                    return Failed(ui.Text("speechBubbles", "cssErrorText"), ui.Text("speechBubbles", "cssErrorHeader"),
+                                    new FileSecurityException("File '" + filename + "' is not a valid stylesheet file."));
+
+                svce.SaveStylesheet(stylesheet);
+            }
+            catch (Exception e)
+            {
+                return Failed(ui.Text("speechBubbles", "cssErrorText"), ui.Text("speechBubbles", "cssErrorHeader"), e);
+            }
+
+            return Success(ui.Text("speechBubbles", "cssSavedText"), ui.Text("speechBubbles", "cssSavedHeader"),
+                new
+                {
+                    path = DeepLink.GetTreePathFromFilePath(stylesheet.Path),
+                    name = stylesheet.Path,
+                    url = stylesheet.VirtualPath,
+                    contents = stylesheet.Content
                 });
         }
 

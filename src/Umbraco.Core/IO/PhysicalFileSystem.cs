@@ -8,7 +8,12 @@ namespace Umbraco.Core.IO
 {
     public class PhysicalFileSystem : IFileSystem
     {
+        // the rooted, filesystem path, using directory separator chars, NOT ending with a separator
+        // eg "c:" or "c:\path\to\site" or "\\server\path"
         private readonly string _rootPath;
+
+        // the ??? url, using url separator chars, NOT ending with a separator
+        // eg "" (?) or "/Scripts" or ???
         private readonly string _rootUrl;
 
         public PhysicalFileSystem(string virtualRoot)
@@ -22,6 +27,7 @@ namespace Umbraco.Core.IO
             _rootPath = _rootPath.TrimEnd(Path.DirectorySeparatorChar);
 
             _rootUrl = IOHelper.ResolveUrl(virtualRoot);
+            _rootUrl = EnsureUrlSeparatorChar(_rootUrl);
             _rootUrl = _rootUrl.TrimEnd('/');
         }
 
@@ -45,6 +51,9 @@ namespace Umbraco.Core.IO
             {
                 rootPath = Path.Combine(localRoot, rootPath);
             }
+
+            rootPath = EnsureDirectorySeparatorChar(rootPath);
+            rootUrl = EnsureUrlSeparatorChar(rootUrl);
 
             _rootPath = rootPath.TrimEnd(Path.DirectorySeparatorChar);
             _rootUrl = rootUrl.TrimEnd('/');
@@ -173,6 +182,8 @@ namespace Umbraco.Core.IO
             return File.Exists(fullpath);
         }
 
+        // beware, many things depend on how the GetRelative/AbsolutePath methods work!
+
         /// <summary>
         /// Gets the relative path.
         /// </summary>
@@ -180,33 +191,27 @@ namespace Umbraco.Core.IO
         /// <returns>The path, relative to this filesystem's root.</returns>
         /// <remarks>
         /// <para>The relative path is relative to this filesystem's root, not starting with any
-        /// directory separator. All separators are converted to Path.DirectorySeparatorChar.</para>
+        /// directory separator. If input was recognized as a url (path), then output uses url (path) separator
+        /// chars.</para>
         /// </remarks>
         public string GetRelativePath(string fullPathOrUrl)
         {
             // test url
-            var path = EnsureUrlSeparatorChar(fullPathOrUrl);
-            if (IOHelper.PathStartsWith(path, _rootUrl, '/'))
-                return path.Substring(_rootUrl.Length)  
-                    .Replace('/', Path.DirectorySeparatorChar)
-                    .TrimStart(Path.DirectorySeparatorChar);
+            var path = fullPathOrUrl.Replace('\\', '/'); // ensure url separator char
+
+            if (IOHelper.PathStartsWith(path, _rootUrl, '/')) // if it starts with the root url...
+                return path.Substring(_rootUrl.Length) // strip it
+                            .TrimStart('/'); // it's relative
 
             // test path
             path = EnsureDirectorySeparatorChar(fullPathOrUrl);
-            if (IOHelper.PathStartsWith(path, _rootPath, Path.DirectorySeparatorChar))
-                return path.Substring(_rootPath.Length)
-                    .TrimStart(Path.DirectorySeparatorChar);
 
+            if (IOHelper.PathStartsWith(path, _rootPath, Path.DirectorySeparatorChar)) // if it starts with the root path
+                return path.Substring(_rootPath.Length) // strip it
+                            .TrimStart(Path.DirectorySeparatorChar); // it's relative
+
+            // unchanged - including separators
             return fullPathOrUrl;
-
-            // previous code kept for reference
-
-            //var relativePath = fullPathOrUrl
-            //    .TrimStart(_rootUrl)
-            //    .Replace('/', Path.DirectorySeparatorChar)
-            //    .TrimStart(RootPath)
-            //    .TrimStart(Path.DirectorySeparatorChar);
-            //return relativePath;
         }
 
         /// <summary>

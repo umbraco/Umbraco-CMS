@@ -16,13 +16,7 @@ namespace Umbraco.Core.Persistence.Migrations
     {
         public ISqlSyntaxProvider SqlSyntax { get; private set; }
         public ILogger Logger { get; private set; }
-
-        [Obsolete("Use the other constructor specifying all dependencies instead")]
-        protected MigrationBase()
-            : this(SqlSyntaxContext.SqlSyntaxProvider, LoggerResolver.Current.Logger)
-        {                
-        }
-
+        
         protected MigrationBase(ISqlSyntaxProvider sqlSyntax, ILogger logger)
         {
             SqlSyntax = sqlSyntax;
@@ -48,7 +42,7 @@ namespace Umbraco.Core.Persistence.Migrations
 
         public IAlterSyntaxBuilder Alter
         {
-            get { return new AlterSyntaxBuilder(Context); }
+            get { return new AlterSyntaxBuilder(Context, SqlSyntax); }
         }
 
         public ICreateBuilder Create
@@ -63,27 +57,27 @@ namespace Umbraco.Core.Persistence.Migrations
 
         public IExecuteBuilder Execute
         {
-            get { return new ExecuteBuilder(Context); }
+            get { return new ExecuteBuilder(Context, SqlSyntax); }
         }
 
         public IInsertBuilder Insert
         {
-            get { return new InsertBuilder(Context); }
+            get { return new InsertBuilder(Context, SqlSyntax); }
         }
 
         public IRenameBuilder Rename
         {
-            get { return new RenameBuilder(Context); }
+            get { return new RenameBuilder(Context, SqlSyntax); }
         }
 
         public IUpdateBuilder Update
         {
-            get { return new UpdateBuilder(Context); }
+            get { return new UpdateBuilder(Context, SqlSyntax); }
         }
 
         public IIfDatabaseBuilder IfDatabase(params DatabaseProviders[] databaseProviders)
         {
-            return new IfDatabaseBuilder(Context, databaseProviders);
+            return new IfDatabaseBuilder(Context, SqlSyntax, databaseProviders);
         }
     }
 }

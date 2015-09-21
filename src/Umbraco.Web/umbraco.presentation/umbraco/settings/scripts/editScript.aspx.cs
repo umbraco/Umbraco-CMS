@@ -42,14 +42,11 @@ namespace umbraco.cms.presentation.settings.scripts
         protected MenuButton SaveButton;
 
         private string filename;
-
         protected string ScriptTreeSyncPath { get; private set; }
-        protected int ScriptId { get; private set; }
 
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-            NameTxt.Text = filename;
 
             // get the script, ensure it exists (not null) and validate (because
             // the file service ensures that it loads scripts from the proper location
@@ -68,6 +65,9 @@ namespace umbraco.cms.presentation.settings.scripts
             editorSource.Text = script.Content;
             ScriptTreeSyncPath = DeepLink.GetTreePathFromFilePath(filename);
 
+            // name derives from filename, clean for xss
+            NameTxt.Text = filename.CleanForXss('\\', '/');
+
             Panel1.Text = ui.Text("editscript", base.getUser());
             pp_name.Text = ui.Text("name", base.getUser());
             pp_path.Text = ui.Text("path", base.getUser());
@@ -84,7 +84,7 @@ namespace umbraco.cms.presentation.settings.scripts
         {
             base.OnInit(e);
 
-            filename = Request.QueryString["file"].TrimStart('/');
+            filename = Request.QueryString["file"].Replace('\\', '/').TrimStart('/');
 
             //need to change the editor type if it is XML
             if (filename.EndsWith("xml"))

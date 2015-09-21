@@ -55,9 +55,11 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                 }
 
                 var propertyTypeIds = propertyData.Select(x => x.PropertyTypeId).Distinct();
-                var propertyTypes = database.Fetch<PropertyTypeDto>(
-                    "WHERE id in (@propertyTypeIds)", new { propertyTypeIds = propertyTypeIds });
 
+                //NOTE: We are writing the full query because we've added a column to the PropertyTypeDto in later versions so one of the columns
+                // won't exist yet
+                var propertyTypes = database.Fetch<PropertyTypeDto>("SELECT * FROM cmsPropertyType WHERE id in (@propertyTypeIds)", new { propertyTypeIds = propertyTypeIds });
+            
                 foreach (var data in propertyData)
                 {
                     if (string.IsNullOrEmpty(data.Text) == false)

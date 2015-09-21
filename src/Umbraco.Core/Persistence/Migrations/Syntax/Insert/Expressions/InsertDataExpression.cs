@@ -9,22 +9,9 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Insert.Expressions
     public class InsertDataExpression : MigrationExpressionBase
     {
         private readonly List<InsertionDataDefinition> _rows = new List<InsertionDataDefinition>();
-
-        [Obsolete("Use the other constructors specifying an ISqlSyntaxProvider instead")]
-        public InsertDataExpression()
-        {
-        }
-
-        [Obsolete("Use the other constructors specifying an ISqlSyntaxProvider instead")]
-        public InsertDataExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders) : base(current, databaseProviders)
-        {
-        }
-
-        public InsertDataExpression(ISqlSyntaxProvider sqlSyntax) : base(sqlSyntax)
-        {
-        }
-
-        public InsertDataExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax) : base(current, databaseProviders, sqlSyntax)
+        
+        public InsertDataExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax) 
+            : base(current, databaseProviders, sqlSyntax)
         {
         }
 
@@ -41,13 +28,16 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Insert.Expressions
         {
             if (IsExpressionSupported() == false)
                 return string.Empty;
-
-            var insertItems = new List<string>();
+            
             var sb = new StringBuilder();
 
             if (EnabledIdentityInsert && SqlSyntax.SupportsIdentityInsert())
             {
                 sb.AppendLine(string.Format("SET IDENTITY_INSERT {0} ON;", SqlSyntax.GetQuotedTableName(TableName)));
+                if (CurrentDatabaseProvider == DatabaseProviders.SqlServer || CurrentDatabaseProvider == DatabaseProviders.SqlServerCE)
+                {
+                    sb.AppendLine("GO");
+                }
             }
 
             try
@@ -58,7 +48,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Insert.Expressions
                     var vals = "";
                     foreach (var keyVal in item)
                     {
-                        cols += keyVal.Key + ",";
+                        cols += SqlSyntax.GetQuotedColumnName(keyVal.Key) + ",";
                         vals += GetQuotedValue(keyVal.Value) + ",";
                     }
                     cols = cols.TrimEnd(',');
@@ -69,16 +59,22 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Insert.Expressions
                                   SqlSyntax.GetQuotedTableName(TableName),
                                   cols, vals);
 
-                    insertItems.Add(sql);
+                    sb.AppendLine(string.Format("{0};", sql));
+                    if (CurrentDatabaseProvider == DatabaseProviders.SqlServer || CurrentDatabaseProvider == DatabaseProviders.SqlServerCE)
+                    {
+                        sb.AppendLine("GO");
+                    }
                 }
-
-                sb.AppendLine(string.Join(",", insertItems));
             }
             finally
             {
                 if (EnabledIdentityInsert && SqlSyntax.SupportsIdentityInsert())
                 {
-                    sb.AppendLine(string.Format(";SET IDENTITY_INSERT {0} OFF;", SqlSyntax.GetQuotedTableName(TableName)));
+                    sb.AppendLine(string.Format("SET IDENTITY_INSERT {0} OFF;", SqlSyntax.GetQuotedTableName(TableName)));
+                    if (CurrentDatabaseProvider == DatabaseProviders.SqlServer || CurrentDatabaseProvider == DatabaseProviders.SqlServerCE)
+                    {
+                        sb.AppendLine("GO");
+                    }
                 }
             }
 

@@ -33,10 +33,12 @@ namespace Umbraco.Tests.Migrations
                     typeof (FiveZeroMigration)                   
 				});
 
-            //This is needed because the Migration resolver is creating migratoni instances with their full ctors
+            var sqlSyntax = new SqlCeSyntaxProvider();
+
+            //This is needed because the Migration resolver is creating migration instances with their full ctors
             ApplicationContext.EnsureContext(
                 new ApplicationContext(
-                    new DatabaseContext(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test"),
+                    new DatabaseContext(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), sqlSyntax, "test"),
                     new ServiceContext(), 
                     CacheHelper.CreateDisabledCacheHelper(),
                     new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())),  
@@ -47,11 +49,9 @@ namespace Umbraco.Tests.Migrations
             {
                 CanResolveBeforeFrozen = true
             };
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
-
+           
 			Resolution.Freeze();
-
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
+            
         }
 
         [Test]
