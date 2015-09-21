@@ -83,18 +83,23 @@
 
                      var activeElementType = document.activeElement.tagName;
                      var clickableElements = ["A", "BUTTON"];
+                     var submitOnEnter = document.activeElement.hasAttribute("overlay-submit-on-enter");
 
                      if(clickableElements.indexOf(activeElementType) === 0) {
                         document.activeElement.click();
+                        event.preventDefault();
+                     } else if(activeElementType === "TEXTAREA" && !submitOnEnter) {
+
+
                      } else {
                         scope.$apply(function () {
                            scope.submitForm(scope.model);
                         });
+                        event.preventDefault();
                      }
 
                   }
 
-                  event.preventDefault();
                }
 
             });
