@@ -74,25 +74,40 @@ angular.module("umbraco")
             template
         *****************/
 
-        $scope.configureTemplate = function(template){
-           if(template === undefined){
-                template = {
-                    name: "",
-                    sections:[
+        $scope.configureTemplate = function(template) {
 
-                    ]
-                };
-                $scope.model.value.templates.push(template);
-           }    
-           
-           dialogService.open(
-               {
-                   template: "views/propertyEditors/grid/dialogs/layoutconfig.html",
-                   currentLayout: template,
-                   rows: $scope.model.value.layouts,
-                   columns: $scope.model.value.columns
-               }
-           );
+           var templatesCopy = angular.copy($scope.model.value.templates);
+
+           if (template === undefined) {
+              template = {
+                 name: "",
+                 sections: [
+
+                 ]
+              };
+              $scope.model.value.templates.push(template);
+           }
+
+           $scope.layoutConfigOverlay = {};
+           $scope.layoutConfigOverlay.view = "views/propertyEditors/grid/dialogs/layoutconfig.html";
+           $scope.layoutConfigOverlay.currentLayout = template;
+           $scope.layoutConfigOverlay.rows = $scope.model.value.layouts;
+           $scope.layoutConfigOverlay.columns = $scope.model.value.columns;
+           $scope.layoutConfigOverlay.show = true;
+
+           $scope.layoutConfigOverlay.submit = function(model) {
+              $scope.layoutConfigOverlay.show = false;
+              $scope.layoutConfigOverlay = null;
+           };
+
+           $scope.layoutConfigOverlay.close = function(oldModel) {
+
+              //reset templates
+              $scope.model.value.templates = templatesCopy;
+
+              $scope.layoutConfigOverlay.show = false;
+              $scope.layoutConfigOverlay = null;
+           }
 
         };
 
