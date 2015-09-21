@@ -24,16 +24,33 @@ angular.module('umbraco')
 				});
 			});
 		}
-		
 
-		$scope.openContentPicker =function() {
-		    var d = dialogService.treePicker({
-		        section: config.type,
-		        treeAlias: config.treeAlias,
-		        multiPicker: config.multiPicker,
-		        callback: populate
-		    });
-		};
+		$scope.openContentPicker = function() {
+			$scope.treePickerOverlay = {};
+			$scope.treePickerOverlay.section = config.type;
+			$scope.treePickerOverlay.treeAlias = config.treeAlias;
+			$scope.treePickerOverlay.multiPicker = config.multiPicker;
+			$scope.treePickerOverlay.view = "treePicker";
+			$scope.treePickerOverlay.show = true;
+
+			$scope.treePickerOverlay.submit = function(model) {
+
+				if(config.multiPicker) {
+					populate(model.selection);
+				} else {
+					populate(model.selection[0]);
+				}
+
+				$scope.treePickerOverlay.show = false;
+				$scope.treePickerOverlay = null;
+			};
+
+			$scope.treePickerOverlay.close = function(oldModel) {
+				$scope.treePickerOverlay.show = false;
+				$scope.treePickerOverlay = null;
+			};
+
+		}
 
 		$scope.remove =function(index){
 			$scope.renderModel.splice(index, 1);
