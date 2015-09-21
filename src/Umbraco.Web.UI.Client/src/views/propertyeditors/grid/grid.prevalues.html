@@ -176,6 +176,13 @@
     </umb-overlay>
 
     <umb-overlay
+      ng-if="editConfigCollectionOverlay.show"
+      model="editConfigCollectionOverlay"
+      view="editConfigCollectionOverlay.view"
+      position="right">
+    </umb-overlay>
+
+    <umb-overlay
       ng-if="rowDeleteOverlay.show"
       model="rowDeleteOverlay"
       view="rowDeleteOverlay.view"

@@ -207,30 +207,40 @@ angular.module("umbraco")
             collection.splice(index, 1);
         };
 
-        var editConfigCollection = function(configValues, title, callbackOnSave){
-            dialogService.open(
-                {
-                    template: "views/propertyeditors/grid/dialogs/editconfig.html",
-                    config: configValues,
-                    name: title,
-                    callback: function(data){
-                        callbackOnSave(data);
-                    }
-                });
+        var editConfigCollection = function(configValues, title, callback) {
+
+           $scope.editConfigCollectionOverlay = {};
+           $scope.editConfigCollectionOverlay.view = "views/propertyeditors/grid/dialogs/editconfig.html";
+           $scope.editConfigCollectionOverlay.config = configValues;
+           $scope.editConfigCollectionOverlay.title = title;
+           $scope.editConfigCollectionOverlay.show = true;
+
+           $scope.editConfigCollectionOverlay.submit = function(model) {
+
+              callback(model.config)
+
+              $scope.editConfigCollectionOverlay.show = false;
+              $scope.editConfigCollectionOverlay = null;
+           };
+
+           $scope.editConfigCollectionOverlay.close = function(oldModel) {
+              $scope.editConfigCollectionOverlay.show = false;
+              $scope.editConfigCollectionOverlay = null;
+           };
+
         };
 
-        $scope.editConfig = function(){
-            editConfigCollection($scope.model.value.config, "Settings", function(data){
-                $scope.model.value.config = data;
-            });
-	    };
-
-        $scope.editStyles = function(){
-            editConfigCollection($scope.model.value.styles, "Styling", function(data){
-                $scope.model.value.styles = data;
-            });
+        $scope.editConfig = function() {
+           editConfigCollection($scope.model.value.config, "Settings", function(data) {
+              $scope.model.value.config = data;
+           });
         };
 
+        $scope.editStyles = function() {
+           editConfigCollection($scope.model.value.styles, "Styling", function(data){
+               $scope.model.value.styles = data;
+           });
+        };
 
         /****************
             editors
