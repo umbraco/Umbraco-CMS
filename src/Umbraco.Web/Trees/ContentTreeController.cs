@@ -106,7 +106,7 @@ namespace Umbraco.Web.Trees
                 if (entity.HasPendingChanges)
                     node.SetHasUnpublishedVersionStyle();
 
-                if (Access.IsProtected(e.Id, e.Path))
+                if (Services.PublicAccessService.IsProtected(e.Path))
                     node.SetProtectedStyle();
 
                 return node;
@@ -177,6 +177,7 @@ namespace Umbraco.Web.Trees
             if (item.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Contains(RecycleBinId.ToInvariantString()))
             {
                 nodeMenu.DefaultMenuAlias = null;
+                nodeMenu.Items.Insert(2, new MenuItem(ActionRestore.Instance, ui.Text("actions", ActionRestore.Instance.Alias)));
             }
             else
             {

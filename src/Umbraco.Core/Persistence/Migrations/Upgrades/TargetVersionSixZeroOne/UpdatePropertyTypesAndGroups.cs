@@ -1,13 +1,19 @@
 ﻿using System;
 using System.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixZeroOne
 {
     [Migration("6.0.2", 0, GlobalSettings.UmbracoMigrationName)]
     public class UpdatePropertyTypesAndGroups : MigrationBase
     {
+        public UpdatePropertyTypesAndGroups(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
+        {
+        }
+
         public override void Up()
         {
             Execute.Code(UpdatePropertyTypesAndGroupsDo);
@@ -22,8 +28,11 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixZeroOne
         {
             if (database != null)
             {
-                //Fetch all PropertyTypes that belongs to a PropertyTypeGroup
-                var propertyTypes = database.Fetch<PropertyTypeDto>("WHERE propertyTypeGroupId > 0");
+                //Fetch all PropertyTypes that belongs to a PropertyTypeGroup                
+                //NOTE: We are writing the full query because we've added a column to the PropertyTypeDto in later versions so one of the columns
+                // won't exist yet
+                var propertyTypes = database.Fetch<PropertyTypeDto>("SELECT * FROM cmsPropertyType WHERE propertyTypeGroupId > 0");
+
                 var propertyGroups = database.Fetch<PropertyTypeGroupDto>("WHERE id > 0");
 
                 foreach (var propertyType in propertyTypes)

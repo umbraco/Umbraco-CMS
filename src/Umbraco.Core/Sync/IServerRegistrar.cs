@@ -3,10 +3,14 @@
 namespace Umbraco.Core.Sync
 {
     /// <summary>
-    /// An interface to expose a list of server registrations for server syncing
+    /// Provides server registrations to the distributed cache.
     /// </summary>
+    /// <remarks>You should implement IServerRegistrar2 instead.</remarks>
     public interface IServerRegistrar
     {
-        IEnumerable<IServerAddress> Registrations { get; } 
+        /// <summary>
+        /// Gets the server registrations.
+        /// </summary>
+        IEnumerable<IServerAddress> Registrations { get; }
     }
 }

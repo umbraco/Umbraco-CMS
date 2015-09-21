@@ -108,6 +108,8 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="Relation"/> objects</returns>
         IEnumerable<IRelation> GetByParentOrChildId(int id);
 
+        IEnumerable<IRelation> GetByParentOrChildId(int id, string relationTypeAlias);
+
         /// <summary>
         /// Gets a list of <see cref="Relation"/> objects by the Name of the <see cref="RelationType"/>
         /// </summary>

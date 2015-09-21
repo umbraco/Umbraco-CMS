@@ -4,6 +4,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.UI;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
@@ -15,7 +16,8 @@ namespace Umbraco.Web.UI.Controls
 	/// </summary>
 	public abstract class UmbracoControl : Control
 	{
-		/// <summary>
+
+        /// <summary>
         /// Default constructor
         /// </summary>
         /// <param name="umbracoContext"></param>
@@ -38,6 +40,22 @@ namespace Umbraco.Web.UI.Controls
         /// Returns an UmbracoHelper object
         /// </summary>
         public UmbracoHelper Umbraco { get; private set; }
+
+        /// <summary>
+        /// Returns an ILogger
+        /// </summary>
+        public ILogger Logger
+        {
+            get { return ProfilingLogger.Logger; }
+        }
+
+        /// <summary>
+        /// Returns a ProfilingLogger
+        /// </summary>
+        public ProfilingLogger ProfilingLogger
+        {
+            get { return UmbracoContext.Application.ProfilingLogger; }
+        }
 
         public UmbracoContext UmbracoContext { get; private set; }
 

@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Data.SqlServerCe;
 using System.Linq;
+using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Caching;
+
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -15,28 +19,31 @@ namespace Umbraco.Tests.Persistence.Repositories
     [TestFixture]
     public class ServerRegistrationRepositoryTest : BaseDatabaseFactoryTest
     {
+        private ICacheProvider _staticCache;
+
         [SetUp]
         public override void Initialize()
         {
             base.Initialize();
 
+            _staticCache = new StaticCacheProvider();
             CreateTestData();
         }
 
-        private ServerRegistrationRepository CreateRepositor(IDatabaseUnitOfWork unitOfWork)
+        private ServerRegistrationRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            return new ServerRegistrationRepository(unitOfWork, NullCacheProvider.Current);
+            return new ServerRegistrationRepository(unitOfWork, _staticCache, Mock.Of<ILogger>(), SqlSyntax);
         }
 
         [Test]
-        public void Cannot_Add_Duplicate_Computer_Names()
+        public void Cannot_Add_Duplicate_Server_Identities()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
 
             // Act
-            using (var repository = CreateRepositor(unitOfWork))
+            using (var repository = CreateRepository(unitOfWork))
             {
                 var server = new ServerRegistration("http://shazwazza.com", "COMPUTER1", DateTime.Now);
                 repository.AddOrUpdate(server);
@@ -47,17 +54,17 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Cannot_Update_To_Duplicate_Computer_Names()
+        public void Cannot_Update_To_Duplicate_Server_Identities()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
 
             // Act
-            using (var repository = CreateRepositor(unitOfWork))
+            using (var repository = CreateRepository(unitOfWork))
             {
                 var server = repository.Get(1);
-                server.ComputerName = "COMPUTER2";
+                server.ServerIdentity = "COMPUTER2";
                 repository.AddOrUpdate(server);
                 Assert.Throws<SqlCeException>(unitOfWork.Commit);
             }
@@ -68,11 +75,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Instantiate_Repository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
 
             // Act
-            using (var repository = CreateRepositor(unitOfWork))
+            using (var repository = CreateRepository(unitOfWork))
             {
                 // Assert
                 Assert.That(repository, Is.Not.Null);    
@@ -83,9 +90,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_On_Repository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepositor(unitOfWork))
+            using (var repository = CreateRepository(unitOfWork))
             {
                 // Act
                 var server = repository.Get(1);
@@ -103,9 +110,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_On_Repository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepositor(unitOfWork))
+            using (var repository = CreateRepository(unitOfWork))
             {
                 // Act
                 var servers = repository.GetAll();
@@ -116,47 +123,49 @@ namespace Umbraco.Tests.Persistence.Repositories
             
         }
 
-        [Test]
-        public void Can_Perform_GetByQuery_On_Repository()
-        {
-            // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepositor(unitOfWork))
-            {
-                // Act
-                var query = Query<ServerRegistration>.Builder.Where(x => x.ComputerName.ToUpper() == "COMPUTER3");
-                var result = repository.GetByQuery(query);
+        // queries are not supported due to in-memory caching
 
-                // Assert
-                Assert.AreEqual(1, result.Count());    
-            }
-        }
+        //[Test]
+        //public void Can_Perform_GetByQuery_On_Repository()
+        //{
+        //    // Arrange
+        //    var provider = new PetaPocoUnitOfWorkProvider(Logger);
+        //    var unitOfWork = provider.GetUnitOfWork();
+        //    using (var repository = CreateRepository(unitOfWork))
+        //    {
+        //        // Act
+        //        var query = Query<IServerRegistration>.Builder.Where(x => x.ServerIdentity.ToUpper() == "COMPUTER3");
+        //        var result = repository.GetByQuery(query);
 
-        [Test]
-        public void Can_Perform_Count_On_Repository()
-        {
-            // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepositor(unitOfWork))
-            {
-                // Act
-                var query = Query<ServerRegistration>.Builder.Where(x => x.ServerAddress.StartsWith("http://"));
-                int count = repository.Count(query);
+        //        // Assert
+        //        Assert.AreEqual(1, result.Count());    
+        //    }
+        //}
 
-                // Assert
-                Assert.That(count, Is.EqualTo(2));    
-            }
-        }
+        //[Test]
+        //public void Can_Perform_Count_On_Repository()
+        //{
+        //    // Arrange
+        //    var provider = new PetaPocoUnitOfWorkProvider(Logger);
+        //    var unitOfWork = provider.GetUnitOfWork();
+        //    using (var repository = CreateRepository(unitOfWork))
+        //    {
+        //        // Act
+        //        var query = Query<IServerRegistration>.Builder.Where(x => x.ServerAddress.StartsWith("http://"));
+        //        int count = repository.Count(query);
+
+        //        // Assert
+        //        Assert.That(count, Is.EqualTo(2));    
+        //    }
+        //}
 
         [Test]
         public void Can_Perform_Add_On_Repository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepositor(unitOfWork))
+            using (var repository = CreateRepository(unitOfWork))
             {
                 // Act
                 var server = new ServerRegistration("http://shazwazza.com", "COMPUTER4", DateTime.Now);
@@ -173,9 +182,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_On_Repository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepositor(unitOfWork))
+            using (var repository = CreateRepository(unitOfWork))
             {
                 // Act
                 var server = repository.Get(2);
@@ -198,9 +207,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_On_Repository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepositor(unitOfWork))
+            using (var repository = CreateRepository(unitOfWork))
             {
                 // Act
                 var server = repository.Get(3);
@@ -219,9 +228,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Exists_On_Repository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepositor(unitOfWork))
+            using (var repository = CreateRepository(unitOfWork))
             {
                 // Act
                 var exists = repository.Exists(3);
@@ -241,9 +250,9 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         public void CreateTestData()
         {
-            var provider = new PetaPocoUnitOfWorkProvider();
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
             using (var unitOfWork = provider.GetUnitOfWork())
-            using (var repository = new ServerRegistrationRepository(unitOfWork))
+            using (var repository = CreateRepository(unitOfWork))
             {
                 repository.AddOrUpdate(new ServerRegistration("http://localhost", "COMPUTER1", DateTime.Now) { IsActive = true });
                 repository.AddOrUpdate(new ServerRegistration("http://www.mydomain.com", "COMPUTER2", DateTime.Now));

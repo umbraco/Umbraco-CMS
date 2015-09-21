@@ -5,7 +5,7 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class MediaFactory : IEntityFactory<IMedia, ContentVersionDto>
+    internal class MediaFactory 
     {
         private readonly IMediaType _contentType;
         private readonly Guid _nodeObjectTypeId;
@@ -32,10 +32,7 @@ namespace Umbraco.Core.Persistence.Factories
             var media = new Models.Media(dto.ContentDto.NodeDto.Text, dto.ContentDto.NodeDto.ParentId, _contentType)
                        {
                            Id = _id,
-                           Key =
-                               dto.ContentDto.NodeDto.UniqueId.HasValue
-                                   ? dto.ContentDto.NodeDto.UniqueId.Value
-                                   : _id.ToGuid(),
+                           Key = dto.ContentDto.NodeDto.UniqueId,
                            Path = dto.ContentDto.NodeDto.Path,
                            CreatorId = dto.ContentDto.NodeDto.UserId.Value,
                            Level = dto.ContentDto.NodeDto.Level,

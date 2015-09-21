@@ -495,7 +495,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "contentApiBaseUrl",
-                        "GetHasPermission",
+                        "HasPermission",
                         [{ permissionToCheck: permission },{ nodeId: id }])),
                 'Failed to check permission for item ' + id);
         },
@@ -507,7 +507,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
          *
          * @description
          * Saves changes made to a content item to its current version, if the content item is new, the isNew paramater must be passed to force creation
-         * if the content item needs to have files attached, they must be provided as the files param and passed seperately 
+         * if the content item needs to have files attached, they must be provided as the files param and passed separately 
          * 
          * 
          * ##usage
@@ -540,7 +540,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
          *
          * @description
          * Saves and publishes changes made to a content item to a new version, if the content item is new, the isNew paramater must be passed to force creation
-         * if the content item needs to have files attached, they must be provided as the files param and passed seperately 
+         * if the content item needs to have files attached, they must be provided as the files param and passed separately 
          * 
          * 
          * ##usage

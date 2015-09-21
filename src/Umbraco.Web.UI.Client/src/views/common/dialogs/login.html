@@ -1,26 +1,55 @@
-﻿<form name="loginForm" ng-submit="loginSubmit(login, password)" ng-controller="Umbraco.Dialogs.LoginController">
-    <div id="login" class="umb-modalcolumn" ng-class="{'show-validation': loginForm.$invalid}">
-
+﻿<div ng-controller="Umbraco.Dialogs.LoginController">
+    <div id="login" class="umb-modalcolumn" ng-class="{'show-validation': loginForm.$invalid}" ng-cloak>
         <div class="form">
             <h1>{{greeting}}</h1>
             <p>
                 <span ng-show="dialogData.isTimedOut"><localize key="login_timeout">Log in below</localize>.</span>
                 <localize key="login_instruction">Log in below</localize>
             </p>
-
-            <div class="control-group" ng-class="{error: loginForm.username.$invalid}">
-                <input type="text" autofocus ng-model="login" name="username" class="input-xlarge" localize="placeholder" placeholder="@placeholders_username" />
-            </div>
-
-            <div class="control-group" ng-class="{error: loginForm.password.$invalid}">
-                <input type="password" ng-model="password" name="password" class="input-xlarge" localize="placeholder" placeholder="@placeholders_password"  />
-            </div>
-
-            <button type="submit" class="btn" val-trigger-change="#login .form input"><localize key="general_login">Login</localize></button>
             
-            <div class="control-group" ng-show="loginForm.$invalid">
-                <div class="alert alert-error">{{errorMsg}}</div>
+            <div class="external-logins" ng-if="externalLoginProviders.length > 0">
+                
+                <div class="alert alert-error" ng-repeat="error in externalLoginInfo.errors">
+                    <span>{{error}}</span>
+                </div>
+
+                <form method="POST" name="externalLoginForm" action="{{externalLoginFormAction}}">
+
+                    <div ng-repeat="login in externalLoginProviders">
+
+                        <button type="submit" class="btn btn-block btn-social"
+                                ng-class="login.properties.SocialStyle"
+                                id="{{login.authType}}" name="provider" value="{{login.authType}}"
+                                title="Log in using your {{login.caption}} account">
+                            <i class="fa" ng-class="login.properties.SocialIcon"></i>
+                            Sign in with {{login.caption}}
+                        </button>
+
+                    </div>
+                </form>
+
+                <div id="hrOr">
+                    <hr/><div>Or</div>
+                </div>
+
             </div>
+
+            <form method="POST" name="loginForm" ng-submit="loginSubmit(login, password)">
+                <div class="control-group" ng-class="{error: loginForm.username.$invalid}">
+                    <input type="text" autofocus ng-model="login" name="username" class="input-xlarge" localize="placeholder" placeholder="@placeholders_username" />
+                </div>
+
+                <div class="control-group" ng-class="{error: loginForm.password.$invalid}">
+                    <input type="password" ng-model="password" name="password" class="input-xlarge" localize="placeholder" placeholder="@placeholders_password" autocomplete="off" />
+                </div>
+
+                <button type="submit" class="btn" val-trigger-change="#login .form input"><localize key="general_login">Login</localize></button>
+
+                <div class="control-group" ng-show="loginForm.$invalid">
+                    <div class="alert alert-error">{{errorMsg}}</div>
+                </div>
+            </form>
+            
         </div>
     </div>
-</form>
+</div>

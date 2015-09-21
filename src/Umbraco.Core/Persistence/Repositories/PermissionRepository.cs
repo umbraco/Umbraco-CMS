@@ -27,11 +27,13 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly IDatabaseUnitOfWork _unitOfWork;
         private readonly CacheHelper _cache;
+        private readonly ISqlSyntaxProvider _sqlSyntax;
 
-        internal PermissionRepository(IDatabaseUnitOfWork unitOfWork, CacheHelper cache)
+        internal PermissionRepository(IDatabaseUnitOfWork unitOfWork, CacheHelper cache, ISqlSyntaxProvider sqlSyntax)
         {
             _unitOfWork = unitOfWork;
             _cache = cache;
+            _sqlSyntax = sqlSyntax;
         }
 
         /// <summary>
@@ -51,7 +53,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     var whereBuilder = new StringBuilder();
             
                     //where userId = @userId AND
-                    whereBuilder.Append(SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("userId"));
+                    whereBuilder.Append(_sqlSyntax.GetQuotedColumnName("userId"));
                     whereBuilder.Append("=");
                     whereBuilder.Append(userId);
 
@@ -64,7 +66,7 @@ namespace Umbraco.Core.Persistence.Repositories
                         for (var index = 0; index < entityIds.Length; index++)
                         {
                             var entityId = entityIds[index];
-                            whereBuilder.Append(SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("nodeId"));
+                            whereBuilder.Append(_sqlSyntax.GetQuotedColumnName("nodeId"));
                             whereBuilder.Append("=");
                             whereBuilder.Append(entityId);
                             if (index < entityIds.Length - 1)
@@ -125,8 +127,12 @@ namespace Umbraco.Core.Persistence.Repositories
             var db = _unitOfWork.Database;
             using (var trans = db.GetTransaction())
             {
-                db.Execute("DELETE FROM umbracoUser2NodePermission WHERE userId=@userId AND nodeId in (@nodeIds)",
-                    new {userId = userId, nodeIds = entityIds});
+                //we need to batch these in groups of 2000 so we don't exceed the max 2100 limit
+                foreach (var idGroup in entityIds.InGroupsOf(2000))
+                {
+                    db.Execute("DELETE FROM umbracoUser2NodePermission WHERE userId=@userId AND nodeId in (@nodeIds)",
+                        new { userId = userId, nodeIds = idGroup });
+                }
 
                 var toInsert = new List<User2NodePermissionDto>();
                 foreach (var p in permissions)
@@ -149,6 +155,42 @@ namespace Umbraco.Core.Persistence.Repositories
                 //Raise the event
                 AssignedPermissions.RaiseEvent(
                     new SaveEventArgs<EntityPermission>(ConvertToPermissionList(toInsert), false), this);
+            }
+        }
+
+        /// <summary>
+        /// Assigns one permission for a user to many entities
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="permission"></param>
+        /// <param name="entityIds"></param>
+        public void AssignUserPermission(int userId, char permission, params int[] entityIds)
+        {
+            var db = _unitOfWork.Database;
+            using (var trans = db.GetTransaction())
+            {
+                db.Execute("DELETE FROM umbracoUser2NodePermission WHERE userId=@userId AND permission=@permission AND nodeId in (@entityIds)",
+                    new
+                    {
+                        userId = userId,
+                        permission = permission.ToString(CultureInfo.InvariantCulture),
+                        entityIds = entityIds
+                    });
+
+                var actions = entityIds.Select(id => new User2NodePermissionDto
+                {
+                    NodeId = id,
+                    Permission = permission.ToString(CultureInfo.InvariantCulture),
+                    UserId = userId
+                }).ToArray();
+
+                _unitOfWork.Database.BulkInsertRecords(actions, trans);
+
+                trans.Complete();
+
+                //Raise the event
+                AssignedPermissions.RaiseEvent(
+                    new SaveEventArgs<EntityPermission>(ConvertToPermissionList(actions), false), this);
             }
         } 
 

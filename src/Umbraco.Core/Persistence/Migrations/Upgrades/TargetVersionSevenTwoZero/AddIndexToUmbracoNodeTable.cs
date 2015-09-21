@@ -1,5 +1,6 @@
 using System.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -10,18 +11,18 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwoZero
     {
         private readonly bool _skipIndexCheck;
 
-        internal AddIndexToUmbracoNodeTable(bool skipIndexCheck)
+        internal AddIndexToUmbracoNodeTable(ISqlSyntaxProvider sqlSyntax, ILogger logger, bool skipIndexCheck) : base(sqlSyntax, logger)
         {
             _skipIndexCheck = skipIndexCheck;
         }
 
-        public AddIndexToUmbracoNodeTable()
+        public AddIndexToUmbracoNodeTable(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
         {
         }
 
         public override void Up()
         {
-            var dbIndexes = _skipIndexCheck ? new DbIndexDefinition[] { } : SqlSyntaxContext.SqlSyntaxProvider.GetDefinedIndexes(Context.Database)
+            var dbIndexes = _skipIndexCheck ? new DbIndexDefinition[] { } : SqlSyntax.GetDefinedIndexes(Context.Database)
                 .Select(x => new DbIndexDefinition
                 {
                     TableName = x.Item1,

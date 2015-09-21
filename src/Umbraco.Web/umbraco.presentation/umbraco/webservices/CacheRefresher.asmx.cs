@@ -1,99 +1,105 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
 using System.Linq;
 using System.Web;
-using System.Web.Script.Serialization;
 using System.Web.Services;
 using System.Xml;
+using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
+using umbraco.interfaces;
 
 namespace umbraco.presentation.webservices
 {
-
 	/// <summary>
-	/// Summary description for CacheRefresher.
+	/// CacheRefresher web service.
 	/// </summary>
 	[WebService(Namespace="http://umbraco.org/webservices/")]
 	public class CacheRefresher : WebService
-	{
+    {
+        #region Helpers
 
-        /// <summary>
-        /// This checks the passed in hash and verifies if it does not match the hash of the combination of appDomainAppId and machineName
-        /// passed in. If the hashes don't match, then cache refreshing continues.
-        /// </summary>
-        /// <param name="hash"></param>
-        /// <param name="appDomainAppId"></param>
-        /// <param name="machineName"></param>
-        /// <returns></returns>
-	    internal bool ContinueRefreshingForRequest(string hash, string appDomainAppId, string machineName)
-	    {
-            //check if this is the same app id as the one passed in, if it is, then we will ignore
-            // the request - we will have to assume that the cache refreshing has already been applied to the server
-            // that executed the request.
-            if (hash.IsNullOrWhiteSpace() == false && SystemUtilities.GetCurrentTrustLevel() == AspNetHostingPermissionLevel.Unrestricted)
-            {
-                var hasher = new HashCodeCombiner();
-                hasher.AddCaseInsensitiveString(machineName);
-                hasher.AddCaseInsensitiveString(appDomainAppId);
-                var hashedAppId = hasher.GetCombinedHashCode();
+        // is the server originating from this server - ie are we self-messaging?
+        // in which case we should ignore the message because it's been processed locally already
+        internal static bool SelfMessage(string hash)
+        {
+            if (string.IsNullOrEmpty(hash)) return false; // no hash = don't know = not self
+            if (hash != WebServiceServerMessenger.GetCurrentServerHash()) return false;
 
-                //we can only check this in full trust. if it's in medium trust we'll just end up with 
-                // the server refreshing it's cache twice.
-                if (hashedAppId == hash)
-                {
-                    LogHelper.Debug<CacheRefresher>(
-                        "The passed in hashed appId equals the current server's hashed appId, cache refreshing will be ignored for this request as it will have already executed for this server (server: {0} , appId: {1} , hash: {2})",
-                        () => machineName,
-                        () => appDomainAppId,
-                        () => hashedAppId);
+            LogHelper.Debug<CacheRefresher>(
+                "Ignoring self-message. (server: {0}, appId: {1}, hash: {2})",
+                () => NetworkHelper.MachineName,
+                () => HttpRuntime.AppDomainAppId,
+                () => hash);
 
-                    return false;
-                }
-            }
+            return true;
+        }
 
-	        return true;
-	    }
+        private static ICacheRefresher GetRefresher(Guid id)
+        {
+            var refresher = CacheRefreshersResolver.Current.GetById(id);
+            if (refresher == null)
+                throw new InvalidOperationException("Cache refresher with ID \"" + id + "\" does not exist.");
+            return refresher;
+        }
+
+        private static IJsonCacheRefresher GetJsonRefresher(Guid id)
+        {
+            return GetJsonRefresher(GetRefresher(id));
+        }
+
+        private static IJsonCacheRefresher GetJsonRefresher(ICacheRefresher refresher)
+        {
+            var jsonRefresher = refresher as IJsonCacheRefresher;
+            if (jsonRefresher == null)
+                throw new InvalidOperationException("Cache refresher with ID \"" + refresher.UniqueIdentifier + "\" does not implement " + typeof(IJsonCacheRefresher) + ".");
+            return jsonRefresher;
+        }
+
+        private static bool NotAutorized(string login, string rawPassword)
+        {
+            var user = ApplicationContext.Current.Services.UserService.GetByUsername(login);
+            return user == null || user.RawPasswordValue != rawPassword;
+        }
+
+        #endregion
 
         [WebMethod]
         public void BulkRefresh(RefreshInstruction[] instructions, string appId, string login, string password)
         {
-            if (BusinessLogic.User.validateCredentials(login, password) == false)
-            {
-                return;
-            }
+            if (NotAutorized(login, password)) return;
+            if (SelfMessage(appId)) return; // do not process self-messages
 
-            if (ContinueRefreshingForRequest(appId, HttpRuntime.AppDomainAppId, NetworkHelper.MachineName) == false) return;
-
-            //only execute distinct instructions - no sense in running the same one.
+            // only execute distinct instructions - no sense in running the same one more than once
             foreach (var instruction in instructions.Distinct())
             {
+                var refresher = GetRefresher(instruction.RefresherId);
                 switch (instruction.RefreshType)
                 {
-                    case RefreshInstruction.RefreshMethodType.RefreshAll:
-                        RefreshAll(instruction.RefresherId);
+                    case RefreshMethodType.RefreshAll:
+                        refresher.RefreshAll();
                         break;
-                    case RefreshInstruction.RefreshMethodType.RefreshByGuid:
-                        RefreshByGuid(instruction.RefresherId, instruction.GuidId);
+                    case RefreshMethodType.RefreshByGuid:
+                        refresher.Refresh(instruction.GuidId);
                         break;
-                    case RefreshInstruction.RefreshMethodType.RefreshById:
-                        RefreshById(instruction.RefresherId, instruction.IntId);
+                    case RefreshMethodType.RefreshById:
+                        refresher.Refresh(instruction.IntId);
                         break;
-                    case RefreshInstruction.RefreshMethodType.RefreshByIds:
-                        RefreshByIds(instruction.RefresherId, instruction.JsonIds);
+                    case RefreshMethodType.RefreshByIds: // not directly supported by ICacheRefresher
+                        foreach (var id in JsonConvert.DeserializeObject<int[]>(instruction.JsonIds))
+	                        refresher.Refresh(id);
                         break;
-                    case RefreshInstruction.RefreshMethodType.RefreshByJson:
-                        RefreshByJson(instruction.RefresherId, instruction.JsonPayload);
+                    case RefreshMethodType.RefreshByJson:
+                        GetJsonRefresher(refresher).Refresh(instruction.JsonPayload);
                         break;
-                    case RefreshInstruction.RefreshMethodType.RemoveById:
-                        RemoveById(instruction.RefresherId, instruction.IntId);
+                    case RefreshMethodType.RemoveById:
+                        refresher.Remove(instruction.IntId);
                         break;
+                    //case RefreshMethodType.RemoveByIds: // not directly supported by ICacheRefresher
+                    //    foreach (var id in JsonConvert.DeserializeObject<int[]>(instruction.JsonIds))
+                    //        refresher.Remove(id);
+                    //    break;
                 }
             }
         }
@@ -101,139 +107,61 @@ namespace umbraco.presentation.webservices
 		[WebMethod]
 		public void RefreshAll(Guid uniqueIdentifier, string Login, string Password)
 		{
-			if (BusinessLogic.User.validateCredentials(Login, Password))
-			{
-			    RefreshAll(uniqueIdentifier);
-			}
+		    if (NotAutorized(Login, Password)) return;
+			GetRefresher(uniqueIdentifier).RefreshAll();
 		}
-
-	    private void RefreshAll(Guid uniqueIdentifier)
-	    {
-            var cr = CacheRefreshersResolver.Current.GetById(uniqueIdentifier);
-            cr.RefreshAll();	
-	    }
 
 	    [WebMethod]
 		public void RefreshByGuid(Guid uniqueIdentifier, Guid Id, string Login, string Password)
 		{
-			if (BusinessLogic.User.validateCredentials(Login, Password))
-			{
-                RefreshByGuid(uniqueIdentifier, Id);
-			}
+		    if (NotAutorized(Login, Password)) return;
+            GetRefresher(uniqueIdentifier).Refresh(Id);
 		}
-
-        private void RefreshByGuid(Guid uniqueIdentifier, Guid Id)
-	    {
-            var cr = CacheRefreshersResolver.Current.GetById(uniqueIdentifier);
-            cr.Refresh(Id);				
-	    }
 
 		[WebMethod]
 		public void RefreshById(Guid uniqueIdentifier, int Id, string Login, string Password)
 		{
-			if (BusinessLogic.User.validateCredentials(Login, Password))
-			{
-			    RefreshById(uniqueIdentifier, Id);
-			}
+		    if (NotAutorized(Login, Password)) return;
+			GetRefresher(uniqueIdentifier).Refresh(Id);
 		}
 
-        private void RefreshById(Guid uniqueIdentifier, int Id)
-	    {
-            var cr = CacheRefreshersResolver.Current.GetById(uniqueIdentifier);
-            cr.Refresh(Id);
-	    }
-
-	    /// <summary>
-        /// Refreshes objects for all Ids matched in the json string
-        /// </summary>
-        /// <param name="uniqueIdentifier"></param>
-        /// <param name="jsonIds">A JSON Serialized string of ids to match</param>
-        /// <param name="Login"></param>
-        /// <param name="Password"></param>
         [WebMethod]
         public void RefreshByIds(Guid uniqueIdentifier, string jsonIds, string Login, string Password)
         {
-            if (BusinessLogic.User.validateCredentials(Login, Password))
-            {
-                RefreshByIds(uniqueIdentifier, jsonIds);
-            }
+		    if (NotAutorized(Login, Password)) return;
+	        var refresher = GetRefresher(uniqueIdentifier);
+	        foreach (var id in JsonConvert.DeserializeObject<int[]>(jsonIds))
+	            refresher.Refresh(id);
         }
 
-	    private void RefreshByIds(Guid uniqueIdentifier, string jsonIds)
-	    {
-            var serializer = new JavaScriptSerializer();
-            var ids = serializer.Deserialize<int[]>(jsonIds);
-
-            var cr = CacheRefreshersResolver.Current.GetById(uniqueIdentifier);
-            foreach (var i in ids)
-            {
-                cr.Refresh(i);
-            }    
-	    }
-
-	    /// <summary>
-        /// Refreshes objects using the passed in Json payload, it will be up to the cache refreshers to deserialize
-        /// </summary>
-        /// <param name="uniqueIdentifier"></param>
-        /// <param name="jsonPayload">A custom JSON payload used by the cache refresher</param>
-        /// <param name="Login"></param>
-        /// <param name="Password"></param>
-        /// <remarks>
-        /// NOTE: the cache refresher defined by the ID MUST be of type IJsonCacheRefresher or an exception will be thrown
-        /// </remarks>
         [WebMethod]
         public void RefreshByJson(Guid uniqueIdentifier, string jsonPayload, string Login, string Password)
-        {            
-            if (BusinessLogic.User.validateCredentials(Login, Password))
-            {
-                RefreshByJson(uniqueIdentifier, jsonPayload);
-            }
+        {
+            if (NotAutorized(Login, Password)) return;
+            GetJsonRefresher(uniqueIdentifier).Refresh(jsonPayload);
         }
-
-	    private void RefreshByJson(Guid uniqueIdentifier, string jsonPayload)
-	    {
-            var cr = CacheRefreshersResolver.Current.GetById(uniqueIdentifier) as IJsonCacheRefresher;
-            if (cr == null)
-            {
-                throw new InvalidOperationException("The cache refresher: " + uniqueIdentifier + " is not of type " + typeof(IJsonCacheRefresher));
-            }
-            cr.Refresh(jsonPayload);
-	    }
 
 	    [WebMethod]
         public void RemoveById(Guid uniqueIdentifier, int Id, string Login, string Password) 
         {
-            if (BusinessLogic.User.validateCredentials(Login, Password))
-            {
-                RemoveById(uniqueIdentifier, Id);
-            }
+            if (NotAutorized(Login, Password)) return;
+            GetRefresher(uniqueIdentifier).Remove(Id);
         }
 
-	    private void RemoveById(Guid uniqueIdentifier, int Id)
-	    {
-            var cr = CacheRefreshersResolver.Current.GetById(uniqueIdentifier);
-            cr.Remove(Id);
-	    }
-
 	    [WebMethod]
-		public XmlDocument GetRefreshers(string Login, string Password) 
-		{
-			if (BusinessLogic.User.validateCredentials(Login, Password))
-			{
-				var xd = new XmlDocument();
-				xd.LoadXml("<cacheRefreshers/>");
-				foreach (var cr in CacheRefreshersResolver.Current.CacheRefreshers) 
-				{
-					var n = xmlHelper.addTextNode(xd, "cacheRefresher", cr.Name);
-					n.Attributes.Append(xmlHelper.addAttribute(xd, "uniqueIdentifier", cr.UniqueIdentifier.ToString()));
-					xd.DocumentElement.AppendChild(n);
-				}
-				return xd;
-						
-				
-			}
-			return null;
-		}
+		public XmlDocument GetRefreshers(string Login, string Password)
+	    {
+	        if (NotAutorized(Login, Password)) return null;
 
+			var xd = new XmlDocument();
+			xd.LoadXml("<cacheRefreshers/>");
+			foreach (var cr in CacheRefreshersResolver.Current.CacheRefreshers) 
+			{
+				var n = xmlHelper.addTextNode(xd, "cacheRefresher", cr.Name);
+				n.Attributes.Append(xmlHelper.addAttribute(xd, "uniqueIdentifier", cr.UniqueIdentifier.ToString()));
+				xd.DocumentElement.AppendChild(n);
+			}
+			return xd;
+		}
 	}
 }

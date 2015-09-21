@@ -19,7 +19,17 @@ namespace Umbraco.Web
     /// Provides extension methods for <c>IPublishedContent</c>.
     /// </summary>
 	public static class PublishedContentExtensions
-	{    
+    {
+        #region Key
+
+        public static Guid GetKey(this IPublishedContent content)
+        {
+            var contentWithKey = content as IPublishedContentWithKey;
+            return contentWithKey == null ? Guid.Empty : contentWithKey.Key;
+        }
+
+        #endregion
+
         #region Urls
 
         /// <summary>
@@ -1734,7 +1744,7 @@ namespace Umbraco.Web
 
         public static IPublishedContent FirstChild(this IPublishedContent content)
         {
-            return content.Children().First();
+            return content.Children().FirstOrDefault();
         }
 
         public static IPublishedContent FirstChild(this IPublishedContent content, Func<IPublishedContent, bool> predicate)
@@ -1898,6 +1908,7 @@ namespace Umbraco.Web
         public static CultureInfo GetCulture(this IPublishedContent content, Uri current = null)
         {
             return Models.ContentExtensions.GetCulture(UmbracoContext.Current,
+                ApplicationContext.Current.Services.DomainService, 
                 ApplicationContext.Current.Services.LocalizationService,
                 ApplicationContext.Current.Services.ContentService,
                 content.Id, content.Path,

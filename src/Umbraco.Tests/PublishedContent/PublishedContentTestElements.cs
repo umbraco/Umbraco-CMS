@@ -14,6 +14,7 @@ namespace Umbraco.Tests.PublishedContent
     class SolidPublishedCaches : IPublishedCaches
     {
         public readonly SolidPublishedContentCache ContentCache = new SolidPublishedContentCache();
+        public readonly SolidPublishedMediaCache MediaCache = new SolidPublishedMediaCache();
 
         public ContextualPublishedContentCache CreateContextualContentCache(UmbracoContext context)
         {
@@ -22,7 +23,7 @@ namespace Umbraco.Tests.PublishedContent
 
         public ContextualPublishedMediaCache CreateContextualMediaCache(UmbracoContext context)
         {
-            return null;
+            return new ContextualPublishedMediaCache(MediaCache, context);
         }
     }
 
@@ -103,6 +104,66 @@ namespace Umbraco.Tests.PublishedContent
         public IPublishedProperty CreateDetachedProperty(PublishedPropertyType propertyType, object value, bool isPreviewing)
         {
             throw new NotImplementedException();
+        }
+    }
+
+    class SolidPublishedMediaCache : IPublishedMediaCache
+    {
+        private readonly Dictionary<int, IPublishedContent> _media = new Dictionary<int, IPublishedContent>();
+
+        public void Add(SolidPublishedContent content)
+        {
+            _media[content.Id] = content.CreateModel();
+        }
+
+        public void Clear()
+        {
+            _media.Clear();
+        }
+
+        public IPublishedContent GetById(UmbracoContext umbracoContext, bool preview, int contentId)
+        {
+            return _media.ContainsKey(contentId) ? _media[contentId] : null;
+        }
+
+        public IEnumerable<IPublishedContent> GetAtRoot(UmbracoContext umbracoContext, bool preview)
+        {
+            return _media.Values.Where(x => x.Parent == null);
+        }
+
+        public IPublishedContent GetSingleByXPath(UmbracoContext umbracoContext, bool preview, string xpath, Core.Xml.XPathVariable[] vars)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IPublishedContent GetSingleByXPath(UmbracoContext umbracoContext, bool preview, System.Xml.XPath.XPathExpression xpath, Core.Xml.XPathVariable[] vars)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<IPublishedContent> GetByXPath(UmbracoContext umbracoContext, bool preview, string xpath, Core.Xml.XPathVariable[] vars)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<IPublishedContent> GetByXPath(UmbracoContext umbracoContext, bool preview, System.Xml.XPath.XPathExpression xpath, Core.Xml.XPathVariable[] vars)
+        {
+            throw new NotImplementedException();
+        }
+
+        public System.Xml.XPath.XPathNavigator GetXPathNavigator(UmbracoContext umbracoContext, bool preview)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool XPathNavigatorIsNavigable
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public bool HasContent(UmbracoContext umbracoContext, bool preview)
+        {
+            return _media.Count > 0;
         }
     }
 

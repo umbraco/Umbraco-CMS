@@ -25,9 +25,9 @@ ECHO Installing the Microsoft.Bcl.Build package before anything else, otherwise 
 SET nuGetFolder=%CD%\..\src\packages\
 ..\src\.nuget\NuGet.exe sources Remove -Name MyGetUmbracoCore >NUL
 ..\src\.nuget\NuGet.exe sources Add -Name MyGetUmbracoCore -Source https://www.myget.org/F/umbracocore/api/v2/ >NUL
-..\src\.nuget\NuGet.exe install ..\src\Umbraco.Web.UI\packages.config -OutputDirectory %nuGetFolder%
-..\src\.nuget\NuGet.exe install ..\src\umbraco.businesslogic\packages.config -OutputDirectory %nuGetFolder%
-..\src\.nuget\NuGet.exe install ..\src\Umbraco.Core\packages.config -OutputDirectory %nuGetFolder%
+..\src\.nuget\NuGet.exe install ..\src\Umbraco.Web.UI\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
+..\src\.nuget\NuGet.exe install ..\src\umbraco.businesslogic\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
+..\src\.nuget\NuGet.exe install ..\src\Umbraco.Core\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
 
 ECHO Removing the belle build folder and bower_components folder to make sure everything is clean as a whistle
 RD ..\src\Umbraco.Web.UI.Client\build /Q /S
@@ -43,7 +43,7 @@ DEL /F /Q webpihash.txt
 ECHO Making sure Git is in the path so that the build can succeed
 CALL InstallGit.cmd
 ECHO Performing MSBuild and producing Umbraco binaries zip files
-%windir%\Microsoft.NET\Framework\v4.0.30319\msbuild.exe "Build.proj" /p:BUILD_RELEASE=%release% /p:BUILD_COMMENT=%comment%
+%windir%\Microsoft.NET\Framework\v4.0.30319\msbuild.exe "Build.proj" /p:BUILD_RELEASE=%release% /p:BUILD_COMMENT=%comment% /verbosity:minimal
 
 ECHO Setting node_modules folder to hidden to prevent VS13 from crashing on it while loading the websites project
 attrib +h ..\src\Umbraco.Web.UI.Client\node_modules
@@ -53,11 +53,13 @@ REN .\_BuildOutput\WebApp\Views\Web.config Web.config.transform
 REN .\_BuildOutput\WebApp\Xslt\Web.config Web.config.transform
 
 ECHO Packing the NuGet release files
-..\src\.nuget\NuGet.exe Pack NuSpecs\UmbracoCms.Core.nuspec -Version %version% -Symbols
-..\src\.nuget\NuGet.exe Pack NuSpecs\UmbracoCms.nuspec -Version %version%
+..\src\.nuget\NuGet.exe Pack NuSpecs\UmbracoCms.Core.nuspec -Version %version% -Symbols -Verbosity quiet
+..\src\.nuget\NuGet.exe Pack NuSpecs\UmbracoCms.nuspec -Version %version% -Verbosity quiet
                         
 IF ERRORLEVEL 1 GOTO :showerror
 
+ECHO No errors were detected but you still may see some in the output, then it's time to investigate.
+ECHO You might see some warnings but that is completely normal.
 GOTO :EOF
 
 :showerror

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
 
@@ -5,6 +6,10 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     public interface ITagRepository : IRepositoryQueryable<int, ITag>
     {
+
+        TaggedEntity GetTaggedEntityByKey(Guid key);
+        TaggedEntity GetTaggedEntityById(int id);
+
         IEnumerable<TaggedEntity> GetTaggedEntitiesByTagGroup(TaggableObjectTypes objectType, string tagGroup);
 
         IEnumerable<TaggedEntity> GetTaggedEntitiesByTag(TaggableObjectTypes objectType, string tag, string tagGroup = null);
@@ -26,6 +31,14 @@ namespace Umbraco.Core.Persistence.Repositories
         IEnumerable<ITag> GetTagsForEntity(int contentId, string group = null);
 
         /// <summary>
+        /// Returns all tags that exist on the content item - Content/Media/Member
+        /// </summary>
+        /// <param name="contentId">The content item id to get tags for</param>
+        /// <param name="group">Optional group</param>
+        /// <returns></returns>
+        IEnumerable<ITag> GetTagsForEntity(Guid contentId, string group = null);
+
+        /// <summary>
         /// Returns all tags that exist on the content item for the property specified - Content/Media/Member
         /// </summary>
         /// <param name="contentId">The content item id to get tags for</param>
@@ -33,6 +46,15 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="group">Optional group</param>
         /// <returns></returns>
         IEnumerable<ITag> GetTagsForProperty(int contentId, string propertyTypeAlias, string group = null);
+
+        /// <summary>
+        /// Returns all tags that exist on the content item for the property specified - Content/Media/Member
+        /// </summary>
+        /// <param name="contentId">The content item id to get tags for</param>
+        /// <param name="propertyTypeAlias">The property alias to get tags for</param>
+        /// <param name="group">Optional group</param>
+        /// <returns></returns>
+        IEnumerable<ITag> GetTagsForProperty(Guid contentId, string propertyTypeAlias, string group = null);
 
         /// <summary>
         /// Assigns the given tags to a content item's property

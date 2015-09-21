@@ -130,6 +130,8 @@ namespace umbraco.cms.presentation.developer
 		{
 			var dirInfo = new DirectoryInfo(path);
 
+		    if (dirInfo.Exists == false) return;
+
 			// Populate subdirectories
 			var dirInfos = dirInfo.GetDirectories();
 			foreach (var dir in dirInfos)
@@ -269,6 +271,7 @@ namespace umbraco.cms.presentation.developer
 		private void PopulateUserControls(string path)
 		{
 			var directoryInfo = new DirectoryInfo(path);
+		    if (directoryInfo.Exists == false) return;
 
 			var rootDir = IOHelper.MapPath(SystemDirectories.UserControls);
 

@@ -130,25 +130,13 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Normally in MVC the way that the View object gets assigned to the result is to Execute the ViewResult, this however
         /// will write to the Response output stream which isn't what we want. Instead, this method will use the same logic inside
-        /// of MVC to assign the View object to the result but without executing it. This also ensures that the ViewData and the TempData
-        /// is assigned from the controller.
+        /// of MVC to assign the View object to the result but without executing it.
         /// This is only relavent for view results of PartialViewResult or ViewResult.
         /// </summary>
         /// <param name="result"></param>
         /// <param name="controller"></param>
-        internal static void EnsureViewObjectDataOnResult(this ControllerBase controller, ViewResultBase result)
-        {
-			//when merging we'll create a new dictionary, otherwise you might run into an enumeration error
-			// caused from ModelStateDictionary
-			result.ViewData.ModelState.Merge(new ModelStateDictionary(controller.ViewData.ModelState));
-
-            // Temporarily copy the dictionary to avoid enumerator-modification errors
-            var newViewDataDict = new ViewDataDictionary(controller.ViewData);
-            foreach (var d in newViewDataDict)
-                result.ViewData[d.Key] = d.Value;
-
-            result.TempData = controller.TempData;
-
+        private static void EnsureViewObjectDataOnResult(this ControllerBase controller, ViewResultBase result)
+        {            
             if (result.View != null) return;
 
             if (string.IsNullOrEmpty(result.ViewName))

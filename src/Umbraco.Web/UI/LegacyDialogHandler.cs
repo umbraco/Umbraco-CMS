@@ -184,6 +184,34 @@ namespace Umbraco.Web.UI
                 : "";
         }
 
+        internal static string Create(HttpContextBase httpContext, User umbracoUser, string nodeType, int nodeId, string text, IDictionary<string, object> additionalValues, int typeId = 0)
+        {
+            var typeInstance = GetTaskForOperation(httpContext, umbracoUser, Operation.Create, nodeType);
+
+            typeInstance.TypeID = typeId;
+            typeInstance.ParentID = nodeId;
+            typeInstance.Alias = text;
+
+            // check for returning url
+            ITaskReturnUrl returnUrlTask = typeInstance as LegacyDialogTask;
+            if (returnUrlTask != null)
+            {
+                // if castable to LegacyDialogTask: add in additionalValues
+                ((LegacyDialogTask) returnUrlTask).AdditionalValues = additionalValues;
+            }
+            else
+            {
+                // otherwise cast to returnUrl interface
+                returnUrlTask = typeInstance as ITaskReturnUrl;
+            }
+            
+            typeInstance.Save();
+            
+            return returnUrlTask != null
+                ? returnUrlTask.ReturnUrl
+                : "";
+        }
+
         private static XmlDocument GetXmlDoc()
         {
             // Load task settings

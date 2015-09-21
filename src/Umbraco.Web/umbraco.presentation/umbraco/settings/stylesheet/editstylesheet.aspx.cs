@@ -1,12 +1,16 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
 using System.Web.UI;
 using Umbraco.Core.IO;
 using Umbraco.Web;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.web;
+using umbraco.cms.helpers;
 using umbraco.cms.presentation.Trees;
 using umbraco.uicontrols;
+using Umbraco.Core;
 
 namespace umbraco.cms.presentation.settings.stylesheet
 {
@@ -15,9 +19,10 @@ namespace umbraco.cms.presentation.settings.stylesheet
     /// </summary>
     public partial class editstylesheet : UmbracoEnsuredPage
     {
-        private StyleSheet stylesheet;
-
         protected MenuButton SaveButton;
+
+        private string filename;
+        protected string TreeSyncPath { get; private set; }
 
         public editstylesheet()
         {
@@ -28,13 +33,13 @@ namespace umbraco.cms.presentation.settings.stylesheet
         {
             base.OnInit(e);
 
+            filename = Request.QueryString["id"].Replace('\\', '/').TrimStart('/');
 
             var editor = Panel1.NewTabPage(ui.Text("stylesheet"));
             editor.Controls.Add(Pane7);
 
             var props = Panel1.NewTabPage(ui.Text("properties"));
             props.Controls.Add(Pane8);
-
 
             SaveButton = Panel1.Menu.NewButton();
             SaveButton.Text = ui.Text("save");
@@ -44,28 +49,27 @@ namespace umbraco.cms.presentation.settings.stylesheet
         }
 
         protected void Page_Load(object sender, EventArgs e)
-        {
-            
+        {           
             Panel1.Text = ui.Text("stylesheet", "editstylesheet", UmbracoUser);
             pp_name.Text = ui.Text("name", UmbracoUser);
             pp_path.Text = ui.Text("path", UmbracoUser);
 
-            stylesheet = new StyleSheet(int.Parse(Request.QueryString["id"]));
-            var appPath = Request.ApplicationPath;
-            if (appPath == "/")
-                appPath = "";
-            lttPath.Text = "<a target='_blank' href='" + appPath + "/css/" + stylesheet.Text + ".css'>" + appPath +
-                            SystemDirectories.Css + "/" + stylesheet.Text + ".css</a>";
+            var stylesheet = Services.FileService.GetStylesheetByName(filename);
+            if (stylesheet == null) // not found
+                throw new FileNotFoundException("Could not find file '" + filename + "'.");
 
+            lttPath.Text = "<a id=\"" + lttPath.ClientID + "\" target=\"_blank\" href=\"" + stylesheet.VirtualPath + "\">" + stylesheet.VirtualPath + "</a>";
+            editorSource.Text = stylesheet.Content;
+            TreeSyncPath = DeepLink.GetTreePathFromFilePath(filename);
+
+            // name derives from path, without the .css extension, clean for xss
+            NameTxt.Text = stylesheet.Path.TrimEnd(".css").CleanForXss('\\', '/');
 
             if (IsPostBack == false)
             {
-                NameTxt.Text = stylesheet.Text;
-                editorSource.Text = stylesheet.Content;
-
                 ClientTools
-                    .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadStylesheets>().Tree.Alias)
-                    .SyncTree("-1,init," + Request.GetItemAsString("id"), false);
+                    .SetActiveTreeType(Constants.Trees.Stylesheets)
+                    .SyncTree(TreeSyncPath, false);
             }
         }
 

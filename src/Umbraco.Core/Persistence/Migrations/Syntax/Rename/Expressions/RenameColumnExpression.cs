@@ -3,13 +3,9 @@
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Rename.Expressions
 {
     public class RenameColumnExpression : MigrationExpressionBase
-    {
-        public RenameColumnExpression()
-        {
-        }
-
-        public RenameColumnExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders)
-            : base(current, databaseProviders)
+    {        
+        public RenameColumnExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax)
+            : base(current, databaseProviders, sqlSyntax)
         {
         }
 
@@ -52,7 +48,7 @@ SELECT CONCAT(
             if (IsExpressionSupported() == false)
                 return string.Empty;
 
-            return SqlSyntaxContext.SqlSyntaxProvider.FormatColumnRename(TableName, OldName, NewName);
+            return SqlSyntax.FormatColumnRename(TableName, OldName, NewName);
         }
     }
 }

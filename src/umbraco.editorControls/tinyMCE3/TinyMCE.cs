@@ -153,6 +153,8 @@ namespace umbraco.editorControls.tinyMCE3
                         if (styleSheetId.Trim() != "")
                             try
                             {
+
+                                //TODO: Fix this, it will no longer work!
                                 var s = StyleSheet.GetStyleSheet(int.Parse(styleSheetId), false, false);
 
                                 if (s.nodeObjectType == StyleSheet.ModuleObjectType)

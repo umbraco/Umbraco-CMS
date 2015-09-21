@@ -2,6 +2,7 @@
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Migrations.Syntax.Alter.Expressions;
 using Umbraco.Core.Persistence.Migrations.Syntax.Expressions;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Table
 {
@@ -10,11 +11,13 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Table
                                                IAlterTableColumnOptionForeignKeyCascadeSyntax
     {
         private readonly IMigrationContext _context;
+        private readonly DatabaseProviders[] _databaseProviders;
 
-        public AlterTableBuilder(AlterTableExpression expression, IMigrationContext context)
+        public AlterTableBuilder(IMigrationContext context, DatabaseProviders[] databaseProviders, AlterTableExpression expression)
             : base(expression)
         {
             _context = context;
+            _databaseProviders = databaseProviders;
         }
 
         public ColumnDefinition CurrentColumn { get; set; }
@@ -36,7 +39,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Table
         {
             if (CurrentColumn.ModificationType == ModificationType.Alter)
             {
-                var dc = new AlterDefaultConstraintExpression
+                var dc = new AlterDefaultConstraintExpression(_context.CurrentDatabaseProvider, _databaseProviders, Expression.SqlSyntax)
                              {
                                  TableName = Expression.TableName,
                                  SchemaName = Expression.SchemaName,
@@ -66,15 +69,12 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Table
         {
             CurrentColumn.IsIndexed = true;
 
-            var index = new CreateIndexExpression
-                            {
-                                Index = new IndexDefinition
-                                            {
-                                                Name = indexName,
-                                                SchemaName = Expression.SchemaName,
-                                                TableName = Expression.TableName
-                                            }
-                            };
+            var index = new CreateIndexExpression(_context.CurrentDatabaseProvider, _databaseProviders, Expression.SqlSyntax, new IndexDefinition
+            {
+                Name = indexName,
+                SchemaName = Expression.SchemaName,
+                TableName = Expression.TableName
+            });
 
             index.Index.Columns.Add(new IndexColumnDefinition
                                         {
@@ -120,16 +120,13 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Table
         {
             CurrentColumn.IsUnique = true;
 
-            var index = new CreateIndexExpression
-                            {
-                                Index = new IndexDefinition
-                                            {
-                                                Name = indexName,
-                                                SchemaName = Expression.SchemaName,
-                                                TableName = Expression.TableName,
-                                                IsUnique = true
-                                            }
-                            };
+            var index = new CreateIndexExpression(_context.CurrentDatabaseProvider, _databaseProviders, Expression.SqlSyntax, new IndexDefinition
+            {
+                Name = indexName,
+                SchemaName = Expression.SchemaName,
+                TableName = Expression.TableName,
+                IsUnique = true
+            });
 
             index.Index.Columns.Add(new IndexColumnDefinition
                                         {
@@ -157,17 +154,14 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Table
         {
             CurrentColumn.IsForeignKey = true;
 
-            var fk = new CreateForeignKeyExpression
-                         {
-                             ForeignKey = new ForeignKeyDefinition
-                                              {
-                                                  Name = foreignKeyName,
-                                                  PrimaryTable = primaryTableName,
-                                                  PrimaryTableSchema = primaryTableSchema,
-                                                  ForeignTable = Expression.TableName,
-                                                  ForeignTableSchema = Expression.SchemaName
-                                              }
-                         };
+            var fk = new CreateForeignKeyExpression(_context.CurrentDatabaseProvider, _databaseProviders, Expression.SqlSyntax, new ForeignKeyDefinition
+            {
+                Name = foreignKeyName,
+                PrimaryTable = primaryTableName,
+                PrimaryTableSchema = primaryTableSchema,
+                ForeignTable = Expression.TableName,
+                ForeignTableSchema = Expression.SchemaName
+            });
 
             fk.ForeignKey.PrimaryColumns.Add(primaryColumnName);
             fk.ForeignKey.ForeignColumns.Add(CurrentColumn.Name);
@@ -197,17 +191,14 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Table
         public IAlterTableColumnOptionForeignKeyCascadeSyntax ReferencedBy(string foreignKeyName, string foreignTableSchema,
                                                                            string foreignTableName, string foreignColumnName)
         {
-            var fk = new CreateForeignKeyExpression
-                         {
-                             ForeignKey = new ForeignKeyDefinition
-                                              {
-                                                  Name = foreignKeyName,
-                                                  PrimaryTable = Expression.TableName,
-                                                  PrimaryTableSchema = Expression.SchemaName,
-                                                  ForeignTable = foreignTableName,
-                                                  ForeignTableSchema = foreignTableSchema
-                                              }
-                         };
+            var fk = new CreateForeignKeyExpression(_context.CurrentDatabaseProvider, _databaseProviders, Expression.SqlSyntax, new ForeignKeyDefinition
+            {
+                Name = foreignKeyName,
+                PrimaryTable = Expression.TableName,
+                PrimaryTableSchema = Expression.SchemaName,
+                ForeignTable = foreignTableName,
+                ForeignTableSchema = foreignTableSchema
+            });
 
             fk.ForeignKey.PrimaryColumns.Add(CurrentColumn.Name);
             fk.ForeignKey.ForeignColumns.Add(foreignColumnName);
@@ -220,7 +211,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Table
         public IAlterTableColumnTypeSyntax AddColumn(string name)
         {
             var column = new ColumnDefinition { Name = name, ModificationType = ModificationType.Create };
-            var createColumn = new CreateColumnExpression
+            var createColumn = new CreateColumnExpression(_context.CurrentDatabaseProvider, _databaseProviders, Expression.SqlSyntax)
                                    {
                                        Column = column,
                                        SchemaName = Expression.SchemaName,
@@ -236,12 +227,12 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Table
         public IAlterTableColumnTypeSyntax AlterColumn(string name)
         {
             var column = new ColumnDefinition { Name = name, ModificationType = ModificationType.Alter };
-            var alterColumn = new AlterColumnExpression
-                                  {
-                                      Column = column,
-                                      SchemaName = Expression.SchemaName,
-                                      TableName = Expression.TableName
-                                  };
+            var alterColumn = new AlterColumnExpression(_context.CurrentDatabaseProvider, _databaseProviders, Expression.SqlSyntax)
+            {
+                Column = column,
+                SchemaName = Expression.SchemaName,
+                TableName = Expression.TableName
+            };
 
             CurrentColumn = column;
 

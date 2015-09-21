@@ -29,7 +29,7 @@ angular.module('umbraco')
 		$scope.openContentPicker =function() {
 		    var d = dialogService.treePicker({
 		        section: config.type,
-		        treeAlias: config.type,
+		        treeAlias: config.treeAlias,
 		        multiPicker: config.multiPicker,
 		        callback: populate
 		    });

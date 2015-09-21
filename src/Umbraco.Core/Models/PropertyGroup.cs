@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
@@ -105,6 +106,13 @@ namespace Umbraco.Core.Models
             set
             {
                 _propertyTypes = value;
+
+                //since we're adding this collection to this group, we need to ensure that all the lazy values are set.
+                foreach (var propertyType in _propertyTypes)
+                {
+                    propertyType.PropertyGroupId = new Lazy<int>(() => this.Id);
+                }
+                
                 _propertyTypes.CollectionChanged += PropertyTypesChanged;
             }
         }

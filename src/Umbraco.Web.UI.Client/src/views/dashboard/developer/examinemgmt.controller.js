@@ -10,7 +10,7 @@ function examineMgmtController($scope, umbRequestHelper, $log, $http, $q, $timeo
                 'Failed to check index processing')
             .then(function(data) {
 
-                if (data) {
+                if (data !== null && data !== "null") {
 
                     //copy all resulting properties
                     for (var k in data) {
@@ -43,7 +43,7 @@ function examineMgmtController($scope, umbRequestHelper, $log, $http, $q, $timeo
         umbRequestHelper.resourcePromise(
                 $http.get(umbRequestHelper.getApiUrl("examineMgmtBaseUrl", "GetSearchResults", {
                     searcherName: searcher.name,
-                    query: searcher.searchText,
+                    query: encodeURIComponent(searcher.searchText),
                     queryType: searcher.searchType
                 })),
                 'Failed to search')
@@ -67,7 +67,9 @@ function examineMgmtController($scope, umbRequestHelper, $log, $http, $q, $timeo
                         "Depending on how much content there is in your site this could take a while. " +
                         "It is not recommended to rebuild an index during times of high website traffic " +
                         "or when editors are editing content.")) {
+
             indexer.isProcessing = true;
+            indexer.processingAttempts = 0;
 
             umbRequestHelper.resourcePromise(
                     $http.post(umbRequestHelper.getApiUrl("examineMgmtBaseUrl", "PostRebuildIndex", { indexerName: indexer.name })),

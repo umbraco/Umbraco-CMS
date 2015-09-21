@@ -384,6 +384,11 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
 
                     //just call the native dialog close() method to remove the dialog
                     lastModal.close();
+
+                    //if it's the last one close them all
+                    if (this._modal.length == 0) {
+                        getRootScope().$emit("app.closeDialogs", undefined);
+                    }
                 }
                 else {
                     //instead of calling just the dialog service we funnel it through the global 

@@ -35,7 +35,7 @@ namespace Umbraco.Web.WebApi
         /// <summary>
         /// Returns the currently logged in Umbraco User
         /// </summary>
-        [Obsolete("This should no longer be used since it returns the legacy user object, use The Security.CurrentUser instead to return the proper user object")]
+        [Obsolete("This should no longer be used since it returns the legacy user object, use The Security.CurrentUser instead to return the proper user object, or Security.GetUserId() if you want to just get the user id")]
         protected User UmbracoUser
         {
             get

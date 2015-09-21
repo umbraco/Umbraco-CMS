@@ -4,12 +4,19 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Tests
 {
     [TestFixture]
     public class UriExtensionsTests
     {
+        [TearDown]
+        public void TearDown()
+        {
+            SystemDirectories.Root = "";
+        }
+
         [TestCase("http://www.domain.com/umbraco", "", true)]
         [TestCase("http://www.domain.com/Umbraco/", "", true)]
         [TestCase("http://www.domain.com/umbraco/default.aspx", "", true)]
@@ -35,6 +42,8 @@ namespace Umbraco.Tests
         [TestCase("http://www.domain.com/umbraco/test/legacyAjaxCalls.ashx?some=query&blah=js", "", true)]  
         public void Is_Back_Office_Request(string input, string virtualPath, bool expected)
         {
+            SystemDirectories.Root = virtualPath;
+
             var source = new Uri(input);
             Assert.AreEqual(expected, source.IsBackOfficeRequest(virtualPath));
         }

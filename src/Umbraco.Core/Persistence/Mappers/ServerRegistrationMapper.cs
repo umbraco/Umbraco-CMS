@@ -7,7 +7,8 @@ using Umbraco.Core.Models.Rdbms;
 namespace Umbraco.Core.Persistence.Mappers
 {
     [MapperFor(typeof(ServerRegistration))]
-    public sealed class ServerRegistrationMapper : BaseMapper
+    [MapperFor(typeof(IServerRegistration))]
+    internal sealed class ServerRegistrationMapper : BaseMapper
     {
         private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
 
@@ -29,10 +30,11 @@ namespace Umbraco.Core.Persistence.Mappers
         {
             CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.Id, dto => dto.Id);
             CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.IsActive, dto => dto.IsActive);
-            CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.ServerAddress, dto => dto.Address);
+            CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.IsMaster, dto => dto.IsMaster);
+            CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.ServerAddress, dto => dto.ServerAddress);
             CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.CreateDate, dto => dto.DateRegistered);
-            CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.UpdateDate, dto => dto.LastNotified);
-            CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.ComputerName, dto => dto.ComputerName);
+            CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.UpdateDate, dto => dto.DateAccessed);
+            CacheMap<ServerRegistration, ServerRegistrationDto>(src => src.ServerIdentity, dto => dto.ServerIdentity);
         }
 
         #endregion

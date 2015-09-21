@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Models.EntityBase;
+﻿using System;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
@@ -24,6 +25,16 @@ namespace Umbraco.Core.Models
         string Path { get; set; }
 
         /// <summary>
+        /// Gets the original path of the file
+        /// </summary>
+        string OriginalPath { get; }
+
+        /// <summary>
+        /// Called to re-set the OriginalPath to the Path
+        /// </summary>
+        void ResetOriginalPath();
+
+        /// <summary>
         /// Gets or sets the Content of a File
         /// </summary>
         string Content { get; set; }
@@ -33,10 +44,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         string VirtualPath { get; set; }
 
-        /// <summary>
-        /// Boolean indicating whether the file could be validated
-        /// </summary>
-        /// <returns>True if file is valid, otherwise false</returns>
+        [Obsolete("This is no longer used and will be removed from the codebase in future versions")]
         bool IsValid();
     }
 }

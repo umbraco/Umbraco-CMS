@@ -29,5 +29,20 @@ namespace Umbraco.Tests
 
             Assert.AreEqual(xmlNode.InnerText, "hello world");
         }
+
+        [Test]
+        public void ToXmlNodeIsNonDestructive()
+        {
+            const string xml = "<root><foo attr=\"123\">hello</foo><bar>world</bar></root>";
+
+            var cdata = new XElement("test", new XText("hello world"));
+            var xdoc = new XmlDocument();
+            xdoc.LoadXml(xml);
+
+            var xmlNode = cdata.GetXmlNode(xdoc);
+
+            Assert.AreEqual(xmlNode.InnerText, "hello world");
+            Assert.AreEqual(xml, xdoc.OuterXml);
+        }
     }
 }

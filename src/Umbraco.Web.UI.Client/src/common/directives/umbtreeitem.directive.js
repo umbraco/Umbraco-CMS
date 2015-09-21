@@ -37,8 +37,7 @@ angular.module("umbraco.directives")
         template: '<li ng-class="{\'current\': (node == currentNode)}" on-right-click="altSelect(node, $event)">' +
             '<div ng-class="getNodeCssClass(node)" ng-swipe-right="options(node, $event)" >' +
             //NOTE: This ins element is used to display the search icon if the node is a container/listview and the tree is currently in dialog
-            //'<ins ng-if="tree.enablelistviewsearch && node.metaData.isContainer" class="umb-tree-node-search icon-search" ng-click="searchNode(node, $event)" alt="searchAltText"></ins>' +            
-            '<ins style="width:18px;"></ins>' +
+            //'<ins ng-if="tree.enablelistviewsearch && node.metaData.isContainer" class="umb-tree-node-search icon-search" ng-click="searchNode(node, $event)" alt="searchAltText"></ins>' + 
             '<ins ng-class="{\'icon-navigation-right\': !node.expanded, \'icon-navigation-down\': node.expanded}" ng-click="load(node)"></ins>' +
             '<i class="icon umb-tree-icon sprTree"></i>' +
             '<a ng-click="select(node, $event)"></a>' +
@@ -87,7 +86,7 @@ angular.module("umbraco.directives")
                 icon.addClass(node.cssClass);
                 icon.attr("title", node.routePath);
 
-                element.find("a:first").html(node.name);
+                element.find("a:first").text(node.name);
 
                 if (!node.menuUrl) {
                     element.find("a.umb-options").remove();

@@ -68,21 +68,23 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Macros
 			//get all the partials in the normal /MacroPartials folder
 			var foundMacroPartials = GetPartialViewFiles(partialsDir, partialsDir, SystemDirectories.MvcViews + "/MacroPartials");
 			//now try to find all of them int he App_Plugins/[PackageName]/Views/MacroPartials folder
-			var partialPluginsDir = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.AppPlugins));
-			foreach(var d in partialPluginsDir.GetDirectories())
-			{
-				var viewsFolder = d.GetDirectories("Views");
-				if (viewsFolder.Any())
-				{
-					var macroPartials = viewsFolder.First().GetDirectories("MacroPartials");
-					if (macroPartials.Any())
-					{
-						foundMacroPartials = foundMacroPartials.Concat(
-							GetPartialViewFiles(macroPartials.First().FullName, macroPartials.First().FullName, SystemDirectories.AppPlugins + "/" + d.Name + "/Views/MacroPartials"));
-					}
-				}
-			}
-			
+			var appPluginsFolder = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.AppPlugins));
+		    if (appPluginsFolder.Exists)
+		    {
+                foreach (var d in appPluginsFolder.GetDirectories())
+                {
+                    var viewsFolder = d.GetDirectories("Views");
+                    if (viewsFolder.Any())
+                    {
+                        var macroPartials = viewsFolder.First().GetDirectories("MacroPartials");
+                        if (macroPartials.Any())
+                        {
+                            foundMacroPartials = foundMacroPartials.Concat(
+                                GetPartialViewFiles(macroPartials.First().FullName, macroPartials.First().FullName, SystemDirectories.AppPlugins + "/" + d.Name + "/Views/MacroPartials"));
+                        }
+                    }
+                }    
+		    }
 			
 			
 			PartialViewList.DataSource = foundMacroPartials;

@@ -81,7 +81,7 @@ namespace Umbraco.Web.Editors
 
         public DataTypeDisplay GetEmpty()
         {
-            var dt = new DataTypeDefinition(-1, "");
+            var dt = new DataTypeDefinition("");
             return Mapper.Map<IDataTypeDefinition, DataTypeDisplay>(dt);
         }
 

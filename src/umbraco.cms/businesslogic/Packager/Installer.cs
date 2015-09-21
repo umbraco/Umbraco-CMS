@@ -242,6 +242,9 @@ namespace umbraco.cms.businesslogic.packager
                 //retrieve the manifest to continue installation
                 var insPack = InstalledPackage.GetById(packageId);
 
+                //TODO: Depending on some files, some files should be installed differently.
+                //i.e. if stylsheets should probably be installed via business logic, media items should probably use the media IFileSystem!
+
                 // Move files
                 //string virtualBasePath = System.Web.HttpContext.Current.Request.ApplicationPath;
                 string basePath = System.Web.Hosting.HostingEnvironment.ApplicationPhysicalPath;
@@ -349,6 +352,7 @@ namespace umbraco.cms.businesslogic.packager
                 #region Macros
                 foreach (XmlNode n in Config.DocumentElement.SelectNodes("//macro"))
                 {
+                    //TODO: Fix this, this should not use the legacy API
                     Macro m = Macro.Import(n);
 
                     if (m != null)

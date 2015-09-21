@@ -203,7 +203,7 @@ namespace umbraco.presentation.translation
                             Document.Import(d.ParentId, UmbracoUser, (XmlElement)taskNode);
 
                             //send notifications! TODO: This should be put somewhere centralized instead of hard coded directly here
-                            ApplicationContext.Services.NotificationService.SendNotification(d.Content, ActionTranslate.Instance, ApplicationContext);
+                            ApplicationContext.Services.NotificationService.SendNotification(d.ContentEntity, ActionTranslate.Instance, ApplicationContext);
 
                             t.Closed = true;
                             t.Save();

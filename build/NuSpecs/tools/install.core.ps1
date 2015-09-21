@@ -58,6 +58,7 @@ if ($project) {
 		if(Test-Path $umbracoBinFolder\ImageProcessor.Web.dll) { Remove-Item $umbracoBinFolder\ImageProcessor.Web.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Lucene.Net.dll) { Remove-Item $umbracoBinFolder\Lucene.Net.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Microsoft.Web.Infrastructure.dll) { Remove-Item $umbracoBinFolder\Microsoft.Web.Infrastructure.dll -Force -Confirm:$false }
+		if(Test-Path $umbracoBinFolder\Microsoft.Web.Helpers.dll) { Remove-Item $umbracoBinFolder\Microsoft.Web.Helpers.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Microsoft.Web.Mvc.FixedDisplayModes.dll) { Remove-Item $umbracoBinFolder\Microsoft.Web.Mvc.FixedDisplayModes.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\MiniProfiler.dll) { Remove-Item $umbracoBinFolder\MiniProfiler.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\MySql.Data.dll) { Remove-Item $umbracoBinFolder\MySql.Data.dll -Force -Confirm:$false }
