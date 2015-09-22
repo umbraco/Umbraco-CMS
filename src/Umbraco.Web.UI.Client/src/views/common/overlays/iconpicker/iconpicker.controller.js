@@ -6,7 +6,7 @@
  * @description
  * The controller for the content type editor property dialog
  */
-function iconPickerController($scope, iconHelper) {
+function IconPickerOverlay($scope, iconHelper) {
 
    $scope.loading = true;
 
@@ -17,4 +17,4 @@ function iconPickerController($scope, iconHelper) {
 
 }
 
-angular.module("umbraco").controller("Umbraco.Editors.DocumentType.IconPickerController", iconPickerController);
+angular.module("umbraco").controller("Umbraco.Overlays.IconPickerOverlay", IconPickerOverlay);
