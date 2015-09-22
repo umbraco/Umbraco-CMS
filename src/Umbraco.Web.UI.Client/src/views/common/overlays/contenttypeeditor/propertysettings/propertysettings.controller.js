@@ -65,7 +65,7 @@
          vm.editorPickerOverlay.title = "Choose editor";
          vm.editorPickerOverlay.property = $scope.model.property;
          vm.editorPickerOverlay.contentTypeName = $scope.model.contentTypeName;
-         vm.editorPickerOverlay.view = "views/documentType/dialogs/property.html";
+         vm.editorPickerOverlay.view = "views/common/overlays/contenttypeeditor/editorpicker/editorpicker.html";
          vm.editorPickerOverlay.show = true;
 
          vm.editorPickerOverlay.submit = function(model) {
