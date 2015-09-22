@@ -98,7 +98,7 @@
 
             vm.editorSettingsOverlay = {};
             vm.editorSettingsOverlay.title = "Editor settings";
-            vm.editorSettingsOverlay.view = "views/documentType/dialogs/editDataType/editDataType.html";
+            vm.editorSettingsOverlay.view = "views/common/overlays/contenttypeeditor/editorsettings/editorsettings.html";
             vm.editorSettingsOverlay.dataType = dataType;
             vm.editorSettingsOverlay.show = true;
 
