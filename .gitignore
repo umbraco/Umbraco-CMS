@@ -76,6 +76,7 @@ src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/umbraco.*
 src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/routes.js
 src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/app.dev.js
 src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/loader.js
+src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/loader.dev.js
 src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/main.js
 src/Umbraco.Web.UI/[Uu]mbraco/[Jj]s/app.js
 
