@@ -366,6 +366,10 @@
             // push new init property to group
             addInitProperty(group);
 
+            // set focus on init property
+            var numberOfProperties = group.properties.length;
+            group.properties[numberOfProperties - 1].focus = true;
+
             // push new init tab to the scope
             addInitGroup(scope.model.groups);
 
