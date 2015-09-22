@@ -10,7 +10,7 @@
  (function() {
 	"use strict";
 
-	function DocumentTypePropertyController($scope, dataTypeResource, dataTypeHelper, contentTypeResource) {
+	function EditorPickerOverlay($scope, dataTypeResource, dataTypeHelper, contentTypeResource) {
 
 		var vm = this;
 
@@ -192,6 +192,6 @@
 
 	}
 
-	angular.module("umbraco").controller("Umbraco.Editors.DocumentType.PropertyController", DocumentTypePropertyController);
+	angular.module("umbraco").controller("Umbraco.Overlays.EditorPickerOverlay", EditorPickerOverlay);
 
 })();
