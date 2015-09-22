@@ -339,6 +339,7 @@
           scope.propertySettingsDialogModel = {};
           scope.propertySettingsDialogModel.title = "Property settings";
           scope.propertySettingsDialogModel.property = property;
+          scope.propertySettingsDialogModel.contentTypeName = scope.model.name;
           scope.propertySettingsDialogModel.view = "views/documentType/dialogs/editPropertySettings/editPropertySettings.html";
           scope.propertySettingsDialogModel.show = true;
 
@@ -348,22 +349,15 @@
           // set property states
           property.dialogIsOpen = true;
 
-          scope.propertySettingsDialogModel.changePropertyEditor = function(property) {
-            scope.choosePropertyType(property);
-          };
-
-          scope.propertySettingsDialogModel.editDataType = function(property) {
-
-            dataTypeResource.getById(property.dataTypeId).then(function(dataType) {
-              scope.configDataType(property, dataType, false);
-            });
-
-          };
-
           scope.propertySettingsDialogModel.submit = function(model) {
 
             property.inherited = false;
             property.dialogIsOpen = false;
+
+            // update existing data types
+            if(model.updateSameDataTypes) {
+              updateSameDataTypes(property);
+            }
 
             // remove dialog
             scope.propertySettingsDialogModel.show = false;
@@ -406,137 +400,6 @@
 
         }
       };
-
-      scope.choosePropertyType = function(property) {
-
-        scope.propertyEditorDialogModel = {};
-        scope.propertyEditorDialogModel.title = "Choose editor";
-        scope.propertyEditorDialogModel.view = "views/documentType/dialogs/property.html";
-        scope.propertyEditorDialogModel.show = true;
-
-        scope.propertyEditorDialogModel.selectDataType = function(editor) {
-
-          if( editor.id !== null ) {
-
-            dataTypeResource.getById(editor.id).then(function(dataType) {
-
-              // open data type settings dialog
-              scope.configDataType(property, dataType, false);
-
-              // remove dialog
-              //scope.propertyEditorDialogModel.show = false;
-              //scope.propertyEditorDialogModel = null;
-
-            });
-
-          } else {
-
-            // create new data datype
-            dataTypeResource.getScaffold().then(function(dataType) {
-
-              // set alias
-              dataType.selectedEditor = editor.alias;
-
-              // set name
-              var nameArray = [];
-
-              if(scope.model.name) {
-                nameArray.push(scope.model.name);
-              }
-
-              if(property.label) {
-                nameArray.push(property.label);
-              }
-
-              if(editor.name) {
-                nameArray.push(editor.name);
-              }
-
-              // make name
-              dataType.name = nameArray.join(" - ");
-
-              // get pre values
-              dataTypeResource.getPreValues(dataType.selectedEditor).then(function(preValues) {
-
-                dataType.preValues = preValues;
-
-                // open data type settings dialog
-                scope.configDataType(property, dataType, true);
-
-                // remove dialog
-                //scope.propertyEditorDialogModel.show = false;
-                //scope.propertyEditorDialogModel = null;
-
-              });
-
-            });
-
-          }
-
-        };
-
-        scope.propertyEditorDialogModel.close = function(oldModel) {
-          // remove dialog
-          scope.propertyEditorDialogModel.show = false;
-          scope.propertyEditorDialogModel = null;
-
-        };
-
-      };
-
-      scope.configDataType = function(property, dataType, isNew) {
-
-        scope.dataTypeSettingsDialogModel = {};
-        scope.dataTypeSettingsDialogModel.title = "Edit data type";
-        scope.dataTypeSettingsDialogModel.dataType = dataType;
-        scope.dataTypeSettingsDialogModel.view = "views/documentType/dialogs/editDataType/editDataType.html";
-        scope.dataTypeSettingsDialogModel.show = true;
-
-        scope.dataTypeSettingsDialogModel.submit = function(model) {
-
-          var preValues = dataTypeHelper.createPreValueProps(model.dataType.preValues);
-
-          dataTypeResource.save(model.dataType, preValues, isNew).then(function(newDataType) {
-
-            contentTypeResource.getPropertyTypeScaffold(newDataType.id).then(function(propertyType) {
-
-              property.config = propertyType.config;
-              property.editor = propertyType.editor;
-              property.view = propertyType.view;
-              property.dataTypeId = newDataType.id;
-              property.dataTypeIcon = newDataType.icon;
-              property.dataTypeName = newDataType.name;
-
-              // change all chosen datatypes to updated config
-              if(!isNew) {
-                updateSameDataTypes(property);
-              }
-
-              // remove dialog
-              scope.dataTypeSettingsDialogModel.show = false;
-              scope.dataTypeSettingsDialogModel = null;
-
-              // remove choose editor picker dialog
-              if(scope.propertyEditorDialogModel) {
-                 scope.propertyEditorDialogModel.show = false;
-                 scope.propertyEditorDialogModel = null;
-              }
-
-            });
-
-          });
-
-        };
-
-        scope.dataTypeSettingsDialogModel.close = function(oldModel) {
-          // remove dialog
-          scope.dataTypeSettingsDialogModel.show = false;
-          scope.dataTypeSettingsDialogModel = null;
-
-        };
-
-      };
-
 
       scope.deleteProperty = function(tab, propertyIndex, group) {
 

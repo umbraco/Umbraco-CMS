@@ -10,7 +10,7 @@
  (function() {
  	"use strict";
 
-   function EditPropertySettingsController($scope, contentTypeResource) {
+   function EditPropertySettingsController($scope, contentTypeResource, dataTypeResource, dataTypeHelper) {
 
       var vm = this;
 
@@ -46,6 +46,8 @@
 
       vm.changeValidationType = changeValidationType;
       vm.changeValidationPattern = changeValidationPattern;
+      vm.openEditorPickerOverlay = openEditorPickerOverlay;
+      vm.openEditorSettingsOverlay = openEditorSettingsOverlay;
 
       function activate() {
 
@@ -55,6 +57,86 @@
 
       function changeValidationPattern() {
          matchValidationType();
+      }
+
+      function openEditorPickerOverlay(property) {
+
+         vm.editorPickerOverlay = {};
+         vm.editorPickerOverlay.title = "Choose editor";
+         vm.editorPickerOverlay.property = $scope.model.property;
+         vm.editorPickerOverlay.contentTypeName = $scope.model.contentTypeName;
+         vm.editorPickerOverlay.view = "views/documentType/dialogs/property.html";
+         vm.editorPickerOverlay.show = true;
+
+         vm.editorPickerOverlay.submit = function(model) {
+
+            $scope.model.updateSameDataTypes = model.updateSameDataTypes;
+
+            // update property
+            property.config = model.property.config;
+            property.editor = model.property.editor;
+            property.view = model.property.view;
+            property.dataTypeId = model.property.dataTypeId;
+            property.dataTypeIcon = model.property.dataTypeIcon;
+            property.dataTypeName = model.property.dataTypeName;
+
+            vm.editorPickerOverlay.show = false;
+            vm.editorPickerOverlay = null;
+         };
+
+         vm.editorPickerOverlay.close = function(model) {
+            vm.editorPickerOverlay.show = false;
+            vm.editorPickerOverlay = null;
+         };
+
+      }
+
+      function openEditorSettingsOverlay(property) {
+
+         // get data type
+         dataTypeResource.getById(property.dataTypeId).then(function(dataType) {
+
+            vm.editorSettingsOverlay = {};
+            vm.editorSettingsOverlay.title = "Editor settings";
+            vm.editorSettingsOverlay.view = "views/documentType/dialogs/editDataType/editDataType.html";
+            vm.editorSettingsOverlay.dataType = dataType;
+            vm.editorSettingsOverlay.show = true;
+
+            vm.editorSettingsOverlay.submit = function(model) {
+
+               var preValues = dataTypeHelper.createPreValueProps(model.dataType.preValues);
+
+               dataTypeResource.save(model.dataType, preValues, false).then(function(newDataType) {
+
+                  contentTypeResource.getPropertyTypeScaffold(newDataType.id).then(function(propertyType) {
+
+                     // update editor
+                     property.config = propertyType.config;
+                     property.editor = propertyType.editor;
+                     property.view = propertyType.view;
+                     property.dataTypeId = newDataType.id;
+                     property.dataTypeIcon = newDataType.icon;
+                     property.dataTypeName = newDataType.name;
+
+                     // set flag to update same data types
+                     $scope.model.updateSameDataTypes = true;
+
+                     vm.editorSettingsOverlay.show = false;
+                     vm.editorSettingsOverlay = null;
+
+                  });
+
+               });
+
+            };
+
+            vm.editorSettingsOverlay.close = function(oldModel) {
+               vm.editorSettingsOverlay.show = false;
+               vm.editorSettingsOverlay = null;
+            };
+
+         });
+
       }
 
       function matchValidationType() {

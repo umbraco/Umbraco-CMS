@@ -10,7 +10,7 @@
  (function() {
 	"use strict";
 
-	function DocumentTypePropertyController($scope, dataTypeResource) {
+	function DocumentTypePropertyController($scope, dataTypeResource, dataTypeHelper, contentTypeResource) {
 
 		var vm = this;
 
@@ -36,6 +36,7 @@
 
 		vm.showDetailsOverlay = showDetailsOverlay;
 		vm.hideDetailsOverlay = hideDetailsOverlay;
+      vm.pickEditor = pickEditor;
 
 		function activate() {
 
@@ -83,6 +84,109 @@
 		function hideDetailsOverlay() {
 			$scope.model.itemDetails = null;
 		}
+
+      function pickEditor(editor) {
+
+         if(editor.id === null) {
+
+            dataTypeResource.getScaffold().then(function(dataType) {
+
+              // set alias
+              dataType.selectedEditor = editor.alias;
+
+              // set name
+              var nameArray = [];
+
+              if($scope.model.contentTypeName) {
+                nameArray.push($scope.model.contentTypeName);
+              }
+
+              if($scope.model.property.label) {
+                nameArray.push($scope.model.property.label);
+              }
+
+              if(editor.name) {
+                nameArray.push(editor.name);
+              }
+
+              // make name
+              dataType.name = nameArray.join(" - ");
+
+              // get pre values
+              dataTypeResource.getPreValues(dataType.selectedEditor).then(function(preValues) {
+
+                dataType.preValues = preValues;
+
+                openEditorSettingsOverlay(dataType, true);
+
+              });
+
+            });
+
+         } else {
+
+            dataTypeResource.getById(editor.id).then(function(dataType) {
+
+               contentTypeResource.getPropertyTypeScaffold(dataType.id).then(function(propertyType) {
+
+                  submitOverlay(dataType, propertyType, false);
+
+               });
+
+            });
+
+         }
+
+      }
+
+      function openEditorSettingsOverlay(dataType, isNew) {
+         vm.editorSettingsOverlay = {};
+         vm.editorSettingsOverlay.title = "Editor settings";
+         vm.editorSettingsOverlay.dataType = dataType;
+         vm.editorSettingsOverlay.view = "views/documentType/dialogs/editDataType/editDataType.html";
+         vm.editorSettingsOverlay.show = true;
+
+         vm.editorSettingsOverlay.submit = function(model) {
+
+            var preValues = dataTypeHelper.createPreValueProps(model.dataType.preValues);
+
+            dataTypeResource.save(model.dataType, preValues, isNew).then(function(newDataType) {
+
+               contentTypeResource.getPropertyTypeScaffold(newDataType.id).then(function(propertyType) {
+
+                  submitOverlay(newDataType, propertyType, true);
+
+                  vm.editorSettingsOverlay.show = false;
+                  vm.editorSettingsOverlay = null;
+
+               });
+
+            });
+
+         };
+
+         vm.editorSettingsOverlay.close = function(oldModel) {
+            vm.editorSettingsOverlay.show = false;
+            vm.editorSettingsOverlay = null;
+         };
+
+      }
+
+      function submitOverlay(dataType, propertyType, isNew) {
+
+         // update property
+         $scope.model.property.config = propertyType.config;
+         $scope.model.property.editor = propertyType.editor;
+         $scope.model.property.view = propertyType.view;
+         $scope.model.property.dataTypeId = dataType.id;
+         $scope.model.property.dataTypeIcon = dataType.icon;
+         $scope.model.property.dataTypeName = dataType.name;
+
+         $scope.model.updateSameDataTypes = isNew;
+
+         $scope.model.submit($scope.model);
+
+      }
 
 		activate();
 

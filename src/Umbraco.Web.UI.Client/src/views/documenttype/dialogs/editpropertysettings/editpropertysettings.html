@@ -32,21 +32,21 @@
 
    <div class="editor-wrapper umb-control-group clearfix" ng-model="model.property.editor" val-require-component>
 
-      <a href="" ng-if="!model.property.editor" class="editor-placeholder" hotkey="alt+shift+e" ng-click="model.changePropertyEditor(model.property)">Add Editor</a>
+      <a href="" ng-if="!model.property.editor" class="editor-placeholder" hotkey="alt+shift+e" ng-click="vm.openEditorPickerOverlay(model.property)">Add Editor</a>
 
       <div class="editor clearfix" ng-if="model.property.editor">
 
-         <a href="" class="editor-icon-wrapper" ng-click="model.changePropertyEditor(model.property)">
-            <i class="icon {{ model.property.dataTypeIcon }}" ng-class="{'icon-autofill': model.property.dataType.icon == null}"></i>
+         <a href="" class="editor-icon-wrapper" ng-click="vm.openEditorPickerOverlay(model.property)">
+            <i class="icon {{ model.property.dataTypeIcon }}" ng-class="{'icon-autofill': model.property.dataTypeIcon == null}"></i>
          </a>
 
          <div class="editor-details">
-            <a href="" class="editor-name" ng-click="model.changePropertyEditor(model.property)">{{ model.property.dataTypeName }}</a>
-            <a href="" class="editor-editor" ng-click="model.changePropertyEditor(model.property)">{{ model.property.editor }}</a>
+            <a href="" class="editor-name" ng-click="vm.openEditorPickerOverlay(model.property)">{{ model.property.dataTypeName }}</a>
+            <a href="" class="editor-editor" ng-click="vm.openEditorPickerOverlay(model.property)">{{ model.property.editor }}</a>
          </div>
 
          <a href class="pull-right" style="padding-top: 15px"
-            ng-click="model.editDataType(model.property)"
+            ng-click="vm.openEditorSettingsOverlay(model.property)"
             hotkey="alt+shift+d"
             ng-if="model.property.editor">
             <i class="icon icon-settings" style="font-size: 15px; color: #555"></i>
@@ -78,5 +78,19 @@
       </textarea>
 
    </div>
+
+   <umb-overlay
+      ng-if="vm.editorPickerOverlay.show"
+      model="vm.editorPickerOverlay"
+      position="right"
+      view="vm.editorPickerOverlay.view">
+   </umb-overlay>
+
+   <umb-overlay
+      ng-if="vm.editorSettingsOverlay.show"
+      model="vm.editorSettingsOverlay"
+      position="right"
+      view="vm.editorSettingsOverlay.view">
+   </umb-overlay>
 
 </div>
