@@ -10,7 +10,7 @@
  (function() {
  	"use strict";
 
-   function EditPropertySettingsController($scope, contentTypeResource, dataTypeResource, dataTypeHelper) {
+   function PropertySettingsOverlay($scope, contentTypeResource, dataTypeResource, dataTypeHelper) {
 
       var vm = this;
 
@@ -189,6 +189,6 @@
 
    }
 
-   angular.module("umbraco").controller("Umbraco.Editors.DocumentType.EditPropertySettingsController", EditPropertySettingsController);
+   angular.module("umbraco").controller("Umbraco.Overlay.PropertySettingsOverlay", PropertySettingsOverlay);
 
 })();
