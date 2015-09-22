@@ -177,7 +177,7 @@
         scope.compositionsDialogModel.contentType = scope.model;
         scope.compositionsDialogModel.availableCompositeContentTypes = scope.model.availableCompositeContentTypes;
         scope.compositionsDialogModel.compositeContentTypes = scope.model.compositeContentTypes;
-        scope.compositionsDialogModel.view = "views/documentType/dialogs/compositions/compositions.html";
+        scope.compositionsDialogModel.view = "views/common/overlays/contenttypeeditor/compositions/compositions.html";
         scope.compositionsDialogModel.show = true;
 
         scope.compositionsDialogModel.submit = function(model) {
