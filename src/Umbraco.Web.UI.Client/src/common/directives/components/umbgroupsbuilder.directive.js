@@ -340,7 +340,7 @@
           scope.propertySettingsDialogModel.title = "Property settings";
           scope.propertySettingsDialogModel.property = property;
           scope.propertySettingsDialogModel.contentTypeName = scope.model.name;
-          scope.propertySettingsDialogModel.view = "views/documentType/dialogs/editPropertySettings/editPropertySettings.html";
+          scope.propertySettingsDialogModel.view = "views/common/overlays/contenttypeeditor/propertysettings/propertysettings.html";
           scope.propertySettingsDialogModel.show = true;
 
           // set state to active to access the preview
