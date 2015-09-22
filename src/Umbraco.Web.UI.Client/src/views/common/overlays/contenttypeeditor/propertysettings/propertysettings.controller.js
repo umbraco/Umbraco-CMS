@@ -16,6 +16,7 @@
 
       vm.showValidationPattern = false;
       vm.focusOnPatternField = false;
+      vm.focusOnMandatoryField = false;
       vm.selectedValidationType = {};
       vm.validationTypes = [
          {
@@ -61,6 +62,8 @@
 
       function openEditorPickerOverlay(property) {
 
+         vm.focusOnMandatoryField = false;
+
          vm.editorPickerOverlay = {};
          vm.editorPickerOverlay.title = "Choose editor";
          vm.editorPickerOverlay.property = $scope.model.property;
@@ -71,6 +74,8 @@
          vm.editorPickerOverlay.submit = function(model) {
 
             $scope.model.updateSameDataTypes = model.updateSameDataTypes;
+
+            vm.focusOnMandatoryField = true;
 
             // update property
             property.config = model.property.config;
@@ -92,6 +97,8 @@
       }
 
       function openEditorSettingsOverlay(property) {
+
+         vm.focusOnMandatoryField = false;
 
          // get data type
          dataTypeResource.getById(property.dataTypeId).then(function(dataType) {
@@ -120,6 +127,8 @@
 
                      // set flag to update same data types
                      $scope.model.updateSameDataTypes = true;
+
+                     vm.focusOnMandatoryField = true;
 
                      vm.editorSettingsOverlay.show = false;
                      vm.editorSettingsOverlay = null;

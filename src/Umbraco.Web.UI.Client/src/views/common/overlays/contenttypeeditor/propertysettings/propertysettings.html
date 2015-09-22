@@ -59,7 +59,7 @@
    <div class="umb-control-group clearfix">
 
       <label class="checkbox no-indent">
-         <input type="checkbox" ng-model="model.property.validation.mandatory"> Field is mandatory
+         <input type="checkbox" ng-model="model.property.validation.mandatory" focus-when="{{vm.focusOnMandatoryField}}"> Field is mandatory
       </label>
 
       <select class="umb-dropdown" ng-options="validationType.name for validationType in vm.validationTypes" ng-model="vm.selectedValidationType" ng-change="vm.changeValidationType(vm.selectedValidationType)">
