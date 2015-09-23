@@ -282,7 +282,7 @@ namespace Umbraco.Web.Editors
                     throw new NotSupportedException("The " + typeof(EntityController) + " currently does not support searching against object type " + entityType);                    
             }
 
-            var internalSearcher = (LuceneSearcher)ExamineManager.Instance.SearchProviderCollection[searcher];
+            var internalSearcher = ExamineManager.Instance.SearchProviderCollection[searcher];
 
             //build a lucene query:
             // the __nodeName will be boosted 10x without wildcards

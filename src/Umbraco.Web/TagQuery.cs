@@ -11,10 +11,15 @@ namespace Umbraco.Web
     /// <summary>
     /// A class that exposes methods used to query tag data in views
     /// </summary>
-    public class TagQuery
+    public class TagQuery : ITagQuery
     {
+
+        //TODO: This class also acts as a wrapper for ITagQuery due to breaking changes, need to fix in
+        // version 8: http://issues.umbraco.org/issue/U4-6899
+        private readonly ITagQuery _wrappedQuery;
+
         private readonly ITagService _tagService;
-        private readonly PublishedContentQuery _contentQuery;
+        private readonly ITypedPublishedContentQuery _typedContentQuery;
 
         [Obsolete("Use the alternate constructor specifying the contentQuery instead")]
         public TagQuery(ITagService tagService)
@@ -22,12 +27,36 @@ namespace Umbraco.Web
         {
         }
 
+        [Obsolete("Use the alternate constructor specifying the ITypedPublishedContentQuery instead")]
         public TagQuery(ITagService tagService, PublishedContentQuery contentQuery)
         {
             if (tagService == null) throw new ArgumentNullException("tagService");
             if (contentQuery == null) throw new ArgumentNullException("contentQuery");
             _tagService = tagService;
-            _contentQuery = contentQuery;
+            _typedContentQuery = contentQuery;
+        }
+
+        /// <summary>
+        /// Constructor for wrapping ITagQuery, see http://issues.umbraco.org/issue/U4-6899
+        /// </summary>
+        /// <param name="wrappedQuery"></param>
+        internal TagQuery(ITagQuery wrappedQuery)
+        {
+            if (wrappedQuery == null) throw new ArgumentNullException("wrappedQuery");
+            _wrappedQuery = wrappedQuery;
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="tagService"></param>
+        /// <param name="typedContentQuery"></param>
+        public TagQuery(ITagService tagService, ITypedPublishedContentQuery typedContentQuery)
+        {
+            if (tagService == null) throw new ArgumentNullException("tagService");
+            if (typedContentQuery == null) throw new ArgumentNullException("typedContentQuery");
+            _tagService = tagService;
+            _typedContentQuery = typedContentQuery;
         }
         
         /// <summary>
@@ -38,9 +67,12 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IEnumerable<IPublishedContent> GetContentByTag(string tag, string tagGroup = null)
         {
+            //TODO: http://issues.umbraco.org/issue/U4-6899
+            if (_wrappedQuery != null) return _wrappedQuery.GetContentByTag(tag, tagGroup);
+
             var ids = _tagService.GetTaggedContentByTag(tag, tagGroup)
                 .Select(x => x.EntityId);
-            return _contentQuery.TypedContent(ids)
+            return _typedContentQuery.TypedContent(ids)
                 .Where(x => x != null);
         }
 
@@ -51,9 +83,12 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IEnumerable<IPublishedContent> GetContentByTagGroup(string tagGroup)
         {
+            //TODO: http://issues.umbraco.org/issue/U4-6899
+            if (_wrappedQuery != null) return _wrappedQuery.GetContentByTagGroup(tagGroup);
+
             var ids = _tagService.GetTaggedContentByTagGroup(tagGroup)
                 .Select(x => x.EntityId);
-            return _contentQuery.TypedContent(ids)
+            return _typedContentQuery.TypedContent(ids)
                 .Where(x => x != null);
         }
 
@@ -65,9 +100,12 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IEnumerable<IPublishedContent> GetMediaByTag(string tag, string tagGroup = null)
         {
+            //TODO: http://issues.umbraco.org/issue/U4-6899
+            if (_wrappedQuery != null) return _wrappedQuery.GetMediaByTag(tag, tagGroup);
+
             var ids = _tagService.GetTaggedMediaByTag(tag, tagGroup)
                 .Select(x => x.EntityId);
-            return _contentQuery.TypedMedia(ids)
+            return _typedContentQuery.TypedMedia(ids)
                 .Where(x => x != null);
         }
 
@@ -78,9 +116,12 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IEnumerable<IPublishedContent> GetMediaByTagGroup(string tagGroup)
         {
+            //TODO: http://issues.umbraco.org/issue/U4-6899
+            if (_wrappedQuery != null) return _wrappedQuery.GetMediaByTagGroup(tagGroup);
+
             var ids = _tagService.GetTaggedMediaByTagGroup(tagGroup)
                 .Select(x => x.EntityId);
-            return _contentQuery.TypedMedia(ids)
+            return _typedContentQuery.TypedMedia(ids)
                 .Where(x => x != null);
         }
 
@@ -99,6 +140,9 @@ namespace Umbraco.Web
         /// </summary>
         public IEnumerable<TagModel> GetAllTags(string group = null)
         {
+            //TODO: http://issues.umbraco.org/issue/U4-6899
+            if (_wrappedQuery != null) return _wrappedQuery.GetAllTags(group);
+
             return Mapper.Map<IEnumerable<TagModel>>(_tagService.GetAllTags(group));
         }
 
@@ -109,6 +153,9 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IEnumerable<TagModel> GetAllContentTags(string group = null)
         {
+            //TODO: http://issues.umbraco.org/issue/U4-6899
+            if (_wrappedQuery != null) return _wrappedQuery.GetAllContentTags(group);
+
             return Mapper.Map<IEnumerable<TagModel>>(_tagService.GetAllContentTags(group));
         }
 
@@ -119,6 +166,9 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IEnumerable<TagModel> GetAllMediaTags(string group = null)
         {
+            //TODO: http://issues.umbraco.org/issue/U4-6899
+            if (_wrappedQuery != null) return _wrappedQuery.GetAllMediaTags(group);
+
             return Mapper.Map<IEnumerable<TagModel>>(_tagService.GetAllMediaTags(group));
         }
 
@@ -129,6 +179,9 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IEnumerable<TagModel> GetAllMemberTags(string group = null)
         {
+            //TODO: http://issues.umbraco.org/issue/U4-6899
+            if (_wrappedQuery != null) return _wrappedQuery.GetAllMemberTags(group);
+
             return Mapper.Map<IEnumerable<TagModel>>(_tagService.GetAllMemberTags(group));
         }
 
@@ -141,6 +194,9 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IEnumerable<TagModel> GetTagsForProperty(int contentId, string propertyTypeAlias, string tagGroup = null)
         {
+            //TODO: http://issues.umbraco.org/issue/U4-6899
+            if (_wrappedQuery != null) return _wrappedQuery.GetTagsForProperty(contentId, propertyTypeAlias, tagGroup);
+
             return Mapper.Map<IEnumerable<TagModel>>(_tagService.GetTagsForProperty(contentId, propertyTypeAlias, tagGroup));
         }
 
@@ -152,6 +208,9 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IEnumerable<TagModel> GetTagsForEntity(int contentId, string tagGroup = null)
         {
+            //TODO: http://issues.umbraco.org/issue/U4-6899
+            if (_wrappedQuery != null) return _wrappedQuery.GetTagsForEntity(contentId, tagGroup);
+
             return Mapper.Map<IEnumerable<TagModel>>(_tagService.GetTagsForEntity(contentId, tagGroup));
         }
     }

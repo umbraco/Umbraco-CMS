@@ -86,11 +86,13 @@ namespace Umbraco.Web.Editors
             UmbracoContext.HttpContext.Items["pageElements"] = legacyPage.Elements;
             UmbracoContext.HttpContext.Items[global::Umbraco.Core.Constants.Conventions.Url.AltTemplate] = null;
 
+            var renderer = new UmbracoComponentRenderer(UmbracoContext);
+
             var result = Request.CreateResponse();
             //need to create a specific content result formatted as html since this controller has been configured
             //with only json formatters.
             result.Content = new StringContent(
-                Umbraco.RenderMacro(macro, macroParams, legacyPage).ToString(),
+                renderer.RenderMacro(macro, macroParams, legacyPage).ToString(),
                 Encoding.UTF8,
                 "text/html");
             return result;

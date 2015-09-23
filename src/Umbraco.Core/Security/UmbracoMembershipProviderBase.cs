@@ -8,6 +8,8 @@ namespace Umbraco.Core.Security
     /// </summary>
     public abstract class UmbracoMembershipProviderBase : MembershipProviderBase
     {
+
+
         public abstract string DefaultMemberTypeAlias { get; }
         
         /// <summary>

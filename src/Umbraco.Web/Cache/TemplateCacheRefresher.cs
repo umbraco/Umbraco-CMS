@@ -2,7 +2,7 @@
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Caching;
+
 using umbraco;
 using umbraco.interfaces;
 
@@ -47,6 +47,14 @@ namespace Umbraco.Web.Cache
         public override void Remove(int id)
         {
             RemoveFromCache(id);
+
+            //During removal we need to clear the runtime cache for templates, content and content type instances!!!
+            // all three of these types are referenced by templates, and the cache needs to be cleared on every server,
+            // otherwise things like looking up content type's after a template is removed is still going to show that
+            // it has an associated template.
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IContent>();
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IContentType>();
+
             base.Remove(id);
         }
 
@@ -54,16 +62,11 @@ namespace Umbraco.Web.Cache
         {
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
-
-            ApplicationContext.Current.ApplicationCache.ClearCacheItem(
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(
                 string.Format("{0}{1}", CacheKeys.TemplateFrontEndCacheKey, id));
 
-            ApplicationContext.Current.ApplicationCache.ClearCacheItem(
-                string.Format("{0}{1}", CacheKeys.TemplateBusinessLogicCacheKey, id));
-
-            //need to clear the runtime cache for template instances
-            //NOTE: This is temp until we implement the correct ApplicationCache and then we can remove the RuntimeCache, etc...
-            RuntimeCacheProvider.Current.Clear(typeof(ITemplate));
+            //need to clear the runtime cache for templates
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<ITemplate>();
         }
 
     }

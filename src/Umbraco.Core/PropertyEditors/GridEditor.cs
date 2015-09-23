@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using Umbraco.Core.Configuration.Grid;
 
 namespace Umbraco.Core.PropertyEditors
 {
-    internal class GridEditor
+    internal class GridEditor : IGridEditorConfig
     {
         public GridEditor()
         {

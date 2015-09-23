@@ -1,6 +1,7 @@
 <%@ Page Language="C#" MasterPageFile="../../masterpages/umbracoPage.Master" AutoEventWireup="true"
     CodeBehind="editScript.aspx.cs" Inherits="umbraco.cms.presentation.settings.scripts.editScript"
     ValidateRequest="False" %>
+<%@ Import Namespace="Umbraco.Core" %>
 
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
@@ -21,13 +22,10 @@
                     nameTxtBox: $('#<%= NameTxt.ClientID %>'),
                     originalFileName: '<%= NameTxt.Text %>',
                     saveButton: $("#<%= ((Control)SaveButton).ClientID %>"),
+                    restServiceLocation: "<%= Url.GetSaveFileServicePath() %>",
                     editorSourceElement: $('#<%= editorSource.ClientID %>'),
-                    text: {
-                        fileErrorHeader: '<%= HttpUtility.JavaScriptStringEncode(umbraco.ui.Text("speechBubbles", "fileErrorHeader")) %>',
-                        fileSavedHeader: '<%= HttpUtility.JavaScriptStringEncode(umbraco.ui.Text("speechBubbles", "fileSavedHeader")) %>',
-                        fileSavedText: '',
-                        fileErrorText: '<%= HttpUtility.JavaScriptStringEncode(umbraco.ui.Text("speechBubbles", "fileErrorText")) %>',
-                    }
+                    treeSyncPath: "<%= ScriptTreeSyncPath %>",
+                    lttPathElement: $('#<%= lttPath.ClientID %>')
                 });
                 editor.init();
                 

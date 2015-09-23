@@ -145,6 +145,7 @@ namespace UmbracoExamine
             = new List<StaticField>
             {
                 new StaticField("id", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
+                new StaticField("key", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
                 new StaticField( "version", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
                 new StaticField( "parentID", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
                 new StaticField( "level", FieldIndexTypes.NOT_ANALYZED, true, "NUMBER"),
@@ -348,7 +349,7 @@ namespace UmbracoExamine
         protected override void PerformIndexAll(string type)
         {
             
-            const int pageSize = 5000;
+            const int pageSize = 1000;
             var pageIndex = 0;
 
             switch (type)
@@ -370,7 +371,7 @@ namespace UmbracoExamine
 
                         do
                         {
-                            int total;
+                            long total;
                             var descendants = _contentService.GetPagedDescendants(contentParentId, pageIndex, pageSize, out total);
 
                             //if specific types are declared we need to post filter them
@@ -386,6 +387,8 @@ namespace UmbracoExamine
 
                             AddNodesToIndex(GetSerializedContent(content), type);
                             pageIndex++;
+
+
                         } while (content.Length == pageSize);
 
                     }
@@ -401,7 +404,7 @@ namespace UmbracoExamine
                     
                     do
                     {
-                        int total;
+                        long total;
                         var descendants = _mediaService.GetPagedDescendants(mediaParentId, pageIndex, pageSize, out total);
 
                         //if specific types are declared we need to post filter them

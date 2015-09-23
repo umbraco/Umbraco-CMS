@@ -8,24 +8,6 @@
         //private methods/variables
         _opts: null,
 
-        _updateNewFileProperties: function(filePath) {
-            /// <summary>Updates the current treeSyncPath and original file name to have the new file name</summary>
-            
-            //update the originalFileName prop
-            this._opts.originalFileName = filePath;
-
-            //re-create the new path
-            var subPath = this._opts.treeSyncPath.split(",");
-            //remove the last element
-            subPath.pop();
-            //add the new element
-            var parts = filePath.split("/");
-            //remove the first bit which will either be "Partials" or "MacroPartials"
-            parts.shift();
-            subPath.push(parts.join("/"));
-            this._opts.treeSyncPath = subPath.join();
-        },
-
         // Constructor
         constructor: function (opts) {
             // Merge options with default
@@ -155,6 +137,9 @@
                 }
                 path = args.path;
             }
+            if (args.contents) {
+                UmbEditor.SetCode(args.contents);
+            }
 
             UmbClientMgr.mainTree().setActiveTreeType(this._opts.currentTreeType);
 
@@ -204,8 +189,8 @@
                     
                     top.UmbSpeechBubble.ShowMessage('save', header, msg);
 
-                    //then we need to update our current tree sync path to represent the new one
-                    this._updateNewFileProperties(newFilePath);
+                    this._opts.originalFileName = args.name;
+                    this._opts.treeSyncPath = args.path;
 
                     UmbClientMgr.mainTree().syncTree(path, true, null, newFilePath.split("/")[1]);
                 }                

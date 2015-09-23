@@ -26,7 +26,8 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	        searchText = value + "...";
 	    });
 
-	    var entityType = "Document";
+        // Allow the entity type to be passed in but defaults to Document for backwards compatibility.
+	    var entityType = dialogOptions.entityType ? dialogOptions.entityType : "Document";
 	    
 
 	    //min / max values

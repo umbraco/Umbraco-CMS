@@ -114,6 +114,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                                         alt: img.altText || "",
                                         src: (img.url) ? img.url : "nothing.jpg",
                                         rel: img.id,
+                                        'data-id': img.id,
                                         id: '__mcenew'
                                     };
 

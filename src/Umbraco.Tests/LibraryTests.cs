@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
@@ -27,7 +28,7 @@ namespace Umbraco.Tests
         public override void Initialize()
 		{
             // required so we can access property.Value
-            PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver();
+            PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(new ActivatorServiceProvider(), Logger);
             
             base.Initialize();
 

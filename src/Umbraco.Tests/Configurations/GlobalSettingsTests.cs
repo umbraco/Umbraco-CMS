@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Configurations
         [Test]
         public void Is_Version_From_Assembly_Correct()
         {
-            Assert.That(UmbracoVersion.Current.ToString(3), Is.EqualTo("6.0.0"));
+            Assert.That(UmbracoVersion.GetSemanticVersion(), Is.EqualTo("6.0.0"));
         }
 
         [TestCase("~/umbraco", "/", "umbraco")]

@@ -7,15 +7,16 @@ using umbraco.BusinessLogic;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Sync;
 
 namespace Umbraco.Web.Scheduling
 {
-    internal class LogScrubber : DelayedRecurringTaskBase<LogScrubber>
+    internal class LogScrubber : RecurringTaskBase
     {
         private readonly ApplicationContext _appContext;
         private readonly IUmbracoSettingsSection _settings;
 
-        public LogScrubber(IBackgroundTaskRunner<LogScrubber> runner, int delayMilliseconds, int periodMilliseconds, 
+        public LogScrubber(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds, 
             ApplicationContext appContext, IUmbracoSettingsSection settings)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
@@ -23,21 +24,10 @@ namespace Umbraco.Web.Scheduling
             _settings = settings;
         }
 
-        public LogScrubber(LogScrubber source)
-            : base(source)
+        // maximum age, in minutes
+        private static int GetLogScrubbingMaximumAge(IUmbracoSettingsSection settings)
         {
-            _appContext = source._appContext;
-            _settings = source._settings;
-        }
-
-        protected override LogScrubber GetRecurring()
-        {
-            return new LogScrubber(this);
-        }
-
-        private int GetLogScrubbingMaximumAge(IUmbracoSettingsSection settings)
-        {
-            int maximumAge = 24 * 60 * 60;
+            var maximumAge = 24 * 60; // 24 hours, in minutes
             try
             {
                 if (settings.Logging.MaxLogAge > -1)
@@ -45,7 +35,7 @@ namespace Umbraco.Web.Scheduling
             }
             catch (Exception e)
             {
-                LogHelper.Error<Scheduler>("Unable to locate a log scrubbing maximum age.  Defaulting to 24 horus", e);
+                LogHelper.Error<LogScrubber>("Unable to locate a log scrubbing maximum age. Defaulting to 24 hours.", e);
             }
             return maximumAge;
 
@@ -66,15 +56,36 @@ namespace Umbraco.Web.Scheduling
             return interval;
         }
 
-        public override void PerformRun()
+        public override bool PerformRun()
         {
-            using (DisposableTimer.DebugDuration<LogScrubber>(() => "Log scrubbing executing", () => "Log scrubbing complete"))
+            if (_appContext == null) return true; // repeat...
+
+            switch (_appContext.GetCurrentServerRole())
+            {
+                case ServerRole.Slave:
+                    LogHelper.Debug<LogScrubber>("Does not run on slave servers.");
+                    return true; // DO repeat, server role can change
+                case ServerRole.Unknown:
+                    LogHelper.Debug<LogScrubber>("Does not run on servers with unknown role.");
+                    return true; // DO repeat, server role can change
+            }
+
+            // ensure we do not run if not main domain, but do NOT lock it
+            if (_appContext.MainDom.IsMainDom == false)
+            {
+                LogHelper.Debug<LogScrubber>("Does not run if not MainDom.");
+                return false; // do NOT repeat, going down
+            }
+
+            using (DisposableTimer.DebugDuration<LogScrubber>("Log scrubbing executing", "Log scrubbing complete"))
             {
                 Log.CleanLogs(GetLogScrubbingMaximumAge(_settings));
-            }           
+            }
+
+            return true; // repeat
         }
 
-        public override Task PerformRunAsync(CancellationToken token)
+        public override Task<bool> PerformRunAsync(CancellationToken token)
         {
             throw new NotImplementedException();
         }

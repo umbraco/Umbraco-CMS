@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Migrations.Initial;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -11,10 +12,14 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
     [Migration("6.2.0", 1, GlobalSettings.UmbracoMigrationName)]
     public class AdditionalIndexesAndKeys : MigrationBase
     {
+        public AdditionalIndexesAndKeys(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
+        {
+        }
+
         public override void Up()
         {
 
-            var dbIndexes = SqlSyntaxContext.SqlSyntaxProvider.GetDefinedIndexes(Context.Database)
+            var dbIndexes = SqlSyntax.GetDefinedIndexes(Context.Database)
                 .Select(x => new DbIndexDefinition()
                 {
                     TableName = x.Item1,
@@ -42,11 +47,33 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
                 Create.Index("IX_cmsDocument_newest").OnTable("cmsDocument").OnColumn("newest").Ascending().WithOptions().NonClustered();
             }
 
-            //TODO: We need to fix this for SQL Azure since it does not let you drop any clustered indexes
-            // Issue: http://issues.umbraco.org/issue/U4-5673
-            // Some work around notes:
-            // http://stackoverflow.com/questions/15872347/alter-clustered-index-column    
-            // https://social.msdn.microsoft.com/Forums/azure/en-US/5cc4b302-fa42-4c62-956a-bbf79dbbd040/changing-clustered-index-in-azure?forum=ssdsgetstarted
+            //We need to do this for SQL Azure V2 since it does not let you drop any clustered indexes
+            // Issue: http://issues.umbraco.org/issue/U4-5673            
+            if (Context.CurrentDatabaseProvider == DatabaseProviders.SqlServer || Context.CurrentDatabaseProvider == DatabaseProviders.SqlAzure)
+            {
+                var version = Context.Database.ExecuteScalar<string>("SELECT @@@@VERSION");
+                if (version.Contains("Microsoft SQL Azure"))
+                {
+                    var parts = version.Split(new[] { '-' }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToArray();
+                    if (parts.Length > 1)
+                    {
+                        if (parts[1].StartsWith("11."))
+                        {
+
+                            //we want to drop the umbracoUserLogins_Index index since it is named incorrectly and then re-create it so 
+                            // it follows the standard naming convention
+                            if (dbIndexes.Any(x => x.IndexName.InvariantEquals("umbracoUserLogins_Index")))
+                            {
+                                //It's the old version that doesn't support dropping a clustered index on a table, so we need to do some manual work.
+                                ExecuteSqlAzureSqlForChangingIndex();
+                            }
+
+                            return;
+                        }
+                    }   
+                }                
+            }
+           
 
             //we want to drop the umbracoUserLogins_Index index since it is named incorrectly and then re-create it so 
             // it follows the standard naming convention
@@ -66,6 +93,29 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
             Delete.Index("IX_cmsContentVersion_ContentId").OnTable("cmsContentVersion");
             Delete.Index("IX_cmsDocument_published").OnTable("cmsDocument");
             Delete.Index("IX_cmsDocument_newest").OnTable("cmsDocument");
+        }
+
+        private void ExecuteSqlAzureSqlForChangingIndex()
+        {
+            Context.Database.Execute(@"CREATE TABLE ""umbracoUserLogins_temp""
+(
+	contextID uniqueidentifier NOT NULL,
+	userID int NOT NULL,
+	[timeout] bigint NOT NULL
+);
+CREATE CLUSTERED INDEX ""IX_umbracoUserLogins_Index"" ON ""umbracoUserLogins_temp"" (""contextID"");
+INSERT INTO ""umbracoUserLogins_temp"" SELECT * FROM ""umbracoUserLogins""
+DROP TABLE ""umbracoUserLogins""
+CREATE TABLE ""umbracoUserLogins""
+(
+	contextID uniqueidentifier NOT NULL,
+	userID int NOT NULL,
+	[timeout] bigint NOT NULL
+);
+CREATE CLUSTERED INDEX ""IX_umbracoUserLogins_Index"" ON ""umbracoUserLogins"" (""contextID"");
+INSERT INTO ""umbracoUserLogins"" SELECT * FROM ""umbracoUserLogins_temp""
+DROP TABLE ""umbracoUserLogins_temp""");
+
         }
     }
 }

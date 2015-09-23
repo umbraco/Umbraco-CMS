@@ -13,6 +13,7 @@
             <%=umbraco.ui.Text("name", UmbracoUser)%>:
           </th>
           <td class="propertyContent">
+            <asp:HiddenField runat="server" ID="OriginalName"/>
             <asp:TextBox ID="NameTxt" Width="350px" runat="server" /><br />
             <small><%=umbraco.ui.Text("stylesheet", "nameHelp", UmbracoUser)%></small>
           </td>

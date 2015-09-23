@@ -15,23 +15,8 @@ namespace Umbraco.Core.Persistence.Repositories
 		
 	}
 
-	/// <summary>
-    /// Defines the implementation of a Repository
-    /// </summary>
-    public interface IRepository<in TId, TEntity> : IRepository
-	{
-        /// <summary>
-        /// Adds or Updates an Entity
-        /// </summary>
-        /// <param name="entity"></param>
-        void AddOrUpdate(TEntity entity);
-
-        /// <summary>
-        /// Deletes an Entity
-        /// </summary>
-        /// <param name="entity"></param>
-        void Delete(TEntity entity);
-
+    public interface IReadRepository<in TId, out TEntity> : IRepository
+    {
         /// <summary>
         /// Gets an Entity by Id
         /// </summary>
@@ -52,5 +37,25 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="id"></param>
         /// <returns></returns>
         bool Exists(TId id);
-	}
+    }
+
+    //TODO: This should be decoupled! Shouldn't inherit from the IReadRepository and should be named IWriteRepository
+
+    /// <summary>
+    /// Defines the implementation of a Repository
+    /// </summary>
+    public interface IRepository<in TId, TEntity> : IReadRepository<TId, TEntity>
+    {
+        /// <summary>
+        /// Adds or Updates an Entity
+        /// </summary>
+        /// <param name="entity"></param>
+        void AddOrUpdate(TEntity entity);
+
+        /// <summary>
+        /// Deletes an Entity
+        /// </summary>
+        /// <param name="entity"></param>
+        void Delete(TEntity entity);
+    }
 }

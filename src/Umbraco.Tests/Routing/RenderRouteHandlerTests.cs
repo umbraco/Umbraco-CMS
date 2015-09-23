@@ -1,7 +1,9 @@
 ﻿using System.Web.Mvc;
 using System.Web.Routing;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
@@ -11,6 +13,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic;
+using Umbraco.Core.Profiling;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Tests.Routing
@@ -26,7 +29,7 @@ namespace Umbraco.Tests.Routing
 
 		    SettingsForTests.UmbracoPath = "~/umbraco";
             
-			var webBoot = new WebBootManager(new UmbracoApplication(), true);
+			var webBoot = new WebBootManager(new UmbracoApplication(), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()),  true);
 			//webBoot.Initialize();
 			//webBoot.Startup(null); -> don't call startup, we don't want any other application event handlers to bind for this test.
 			//webBoot.Complete(null);
@@ -38,8 +41,10 @@ namespace Umbraco.Tests.Routing
             DefaultRenderMvcControllerResolver.Current = new DefaultRenderMvcControllerResolver(typeof(RenderMvcController));
 
             SurfaceControllerResolver.Current = new SurfaceControllerResolver(
+                new ActivatorServiceProvider(), Logger,
                 PluginManager.Current.ResolveSurfaceControllers());
             UmbracoApiControllerResolver.Current = new UmbracoApiControllerResolver(
+                new ActivatorServiceProvider(), Logger,
                 PluginManager.Current.ResolveUmbracoApiControllers());
             ShortStringHelperResolver.Current = new ShortStringHelperResolver(new LegacyShortStringHelper());
 
@@ -80,7 +85,9 @@ namespace Umbraco.Tests.Routing
                 RenderingEngine = RenderingEngine.Mvc
 			};
 
-			var handler = new RenderRouteHandler(new TestControllerFactory(), routingContext.UmbracoContext);
+			var handler = new RenderRouteHandler(
+                new TestControllerFactory(routingContext.UmbracoContext, Mock.Of<ILogger>()), 
+                routingContext.UmbracoContext);
 
 			handler.GetHandlerForRoute(routingContext.UmbracoContext.HttpContext.Request.RequestContext, docRequest);
 			Assert.AreEqual("RenderMvc", routeData.Values["controller"].ToString());
@@ -116,7 +123,9 @@ namespace Umbraco.Tests.Routing
 					TemplateModel = template
 				};
 
-			var handler = new RenderRouteHandler(new TestControllerFactory(), routingContext.UmbracoContext);
+			var handler = new RenderRouteHandler(
+                new TestControllerFactory(routingContext.UmbracoContext, Mock.Of<ILogger>()), 
+                routingContext.UmbracoContext);
 
 			handler.GetHandlerForRoute(routingContext.UmbracoContext.HttpContext.Request.RequestContext, docRequest);
 			Assert.AreEqual("CustomDocument", routeData.Values["controller"].ToString());
@@ -152,8 +161,11 @@ namespace Umbraco.Tests.Routing
 		/// </summary>
 		public class CustomDocumentController : RenderMvcController
 		{
+		    public CustomDocumentController(UmbracoContext umbracoContext) : base(umbracoContext)
+		    {
+		    }
 
-			public ActionResult HomePage(RenderModel model)
+		    public ActionResult HomePage(RenderModel model)
 			{
 				return View();
 			}

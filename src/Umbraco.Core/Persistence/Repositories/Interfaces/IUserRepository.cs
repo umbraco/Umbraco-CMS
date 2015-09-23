@@ -55,5 +55,13 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="permissions"></param>
         /// <param name="entityIds"></param>
         void ReplaceUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds);
+
+        /// <summary>
+        /// Assigns the same permission set for a single user to any number of entities
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="permission"></param>
+        /// <param name="entityIds"></param>
+        void AssignUserPermission(int userId, char permission, params int[] entityIds);
     }
 }

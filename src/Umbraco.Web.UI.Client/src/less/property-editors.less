@@ -294,7 +294,90 @@ ul.color-picker li a  {
    margin-top: 7px;
    width: 320px;
 }
+   .umb-cropper-gravity .viewport, .umb-cropper-gravity, .umb-cropper-imageholder {
+        display: inline-block;
+    }
 
+    .umb-cropper-imageholder {
+        float: left;
+    }
+
+    .cropList {
+        display: inline-block;
+        position: relative;
+        vertical-align: top;
+    }
+
+    .gravity-container .viewport {
+        width: 494px;
+    }
+
+    .imagecropper .umb-sortable-thumbnails {
+        border-left: 2px solid #f8f8f8;
+        margin-left: 4px;
+        padding-left: 2px;
+        float: left;
+        width: 100px;
+    }
+
+    .imagecropper .umb-sortable-thumbnails li {
+        display: block;
+    }
+
+    .imagecropper .umb-sortable-thumbnails li.current a, .imagecropper .umb-sortable-thumbnails li.current a:hover {
+        background: #eeeeee;
+        text-decoration: none;
+    }
+
+    .imagecropper .umb-sortable-thumbnails li:first-of-type {
+        margin-top: 0;
+        padding-top: 0;
+    }
+
+    .imagecropper .umb-sortable-thumbnails li .crop-name, .imagecropper .umb-sortable-thumbnails li .crop-size {
+        display: block;
+        text-align: left;
+        font-size: 11px;
+    }
+
+    .imagecropper .umb-sortable-thumbnails li .crop-size {
+        font-size: 10px;
+        font-style: italic;
+        color: #666;
+    }
+
+    .imagecropper .umb-sortable-thumbnails li a {
+        display: block;
+        padding: 5px;
+    }
+
+    .imagecropper .umb-sortable-thumbnails li a:hover {
+        background: #f8f8f8;
+        text-decoration: none;
+    }
+
+    .imagecropper .umb-sortable-thumbnails li a:hover .crop-text {
+        text-decoration: none;
+    }
+
+    .btn-crop-delete {
+        display: block;
+        text-align: left;
+    }
+
+    .imagecropper .umb-sortable-thumbnails.many {
+        width: 210px;
+    }
+
+    .imagecropper .umb-sortable-thumbnails.many li {
+        width: 85px;
+        float: left;
+    }
+
+    .imagecropper .umb-sortable-thumbnails.many li:nth-child(2) {
+        margin-top: 0;
+        padding-top: 0;
+    }
 
 //
 // folder-browser
@@ -522,3 +605,14 @@ ul.color-picker li a  {
 .bootstrap-datetimepicker-widget .btn{padding: 0;}
 .bootstrap-datetimepicker-widget .picker-switch .btn{ background: none; border: none;}
 .umb-datepicker .input-append .add-on{cursor: pointer;}
+.umb-datepicker p {margin-top:10px;}
+.umb-datepicker p a{color: @gray;}
+
+//
+// Code mirror - even though this isn't a proprety editor right now, it could be so I'm putting the styles here
+// --------------------------------------------------
+
+.CodeMirror, .CodeMirror-scroll { 
+	height: 100%;
+    min-height:200px;
+}

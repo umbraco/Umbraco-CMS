@@ -4,45 +4,12 @@ using Newtonsoft.Json;
 using umbraco.cms.businesslogic.web;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Cache
 {
-    public sealed class PublicAccessCacheRefresher : JsonCacheRefresherBase<PublicAccessCacheRefresher>
+    public sealed class PublicAccessCacheRefresher : CacheRefresherBase<PublicAccessCacheRefresher>
     {
-        #region Static helpers
-
-        internal static JsonPayload DeserializeFromJsonPayload(string json)
-        {
-            return JsonConvert.DeserializeObject<JsonPayload>(json);
-        }
-
-        internal static string SerializeToJsonPayload(XmlDocument doc)
-        {
-            return JsonConvert.SerializeObject(FromXml(doc));
-        }
-
-        internal static JsonPayload FromXml(XmlDocument doc)
-        {
-            if (doc == null) return null;
-
-            var payload = new JsonPayload
-            {
-                XmlContent = doc.OuterXml
-            };
-            return payload;
-        }
-
-        #endregion
-
-        #region Sub classes
-
-        internal class JsonPayload
-        {
-            public string XmlContent { get; set; }
-        }
-
-        #endregion
-
         protected override PublicAccessCacheRefresher Instance
         {
             get { return this; }
@@ -58,20 +25,28 @@ namespace Umbraco.Web.Cache
             get { return "Public access cache refresher"; }
         }
 
-        public override void Refresh(string jsonPayload)
+        public override void Refresh(Guid id)
         {
-            if (jsonPayload.IsNullOrWhiteSpace()) return;
-            var deserialized = DeserializeFromJsonPayload(jsonPayload);
-            if (deserialized == null) return;
-            var xDoc = new XmlDocument();
-            xDoc.LoadXml(deserialized.XmlContent);
-            ClearCache(xDoc);
-            base.Refresh(jsonPayload);
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<PublicAccessEntry>();
+            base.Refresh(id);
         }
 
-        private void ClearCache(XmlDocument xDoc)
+        public override void Refresh(int id)
         {
-            Access.UpdateInMemoryDocument(xDoc);
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<PublicAccessEntry>();
+            base.Refresh(id);
+        }
+
+        public override void RefreshAll()
+        {
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<PublicAccessEntry>();
+            base.RefreshAll();
+        }
+
+        public override void Remove(int id)
+        {
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<PublicAccessEntry>();
+            base.Remove(id);
         }
     }
 }

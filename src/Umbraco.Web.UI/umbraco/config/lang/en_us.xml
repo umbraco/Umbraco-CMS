@@ -27,6 +27,7 @@
     <key alias="unpublish">Unpublish</key>
     <key alias="refreshNode">Reload nodes</key>
     <key alias="republish">Republish entire site</key>
+    <key alias="restore" version="7.3.0">Restore</key>
     <key alias="rights">Permissions</key>
     <key alias="rollback">Rollback</key>
     <key alias="sendtopublish">Send To Publish</key>
@@ -167,6 +168,10 @@
   <area alias="media">
     <key alias="clickToUpload">Click to upload</key>
     <key alias="dropFilesHere">Drop your files here...</key>
+  </area>
+  <area alias="member">
+    <key alias="createNewMember">Create a new member</key>
+    <key alias="allMembers">All Members</key>
   </area>
   <area alias="create">
     <key alias="chooseNode">Where do you want to create the new %0%</key>
@@ -748,6 +753,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="forms">Forms</key>
     <key alias="analytics">Analytics</key>
   </area>
+  <area alias="help">
+    <key alias="goTo">go to</key>
+    <key alias="helpTopicsFor">Help topics for</key>
+    <key alias="videoChaptersFor">Video chapters for</key>
+    <key alias="theBestUmbracoVideoTutorials">The best Umbraco video tutorials</key>
+  </area>
   <area alias="settings">
     <key alias="defaulttemplate">Default template</key>
     <key alias="dictionary editor egenskab">Dictionary Key</key>
@@ -774,6 +785,10 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="sortPleaseWait"><![CDATA[ Please wait. Items are being sorted, this can take a while.<br/> <br/> Do not close this window during sorting]]></key>
   </area>
   <area alias="speechBubbles">
+	<key alias="operationFailedHeader">Failed</key>
+	<key alias="invalidUserPermissionsText">Insufficient user permissions, could not complete the operation</key>
+	<key alias="operationCancelledHeader">Cancelled</key>
+	<key alias="operationCancelledText">Operation was cancelled by a 3rd party add-in</key>
     <key alias="contentPublishedFailedByEvent">Publishing was cancelled by a 3rd party add-in</key>
     <key alias="contentTypeDublicatePropertyType">Property type already exists</key>
     <key alias="contentTypePropertyTypeCreated">Property type created</key>
@@ -827,6 +842,11 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="partialViewSavedText">Partial view saved without any errors!</key>
     <key alias="partialViewErrorHeader">Partial view not saved</key>
     <key alias="partialViewErrorText">An error occurred saving the file.</key>
+    <key alias="scriptSavedHeader">Script view saved</key>
+    <key alias="scriptSavedText">Script view saved without any errors!</key>
+    <key alias="scriptErrorHeader">Script view not saved</key>
+    <key alias="scriptErrorText">An error occurred saving the file.</key>
+    <key alias="cssErrorText">An error occurred saving the file.</key>
   </area>
   <area alias="stylesheet">
     <key alias="aliasHelp">Uses CSS syntax ex: h1, .redHeader, .blueTex</key>
@@ -849,7 +869,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="grid">
     <key alias="insertControl">Insert control</key>
-    <key alias="addRows">Choose a layout for the page</key>
+    <key alias="addRows">Choose a layout for this section</key>
     <key alias="addElement"><![CDATA[To start, click the <i class="icon icon-add blue"></i> below and add your first element]]></key>
 
     <key alias="clickToEmbed">Click to embed</key>
@@ -1034,6 +1054,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="usertype">User type</key>
     <key alias="userTypes">User types</key>
     <key alias="writer">Writer</key>
+    <key alias="translator">Translator</key>
     <key alias="yourProfile" version="7.0">Your profile</key>
     <key alias="yourHistory" version="7.0">Your recent history</key>
     <key alias="sessionExpires" version="7.0">Session expires in</key>

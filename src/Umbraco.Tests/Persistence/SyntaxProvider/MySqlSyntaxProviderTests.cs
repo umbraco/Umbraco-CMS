@@ -1,5 +1,8 @@
 using System;
+
+using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -13,7 +16,7 @@ namespace Umbraco.Tests.Persistence.SyntaxProvider
         [SetUp]
         public void SetUp()
         {
-            SqlSyntaxContext.SqlSyntaxProvider = MySqlSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = new MySqlSyntaxProvider(Mock.Of<ILogger>());
         }
 
         [Test]

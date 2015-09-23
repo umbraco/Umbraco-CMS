@@ -30,63 +30,87 @@
         doSubmit: function () {
             var self = this;
 
-            var fileName = this._opts.nameTxtBox.val();
-            var codeVal = this._opts.editorSourceElement.val();
+            var filename = this._opts.nameTxtBox.val();
+            var codeval = this._opts.editorSourceElement.val();
             //if CodeMirror is not defined, then the code editor is disabled.
             if (typeof (CodeMirror) != "undefined") {
-                codeVal = UmbEditor.GetCode();
+                codeval = UmbEditor.GetCode();
             }
-            umbraco.presentation.webservices.codeEditorSave.SaveScript(
-                fileName, self._opts.originalFileName, codeVal,
-                function (t) { self.submitSucces(t); },
-                function (t) { self.submitFailure(t); });
 
+            this.save(
+                    filename,
+                    self._opts.originalFileName,
+                    codeval);
         },
 
-        submitSucces: function(t) {
+        save: function (filename, oldName, contents) {
+            var self = this;
 
-            if (t != 'true') {
-                top.UmbSpeechBubble.ShowMessage('error', unescape(this._opts.text.fileErrorHeader), unescape(this._opts.text.fileErrorText));
+            $.post(self._opts.restServiceLocation + "SaveScript",
+                    JSON.stringify({
+                        filename: filename,
+                        oldName: oldName,
+                        contents: contents
+                    }),
+                    function (e) {
+                        if (e.success) {
+                            self.submitSuccess(e);
+                        } else {
+                            self.submitFailure(e.message, e.header);
+                        }
+                    });
+        },
+
+        submitSuccess: function (args) {
+            var msg = args.message;
+            var header = args.header;
+            var path = this._opts.treeSyncPath;
+            var pathChanged = false;
+            if (args.path) {
+                if (path != args.path) {
+                    pathChanged = true;
+                }
+                path = args.path;
+            }
+            if (args.contents) {
+                UmbEditor.SetCode(args.contents);
             }
 
-            var newFilePath = this._opts.nameTxtBox.val();
-            
-            //if the filename changes, we need to redirect since the file name is used in the url
-            if (this._opts.originalFileName != newFilePath) {                
-                var newLocation = window.location.pathname + "?" + "&file=" + newFilePath;
+            UmbClientMgr.mainTree().setActiveTreeType("scripts");
+            if (pathChanged) {
+                // no! file is used in url so we need to redirect
+                //UmbClientMgr.mainTree().moveNode(this._opts.originalFileName, path);
+                //this._opts.treeSyncPath = args.path;
+                //this._opts.lttPathElement.prop("href", args.url).html(args.url);
 
-                UmbClientMgr.contentFrame(newLocation);
+                var qs = window.location.search;
+                if (qs.startsWith("?")) qs = qs.substring("?".length);
+                var qp1 = qs.split("&");
+                var qp2 = [];
+                for (var i = 0; i < qp1.length; i++)
+                    if (!qp1[i].startsWith("file="))
+                        qp2.push(qp1[i]);
 
-                //we need to do this after we navigate otherwise the navigation will wait unti lthe message timeout is done!
-                top.UmbSpeechBubble.ShowMessage('save', unescape(this._opts.text.fileSavedHeader), unescape(this._opts.text.fileSavedText));
+                var location = window.location.pathname + "?" + qp2.join("&") + "&file=" + args.name;
+                UmbClientMgr.contentFrame(location);
+
+                // need to do it after we navigate otherwise the navigation waits until the message timeout is done
+                top.UmbSpeechBubble.ShowMessage("save", header, msg);
             }
             else {
-
-                top.UmbSpeechBubble.ShowMessage('save', unescape(this._opts.text.fileSavedHeader), unescape(this._opts.text.fileSavedText));
-                UmbClientMgr.mainTree().setActiveTreeType('scripts');
-
-                //we need to create a list of ids for each folder/file. Each folder/file's id is it's full path so we need to build each one.
-                var paths = [];
-                var parts = this._opts.originalFileName.split('/');
-                for (var i = 0;i < parts.length;i++) {
-                    if (paths.length > 0) {
-                        paths.push(paths[i - 1] + "/" + parts[i]);
-                    }
-                    else {
-                        paths.push(parts[i]);
-                    }
-                }
-
-                //we need to pass in the newId parameter so it knows which node to resync after retreival from the server
-                UmbClientMgr.mainTree().syncTree("-1,init," + paths.join(','), true, null, newFilePath);
-                //set the original file path to the new one
-                this._opts.originalFileName = newFilePath;
+                top.UmbSpeechBubble.ShowMessage("save", header, msg);
+                this._opts.lttPathElement.prop("href", args.url).html(args.url);
+                this._opts.originalFileName = args.name;
+                this._opts.treeSyncPath = args.path;
+                UmbClientMgr.mainTree().syncTree(path, true);
             }
-            
+
+            //this._opts.lttPathElement.prop("href", args.url).html(args.url);
+            //this._opts.originalFileName = args.name;
         },
 
-        submitFailure: function(t) {
-            top.UmbSpeechBubble.ShowMessage('error', unescape(this._opts.text.fileErrorHeader), unescape(this._opts.text.fileErrorText));
+        submitFailure: function(err, header) {
+            top.UmbSpeechBubble.ShowMessage('error', header, err);
         }
     });
 })(jQuery);

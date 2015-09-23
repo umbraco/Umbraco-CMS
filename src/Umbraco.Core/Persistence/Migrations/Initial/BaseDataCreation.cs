@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 
@@ -10,11 +11,13 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
     internal class BaseDataCreation
     {
         private readonly Database _database;
+        private readonly ILogger _logger;
 
-        public BaseDataCreation(Database database)
+        public BaseDataCreation(Database database, ILogger logger)
         {
             _database = database;
-        } 
+            _logger = logger;
+        }
 
         /// <summary>
         /// Initialize the base data creation by inserting the data foundation for umbraco
@@ -23,7 +26,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         /// <param name="tableName">Name of the table to create base data for</param>
         public void InitializeBaseData(string tableName)
         {
-            LogHelper.Info<BaseDataCreation>(string.Format("Creating data in table {0}", tableName));
+            _logger.Info<BaseDataCreation>(string.Format("Creating data in table {0}", tableName));
 
             if(tableName.Equals("umbracoNode"))
             {
@@ -84,12 +87,18 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             {
                 CreateUmbracoRelationTypeData();
             }
+
             if (tableName.Equals("cmsTaskType"))
             {
                 CreateCmsTaskTypeData();
             }
 
-            LogHelper.Info<BaseDataCreation>(string.Format("Done creating data in table {0}", tableName));
+            if (tableName.Equals("umbracoMigration"))
+            {
+                CreateUmbracoMigrationData();
+            }
+
+            _logger.Info<BaseDataCreation>(string.Format("Done creating data in table {0}", tableName));
         }
 
         private void CreateUmbracNodeData()
@@ -179,28 +188,24 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
         private void CreateCmsPropertyTypeData()
         {
-            _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 6, DataTypeId = -90, ContentTypeId = 1032, PropertyTypeGroupId = 3, Alias = Constants.Conventions.Media.File, Name = "Upload image", HelpText = null, SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null });
-            _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 7, DataTypeId = -92, ContentTypeId = 1032, PropertyTypeGroupId = 3, Alias = Constants.Conventions.Media.Width, Name = "Width", HelpText = null, SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null });
-            _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 8, DataTypeId = -92, ContentTypeId = 1032, PropertyTypeGroupId = 3, Alias = Constants.Conventions.Media.Height, Name = "Height", HelpText = null, SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null });
-            _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 9, DataTypeId = -92, ContentTypeId = 1032, PropertyTypeGroupId = 3, Alias = Constants.Conventions.Media.Bytes, Name = "Size", HelpText = null, SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null });
-            _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 10, DataTypeId = -92, ContentTypeId = 1032, PropertyTypeGroupId = 3, Alias = Constants.Conventions.Media.Extension, Name = "Type", HelpText = null, SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null });
-            _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 24, DataTypeId = -90, ContentTypeId = 1033, PropertyTypeGroupId = 4, Alias = Constants.Conventions.Media.File, Name = "Upload file", HelpText = null, SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null });
-            _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 25, DataTypeId = -92, ContentTypeId = 1033, PropertyTypeGroupId = 4, Alias = Constants.Conventions.Media.Extension, Name = "Type", HelpText = null, SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null });
-            _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 26, DataTypeId = -92, ContentTypeId = 1033, PropertyTypeGroupId = 4, Alias = Constants.Conventions.Media.Bytes, Name = "Size", HelpText = null, SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null });
-            _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 27, DataTypeId = -38, ContentTypeId = 1031, PropertyTypeGroupId = 5, Alias = "contents", Name = "Contents:", HelpText = null, SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null });
+            _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 6, UniqueId = 6.ToGuid(), DataTypeId = -90, ContentTypeId = 1032, PropertyTypeGroupId = 3, Alias = Constants.Conventions.Media.File, Name = "Upload image", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null });
+            _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 7, UniqueId = 7.ToGuid(), DataTypeId = -92, ContentTypeId = 1032, PropertyTypeGroupId = 3, Alias = Constants.Conventions.Media.Width, Name = "Width", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null });
+            _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 8, UniqueId = 8.ToGuid(), DataTypeId = -92, ContentTypeId = 1032, PropertyTypeGroupId = 3, Alias = Constants.Conventions.Media.Height, Name = "Height", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null });
+            _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 9, UniqueId = 9.ToGuid(), DataTypeId = -92, ContentTypeId = 1032, PropertyTypeGroupId = 3, Alias = Constants.Conventions.Media.Bytes, Name = "Size", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null });
+            _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 10, UniqueId = 10.ToGuid(), DataTypeId = -92, ContentTypeId = 1032, PropertyTypeGroupId = 3, Alias = Constants.Conventions.Media.Extension, Name = "Type", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null });
+            _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 24, UniqueId = 24.ToGuid(), DataTypeId = -90, ContentTypeId = 1033, PropertyTypeGroupId = 4, Alias = Constants.Conventions.Media.File, Name = "Upload file", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null });
+            _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 25, UniqueId = 25.ToGuid(), DataTypeId = -92, ContentTypeId = 1033, PropertyTypeGroupId = 4, Alias = Constants.Conventions.Media.Extension, Name = "Type", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null });
+            _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 26, UniqueId = 26.ToGuid(), DataTypeId = -92, ContentTypeId = 1033, PropertyTypeGroupId = 4, Alias = Constants.Conventions.Media.Bytes, Name = "Size", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null });
+            _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 27, UniqueId = 27.ToGuid(), DataTypeId = -38, ContentTypeId = 1031, PropertyTypeGroupId = 5, Alias = "contents", Name = "Contents:", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null });
             //membership property types
-            _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 28, DataTypeId = -89, ContentTypeId = 1044, PropertyTypeGroupId = 11, Alias = Constants.Conventions.Member.Comments, Name = Constants.Conventions.Member.CommentsLabel, HelpText = null, SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null });
-            _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 29, DataTypeId = -92, ContentTypeId = 1044, PropertyTypeGroupId = 11, Alias = Constants.Conventions.Member.FailedPasswordAttempts, Name = Constants.Conventions.Member.FailedPasswordAttemptsLabel, HelpText = null, SortOrder = 1, Mandatory = false, ValidationRegExp = null, Description = null });
-            _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 30, DataTypeId = -49, ContentTypeId = 1044, PropertyTypeGroupId = 11, Alias = Constants.Conventions.Member.IsApproved, Name = Constants.Conventions.Member.IsApprovedLabel, HelpText = null, SortOrder = 2, Mandatory = false, ValidationRegExp = null, Description = null });
-            _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 31, DataTypeId = -49, ContentTypeId = 1044, PropertyTypeGroupId = 11, Alias = Constants.Conventions.Member.IsLockedOut, Name = Constants.Conventions.Member.IsLockedOutLabel, HelpText = null, SortOrder = 3, Mandatory = false, ValidationRegExp = null, Description = null });
-            _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 32, DataTypeId = -92, ContentTypeId = 1044, PropertyTypeGroupId = 11, Alias = Constants.Conventions.Member.LastLockoutDate, Name = Constants.Conventions.Member.LastLockoutDateLabel, HelpText = null, SortOrder = 4, Mandatory = false, ValidationRegExp = null, Description = null });
-            _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 33, DataTypeId = -92, ContentTypeId = 1044, PropertyTypeGroupId = 11, Alias = Constants.Conventions.Member.LastLoginDate, Name = Constants.Conventions.Member.LastLoginDateLabel, HelpText = null, SortOrder = 5, Mandatory = false, ValidationRegExp = null, Description = null });
-            _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 34, DataTypeId = -92, ContentTypeId = 1044, PropertyTypeGroupId = 11, Alias = Constants.Conventions.Member.LastPasswordChangeDate, Name = Constants.Conventions.Member.LastPasswordChangeDateLabel, HelpText = null, SortOrder = 6, Mandatory = false, ValidationRegExp = null, Description = null });
+            _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 28, UniqueId = 28.ToGuid(), DataTypeId = -89, ContentTypeId = 1044, PropertyTypeGroupId = 11, Alias = Constants.Conventions.Member.Comments, Name = Constants.Conventions.Member.CommentsLabel, SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null });
+            _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 29, UniqueId = 29.ToGuid(), DataTypeId = -92, ContentTypeId = 1044, PropertyTypeGroupId = 11, Alias = Constants.Conventions.Member.FailedPasswordAttempts, Name = Constants.Conventions.Member.FailedPasswordAttemptsLabel, SortOrder = 1, Mandatory = false, ValidationRegExp = null, Description = null });
+            _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 30, UniqueId = 30.ToGuid(), DataTypeId = -49, ContentTypeId = 1044, PropertyTypeGroupId = 11, Alias = Constants.Conventions.Member.IsApproved, Name = Constants.Conventions.Member.IsApprovedLabel, SortOrder = 2, Mandatory = false, ValidationRegExp = null, Description = null });
+            _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 31, UniqueId = 31.ToGuid(), DataTypeId = -49, ContentTypeId = 1044, PropertyTypeGroupId = 11, Alias = Constants.Conventions.Member.IsLockedOut, Name = Constants.Conventions.Member.IsLockedOutLabel, SortOrder = 3, Mandatory = false, ValidationRegExp = null, Description = null });
+            _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 32, UniqueId = 32.ToGuid(), DataTypeId = -92, ContentTypeId = 1044, PropertyTypeGroupId = 11, Alias = Constants.Conventions.Member.LastLockoutDate, Name = Constants.Conventions.Member.LastLockoutDateLabel, SortOrder = 4, Mandatory = false, ValidationRegExp = null, Description = null });
+            _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 33, UniqueId = 33.ToGuid(), DataTypeId = -92, ContentTypeId = 1044, PropertyTypeGroupId = 11, Alias = Constants.Conventions.Member.LastLoginDate, Name = Constants.Conventions.Member.LastLoginDateLabel, SortOrder = 5, Mandatory = false, ValidationRegExp = null, Description = null });
+            _database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 34, UniqueId = 34.ToGuid(), DataTypeId = -92, ContentTypeId = 1044, PropertyTypeGroupId = 11, Alias = Constants.Conventions.Member.LastPasswordChangeDate, Name = Constants.Conventions.Member.LastPasswordChangeDateLabel, SortOrder = 6, Mandatory = false, ValidationRegExp = null, Description = null });
             
-            //TODO: The member editor doesn't currently support providers that have question/answer so we'll leave these out for now.
-            // Also, it's worth noting that the built in ASP.Net providers encrypt the answer so that admins cannot see it for added security which is something we should actually do!
-            //_database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 35, DataTypeId = -92, ContentTypeId = 1044, PropertyTypeGroupId = 11, Alias = Constants.Conventions.Member.PasswordAnswer, Name = Constants.Conventions.Member.PasswordAnswerLabel, HelpText = null, SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null });
-            //_database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 36, DataTypeId = -92, ContentTypeId = 1044, PropertyTypeGroupId = 11, Alias = Constants.Conventions.Member.PasswordQuestion, Name = Constants.Conventions.Member.PasswordQuestionLabel, HelpText = null, SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null });
         }
 
         private void CreateUmbracoLanguageData()
@@ -268,12 +273,26 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
         private void CreateUmbracoRelationTypeData()
         {
-            _database.Insert("umbracoRelationType", "id", false, new RelationTypeDto { Id = 1, Alias = Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias, ChildObjectType = new Guid(Constants.ObjectTypes.Document), ParentObjectType = new Guid("C66BA18E-EAF3-4CFF-8A22-41B16D66A972"), Dual = true, Name = Constants.Conventions.RelationTypes.RelateDocumentOnCopyName });
+            _database.Insert("umbracoRelationType", "id", false, new RelationTypeDto { Id = 1, Alias = Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias, ChildObjectType = new Guid(Constants.ObjectTypes.Document), ParentObjectType = new Guid(Constants.ObjectTypes.Document), Dual = true, Name = Constants.Conventions.RelationTypes.RelateDocumentOnCopyName });
+            _database.Insert("umbracoRelationType", "id", false, new RelationTypeDto { Id = 2, Alias = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias, ChildObjectType = new Guid(Constants.ObjectTypes.Document), ParentObjectType = new Guid(Constants.ObjectTypes.Document), Dual = false, Name = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteName });
         }
 
         private void CreateCmsTaskTypeData()
         {
             _database.Insert("cmsTaskType", "id", false, new TaskTypeDto { Id = 1, Alias = "toTranslate" });
+        }
+
+        private void CreateUmbracoMigrationData()
+        {
+            var dto = new MigrationDto
+            {
+                Id = 1,
+                Name = GlobalSettings.UmbracoMigrationName,
+                Version = UmbracoVersion.GetSemanticVersion().ToString(),
+                CreateDate = DateTime.Now
+            };
+
+            _database.Insert("umbracoMigration", "pk", false, dto);
         }
     }
 }

@@ -62,13 +62,15 @@ namespace Umbraco.Web.Routing
             if (string.IsNullOrWhiteSpace(umbracoUrlName))
                 return Enumerable.Empty<string>();
 
+            var domainHelper = new DomainHelper(umbracoContext.Application.Services.DomainService);
+
             var n = node;
-            var domainUris = DomainHelper.DomainsForNode(n.Id, current, false);
+            var domainUris = domainHelper.DomainsForNode(n.Id, current, false);
             while (domainUris == null && n != null) // n is null at root
             {
                 // move to parent node
                 n = n.Parent;
-                domainUris = n == null ? null : DomainHelper.DomainsForNode(n.Id, current, false);
+                domainUris = n == null ? null : domainHelper.DomainsForNode(n.Id, current, false);
             }
 
             var path = "/" + umbracoUrlName;

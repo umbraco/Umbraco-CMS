@@ -1,6 +1,7 @@
 ﻿using System;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Models.Rdbms
 {
@@ -34,12 +35,15 @@ namespace Umbraco.Core.Models.Rdbms
         public int UserId { get; set; }
 
         [Column("DateTime")]
-        [Constraint(Default = "getdate()")]
+        [Constraint(Default = SystemMethods.CurrentDateTime)]
         public DateTime DateTime { get; set; }
 
         [Column("Comment")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(500)]
         public string Comment { get; set; }
+
+        [ResultColumn]
+        public TaskTypeDto TaskTypeDto { get; set; }
     }
 }

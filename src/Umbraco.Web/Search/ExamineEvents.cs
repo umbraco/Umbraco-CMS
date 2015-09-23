@@ -1,7 +1,6 @@
 using System;
 using System.Globalization;
 using System.Linq;
-using System.Security;
 using System.Xml;
 using System.Xml.Linq;
 using Examine;
@@ -11,19 +10,11 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
 using UmbracoExamine;
-using umbraco;
-using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.member;
-using umbraco.interfaces;
 using Content = umbraco.cms.businesslogic.Content;
 using Document = umbraco.cms.businesslogic.web.Document;
-using Member = umbraco.cms.businesslogic.member.Member;
 
 namespace Umbraco.Web.Search
 {
@@ -473,7 +464,7 @@ namespace Umbraco.Web.Search
 		{
             if (TypeHelper.IsTypeAssignableFrom<Document>(node))
             {
-                return new XDocument(((Document) node).Content.ToXml());
+                return new XDocument(((Document) node).ContentEntity.ToXml());
             }
 
             if (TypeHelper.IsTypeAssignableFrom<global::umbraco.cms.businesslogic.media.Media>(node))

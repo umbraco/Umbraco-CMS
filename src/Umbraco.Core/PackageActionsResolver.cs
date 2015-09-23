@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using umbraco.interfaces;
 
@@ -10,13 +11,14 @@ namespace Umbraco.Core
 	/// </summary>
 	internal sealed class PackageActionsResolver : LazyManyObjectsResolverBase<PackageActionsResolver, IPackageAction>
 	{
-
-		/// <summary>
-		/// Constructor
-		/// </summary>
-		/// <param name="packageActions"></param>		
-		internal PackageActionsResolver(Func<IEnumerable<Type>> packageActions)
-			: base(packageActions)
+	    /// <summary>
+	    /// Constructor
+	    /// </summary>
+	    /// <param name="serviceProvider"></param>
+	    /// <param name="logger"></param>
+	    /// <param name="packageActions"></param>		
+	    internal PackageActionsResolver(IServiceProvider serviceProvider, ILogger logger, Func<IEnumerable<Type>> packageActions)
+            : base(serviceProvider, logger, packageActions)
 		{
 			
 		}

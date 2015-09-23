@@ -35,6 +35,11 @@
         views/dashboard/developer/examinemanagement.html
       </control>
     </tab>    
+    <tab caption="Xml Data Integrity Report" xdt:Transform="InsertIfMissing">
+      <control>
+        views/dashboard/developer/xmldataintegrityreport.html
+      </control>
+    </tab>	
   </section>
   
   <section alias="StartupMediaDashboardSection" xdt:Locator="Match(alias)">

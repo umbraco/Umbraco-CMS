@@ -7,9 +7,11 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Caching;
+
+using Umbraco.Core.Persistence.Repositories;
 using umbraco.interfaces;
 using System.Linq;
+using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
 namespace Umbraco.Web.Cache
 {
@@ -28,7 +30,7 @@ namespace Umbraco.Web.Cache
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        internal static JsonPayload[] DeserializeFromJsonPayload(string json)
+        public static JsonPayload[] DeserializeFromJsonPayload(string json)
         {
             var serializer = new JavaScriptSerializer();
             var jsonObject = serializer.Deserialize<JsonPayload[]>(json);
@@ -97,14 +99,14 @@ namespace Umbraco.Web.Cache
 
         #region Sub classes
 
-        internal enum OperationType
+        public enum OperationType
         {
             Saved,
             Trashed,
             Deleted
         }
 
-        internal class JsonPayload
+        public class JsonPayload
         {
             public string Path { get; set; }
             public int Id { get; set; }
@@ -162,7 +164,7 @@ namespace Umbraco.Web.Cache
                     //if there's no path, then just use id (this will occur on permanent deletion like emptying recycle bin)
                     if (payload.Path.IsNullOrWhiteSpace())
                     {
-                        ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(
+                        ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(
                             string.Format("{0}_{1}", CacheKeys.MediaCacheKey, payload.Id));
                     }
                     else
@@ -172,19 +174,22 @@ namespace Umbraco.Web.Cache
                             int idPartAsInt;
                             if (int.TryParse(idPart, out idPartAsInt))
                             {
-                                RuntimeCacheProvider.Current.Delete(typeof(IMedia), idPartAsInt);    
+                                ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(
+                                    RepositoryBase.GetCacheIdKey<IMedia>(idPartAsInt));
                             }
 
-                            ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(
+                            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(
                                 string.Format("{0}_{1}_True", CacheKeys.MediaCacheKey, idPart));
 
                             // Also clear calls that only query this specific item!
                             if (idPart == payload.Id.ToString(CultureInfo.InvariantCulture))
-                                ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(
+                                ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(
                                     string.Format("{0}_{1}", CacheKeys.MediaCacheKey, payload.Id));
-
                         }   
-                    }                    
+                    }
+
+                    // published cache...
+                    PublishedMediaCache.ClearCache(payload.Id);
                 });
 
             

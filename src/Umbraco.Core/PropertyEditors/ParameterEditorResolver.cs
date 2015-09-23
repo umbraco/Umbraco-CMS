@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.ObjectResolution;
 
@@ -16,9 +17,9 @@ namespace Umbraco.Core.PropertyEditors
     internal class ParameterEditorResolver : LazyManyObjectsResolverBase<ParameterEditorResolver, IParameterEditor>
     {
         private readonly ManifestBuilder _builder;
-
-        public ParameterEditorResolver(Func<IEnumerable<Type>> typeListProducerList, ManifestBuilder builder)
-            : base(typeListProducerList, ObjectLifetimeScope.Application)
+        
+        public ParameterEditorResolver(IServiceProvider serviceProvider, ILogger logger, Func<IEnumerable<Type>> typeListProducerList, ManifestBuilder builder)
+            : base(serviceProvider, logger, typeListProducerList, ObjectLifetimeScope.Application)
         {
             _builder = builder;
         }

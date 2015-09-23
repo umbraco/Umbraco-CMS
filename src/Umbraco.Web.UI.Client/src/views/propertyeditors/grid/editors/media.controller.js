@@ -14,7 +14,8 @@ angular.module("umbraco")
                     $scope.control.value = {
                         focalPoint: data.focalPoint,
                         id: data.id,
-                        image: data.image
+                        image: data.image,
+                        altText: data.altText
                     };
 
                     $scope.setUrl();
@@ -44,7 +45,7 @@ angular.module("umbraco")
         $timeout(function(){
             if($scope.control.$initializing){
                 $scope.setImage();
-            }else{
+            }else if($scope.control.value){
                 $scope.setUrl();
             }
         }, 200);

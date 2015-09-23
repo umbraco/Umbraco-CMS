@@ -3,12 +3,16 @@ using System.IO;
 using System.Web.Caching;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Profiling;
 using umbraco;
 using umbraco.cms.businesslogic.macro;
+using Umbraco.Core.Configuration;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Macros
 {
@@ -24,18 +28,14 @@ namespace Umbraco.Tests.Macros
                 new ObjectCacheRuntimeCacheProvider(),
                 new StaticCacheProvider(),
                 new NullCacheProvider());
-            ApplicationContext.Current = new ApplicationContext(cacheHelper);
-            ProfilerResolver.Current = new ProfilerResolver(new LogProfiler())
-            {
-                CanResolveBeforeFrozen = true
-            };
+            ApplicationContext.Current = new ApplicationContext(cacheHelper, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+
+            UmbracoConfig.For.SetUmbracoSettings(SettingsForTests.GetDefault());
         }
 
         [TearDown]
         public void TearDown()
         {
-            ProfilerResolver.Current.DisposeIfDisposable();
-            ProfilerResolver.Reset();
             ApplicationContext.Current.ApplicationCache.ClearAllCache();
             ApplicationContext.Current.DisposeIfDisposable();
             ApplicationContext.Current = null;

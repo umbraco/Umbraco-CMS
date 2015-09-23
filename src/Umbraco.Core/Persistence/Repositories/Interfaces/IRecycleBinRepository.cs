@@ -18,12 +18,6 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <returns></returns>
         bool EmptyRecycleBin();
-
-        /// <summary>
-        /// Called to remove all files associated with entities when recycle bin is emptied
-        /// </summary>
-        /// <param name="files"></param>
-        /// <returns></returns>
-        bool DeleteFiles(IEnumerable<string> files);
+       
     }
 }

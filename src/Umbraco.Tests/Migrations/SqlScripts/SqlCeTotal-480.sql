@@ -443,14 +443,7 @@ CREATE TABLE [umbracoUser2NodePermission]
 ; 
 ALTER TABLE [umbracoUser2NodePermission] ADD CONSTRAINT [PK_umbracoUser2NodePermission] PRIMARY KEY  ([userId], [nodeId], [permission]) 
 ; 
-CREATE TABLE [umbracoUserLogins] 
-( 
-[contextID] [uniqueidentifier] NOT NULL, 
-[userID] [int] NOT NULL, 
-[timeout] [bigint] NOT NULL 
-) 
  
-; 
 ALTER TABLE [umbracoAppTree] ADD 
 CONSTRAINT [FK_umbracoAppTree_umbracoApp] FOREIGN KEY ([appAlias]) REFERENCES [umbracoApp] ([appAlias]) 
 ; 

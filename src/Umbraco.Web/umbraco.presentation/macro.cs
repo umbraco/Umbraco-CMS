@@ -537,8 +537,8 @@ namespace umbraco
         /// <returns></returns>
         private Control AddMacroResultToCache(Control macroControl)
         {
-            // Add result to cache if successful
-            if (Model.CacheDuration > 0)
+            // Add result to cache if successful (and cache is enabled)
+            if (UmbracoContext.Current.InPreviewMode == false && Model.CacheDuration > 0)
             {
                 // do not add to cache if there's no member and it should cache by personalization
                 if (!Model.CacheByMember || (Model.CacheByMember && Member.IsLoggedOn()))
@@ -1578,7 +1578,7 @@ namespace umbraco
             //Trace out to profiling... doesn't actually profile, just for informational output.
             if (excludeProfiling == false)
             {
-                using (ProfilerResolver.Current.Profiler.Step(string.Format("{0}", message)))
+                using (ApplicationContext.Current.ProfilingLogger.TraceDuration<macro>(string.Format("{0}", message)))
                 {
                 }
             }
@@ -1592,7 +1592,7 @@ namespace umbraco
             //Trace out to profiling... doesn't actually profile, just for informational output.
             if (excludeProfiling == false)
             {
-                using (ProfilerResolver.Current.Profiler.Step(string.Format("Warning: {0}", message)))
+                using (ApplicationContext.Current.ProfilingLogger.TraceDuration<macro>(string.Format("Warning: {0}", message)))
                 {
                 }
             }
@@ -1606,7 +1606,7 @@ namespace umbraco
             //Trace out to profiling... doesn't actually profile, just for informational output.
             if (excludeProfiling == false)
             {
-                using (ProfilerResolver.Current.Profiler.Step(string.Format("{0}, Error: {1}", message, ex)))
+                using (ApplicationContext.Current.ProfilingLogger.TraceDuration<macro>(string.Format("{0}, Error: {1}", message, ex)))
                 {
                 }
             }
