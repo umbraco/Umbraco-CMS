@@ -83,6 +83,8 @@ namespace Umbraco.Web.Editors
         public ContentTypeCompositionDisplay GetEmpty()
         {
             var ct = new MediaType(-1);
+            ct.Icon = "icon-picture";
+
             var dto = Mapper.Map<IMediaType, ContentTypeCompositionDisplay>(ct);
             return dto;
         }
