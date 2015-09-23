@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 
@@ -86,9 +87,15 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             {
                 CreateUmbracoRelationTypeData();
             }
+
             if (tableName.Equals("cmsTaskType"))
             {
                 CreateCmsTaskTypeData();
+            }
+
+            if (tableName.Equals("umbracoMigration"))
+            {
+                CreateUmbracoMigrationData();
             }
 
             _logger.Info<BaseDataCreation>(string.Format("Done creating data in table {0}", tableName));
@@ -273,6 +280,19 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         private void CreateCmsTaskTypeData()
         {
             _database.Insert("cmsTaskType", "id", false, new TaskTypeDto { Id = 1, Alias = "toTranslate" });
+        }
+
+        private void CreateUmbracoMigrationData()
+        {
+            var dto = new MigrationDto
+            {
+                Id = 1,
+                Name = GlobalSettings.UmbracoMigrationName,
+                Version = UmbracoVersion.GetSemanticVersion().ToString(),
+                CreateDate = DateTime.Now
+            };
+
+            _database.Insert("umbracoMigration", "pk", false, dto);
         }
     }
 }
