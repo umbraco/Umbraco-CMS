@@ -129,6 +129,8 @@ namespace Umbraco.Web.Editors
 
                 //set id to null to ensure its handled as a new type
                 contentType.Id = null;
+                contentType.CreateDate = DateTime.Now;
+                contentType.UpdateDate = DateTime.Now;
 
 
                 //create a default template if it doesnt exist -but only if default template is == to the content type
