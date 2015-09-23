@@ -17,6 +17,11 @@
 		ng-class="{'-unlocked': !locked}"
 		placeholder="{{placeholderText}}"
 		umb-auto-resize
+        required
+        val-regex="^[a-zA-Z]\w.*$"
 	/>
+    
+    <span class="validation-label" val-msg-for="lockedField" val-toggle-msg="required"><localize key="required" /></span>
+    <span class="validation-label" val-msg-for="lockedField" val-toggle-msg="valRegex">Invalid alias</span>
 
 </div>
