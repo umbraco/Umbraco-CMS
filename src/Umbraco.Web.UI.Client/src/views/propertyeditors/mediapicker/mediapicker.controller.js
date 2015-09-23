@@ -11,12 +11,10 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                 $scope.model.config.startNodeId = userData.startMediaId;
             });
         }
-            
-
          
         function setupViewModel() {
             $scope.images = [];
-            $scope.ids = []; 
+            $scope.ids = [];
 
             if ($scope.model.value) {
                 var ids = $scope.model.value.split(',');
@@ -40,7 +38,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                             }
 
                             $scope.images.push(media);
-                            $scope.ids.push(media.id);   
+                            $scope.ids.push(media.id);
                         }
                     });
 
@@ -60,6 +58,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         $scope.add = function() {
             dialogService.mediaPicker({
                 startNodeId: $scope.model.config.startNodeId,
+                openAtNodeId: $rootScope.lastPickedMediaParentId ? $rootScope.lastPickedMediaParentId : $scope.model.config.startNodeId,
                 multiPicker: multiPicker,
                 callback: function(data) {
                     
@@ -76,6 +75,8 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
 
                         $scope.images.push(media);
                         $scope.ids.push(media.id);
+
+                        $rootScope.lastPickedMediaParentId = media.parentId;
                     });
 
                     $scope.sync();

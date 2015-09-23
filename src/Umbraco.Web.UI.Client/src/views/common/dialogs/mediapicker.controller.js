@@ -27,7 +27,7 @@ angular.module("umbraco")
 
             //preload selected item
             $scope.target = undefined;
-            if(dialogOptions.currentTarget){
+            if(dialogOptions.currentTarget) {
                 $scope.target = dialogOptions.currentTarget;
             }
 
@@ -150,11 +150,24 @@ angular.module("umbraco")
 
                 $scope.target = undefined;
             };
+            
+            if (!$scope.target) {
 
-           
+                // Check start node is in the path of the requested node to open on (if passed).  It might not be if there are multiple media pickers
+                // with different start nodes.  If it's not, we'll reset to present from the start node.
+                if (dialogOptions.openAtNodeId && dialogOptions.openAtNodeId !== $scope.startNodeId) {
+                    entityResource.getById(dialogOptions.openAtNodeId, "media")
+                        .then(function (openAtNode) {
+                            var openAtNodeId = $scope.startNodeId;
+                            if (openAtNode.path.split(',').indexOf($scope.startNodeId)) {
+                                openAtNodeId = openAtNode.id;
+                            }
 
-            //default root item
-            if(!$scope.target){
-                $scope.gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });  
+                            $scope.gotoFolder({ id: openAtNodeId, name: "Media", icon: "icon-folder" });
+                        });
+                } else {
+                    $scope.gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });
+                }
+
             }
         });
