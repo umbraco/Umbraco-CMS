@@ -1,7 +1,7 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Overlays.MediaPickerController",
-        function ($scope, mediaResource, umbRequestHelper, entityResource, $log, mediaHelper, eventsService, treeService, $cookies, $element, $timeout) {
+        function ($scope, mediaResource, umbRequestHelper, entityResource, $log, mediaHelper, eventsService, treeService, $element, $timeout, $cookies, $cookieStore) {
 
             var dialogOptions = $scope.model;
 
@@ -10,6 +10,7 @@ angular.module("umbraco")
             $scope.multiPicker = (dialogOptions.multiPicker && dialogOptions.multiPicker !== "0") ? true : false;
             $scope.startNodeId = dialogOptions.startNodeId ? dialogOptions.startNodeId : -1;
             $scope.cropSize = dialogOptions.cropSize;
+            $scope.lastOpenedNode = $cookieStore.get("umbLastOpenedMediaNodeId");
 
             $scope.model.selectedImages = [];
 
@@ -102,8 +103,11 @@ angular.module("umbraco")
                    });
 
                 $scope.currentFolder = folder;
-            };
 
+                // for some reason i cannot set cookies with cookieStore
+                document.cookie="umbLastOpenedMediaNodeId=" + folder.id;
+
+            };
 
             $scope.clickHandler = function(image, ev, select) {
                 ev.preventDefault();
@@ -171,8 +175,30 @@ angular.module("umbraco")
             };
 
             //default root item
-            if(!$scope.target){
-                $scope.gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });
+            if (!$scope.target) {
+
+               if($scope.lastOpenedNode) {
+
+                  entityResource.getById($scope.lastOpenedNode, "media")
+                     .then(function(node){
+
+                        // make sure that las opened node is on the same path as start node
+                        var nodePath = node.path.split(",");
+
+                        if(nodePath.indexOf($scope.startNodeId) !== -1) {
+                           $scope.gotoFolder({id: $scope.lastOpenedNode, name: "Media", icon: "icon-folder"});
+                        } else {
+                           $scope.gotoFolder({id: $scope.startNodeId, name: "Media", icon: "icon-folder"});
+                        }
+
+                     });
+
+               } else {
+
+                  $scope.gotoFolder({id: $scope.startNodeId, name: "Media", icon: "icon-folder"});
+
+               }
+
             }
 
             $scope.openDetailsDialog = function() {
