@@ -6,19 +6,25 @@
 
             <div class="umb-panel-header-left-side">
 
-               <div class="umb-panel-header-icon" ng-if="icon!==undefined" ng-click="openIconPicker()" ng-class="{'-placeholder': $parent.icon==='' || $parent.icon===null}">
+               <div class="umb-panel-header-icon" ng-if="!hideIcon" ng-click="openIconPicker()" ng-class="{'-placeholder': $parent.icon==='' || $parent.icon===null}">
                    <i class="icon {{$parent.icon}}"  ng-if="$parent.icon!=='' && $parent.icon!==null"></i>
                    <div class="umb-panel-header-icon-text" ng-if="$parent.icon==='' || $parent.icon===null">Add icon</div>
                </div>
 
                <div class="umb-panel-header-title-wrapper">
 
-                  <input type="text" class="umb-panel-header-name-input" placeholder="Enter name..." ng-if="name!==undefined && !nameLocked" ng-model="$parent.name"  ng-class="{'name-is-empty': $parent.name===null || $parent.name===''}" umb-auto-focus focus-on-filled="true" />
-                  <div class="umb-panel-header-name" ng-if="name!==undefined && nameLocked">{{ name }}</div>
+                  <input type="text" class="umb-panel-header-name-input" placeholder="Enter name..." 
+                         ng-if="!nameLocked" 
+                         ng-model="$parent.name"  
+                         ng-class="{'name-is-empty': $parent.name===null || $parent.name===''}" 
+                         umb-auto-focus 
+                         focus-on-filled="true"
+                         required />
+                  <div class="umb-panel-header-name" ng-if="nameLocked">{{ name }}</div>
 
-                  <umb-generate-alias class="umb-panel-header-alias" ng-if="alias!==undefined" alias="$parent.alias" alias-from="$parent.name" enable-lock="true"></umb-generate-alias>
+                  <umb-generate-alias class="umb-panel-header-alias" ng-if="!hideAlias" alias="$parent.alias" alias-from="$parent.name" enable-lock="true"></umb-generate-alias>
 
-                  <input type="text" class="umb-panel-header-description" placeholder="Enter description..." ng-if="description!==undefined" ng-model="$parent.description" />
+                  <input type="text" class="umb-panel-header-description" placeholder="Enter description..." ng-if="!hideDescription" ng-model="$parent.description" />
 
                </div>
 
