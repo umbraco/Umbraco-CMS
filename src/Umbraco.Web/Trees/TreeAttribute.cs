@@ -20,7 +20,7 @@ namespace Umbraco.Web.Trees
         /// <param name="sortOrder">The sort order.</param>
         public TreeAttribute(string appAlias,
             string alias,
-            string title,
+            string title = "",
             string iconClosed = "icon-folder",
             string iconOpen = "icon-folder-open",
             bool initialize = true,
