@@ -13,13 +13,17 @@
 
                <div class="umb-panel-header-title-wrapper">
 
-                  <input type="text" class="umb-panel-header-name-input" placeholder="Enter name..." 
-                         ng-if="!nameLocked" 
-                         ng-model="$parent.name"  
-                         ng-class="{'name-is-empty': $parent.name===null || $parent.name===''}" 
-                         umb-auto-focus 
-                         focus-on-filled="true"
-                         required />
+                   <ng-form name="headerNameForm">
+                       <input type="text" class="umb-panel-header-name-input" placeholder="Enter name..."
+                              name="headerName"
+                              ng-show="!nameLocked"
+                              ng-model="name"
+                              ng-class="{'name-is-empty': $parent.name===null || $parent.name===''}"
+                              umb-auto-focus
+                              focus-on-filled="true"
+                              required />
+                   </ng-form>
+
                   <div class="umb-panel-header-name" ng-if="nameLocked">{{ name }}</div>
 
                   <umb-generate-alias class="umb-panel-header-alias" ng-if="!hideAlias" alias="$parent.alias" alias-from="$parent.name" enable-lock="true"></umb-generate-alias>
