@@ -36,11 +36,9 @@ namespace Umbraco.Core.Persistence.Repositories
             _contentTypeRepository = contentTypeRepository;
             _preValRepository = new DataTypePreValueRepository(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax);
 
-            EnsureUniqueNaming = true;
         }
 
-        public bool EnsureUniqueNaming { get; set; }
-
+     
         #region Overrides of RepositoryBase<int,DataTypeDefinition>
 
         protected override IDataTypeDefinition PerformGet(int id)
@@ -429,8 +427,7 @@ AND umbracoNode.id <> @id",
 
         private string EnsureUniqueNodeName(string nodeName, int id = 0)
         {
-            if (EnsureUniqueNaming == false)
-                return nodeName;
+         
 
             var sql = new Sql();
             sql.Select("*")
