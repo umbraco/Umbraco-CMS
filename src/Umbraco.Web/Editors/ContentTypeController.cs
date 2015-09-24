@@ -130,6 +130,8 @@ namespace Umbraco.Web.Editors
                 //set id to null to ensure its handled as a new type
                 contentType.Id = null;
 
+                //TODO: This all needs to be done in a transaction!!
+                // Which means that all of this logic needs to take place inside the service
 
                 //create a default template if it doesnt exist -but only if default template is == to the content type
                 if (contentType.DefaultTemplate != null && contentType.DefaultTemplate.Alias == contentType.Alias)
