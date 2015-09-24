@@ -49,7 +49,7 @@ namespace Umbraco.Web.Trees
 
 
                 //try to look up a tree header matching the tree alias
-                var culture = CultureInfo.GetCultureInfo(Security.CurrentUser.Language.Replace("_", "-"));
+                var culture = Security.CurrentUser.GetUserCulture(Services.TextService);
                 var localizedLabel = Services.TextService.Localize("treeHeaders/" + _attribute.Alias, culture);
                 if (string.IsNullOrEmpty(localizedLabel) == false)
                     return localizedLabel;
