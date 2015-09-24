@@ -85,6 +85,8 @@ namespace Umbraco.Web.Editors
         public ContentTypeCompositionDisplay GetEmpty()
         {
             var ct = new MemberType(-1);
+            ct.Icon = "icon-user";
+
             var dto = Mapper.Map<IMemberType, ContentTypeCompositionDisplay>(ct);
             return dto;
         }

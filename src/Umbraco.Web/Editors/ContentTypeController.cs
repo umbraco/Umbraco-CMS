@@ -129,6 +129,8 @@ namespace Umbraco.Web.Editors
 
                 //set id to null to ensure its handled as a new type
                 contentType.Id = null;
+                contentType.CreateDate = DateTime.Now;
+                contentType.UpdateDate = DateTime.Now;
 
                 //TODO: This all needs to be done in a transaction!!
                 // Which means that all of this logic needs to take place inside the service
@@ -184,7 +186,7 @@ namespace Umbraco.Web.Editors
         public ContentTypeDisplay GetEmpty(int parentId)
         {
             var ct = new ContentType(parentId);
-            ct.Icon = "icon-doc";
+            ct.Icon = "icon-document";
 
             var dto = Mapper.Map<IContentType, ContentTypeDisplay>(ct);
             return dto;

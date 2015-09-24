@@ -58,7 +58,7 @@ namespace Umbraco.Web.Models.Mapping
                     Id = Convert.ToInt32(basic.Id),
                     Key = basic.Key
                 })
-               .ForMember(t => t.Path, expression => expression.MapFrom(template => template.Path))
+               .ForMember(t => t.Path, expression => expression.Ignore())
                .ForMember(t => t.Id, expression => expression.MapFrom(template => Convert.ToInt32(template.Id)))
                .ForMember(x => x.VirtualPath, expression => expression.Ignore())
                .ForMember(x => x.CreateDate, expression => expression.Ignore())

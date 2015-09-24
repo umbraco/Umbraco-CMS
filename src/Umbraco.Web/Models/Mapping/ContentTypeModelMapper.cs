@@ -43,6 +43,7 @@ namespace Umbraco.Web.Models.Mapping
                 //only map id if set to something higher then zero
                 .ForMember(dto => dto.Id, expression => expression.Condition(display => (Convert.ToInt32(display.Id) > 0)))
                 .ForMember(dto => dto.Id, expression => expression.MapFrom(display => Convert.ToInt32(display.Id)))
+                
                 .ForMember(dto => dto.AllowedAsRoot, expression => expression.MapFrom(display => display.AllowAsRoot))
                 .ForMember(dto => dto.CreatorId, expression => expression.Ignore())
                 .ForMember(dto => dto.Level, expression => expression.Ignore())
@@ -118,14 +119,14 @@ namespace Umbraco.Web.Models.Mapping
 
             config.CreateMap<ContentTypeDisplay, IContentType>()
                 .ConstructUsing((source) => new ContentType(source.ParentId))
-
+                .ForMember(dto => dto.Id, expression => expression.Ignore())
                 .ForMember(dto => dto.AllowedTemplates, expression => expression.Ignore())
                 .ForMember(dto => dto.DefaultTemplate, expression => expression.Ignore())
 
                 .AfterMap((source, dest) =>
                 {
                     //sync templates
-                    dest.AllowedTemplates = source.AllowedTemplates.Select(x => Mapper.Map<ITemplate>(x));
+                    dest.AllowedTemplates = source.AllowedTemplates.Where(x => x != null).Select(x => Mapper.Map<ITemplate>(x));
 
                     if (source.DefaultTemplate != null)
                         dest.SetDefaultTemplate(Mapper.Map<ITemplate>(source.DefaultTemplate));
