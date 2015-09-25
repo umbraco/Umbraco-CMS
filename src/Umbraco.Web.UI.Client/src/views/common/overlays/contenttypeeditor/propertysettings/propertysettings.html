@@ -1,21 +1,21 @@
 <div class="content-type-editor-dialog edit-property-settings" ng-controller="Umbraco.Overlay.PropertySettingsOverlay as vm">
 
-   <div class="umb-control-group control-group">
-        <textarea class="editor-label"
-            name="propertyLabel"
-            ng-model="model.property.label"
-            placeholder="Enter a name..."
-            umb-auto-focus
-            focus-on-filled="true"
-            umb-auto-resize
-            required
-            overlay-submit-on-enter>
-        </textarea>
+   <div class="umb-control-group">
+       <div class="control-group -no-margin">
+           <textarea class="editor-label"
+                     name="propertyLabel"
+                     ng-model="model.property.label"
+                     placeholder="Enter a name..."
+                     umb-auto-focus
+                     focus-on-filled="true"
+                     umb-auto-resize
+                     required
+                     overlay-submit-on-enter></textarea>    
+       </div> 
+       <div class="control-group -no-margin">
+           <umb-generate-alias enable-lock="true" alias-from="model.property.label" alias="model.property.alias"></umb-generate-alias>
+       </div>
    </div>
-
-    <div class="umb-control-group control-group">
-        <umb-generate-alias enable-lock="true" alias-from="model.property.label" alias="model.property.alias"></umb-generate-alias>
-    </div>
 
    <div class="umb-control-group control-group">
       <textarea
