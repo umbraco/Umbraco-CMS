@@ -9,6 +9,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Trees
 {
@@ -43,14 +44,14 @@ namespace Umbraco.Web.Trees
         {
             get
             {
+
                 //if title is defined, return that
                 if(string.IsNullOrEmpty(_attribute.Title) == false)
                     return _attribute.Title;
 
 
                 //try to look up a tree header matching the tree alias
-                var culture = Security.CurrentUser.GetUserCulture(Services.TextService);
-                var localizedLabel = Services.TextService.Localize("treeHeaders/" + _attribute.Alias, culture);
+                var localizedLabel = Services.TextService.Localize("treeHeaders/" + _attribute.Alias);
                 if (string.IsNullOrEmpty(localizedLabel) == false)
                     return localizedLabel;
 
