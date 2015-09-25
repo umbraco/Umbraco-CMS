@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http.Formatting;
+using System.Threading;
+using System.Web.Security;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 
@@ -37,7 +41,22 @@ namespace Umbraco.Web.Trees
         /// </summary>
         public override string RootNodeDisplayName
         {
-            get { return _attribute.Title; }
+            get
+            {
+                //if title is defined, return that
+                if(string.IsNullOrEmpty(_attribute.Title) == false)
+                    return _attribute.Title;
+
+
+                //try to look up a tree header matching the tree alias
+                var culture = Security.CurrentUser.GetUserCulture(Services.TextService);
+                var localizedLabel = Services.TextService.Localize("treeHeaders/" + _attribute.Alias, culture);
+                if (string.IsNullOrEmpty(localizedLabel) == false)
+                    return localizedLabel;
+
+                //is returned to signal that a label was not found
+                return "[" + _attribute.Alias + "]";
+            }
         }
 
         /// <summary>
