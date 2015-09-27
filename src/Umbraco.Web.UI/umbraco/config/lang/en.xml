@@ -841,6 +841,11 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="partialViewSavedText">Partial view saved without any errors!</key>
     <key alias="partialViewErrorHeader">Partial view not saved</key>
     <key alias="partialViewErrorText">An error occurred saving the file.</key>
+    <key alias="scriptSavedHeader">Script view saved</key>
+    <key alias="scriptSavedText">Script view saved without any errors!</key>
+    <key alias="scriptErrorHeader">Script view not saved</key>
+    <key alias="scriptErrorText">An error occurred saving the file.</key>
+    <key alias="cssErrorText">An error occurred saving the file.</key>
   </area>
   <area alias="stylesheet">
     <key alias="aliasHelp">Uses CSS syntax ex: h1, .redHeader, .blueTex</key>

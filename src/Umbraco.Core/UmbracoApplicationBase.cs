@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Web;
 using System.Web.Hosting;
 using log4net;
@@ -32,19 +34,6 @@ namespace Umbraco.Core
         /// </summary>
         internal void StartApplication(object sender, EventArgs e)
         {
-            //take care of unhandled exceptions - there is nothing we can do to 
-            // prevent the entire w3wp process to go down but at least we can try
-            // and log the exception
-            AppDomain.CurrentDomain.UnhandledException += (_, args) =>
-            {
-                var exception = (Exception) args.ExceptionObject;
-                var isTerminating = args.IsTerminating; // always true?
-
-                var msg = "Unhandled exception in AppDomain";
-                if (isTerminating) msg += " (terminating)";
-                Logger.Error(typeof(UmbracoApplicationBase), msg, exception);
-            };
-
             //take care of unhandled exceptions - there is nothing we can do to 
             // prevent the entire w3wp process to go down but at least we can try
             // and log the exception
@@ -193,7 +182,47 @@ namespace Umbraco.Core
         {
             if (SystemUtilities.GetCurrentTrustLevel() == AspNetHostingPermissionLevel.Unrestricted)
             {
-                Logger.Info<UmbracoApplicationBase>("Application shutdown. Reason: " + HostingEnvironment.ShutdownReason);
+                //Try to log the detailed shutdown message (typical asp.net hack: http://weblogs.asp.net/scottgu/433194)
+                try
+                {
+                    var runtime = (HttpRuntime)typeof(HttpRuntime).InvokeMember("_theRuntime",
+                                BindingFlags.NonPublic
+                                | BindingFlags.Static
+                                | BindingFlags.GetField,
+                                null,
+                                null,
+                                null);
+                    if (runtime == null)
+                        return;
+
+                    var shutDownMessage = (string)runtime.GetType().InvokeMember("_shutDownMessage",
+                        BindingFlags.NonPublic
+                        | BindingFlags.Instance
+                        | BindingFlags.GetField,
+                        null,
+                        runtime,
+                        null);
+
+                    var shutDownStack = (string)runtime.GetType().InvokeMember("_shutDownStack",
+                        BindingFlags.NonPublic
+                        | BindingFlags.Instance
+                        | BindingFlags.GetField,
+                        null,
+                        runtime,
+                        null);
+
+                    var shutdownMsg = string.Format("{0}\r\n\r\n_shutDownMessage={1}\r\n\r\n_shutDownStack={2}",
+                        HostingEnvironment.ShutdownReason,
+                        shutDownMessage,
+                        shutDownStack);
+
+                    Logger.Info<UmbracoApplicationBase>("Application shutdown. Details: " + shutdownMsg);
+                }
+                catch (Exception)
+                {
+                    //if for some reason that fails, then log the normal output
+                    Logger.Info<UmbracoApplicationBase>("Application shutdown. Reason: " + HostingEnvironment.ShutdownReason);
+                }
             }
             OnApplicationEnd(sender, e);
 

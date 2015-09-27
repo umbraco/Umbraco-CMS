@@ -8,24 +8,11 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 {
     public class DeleteForeignKeyExpression : MigrationExpressionBase
     {
-        [Obsolete("Use the other constructors specifying an ILogger instead")]
-        public DeleteForeignKeyExpression()
-        {
-            ForeignKey = new ForeignKeyDefinition();
-        }
-
-        [Obsolete("Use the other constructors specifying an ILogger instead")]
-        public DeleteForeignKeyExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders)
-            : base(current, databaseProviders)
-        {
-            ForeignKey = new ForeignKeyDefinition();
-        }
-
-        public DeleteForeignKeyExpression(ISqlSyntaxProvider sqlSyntax)
-            : base(sqlSyntax)
-        {
-            ForeignKey = new ForeignKeyDefinition();
-        }
+        //public DeleteForeignKeyExpression(ISqlSyntaxProvider sqlSyntax)
+        //    : base(sqlSyntax)
+        //{
+        //    ForeignKey = new ForeignKeyDefinition();
+        //}
 
         public DeleteForeignKeyExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax)
             : base(current, databaseProviders, sqlSyntax)
@@ -33,7 +20,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
             ForeignKey = new ForeignKeyDefinition();
         }
 
-        public virtual ForeignKeyDefinition ForeignKey { get; set; }
+        public ForeignKeyDefinition ForeignKey { get; set; }
 
         public override string ToString()
         {
@@ -45,7 +32,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 
             if (CurrentDatabaseProvider == DatabaseProviders.MySql)
             {
-                //MySql naming "convention" for foreignkeys, which aren't explicitly named
+                //MySql naming "convention" for foreignkeys, which aren't explicitly named                
                 if (string.IsNullOrEmpty(ForeignKey.Name))
                     ForeignKey.Name = string.Format("{0}_ibfk_1", ForeignKey.ForeignTable.ToLower());
 

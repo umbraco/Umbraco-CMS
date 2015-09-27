@@ -81,6 +81,7 @@
             {
                 return null;
             }
+
             if ((preferFocalPoint && cropDataSet.HasFocalPoint()) || (crop != null && crop.Coordinates == null && cropDataSet.HasFocalPoint()) || (string.IsNullOrEmpty(cropAlias) && cropDataSet.HasFocalPoint()))
             {
                 cropUrl.Append("?center=" + cropDataSet.FocalPoint.Top.ToString(CultureInfo.InvariantCulture) + "," + cropDataSet.FocalPoint.Left.ToString(CultureInfo.InvariantCulture));
@@ -100,6 +101,7 @@
                 cropUrl.Append("?anchor=center");
                 cropUrl.Append("&mode=crop");
             }
+
             return cropUrl.ToString();
         }
     }

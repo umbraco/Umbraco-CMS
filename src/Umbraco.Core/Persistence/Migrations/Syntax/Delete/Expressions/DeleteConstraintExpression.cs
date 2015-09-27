@@ -5,13 +5,9 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 {
     public class DeleteConstraintExpression : MigrationExpressionBase
     {
-        public DeleteConstraintExpression(ConstraintType type)
-        {
-            Constraint = new ConstraintDefinition(type);
-        }
-
-        public DeleteConstraintExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ConstraintType type)
-            : base(current, databaseProviders)
+        
+        public DeleteConstraintExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax, ConstraintType type)
+            : base(current, databaseProviders, sqlSyntax)
         {
             Constraint = new ConstraintDefinition(type);
         }
@@ -25,24 +21,24 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
             {
                 if (Constraint.IsPrimaryKeyConstraint)
                 {
-                    return string.Format(SqlSyntaxContext.SqlSyntaxProvider.DeleteConstraint,
-                                     SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(Constraint.TableName),
+                    return string.Format(SqlSyntax.DeleteConstraint,
+                                     SqlSyntax.GetQuotedTableName(Constraint.TableName),
                                      "PRIMARY KEY",
                                      "");
                 }
                 else
                 {
-                    return string.Format(SqlSyntaxContext.SqlSyntaxProvider.DeleteConstraint,
-                                     SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(Constraint.TableName),
+                    return string.Format(SqlSyntax.DeleteConstraint,
+                                     SqlSyntax.GetQuotedTableName(Constraint.TableName),
                                      "FOREIGN KEY",
                                      "");
                 }
             }
             else
             {
-                return string.Format(SqlSyntaxContext.SqlSyntaxProvider.DeleteConstraint,
-                                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(Constraint.TableName),
-                                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedName(Constraint.ConstraintName));
+                return string.Format(SqlSyntax.DeleteConstraint,
+                                 SqlSyntax.GetQuotedTableName(Constraint.TableName),
+                                 SqlSyntax.GetQuotedName(Constraint.ConstraintName));
             }
         }
     }

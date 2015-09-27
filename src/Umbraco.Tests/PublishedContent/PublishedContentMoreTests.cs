@@ -139,7 +139,6 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [Test]
-        [Ignore("Fails as long as PublishedContentModel is internal.")] // fixme
         public void OfType1()
         {
             var content = UmbracoContext.Current.ContentCache.GetAtRoot()
@@ -155,7 +154,6 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [Test]
-        [Ignore("Fails as long as PublishedContentModel is internal.")] // fixme
         public void OfType2()
         {
             var content = UmbracoContext.Current.ContentCache.GetAtRoot()
@@ -169,7 +167,6 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [Test]
-        [Ignore("Fails as long as PublishedContentModel is internal.")] // fixme
         public void OfType()
         {
             var content = UmbracoContext.Current.ContentCache.GetAtRoot()
@@ -196,7 +193,6 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [Test]
-        [Ignore("Fails as long as PublishedContentModel is internal.")] // fixme
         public void Issue()
         {
             var content = UmbracoContext.Current.ContentCache.GetAtRoot()
@@ -216,6 +212,16 @@ namespace Umbraco.Tests.PublishedContent
                 .OfType<ContentType2>()
                 .First();
             Assert.AreEqual(1234, content3.Prop1);
+        }
+
+        [Test]
+        public void PublishedContentQueryTypedContentList()
+        {
+            var query = new PublishedContentQuery(UmbracoContext.Current.ContentCache, UmbracoContext.Current.MediaCache);
+            var result = query.TypedContent(new[] { 1, 2, 4 }).ToArray();
+            Assert.AreEqual(2, result.Length);
+            Assert.AreEqual(1, result[0].Id);
+            Assert.AreEqual(2, result[1].Id);
         }
 
         static SolidPublishedCaches CreatePublishedContent()

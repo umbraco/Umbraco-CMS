@@ -4,11 +4,8 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Expressions
 {
     public class AlterDefaultConstraintExpression : MigrationExpressionBase
     {
-        public AlterDefaultConstraintExpression()
-        {
-        }
-
-        public AlterDefaultConstraintExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders) : base(current, databaseProviders)
+        public AlterDefaultConstraintExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax) 
+            : base(current, databaseProviders, sqlSyntax)
         {
         }
 
@@ -22,9 +19,9 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Expressions
         {
             //NOTE Should probably investigate if Deleting a Default Constraint is different from deleting a 'regular' constraint
 
-            return string.Format(SqlSyntaxContext.SqlSyntaxProvider.DeleteConstraint,
-                                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(TableName),
-                                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedName(ConstraintName));
+            return string.Format(SqlSyntax.DeleteConstraint,
+                                 SqlSyntax.GetQuotedTableName(TableName),
+                                 SqlSyntax.GetQuotedName(ConstraintName));
         }
     }
 }

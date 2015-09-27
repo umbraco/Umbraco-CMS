@@ -79,7 +79,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public object GetCacheItem(string cacheKey, Func<object> getCacheItem)
         {
-            return  InnerProvider.GetCacheItem(cacheKey, () =>
+            var cached = InnerProvider.GetCacheItem(cacheKey, () =>
             {
                 var result = DictionaryCacheProviderBase.GetSafeLazy(getCacheItem);
                 var value = result.Value; // force evaluation now - this may throw if cacheItem throws, and then nothing goes into cache
@@ -87,18 +87,21 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 return CheckCloneableAndTracksChanges(value);
             });
+            return CheckCloneableAndTracksChanges(cached);
         }
 
         public object GetCacheItem(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
         {
-            return InnerProvider.GetCacheItem(cacheKey, () =>
+            var cached = InnerProvider.GetCacheItem(cacheKey, () =>
             {
                 var result = DictionaryCacheProviderBase.GetSafeLazy(getCacheItem);
                 var value = result.Value; // force evaluation now - this may throw if cacheItem throws, and then nothing goes into cache
                 if (value == null) return null; // do not store null values (backward compat)
 
                 return CheckCloneableAndTracksChanges(value);
-            }, timeout, isSliding, priority, removedCallback, dependentFiles);         
+            }, timeout, isSliding, priority, removedCallback, dependentFiles);
+
+            return CheckCloneableAndTracksChanges(cached);
         }
 
         public void InsertCacheItem(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)

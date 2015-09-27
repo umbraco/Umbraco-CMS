@@ -80,9 +80,6 @@ namespace Umbraco.Core.Persistence
             var creation = new DatabaseSchemaCreation(_db, _logger, _syntaxProvider);
             creation.InitializeDatabaseSchema();
 
-            //Now ensure to cretae the tag in the db for the current migration version
-            migrationEntryService.CreateEntry(GlobalSettings.UmbracoMigrationName, UmbracoVersion.GetSemanticVersion());
-
             _logger.Info<Database>("Finalized database schema creation");
         }
 

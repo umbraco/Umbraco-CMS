@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Web;
 using Umbraco.Core.Sync;
 
 namespace Umbraco.Web
@@ -38,11 +39,19 @@ namespace Umbraco.Web
 
         protected override ICollection<RefreshInstructionEnvelope> GetBatch(bool ensureHttpContext)
         {
-            var httpContext = UmbracoContext.Current == null ? null : UmbracoContext.Current.HttpContext;
+            //try get the http context from the UmbracoContext, we do this because in the case we are launching an async
+            // thread and we know that the cache refreshers will execute, we will ensure the UmbracoContext and therefore we
+            // can get the http context from it
+            var httpContext = (UmbracoContext.Current == null ? null : UmbracoContext.Current.HttpContext)
+                //if this is null, it could be that an async thread is calling this method that we weren't aware of and the UmbracoContext
+                // wasn't ensured at the beginning of the thread. We can try to see if the HttpContext.Current is available which might be 
+                // the case if the asp.net synchronization context has kicked in
+                ?? (HttpContext.Current == null ? null : new HttpContextWrapper(HttpContext.Current));
+
             if (httpContext == null)
             {
                 if (ensureHttpContext)
-                    throw new NotSupportedException("Cannot execute without a valid/current UmbracoContext with an HttpContext assigned.");
+                    throw new NotSupportedException("Cannot execute without a valid/current HttpContext assigned.");
                 return null;
             }
 

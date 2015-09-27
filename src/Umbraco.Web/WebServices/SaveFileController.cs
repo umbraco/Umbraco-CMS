@@ -12,8 +12,9 @@ using Umbraco.Web.Mvc;
 using umbraco;
 using umbraco.cms.businesslogic.macro;
 using System.Collections.Generic;
+using umbraco.cms.helpers;
 using Umbraco.Core;
-
+using Umbraco.Core.Configuration;
 using Template = umbraco.cms.businesslogic.template.Template;
 
 namespace Umbraco.Web.WebServices
@@ -37,56 +38,14 @@ namespace Umbraco.Web.WebServices
         [HttpPost]
         public JsonResult SavePartialViewMacro(string filename, string oldName, string contents)
         {
-            //NOTE: This is a bit of a hack because we're sharing the View editor with templates/partial views/partial view macros, so the path starts with
-            // 'Partials' which we need to remove because the path that we construct the partial view with is a relative path to the root path of 
-            // Views/Partials
-            if (filename.InvariantStartsWith("MacroPartials/"))
-            {
-                filename = filename.TrimStart("MacroPartials/");
-            }
-            if (oldName.IsNullOrWhiteSpace() == false)
-            {
-                if (oldName.InvariantStartsWith("MacroPartials/"))
-                {
-                    oldName = oldName.TrimStart("MacroPartials/");
-                }
-            }
+            var svce = (FileService) Services.FileService;
 
-            var fileService = (FileService)Services.FileService;
-
-            //try to get the file by the old name first if they are different and delete that file
-            if (filename.Trim().InvariantEquals(oldName.Trim()) == false)
-            {
-                var existing = fileService.GetPartialViewMacro(oldName);
-                if (existing != null)
-                {
-                    var success = fileService.DeletePartialViewMacro(existing.Path, Security.GetUserId());
-                    if (success == false)
-                    {
-                        return Failed(
-                            ui.Text("speechBubbles", "partialViewErrorText"), ui.Text("speechBubbles", "partialViewErrorHeader"),
-                            //pass in a new exception ... this will also append the the message
-                            new Exception("Could not delete old file: " + oldName));
-                    }
-                }
-            }
-
-            var partialView = new PartialView(filename)
-            {
-                Content = contents
-            };
-
-            var attempt = fileService.SavePartialViewMacro(partialView);
-
-            if (attempt.Success == false)
-            {
-                return Failed(
-                    ui.Text("speechBubbles", "partialViewErrorText"), ui.Text("speechBubbles", "partialViewErrorHeader"),
-                    //pass in a new exception ... this will also append the the message
-                    attempt.Exception);
-            }
-
-            return Success(ui.Text("speechBubbles", "partialViewSavedText"), ui.Text("speechBubbles", "partialViewSavedHeader"));
+            return SavePartialView(svce,
+                filename, oldName, contents,
+                "MacroPartials/",
+                (s, n) => s.GetPartialViewMacro(n),
+                (s, v) => s.ValidatePartialViewMacro((PartialView) v),
+                (s, v) => s.SavePartialViewMacro(v));
         }
 
         /// <summary>
@@ -99,53 +58,71 @@ namespace Umbraco.Web.WebServices
         [HttpPost]
         public JsonResult SavePartialView(string filename, string oldName, string contents)
         {
-            //NOTE: This is a bit of a hack because we're sharing the View editor with templates/partial views/partial view macros, so the path starts with
-            // 'Partials' which we need to remove because the path that we construct the partial view with is a relative path to the root path of 
-            // Views/Partials
-            if (filename.InvariantStartsWith("Partials/"))
+            var svce = (FileService) Services.FileService;
+
+            return SavePartialView(svce,
+                filename, oldName, contents,
+                "Partials/",
+                (s, n) => s.GetPartialView(n),
+                (s, v) => s.ValidatePartialView((PartialView) v),
+                (s, v) => s.SavePartialView(v));
+        }
+
+        private JsonResult SavePartialView(IFileService svce,
+            string filename, string oldname, string contents,
+            string pathPrefix,
+            Func<IFileService, string, IPartialView> get,
+            Func<IFileService, IPartialView, bool> validate,
+            Func<IFileService, IPartialView, Attempt<IPartialView>> save)
+        {
+            // sanitize input - partial view names have an extension
+            filename = filename
+                .Replace('\\', '/')
+                .TrimStart('/');
+
+            // sharing the editor with partial views & partial view macros,
+            // using path prefix to differenciate,
+            // but the file service manages different filesystems,
+            // and we need to come back to filesystem-relative paths
+
+            // not sure why we still need this but not going to change it now
+
+            if (filename.InvariantStartsWith(pathPrefix))
+                filename = filename.TrimStart(pathPrefix);
+
+            if (oldname != null)
             {
-                filename = filename.TrimStart("Partials/");
-            }
-            if (oldName.IsNullOrWhiteSpace() == false)
-            {
-                if (oldName.InvariantStartsWith("Partials/"))
-                {
-                    oldName = oldName.TrimStart("Partials/");
-                }    
+                oldname = oldname.TrimStart('/', '\\');
+                if (oldname.InvariantStartsWith(pathPrefix))
+                    oldname = oldname.TrimStart(pathPrefix);
             }
 
-            var fileService = (FileService)Services.FileService;
-            
-            //try to get the file by the old name first if they are different and delete that file
-            if (filename.Trim().InvariantEquals(oldName.Trim()) == false)
+            var view = get(svce, oldname);
+            if (view == null)
+                view = new PartialView(filename);
+            else
+                view.Path = filename;
+            view.Content = contents;
+
+            Attempt<IPartialView> attempt;
+            try
             {
-                var existing = fileService.GetPartialView(oldName);
-                if (existing != null)
-                {
-                    var success = fileService.DeletePartialView(existing.Path, Security.GetUserId());
-                    if (success == false)
-                    {
-                        return Failed(
-                            ui.Text("speechBubbles", "partialViewErrorText"), ui.Text("speechBubbles", "partialViewErrorHeader"),
-                            //pass in a new exception ... this will also append the the message
-                            new Exception("Could not delete old file: " + oldName));
-                    }
-                }
+                var partialView = view as PartialView;
+                if (partialView != null && validate != null && validate(svce, partialView) == false)
+                    return Failed(ui.Text("speechBubbles", "partialViewErrorText"), ui.Text("speechBubbles", "partialViewErrorHeader"),
+                                    new FileSecurityException("File '" + view.Path + "' is not a valid partial view file."));
+
+                attempt = save(svce, view);
             }
-            
-            var partialView = new PartialView(filename)
+            catch (Exception e)
             {
-                Content = contents
-            };
-            
-            var attempt = fileService.SavePartialView(partialView);
+                return Failed(ui.Text("speechBubbles", "partialViewErrorText"), ui.Text("speechBubbles", "partialViewErrorHeader"), e);
+            }
 
             if (attempt.Success == false)
             {
-                return Failed(
-                    ui.Text("speechBubbles", "partialViewErrorText"), ui.Text("speechBubbles", "partialViewErrorHeader"),
-                    //pass in a new exception ... this will also append the the message
-                    attempt.Exception);
+                return Failed(ui.Text("speechBubbles", "partialViewErrorText"), ui.Text("speechBubbles", "partialViewErrorHeader"),
+                                attempt.Exception);
             }
 
             return Success(ui.Text("speechBubbles", "partialViewSavedText"), ui.Text("speechBubbles", "partialViewSavedHeader"));
@@ -214,6 +191,85 @@ namespace Umbraco.Web.WebServices
             {
                 return Failed(ui.Text("speechBubbles", "templateErrorText"), ui.Text("speechBubbles", "templateErrorHeader"), ex);
             }
+        }
+
+        [HttpPost]
+        public JsonResult SaveScript(string filename, string oldName, string contents)
+        {
+            // sanitize input - script names have an extension
+            filename = filename
+                .Replace('\\', '/')
+                .TrimStart('/');
+
+            var svce = (FileService) Services.FileService;
+            var script = svce.GetScriptByName(oldName);
+            if (script == null)
+                script = new Script(filename);
+            else
+                script.Path = filename;
+            script.Content = contents;
+
+            try
+            {
+                if (svce.ValidateScript(script) == false)
+                    return Failed(ui.Text("speechBubbles", "scriptErrorText"), ui.Text("speechBubbles", "scriptErrorHeader"),
+                                    new FileSecurityException("File '" + filename + "' is not a valid script file."));
+                
+                svce.SaveScript(script);
+            }
+            catch (Exception e)
+            {
+                return Failed(ui.Text("speechBubbles", "scriptErrorText"), ui.Text("speechBubbles", "scriptErrorHeader"), e);
+            }
+
+            return Success(ui.Text("speechBubbles", "scriptSavedText"), ui.Text("speechBubbles", "scriptSavedHeader"),
+                new
+                {
+                    path = DeepLink.GetTreePathFromFilePath(script.Path),
+                    name = script.Path,
+                    url = script.VirtualPath,
+                    contents = script.Content
+                });
+        }
+
+        [HttpPost]
+        public JsonResult SaveStylesheet(string filename, string oldName, string contents)
+        {
+            // sanitize input - stylesheet names have no extension
+            filename = filename
+                .Replace('\\', '/')
+                .TrimStart('/')
+                .EnsureEndsWith(".css");
+
+            var svce = (FileService) Services.FileService;
+            var stylesheet = svce.GetStylesheetByName(oldName);
+            if (stylesheet == null)
+                stylesheet = new Stylesheet(filename);
+            else
+                stylesheet.Path = filename;
+            stylesheet.Content = contents;
+
+            try
+            {
+                if (svce.ValidateStylesheet(stylesheet) == false)
+                    return Failed(ui.Text("speechBubbles", "cssErrorText"), ui.Text("speechBubbles", "cssErrorHeader"),
+                                    new FileSecurityException("File '" + filename + "' is not a valid stylesheet file."));
+
+                svce.SaveStylesheet(stylesheet);
+            }
+            catch (Exception e)
+            {
+                return Failed(ui.Text("speechBubbles", "cssErrorText"), ui.Text("speechBubbles", "cssErrorHeader"), e);
+            }
+
+            return Success(ui.Text("speechBubbles", "cssSavedText"), ui.Text("speechBubbles", "cssSavedHeader"),
+                new
+                {
+                    path = DeepLink.GetTreePathFromFilePath(stylesheet.Path),
+                    name = stylesheet.Path,
+                    url = stylesheet.VirtualPath,
+                    contents = stylesheet.Content
+                });
         }
 
         /// <summary>

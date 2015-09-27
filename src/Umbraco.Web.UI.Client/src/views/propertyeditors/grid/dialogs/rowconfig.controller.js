@@ -19,7 +19,7 @@ function RowConfigController($scope) {
     };
 
     $scope.percentage = function(spans) {
-        return ((spans / $scope.columns) * 100).toFixed(1);
+        return ((spans / $scope.columns) * 100).toFixed(8);
     };
 
     $scope.toggleCollection = function(collection, toggle) {

@@ -6,7 +6,6 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Sync;
@@ -38,7 +37,6 @@ namespace Umbraco.Core.Services
             _lrepo = new LockingRepository<IServerRegistrationRepository>(UowProvider,
                 x => RepositoryFactory.CreateServerRegistrationRepository(x),
                 LockingRepositoryIds, LockingRepositoryIds);
-
         }
 
         /// <summary>
@@ -51,10 +49,11 @@ namespace Umbraco.Core.Services
         {
             _lrepo.WithWriteLocked(xr =>
             {
-                var regs = xr.Repository.GetAll().ToArray(); // faster to query only once
+                ((ServerRegistrationRepository) xr.Repository).ReloadCache(); // ensure we have up-to-date cache
+
+                var regs = xr.Repository.GetAll().ToArray();
                 var hasMaster = regs.Any(x => ((ServerRegistration)x).IsMaster);
                 var server = regs.FirstOrDefault(x => x.ServerIdentity.InvariantEquals(serverIdentity));
-                var hasServer = server != null;
 
                 if (server == null)
                 {
@@ -71,18 +70,17 @@ namespace Umbraco.Core.Services
                     server.IsMaster = true;
 
                 xr.Repository.AddOrUpdate(server);
-                xr.UnitOfWork.Commit();
-                xr.Repository.DeactiveStaleServers(staleTimeout);
+                xr.UnitOfWork.Commit(); // triggers a cache reload
+                xr.Repository.DeactiveStaleServers(staleTimeout); // triggers a cache reload
 
-                // default role is single server
-                _currentServerRole = ServerRole.Single;
+                // reload - cheap, cached
+                regs = xr.Repository.GetAll().ToArray();
 
-                // if registrations contain more than 0/1 server, role is master or slave
-                // compare to 0 or 1 depending on whether regs already contains the server
-                if (regs.Length > (hasServer ? 1 : 0))
-                    _currentServerRole = server.IsMaster
-                        ? ServerRole.Master
-                        : ServerRole.Slave;
+                // default role is single server, but if registrations contain more
+                // than one active server, then role is master or slave
+                _currentServerRole = regs.Count(x => x.IsActive) > 1
+                    ? (server.IsMaster ? ServerRole.Master : ServerRole.Slave)
+                    : ServerRole.Single;
             });
         }
 
@@ -92,15 +90,27 @@ namespace Umbraco.Core.Services
         /// <param name="serverIdentity">The server unique identity.</param>
         public void DeactiveServer(string serverIdentity)
         {
+            //_lrepo.WithWriteLocked(xr =>
+            //{
+            //    var query = Query<IServerRegistration>.Builder.Where(x => x.ServerIdentity.ToUpper() == serverIdentity.ToUpper());
+            //    var server = xr.Repository.GetByQuery(query).FirstOrDefault();
+            //    if (server == null) return;
+
+            //    server.IsActive = false;
+            //    server.IsMaster = false;
+            //    xr.Repository.AddOrUpdate(server);
+            //});
+
+            // because the repository caches "all" and has queries disabled...
+
             _lrepo.WithWriteLocked(xr =>
             {
-                var query = Query<IServerRegistration>.Builder.Where(x => x.ServerIdentity.ToUpper() == serverIdentity.ToUpper());
-                var server = xr.Repository.GetByQuery(query).FirstOrDefault();
-                if (server == null) return;
+                ((ServerRegistrationRepository)xr.Repository).ReloadCache(); // ensure we have up-to-date cache
 
-                server.IsActive = false;
-                server.IsMaster = false;
-                xr.Repository.AddOrUpdate(server);
+                var server = xr.Repository.GetAll().FirstOrDefault(x => x.ServerIdentity.InvariantEquals(serverIdentity));
+                if (server == null) return;
+                server.IsActive = server.IsMaster = false;
+                xr.Repository.AddOrUpdate(server); // will trigger a cache reload
             });
         }
 
@@ -119,11 +129,32 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IEnumerable<IServerRegistration> GetActiveServers()
         {
-            return _lrepo.WithReadLocked(xr =>
-            {
-                var query = Query<IServerRegistration>.Builder.Where(x => x.IsActive);
-                return xr.Repository.GetByQuery(query).ToArray();
-            });
+            //return _lrepo.WithReadLocked(xr =>
+            //{
+            //    var query = Query<IServerRegistration>.Builder.Where(x => x.IsActive);
+            //    return xr.Repository.GetByQuery(query).ToArray();
+            //});
+
+            // because the repository caches "all" we should use the following code
+            // in order to ensure we use the cache and not hit the database each time
+
+            //return _lrepo.WithReadLocked(xr => xr.Repository.GetAll().Where(x => x.IsActive).ToArray());
+
+            // however, WithReadLocked (as any other LockingRepository methods) will attempt
+            // to properly lock the repository using a database-level lock, which wants
+            // the transaction isolation level to be RepeatableRead, which it is not by default,
+            // and then, see U4-7046.
+            //
+            // in addition, LockingRepository methods need to hit the database in order to
+            // ensure proper locking, and so if we know that the repository might not need the
+            // database, we cannot use these methods - and then what?
+            //
+            // this raises a good number of questions, including whether caching anything in
+            // repositories works at all in a LB environment - TODO: figure it out
+
+            var uow = UowProvider.GetUnitOfWork();
+            var repo = RepositoryFactory.CreateServerRegistrationRepository(uow);
+            return repo.GetAll().Where(x => x.IsActive).ToArray(); // fast, cached
         }
 
         /// <summary>

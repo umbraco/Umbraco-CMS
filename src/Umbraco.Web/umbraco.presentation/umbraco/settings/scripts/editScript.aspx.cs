@@ -41,58 +41,42 @@ namespace umbraco.cms.presentation.settings.scripts
 
         protected MenuButton SaveButton;
 
-        private string file;
+        private string filename;
+        protected string ScriptTreeSyncPath { get; private set; }
 
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-            NameTxt.Text = file;
 
-            string path = "";
-            if (file.StartsWith("~/"))
-                path = IOHelper.ResolveUrl(file);
-            else
-                path = IOHelper.ResolveUrl(SystemDirectories.Scripts + "/" + file);
+            // get the script, ensure it exists (not null) and validate (because
+            // the file service ensures that it loads scripts from the proper location
+            // but does not seem to validate extensions?) - in case of an error,
+            // throw - that's what we did anyways.
 
+            // also scrapping the code that added .cshtml and .vbhtml extensions, and
+            // ~/Views directory - we're not using editScript.aspx for views anymore.
 
-            lttPath.Text = "<a target='_blank' href='" + path + "'>" + path + "</a>";
+            var svce = ApplicationContext.Current.Services.FileService;
+            var script = svce.GetScriptByName(filename);
+            if (script == null) // not found
+                throw new FileNotFoundException("Could not find file '" + filename + "'.");
 
-            var exts = UmbracoConfig.For.UmbracoSettings().Content.ScriptFileTypes.ToList();
-            if (UmbracoConfig.For.UmbracoSettings().Templates.DefaultRenderingEngine == RenderingEngine.Mvc)
-            {
-                exts.Add("cshtml");
-                exts.Add("vbhtml");
-            }
+            lttPath.Text = "<a id=\"" + lttPath.ClientID + "\" target=\"_blank\" href=\"" + script.VirtualPath + "\">" + script.VirtualPath + "</a>";
+            editorSource.Text = script.Content;
+            ScriptTreeSyncPath = DeepLink.GetTreePathFromFilePath(filename);
 
-            var dirs = SystemDirectories.Scripts;
-            if (UmbracoConfig.For.UmbracoSettings().Templates.DefaultRenderingEngine == RenderingEngine.Mvc)
-                dirs += "," + SystemDirectories.MvcViews;
-
-            // validate file
-            IOHelper.ValidateEditPath(IOHelper.MapPath(path), dirs.Split(','));
-
-            // validate extension
-            IOHelper.ValidateFileExtension(IOHelper.MapPath(path), exts);
-
-
-            StreamReader SR;
-            string S;
-            SR = File.OpenText(IOHelper.MapPath(path));
-            S = SR.ReadToEnd();
-            SR.Close();
-
-            editorSource.Text = S;
+            // name derives from filename, clean for xss
+            NameTxt.Text = filename.CleanForXss('\\', '/');
 
             Panel1.Text = ui.Text("editscript", base.getUser());
             pp_name.Text = ui.Text("name", base.getUser());
             pp_path.Text = ui.Text("path", base.getUser());
 
-            if (!IsPostBack)
+            if (IsPostBack == false)
             {
-                string sPath = DeepLink.GetTreePathFromFilePath(file);
                 ClientTools
                     .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadScripts>().Tree.Alias)
-                    .SyncTree(sPath, false);
+                    .SyncTree(ScriptTreeSyncPath, false);
             }
         }
 
@@ -100,12 +84,12 @@ namespace umbraco.cms.presentation.settings.scripts
         {
             base.OnInit(e);
 
-            file = Request.QueryString["file"].TrimStart('/');
+            filename = Request.QueryString["file"].Replace('\\', '/').TrimStart('/');
 
             //need to change the editor type if it is XML
-            if (file.EndsWith("xml"))
+            if (filename.EndsWith("xml"))
                 editorSource.CodeBase = uicontrols.CodeArea.EditorType.XML;
-            else if (file.EndsWith("master"))
+            else if (filename.EndsWith("master"))
                 editorSource.CodeBase = uicontrols.CodeArea.EditorType.HTML;
 
 
@@ -153,7 +137,6 @@ namespace umbraco.cms.presentation.settings.scripts
             }
 
         }
-        
 
         protected override void OnPreRender(EventArgs e)
         {
