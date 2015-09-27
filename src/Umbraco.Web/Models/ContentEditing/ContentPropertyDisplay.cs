@@ -35,5 +35,8 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "validation")]
         public PropertyTypeValidation Validation { get; set; }
+
+        [DataMember(Name = "hasSettingsAccess")]
+        public bool HasSettingsAccess { get; set; }
     }
 }

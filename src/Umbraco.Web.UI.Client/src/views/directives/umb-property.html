@@ -7,11 +7,13 @@
             <div class="umb-el-wrap">
                 <label class="control-label" ng-hide="property.hideLabel" for="{{property.alias}}">
                     {{property.label}}
+                    <span ng-show="{{property.hasSettingsAccess}}">
+                        <small class="content-alias-helper">{{property.alias}}</small>
+                    </span>
                     <small ng-bind-html="property.description"></small>
                 </label>
 
-                <div class="controls controls-row" ng-transclude>
-                </div>
+                <div class="controls controls-row" ng-transclude></div>
             </div>
         </div>
     </ng-form>
