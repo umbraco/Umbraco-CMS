@@ -335,8 +335,37 @@ function mediaHelper(umbRequestHelper) {
             var lowered = imagePath.toLowerCase();
             var ext = lowered.substr(lowered.lastIndexOf(".") + 1);
             return ("," + Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes + ",").indexOf("," + ext + ",") !== -1;
+        },
+
+        /**
+         * @ngdoc function
+         * @name umbraco.services.mediaHelper#formatFileTypes
+         * @methodOf umbraco.services.mediaHelper
+         * @function
+         *
+         * @description
+         * Returns a string with correctly formated file types for ng-file-upload
+         *
+         * @param {string} file types, ex: jpg,png,tiff
+         */
+        formatFileTypes: function(fileTypes) {
+
+           var fileTypesArray = fileTypes.split(',');
+           var newFileTypesArray = [];
+
+           for (var i = 0; i < fileTypesArray.length; i++) {
+              var fileType = fileTypesArray[i];
+
+              if (fileType.indexOf(".") !== 0) {
+                 fileType = ".".concat(fileType);
+              }
+
+              newFileTypesArray.push(fileType);
+           }
+
+           return newFileTypesArray.join(",");
+
         }
         
     };
-}
-angular.module('umbraco.services').factory('mediaHelper', mediaHelper);
+}angular.module('umbraco.services').factory('mediaHelper', mediaHelper);

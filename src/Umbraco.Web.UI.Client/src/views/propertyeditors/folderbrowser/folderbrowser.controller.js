@@ -1,11 +1,12 @@
 angular.module("umbraco")
 
 .controller("Umbraco.PropertyEditors.FolderBrowserController",
-    function ($rootScope, $scope, $routeParams, $timeout, editorState, navigationService, mediaResource) {
+    function ($rootScope, $scope, $routeParams, $timeout, editorState, navigationService, mediaResource, mediaHelper) {
 
         var dialogOptions = $scope.dialogOptions;
         $scope.creating = $routeParams.create;
         $scope.nodeId = $routeParams.id;
+        $scope.acceptedFileTypes = mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
         loadChildren();
 
         function loadChildren() {

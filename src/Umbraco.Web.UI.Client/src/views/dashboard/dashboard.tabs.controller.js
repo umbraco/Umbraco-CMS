@@ -186,31 +186,12 @@ function startupLatestEditsController($scope) {
 }
 angular.module("umbraco").controller("Umbraco.Dashboard.StartupLatestEditsController", startupLatestEditsController);
 
-function MediaFolderBrowserDashboardController($rootScope, $scope, assetsService, $routeParams, $timeout, $element, $location, umbRequestHelper,navigationService, mediaResource, $cookies) {
+function MediaFolderBrowserDashboardController($rootScope, $scope, assetsService, $routeParams, $timeout, $element, $location, umbRequestHelper,navigationService, mediaResource, $cookies, mediaHelper) {
         var dialogOptions = $scope.dialogOptions;
 
         $scope.filesUploading = [];
         $scope.nodeId = -1;
-        $scope.acceptedFileTypes = formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
-
-        function formatFileTypes(fileTypes) {
-
-           var fileTypesArray = fileTypes.split(',');
-           var newFileTypesArray = [];
-
-           for (var i = 0; i < fileTypesArray.length; i++) {
-              var fileType = fileTypesArray[i];
-
-              if (fileType.indexOf(".") !== 0) {
-                 fileType = ".".concat(fileType);
-              }
-
-              newFileTypesArray.push(fileType);
-           }
-
-           return newFileTypesArray.join(",");
-
-        }
+        $scope.acceptedFileTypes = mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
 
         function loadChildren() {
                 mediaResource.getChildren($scope.nodeId)
