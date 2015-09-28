@@ -2,12 +2,12 @@
  * @ngdoc controller
  * @name Umbraco.Editors.Member.ListController
  * @function
- * 
+ *
  * @description
  * The controller for the member list view
  */
 function MemberListController($scope, $routeParams, $location, $q, $window, appState, memberResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, formHelper, umbModelMapper, editorState, localizationService) {
-    
+
     //setup scope vars
     $scope.currentSection = appState.getSectionState("currentSection");
     $scope.currentNode = null; //the editors affiliated node
@@ -31,7 +31,7 @@ function MemberListController($scope, $routeParams, $location, $q, $window, appS
 
             editorState.set($scope.content);
 
-            navigationService.syncTree({ tree: "member", path: data.path.split(",") }).then(function (syncArgs) {
+            navigationService.syncTree({ tree: "members", path: data.path.split(",") }).then(function (syncArgs) {
                 $scope.currentNode = syncArgs.node;
             });
 
