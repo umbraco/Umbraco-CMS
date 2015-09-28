@@ -12,7 +12,7 @@
     'lib/angular/angular-ui-sortable.js',
 
     'lib/angular-dynamic-locale/tmhDynamicLocale.min.js',
-    'lib/ng-file-upload/angular-file-upload.min.js',
+    'lib/ng-file-upload/ng-file-upload.min.js',
 
     'lib/bootstrap/js/bootstrap.2.3.2.min.js',
     'lib/bootstrap-tabdrop/bootstrap-tabdrop.js',

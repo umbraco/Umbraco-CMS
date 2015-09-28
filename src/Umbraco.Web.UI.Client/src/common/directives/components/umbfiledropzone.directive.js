@@ -25,7 +25,7 @@ TODO
 
 angular.module("umbraco.directives")
 
-.directive('umbFileDropzone', function ($timeout, $upload, localizationService, umbRequestHelper) {
+.directive('umbFileDropzone', function ($timeout, Upload, localizationService, umbRequestHelper) {
 	return {
 
 		restrict: 'E',
@@ -38,6 +38,7 @@ angular.module("umbraco.directives")
 			contentTypeAlias: '@',
 			propertyAlias: '@',
 			accept: '@',
+			maxFileSize: '@',
 
 			compact: '@',
 			hideDropzone: '@',
@@ -51,14 +52,42 @@ angular.module("umbraco.directives")
 
 			scope.queue = [];
 			scope.done = [];
+			scope.rejected = [];
 			scope.currentFile = undefined;
 
+			function _filterFile(file) {
+
+				var ignoreFileNames = ['Thumbs.db'];
+				var ignoreFileTypes = ['directory'];
+
+				// ignore files with names from the list
+				// ignore files with types from the list
+				// ignore files which starts with "."
+				if(ignoreFileNames.indexOf(file.name) === -1 &&
+					ignoreFileTypes.indexOf(file.type) === -1 &&
+					file.name.indexOf(".") !== 0) {
+					return true;
+				} else {
+					return false;
+				}
+
+			}
 
 			function _filesQueued(files, event){
 				
 				//Push into the queue
 				angular.forEach(files, function(file){
-					scope.queue.push(file);
+
+					if(_filterFile(file) === true) {
+
+						if(file.$error) {
+							scope.rejected.push(file);
+						} else {
+							scope.queue.push(file);
+						}
+
+					}
+
 				});
 
 				//when queue is done, kick the uploader
@@ -93,12 +122,13 @@ angular.module("umbraco.directives")
 				scope.propertyAlias = scope.propertyAlias ? scope.propertyAlias : "umbracoFile";
 				scope.contentTypeAlias = scope.contentTypeAlias ? scope.contentTypeAlias : "Image"; 
 
-				$upload.upload({
+				Upload.upload({
 					url: umbRequestHelper.getApiUrl("mediaApiBaseUrl", "PostAddFile"),
 					fields: {
-						'currentFolder': scope.parentId, 
-						'contentTypeAlias': scope.contentTypeAlias, 
-						'propertyAlias': scope.propertyAlias
+						'currentFolder': scope.parentId,
+						'contentTypeAlias': scope.contentTypeAlias,
+						'propertyAlias': scope.propertyAlias,
+						'path': file.path
 					},
 					file: file
 				}).progress(function (evt) {

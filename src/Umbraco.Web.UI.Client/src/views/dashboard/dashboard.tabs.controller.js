@@ -191,6 +191,26 @@ function MediaFolderBrowserDashboardController($rootScope, $scope, assetsService
 
         $scope.filesUploading = [];
         $scope.nodeId = -1;
+        $scope.acceptedFileTypes = formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
+
+        function formatFileTypes(fileTypes) {
+
+           var fileTypesArray = fileTypes.split(',');
+           var newFileTypesArray = [];
+
+           for (var i = 0; i < fileTypesArray.length; i++) {
+              var fileType = fileTypesArray[i];
+
+              if (fileType.indexOf(".") !== 0) {
+                 fileType = ".".concat(fileType);
+              }
+
+              newFileTypesArray.push(fileType);
+           }
+
+           return newFileTypesArray.join(",");
+
+        }
 
         function loadChildren() {
                 mediaResource.getChildren($scope.nodeId)
