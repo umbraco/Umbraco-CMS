@@ -981,7 +981,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="cacheBrowser">キャッシュの参照</key>
     <key alias="contentRecycleBin">ごみ箱</key>
     <key alias="createdPackages">パッケージの作成</key>
-    <key alias="datatype">データ型</key>
+    <key alias="dataTypes">データ型</key>
     <key alias="dictionary">ディクショナリ</key>
     <key alias="installedPackages">インストール済のパッケージ</key>
     <key alias="installSkin">スキンのインストール</key>
@@ -990,11 +990,11 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="localPackage">ローカルパッケージのインストール</key>
     <key alias="macros">マクロ</key>
     <key alias="mediaTypes">メディアタイプ</key>
-    <key alias="member">メンバー</key>
-    <key alias="memberGroup">メンバーのグループ</key>
+    <key alias="members">メンバー</key>
+    <key alias="memberGroups">メンバーのグループ</key>
     <key alias="memberRoles">役割</key>
-    <key alias="memberType">メンバーの種類</key>
-    <key alias="nodeTypes">ドキュメントタイプ</key>
+    <key alias="memberTypes">メンバーの種類</key>
+    <key alias="documentTypes">ドキュメントタイプ</key>
     <key alias="packager">パッケージ</key>
     <key alias="packages">パッケージ</key>
     <key alias="python">Python ファイル</key>

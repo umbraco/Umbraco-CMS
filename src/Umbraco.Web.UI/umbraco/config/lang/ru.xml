@@ -965,7 +965,7 @@
     <key alias="cacheBrowser">Обзор кэша</key>
     <key alias="contentRecycleBin">Корзина</key>
     <key alias="createdPackages">Созданные пакеты</key>
-    <key alias="datatype">Типы данных</key>
+    <key alias="dataTypes">Типы данных</key>
     <key alias="dictionary">Словарь</key>
     <key alias="installedPackages">Установленные пакеты</key>
     <key alias="installSkin">Установить тему</key>
@@ -974,11 +974,11 @@
     <key alias="localPackage">Установить локальный пакет</key>
     <key alias="macros">Макросы</key>
     <key alias="mediaTypes">Типы медиа-материалов</key>
-    <key alias="member">Участники</key>
-    <key alias="memberGroup">Группы участников</key>
+    <key alias="members">Участники</key>
+    <key alias="memberGroups">Группы участников</key>
     <key alias="memberRoles">Роли участников</key>
-    <key alias="memberType">Типы участников</key>
-    <key alias="nodeTypes">Типы документов</key>
+    <key alias="memberTypes">Типы участников</key>
+    <key alias="documentTypes">Типы документов</key>
     <key alias="packager">Пакеты дополнений</key>
     <key alias="packages">Пакеты дополнений</key>
     <key alias="python">Скрипты Python</key>

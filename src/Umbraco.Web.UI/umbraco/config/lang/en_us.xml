@@ -983,7 +983,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="cacheBrowser">Cache Browser</key>
     <key alias="contentRecycleBin">Recycle Bin</key>
     <key alias="createdPackages">Created packages</key>
-    <key alias="datatype">Data Types</key>
+    <key alias="dataTypes">Data Types</key>
     <key alias="dictionary">Dictionary</key>
     <key alias="installedPackages">Installed packages</key>
     <key alias="installSkin">Install skin</key>
@@ -992,11 +992,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="localPackage">Install local package</key>
     <key alias="macros">Macros</key>
     <key alias="mediaTypes">Media Types</key>
-    <key alias="member">Members</key>
-    <key alias="memberGroup">Member Groups</key>
-    <key alias="memberRoles">Roles</key>
-    <key alias="memberType">Member Types</key>
-    <key alias="nodeTypes">Document Types</key>
+    <key alias="members">Members</key>
+    <key alias="memberGroups">Member Groups</key>
+    <key alias="memberRoles">Member Roles</key>
+    <key alias="memberTypes">Member Types</key>
+    <key alias="documentTypes">Document Types</key>
+    <key alias="relationTypes">Relation Types</key>
     <key alias="packager">Packages</key>
     <key alias="packages">Packages</key>
     <key alias="python">Python Files</key>

@@ -851,7 +851,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="cacheBrowser">Cacheviser</key>
     <key alias="contentRecycleBin">Papirkurv</key>
     <key alias="createdPackages">Oprettede pakker</key>
-    <key alias="datatype">Datatyper</key>
+    <key alias="dataTypes">Datatyper</key>
     <key alias="dictionary">Ordbog</key>
     <key alias="installedPackages">Installerede pakker</key>
     <key alias="installSkin">Installér et skin'</key>
@@ -860,11 +860,13 @@ Mange hilsner fra Umbraco robotten
     <key alias="localPackage">Installer lokal pakke</key>
     <key alias="macros">Makroer</key>
     <key alias="mediaTypes">Medietyper</key>
-    <key alias="member">Medlemmer</key>
-    <key alias="memberGroup">Medlemsgruppe</key>
+    <key alias="members">Medlemmer</key>
+    <key alias="memberGroups">Medlemsgruppe</key>
     <key alias="memberRoles">Roller</key>
-    <key alias="memberType">Medlemstype</key>
-    <key alias="nodeTypes">Dokumenttyper</key>
+    <key alias="memberTypes">Medlemstype</key>
+    <key alias="documentTypes">Dokumenttyper</key>
+    <key alias="relationTypes">Dokumenttyper</key>
+    
     <key alias="packager">Pakker</key>
     <key alias="packages">Pakker</key>
     <key alias="python">Python</key>
@@ -872,7 +874,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="runway">Installer Runway</key>
     <key alias="runwayModules">Runway-moduler</key>
     <key alias="scripting">Scripting filer</key>
-    <key alias="scripts">Script</key>
+    <key alias="scripts">Scripts</key>
     <key alias="stylesheets">Stylesheets</key>
     <key alias="templates">Skabeloner</key>
     <key alias="xslt">XSLT-filer</key>

@@ -16,7 +16,7 @@ using Umbraco.Core.Services;
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.DataTypes)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.MediaTypes, "Media Types", sortOrder:5)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.MediaTypes, null, sortOrder:5)]
     [Umbraco.Web.Mvc.PluginController("UmbracoTrees")]
     [CoreTree]
     public class MediaTypeTreeController : TreeController

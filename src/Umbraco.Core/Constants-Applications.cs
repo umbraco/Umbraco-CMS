@@ -61,7 +61,7 @@
             /// <summary>
             /// alias for the media tree.
             /// </summary>
-            public const string Members = "member";
+            public const string Members = "members";
 
             /// <summary>
             /// alias for the media tree.
@@ -71,7 +71,7 @@
             /// <summary>
             /// alias for the datatype tree.
             /// </summary>
-			public const string DataTypes = "datatype";
+			public const string DataTypes = "dataTypes";
 
 			/// <summary>
 			/// alias for the dictionary tree.
@@ -83,18 +83,18 @@
             /// <summary>
             /// alias for the document type tree.
             /// </summary>
-            public const string DocumentTypes = "documenttype";
+            public const string DocumentTypes = "documentTypes";
 
             /// <summary>
             /// alias for the media type tree.
             /// </summary>
-            public const string MediaTypes = "mediatype";
+            public const string MediaTypes = "mediaTypes";
 
 
             /// <summary>
             /// alias for the member type tree.
             /// </summary>
-            public const string MemberTypes = "membertype";
+            public const string MemberTypes = "memberTypes";
 
             /// <summary>
             /// alias for the template tree.
