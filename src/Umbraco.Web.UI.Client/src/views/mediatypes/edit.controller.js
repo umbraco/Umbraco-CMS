@@ -232,7 +232,7 @@
 		/** Syncs the content type  to it's tree node - this occurs on first load and after saving */
 		function syncTreeNode(dt, path, initialLoad) {
 
-			navigationService.syncTree({ tree: "mediatype", path: path.split(","), forceReload: initialLoad !== true }).then(function (syncArgs) {
+			navigationService.syncTree({ tree: "mediatypes", path: path.split(","), forceReload: initialLoad !== true }).then(function (syncArgs) {
 				vm.currentNode = syncArgs.node;
 			});
 
