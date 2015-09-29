@@ -274,7 +274,36 @@
     display: none;
 }
 
+//Change password form in user flyout
+//Styling overrides to avoid duplicating property editor code
+.umb-panel-body .change-password{
 
+     .umb-pane{
+        margin:0;
+
+    }
+
+    .control-label{
+        display: inline-block;
+        width: 46%;
+        vertical-align: top;
+    }
+
+    .controls-row{
+        margin-left:0 !important;
+        display: inline-block;
+        width: 47%;
+
+        input[type=text],
+        input[type=password]{
+            width: 100%;
+        }
+    }
+
+    .umb-control-group{
+        padding-bottom: 0;
+    }
+}
 
 
 // Utility classes

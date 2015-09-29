@@ -74,6 +74,28 @@
                 </ul>
             </div>
 
+			<div class="umb-pane change-password">
+                <h5>Change password</h5>
+
+                <p>Enter your current password, then repeat your new password to change it</p>
+                <form novalidate name="passwordForm"
+                      ng-controller="Umbraco.Dashboard.StartupChangePasswordController"
+                      ng-submit="changePassword()"
+                      val-form-manager>
+
+
+                    <umb-pane>
+
+                        <umb-editor model="changePasswordModel"></umb-editor>
+
+                        <umb-control-group hidelabel="1">
+                            <button class="btn btn-primary">Change</button>
+                        </umb-control-group>
+
+                    </umb-pane>
+                </form>
+            </div>
+			
         </div>
 
         <small class="umb-version">Umbraco version {{version}}</small>
