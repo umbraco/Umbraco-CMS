@@ -9,7 +9,7 @@
 (function() {
 	"use strict";
 
-	function MediaTypeEditController($scope, $routeParams, mediaTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter) {
+	function MediaTypesEditController($scope, $routeParams, mediaTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter) {
 
 		var vm = this;
 
@@ -240,6 +240,6 @@
 
 	}
 
-	angular.module("umbraco").controller("Umbraco.Editors.MediaType.EditController", MediaTypeEditController);
+	angular.module("umbraco").controller("Umbraco.Editors.MediaTypes.EditController", MediaTypesEditController);
 
 })();

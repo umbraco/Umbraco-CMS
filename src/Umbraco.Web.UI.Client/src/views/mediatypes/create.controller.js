@@ -6,7 +6,7 @@
  * @description
  * The controller for the media type creation dialog
  */
-function mediaTypeCreateController($scope, $location, navigationService, mediaTypeResource, formHelper, appState) {
+function MediaTypesCreateController($scope, $location, navigationService, mediaTypeResource, formHelper, appState) {
 
     $scope.model = {
         folderName: "",
@@ -47,4 +47,4 @@ function mediaTypeCreateController($scope, $location, navigationService, mediaTy
     }
 }
 
-angular.module('umbraco').controller("Umbraco.Editors.MediaType.CreateController", mediaTypeCreateController);
+angular.module('umbraco').controller("Umbraco.Editors.MediaTypes.CreateController", MediaTypesCreateController);
