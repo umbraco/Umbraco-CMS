@@ -786,7 +786,7 @@
     <key alias="localPackage">로컬 패키지 설치</key>
     <key alias="macros">매크로</key>
     <key alias="mediaTypes">미디어 타입</key>
-    <key alias="members">구성원</key>
+    <key alias="member">구성원</key>
     <key alias="memberGroups">구성원 그룹</key>
     <key alias="memberRoles">역할</key>
     <key alias="memberTypes">구성원 유형</key>

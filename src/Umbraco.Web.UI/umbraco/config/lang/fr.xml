@@ -924,7 +924,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="localPackage">Installer un package local</key>
     <key alias="macros">Macros</key>
     <key alias="mediaTypes">Types de médias</key>
-    <key alias="members">Membres</key>
+    <key alias="member">Membres</key>
     <key alias="memberGroups">Groupes de membres</key>
     <key alias="memberRoles">Rôles</key>
     <key alias="memberTypes">Types de membres</key>

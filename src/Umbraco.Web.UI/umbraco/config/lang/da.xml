@@ -860,7 +860,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="localPackage">Installer lokal pakke</key>
     <key alias="macros">Makroer</key>
     <key alias="mediaTypes">Medietyper</key>
-    <key alias="members">Medlemmer</key>
+    <key alias="member">Medlemmer</key>
     <key alias="memberGroups">Medlemsgruppe</key>
     <key alias="memberRoles">Roller</key>
     <key alias="memberTypes">Medlemstype</key>

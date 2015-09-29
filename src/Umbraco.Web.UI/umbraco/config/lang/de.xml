@@ -937,7 +937,7 @@ Ihr freundlicher Umbraco-Robot
     <key alias="localPackage">Lokales Paket hochladen und installieren</key>
     <key alias="macros">Makros</key>
     <key alias="mediaTypes">Medientypen</key>
-    <key alias="members">Mitglieder</key>
+    <key alias="member">Mitglieder</key>
     <key alias="memberGroups">Mitgliedergruppen</key>
     <key alias="memberRoles">Mitgliederrollen</key>
     <key alias="memberTypes">Mitglieder-Typen</key>

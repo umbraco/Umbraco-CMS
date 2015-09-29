@@ -59,9 +59,9 @@
             public const string Content = "content";
 
             /// <summary>
-            /// alias for the media tree.
+            /// alias for the member tree.
             /// </summary>
-            public const string Members = "members";
+            public const string Members = "member";
 
             /// <summary>
             /// alias for the media tree.

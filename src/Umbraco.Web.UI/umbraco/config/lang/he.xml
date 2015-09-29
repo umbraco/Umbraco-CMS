@@ -809,7 +809,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="localPackage">התקן חבילה מקומית</key>
     <key alias="macros">מקרו</key>
     <key alias="mediaTypes">סוגי מדיה</key>
-    <key alias="members">משתמשים</key>
+    <key alias="member">משתמשים</key>
     <key alias="memberGroups">קבוצות משתמשים</key>
     <key alias="memberRoles">כללים</key>
     <key alias="memberTypes">סוגי משתמשים</key>

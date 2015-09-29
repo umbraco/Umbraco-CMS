@@ -823,7 +823,7 @@
     <key alias="localPackage">Instalar paquete local</key>
     <key alias="macros">Macros</key>
     <key alias="mediaTypes">Tipos de medios</key>
-    <key alias="members">Miembros</key>
+    <key alias="member">Miembros</key>
     <key alias="memberGroups">Grupos de miembros</key>
     <key alias="memberRoles">Roles</key>
     <key alias="memberTypes">Tipos de miembros</key>

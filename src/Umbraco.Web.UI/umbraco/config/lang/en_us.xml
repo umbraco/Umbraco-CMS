@@ -992,7 +992,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="localPackage">Install local package</key>
     <key alias="macros">Macros</key>
     <key alias="mediaTypes">Media Types</key>
-    <key alias="members">Members</key>
+    <key alias="member">Members</key>
     <key alias="memberGroups">Member Groups</key>
     <key alias="memberRoles">Member Roles</key>
     <key alias="memberTypes">Member Types</key>
