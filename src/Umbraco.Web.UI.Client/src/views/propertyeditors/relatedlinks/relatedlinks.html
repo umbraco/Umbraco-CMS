@@ -1,5 +1,5 @@
 ﻿<div class="umb-editor umb-relatedlinks" ng-controller="Umbraco.PropertyEditors.RelatedLinksController">
-    
+
     <table class="table table-striped">
         <thead>
             <tr>
@@ -78,4 +78,12 @@
             </tr>
         </tfoot>
     </table>
+
+   <umb-overlay
+      ng-if="contentPickerOverlay.show"
+      model="contentPickerOverlay"
+      view="contentPickerOverlay.view"
+      position="right">
+   </umb-overlay>
+
 </div>
