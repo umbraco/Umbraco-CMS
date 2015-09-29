@@ -860,7 +860,7 @@
     <key alias="localPackage">安装本地扩展包</key>
     <key alias="macros">宏</key>
     <key alias="mediaTypes">媒体类型</key>
-    <key alias="members">会员</key>
+    <key alias="member">会员</key>
     <key alias="memberGroups">会员组</key>
     <key alias="memberRoles">角色</key>
     <key alias="memberTypes">会员类型</key>

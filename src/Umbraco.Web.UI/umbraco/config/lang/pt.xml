@@ -770,7 +770,7 @@ Para fechar a tarefa de tradução vá até os detalhes e clique no botão "Fech
     <key alias="localPackage">Instalar pacote local</key>
     <key alias="macros">Macros</key>
     <key alias="mediaTypes">Tipos de Mídia</key>
-    <key alias="members">Membros</key>
+    <key alias="member">Membros</key>
     <key alias="memberGroups">Grupos de Membros</key>
     <key alias="memberRoles">Funções</key>
     <key alias="memberTypes">Tipo de Membro</key>

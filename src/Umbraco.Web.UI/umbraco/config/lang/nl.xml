@@ -924,7 +924,7 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="localPackage">Installeer een lokale package</key>
     <key alias="macros">Macro's</key>
     <key alias="mediaTypes">Mediatypes</key>
-    <key alias="members">Leden</key>
+    <key alias="member">Leden</key>
     <key alias="memberGroups">Ledengroepen</key>
     <key alias="memberRoles">Rollen</key>
     <key alias="memberTypes">Ledentypes</key>

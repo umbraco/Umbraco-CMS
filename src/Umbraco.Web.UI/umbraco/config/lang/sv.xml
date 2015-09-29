@@ -825,7 +825,7 @@
     <key alias="localPackage">Installera lokalt paket</key>
     <key alias="macros">Makron</key>
     <key alias="mediaTypes">Mediatyper</key>
-    <key alias="members">Medlem</key>
+    <key alias="member">Medlem</key>
     <key alias="memberGroups">Medlemsgrupper</key>
     <key alias="memberRoles">Roller</key>
     <key alias="memberTypes">Medlemstyper</key>

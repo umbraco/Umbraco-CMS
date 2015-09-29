@@ -990,7 +990,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="localPackage">ローカルパッケージのインストール</key>
     <key alias="macros">マクロ</key>
     <key alias="mediaTypes">メディアタイプ</key>
-    <key alias="members">メンバー</key>
+    <key alias="member">メンバー</key>
     <key alias="memberGroups">メンバーのグループ</key>
     <key alias="memberRoles">役割</key>
     <key alias="memberTypes">メンバーの種類</key>

@@ -908,7 +908,7 @@
     <key alias="localPackage">Instalovat místní balíček</key>
     <key alias="macros">Makra</key>
     <key alias="mediaTypes">Typy medií</key>
-    <key alias="members">Členové</key>
+    <key alias="member">Členové</key>
     <key alias="memberGroups">Skupiny členů</key>
     <key alias="memberRoles">Role</key>
     <key alias="memberTypes">Typy členů</key>

@@ -782,7 +782,7 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="localPackage">Installa un pacchetto locale</key>
     <key alias="macros">Macros</key>
     <key alias="mediaTypes">Tipi di media</key>
-    <key alias="members">Membri</key>
+    <key alias="member">Membri</key>
     <key alias="memberGroups">Gruppi di Membri</key>
     <key alias="memberRoles">Ruoli</key>
     <key alias="memberTypes">Tipologia Membri</key>

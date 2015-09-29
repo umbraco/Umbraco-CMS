@@ -974,7 +974,7 @@
     <key alias="localPackage">Установить локальный пакет</key>
     <key alias="macros">Макросы</key>
     <key alias="mediaTypes">Типы медиа-материалов</key>
-    <key alias="members">Участники</key>
+    <key alias="member">Участники</key>
     <key alias="memberGroups">Группы участников</key>
     <key alias="memberRoles">Роли участников</key>
     <key alias="memberTypes">Типы участников</key>

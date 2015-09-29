@@ -682,7 +682,7 @@ Miłego dnia!]]></key>
     <key alias="localPackage">Zainstaluj pakiet lokalny</key>
     <key alias="macros">Makra</key>
     <key alias="mediaTypes">Typy mediów</key>
-    <key alias="members">Członkowie</key>
+    <key alias="member">Członkowie</key>
     <key alias="memberGroups">Grupy członków</key>
     <key alias="memberRoles">Role</key>
     <key alias="memberTypes">Typ członka</key>
