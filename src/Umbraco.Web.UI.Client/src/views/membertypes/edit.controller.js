@@ -9,7 +9,7 @@
  (function() {
  	"use strict";
 
-	function MemberTypeEditController($scope, $rootScope, $routeParams, $log, $filter, memberTypeResource, dataTypeResource, editorState, iconHelper, formHelper, navigationService, contentEditingHelper, notificationsService) {
+	function MemberTypesEditController($scope, $rootScope, $routeParams, $log, $filter, memberTypeResource, dataTypeResource, editorState, iconHelper, formHelper, navigationService, contentEditingHelper, notificationsService) {
 
 		var vm = this;
 
@@ -188,6 +188,6 @@
 
 	}
 
-	angular.module("umbraco").controller("Umbraco.Editors.MemberType.EditController", MemberTypeEditController);
+	angular.module("umbraco").controller("Umbraco.Editors.MemberTypes.EditController", MemberTypesEditController);
 
 })();

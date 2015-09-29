@@ -2,11 +2,11 @@
  * @ngdoc controller
  * @name Umbraco.Editors.DocumentType.DeleteController
  * @function
- * 
+ *
  * @description
  * The controller for deleting content
  */
-function MemberTypeDeleteController($scope, memberTypeResource, treeService, navigationService) {
+function MemberTypesDeleteController($scope, memberTypeResource, treeService, navigationService) {
 
     $scope.performDelete = function() {
 
@@ -17,7 +17,7 @@ function MemberTypeDeleteController($scope, memberTypeResource, treeService, nav
 
             //get the root node before we remove it
             var rootNode = treeService.getTreeRoot($scope.currentNode);
-            
+
             //TODO: Need to sync tree, etc...
             treeService.removeNode($scope.currentNode);
             navigationService.hideMenu();
@@ -30,4 +30,4 @@ function MemberTypeDeleteController($scope, memberTypeResource, treeService, nav
     };
 }
 
-angular.module("umbraco").controller("Umbraco.Editors.MemberType.DeleteController", MemberTypeDeleteController);
+angular.module("umbraco").controller("Umbraco.Editors.MemberTypes.DeleteController", MemberTypesDeleteController);
