@@ -500,7 +500,12 @@ namespace Umbraco.Core
             //the database migration objects
             MigrationResolver.Current = new MigrationResolver(
                 ProfilingLogger.Logger,
-                () => PluginManager.ResolveTypes<IMigration>());
+                () => PluginManager.ResolveTypes<IMigration>())
+            {
+                //This needs to be resolved before it's frozen because we need to find migrations to determine
+                // if Umbraco IsConfigured
+                CanResolveBeforeFrozen = true
+            };
 
             // todo: remove once we drop IPropertyEditorValueConverter support.
             PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(

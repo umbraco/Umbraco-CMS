@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Configuration;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
+using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
@@ -304,6 +306,36 @@ namespace Umbraco.Core
                                 ProfilingLogger.Logger.Debug<ApplicationContext>(string.Format("The migration for version: '{0} has not been executed, there is no record in the database", currentVersion.ToSemanticString()));
                                 ok = false;
                             }
+
+                            //Now we can check if there are any package migrations that haven't been executed.
+                            //Find packages that have migrations:
+                            var packageMigrations = MigrationResolver.Current.MigrationMetaData.Where(x => x.ProductName != GlobalSettings.UmbracoMigrationName);
+                            var packageMigrationProductNames = packageMigrations.Select(x => x.ProductName).Distinct().ToArray();
+                            var packageEntries = Services.MigrationEntryService.FindEntries(
+                                UmbracoVersion.GetSemanticVersion(),
+                                packageMigrationProductNames)
+                                .Select(x => x.MigrationName)
+                                .ToArray();
+
+                            //If there are not the same number of entries in the db for the current version 
+                            // as there are package migration names found, then we need to run the migrations
+                            if (packageMigrationProductNames.Length != packageEntries.Length)
+                            {
+                                //we'll loop over the ones that need to run so we can log it
+                                foreach (var prodName in packageMigrationProductNames)
+                                {
+                                    if (packageEntries.Contains(prodName) == false)
+                                    {
+                                        ProfilingLogger.Logger.Debug<ApplicationContext>(
+                                            string.Format("The migration {0} for version: '{1} has not been executed, there is no record in the database", 
+                                            prodName,
+                                            currentVersion.ToSemanticString()));
+
+                                        ok = false;
+                                    }
+                                }
+                            }
+
                         }
                     }
                     else

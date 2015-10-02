@@ -128,5 +128,25 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return result == null ? null : factory.BuildEntity(result);
         }
+
+        public IEnumerable<IMigrationEntry> FindEntries(SemVersion version, params string[] migrationNames)
+        {
+            if (migrationNames.Length == 0) return Enumerable.Empty<IMigrationEntry>();
+
+            var versionString = version.ToString();
+
+            var sql = new Sql().Select("*")
+                .From<MigrationDto>(SqlSyntax)
+                .Where<MigrationDto>(x => x.Version == versionString)
+                .Where(
+                    SqlSyntax.GetQuotedColumnName("version") + "=@versionString AND " +
+                    SqlSyntax.GetQuotedColumnName("name") + " IN (@names)", new {names = migrationNames, versionString});
+
+            var result = Database.Fetch<MigrationDto>(sql);
+
+            var factory = new MigrationEntryFactory();
+
+            return result.Select(factory.BuildEntity);
+        }
     }
 }

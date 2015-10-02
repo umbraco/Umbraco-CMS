@@ -60,6 +60,15 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public IEnumerable<IMigrationEntry> FindEntries(SemVersion version, params string[] migrationNames)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateMigrationEntryRepository(uow))
+            {
+                return repo.FindEntries(version, migrationNames);
+            }
+        }
+
         /// <summary>
         /// Gets all entries for a given migration name
         /// </summary>
