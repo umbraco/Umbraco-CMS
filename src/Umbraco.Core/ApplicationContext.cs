@@ -214,17 +214,26 @@ namespace Umbraco.Core
         
         public bool IsConfigured
         {
-            get { return _configured.Value; }
+            get { return _umbracoVersionConfigured.Value; }
         }
 
         /// <summary>
-        /// If the db is configured, there is a database context and there is an umbraco schema, but we are not 'configured' , then it means we are upgrading
+        /// Returns true if there are pending package migrations that need to be executed
+        /// </summary>
+        internal bool HasPendingPackageMigrations
+        {
+            get { return _packageVersionsConfigured.Value == false; }
+        }
+
+        /// <summary>
+        /// If the db is configured, there is a database context and there is an umbraco schema, 
+        /// but we are: (not 'configured' OR there's pending migrations), then it means we are upgrading
         /// </summary>
 	    public bool IsUpgrading
 	    {
             get
             {
-                if (IsConfigured == false 
+                if ((IsConfigured == false || HasPendingPackageMigrations)
                     && DatabaseContext != null 
                     && DatabaseContext.IsDatabaseConfigured)
                 {
@@ -270,7 +279,8 @@ namespace Umbraco.Core
 	    // ReSharper disable once InconsistentNaming
 	    internal string _umbracoApplicationUrl;
 
-        private Lazy<bool> _configured;
+        private Lazy<bool> _umbracoVersionConfigured;
+        private Lazy<bool> _packageVersionsConfigured;        
         internal MainDom MainDom { get; private set; }
        
 	    private void Init()
@@ -279,7 +289,7 @@ namespace Umbraco.Core
             MainDom.Acquire();
             
             //Create the lazy value to resolve whether or not the application is 'configured'
-            _configured = new Lazy<bool>(() =>
+            _umbracoVersionConfigured = new Lazy<bool>(() =>
             {
                 try
                 {
@@ -306,36 +316,6 @@ namespace Umbraco.Core
                                 ProfilingLogger.Logger.Debug<ApplicationContext>(string.Format("The migration for version: '{0} has not been executed, there is no record in the database", currentVersion.ToSemanticString()));
                                 ok = false;
                             }
-
-                            //Now we can check if there are any package migrations that haven't been executed.
-                            //Find packages that have migrations:
-                            var packageMigrations = MigrationResolver.Current.MigrationMetaData.Where(x => x.ProductName != GlobalSettings.UmbracoMigrationName);
-                            var packageMigrationProductNames = packageMigrations.Select(x => x.ProductName).Distinct().ToArray();
-                            var packageEntries = Services.MigrationEntryService.FindEntries(
-                                UmbracoVersion.GetSemanticVersion(),
-                                packageMigrationProductNames)
-                                .Select(x => x.MigrationName)
-                                .ToArray();
-
-                            //If there are not the same number of entries in the db for the current version 
-                            // as there are package migration names found, then we need to run the migrations
-                            if (packageMigrationProductNames.Length != packageEntries.Length)
-                            {
-                                //we'll loop over the ones that need to run so we can log it
-                                foreach (var prodName in packageMigrationProductNames)
-                                {
-                                    if (packageEntries.Contains(prodName) == false)
-                                    {
-                                        ProfilingLogger.Logger.Debug<ApplicationContext>(
-                                            string.Format("The migration {0} for version: '{1} has not been executed, there is no record in the database", 
-                                            prodName,
-                                            currentVersion.ToSemanticString()));
-
-                                        ok = false;
-                                    }
-                                }
-                            }
-
                         }
                     }
                     else
@@ -350,9 +330,51 @@ namespace Umbraco.Core
                     LogHelper.Error<ApplicationContext>("Error determining if application is configured, returning false", ex);
                     return false;
                 }
+            });
 
-            }); 
-		}
+            _packageVersionsConfigured = new Lazy<bool>(() =>
+            {
+                var currentVersion = UmbracoVersion.GetSemanticVersion();
+                var ok = true;
+
+                //The versions are the same in config, but are they the same in the database. We can only check this
+                // if we have a db context available, if we don't then we are not installed anyways
+                if (DatabaseContext.IsDatabaseConfigured && DatabaseContext.CanConnect)
+                {
+                    //Now we can check if there are any package migrations that haven't been executed.
+                    //Find packages that have migrations:
+                    var packageMigrations = MigrationResolver.Current.MigrationMetaData.Where(x => x.ProductName != GlobalSettings.UmbracoMigrationName);
+                    var packageMigrationProductNames = packageMigrations.Select(x => x.ProductName).Distinct().ToArray();
+                    var packageEntries = Services.MigrationEntryService.FindEntries(
+                        UmbracoVersion.GetSemanticVersion(),
+                        packageMigrationProductNames)
+                        .Select(x => x.MigrationName)
+                        .ToArray();
+
+                    //If there are not the same number of entries in the db for the current version 
+                    // as there are package migration names found, then we need to run the migrations
+                    if (packageMigrationProductNames.Length != packageEntries.Length)
+                    {
+                        //we'll loop over the ones that need to run so we can log it
+                        foreach (var prodName in packageMigrationProductNames)
+                        {
+                            if (packageEntries.Contains(prodName) == false)
+                            {
+                                ProfilingLogger.Logger.Debug<ApplicationContext>(
+                                    string.Format("The migration {0} for version: '{1} has not been executed, there is no record in the database",
+                                    prodName,
+                                    currentVersion.ToSemanticString()));
+
+                                ok = false;
+                            }
+                        }
+                    }
+
+                }
+
+                return ok;
+            });
+        }
 
 		private string ConfigurationStatus
 		{

@@ -33,6 +33,11 @@ namespace Umbraco.Web.Install.Controllers
 			_umbracoContext = umbracoContext;
 		}
 
+        [HttpGet]
+        public ActionResult PackageMigrations()
+        {
+            return null;
+        }
 
         [HttpGet]
         public ActionResult Index()

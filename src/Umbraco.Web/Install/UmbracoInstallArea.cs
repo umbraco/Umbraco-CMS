@@ -26,10 +26,16 @@ namespace Umbraco.Web.Install
         /// </remarks>
         public override void RegisterArea(AreaRegistrationContext context)
         {
+            //Can easily do this two routes with one route and some constraints but whatevs, we'll just leave as 2 for now
             context.MapRoute(
                 "umbraco-install",
                 "Install",
                 new { controller = "Install", action = "Index", id = UrlParameter.Optional },
+                new[] { typeof(InstallController).Namespace });
+            context.MapRoute(
+                "umbraco-install-package-migrations",
+                "Install/PackageMigrations",
+                new { controller = "Install", action = "PackageMigrations", id = UrlParameter.Optional },
                 new[] { typeof(InstallController).Namespace });
 
             //TODO: We can remove this when we re-build the back office package installer
