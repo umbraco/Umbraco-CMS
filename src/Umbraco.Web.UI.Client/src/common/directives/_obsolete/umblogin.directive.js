@@ -9,7 +9,7 @@ function loginDirective() {
     return {
         restrict: "E",    // restrict to an element
         replace: true,   // replace the html element with the template
-        templateUrl: 'views/directives/umb-login.html'        
+        templateUrl: 'views/directives/_obsolete/umb-login.html'
     };
 }
 

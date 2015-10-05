@@ -5,13 +5,13 @@
 **/
 angular.module("umbraco.directives.html")
     .directive('umbPhotoFolder', function($compile, $log, $timeout, $filter, umbPhotoFolderHelper) {
-        
+
         return {
             restrict: 'E',
             replace: true,
             require: '?ngModel',
             terminate: true,
-            templateUrl: 'views/directives/html/umb-photo-folder.html',
+            templateUrl: 'views/directives/_obsolete/umb-photo-folder.html',
             link: function(scope, element, attrs, ngModel) {
 
                 var lastWatch = null;
@@ -24,10 +24,10 @@ angular.module("umbraco.directives.html")
 
                             scope.clickHandler = scope.$eval(element.attr('on-click'));
 
-                            
+
                             var imagesOnly =  element.attr('images-only') === "true";
-                           
-                            
+
+
                             var margin = element.attr('border') ? parseInt(element.attr('border'), 10) : 5;
                             var startingIndex = element.attr('baseline') ? parseInt(element.attr('baseline'), 10) : 0;
                             var minWidth = element.attr('min-width') ? parseInt(element.attr('min-width'), 10) : 420;

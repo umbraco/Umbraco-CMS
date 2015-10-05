@@ -1,5 +1,5 @@
-<div class="btn-group" ng-class="{dimmed: content.id === 0}">
-    
+<div class="btn-group">
+
     <!-- options button -->
     <a class="btn" href="#" ng-click="getOptions()" prevent-default data-toggle="dropdown">
         <localize key="general_actions">Actions</localize>
@@ -7,7 +7,7 @@
     </a>
 
     <!-- actions -->
-    <ul class="dropdown-menu  umb-actions" role="menu" aria-labelledby="dLabel">
+    <ul class="dropdown-menu umb-actions" role="menu" aria-labelledby="dLabel">
         <li class="action" ng-class="{sep:action.seperator}" ng-repeat="action in actions">
 
             <!-- How does this reference executeMenuItem() i really don't think that this is very clear -->
@@ -16,6 +16,7 @@
                 <i class="icon icon-{{action.cssclass}}"></i>
                 <span class="menu-label">{{action.name}}</span>
             </a>
+
         </li>
     </ul>
 </div>

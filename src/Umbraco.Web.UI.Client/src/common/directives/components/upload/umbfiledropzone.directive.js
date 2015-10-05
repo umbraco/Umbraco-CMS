@@ -1,9 +1,9 @@
 /**
 * @ngdoc directive
-* @name umbraco.directives.directive:umbContentName 
+* @name umbraco.directives.directive:umbContentName
 * @restrict E
 * @function
-* @description 
+* @description
 * Used by editors that require naming an entity. Shows a textbox/headline with a required validator within it's own form.
 **/
 
@@ -31,7 +31,7 @@ angular.module("umbraco.directives")
 		restrict: 'E',
 		replace: true,
 
-		templateUrl: 'views/components/umb-file-dropzone.html',
+		templateUrl: 'views/components/upload/umb-file-dropzone.html',
 
 		scope: {
 			parentId: '@',
@@ -74,7 +74,7 @@ angular.module("umbraco.directives")
 			}
 
 			function _filesQueued(files, event){
-				
+
 				//Push into the queue
 				angular.forEach(files, function(file){
 
@@ -93,7 +93,7 @@ angular.module("umbraco.directives")
 				//when queue is done, kick the uploader
 				if(!scope.working){
 					_processQueueItem();
-				}				
+				}
 			}
 
 
@@ -120,7 +120,7 @@ angular.module("umbraco.directives")
 			function _upload(file) {
 
 				scope.propertyAlias = scope.propertyAlias ? scope.propertyAlias : "umbracoFile";
-				scope.contentTypeAlias = scope.contentTypeAlias ? scope.contentTypeAlias : "Image"; 
+				scope.contentTypeAlias = scope.contentTypeAlias ? scope.contentTypeAlias : "Image";
 
 				Upload.upload({
 					url: umbRequestHelper.getApiUrl("mediaApiBaseUrl", "PostAddFile"),
@@ -172,7 +172,7 @@ angular.module("umbraco.directives")
 					//after processing, test if everthing is done
 					scope.done.push(file);
 					scope.currentFile = undefined;
-					
+
 					_processQueueItem();
 				});
 			}
@@ -184,9 +184,9 @@ angular.module("umbraco.directives")
 				}
 
 				_filesQueued(files, event);
-				
+
 			};
-			
+
 			}
 
 

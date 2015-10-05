@@ -1,6 +1,6 @@
 /**
 * @ngdoc directive
-* @name umbraco.directives.directive:umbTabView 
+* @name umbraco.directives.directive:umbTabView
 * @restrict E
 **/
 angular.module("umbraco.directives")
@@ -9,6 +9,6 @@ angular.module("umbraco.directives")
 		restrict: 'E',
 		replace: true,
 		transclude: 'true',
-		templateUrl: 'views/directives/umb-tab-view.html'
+		templateUrl: 'views/directives/_obsolete/umb-tab-view.html'
 	};
 });

@@ -1,9 +1,9 @@
 /**
 * @ngdoc directive
-* @name umbraco.directives.directive:umbContentName 
+* @name umbraco.directives.directive:umbContentName
 * @restrict E
 * @function
-* @description 
+* @description
 * Used by editors that require naming an entity. Shows a textbox/headline with a required validator within it's own form.
 **/
 angular.module("umbraco.directives")
@@ -12,7 +12,8 @@ angular.module("umbraco.directives")
 	        require: "ngModel",
 			restrict: 'E',
 			replace: true,
-			templateUrl: 'views/directives/umb-content-name.html',
+			templateUrl: 'views/directives/_obsolete/umb-content-name.html',
+			
 			scope: {
 			    placeholder: '@placeholder',
 			    model: '=ngModel',
@@ -24,10 +25,10 @@ angular.module("umbraco.directives")
 				if(scope.placeholder && scope.placeholder[0] === "@"){
 					localizationService.localize(scope.placeholder.substring(1))
 						.then(function(value){
-							scope.placeholder = value;	
+							scope.placeholder = value;
 						});
 				}
-			    
+
 				var mX, mY, distance;
 
 				function calculateDistance(elem, mouseX, mouseY) {
@@ -64,18 +65,18 @@ angular.module("umbraco.directives")
 						scope.goEdit();
 					}
 				}, 100, false);
-			
+
 				scope.goEdit = function(){
 					scope.editMode = true;
 
-					$timeout(function () {					    
-					    inputElement.focus();					    
+					$timeout(function () {
+					    inputElement.focus();
 					}, 100, false);
 				};
 
 				scope.exitEdit = function(){
 					if(scope.model && scope.model !== ""){
-						scope.editMode = false;	
+						scope.editMode = false;
 					}
 				};
 

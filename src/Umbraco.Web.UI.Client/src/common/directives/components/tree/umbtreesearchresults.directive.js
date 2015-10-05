@@ -13,9 +13,9 @@ function treeSearchResults() {
         },
         restrict: "E",    // restrict to an element
         replace: true,   // replace the html element with the template
-        templateUrl: 'views/directives/umb-tree-search-results.html',
+        templateUrl: 'views/components/tree/umb-tree-search-results.html',
         link: function (scope, element, attrs, ctrl) {
-            
+
         }
     };
 }

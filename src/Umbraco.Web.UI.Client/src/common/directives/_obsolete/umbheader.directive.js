@@ -1,9 +1,9 @@
 /**
 * @ngdoc directive
-* @name umbraco.directives.directive:umbHeader 
+* @name umbraco.directives.directive:umbHeader
 * @restrict E
 * @function
-* @description 
+* @description
 * The header on an editor that contains tabs using bootstrap tabs - THIS IS OBSOLETE, use umbTabHeader instead
 **/
 angular.module("umbraco.directives")
@@ -12,14 +12,14 @@ angular.module("umbraco.directives")
         restrict: 'E',
         replace: true,
         transclude: 'true',
-        templateUrl: 'views/directives/umb-header.html',
+        templateUrl: 'views/directives/_obsolete/umb-header.html',
         //create a new isolated scope assigning a tabs property from the attribute 'tabs'
         //which is bound to the parent scope property passed in
         scope: {
             tabs: "="
         },
         link: function (scope, iElement, iAttrs) {
-            
+
             scope.showTabs = iAttrs.tabs ? true : false;
             scope.visibleTabs = [];
 
@@ -31,11 +31,11 @@ angular.module("umbraco.directives")
                         var tab = {id: val.id, label: val.label};
                         scope.visibleTabs.push(tab);
                 });
-                
+
                 //don't process if we cannot or have already done so
                 if (!newValue) {return;}
                 if (!newValue.length || newValue.length === 0){return;}
-               
+
                 //we need to do a timeout here so that the current sync operation can complete
                 // and update the UI, then this will fire and the UI elements will be available.
                 $timeout(function () {
@@ -54,7 +54,7 @@ angular.module("umbraco.directives")
                     //stop watching now
                     tabWatch();
                 }, 200);
-                
+
             });
         }
     };

@@ -6,7 +6,7 @@
     var directive = {
       restrict: 'E',
       replace: true,
-      templateUrl: 'views/components/umb-breadcrumbs.html',
+      templateUrl: 'views/components/editor/umb-breadcrumbs.html',
       scope: {
         ancestors: "="
       }

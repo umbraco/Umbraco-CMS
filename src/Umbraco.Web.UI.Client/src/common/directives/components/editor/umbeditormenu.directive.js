@@ -34,7 +34,7 @@
       var directive = {
          restrict: 'E',
          replace: true,
-         templateUrl: 'views/components/navigation/umb-editor-menu.html',
+         templateUrl: 'views/components/editor/umb-editor-menu.html',
          link: link,
          scope: {
             currentNode: "=",

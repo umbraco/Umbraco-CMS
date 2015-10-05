@@ -17,7 +17,7 @@ function treeSearchBox(localizationService, searchService, $q) {
         },
         restrict: "E",    // restrict to an element
         replace: true,   // replace the html element with the template
-        templateUrl: 'views/directives/umb-tree-search-box.html',
+        templateUrl: 'views/components/tree/umb-tree-search-box.html',
         link: function (scope, element, attrs, ctrl) {
 
             scope.term = "";
@@ -40,7 +40,7 @@ function treeSearchBox(localizationService, searchService, $q) {
             function performSearch() {
                 if (scope.term) {
                     scope.results = [];
-                    
+
                     //a canceler exists, so perform the cancelation operation and reset
                     if (canceler) {
                         console.log("CANCELED!");
@@ -80,7 +80,7 @@ function treeSearchBox(localizationService, searchService, $q) {
             var searcher = searchService.searchContent;
             //search
             if (scope.section === "member") {
-                searcher = searchService.searchMembers;             
+                searcher = searchService.searchMembers;
             }
             else if (scope.section === "media") {
                 searcher = searchService.searchMedia;

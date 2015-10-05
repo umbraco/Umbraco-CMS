@@ -7,7 +7,7 @@ angular.module("umbraco.directives")
         },
         restrict: 'E',
         replace: true,
-        templateUrl: 'views/directives/umb-optionsmenu.html',
+        templateUrl: 'views/directives/_obsolete/umb-optionsmenu.html',
         link: function (scope, element, attrs, ctrl) {
 
             //adds a handler to the context menu item click, we need to handle this differently
@@ -22,7 +22,7 @@ angular.module("umbraco.directives")
                 if (!scope.currentNode) {
                     return;
                 }
-                
+
                 //when the options item is selected, we need to set the current menu item in appState (since this is synonymous with a menu)
                 appState.setMenuState("currentNode", scope.currentNode);
 

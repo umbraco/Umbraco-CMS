@@ -13,7 +13,7 @@ function umbItemSorter(angularHelper) {
         },
         restrict: "E",    // restrict to an element
         replace: true,   // replace the html element with the template
-        templateUrl: 'views/directives/umb-item-sorter.html',
+        templateUrl: 'views/directives/_obsolete/umb-item-sorter.html',
         link: function(scope, element, attrs, ctrl) {
             var defaultModel = {
                 okButton: "Ok",
@@ -38,7 +38,7 @@ function umbItemSorter(angularHelper) {
             scope.handleOk = function() {
                 scope.$emit("umbItemSorter.ok");
             };
-            
+
             //defines the options for the jquery sortable
             scope.sortableOptions = {
                 axis: 'y',
