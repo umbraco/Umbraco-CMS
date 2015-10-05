@@ -8,6 +8,7 @@ using System.Web;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
+using Umbraco.Core.Packaging;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.Services;
@@ -15,7 +16,7 @@ using Umbraco.Core.Sync;
 
 namespace Umbraco.Core
 {
-	/// <summary>
+    /// <summary>
     /// the Umbraco Application context
     /// </summary>
     /// <remarks>
@@ -186,6 +187,7 @@ namespace Umbraco.Core
 		readonly ManualResetEventSlim _isReadyEvent = new ManualResetEventSlim(false);
 		private DatabaseContext _databaseContext;
 		private ServiceContext _services;
+        private PackageMigrationsContext _packageMigrationsContext;
 
 		public bool IsReady
         {
@@ -217,71 +219,7 @@ namespace Umbraco.Core
         {
             get { return _umbracoVersionConfigured.Value; }
         }
-
-        /// <summary>
-        /// Returns true if there are pending package migrations that need to be executed
-        /// </summary>
-        internal bool HasPendingPackageMigrations
-        {
-            get { return _packageVersionsConfigured.Value.Length > 0; }
-        }
-
-        /// <summary>
-        /// Returns the list of package migration names that need to be executed
-        /// </summary>
-        internal string[] GetPendingPackageMigrations()
-        {
-            return _packageVersionsConfigured.Value;
-        }
-
-        /// <summary>
-        /// Called to initialize or when package migrations have executed - since an app restart is mandatory
-        /// </summary>
-	    internal void ResetPendingPackageMigrations()
-	    {
-            _packageVersionsConfigured = new Lazy<string[]>(() =>
-            {
-                var currentVersion = UmbracoVersion.GetSemanticVersion();
-
-                var result = new List<string>();
-
-                //The versions are the same in config, but are they the same in the database. We can only check this
-                // if we have a db context available, if we don't then we are not installed anyways
-                if (DatabaseContext.IsDatabaseConfigured && DatabaseContext.CanConnect)
-                {
-                    //Now we can check if there are any package migrations that haven't been executed.
-                    //Find packages that have migrations:
-                    var packageMigrations = MigrationResolver.Current.MigrationMetaData.Where(x => x.ProductName != GlobalSettings.UmbracoMigrationName);
-                    var packageMigrationProductNames = packageMigrations.Select(x => x.ProductName).Distinct().ToArray();
-                    var packageEntries = Services.MigrationEntryService.FindEntries(
-                        UmbracoVersion.GetSemanticVersion(),
-                        packageMigrationProductNames)
-                        .Select(x => x.MigrationName)
-                        .ToArray();
-
-                    //If there are not the same number of entries in the db for the current version 
-                    // as there are package migration names found, then we need to run the migrations
-                    if (packageMigrationProductNames.Length != packageEntries.Length)
-                    {
-                        foreach (var prodName in packageMigrationProductNames)
-                        {
-                            if (packageEntries.Contains(prodName) == false)
-                            {
-                                result.Add(prodName);
-
-                                ProfilingLogger.Logger.Debug<ApplicationContext>(
-                                    string.Format("The migration {0} for version: '{1} has not been executed, there is no record in the database",
-                                    prodName,
-                                    currentVersion.ToSemanticString()));
-                            }
-                        }
-                    }
-
-                }
-
-                return result.ToArray();
-            });
-        }
+        
 
         /// <summary>
         /// If the db is configured, there is a database context and there is an umbraco schema, 
@@ -291,7 +229,7 @@ namespace Umbraco.Core
 	    {
             get
             {
-                if ((IsConfigured == false || HasPendingPackageMigrations)
+                if ((IsConfigured == false || PackageMigrationsContext.HasPendingPackageMigrations)
                     && DatabaseContext != null 
                     && DatabaseContext.IsDatabaseConfigured)
                 {
@@ -338,7 +276,7 @@ namespace Umbraco.Core
 	    internal string _umbracoApplicationUrl;
 
         private Lazy<bool> _umbracoVersionConfigured;
-        private Lazy<string[]> _packageVersionsConfigured;        
+        
         internal MainDom MainDom { get; private set; }
        
 	    private void Init()
@@ -390,7 +328,7 @@ namespace Umbraco.Core
                 }
             });
 
-            ResetPendingPackageMigrations();
+            _packageMigrationsContext = new PackageMigrationsContext(DatabaseContext, Services.MigrationEntryService, ProfilingLogger.Logger);
         }
 
 		private string ConfigurationStatus
@@ -412,6 +350,11 @@ namespace Umbraco.Core
         {
             if (this.IsReady)
                 throw new Exception("ApplicationContext has already been initialized.");
+        }
+
+        internal PackageMigrationsContext PackageMigrationsContext
+        {
+            get { return _packageMigrationsContext; }
         }
 
 		/// <summary>

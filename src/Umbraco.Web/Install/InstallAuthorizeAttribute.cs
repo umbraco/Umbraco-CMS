@@ -56,7 +56,7 @@ namespace Umbraco.Web.Install
             {
                 var appContext = GetApplicationContext();
                 //if its not configured then we can continue
-                if (appContext.IsConfigured == false || appContext.HasPendingPackageMigrations)
+                if (appContext.IsConfigured == false || appContext.PackageMigrationsContext.HasPendingPackageMigrations)
                 {
                     return true;
                 }

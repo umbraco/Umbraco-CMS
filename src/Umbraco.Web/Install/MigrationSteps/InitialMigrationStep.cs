@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Specialized;
 using System.Configuration;
+using System.Linq;
 using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Web.Install.Models;
@@ -27,7 +28,7 @@ namespace Umbraco.Web.Install.MigrationSteps
         /// </summary>
         public override object ViewModel
         {
-            get { return _applicationContext.GetPendingPackageMigrations(); }
+            get { return _applicationContext.PackageMigrationsContext.GetPendingPackageMigrations().Select(x => x.Key); }
         }
 
         public override InstallSetupResult Execute(object model)

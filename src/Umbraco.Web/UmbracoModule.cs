@@ -321,7 +321,7 @@ namespace Umbraco.Web
 
         private bool EnsurePackageMigrationsHaveExecuted(HttpContextBase httpContext, Uri uri)
         {
-            if (ApplicationContext.Current.HasPendingPackageMigrations == false)
+            if (ApplicationContext.Current.PackageMigrationsContext.HasPendingPackageMigrations == false)
                 return true;
 
             if (_notConfiguredReported)

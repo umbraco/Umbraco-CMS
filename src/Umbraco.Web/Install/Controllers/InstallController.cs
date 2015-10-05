@@ -36,7 +36,7 @@ namespace Umbraco.Web.Install.Controllers
         [HttpGet]
         public ActionResult PackageMigrations()
         {
-            if (ApplicationContext.Current.HasPendingPackageMigrations == false)
+            if (ApplicationContext.Current.PackageMigrationsContext.HasPendingPackageMigrations == false)
             {
                 return Redirect(SystemDirectories.Umbraco.EnsureEndsWith('/'));
             }

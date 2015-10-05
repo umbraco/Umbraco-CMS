@@ -21,36 +21,37 @@ namespace Umbraco.Web.Install.MigrationSteps
 
         public override bool RequiresExecution(object model)
         {
-            return _applicationContext.HasPendingPackageMigrations;
+            return _applicationContext.PackageMigrationsContext.HasPendingPackageMigrations;
         }        
 
         public override InstallSetupResult Execute(object model)
         {
-            var umbVersion = UmbracoVersion.GetSemanticVersion();
             //NOTE: We could separate these out into separate tasks (dynamically) if we wanted to but I 
             // think it will be fine processing them all at once.
-            foreach (var pendingPackageMigration in _applicationContext.GetPendingPackageMigrations())
+
+            var pendingMigrations = _applicationContext.PackageMigrationsContext.GetPendingPackageMigrations();
+            var packageDbMigrations = _applicationContext.Services.MigrationEntryService
+                .FindEntries(pendingMigrations.Select(x => x.Key))
+                .ToArray();
+
+            foreach (var pendingPackageMigration in _applicationContext.PackageMigrationsContext.GetPendingPackageMigrations())
             {
-                var latestMigration = _applicationContext.Services.MigrationEntryService
-                    .FindEntries(pendingPackageMigration)
-                    .Where(x => x.Version != umbVersion)
+                var latestDbMigration = packageDbMigrations
+                    .Where(x => x.MigrationName.InvariantEquals(pendingPackageMigration.Key))
                     .OrderByDescending(x => x.Version)
                     .FirstOrDefault();
 
                 var runner = new MigrationRunner(_applicationContext.Services.MigrationEntryService,
                     _applicationContext.ProfilingLogger.Logger,
                     //This is the version this package is coming from:
-                    latestMigration == null ? new SemVersion(0) : latestMigration.Version,
-                    umbVersion,
-                    pendingPackageMigration);
+                    latestDbMigration == null ? new SemVersion(0) : latestDbMigration.Version,
+                    //This is the latest migration specified in the packages c# migrations
+                    pendingPackageMigration.Value,
+                    pendingPackageMigration.Key);
 
                 var result = runner.Execute(_applicationContext.DatabaseContext.Database, _applicationContext.DatabaseContext.DatabaseProvider, true);
 
-                if (result)
-                {
-                    _applicationContext.Services.MigrationEntryService.CreateEntry(pendingPackageMigration, umbVersion);
-                }
-                else
+                if (result == false)
                 {
                     //this will only happen normally if something cancels the migration
                     return new InstallSetupResult("failedmigration", new
@@ -61,7 +62,7 @@ namespace Umbraco.Web.Install.MigrationSteps
             }
             
             //very important to reset migrations since an app restart isn't actually a mandatory thing
-            _applicationContext.ResetPendingPackageMigrations();
+            _applicationContext.PackageMigrationsContext.ResetPendingPackageMigrations();
 
             //everything was ok
             return null;
