@@ -10,7 +10,7 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-    [InstallSetupStep(InstallationType.Upgrade,
+    [CoreInstallSetupStep(CoreInstallationType.Upgrade,
         "Version73FileCleanup", 2, 
         "Performing some housecleaning...", 
         PerformsAppRestart = true)]

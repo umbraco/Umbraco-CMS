@@ -148,5 +148,18 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return result.Select(factory.BuildEntity);
         }
+
+        public IEnumerable<IMigrationEntry> FindEntries(string migrationName)
+        {            
+            var sql = new Sql().Select("*")
+                .From<MigrationDto>(SqlSyntax)
+                .Where<MigrationDto>(x => x.Name.InvariantEquals(migrationName));
+
+            var result = Database.Fetch<MigrationDto>(sql);
+
+            var factory = new MigrationEntryFactory();
+
+            return result.Select(factory.BuildEntity);
+        }
     }
 }

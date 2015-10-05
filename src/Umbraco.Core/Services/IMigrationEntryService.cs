@@ -23,6 +23,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         IMigrationEntry FindEntry(string migrationName, SemVersion version);
 
+        IEnumerable<IMigrationEntry> FindEntries(string migrationName);
         IEnumerable<IMigrationEntry> FindEntries(SemVersion version, params string[] migrationNames);
 
         /// <summary>

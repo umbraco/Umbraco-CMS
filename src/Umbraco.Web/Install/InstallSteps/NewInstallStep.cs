@@ -18,7 +18,7 @@ namespace Umbraco.Web.Install.InstallSteps
     /// error, etc... and the end-user refreshes the installer then we cannot show the user screen because they've already entered that information so instead we'll    
     /// display a simple continue installation view.
     /// </remarks>
-    [InstallSetupStep(InstallationType.NewInstall,
+    [CoreInstallSetupStep(CoreInstallationType.NewInstall,
         "User", 20, "")]
     internal class NewInstallStep : InstallSetupStep<UserModel>
     {

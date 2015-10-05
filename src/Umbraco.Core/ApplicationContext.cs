@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Threading;
@@ -222,7 +223,64 @@ namespace Umbraco.Core
         /// </summary>
         internal bool HasPendingPackageMigrations
         {
-            get { return _packageVersionsConfigured.Value == false; }
+            get { return _packageVersionsConfigured.Value.Length > 0; }
+        }
+
+        /// <summary>
+        /// Returns the list of package migration names that need to be executed
+        /// </summary>
+        internal string[] GetPendingPackageMigrations()
+        {
+            return _packageVersionsConfigured.Value;
+        }
+
+        /// <summary>
+        /// Called to initialize or when package migrations have executed - since an app restart is mandatory
+        /// </summary>
+	    internal void ResetPendingPackageMigrations()
+	    {
+            _packageVersionsConfigured = new Lazy<string[]>(() =>
+            {
+                var currentVersion = UmbracoVersion.GetSemanticVersion();
+
+                var result = new List<string>();
+
+                //The versions are the same in config, but are they the same in the database. We can only check this
+                // if we have a db context available, if we don't then we are not installed anyways
+                if (DatabaseContext.IsDatabaseConfigured && DatabaseContext.CanConnect)
+                {
+                    //Now we can check if there are any package migrations that haven't been executed.
+                    //Find packages that have migrations:
+                    var packageMigrations = MigrationResolver.Current.MigrationMetaData.Where(x => x.ProductName != GlobalSettings.UmbracoMigrationName);
+                    var packageMigrationProductNames = packageMigrations.Select(x => x.ProductName).Distinct().ToArray();
+                    var packageEntries = Services.MigrationEntryService.FindEntries(
+                        UmbracoVersion.GetSemanticVersion(),
+                        packageMigrationProductNames)
+                        .Select(x => x.MigrationName)
+                        .ToArray();
+
+                    //If there are not the same number of entries in the db for the current version 
+                    // as there are package migration names found, then we need to run the migrations
+                    if (packageMigrationProductNames.Length != packageEntries.Length)
+                    {
+                        foreach (var prodName in packageMigrationProductNames)
+                        {
+                            if (packageEntries.Contains(prodName) == false)
+                            {
+                                result.Add(prodName);
+
+                                ProfilingLogger.Logger.Debug<ApplicationContext>(
+                                    string.Format("The migration {0} for version: '{1} has not been executed, there is no record in the database",
+                                    prodName,
+                                    currentVersion.ToSemanticString()));
+                            }
+                        }
+                    }
+
+                }
+
+                return result.ToArray();
+            });
         }
 
         /// <summary>
@@ -280,7 +338,7 @@ namespace Umbraco.Core
 	    internal string _umbracoApplicationUrl;
 
         private Lazy<bool> _umbracoVersionConfigured;
-        private Lazy<bool> _packageVersionsConfigured;        
+        private Lazy<string[]> _packageVersionsConfigured;        
         internal MainDom MainDom { get; private set; }
        
 	    private void Init()
@@ -332,48 +390,7 @@ namespace Umbraco.Core
                 }
             });
 
-            _packageVersionsConfigured = new Lazy<bool>(() =>
-            {
-                var currentVersion = UmbracoVersion.GetSemanticVersion();
-                var ok = true;
-
-                //The versions are the same in config, but are they the same in the database. We can only check this
-                // if we have a db context available, if we don't then we are not installed anyways
-                if (DatabaseContext.IsDatabaseConfigured && DatabaseContext.CanConnect)
-                {
-                    //Now we can check if there are any package migrations that haven't been executed.
-                    //Find packages that have migrations:
-                    var packageMigrations = MigrationResolver.Current.MigrationMetaData.Where(x => x.ProductName != GlobalSettings.UmbracoMigrationName);
-                    var packageMigrationProductNames = packageMigrations.Select(x => x.ProductName).Distinct().ToArray();
-                    var packageEntries = Services.MigrationEntryService.FindEntries(
-                        UmbracoVersion.GetSemanticVersion(),
-                        packageMigrationProductNames)
-                        .Select(x => x.MigrationName)
-                        .ToArray();
-
-                    //If there are not the same number of entries in the db for the current version 
-                    // as there are package migration names found, then we need to run the migrations
-                    if (packageMigrationProductNames.Length != packageEntries.Length)
-                    {
-                        //we'll loop over the ones that need to run so we can log it
-                        foreach (var prodName in packageMigrationProductNames)
-                        {
-                            if (packageEntries.Contains(prodName) == false)
-                            {
-                                ProfilingLogger.Logger.Debug<ApplicationContext>(
-                                    string.Format("The migration {0} for version: '{1} has not been executed, there is no record in the database",
-                                    prodName,
-                                    currentVersion.ToSemanticString()));
-
-                                ok = false;
-                            }
-                        }
-                    }
-
-                }
-
-                return ok;
-            });
+            ResetPendingPackageMigrations();
         }
 
 		private string ConfigurationStatus

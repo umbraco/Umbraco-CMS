@@ -97,7 +97,9 @@ namespace Umbraco.Web
             //re-write for the default back office path
             if (httpContext.Request.Url.IsDefaultBackOfficeRequest())
             {
-                if (EnsureIsConfigured(httpContext, umbracoContext.OriginalRequestUrl))
+                //only continue to process the back office if the app is configured and there are no pending migrations
+                if (EnsureIsConfigured(httpContext, umbracoContext.OriginalRequestUrl) 
+                    && EnsurePackageMigrationsHaveExecuted(httpContext, umbracoContext.OriginalRequestUrl))
                 {
                     RewriteToBackOfficeHandler(httpContext);
                 }

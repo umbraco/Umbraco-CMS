@@ -10,5 +10,7 @@ namespace Umbraco.Core.Persistence.Repositories
         IMigrationEntry FindEntry(string migrationName, SemVersion version);
 
         IEnumerable<IMigrationEntry> FindEntries(SemVersion version, params string[] migrationNames);
+
+        IEnumerable<IMigrationEntry> FindEntries(string migrationName);
     }
 }

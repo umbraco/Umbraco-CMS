@@ -5,7 +5,7 @@ namespace Umbraco.Web.Install.InstallSteps
     /// <summary>
     /// This step is purely here to show the button to commence the upgrade
     /// </summary>
-    [InstallSetupStep(InstallationType.Upgrade,
+    [CoreInstallSetupStep(CoreInstallationType.Upgrade,
         "Upgrade", "upgrade", 1, "Upgrading Umbraco to the latest and greatest version.")]
     internal class UpgradeStep : InstallSetupStep<object>
     {

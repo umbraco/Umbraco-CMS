@@ -9,7 +9,7 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-    [InstallSetupStep(InstallationType.Upgrade | InstallationType.NewInstall,
+    [CoreInstallSetupStep(CoreInstallationType.Upgrade | CoreInstallationType.NewInstall,
         "DatabaseUpgrade", 12, "")]
     internal class DatabaseUpgradeStep : InstallSetupStep<object>
     {

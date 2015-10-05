@@ -325,6 +325,10 @@
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
     <Compile Include="Install\InstallSteps\Version73FileCleanup.cs" />
     <Compile Include="Models\ContentEditing\DocumentTypeDisplay.cs" />
+    <Compile Include="Install\MigrationSteps\ExecutionMigrationStep.cs" />
+    <Compile Include="Install\MigrationSteps\InitialMigrationStep.cs" />
+    <Compile Include="Install\Models\InstallerType.cs" />
+    <Compile Include="Install\Models\InstallSetupStepAttribute.cs" />
     <Compile Include="Media\EmbedProviders\Flickr.cs" />
     <Compile Include="Models\ContentEditing\ContentTypeCompositionDisplay.cs" />
     <Compile Include="Models\ContentEditing\ContentTypeSave.cs" />
@@ -485,14 +489,14 @@
     <Compile Include="Install\Controllers\InstallPackageController.cs" />
     <Compile Include="Install\Models\DatabaseModel.cs" />
     <Compile Include="Install\Models\DatabaseType.cs" />
-    <Compile Include="Install\Models\InstallationType.cs" />
+    <Compile Include="Install\Models\CoreInstallationType.cs" />
     <Compile Include="Install\Models\InstallInstructions.cs" />
     <Compile Include="Install\Models\InstallPackageModel.cs" />
     <Compile Include="Install\Models\InstallProgressResultModel.cs" />
     <Compile Include="Install\Models\InstallSetup.cs" />
     <Compile Include="Install\Models\InstallSetupResult.cs" />
     <Compile Include="Install\Models\InstallSetupStep.cs" />
-    <Compile Include="Install\Models\InstallSetupStepAttribute.cs" />
+    <Compile Include="Install\Models\CoreInstallSetupStepAttribute.cs" />
     <Compile Include="Install\Models\InstallTrackingItem.cs" />
     <Compile Include="Install\Models\Package.cs" />
     <Compile Include="Install\Models\UserModel.cs" />

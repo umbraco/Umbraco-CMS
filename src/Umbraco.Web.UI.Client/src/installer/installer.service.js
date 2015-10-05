@@ -12,7 +12,8 @@ angular.module("umbraco.install").factory('installerService', function($rootScop
 	var _installerModel = {
 	    installId: undefined,
         instructions: {
-        }
+        },
+        installType: Umbraco.Sys.ServerVariables.installType
 	};
 
 	//add to umbraco installer facts here
@@ -107,7 +108,7 @@ angular.module("umbraco.install").factory('installerService', function($rootScop
 		init : function(){
 			service.status.loading = true;
 			if(!_status.all){
-				service.getSteps().then(function(response){
+			    service.getSteps(Umbraco.Sys.ServerVariables.installType).then(function (response) {
 					service.status.steps = response.data.steps;
 					service.status.index = 0;
 					_installerModel.installId = response.data.installId;
@@ -126,8 +127,8 @@ angular.module("umbraco.install").factory('installerService', function($rootScop
 			return $http.get(Umbraco.Sys.ServerVariables.installApiBaseUrl + "GetPackages");
 		},
 
-		getSteps : function(){
-			return $http.get(Umbraco.Sys.ServerVariables.installApiBaseUrl + "GetSetup");
+		getSteps : function(installType){
+		    return $http.get(Umbraco.Sys.ServerVariables.installApiBaseUrl + "GetSetup?installType=" + installType);
 		},
 
 		gotoStep : function(index){

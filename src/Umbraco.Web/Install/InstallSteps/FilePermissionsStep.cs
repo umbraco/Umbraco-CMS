@@ -8,7 +8,7 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-    [InstallSetupStep(InstallationType.NewInstall | InstallationType.Upgrade,
+    [CoreInstallSetupStep(CoreInstallationType.NewInstall | CoreInstallationType.Upgrade,
         "Permissions", 0, "",
         PerformsAppRestart = true)]
     internal class FilePermissionsStep : InstallSetupStep<object>
