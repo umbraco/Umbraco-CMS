@@ -15,8 +15,8 @@ angular.module("umbraco.directives.html")
             require: '?^form',
             transclude: true,
             restrict: 'E',
-            replace: true,        
-            templateUrl: 'views/directives/html/umb-control-group.html',
+            replace: true,
+            templateUrl: 'views/components/html/umb-control-group.html',
             link: function (scope, element, attr, formCtrl) {
 
                 scope.formValid = function() {

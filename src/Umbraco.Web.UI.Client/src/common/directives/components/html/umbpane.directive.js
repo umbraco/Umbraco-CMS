@@ -8,7 +8,7 @@ angular.module("umbraco.directives.html")
         return {
             transclude: true,
             restrict: 'E',
-            replace: true,        
-            templateUrl: 'views/directives/html/umb-pane.html'
+            replace: true,
+            templateUrl: 'views/components/html/umb-pane.html'
         };
     });
