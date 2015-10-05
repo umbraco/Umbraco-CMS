@@ -7,7 +7,7 @@ function avatarDirective() {
     return {
         restrict: "E",    // restrict to an element
         replace: true,   // replace the html element with the template
-        templateUrl: 'views/directives/umb-avatar.html',
+        templateUrl: 'views/components/application/umb-avatar.html',
         scope: {
             name: '@',
             email: '@',
@@ -19,7 +19,7 @@ function avatarDirective() {
                 //set the gravatar url
                 scope.gravatar = "https://www.gravatar.com/avatar/" + val + "?s=40";
             });
-            
+
         }
     };
 }

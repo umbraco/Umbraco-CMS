@@ -7,9 +7,9 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
     return {
         restrict: "E",    // restrict to an element
         replace: true,   // replace the html element with the template
-        templateUrl: 'views/directives/umb-sections.html',
+        templateUrl: 'views/components/application/umb-sections.html',
         link: function (scope, element, attr, ctrl) {
-			
+
             //setup scope vars
 			scope.maxSections = 7;
 			scope.overflowingSections = 0;
@@ -18,7 +18,7 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
             scope.showTray = false; //appState.getGlobalState("showTray");
             scope.stickyNavigation = appState.getGlobalState("stickyNavigation");
             scope.needTray = false;
-            scope.trayAnimation = function() {                
+            scope.trayAnimation = function() {
                 if (scope.showTray) {
                     return 'slide';
                 }
@@ -85,7 +85,7 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 
 			//on page resize
 			window.onresize = calculateHeight;
-			
+
 			scope.avatarClick = function(){
 				navigationService.showUserDialog();
 			};
@@ -101,7 +101,7 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 			    if (navigationService.helpDialog) {
 			        navigationService.helpDialog.close();
 			    }
-			    
+
 			    navigationService.hideSearch();
 			    navigationService.showTree(section.alias);
 			    $location.path("/" + section.alias);
@@ -126,7 +126,7 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 			        navigationService.showTray();
 			    }
 			};
-            
+
 			loadSections();
 
         }
