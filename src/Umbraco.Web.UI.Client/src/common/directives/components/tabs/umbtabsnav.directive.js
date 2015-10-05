@@ -40,7 +40,7 @@
     var directive = {
       restrict: "E",
       replace: true,
-      templateUrl: "views/components/umb-tabs-nav.html",
+      templateUrl: "views/components/tabs/umb-tabs-nav.html",
       scope: {
         model: "=",
         tabdrop: "="

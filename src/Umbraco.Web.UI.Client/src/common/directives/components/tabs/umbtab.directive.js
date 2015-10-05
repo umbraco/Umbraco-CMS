@@ -9,6 +9,6 @@ angular.module("umbraco.directives")
 		restrict: 'E',
 		replace: true,
         transclude: 'true',
-		templateUrl: 'views/directives/components/umb-tab.html'		
+		templateUrl: 'views/components/tabs/umb-tab.html'		
     };
 });

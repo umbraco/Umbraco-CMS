@@ -13,7 +13,7 @@
       restrict: "E",
       replace: true,
       transclude: 'true',
-      templateUrl: "views/directives/components/umb-tabs-content.html",
+      templateUrl: "views/components/tabs/umb-tabs-content.html",
       link: link
     };
 
