@@ -3,7 +3,7 @@
 * @name umbraco.directives.directive:umbCropsy
 * @restrict E
 * @function
-* @description 
+* @description
 * Used by editors that require naming an entity. Shows a textbox/headline with a required validator within it's own form.
 **/
 angular.module("umbraco.directives")
@@ -11,13 +11,13 @@ angular.module("umbraco.directives")
 	    return {
 				restrict: 'E',
 				replace: true,
-				templateUrl: 'views/directives/imaging/umb-image-gravity.html',
+				templateUrl: 'views/components/imaging/umb-image-gravity.html',
 				scope: {
 					src: '=',
 					center: "="
 				},
 				link: function(scope, element, attrs) {
-					
+
 					//Internal values for keeping track of the dot and the size of the editor
 					scope.dimensions = {
 						width: 0,
@@ -27,10 +27,10 @@ angular.module("umbraco.directives")
 					};
 
 					//elements
-					var $viewport = element.find(".viewport"); 
+					var $viewport = element.find(".viewport");
 					var $image = element.find("img");
 					var $overlay = element.find(".overlay");
-					
+
 					scope.style = function () {
 						if(scope.dimensions.width <= 0){
 							setDimensions();
@@ -38,7 +38,7 @@ angular.module("umbraco.directives")
 
 						return {
 							'top': scope.dimensions.top + 'px',
-							'left': scope.dimensions.left + 'px' 
+							'left': scope.dimensions.left + 'px'
 						};
 					};
 
@@ -52,7 +52,7 @@ angular.module("umbraco.directives")
 						}else{
 							scope.center = { left: 0.5, top: 0.5 };
 						}
-					};	
+					};
 
 					var calculateGravity = function(){
 						scope.dimensions.left = $overlay[0].offsetLeft;
@@ -61,13 +61,13 @@ angular.module("umbraco.directives")
 						scope.center.left =  (scope.dimensions.left+10) / scope.dimensions.width;
 						scope.center.top =  (scope.dimensions.top+10) / scope.dimensions.height;
 					};
-					
+
 					var lazyEndEvent = _.debounce(function(){
 						scope.$apply(function(){
 							scope.$emit("imageFocalPointStop");
 						});
 					}, 2000);
-					
+
 
 					//Drag and drop positioning, using jquery ui draggable
 					//TODO ensure that the point doesnt go outside the box

@@ -8,6 +8,6 @@ angular.module("umbraco.directives.html")
 		return {
 			restrict: 'E',
 			replace: true,
-			templateUrl: 'views/directives/html/umb-upload-dropzone.html'
+			templateUrl: 'views/directives/_obsolete/umb-upload-dropzone.html'
 		};
 	});

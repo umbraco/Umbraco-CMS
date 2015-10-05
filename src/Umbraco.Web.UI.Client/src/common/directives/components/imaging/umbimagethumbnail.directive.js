@@ -3,17 +3,17 @@
 * @name umbraco.directives.directive:umbCropsy
 * @restrict E
 * @function
-* @description 
+* @description
 * Used by editors that require naming an entity. Shows a textbox/headline with a required validator within it's own form.
 **/
 angular.module("umbraco.directives")
-	.directive('umbImageThumbnail', 
+	.directive('umbImageThumbnail',
 		function ($timeout, localizationService, cropperHelper, $log) {
 	    return {
 				restrict: 'E',
 				replace: true,
-				templateUrl: 'views/directives/imaging/umb-image-thumbnail.html',
-				
+				templateUrl: 'views/components/imaging/umb-image-thumbnail.html',
+
 				scope: {
 					src: '=',
 					width: '@',
@@ -22,7 +22,7 @@ angular.module("umbraco.directives")
 					crop: "=",
 					maxSize: '@'
 				},
-				
+
 				link: function(scope, element, attrs) {
 					//// INIT /////
 					var $image = element.find("img");
@@ -40,10 +40,10 @@ angular.module("umbraco.directives")
 							//we do not compare to the image dimensions, but the thumbs
 							if(scope.maxSize){
 								var ratioCalculation = cropperHelper.calculateAspectRatioFit(
-										scope.width, 
+										scope.width,
 										scope.height,
-										scope.maxSize, 
-										scope.maxSize, 
+										scope.maxSize,
+										scope.maxSize,
 										false);
 
 								//so if we have a max size, override the thumb sizes
@@ -51,7 +51,7 @@ angular.module("umbraco.directives")
 								scope.height = ratioCalculation.height;
 							}
 
-							setPreviewStyle();	
+							setPreviewStyle();
 						});
 					});
 
@@ -65,22 +65,22 @@ angular.module("umbraco.directives")
 					scope.$watch("center", function(){
 						setPreviewStyle();
 					}, true);
-					
+
 					function setPreviewStyle(){
 						if(scope.crop && scope.image){
 							scope.preview = cropperHelper.convertToStyle(
-												scope.crop, 
+												scope.crop,
 												scope.image,
 												{width: scope.width, height: scope.height},
 												0);
 						}else if(scope.image){
 
-							//returns size fitting the cropper	
+							//returns size fitting the cropper
 							var p = cropperHelper.calculateAspectRatioFit(
-									scope.image.width, 
-									scope.image.height, 
-									scope.width, 
-									scope.height, 
+									scope.image.width,
+									scope.image.height,
+									scope.width,
+									scope.height,
 									true);
 
 

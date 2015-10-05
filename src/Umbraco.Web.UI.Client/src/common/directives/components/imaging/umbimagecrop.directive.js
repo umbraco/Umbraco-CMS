@@ -5,12 +5,12 @@
 * @function
 **/
 angular.module("umbraco.directives")
-	.directive('umbImageCrop', 
+	.directive('umbImageCrop',
 		function ($timeout, localizationService, cropperHelper,  $log) {
 	    return {
 				restrict: 'E',
 				replace: true,
-				templateUrl: 'views/directives/imaging/umb-image-crop.html',
+				templateUrl: 'views/components/imaging/umb-image-crop.html',
 				scope: {
 					src: '=',
 					width: '@',
@@ -39,15 +39,15 @@ angular.module("umbraco.directives")
 
 					//live rendering of viewport and image styles
 					scope.style = function () {
-						return { 
+						return {
 							'height': (parseInt(scope.dimensions.viewport.height, 10)) + 'px',
-							'width': (parseInt(scope.dimensions.viewport.width, 10)) + 'px' 
+							'width': (parseInt(scope.dimensions.viewport.width, 10)) + 'px'
 						};
 					};
-				
+
 
 					//elements
-					var $viewport = element.find(".viewport"); 
+					var $viewport = element.find(".viewport");
 					var $image = element.find("img");
 					var $overlay = element.find(".overlay");
 					var $container = element.find(".crop-container");
@@ -64,7 +64,7 @@ angular.module("umbraco.directives")
 					};
 
 
-					var setDimensions = function(originalImage){	
+					var setDimensions = function(originalImage){
 						originalImage.width("auto");
 						originalImage.height("auto");
 
@@ -86,15 +86,15 @@ angular.module("umbraco.directives")
 						var _viewPortH =  parseInt(scope.height, 10);
 
 						//if we set a constraint we will scale it down if needed
-						if(scope.maxSize){	
+						if(scope.maxSize){
 							var ratioCalculation = cropperHelper.scaleToMaxSize(
-									_viewPortW, 
+									_viewPortW,
 									_viewPortH,
 									scope.maxSize);
 
 							//so if we have a max size, override the thumb sizes
 							_viewPortW = ratioCalculation.width;
-							_viewPortH = ratioCalculation.height;	
+							_viewPortH = ratioCalculation.height;
 						}
 
 						scope.dimensions.viewport.width = _viewPortW + 2 * scope.dimensions.margin;
@@ -106,12 +106,12 @@ angular.module("umbraco.directives")
 
 					//when loading an image without any crop info, we center and fit it
 					var resizeImageToEditor = function(){
-						//returns size fitting the cropper	
+						//returns size fitting the cropper
 						var size = cropperHelper.calculateAspectRatioFit(
-								scope.dimensions.image.width, 
-								scope.dimensions.image.height, 
-								scope.dimensions.cropper.width, 
-								scope.dimensions.cropper.height, 
+								scope.dimensions.image.width,
+								scope.dimensions.image.height,
+								scope.dimensions.cropper.width,
+								scope.dimensions.cropper.height,
 								true);
 
 						//sets the image size and updates the scope
@@ -145,16 +145,16 @@ angular.module("umbraco.directives")
 					//resize the image to a predefined crop coordinate
 					var resizeImageToCrop = function(){
 						scope.dimensions.image = cropperHelper.convertToStyle(
-												scope.crop, 
+												scope.crop,
 												{width: scope.dimensions.image.originalWidth, height: scope.dimensions.image.originalHeight},
 												scope.dimensions.cropper,
 												scope.dimensions.margin);
 
 						var ratioCalculation = cropperHelper.calculateAspectRatioFit(
-								scope.dimensions.image.originalWidth, 
-								scope.dimensions.image.originalHeight, 
-								scope.dimensions.cropper.width, 
-								scope.dimensions.cropper.height, 
+								scope.dimensions.image.originalWidth,
+								scope.dimensions.image.originalHeight,
+								scope.dimensions.cropper.width,
+								scope.dimensions.cropper.height,
 								true);
 
 						scope.dimensions.scale.current = scope.dimensions.image.ratio;
@@ -169,7 +169,7 @@ angular.module("umbraco.directives")
 					var validatePosition = function(left, top){
 						if(left > constraints.left.max)
 						{
-							left = constraints.left.max; 
+							left = constraints.left.max;
 						}
 
 						if(left <= constraints.left.min){
@@ -178,7 +178,7 @@ angular.module("umbraco.directives")
 
 						if(top > constraints.top.max)
 						{
-							top = constraints.top.max; 
+							top = constraints.top.max;
 						}
 						if(top <= constraints.top.min){
 							top = constraints.top.min;
@@ -186,17 +186,17 @@ angular.module("umbraco.directives")
 
 						if(scope.dimensions.image.left !== left){
 							scope.dimensions.image.left = left;
-						}	
-						
+						}
+
 						if(scope.dimensions.image.top !== top){
 							scope.dimensions.image.top = top;
 						}
-					};	
+					};
 
 
-					//sets scope.crop to the recalculated % based crop	
+					//sets scope.crop to the recalculated % based crop
 					var calculateCropBox = function(){
-						scope.crop = cropperHelper.pixelsToCoordinates(scope.dimensions.image, scope.dimensions.cropper.width, scope.dimensions.cropper.height, scope.dimensions.margin);	
+						scope.crop = cropperHelper.pixelsToCoordinates(scope.dimensions.image, scope.dimensions.cropper.width, scope.dimensions.cropper.height, scope.dimensions.margin);
 					};
 
 
@@ -218,7 +218,7 @@ angular.module("umbraco.directives")
 							});
 						}
 					});
-					
+
 
 
 					var init = function(image){
@@ -252,10 +252,10 @@ angular.module("umbraco.directives")
 
 					var throttledResizing = _.throttle(function(){
 						resizeImageToScale(scope.dimensions.scale.current);
-						calculateCropBox();	
+						calculateCropBox();
 					}, 100);
 
-					
+
 					//happens when we change the scale
 					scope.$watch("dimensions.scale.current", function(){
 						if(scope.loaded){
@@ -270,9 +270,9 @@ angular.module("umbraco.directives")
 							scope.$apply(function(){
 								scope.dimensions.scale.current = ranger.val();
 							});
-						});	
+						});
 					}
-					
+
 					//// INIT /////
 					$image.load(function(){
 						$timeout(function(){
