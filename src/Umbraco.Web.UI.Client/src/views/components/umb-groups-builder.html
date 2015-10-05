@@ -34,7 +34,7 @@
                         <input class="umb-group-builder__group-title-input" type="text" placeholder="Enter name..." ng-model="tab.name" ng-class="{'-placeholder': tab.name == ''}" ng-change="updateGroupTitle(tab)" ng-disabled="tab.inherited" umb-auto-focus umb-auto-resize />
                     </div>
 
-                    <input type="number" class="umb-group-builder__group-sort-value" ng-if="sortingMode" ng-model="tab.sortOrder" ng-disabled="tab.inherited" umb-blur="changeSortOrderValue()" />
+                    <input type="number" class="umb-group-builder__group-sort-value" ng-if="sortingMode" ng-model="tab.sortOrder" ng-disabled="tab.inherited" on-blur="changeSortOrderValue()" />
 
                     <div class="umb-group-builder__group-inherited-label" ng-if="tab.inherited">
                         <i class="icon icon-merge"></i> Inherited from {{ tab.inheritedFromName }}
