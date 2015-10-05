@@ -2,7 +2,7 @@
 * @ngdoc directive
 * @name umbraco.directives.directive:navResize
 * @restrict A
- * 
+ *
  * @description
  * Handles how the navigation responds to window resizing and controls how the draggable resize panel works
 **/
@@ -43,7 +43,7 @@ angular.module("umbraco.directives")
                                 navOffeset.css({ "margin-left": ui.element.outerWidth() });
                             },
                             stop: function (e, ui) {
-                             
+
                             }
                         });
 
@@ -92,7 +92,7 @@ angular.module("umbraco.directives")
                 scope.$on('$destroy', function () {
                     windowResizeListener.unregister(resizeCallback);
                     for (var e in evts) {
-                        eventsService.unsubscribe(evts[e]);                        
+                        eventsService.unsubscribe(evts[e]);
                     }
                     var navInnerContainer = element.find(".navigation-inner-container");
                     navInnerContainer.resizable("destroy");
