@@ -167,6 +167,12 @@ input[type="color"],
   vertical-align: middle;
 }
 
+input.-full-width-input {
+   width: 100%;
+   box-sizing: border-box;
+   padding: 4px 6px;
+}
+
 // Reset appearance properties for textual inputs and textarea
 // Declare width for legacy (can't be on input[type=*] selectors or it's too specific)
 input,
@@ -429,7 +435,7 @@ input[type="checkbox"][readonly] {
 
 
 //SD: NOTE: Had to change these to use our 'form' prefixed colors since we cannot
-// share colors with the notifications/alerts. Also had to change them so that 
+// share colors with the notifications/alerts. Also had to change them so that
 // we do not show any errors unless the containing element has the show-validation
 // class assigned.
 
@@ -453,7 +459,7 @@ input[type="checkbox"][readonly] {
   .formFieldState(@formInfoText, @formInfoText, @formInfoBackground);
 }
 
-// HTML5 invalid states 
+// HTML5 invalid states
 // Shares styles with the .control-group.error above
 
 .show-validation input:focus:invalid,
