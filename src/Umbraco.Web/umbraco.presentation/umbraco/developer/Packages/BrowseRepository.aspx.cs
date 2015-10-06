@@ -12,6 +12,7 @@ using System.Xml;
 using System.Xml.XPath;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Web;
 
 namespace umbraco.presentation.developer.packages {
     public partial class BrowseRepository : BasePages.UmbracoEnsuredPage {
@@ -31,8 +32,8 @@ namespace umbraco.presentation.developer.packages {
                 fb.Text = "<strong>" + ui.Text("errors", "filePermissionsError") + ":</strong><br/>" + ex.Message;
             }
 
-            string category = Request.QueryString["category"];
-            string repoGuid = Request.QueryString["repoGuid"];
+            string category = Request.CleanForXss("category");
+            string repoGuid = Request.CleanForXss("repoGuid");
 
             var repo = cms.businesslogic.packager.repositories.Repository.getByGuid(repoGuid);
             if (repo == null)
