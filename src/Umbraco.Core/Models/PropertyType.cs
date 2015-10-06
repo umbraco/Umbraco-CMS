@@ -33,6 +33,8 @@ namespace Umbraco.Core.Models
 
         public PropertyType(IDataTypeDefinition dataTypeDefinition)
         {
+            if (dataTypeDefinition == null) throw new ArgumentNullException("dataTypeDefinition");
+
             if(dataTypeDefinition.HasIdentity)
                 _dataTypeDefinitionId = dataTypeDefinition.Id;
 

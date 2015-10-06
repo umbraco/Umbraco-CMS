@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
@@ -8,52 +9,28 @@ using System.Threading.Tasks;
 namespace Umbraco.Web.Models.ContentEditing
 {
     [DataContract(Name = "propertyType")]
-    public class PropertyTypeDisplay
-    {
-        [DataMember(Name = "id")]
-        public int Id { get; set; }
-
-        [DataMember(Name = "alias")]
-        public string Alias { get; set; }
-
-        [DataMember(Name = "description")]
-        public string Description { get; set; }
-
+    public class PropertyTypeDisplay : PropertyTypeBasic
+    {  
         [DataMember(Name = "editor")]
+        [ReadOnly(true)]
         public string Editor { get; set; }
-
-        [DataMember(Name = "validation")]
-        public PropertyTypeValidation Validation { get; set; }
-
-        [DataMember(Name = "label")]
-        public string Label { get; set; }
-
+        
         [DataMember(Name = "view")]
+        [ReadOnly(true)]
         public string View { get; set; }
 
         [DataMember(Name = "config")]
+        [ReadOnly(true)]
         public IDictionary<string, object> Config { get; set; }
-
-        [DataMember(Name = "value")]
-        public string Value { get; set; }
-
-        [DataMember(Name = "sortOrder")]
-        public int SortOrder { get; set; }
-
-        //indicates if this property was inherited
-        [DataMember(Name = "inherited")]
-        public bool Inherited { get; set; }
-
-        [DataMember(Name = "dataTypeId")]
-        public int DataTypeId { get; set; }
-
-        [DataMember(Name = "groupId")]
-        public int GroupId { get; set; }
-
+        
+        //SD: Seems strange that this is needed
         [DataMember(Name = "contentTypeId")]
+        [ReadOnly(true)]
         public int ContentTypeId { get; set; }
 
+        //SD: Seems strange that this is needed
         [DataMember(Name = "contentTypeName")]
+        [ReadOnly(true)]
         public string ContentTypeName { get; set; }
     }
 }

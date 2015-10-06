@@ -52,18 +52,18 @@ namespace Umbraco.Web.Models.Mapping
                .ForMember(dto => dto.Trashed, expression => expression.Ignore())
                .ForMember(x => x.AdditionalData, expression => expression.Ignore());
 
-            config.CreateMap<EntityBasic, ITemplate>()
-                .ConstructUsing(basic => new Template(basic.Name, basic.Alias)
-                {
-                    Id = Convert.ToInt32(basic.Id),
-                    Key = basic.Key
-                })
-               .ForMember(t => t.Path, expression => expression.Ignore())
-               .ForMember(t => t.Id, expression => expression.MapFrom(template => Convert.ToInt32(template.Id)))
-               .ForMember(x => x.VirtualPath, expression => expression.Ignore())
-               .ForMember(x => x.CreateDate, expression => expression.Ignore())
-               .ForMember(x => x.UpdateDate, expression => expression.Ignore())
-               .ForMember(x => x.Content, expression => expression.Ignore());
+            //config.CreateMap<EntityBasic, ITemplate>()
+            //    .ConstructUsing(basic => new Template(basic.Name, basic.Alias)
+            //    {
+            //        Id = Convert.ToInt32(basic.Id),
+            //        Key = basic.Key
+            //    })
+            //   .ForMember(t => t.Path, expression => expression.Ignore())
+            //   .ForMember(t => t.Id, expression => expression.MapFrom(template => Convert.ToInt32(template.Id)))
+            //   .ForMember(x => x.VirtualPath, expression => expression.Ignore())
+            //   .ForMember(x => x.CreateDate, expression => expression.Ignore())
+            //   .ForMember(x => x.UpdateDate, expression => expression.Ignore())
+            //   .ForMember(x => x.Content, expression => expression.Ignore());
 
             config.CreateMap<EntityBasic, ContentTypeSort>()
                 .ForMember(x => x.Id, expression => expression.MapFrom(entity => new Lazy<int>(() => Convert.ToInt32(entity.Id))))

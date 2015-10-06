@@ -48,6 +48,9 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
 
             var self = this;
 
+            //we will use the default one for content if not specified
+            var rebindCallback = args.rebindCallback === undefined ? self.reBindChangedProperties : args.rebindCallback;
+
             var deferred = $q.defer();
 
             if (!args.scope.busy && formHelper.submitForm({ scope: args.scope, statusMessage: args.statusMessage })) {
@@ -62,7 +65,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                         self.handleSuccessfulSave({
                             scope: args.scope,
                             savedContent: data,
-                            rebindCallback: self.reBindChangedProperties(args.content, data)
+                            rebindCallback: rebindCallback(args.content, data)
                         });
 
                         args.scope.busy = false;
@@ -72,7 +75,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                         self.handleSaveError({
                             redirectOnFailure: true,
                             err: err,
-                            rebindCallback: self.reBindChangedProperties(args.content, err.data)
+                            rebindCallback: rebindCallback(args.content, err.data)
                         });
                         //show any notifications
                         if (angular.isArray(err.data.notifications)) {
@@ -90,6 +93,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
 
             return deferred.promise;
         },
+
 
         /** Returns the action button definitions based on what permissions the user has.
         The content.allowedActions parameter contains a list of chars, each represents a button by permission so

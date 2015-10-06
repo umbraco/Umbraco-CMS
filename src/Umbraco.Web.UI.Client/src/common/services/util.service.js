@@ -487,6 +487,31 @@ angular.module('umbraco.services').factory('umbPropEditorHelper', umbPropEditorH
 function umbDataFormatter() {
     return {
         
+        formatContentTypePostData: function (displayModel, action) {
+
+            //create the save model from the display model
+            var saveModel = _.pick(displayModel,
+                'compositeContentTypes', 'isContainer', 'allowAsRoot', 'allowedTemplates', 'allowedContentTypes',
+                'alias', 'description', 'thumbnail', 'name', 'id', 'icon', 'trashed',
+                'key', 'parentId', 'alias', 'path');
+
+            //TODO: Map these
+            saveModel.allowedTemplates = _.map(displayModel.allowedTemplates, function (t) { return t.alias; });
+            saveModel.defaultTemplate = displayModel.defaultTemplate.alias;
+            saveModel.groups = _.map(displayModel.groups, function (g) {
+
+                var saveGroup = _.pick(g, 'inherited', 'id', 'sortOrder', 'name');
+                var saveProperties = _.map(g.properties, function(p) {
+                    var saveProperty = _.pick(p, 'id', 'alias', 'description', 'validation', 'label', 'sortOrder', 'dataTypeId', 'groupId');
+                    return saveProperty;
+                });
+
+                return saveGroup;
+            });
+            
+            return saveModel;
+        },
+
         /** formats the display model used to display the data type to the model used to save the data type */
         formatDataTypePostData: function(displayModel, preValues, action) {
             var saveModel = {

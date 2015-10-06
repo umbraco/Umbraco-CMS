@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 namespace Umbraco.Web.Models.ContentEditing
 {
     [DataContract(Name = "propertyGroup", Namespace = "")]
-    public class PropertyGroupDisplay
+    public class PropertyGroupDisplay : PropertyGroupBasic<PropertyTypeDisplay>
     {
         public PropertyGroupDisplay()
         {
@@ -16,33 +17,22 @@ namespace Umbraco.Web.Models.ContentEditing
             ParentTabContentTypeNames = new List<string>();
             ParentTabContentTypes = new List<int>();
         }
-
-        [DataMember(Name = "id")]
-        public int Id { get; set; }
-
+        
         [DataMember(Name = "parentGroupId")]
+        [ReadOnly(true)]
         public int ParentGroupId { get; set; }
-
-        [DataMember(Name = "sortOrder")]
-        public int SortOrder { get; set; }
-
-        [DataMember(Name = "name")]
-        public string Name { get; set; }
-
-        [DataMember(Name = "properties")]
-        public IEnumerable<PropertyTypeDisplay> Properties { get; set; }
-
-        //Indicate if this tab was inherited
-        [DataMember(Name = "inherited")]
-        public bool Inherited { get; set; }
-
+        
+        //SD: Seems strange that this is required
         [DataMember(Name = "contentTypeId")]
+        [ReadOnly(true)]
         public int ContentTypeId { get; set; }
 
         [DataMember(Name = "parentTabContentTypes")]
+        [ReadOnly(true)]
         public IEnumerable<int> ParentTabContentTypes { get; set; }
 
         [DataMember(Name = "parentTabContentTypeNames")]
+        [ReadOnly(true)]
         public IEnumerable<string> ParentTabContentTypeNames { get; set; }
     }
 }

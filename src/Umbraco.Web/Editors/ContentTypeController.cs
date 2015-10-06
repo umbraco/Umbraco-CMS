@@ -88,81 +88,81 @@ namespace Umbraco.Web.Editors
                 ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id 
                 : Request.CreateValidationErrorResponse(result.Exception.Message);
         }
-
-        public ContentTypeDisplay PostSave(ContentTypeDisplay contentType)
+        
+        public ContentTypeDisplay PostSave(ContentTypeSave contentTypeSave)
         {
+            var ctId = Convert.ToInt32(contentTypeSave.Id);
+
             var ctService = Services.ContentTypeService;
 
-            //TODO: warn on content type alias conflicts
-            //TODO: warn on property alias conflicts
+            if (ModelState.IsValid == false)
+            {
+                var ct = ctService.GetContentType(ctId);
+                //Required data is invalid so we cannot continue
+                var forDisplay = Mapper.Map<ContentTypeDisplay>(ct);
+                //map the 'save' data on top
+                forDisplay = Mapper.Map(contentTypeSave, forDisplay);
+                forDisplay.Errors = ModelState.ToErrorDictionary();
+                throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
+            }
 
-            //TODO: Validate the submitted model
-
-            var ctId = Convert.ToInt32(contentType.Id);
-
+            //TODO: Deal with validation for composition with property and group names/aliases
+            
             //filter out empty properties
-            contentType.Groups = contentType.Groups.Where(x => x.Name.IsNullOrWhiteSpace() == false).ToList();
-            foreach (var group in contentType.Groups)
+            contentTypeSave.Groups = contentTypeSave.Groups.Where(x => x.Name.IsNullOrWhiteSpace() == false).ToList();
+            foreach (var group in contentTypeSave.Groups)
             {
                 group.Properties = group.Properties.Where(x => x.Alias.IsNullOrWhiteSpace() == false).ToList();
             }
 
+            //TODO: This all needs to be done in a transaction!!
+            // Which means that all of this logic needs to take place inside the service
+
             if (ctId > 0)
             {
                 //its an update to an existing
-                IContentType found = ctService.GetContentType(ctId);
+                var found = ctService.GetContentType(ctId);
                 if (found == null)
                     throw new HttpResponseException(HttpStatusCode.NotFound);
 
-                Mapper.Map(contentType, found);
+                Mapper.Map(contentTypeSave, found);
                 ctService.Save(found);
-
-                //map the saved item back to the content type (it should now get id etc set)
-                Mapper.Map(found, contentType);
-                return contentType;
+                
+                return Mapper.Map<ContentTypeDisplay>(found);
             }
             else
             {
-                //ensure alias is set
-                if (string.IsNullOrEmpty(contentType.Alias))
-                    contentType.Alias = contentType.Name.ToSafeAlias();
-
                 //set id to null to ensure its handled as a new type
-                contentType.Id = null;
-                contentType.CreateDate = DateTime.Now;
-                contentType.UpdateDate = DateTime.Now;
-
-                //TODO: This all needs to be done in a transaction!!
-                // Which means that all of this logic needs to take place inside the service
-
+                contentTypeSave.Id = null;
+                contentTypeSave.CreateDate = DateTime.Now;
+                contentTypeSave.UpdateDate = DateTime.Now;
+                
                 //create a default template if it doesnt exist -but only if default template is == to the content type
-                if (contentType.DefaultTemplate != null && contentType.DefaultTemplate.Alias == contentType.Alias)
+                //TODO: Is this really what we want? What if we don't want any template assigned at all ?
+                if (contentTypeSave.DefaultTemplate.IsNullOrWhiteSpace() == false && contentTypeSave.DefaultTemplate == contentTypeSave.Alias)
                 {
-                    var template = Services.FileService.GetTemplate(contentType.Alias);
+                    var template = Services.FileService.GetTemplate(contentTypeSave.Alias);
                     if (template == null)
                     {
-                        template = new Template(contentType.Name, contentType.Alias);
+                        template = new Template(contentTypeSave.Name, contentTypeSave.Alias);
                         Services.FileService.SaveTemplate(template);
                     }
 
-                    //make sure the template id is set on the default and allowed template
-                    contentType.DefaultTemplate.Id = template.Id;
-                    var found = contentType.AllowedTemplates.FirstOrDefault(x => x.Alias == contentType.Alias);
-                    if (found != null)
-                        found.Id = template.Id;
+                    //make sure the template alias is set on the default and allowed template so we can map it back
+                    contentTypeSave.DefaultTemplate = template.Alias;
                 }
 
                 //check if the type is trying to allow type 0 below itself - id zero refers to the currently unsaved type
                 //always filter these 0 types out
                 var allowItselfAsChild = false;
-                if (contentType.AllowedContentTypes != null)
+                if (contentTypeSave.AllowedContentTypes != null)
                 {
-                    allowItselfAsChild = contentType.AllowedContentTypes.Any(x => x == 0);
-                    contentType.AllowedContentTypes = contentType.AllowedContentTypes.Where(x => x > 0).ToList();
+                    allowItselfAsChild = contentTypeSave.AllowedContentTypes.Any(x => x == 0);
+                    contentTypeSave.AllowedContentTypes = contentTypeSave.AllowedContentTypes.Where(x => x > 0).ToList();
                 }
 
                 //save as new
-                var newCt = Mapper.Map<IContentType>(contentType);
+                var newCt = Mapper.Map<IContentType>(contentTypeSave);
                 ctService.Save(newCt);
 
                 //we need to save it twice to allow itself under itself.
@@ -171,10 +171,8 @@ namespace Umbraco.Web.Editors
                     newCt.AddContentType(newCt);
                     ctService.Save(newCt);
                 }
-
-                //map the saved item back to the content type (it should now get id etc set)
-                Mapper.Map(newCt, contentType);
-                return contentType;
+                
+                return Mapper.Map<ContentTypeDisplay>(newCt);
             }
         }
 
@@ -254,6 +252,6 @@ namespace Umbraco.Web.Editors
             return basics;
         }
 
-        
+
     }
 }

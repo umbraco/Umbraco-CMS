@@ -3,7 +3,7 @@
     * @name umbraco.resources.contentTypeResource
     * @description Loads in data for content types
     **/
-function contentTypeResource($q, $http, umbRequestHelper) {
+function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
 
     return {
 
@@ -157,8 +157,10 @@ function contentTypeResource($q, $http, umbRequestHelper) {
          */
         save: function (contentType) {
 
+            var saveModel = umbDataFormatter.formatContentTypePostData(contentType);
+
             return umbRequestHelper.resourcePromise(
-                 $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostSave"), contentType),
+                 $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostSave"), saveModel),
                 'Failed to save data for content type id ' + contentType.id);
         },
 
