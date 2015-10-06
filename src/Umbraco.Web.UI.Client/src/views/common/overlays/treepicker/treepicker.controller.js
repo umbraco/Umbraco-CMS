@@ -19,6 +19,17 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 
 		  $scope.model.selection = [];
 
+		  $scope.init = function(contentType) {
+
+			  if(contentType === "content") {
+				  entityType = "Document";
+			  } else if(contentType === "member") {
+				  entityType = "Member";
+			  } else if(contentType === "media") {
+				  entityType = "Media";
+			  }
+		  }
+
 	    //create the custom query string param for this tree
 	    $scope.customTreeParams = dialogOptions.startNodeId ? "startNodeId=" + dialogOptions.startNodeId : "";
 	    $scope.customTreeParams += dialogOptions.customTreeParams ? "&" + dialogOptions.customTreeParams : "";

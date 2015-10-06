@@ -6,13 +6,13 @@
  * @description
  * The controller for deleting content
  */
-function DocumentTypeDeleteController($scope, dataTypeResource, contentTypeResource, treeService, navigationService) {
+function MemberTypesDeleteController($scope, memberTypeResource, treeService, navigationService) {
 
     $scope.performDelete = function() {
 
         //mark it for deletion (used in the UI)
         $scope.currentNode.loading = true;
-        contentTypeResource.deleteById($scope.currentNode.id).then(function () {
+        memberTypeResource.deleteById($scope.currentNode.id).then(function () {
             $scope.currentNode.loading = false;
 
             //get the root node before we remove it
@@ -30,4 +30,4 @@ function DocumentTypeDeleteController($scope, dataTypeResource, contentTypeResou
     };
 }
 
-angular.module("umbraco").controller("Umbraco.Editors.DocumentType.DeleteController", DocumentTypeDeleteController);
+angular.module("umbraco").controller("Umbraco.Editors.MemberTypes.DeleteController", MemberTypesDeleteController);

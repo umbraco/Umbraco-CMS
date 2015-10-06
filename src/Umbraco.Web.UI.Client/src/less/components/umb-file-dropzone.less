@@ -66,22 +66,16 @@
       &:first-child {
         border-top: none;
       }
-      
+
       &.ng-enter {
-        -webkit-animation: fadeIn 0.5s;
-        -moz-animation: fadeIn 0.5s;
-        -ms-animation: fadeIn 0.5s;
         animation: fadeIn 0.5s;
       }
       &.ng-leave {
-        -webkit-animation: fadeOut 2s;
-        -moz-animation: fadeOut 2s;
-        -ms-animation: fadeOut 2s;
         animation: fadeOut 2s;
       }
-      .file-name {
+      .file-description {
         color: @grayDarker;
-        font-size: 10px;
+        font-size: 12px;
         width: 100%;
         display: block;
       }
@@ -91,25 +85,17 @@
         width: 100%;
       }
 
-      .file-upload-done {
+      .file-icon {
         position: absolute;
         right: 0;
         bottom: 0;
-        text-align: right;
-        font-size: 10px;
-        
+
         .icon {
           font-size: 20px;
           &.ng-enter {
-            -webkit-animation: fadeIn 0.5s;
-            -moz-animation: fadeIn 0.5s;
-            -ms-animation: fadeIn 0.5s;
             animation: fadeIn 0.5s;
           }
           &.ng-leave {
-            -webkit-animation: fadeIn 0.5s;
-            -moz-animation: fadeIn 0.5s;
-            -ms-animation: fadeIn 0.5s;
             animation: fadeIn 0.5s;
           }
         }

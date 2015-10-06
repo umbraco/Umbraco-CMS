@@ -773,7 +773,7 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="cacheBrowser">Cache Browser</key>
     <key alias="contentRecycleBin">Cestino</key>
     <key alias="createdPackages">Pacchetti creati</key>
-    <key alias="datatype">Tipi di dato</key>
+    <key alias="dataTypes">Tipi di dato</key>
     <key alias="dictionary">Dizionario</key>
     <key alias="installedPackages">Pacchetti installati</key>
     <key alias="installSkin">Installare skin</key>
@@ -783,10 +783,10 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="macros">Macros</key>
     <key alias="mediaTypes">Tipi di media</key>
     <key alias="member">Membri</key>
-    <key alias="memberGroup">Gruppi di Membri</key>
+    <key alias="memberGroups">Gruppi di Membri</key>
     <key alias="memberRoles">Ruoli</key>
-    <key alias="memberType">Tipologia Membri</key>
-    <key alias="nodeTypes">Tipi di documento</key>
+    <key alias="memberTypes">Tipologia Membri</key>
+    <key alias="documentTypes">Tipi di documento</key>
     <key alias="packager">Pacchetti</key>
 	  <key alias="packages">Pacchetti</key>
     <key alias="python">Files Python</key>

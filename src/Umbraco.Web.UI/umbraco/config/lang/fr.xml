@@ -915,7 +915,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="cacheBrowser">Navigateur de cache</key>
     <key alias="contentRecycleBin">Corbeille</key>
     <key alias="createdPackages">Packages créés</key>
-    <key alias="datatype">Typesde données</key>
+    <key alias="dataTypes">Typesde données</key>
     <key alias="dictionary">Dictionnaire</key>
     <key alias="installedPackages">Packages installés</key>
     <key alias="installSkin">Installer un skin</key>
@@ -925,10 +925,10 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="macros">Macros</key>
     <key alias="mediaTypes">Types de médias</key>
     <key alias="member">Membres</key>
-    <key alias="memberGroup">Groupes de membres</key>
+    <key alias="memberGroups">Groupes de membres</key>
     <key alias="memberRoles">Rôles</key>
-    <key alias="memberType">Types de membres</key>
-    <key alias="nodeTypes">Types de documents</key>
+    <key alias="memberTypes">Types de membres</key>
+    <key alias="documentTypes">Types de documents</key>
     <key alias="packager">Packages</key>
     <key alias="packages">Packages</key>
     <key alias="python">Fichiers Python</key>

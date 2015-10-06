@@ -6,7 +6,7 @@
  * @description
  * The controller for the media type creation dialog
  */
-function mediaTypeCreateController($scope, $location, navigationService, mediaTypeResource, formHelper, appState) {
+function MediaTypesCreateController($scope, $location, navigationService, mediaTypeResource, formHelper, appState) {
 
     $scope.model = {
         folderName: "",
@@ -25,13 +25,13 @@ function mediaTypeCreateController($scope, $location, navigationService, mediaTy
 
                 navigationService.hideMenu();
                 var currPath = node.path ? node.path : "-1";
-                navigationService.syncTree({ tree: "mediatype", path: currPath + "," + folderId, forceReload: true, activate: true });
+                navigationService.syncTree({ tree: "mediatypes", path: currPath + "," + folderId, forceReload: true, activate: true });
 
                 formHelper.resetForm({ scope: $scope });
 
                 var section = appState.getSectionState("currentSection");
 
-                $location.path("/" + section + "/mediatype/list/" + folderId);
+                $location.path("/" + section + "/mediatypes/list/" + folderId);
 
             }, function(err) {
 
@@ -42,9 +42,9 @@ function mediaTypeCreateController($scope, $location, navigationService, mediaTy
 
     $scope.createMediaType = function() {
         $location.search('create', null);
-        $location.path("/settings/mediatype/edit/" + node.id).search("create", true);
+        $location.path("/settings/mediatypes/edit/" + node.id).search("create", true);
         navigationService.hideMenu();
     }
 }
 
-angular.module('umbraco').controller("Umbraco.Editors.MediaType.CreateController", mediaTypeCreateController);
+angular.module('umbraco').controller("Umbraco.Editors.MediaTypes.CreateController", MediaTypesCreateController);

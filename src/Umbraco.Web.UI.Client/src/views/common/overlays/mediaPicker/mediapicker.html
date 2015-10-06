@@ -46,7 +46,8 @@
       <umb-file-dropzone
          parent-id="{{currentFolder.id}}"
          files-uploaded="onUploadComplete"
-         files-queued="onFilesQueue">
+         files-queued="onFilesQueue"
+         accept="{{acceptedFileTypes}}">
       </umb-file-dropzone>
 
       <umb-photo-folder

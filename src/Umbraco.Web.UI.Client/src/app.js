@@ -8,7 +8,7 @@ var app = angular.module('umbraco', [
     'ngSanitize',
     'ngMobile',
     'tmh.dynamicLocale',
-    'angularFileUpload'
+    'ngFileUpload'
 ]);
 
 var packages = angular.module("umbraco.packages", []);

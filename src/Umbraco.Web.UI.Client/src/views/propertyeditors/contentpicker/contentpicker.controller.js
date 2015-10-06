@@ -137,7 +137,7 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
     //dialog
     $scope.openContentPicker = function() {
       $scope.contentPickerOverlay = dialogOptions;
-      $scope.contentPickerOverlay.view = "contentPicker";
+      $scope.contentPickerOverlay.view = "treepicker";
       $scope.contentPickerOverlay.show = true;
 
       $scope.contentPickerOverlay.submit = function(model) {

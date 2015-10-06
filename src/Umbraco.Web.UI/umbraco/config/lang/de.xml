@@ -928,7 +928,7 @@ Ihr freundlicher Umbraco-Robot
     <key alias="cacheBrowser">Zwischenspeicher</key>
     <key alias="contentRecycleBin">Papierkorb</key>
     <key alias="createdPackages">Erstellte Pakete</key>
-    <key alias="datatype">Datentypen</key>
+    <key alias="dataTypes">Datentypen</key>
     <key alias="dictionary">Wörterbuch</key>
     <key alias="installedPackages">Installierte Pakete</key>
     <key alias="installSkin">Design-Skin installieren</key>
@@ -938,10 +938,10 @@ Ihr freundlicher Umbraco-Robot
     <key alias="macros">Makros</key>
     <key alias="mediaTypes">Medientypen</key>
     <key alias="member">Mitglieder</key>
-    <key alias="memberGroup">Mitgliedergruppen</key>
+    <key alias="memberGroups">Mitgliedergruppen</key>
     <key alias="memberRoles">Mitgliederrollen</key>
-    <key alias="memberType">Mitglieder-Typen</key>
-    <key alias="nodeTypes">Dokumententypen</key>
+    <key alias="memberTypes">Mitglieder-Typen</key>
+    <key alias="documentTypes">Dokumententypen</key>
     <key alias="packager">Pakete</key>
     <key alias="packages">Pakete</key>
     <key alias="python">Python-Dateien</key>

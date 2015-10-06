@@ -777,7 +777,7 @@
     <key alias="cacheBrowser">캐시 브라우저</key>
     <key alias="contentRecycleBin">휴지통</key>
     <key alias="createdPackages">생성된 패키지</key>
-    <key alias="datatype">데이터 타입</key>
+    <key alias="dataTypes">데이터 타입</key>
     <key alias="dictionary">사전</key>
     <key alias="installedPackages">설치된 패키지</key>
     <key alias="installSkin">TRANSLATE ME: 'Install skin'</key>
@@ -787,10 +787,10 @@
     <key alias="macros">매크로</key>
     <key alias="mediaTypes">미디어 타입</key>
     <key alias="member">구성원</key>
-    <key alias="memberGroup">구성원 그룹</key>
+    <key alias="memberGroups">구성원 그룹</key>
     <key alias="memberRoles">역할</key>
-    <key alias="memberType">구성원 유형</key>
-    <key alias="nodeTypes">문서 타입</key>
+    <key alias="memberTypes">구성원 유형</key>
+    <key alias="docuemntTypes">문서 타입</key>
     <key alias="packager">패키지</key>
     <key alias="packages">패키지</key>
     <key alias="python">Python 파일</key>

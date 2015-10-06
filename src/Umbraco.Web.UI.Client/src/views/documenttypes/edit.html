@@ -1,6 +1,6 @@
-<div ng-controller="Umbraco.Editors.MemberType.EditController as vm">
+<div ng-controller="Umbraco.Editors.DocumentTypes.EditController as vm">
 
-   <umb-load-indicator ng-if="vm.page.loading"></umb-load-indicator>
+    <umb-load-indicator ng-if="vm.page.loading"></umb-load-indicator>
 
     <form novalidate name="contentTypeForm"
           ng-show="!vm.page.loading"
@@ -16,14 +16,11 @@
                     icon="vm.contentType.icon">
             </umb-editor-header>
 
-            <umb-editor-container class="editors-document-type-container">
+            <umb-editor-container>
 
-                <div class="editors-document-type-canvas">
-                    <umb-editor-sub-views sub-views="vm.page.navigation" model="vm.contentType"></umb-editor-sub-views>
-                </div>
+               <umb-editor-sub-views sub-views="vm.page.navigation" model="vm.contentType"></umb-editor-sub-views>
 
             </umb-editor-container>
-
 
             <umb-editor-footer>
 
@@ -48,10 +45,10 @@
 
                </umb-editor-footer-content-right>
 
+
             </umb-editor-footer>
 
         </umb-editor-view>
-
 
     </form>
 

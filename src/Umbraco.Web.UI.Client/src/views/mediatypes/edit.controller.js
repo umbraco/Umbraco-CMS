@@ -1,15 +1,15 @@
 /**
  * @ngdoc controller
- * @name Umbraco.Editors.DocumentType.EditController
+ * @name Umbraco.Editors.MediaType.EditController
  * @function
  *
  * @description
- * The controller for the content type editor
+ * The controller for the media type editor
  */
 (function() {
 	"use strict";
 
-	function DocumentTypeEditController($scope, $routeParams, contentTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter, $q) {
+	function MediaTypesEditController($scope, $routeParams, mediaTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter) {
 
 		var vm = this;
 
@@ -24,23 +24,18 @@
 			{
 				"name": "Design",
 				"icon": "icon-document-dashed-line",
-				"view": "views/documentType/views/design/design.html",
+				"view": "views/mediaType/views/design/design.html",
 				"active": true
 			},
 			{
 				"name": "List view",
 				"icon": "icon-list",
-				"view": "views/documentType/views/listview/listview.html"
+				"view": "views/mediaType/views/listview/listview.html"
 			},
 			{
 				"name": "Permissions",
 				"icon": "icon-keychain",
-				"view": "views/documentType/views/permissions/permissions.html"
-			},
-			{
-				"name": "Templates",
-				"icon": "icon-layout",
-				"view": "views/documentType/views/templates/templates.html"
+				"view": "views/mediaType/views/permissions/permissions.html"
 			}
 		];
 
@@ -50,7 +45,7 @@
 				"shortcuts": [
 					{
 						"description": "Navigate sections",
-						"keys": [{"key": "1"}, {"key": "4"}],
+						"keys": [{"key": "1"}, {"key": "3"}],
 						"keyRange": true
 					}
 				]
@@ -97,15 +92,6 @@
 					"keys": [{"key": "alt"},{"key": "shift"},{"key": "c"}]
 				}
 			]
-		},
-		{
-			"name": "Templates",
-			"shortcuts": [
-				{
-					"description": "Add template",
-					"keys": [{"key": "alt"},{"key": "shift"},{"key": "t"}]
-				}
-			]
 		}
 	];
 
@@ -114,26 +100,23 @@
 			vm.page.loading = true;
 
 			//we are creating so get an empty data type item
-			contentTypeResource.getScaffold($routeParams.id)
+			mediaTypeResource.getScaffold($routeParams.id)
 				.then(function(dt) {
-
 					init(dt);
 
 					vm.page.loading = false;
-
 				});
 		}
 		else {
 
 			vm.page.loading = true;
 
-			contentTypeResource.getById($routeParams.id).then(function(dt){
+			mediaTypeResource.getById($routeParams.id).then(function(dt){
 				init(dt);
 
 				syncTreeNode(vm.contentType, dt.path, true);
 
 				vm.page.loading = false;
-
 			});
 		}
 
@@ -142,66 +125,49 @@
 
 		function save() {
 
-		    var deferred = $q.defer();
+			// validate form
+			if (formHelper.submitForm({ scope: $scope })) {
 
-		    vm.page.saveButtonState = "busy";
+				formHelper.resetForm({ scope: $scope });
 
-		    // reformat allowed content types to array if id's
-		    vm.contentType.allowedContentTypes = contentTypeHelper.createIdArray(vm.contentType.allowedContentTypes);
+				// if form validates - perform save
+				performSave();
 
-		    // update placeholder template information on new doc types
-		    if (!$routeParams.notemplate && vm.contentType.id === 0) {
-		        vm.contentType = contentTypeHelper.updateTemplatePlaceholder(vm.contentType);
-		    }
-
-		    //contentTypeResource.save(vm.contentType).then(function(dt){
-
-		    //	formHelper.resetForm({ scope: $scope, notifications: dt.notifications });
-		    //	contentEditingHelper.handleSuccessfulSave({
-		    //		scope: $scope,
-		    //		savedContent: dt,
-		    //		rebindCallback: function() {
-
-		    //		}
-		    //	});
-
-		    //	notificationsService.success("Document type save");
-		    //	//post save logic here -the saved doctype returns as a new object
-		    //	init(dt);
-
-		    //	syncTreeNode(vm.contentType, dt.path);
-
-		    //	vm.page.saveButtonState = "success";
-
-		    //});
-
-		    contentEditingHelper.contentEditorPerformSave({
-		        statusMessage: "Saving...",
-		        saveMethod: contentTypeResource.save,
-		        scope: $scope,
-		        content: vm.contentType
-		    }).then(function (data) {
-		        //success            
-		        syncTreeNode(vm.contentType, dt.path);
-
-		        vm.page.saveButtonState = "success";
-
-		        deferred.resolve(data);
-		    }, function (err) {
-		        //error
-		        if (err) {
-		            editorState.set($scope.content);
-		        }
-
-		        vm.page.saveButtonState = "error";
-
-		        deferred.reject(err);
-		    });
-
-		    return deferred.promise;
+			}
 
 		}
-        
+
+		function performSave() {
+
+			vm.page.saveButtonState = "busy";
+
+			// reformat allowed content types to array if id's
+			vm.contentType.allowedContentTypes = contentTypeHelper.createIdArray(vm.contentType.allowedContentTypes);
+
+			mediaTypeResource.save(vm.contentType).then(function(dt){
+
+				formHelper.resetForm({ scope: $scope, notifications: dt.notifications });
+				contentEditingHelper.handleSuccessfulSave({
+					scope: $scope,
+					savedContent: dt,
+					rebindCallback: function() {
+
+					}
+				});
+
+				notificationsService.success("Media type saved");
+				//post save logic here -the saved doctype returns as a new object
+				init(dt);
+
+				syncTreeNode(vm.contentType, dt.path);
+
+				vm.page.saveButtonState = "success";
+
+			});
+
+		}
+
+
 		function init(contentType){
 
 			// set all tab to inactive
@@ -223,12 +189,6 @@
 			angular.forEach(contentType.groups, function(group){
 				group.properties = $filter('orderBy')(group.properties, 'sortOrder');
 			});
-
-			// insert template on new doc types
-			if (!$routeParams.notemplate && contentType.id === 0) {
-				contentType.defaultTemplate = contentTypeHelper.insertDefaultTemplatePlaceholder(contentType.defaultTemplate);
-				contentType.allowedTemplates = contentTypeHelper.insertTemplatePlaceholder(contentType.allowedTemplates);
-			}
 
 			//set a shared state
 			editorState.set(contentType);
@@ -272,7 +232,7 @@
 		/** Syncs the content type  to it's tree node - this occurs on first load and after saving */
 		function syncTreeNode(dt, path, initialLoad) {
 
-			navigationService.syncTree({ tree: "documenttype", path: path.split(","), forceReload: initialLoad !== true }).then(function (syncArgs) {
+			navigationService.syncTree({ tree: "mediatypes", path: path.split(","), forceReload: initialLoad !== true }).then(function (syncArgs) {
 				vm.currentNode = syncArgs.node;
 			});
 
@@ -280,6 +240,6 @@
 
 	}
 
-	angular.module("umbraco").controller("Umbraco.Editors.DocumentType.EditController", DocumentTypeEditController);
+	angular.module("umbraco").controller("Umbraco.Editors.MediaTypes.EditController", MediaTypesEditController);
 
 })();

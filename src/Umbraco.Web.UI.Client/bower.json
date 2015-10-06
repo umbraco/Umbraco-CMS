@@ -24,7 +24,7 @@
         "jquery": "2.0.3",
         "jquery-ui": "1.10.3",
         "angular-dynamic-locale": "~0.1.27",
-        "ng-file-upload": "~3.0.2",
+        "ng-file-upload": "~7.3.8",
         "tinymce": "~4.1.10",
     "codemirror": "~5.3.0"
     }

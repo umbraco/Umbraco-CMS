@@ -1,4 +1,4 @@
-<div class="umbracoDialog umb-dialog-body with-footer" ng-controller="Umbraco.Editors.MediaType.CreateController">
+<div class="umbracoDialog umb-dialog-body with-footer" ng-controller="Umbraco.Editors.DocumentTypes.CreateController">
 
     <div class="umb-pane" ng-if="!model.creatingFolder">
         <h5><localize key="create_createUnder">Create a page under</localize> {{currentNode.name}}</h5>
@@ -15,17 +15,28 @@
                 </a>
             </li>
             <li>
-                <a href="" ng-click="createMediaType()">
+                <a href="" ng-click="createDocType()">
 
                     <i class="large icon-item-arrangement"></i>
 
                     <span class="menu-label">
                         <localize key="general_new">New</localize>&nbsp;
-                        <localize key="content_mediaType">Media type</localize>
+                        <localize key="content_documentType">Document type</localize>
+                        (with template)
                     </span>
-
                 </a>
             </li>
+            <li>
+              <a href="" ng-click="createComponent()">
+                <i class="large icon-item-arrangement"></i>
+                <span class="menu-label">
+                    <localize key="general_new">New</localize>&nbsp;
+                    <localize key="content_documentType">Document type</localize>
+                    (without template)
+                </span>
+              </a>
+            </li>
+
         </ul>
     </div>
 

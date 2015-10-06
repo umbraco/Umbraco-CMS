@@ -2,7 +2,7 @@
  * @ngdoc controller
  * @name Umbraco.Editors.DataType.EditController
  * @function
- * 
+ *
  * @description
  * The controller for the content editor
  */
@@ -43,7 +43,7 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
             label: "Property editor alias"
         }
     };
-    
+
     //setup the pre-values as props
     $scope.preValues = [];
 
@@ -90,8 +90,8 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
                 // after the redirect, so we will bind all subscriptions which will show the server validation errors
                 // if there are any and then clear them so the collection no longer persists them.
                 serverValidationManager.executeAndClearAllSubscriptions();
-                
-                navigationService.syncTree({ tree: "datatype", path: [String(data.id)] }).then(function (syncArgs) {
+
+                navigationService.syncTree({ tree: "datatypes", path: [String(data.id)] }).then(function (syncArgs) {
                     $scope.page.menu.currentNode = syncArgs.node;
                 });
 
@@ -99,7 +99,7 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
 
             });
     }
-    
+
     $scope.$watch("content.selectedEditor", function (newVal, oldVal) {
 
         //when the value changes, we need to dynamically load in the new editor
@@ -133,7 +133,7 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
         $scope.page.saveButtonState = "busy";
 
         if (formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {
-            
+
             dataTypeResource.save($scope.content, $scope.preValues, $routeParams.create)
                 .then(function(data) {
 
@@ -152,21 +152,21 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
                     //share state
                     editorState.set($scope.content);
 
-                    navigationService.syncTree({ tree: "datatype", path: [String(data.id)], forceReload: true }).then(function (syncArgs) {
+                    navigationService.syncTree({ tree: "datatypes", path: [String(data.id)], forceReload: true }).then(function (syncArgs) {
                         $scope.page.menu.currentNode = syncArgs.node;
                     });
-                    
+
                     $scope.page.saveButtonState = "success";
 
                 }, function(err) {
 
-                    //NOTE: in the case of data type values we are setting the orig/new props 
+                    //NOTE: in the case of data type values we are setting the orig/new props
                     // to be the same thing since that only really matters for content/media.
                     contentEditingHelper.handleSaveError({
                         redirectOnFailure: false,
                         err: err
                     });
-                    
+
                     $scope.page.saveButtonState = "error";
 
                     //share state

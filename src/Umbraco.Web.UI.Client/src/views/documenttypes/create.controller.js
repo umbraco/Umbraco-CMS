@@ -6,7 +6,7 @@
  * @description
  * The controller for the doc type creation dialog
  */
-function contentTypeCreateController($scope, $location, navigationService, contentTypeResource, formHelper, appState) {
+function DocumentTypesCreateController($scope, $location, navigationService, contentTypeResource, formHelper, appState) {
 
     $scope.model = {
         folderName: "",
@@ -25,13 +25,13 @@ function contentTypeCreateController($scope, $location, navigationService, conte
 
                 navigationService.hideMenu();
                 var currPath = node.path ? node.path : "-1";
-                navigationService.syncTree({ tree: "documenttype", path: currPath + "," + folderId, forceReload: true, activate: true });
+                navigationService.syncTree({ tree: "documenttypes", path: currPath + "," + folderId, forceReload: true, activate: true });
 
                 formHelper.resetForm({ scope: $scope });
 
                 var section = appState.getSectionState("currentSection");
 
-                $location.path("/" + section + "/documenttype/list/" + folderId);
+                $location.path("/" + section + "/documenttypes/list/" + folderId);
 
             }, function(err) {
 
@@ -43,16 +43,16 @@ function contentTypeCreateController($scope, $location, navigationService, conte
     $scope.createDocType = function() {
         $location.search('create', null);
         $location.search('notemplate', null);
-        $location.path("/settings/documenttype/edit/" + node.id).search("create", true);
+        $location.path("/settings/documenttypes/edit/" + node.id).search("create", true);
         navigationService.hideMenu();
     }
 
     $scope.createComponent = function() {
       $location.search('create', null);
       $location.search('notemplate', null);
-      $location.path("/settings/documenttype/edit/" + node.id).search("create", true).search("notemplate", true);
+      $location.path("/settings/documenttypes/edit/" + node.id).search("create", true).search("notemplate", true);
       navigationService.hideMenu();
     }
 }
 
-angular.module('umbraco').controller("Umbraco.Editors.DocumentType.CreateController", contentTypeCreateController);
+angular.module('umbraco').controller("Umbraco.Editors.DocumentTypes.CreateController", DocumentTypesCreateController);

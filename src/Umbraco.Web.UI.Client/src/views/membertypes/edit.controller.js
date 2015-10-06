@@ -9,7 +9,7 @@
  (function() {
  	"use strict";
 
-	function MemberTypeEditController($scope, $rootScope, $routeParams, $log, $filter, memberTypeResource, dataTypeResource, editorState, iconHelper, formHelper, navigationService, contentEditingHelper, notificationsService) {
+	function MemberTypesEditController($scope, $rootScope, $routeParams, $log, $filter, memberTypeResource, dataTypeResource, editorState, iconHelper, formHelper, navigationService, contentEditingHelper, notificationsService) {
 
 		var vm = this;
 
@@ -179,7 +179,7 @@
 		/** Syncs the content type  to it's tree node - this occurs on first load and after saving */
 		function syncTreeNode(dt, path, initialLoad) {
 
-			navigationService.syncTree({ tree: "membertype", path: path.split(","), forceReload: initialLoad !== true }).then(function (syncArgs) {
+			navigationService.syncTree({ tree: "membertypes", path: path.split(","), forceReload: initialLoad !== true }).then(function (syncArgs) {
 				vm.currentNode = syncArgs.node;
 			});
 
@@ -188,6 +188,6 @@
 
 	}
 
-	angular.module("umbraco").controller("Umbraco.Editors.MemberType.EditController", MemberTypeEditController);
+	angular.module("umbraco").controller("Umbraco.Editors.MemberTypes.EditController", MemberTypesEditController);
 
 })();

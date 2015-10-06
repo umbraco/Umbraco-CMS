@@ -19,7 +19,7 @@
 
          function activate() {
 
-            setOptions();
+            setView();
 
             registerOverlay();
 
@@ -37,25 +37,17 @@
 
          }
 
-         function setOptions() {
+         function setView() {
 
-            switch (scope.view) {
+            if (scope.view) {
 
-               case "memberPicker":
-
-                  scope.model.section = "member";
-                  scope.model.treeAlias = "member";
-
-                  break;
-
-               case "contentPicker":
-
-                  scope.model.treeAlias = "content";
-                  scope.model.section = "content";
-
-                  break;
+               if (scope.view.indexOf(".html") === -1) {
+                  var viewAlias = scope.view.toLowerCase();
+                  scope.view = "views/common/overlays/" + viewAlias + "/" + viewAlias + ".html";
+               }
 
             }
+
          }
 
          function registerOverlay() {

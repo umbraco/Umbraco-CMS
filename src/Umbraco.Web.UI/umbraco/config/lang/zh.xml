@@ -851,7 +851,7 @@
     <key alias="cacheBrowser">缓存浏览</key>
     <key alias="contentRecycleBin">回收站</key>
     <key alias="createdPackages">创建扩展包</key>
-    <key alias="datatype">数据类型</key>
+    <key alias="dataTypes">数据类型</key>
     <key alias="dictionary">字典</key>
     <key alias="installedPackages">已安装的扩展包</key>
     <key alias="installSkin">安装皮肤</key>
@@ -861,10 +861,10 @@
     <key alias="macros">宏</key>
     <key alias="mediaTypes">媒体类型</key>
     <key alias="member">会员</key>
-    <key alias="memberGroup">会员组</key>
+    <key alias="memberGroups">会员组</key>
     <key alias="memberRoles">角色</key>
-    <key alias="memberType">会员类型</key>
-    <key alias="nodeTypes">文档类型</key>
+    <key alias="memberTypes">会员类型</key>
+    <key alias="documentTypes">文档类型</key>
     <key alias="packager">扩展包</key>
     <key alias="packages">扩展包</key>
     <key alias="python">Python文件</key>

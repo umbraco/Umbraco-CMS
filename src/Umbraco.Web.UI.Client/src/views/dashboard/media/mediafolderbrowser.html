@@ -1,10 +1,13 @@
 <div ng-controller="Umbraco.Dashboard.MediaFolderBrowserDashboardController">
 
-	<umb-file-dropzone 
-			ng-if="creating == null"
-			parent-id="{{nodeId}}"
-			compact="[images.length > 0}" 
-			files-uploaded="onUploadComplete"></umb-file-dropzone>
+	<umb-file-dropzone
+		ng-if="creating == null"
+		parent-id="{{nodeId}}"
+		compact="[images.length > 0}"
+		files-uploaded="onUploadComplete"
+		accept="{{ acceptedFileTypes }}">
+	</umb-file-dropzone>
+
 
 	<umb-photo-folder ng-show="images.length > 0"
                       min-height="105"
@@ -12,5 +15,5 @@
                       on-click="clickHandler"
                       ng-model="images" />
 
-</div>
 
+</div>

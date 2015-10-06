@@ -16,7 +16,7 @@ using Umbraco.Core.Services;
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.DataTypes)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.DocumentTypes, "Document Types", sortOrder: 6)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.DocumentTypes, null, sortOrder: 6)]
     [Umbraco.Web.Mvc.PluginController("UmbracoTrees")]
     [CoreTree]
     public class ContentTypeTreeController : TreeController
