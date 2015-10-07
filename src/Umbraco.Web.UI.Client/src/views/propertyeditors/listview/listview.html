@@ -44,96 +44,26 @@
 
             <span ng-bind="bulkStatus" ng-show="isAnythingSelected()" class="pull-right"></span>
 
-            <form class="form-search pull-right" novalidate ng-show="!actionInProgress">
-                <div class="inner-addon left-addon">
-                    <i class="icon icon-search" ng-click="enterSearch($event)"></i>
-                    <input type="text" class="form-control" localize="placeholder" placeholder="@general_typeToSearch" ng-model="options.filter" prevent-enter-submit no-dirty-check>
-                </div>
-            </form>
+            <div class="pull-right">
+
+               <form class="form-search pull-right" novalidate ng-show="!actionInProgress">
+                   <div class="inner-addon left-addon">
+                       <i class="icon icon-search" ng-click="enterSearch($event)"></i>
+                       <input type="text" class="form-control" localize="placeholder" placeholder="@general_typeToSearch" ng-model="options.filter" prevent-enter-submit no-dirty-check>
+                   </div>
+               </form>
+
+               <umb-layout-selector
+                  ng-if="model.config.layouts"
+                  layouts="model.config.layouts"
+                  active-layout="layout.activeLayout">
+               </umb-layout-selector>
+
+            </div>
+
         </div>
 
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <td style="width: 35px">
-                        <input type="checkbox" ng-click="selectAll($event)" ng-checked="isSelectedAll()">
-                    </td>
-                    <td>
-                        <a href="#" ng-click="sort('Name', true)" prevent-default class="sortable">
-                            <localize key="general_name">Name</localize>
-                            <i class="icon" ng-class="{'icon-navigation-up': isSortDirection('Name', 'asc'), 'icon-navigation-down': isSortDirection('Name', 'desc')}"></i>
-                        </a>
-                    </td>
+        <div ng-include="layout.activeLayout.path"></div>
 
-                    <td ng-repeat="column in options.includeProperties">
-                        <a href="#" ng-click="sort(column.alias, column.allowSorting)" ng-class="{'sortable':column.allowSorting}" prevent-default>
-                            <span ng-bind="column.header"></span>
-                            <i class="icon" ng-class="{'icon-navigation-up': isSortDirection(column.alias, 'asc'), 'icon-navigation-down': isSortDirection(column.alias, 'desc')}"></i>
-                        </a>
-                    </td>
-                </tr>
-            </thead>
-
-            <tbody ng-show="listViewResultSet.totalItems === 0">
-                <tr>
-                    <td colspan="{{options.includeProperties.length + 2}}">
-                        <p><localize key="content_listViewNoItems">There are no items show in the list.</localize></p>
-                    </td>
-                </tr>
-            </tbody>
-
-            <tbody ng-show="listViewResultSet.totalItems > 0">
-                <tr ng-repeat="result in listViewResultSet.items"
-                    ng-class="{selected:result.selected}">
-
-                    <td>
-                        <i class="icon {{result.icon}}" ng-class="getIcon(result)"></i>
-                        <input type="checkbox" ng-model="result.selected" no-dirty-check>
-                    </td>
-                    <td>
-                        <a ng-class="{inactive: (entityType === 'content' && !result.published) || isTrashed}"
-                           href="#{{result.editPath}}"
-                           ng-bind="result.name"></a>
-                    </td>
-
-                    <td ng-repeat="column in options.includeProperties">
-                        <span>{{result[column.alias]}}</span>
-                    </td>
-                </tr>
-            </tbody>
-
-            <tfoot ng-show="pagination.length > 1">
-                <tr>
-                    <th colspan="{{options.includeProperties.length + 2}}">
-                        <div class="pull-left">
-                        </div>
-                        <div class="pagination pagination-right">
-                            <ul>
-                                <li ng-class="{disabled:options.pageNumber <= 1}">
-                                    <a href="#" ng-click="prev()" prevent-default>
-                                        <localize key="general_previous">Previous</localize>
-                                    </a>
-                                </li>
-
-                                <li ng-repeat="pgn in pagination"
-                                    ng-class="{active:pgn.isActive}">
-
-                                    <a href="#" ng-click="goToPage(pgn.val - 1)" prevent-default
-                                       ng-bind="pgn.name ? pgn.name : pgn.val"
-                                       ng-if="pgn.val != '...'"></a>
-                                    <span ng-bind="pgn.val" ng-if="pgn.val == '...'"></span>
-                                </li>
-
-                                <li ng-class="{disabled:options.pageNumber >= listViewResultSet.totalPages}">
-                                    <a href="#" ng-click="next()" prevent-default>
-                                        <localize key="general_next">Next</localize>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </th>
-                </tr>
-            </tfoot>
-        </table>
     </div>
 </div>
