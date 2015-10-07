@@ -367,6 +367,7 @@
     <Compile Include="Models\IMigrationEntry.cs" />
     <Compile Include="Models\IPublishedContentWithKey.cs" />
     <Compile Include="Models\IServerRegistration.cs" />
+    <Compile Include="Models\Mapping\MappingExpressionExtensions.cs" />
     <Compile Include="Models\MigrationEntry.cs" />
     <Compile Include="Models\PartialViewType.cs" />
     <Compile Include="Models\PublicAccessEntry.cs" />

@@ -9,7 +9,7 @@
 (function() {
 	"use strict";
 
-	function DocumentTypeEditController($scope, $routeParams, contentTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter, $q) {
+	function DocumentTypesEditController($scope, $routeParams, contentTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter, $q) {
 
 		var vm = this;
 
@@ -179,10 +179,15 @@
 		        statusMessage: "Saving...",
 		        saveMethod: contentTypeResource.save,
 		        scope: $scope,
-		        content: vm.contentType
+		        content: vm.contentType,
+		        rebindCallback: function (origContent, savedContent) {
+		            //This is called when the data returns and we need to merge the property values from the saved content to the original content.
+		            //re-binds all changed property values to the origContent object from the savedContent object and returns an array of changed properties.
+
+		        }
 		    }).then(function (data) {
 		        //success            
-		        syncTreeNode(vm.contentType, dt.path);
+		        syncTreeNode(vm.contentType, data.path);
 
 		        vm.page.saveButtonState = "success";
 

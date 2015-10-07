@@ -497,8 +497,12 @@ function umbDataFormatter() {
 
             //TODO: Map these
             saveModel.allowedTemplates = _.map(displayModel.allowedTemplates, function (t) { return t.alias; });
-            saveModel.defaultTemplate = displayModel.defaultTemplate.alias;
-            saveModel.groups = _.map(displayModel.groups, function (g) {
+            saveModel.defaultTemplate = displayModel.defaultTemplate ? displayModel.defaultTemplate.alias : null;
+            var realGroups = _.reject(displayModel.groups, function(g) {
+                //do not include these tabs
+                return g.tabState === "init";
+            });
+            saveModel.groups = _.map(realGroups, function (g) {
 
                 var saveGroup = _.pick(g, 'inherited', 'id', 'sortOrder', 'name');
                 var saveProperties = _.map(g.properties, function(p) {
