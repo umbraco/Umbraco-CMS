@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 using Umbraco.Core.PropertyEditors;
 using System;
 using System.Net.Http;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Editors
 {
@@ -118,6 +119,8 @@ namespace Umbraco.Web.Editors
             //TODO: This all needs to be done in a transaction!!
             // Which means that all of this logic needs to take place inside the service
 
+            ContentTypeDisplay display;
+
             if (ctId > 0)
             {
                 //its an update to an existing
@@ -127,8 +130,8 @@ namespace Umbraco.Web.Editors
 
                 Mapper.Map(contentTypeSave, found);
                 ctService.Save(found);
-                
-                return Mapper.Map<ContentTypeDisplay>(found);
+
+                display = Mapper.Map<ContentTypeDisplay>(found);
             }
             else
             {
@@ -171,9 +174,15 @@ namespace Umbraco.Web.Editors
                     newCt.AddContentType(newCt);
                     ctService.Save(newCt);
                 }
-                
-                return Mapper.Map<ContentTypeDisplay>(newCt);
+
+                display = Mapper.Map<ContentTypeDisplay>(newCt);
             }
+
+            display.AddSuccessNotification(
+                            Services.TextService.Localize("speechBubbles/contentTypeSavedHeader"),
+                            string.Empty);
+
+            return display;
         }
 
         /// <summary>

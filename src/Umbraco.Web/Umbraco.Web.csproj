@@ -904,6 +904,8 @@
     <Compile Include="WebApi\MemberAuthorizeAttribute.cs" />
     <Compile Include="WebApi\MvcVersionCheck.cs" />
     <Compile Include="WebApi\NamespaceHttpControllerSelector.cs" />
+    <Compile Include="WebApi\PrefixlessBodyModelValidator.cs" />
+    <Compile Include="WebApi\PrefixlessBodyModelValidatorAttribute.cs" />
     <Compile Include="WebApi\UmbracoApiController.cs" />
     <Compile Include="WebApi\UmbracoApiControllerBase.cs" />
     <Compile Include="WebApi\UmbracoApiControllerResolver.cs" />

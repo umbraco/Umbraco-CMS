@@ -68,6 +68,10 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.Id, expression => expression.Condition(display => (Convert.ToInt32(display.Id) > 0)))
                 .ForMember(dto => dto.Id, expression => expression.MapFrom(display => Convert.ToInt32(display.Id)))
 
+                //These get persisted as part of the saving procedure, nothing to do with the display model
+                .ForMember(dto => dto.CreateDate, expression => expression.Ignore())
+                .ForMember(dto => dto.UpdateDate, expression => expression.Ignore())
+
                 .ForMember(dto => dto.AllowedAsRoot, expression => expression.MapFrom(display => display.AllowAsRoot))
                 .ForMember(dto => dto.CreatorId, expression => expression.Ignore())
                 .ForMember(dto => dto.Level, expression => expression.Ignore())

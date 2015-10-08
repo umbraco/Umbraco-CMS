@@ -180,11 +180,8 @@
 		        saveMethod: contentTypeResource.save,
 		        scope: $scope,
 		        content: vm.contentType,
-		        rebindCallback: function (origContent, savedContent) {
-		            //This is called when the data returns and we need to merge the property values from the saved content to the original content.
-		            //re-binds all changed property values to the origContent object from the savedContent object and returns an array of changed properties.
-
-		        }
+                //no-op for rebind callback... we don't really need to rebind for content types
+		        rebindCallback: angular.noop
 		    }).then(function (data) {
 		        //success            
 		        syncTreeNode(vm.contentType, data.path);

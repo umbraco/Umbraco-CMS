@@ -14,6 +14,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.WebApi;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
@@ -22,6 +23,7 @@ namespace Umbraco.Web.Editors
     /// Am abstract API controller providing functionality used for dealing with content and media types
     /// </summary>
     [PluginController("UmbracoApi")]    
+    [PrefixlessBodyModelValidator]
     public abstract class ContentTypeControllerBase : UmbracoAuthorizedJsonController
     {
         private ICultureDictionary _cultureDictionary;

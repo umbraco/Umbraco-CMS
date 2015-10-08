@@ -505,10 +505,18 @@ function umbDataFormatter() {
             saveModel.groups = _.map(realGroups, function (g) {
 
                 var saveGroup = _.pick(g, 'inherited', 'id', 'sortOrder', 'name');
-                var saveProperties = _.map(g.properties, function(p) {
+
+                var realProperties = _.reject(g.properties, function (p) {
+                    //do not include these properties
+                    return p.propertyState === "init";
+                });
+
+                var saveProperties = _.map(realProperties, function (p) {
                     var saveProperty = _.pick(p, 'id', 'alias', 'description', 'validation', 'label', 'sortOrder', 'dataTypeId', 'groupId');
                     return saveProperty;
                 });
+
+                saveGroup.properties = saveProperties;
 
                 return saveGroup;
             });

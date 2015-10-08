@@ -11,7 +11,7 @@ using Umbraco.Core.Models.Validation;
 namespace Umbraco.Web.Models.ContentEditing
 {
     [DataContract(Name = "contentType", Namespace = "")]
-    public class ContentTypeCompositionDisplay : ContentTypeBasic
+    public class ContentTypeCompositionDisplay : ContentTypeBasic, INotificationModel
     {
         public ContentTypeCompositionDisplay()
         {

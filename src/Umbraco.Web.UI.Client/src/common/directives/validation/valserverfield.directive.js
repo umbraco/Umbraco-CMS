@@ -16,7 +16,11 @@ function valServerField(serverValidationManager) {
             }
 
             var fieldName = attr.valServerField;
-            
+            var evalfieldName = scope.$eval(attr.valServerField);
+            if (evalfieldName) {
+                fieldName = evalfieldName;
+            }
+
             //subscribe to the changed event of the view model. This is required because when we
             // have a server error we actually invalidate the form which means it cannot be 
             // resubmitted. So once a field is changed that has a server error assigned to it

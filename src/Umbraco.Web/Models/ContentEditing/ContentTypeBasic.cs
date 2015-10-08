@@ -26,9 +26,11 @@ namespace Umbraco.Web.Models.ContentEditing
         public override string Alias { get; set; }
 
         [DataMember(Name = "updateDate")]
+        [ReadOnly(true)]
         public DateTime UpdateDate { get; set; }
 
         [DataMember(Name = "createDate")]
+        [ReadOnly(true)]
         public DateTime CreateDate { get; set; }
 
         [DataMember(Name = "description")]

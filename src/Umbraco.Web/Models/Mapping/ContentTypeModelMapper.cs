@@ -225,6 +225,8 @@ namespace Umbraco.Web.Models.Mapping
             #region *** Used for mapping on top of an existing display object from a save object ***
 
             config.CreateMap<ContentTypeSave, ContentTypeDisplay>()
+                .ForMember(dto => dto.CreateDate, expression => expression.Ignore())
+                .ForMember(dto => dto.UpdateDate, expression => expression.Ignore())
                 .ForMember(dto => dto.AllowedTemplates, expression => expression.Ignore())
                 .ForMember(dto => dto.DefaultTemplate, expression => expression.Ignore())
                 .ForMember(dto => dto.ListViewEditorName, expression => expression.Ignore())

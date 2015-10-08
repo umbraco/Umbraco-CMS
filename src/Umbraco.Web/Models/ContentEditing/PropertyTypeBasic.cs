@@ -26,15 +26,17 @@ namespace Umbraco.Web.Models.ContentEditing
         public PropertyTypeValidation Validation { get; set; }
 
         [DataMember(Name = "label")]
+        [Required]
         public string Label { get; set; }
 
         [DataMember(Name = "sortOrder")]
         public int SortOrder { get; set; }
 
         [DataMember(Name = "dataTypeId")]
+        [Required]
         public int DataTypeId { get; set; }
 
-        //SD: Is this really required ?
+        //SD: Is this really needed ?
         [DataMember(Name = "groupId")]
         public int GroupId { get; set; }
     }

@@ -29,7 +29,7 @@
 
                 <div class="umb-group-builder__group-title-wrapper">
 
-                    <ng-form>
+                    <ng-form name="groupNameForm">
                         <div class="umb-group-builder__group-title control-group -no-margin" ng-class="{'-active':tab.tabState=='active', '-inherited': tab.inherited}">
                             <i class="umb-group-builder__group-title-icon icon-navigation" ng-if="sortingMode && !tab.inherited"></i>
                             <input class="umb-group-builder__group-title-input" type="text" placeholder="Enter name..."
@@ -40,7 +40,8 @@
                                    ng-disabled="tab.inherited"
                                    umb-auto-focus
                                    umb-auto-resize
-                                   required />
+                                   required
+                                   val-server-field="{{'Groups[' + $index + '].Name'}}" />
                         </div>
                     </ng-form>
 
@@ -90,19 +91,22 @@
                                     <i class="icon icon-merge"></i> Inherited from {{property.contentTypeName}}
                                 </div>
 
-                                <div ng-if="!sortingMode">
+                                <ng-form name="propertyTypeForm">
+                                    <div class="control-group -no-margin" ng-if="!sortingMode">
+                                        <div class="umb-group-builder__property-meta-alias">{{ property.alias }}</div>
 
-                                    <div class="umb-group-builder__property-meta-alias">{{ property.alias }}</div>
+                                        <div class="umb-group-builder__property-meta-label">
+                                            <textarea placeholder="Label..." ng-model="property.label" ng-disabled="property.inherited"
+                                                      umb-auto-resize
+                                                      required
+                                                      val-server-field="{{'Groups[' + $parent.$index + '].Properties[' + $index + '].Label'}}"></textarea>
+                                        </div>
 
-                                    <div class="umb-group-builder__property-meta-label">
-                                        <textarea placeholder="Label..." ng-model="property.label" ng-disabled="property.inherited" umb-auto-resize></textarea>
+                                        <div class="umb-group-builder__property-meta-description">
+                                            <textarea ng-model="property.description" placeholder="Enter your description..." ng-disabled="property.inherited" umb-auto-resize></textarea>
+                                        </div>
                                     </div>
-
-                                    <div class="umb-group-builder__property-meta-description">
-                                        <textarea ng-model="property.description" placeholder="Enter your description..." ng-disabled="property.inherited" umb-auto-resize></textarea>
-                                    </div>
-
-                                </div>
+                                </ng-form>
 
                                 <div ng-if="sortingMode">
                                     <i class="icon icon-navigation" ng-if="!property.inherited"></i>

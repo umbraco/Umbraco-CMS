@@ -65,7 +65,9 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                         self.handleSuccessfulSave({
                             scope: args.scope,
                             savedContent: data,
-                            rebindCallback: rebindCallback(args.content, data)
+                            rebindCallback: function() {
+                                rebindCallback.apply(self, [args.content, data]);
+                            }
                         });
 
                         args.scope.busy = false;
@@ -75,7 +77,9 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                         self.handleSaveError({
                             redirectOnFailure: true,
                             err: err,
-                            rebindCallback: rebindCallback(args.content, err.data)
+                            rebindCallback: function() {
+                                rebindCallback.apply(self, [args.content, err.data]);
+                            }
                         });
                         //show any notifications
                         if (angular.isArray(err.data.notifications)) {
