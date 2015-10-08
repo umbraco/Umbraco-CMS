@@ -37,6 +37,7 @@
     "grunt-contrib-watch": "~0.3.1",
     "grunt-eslint": "^15.0.0",
     "grunt-html2js": "~0.1.0",
+    "grunt-hustler": "^4.0.6",
     "grunt-karma": "~0.5",
     "grunt-ngdocs": "~0.1.2",
     "grunt-open": "~0.2.0",
