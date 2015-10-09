@@ -104,6 +104,9 @@ namespace Umbraco.Web.WebServices
                 view.Path = filename;
             view.Content = contents;
 
+            
+
+
             Attempt<IPartialView> attempt;
             try
             {
@@ -125,7 +128,8 @@ namespace Umbraco.Web.WebServices
                                 attempt.Exception);
             }
 
-            return Success(ui.Text("speechBubbles", "partialViewSavedText"), ui.Text("speechBubbles", "partialViewSavedHeader"));
+
+            return Success(ui.Text("speechBubbles", "partialViewSavedText"), ui.Text("speechBubbles", "partialViewSavedHeader"), new { name = view.Name, path = view.Path });
         }
 
         /// <summary>
