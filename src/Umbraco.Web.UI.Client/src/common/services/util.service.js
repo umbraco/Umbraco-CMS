@@ -508,7 +508,7 @@ function umbDataFormatter() {
 
                 var realProperties = _.reject(g.properties, function (p) {
                     //do not include these properties
-                    return p.propertyState === "init";
+                    return p.propertyState === "init" || p.inherited === true;
                 });
 
                 var saveProperties = _.map(realProperties, function (p) {
@@ -518,9 +518,19 @@ function umbDataFormatter() {
 
                 saveGroup.properties = saveProperties;
 
+                //if this is an inherited group and there are not non-inherited properties on it, then don't send up the data
+                if (saveGroup.inherited === true && saveProperties.length === 0) {
+                    return null;
+                }
+
                 return saveGroup;
             });
             
+            //we don't want any null groups
+            saveModel.groups = _.reject(saveModel.groups, function(g) {
+                return !g;
+            });
+
             return saveModel;
         },
 

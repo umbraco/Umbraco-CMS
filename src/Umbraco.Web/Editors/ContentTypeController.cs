@@ -89,7 +89,42 @@ namespace Umbraco.Web.Editors
                 ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id 
                 : Request.CreateValidationErrorResponse(result.Exception.Message);
         }
-        
+
+        /// <summary>
+        /// Validates the composition and adds errors to the model state if any are found then throws an error response if there are errors
+        /// </summary>
+        /// <param name="contentTypeSave"></param>
+        /// <param name="composition"></param>
+        /// <returns></returns>
+        private void ValidateComposition(ContentTypeSave contentTypeSave, IContentTypeComposition composition)
+        {
+            var validateAttempt = Services.ContentTypeService.ValidateComposition(composition);
+            if (validateAttempt == false)
+            {
+                //if it's not successful then we need to return some model state for the property aliases that 
+                // are duplicated
+                var propertyAliases = validateAttempt.Result.Distinct();                
+                foreach (var propertyAlias in propertyAliases)
+                {
+                    //find the property relating to these
+                    var prop = contentTypeSave.Groups.SelectMany(x => x.Properties).Single(x => x.Alias == propertyAlias);
+                    var group = contentTypeSave.Groups.Single(x => x.Properties.Contains(prop));
+                    var propIndex = group.Properties.IndexOf(prop);
+                    var groupIndex = contentTypeSave.Groups.IndexOf(group);
+
+                    var key = string.Format("Groups[{0}].Properties[{1}].Alias", groupIndex, propIndex);
+                    ModelState.AddModelError(key, "Duplicate property aliases not allowed between compositions");
+                }
+
+                var display = Mapper.Map<ContentTypeDisplay>(composition);
+                //map the 'save' data on top
+                display = Mapper.Map(contentTypeSave, display);
+                display.Errors = ModelState.ToErrorDictionary();
+                throw new HttpResponseException(Request.CreateValidationErrorResponse(display));
+            }
+            
+        }
+
         public ContentTypeDisplay PostSave(ContentTypeSave contentTypeSave)
         {
             var ctId = Convert.ToInt32(contentTypeSave.Id);
@@ -106,8 +141,6 @@ namespace Umbraco.Web.Editors
                 forDisplay.Errors = ModelState.ToErrorDictionary();
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
             }
-
-            //TODO: Deal with validation for composition with property and group names/aliases
             
             //filter out empty properties
             contentTypeSave.Groups = contentTypeSave.Groups.Where(x => x.Name.IsNullOrWhiteSpace() == false).ToList();
@@ -129,8 +162,11 @@ namespace Umbraco.Web.Editors
                     throw new HttpResponseException(HttpStatusCode.NotFound);
 
                 Mapper.Map(contentTypeSave, found);
-                ctService.Save(found);
 
+                //NOTE: this throws an error response if it is not valid
+                ValidateComposition(contentTypeSave, found);
+
+                ctService.Save(found);
                 display = Mapper.Map<ContentTypeDisplay>(found);
             }
             else
@@ -166,11 +202,16 @@ namespace Umbraco.Web.Editors
 
                 //save as new
                 var newCt = Mapper.Map<IContentType>(contentTypeSave);
+
+                //NOTE: this throws an error response if it is not valid
+                ValidateComposition(contentTypeSave, newCt);
+
                 ctService.Save(newCt);
 
                 //we need to save it twice to allow itself under itself.
                 if (allowItselfAsChild)
                 {
+                    //NOTE: This will throw if the composition isn't right... but it shouldn't be at this stage
                     newCt.AddContentType(newCt);
                     ctService.Save(newCt);
                 }

@@ -96,10 +96,12 @@
                                 <ng-form name="propertyTypeForm">
                                     <div class="control-group -no-margin" ng-if="!sortingMode">
                                         
-                                        <umb-locked-field locked="locked"
+                                        <div class="umb-group-builder__property-meta-alias" ng-if="property.inherited">{{ property.alias }}</div>
+                                        <umb-locked-field ng-if="!property.inherited"
+                                                          locked="locked"
                                                           ng-model="property.alias"
                                                           placeholder-text="'Alias...'"
-                                                          server-validation-field="{{'Groups[' + $parent.$index + '].Properties[' + $index + '].Alias'}}">
+                                                          server-validation-field="{{'Groups[' + $parent.$parent.$parent.$parent.$index + '].Properties[' + $index + '].Alias'}}">
                                         </umb-locked-field>
 
                                         <div class="umb-group-builder__property-meta-label">
@@ -107,7 +109,7 @@
                                                       name="groupName"
                                                       umb-auto-resize
                                                       required
-                                                      val-server-field="{{'Groups[' + $parent.$index + '].Properties[' + $index + '].Label'}}"></textarea>
+                                                      val-server-field="{{'Groups[' + $parent.$parent.$parent.$parent.$index + '].Properties[' + $index + '].Label'}}"></textarea>
                                             
                                             <span class="help-inline" val-msg-for="groupName" val-toggle-msg="valServerField"></span>
                                         </div>
