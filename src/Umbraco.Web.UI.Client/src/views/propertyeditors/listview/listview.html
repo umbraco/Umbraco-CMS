@@ -5,44 +5,40 @@
     </div>
 
     <div class="row-fluid" ng-switch-when="false">
-        <div class="umb-sub-header">
 
-            <div class="btn-group" ng-show="listViewAllowedTypes && listViewAllowedTypes.length > 0">
-                <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-                    <localize key="actions_create">Create</localize>
-                    <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu">
-                    <li ng-repeat="contentType in listViewAllowedTypes">
-                        <a href="#/{{entityType}}/{{entityType}}/edit/{{contentId}}?doctype={{contentType.alias}}&create=true">
-                            <i class="icon-{{contentType.cssClass}}"></i>
-                            {{contentType.name}}
-                        </a>
-                    </li>
-                </ul>
-            </div>
+        <div class="umb-sub-header clearfix">
+           <div class="pull-left">
+               <div class="btn-group" ng-show="listViewAllowedTypes && listViewAllowedTypes.length > 0">
+                   <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                       <localize key="actions_create">Create</localize>
+                       <span class="caret"></span>
+                   </a>
+                   <ul class="dropdown-menu">
+                       <li ng-repeat="contentType in listViewAllowedTypes">
+                           <a href="#/{{entityType}}/{{entityType}}/edit/{{contentId}}?doctype={{contentType.alias}}&create=true">
+                               <i class="icon-{{contentType.cssClass}}"></i>
+                               {{contentType.name}}
+                           </a>
+                       </li>
+                   </ul>
+               </div>
 
-            <div class="btn-group" ng-show="isAnythingSelected()" ng-if="entityType === 'content' && !isTrashed && options.allowBulkPublish">
-                <a class="btn btn-success" ng-disabled="actionInProgress" ng-click="publish()" prevent-default>
-                    <localize key="actions_publish">Publish</localize>
-                </a>
+               <div class="btn-group" ng-show="isAnythingSelected()" ng-if="entityType === 'content' && !isTrashed && options.allowBulkPublish">
+                   <a class="btn btn-success" ng-disabled="actionInProgress" ng-click="publish()" prevent-default>
+                       <localize key="actions_publish">Publish</localize>
+                   </a>
+               </div>
+               <div class="btn-group" ng-show="isAnythingSelected()" ng-if="entityType === 'content' && !isTrashed && options.allowBulkUnpublish">
+                   <a class="btn btn-warning" ng-disabled="actionInProgress" ng-click="unpublish()" prevent-default>
+                       <localize key="actions_unpublish">Unpublish</localize>
+                   </a>
+               </div>
+               <div class="btn-group" ng-show="isAnythingSelected()" ng-if="options.allowBulkDelete">
+                   <a class="btn btn-danger" ng-disabled="actionInProgress" ng-click="delete()" prevent-default>
+                       <localize key="actions_delete">Delete</localize>
+                   </a>
+               </div>
             </div>
-            <div class="btn-group" ng-show="isAnythingSelected()" ng-if="entityType === 'content' && !isTrashed && options.allowBulkUnpublish">
-                <a class="btn btn-warning" ng-disabled="actionInProgress" ng-click="unpublish()" prevent-default>
-                    <localize key="actions_unpublish">Unpublish</localize>
-                </a>
-            </div>
-            <div class="btn-group" ng-show="isAnythingSelected()" ng-if="options.allowBulkDelete">
-                <a class="btn btn-danger" ng-disabled="actionInProgress" ng-click="delete()" prevent-default>
-                    <localize key="actions_delete">Delete</localize>
-                </a>
-            </div>
-
-            <div class="umb-loader-wrapper" ng-show="actionInProgress">
-                <div class="umb-loader"></div>
-            </div>
-
-            <span ng-bind="bulkStatus" ng-show="isAnythingSelected()" class="pull-right"></span>
 
             <div class="pull-right">
 
@@ -60,6 +56,12 @@
                </umb-layout-selector>
 
             </div>
+
+            <div class="umb-loader-wrapper" ng-show="actionInProgress">
+                <div class="umb-loader"></div>
+            </div>
+
+            <span ng-bind="bulkStatus" ng-show="isAnythingSelected()" class="pull-right"></span>
 
         </div>
 
