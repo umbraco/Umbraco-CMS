@@ -11,6 +11,9 @@
 
          function activate() {
 
+            scope.folders = [];
+            scope.mediaItems = [];
+
             for (var i = 0; scope.items.length > i; i++) {
 
                var item = scope.items[i];
@@ -23,7 +26,9 @@
 
             }
 
-            setFlexValues(scope.items);
+            if(scope.mediaItems.length > 0) {
+               setFlexValues(scope.mediaItems);
+            }
 
          }
 
@@ -76,9 +81,9 @@
 
          }
 
-         function setFlexValues(items) {
+         function setFlexValues(mediaItems) {
 
-            var flexSortArray = scope.mediaItems;
+            var flexSortArray = mediaItems;
             var smallestImageWidth = null;
             var widestImageAspectRatio = null;
 
@@ -117,7 +122,13 @@
             item.selected = !item.selected;
          };
 
-         activate();
+         var unbindItemsWatcher = scope.$watch('items', function(newValue, oldValue){
+            activate();
+         });
+
+         scope.$on('$destroy', function(){
+           unbindItemsWatcher();
+         });
 
       }
 
