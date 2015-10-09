@@ -42,6 +42,8 @@
                                    umb-auto-resize
                                    required
                                    val-server-field="{{'Groups[' + $index + '].Name'}}" />
+                            
+                            <span class="help-inline" val-msg-for="groupName" val-toggle-msg="valServerField"></span>
                         </div>
                     </ng-form>
 
@@ -93,13 +95,21 @@
 
                                 <ng-form name="propertyTypeForm">
                                     <div class="control-group -no-margin" ng-if="!sortingMode">
-                                        <div class="umb-group-builder__property-meta-alias">{{ property.alias }}</div>
+                                        
+                                        <umb-locked-field locked="locked"
+                                                          ng-model="property.alias"
+                                                          placeholder-text="'Alias...'"
+                                                          server-validation-field="{{'Groups[' + $parent.$index + '].Properties[' + $index + '].Alias'}}">
+                                        </umb-locked-field>
 
                                         <div class="umb-group-builder__property-meta-label">
                                             <textarea placeholder="Label..." ng-model="property.label" ng-disabled="property.inherited"
+                                                      name="groupName"
                                                       umb-auto-resize
                                                       required
                                                       val-server-field="{{'Groups[' + $parent.$index + '].Properties[' + $index + '].Label'}}"></textarea>
+                                            
+                                            <span class="help-inline" val-msg-for="groupName" val-toggle-msg="valServerField"></span>
                                         </div>
 
                                         <div class="umb-group-builder__property-meta-description">

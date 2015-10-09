@@ -59,9 +59,6 @@ function valPropertyValidator(serverValidationManager) {
                 }
             };
 
-            // Formatters are invoked when the model is modified in the code.
-            modelCtrl.$formatters.push(validate);
-
             // Parsers are called as soon as the value in the form input is modified
             modelCtrl.$parsers.push(validate);
 

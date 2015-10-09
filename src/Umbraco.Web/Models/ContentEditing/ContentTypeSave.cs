@@ -60,11 +60,32 @@ namespace Umbraco.Web.Models.ContentEditing
             if (CompositeContentTypes.Any(x => x.IsNullOrWhiteSpace()))
                 yield return new ValidationResult("Composite Content Type value cannot be null", new[] { "CompositeContentTypes" });
 
-            if (Groups.GroupBy(x => x.Name).Any(x => x.Count() > 1))
-                yield return new ValidationResult("Duplicate group names not allowed", new[] { "Groups" });
+            var duplicateGroups = Groups.GroupBy(x => x.Name).Where(x => x.Count() > 1).ToArray();
+            if (duplicateGroups.Any())
+            {
+                //we need to return the field name with an index so it's wired up correctly
+                var firstIndex = Groups.IndexOf(duplicateGroups.First().First());
+                yield return new ValidationResult("Duplicate group names not allowed", new[]
+                {
+                    string.Format("Groups[{0}].Name", firstIndex)
+                });
+            }
+            
+            var duplicateProperties = Groups.SelectMany(x => x.Properties).Where(x => x.Inherited == false).GroupBy(x => x.Alias).Where(x => x.Count() > 1).ToArray();
+            if (duplicateProperties.Any())
+            {
+                //we need to return the field name with an index so it's wired up correctly
+                var firstProperty = duplicateProperties.First().First();
+                var propertyGroup = Groups.Single(x => x.Properties.Contains(firstProperty));
+                var groupIndex = Groups.IndexOf(propertyGroup);
+                var propertyIndex = propertyGroup.Properties.IndexOf(firstProperty);
 
-            if (Groups.SelectMany(x => x.Properties).Where(x => x.Inherited == false).GroupBy(x => x.Alias).Any(x => x.Count() > 1))
-                yield return new ValidationResult("Duplicate property aliases not allowed", new[] { "Groups" });
+                yield return new ValidationResult("Duplicate property aliases not allowed", new[]
+                {
+                    string.Format("Groups[{0}].Properties[{1}].Alias", groupIndex, propertyIndex)
+                });
+            }
+            
         }
     }
 }

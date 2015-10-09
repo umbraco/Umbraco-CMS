@@ -8,20 +8,21 @@
 		<i class="umb-locked-field__lock-icon icon-unlocked -unlocked"></i>
 	</a>
 
-	<input
-		type="text"
-		class="umb-locked-field__input"
-		name="lockedField"
-		ng-model="model"
-		ng-disabled="locked"
-		ng-class="{'-unlocked': !locked}"
-		placeholder="{{placeholderText}}"
-		umb-auto-resize
-        required
-        val-regex="^[a-zA-Z]\w.*$"
-	/>
-    
+    <input type="text"
+           class="umb-locked-field__input"
+           name="lockedField"
+           ng-model="model"
+           ng-disabled="locked"
+           ng-class="{'-unlocked': !locked}"
+           placeholder="{{placeholderText}}"
+           val-regex="{{regexValidation}}"
+           umb-auto-resize
+           required
+           val-server-field="{{serverValidationField}}"
+            />
+
     <span class="validation-label" val-msg-for="lockedField" val-toggle-msg="required"><localize key="required" /></span>
-    <span class="validation-label" val-msg-for="lockedField" val-toggle-msg="valRegex">Invalid alias</span>
+    <span ng-if="regexValidation.length > 0" class="validation-label" val-msg-for="lockedField" val-toggle-msg="valRegex">Invalid alias</span>
+    <span ng-if="serverValidationField.length > 0" class="validation-label" val-msg-for="lockedField" val-toggle-msg="valServerField"></span>
 
 </div>
