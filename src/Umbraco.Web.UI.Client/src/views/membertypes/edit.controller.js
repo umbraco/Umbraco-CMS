@@ -18,13 +18,13 @@
 		vm.currentNode = null;
 		vm.contentType = {};
 		vm.page = {};
-      vm.page.loading = false;
-      vm.page.saveButtonState = "init";
+        vm.page.loading = false;
+        vm.page.saveButtonState = "init";
 		vm.page.navigation = [
 			{
 				"name": "Design",
 				"icon": "icon-document-dashed-line",
-				"view": "views/membertype/views/design/design.html",
+				"view": "views/membertypes/views/design/design.html",
 				"active": true
 			}
 		];
