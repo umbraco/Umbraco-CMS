@@ -1,6 +1,6 @@
 module.exports = function (grunt) {
 
-    
+
 
     // Default task.
     grunt.registerTask('default', ['jshint:dev', 'build', 'karma:unit']);
@@ -18,7 +18,7 @@ module.exports = function (grunt) {
     grunt.registerTask('watch-test', ['jshint:dev', 'karma:unit']);
 
     //triggered from grunt
-    grunt.registerTask('build', ['clean:pre', 'concat', 'recess:build', 'recess:installer', 'recess:canvasdesigner', 'postcss', 'bower-install-simple', 'bower', 'copy', 'clean:post']);
+    grunt.registerTask('build', ['concat', 'recess:build', 'recess:installer', 'recess:canvasdesigner', 'postcss', 'bower-install-simple', 'bower', 'copy', 'clean:post']);
 
     //triggered from grunt dev vs or grunt vs
     grunt.registerTask('build-dev', ['clean:pre', 'concat', 'recess:build', 'recess:installer', 'postcss', 'bower-install-simple', 'bower', 'copy']);
@@ -92,7 +92,7 @@ module.exports = function (grunt) {
                 ' * Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %>\n */\n',
         src: {
             js: ['src/**/*.js', 'src/*.js'],
-            
+
             common: ['src/common/**/*.js'],
             controllers: ['src/**/*.controller.js'],
 
@@ -143,17 +143,21 @@ module.exports = function (grunt) {
             vendor: {
                 files: [{ dest: '<%= distdir %>/lib', src: '**', expand: true, cwd: 'lib/' }]
             },
+
             views: {
-                files: [{ dest: '<%= distdir %>/views', src: ['**/*.*', '!**/*.controller.js'], expand: true, cwd: 'src/views/' }]
+                files: [{ dest: '<%= distdir %>/views', src: ['**/*.*', '!**/*.controller.js'], expand: true, cwd: 'src/views' }]
             },
+
             app: {
                 files: [
                     { dest: '<%= distdir %>/js', src: '*.js', expand: true, cwd: 'src/' }
                 ]
             },
+
             mocks: {
                 files: [{ dest: '<%= distdir %>/js', src: '*.js', expand: true, cwd: 'src/common/mocks/' }]
             },
+
             vs: {
                 files: [
                     //everything except the index.html root file!
@@ -197,6 +201,7 @@ module.exports = function (grunt) {
                     footer: "\n\n})();"
                 }
             },
+
             canvasdesignerJs: {
                 src: ['src/canvasdesigner/canvasdesigner.global.js', 'src/canvasdesigner/canvasdesigner.controller.js', 'src/canvasdesigner/editors/*.js', 'src/canvasdesigner/lib/*.js'],
                 dest: '<%= distdir %>/js/canvasdesigner.panel.js'
@@ -324,6 +329,18 @@ module.exports = function (grunt) {
            }
         },
 
+        ngTemplateCache: {
+            views: {
+                files: {
+                    '<%= distdir %>/js/umbraco.views.js': 'src/views/**/*.html'
+                },
+                options: {
+                    trim: 'src/',
+                    module: 'umbraco.views'
+                }
+            }
+        },
+
         watch: {
             docs: {
                 files: ['docs/src/**/*.md'],
@@ -435,7 +452,7 @@ module.exports = function (grunt) {
             }
         },
 
-        bower: {            
+        bower: {
             dev: {
                 dest: '<%= distdir %>/lib',
                 options: {
@@ -473,7 +490,7 @@ module.exports = function (grunt) {
                         },
                         'angular-dynamic-locale': {
                             files: ['tmhDynamicLocale.min.js', 'tmhDynamicLocale.min.js.map']
-                        },                        
+                        },
                         'ng-file-upload': {
                             keepExpandedHierarchy: false,
                             files: ['ng-file-upload.min.js']
@@ -530,4 +547,5 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-ngdocs');
 
     grunt.loadNpmTasks('grunt-eslint');
+    grunt.loadNpmTasks('grunt-hustler');
 };
