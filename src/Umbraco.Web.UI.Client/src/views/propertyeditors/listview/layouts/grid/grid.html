@@ -1,8 +1,24 @@
-<div ng-if="entityType === 'media'">
+<div ng-controller="Umbraco.PropertyEditors.ListView.GridLayoutController as vm">
 
-   <umb-media-grid
-      ng-if="listViewResultSet.items"
-      items="listViewResultSet.items">
-   </umb-media-grid>
+   <div
+   ng-if="entityType === 'media'"
+   on-drag-leave="vm.dragLeave()"
+   on-drag-end="vm.dragLeave()"
+   on-drag-enter="vm.dragEnter()">
 
-<div>
+      <umb-file-dropzone
+         parent-id="{{vm.nodeId}}"
+         files-uploaded="vm.onUploadComplete"
+         accept="{{vm.acceptedFileTypes}}"
+         hide-dropzone="{{!vm.activeDrag && listViewResultSet.items.length > 0 }}"
+         compact="{{ listViewResultSet.items.length > 0 }}"
+         files-queued="vm.onFilesQueue">
+      </umb-file-dropzone>
+
+      <umb-media-grid
+         items="listViewResultSet.items">
+      </umb-media-grid>
+
+   <div>
+
+</div>
