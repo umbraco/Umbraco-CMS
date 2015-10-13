@@ -48,6 +48,11 @@
   <system.web xdt:Transform="InsertIfMissing" />
   <system.web>
     <siteMap xdt:Transform="Remove" />
+	<siteMap xdt:Transform="Insert">
+      <providers xdt:Transform="Insert">
+        <remove name="MySqlSiteMapProvider"  xdt:Transform="Insert" />
+      </providers>
+      </siteMap>	
     <httpRuntime xdt:Transform="InsertIfMissing" />
     <httpRuntime targetFramework="4.5" xdt:Transform="SetAttributes(targetFramework)" />
     <membership defaultProvider="DefaultMembershipProvider" xdt:Locator="Match(defaultProvider)" xdt:Transform="Remove" />
