@@ -21,6 +21,18 @@ namespace Umbraco.Core.Security
         {
         }
 
+        public BackOfficeUserManager(
+            IUserStore<BackOfficeIdentityUser, int> store,
+            IdentityFactoryOptions<BackOfficeUserManager> options,
+            MembershipProviderBase membershipProvider)
+            : base(store)
+        {
+            if (options == null) throw new ArgumentNullException("options");
+            var manager = new BackOfficeUserManager(store);
+            InitUserManager(manager, membershipProvider, options);
+        }
+
+        #region Static Create methods
         /// <summary>
         /// Creates a BackOfficeUserManager instance with all default options and the default BackOfficeUserManager 
         /// </summary>
@@ -56,13 +68,10 @@ namespace Umbraco.Core.Security
            BackOfficeUserStore customUserStore,
            MembershipProviderBase membershipProvider)
         {
-            if (options == null) throw new ArgumentNullException("options");
-            if (customUserStore == null) throw new ArgumentNullException("customUserStore");
-
-            var manager = new BackOfficeUserManager(customUserStore);
-
-            return InitUserManager(manager, membershipProvider, options);
-        }
+            var manager = new BackOfficeUserManager(customUserStore, options, membershipProvider);
+            return manager;
+        } 
+        #endregion
 
         /// <summary>
         /// Initializes the user manager with the correct options
