@@ -7,7 +7,6 @@
 
          var bar = $(el);
          var scrollableContainer = null;
-         var scrollBody = $(attr.scrollBody);
          var clonedBar = null;
          var cloneIsMade = false;
 
