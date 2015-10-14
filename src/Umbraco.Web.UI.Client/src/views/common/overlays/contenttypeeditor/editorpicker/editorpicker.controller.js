@@ -34,6 +34,7 @@
 			}
 		];
 
+      vm.filterItems = filterItems;
 		vm.showDetailsOverlay = showDetailsOverlay;
 		vm.hideDetailsOverlay = hideDetailsOverlay;
       vm.pickEditor = pickEditor;
@@ -71,6 +72,11 @@
 			}
 		}
 
+      function filterItems() {
+         // clear item details
+         $scope.model.itemDetails = null;
+      }
+
 		function showDetailsOverlay(property) {
 
 			var propertyDetails = {};
@@ -79,7 +85,7 @@
 
 			$scope.model.itemDetails = propertyDetails;
 
-		};
+		}
 
 		function hideDetailsOverlay() {
 			$scope.model.itemDetails = null;
