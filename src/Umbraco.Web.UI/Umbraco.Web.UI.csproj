@@ -2258,7 +2258,6 @@
     <Content Include="Umbraco\Users\EditUser.aspx" />
     <Content Include="Umbraco\Users\EditUserType.aspx" />
     <!--<Content Include="Umbraco\users\PermissionEditor.aspx" />-->
-    <Content Include="Umbraco\webService.asmx" />
     <Content Include="Umbraco\Webservices\ajax.js" />
     <Content Include="Umbraco\Webservices\CacheRefresher.asmx">
       <SubType>Form</SubType>
