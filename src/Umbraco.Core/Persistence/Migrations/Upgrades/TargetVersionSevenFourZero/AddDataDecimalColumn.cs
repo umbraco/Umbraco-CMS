@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourZer
             var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToArray();
 
             if (columns.Any(x => x.TableName.InvariantEquals("cmsPropertyData") && x.ColumnName.InvariantEquals("dataDecimal")) == false)
-                Create.Column("dataDecimal").OnTable("cmsPropertyData").AsDecimal(18, 9).Nullable();
+                Create.Column("dataDecimal").OnTable("cmsPropertyData").AsDecimal().Nullable();
         }
 
         public override void Down()
