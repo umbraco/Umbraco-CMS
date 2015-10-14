@@ -33,6 +33,10 @@ namespace Umbraco.Core.Models.Rdbms
         [NullSetting(NullSetting = NullSettings.Null)]
         public int? Integer { get; set; }
 
+        [Column("dataDecimal")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public decimal? Decimal { get; set; }
+
         [Column("dataDate")]
         [NullSetting(NullSetting = NullSettings.Null)]
         public DateTime? Date { get; set; }
@@ -55,22 +59,27 @@ namespace Umbraco.Core.Models.Rdbms
         {
             get
             {
-                if(Integer.HasValue)
+                if (Integer.HasValue)
                 {
                     return Integer.Value;
                 }
+
+                if (Decimal.HasValue)
+                {
+                    return Decimal.Value;
+                }
                 
-                if(Date.HasValue)
+                if (Date.HasValue)
                 {
                     return Date.Value;
                 }
                 
-                if(string.IsNullOrEmpty(VarChar) == false)
+                if (string.IsNullOrEmpty(VarChar) == false)
                 {
                     return VarChar;
                 }
 
-                if(string.IsNullOrEmpty(Text) == false)
+                if (string.IsNullOrEmpty(Text) == false)
                 {
                     return Text;
                 }

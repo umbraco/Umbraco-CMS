@@ -405,6 +405,7 @@
     <Compile Include="Persistence\Mappers\AccessMapper.cs" />
     <Compile Include="Persistence\Mappers\DomainMapper.cs" />
     <Compile Include="Persistence\Mappers\MigrationEntryMapper.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFourZero\AddDataDecimalColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\AddExternalLoginsTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\AddForeignKeysForLanguageAndDictionaryTables.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\AddServerRegistrationColumnsAndLock.cs" />
@@ -456,7 +457,9 @@
     <Compile Include="Persistence\Repositories\RepositoryCacheOptions.cs" />
     <Compile Include="Persistence\Repositories\TaskRepository.cs" />
     <Compile Include="Persistence\Repositories\TaskTypeRepository.cs" />
+    <Compile Include="PropertyEditors\DecimalValidator.cs" />
     <Compile Include="PropertyEditors\ValueConverters\GridValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\DecimalValueConverter.cs" />
     <Compile Include="Publishing\UnPublishedStatusType.cs" />
     <Compile Include="Publishing\UnPublishStatus.cs" />
     <Compile Include="Security\BackOfficeClaimsIdentityFactory.cs" />
