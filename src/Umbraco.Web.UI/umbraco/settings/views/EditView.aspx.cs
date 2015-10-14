@@ -66,7 +66,7 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 	            {
 	                return TreeDefinitionCollection.Instance.FindTree<PartialViewsTree>().Tree.Alias;
 	            }
-	            return Request.QueryString["treeType"];
+	            return Request.CleanForXss("treeType");
 	        }
 	    }
 

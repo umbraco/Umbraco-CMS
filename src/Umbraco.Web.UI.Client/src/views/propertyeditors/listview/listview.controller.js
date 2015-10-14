@@ -51,6 +51,8 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
     $scope.pagination = [];
     $scope.isNew = false;
     $scope.actionInProgress = false;
+    $scope.layout = {};
+    $scope.layout.activeLayout = {};
     $scope.listViewResultSet = {
         totalPages: 0,
         items: []
@@ -71,6 +73,9 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         allowBulkDelete: true,        
     };
 
+    // set active layout
+    $scope.layout.activeLayout = getFirstAllowedLayout($scope.model.config.layouts);
+
     //update all of the system includeProperties to enable sorting
     _.each($scope.options.includeProperties, function(e, i) {
         
@@ -90,6 +95,24 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
             });
         }
     });
+
+    function getFirstAllowedLayout(layouts) {
+
+       var firstAllowedLayout = {};
+
+       for (var i = 0; layouts.length > i; i++) {
+
+          var layout = layouts[i];
+
+          if (layout.selected === true) {
+             firstAllowedLayout = layout;
+             break;
+          }
+
+       }
+
+       return firstAllowedLayout;
+    }
 
     function showNotificationsAndReset(err, reload, successMsg) {
 

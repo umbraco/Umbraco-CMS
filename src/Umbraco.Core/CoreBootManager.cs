@@ -431,6 +431,7 @@ namespace Umbraco.Core
                     new Lazy<Type>(() => typeof (DelimitedManifestValueValidator)),
                     new Lazy<Type>(() => typeof (EmailValidator)),
                     new Lazy<Type>(() => typeof (IntegerValidator)),
+                    new Lazy<Type>(() => typeof (DecimalValidator)),
                 });
 
             //by default we'll use the db server registrar unless the developer has the legacy

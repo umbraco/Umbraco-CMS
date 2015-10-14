@@ -41,7 +41,7 @@ function valRegex() {
             var patternValidator = function (viewValue) {
                 if (regex) {
                     //NOTE: we don't validate on empty values, use required validator for that
-                    if (!viewValue || regex.test(viewValue)) {
+                if (!viewValue || regex.test(viewValue.toString())) {
                         // it is valid
                         ctrl.$setValidity('valRegex', true);
                         //assign a message to the validator

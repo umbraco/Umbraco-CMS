@@ -211,7 +211,7 @@ angular.module('umbraco.directives')
 
             link: function (scope, element, attrs, ctrl) {
                 var active = false;
-                var fn = $parse(attrs.delayedMouseleave);
+                var fn = $parse(attrs.onDelayedMouseleave);
 
                 var leave_f = function(event) {
                     var callback = function() {

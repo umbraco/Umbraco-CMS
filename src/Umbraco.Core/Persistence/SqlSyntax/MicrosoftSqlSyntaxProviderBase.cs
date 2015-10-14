@@ -10,6 +10,19 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     public abstract class MicrosoftSqlSyntaxProviderBase<TSyntax> : SqlSyntaxProviderBase<TSyntax>
         where TSyntax : ISqlSyntaxProvider
     {
+        protected MicrosoftSqlSyntaxProviderBase()
+        {            
+            AutoIncrementDefinition = "IDENTITY(1,1)";
+            GuidColumnDefinition = "UniqueIdentifier";
+            RealColumnDefinition = "FLOAT";
+            BoolColumnDefinition = "BIT";
+            DecimalColumnDefinition = "DECIMAL(38,6)";
+            TimeColumnDefinition = "TIME"; //SQLSERVER 2008+
+            BlobColumnDefinition = "VARBINARY(MAX)";
+
+            InitColumnTypeMap();
+        }
+
         public override string RenameTable { get { return "sp_rename '{0}', '{1}'"; } }
 
         public override string AddColumn { get { return "ALTER TABLE {0} ADD {1}"; } }

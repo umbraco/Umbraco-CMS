@@ -6,14 +6,14 @@
         </p>
 
         <p>
-        	<i class="icon-alert red"></i> <strong class="red">2345 Documents</strong> will be deleted permanently if you delete this document type,
-        	please confirm you want to delete these as well.
+        	<i class="icon-alert red"></i> <strong class="red">All Documents</strong>
+            using this document type will be deleted permanently, please confirm you want to delete these as well.
         </p>
 
         <hr />
 
         <label class="checkbox">
-        		<input type="checkbox" ng-model="confirmed" /> Delete all 2345 documents using {{currentNode.name}}
+        		<input type="checkbox" ng-model="confirmed" /> Delete {{currentNode.name}} and all documents using this type
         </label>
 
         <umb-confirm ng-if="confirmed" on-confirm="performDelete" on-cancel="cancel">

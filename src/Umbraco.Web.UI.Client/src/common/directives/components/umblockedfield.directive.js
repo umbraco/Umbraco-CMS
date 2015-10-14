@@ -59,6 +59,7 @@
 
 				$timeout(function() {
 					input.focus();
+					input.select();
 					input.on("blur", onBlurHandler);
 				});
 

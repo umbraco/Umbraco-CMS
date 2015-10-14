@@ -4,6 +4,7 @@
 
 <%@ Import Namespace="Umbraco.Core.Configuration" %>
 <%@ Import Namespace="Umbraco.Web" %>
+<%@ Import Namespace="Umbraco.Core" %>
 <%@ Register TagPrefix="cc2" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <asp:Content ContentPlaceHolderID="head" runat="server">
 
@@ -15,7 +16,7 @@
             $(document).ready(function () {
                 Umbraco.Dialogs.EditMacro.getInstance().init({
                     useAspNetMasterPages: <%=UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages.ToString().ToLower() %>,
-                    codeEditorElementId: "<%=Request.GetItemAsString("objectId")%>",
+                    codeEditorElementId: "<%=Request.CleanForXss("objectId") %>",
                     renderingEngine: "<%=Request.GetItemAsString("renderingEngine", "Mvc")%>",
                     macroAlias: '<%= _macroAlias %>'
                 });
