@@ -121,7 +121,7 @@ namespace Umbraco.Core.Services
                 if (entry == null)
                     return Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>>.Fail();
 
-                var existingRule = entry.Rules.FirstOrDefault(x => x.RuleType == ruleType);
+                var existingRule = entry.Rules.FirstOrDefault(x => x.RuleType == ruleType && x.RuleValue == newRuleValue);
                 if (existingRule == null)
                 {
                     entry.AddRule(newRuleValue, ruleType);
