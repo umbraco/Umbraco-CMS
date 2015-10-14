@@ -119,7 +119,7 @@ namespace Umbraco.Tests.Services
             // Assert           
             Assert.IsTrue(updated.Success);
             Assert.AreEqual(OperationStatusType.Success, updated.Result.StatusType);
-            Assert.AreEqual(1, entry.Rules.Count());
+            Assert.AreEqual(2, entry.Rules.Count());
             Assert.AreEqual("AnotherVal", entry.Rules.ElementAt(0).RuleValue);
         }
     }
