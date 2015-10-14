@@ -1,14 +1,17 @@
 <div class="umb-editor umb-listview" ng-controller="Umbraco.PropertyEditors.ListViewController" ng-switch="isNew">
 
-    <div class="row-fluid" ng-switch-when="true">
+   <div class="row-fluid" ng-switch-when="true">
 
-    </div>
+   </div>
 
-    <div class="row-fluid" ng-switch-when="false">
+   <div class="row-fluid" ng-switch-when="false">
 
-        <div class="umb-sub-header clearfix">
-           <div class="pull-left">
-               <div class="btn-group" ng-show="listViewAllowedTypes && listViewAllowedTypes.length > 0">
+      <umb-editor-sub-header>
+
+         <umb-editor-sub-header-content-left>
+
+            <umb-editor-sub-header-section ng-if="listViewAllowedTypes && listViewAllowedTypes.length > 0">
+               <div class="btn-group">
                    <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
                        <localize key="actions_create">Create</localize>
                        <span class="caret"></span>
@@ -22,48 +25,60 @@
                        </li>
                    </ul>
                </div>
+            </umb-editor-sub-header-section>
 
+            <umb-editor-sub-header-section ng-if="isAnythingSelected()">
                <div class="btn-group" ng-show="isAnythingSelected()" ng-if="entityType === 'content' && !isTrashed && options.allowBulkPublish">
-                   <a class="btn btn-success" ng-disabled="actionInProgress" ng-click="publish()" prevent-default>
-                       <localize key="actions_publish">Publish</localize>
-                   </a>
+                  <a class="btn btn-success" ng-disabled="actionInProgress" ng-click="publish()" prevent-default>
+                     <localize key="actions_publish">Publish</localize>
+                  </a>
                </div>
+
                <div class="btn-group" ng-show="isAnythingSelected()" ng-if="entityType === 'content' && !isTrashed && options.allowBulkUnpublish">
-                   <a class="btn btn-warning" ng-disabled="actionInProgress" ng-click="unpublish()" prevent-default>
-                       <localize key="actions_unpublish">Unpublish</localize>
-                   </a>
+                  <a class="btn btn-warning" ng-disabled="actionInProgress" ng-click="unpublish()" prevent-default>
+                     <localize key="actions_unpublish">Unpublish</localize>
+                  </a>
                </div>
+
                <div class="btn-group" ng-show="isAnythingSelected()" ng-if="options.allowBulkDelete">
-                   <a class="btn btn-danger" ng-disabled="actionInProgress" ng-click="delete()" prevent-default>
-                       <localize key="actions_delete">Delete</localize>
-                   </a>
-               </div>
-            </div>
+                  <a class="btn btn-danger" ng-disabled="actionInProgress" ng-click="delete()" prevent-default>
+                    <localize key="actions_delete">Delete</localize>
+                 </a>
+              </div>
 
-            <div class="pull-right">
+              <div class="umb-loader-wrapper" ng-show="actionInProgress">
+                 <div class="umb-loader"></div>
+              </div>
 
-               <form class="form-search pull-right" novalidate ng-show="!actionInProgress">
-                   <div class="inner-addon left-addon">
-                       <i class="icon icon-search" ng-click="enterSearch($event)"></i>
-                       <input type="text" class="form-control" localize="placeholder" placeholder="@general_typeToSearch" ng-model="options.filter" prevent-enter-submit no-dirty-check>
-                   </div>
-               </form>
+              <span ng-bind="bulkStatus" ng-show="isAnythingSelected()" class="pull-right"></span>
+            </umb-editor-sub-header-section>
 
+         </umb-editor-sub-header-content-left>
+
+
+         <umb-editor-sub-header-content-right>
+
+            <umb-editor-sub-header-section>
                <umb-layout-selector
                   ng-if="model.config.layouts"
                   layouts="model.config.layouts"
                   active-layout="layout.activeLayout">
                </umb-layout-selector>
+            </umb-editor-sub-header-section>
 
-            </div>
+            <umb-editor-sub-header-section ng-if="!actionInProgress">
+               <form class="form-search -no-margin-bottom pull-right" novalidate>
+                   <div class="inner-addon left-addon">
+                       <i class="icon icon-search" ng-click="enterSearch($event)"></i>
+                       <input type="text" class="form-control" localize="placeholder" placeholder="@general_typeToSearch" ng-model="options.filter" prevent-enter-submit no-dirty-check>
+                   </div>
+               </form>
+            </umb-editor-sub-header-section>
 
-            <div class="umb-loader-wrapper" ng-show="actionInProgress">
-                <div class="umb-loader"></div>
-            </div>
+         </umb-editor-sub-header-content-right>
 
-            <span ng-bind="bulkStatus" ng-show="isAnythingSelected()" class="pull-right"></span>
+      </umb-editor-sub-header>
 
-        </div>
 
         <div ng-include="layout.activeLayout.path"></div>
 
