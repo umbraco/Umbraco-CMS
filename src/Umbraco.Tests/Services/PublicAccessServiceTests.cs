@@ -91,7 +91,7 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void Can_Update_Rule()
+        public void Can_Remove_Rule()
         {
             // Arrange
             var contentService = ServiceContext.ContentService;
@@ -110,16 +110,17 @@ namespace Umbraco.Tests.Services
                 },
             });
             publicAccessService.Save(entry);
+            publicAccessService.AddOrUpdateRule(c, "TestType", "AnotherVal");
 
             // Act
-            var updated = publicAccessService.AddOrUpdateRule(c, "TestType", "AnotherVal");
+            var removed = publicAccessService.RemoveRule(c, "TestType", "TestValue");
             //re-get
             entry = publicAccessService.GetEntryForContent(c);
 
             // Assert           
-            Assert.IsTrue(updated.Success);
-            Assert.AreEqual(OperationStatusType.Success, updated.Result.StatusType);
-            Assert.AreEqual(2, entry.Rules.Count());
+            Assert.IsTrue(removed.Success);
+            Assert.AreEqual(OperationStatusType.Success, removed.Result.StatusType);
+            Assert.AreEqual(1, entry.Rules.Count());
             Assert.AreEqual("AnotherVal", entry.Rules.ElementAt(0).RuleValue);
         }
     }
