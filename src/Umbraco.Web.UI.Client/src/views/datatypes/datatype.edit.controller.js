@@ -6,7 +6,7 @@
  * @description
  * The controller for the content editor
  */
-function DataTypeEditController($scope, $routeParams, $location, appState, navigationService, treeService, dataTypeResource, notificationsService,  angularHelper, serverValidationManager, contentEditingHelper, formHelper, editorState) {
+function DataTypeEditController($scope, $routeParams, $location, appState, navigationService, treeService, dataTypeResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, formHelper, editorState, dataTypeHelper) {
 
     //setup scope vars
     $scope.page = {};
@@ -158,6 +158,8 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
 
                     $scope.page.saveButtonState = "success";
 
+                    dataTypeHelper.rebindChangedProperties($scope.content, data);
+
                 }, function(err) {
 
                     //NOTE: in the case of data type values we are setting the orig/new props
@@ -171,6 +173,8 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
 
                     //share state
                     editorState.set($scope.content);
+
+                    dataTypeHelper.rebindChangedProperties($scope.content, data);
                 });
         }
 

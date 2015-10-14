@@ -118,9 +118,9 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*")
-               .From<DataTypeDto>()
-               .InnerJoin<NodeDto>()
-               .On<DataTypeDto, NodeDto>(left => left.DataTypeId, right => right.NodeId)
+               .From<DataTypeDto>(SqlSyntax)
+               .InnerJoin<NodeDto>(SqlSyntax)
+               .On<DataTypeDto, NodeDto>(SqlSyntax, left => left.DataTypeId, right => right.NodeId)
                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
         }
@@ -338,9 +338,9 @@ AND umbracoNode.id <> @id",
             {
                 //first just get all pre-values for this data type so we can compare them to see if we need to insert or update or replace
                 var sql = new Sql().Select("*")
-                                   .From<DataTypePreValueDto>()
+                                   .From<DataTypePreValueDto>(SqlSyntax)
                                    .Where<DataTypePreValueDto>(dto => dto.DataTypeNodeId == dataType.Id)
-                                   .OrderBy<DataTypePreValueDto>(dto => dto.SortOrder);
+                                   .OrderBy<DataTypePreValueDto>(dto => dto.SortOrder, SqlSyntax);
                 currentVals = Database.Fetch<DataTypePreValueDto>(sql).ToArray();
             }
 
@@ -431,7 +431,7 @@ AND umbracoNode.id <> @id",
 
             var sql = new Sql();
             sql.Select("*")
-               .From<NodeDto>()
+               .From<NodeDto>(SqlSyntax)
                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId && x.Text.StartsWith(nodeName));
 
             int uniqueNumber = 1;
