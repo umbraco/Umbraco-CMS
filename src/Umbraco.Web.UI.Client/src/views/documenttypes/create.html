@@ -5,24 +5,12 @@
 
         <ul class="umb-actions umb-actions-child">
             <li>
-                <a href="" ng-click="showCreateFolder()">
-
-                    <i class="large icon-folder"></i>
-
-                    <span class="menu-label">
-                        Folder
-                    </span>
-                </a>
-            </li>
-            <li>
-                <a href="" ng-click="createDocType()">
+                <a href="" ng-click="createDocType()" umb-auto-focus>
 
                     <i class="large icon-item-arrangement"></i>
 
                     <span class="menu-label">
-                        <localize key="general_new">New</localize>&nbsp;
                         <localize key="content_documentType">Document type</localize>
-                        (with template)
                     </span>
                 </a>
             </li>
@@ -30,13 +18,16 @@
               <a href="" ng-click="createComponent()">
                 <i class="large icon-item-arrangement"></i>
                 <span class="menu-label">
-                    <localize key="general_new">New</localize>&nbsp;
-                    <localize key="content_documentType">Document type</localize>
-                    (without template)
+                    Document Type Without Template
                 </span>
               </a>
             </li>
-
+            <li>
+                <a href="" ng-click="showCreateFolder()">
+                    <i class="large icon-folder"></i>
+                    <span class="menu-label">Folder</span>
+                </a>
+            </li>
         </ul>
     </div>
 
