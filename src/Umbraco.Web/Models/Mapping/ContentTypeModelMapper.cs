@@ -49,7 +49,6 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(type => type.UpdateDate, expression => expression.Ignore())
                 .ForMember(type => type.HasIdentity, expression => expression.Ignore());
 
-
             config.CreateMap<ContentTypeSave, IContentType>()
                 //do the base mapping
                 .MapBaseContentTypeSaveToEntity(applicationContext)
@@ -64,83 +63,28 @@ namespace Umbraco.Web.Models.Mapping
                     if (source.DefaultTemplate != null)
                         dest.SetDefaultTemplate(applicationContext.Services.FileService.GetTemplate(source.DefaultTemplate));
 
-                    //sync compositions
-                    var current = dest.CompositionAliases().ToArray();
-                    var proposed = source.CompositeContentTypes;
-
-                    var remove = current.Where(x => proposed.Contains(x) == false);
-                    var add = proposed.Where(x => current.Contains(x) == false);
-
-                    foreach (var rem in remove)
-                    {
-                        dest.RemoveContentType(rem);
-                    }
-
-                    foreach (var a in add)
-                    {
-
-                        //TODO: Remove N+1 lookup
-                        var addCt = applicationContext.Services.ContentTypeService.GetContentType(a);
-                        if (addCt != null)
-                            dest.AddContentType(addCt);
-                    }
+                    ContentTypeModelMapperExtensions.AfterMapContentTypeSaveToEntity(source, dest, applicationContext);
                 });
 
-            
+            config.CreateMap<ContentTypeSave, IMediaType>()
+                //do the base mapping
+                .MapBaseContentTypeSaveToEntity(applicationContext)
+                .ConstructUsing((source) => new MediaType(source.ParentId))                
+                .AfterMap((source, dest) =>
+                {
+                    ContentTypeModelMapperExtensions.AfterMapContentTypeSaveToEntity(source, dest, applicationContext);
+                });
 
-            //config.CreateMap<ContentTypeCompositionDisplay, IMemberType>()
-            //    //do the base mapping
-            //    .MapBaseContentTypeSaveToEntity(applicationContext)
-            //    .AfterMap((source, dest) =>
-            //     {
-
-            //         //sync compositions
-            //         var current = dest.CompositionAliases().ToArray();
-            //         var proposed = source.CompositeContentTypes;
-
-            //         var remove = current.Where(x => proposed.Contains(x) == false);
-            //         var add = proposed.Where(x => current.Contains(x) == false);
-
-            //         foreach (var rem in remove)
-            //             dest.RemoveContentType(rem);
-
-            //         foreach (var a in add)
-            //         {
-            //             //TODO: Remove N+1 lookup
-            //             var addCt = applicationContext.Services.MemberTypeService.Get(a);
-            //             if (addCt != null)
-            //                 dest.AddContentType(addCt);
-            //         }
-            //     });
-
-
-            //config.CreateMap<ContentTypeCompositionDisplay, IMediaType>()
-            //    //do the base mapping
-            //    .MapBaseContentTypeSaveToEntity(applicationContext)
-            //    .AfterMap((source, dest) =>
-            //     {
-            //         //sync compositions
-            //         var current = dest.CompositionAliases().ToArray();
-            //         var proposed = source.CompositeContentTypes;
-
-            //         var remove = current.Where(x => proposed.Contains(x) == false);
-            //         var add = proposed.Where(x => current.Contains(x) == false);
-
-            //         foreach (var rem in remove)
-            //             dest.RemoveContentType(rem);
-
-            //         foreach (var a in add)
-            //         {
-            //             //TODO: Remove N+1 lookup
-            //             var addCt = applicationContext.Services.ContentTypeService.GetMediaType(a);
-            //             if (addCt != null)
-            //                 dest.AddContentType(addCt);
-            //         }
-            //     });
-
+            config.CreateMap<ContentTypeSave, IMemberType>()
+                //do the base mapping
+                .MapBaseContentTypeSaveToEntity(applicationContext)
+                .ConstructUsing((source) => new MemberType(source.ParentId))
+                .AfterMap((source, dest) =>
+                {
+                    ContentTypeModelMapperExtensions.AfterMapContentTypeSaveToEntity(source, dest, applicationContext);
+                });
 
             config.CreateMap<IContentTypeComposition, string>().ConvertUsing(x => x.Alias);
-
 
             config.CreateMap<IMemberType, ContentTypeCompositionDisplay>()
                 //map base logic
@@ -151,7 +95,6 @@ namespace Umbraco.Web.Models.Mapping
                 .MapBaseContentTypeEntityToDisplay(applicationContext, _propertyEditorResolver)
                 .AfterMap((source, dest) =>
                  {
-
                      //default listview
                      dest.ListViewEditorName = Constants.Conventions.DataTypes.ListViewPrefix + "Media";
 
@@ -224,15 +167,13 @@ namespace Umbraco.Web.Models.Mapping
 
             #region *** Used for mapping on top of an existing display object from a save object ***
 
+            config.CreateMap<ContentTypeSave, ContentTypeCompositionDisplay>()
+                .MapBaseContentTypeSaveToDisplay();
+            
             config.CreateMap<ContentTypeSave, ContentTypeDisplay>()
-                .ForMember(dto => dto.CreateDate, expression => expression.Ignore())
-                .ForMember(dto => dto.UpdateDate, expression => expression.Ignore())
+                .MapBaseContentTypeSaveToDisplay()
                 .ForMember(dto => dto.AllowedTemplates, expression => expression.Ignore())
                 .ForMember(dto => dto.DefaultTemplate, expression => expression.Ignore())
-                .ForMember(dto => dto.ListViewEditorName, expression => expression.Ignore())
-                .ForMember(dto => dto.AvailableCompositeContentTypes, expression => expression.Ignore())
-                .ForMember(dto => dto.Notifications, expression => expression.Ignore())
-                .ForMember(dto => dto.Errors, expression => expression.Ignore())
                 .AfterMap((source, dest) =>
                 {
                     //sync templates

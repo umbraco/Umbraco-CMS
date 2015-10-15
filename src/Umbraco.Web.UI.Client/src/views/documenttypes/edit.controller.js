@@ -154,33 +154,12 @@
 		        vm.contentType = contentTypeHelper.updateTemplatePlaceholder(vm.contentType);
 		    }
 
-		    //contentTypeResource.save(vm.contentType).then(function(dt){
-
-		    //	formHelper.resetForm({ scope: $scope, notifications: dt.notifications });
-		    //	contentEditingHelper.handleSuccessfulSave({
-		    //		scope: $scope,
-		    //		savedContent: dt,
-		    //		rebindCallback: function() {
-
-		    //		}
-		    //	});
-
-		    //	notificationsService.success("Document type save");
-		    //	//post save logic here -the saved doctype returns as a new object
-		    //	init(dt);
-
-		    //	syncTreeNode(vm.contentType, dt.path);
-
-		    //	vm.page.saveButtonState = "success";
-
-		    //});
-
 		    contentEditingHelper.contentEditorPerformSave({
 		        statusMessage: "Saving...",
 		        saveMethod: contentTypeResource.save,
 		        scope: $scope,
 		        content: vm.contentType,
-                //no-op for rebind callback... we don't really need to rebind for content types
+		        //no-op for rebind callback... we don't really need to rebind for content types
 		        rebindCallback: angular.noop
 		    }).then(function (data) {
 		        //success            

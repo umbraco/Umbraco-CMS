@@ -19,6 +19,48 @@ namespace Umbraco.Web.Models.Mapping
     /// </remarks>
     internal static class ContentTypeModelMapperExtensions
     {
+
+        public static void AfterMapContentTypeSaveToEntity<TSource, TDestination>(
+            TSource source, TDestination dest,
+            ApplicationContext applicationContext)
+            where TSource : ContentTypeSave
+            where TDestination : IContentTypeComposition
+        {
+            //sync compositions
+            var current = dest.CompositionAliases().ToArray();
+            var proposed = source.CompositeContentTypes;
+
+            var remove = current.Where(x => proposed.Contains(x) == false);
+            var add = proposed.Where(x => current.Contains(x) == false);
+
+            foreach (var rem in remove)
+            {
+                dest.RemoveContentType(rem);
+            }
+
+            foreach (var a in add)
+            {
+                //TODO: Remove N+1 lookup
+                var addCt = applicationContext.Services.ContentTypeService.GetContentType(a);
+                if (addCt != null)
+                    dest.AddContentType(addCt);
+            }
+        }
+
+        public static IMappingExpression<TSource, TDestination> MapBaseContentTypeSaveToDisplay<TSource, TDestination>(
+            this IMappingExpression<TSource, TDestination> mapping)
+            where TSource : ContentTypeSave
+            where TDestination : ContentTypeCompositionDisplay
+        {
+            return mapping
+                .ForMember(dto => dto.CreateDate, expression => expression.Ignore())
+                .ForMember(dto => dto.UpdateDate, expression => expression.Ignore())                
+                .ForMember(dto => dto.ListViewEditorName, expression => expression.Ignore())
+                .ForMember(dto => dto.AvailableCompositeContentTypes, expression => expression.Ignore())
+                .ForMember(dto => dto.Notifications, expression => expression.Ignore())
+                .ForMember(dto => dto.Errors, expression => expression.Ignore());
+        }
+
         public static IMappingExpression<TSource, TDestination> MapBaseContentTypeEntityToDisplay<TSource, TDestination>(
             this IMappingExpression<TSource, TDestination> mapping, ApplicationContext applicationContext, Lazy<PropertyEditorResolver> propertyEditorResolver)
             where TSource : IContentTypeComposition

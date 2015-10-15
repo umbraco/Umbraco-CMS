@@ -9,7 +9,7 @@
 (function() {
 	"use strict";
 
-	function MediaTypesEditController($scope, $routeParams, mediaTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter) {
+	function MediaTypesEditController($scope, $routeParams, mediaTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter, $q) {
 
 		var vm = this;
 
@@ -125,48 +125,46 @@
 
 		function save() {
 
-			// validate form
-			if (formHelper.submitForm({ scope: $scope })) {
+		    var deferred = $q.defer();
 
-				formHelper.resetForm({ scope: $scope });
+		    vm.page.saveButtonState = "busy";
 
-				// if form validates - perform save
-				performSave();
+		    // reformat allowed content types to array if id's
+		    vm.contentType.allowedContentTypes = contentTypeHelper.createIdArray(vm.contentType.allowedContentTypes);
 
-			}
+		    // update placeholder template information on new doc types
+		    if (!$routeParams.notemplate && vm.contentType.id === 0) {
+		        vm.contentType = contentTypeHelper.updateTemplatePlaceholder(vm.contentType);
+		    }
+
+		    contentEditingHelper.contentEditorPerformSave({
+		        statusMessage: "Saving...",
+		        saveMethod: mediaTypeResource.save,
+		        scope: $scope,
+		        content: vm.contentType,
+		        //no-op for rebind callback... we don't really need to rebind for content types
+		        rebindCallback: angular.noop
+		    }).then(function (data) {
+		        //success            
+		        syncTreeNode(vm.contentType, data.path);
+
+		        vm.page.saveButtonState = "success";
+
+		        deferred.resolve(data);
+		    }, function (err) {
+		        //error
+		        if (err) {
+		            editorState.set($scope.content);
+		        }
+
+		        vm.page.saveButtonState = "error";
+
+		        deferred.reject(err);
+		    });
+
+		    return deferred.promise;
 
 		}
-
-		function performSave() {
-
-			vm.page.saveButtonState = "busy";
-
-			// reformat allowed content types to array if id's
-			vm.contentType.allowedContentTypes = contentTypeHelper.createIdArray(vm.contentType.allowedContentTypes);
-
-			mediaTypeResource.save(vm.contentType).then(function(dt){
-
-				formHelper.resetForm({ scope: $scope, notifications: dt.notifications });
-				contentEditingHelper.handleSuccessfulSave({
-					scope: $scope,
-					savedContent: dt,
-					rebindCallback: function() {
-
-					}
-				});
-
-				notificationsService.success("Media type saved");
-				//post save logic here -the saved doctype returns as a new object
-				init(dt);
-
-				syncTreeNode(vm.contentType, dt.path);
-
-				vm.page.saveButtonState = "success";
-
-			});
-
-		}
-
 
 		function init(contentType){
 

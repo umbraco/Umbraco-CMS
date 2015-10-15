@@ -4,6 +4,7 @@ using System.Web.Security;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Core.Security;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
@@ -105,58 +106,20 @@ namespace Umbraco.Web.Editors
             return Enumerable.Empty<ContentTypeBasic>();
         }
 
-        public ContentTypeCompositionDisplay PostSave(ContentTypeCompositionDisplay contentType)
+        public ContentTypeCompositionDisplay PostSave(ContentTypeSave contentTypeSave)
         {
+            var savedCt = PerformPostSave(
+                contentTypeSave: contentTypeSave,
+                getContentType: i => Services.MemberTypeService.Get(i),
+                saveContentType: type => Services.MemberTypeService.Save(type));
 
-            var ctService = ApplicationContext.Services.MemberTypeService;
+            var display = Mapper.Map<ContentTypeCompositionDisplay>(savedCt);
 
-            //TODO: warn on content type alias conflicts
-            //TODO: warn on property alias conflicts
+            display.AddSuccessNotification(
+                            Services.TextService.Localize("speechBubbles/contentTypeSavedHeader"),
+                            string.Empty);
 
-            //TODO: Validate the submitted model
-
-            //filter out empty properties
-            contentType.Groups = contentType.Groups.Where(x => x.Name.IsNullOrWhiteSpace() == false).ToList();
-            foreach (var group in contentType.Groups)
-            {
-                group.Properties = group.Properties.Where(x => x.Alias.IsNullOrWhiteSpace() == false).ToList();
-            }
-
-            var ctId = Convert.ToInt32(contentType.Id);
-
-            if (ctId > 0)
-            {
-                //its an update to an existing
-                IMemberType found = ctService.Get(ctId);
-                if (found == null)
-                    throw new HttpResponseException(HttpStatusCode.NotFound);
-
-                Mapper.Map(contentType, found);
-                ctService.Save(found);
-
-                //map the saved item back to the content type (it should now get id etc set)
-                Mapper.Map(found, contentType);
-                return contentType;
-            }
-            else
-            {
-                //ensure alias is set
-                if (string.IsNullOrEmpty(contentType.Alias))
-                    contentType.Alias = contentType.Name.ToSafeAlias();
-
-                contentType.Id = null;
-
-                //save as new
-                IMemberType newCt = new MemberType(-1);
-                Mapper.Map(contentType, newCt);
-
-                ctService.Save(newCt);
-
-                //map the saved item back to the content type (it should now get id etc set)
-                Mapper.Map(newCt, contentType);
-                return contentType;
-            }
-
+            return display;
         }
     }
 }
