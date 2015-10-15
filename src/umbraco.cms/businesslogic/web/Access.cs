@@ -71,7 +71,7 @@ namespace umbraco.cms.businesslogic.web
             if (e.Cancel) return;
 
 
-            var entry = ApplicationContext.Current.Services.PublicAccessService.AddOrUpdateRule(
+            var entry = ApplicationContext.Current.Services.PublicAccessService.AddRule(
                 doc.ContentEntity,
                 Constants.Conventions.PublicAccess.MemberRoleRuleType,
                 role);
@@ -95,7 +95,7 @@ namespace umbraco.cms.businesslogic.web
             if (content == null)
                 throw new Exception("No content found with document id " + DocumentId);
 
-            if (ApplicationContext.Current.Services.PublicAccessService.AddOrUpdateRule(
+            if (ApplicationContext.Current.Services.PublicAccessService.AddRule(
                 content,
                 Constants.Conventions.PublicAccess.MemberGroupIdRuleType,
                 MemberGroupId.ToString(CultureInfo.InvariantCulture)))
@@ -113,7 +113,7 @@ namespace umbraco.cms.businesslogic.web
             if (content == null)
                 throw new Exception("No content found with document id " + DocumentId);
 
-            if (ApplicationContext.Current.Services.PublicAccessService.AddOrUpdateRule(
+            if (ApplicationContext.Current.Services.PublicAccessService.AddRule(
                 content,
                 Constants.Conventions.PublicAccess.MemberIdRuleType,
                 MemberId.ToString(CultureInfo.InvariantCulture)))
@@ -132,7 +132,7 @@ namespace umbraco.cms.businesslogic.web
 
             if (e.Cancel) return;
 
-            var entry = ApplicationContext.Current.Services.PublicAccessService.AddOrUpdateRule(
+            var entry = ApplicationContext.Current.Services.PublicAccessService.AddRule(
                 doc.ContentEntity, 
                 Constants.Conventions.PublicAccess.MemberUsernameRuleType, 
                 membershipUserName);
@@ -155,7 +155,7 @@ namespace umbraco.cms.businesslogic.web
         {
             var doc = new Document(DocumentId);
 
-            var entry = ApplicationContext.Current.Services.PublicAccessService.AddOrUpdateRule(
+            var entry = ApplicationContext.Current.Services.PublicAccessService.AddRule(
                 doc.ContentEntity, 
                 Constants.Conventions.PublicAccess.MemberGroupIdRuleType, 
                 MemberGroupId.ToString(CultureInfo.InvariantCulture));
