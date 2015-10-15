@@ -111,6 +111,33 @@ namespace Umbraco.Web.Editors
             };
         }
 
+        /// <summary>
+        /// Deletes a document type container wth a given ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [HttpPost]
+        public HttpResponseMessage DeleteContainerById(int id)
+        {
+            //TODO: This needs to be implemented correctly
+
+            var foundType = Services.EntityService.Get(id);
+            if (foundType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            if (foundType.HasChildren())
+            {
+                throw new HttpResponseException(HttpStatusCode.Forbidden);
+            }
+
+            //TODO: what service to use to delete?
+
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
         public HttpResponseMessage PostCreateFolder(int parentId, string name)
         {
             var result = Services.ContentTypeService.CreateFolder(parentId, name, Security.CurrentUser.Id);
