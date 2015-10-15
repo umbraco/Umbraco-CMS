@@ -49,6 +49,7 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                'Failed to retrieve data for content id ' + contentId);
         },
 
+
         /**
          * @ngdoc method
          * @name umbraco.resources.contentTypeResource#getAllPropertyTypeAliases
@@ -99,7 +100,18 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                        "contentTypeApiBaseUrl",
                        "DeleteById",
                        [{ id: id }])),
-               'Failed to retrieve content type');
+               'Failed to delete content type');
+        },
+
+        deleteContainerById: function (id) {
+
+            return umbRequestHelper.resourcePromise(
+               $http.post(
+                   umbRequestHelper.getApiUrl(
+                       "contentTypeApiBaseUrl",
+                       "DeleteContainerById",
+                       [{ id: id }])),
+               'Failed to delete content type contaier');
         },
 
         /**

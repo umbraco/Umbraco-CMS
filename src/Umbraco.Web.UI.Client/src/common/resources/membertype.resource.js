@@ -27,7 +27,7 @@ function memberTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                        [{ id: id }])),
                'Failed to retrieve property type scaffold');
         },
-        
+
         getById: function (id) {
 
             return umbRequestHelper.resourcePromise(
@@ -37,6 +37,17 @@ function memberTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                        "GetById",
                        [{ id: id }])),
                'Failed to retrieve content type');
+        },
+
+        deleteById: function (id) {
+
+            return umbRequestHelper.resourcePromise(
+               $http.post(
+                   umbRequestHelper.getApiUrl(
+                       "memberTypeApiBaseUrl",
+                       "DeleteById",
+                       [{ id: id }])),
+               'Failed to delete member type');
         },
 
         getScaffold: function () {
@@ -55,14 +66,14 @@ function memberTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
          * @methodOf umbraco.resources.contentTypeResource
          *
          * @description
-         * Saves or update a member type       
-         * 
+         * Saves or update a member type
+         *
          * @param {Object} content data type object to create/update
          * @returns {Promise} resourcePromise object.
          *
          */
         save: function (contentType) {
-            
+
             var saveModel = umbDataFormatter.formatContentTypePostData(contentType);
 
             return umbRequestHelper.resourcePromise(

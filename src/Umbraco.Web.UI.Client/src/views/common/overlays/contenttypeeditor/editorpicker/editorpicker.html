@@ -5,6 +5,7 @@
 			<i class="icon-search"></i>
 			<input type="text"
 				style="width: 100%"
+				ng-change="vm.filterItems()"
 				ng-model="vm.searchTerm"
 				class="umb-search-field search-query input-block-level"
 				placeholder="Filter..."
@@ -26,7 +27,7 @@
 						<div ng-if="(value | filter:vm.searchTerm).length > 0">
 							<h5>{{key}}</h5>
 
-							<ul class="umb-card-grid" ng-mouseleave="hideDetailsOverlay()">
+							<ul class="umb-card-grid" ng-mouseleave="vm.hideDetailsOverlay()">
 								<li ng-repeat="systemDataType in value | orderBy:'name' | filter: vm.searchTerm" ng-mouseover="vm.showDetailsOverlay(systemDataType)">
 									<a href="" ng-click="vm.pickEditor(systemDataType)">
 										<i class="{{ systemDataType.icon }}" ng-class="{'icon-autofill': systemDataType.icon == null}"></i>
