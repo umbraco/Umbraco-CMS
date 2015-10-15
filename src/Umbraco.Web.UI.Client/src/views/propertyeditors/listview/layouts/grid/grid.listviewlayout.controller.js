@@ -21,6 +21,7 @@
       vm.dragLeave = dragLeave;
 		vm.onFilesQueue = onFilesQueue;
       vm.onUploadComplete = onUploadComplete;
+      vm.showMediaDetailsTooltip = showMediaDetailsTooltip;
 
       function dragEnter(el, event) {
          vm.activeDrag = true;
@@ -38,6 +39,25 @@
 
 			// call reload function on list view parent controller
          $scope.reloadView($scope.contentId);
+
+      }
+
+      vm.mediaDetailsTooltip = {};
+
+
+      function showMediaDetailsTooltip(item, event, isHovering) {
+
+         if (isHovering && !vm.mediaDetailsTooltip.show) {
+
+            vm.mediaDetailsTooltip.event = event;
+            vm.mediaDetailsTooltip.item = item;
+            vm.mediaDetailsTooltip.show = true;
+
+         } else if (!isHovering && vm.mediaDetailsTooltip.show) {
+
+            vm.mediaDetailsTooltip.show = false;
+
+         }
 
       }
 

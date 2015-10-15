@@ -16,8 +16,20 @@
       </umb-file-dropzone>
 
       <umb-media-grid
-         items="listViewResultSet.items">
+         items="listViewResultSet.items"
+         details-hover="vm.showMediaDetailsTooltip">
       </umb-media-grid>
+
+      <umb-tooltip
+         ng-if="vm.mediaDetailsTooltip.show"
+         event="vm.mediaDetailsTooltip.event">
+         <ul class="umb-tooltip-list">
+            <li class="umb-tooltip-list__item" ng-repeat="property in options.includeProperties">
+               <div class="umb-tooltip-list__item-label">{{ property.header }}</div>
+               <div class="umb-tooltip-list__item-value">{{ vm.mediaDetailsTooltip.item[property.alias] }}</div>
+            </li>
+         </ul>
+      </umb-tooltip>
 
    <div>
 

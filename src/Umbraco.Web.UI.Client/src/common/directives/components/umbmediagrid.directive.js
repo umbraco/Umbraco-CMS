@@ -136,6 +136,18 @@
             item.selected = !item.selected;
          };
 
+         scope.onDetailsOver = function(item, event) {
+            if(scope.detailsHover) {
+               scope.detailsHover(item, event, true);
+            }
+         };
+
+         scope.onDetailsOut = function(item, event) {
+            if(scope.detailsHover) {
+               scope.detailsHover(item, event, false);
+            }
+         };
+
          var unbindItemsWatcher = scope.$watch('items', function(newValue, oldValue){
             activate();
          });
@@ -151,7 +163,8 @@
          replace: true,
          templateUrl: 'views/components/umb-media-grid.html',
          scope: {
-            items: '='
+            items: '=',
+            detailsHover: "="
          },
          link: link
       };
