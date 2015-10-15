@@ -89,6 +89,7 @@
     <key alias="styleChoose">Vælg formattering</key>
     <key alias="styleShow">Vis koder</key>
     <key alias="tableInsert">Indsæt tabel</key>
+    <key alias="generateModels">Generer modeller</key>
   </area>
   <area alias="changeDocType">
     <key alias="changeDocTypeInstruction">For at skifte det valgte indholds dokumenttype, skal du først vælge en ny dokumenttype, som er gyldig på denne placering.</key>
