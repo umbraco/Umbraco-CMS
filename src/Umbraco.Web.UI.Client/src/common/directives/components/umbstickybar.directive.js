@@ -9,6 +9,7 @@
          var scrollableContainer = null;
          var clonedBar = null;
          var cloneIsMade = false;
+         var barTop = bar.context.offsetTop;
 
          function activate() {
 
@@ -31,9 +32,8 @@
          function determineVisibility() {
 
             var scrollTop = scrollableContainer.scrollTop();
-            var elementTop = bar.offset().top;
 
-            if (scrollTop > elementTop) {
+            if (scrollTop > barTop) {
 
                if (!cloneIsMade) {
 
