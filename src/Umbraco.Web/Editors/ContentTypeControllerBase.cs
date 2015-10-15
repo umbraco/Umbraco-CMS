@@ -78,47 +78,6 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Gets all user defined properties.
-        /// </summary>
-        /// <returns></returns>
-        protected IEnumerable<string> GetAllPropertyTypeAliases()
-        {
-            return ApplicationContext.Services.ContentTypeService.GetAllPropertyTypeAliases();
-        }
-
-        protected ContentPropertyDisplay GetPropertyTypeScaffold(int id)
-        {
-            var dataTypeDiff = Services.DataTypeService.GetDataTypeDefinitionById(id);
-
-            if (dataTypeDiff == null)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
-
-            var preVals = UmbracoContext.Current.Application.Services.DataTypeService.GetPreValuesCollectionByDataTypeId(id);
-            var editor = PropertyEditorResolver.Current.GetByAlias(dataTypeDiff.PropertyEditorAlias);
-
-            return new ContentPropertyDisplay()
-            {
-                Editor = dataTypeDiff.PropertyEditorAlias,
-                Validation = new PropertyTypeValidation() { },
-                View = editor.ValueEditor.View,
-                Config = editor.PreValueEditor.ConvertDbToEditor(editor.DefaultPreValues, preVals)
-            };
-        }
-
-        protected dynamic GetSafeAlias(string value, bool camelCase = true)
-        {
-            var returnValue = (string.IsNullOrWhiteSpace(value)) ? string.Empty : value.ToSafeAlias(camelCase);
-            dynamic returnObj = new System.Dynamic.ExpandoObject();
-            returnObj.alias = returnValue;
-            returnObj.original = value;
-            returnObj.camelCase = camelCase;
-
-            return returnObj;
-        }
-
-        /// <summary>
         /// Validates the composition and adds errors to the model state if any are found then throws an error response if there are errors
         /// </summary>
         /// <param name="contentTypeSave"></param>
@@ -171,6 +130,7 @@ namespace Umbraco.Web.Editors
             ContentTypeSave contentTypeSave,
             Func<int, TContentType> getContentType,
             Action<TContentType> saveContentType,
+            bool validateComposition = true,
             Action<ContentTypeSave> beforeCreateNew = null)
             where TContentType : IContentTypeComposition
         {
@@ -203,8 +163,11 @@ namespace Umbraco.Web.Editors
 
                 Mapper.Map(contentTypeSave, found);
 
-                //NOTE: this throws an error response if it is not valid
-                ValidateComposition(contentTypeSave, found);
+                if (validateComposition)
+                {
+                    //NOTE: this throws an error response if it is not valid
+                    ValidateComposition(contentTypeSave, found);
+                }
 
                 saveContentType(found);
 
@@ -234,8 +197,11 @@ namespace Umbraco.Web.Editors
                 //save as new
                 var newCt = Mapper.Map<TContentType>(contentTypeSave);
 
-                //NOTE: this throws an error response if it is not valid
-                ValidateComposition(contentTypeSave, newCt);
+                if (validateComposition)
+                {
+                    //NOTE: this throws an error response if it is not valid
+                    ValidateComposition(contentTypeSave, newCt);
+                }
 
                 saveContentType(newCt);
 

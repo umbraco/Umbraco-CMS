@@ -19,16 +19,12 @@ using ContentType = System.Net.Mime.ContentType;
 
 namespace Umbraco.Web.Editors
 {
-    //TODO:  We'll need to be careful about the security on this controller, when we start implementing 
-    // methods to modify content types we'll need to enforce security on the individual methods, we
-    // cannot put security on the whole controller because things like GetAllowedChildren are required for content editing.
-
+    
     /// <summary>
     /// An API controller used for dealing with content types
     /// </summary>
     [PluginController("UmbracoApi")]
-    [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
-    [EnableOverrideAuthorization]
+    [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]    
     public class MemberTypeController : ContentTypeControllerBase
     {
         /// <summary>
@@ -109,9 +105,10 @@ namespace Umbraco.Web.Editors
         public ContentTypeCompositionDisplay PostSave(ContentTypeSave contentTypeSave)
         {
             var savedCt = PerformPostSave(
-                contentTypeSave: contentTypeSave,
-                getContentType: i => Services.MemberTypeService.Get(i),
-                saveContentType: type => Services.MemberTypeService.Save(type));
+                contentTypeSave:        contentTypeSave,
+                getContentType:         i => Services.MemberTypeService.Get(i),
+                saveContentType:        type => Services.MemberTypeService.Save(type),
+                validateComposition:    false);
 
             var display = Mapper.Map<ContentTypeCompositionDisplay>(savedCt);
 

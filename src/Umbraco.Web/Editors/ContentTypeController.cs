@@ -81,6 +81,36 @@ namespace Umbraco.Web.Editors
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
+        /// <summary>
+        /// Gets all user defined properties.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<string> GetAllPropertyTypeAliases()
+        {
+            return ApplicationContext.Services.ContentTypeService.GetAllPropertyTypeAliases();
+        }
+
+        public ContentPropertyDisplay GetPropertyTypeScaffold(int id)
+        {
+            var dataTypeDiff = Services.DataTypeService.GetDataTypeDefinitionById(id);
+
+            if (dataTypeDiff == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var preVals = UmbracoContext.Current.Application.Services.DataTypeService.GetPreValuesCollectionByDataTypeId(id);
+            var editor = PropertyEditorResolver.Current.GetByAlias(dataTypeDiff.PropertyEditorAlias);
+
+            return new ContentPropertyDisplay()
+            {
+                Editor = dataTypeDiff.PropertyEditorAlias,
+                Validation = new PropertyTypeValidation() { },
+                View = editor.ValueEditor.View,
+                Config = editor.PreValueEditor.ConvertDbToEditor(editor.DefaultPreValues, preVals)
+            };
+        }
+
         public HttpResponseMessage PostCreateFolder(int parentId, string name)
         {
             var result = Services.ContentTypeService.CreateFolder(parentId, name, Security.CurrentUser.Id);
@@ -95,10 +125,10 @@ namespace Umbraco.Web.Editors
         public ContentTypeDisplay PostSave(ContentTypeSave contentTypeSave)
         {
             var savedCt = PerformPostSave(
-                contentTypeSave: contentTypeSave,
-                getContentType: i => Services.ContentTypeService.GetContentType(i),
-                saveContentType: type => Services.ContentTypeService.Save(type),
-                beforeCreateNew: ctSave =>
+                contentTypeSave:    contentTypeSave,
+                getContentType:     i => Services.ContentTypeService.GetContentType(i),
+                saveContentType:    type => Services.ContentTypeService.Save(type),
+                beforeCreateNew:    ctSave =>
                 {
                     //create a default template if it doesnt exist -but only if default template is == to the content type
                     //TODO: Is this really what we want? What if we don't want any template assigned at all ?

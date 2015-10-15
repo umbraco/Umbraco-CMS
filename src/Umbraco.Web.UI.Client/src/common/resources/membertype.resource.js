@@ -3,7 +3,7 @@
     * @name umbraco.resources.memberTypeResource
     * @description Loads in data for member types
     **/
-function memberTypeResource($q, $http, umbRequestHelper) {
+function memberTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
 
     return {
 
@@ -63,8 +63,10 @@ function memberTypeResource($q, $http, umbRequestHelper) {
          */
         save: function (contentType) {
             
+            var saveModel = umbDataFormatter.formatContentTypePostData(contentType);
+
             return umbRequestHelper.resourcePromise(
-                 $http.post(umbRequestHelper.getApiUrl("memberTypeApiBaseUrl", "PostSave"), contentType),
+                 $http.post(umbRequestHelper.getApiUrl("memberTypeApiBaseUrl", "PostSave"), saveModel),
                 'Failed to save data for member type id ' + contentType.id);
         }
 

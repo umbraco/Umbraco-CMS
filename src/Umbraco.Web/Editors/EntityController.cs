@@ -43,6 +43,23 @@ namespace Umbraco.Web.Editors
     public class EntityController : UmbracoAuthorizedJsonController
     {
         /// <summary>
+        /// Returns an Umbraco alias given a string
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="camelCase"></param>
+        /// <returns></returns>
+        public dynamic GetSafeAlias(string value, bool camelCase = true)
+        {
+            var returnValue = (string.IsNullOrWhiteSpace(value)) ? string.Empty : value.ToSafeAlias(camelCase);
+            dynamic returnObj = new System.Dynamic.ExpandoObject();
+            returnObj.alias = returnValue;
+            returnObj.original = value;
+            returnObj.camelCase = camelCase;
+
+            return returnObj;
+        }
+
+        /// <summary>
         /// Searches for results based on the entity type
         /// </summary>
         /// <param name="query"></param>

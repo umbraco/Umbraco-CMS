@@ -133,16 +133,6 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                'Failed to retrieve content type scaffold');
         },
 
-        getSafeAlias: function (value, camelCase) {
-
-            return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "contentTypeApiBaseUrl",
-                       "GetSafeAlias", { value: value, camelCase: camelCase })),
-               'Failed to retrieve content type scaffold');
-        },
-
         /**
          * @ngdoc method
          * @name umbraco.resources.contentTypeResource#save
