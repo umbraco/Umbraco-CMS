@@ -9,10 +9,11 @@
 (function() {
    "use strict";
 
-   function ListViewGridLayoutController($scope, $routeParams, mediaHelper) {
+   function ListViewGridLayoutController($scope, $routeParams, mediaHelper, mediaResource, $location) {
 
       var vm = this;
 
+      vm.folders = [];
       vm.nodeId = $routeParams.id;
       vm.acceptedFileTypes = mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
       vm.activeDrag = false;
@@ -22,6 +23,16 @@
 		vm.onFilesQueue = onFilesQueue;
       vm.onUploadComplete = onUploadComplete;
       vm.showMediaDetailsTooltip = showMediaDetailsTooltip;
+      vm.selectFolder = selectFolder;
+      vm.clickFolder = clickFolder;
+
+      function activate() {
+
+         mediaResource.getChildFolders(vm.nodeId)
+            .then(function(folders) {
+               vm.folders = folders;
+            });
+      }
 
       function dragEnter(el, event) {
          vm.activeDrag = true;
@@ -60,6 +71,16 @@
          }
 
       }
+
+      function selectFolder(folder) {
+         folder.selected = !folder.selected;
+      }
+
+      function clickFolder(folder) {
+         $location.path($scope.entityType + '/' + $scope.entityType + '/edit/' + folder.id);
+      }
+
+      activate();
 
    }
 

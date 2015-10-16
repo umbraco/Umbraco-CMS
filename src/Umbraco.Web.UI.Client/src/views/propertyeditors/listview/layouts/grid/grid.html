@@ -15,6 +15,13 @@
          files-queued="vm.onFilesQueue">
       </umb-file-dropzone>
 
+      <umb-folder-grid
+         ng-if="vm.folders.length > 0"
+         folders="vm.folders"
+         on-select="vm.selectFolder"
+         on-click="vm.clickFolder">
+      </umb-folder-grid>
+
       <umb-media-grid
          items="listViewResultSet.items"
          details-hover="vm.showMediaDetailsTooltip">
