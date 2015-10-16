@@ -127,7 +127,7 @@ namespace Umbraco.Web.Dictionary
             {
                 //ensure it's stored/retrieved from request cache
                 return _requestCacheProvider.GetCacheItem<ILanguage>(typeof (DefaultCultureDictionary).Name + "Culture",
-                    () => _localizationService.GetLanguageByIsoCode(Culture.Name));
+                    () => _localizationService.GetLanguageByIsoCode(Culture.TwoLetterISOLanguageName));
             }
 		}
 	}
