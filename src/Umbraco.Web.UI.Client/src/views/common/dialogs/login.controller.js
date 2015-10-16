@@ -1,5 +1,5 @@
 ﻿angular.module("umbraco").controller("Umbraco.Dialogs.LoginController",
-    function ($scope, localizationService, userService, externalLoginInfo) {
+    function ($scope, $location, localizationService, userService, externalLoginInfo) {
 
         /**
          * @ngdoc function
@@ -16,11 +16,34 @@
             $scope.greeting = label;
         }); // weekday[d.getDay()];
 
-        $scope.errorMsg = "";
-
         $scope.externalLoginFormAction = Umbraco.Sys.ServerVariables.umbracoUrls.externalLoginsUrl;
         $scope.externalLoginProviders = externalLoginInfo.providers;
         $scope.externalLoginInfo = externalLoginInfo;
+
+        var userId = $location.search().userId;
+        var resetCode = $location.search().resetCode;
+        if (userId && resetCode) {
+            userService.validatePasswordResetCode(userId, resetCode)
+                .then(function () {
+                    $scope.view = "set-password";
+                }, function () {
+                    console.log("Failed");
+                    $scope.view = "password-reset-code-expired";
+                });
+        } else {
+            $scope.view = "login";
+        }
+
+        $scope.showLogin = function () {
+            $scope.errorMsg = "";
+            $scope.view = "login";
+        }
+
+        $scope.showRequestPasswordReset = function () {
+            $scope.errorMsg = "";
+            $scope.view = "request-password-reset";
+            $scope.showEmailResetConfirmation = false;
+        }
 
         $scope.loginSubmit = function (login, password) {
 
@@ -32,7 +55,6 @@
                 $scope.loginForm.username.$setValidity('auth', true);
                 $scope.loginForm.password.$setValidity('auth', true);
             }
-
 
             if ($scope.loginForm.$invalid) {
                 return;
@@ -63,4 +85,62 @@
                 }
             });
         };
+
+        $scope.requestPasswordResetSubmit = function (email) {
+
+            if (email && email.length > 0) {
+                $scope.requestPasswordResetForm.email.$setValidity('auth', true);
+            }
+
+            if ($scope.requestPasswordResetForm.$invalid) {
+                return;
+            }
+
+            userService.requestPasswordReset(email)
+                .then(function () {
+                    $scope.showEmailResetConfirmation = true;
+                }, function (reason) {
+                    $scope.errorMsg = reason.errorMsg;
+                    $scope.requestPasswordResetForm.email.$setValidity("auth", false);
+                });
+
+            $scope.requestPasswordResetForm.email.$viewChangeListeners.push(function () {
+                if ($scope.requestPasswordResetForm.email.$invalid) {
+                    $scope.requestPasswordResetForm.email.$setValidity('auth', true);
+                }
+            });
+        };
+
+        $scope.setPasswordSubmit = function (password, confirmPassword) {
+
+            if (password && confirmPassword && password.length > 0 && confirmPassword.length > 0) {
+                $scope.setPasswordForm.password.$setValidity('auth', true);
+                $scope.setPasswordForm.confirmPassword.$setValidity('auth', true);
+            }
+
+            if ($scope.setPasswordForm.$invalid) {
+                return;
+            }
+
+            userService.setPassword(userId, password, confirmPassword, resetCode)
+                .then(function () {
+                    $scope.showSetPasswordConfirmation = true;
+                }, function (reason) {
+                    $scope.errorMsg = reason.errorMsg;
+                    $scope.setPasswordForm.password.$setValidity("auth", false);
+                    $scope.setPasswordForm.confirmPassword.$setValidity("auth", false);
+                });
+
+            $scope.setPasswordForm.password.$viewChangeListeners.push(function () {
+                if ($scope.setPasswordForm.password.$invalid) {
+                    $scope.setPasswordForm.password.$setValidity('auth', true);
+                }
+            });
+            $scope.setPasswordForm.confirmPassword.$viewChangeListeners.push(function () {
+                if ($scope.setPasswordForm.confirmPassword.$invalid) {
+                    $scope.setPasswordForm.confirmPassword.$setValidity('auth', true);
+                }
+            });
+        }
+
     });

@@ -5,7 +5,7 @@ app.config(function ($routeProvider) {
         otherwise the route will fail and the $routeChangeError event will execute, in that handler we will redirect to the rejected
         path that is resolved from this method and prevent default (prevent the route from executing) */
     var canRoute = function(isRequired) {
-        
+
         return {
             /** Checks that the user is authenticated, then ensures that are requires assets are loaded */
             isAuthenticatedAndReady: function ($q, userService, $route, assetsService, appState) {
@@ -93,10 +93,10 @@ app.config(function ($routeProvider) {
             //ensure auth is *not* required so it will redirect to / 
             resolve: canRoute(false)
         })
-         .when('/logout', {
-             redirectTo: '/login/false',             
-             resolve: doLogout()
-         })
+        .when('/logout', {
+            redirectTo: '/login/false',             
+            resolve: doLogout()
+        })
         .when('/:section', {
             templateUrl: function (rp) {
                 if (rp.section.toLowerCase() === "default" || rp.section.toLowerCase() === "umbraco" || rp.section === "")
