@@ -756,8 +756,7 @@ namespace Umbraco.Web
 		}
 
 		#endregion
-
-
+        
 		#region Wrap
 
 		public static HtmlTagWrapper Wrap(this HtmlHelper html, string tag, string innerText, params IHtmlTagWrapper[] children)
@@ -823,7 +822,71 @@ namespace Umbraco.Web
 			return item;
 		}
 
-		#endregion
+        #endregion
 
-	}
+        #region canvasdesigner
+
+        public static IHtmlString EnableCanvasDesigner(this HtmlHelper html, 
+            UrlHelper url,
+            UmbracoContext umbCtx)
+        {
+            return html.EnableCanvasDesigner(url, umbCtx, string.Empty, string.Empty);
+        }
+
+        public static IHtmlString EnableCanvasDesigner(this HtmlHelper html,
+            UrlHelper url,
+            UmbracoContext umbCtx, string canvasdesignerConfigPath)
+        {
+            return html.EnableCanvasDesigner(url, umbCtx, canvasdesignerConfigPath, string.Empty);
+        }
+
+        public static IHtmlString EnableCanvasDesigner(this HtmlHelper html,
+            UrlHelper url,
+            UmbracoContext umbCtx, string canvasdesignerConfigPath, string canvasdesignerPalettesPath)
+        {
+            
+            var umbracoPath = url.Content(SystemDirectories.Umbraco);
+
+            string previewLink = @"<script src=""{0}/lib/jquery/jquery.min.js"" type=""text/javascript""></script>" +
+                                 @"<script src=""{1}"" type=""text/javascript""></script>" +
+                                 @"<script src=""{2}"" type=""text/javascript""></script>" +
+                                 @"<script type=""text/javascript"">var pageId = '{3}'</script>" +
+                                 @"<script src=""{0}/js/canvasdesigner.front.js"" type=""text/javascript""></script>";
+
+            string noPreviewLinks = @"<link href=""{1}"" type=""text/css"" rel=""stylesheet"" data-title=""canvasdesignerCss"" />";
+
+            // Get page value
+            int pageId = umbCtx.PublishedContentRequest.UmbracoPage.PageID;
+            string[] path = umbCtx.PublishedContentRequest.UmbracoPage.SplitPath;
+            string result = string.Empty;
+            string cssPath = CanvasDesignerUtility.GetStylesheetPath(path, false);
+
+            if (umbCtx.InPreviewMode)
+            {
+                canvasdesignerConfigPath = string.IsNullOrEmpty(canvasdesignerConfigPath) == false 
+                    ? canvasdesignerConfigPath 
+                    : string.Format("{0}/js/canvasdesigner.config.js", umbracoPath);
+                canvasdesignerPalettesPath = string.IsNullOrEmpty(canvasdesignerPalettesPath) == false 
+                    ? canvasdesignerPalettesPath 
+                    : string.Format("{0}/js/canvasdesigner.palettes.js", umbracoPath);
+
+                if (string.IsNullOrEmpty(cssPath) == false)
+                    result = string.Format(noPreviewLinks, cssPath) + Environment.NewLine;
+
+                result = result + string.Format(previewLink, umbracoPath, canvasdesignerConfigPath, canvasdesignerPalettesPath, pageId);
+            }
+            else
+            {
+                // Get css path for current page
+                if (string.IsNullOrEmpty(cssPath) == false)
+                    result = string.Format(noPreviewLinks, cssPath);
+            }
+
+            return new HtmlString(result);
+
+        }
+
+        #endregion
+
+    }
 }
