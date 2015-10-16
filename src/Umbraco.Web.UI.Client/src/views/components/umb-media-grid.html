@@ -1,40 +1,21 @@
-<div class="umb-media-grid">
+<div class="umb-media-grid" ui-sortable="mediaItemsSortingOptions" ng-model="mediaItems">
 
-   <div class="umb-media-grid__folders">
+   <a href="#{{item.editPath}}" ng-repeat="item in mediaItems" ng-style="item.flexStyle" class="umb-media-grid__item">
 
-      <a href="#{{folder.editPath}}" class="umb-media-grid__folder" ng-repeat="folder in folders">
+      <div class="umb-media-grid__actions">
+         <i class="icon-info umb-media-grid__action -not-clickable" ng-if="detailsHover" ng-mouseover="onDetailsOver(item, $event)" ng-mouseleave="onDetailsOut(item, $event)"></i>
+         <i class="icon-check umb-media-grid__action" ng-click="toggleSelectItem(item)" ng-class="{'-selected': item.selected}" prevent-default></i>
+      </div>
 
-         <div class="umb-media-grid__folder-description">
-            <i class="umb-media-grid__folder-icon {{ folder.icon }}"></i>
-            <div class="umb-media-grid__folder-name">{{ folder.name }}</div>
-         </div>
+      <div class="umb-media-grid__item-overlay">
+         <div class="umb-media-grid__item-name">{{item.name}}</div>
+      </div>
 
-         <i class="icon-check umb-media-grid__action" ng-click="toggleSelectItem(folder)" ng-class="{'-selected': folder.selected}" prevent-default></i>
+      <img class="umb-media-grid__item-image" ng-if="item.thumbnail" ng-src="{{item.thumbnail}}" alt="{{item.name}}" ng-class="{'-faded': item.selected}" />
+      <img class="umb-media-grid__item-image" ng-if="!item.thumbnail" src="assets/img/transparent.png" alt="{{item.name}}" />
 
-      </a>
+      <i class="umb-media-grid__item-icon {{ item.icon }}" ng-if="!item.thumbnail"></i>
 
-   </div>
-
-   <div class="umb-media-grid__media" ui-sortable="mediaItemsSortingOptions" ng-model="mediaItems">
-
-      <a href="#{{item.editPath}}" ng-repeat="item in mediaItems" ng-style="item.flexStyle" class="umb-media-grid__item">
-
-         <div class="umb-media-grid__actions">
-            <i class="icon-info umb-media-grid__action -not-clickable" ng-if="detailsHover" ng-mouseover="onDetailsOver(item, $event)" ng-mouseleave="onDetailsOut(item, $event)"></i>
-            <i class="icon-check umb-media-grid__action" ng-click="toggleSelectItem(item)" ng-class="{'-selected': item.selected}" prevent-default></i>
-         </div>
-
-         <div class="umb-media-grid__item-overlay">
-            <div class="umb-media-grid__item-name">{{item.name}}</div>
-         </div>
-
-         <img class="umb-media-grid__item-image" ng-if="item.thumbnail" ng-src="{{item.thumbnail}}" alt="{{item.name}}" ng-class="{'-faded': item.selected}" />
-         <img class="umb-media-grid__item-image" ng-if="!item.thumbnail" src="assets/img/transparent.png" alt="{{item.name}}" />
-
-         <i class="umb-media-grid__item-icon {{ item.icon }}" ng-if="!item.thumbnail"></i>
-
-      </a>
-
-   </div>
+   </a>
 
 </div>

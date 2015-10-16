@@ -5,7 +5,6 @@
 
       function link(scope, el, attr, ctrl) {
 
-         scope.folders = [];
          scope.mediaItems = [];
          var itemMaxHeight = 200;
 
@@ -25,7 +24,6 @@
 
          function activate() {
 
-            scope.folders = [];
             scope.mediaItems = [];
 
             for (var i = 0; scope.items.length > i; i++) {
@@ -87,9 +85,7 @@
 
          function seperateFolderAndMediaItems(item) {
 
-            if(item.isFolder){
-               scope.folders.push(item);
-            } else {
+            if(!item.isFolder){
                scope.mediaItems.push(item);
             }
 
