@@ -16,7 +16,7 @@
       </span>
    </a>
 
-   <button ng-if="type === 'button'" type="button" class="btn umb-button__button {{style}}" ng-click="action(model)" hotkey="{{shortcut}}">
+   <button ng-if="type === 'button'" type="button" class="btn umb-button__button {{style}}" ng-click="action(model)" hotkey="{{shortcut}}" ng-disabled="disabled">
       <span class="umb-button__content" ng-class="{'-hidden': state !== 'init'}">
          <i ng-if="icon && buttonStyle==='link'" class="{{icon}}"></i>
          <localize ng-if="labelKey" key="{{labelKey}}">{{label}}</localize>
@@ -24,7 +24,7 @@
       </span>
    </button>
 
-   <button ng-if="type === 'submit'" type="submit" class="btn umb-button__button {{style}}" hotkey="{{shortcut}}">
+   <button ng-if="type === 'submit'" type="submit" class="btn umb-button__button {{style}}" hotkey="{{shortcut}}" ng-disabled="disabled">
       <span class="umb-button__content" ng-class="{'-hidden': state !== 'init'}">
          <i ng-if="icon && buttonStyle==='link'" class="{{icon}}"></i>
          <localize ng-if="labelKey" key="{{labelKey}}">{{label}}</localize>

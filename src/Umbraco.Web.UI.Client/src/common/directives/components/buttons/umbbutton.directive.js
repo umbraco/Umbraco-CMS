@@ -52,7 +52,8 @@
             shortcut: "@?",
             label: "@?",
             labelKey: "@?",
-            icon: "@?"
+            icon: "@?",
+            disabled: "="
          }
       };
 
