@@ -57,31 +57,38 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             $scope.sync();
         };
 
-        $scope.add = function() {
-            dialogService.mediaPicker({
-                startNodeId: $scope.model.config.startNodeId,
-                multiPicker: multiPicker,
-                callback: function(data) {
-                    
-                    //it's only a single selector, so make it into an array
-                    if (!multiPicker) {
-                        data = [data];
-                    }
-                    
-                    _.each(data, function(media, i) {
+       $scope.add = function() {
 
-                        if (!media.thumbnail) {
-                            media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
-                        }
+          $scope.mediaPickerOverlay = {};
+          $scope.mediaPickerOverlay.startNodeId = $scope.model.config.startNodeId;
+          $scope.mediaPickerOverlay.multiPicker = multiPicker;
+          $scope.mediaPickerOverlay.view = "mediaPicker";
+          $scope.mediaPickerOverlay.show = true;
 
-                        $scope.images.push(media);
-                        $scope.ids.push(media.id);
-                    });
+          $scope.mediaPickerOverlay.submit = function(model) {
 
-                    $scope.sync();
-                }
-            });
-        };
+             _.each(model.selectedImages, function(media, i) {
+
+                 if (!media.thumbnail) {
+                     media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
+                 }
+
+                 $scope.images.push(media);
+                 $scope.ids.push(media.id);
+             });
+
+             $scope.sync();
+
+             $scope.mediaPickerOverlay.show = false;
+             $scope.mediaPickerOverlay = null;
+          };
+
+          $scope.mediaPickerOverlay.close = function(oldModel) {
+             $scope.mediaPickerOverlay.show = false;
+             $scope.mediaPickerOverlay = null;
+          };
+
+       };
 
        $scope.sortableOptions = {
            update: function(e, ui) {

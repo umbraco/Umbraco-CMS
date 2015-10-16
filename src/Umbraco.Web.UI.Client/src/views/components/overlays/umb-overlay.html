@@ -1,0 +1,34 @@
+<div class="umb-overlay umb-overlay-{{position}}" on-outside-click="closeOverLay()">
+  <form name="overlayForm" ng-submit="submitForm(model)" novalidate val-form-manager>
+
+    <div class="umb-overlay-header">
+      <h4>{{model.title}}
+        <a class="pull-right" href ng-click="closeOverLay()">
+          <i class="icon-delete"></i>
+        </a>
+      </h4>
+    </div>
+
+    <div class="umb-overlay-container" ng-transclude>
+      <div ng-if="view" ng-include="view"></div>
+    </div>
+
+    <div class="umb-overlay__item-details" ng-if="model.itemDetails">
+
+      <div class="umb-overlay__item-details-title-wrapper" ng-if="model.itemDetails.icon || model.itemDetails.title">
+        <i ng-if="model.itemDetails.icon" class="{{ model.itemDetails.icon }} umb-overlay__item-details-icon"></i>
+        <h5 ng-if="model.itemDetails.title" class="umb-overlay__item-details-title">{{ model.itemDetails.title }}</h5>
+      </div>
+
+      <div ng-if="model.itemDetails.description" class="umb-overlay__item-details-description">{{ model.itemDetails.description }}</div>
+
+    </div>
+
+    <div class="umb-overlay-drawer" ng-if="model.close || model.submit">
+      <div class="umb-overlay-drawer-content">
+        <umb-button ng-if="model.close" type="button" label="Cancel" action="closeOverLay()" button-style="link"></umb-button>
+        <umb-button ng-if="model.submit" type="submit" label="Submit" button-style="success"></umb-button>
+      </div>
+    </div>
+  </form>
+</div>

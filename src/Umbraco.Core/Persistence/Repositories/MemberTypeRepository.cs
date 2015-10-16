@@ -242,6 +242,14 @@ namespace Umbraco.Core.Persistence.Repositories
         #endregion
 
         /// <summary>
+        /// The container object type - used for organizing content types
+        /// </summary>
+        protected override Guid ContainerObjectTypeId
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        /// <summary>
         /// Override so we can specify explicit db type's on any property types that are built-in.
         /// </summary>
         /// <param name="propertyEditorAlias"></param>

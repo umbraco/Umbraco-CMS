@@ -800,7 +800,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="cacheBrowser">זיכרון מטמון בדפדפן</key>
     <key alias="contentRecycleBin">סל מיחזור</key>
     <key alias="createdPackages">יצירת חבילות</key>
-    <key alias="datatype">סוגי מידע</key>
+    <key alias="dataTypes">סוגי מידע</key>
     <key alias="dictionary">מילון</key>
     <key alias="installedPackages">חבילות מותקנות</key>
     <key alias="installSkin">התקן עיצוב</key>
@@ -810,10 +810,10 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="macros">מקרו</key>
     <key alias="mediaTypes">סוגי מדיה</key>
     <key alias="member">משתמשים</key>
-    <key alias="memberGroup">קבוצות משתמשים</key>
+    <key alias="memberGroups">קבוצות משתמשים</key>
     <key alias="memberRoles">כללים</key>
-    <key alias="memberType">סוגי משתמשים</key>
-    <key alias="nodeTypes">סוגי מסמכים</key>
+    <key alias="memberTypes">סוגי משתמשים</key>
+    <key alias="documentTypes">סוגי מסמכים</key>
     <key alias="packager">חבילות</key>
     <key alias="packages">חבילות</key>
     <key alias="python">קבצי פייתון</key>

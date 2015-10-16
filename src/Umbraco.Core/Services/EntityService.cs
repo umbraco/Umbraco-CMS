@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core.Cache;
 using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Events;
@@ -35,7 +36,28 @@ namespace Umbraco.Core.Services
                 {typeof (IMedia).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.Media, mediaService.GetById)},
                 {typeof (IMediaType).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.MediaType, contentTypeService1.GetMediaType)},
                 {typeof (IMember).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.Member, memberService.GetById)},
-                {typeof (IMemberType).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.MemberType, memberTypeService.Get)}
+                {typeof (IMemberType).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.MemberType, memberTypeService.Get)},
+                //{typeof (IUmbracoEntity).FullName, new Tuple<UmbracoObjectTypes, Func<int, IUmbracoEntity>>(UmbracoObjectTypes.EntityContainer, id =>
+                //{
+                //    using (var uow = UowProvider.GetUnitOfWork())
+                //    {
+                //        var found = uow.Database.FirstOrDefault<NodeDto>("SELECT * FROM umbracoNode WHERE id=@id", new { id = id });
+                //        return found == null ? null : new UmbracoEntity(found.Trashed)
+                //        {
+                //            Id = found.NodeId,
+                //            Name = found.Text,
+                //            Key = found.UniqueId,
+                //            SortOrder = found.SortOrder,
+                //            Path = found.Path,
+                //            NodeObjectTypeId = found.NodeObjectType.Value,
+                //            CreateDate = found.CreateDate,
+                //            CreatorId = found.UserId.Value,
+                //            Level = found.Level,
+                //            ParentId = found.ParentId
+                //        };
+                //    }
+                    
+                //})}
             };
 
         }
@@ -62,6 +84,7 @@ namespace Umbraco.Core.Services
                         case UmbracoObjectTypes.DocumentType:
                         case UmbracoObjectTypes.Member:
                         case UmbracoObjectTypes.DataType:
+                        case UmbracoObjectTypes.DocumentTypeContainer:
                             return uow.Database.ExecuteScalar<int?>(new Sql().Select("id").From<NodeDto>().Where<NodeDto>(dto => dto.UniqueId == key));
                         case UmbracoObjectTypes.RecycleBin:
                         case UmbracoObjectTypes.Stylesheet:

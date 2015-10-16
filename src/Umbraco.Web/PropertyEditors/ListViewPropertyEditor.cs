@@ -9,7 +9,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.ListViewAlias, "List view", "listview", HideLabel = true)]
+    [PropertyEditor(Constants.PropertyEditors.ListViewAlias, "List view", "listview", HideLabel = true, Group = "lists", Icon = "icon-item-arrangement")]
     public class ListViewPropertyEditor : PropertyEditor
     {
         protected override PreValueEditor CreatePreValueEditor()
@@ -33,6 +33,13 @@ namespace Umbraco.Web.PropertyEditors
                             new {alias = "updateDate", header = "Last edited", isSystem = 1},
                             new {alias = "owner", header = "Created by", isSystem = 1}
                         }
+                    },
+                    {
+                        "layouts", new[]
+                        {
+                            new {name = "List", path = "views/propertyeditors/listview/layouts/list/list.html", icon = "icon-list", isSystem = 1, selected = true},
+                            new {name = "Grid", path = "views/propertyeditors/listview/layouts/grid/grid.html", icon = "icon-thumbnails-small", isSystem = 1, selected = true}
+                        }
                     }
                 };
             }
@@ -50,6 +57,9 @@ namespace Umbraco.Web.PropertyEditors
 
             [PreValueField("orderDirection", "Order Direction", "views/propertyeditors/listview/orderdirection.prevalues.html")]
             public int OrderDirection { get; set; }
+
+            [PreValueField("layouts", "Layouts", "views/propertyeditors/listview/layouts.prevalues.html")]
+            public int Layouts { get; set; }
 
             [PreValueField("includeProperties", "Columns Displayed", "views/propertyeditors/listview/includeproperties.prevalues.html", 
                 Description = "The properties that will be displayed for each column")]

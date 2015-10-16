@@ -10,6 +10,8 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IContentTypeService : IService
     {
+        Attempt<int> CreateFolder(int parentId, string name, int userId = 0);
+
         /// <summary>
         /// Gets all property type aliases.
         /// </summary>

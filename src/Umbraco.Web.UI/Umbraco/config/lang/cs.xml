@@ -899,7 +899,7 @@
     <key alias="cacheBrowser">Prohlížeč mezipaměti</key>
     <key alias="contentRecycleBin">Koš</key>
     <key alias="createdPackages">Vytvořené balíčky</key>
-    <key alias="datatype">Datové typy</key>
+    <key alias="dataTypes">Datové typy</key>
     <key alias="dictionary">Slovník</key>
     <key alias="installedPackages">Instalované balíčky</key>
     <key alias="installSkin">Instalovat téma</key>
@@ -909,10 +909,10 @@
     <key alias="macros">Makra</key>
     <key alias="mediaTypes">Typy medií</key>
     <key alias="member">Členové</key>
-    <key alias="memberGroup">Skupiny členů</key>
+    <key alias="memberGroups">Skupiny členů</key>
     <key alias="memberRoles">Role</key>
-    <key alias="memberType">Typy členů</key>
-    <key alias="nodeTypes">Typy dokumentů</key>
+    <key alias="memberTypes">Typy členů</key>
+    <key alias="documentTypes">Typy dokumentů</key>
     <key alias="packager">Balíčky</key>
     <key alias="packages">Balíčky</key>
     <key alias="python">Soubory python</key>

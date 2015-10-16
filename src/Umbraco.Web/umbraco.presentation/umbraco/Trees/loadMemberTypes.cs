@@ -30,10 +30,10 @@ using Umbraco.Core;
 
 namespace umbraco
 {
-	/// <summary>
-	/// Handles loading of the member types into the application tree
-	/// </summary>
-    [Tree(Constants.Applications.Members, "memberType", "Member Types", sortOrder: 2)]
+    /// <summary>
+    /// Handles loading of the member types into the application tree
+    /// </summary>
+    [Obsolete("This class is no longer used and will be removed from the codebase in future versions")]
     public class loadMemberTypes : BaseTree
 	{
         public loadMemberTypes(string application) : base(application) { }

@@ -1,0 +1,46 @@
+.umb-checkbox-list {
+  list-style: none;
+  margin-left: 0;
+}
+
+.umb-checkbox-list__item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1px;
+  //border-bottom: 1px solid @grayLight;
+}
+
+.umb-checkbox-list__item.-selected {
+  background: @blue;
+  color: white;
+}
+
+.umb-checkbox-list__item-checkbox {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: @grayLighter;
+  flex: 0 0 30px;
+  height: 30px;
+  margin-right: 10px;
+}
+
+.umb-checkbox-list__item-checkbox.-selected {
+  background: @blue;
+}
+
+.umb-checkbox-list__item-icon {
+  margin-right: 5px;
+}
+
+.umb-checkbox-list__item-text {
+  font-size: 14px;
+}
+
+.umb-checkbox-list__no-data {
+  text-align: center;
+  padding-top: 50px;
+  color: #ccc;
+  font-size: 16px;
+  line-height: 1.8em;
+}

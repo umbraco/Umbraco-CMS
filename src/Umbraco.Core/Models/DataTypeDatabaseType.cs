@@ -21,6 +21,8 @@ namespace Umbraco.Core.Models
         [EnumMember]
         Integer,
         [EnumMember]
-        Date
+        Date,
+        [EnumMember]
+        Decimal
     }
 }

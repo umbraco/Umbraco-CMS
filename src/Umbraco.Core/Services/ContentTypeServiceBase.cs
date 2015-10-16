@@ -16,6 +16,14 @@ namespace Umbraco.Core.Services
         {
         }
 
+        public Attempt<int> CreateFolder(int parentId, string name, int userId = 0)
+        {
+            using (var repo = RepositoryFactory.CreateContentTypeRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repo.CreateFolder(parentId, name, userId);
+            }
+        }
+
         /// <summary>
         /// This is called after an content type is saved and is used to update the content xml structures in the database
         /// if they are required to be updated.

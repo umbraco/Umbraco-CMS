@@ -15,37 +15,37 @@ function memberGroupPicker($scope, dialogService){
             $scope.renderModel.push({ name: item, id: item, icon: 'icon-users' });
         });
     }
-	    
-    var dialogOptions = {
-        multiPicker: true,
-        entityType: "MemberGroup",
-        section: "membergroup",
-        treeAlias: "memberGroup",
-        filter: "",
-        filterCssClass: "not-allowed",
-        callback: function (data) {
-            if (angular.isArray(data)) {
-                _.each(data, function (item, i) {
-                    $scope.add(item);
-                });
-            } else {
-                $scope.clear();
-                $scope.add(data);
 
-            }
-        }
+    $scope.openMemberGroupPicker = function() {
+
+      $scope.memberGroupPicker = {};
+      $scope.memberGroupPicker.multiPicker = true;
+      $scope.memberGroupPicker.view = "memberGroupPicker";
+      $scope.memberGroupPicker.show = true;
+
+      $scope.memberGroupPicker.submit = function(model) {
+
+         if(model.selectedMemberGroups) {
+            _.each(model.selectedMemberGroups, function (item, i) {
+                $scope.add(item);
+            });
+         }
+
+         if(model.selectedMemberGroup) {
+            $scope.clear();
+            $scope.add(model.selectedMemberGroup);
+         }
+
+         $scope.memberGroupPicker.show = false;
+         $scope.memberGroupPicker = null;
+      };
+
+      $scope.memberGroupPicker.close = function(oldModel) {
+         $scope.memberGroupPicker.show = false;
+         $scope.memberGroupPicker = null;
+      };
+
     };
-
-    //since most of the pre-value config's are used in the dialog options (i.e. maxNumber, minNumber, etc...) we'll merge the 
-    // pre-value config on to the dialog options
-    if($scope.model.config){
-        angular.extend(dialogOptions, $scope.model.config);
-    }
-
-    $scope.openMemberGroupPicker =function() {
-        var d = dialogService.memberGroupPicker(dialogOptions);
-    };
-
 
     $scope.remove =function(index){
         $scope.renderModel.splice(index, 1);

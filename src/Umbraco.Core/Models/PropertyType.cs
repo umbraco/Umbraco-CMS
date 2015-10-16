@@ -9,6 +9,7 @@ using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models
 {
+
     /// <summary>
     /// Defines the type of a <see cref="Property"/> object
     /// </summary>
@@ -399,6 +400,9 @@ namespace Umbraco.Core.Models
 
                 //Simple validation using the DatabaseType from the DataTypeDefinition and Type of the passed in value
                 if (DataTypeDatabaseType == DataTypeDatabaseType.Integer && type == typeof(int))
+                    return true;
+
+                if (DataTypeDatabaseType == DataTypeDatabaseType.Decimal && type == typeof(decimal))
                     return true;
 
                 if (DataTypeDatabaseType == DataTypeDatabaseType.Date && type == typeof(DateTime))

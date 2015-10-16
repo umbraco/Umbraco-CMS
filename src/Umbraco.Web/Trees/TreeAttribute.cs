@@ -13,6 +13,16 @@ namespace Umbraco.Web.Trees
         /// </summary>
         /// <param name="appAlias">The app alias.</param>
         /// <param name="alias">The alias.</param>
+        public TreeAttribute(string appAlias,
+            string alias) : this(appAlias, alias, null)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TreeAttribute"/> class.
+        /// </summary>
+        /// <param name="appAlias">The app alias.</param>
+        /// <param name="alias">The alias.</param>
         /// <param name="title">The title.</param>
         /// <param name="iconClosed">The icon closed.</param>
         /// <param name="iconOpen">The icon open.</param>
@@ -34,6 +44,8 @@ namespace Umbraco.Web.Trees
             Initialize = initialize;
             SortOrder = sortOrder;
         }
+
+
 
         public string ApplicationAlias { get; private set; }
         public string Alias { get; private set; }

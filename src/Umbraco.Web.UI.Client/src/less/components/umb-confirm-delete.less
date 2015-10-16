@@ -1,0 +1,34 @@
+.umb-confirm-delete {
+  position: relative;
+}
+
+.umb_confirm-delete__overlay-action {
+  position: absolute;
+  z-index: 999999;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  border-radius: 40px;
+  animation: fadeInRight 0.2s;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+}
+
+.umb_confirm-delete__overlay-action:hover {
+  text-decoration: none;
+  color: #ffffff;
+}
+
+.umb_confirm-delete__overlay-action.-confirm {
+  background: @green;
+  top: 0;
+  left: -50px;
+}
+
+.umb_confirm-delete__overlay-action.-cancel {
+  background: @red;
+  top: 0;
+  left: -25px;
+}
