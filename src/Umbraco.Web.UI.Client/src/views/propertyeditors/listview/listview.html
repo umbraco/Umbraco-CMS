@@ -10,7 +10,7 @@
 
          <umb-editor-sub-header-content-left>
 
-            <umb-editor-sub-header-section ng-if="listViewAllowedTypes && listViewAllowedTypes.length > 0">
+            <umb-editor-sub-header-section ng-if="listViewAllowedTypes && listViewAllowedTypes.length > 0 && !isAnythingSelected()">
                <div class="btn-group">
                    <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
                        <localize key="actions_create">Create</localize>
@@ -28,29 +28,21 @@
             </umb-editor-sub-header-section>
 
             <umb-editor-sub-header-section ng-if="isAnythingSelected()">
-               <div class="btn-group" ng-show="isAnythingSelected()" ng-if="entityType === 'content' && !isTrashed && options.allowBulkPublish">
-                  <a class="btn btn-success" ng-disabled="actionInProgress" ng-click="publish()" prevent-default>
-                     <localize key="actions_publish">Publish</localize>
-                  </a>
+               <umb-button
+                  type="button"
+                  label="Cancel"
+                  action="clearSelection()"
+                  disabled="actionInProgress">
+               </umb-button>
+            </umb-editor-sub-header-section>
+
+            <umb-editor-sub-header-section ng-if="isAnythingSelected()">
+               <strong ng-show="!actionInProgress">{{ selectedItemsCount() }} of {{ listViewResultSet.items.length }} selected</strong>
+               <strong ng-show="actionInProgress" ng-bind="bulkStatus"></strong>
+
+               <div class="umb-loader-wrapper -bottom" ng-show="actionInProgress">
+                  <div class="umb-loader"></div>
                </div>
-
-               <div class="btn-group" ng-show="isAnythingSelected()" ng-if="entityType === 'content' && !isTrashed && options.allowBulkUnpublish">
-                  <a class="btn btn-warning" ng-disabled="actionInProgress" ng-click="unpublish()" prevent-default>
-                     <localize key="actions_unpublish">Unpublish</localize>
-                  </a>
-               </div>
-
-               <div class="btn-group" ng-show="isAnythingSelected()" ng-if="options.allowBulkDelete">
-                  <a class="btn btn-danger" ng-disabled="actionInProgress" ng-click="delete()" prevent-default>
-                    <localize key="actions_delete">Delete</localize>
-                 </a>
-              </div>
-
-              <div class="umb-loader-wrapper" ng-show="actionInProgress">
-                 <div class="umb-loader"></div>
-              </div>
-
-              <span ng-bind="bulkStatus" ng-show="isAnythingSelected()" class="pull-right"></span>
             </umb-editor-sub-header-section>
 
          </umb-editor-sub-header-content-left>
@@ -58,7 +50,7 @@
 
          <umb-editor-sub-header-content-right>
 
-            <umb-editor-sub-header-section>
+            <umb-editor-sub-header-section ng-if="!isAnythingSelected()">
                <umb-layout-selector
                   ng-if="model.config.layouts"
                   layouts="model.config.layouts"
@@ -66,13 +58,50 @@
                </umb-layout-selector>
             </umb-editor-sub-header-section>
 
-            <umb-editor-sub-header-section ng-if="!actionInProgress">
+            <umb-editor-sub-header-section ng-if="!actionInProgress && !isAnythingSelected()">
                <form class="form-search -no-margin-bottom pull-right" novalidate>
                    <div class="inner-addon left-addon">
                        <i class="icon icon-search" ng-click="enterSearch($event)"></i>
                        <input type="text" class="form-control" localize="placeholder" placeholder="@general_typeToSearch" ng-model="options.filter" prevent-enter-submit no-dirty-check>
                    </div>
                </form>
+            </umb-editor-sub-header-section>
+
+            <umb-editor-sub-header-section ng-if="isAnythingSelected()">
+
+               <umb-button
+                  ng-if="entityType === 'content' && !isTrashed && options.allowBulkPublish"
+                  type="button"
+                  button-style="link"
+                  label="Publish"
+                  key="actions_publish"
+                  icon="icon-globe"
+                  action="publish()"
+                  disabled="actionInProgress">
+               </umb-button>
+
+               <umb-button
+                  ng-if="entityType === 'content' && !isTrashed && options.allowBulkUnpublish"
+                  type="button"
+                  button-style="link"
+                  label="Unpublish"
+                  key="actions_unpublish"
+                  icon="icon-block"
+                  action="unpublish()"
+                  disabled="actionInProgress">
+               </umb-button>
+
+               <umb-button
+                  ng-if="options.allowBulkDelete"
+                  type="button"
+                  button-style="link"
+                  label="Delete"
+                  key="actions_delete"
+                  icon="icon-trash"
+                  action="delete()"
+                  disabled="actionInProgress">
+               </umb-button>
+
             </umb-editor-sub-header-section>
 
          </umb-editor-sub-header-content-right>

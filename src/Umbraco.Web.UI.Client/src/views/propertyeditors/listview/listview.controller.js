@@ -301,6 +301,26 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         });
     };
 
+    $scope.selectedItemsCount = function() {
+       var selected = 0;
+
+       for (var i = 0; $scope.listViewResultSet.items.length > i; i++) {
+          var item = $scope.listViewResultSet.items[i];
+          if (item.selected) {
+             selected = selected + 1;
+          }
+       }
+
+       return selected;
+    };
+
+    $scope.clearSelection = function() {
+      for (var i = 0; $scope.listViewResultSet.items.length > i; i++) {
+          var item = $scope.listViewResultSet.items[i];
+          item.selected = false;
+      }
+    };
+
     $scope.getIcon = function(entry) {
         return iconHelper.convertFromLegacyIcon(entry.icon);
     };

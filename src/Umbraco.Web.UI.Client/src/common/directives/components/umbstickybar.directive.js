@@ -60,7 +60,7 @@
 
                   bar.removeClass('-umb-sticky-bar');
                   bar.css({
-                     position: 'static',
+                     position: 'relative',
                      'width': 'auto',
                      'height': 'auto',
                      'z-index': 'auto',
