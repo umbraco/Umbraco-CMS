@@ -60,8 +60,9 @@
 
                   bar.removeClass('-umb-sticky-bar');
                   bar.css({
-                     position: 'relative',
+                     position: 'static',
                      'width': 'auto',
+                     'height': 'auto',
                      'z-index': 'auto',
                      'visibility': 'visible'
                   });
@@ -89,7 +90,7 @@
             clonedBar.addClass('-umb-sticky-bar');
             clonedBar.css({
                'position': 'fixed',
-               'z-index': 10000,
+               'z-index': 500,
                'visibility': 'hidden'
             });
 
