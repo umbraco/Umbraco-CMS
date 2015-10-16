@@ -424,7 +424,7 @@ namespace Umbraco.Web.Editors
             {
                 return Request.CreateValidationErrorResponse("The request was not formatted correctly, the currentFolder is not an integer");
             }
-
+            
             //ensure the user has access to this folder by parent id!
             if (CheckPermissions(
                new Dictionary<string, object>(), 
@@ -438,9 +438,42 @@ namespace Umbraco.Web.Editors
                         Services.TextService.Localize("speechBubbles/invalidUserPermissionsText"),
                         SpeechBubbleIcon.Warning)));
             }
-
+            
             var tempFiles = new PostedFiles();
+            var mediaService = ApplicationContext.Services.MediaService;
 
+
+            //in case we pass a path with a folder in it, we will create it and upload media to it.
+            string path;
+            if (result.FormData.ContainsKey("path"))
+            {
+                var folders = result.FormData["path"].Split('/');
+
+                for (int i = 0; i < folders.Length-1; i++)
+                {
+                    var folderName = folders[i];
+
+                    //get current parent
+                    var mediaRoot = mediaService.GetById(parentId);
+
+                    //look for matching folder
+                    var folderMediaItem = mediaRoot.Children().FirstOrDefault(x => x.Name == folderName && x.ContentType.Alias == Core.Constants.Conventions.MediaTypes.Folder);
+                    if (folderMediaItem == null)
+                    {
+                        //if null, create a folder
+                        folderMediaItem = mediaService.CreateMedia(folderName, mediaRoot, Constants.Conventions.MediaTypes.Folder);
+                        mediaService.Save(folderMediaItem);
+
+                        //set the media root to the folder id so uploaded files will end there.
+                        parentId = folderMediaItem.Id;
+                    }
+                    else
+                    {
+                        parentId = folderMediaItem.Id;
+                    }
+                }
+            }
+  
             //get the files
             foreach (var file in result.FileData)
             {
@@ -454,7 +487,6 @@ namespace Umbraco.Web.Editors
                     if (UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes.Contains(ext))
                         mediaType = Constants.Conventions.MediaTypes.Image;
 
-                    var mediaService = ApplicationContext.Services.MediaService;
                     var f = mediaService.CreateMedia(fileName, parentId, mediaType, Security.CurrentUser.Id);
 
                     var fileInfo = new FileInfo(file.LocalFileName);
