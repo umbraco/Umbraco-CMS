@@ -50,7 +50,7 @@
             //if the login and password are not empty we need to automatically 
             // validate them - this is because if there are validation errors on the server
             // then the user has to change both username & password to resubmit which isn't ideal,
-            // so if they're not empty , we'l just make sure to set them to valid.
+            // so if they're not empty, we'll just make sure to set them to valid.
             if (login && password && login.length > 0 && password.length > 0) {
                 $scope.loginForm.username.$setValidity('auth', true);
                 $scope.loginForm.password.$setValidity('auth', true);
@@ -88,9 +88,8 @@
 
         $scope.requestPasswordResetSubmit = function (email) {
 
-            if (email && email.length > 0) {
-                $scope.requestPasswordResetForm.email.$setValidity('auth', true);
-            }
+            $scope.errorMsg = "";
+            $scope.showEmailResetConfirmation = false;
 
             if ($scope.requestPasswordResetForm.$invalid) {
                 return;
@@ -112,6 +111,8 @@
         };
 
         $scope.setPasswordSubmit = function (password, confirmPassword) {
+
+            $scope.showSetPasswordConfirmation = false;
 
             if (password && confirmPassword && password.length > 0 && confirmPassword.length > 0) {
                 $scope.setPasswordForm.password.$setValidity('auth', true);
