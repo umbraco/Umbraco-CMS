@@ -30,10 +30,13 @@
 
       function activate() {
 
-         mediaResource.getChildFolders(vm.nodeId)
-            .then(function(folders) {
-               vm.folders = folders;
-            });
+         if($scope.entityType === 'media') {
+            mediaResource.getChildFolders(vm.nodeId)
+               .then(function(folders) {
+                  vm.folders = folders;
+               });
+         }
+
       }
 
       function dragEnter(el, event) {
