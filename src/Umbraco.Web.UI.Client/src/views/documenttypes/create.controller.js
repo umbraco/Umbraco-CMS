@@ -30,7 +30,6 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
                 formHelper.resetForm({ scope: $scope });
 
                 var section = appState.getSectionState("currentSection");
-
                 $location.path("/" + section + "/documenttypes/list/" + folderId);
 
             }, function(err) {
@@ -43,14 +42,14 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
     $scope.createDocType = function() {
         $location.search('create', null);
         $location.search('notemplate', null);
-        $location.path("/settings/documenttypes/edit/" + node.id).search("create", true);
+        $location.path("/settings/documenttypes/edit/" + node.id).search("create", "true");
         navigationService.hideMenu();
     }
 
     $scope.createComponent = function() {
       $location.search('create', null);
       $location.search('notemplate', null);
-      $location.path("/settings/documenttypes/edit/" + node.id).search("create", true).search("notemplate", true);
+      $location.path("/settings/documenttypes/edit/" + node.id).search("create", "true").search("notemplate", "true");
       navigationService.hideMenu();
     }
 }

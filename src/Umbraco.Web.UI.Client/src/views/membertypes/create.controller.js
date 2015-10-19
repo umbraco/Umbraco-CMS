@@ -1,12 +1,12 @@
 /**
  * @ngdoc controller
- * @name Umbraco.Editors.MediaType.CreateController
+ * @name Umbraco.Editors.MemberType.CreateController
  * @function
  *
  * @description
- * The controller for the media type creation dialog
+ * The controller for the member type creation dialog
  */
-function MediaTypesCreateController($scope, $location, navigationService, mediaTypeResource, formHelper, appState) {
+function MemberTypesCreateController($scope, $location, navigationService, memberTypeResource, formHelper, appState) {
 
     $scope.model = {
         folderName: "",
@@ -21,11 +21,11 @@ function MediaTypesCreateController($scope, $location, navigationService, mediaT
 
     $scope.createFolder = function () {
         if (formHelper.submitForm({ scope: $scope, formCtrl: this.createFolderForm, statusMessage: "Creating folder..." })) {
-            mediaTypeResource.createFolder(node.id, $scope.model.folderName).then(function (folderId) {
+            memberTypeResource.createFolder(node.id, $scope.model.folderName).then(function (folderId) {
 
                 navigationService.hideMenu();
                 var currPath = node.path ? node.path : "-1";
-                navigationService.syncTree({ tree: "mediatypes", path: currPath + "," + folderId, forceReload: true, activate: true });
+                navigationService.syncTree({ tree: "membertypes", path: currPath + "," + folderId, forceReload: true, activate: true });
 
                 formHelper.resetForm({ scope: $scope });
 
@@ -38,11 +38,11 @@ function MediaTypesCreateController($scope, $location, navigationService, mediaT
         };
     }
 
-    $scope.createMediaType = function() {
+    $scope.createMemberType = function() {
         $location.search('create', null);
-        $location.path("/settings/mediatypes/edit/" + node.id).search("create", "true");
+        $location.path("/settings/membertypes/edit/" + node.id).search("create", "true");
         navigationService.hideMenu();
     }
 }
 
-angular.module('umbraco').controller("Umbraco.Editors.MediaTypes.CreateController", MediaTypesCreateController);
+angular.module('umbraco').controller("Umbraco.Editors.MemberTypes.CreateController", MemberTypesCreateController);
