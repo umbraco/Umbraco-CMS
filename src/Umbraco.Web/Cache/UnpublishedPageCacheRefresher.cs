@@ -79,6 +79,7 @@ namespace Umbraco.Web.Cache
         {
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IContent>();
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<PublicAccessEntry>();
+            DistributedCache.Instance.ClearDomainCacheOnCurrentServer();
             base.RefreshAll();
         }
 
@@ -87,6 +88,7 @@ namespace Umbraco.Web.Cache
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(RepositoryBase.GetCacheIdKey<IContent>(id));
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<PublicAccessEntry>();
             content.Instance.UpdateSortOrder(id);
+            DistributedCache.Instance.ClearDomainCacheOnCurrentServer();
             base.Refresh(id);
         }
 
@@ -94,6 +96,7 @@ namespace Umbraco.Web.Cache
         {
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(RepositoryBase.GetCacheIdKey<IContent>(id));
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<PublicAccessEntry>();
+            DistributedCache.Instance.ClearDomainCacheOnCurrentServer();
             base.Remove(id);
         }
 
@@ -103,6 +106,7 @@ namespace Umbraco.Web.Cache
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(RepositoryBase.GetCacheIdKey<IContent>(instance.Id));
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<PublicAccessEntry>();
             content.Instance.UpdateSortOrder(instance);
+            DistributedCache.Instance.ClearDomainCacheOnCurrentServer();
             base.Refresh(instance);
         }
 
@@ -110,6 +114,7 @@ namespace Umbraco.Web.Cache
         {
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(RepositoryBase.GetCacheIdKey<IContent>(instance.Id));
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<PublicAccessEntry>();
+            DistributedCache.Instance.ClearDomainCacheOnCurrentServer();
             base.Remove(instance);
         }
 
@@ -126,6 +131,8 @@ namespace Umbraco.Web.Cache
                 ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(RepositoryBase.GetCacheIdKey<IContent>(payload.Id));
                 content.Instance.UpdateSortOrder(payload.Id);
             }
+
+            DistributedCache.Instance.ClearDomainCacheOnCurrentServer();
 
             OnCacheUpdated(Instance, new CacheRefresherEventArgs(jsonPayload, MessageType.RefreshByJson));
         }
