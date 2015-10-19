@@ -6,7 +6,11 @@
       function link(scope, el, attr, ctrl) {
 
          scope.mediaItems = [];
-         var itemMaxHeight = 200;
+
+         var itemDefaultHeight = 200;
+         var itemDefaultWidth = 200;
+         var itemMaxWidth = 300;
+         var itemMaxHeight = 300;
 
          scope.mediaItemsSortingOptions = {
             distance: 10,
@@ -57,29 +61,40 @@
          function setOriginalSize(item, maxHeight) {
 
              //set to a square by default
-             item.originalWidth = maxHeight;
-             item.originalHeight = maxHeight;
+             item.width = itemDefaultWidth;
+             item.height = itemDefaultHeight;
              item.aspectRatio = 1;
 
              var widthProp = _.find(item.properties, function(v) { return (v.alias === "umbracoWidth"); });
 
              if (widthProp && widthProp.value) {
-                 item.originalWidth = parseInt(widthProp.value, 10);
-                 if (isNaN(item.originalWidth)) {
-                     item.originalWidth = maxHeight;
+                 item.width = parseInt(widthProp.value, 10);
+                 if (isNaN(item.width)) {
+                     item.width = itemDefaultWidth;
                  }
              }
 
              var heightProp = _.find(item.properties, function(v) { return (v.alias === "umbracoHeight"); });
 
              if (heightProp && heightProp.value) {
-                 item.originalHeight = parseInt(heightProp.value, 10);
-                 if (isNaN(item.originalHeight)) {
-                     item.originalHeight = maxHeight;
+                 item.height = parseInt(heightProp.value, 10);
+                 if (isNaN(item.height)) {
+                     item.height = itemDefaultWidth;
                  }
              }
 
-             item.aspectRatio = item.originalWidth / item.originalHeight;
+             item.aspectRatio = item.width / item.height;
+
+             // set max width and height
+             if(item.width > itemMaxWidth) {
+                item.width = itemMaxWidth;
+                item.height = itemMaxWidth / item.aspectRatio;
+             }
+
+             if(item.height > itemMaxHeight) {
+                item.height = itemMaxHeight;
+                item.width = itemMaxHeight * item.aspectRatio;
+             }
 
          }
 
@@ -98,13 +113,13 @@
             var widestImageAspectRatio = null;
 
             // sort array after image width with the widest image first
-            flexSortArray = $filter('orderBy')(flexSortArray, 'originalWidth', true);
+            flexSortArray = $filter('orderBy')(flexSortArray, 'width', true);
 
             // find widest image aspect ratio
             widestImageAspectRatio = flexSortArray[0].aspectRatio;
 
             // find smallest image width
-            smallestImageWidth = flexSortArray[flexSortArray.length - 1].originalWidth;
+            smallestImageWidth = flexSortArray[flexSortArray.length - 1].width;
 
             for (var i = 0; flexSortArray.length > i; i++) {
 
@@ -119,7 +134,7 @@
 
                var flexStyle = {
                   "flex": flex + " 1 " + imageMinWidth + "px",
-                  "max-width": mediaItem.originalWidth + "px"
+                  "max-width": mediaItem.width + "px"
                };
 
                mediaItem.flexStyle = flexStyle;
