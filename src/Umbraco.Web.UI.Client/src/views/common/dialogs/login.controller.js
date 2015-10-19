@@ -1,48 +1,52 @@
 ﻿angular.module("umbraco").controller("Umbraco.Dialogs.LoginController",
-    function ($scope, $location, localizationService, userService, externalLoginInfo) {
+    function ($scope, $location, $timeout, localizationService, userService, externalLoginInfo) {
 
-        /**
-         * @ngdoc function
-         * @name signin
-         * @methodOf MainController
-         * @function
-         *
-         * @description
-         * signs the user in
-         */
-        var d = new Date();
-        //var weekday = new Array("Super Sunday", "Manic Monday", "Tremendous Tuesday", "Wonderful Wednesday", "Thunder Thursday", "Friendly Friday", "Shiny Saturday");
-        localizationService.localize("login_greeting" + d.getDay()).then(function (label) {
-            $scope.greeting = label;
-        }); // weekday[d.getDay()];
-
-        $scope.externalLoginFormAction = Umbraco.Sys.ServerVariables.umbracoUrls.externalLoginsUrl;
-        $scope.externalLoginProviders = externalLoginInfo.providers;
-        $scope.externalLoginInfo = externalLoginInfo;
-
-        var userId = $location.search().userId;
-        var resetCode = $location.search().resetCode;
-        if (userId && resetCode) {
-            userService.validatePasswordResetCode(userId, resetCode)
-                .then(function () {
-                    $scope.view = "set-password";
-                }, function () {
-                    console.log("Failed");
-                    $scope.view = "password-reset-code-expired";
-                });
-        } else {
-            $scope.view = "login";
+        var setFieldFocus = function(form, field) {
+            $timeout(function() {
+                $("form[name='" + form + "'] input[name='" + field + "']").focus();
+            });
         }
 
         $scope.showLogin = function () {
             $scope.errorMsg = "";
             $scope.view = "login";
+            setFieldFocus("loginForm", "username");
         }
 
         $scope.showRequestPasswordReset = function () {
             $scope.errorMsg = "";
             $scope.view = "request-password-reset";
             $scope.showEmailResetConfirmation = false;
+            setFieldFocus("requestPasswordResetForm", "email");
+        }
+
+        $scope.showSetPassword = function () {
+            $scope.view = "set-password";
+            setFieldFocus("setPasswordForm", "password");
+        }
+
+        var d = new Date();
+        localizationService.localize("login_greeting" + d.getDay()).then(function (label) {
+            $scope.greeting = label;
+        });
+
+        $scope.externalLoginFormAction = Umbraco.Sys.ServerVariables.umbracoUrls.externalLoginsUrl;
+        $scope.externalLoginProviders = externalLoginInfo.providers;
+        $scope.externalLoginInfo = externalLoginInfo;
+
+        // Set initial view - either set password if reset code provided in querystring
+        // otherwise login form
+        var userId = $location.search().userId;
+        var resetCode = $location.search().resetCode;
+        if (userId && resetCode) {
+            userService.validatePasswordResetCode(userId, resetCode)
+                .then(function () {
+                    $scope.showSetPassword();
+                }, function () {
+                    $scope.view = "password-reset-code-expired";
+                });
+        } else {
+            $scope.showLogin();
         }
 
         $scope.loginSubmit = function (login, password) {

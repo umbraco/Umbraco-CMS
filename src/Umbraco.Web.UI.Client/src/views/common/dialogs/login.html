@@ -40,7 +40,7 @@
 
                 <form method="POST" name="loginForm" ng-submit="loginSubmit(login, password)">
                     <div class="control-group" ng-class="{error: loginForm.username.$invalid}">
-                        <input type="text" autofocus ng-model="login" name="username" class="input-xlarge" localize="placeholder" placeholder="@placeholders_username" />
+                        <input type="text" ng-model="login" name="username" class="input-xlarge" localize="placeholder" placeholder="@placeholders_username" />
                     </div>
 
                     <div class="control-group" ng-class="{error: loginForm.password.$invalid}">
@@ -95,7 +95,7 @@
                 <form method="POST" name="setPasswordForm" ng-submit="setPasswordSubmit(password, confirmPassword)">
 
                     <div class="control-group" ng-class="{error: setPasswordForm.password.$invalid}">
-                        <input type="password" ng-model="password" name="password" class="input-xlarge" localize="placeholder" placeholder="@placeholders_password" />
+                        <input type="password" ng-model="password" name="password" class="input-xlarge" placeholder="@placeholders_password" />
                     </div>
 
                     <div class="control-group" ng-class="{error: setPasswordForm.confirmPassword.$invalid}">
