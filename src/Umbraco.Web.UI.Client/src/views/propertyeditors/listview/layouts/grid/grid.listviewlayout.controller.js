@@ -27,6 +27,8 @@
       vm.clickFolder = clickFolder;
       vm.selectMediaItem = selectMediaItem;
       vm.clickMediaItem = clickMediaItem;
+      vm.selectContentItem = selectContentItem;
+      vm.clickContentItem = clickContentItem;
 
       function activate() {
 
@@ -91,6 +93,14 @@
 
       function clickMediaItem(mediaItem) {
          $location.path($scope.entityType + '/' + $scope.entityType + '/edit/' + mediaItem.id);
+      }
+
+      function selectContentItem(contentItem) {
+         contentItem.selected = !contentItem.selected;
+      }
+
+      function clickContentItem(contentItem) {
+         $location.path($scope.entityType + '/' + $scope.entityType + '/edit/' + contentItem.id);
       }
 
       activate();

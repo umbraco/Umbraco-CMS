@@ -1,6 +1,19 @@
 <div ng-controller="Umbraco.PropertyEditors.ListView.GridLayoutController as vm">
 
    <div
+      ng-if="entityType !== 'media'">
+
+      <umb-content-grid
+         ng-if="listViewResultSet.items.length > 0"
+         content="listViewResultSet.items"
+         content-properties="options.includeProperties"
+         on-click="vm.clickContentItem"
+         on-select="vm.selectContentItem">
+      </umb-content-grid>
+
+   </div>
+
+   <div
    ng-if="entityType === 'media'"
    on-drag-leave="vm.dragLeave()"
    on-drag-end="vm.dragLeave()"
