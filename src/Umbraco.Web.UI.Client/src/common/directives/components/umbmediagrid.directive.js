@@ -143,19 +143,22 @@
 
          }
 
-         scope.toggleSelectItem = function(item) {
-            item.selected = !item.selected;
-         };
-
-         scope.onDetailsOver = function(item, event) {
-            if(scope.detailsHover) {
-               scope.detailsHover(item, event, true);
+         scope.selectItem = function(item, $event) {
+            if(scope.onSelect) {
+               scope.onSelect(item);
+               $event.stopPropagation();
             }
          };
 
-         scope.onDetailsOut = function(item, event) {
-            if(scope.detailsHover) {
-               scope.detailsHover(item, event, false);
+         scope.clickItem = function(item) {
+            if(scope.onClick) {
+               scope.onClick(item);
+            }
+         };
+
+         scope.hoverItemDetails = function(item, $event, hover) {
+            if(scope.onDetailsHover) {
+               scope.onDetailsHover(item, $event, hover);
             }
          };
 
@@ -175,7 +178,9 @@
          templateUrl: 'views/components/umb-media-grid.html',
          scope: {
             items: '=',
-            detailsHover: "="
+            onDetailsHover: "=",
+            onSelect: '=',
+            onClick: '='
          },
          link: link
       };

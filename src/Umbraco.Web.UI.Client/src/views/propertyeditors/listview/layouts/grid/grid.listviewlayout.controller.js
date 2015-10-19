@@ -22,9 +22,11 @@
       vm.dragLeave = dragLeave;
 		vm.onFilesQueue = onFilesQueue;
       vm.onUploadComplete = onUploadComplete;
-      vm.showMediaDetailsTooltip = showMediaDetailsTooltip;
+      vm.hoverMediaItemDetails = hoverMediaItemDetails;
       vm.selectFolder = selectFolder;
       vm.clickFolder = clickFolder;
+      vm.selectMediaItem = selectMediaItem;
+      vm.clickMediaItem = clickMediaItem;
 
       function activate() {
 
@@ -56,15 +58,15 @@
       vm.mediaDetailsTooltip = {};
 
 
-      function showMediaDetailsTooltip(item, event, isHovering) {
+      function hoverMediaItemDetails(item, event, hover) {
 
-         if (isHovering && !vm.mediaDetailsTooltip.show) {
+         if (hover && !vm.mediaDetailsTooltip.show) {
 
             vm.mediaDetailsTooltip.event = event;
             vm.mediaDetailsTooltip.item = item;
             vm.mediaDetailsTooltip.show = true;
 
-         } else if (!isHovering && vm.mediaDetailsTooltip.show) {
+         } else if (!hover && vm.mediaDetailsTooltip.show) {
 
             vm.mediaDetailsTooltip.show = false;
 
@@ -78,6 +80,14 @@
 
       function clickFolder(folder) {
          $location.path($scope.entityType + '/' + $scope.entityType + '/edit/' + folder.id);
+      }
+
+      function selectMediaItem(mediaItem) {
+         mediaItem.selected = !mediaItem.selected;
+      }
+
+      function clickMediaItem(mediaItem) {
+         $location.path($scope.entityType + '/' + $scope.entityType + '/edit/' + mediaItem.id);
       }
 
       activate();
