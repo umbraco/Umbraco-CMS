@@ -128,7 +128,7 @@ namespace Umbraco.Web.Editors
         {
             //Suggested convention for folder mediatypes - we can make this more or less complicated as long as we document it...
             //if you create a media type, which has an alias that ends with ...Folder then its a folder: ex: "secureFolder", "bannerFolder", "Folder"
-            var folderTypes = Services.ContentTypeService.GetAllMediaTypes().Where(x => x.Alias.EndsWith("Folder")).Select(x => x.Id);
+            var folderTypes = Services.ContentTypeService.GetAllMediaTypes().ToArray().Where(x => x.Alias.EndsWith("Folder")).Select(x => x.Id);
 
             var children = (id < 0) ? Services.MediaService.GetRootMedia() : Services.MediaService.GetById(id).Children();
             return children.Where(x =>  folderTypes.Contains(x.ContentTypeId)).Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>);
@@ -444,9 +444,9 @@ namespace Umbraco.Web.Editors
 
 
             //in case we pass a path with a folder in it, we will create it and upload media to it.
-            string path;
             if (result.FormData.ContainsKey("path"))
             {
+
                 var folders = result.FormData["path"].Split('/');
 
                 for (int i = 0; i < folders.Length-1; i++)
@@ -455,6 +455,10 @@ namespace Umbraco.Web.Editors
 
                     //get current parent
                     var mediaRoot = mediaService.GetById(parentId);
+
+                    //if the media root is null, something went wrong, we'll abort
+                    if (mediaRoot == null)
+                        return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "The folder: " + folderName + " could not be used for storing images, its ID: " + parentId + " returned null");
 
                     //look for matching folder
                     var folderMediaItem = mediaRoot.Children().FirstOrDefault(x => x.Name == folderName && x.ContentType.Alias == Core.Constants.Conventions.MediaTypes.Folder);
@@ -471,6 +475,7 @@ namespace Umbraco.Web.Editors
                     {
                         parentId = folderMediaItem.Id;
                     }
+                    
                 }
             }
   
