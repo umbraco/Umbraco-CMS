@@ -24,7 +24,9 @@
 
       <umb-media-grid
          items="listViewResultSet.items"
-         details-hover="vm.showMediaDetailsTooltip">
+         on-details-hover="vm.hoverMediaItemDetails"
+         on-select="vm.selectMediaItem"
+         on-click="vm.clickMediaItem">
       </umb-media-grid>
 
       <umb-tooltip

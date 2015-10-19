@@ -1,10 +1,10 @@
 <div class="umb-media-grid" ui-sortable="mediaItemsSortingOptions" ng-model="mediaItems">
 
-   <a href="#{{item.editPath}}" ng-repeat="item in mediaItems" ng-style="item.flexStyle" class="umb-media-grid__item">
+   <a href="" ng-click="clickItem(item)" ng-repeat="item in mediaItems" ng-style="item.flexStyle" class="umb-media-grid__item">
 
       <div class="umb-media-grid__actions">
-         <i class="icon-info umb-media-grid__action -not-clickable" ng-if="detailsHover" ng-mouseover="onDetailsOver(item, $event)" ng-mouseleave="onDetailsOut(item, $event)"></i>
-         <i class="icon-check umb-media-grid__action" ng-click="toggleSelectItem(item)" ng-class="{'-selected': item.selected}" prevent-default></i>
+         <i ng-if="onDetailsHover" class="icon-info umb-media-grid__action -not-clickable" ng-mouseover="hoverItemDetails(item, $event, true)" ng-mouseleave="hoverItemDetails(item, $event, false)"></i>
+         <i ng-if="onSelect" class="icon-check umb-media-grid__action" ng-click="selectItem(item, $event)" ng-class="{'-selected': item.selected}" prevent-default></i>
       </div>
 
       <div class="umb-media-grid__item-overlay">
