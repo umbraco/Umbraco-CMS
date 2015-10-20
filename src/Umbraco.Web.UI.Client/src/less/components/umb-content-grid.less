@@ -10,8 +10,12 @@
    flex: 0 1 200px;
    cursor: pointer;
    position: relative;
-   margin-right: 20px;
-   margin-bottom: 20px;
+   margin: 10px;
+   border: 1px solid #ffffff;
+}
+
+.umb-content-grid__item:hover {
+   border: 1px solid @blue;
 }
 
 .umb-content-grid__item:hover .umb-content-grid__action {
@@ -112,4 +116,11 @@
    animation: fadeIn;
    animation-duration: 0.2s;
    animation-timing-function: ease-in-out;
+}
+
+.umb-content-grid__placeholder {
+   background: @grayLighter;
+   border: 2px dashed @grayLight;
+   box-sizing: border-box;
+   margin: 10px;
 }
