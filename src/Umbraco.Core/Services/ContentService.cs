@@ -1408,8 +1408,6 @@ namespace Umbraco.Core.Services
                     if (success)
                         repository.DeleteMediaFiles(files);
                 }
-
-
             }
             Audit(AuditType.Delete, "Empty Content Recycle Bin performed by user", 0, Constants.System.RecycleBinContent);
         }
@@ -1836,14 +1834,18 @@ namespace Umbraco.Core.Services
 
                 //Publish and then update the database with new status
                 var publishedOutcome = internalStrategy.PublishWithChildrenInternal(list, userId, includeUnpublished).ToArray();
+                var published = publishedOutcome
+                    .Where(x => x.Success || x.Result.StatusType == PublishStatusType.SuccessAlreadyPublished)
+                    // ensure proper order (for events) - cannot publish a child before its parent!
+                    .OrderBy(x => x.Result.ContentItem.Level)
+                    .ThenBy(x => x.Result.ContentItem.SortOrder);
 
                 var uow = UowProvider.GetUnitOfWork();
                 using (var repository = RepositoryFactory.CreateContentRepository(uow))
                 {
                     //NOTE The Publish with subpages-dialog was used more as a republish-type-thing, so we'll have to include PublishStatusType.SuccessAlreadyPublished
                     //in the updated-list, so the Published event is triggered with the expected set of pages and the xml is updated.
-                    foreach (var item in publishedOutcome.Where(
-                        x => x.Success || x.Result.StatusType == PublishStatusType.SuccessAlreadyPublished))
+                    foreach (var item in published)
                     {
                         item.Result.ContentItem.WriterId = userId;
                         repository.AddOrUpdate(item.Result.ContentItem);

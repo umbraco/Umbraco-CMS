@@ -1,6 +1,7 @@
 using System;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Models.Rdbms
 {
@@ -27,7 +28,7 @@ namespace Umbraco.Core.Models.Rdbms
         public string ProviderKey { get; set; }
 
         [Column("createDate")]
-        [Constraint(Default = "getdate()")]
+        [Constraint(Default = SystemMethods.CurrentDateTime)]
         public DateTime CreateDate { get; set; }
 
 

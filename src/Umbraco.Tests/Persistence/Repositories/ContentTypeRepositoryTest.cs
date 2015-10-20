@@ -249,6 +249,22 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Can_Perform_Get_By_Missing_Guid_On_ContentTypeRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                // Act
+                var result = repository.Get(Guid.NewGuid());
+
+                // Assert
+                Assert.That(result, Is.Null);
+            }
+        }
+
+        [Test]
         public void Can_Perform_GetAll_On_ContentTypeRepository()
         {
             // Arrange

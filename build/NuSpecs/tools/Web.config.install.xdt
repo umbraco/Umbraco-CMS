@@ -22,10 +22,7 @@
   <appSettings>
     <add key="owin:appStartup" value="UmbracoDefaultOwinStartup" xdt:Locator="Match(key)" xdt:Transform="InsertIfMissing" />
   </appSettings>
-  <appSettings>
-    <add key="owin:appStartup" value="UmbracoDefaultOwinStartup" xdt:Locator="Match(key)" xdt:Transform="SetAttributes" />
-  </appSettings>
-
+  
   <umbracoConfiguration xdt:Transform="InsertIfMissing">
     <settings configSource="config\umbracoSettings.config" xdt:Locator="Match(configSource)" xdt:Transform="InsertIfMissing" />
     <BaseRestExtensions configSource="config\BaseRestExtensions.config" xdt:Locator="Match(configSource)" xdt:Transform="InsertIfMissing" />

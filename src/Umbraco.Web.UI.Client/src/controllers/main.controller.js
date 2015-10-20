@@ -91,7 +91,7 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
                     $timeout(function () {
                         //this can be null if they time out
                         if ($scope.user && $scope.user.emailHash) {
-                            $scope.avatar = "//www.gravatar.com/avatar/" + $scope.user.emailHash + ".jpg?s=64&d=mm";
+                            $scope.avatar = "https://www.gravatar.com/avatar/" + $scope.user.emailHash + ".jpg?s=64&d=mm";
                         }
                     });
                     $("#avatar-img").fadeTo(1000, 1);

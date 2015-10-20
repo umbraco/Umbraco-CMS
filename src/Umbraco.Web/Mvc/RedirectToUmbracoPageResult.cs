@@ -42,6 +42,11 @@ namespace Umbraco.Web.Mvc
 			}
 		}
 
+        public int PageId
+        {
+            get { return _pageId; }
+        }
+
 		public IPublishedContent PublishedContent
 		{
 			get

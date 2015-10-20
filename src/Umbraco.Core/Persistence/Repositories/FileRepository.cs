@@ -147,10 +147,6 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected virtual void PersistUpdatedItem(TEntity entity)
         {
-            //TODO: A big problem here is if the entities 'Path' changes, if that is the case then 
-            // we'd need to rename the underlying file, BUT how would we do this since we aren't storing an 
-            // original path property.
-
             using (var stream = GetContentStream(entity.Content))
             {
                 FileSystem.AddFile(entity.Path, stream, true);
@@ -217,6 +213,15 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             return list;
+        }
+
+        protected string GetFileContent(string filename)
+        {
+            using (var stream = FileSystem.OpenFile(filename))
+            using (var reader = new StreamReader(stream, Encoding.UTF8, true))
+            {
+                return reader.ReadToEnd();
+            }
         }
 
 		/// <summary>

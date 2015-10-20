@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using log4net;
 using Semver;
 using Umbraco.Core.Configuration;
@@ -243,12 +245,42 @@ namespace Umbraco.Core.Persistence.Migrations
                     //TODO: We should output all of these SQL calls to files in a migration folder in App_Data/TEMP
                     // so if people want to executed them manually on another environment, they can.
 
-                    _logger.Info<MigrationRunner>("Executing sql statement " + i + ": " + sql);
-                    database.Execute(sql);
+                    //The following ensures the multiple statement sare executed one at a time, this is a requirement
+                    // of SQLCE, it's unfortunate but necessary.
+                    // http://stackoverflow.com/questions/13665491/sql-ce-inconsistent-with-multiple-statements
+                    var sb = new StringBuilder();
+                    using (var reader = new StringReader(sql))
+                    {
+                        string line;
+                        while ((line = reader.ReadLine()) != null)
+                        {
+                            line = line.Trim();
+                            if (line.Equals("GO", StringComparison.OrdinalIgnoreCase))
+                            {
+                                //Execute the SQL up to the point of a GO statement
+                                var exeSql = sb.ToString();
+                                _logger.Info<MigrationRunner>("Executing sql statement " + i + ": " + exeSql);
+                                database.Execute(exeSql);
+                                
+                                //restart the string builder
+                                sb.Remove(0, sb.Length);
+                            }
+                            else
+                            {
+                                sb.AppendLine(line);
+                            }
+                        }
+                        //execute anything remaining
+                        if (sb.Length > 0)
+                        {
+                            var exeSql = sb.ToString();
+                            _logger.Info<MigrationRunner>("Executing sql statement " + i + ": " + exeSql);
+                            database.Execute(exeSql);
+                        }
+                    }
+                    
                     i++;
                 }
-
-                
 
                 transaction.Complete();
 

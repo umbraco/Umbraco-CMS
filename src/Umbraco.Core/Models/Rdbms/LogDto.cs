@@ -1,6 +1,7 @@
 ﻿using System;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Models.Rdbms
 {
@@ -21,7 +22,7 @@ namespace Umbraco.Core.Models.Rdbms
         public int NodeId { get; set; }
 
         [Column("Datestamp")]
-        [Constraint(Default = "getdate()")]
+        [Constraint(Default = SystemMethods.CurrentDateTime)]
         public DateTime Datestamp { get; set; }
 
         [Column("logHeader")]

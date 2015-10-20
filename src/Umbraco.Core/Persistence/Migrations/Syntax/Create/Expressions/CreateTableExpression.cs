@@ -7,24 +7,24 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Expressions
 {
     public class CreateTableExpression : MigrationExpressionBase
     {
-        [Obsolete("Use the other constructors specifying an ISqlSyntaxProvider instead")]
-        public CreateTableExpression()
-        {
-            Columns = new List<ColumnDefinition>();
-        }
+        //[Obsolete("Use the other constructors specifying an ISqlSyntaxProvider instead")]
+        //public CreateTableExpression()
+        //{
+        //    Columns = new List<ColumnDefinition>();
+        //}
 
-        [Obsolete("Use the other constructors specifying an ISqlSyntaxProvider instead")]
-        public CreateTableExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders)
-            : base(current, databaseProviders)
-        {
-            Columns = new List<ColumnDefinition>();
-        }
+        //[Obsolete("Use the other constructors specifying an ISqlSyntaxProvider instead")]
+        //public CreateTableExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders)
+        //    : base(current, databaseProviders)
+        //{
+        //    Columns = new List<ColumnDefinition>();
+        //}
 
-        public CreateTableExpression(ISqlSyntaxProvider sqlSyntax)
-            : base(sqlSyntax)
-        {
-            Columns = new List<ColumnDefinition>();
-        }
+        //public CreateTableExpression(ISqlSyntaxProvider sqlSyntax)
+        //    : base(sqlSyntax)
+        //{
+        //    Columns = new List<ColumnDefinition>();
+        //}
 
         public CreateTableExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax)
             : base(current, databaseProviders, sqlSyntax)

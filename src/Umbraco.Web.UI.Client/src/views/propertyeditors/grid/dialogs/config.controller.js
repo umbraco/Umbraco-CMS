@@ -22,7 +22,10 @@ angular.module("umbraco")
                     } else {
                         return val.slice(paddArray[0].length, 0);
                     }
-                }else{
+                } else {
+                    if (paddArray[1].length === 0) {
+                        return val.slice(paddArray[0].length);
+                    }
                     return val.slice(paddArray[0].length, -paddArray[1].length); 
                 }
             }

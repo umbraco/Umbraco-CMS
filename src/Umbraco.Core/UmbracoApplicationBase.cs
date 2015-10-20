@@ -42,19 +42,6 @@ namespace Umbraco.Core
 
                 var msg = "Unhandled exception in AppDomain";
                 if (isTerminating) msg += " (terminating)";
-                Logger.Error(typeof(UmbracoApplicationBase), msg, exception);
-            };
-
-            //take care of unhandled exceptions - there is nothing we can do to 
-            // prevent the entire w3wp process to go down but at least we can try
-            // and log the exception
-            AppDomain.CurrentDomain.UnhandledException += (_, args) =>
-            {
-                var exception = (Exception) args.ExceptionObject;
-                var isTerminating = args.IsTerminating; // always true?
-
-                var msg = "Unhandled exception in AppDomain";
-                if (isTerminating) msg += " (terminating)";
                 LogHelper.Error<UmbracoApplicationBase>(msg, exception);
             };
 

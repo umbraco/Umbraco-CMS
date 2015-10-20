@@ -66,6 +66,7 @@
         <cc1:Pane ID="Pane7" runat="server" >
             
             <cc1:PropertyPanel ID="pp_name" runat="server">
+                <asp:Literal runat="server" ID="PathPrefix"></asp:Literal>
                 <asp:TextBox ID="NameTxt" runat="server"></asp:TextBox>
             </cc1:PropertyPanel>
             

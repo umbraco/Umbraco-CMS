@@ -33,9 +33,9 @@ namespace Umbraco.Core.Persistence.Factories
 
         #region Implementation of IEntityFactory<ITemplate,TemplateDto>
 
-        public Template BuildEntity(TemplateDto dto, IEnumerable<IUmbracoEntity> childDefinitions)
+        public Template BuildEntity(TemplateDto dto, IEnumerable<IUmbracoEntity> childDefinitions, Func<File, string> getFileContent)
         {
-            var template = new Template(dto.NodeDto.Text, dto.Alias)
+            var template = new Template(dto.NodeDto.Text, dto.Alias, getFileContent)
                                {
                                    CreateDate = dto.NodeDto.CreateDate,
                                    Id = dto.NodeId,

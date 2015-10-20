@@ -182,6 +182,7 @@
     <Compile Include="Logging\ParallelForwarderTest.cs" />
     <Compile Include="Persistence\Repositories\AuditRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\DomainRepositoryTest.cs" />
+    <Compile Include="Persistence\Repositories\PartialViewRepositoryTests.cs" />
     <Compile Include="Persistence\Repositories\PublicAccessRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\TaskRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\TaskTypeRepositoryTest.cs" />

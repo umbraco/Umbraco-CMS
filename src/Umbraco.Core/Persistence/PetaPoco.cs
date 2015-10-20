@@ -353,6 +353,7 @@ namespace Umbraco.Core.Persistence
 		public void AbortTransaction()
 		{
 			_transactionCancelled = true;
+            //TODO what shall we do if transactionDepth is already zero?
 			if ((--_transactionDepth) == 0)
 				CleanupTransaction();
 		}
@@ -360,7 +361,8 @@ namespace Umbraco.Core.Persistence
 		// Complete the transaction
 		public void CompleteTransaction()
 		{
-			if ((--_transactionDepth) == 0)
+            //TODO what shall we do if transactionDepth is already zero?
+            if ((--_transactionDepth) == 0)
 				CleanupTransaction();
 		}
 
@@ -2344,6 +2346,7 @@ namespace Umbraco.Core.Persistence
 
 		public void Dispose()
 		{
+            //TODO prevent multiple calls to Dispose
 			if (_db != null)
 				_db.AbortTransaction();
 		}
