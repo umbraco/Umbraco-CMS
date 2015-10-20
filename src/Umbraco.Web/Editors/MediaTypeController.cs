@@ -176,7 +176,7 @@ namespace Umbraco.Web.Editors
             }
             else
             {
-                var contentItem = Services.ContentService.GetById(contentId);
+                var contentItem = Services.MediaService.GetById(contentId);
                 if (contentItem == null)
                 {
                     return Enumerable.Empty<ContentTypeBasic>();
