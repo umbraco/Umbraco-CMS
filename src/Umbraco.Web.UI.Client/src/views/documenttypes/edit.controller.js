@@ -9,7 +9,7 @@
 (function() {
 	"use strict";
 
-	function DocumentTypesEditController($scope, $routeParams, contentTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter) {
+	function DocumentTypesEditController($scope, $routeParams, modelsResource, contentTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter) {
 
 		var vm = this;
 
@@ -17,6 +17,7 @@
 
 		vm.currentNode = null;
 		vm.contentType = {};
+
 		vm.page = {};
 		vm.page.loading = false;
 		vm.page.saveButtonState = "init";
@@ -43,6 +44,51 @@
 				"view": "views/documenttypes/views/templates/templates.html"
 			}
 		];
+
+
+        
+        //disable by default, turn on if detected correctly.
+		vm.page.modelsBuilder = false;
+		modelsResource.getModelsOutOfDateStatus().then(function () {
+		    vm.page.modelsBuilder = true;
+		});
+
+	    //Models builder mode:
+
+		vm.page.defaultButton = {
+			hotKey: "ctrl+s",
+			labelKey: "buttons_save",
+			letter: "S",
+			type: "submit",
+			handler: function () { vm.save(); }
+		};
+		vm.page.subButtons = [{
+			hotKey: "ctrl+g",
+			labelKey: "buttons_generateModels",
+			letter: "G",
+			handler: function(){
+
+				vm.page.saveButtonState = "busy";
+				notificationsService.info("Building models", "this can take abit of time, don't worry");
+				
+				modelsResource.buildModels().then(function(){
+					vm.page.saveButtonState = "init";
+
+					//clear and add success
+					notificationsService.success("Models Generated");
+
+					//just calling this to get the servar back to life
+					modelsResource.getModelsOutOfDateStatus();
+
+				}, function(){
+                    notificationsService.error("Models could not be generated");
+                    vm.page.saveButtonState = "error";
+				});
+
+			}
+		}];
+
+
 
 		vm.page.keyboardShortcutsOverview = [
 			{
