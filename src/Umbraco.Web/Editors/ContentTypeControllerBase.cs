@@ -126,13 +126,14 @@ namespace Umbraco.Web.Editors
             return CultureDictionary[text].IfNullOrWhiteSpace(text);
         }
 
-        protected TContentType PerformPostSave<TContentType>(
+        protected TContentType PerformPostSave<TContentType, TContentTypeDisplay>(
             ContentTypeSave contentTypeSave,
             Func<int, TContentType> getContentType,
             Action<TContentType> saveContentType,
             bool validateComposition = true,
             Action<ContentTypeSave> beforeCreateNew = null)
             where TContentType : IContentTypeComposition
+            where TContentTypeDisplay : ContentTypeCompositionDisplay
         {
             var ctId = Convert.ToInt32(contentTypeSave.Id);
             
@@ -140,7 +141,7 @@ namespace Umbraco.Web.Editors
             {
                 var ct = getContentType(ctId);
                 //Required data is invalid so we cannot continue
-                var forDisplay = Mapper.Map<ContentTypeCompositionDisplay>(ct);
+                var forDisplay = Mapper.Map<TContentTypeDisplay>(ct);
                 //map the 'save' data on top
                 forDisplay = Mapper.Map(contentTypeSave, forDisplay);
                 forDisplay.Errors = ModelState.ToErrorDictionary();
