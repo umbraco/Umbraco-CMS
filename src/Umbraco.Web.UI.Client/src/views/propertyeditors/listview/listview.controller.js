@@ -70,7 +70,8 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         ],
         allowBulkPublish: true,
         allowBulkUnpublish: true,
-        allowBulkDelete: true,        
+        allowBulkMove: true,
+        allowBulkDelete: true,
     };
 
     // set active layout
@@ -378,6 +379,38 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
             function (count, total) { return "Unpublished " + count + " out of " + total + " document" + (total > 1 ? "s" : "") },
             function (total) { return "Unpublished " + total + " document" + (total > 1 ? "s" : "") });
     };
+
+    $scope.move = function() {
+      $scope.moveDialog = {};
+      $scope.moveDialog.title = "Move";
+      $scope.moveDialog.section = $scope.entityType;
+      $scope.moveDialog.view = "treepicker";
+      $scope.moveDialog.show = true;
+
+      $scope.moveDialog.submit = function(model) {
+
+         if(model.selection.length > 0) {
+            performMove(model.selection[0]);
+         }
+
+         $scope.moveDialog.show = false;
+         $scope.moveDialog = null;
+      };
+
+      $scope.moveDialog.close = function(oldModel) {
+         $scope.moveDialog.show = false;
+         $scope.moveDialog = null;
+      };
+
+    };
+
+    function performMove(target) {
+
+      applySelected(
+          function(selected, index) {return contentResource.move({parentId: target.id, id: getIdCallback(selected[index])}); },
+          function(count, total) {return "Moved " + count + " out of " + total + " document" + (total > 1 ? "s" : ""); },
+          function(total) {return "Moved " + total + " document" + (total > 1 ? "s" : ""); });
+    }
 
     function getCustomPropertyValue(alias, properties) {
         var value = '';

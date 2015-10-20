@@ -92,6 +92,17 @@
                </umb-button>
 
                <umb-button
+                  ng-if="options.allowBulkMove"
+                  type="button"
+                  button-style="link"
+                  label="Move"
+                  key="actions_move"
+                  icon="icon-enter"
+                  action="move()"
+                  disabled="actionInProgress">
+               </umb-button>
+
+               <umb-button
                   ng-if="options.allowBulkDelete"
                   type="button"
                   button-style="link"
@@ -139,4 +150,12 @@
         </div>
 
     </div>
+
+    <umb-overlay
+      ng-if="moveDialog.show"
+      model="moveDialog"
+      position="right"
+      view="moveDialog.view">
+    </umb-overlay>
+
 </div>
