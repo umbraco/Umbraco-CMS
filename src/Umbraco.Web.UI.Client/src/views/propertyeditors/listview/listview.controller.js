@@ -1,4 +1,4 @@
-function listViewController($rootScope, $scope, $routeParams, $injector, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q) {
+function listViewController($rootScope, $scope, $routeParams, $injector, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q, mediaResource) {
 
     //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content
     // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -51,8 +51,8 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
     $scope.pagination = [];
     $scope.isNew = false;
     $scope.actionInProgress = false;
-    $scope.layout = {};
-    $scope.layout.activeLayout = {};
+    $scope.selection = [];
+    $scope.folders = [];
     $scope.listViewResultSet = {
         totalPages: 0,
         items: []
@@ -142,10 +142,6 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         }
     }
 
-    $scope.isSortDirection = function (col, direction) {
-        return $scope.options.orderBy.toUpperCase() == col.toUpperCase() && $scope.options.orderDirection == direction;
-    }
-
     $scope.next = function() {
         if ($scope.options.pageNumber < $scope.listViewResultSet.totalPages) {
             $scope.options.pageNumber++;
@@ -160,21 +156,6 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         $scope.reloadView($scope.contentId);
         //TODO: this would be nice but causes the whole view to reload
         //$location.search("page", $scope.options.pageNumber);
-    };
-
-    $scope.sort = function(field, allow) {
-        if (allow) {
-            $scope.options.orderBy = field;
-
-            if ($scope.options.orderDirection === "desc") {
-                $scope.options.orderDirection = "asc";
-            }
-            else {
-                $scope.options.orderDirection = "desc";
-            }
-
-            $scope.reloadView($scope.contentId);
-        }
     };
 
     $scope.prev = function() {
@@ -193,7 +174,18 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
 
     $scope.reloadView = function (id) {
 
+         if($scope.entityType === 'media') {
+
+             mediaResource.getChildFolders($scope.contentId)
+                .then(function(folders) {
+                   $scope.folders = folders;
+                });
+
+         }
+
         getListResultsCallback(id, $scope.options).then(function (data) {
+
+            $scope.selection.length = 0;
 
             $scope.actionInProgress = false;
 
@@ -274,53 +266,35 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         $($event.target).next().focus();
     }
 
-    $scope.selectAll = function($event) {
-        var checkbox = $event.target;
-        if (!angular.isArray($scope.listViewResultSet.items)) {
-            return;
-        }
-        for (var i = 0; i < $scope.listViewResultSet.items.length; i++) {
-            var entity = $scope.listViewResultSet.items[i];
-            entity.selected = checkbox.checked;
-        }
-    };
-
-    $scope.isSelectedAll = function() {
-        if (!angular.isArray($scope.listViewResultSet.items)) {
-            return false;
-        }
-        return _.every($scope.listViewResultSet.items, function(item) {
-            return item.selected;
-        });
-    };
-
     $scope.isAnythingSelected = function() {
-        if (!angular.isArray($scope.listViewResultSet.items)) {
-            return false;
-        }
-        return _.some($scope.listViewResultSet.items, function(item) {
-            return item.selected;
-        });
+       if ($scope.selection.length === 0) {
+          return false;
+       } else {
+          return true;
+       }
     };
 
     $scope.selectedItemsCount = function() {
-       var selected = 0;
-
-       for (var i = 0; $scope.listViewResultSet.items.length > i; i++) {
-          var item = $scope.listViewResultSet.items[i];
-          if (item.selected) {
-             selected = selected + 1;
-          }
-       }
-
-       return selected;
+      return $scope.selection.length;
     };
 
     $scope.clearSelection = function() {
-      for (var i = 0; $scope.listViewResultSet.items.length > i; i++) {
-          var item = $scope.listViewResultSet.items[i];
-          item.selected = false;
+      var items = $scope.listViewResultSet.items;
+      var folders = $scope.folders;
+      var i = 0;
+
+      for (i = 0; items.length > i; i++) {
+         var item = items[i];
+         item.selected = false;
       }
+
+      for (i = 0; folders.length > i; i++) {
+         var folder = folders[i];
+         folder.selected = false;
+      }
+
+      $scope.selection.length = 0;
+
     };
 
     $scope.getIcon = function(entry) {
@@ -340,9 +314,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
     }
 
     function applySelected(fn, getStatusMsg, getSuccessMsg, confirmMsg) {
-        var selected = _.filter($scope.listViewResultSet.items, function (item) {
-            return item.selected;
-        });
+        var selected = $scope.selection;
         if (selected.length === 0)
             return;
         if (confirmMsg && !confirm(confirmMsg))
