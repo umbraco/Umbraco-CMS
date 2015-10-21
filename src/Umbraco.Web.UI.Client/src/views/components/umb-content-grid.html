@@ -1,4 +1,4 @@
-<div class="umb-content-grid">
+<div class="umb-content-grid" ui-sortable="contentItemSortingOptions" ng-model="content">
 
    <div
       class="umb-content-grid__item"
@@ -26,5 +26,7 @@
       </div>
 
    </div>
+
+   <div ng-if="!content" class="umb-content-grid__no-items">There are no items to show</div>
 
 </div>

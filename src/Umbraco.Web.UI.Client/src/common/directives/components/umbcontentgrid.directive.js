@@ -5,6 +5,20 @@
 
       function link(scope, el, attr, ctrl) {
 
+         scope.contentItemSortingOptions = {
+            distance: 10,
+            tolerance: "pointer",
+            opacity: 0.7,
+            scroll: true,
+            cursor: "move",
+            zIndex: 6000,
+            placeholder: "umb-content-grid__placeholder",
+            start: function(e, ui) {
+              ui.placeholder.height(ui.item.height());
+              ui.placeholder.width(ui.item.width());
+            }
+         };
+
          scope.clickItem = function(item) {
             if(scope.onClick) {
                scope.onClick(item);

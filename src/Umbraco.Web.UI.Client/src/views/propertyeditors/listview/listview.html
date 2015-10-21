@@ -52,9 +52,9 @@
 
             <umb-editor-sub-header-section ng-if="!isAnythingSelected()">
                <umb-layout-selector
-                  ng-if="model.config.layouts"
-                  layouts="model.config.layouts"
-                  active-layout="layout.activeLayout">
+                  ng-if="options.layout.layouts"
+                  layouts="options.layout.layouts"
+                  active-layout="options.layout.activeLayout">
                </umb-layout-selector>
             </umb-editor-sub-header-section>
 
@@ -120,7 +120,7 @@
       </umb-editor-sub-header>
 
 
-        <div ng-include="layout.activeLayout.path"></div>
+        <div ng-include="options.layout.activeLayout.path"></div>
 
         <div class="pagination" ng-show="pagination.length > 1">
 

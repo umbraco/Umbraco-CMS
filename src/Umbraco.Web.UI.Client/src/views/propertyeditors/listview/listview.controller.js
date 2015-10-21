@@ -68,18 +68,19 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
             { alias: 'updateDate', header: 'Last edited', isSystem: 1 },
             { alias: 'updater', header: 'Last edited by', isSystem: 1 }
         ],
+        layout: {
+           layouts: $scope.model.config.layouts,
+           activeLayout: getFirstAllowedLayout($scope.model.config.layouts)
+        },
         allowBulkPublish: true,
         allowBulkUnpublish: true,
         allowBulkMove: true,
         allowBulkDelete: true,
     };
 
-    // set active layout
-    $scope.layout.activeLayout = getFirstAllowedLayout($scope.model.config.layouts);
-
     //update all of the system includeProperties to enable sorting
     _.each($scope.options.includeProperties, function(e, i) {
-        
+
         if (e.isSystem) {
 
             //NOTE: special case for contentTypeAlias, it's a system property that cannot be sorted
@@ -88,7 +89,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
             if (e.alias != "contentTypeAlias") {
                 e.allowSorting = true;
             }
-            
+
             //localize the header
             var key = getLocalizedKey(e.alias);
             localizationService.localize(key).then(function (v) {
@@ -184,7 +185,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
             //$location.search("page", $scope.options.pageNumber);
         }
     };
-    
+
 
     /*Loads the search results, based on parameters set in prev,next,sort and so on*/
     /*Pagination is done by an array of objects, due angularJS's funky way of monitoring state
@@ -441,9 +442,9 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
 
             var alias = e.alias;
 
-            // First try to pull the value directly from the alias (e.g. updatedBy)        
+            // First try to pull the value directly from the alias (e.g. updatedBy)
             var value = result[alias];
-            
+
             // If this returns an object, look for the name property of that (e.g. owner.name)
             if (value === Object(value)) {
                 value = value['name'];
@@ -515,4 +516,4 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
 }
 
 
-angular.module("umbraco").controller("Umbraco.PropertyEditors.ListViewController", listViewController);
+angular.module("umbraco").controller("Umbraco.PropertyEditors.ListViewController", listViewController);
