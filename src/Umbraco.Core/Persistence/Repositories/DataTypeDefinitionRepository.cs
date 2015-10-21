@@ -35,8 +35,10 @@ namespace Umbraco.Core.Persistence.Repositories
             _cacheHelper = cacheHelper;
             _contentTypeRepository = contentTypeRepository;
             _preValRepository = new DataTypePreValueRepository(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax);
+
         }
 
+     
         #region Overrides of RepositoryBase<int,DataTypeDefinition>
 
         protected override IDataTypeDefinition PerformGet(int id)
@@ -146,6 +148,10 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             ((DataTypeDefinition)entity).AddingEntity();
 
+            //ensure a datatype has a unique name before creating it
+            entity.Name = EnsureUniqueNodeName(entity.Name);
+
+            //TODO: should the below be removed?
             //Cannot add a duplicate data type
             var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsDataType
 INNER JOIN umbracoNode ON cmsDataType.nodeId = umbracoNode.id
@@ -190,6 +196,8 @@ WHERE umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + "= @name", new { n
 
         protected override void PersistUpdatedItem(IDataTypeDefinition entity)
         {
+
+            entity.Name = EnsureUniqueNodeName(entity.Name, entity.Id);
 
             //Cannot change to a duplicate alias
             var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsDataType
@@ -417,6 +425,37 @@ AND umbracoNode.id <> @id",
             return collection;
         }
 
+        private string EnsureUniqueNodeName(string nodeName, int id = 0)
+        {
+         
+
+            var sql = new Sql();
+            sql.Select("*")
+               .From<NodeDto>()
+               .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId && x.Text.StartsWith(nodeName));
+
+            int uniqueNumber = 1;
+            var currentName = nodeName;
+
+            var dtos = Database.Fetch<NodeDto>(sql);
+            if (dtos.Any())
+            {
+                var results = dtos.OrderBy(x => x.Text, new SimilarNodeNameComparer());
+                foreach (var dto in results)
+                {
+                    if (id != 0 && id == dto.NodeId) continue;
+
+                    if (dto.Text.ToLowerInvariant().Equals(currentName.ToLowerInvariant()))
+                    {
+                        currentName = nodeName + string.Format(" ({0})", uniqueNumber);
+                        uniqueNumber++;
+                    }
+                }
+            }
+
+            return currentName;
+        }
+
         /// <summary>
         /// Private class to handle pre-value crud based on units of work with transactions
         /// </summary>
@@ -527,6 +566,8 @@ AND umbracoNode.id <> @id",
                 };
                 Database.Update(dto);
             }
+
+            
         }
 
         internal static class PreValueConverter

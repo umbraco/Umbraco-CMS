@@ -132,17 +132,37 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
         });
     } else {
         dialogOptions.startNodeId = $scope.model.config.startNode.id;
-    }        
-    
+    }
+
     //dialog
-    $scope.openContentPicker = function () {                
-        var d = dialogService.treePicker(dialogOptions);
+    $scope.openContentPicker = function() {
+      $scope.contentPickerOverlay = dialogOptions;
+      $scope.contentPickerOverlay.view = "treepicker";
+      $scope.contentPickerOverlay.show = true;
+
+      $scope.contentPickerOverlay.submit = function(model) {
+
+          if (angular.isArray(model.selection)) {
+             _.each(model.selection, function (item, i) {
+                  $scope.add(item);
+             });
+          }
+
+          $scope.contentPickerOverlay.show = false;
+          $scope.contentPickerOverlay = null;
+      }
+
+      $scope.contentPickerOverlay.close = function(oldModel) {
+          $scope.contentPickerOverlay.show = false;
+          $scope.contentPickerOverlay = null;
+      }
+
     };
 
     $scope.remove = function (index) {
         $scope.renderModel.splice(index, 1);
     };
-        
+
     $scope.add = function (item) {
         var currIds = _.map($scope.renderModel, function (i) {
             return i.id;

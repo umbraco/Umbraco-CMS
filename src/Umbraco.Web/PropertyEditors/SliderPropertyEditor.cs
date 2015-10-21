@@ -3,7 +3,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.SliderAlias, "Slider", "slider")]
+    [PropertyEditor(Constants.PropertyEditors.SliderAlias, "Slider", "slider", Icon="icon-navigation-horizontal")]
     public class SliderPropertyEditor : PropertyEditor
     {
         protected override PreValueEditor CreatePreValueEditor()

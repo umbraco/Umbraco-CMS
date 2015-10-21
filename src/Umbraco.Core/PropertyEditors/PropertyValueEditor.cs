@@ -133,6 +133,8 @@ namespace Umbraco.Core.PropertyEditors
                 case "INT":
                 case "INTEGER":
                     return DataTypeDatabaseType.Integer;
+                case "DECIMAL":
+                    return DataTypeDatabaseType.Decimal;
                 case "STRING":
                     return DataTypeDatabaseType.Nvarchar;
                 case "TEXT":
@@ -201,6 +203,11 @@ namespace Umbraco.Core.PropertyEditors
                     return result.Success && result.Result != null
                         ? Attempt<object>.Succeed((int)(long)result.Result) 
                         : result;
+
+                case DataTypeDatabaseType.Decimal:
+                    //ensure these are nullable so we can return a null if required
+                    valueType = typeof(decimal?);
+                    break;
 
                 case DataTypeDatabaseType.Date:
                     //ensure these are nullable so we can return a null if required
@@ -283,6 +290,7 @@ namespace Umbraco.Core.PropertyEditors
                     }
                     return property.Value.ToString();
                 case DataTypeDatabaseType.Integer:
+                case DataTypeDatabaseType.Decimal:
                     //we can just ToString() any of these types
                     return property.Value.ToString();
                 case DataTypeDatabaseType.Date:
@@ -325,6 +333,7 @@ namespace Umbraco.Core.PropertyEditors
             {
                 case DataTypeDatabaseType.Date:
                 case DataTypeDatabaseType.Integer:
+                case DataTypeDatabaseType.Decimal:
                     return new XText(ConvertDbToString(property, propertyType, dataTypeService));                    
                 case DataTypeDatabaseType.Nvarchar:
                 case DataTypeDatabaseType.Ntext:
@@ -354,6 +363,7 @@ namespace Umbraco.Core.PropertyEditors
                     property.Value.ToXmlString<string>();
                     return property.Value.ToXmlString<string>();
                 case DataTypeDatabaseType.Integer:
+                case DataTypeDatabaseType.Decimal:
                     return property.Value.ToXmlString(property.Value.GetType());                
                 case DataTypeDatabaseType.Date:
                     //treat dates differently, output the format as xml format

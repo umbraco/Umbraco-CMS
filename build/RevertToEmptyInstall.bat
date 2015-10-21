@@ -55,7 +55,7 @@ echo Removing masterpage files
 del ..\src\Umbraco.Web.UI\masterpages\*.*
 
 echo Removing view files
-del ..\src\Umbraco.Web.UI\Views\*.*
+del ..\src\Umbraco.Web.UI\Views\*.cshtml
 
 echo Removing razor files
 del ..\src\Umbraco.Web.UI\macroScripts\*.*
@@ -122,7 +122,7 @@ echo Removing user control files
 FOR %%A IN (..\src\Umbraco.Web.UI\usercontrols\*.*) DO DEL %%A
 
 echo Removing view files
-FOR %%A IN (..\src\Umbraco.Web.UI\Views\*.*) DO DEL %%A
+FOR %%A IN (..\src\Umbraco.Web.UI\Views\*.cshtml) DO DEL %%A
 
 echo Removing razor files
 FOR %%A IN (..\src\Umbraco.Web.UI\macroScripts\*.*) DO DEL %%A
@@ -147,6 +147,9 @@ FOR %%A IN (..\src\Umbraco.Web.UI\umbraco\images\umbraco\icon_*.*) DO DEL %%A
 rmdir "..\src\Umbraco.Web.UI\umbraco\plugins\umbracoContour\" /S /Q
 del ..\src\Umbraco.Web.UI\umbraco\xslt\templates\UmbracoContour*.* /S /Q
 rmdir "..\src\Umbraco.Web.UI\usercontrols\umbracoContour\" /S /Q
+
+echo Start with a clean web.config
+copy ..\src\Umbraco.Web.UI\web.Template.config ..\src\Umbraco.Web.UI\web.config /Y
 
 echo Start with a clean web.config
 copy ..\src\Umbraco.Web.UI\web.Template.config ..\src\Umbraco.Web.UI\web.config /Y

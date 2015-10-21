@@ -242,6 +242,14 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
+        /// <summary>
+        /// The container object type - used for organizing content types
+        /// </summary>
+        protected override Guid ContainerObjectTypeId
+        {
+            get { return new Guid(Constants.ObjectTypes.DocumentTypeContainer); }
+        }
+        
         protected override IContentType PerformGet(Guid id)
         {
             var contentTypes = ContentTypeQueryMapper.GetContentTypes(

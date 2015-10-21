@@ -535,6 +535,11 @@ namespace Umbraco.Web.Editors
             //now we need to convert the unknown ones
             switch (entityType)
             {
+                case UmbracoEntityTypes.Template:
+                    var templates = Services.FileService.GetTemplates();
+                    var filteredTemplates = ExecutePostFilter(templates, postFilter, postFilterParams);
+                    return filteredTemplates.Select(Mapper.Map<EntityBasic>);
+
                 case UmbracoEntityTypes.Macro:                    
                     //Get all macros from the macro service
                     var macros = Services.MacroService.GetAll().WhereNotNull().OrderBy(x => x.Name);
@@ -717,8 +722,6 @@ namespace Umbraco.Web.Editors
                     return UmbracoObjectTypes.Media;
                 case UmbracoEntityTypes.MemberType:
                     return UmbracoObjectTypes.MediaType;
-                case UmbracoEntityTypes.Template:
-                    return UmbracoObjectTypes.Template;
                 case UmbracoEntityTypes.MemberGroup:
                     return UmbracoObjectTypes.MemberGroup;
                 case UmbracoEntityTypes.ContentItem:

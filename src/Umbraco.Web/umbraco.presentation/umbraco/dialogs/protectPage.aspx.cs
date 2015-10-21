@@ -79,7 +79,7 @@ namespace umbraco.presentation.umbraco.dialogs
 
             if (IsPostBack == false)
             {
-                if (Access.IsProtected(documentId, documentObject.Path) && Access.GetProtectionType(documentId) != ProtectionType.NotProtected)
+                if (Access.IsProtected(documentId) && Access.GetProtectionType(documentId) != ProtectionType.NotProtected)
                 {
                     bt_buttonRemoveProtection.Visible = true;
                     bt_buttonRemoveProtection.Attributes.Add("onClick", "return confirm('" + ui.Text("areyousure") + "')");
@@ -263,10 +263,11 @@ namespace umbraco.presentation.umbraco.dialogs
                 p_buttons.Visible = false;
                 pane_advanced.Visible = false;
                 pane_simple.Visible = false;
-                
                 var content = ApplicationContext.Current.Services.ContentService.GetById(pageId);
+                //reloads the current node in the tree
                 ClientTools.SyncTree(content.Path, true);
-
+                //reloads the current node's children in the tree
+                ClientTools.ReloadActionNode(false, true);
                 feedback.type = global::umbraco.uicontrols.Feedback.feedbacktype.success;
             }
         }
@@ -284,8 +285,10 @@ namespace umbraco.presentation.umbraco.dialogs
             feedback.Text = ui.Text("publicAccess", "paIsRemoved", new cms.businesslogic.CMSNode(pageId).Text) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
 
             var content = ApplicationContext.Current.Services.ContentService.GetById(pageId);
+            //reloads the current node in the tree
             ClientTools.SyncTree(content.Path, true);
-
+            //reloads the current node's children in the tree
+            ClientTools.ReloadActionNode(false, true);
             feedback.type = global::umbraco.uicontrols.Feedback.feedbacktype.success;
         }
 

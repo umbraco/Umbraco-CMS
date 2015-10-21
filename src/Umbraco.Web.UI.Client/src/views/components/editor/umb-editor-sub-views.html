@@ -1,0 +1,5 @@
+<div class="umb-editor-sub-views">
+    <div ng-if="activeView.view && activeView.active" ng-include="activeView.view"></div>
+    <div ng-if="!activeView.view && activeView.active" ng-transclude></div>
+</div>
+

@@ -761,7 +761,7 @@ Para fechar a tarefa de tradução vá até os detalhes e clique no botão "Fech
     <key alias="cacheBrowser">Navegador de Cache</key>
     <key alias="contentRecycleBin">Lixeira</key>
     <key alias="createdPackages">Pacotes criados</key>
-    <key alias="datatype">Tipo de Dado</key>
+    <key alias="dataTypes">Tipo de Dado</key>
     <key alias="dictionary">Dicionário</key>
     <key alias="installedPackages">Pacotes instalados</key>
     <key alias="installSkin">Instalar tema</key>
@@ -771,10 +771,10 @@ Para fechar a tarefa de tradução vá até os detalhes e clique no botão "Fech
     <key alias="macros">Macros</key>
     <key alias="mediaTypes">Tipos de Mídia</key>
     <key alias="member">Membros</key>
-    <key alias="memberGroup">Grupos de Membros</key>
+    <key alias="memberGroups">Grupos de Membros</key>
     <key alias="memberRoles">Funções</key>
-    <key alias="memberType">Tipo de Membro</key>
-    <key alias="nodeTypes">Tipos de Documentos</key>
+    <key alias="memberTypes">Tipo de Membro</key>
+    <key alias="documentTypes">Tipos de Documentos</key>
     <key alias="packager">Pacotes</key>
     <key alias="packages">Pacotes</key>
     <key alias="python">Arquivos Python</key>
