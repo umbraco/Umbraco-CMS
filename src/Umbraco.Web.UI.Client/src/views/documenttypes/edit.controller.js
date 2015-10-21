@@ -9,7 +9,7 @@
 (function () {
     "use strict";
 
-    function DocumentTypesEditController($scope, $routeParams, modelsResource, contentTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter, $q) {
+    function DocumentTypesEditController($scope, $routeParams, modelsResource, contentTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter, $q, localizationService) {
 
         var vm = this;
 
@@ -218,6 +218,13 @@
                 //error
                 if (err) {
                     editorState.set($scope.content);
+                }
+                else {
+                    localizationService.localize("speechBubbles_validationFailedHeader").then(function (headerValue) {
+                        localizationService.localize("speechBubbles_validationFailedMessage").then(function(msgValue) {
+                            notificationsService.error(headerValue, msgValue);
+                        });
+                    });
                 }
 
                 vm.page.saveButtonState = "error";

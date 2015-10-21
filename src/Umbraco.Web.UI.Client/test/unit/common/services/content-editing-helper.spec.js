@@ -8,7 +8,9 @@ describe('contentEditingHelper tests', function () {
     //Only for 1.2: beforeEach(module('ngRoute'));
 
 
-    beforeEach(inject(function ($injector) {
+    beforeEach(inject(function ($injector, localizationMocks) {
+        localizationMocks.register();
+
         contentEditingHelper = $injector.get('contentEditingHelper');
         $routeParams = $injector.get('$routeParams');
         serverValidationManager = $injector.get('serverValidationManager');

@@ -9,7 +9,7 @@
 (function () {
     "use strict";
 
-    function MediaTypesEditController($scope, $routeParams, mediaTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter, $q) {
+    function MediaTypesEditController($scope, $routeParams, mediaTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter, $q, localizationService) {
 
         var vm = this;
 
@@ -150,6 +150,13 @@
                 //error
                 if (err) {
                     editorState.set($scope.content);
+                }
+                else {
+                    localizationService.localize("speechBubbles_validationFailedHeader").then(function (headerValue) {
+                        localizationService.localize("speechBubbles_validationFailedMessage").then(function (msgValue) {
+                            notificationsService.error(headerValue, msgValue);
+                        });
+                    });
                 }
 
                 vm.page.saveButtonState = "error";
