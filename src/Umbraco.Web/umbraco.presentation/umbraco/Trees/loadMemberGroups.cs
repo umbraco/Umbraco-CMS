@@ -43,7 +43,7 @@ namespace umbraco
             {
                 rootNode.Text = ui.Text("memberRoles");
             }
-            rootNode.NodeType = "init" + TreeAlias;
+            rootNode.NodeType = "initmemberGroup";
             rootNode.NodeID = "init";
         }
 
