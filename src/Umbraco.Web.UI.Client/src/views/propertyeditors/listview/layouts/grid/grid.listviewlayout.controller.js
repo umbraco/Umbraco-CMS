@@ -14,7 +14,8 @@
       var vm = this;
 
       vm.folders = [];
-      vm.nodeId = $routeParams.id;
+      //pass in the content id from the grid view parent scope (badbadnotgood)
+      vm.nodeId = $scope.contentId;
       vm.acceptedFileTypes = mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
       vm.activeDrag = false;
 

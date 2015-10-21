@@ -1,6 +1,6 @@
 function listViewController($rootScope, $scope, $routeParams, $injector, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q) {
 
-    //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content 
+    //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content
     // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
     // we want. NOTE: This is just a safety check since when we scaffold an empty model on the server we remove
     // the list view tab entirely when it's new.
@@ -11,7 +11,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
 
     //Now we need to check if this is for media, members or content because that will depend on the resources we use
     var contentResource, getContentTypesCallback, getListResultsCallback, deleteItemCallback, getIdCallback, createEditUrlCallback;
-    
+
     //check the config for the entity type, or the current section name (since the config is only set in c#, not in pre-vals)
     if (($scope.model.config.entityType && $scope.model.config.entityType === "member") || (appState.getSectionState("currentSection") === "member")) {
         $scope.entityType = "member";
@@ -31,12 +31,12 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         if (($scope.model.config.entityType && $scope.model.config.entityType === "media") || (appState.getSectionState("currentSection") === "media")) {
             $scope.entityType = "media";
             contentResource = $injector.get('mediaResource');
-            getContentTypesCallback = $injector.get('mediaTypeResource').getAllowedTypes;                        
+            getContentTypesCallback = $injector.get('mediaTypeResource').getAllowedTypes;
         }
         else {
             $scope.entityType = "content";
             contentResource = $injector.get('contentResource');
-            getContentTypesCallback = $injector.get('contentTypeResource').getAllowedTypes;            
+            getContentTypesCallback = $injector.get('contentTypeResource').getAllowedTypes;
         }
         getListResultsCallback = contentResource.getChildren;
         deleteItemCallback = contentResource.deleteById;
@@ -475,14 +475,18 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
     };
 
     function initView() {
-        if ($routeParams.id) {
-            $scope.listViewAllowedTypes = getContentTypesCallback($routeParams.id);
-
-            $scope.contentId = $routeParams.id;
-            $scope.isTrashed = $routeParams.id === "-20" || $routeParams.id === "-21";
-
-            $scope.reloadView($scope.contentId);
+        //default to root id if the id is undefined
+        var id = $routeParams.id;
+        if(id === undefined){
+            id = -1;
         }
+
+        $scope.listViewAllowedTypes = getContentTypesCallback(id);
+
+        $scope.contentId = id;
+        $scope.isTrashed = id === "-20" || id === "-21";
+
+        $scope.reloadView($scope.contentId);
     };
 
     function getLocalizedKey(alias) {
