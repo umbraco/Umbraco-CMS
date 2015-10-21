@@ -32,7 +32,13 @@
          <umb-editor-footer>
 
             <umb-editor-footer-content-left>
-               <umb-breadcrumbs ng-if="ancestors && ancestors.length > 0" ancestors="ancestors"></umb-breadcrumbs>
+
+               <umb-breadcrumbs
+                  ng-if="ancestors && ancestors.length > 0"
+                  ancestors="ancestors"
+                  entity-type="media">
+               </umb-breadcrumbs>
+
             </umb-editor-footer-content-left>
 
 
