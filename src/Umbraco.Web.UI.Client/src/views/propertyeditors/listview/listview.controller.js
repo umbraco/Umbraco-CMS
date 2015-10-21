@@ -334,23 +334,23 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
     $scope.delete = function () {
         applySelected(
             function (selected, index) { return deleteItemCallback(getIdCallback(selected[index])) },
-            function (count, total) { return "Deleted " + count + " out of " + total + " document" + (total > 1 ? "s" : "") },
-            function (total) { return "Deleted " + total + " document" + (total > 1 ? "s" : "") },
+            function (count, total) { return "Deleted " + count + " out of " + total + " item" + (total > 1 ? "s" : "") },
+            function (total) { return "Deleted " + total + " item" + (total > 1 ? "s" : "") },
             "Sure you want to delete?");
     };
 
     $scope.publish = function () {
         applySelected(
             function (selected, index) { return contentResource.publishById(getIdCallback(selected[index])); },
-            function (count, total) { return "Published " + count + " out of " + total + " document" + (total > 1 ? "s" : "") },
-            function (total) { return "Published " + total + " document" + (total > 1 ? "s" : "") });
+            function (count, total) { return "Published " + count + " out of " + total + " item" + (total > 1 ? "s" : "") },
+            function (total) { return "Published " + total + " item" + (total > 1 ? "s" : "") });
     };
 
     $scope.unpublish = function() {
         applySelected(
             function (selected, index) { return contentResource.unPublish(getIdCallback(selected[index])); },
-            function (count, total) { return "Unpublished " + count + " out of " + total + " document" + (total > 1 ? "s" : "") },
-            function (total) { return "Unpublished " + total + " document" + (total > 1 ? "s" : "") });
+            function (count, total) { return "Unpublished " + count + " out of " + total + " item" + (total > 1 ? "s" : "") },
+            function (total) { return "Unpublished " + total + " item" + (total > 1 ? "s" : "") });
     };
 
     $scope.move = function() {
@@ -381,8 +381,8 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
 
       applySelected(
           function(selected, index) {return contentResource.move({parentId: target.id, id: getIdCallback(selected[index])}); },
-          function(count, total) {return "Moved " + count + " out of " + total + " document" + (total > 1 ? "s" : ""); },
-          function(total) {return "Moved " + total + " document" + (total > 1 ? "s" : ""); });
+          function(count, total) {return "Moved " + count + " out of " + total + " item" + (total > 1 ? "s" : ""); },
+          function(total) {return "Moved " + total + " item" + (total > 1 ? "s" : ""); });
     }
 
     function getCustomPropertyValue(alias, properties) {
