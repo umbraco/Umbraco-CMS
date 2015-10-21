@@ -36,7 +36,7 @@ namespace Umbraco.Core.Configuration
         //make this volatile so that we can ensure thread safety with a double check lock
     	private static volatile string _reservedUrlsCache;
         private static string _reservedPathsCache;
-        private static StartsWithContainer _reservedList = new StartsWithContainer();
+        private static HashSet<string> _reservedList = new HashSet<string>();
         private static string _reservedPaths;
         private static string _reservedUrls;
         //ensure the built on (non-changeable) reserved paths are there at all times
@@ -767,38 +767,31 @@ namespace Umbraco.Core.Configuration
                         // store references to strings to determine changes
                         _reservedPathsCache = GlobalSettings.ReservedPaths;
                         _reservedUrlsCache = GlobalSettings.ReservedUrls;
-
-                        string _root = SystemDirectories.Root.Trim().ToLower();
-
+                        
                         // add URLs and paths to a new list
-                        StartsWithContainer _newReservedList = new StartsWithContainer();
-                        foreach (string reservedUrl in _reservedUrlsCache.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries))
+                        var newReservedList = new HashSet<string>();
+                        foreach (var reservedUrlTrimmed in _reservedUrlsCache
+                            .Split(new[] {","}, StringSplitOptions.RemoveEmptyEntries)
+                            .Select(x => x.Trim().ToLowerInvariant())
+                            .Where(x => x.IsNullOrWhiteSpace() == false)
+                            .Select(reservedUrl => IOHelper.ResolveUrl(reservedUrl).Trim().EnsureStartsWith("/"))
+                            .Where(reservedUrlTrimmed => reservedUrlTrimmed.IsNullOrWhiteSpace() == false))
                         {
-                            if (string.IsNullOrWhiteSpace(reservedUrl))
-                               continue;
-                            
-
-                            //resolves the url to support tilde chars
-                            string reservedUrlTrimmed = IOHelper.ResolveUrl(reservedUrl.Trim()).Trim().ToLower();
-                            if (reservedUrlTrimmed.Length > 0)
-                                _newReservedList.Add(reservedUrlTrimmed);
+                            newReservedList.Add(reservedUrlTrimmed);
                         }
 
-                        foreach (string reservedPath in _reservedPathsCache.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries))
+                        foreach (var reservedPathTrimmed in _reservedPathsCache
+                            .Split(new[] {","}, StringSplitOptions.RemoveEmptyEntries)
+                            .Select(x => x.Trim().ToLowerInvariant())
+                            .Where(x => x.IsNullOrWhiteSpace() == false)
+                            .Select(reservedPath => IOHelper.ResolveUrl(reservedPath).Trim().EnsureStartsWith("/").EnsureEndsWith("/"))
+                            .Where(reservedPathTrimmed => reservedPathTrimmed.IsNullOrWhiteSpace() == false))
                         {
-                            bool trimEnd = !reservedPath.EndsWith("/");
-                            if (string.IsNullOrWhiteSpace(reservedPath))
-                                continue;
-                           
-                            //resolves the url to support tilde chars
-                            string reservedPathTrimmed = IOHelper.ResolveUrl(reservedPath.Trim()).Trim().ToLower();
-
-                            if (reservedPathTrimmed.Length > 0)
-                                _newReservedList.Add(reservedPathTrimmed + (reservedPathTrimmed.EndsWith("/") ? "" : "/"));
+                            newReservedList.Add(reservedPathTrimmed);
                         }
 
                         // use the new list from now on
-                        _reservedList = _newReservedList;
+                        _reservedList = newReservedList;
                     }
                 }
             }
@@ -806,107 +799,17 @@ namespace Umbraco.Core.Configuration
             //The url should be cleaned up before checking:
             // * If it doesn't contain an '.' in the path then we assume it is a path based URL, if that is the case we should add an trailing '/' because all of our reservedPaths use a trailing '/'
             // * We shouldn't be comparing the query at all
-            var pathPart = url.Split('?')[0];
-            if (!pathPart.Contains(".") && !pathPart.EndsWith("/"))
+            var pathPart = url.Split(new[] {'?'}, StringSplitOptions.RemoveEmptyEntries)[0].ToLowerInvariant();
+            if (pathPart.Contains(".") == false)
             {
-                pathPart += "/";
+                pathPart = pathPart.EnsureEndsWith('/');
             }
 
             // return true if url starts with an element of the reserved list
-            return _reservedList.StartsWith(pathPart.ToLowerInvariant());
+            return _reservedList.Any(x => pathPart.InvariantStartsWith(x));
         }
 
-        /// <summary>
-        /// Structure that checks in logarithmic time
-        /// if a given string starts with one of the added keys.
-        /// </summary>
-        private class StartsWithContainer
-        {
-            /// <summary>Internal sorted list of keys.</summary>
-            public SortedList<string, string> _list
-                = new SortedList<string, string>(StartsWithComparator.Instance);
-
-            /// <summary>
-            /// Adds the specified new key.
-            /// </summary>
-            /// <param name="newKey">The new key.</param>
-            public void Add(string newKey)
-            {
-                // if the list already contains an element that begins with newKey, return
-                if (String.IsNullOrEmpty(newKey) || StartsWith(newKey))
-                    return;
-
-                // create a new collection, so the old one can still be accessed
-                SortedList<string, string> newList
-                    = new SortedList<string, string>(_list.Count + 1, StartsWithComparator.Instance);
-
-                // add only keys that don't already start with newKey, others are unnecessary
-                foreach (string key in _list.Keys)
-                    if (!key.StartsWith(newKey))
-                        newList.Add(key, null);
-                // add the new key
-                newList.Add(newKey, null);
-
-                // update the list (thread safe, _list was never in incomplete state)
-                _list = newList;
-            }
-
-            /// <summary>
-            /// Checks if the given string starts with any of the added keys.
-            /// </summary>
-            /// <param name="target">The target.</param>
-            /// <returns>true if a key is found that matches the start of target</returns>
-            /// <remarks>
-            /// Runs in O(s*log(n)), with n the number of keys and s the length of target.
-            /// </remarks>
-            public bool StartsWith(string target)
-            {
-                return _list.ContainsKey(target);
-            }
-
-            /// <summary>Comparator that tests if a string starts with another.</summary>
-            /// <remarks>Not a real comparator, since it is not reflexive. (x==y does not imply y==x)</remarks>
-            private sealed class StartsWithComparator : IComparer<string>
-            {
-                /// <summary>Default string comparer.</summary>
-                private readonly static Comparer<string> _stringComparer = Comparer<string>.Default;
-
-                /// <summary>Gets an instance of the StartsWithComparator.</summary>
-                public static readonly StartsWithComparator Instance = new StartsWithComparator();
-
-                /// <summary>
-                /// Tests if whole begins with all characters of part.
-                /// </summary>
-                /// <param name="part">The part.</param>
-                /// <param name="whole">The whole.</param>
-                /// <returns>
-                /// Returns 0 if whole starts with part, otherwise performs standard string comparison.
-                /// </returns>
-                public int Compare(string part, string whole)
-                {
-                    // let the default string comparer deal with null or when part is not smaller then whole
-                    if (part == null || whole == null || part.Length >= whole.Length)
-                        return _stringComparer.Compare(part, whole);
-
-                    ////ensure both have a / on the end
-                    //part = part.EndsWith("/") ? part : part + "/"; 
-                    //whole = whole.EndsWith("/") ? whole : whole + "/";
-                    //if (part.Length >= whole.Length)
-                    //    return _stringComparer.Compare(part, whole);
-
-                    // loop through all characters that part and whole have in common
-                    int pos = 0;
-                    bool match;
-                    do
-                    {
-                        match = (part[pos] == whole[pos]);
-                    } while (match && ++pos < part.Length);
-
-                    // return result of last comparison
-                    return match ? 0 : (part[pos] < whole[pos] ? -1 : 1);
-                }
-            }
-        }
+      
 
     }
 
