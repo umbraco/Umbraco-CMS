@@ -293,15 +293,20 @@ namespace Umbraco.Web.Editors
             {
                 var hasPrevalues = propertyEditor.PreValueEditor.Fields.Any();
 
-                //if no prevalues and a datatype available
+                //check if a data type exists for this property editor
                 var dataDef = datadefs.FirstOrDefault(x => x.PropertyEditorAlias == propertyEditor.Alias);
-                if(hasPrevalues == false && dataDef != null)
+
+                //if no prevalues and a datatype exists with this property editor
+                if (hasPrevalues == false && dataDef != null)
                 {
-                    if (propertyEditor.Alias != Constants.PropertyEditors.ListViewAlias)
-                        datatypes.Add( Mapper.Map<DataTypeBasic>( dataDef ));
-
-                }else{
-
+                    //exclude system list views
+                    if (dataDef.Name.InvariantStartsWith(Constants.Conventions.DataTypes.ListViewPrefix) == false)
+                    {
+                        datatypes.Add(Mapper.Map<DataTypeBasic>(dataDef));
+                    }   
+                }
+                else
+                {
                     //else, just add a clean property editor
                     var basic = Mapper.Map<DataTypeBasic>(propertyEditor);
                     basic.HasPrevalues = hasPrevalues;
@@ -309,7 +314,7 @@ namespace Umbraco.Web.Editors
                 }
             }
 
-            
+
             var grouped = datatypes
                 .GroupBy(x => x.Group.IsNullOrWhiteSpace() ? "" : x.Group.ToLower())
                 .ToDictionary(group => group.Key, group => group.AsEnumerable());
