@@ -122,6 +122,15 @@
 
         <div ng-include="options.layout.activeLayout.path"></div>
 
+      <umb-pagination
+         ng-if="listViewResultSet.totalPages"
+         page-number="options.pageNumber"
+         total-pages="listViewResultSet.totalPages"
+         on-next="next"
+         on-prev="prev"
+         on-go-to-page="goToPage">
+      </umb-pagination>
+
         <div class="pagination" ng-show="pagination.length > 1">
 
            <ul>

@@ -1,0 +1,26 @@
+<div class="pagination" ng-show="pagination.length > 1">
+
+   <ul>
+      <li ng-class="{disabled:pageNumber <= 1}">
+           <a href="#" ng-click="prev()" prevent-default>
+             <localize key="general_previous">Previous</localize>
+           </a>
+      </li>
+
+      <li ng-repeat="pgn in pagination"
+           ng-class="{active:pgn.isActive}">
+
+           <a href="#" ng-click="goToPage(pgn.val - 1)" prevent-default
+             ng-bind="pgn.name ? pgn.name : pgn.val"
+             ng-if="pgn.val != '...'"></a>
+           <span ng-bind="pgn.val" ng-if="pgn.val == '...'"></span>
+      </li>
+
+      <li ng-class="{disabled:pageNumber >= totalPages}">
+           <a href="#" ng-click="next()" prevent-default>
+             <localize key="general_next">Next</localize>
+           </a>
+      </li>
+   </ul>
+
+</div>
