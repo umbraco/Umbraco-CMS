@@ -12,20 +12,6 @@
          var itemMaxWidth = 300;
          var itemMaxHeight = 300;
 
-         scope.mediaItemsSortingOptions = {
-            distance: 10,
-            tolerance: "pointer",
-            opacity: 0.7,
-            scroll: true,
-            cursor: "move",
-            zIndex: 6000,
-            placeholder: "umb-media-grid__placeholder",
-            start: function(e, ui) {
-              ui.placeholder.height(ui.item.height());
-              ui.placeholder.width(ui.item.width());
-            }
-         };
-
          function activate() {
 
             scope.mediaItems = [];
