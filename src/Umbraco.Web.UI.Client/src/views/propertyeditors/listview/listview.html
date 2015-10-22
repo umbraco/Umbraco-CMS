@@ -92,6 +92,17 @@
                </umb-button>
 
                <umb-button
+                  ng-if="entityType === 'content' && options.allowBulkCopy"
+                  type="button"
+                  button-style="link"
+                  label="Copy"
+                  key="actions_copy"
+                  icon="icon-documents"
+                  action="copy()"
+                  disabled="actionInProgress">
+               </umb-button>
+
+               <umb-button
                   ng-if="options.allowBulkMove"
                   type="button"
                   button-style="link"
@@ -145,6 +156,13 @@
       model="moveDialog"
       position="right"
       view="moveDialog.view">
+    </umb-overlay>
+
+    <umb-overlay
+      ng-if="copyDialog.show"
+      model="copyDialog"
+      position="right"
+      view="copyDialog.view">
     </umb-overlay>
 
 </div>

@@ -74,6 +74,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         },
         allowBulkPublish: true,
         allowBulkUnpublish: true,
+        allowBulkCopy: true,
         allowBulkMove: true,
         allowBulkDelete: true,
     };
@@ -308,13 +309,14 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
       $scope.moveDialog = {};
       $scope.moveDialog.title = "Move";
       $scope.moveDialog.section = $scope.entityType;
-      $scope.moveDialog.view = "treepicker";
+      $scope.moveDialog.currentNode = $scope.contentId;
+      $scope.moveDialog.view = "move";
       $scope.moveDialog.show = true;
 
       $scope.moveDialog.submit = function(model) {
 
-         if(model.selection.length > 0) {
-            performMove(model.selection[0]);
+         if(model.target) {
+            performMove(model.target);
          }
 
          $scope.moveDialog.show = false;
@@ -334,6 +336,37 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
           function(selected, index) {return contentResource.move({parentId: target.id, id: getIdCallback(selected[index])}); },
           function(count, total) {return "Moved " + count + " out of " + total + " item" + (total > 1 ? "s" : ""); },
           function(total) {return "Moved " + total + " item" + (total > 1 ? "s" : ""); });
+    }
+
+    $scope.copy = function() {
+      $scope.copyDialog = {};
+      $scope.copyDialog.title = "Copy";
+      $scope.copyDialog.section = $scope.entityType;
+      $scope.copyDialog.currentNode = $scope.contentId;
+      $scope.copyDialog.view = "copy";
+      $scope.copyDialog.show = true;
+
+      $scope.copyDialog.submit = function(model) {
+         if(model.target) {
+            performCopy(model.target, model.relateToOriginal);
+         }
+
+         $scope.copyDialog.show = false;
+         $scope.copyDialog = null;
+      };
+
+      $scope.copyDialog.close = function(oldModel) {
+         $scope.copyDialog.show = false;
+         $scope.copyDialog = null;
+      };
+
+    };
+
+    function performCopy(target, relateToOriginal) {
+      applySelected(
+          function(selected, index) {return contentResource.copy({parentId: target.id, id: getIdCallback(selected[index]), relateToOriginal: relateToOriginal}); },
+          function(count, total) {return "Copied " + count + " out of " + total + " item" + (total > 1 ? "s" : ""); },
+          function(total) {return "Copied " + total + " item" + (total > 1 ? "s" : ""); });
     }
 
     function getCustomPropertyValue(alias, properties) {
