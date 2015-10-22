@@ -4,7 +4,6 @@ using System.Linq;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -90,13 +89,6 @@ namespace Umbraco.Web.Models.Mapping
                             Label = ui.Text("content", "updateDate"),
                             Description = ui.Text("content", "updateDateDesc"), 
                             Value = display.UpdateDate.ToIsoString(),
-                            View = labelEditor
-                        },                    
-                    new ContentPropertyDisplay
-                        {
-                            Alias = string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                            Label = ui.Text("content", "documentType"),
-                            Value = TranslateItem(display.ContentTypeName, CreateDictionary()),
                             View = labelEditor
                         }
                 };
