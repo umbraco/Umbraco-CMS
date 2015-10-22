@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
@@ -13,8 +11,7 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class ContentPropertyDisplayConverter : ContentPropertyBasicConverter<ContentPropertyDisplay>
     {
-        public ContentPropertyDisplayConverter(Lazy<IDataTypeService> dataTypeService)
-            : base(dataTypeService)
+        public ContentPropertyDisplayConverter(Lazy<IDataTypeService> dataTypeService) : base(dataTypeService)
         {
 
         }
@@ -35,7 +32,13 @@ namespace Umbraco.Web.Models.Mapping
             display.Description = originalProp.PropertyType.Description;
             display.Label = originalProp.PropertyType.Name;
             display.HideLabel = valEditor.HideLabel;
-            
+#if DEBUG
+            var currentUser = UmbracoContext.Current.Application.Services.UserService.GetUserById(UmbracoContext.Current.Security.CurrentUser.Id);
+            display.HasSettingsAccess = currentUser.AllowedSections.Any(x => x.Equals("settings"));
+#else
+            display.HasSettingsAccess = false;
+#endif
+
             //add the validation information
             display.Validation.Mandatory = originalProp.PropertyType.Mandatory;
             display.Validation.Pattern = originalProp.PropertyType.ValidationRegExp;
