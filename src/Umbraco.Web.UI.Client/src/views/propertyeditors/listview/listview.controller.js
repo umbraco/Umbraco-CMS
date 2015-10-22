@@ -153,7 +153,6 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
     };
 
     $scope.prev = function(pageNumber) {
-      console.log(pageNumber);
       $scope.options.pageNumber = pageNumber;
       $scope.reloadView($scope.contentId);
     };
