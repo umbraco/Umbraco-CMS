@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Web.Mvc;
 using Umbraco.Core;
@@ -10,6 +12,6 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.FolderBrowserAlias, "(Obsolete) Folder Browser", "folderbrowser", HideLabel=true, Icon="icon-folder", Group="media")]
     public class FolderBrowserPropertyEditor : PropertyEditor
     {
-       
+
     }
 }
