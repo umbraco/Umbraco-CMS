@@ -15,15 +15,15 @@
          var checkbox = $event.target;
          var clearSelection = false;
 
-         if (!angular.isArray($scope.listViewResultSet.items)) {
+         if (!angular.isArray($scope.items)) {
             return;
          }
 
          $scope.selection.length = 0;
 
-         for (var i = 0; i < $scope.listViewResultSet.items.length; i++) {
+         for (var i = 0; i < $scope.items.length; i++) {
 
-            var entity = $scope.listViewResultSet.items[i];
+            var entity = $scope.items[i];
 
             if (checkbox.checked) {
                $scope.selection.push({id: entity.id});
@@ -64,10 +64,10 @@
       }
 
       function isSelectedAll() {
-         if (!angular.isArray($scope.listViewResultSet.items)) {
+         if (!angular.isArray($scope.items)) {
             return false;
          }
-         return _.every($scope.listViewResultSet.items, function(item) {
+         return _.every($scope.items, function(item) {
             return item.selected;
          });
       }
@@ -87,7 +87,8 @@
                   $scope.options.orderDirection = "desc";
              }
 
-             $scope.reloadView($scope.contentId);
+             $scope.getContent($scope.contentId);
+
           }
       }
 

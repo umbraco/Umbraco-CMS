@@ -4,7 +4,7 @@
       ng-if="entityType !== 'media'">
 
       <umb-content-grid
-         content="listViewResultSet.items"
+         content="items"
          content-properties="options.includeProperties"
          on-click="vm.clickItem"
          on-select="vm.selectItem">
@@ -22,8 +22,8 @@
          parent-id="{{vm.nodeId}}"
          files-uploaded="vm.onUploadComplete"
          accept="{{vm.acceptedFileTypes}}"
-         hide-dropzone="{{!vm.activeDrag && listViewResultSet.items.length > 0 }}"
-         compact="{{ listViewResultSet.items.length > 0 }}"
+         hide-dropzone="{{!vm.activeDrag && items.length > 0 }}"
+         compact="{{ items.length > 0 }}"
          files-queued="vm.onFilesQueue">
       </umb-file-dropzone>
 
@@ -35,7 +35,7 @@
       </umb-folder-grid>
 
       <umb-media-grid
-         items="listViewResultSet.items"
+         items="items"
          on-details-hover="vm.hoverMediaItemDetails"
          on-select="vm.selectItem"
          on-click="vm.clickItem">

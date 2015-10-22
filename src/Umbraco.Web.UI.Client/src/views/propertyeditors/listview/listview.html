@@ -119,8 +119,15 @@
 
       </umb-editor-sub-header>
 
-
-        <div ng-include="options.layout.activeLayout.path"></div>
+      <umb-list-view-layout
+         content-id="contentId"
+         folders="folders"
+         items="listViewResultSet.items"
+         selection="selection"
+         options="options"
+         entity-type="{{entityType}}"
+         on-get-content="reloadView">
+      </umb-list-view-layout>
 
       <umb-pagination
          ng-if="listViewResultSet.totalPages"

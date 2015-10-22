@@ -13,7 +13,6 @@
 
       var vm = this;
 
-      //pass in the content id from the grid view parent scope (badbadnotgood)
       vm.nodeId = $scope.contentId;
       vm.acceptedFileTypes = mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
       vm.activeDrag = false;
@@ -41,10 +40,7 @@
 		}
 
       function onUploadComplete() {
-
-			// call reload function on list view parent controller
-         $scope.reloadView($scope.contentId);
-
+         $scope.getContent($scope.contentId);
       }
 
       function hoverMediaItemDetails(item, event, hover) {

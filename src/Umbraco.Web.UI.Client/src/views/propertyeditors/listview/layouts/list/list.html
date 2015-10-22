@@ -22,7 +22,7 @@
            </tr>
        </thead>
 
-       <tbody ng-show="listViewResultSet.totalItems === 0">
+       <tbody ng-show="items.length === 0">
            <tr>
                <td colspan="{{options.includeProperties.length + 2}}">
                    <p><localize key="content_listViewNoItems">There are no items show in the list.</localize></p>
@@ -30,22 +30,22 @@
            </tr>
        </tbody>
 
-       <tbody ng-show="listViewResultSet.totalItems > 0">
-           <tr ng-repeat="result in listViewResultSet.items"
-               ng-class="{selected:result.selected}">
+       <tbody ng-show="items.length > 0">
+           <tr ng-repeat="item in items"
+               ng-class="{selected:item.selected}">
 
                <td>
-                   <i class="icon {{result.icon}}" ng-class="getIcon(result)"></i>
-                   <input type="checkbox" ng-click="vm.selectItem(result)" ng-model="result.selected" no-dirty-check>
+                   <i class="icon {{item.icon}}" ng-class="getIcon(item)"></i>
+                   <input type="checkbox" ng-click="vm.selectItem(item)" ng-model="item.selected" no-dirty-check>
                </td>
                <td>
-                   <a ng-class="{inactive: (entityType === 'content' && !result.published) || isTrashed}"
-                      href="#{{result.editPath}}"
-                      ng-bind="result.name"></a>
+                   <a ng-class="{inactive: (entityType === 'content' && !item.published) || isTrashed}"
+                      href="#{{item.editPath}}"
+                      ng-bind="item.name"></a>
                </td>
 
                <td ng-repeat="column in options.includeProperties">
-                   <span>{{result[column.alias]}}</span>
+                   <span>{{item[column.alias]}}</span>
                </td>
            </tr>
        </tbody>
