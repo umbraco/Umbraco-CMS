@@ -73,7 +73,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.AllowedActions, expression => expression.ResolveUsing(
                     new ActionButtonsResolver(new Lazy<IUserService>(() => applicationContext.Services.UserService))))
                 .AfterMap((media, display) => AfterMap(media, display, applicationContext.Services.DataTypeService, applicationContext.Services.TextService,
-                    applicationContext.Services.ContentTypeService, applicationContext.Services.UserService));
+                    applicationContext.Services.ContentTypeService, applicationContext.Services.UserService, 
+                    UmbracoContext.Current != null && UmbracoContext.Current.Security.CurrentUser != null));
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
             config.CreateMap<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>()
@@ -116,8 +117,9 @@ namespace Umbraco.Web.Models.Mapping
         /// <param name="localizedText"></param>
         /// <param name="contentTypeService"></param>
         /// <param name="userService"></param>
+        /// <param name="canAccessUser"></param>
         private static void AfterMap(IContent content, ContentItemDisplay display, IDataTypeService dataTypeService, ILocalizedTextService localizedText,
-            IContentTypeService contentTypeService, IUserService userService)
+            IContentTypeService contentTypeService, IUserService userService, Boolean canAccessUser)
         {
             //map the tree node url
             if (HttpContext.Current != null)
@@ -145,11 +147,14 @@ namespace Umbraco.Web.Models.Mapping
             var docTypeValue = String.Empty;
 
 #if (DEBUG)
-            var currentUser = userService.GetUserById(UmbracoContext.Current.Security.CurrentUser.Id);
-            if (currentUser.AllowedSections.Any(x => x.Equals("settings")))
+            if (canAccessUser)
             {
-                var currentDocumentTypeId = currentDocumentType == null ? String.Empty : currentDocumentType.Id.ToString(CultureInfo.InvariantCulture);
-                docTypeValue = string.Format("#/settings/framed/%252Fumbraco%252Fsettings%252FeditNodeTypeNew.aspx%253Fid%253D{0}", currentDocumentTypeId);
+                var currentUser = userService.GetUserById(UmbracoContext.Current.Security.CurrentUser.Id);
+                if (currentUser.AllowedSections.Any(x => x.Equals("settings")))
+                {
+                    var currentDocumentTypeId = currentDocumentType == null ? String.Empty : currentDocumentType.Id.ToString(CultureInfo.InvariantCulture);
+                    docTypeValue = string.Format("#/settings/framed/%252Fumbraco%252Fsettings%252FeditNodeTypeNew.aspx%253Fid%253D{0}", currentDocumentTypeId);
+                }
             }
 #endif
 
