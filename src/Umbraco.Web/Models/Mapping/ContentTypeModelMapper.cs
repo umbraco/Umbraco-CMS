@@ -53,13 +53,15 @@ namespace Umbraco.Web.Models.Mapping
                 //do the base mapping
                 .MapBaseContentTypeSaveToEntity(applicationContext)
                 .ConstructUsing((source) => new ContentType(source.ParentId))
-                .ForMember(
-                    dto => dto.AllowedTemplates,
-                    expression => expression.ResolveUsing(basic => basic.AllowedTemplates.Where(x => x != null)
-                        .Select(s => applicationContext.Services.FileService.GetTemplate(s))))
+                .ForMember(source => source.AllowedTemplates, expression => expression.Ignore())
                 .ForMember(dto => dto.DefaultTemplate, expression => expression.Ignore())
                 .AfterMap((source, dest) =>
                 {
+                    dest.AllowedTemplates = source.AllowedTemplates
+                        .Where(x => x != null)
+                        .Select(s => applicationContext.Services.FileService.GetTemplate(s))
+                        .ToArray();
+
                     if (source.DefaultTemplate != null)
                         dest.SetDefaultTemplate(applicationContext.Services.FileService.GetTemplate(source.DefaultTemplate));
 
@@ -115,7 +117,7 @@ namespace Umbraco.Web.Models.Mapping
                 .AfterMap((source, dest) =>
                 {
                     //sync templates
-                    dest.AllowedTemplates = source.AllowedTemplates.Select(Mapper.Map<EntityBasic>);
+                    dest.AllowedTemplates = source.AllowedTemplates.Select(Mapper.Map<EntityBasic>).ToArray();
 
                     if (source.DefaultTemplate != null)
                         dest.DefaultTemplate = Mapper.Map<EntityBasic>(source.DefaultTemplate);
@@ -182,7 +184,7 @@ namespace Umbraco.Web.Models.Mapping
                     if (destAllowedTemplateAliases.SequenceEqual(source.AllowedTemplates) == false)
                     {
                         var templates = applicationContext.Services.FileService.GetTemplates(source.AllowedTemplates.ToArray());
-                        dest.AllowedTemplates = source.AllowedTemplates.Select(x => Mapper.Map<EntityBasic>(templates.Single(t => t.Alias == x)));
+                        dest.AllowedTemplates = source.AllowedTemplates.Select(x => Mapper.Map<EntityBasic>(templates.Single(t => t.Alias == x))).ToArray();
                     }
 
                     if (source.DefaultTemplate.IsNullOrWhiteSpace() == false)
