@@ -13,34 +13,19 @@
 
       var vm = this;
 
-      vm.folders = [];
-      //pass in the content id from the grid view parent scope (badbadnotgood)
       vm.nodeId = $scope.contentId;
       vm.acceptedFileTypes = mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
       vm.activeDrag = false;
+      vm.mediaDetailsTooltip = {};
 
       vm.dragEnter = dragEnter;
       vm.dragLeave = dragLeave;
 		vm.onFilesQueue = onFilesQueue;
       vm.onUploadComplete = onUploadComplete;
       vm.hoverMediaItemDetails = hoverMediaItemDetails;
-      vm.selectFolder = selectFolder;
-      vm.clickFolder = clickFolder;
-      vm.selectMediaItem = selectMediaItem;
-      vm.clickMediaItem = clickMediaItem;
-      vm.selectContentItem = selectContentItem;
-      vm.clickContentItem = clickContentItem;
+      vm.selectItem = selectItem;
+      vm.clickItem = clickItem;
 
-      function activate() {
-
-         if($scope.entityType === 'media') {
-            mediaResource.getChildFolders(vm.nodeId)
-               .then(function(folders) {
-                  vm.folders = folders;
-               });
-         }
-
-      }
 
       function dragEnter(el, event) {
          vm.activeDrag = true;
@@ -55,14 +40,8 @@
 		}
 
       function onUploadComplete() {
-
-			// call reload function on list view parent controller
-         $scope.reloadView($scope.contentId);
-
+         $scope.getContent($scope.contentId);
       }
-
-      vm.mediaDetailsTooltip = {};
-
 
       function hoverMediaItemDetails(item, event, hover) {
 
@@ -80,31 +59,29 @@
 
       }
 
-      function selectFolder(folder) {
-         folder.selected = !folder.selected;
+      function selectItem(item) {
+         var selection = $scope.selection;
+         var isSelected = false;
+
+         for (var i = 0; selection.length > i; i++) {
+            var selectedItem = selection[i];
+
+            if (item.id === selectedItem.id) {
+               isSelected = true;
+               selection.splice(i, 1);
+               item.selected = false;
+            }
+         }
+
+         if (!isSelected) {
+            selection.push({id: item.id});
+            item.selected = true;
+         }
       }
 
-      function clickFolder(folder) {
-         $location.path($scope.entityType + '/' + $scope.entityType + '/edit/' + folder.id);
+      function clickItem(item) {
+         $location.path($scope.entityType + '/' + $scope.entityType + '/edit/' + item.id);
       }
-
-      function selectMediaItem(mediaItem) {
-         mediaItem.selected = !mediaItem.selected;
-      }
-
-      function clickMediaItem(mediaItem) {
-         $location.path($scope.entityType + '/' + $scope.entityType + '/edit/' + mediaItem.id);
-      }
-
-      function selectContentItem(contentItem) {
-         contentItem.selected = !contentItem.selected;
-      }
-
-      function clickContentItem(contentItem) {
-         $location.path($scope.entityType + '/' + $scope.entityType + '/edit/' + contentItem.id);
-      }
-
-      activate();
 
    }
 

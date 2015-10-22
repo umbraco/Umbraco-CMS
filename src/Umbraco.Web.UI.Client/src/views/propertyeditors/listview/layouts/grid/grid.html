@@ -4,10 +4,10 @@
       ng-if="entityType !== 'media'">
 
       <umb-content-grid
-         content="listViewResultSet.items"
+         content="items"
          content-properties="options.includeProperties"
-         on-click="vm.clickContentItem"
-         on-select="vm.selectContentItem">
+         on-click="vm.clickItem"
+         on-select="vm.selectItem">
       </umb-content-grid>
 
    </div>
@@ -22,23 +22,23 @@
          parent-id="{{vm.nodeId}}"
          files-uploaded="vm.onUploadComplete"
          accept="{{vm.acceptedFileTypes}}"
-         hide-dropzone="{{!vm.activeDrag && listViewResultSet.items.length > 0 }}"
-         compact="{{ listViewResultSet.items.length > 0 }}"
+         hide-dropzone="{{!vm.activeDrag && items.length > 0 }}"
+         compact="{{ items.length > 0 }}"
          files-queued="vm.onFilesQueue">
       </umb-file-dropzone>
 
       <umb-folder-grid
-         ng-if="vm.folders.length > 0"
-         folders="vm.folders"
-         on-select="vm.selectFolder"
-         on-click="vm.clickFolder">
+         ng-if="folders.length > 0"
+         folders="folders"
+         on-select="vm.selectItem"
+         on-click="vm.clickItem">
       </umb-folder-grid>
 
       <umb-media-grid
-         items="listViewResultSet.items"
+         items="items"
          on-details-hover="vm.hoverMediaItemDetails"
-         on-select="vm.selectMediaItem"
-         on-click="vm.clickMediaItem">
+         on-select="vm.selectItem"
+         on-click="vm.clickItem">
       </umb-media-grid>
 
       <umb-tooltip
