@@ -5,6 +5,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using umbraco;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Core.Persistence.Repositories;
 
 namespace Umbraco.Web.Cache
 {
@@ -398,6 +399,12 @@ namespace Umbraco.Web.Cache
         {
             if (domain == null) return;
             dc.Remove(DistributedCache.DomainCacheRefresherGuid, domain.Id);
+        }
+
+        public static void ClearDomainCacheOnCurrentServer(this DistributedCache dc)
+        {
+            var key = RepositoryBase.GetCacheTypeKey<IDomain>();
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(key);
         }
 
         #endregion

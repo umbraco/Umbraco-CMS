@@ -71,7 +71,7 @@ namespace umbraco.cms.businesslogic.web
             if (e.Cancel) return;
 
 
-            var entry = ApplicationContext.Current.Services.PublicAccessService.AddOrUpdateRule(
+            var entry = ApplicationContext.Current.Services.PublicAccessService.AddRule(
                 doc.ContentEntity,
                 Constants.Conventions.PublicAccess.MemberRoleRuleType,
                 role);
@@ -95,7 +95,7 @@ namespace umbraco.cms.businesslogic.web
             if (content == null)
                 throw new Exception("No content found with document id " + DocumentId);
 
-            if (ApplicationContext.Current.Services.PublicAccessService.AddOrUpdateRule(
+            if (ApplicationContext.Current.Services.PublicAccessService.AddRule(
                 content,
                 Constants.Conventions.PublicAccess.MemberGroupIdRuleType,
                 MemberGroupId.ToString(CultureInfo.InvariantCulture)))
@@ -113,7 +113,7 @@ namespace umbraco.cms.businesslogic.web
             if (content == null)
                 throw new Exception("No content found with document id " + DocumentId);
 
-            if (ApplicationContext.Current.Services.PublicAccessService.AddOrUpdateRule(
+            if (ApplicationContext.Current.Services.PublicAccessService.AddRule(
                 content,
                 Constants.Conventions.PublicAccess.MemberIdRuleType,
                 MemberId.ToString(CultureInfo.InvariantCulture)))
@@ -132,7 +132,7 @@ namespace umbraco.cms.businesslogic.web
 
             if (e.Cancel) return;
 
-            var entry = ApplicationContext.Current.Services.PublicAccessService.AddOrUpdateRule(
+            var entry = ApplicationContext.Current.Services.PublicAccessService.AddRule(
                 doc.ContentEntity, 
                 Constants.Conventions.PublicAccess.MemberUsernameRuleType, 
                 membershipUserName);
@@ -155,7 +155,7 @@ namespace umbraco.cms.businesslogic.web
         {
             var doc = new Document(DocumentId);
 
-            var entry = ApplicationContext.Current.Services.PublicAccessService.AddOrUpdateRule(
+            var entry = ApplicationContext.Current.Services.PublicAccessService.AddRule(
                 doc.ContentEntity, 
                 Constants.Conventions.PublicAccess.MemberGroupIdRuleType, 
                 MemberGroupId.ToString(CultureInfo.InvariantCulture));
@@ -213,7 +213,7 @@ namespace umbraco.cms.businesslogic.web
             var noAccessContent = ApplicationContext.Current.Services.ContentService.GetById(ErrorDocumentId);
             if (noAccessContent == null) throw new NullReferenceException("No content item found with id " + ErrorDocumentId);
 
-            var entry = ApplicationContext.Current.Services.PublicAccessService.GetEntryForContent(doc.ContentEntity);
+            var entry = ApplicationContext.Current.Services.PublicAccessService.GetEntryForContent(doc.ContentEntity.Id.ToString());
             if (entry != null)
             {
                 if (Simple)
@@ -418,6 +418,12 @@ namespace umbraco.cms.businesslogic.web
         public static bool IsProtected(int DocumentId, string Path)
         {
             return ApplicationContext.Current.Services.PublicAccessService.IsProtected(Path.EnsureEndsWith("," + DocumentId));             
+        }
+
+        //return the protection status of this exact document - not based on inheritance
+        public static bool IsProtected(int DocumentId)
+        {
+            return ApplicationContext.Current.Services.PublicAccessService.IsProtected(DocumentId.ToString());
         }
 
         public static int GetErrorPage(string Path)

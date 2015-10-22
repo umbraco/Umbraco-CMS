@@ -2258,7 +2258,6 @@
     <Content Include="Umbraco\Users\EditUser.aspx" />
     <Content Include="Umbraco\Users\EditUserType.aspx" />
     <!--<Content Include="Umbraco\users\PermissionEditor.aspx" />-->
-    <Content Include="Umbraco\webService.asmx" />
     <Content Include="Umbraco\Webservices\ajax.js" />
     <Content Include="Umbraco\Webservices\CacheRefresher.asmx">
       <SubType>Form</SubType>
@@ -2414,7 +2413,7 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.0\x86\*.* "$(TargetDir)x86\" 
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>7300</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:7300</IISUrl>
+          <IISUrl>http://localhost:7310</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
