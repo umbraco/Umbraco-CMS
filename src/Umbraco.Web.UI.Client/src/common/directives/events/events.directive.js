@@ -10,7 +10,7 @@ angular.module('umbraco.directives')
                 scope.$apply(attrs.onKeyup);
             };
             elm.on("keyup", f);
-            scope.$on("$destroy", function(){ elm.off(f);} );
+            scope.$on("$destroy", function(){ elm.off("keyup", f);} );
         }
     };
 })
@@ -22,7 +22,7 @@ angular.module('umbraco.directives')
                 scope.$apply(attrs.onKeydown);
             };
             elm.on("keydown", f);
-            scope.$on("$destroy", function(){ elm.off(f);} );
+            scope.$on("$destroy", function(){ elm.off("keydown", f);} );
         }
     };
 })
@@ -34,7 +34,7 @@ angular.module('umbraco.directives')
                 scope.$apply(attrs.onBlur);
             };
             elm.on("blur", f);
-            scope.$on("$destroy", function(){ elm.off(f);} );
+            scope.$on("$destroy", function(){ elm.off("blur", f);} );
         }
     };
 })
@@ -46,7 +46,7 @@ angular.module('umbraco.directives')
                 scope.$apply(attrs.onFocus);
             };
             elm.on("focus", f);
-            scope.$on("$destroy", function(){ elm.off(f);} );
+            scope.$on("$destroy", function(){ elm.off("focus", f);} );
         }
     };
 })
@@ -58,7 +58,7 @@ angular.module('umbraco.directives')
                 scope.$apply(attrs.onDragEnter);
             };
             elm.on("dragenter", f);
-            scope.$on("$destroy", function(){ elm.off(f);} );
+            scope.$on("$destroy", function(){ elm.off("dragenter", f);} );
         }
     };
 })
@@ -91,7 +91,7 @@ angular.module('umbraco.directives')
         };
 
         elm.on("dragleave", f);
-        scope.$on("$destroy", function(){ elm.off(f);} );
+        scope.$on("$destroy", function(){ elm.off("dragleave", f);} );
     };
 })
 
@@ -102,7 +102,7 @@ angular.module('umbraco.directives')
                 scope.$apply(attrs.onDragOver);
             };
             elm.on("dragover", f);
-            scope.$on("$destroy", function(){ elm.off(f);} );
+            scope.$on("$destroy", function(){ elm.off("dragover", f);} );
         }
     };
 })
@@ -114,7 +114,7 @@ angular.module('umbraco.directives')
                 scope.$apply(attrs.onDragStart);
             };
             elm.on("dragstart", f);
-            scope.$on("$destroy", function(){ elm.off(f);} );
+            scope.$on("$destroy", function(){ elm.off("dragstart", f);} );
         }
     };
 })
@@ -126,7 +126,7 @@ angular.module('umbraco.directives')
                 scope.$apply(attrs.onDragEnd);
             };
             elm.on("dragend", f);
-            scope.$on("$destroy", function(){ elm.off(f);} );
+            scope.$on("$destroy", function(){ elm.off("dragend", f);} );
         }
     };
 })
@@ -138,7 +138,7 @@ angular.module('umbraco.directives')
                 scope.$apply(attrs.onDrop);
             };
             elm.on("drop", f);
-            scope.$on("$destroy", function(){ elm.off(f);} );
+            scope.$on("$destroy", function(){ elm.off("drop", f);} );
         }
     };
 })
@@ -236,8 +236,8 @@ angular.module('umbraco.directives')
 
                 //unsub events
                 scope.$on("$destroy", function(){
-                    element.off(leave_f);
-                    element.off(enter_f);
+                    element.off("mouseleave", leave_f);
+                    element.off("mouseenter", enter_f);
                 });
             }
         };
