@@ -149,7 +149,9 @@
          };
 
          var unbindItemsWatcher = scope.$watch('items', function(newValue, oldValue){
-            activate();
+            if(angular.isArray(newValue)) {
+               activate();
+            }
          });
 
          scope.$on('$destroy', function(){
