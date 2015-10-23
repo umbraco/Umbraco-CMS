@@ -84,7 +84,6 @@
                     notificationsService.error("Models could not be generated");
                     vm.page.saveButtonState = "error";
 				});
-
 			}
 		}];
 
