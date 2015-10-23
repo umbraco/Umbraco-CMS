@@ -46,8 +46,11 @@
             nameLocked: "=",
             menu: "=",
             icon: "=",
+            hideIcon: "@",
             alias: "=",
+            hideAlias: "@",
             description: "=",
+            hideDescription: "@",
             navigation: "="
          },
          link: link

@@ -3,7 +3,7 @@
     * @name umbraco.resources.contentTypeResource
     * @description Loads in data for content types
     **/
-function contentTypeResource($q, $http, umbRequestHelper) {
+function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
 
     return {
 
@@ -145,16 +145,6 @@ function contentTypeResource($q, $http, umbRequestHelper) {
                'Failed to retrieve content type scaffold');
         },
 
-        getSafeAlias: function (value, camelCase) {
-
-            return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "contentTypeApiBaseUrl",
-                       "GetSafeAlias", { value: value, camelCase: camelCase })),
-               'Failed to retrieve content type scaffold');
-        },
-
         /**
          * @ngdoc method
          * @name umbraco.resources.contentTypeResource#save
@@ -169,8 +159,10 @@ function contentTypeResource($q, $http, umbRequestHelper) {
          */
         save: function (contentType) {
 
+            var saveModel = umbDataFormatter.formatContentTypePostData(contentType);
+
             return umbRequestHelper.resourcePromise(
-                 $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostSave"), contentType),
+                 $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostSave"), saveModel),
                 'Failed to save data for content type id ' + contentType.id);
         },
 

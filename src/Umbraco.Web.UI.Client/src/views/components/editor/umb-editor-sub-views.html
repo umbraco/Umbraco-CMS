@@ -1,5 +1,4 @@
 <div class="umb-editor-sub-views">
-    <div ng-if="activeView.view && activeView.active" ng-include="activeView.view"></div>
+    <div ng-repeat="sub in subViews" ng-include="sub.view" ng-show="activeView.name == sub.name" ng-class="'sub-view-' + sub.name"></div>
     <div ng-if="!activeView.view && activeView.active" ng-transclude></div>
 </div>
-

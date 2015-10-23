@@ -29,7 +29,6 @@ function valEmail(valEmailExpression) {
                 }
             };
 
-            ctrl.$formatters.push(patternValidator);
             ctrl.$parsers.push(patternValidator);
         }
     };

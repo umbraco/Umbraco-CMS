@@ -308,15 +308,28 @@ namespace Umbraco.Core.Services
             
         }
 
-        public void Validate(IContentTypeComposition compo)
+        /// <summary>
+        /// Validates the composition, if its invalid a list of property type aliases that were duplicated is returned
+        /// </summary>
+        /// <param name="compo"></param>
+        /// <returns></returns>
+        public Attempt<string[]> ValidateComposition(IContentTypeComposition compo)
         {
             using (new WriteLock(Locker))
             {
-                ValidateLocked(compo);
+                try
+                {
+                    ValidateLocked(compo);
+                    return Attempt<string[]>.Succeed();
+                }
+                catch (InvalidCompositionException ex)
+                {
+                    return Attempt.Fail(ex.PropertyTypeAliases, ex);
+                }
             }
         }
 
-        private void ValidateLocked(IContentTypeComposition compositionContentType)
+        protected void ValidateLocked(IContentTypeComposition compositionContentType)
         {
             // performs business-level validation of the composition
             // should ensure that it is absolutely safe to save the composition
@@ -369,10 +382,8 @@ namespace Umbraco.Core.Services
                 if (contentTypeDependency == null) continue;
                 var intersect = contentTypeDependency.PropertyTypes.Select(x => x.Alias.ToLowerInvariant()).Intersect(propertyTypeAliases).ToArray();
                 if (intersect.Length == 0) continue;
-
-                var message = string.Format("The following PropertyType aliases from the current ContentType conflict with existing PropertyType aliases: {0}.",
-                    string.Join(", ", intersect));
-                throw new Exception(message);
+                
+                throw new InvalidCompositionException(compositionContentType.Alias, intersect.ToArray());
             }
         }
 

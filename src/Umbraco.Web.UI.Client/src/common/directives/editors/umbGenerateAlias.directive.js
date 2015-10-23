@@ -1,5 +1,5 @@
 angular.module("umbraco.directives")
-    .directive('umbGenerateAlias', function ($timeout, contentTypeResource) {
+    .directive('umbGenerateAlias', function ($timeout, entityResource) {
         return {
             restrict: 'E',
             templateUrl: 'views/components/umb-generate-alias.html',
@@ -29,7 +29,7 @@ angular.module("umbraco.directives")
                     scope.alias = "Generating Alias...";
 
                     generateAliasTimeout = $timeout(function () {
-                      contentTypeResource.getSafeAlias(value, true).then(function(safeAlias){
+                        entityResource.getSafeAlias(value, true).then(function (safeAlias) {
                         scope.alias = safeAlias.alias;
                       });
                     }, 500);
