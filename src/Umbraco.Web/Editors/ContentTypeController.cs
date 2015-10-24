@@ -184,6 +184,15 @@ namespace Umbraco.Web.Editors
                     if (template == null)
                     {
                         template = new Template(contentType.Name, contentType.Alias);
+
+                        //POC: temporary models template support, this should really not be handled here but by
+                        //the models builder
+                        var design = @"@inherits Umbraco.Web.Mvc.UmbracoTemplatePage<IPublishedContent>
+@{
+    Layout = null;
+}";
+
+                        template.Content = design.Replace("IPublishedContent", contentType.Name.ToSafeAlias(false));
                         Services.FileService.SaveTemplate(template);
                     }
 
