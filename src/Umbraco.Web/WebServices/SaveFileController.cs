@@ -97,22 +97,25 @@ namespace Umbraco.Web.WebServices
                     oldname = oldname.TrimStart(pathPrefix);
             }
 
-            var view = get(svce, oldname);
-            if (view == null)
-                view = new PartialView(filename);
+            var currentView = oldname.IsNullOrWhiteSpace() 
+                ? get(svce, filename)
+                : get(svce, oldname);
+
+            if (currentView == null)
+                currentView = new PartialView(filename);
             else
-                view.Path = filename;
-            view.Content = contents;
+                currentView.Path = filename;
+            currentView.Content = contents;
 
             Attempt<IPartialView> attempt;
             try
             {
-                var partialView = view as PartialView;
+                var partialView = currentView as PartialView;
                 if (partialView != null && validate != null && validate(svce, partialView) == false)
                     return Failed(ui.Text("speechBubbles", "partialViewErrorText"), ui.Text("speechBubbles", "partialViewErrorHeader"),
-                                    new FileSecurityException("File '" + view.Path + "' is not a valid partial view file."));
+                                    new FileSecurityException("File '" + currentView.Path + "' is not a valid partial view file."));
 
-                attempt = save(svce, view);
+                attempt = save(svce, currentView);
             }
             catch (Exception e)
             {
