@@ -1,7 +1,7 @@
 <div class="umb-editor umb-datepicker" ng-controller="Umbraco.PropertyEditors.DatepickerController">
     <ng-form name="datePickerForm">
-        <div class="input-append date datepicker" style="position: relative;" id="datepicker{{model.alias}}">
-            
+        <div class="input-append date datepicker" ng-class="{'onlytime': onlyTimePicker}" style="position: relative;" id="datepicker{{model.alias}}">
+
             <input name="datepicker" data-format="{{model.config.format}}" type="text"
                    ng-model="datetimePickerValue"
                    ng-required="model.validation.mandatory"
@@ -9,9 +9,9 @@
                    class="datepickerinput" />
 
             <span class="add-on">
-                <i class="icon-calendar"></i>
+                <i class="icon-{{datetimePickerIcon}}"></i>
             </span>
-            
+
         </div>
 
         <span class="help-inline" val-msg-for="datepicker" val-toggle-msg="required">Required</span>

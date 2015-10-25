@@ -17,13 +17,38 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 
     //map the user config
     $scope.model.config = angular.extend(config, $scope.model.config);
+
+    if (!$scope.model.config.useSeconds === undefined || !$scope.model.config.useSeconds === null) {
+        $scope.model.config.useSeconds = $scope.model.config.useSeconds == 0 ? false : true;
+    }
+
+    if (!$scope.model.config.pickTime === undefined || !$scope.model.config.pickTime === null) {
+        $scope.model.config.pickTime = $scope.model.config.pickTime == 0 ? false : true;
+    }
+
+    if (!$scope.model.config.pickDate === undefined || !$scope.model.config.pickDate === null) {
+        $scope.model.config.pickDate = $scope.model.config.pickDate == 0 ? false : true;
+    }
+
     //ensure the format doesn't get overwritten with an empty string
     if ($scope.model.config.format === "" || $scope.model.config.format === undefined || $scope.model.config.format === null) {
-        $scope.model.config.format = $scope.model.config.pickTime ? "YYYY-MM-DD HH:mm:ss" : "YYYY-MM-DD";
+        $scope.model.config.format = "YYYY-MM-DD";
+
+        if ($scope.model.config.pickTime) {
+            if ($scope.model.config.useSeconds) {
+                $scope.model.config.format = "YYYY-MM-DD HH:mm:ss";
+            }
+            else {
+                $scope.model.config.format = "YYYY-MM-DD HH:mm";
+            }
+        }
     }
 
     $scope.hasDatetimePickerValue = $scope.model.value ? true : false;
     $scope.datetimePickerValue = null;
+
+    $scope.onlyTimePicker = $scope.model.config.pickTime && !$scope.model.config.pickDate;
+    $scope.datetimePickerIcon = $scope.onlyTimePicker ? "time" : "calendar";
 
     //hide picker if clicking on the document 
     $scope.hidePicker = function () {
@@ -118,8 +143,24 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 			    var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
 			        if ($scope.hasDatetimePickerValue) {
 			            var elementData = $element.find("div:first").data().DateTimePicker;
-			            if ($scope.model.config.pickTime) {
-			                $scope.model.value = elementData.getDate().format("YYYY-MM-DD HH:mm:ss");
+			            if ($scope.model.config.pickDate && $scope.model.config.pickTime) {
+			                if ($scope.model.config.useSeconds) {
+			                    $scope.model.value = elementData.getDate().format("YYYY-MM-DD HH:mm:ss");
+			                }
+			                else {
+			                    $scope.model.value = elementData.getDate().format("YYYY-MM-DD HH:mm");
+			                }
+			            }
+			            else if ($scope.model.config.pickDate && !$scope.model.config.pickTime) {
+			                $scope.model.value = elementData.getDate().format("YYYY-MM-DD");
+			            }
+			            else if (!$scope.model.config.pickDate && $scope.model.config.pickTime) {
+			                if ($scope.model.config.useSeconds) {
+			                    $scope.model.value = elementData.getDate().format("HH:mm:ss");
+			                }
+			                else {
+			                    $scope.model.value = elementData.getDate().format("HH:mm");
+			                }
 			            }
 			            else {
 			                $scope.model.value = elementData.getDate().format("YYYY-MM-DD");
@@ -142,11 +183,27 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 
     var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
         if ($scope.hasDatetimePickerValue) {
-            if ($scope.model.config.pickTime) {
-                $scope.model.value = $element.find("div:first").data().DateTimePicker.getDate().format("YYYY-MM-DD HH:mm:ss");
+            if ($scope.model.config.pickDate && $scope.model.config.pickTime) {
+                if ($scope.model.config.useSeconds) {
+                    $scope.model.value = elementData.getDate().format("YYYY-MM-DD HH:mm:ss");
+                }
+                else {
+                    $scope.model.value = elementData.getDate().format("YYYY-MM-DD HH:mm");
+                }
+            }
+            else if ($scope.model.config.pickDate && !$scope.model.config.pickTime) {
+                $scope.model.value = elementData.getDate().format("YYYY-MM-DD");
+            }
+            else if (!$scope.model.config.pickDate && $scope.model.config.pickTime) {
+                if ($scope.model.config.useSeconds) {
+                    $scope.model.value = elementData.getDate().format("HH:mm:ss");
+                }
+                else {
+                    $scope.model.value = elementData.getDate().format("HH:mm");
+                }
             }
             else {
-                $scope.model.value = $element.find("div:first").data().DateTimePicker.getDate().format("YYYY-MM-DD");
+                $scope.model.value = elementData.getDate().format("YYYY-MM-DD");
             }
         }
         else {
