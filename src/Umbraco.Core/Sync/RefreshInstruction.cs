@@ -15,7 +15,12 @@ namespace Umbraco.Core.Sync
         // but at the moment it is exposed in CacheRefresher webservice
         // so for the time being we keep it as-is for backward compatibility reasons
 
-        // need the public one so it can be de-serialized
+        // need this public, parameter-less constructor so the web service messenger
+        // can de-serialize the instructions it receives
+        public RefreshInstruction()
+        { }
+
+        // need this public one so it can be de-serialized - used by the Json thing
         // otherwise, should use GetInstructions(...)
         public RefreshInstruction(Guid refresherId, RefreshMethodType refreshType, Guid guidId, int intId, string jsonIds, string jsonPayload)
         {

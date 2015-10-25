@@ -307,7 +307,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Append(new Sql(") tmpTbl LEFT JOIN ("))
                 .Append(joinSql)
                 .Append(new Sql(") as property ON id = property.contentNodeId"))
-                .OrderBy("sortOrder");
+                .OrderBy("sortOrder, id");
 
             return wrappedSql;
         }

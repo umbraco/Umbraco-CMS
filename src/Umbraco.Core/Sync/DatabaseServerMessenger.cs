@@ -187,7 +187,13 @@ namespace Umbraco.Core.Sync
                 using (_profilingLogger.DebugDuration<DatabaseServerMessenger>("Syncing from database..."))
                 {
                     ProcessDatabaseInstructions();
-                    PruneOldInstructions();
+                    switch (_appContext.GetCurrentServerRole())
+                    {
+                        case ServerRole.Single:
+                        case ServerRole.Master:
+                            PruneOldInstructions();
+                            break;
+                    }
                 }
             }
             finally

@@ -33,8 +33,8 @@
       <dependency id="AutoMapper" version="[3.0.0, 3.1.0)" />
       <dependency id="Newtonsoft.Json" version="[6.0.8, 7.0.0)" />
       <dependency id="Examine" version="[0.1.68, 1.0.0)" />
-      <dependency id="ImageProcessor" version="[2.2.8, 3.0.0)" />
-      <dependency id="ImageProcessor.Web" version="[4.3.6, 5.0.0)" />
+      <dependency id="ImageProcessor" version="[2.3.0, 3.0.0)" />
+      <dependency id="ImageProcessor.Web" version="[4.4.0, 5.0.0)" />
       <dependency id="semver" version="[1.1.2, 2.0.0)" />
       <dependency id="Microsoft.AspNet.WebHelpers" version="[3.2.3, 4.0.0)" />
       <dependency id="Microsoft.AspNet.WebPages.Data" version="[3.2.3, 4.0.0)" />
