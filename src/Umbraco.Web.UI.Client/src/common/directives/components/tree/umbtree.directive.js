@@ -200,6 +200,10 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                 //NOTE: loadChildren is ONLY used for legacy purposes, do not use this when syncing the tree as it will cause problems
                 // since there will be double request and event handling operations.
                 function loadActiveTree(treeAlias, loadChildren) {
+                    if (!treeAlias) {
+                        return;
+                    }
+
                     scope.activeTree = undefined;
 
                     function doLoad(tree) {

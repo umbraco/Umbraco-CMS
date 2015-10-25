@@ -8,6 +8,7 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.CopyController",
 	    });
 
 	    $scope.relateToOriginal = true;
+	    $scope.recursive = true;
 	    $scope.dialogTreeEventHandler = $({});
 	    $scope.busy = false;
 	    $scope.searchInfo = {
@@ -95,7 +96,7 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.CopyController",
 	        $scope.busy = true;
 	        $scope.error = false;
 
-	        contentResource.copy({ parentId: $scope.target.id, id: node.id, relateToOriginal: $scope.relateToOriginal })
+	        contentResource.copy({ parentId: $scope.target.id, id: node.id, relateToOriginal: $scope.relateToOriginal, recursive: $scope.recursive })
                 .then(function (path) {
                     $scope.error = false;
                     $scope.success = true;
