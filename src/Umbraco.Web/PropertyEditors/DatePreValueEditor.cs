@@ -15,5 +15,12 @@ namespace Umbraco.Web.PropertyEditors
 
         [PreValueField("useSeconds", "Use seconds", "boolean", Description = "Choose if seconds should be used.")]
         public string UseSeconds { get; set; }
+
+        [PreValueField("showTodayButton", "Show today button", "boolean", Description = "Choose if today button should be shown.")]
+        public string ShowTodayButton { get; set; }
+
+        [PreValueField("calendarWeeks", "Show calendar weeks", "boolean", Description = "Choose if calendar weeks should be shown.")]
+        public string CalendarWeeks { get; set; }
+        
     }
 }

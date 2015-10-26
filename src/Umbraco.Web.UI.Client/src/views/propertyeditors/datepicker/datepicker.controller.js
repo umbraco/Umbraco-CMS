@@ -2,9 +2,11 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 
     //setup the default config
     var config = {
+        showTodayButton: false,
+        calendarWeeks: false,
         pickDate: true,
         pickTime: true,
-		useSeconds: true,
+        useSeconds: true,
         format: "YYYY-MM-DD HH:mm:ss",
 		icons: {
                     time: "icon-time",
@@ -17,6 +19,14 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 
     //map the user config
     $scope.model.config = angular.extend(config, $scope.model.config);
+
+    if (!$scope.model.config.showTodayButton === undefined || !$scope.model.config.showTodayButton === null) {
+        $scope.model.config.showTodayButton = $scope.model.config.showTodayButton == 0 ? false : true;
+    }
+
+    if (!$scope.model.config.calendarWeeks === undefined || !$scope.model.config.calendarWeeks === null) {
+        $scope.model.config.calendarWeeks = $scope.model.config.calendarWeeks == 0 ? false : true;
+    }
 
     if (!$scope.model.config.useSeconds === undefined || !$scope.model.config.useSeconds === null) {
         $scope.model.config.useSeconds = $scope.model.config.useSeconds == 0 ? false : true;
@@ -183,6 +193,7 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 
     var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
         if ($scope.hasDatetimePickerValue) {
+            var elementData = $element.find("div:first").data().DateTimePicker;
             if ($scope.model.config.pickDate && $scope.model.config.pickTime) {
                 if ($scope.model.config.useSeconds) {
                     $scope.model.value = elementData.getDate().format("YYYY-MM-DD HH:mm:ss");
