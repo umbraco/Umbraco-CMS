@@ -201,12 +201,17 @@ namespace Umbraco.Core.Security
         /// </remarks>
         public async override Task<bool> CheckPasswordAsync(T user, string password)
         {
-            if (BackOfficeUserPasswordChecker == null)
+            if (BackOfficeUserPasswordChecker != null)
             {
-                //use the default behavior
-                return await base.CheckPasswordAsync(user, password);
+                var result = await BackOfficeUserPasswordChecker.CheckPasswordAsync(user, password);
+                //if the result indicates to not fallback to the default, then return true if the credentials are valid
+                if (result != BackOfficeUserPasswordCheckerResult.FallbackToDefaultChecker)
+                {
+                    return result == BackOfficeUserPasswordCheckerResult.ValidCredentials;
+                }
             }
-            return await BackOfficeUserPasswordChecker.CheckPasswordAsync(user, password);
+            //use the default behavior
+            return await base.CheckPasswordAsync(user, password);
         }
 
         /// <summary>

@@ -9,6 +9,6 @@ namespace Umbraco.Core.Security
     /// </summary>
     public interface IBackOfficeUserPasswordChecker
     {
-        Task<bool> CheckPasswordAsync(BackOfficeIdentityUser user, string password);
+        Task<BackOfficeUserPasswordCheckerResult> CheckPasswordAsync(BackOfficeIdentityUser user, string password);
     }
 }
