@@ -11,9 +11,9 @@
             }
          };
 
-         scope.selectFolder = function(folder, $event) {
+         scope.selectFolder = function(folder, $event, $index) {
             if(scope.onSelect) {
-               scope.onSelect(folder);
+               scope.onSelect(folder, $event, $index);
             }
             $event.stopPropagation();
          };

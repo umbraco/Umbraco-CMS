@@ -1,4 +1,4 @@
-function listViewController($rootScope, $scope, $routeParams, $injector, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q, mediaResource) {
+function listViewController($rootScope, $scope, $routeParams, $injector, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q, mediaResource, listViewHelper) {
 
     //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content
     // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -165,6 +165,8 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
 
     $scope.reloadView = function (id) {
 
+      listViewHelper.clearSelection($scope.listViewResultSet.items, $scope.folders, $scope.selection);
+
          if($scope.entityType === 'media') {
 
              mediaResource.getChildFolders($scope.contentId)
@@ -175,8 +177,6 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
          }
 
         getListResultsCallback(id, $scope.options).then(function (data) {
-
-            $scope.selection.length = 0;
 
             $scope.actionInProgress = false;
 
@@ -231,22 +231,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
     };
 
     $scope.clearSelection = function() {
-      var items = $scope.listViewResultSet.items;
-      var folders = $scope.folders;
-      var i = 0;
-
-      for (i = 0; items.length > i; i++) {
-         var item = items[i];
-         item.selected = false;
-      }
-
-      for (i = 0; folders.length > i; i++) {
-         var folder = folders[i];
-         folder.selected = false;
-      }
-
-      $scope.selection.length = 0;
-
+      listViewHelper.clearSelection($scope.listViewResultSet.items, $scope.folders, $scope.selection);
     };
 
     $scope.getIcon = function(entry) {

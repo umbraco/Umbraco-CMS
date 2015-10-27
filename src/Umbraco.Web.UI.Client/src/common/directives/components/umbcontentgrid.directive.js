@@ -11,9 +11,9 @@
             }
          };
 
-         scope.selectItem = function(item, $event) {
+         scope.selectItem = function(item, $event, $index) {
             if(scope.onSelect) {
-               scope.onSelect(item);
+               scope.onSelect(item, $event, $index);
                $event.stopPropagation();
             }
          };

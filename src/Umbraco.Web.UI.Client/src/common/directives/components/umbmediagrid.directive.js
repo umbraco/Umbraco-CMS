@@ -5,8 +5,6 @@
 
       function link(scope, el, attr, ctrl) {
 
-         scope.mediaItems = [];
-
          var itemDefaultHeight = 200;
          var itemDefaultWidth = 200;
          var itemMaxWidth = 300;
@@ -14,22 +12,14 @@
 
          function activate() {
 
-            scope.mediaItems = [];
-
             for (var i = 0; scope.items.length > i; i++) {
-
                var item = scope.items[i];
-
                setItemData(item);
-
                setOriginalSize(item, itemMaxHeight);
-
-               seperateFolderAndMediaItems(item);
-
             }
 
-            if(scope.mediaItems.length > 0) {
-               setFlexValues(scope.mediaItems);
+            if(scope.items.length > 0) {
+               setFlexValues(scope.items);
             }
 
          }
@@ -37,6 +27,7 @@
          function setItemData(item) {
 
              item.isFolder = !mediaHelper.hasFilePropertyType(item);
+             item.hidden = item.isFolder;
 
              if(!item.isFolder){
                  item.thumbnail = mediaHelper.resolveFile(item, true);
@@ -84,14 +75,6 @@
 
          }
 
-         function seperateFolderAndMediaItems(item) {
-
-            if(!item.isFolder){
-               scope.mediaItems.push(item);
-            }
-
-         }
-
          function setFlexValues(mediaItems) {
 
             var flexSortArray = mediaItems;
@@ -129,9 +112,9 @@
 
          }
 
-         scope.selectItem = function(item, $event) {
+         scope.selectItem = function(item, $event, $index) {
             if(scope.onSelect) {
-               scope.onSelect(item);
+               scope.onSelect(item, $event, $index);
                $event.stopPropagation();
             }
          };

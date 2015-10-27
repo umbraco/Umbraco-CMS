@@ -9,7 +9,7 @@
 (function() {
    "use strict";
 
-   function ListViewGridLayoutController($scope, $routeParams, mediaHelper, mediaResource, $location) {
+   function ListViewGridLayoutController($scope, $routeParams, mediaHelper, mediaResource, $location, listViewHelper) {
 
       var vm = this;
 
@@ -24,8 +24,8 @@
       vm.onUploadComplete = onUploadComplete;
       vm.hoverMediaItemDetails = hoverMediaItemDetails;
       vm.selectItem = selectItem;
+      vm.selectFolder = selectFolder;
       vm.clickItem = clickItem;
-
 
       function dragEnter(el, event) {
          vm.activeDrag = true;
@@ -59,24 +59,12 @@
 
       }
 
-      function selectItem(item) {
-         var selection = $scope.selection;
-         var isSelected = false;
+      function selectItem(selectedItem, $event, index) {
+         listViewHelper.selectHandler(selectedItem, index, $scope.items, $scope.selection, $event);
+      }
 
-         for (var i = 0; selection.length > i; i++) {
-            var selectedItem = selection[i];
-
-            if (item.id === selectedItem.id) {
-               isSelected = true;
-               selection.splice(i, 1);
-               item.selected = false;
-            }
-         }
-
-         if (!isSelected) {
-            selection.push({id: item.id});
-            item.selected = true;
-         }
+      function selectFolder(selectedItem, $event, index) {
+         listViewHelper.selectHandler(selectedItem, index, $scope.folders, $scope.selection, $event);
       }
 
       function clickItem(item) {

@@ -6,7 +6,7 @@
       ng-class="{'-selected': item.selected}"
       ng-click="clickItem(item)">
 
-      <i ng-if="onSelect" class="icon-check umb-content-grid__action" ng-click="selectItem(item, $event)" ng-class="{'-selected': item.selected}"></i>
+      <i ng-if="onSelect" class="icon-check umb-content-grid__action" ng-click="selectItem(item, $event, $index)" ng-class="{'-selected': item.selected}"></i>
 
       <div class="umb-content-grid__icon-container">
          <i class="{{ item.icon }} umb-content-grid__icon" ng-class="{'-light': !item.published}"></i>
