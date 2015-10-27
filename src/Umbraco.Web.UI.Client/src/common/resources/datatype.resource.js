@@ -17,7 +17,7 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
          *
          * ##usage
          * <pre>
-         * dataTypeResource.getPrevalyes("Umbraco.MediaPicker", 1234)
+         * dataTypeResource.getPreValues("Umbraco.MediaPicker", 1234)
          *    .then(function(prevalues) {
          *        alert('its gone!');
          *    });

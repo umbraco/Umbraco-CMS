@@ -46,7 +46,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Gets the content json for the content id
+        /// Gets the datatype json for the datatype id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
