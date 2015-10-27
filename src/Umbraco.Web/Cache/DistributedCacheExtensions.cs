@@ -263,8 +263,8 @@ namespace Umbraco.Web.Cache
 
         public static void ClearAllMacroCacheOnCurrentServer(this DistributedCache dc)
         {
-            // NOTE: The 'false' ensure that it will only refresh on the current server, not post to all servers
-            dc.RefreshAll(DistributedCache.MacroCacheRefresherGuid, false);
+            var macroRefresher = CacheRefreshersResolver.Current.GetById(DistributedCache.MacroCacheRefresherGuid);
+            macroRefresher.RefreshAll();
         }
 
         public static void RefreshMacroCache(this DistributedCache dc, IMacro macro)
@@ -403,8 +403,8 @@ namespace Umbraco.Web.Cache
 
         public static void ClearDomainCacheOnCurrentServer(this DistributedCache dc)
         {
-            var key = RepositoryBase.GetCacheTypeKey<IDomain>();
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(key);
+            var domainRefresher = CacheRefreshersResolver.Current.GetById(DistributedCache.DomainCacheRefresherGuid);
+            domainRefresher.RefreshAll();
         }
 
         #endregion
