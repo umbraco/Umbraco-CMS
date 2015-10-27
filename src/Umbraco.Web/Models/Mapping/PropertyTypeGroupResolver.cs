@@ -176,7 +176,7 @@ namespace Umbraco.Web.Models.Mapping
                         Label = p.Name,
                         View = editor.ValueEditor.View,
                         Config = editor.PreValueEditor.ConvertDbToEditor(editor.DefaultPreValues, preVals) ,
-                        Value = "",
+                        //Value = "",
                         ContentTypeId = contentType.Id,
                         ContentTypeName = contentType.Name,
                         GroupId = groupId,

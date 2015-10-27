@@ -94,13 +94,7 @@ namespace Umbraco.Core.Models
                         .Select(p => p.Alias)).ToList();
 
                 if (conflictingPropertyTypeAliases.Any())
-                    throw new InvalidCompositionException
-                          {
-                              AddedCompositionAlias = contentType.Alias,
-                              ContentTypeAlias = Alias,
-                              PropertyTypeAlias =
-                                  string.Join(", ", conflictingPropertyTypeAliases)
-                          };
+                    throw new InvalidCompositionException(Alias, contentType.Alias, conflictingPropertyTypeAliases.ToArray());
 
                 _contentTypeComposition.Add(contentType);
                 OnPropertyChanged(ContentTypeCompositionSelector);

@@ -36,6 +36,16 @@ function entityResource($q, $http, umbRequestHelper) {
     //the factory object returned
     return {
         
+        getSafeAlias: function (value, camelCase) {
+
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "entityApiBaseUrl",
+                       "GetSafeAlias", { value: value, camelCase: camelCase })),
+               'Failed to retrieve content type scaffold');
+        },
+
         /**
          * @ngdoc method
          * @name umbraco.resources.entityResource#getPath

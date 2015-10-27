@@ -12,12 +12,11 @@ namespace Umbraco.Web.Models.Mapping
 {
     internal class AvailableCompositeContentTypesResolver : ValueResolver<IContentTypeComposition, IEnumerable<EntityBasic>>
     {
-        private ApplicationContext _context;
-        private bool _mediaType;
-        internal AvailableCompositeContentTypesResolver(ApplicationContext context, bool mediaType = false)
+        private readonly ApplicationContext _context;
+
+        internal AvailableCompositeContentTypesResolver(ApplicationContext context)
         {
             _context = context;
-            _mediaType = mediaType;
         }
 
         protected override IEnumerable<EntityBasic> ResolveCore(IContentTypeComposition source)
@@ -27,19 +26,19 @@ namespace Umbraco.Web.Models.Mapping
 
             var s = source;
             var type = _context.Services.EntityService.GetObjectType(source.Id);
-            IContentTypeComposition[] allContentTypes = new IContentTypeComposition[0];
+            var allContentTypes = new IContentTypeComposition[0];
 
             switch (type)
             {
-                    case UmbracoObjectTypes.DocumentType:
+                case UmbracoObjectTypes.DocumentType:
                     allContentTypes = _context.Services.ContentTypeService.GetAllContentTypes().Cast<IContentTypeComposition>().ToArray();
                     break;
 
-                    case UmbracoObjectTypes.MediaType:
+                case UmbracoObjectTypes.MediaType:
                     allContentTypes = _context.Services.ContentTypeService.GetAllMediaTypes().Cast<IContentTypeComposition>().ToArray();
                     break;
 
-                    case UmbracoObjectTypes.MemberType:
+                case UmbracoObjectTypes.MemberType:
                     allContentTypes = _context.Services.MemberTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
                     break;
             }
@@ -56,42 +55,40 @@ namespace Umbraco.Web.Models.Mapping
                 //if already in use a composition, do not allow any composited types
                 return new List<EntityBasic>();
             }
-            else
-            {
-                // if it is not used then composition is possible
-                // hashset guarantees unicity on Id
-                var list = new HashSet<IContentTypeComposition>(new DelegateEqualityComparer<IContentTypeComposition>(
-                    (x, y) => x.Id == y.Id,
-                    x => x.Id));
 
-                // usable types are those that are top-level
-                var usableContentTypes = allContentTypes
-                    .Where(x => x.ContentTypeComposition.Any() == false).ToArray();
-                foreach (var x in usableContentTypes)
-                    list.Add(x);
+            // if it is not used then composition is possible
+            // hashset guarantees unicity on Id
+            var list = new HashSet<IContentTypeComposition>(new DelegateEqualityComparer<IContentTypeComposition>(
+                (x, y) => x.Id == y.Id,
+                x => x.Id));
 
-                // indirect types are those that we use, directly or indirectly
-                var indirectContentTypes = GetIndirect(source).ToArray();
-                foreach (var x in indirectContentTypes)
-                    list.Add(x);
+            // usable types are those that are top-level
+            var usableContentTypes = allContentTypes
+                .Where(x => x.ContentTypeComposition.Any() == false).ToArray();
+            foreach (var x in usableContentTypes)
+                list.Add(x);
 
-                // directContentTypes are those we use directly
-                // they are already in indirectContentTypes, no need to add to the list
-                var directContentTypes = source.ContentTypeComposition.ToArray();
+            // indirect types are those that we use, directly or indirectly
+            var indirectContentTypes = GetIndirect(source).ToArray();
+            foreach (var x in indirectContentTypes)
+                list.Add(x);
 
-                var enabled = usableContentTypes.Select(x => x.Id) // those we can use
-                    .Except(indirectContentTypes.Select(x => x.Id)) // except those that are indirectly used
-                    .Union(directContentTypes.Select(x => x.Id)) // but those that are directly used
-                    .Where(x => x != source.ParentId) // but not the parent
-                    .Distinct()
-                    .ToArray();
+            //// directContentTypes are those we use directly
+            //// they are already in indirectContentTypes, no need to add to the list
+            //var directContentTypes = source.ContentTypeComposition.ToArray();
 
-                var wtf = new List<EntityBasic>();
-                foreach (var contentType in list.OrderBy(x => x.Name).Where(x => x.Id != source.Id))
-                    wtf.Add(Mapper.Map<IContentTypeComposition, EntityBasic>(contentType));
+            //var enabled = usableContentTypes.Select(x => x.Id) // those we can use
+            //    .Except(indirectContentTypes.Select(x => x.Id)) // except those that are indirectly used
+            //    .Union(directContentTypes.Select(x => x.Id)) // but those that are directly used
+            //    .Where(x => x != source.ParentId) // but not the parent
+            //    .Distinct()
+            //    .ToArray();
 
-                return wtf;
-            }
+            return list
+                .Where(x => x.Id != source.Id)
+                .OrderBy(x => x.Name)
+                .Select(Mapper.Map<IContentTypeComposition, EntityBasic>)
+                .ToList();
         }
 
 

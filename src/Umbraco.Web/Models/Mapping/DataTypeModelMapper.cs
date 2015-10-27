@@ -35,6 +35,7 @@ namespace Umbraco.Web.Models.Mapping
             };
 
             config.CreateMap<PropertyEditor, DataTypeBasic>()
+                .ForMember(x => x.HasPrevalues, expression => expression.Ignore())
                 .ForMember(x => x.IsSystemDataType, expression => expression.Ignore())
                 .ForMember(x => x.Id, expression => expression.Ignore())
                 .ForMember(x => x.Trashed, expression => expression.Ignore())
@@ -44,6 +45,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.AdditionalData, expression => expression.Ignore());
 
             config.CreateMap<IDataTypeDefinition, DataTypeBasic>()
+                .ForMember(x => x.HasPrevalues, expression => expression.Ignore())
                 .ForMember(x => x.Icon, expression => expression.Ignore())
                 .ForMember(x => x.Alias, expression => expression.Ignore())
                 .ForMember(x => x.Group, expression => expression.Ignore())
@@ -65,6 +67,7 @@ namespace Umbraco.Web.Models.Mapping
                     new PreValueDisplayResolver(lazyDataTypeService)))
                 .ForMember(display => display.SelectedEditor, expression => expression.MapFrom(
                     definition => definition.PropertyEditorAlias.IsNullOrWhiteSpace() ? null : definition.PropertyEditorAlias))
+                .ForMember(x => x.HasPrevalues, expression => expression.Ignore())
                 .ForMember(x => x.Notifications, expression => expression.Ignore())
                 .ForMember(x => x.Icon, expression => expression.Ignore())
                 .ForMember(x => x.Alias, expression => expression.Ignore())

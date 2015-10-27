@@ -298,7 +298,6 @@
 
         if (addGroup) {
           groups.push({
-            groups: [],
             properties: [],
             parentTabContentTypes: [],
             parentTabContentTypeNames: [],

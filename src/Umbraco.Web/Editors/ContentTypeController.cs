@@ -16,7 +16,7 @@ using Newtonsoft.Json;
 using Umbraco.Core.PropertyEditors;
 using System;
 using System.Net.Http;
-using System.Text;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Editors
 {
@@ -82,6 +82,36 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Gets all user defined properties.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<string> GetAllPropertyTypeAliases()
+        {
+            return ApplicationContext.Services.ContentTypeService.GetAllPropertyTypeAliases();
+        }
+
+        public ContentPropertyDisplay GetPropertyTypeScaffold(int id)
+        {
+            var dataTypeDiff = Services.DataTypeService.GetDataTypeDefinitionById(id);
+
+            if (dataTypeDiff == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var preVals = UmbracoContext.Current.Application.Services.DataTypeService.GetPreValuesCollectionByDataTypeId(id);
+            var editor = PropertyEditorResolver.Current.GetByAlias(dataTypeDiff.PropertyEditorAlias);
+
+            return new ContentPropertyDisplay()
+            {
+                Editor = dataTypeDiff.PropertyEditorAlias,
+                Validation = new PropertyTypeValidation() { },
+                View = editor.ValueEditor.View,
+                Config = editor.PreValueEditor.ConvertDbToEditor(editor.DefaultPreValues, preVals)
+            };
+        }
+
+        /// <summary>
         /// Deletes a document type container wth a given ID
         /// </summary>
         /// <param name="id"></param>
@@ -90,19 +120,21 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public HttpResponseMessage DeleteContainerById(int id)
         {
+            //TODO: This needs to be implemented correctly
+
             var foundType = Services.EntityService.Get(id);
             if (foundType == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            if(foundType.HasChildren())
+            if (foundType.HasChildren())
             {
                 throw new HttpResponseException(HttpStatusCode.Forbidden);
             }
 
             //TODO: what service to use to delete?
-                
+
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
@@ -115,109 +147,39 @@ namespace Umbraco.Web.Editors
                 : Request.CreateValidationErrorResponse(result.Exception.Message);
         }
 
-        /// <summary>
-        /// Move a content type to a container
-        /// </summary>
-        /// <param name="move"></param>
-        /// <returns></returns>
-        public HttpResponseMessage PostMove(MoveOrCopy move)
+        
+
+        public ContentTypeDisplay PostSave(ContentTypeSave contentTypeSave)
         {
-            //TODO, validate move
-
-            //TODO, service method for moving
-
-            var response = Request.CreateResponse(HttpStatusCode.OK);
-
-            //TODO, response
-            response.Content = new StringContent("", Encoding.UTF8, "application/json");
-            return response;
-        }
-
-        public ContentTypeDisplay PostSave(ContentTypeDisplay contentType)
-        {
-            var ctService = Services.ContentTypeService;
-
-            //TODO: warn on content type alias conflicts
-            //TODO: warn on property alias conflicts
-
-            //TODO: Validate the submitted model
-
-            var ctId = Convert.ToInt32(contentType.Id);
-
-            //filter out empty properties
-            contentType.Groups = contentType.Groups.Where(x => x.Name.IsNullOrWhiteSpace() == false).ToList();
-            foreach (var group in contentType.Groups)
-            {
-                group.Properties = group.Properties.Where(x => x.Alias.IsNullOrWhiteSpace() == false).ToList();
-            }
-
-            if (ctId > 0)
-            {
-                //its an update to an existing
-                IContentType found = ctService.GetContentType(ctId);
-                if (found == null)
-                    throw new HttpResponseException(HttpStatusCode.NotFound);
-
-                Mapper.Map(contentType, found);
-                ctService.Save(found);
-
-                //map the saved item back to the content type (it should now get id etc set)
-                Mapper.Map(found, contentType);
-                return contentType;
-            }
-            else
-            {
-                //ensure alias is set
-                if (string.IsNullOrEmpty(contentType.Alias))
-                    contentType.Alias = contentType.Name.ToSafeAlias();
-
-                //set id to null to ensure its handled as a new type
-                contentType.Id = null;
-                contentType.CreateDate = DateTime.Now;
-                contentType.UpdateDate = DateTime.Now;
-
-
-                //create a default template if it doesnt exist -but only if default template is == to the content type
-                if (contentType.DefaultTemplate != null && contentType.DefaultTemplate.Alias == contentType.Alias)
+            var savedCt = PerformPostSave<IContentType, ContentTypeDisplay>(
+                contentTypeSave:    contentTypeSave,
+                getContentType:     i => Services.ContentTypeService.GetContentType(i),
+                saveContentType:    type => Services.ContentTypeService.Save(type),
+                beforeCreateNew:    ctSave =>
                 {
-                    var template = Services.FileService.GetTemplate(contentType.Alias);
-                    if (template == null)
+                    //create a default template if it doesnt exist -but only if default template is == to the content type
+                    //TODO: Is this really what we want? What if we don't want any template assigned at all ?
+                    if (ctSave.DefaultTemplate.IsNullOrWhiteSpace() == false && ctSave.DefaultTemplate == ctSave.Alias)
                     {
-                        template = new Template(contentType.Name, contentType.Alias);
-                        Services.FileService.SaveTemplate(template);
+                        var template = Services.FileService.GetTemplate(ctSave.Alias);
+                        if (template == null)
+                        {
+                            template = new Template(ctSave.Name, ctSave.Alias);
+                            Services.FileService.SaveTemplate(template);
+                        }
+
+                        //make sure the template alias is set on the default and allowed template so we can map it back
+                        ctSave.DefaultTemplate = template.Alias;
                     }
+                });
 
-                    //make sure the template id is set on the default and allowed template
-                    contentType.DefaultTemplate.Id = template.Id;
-                    var found = contentType.AllowedTemplates.FirstOrDefault(x => x.Alias == contentType.Alias);
-                    if (found != null)
-                        found.Id = template.Id;
-                }
+            var display = Mapper.Map<ContentTypeDisplay>(savedCt);
 
-                //check if the type is trying to allow type 0 below itself - id zero refers to the currently unsaved type
-                //always filter these 0 types out
-                var allowItselfAsChild = false;
-                if (contentType.AllowedContentTypes != null)
-                {
-                    allowItselfAsChild = contentType.AllowedContentTypes.Any(x => x == 0);
-                    contentType.AllowedContentTypes = contentType.AllowedContentTypes.Where(x => x > 0).ToList();
-                }
+            display.AddSuccessNotification(
+                            Services.TextService.Localize("speechBubbles/contentTypeSavedHeader"),
+                            string.Empty);
 
-                //save as new
-                var newCt = Mapper.Map<IContentType>(contentType);
-                ctService.Save(newCt);
-
-                //we need to save it twice to allow itself under itself.
-                if (allowItselfAsChild)
-                {
-                    newCt.AddContentType(newCt);
-                    ctService.Save(newCt);
-                }
-
-                //map the saved item back to the content type (it should now get id etc set)
-                Mapper.Map(newCt, contentType);
-                return contentType;
-            }
+            return display;
         }
 
         /// <summary>
@@ -296,6 +258,6 @@ namespace Umbraco.Web.Editors
             return basics;
         }
 
-        
+
     }
 }

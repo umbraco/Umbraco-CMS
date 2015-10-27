@@ -1,22 +1,27 @@
 <div class="umb-locked-field">
+    <ng-form>
+        <a ng-if="locked" href="" ng-click="unlock()" class="umb-locked-field__toggle">
+            <i class="umb-locked-field__lock-icon icon-lock"></i>
+        </a>
 
-	<a ng-if="locked" href="" ng-click="unlock()" class="umb-locked-field__toggle">
-		<i class="umb-locked-field__lock-icon icon-lock"></i>
-	</a>
+        <a ng-if="!locked" href="" ng-click="lock()" class="umb-locked-field__toggle">
+            <i class="umb-locked-field__lock-icon icon-unlocked -unlocked"></i>
+        </a>
 
-	<a ng-if="!locked" href="" ng-click="lock()" class="umb-locked-field__toggle">
-		<i class="umb-locked-field__lock-icon icon-unlocked -unlocked"></i>
-	</a>
+        <input type="text"
+               class="umb-locked-field__input"
+               name="lockedField"
+               ng-model="model"
+               ng-disabled="locked"
+               ng-class="{'-unlocked': !locked}"
+               placeholder="{{placeholderText}}"
+               val-regex="{{regexValidation}}"
+               umb-auto-resize
+               required
+               val-server-field="{{serverValidationField}}" />
 
-	<input
-		type="text"
-		class="umb-locked-field__input"
-		name="lockedField"
-		ng-model="model"
-		ng-disabled="locked"
-		ng-class="{'-unlocked': !locked}"
-		placeholder="{{placeholderText}}"
-		umb-auto-resize
-	/>
-
+        <span class="validation-label" val-msg-for="lockedField" val-toggle-msg="required"><localize key="required" /></span>
+        <span ng-if="regexValidation.length > 0" class="validation-label" val-msg-for="lockedField" val-toggle-msg="valRegex">Invalid alias</span>
+        <span ng-if="serverValidationField.length > 0" class="validation-label" val-msg-for="lockedField" val-toggle-msg="valServerField"></span>
+    </ng-form>
 </div>

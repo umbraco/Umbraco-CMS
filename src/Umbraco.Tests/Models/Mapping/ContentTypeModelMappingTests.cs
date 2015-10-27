@@ -26,12 +26,12 @@ namespace Umbraco.Tests.Models.Mapping
     public class ContentTypeModelMappingTests : BaseUmbracoConfigurationTest
     {
         //Mocks of services that can be setup on a test by test basis to return whatever we want
-        private Mock<IContentTypeService> _contentTypeService = new Mock<IContentTypeService>();
-        private Mock<IContentService> _contentService = new Mock<IContentService>();
-        private Mock<IDataTypeService> _dataTypeService = new Mock<IDataTypeService>();
+        private readonly Mock<IContentTypeService> _contentTypeService = new Mock<IContentTypeService>();
+        private readonly Mock<IContentService> _contentService = new Mock<IContentService>();
+        private readonly Mock<IDataTypeService> _dataTypeService = new Mock<IDataTypeService>();
         private Mock<PropertyEditorResolver> _propertyEditorResolver;
-
-        private Mock<IEntityService> _entityService = new Mock<IEntityService>();
+        private readonly Mock<IEntityService> _entityService = new Mock<IEntityService>();
+        private readonly Mock<IFileService> _fileService = new Mock<IFileService>();
 
         [SetUp]
         public void Setup()
@@ -47,7 +47,9 @@ namespace Umbraco.Tests.Models.Mapping
 
                     contentService: _contentService.Object,
                     contentTypeService:_contentTypeService.Object,
-                    dataTypeService:_dataTypeService.Object),                    
+                    dataTypeService:_dataTypeService.Object,
+                    entityService:_entityService.Object,
+                    fileService: _fileService.Object),                    
 
                 nullCacheHelper,
                 new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
@@ -67,84 +69,9 @@ namespace Umbraco.Tests.Models.Mapping
                 entityMapper.ConfigureMappings(configuration, appContext);
             });
         }
-
+        
         [Test]
-        public void PropertyTypeDisplay_To_PropertyType()
-        {
-            // setup the mocks to return the data we want to test against...
-
-            _dataTypeService.Setup(x => x.GetDataTypeDefinitionById(It.IsAny<int>()))
-                .Returns(Mock.Of<IDataTypeDefinition>(
-                    definition =>
-                        definition.Id == 555
-                        && definition.PropertyEditorAlias == "myPropertyType"
-                        && definition.DatabaseType == DataTypeDatabaseType.Nvarchar));
-
-            var display = new PropertyTypeDisplay()
-            {
-                Id = 1,
-                Alias = "test",
-                ContentTypeId = 4,
-                Description = "testing",
-                DataTypeId = 555,
-
-                Value = "testsdfasdf",
-                Inherited = false,
-                Editor = "blah",
-                SortOrder = 6,
-                ContentTypeName = "Hello",
-                Label = "asdfasdf",
-                GroupId = 8,
-                Validation = new PropertyTypeValidation()
-                {
-                    Mandatory = true,
-                    Pattern = "asdfasdfa"
-                }
-            };
-
-            var result = Mapper.Map<PropertyType>(display);
-
-            Assert.AreEqual(1, result.Id);
-            Assert.AreEqual("test", result.Alias);
-            Assert.AreEqual("testing", result.Description);
-            Assert.AreEqual("blah", result.PropertyEditorAlias);
-            Assert.AreEqual(6, result.SortOrder);
-            Assert.AreEqual("asdfasdf", result.Name);
-        }
-
-        [Test]
-        public void ContentGroupDisplay_To_PropertyGroup()
-        {
-            var display = new PropertyGroupDisplay()
-            {
-                ContentTypeId = 2,
-                Id = 1,
-                Inherited = false,
-                Name = "test",
-                ParentGroupId = 4,
-                ParentTabContentTypeNames = new[]
-                {
-                    "hello", "world"
-                },
-                SortOrder = 5,
-                ParentTabContentTypes = new[]
-                {
-                    10, 11
-                }
-            };
-
-
-            var result = Mapper.Map<PropertyGroup>(display);
-
-            Assert.AreEqual(1, result.Id);
-            Assert.AreEqual("test", result.Name);
-            Assert.AreEqual(4, result.ParentId);
-            Assert.AreEqual(5, result.SortOrder);
-
-        }
-
-        [Test]
-        public void ContentTypeDisplay_To_IContentType()
+        public void ContentTypeSave_To_IContentType()
         {
             //Arrange
 
@@ -157,8 +84,14 @@ namespace Umbraco.Tests.Models.Mapping
                         && definition.PropertyEditorAlias == "myPropertyType"
                         && definition.DatabaseType == DataTypeDatabaseType.Nvarchar));
 
-            
-            var display = CreateSimpleContentTypeDisplay();
+
+            _fileService.Setup(x => x.GetTemplate(It.IsAny<string>()))
+                .Returns((string alias) => Mock.Of<ITemplate>(
+                    definition =>
+                        definition.Id == alias.GetHashCode() && definition.Alias == alias));
+                
+
+            var display = CreateContentTypeSave();
 
             //Act
 
@@ -194,10 +127,14 @@ namespace Umbraco.Tests.Models.Mapping
                 }
             }
 
-            Assert.AreEqual(display.AllowedTemplates.Count(), result.AllowedTemplates.Count());
+            var allowedTemplateAliases = display.AllowedTemplates
+                .Concat(new[] {display.DefaultTemplate})
+                .Distinct();
+
+            Assert.AreEqual(allowedTemplateAliases.Count(), result.AllowedTemplates.Count());
             for (var i = 0; i < display.AllowedTemplates.Count(); i++)
             {
-                Assert.AreEqual(display.AllowedTemplates.ElementAt(i).Id, result.AllowedTemplates.ElementAt(i).Id);
+                Assert.AreEqual(display.AllowedTemplates.ElementAt(i), result.AllowedTemplates.ElementAt(i).Alias);
             }
 
             Assert.AreEqual(display.AllowedContentTypes.Count(), result.AllowedContentTypes.Count());
@@ -208,7 +145,7 @@ namespace Umbraco.Tests.Models.Mapping
         }
 
         [Test]
-        public void ContentTypeDisplay_With_Composition_To_IContentType()
+        public void ContentTypeSave_With_Composition_To_IContentType()
         {
             //Arrange
 
@@ -222,7 +159,7 @@ namespace Umbraco.Tests.Models.Mapping
                         && definition.DatabaseType == DataTypeDatabaseType.Nvarchar));
 
 
-            var display = CreateCompositionContentTypeDisplay();
+            var display = CreateCompositionContentTypeSave();
 
             //Act
 
@@ -307,6 +244,91 @@ namespace Umbraco.Tests.Models.Mapping
         }
 
         [Test]
+        public void PropertyGroupBasic_To_PropertyGroup()
+        {
+            var basic = new PropertyGroupBasic<PropertyTypeBasic>()
+            {
+                Id = 222,
+                Name = "Group 1",
+                SortOrder = 1,
+                Properties = new[]
+                {
+                    new PropertyTypeBasic()
+                    {
+                        Id = 33,
+                        SortOrder = 1,
+                        Alias = "prop1",
+                        Description = "property 1",
+                        DataTypeId = 99,
+                        GroupId = 222,
+                        Label = "Prop 1",
+                        Validation = new PropertyTypeValidation()
+                        {
+                            Mandatory = true,
+                            Pattern = null
+                        }
+                    },
+                    new PropertyTypeBasic()
+                    {
+                        Id = 34,
+                        SortOrder = 2,
+                        Alias = "prop2",
+                        Description = "property 2",
+                        DataTypeId = 99,
+                        GroupId = 222,
+                        Label = "Prop 2",
+                        Validation = new PropertyTypeValidation()
+                        {
+                            Mandatory = false,
+                            Pattern = null
+                        }
+                    },
+                }
+            };
+
+            var result = Mapper.Map<PropertyGroup>(basic);
+
+            Assert.AreEqual(basic.Name, result.Name);
+            Assert.AreEqual(basic.Id, result.Id);
+            Assert.AreEqual(basic.SortOrder, result.SortOrder);
+            Assert.AreEqual(basic.Properties.Count(), result.PropertyTypes.Count());
+        }
+
+        [Test]
+        public void PropertyTypeBasic_To_PropertyType()
+        {
+            _dataTypeService.Setup(x => x.GetDataTypeDefinitionById(It.IsAny<int>()))
+                .Returns(new DataTypeDefinition("test"));
+
+            var basic = new PropertyTypeBasic()
+            {
+                Id = 33,
+                SortOrder = 1,
+                Alias = "prop1",
+                Description = "property 1",
+                DataTypeId = 99,
+                GroupId = 222,
+                Label = "Prop 1",
+                Validation = new PropertyTypeValidation()
+                {
+                    Mandatory = true,
+                    Pattern = "xyz"
+                }
+            };
+
+            var result = Mapper.Map<PropertyType>(basic);
+
+            Assert.AreEqual(basic.Id, result.Id);
+            Assert.AreEqual(basic.SortOrder, result.SortOrder);
+            Assert.AreEqual(basic.Alias, result.Alias);
+            Assert.AreEqual(basic.Description, result.Description);
+            Assert.AreEqual(basic.DataTypeId, result.DataTypeDefinitionId);           
+            Assert.AreEqual(basic.Label, result.Name);
+            Assert.AreEqual(basic.Validation.Mandatory, result.Mandatory);
+            Assert.AreEqual(basic.Validation.Pattern, result.ValidationRegExp);
+        }
+
+        [Test]
         public void IContentTypeComposition_To_ContentTypeDisplay()
         {
             //Arrange
@@ -317,6 +339,9 @@ namespace Umbraco.Tests.Models.Mapping
             // TODO: but we'll need to change this to return some pre-values to test the mappings
             _dataTypeService.Setup(x => x.GetPreValuesCollectionByDataTypeId(It.IsAny<int>()))
                 .Returns(new PreValueCollection(new Dictionary<string, PreValue>()));
+
+            _entityService.Setup(x => x.GetObjectType(It.IsAny<int>()))
+                .Returns(UmbracoObjectTypes.DocumentType);
 
             //return a textbox property editor for any requested editor by alias
             _propertyEditorResolver.Setup(resolver => resolver.GetByAlias(It.IsAny<string>()))
@@ -403,31 +428,19 @@ namespace Umbraco.Tests.Models.Mapping
         }
 
 
-        private ContentTypeDisplay CreateSimpleContentTypeDisplay()
+        private ContentTypeSave CreateContentTypeSave()
         {            
-            return new ContentTypeDisplay
+            return new ContentTypeSave
             {
                 Alias = "test",     
                 AllowAsRoot = true,
-                AllowedTemplates = new List<EntityBasic>
+                AllowedTemplates = new []
                 {
-                    new EntityBasic
-                    {
-                        Id = 555,
-                        Alias = "template1",
-                        Name = "Template1"
-                    },
-                    new EntityBasic
-                    {
-                        Id = 556,
-                        Alias = "template2",
-                        Name = "Template2"
-                    }
+                    "template1",
+                    "template2"
                 },
-
                 AllowedContentTypes = new [] {666, 667},
-                AvailableCompositeContentTypes = new List<EntityBasic>(),
-                DefaultTemplate = new EntityBasic(){ Alias = "test" },
+                DefaultTemplate = "test",
                 Description = "hello world",
                 Icon = "tree-icon",
                 Id = 1234,
@@ -437,18 +450,17 @@ namespace Umbraco.Tests.Models.Mapping
                 ParentId = -1,
                 Thumbnail = "tree-thumb",
                 IsContainer = true,
-                Groups = new List<PropertyGroupDisplay>()
+                Groups = new []
                 {
-                    new PropertyGroupDisplay
+                    new PropertyGroupBasic<PropertyTypeBasic>()
                     {
                         Id = 987,
                         Name = "Tab 1",
-                        ParentGroupId = -1,
                         SortOrder = 0,
                         Inherited = false,                        
-                        Properties = new List<PropertyTypeDisplay>
+                        Properties = new []
                         {
-                            new PropertyTypeDisplay
+                            new PropertyTypeBasic
                             {                                
                                 Alias = "property1",
                                 Description = "this is property 1",
@@ -459,17 +471,8 @@ namespace Umbraco.Tests.Models.Mapping
                                     Mandatory = false,
                                     Pattern = ""
                                 },
-                                Editor = "myPropertyType",
-                                Value = "value 1",
-                                //View = ??? - isn't this the same as editor?
-                                Config = new Dictionary<string, object>
-                                {
-                                    {"item1", "value1"},
-                                    {"item2", "value2"}
-                                },
                                 SortOrder = 0,
-                                DataTypeId = 555,
-                                View = "blah"
+                                DataTypeId = 555
                             }
                         }
                     }
@@ -477,30 +480,19 @@ namespace Umbraco.Tests.Models.Mapping
             };
         }
 
-        private ContentTypeDisplay CreateCompositionContentTypeDisplay()
+        private ContentTypeSave CreateCompositionContentTypeSave()
         {
-            return new ContentTypeDisplay
+            return new ContentTypeSave
             {
                 Alias = "test",
                 AllowAsRoot = true,
-                AllowedTemplates = new List<EntityBasic>
+                AllowedTemplates = new[]
                 {
-                    new EntityBasic
-                    {
-                        Id = 555,
-                        Alias = "template1",
-                        Name = "Template1"
-                    },
-                    new EntityBasic
-                    {
-                        Id = 556,
-                        Alias = "template2",
-                        Name = "Template2"
-                    }
+                    "template1",
+                    "template2"
                 },
                 AllowedContentTypes = new[] { 666, 667 },
-                AvailableCompositeContentTypes = new List<EntityBasic>(),
-                DefaultTemplate = new EntityBasic() { Alias = "test" },
+                DefaultTemplate = "test",
                 Description = "hello world",
                 Icon = "tree-icon",
                 Id = 1234,
@@ -510,18 +502,17 @@ namespace Umbraco.Tests.Models.Mapping
                 ParentId = -1,
                 Thumbnail = "tree-thumb",
                 IsContainer = true,
-                Groups = new List<PropertyGroupDisplay>()
+                Groups = new[]
                 {
-                    new PropertyGroupDisplay
+                    new PropertyGroupBasic<PropertyTypeBasic>()
                     {
                         Id = 987,
                         Name = "Tab 1",
-                        ParentGroupId = -1,
                         SortOrder = 0,
                         Inherited = false,                        
-                        Properties = new List<PropertyTypeDisplay>
+                        Properties = new[]
                         {
-                            new PropertyTypeDisplay
+                            new PropertyTypeBasic
                             {                                
                                 Alias = "property1",
                                 Description = "this is property 1",
@@ -532,30 +523,20 @@ namespace Umbraco.Tests.Models.Mapping
                                     Mandatory = false,
                                     Pattern = ""
                                 },
-                                Editor = "myPropertyType",
-                                Value = "value 1",
-                                //View = ??? - isn't this the same as editor?
-                                Config = new Dictionary<string, object>
-                                {
-                                    {"item1", "value1"},
-                                    {"item2", "value2"}
-                                },
                                 SortOrder = 0,
-                                DataTypeId = 555,
-                                View = "blah"
+                                DataTypeId = 555
                             }
                         }
                     },
-                    new PropertyGroupDisplay
+                    new PropertyGroupBasic<PropertyTypeBasic>()
                     {
                         Id = 894,
                         Name = "Tab 2",
-                        ParentGroupId = -1,
                         SortOrder = 0,
                         Inherited = true,                        
-                        Properties = new List<PropertyTypeDisplay>
+                        Properties = new[]
                         {
-                            new PropertyTypeDisplay
+                            new PropertyTypeBasic
                             {                                
                                 Alias = "parentProperty",
                                 Description = "this is a property from the parent",
@@ -565,17 +546,9 @@ namespace Umbraco.Tests.Models.Mapping
                                 {
                                     Mandatory = false,
                                     Pattern = ""
-                                },
-                                Editor = "myPropertyType",
-                                Value = "parent value",
-                                //View = ??? - isn't this the same as editor?
-                                Config = new Dictionary<string, object>
-                                {
-                                    {"item1", "value1"}
-                                },
+                                },                                
                                 SortOrder = 0,
-                                DataTypeId = 555,
-                                View = "blah"
+                                DataTypeId = 555
                             }
                         }
                         
