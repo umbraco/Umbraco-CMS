@@ -61,7 +61,7 @@ namespace umbraco.cms.presentation.user
         }
 
         /// <summary>
-        /// The JavaScript method to call when a node is checked. The method will receive a comma seperated list of node IDs that are checked.
+        /// The JavaScript method to call when a node is checked. The method will receive a comma separated list of node IDs that are checked.
         /// </summary>
         public string OnClientItemChecked
         {

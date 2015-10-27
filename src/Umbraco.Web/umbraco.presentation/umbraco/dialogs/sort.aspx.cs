@@ -23,6 +23,12 @@ namespace umbraco.cms.presentation
     {
         private readonly List<SortableNode> _nodes = new List<SortableNode>();
 
+        protected bool HideDateColumn
+        {
+            set { ViewState["HideDateColumn"] = value; }
+            get { return ViewState["HideDateColumn"] == null ? false : (bool) ViewState["HideDateColumn"]; }
+        }
+
         protected override void OnInit(EventArgs e)
         {
             CurrentApp = helper.Request("app");
@@ -56,13 +62,13 @@ namespace umbraco.cms.presentation
                     if (parentId == -1)
                     {
                         foreach (var child in mediaService.GetRootMedia().ToList().OrderBy(x => x.SortOrder))
-                            _nodes.Add(CreateNode(child.Id, child.SortOrder, child.Name, child.CreateDate, icon));
+                            _nodes.Add(CreateNode(child.Id.ToInvariantString(), child.SortOrder, child.Name, child.CreateDate, icon));
                     }
                     else
                     {
                         var children = mediaService.GetChildren(parentId);
                         foreach (var child in children.OrderBy(x => x.SortOrder))
-                            _nodes.Add(CreateNode(child.Id, child.SortOrder, child.Name, child.CreateDate, icon));
+                            _nodes.Add(CreateNode(child.Id.ToInvariantString(), child.SortOrder, child.Name, child.CreateDate, icon));
                     }
                 }
 
@@ -73,29 +79,41 @@ namespace umbraco.cms.presentation
                     if (parentId == -1)
                     {
                         foreach (var child in contentService.GetRootContent().ToList().OrderBy(x => x.SortOrder))
-                            _nodes.Add(CreateNode(child.Id, child.SortOrder, child.Name, child.CreateDate, icon));
+                            _nodes.Add(CreateNode(child.Id.ToInvariantString(), child.SortOrder, child.Name, child.CreateDate, icon));
                     }
                     else
                     {
                         var children = contentService.GetChildren(parentId);
                         foreach (var child in children)
-                            _nodes.Add(CreateNode(child.Id, child.SortOrder, child.Name, child.CreateDate, icon));
+                            _nodes.Add(CreateNode(child.Id.ToInvariantString(), child.SortOrder, child.Name, child.CreateDate, icon));
                     }
                 }
-
+                
+                bindNodesToList(string.Empty);
+            }
+            else
+            {
                 // hack for stylesheet, used to sort stylesheet properties
                 if (app == Constants.Applications.Settings)
                 {
                     icon = "../images/umbraco/settingCss.gif";
-                    var ss = new StyleSheet(parentId);
-                    foreach (var child in ss.Properties)
-                    {
-                        var node = new CMSNode(child.Id);
-                        _nodes.Add(CreateNode(child.Id, node.sortOrder, child.Text, child.CreateDateTime, icon));
-                    }
-                }
 
-                bindNodesToList(string.Empty);
+                    HideDateColumn = true;
+
+                    var stylesheetName = Request.GetItemAsString("ID");
+                    if (stylesheetName.IsNullOrWhiteSpace())throw new NullReferenceException("No Id passed in to editor");
+                    var stylesheet = Services.FileService.GetStylesheetByName(stylesheetName.EnsureEndsWith(".css"));
+                    if (stylesheet == null) throw new InvalidOperationException("No stylesheet found by name " + stylesheetName);
+
+                    var sort = 0;
+                    foreach (var child in stylesheet.Properties)
+                    {                        
+                        _nodes.Add(CreateNode(child.Name, sort, child.Name, DateTime.Now, icon));
+                        sort++;
+                    }
+                    
+                    bindNodesToList(string.Empty);
+                }
             }
         }
 
@@ -115,10 +133,12 @@ namespace umbraco.cms.presentation
             }
 
             foreach (var n in _nodes)
-                lt_nodes.Text += string.Format("<tr id='node_{0}'><td>{1}</td><td class='nowrap'>{2} {3}</td><td style='text-align: center;'>{4}</td></tr>", n.id, n.Name, n.createDate.ToShortDateString(), n.createDate.ToShortTimeString(), n.sortOder);
+                lt_nodes.Text += string.Format(
+                    "<tr id='node_{0}'><td>{1}</td><td class='nowrap' style='display:{5};'>{2} {3}</td><td style='text-align: center;'>{4}</td></tr>", 
+                    n.id, n.Name, n.createDate.ToShortDateString(), n.createDate.ToShortTimeString(), n.sortOder, HideDateColumn ? "none" : "block");
         }
 
-        private static SortableNode CreateNode(int id, int sortOrder, string name, DateTime createDateTime, string icon)
+        private static SortableNode CreateNode(string id, int sortOrder, string name, DateTime createDateTime, string icon)
         {
             var node = new SortableNode
                             {
@@ -133,7 +153,7 @@ namespace umbraco.cms.presentation
 
         public struct SortableNode
         {
-            public int id;
+            public string id;
             public int sortOder;
             public string Name;
             public string icon;

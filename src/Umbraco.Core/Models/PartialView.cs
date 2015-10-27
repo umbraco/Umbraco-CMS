@@ -1,26 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text.RegularExpressions;
-using Umbraco.Core.IO;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Models
 {
-    //internal class PartialViewMacro : PartialView
-    //{
-    //    public PartialViewMacro()
-    //        : base(string.Empty)
-    //    {
-    //    }
-
-    //    public PartialViewMacro(string path) : base(path)
-    //    {
-    //    }
-
-    //    public IMacro AssociatedMacro { get; set; }
-    //}
-
+  
     /// <summary>
     /// Represents a Partial View file
     /// </summary>
@@ -28,29 +12,14 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class PartialView : File, IPartialView
     {
-        //public PartialView(): base(string.Empty)
-        //{
-        //}
-
         public PartialView(string path)
-            : base(path)
-        {
-            base.Path = path;
-        }
+            : this(path, null)
+        { }
 
-        /// <summary>
-        /// Boolean indicating whether the file could be validated
-        /// </summary>
-        /// <returns>True if file is valid, otherwise false</returns>
-        public override bool IsValid()
-        {            
-            //TODO: Why is this here? Needs to go on the FileService
+        internal PartialView(string path, Func<File, string> getFileContent)
+            : base(path, getFileContent)
+        { }
 
-            var validatePath = IOHelper.ValidateEditPath(Path, new[] { SystemDirectories.MvcViews + "/Partials/", SystemDirectories.MvcViews + "/MacroPartials/" });
-            var verifyFileExtension = IOHelper.VerifyFileExtension(Path, new List<string> { "cshtml" });
-
-            return validatePath && verifyFileExtension;
-        }
-        
+        internal PartialViewType ViewType { get; set; }
     }
 }

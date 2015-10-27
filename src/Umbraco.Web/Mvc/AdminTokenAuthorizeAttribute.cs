@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -36,22 +37,33 @@ namespace Umbraco.Web.Mvc
             return _applicationContext ?? ApplicationContext.Current;
         }
 
+        public const string AuthorizationType = "AToken";
+
         /// <summary>
-        /// Used to return the value that needs to go in the Authorization header
+        /// Used to return the full value that needs to go in the Authorization header
         /// </summary>
         /// <param name="appContext"></param>
         /// <returns></returns>
         public static string GetAuthHeaderTokenVal(ApplicationContext appContext)
         {
-            var admin = appContext.Services.UserService.GetUserById(0);
+            return string.Format("{0} {1}", AuthorizationType, GetAuthHeaderVal(appContext));
+        }
 
+        public static AuthenticationHeaderValue GetAuthenticationHeaderValue(ApplicationContext appContext)
+        {
+            return new AuthenticationHeaderValue(AuthorizationType, GetAuthHeaderVal(appContext));
+        }
+
+        private static string GetAuthHeaderVal(ApplicationContext appContext)
+        {
+            var admin = appContext.Services.UserService.GetUserById(0);
 
             var token = string.Format("{0}u____u{1}u____u{2}", admin.Email, admin.Username, admin.RawPasswordValue);
 
             var encrypted = token.EncryptWithMachineKey();
             var bytes = Encoding.UTF8.GetBytes(encrypted);
             var base64 = Convert.ToBase64String(bytes);
-            return "AToken val=\"" + base64 + "\"";
+            return string.Format("val=\"{0}\"", base64);
         }
         
         /// <summary>

@@ -34,7 +34,8 @@ namespace Umbraco.Core.Strategies
                 var relation = new Relation(e.Original.Id, e.Copy.Id, relationType);
                 relationService.Save(relation);
 
-                Audit.Add(AuditTypes.Copy,
+                ApplicationContext.Current.Services.AuditService.Add(
+                    AuditType.Copy,
                     string.Format("Copied content with Id: '{0}' related to original content with Id: '{1}'",
                         e.Copy.Id, e.Original.Id), e.Copy.WriterId, e.Copy.Id);
             }

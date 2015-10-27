@@ -18,12 +18,14 @@ namespace Umbraco.Core.Models
 
         public DictionaryTranslation(ILanguage language, string value)
         {
+            if (language == null) throw new ArgumentNullException("language");
             _language = language;
             _value = value;
         }
 
         public DictionaryTranslation(ILanguage language, string value, Guid uniqueId)
         {
+            if (language == null) throw new ArgumentNullException("language");
             _language = language;
             _value = value;
             Key = uniqueId;

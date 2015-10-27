@@ -5,37 +5,18 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Macros;
 using Umbraco.Core.ObjectResolution;
-using Umbraco.Tests.TestHelpers;
 using umbraco.interfaces;
 
 namespace Umbraco.Tests.Resolvers
 {
 	[TestFixture]
-	public class MacroFieldEditorsResolverTests
+    public class MacroFieldEditorsResolverTests : ResolverBaseTest
 	{
-		[SetUp]
-		public void Initialize()
-		{
-            TestHelper.SetupLog4NetForTests();
-
-            MacroFieldEditorsResolver.Reset();
-
-
-			// this ensures it's reset
-			PluginManager.Current = new PluginManager(false);
-
-			// for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
-			PluginManager.Current.AssembliesToScan = new[]
-				{
-					this.GetType().Assembly
-				};
-		}
-
+		
 		[TearDown]
 		public void TearDown()
 		{
             MacroFieldEditorsResolver.Reset();
-            PluginManager.Current = null;
 		}
 
         // NOTE
@@ -46,7 +27,8 @@ namespace Umbraco.Tests.Resolvers
 		public void FindAllTypes()
 		{
             MacroFieldEditorsResolver.Current = new MacroFieldEditorsResolver(
-                () => PluginManager.Current.ResolveMacroRenderings());
+                new ActivatorServiceProvider(), ProfilingLogger.Logger,
+                () => PluginManager.ResolveMacroRenderings());
 
             Resolution.Freeze();
             

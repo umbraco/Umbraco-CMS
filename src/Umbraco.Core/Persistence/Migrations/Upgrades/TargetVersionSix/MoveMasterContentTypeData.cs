@@ -1,10 +1,16 @@
 ﻿using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
 {
     [Migration("6.0.0", 5, GlobalSettings.UmbracoMigrationName)]
     public class MoveMasterContentTypeData : MigrationBase
     {
+        public MoveMasterContentTypeData(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
+        {
+        }
+
         public override void Up()
         {
             //Reading entries from the cmsContentType table in order to update the parentID on the umbracoNode table.

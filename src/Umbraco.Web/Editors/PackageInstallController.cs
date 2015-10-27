@@ -87,7 +87,7 @@ namespace Umbraco.Web.Editors
             ins.LoadConfig(IOHelper.MapPath(model.TemporaryDirectoryPath));
             ins.InstallCleanUp(model.Id, IOHelper.MapPath(model.TemporaryDirectoryPath));
 
-            var clientDependencyConfig = new Umbraco.Core.Configuration.ClientDependencyConfiguration();
+            var clientDependencyConfig = new Umbraco.Core.Configuration.ClientDependencyConfiguration(ApplicationContext.ProfilingLogger.Logger);
             var clientDependencyUpdated = clientDependencyConfig.IncreaseVersionNumber();
 
             //clear the tree cache - we'll do this here even though the browser will reload, but just in case it doesn't can't hurt.

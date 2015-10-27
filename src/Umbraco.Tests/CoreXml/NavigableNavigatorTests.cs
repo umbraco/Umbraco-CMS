@@ -1162,13 +1162,4 @@ namespace Umbraco.Tests.CoreXml
     }
 
     #endregion
-
-    static class StringCrLfExtensions
-    {
-        public static string Lf(this string s)
-        {
-            if (string.IsNullOrEmpty(s)) return s;
-            return s.Replace("\r", ""); // remove Cr
-        }
-    }
 }

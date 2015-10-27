@@ -479,14 +479,6 @@ permission char (1) NOT NULL
 ; 
 ALTER TABLE umbracoUser2NodePermission ADD CONSTRAINT PK_umbracoUser2NodePermission PRIMARY KEY CLUSTERED  (userId, nodeId, permission) 
 ; 
-CREATE TABLE umbracoUserLogins 
-( 
-contextId CHAR(36) NOT NULL, 
-userID int NOT NULL, 
-timeout bigint NOT NULL 
-) 
- 
-; 
 INSERT INTO umbracoNode (id, trashed, parentID, nodeUser, level, path, sortOrder, uniqueID, text, nodeObjectType, createDate) VALUES 
 	(-92, 0, -1, 0, 11, '-1,-92', 37, 'f0bc4bfb-b499-40d6-ba86-058885a5178c', 'Label', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '2004/09/30 14:01:49.920'),
 	(-90, 0, -1, 0, 11, '-1,-90', 35, '84c6b441-31df-4ffe-b67e-67d5bc3ae65a', 'Upload', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '2004/09/30 14:01:49.920'),

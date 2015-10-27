@@ -16,8 +16,6 @@
     <key alias="disable">Uitschakelen</key>
     <key alias="emptyTrashcan">Prullenbak leegmaken</key>
     <key alias="exportDocumentType">Documenttype exporteren</key>
-    <key alias="exportDocumentTypeAsCode">Exporteer naar .NET</key>
-    <key alias="exportDocumentTypeAsCode-Full">Exporteer naar .NET</key>
     <key alias="importDocumentType">Documenttype importeren</key>
     <key alias="importPackage">Package importeren</key>
     <key alias="liveEdit">Aanpassen in Canvas</key>
@@ -51,11 +49,11 @@
     <key alias="domainCreated">Nieuw domein '%0%' is aangemaakt</key>
     <key alias="domainDeleted">Domein '%0%' is verwijderd</key>
     <key alias="domainExists">Domein '%0' is al aanwezig</key>
+    <key alias="domainUpdated">Domein '%0%' is bijgewerkt</key>
+    <key alias="orEdit">Bewerk huidige domeinen</key>
     <key alias="domainHelp"><![CDATA[Geldige domeinnamen zijn: "example.com", "www.example.com", "example.com:8080" of
         "https://www.example.com/".<br /><br />Zgn. 'one-level' paden in domeinen worden ondersteund, bijv. "example.com/en". Echter, ze
         zouden moeten worden vermeden. Gebruik bij voorkeur de cultuurinstelling hierboven.]]></key>
-    <key alias="domainUpdated">Domein '%0%' is bijgewerkt</key>
-    <key alias="orEdit">Bewerk huidige domeinen</key>
     <key alias="inherit">Overerven</key>
     <key alias="setLanguage">Cultuur</key>
     <key alias="setLanguageHelp"><![CDATA[Zet de cultuur voor de nodes onder de huidige node,<br /> of erf de cultuur over van de ouder nodes. Zal ook van toepassing <br />
@@ -87,6 +85,7 @@
     <key alias="macroInsert">Macro invoegen</key>
     <key alias="pictureInsert">Afbeelding invoegen</key>
     <key alias="relations">Relaties wijzigen</key>
+    <key alias="returnToList">Terug naar overzicht</key>
     <key alias="save">Opslaan</key>
     <key alias="saveAndPublish">Opslaan en publiceren</key>
     <key alias="saveToPublish">Opslaan en verzenden voor goedkeuring</key>
@@ -117,6 +116,7 @@
     <key alias="validDocTypesNote">Alleen alternatieve types geldig voor de huidige locatie worden weergegeven.</key>
   </area>
   <area alias="content">
+    <key alias="isPublished" version="7.2">Is gepubliceerd</key>
     <key alias="about">Over deze pagina</key>
     <key alias="alias">Alternatieve link</key>
     <key alias="alternativeTextHelp">(hoe zou jij de foto beschrijven via de telefoon)</key>
@@ -133,6 +133,7 @@
     <key alias="itemChanged">Dit item is gewijzigd na publicatie</key>
     <key alias="itemNotPublished">Dit item is niet gepubliceerd</key>
     <key alias="lastPublished">Laatst gepubliceerd op</key>
+    <key alias="listViewNoItems" version="7.1.5">Nog geen items om weer te geven.</key>
     <key alias="mediatype">Mediatype</key>
     <key alias="mediaLinks">Link naar media item(s)</key>
     <key alias="membergroup">Ledengroep</key>
@@ -152,11 +153,12 @@
     <key alias="sortHelp">Om nodes te sorteren, sleep de nodes of klik op één van de kolomtitels. Je kan meerdere nodes tegelijk selecteren door de "shift"- of "control"knop in te drukken tijdens het selecteren.</key>
     <key alias="statistics">Statistieken</key>
     <key alias="titleOptional">Titel (optioneel)</key>
+    <key alias="altTextOptional">Alternatieve tekst (optioneel)</key>
     <key alias="type">Type</key>
     <key alias="unPublish">Depubliceren</key>
     <key alias="updateDate">Laatst gewijzigd</key>
     <key alias="updateDateDesc" version="7.0">Date/time this document was edited</key>
-    <key alias="uploadClear">Bestand verwijderen</key>
+    <key alias="uploadClear">Bestand(en) verwijderen</key>
     <key alias="urls">Link naar het document</key>
     <key alias="memberof">Lid van groep(en)</key>
     <key alias="notmemberof">Geen lid van groep(en)</key>
@@ -170,7 +172,7 @@
   </area>
   <area alias="create">
     <key alias="chooseNode">Waar wil je de nieuwe %0% aanmaken?</key>
-    <key alias="createUnder">Aanmaken op</key>
+    <key alias="createUnder">Aanmaken onder</key>
     <key alias="updateData">Kies een type en een titel</key>
 
     <key alias="noDocumentTypes" version="7.0"><![CDATA[Er zijn geen toegestane ​​documenttypes beschikbaar. Je moet deze inschakelen in de Instellingen sectie onder <strong>"Documenttypes"</ strong>.]]></key>
@@ -241,16 +243,20 @@
     <key alias="displayName">Cultuurnaam</key>
   </area>
   <area alias="placeholders">
-    <key alias="username">Type je gebruikersnaam</key>
-    <key alias="password">Type je wachtwoord</key>
+    <key alias="username">Typ je gebruikersnaam</key>
+    <key alias="password">Typ je wachtwoord</key>
     <key alias="nameentity">Benoem de %0%...</key>
-    <key alias="entername">Type een naam...</key>
-    <key alias="search">Type om te zoeken...</key>
-    <key alias="filter">Type om te filteren...</key>
+    <key alias="entername">Typ een naam...</key>
+    <key alias="search">Typ om te zoeken...</key>
+    <key alias="filter">Typ om te filteren...</key>
+    <key alias="enterTags">Typ om tags toe te voegen (druk op enter na elke tag)...</key>
   </area>
 
   <area alias="editcontenttype">
+    <key alias="allowAtRoot" version="7.2">Toestaan op root-niveau</key>
+    <key alias="allowAtRootDesc" version="7.2">Wanneer aangevinkt dan mag dit document type aangemaakt worden op het root-niveau van content of media trees.</key>
     <key alias="allowedchildnodetypes">Toegelaten subnodetypes</key>
+    <key alias="contenttypecompositions">Document Type Composities</key>
     <key alias="create">Nieuw</key>
     <key alias="deletetab">Tab verwijderen</key>
     <key alias="description">Omschrijving</key>
@@ -258,6 +264,11 @@
     <key alias="tab">Tab</key>
     <key alias="thumbnail">Miniatuur</key>
     <key alias="hasListView">Lijstweergave inschakelen</key>
+    <key alias="hasListViewDesc" version="7.2">Stelt het content item in zodat een sorteer- en zoekbare lijstweergave van onderliggende nodes wordt getoond. De onderliggende nodes worden niet in de tree getoond</key>
+    <key alias="currentListView" version="7.2">Huidige lijstweergave</key>
+    <key alias="currentListViewDesc" version="7.2">De actieve data type in lijstweergave</key>
+    <key alias="createListView" version="7.2">Maak een aangepaste lijstweergave</key>
+    <key alias="removeListView" version="7.2">Verwijder aangepaste lijstweergave</key>
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue">Prevalue toevoegen</key>
@@ -501,7 +512,6 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="timeout">Sessie is verlopen</key>
 
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p>]]></key>
-    <key alias="topText">Welkom bij Umbraco, geef je gebruikersnaam en wachtwoord op in de onderstaande velden:</key>
   </area>
   <area alias="main">
     <key alias="dashboard">Dashboard</key>
@@ -662,6 +672,9 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="newWindow">Open in nieuw venster</key>
     <key alias="removeLink">Verwijder link</key>
   </area>
+  <area alias="imagecropper">
+    <key alias="reset">Reset</key>
+  </area>
   <area alias="rollback">
     <key alias="currentVersion">Huidige versie</key>
     <key alias="diffHelp"><![CDATA[Hier worden de verschillen getoond tussen de huidige en de geselecteerde versie<br /><del>Rode</del> tekst wordt niet getoond in de geselecteerde versie , <ins>groen betekent toegevoegd</ins>]]></key>
@@ -690,6 +703,8 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="contour" version="4.0">Umbraco Contour</key>
 
     <key alias="help" version="7.0">Help</key>
+    <key alias="forms">Formulieren</key>
+    <key alias="analytics">Analytics</key>
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Standaard template</key>
@@ -708,6 +723,8 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="contentTypeUses">Dit inhoudstype gebruikt</key>
     <key alias="asAContentMasterType">als basis inhoudstype. Tabs van basis inhoudstypes worden niet getoond en kunnen alleen worden aangepast op het basis inhoudstype zelf</key>
     <key alias="noPropertiesDefinedOnTab">Geen eigenschappen gedefinieerd op dit tabblad. Klik op de link "voeg een nieuwe eigenschap" aan de bovenkant om een ​​nieuwe eigenschap te creëren.</key>
+    <key alias="masterDocumentType">Master Document Type</key>
+    <key alias="createMatchingTemplate">Maak een bijbehorend template</key>
   </area>
   <area alias="sort">
     <key alias="sortDone">Sorteren gereed.</key>
@@ -788,36 +805,40 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="quickGuide">Quick Guide voor Umbraco template tags</key>
     <key alias="template">Sjabloon</key>
   </area>
-	<area alias="grid">
-		<key alias="insertControl">Item toevoegen</key>
-		<key alias="addRows">Een rij aan de lay-out toevoegen</key>
-		<key alias="addElement"><![CDATA[Klik om te starten op het <i class="icon icon-add blue"></i> teken onderaan en voeg je eerste item toe]]></key>
+  <area alias="grid">
+    <key alias="insertControl">Item toevoegen</key>
+    <key alias="addRows">Een rij aan de lay-out toevoegen</key>
+    <key alias="addElement"><![CDATA[Klik om te starten op het <i class="icon icon-add blue"></i> teken onderaan en voeg je eerste item toe]]></key>
 
-		<key alias="gridLayouts">Grid lay-outs</key>
-		<key alias="gridLayoutsDetail">Lay-outs zijn het globale werkgebied voor de grid editor. Je hebt meestal maar één of twee verschillende lay-outs nodig</key>
-		<key alias="addGridLayout">Een grid layout toevoegen</key>
-		<key alias="addGridLayoutDetail">De lay-out aanpassen door de kolombreedte aan te passen en extra kolommen toe te voegen</key>
+    <key alias="clickToEmbed">Klik om een item te embedden</key>
+    <key alias="clickToInsertImage">Klik om een afbeelding in te voegen</key>
+    <key alias="placeholderImageCaption">Afbeelding ondertitel...</key>
+    <key alias="placeholderWriteHere">Typ hier......</key>
+    <key alias="gridLayouts">Grid lay-outs</key>
+    <key alias="gridLayoutsDetail">Lay-outs zijn het globale werkgebied voor de grid editor. Je hebt meestal maar één of twee verschillende lay-outs nodig</key>
+    <key alias="addGridLayout">Een grid layout toevoegen</key>
+    <key alias="addGridLayoutDetail">De lay-out aanpassen door de kolombreedte aan te passen en extra kolommen toe te voegen</key>
 
-		<key alias="rowConfigurations">Rijconfiguratie</key>
-		<key alias="rowConfigurationsDetail">Rijen zijn voorgedefinieerde cellen die horizontaal zijn gerangschikt</key>
-		<key alias="addRowConfiguration">Een rijconfiguratie toevoegen</key>
-		<key alias="addRowConfigurationDetail">De rijconfiguratie aanpassen door de breedte van de cel in te stellen en extra cellen toe te voegen</key>
+    <key alias="rowConfigurations">Rijconfiguratie</key>
+    <key alias="rowConfigurationsDetail">Rijen zijn voorgedefinieerde cellen die horizontaal zijn gerangschikt</key>
+    <key alias="addRowConfiguration">Een rijconfiguratie toevoegen</key>
+    <key alias="addRowConfigurationDetail">De rijconfiguratie aanpassen door de breedte van de cel in te stellen en extra cellen toe te voegen</key>
 
-		<key alias="columns">Kolommen</key>
-		<key alias="columnsDetails">Het totaal aantal gecombineerde kolommen in de grid layout</key>
+    <key alias="columns">Kolommen</key>
+    <key alias="columnsDetails">Het totaal aantal gecombineerde kolommen in de grid layout</key>
 
-		<key alias="settings">Instellingen</key>
-		<key alias="settingsDetails">Configureren welke instellingen de editors kunnen aanpassen</key>
+    <key alias="settings">Instellingen</key>
+    <key alias="settingsDetails">Configureren welke instellingen de editors kunnen aanpassen</key>
 
 
-		<key alias="styles">Styles</key>
-		<key alias="stylesDetails">Configureren welke stijlen de editors kunnen aanpassen</key>
+    <key alias="styles">Styles</key>
+    <key alias="stylesDetails">Configureren welke stijlen de editors kunnen aanpassen</key>
 
-		<key alias="settingDialogDetails">De instellingen worden enkel bewaard indien de ingevoerde Json geldig is</key>
+    <key alias="settingDialogDetails">De instellingen worden enkel bewaard indien de ingevoerde Json geldig is</key>
 
-		<key alias="allowAllEditors">Alle editors toelaten</key>
-		<key alias="allowAllRowConfigurations">Alle rijconfiguraties toelaten</key>
-	</area>
+    <key alias="allowAllEditors">Alle editors toelaten</key>
+    <key alias="allowAllRowConfigurations">Alle rijconfiguraties toelaten</key>
+</area>
   <area alias="templateEditor">
     <key alias="alternativeField">Alternatief veld</key>
     <key alias="alternativeText">Alternatieve tekst</key>

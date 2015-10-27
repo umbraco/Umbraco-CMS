@@ -65,7 +65,7 @@ namespace Umbraco.Web.Models.Mapping
                         {
                             Alias = string.Format("{0}id", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                             Label = "Id",
-                            Value = Convert.ToInt32(display.Id).ToInvariantString(),
+                            Value = Convert.ToInt32(display.Id).ToInvariantString() + "<br/><small class='muted'>" + display.Key + "</small>",
                             View = labelEditor
                         },
                     new ContentPropertyDisplay
@@ -143,6 +143,11 @@ namespace Umbraco.Web.Models.Mapping
             //first try to get the custom one if there is one
             var dt = dataTypeService.GetDataTypeDefinitionByName(customDtdName) 
                 ?? dataTypeService.GetDataTypeDefinitionById(dtdId);
+
+            if (dt == null)
+            {
+                throw new InvalidOperationException("No list view data type was found for this document type, ensure that the default list view data types exists and/or that your custom list view data type exists");
+            }
 
             var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(dt.Id);
 

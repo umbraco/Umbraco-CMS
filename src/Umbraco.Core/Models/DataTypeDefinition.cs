@@ -33,6 +33,7 @@ namespace Umbraco.Core.Models
         private DataTypeDatabaseType _databaseType;
 
         [Obsolete("Property editor's are defined by a string alias from version 7 onwards, use the alternative contructor that specifies an alias")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public DataTypeDefinition(int parentId, Guid controlId)
         {
             _parentId = parentId;
@@ -47,9 +48,20 @@ namespace Umbraco.Core.Models
 
             _additionalData = new Dictionary<string, object>();
         }
+
+        [Obsolete("Don't use this, parentId is always -1 for data types")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public DataTypeDefinition(int parentId, string propertyEditorAlias)
         {
             _parentId = parentId;
+            _propertyEditorAlias = propertyEditorAlias;
+
+            _additionalData = new Dictionary<string, object>();
+        }
+
+        public DataTypeDefinition(string propertyEditorAlias)
+        {
+            _parentId = -1;
             _propertyEditorAlias = propertyEditorAlias;
 
             _additionalData = new Dictionary<string, object>();
@@ -255,11 +267,6 @@ namespace Umbraco.Core.Models
         {
             get { return _additionalData; }
         }
-
-        /// <summary>
-        /// Some entities may expose additional data that other's might not, this custom data will be available in this collection
-        /// </summary>
-        public IDictionary<string, object> AdditionalData { get; private set; }
 
         internal override void AddingEntity()
         {

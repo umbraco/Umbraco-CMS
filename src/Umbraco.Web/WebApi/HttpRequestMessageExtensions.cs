@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
+using Microsoft.Owin;
 using Umbraco.Core;
 
 namespace Umbraco.Web.WebApi
@@ -16,6 +17,20 @@ namespace Umbraco.Web.WebApi
     
     public static class HttpRequestMessageExtensions
     {
+
+        /// <summary>
+        /// Borrowed from the latest Microsoft.AspNet.WebApi.Owin package which we cannot use because of a later webapi dependency
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        internal static Attempt<IOwinContext> TryGetOwinContext(this HttpRequestMessage request)
+        {
+            var httpContext = request.TryGetHttpContext();
+            return httpContext 
+                ? Attempt.Succeed(httpContext.Result.GetOwinContext()) 
+                : Attempt<IOwinContext>.Fail();
+        }
+
         /// <summary>
         /// Tries to retrieve the current HttpContext if one exists.
         /// </summary>

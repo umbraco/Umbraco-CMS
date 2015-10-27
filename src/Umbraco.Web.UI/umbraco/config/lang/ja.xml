@@ -8,6 +8,7 @@
     <key alias="assignDomain">ドメインの割り当て</key>
     <key alias="auditTrail">動作記録</key>
     <key alias="browse">ノードの参照</key>
+    <key alias="changeDocType">ドキュメントタイプの変更</key>
     <key alias="copy">コピー</key>
     <key alias="create">新規作成</key>
     <key alias="createPackage">パッケージの作成</key>
@@ -26,6 +27,7 @@
     <key alias="unpublish">公開を止める</key>
     <key alias="refreshNode">最新の情報に更新</key>
     <key alias="republish">サイトのリフレッシュ</key>
+    <key alias="restore" version="7.3.0">復元</key>
     <key alias="rights">アクセス権</key>
     <key alias="rollback">以前の版に戻る</key>
     <key alias="sendtopublish">公開に送る</key>
@@ -34,22 +36,35 @@
     <key alias="toPublish">公開する</key>
     <key alias="translate">翻訳</key>
     <key alias="update">更新</key>
+    <key alias="defaultValue">初期値</key>
   </area>
   <area alias="assignDomain">
+    <key alias="permissionDenied">アクセスが拒否されました</key>
     <key alias="addNew">ドメインの割り当て</key>
+    <key alias="remove">ドメインの削除</key>
+    <key alias="invalidNode">適当でないノード名</key>
     <key alias="invalidDomain">適当でないホスト名</key>
+    <key alias="duplicateDomain">そのホスト名は既に利用されています</key>
+    <key alias="language">言語コード</key>
     <key alias="domain">ドメイン</key>
     <key alias="domainCreated">ドメイン '%0%' が新たに割り当てられました</key>
     <key alias="domainDeleted">ドメイン '%0%' は削除されました</key>
     <key alias="domainExists">ドメイン '%0%' は既に割り当てられています</key>
-    <key alias="domainHelp">例: yourdomain.com, www.yourdomain.com</key>
     <key alias="domainUpdated">ドメイン '%0%' は更新されました</key>
     <key alias="orEdit">ドメインの編集</key>
+    <key alias="domainHelp"><![CDATA[例: "example.com", "www.example.com", "example.com:8080" または "https://www.example.com/". ]]></key>
+    <key alias="inherit">Inherit</key>
+    <key alias="setLanguage">カルチャの割り当て</key>
+    <key alias="setLanguageHelp"><![CDATA[現在のノード以下のカルチャを設定します。親ノードのカルチャを継承します。]]></key>
+    <key alias="setDomains">ドメイン割り当て</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">これらを表示</key>
   </area>
   <area alias="buttons">
+    <key alias="select">選択</key>
+    <key alias="selectCurrentFolder">現在のフォルダを選択</key>
+    <key alias="somethingElse">その他のアクション</key>
     <key alias="bold">太字</key>
     <key alias="deindent">インデント解除</key>
     <key alias="formFieldInsert">フィールドから挿入</key>
@@ -67,6 +82,7 @@
     <key alias="macroInsert">マクロの挿入</key>
     <key alias="pictureInsert">画像の挿入</key>
     <key alias="relations">関係性の編集</key>
+    <key alias="returnToList">リストに戻る</key>
     <key alias="save">保存</key>
     <key alias="saveAndPublish">保存及び公開</key>
     <key alias="saveToPublish">保存して承認に送る</key>
@@ -76,20 +92,45 @@
     <key alias="styleShow">スタイルの表示</key>
     <key alias="tableInsert">表の挿入</key>
   </area>
+  <area alias="changeDocType">
+    <key alias="changeDocTypeInstruction">ドキュメントタイプを変更するには、まず有効なドキュメントタイプのリストから選択します</key>
+    <key alias="changeDocTypeInstruction2">確認および現在のドキュメントタイプからのマッピングを割り当て、保存します。</key>
+    <key alias="contentRepublished">コンテントは再公開されています</key>
+    <key alias="currentProperty">現在のプロパティ</key>
+    <key alias="currentType">現在のドキュメントタイプ</key>
+    <key alias="docTypeCannotBeChanged">有効な代替タイプが存在しないため変更することができません。選択されたコンテントの親の下に許可されたドキュメントタイプへのみ変更ができます</key>
+    <key alias="docTypeChanged">ドキュメントタイプを変更しました</key>
+    <key alias="mapProperties">プロパティを割り当てる</key>
+    <key alias="mapToProperty">割り当てるプロパティ</key>
+    <key alias="newTemplate">新しいテンプレート</key>
+    <key alias="newType">新しいドキュメントタイプ</key>
+    <key alias="none">None</key>
+    <key alias="selectedContent">コンテント</key>
+    <key alias="selectNewDocType">ドキュメントタイプを変更する</key>
+    <key alias="successMessage">プロパティが以下のように割り当てられました</key>
+    <key alias="to">から</key>
+    <key alias="validationErrorPropertyWithMoreThanOneMapping">1つ以上のプロパティを割り当てられませんでした。プロパティが定義が重複しています</key>
+    <key alias="validDocTypesNote">有効なドキュメントタイプのみが表示されます</key>
+  </area>
   <area alias="content">
+    <key alias="isPublished" version="7.2">公開されました</key>
     <key alias="about">このページについて</key>
     <key alias="alias">エイリアス</key>
     <key alias="alternativeTextHelp">(画像を電話でわかるように言葉で説明)</key>
     <key alias="alternativeUrls">別名のリンク</key>
     <key alias="clickToEdit">クリックでアイテムを編集する</key>
     <key alias="createBy">作成者</key>
+    <key alias="createByDesc" version="7.0">作成者</key>
+    <key alias="updatedBy" version="7.0">更新者</key>
     <key alias="createDate">作成日時</key>
+    <key alias="createDateDesc" version="7.0">このドキュメントが作成された日時</key>
     <key alias="documentType">ドキュメントタイプ</key>
     <key alias="editing">変種中</key>
     <key alias="expireDate">公開終了日時</key>
     <key alias="itemChanged">このページは公開後変更されています</key>
     <key alias="itemNotPublished">このページは公開されていません</key>
     <key alias="lastPublished">公開日時</key>
+    <key alias="listViewNoItems" version="7.1.5">リストに表示するアイテムはありません</key>
     <key alias="mediatype">メディアタイプ</key>
     <key alias="mediaLinks">メディアの項目へのリンク</key>
     <key alias="membergroup">メンバーグループ</key>
@@ -99,24 +140,42 @@
     <key alias="nodeName">タイトル</key>
     <key alias="otherElements">プロパティ</key>
     <key alias="parentNotPublished">このページは公開されましたが、親ページの '%0%' が非公開のため閲覧できません</key>
+    <key alias="parentNotPublishedAnomaly">このコンテントは公開されていますがキャッシュされていません(内部エラー)</key>
     <key alias="publish">公開</key>
     <key alias="publishStatus">公開状態</key>
     <key alias="releaseDate">公開開始日時</key>
+    <key alias="unpublishDate">公開停止日時</key>
     <key alias="removeDate">日時の消去</key>
     <key alias="sortDone">並び順が更新されました</key>
     <key alias="sortHelp">ノードをドラッグ、クリック、または列のヘッダーをクリックする事でノードを簡単にソートできます。SHIFT、CONTROLキーを使い複数のノードを選択する事もできます。</key>
     <key alias="statistics">統計</key>
     <key alias="titleOptional">タイトル (オプション)</key>
+    <key alias="altTextOptional">代替テキスト (オプション)</key>
     <key alias="type">型</key>
     <key alias="unPublish">非公開</key>
     <key alias="updateDate">最終更新日時</key>
+    <key alias="updateDateDesc" version="7.0">このドキュメントが最後に更新された日時</key>
     <key alias="uploadClear">ファイルの消去</key>
     <key alias="urls">ページへのリンク</key>
+    <key alias="memberof">グループのメンバー</key>
+    <key alias="notmemberof">グループのメンバーではありません</key>
+    <key alias="childItems" version="7.0">子コンテンツ</key>
+    <key alias="target" version="7.0">ターゲット</key>
+  </area>
+  <area alias="media">
+    <key alias="clickToUpload">クリックしてアップロードする</key>
+    <key alias="dropFilesHere">ファイルをここへドロップ..</key>
+  </area>
+    <area alias="member">
+    <key alias="createNewMember">メンバーの新規作成</key>
+    <key alias="allMembers">全てのメンバー</key>
   </area>
   <area alias="create">
     <key alias="chooseNode">どこに新しい %0% を作りますか</key>
     <key alias="createUnder">ここに作成</key>
     <key alias="updateData">型とタイトルを選んでください</key>
+    <key alias="noDocumentTypes" version="7.0"><![CDATA[利用可能なドキュメントタイプがありません。以下の設定セクションでこれらを有効にする必要があります。<strong>"document types"</strong>.]]></key>
+    <key alias="noMediaTypes" version="7.0"><![CDATA[利用可能なメディアタイプがありません。以下の設定セクションでこれらを有効にする必要があります。<strong>"media types"</strong>.]]></key>
   </area>
   <area alias="dashboard">
     <key alias="browser">ウェブサイトを参照する</key>
@@ -181,14 +240,32 @@
    ]]></key>
     <key alias="displayName">カルチャ名</key>
   </area>
+  <area alias="placeholders">
+    <key alias="username">ユーザー名を入力...</key>
+    <key alias="password">パスワードを入力...</key>
+    <key alias="nameentity">%0%と命名します...</key>
+    <key alias="entername">ここに名称を入力してください...</key>
+    <key alias="search">検索する...</key>
+    <key alias="filter">条件で絞り込む...</key>
+    <key alias="enterTags">タグを追加します...</key>
+  </area>
   <area alias="editcontenttype">
+    <key alias="allowAtRoot" version="7.2">ルートノードとして許可する</key>
+    <key alias="allowAtRootDesc" version="7.2">これを有効にするとコンテンツとメディアツリーのルートレベルに作成することができます</key>
     <key alias="allowedchildnodetypes">子ノードとして許可するタイプ</key>
+    <key alias="contenttypecompositions">Document Type Compositions</key>
     <key alias="create">新規作成</key>
     <key alias="deletetab">削除</key>
     <key alias="description">説明</key>
     <key alias="newtab">新規見出し</key>
     <key alias="tab">見出し</key>
     <key alias="thumbnail">サムネイル</key>
+    <key alias="hasListView">リストビューを有効にする</key>
+    <key alias="hasListViewDesc" version="7.2">子ノードをツリーに表示せずにリストビューに表示します</key>
+    <key alias="currentListView" version="7.2">現在のリストビュー</key>
+    <key alias="currentListViewDesc" version="7.2">有効なリストビューデータタイプ</key>
+    <key alias="createListView" version="7.2">カスタムリストビューを作成する</key>
+    <key alias="removeListView" version="7.2">カスタムリストビューを削除する</key>
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue">値の前に追加</key>
@@ -217,7 +294,8 @@
     <key alias="errorRegExpWithoutTab">%0% は正しい書式ではありません</key>
   </area>
   <area alias="errors">
-    <key alias="codemirroriewarning">注意! CodeMirrorが設定で有効かされていますが、 Internet Explorerでは不安定なので無効化してください。</key>
+    <key alias="dissallowedMediaType">指定されたファイルタイプは管理者のみに許可されます</key>
+    <key alias="codemirroriewarning">注意! CodeMirrorが設定で有効化されていますが、 Internet Explorerでは不安定なので無効化してください。</key>
     <key alias="contentTypeAliasAndNameNotNull">新しいプロパティ型のエイリアスと名前の両方を設定してください！</key>
     <key alias="filePermissionsError">特定のファイルまたはフォルタの読み込み/書き込みアクセスに問題があります</key>
     <key alias="missingTitle">タイトルを入力してください</key>
@@ -232,10 +310,12 @@
     <key alias="tableSplitNotSplittable">このセルは結合されたものではないので分離する事はできません。</key>
     <key alias="xsltErrorHeader">XSLTソースにエラーがあります</key>
     <key alias="xsltErrorText">1つ以上のエラーがあるのでこのXSLTは保存できませんでした</key>
+    <key alias="missingPropertyEditorErrorMessage">このプロパティに使用されているデータタイプにエラーがあります</key>
   </area>
   <area alias="general">
     <key alias="about">Umbracoについて</key>
     <key alias="action">アクション</key>
+    <key alias="actions">アクション選択</key>
     <key alias="add">追加</key>
     <key alias="alias">エイリアス</key>
     <key alias="areyousure">確かですか?</key>
@@ -285,6 +365,7 @@
     <key alias="logout">ログアウト</key>
     <key alias="macro">マクロ</key>
     <key alias="move">移動</key>
+    <key alias="more">もっと</key>
     <key alias="name">名前</key>
     <key alias="new">新規</key>
     <key alias="next">次へ</key>
@@ -304,6 +385,7 @@
     <key alias="remaining">残り</key>
     <key alias="rename">名前の変更</key>
     <key alias="renew">更新</key>
+    <key alias="required" version="7.0">この項目は必須です</key>
     <key alias="retry">再試行</key>
     <key alias="rights">許可</key>
     <key alias="search">検索</key>
@@ -313,7 +395,7 @@
     <key alias="size">サイズ</key>
     <key alias="sort">並べ替え</key>
     <key alias="type">型</key>
-    <key alias="typeToSearch">探す型...</key>
+    <key alias="typeToSearch">検索...</key>
     <key alias="up">上</key>
     <key alias="update">更新</key>
     <key alias="upgrade">アップグレード</key>
@@ -327,6 +409,7 @@
     <key alias="width">幅</key>
     <key alias="yes">はい</key>
     <key alias="folder">フォルダー</key>
+    <key alias="searchResults">検索結果</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">背景色</key>
@@ -348,10 +431,10 @@
     ]]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% をデータベースにコピーします。<strong>次へ</strong>を押して続行してください。]]></key>
     <key alias="databaseNotFound"><![CDATA[<p>データベースを見つけられません！"web.config"ファイルの中の"接続文字列"を確認してください。</p>
-              <p>続行するには"web.config"ファイルを編集(Visual Studioないし使い慣れたテキストエディタで)し、下の方にスクロールし、"UmbracoDbDSN"という名前のキーでデータベースの接続文字列を追加して保存します。</p>
+              <p>続行するには"web.config"ファイルを編集(Visual Studioないし使い慣れたテキストエディタで)し、下の方にスクロールし、"umbracoDbDSN"という名前のキーでデータベースの接続文字列を追加して保存します。</p>
               <p>
               <strong>再施行</strong>ボタンをクリックして
-              続けます。<br /><a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
+              続けます。<br /><a href="http://umbraco.org/redir/installWebConfig" target="_blank">
 			              より詳細にはこちらの web.config を編集します。</a></p>]]></key>
     <key alias="databaseText"><![CDATA[このステップを完了するには、データベースサーバー(の"接続文字列")について把握していなければなりません。<br />
         必要ならISPに連絡するなどしてみてください。
@@ -380,7 +463,7 @@
         </p>
       ]]></key>
     <key alias="greatStart">始めに、ビデオによる解説を見ましょう</key>
-    <key alias="licenseText">次へボタンをクリック(またはweb.configのUmbracoConfigurationStatusを編集)すると、あなたはここに示されるこのソフトウェアのライセンスを承諾したと見做されます。注意として、UmbracoはMITライセンスをフレームワークへ、フリーウェアライセンスをUIへ、それぞれ異なる2つのライセンスを採用しています。</key>
+    <key alias="licenseText">次へボタンをクリック(またはweb.configのumbracoConfigurationStatusを編集)すると、あなたはここに示されるこのソフトウェアのライセンスを承諾したと見做されます。注意として、UmbracoはMITライセンスをフレームワークへ、フリーウェアライセンスをUIへ、それぞれ異なる2つのライセンスを採用しています。</key>
     <key alias="None">まだインストールは完了していません。</key>
     <key alias="permissionsAffectedFolders">影響するファイルとフォルダ</key>
     <key alias="permissionsAffectedFoldersMoreInfo">Umbracoに必要なアクセス権の設定についての詳細はこちらをどうぞ</key>
@@ -408,7 +491,7 @@
     <key alias="runwayFromScratch">スクラッチから始めたい</key>
     <key alias="runwayFromScratchText"><![CDATA[
         ウェブサイトはさしあたり完全に空っぽで、必要なドキュメント型やテンプレートを作成するところから始められます。 
-        (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">どうしたらいいの？</a>)
+        (<a href="http://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">どうしたらいいの？</a>)
         後からRunwayをインストールする事もできます。そうしたくなった時は、Developerセクションのパッケージへどうぞ。
       ]]></key>
     <key alias="runwayHeader">Umbracoプラットフォームのクリーンセットアップが完了しました。この後はどうしますか？</key>
@@ -444,7 +527,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
 我々の認めるコミュニティから手助けを得られるでしょう。どうしたら簡単なサイトを構築できるか、どうしたらパッケージを使えるかについてのビデオや文書、またUmbracoの用語のクイックガイドも見る事ができます。]]></key>
     <key alias="theEndHeader">Umbraco %0% のインストールは完了、準備が整いました</key>
     <key alias="theEndInstallFailed"><![CDATA[インストールを終えた後、もし必要ならば
-        <strong>/web.config file</strong>を手作業で編集し、<strong>'%0%'</strong>の下にある<strong>UmbracoConfigurationStatus</strong>キーを設定してください。]]></key>
+        <strong>/web.config file</strong>を手作業で編集し、<strong>'%0%'</strong>の下にある<strong>umbracoConfigurationStatus</strong>キーを設定してください。]]></key>
     <key alias="theEndInstallSuccess"><![CDATA["Umbracoを始める"ボタンをクリックして<strong>今すぐ開始</strong>できます。<br />もし<strong>Umbracoの初心者</strong>なら、
 私たちの初心者向けのたくさんの情報を参考にしてください。]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Umbracoの開始</h3>
@@ -453,7 +536,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="Version3">Umbraco Version 3</key>
     <key alias="Version4">Umbraco Version 4</key>
     <key alias="watch">見る</key>
-    <key alias="welcomeIntro"><![CDATA[このウィザードでは <strong>Umbraco %0%</strong> の新規インストールまたは3.0からの更新について設定方法を案内します。
+    <key alias="welcomeIntro"><![CDATA[このウィザードでは <strong>umbraco %0%</strong> の新規インストールまたは3.0からの更新について設定方法を案内します。
                                 <br /><br />
                                 <strong>"次へ"</strong>を押してウィザードを開始します。]]></key>
   </area>
@@ -466,7 +549,16 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="renewSession">作業を保存して今すぐ更新</key>
   </area>
   <area alias="login">
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
+    <key alias="greeting0">Happy super sunday</key>
+    <key alias="greeting1">Happy manic monday </key>
+    <key alias="greeting2">Happy tubular tuesday</key>
+    <key alias="greeting3">Happy wonderful wednesday</key>
+    <key alias="greeting4">Happy thunder thursday</key>
+    <key alias="greeting5">Happy funky friday</key>
+    <key alias="greeting6">Happy caturday</key>
+    <key alias="instruction">ウェブサイトにログインします。</key>
+    <key alias="timeout">セッションタイムアウトしました。</key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
     <key alias="topText">Umbraco にようこそ。ユーザー名とパスワードを入力してください:</key>
   </area>
   <area alias="main">
@@ -549,7 +641,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="packageUninstallConfirm">本当にアンインストールしますか</key>
     <key alias="packageUninstalledHeader">パッケージのアンインストールが終了しました</key>
     <key alias="packageUninstalledText">パッケージが正常にアンインストールされました</key>
-    <key alias="packageUninstallHeader">パッケージのアンンストール</key>
+    <key alias="packageUninstallHeader">パッケージのアンインストール</key>
     <key alias="packageUninstallText"><![CDATA[今はまだ削除したくない項目の選択を解除できます。"アンインストールの確認"をクリックすると全てのチェックの外された項目を削除します。<br />
       <span style="color: Red; font-weight: bold;">注意:</span> 全ての、文書やメディアなどに依存したアイテムを削除する場合はそれらの作業を一端止めてからアンインストールしなければシステムが不安定になる恐れがあります。
       疑問点などあればパッケージの作者へ連絡してください。]]></key>
@@ -558,6 +650,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="packageUpgradeInstructions">更新の手順</key>
     <key alias="packageUpgradeText"> このパッケージの更新があります。Umbracoのパッケージリポジトリから直接ダウンロードできます。</key>
     <key alias="packageVersion">パッケージのバージョン</key>
+    <key alias="packageVersionHistory">パッケージのバージョン履歴</key>
     <key alias="viewPackageWebsite">パッケージのウェブサイトを見る</key>
   </area>
   <area alias="paste">
@@ -585,14 +678,21 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="paSimpleHelp">単一のログインとパスワードで単純に保護したい場合に適します</key>
   </area>
   <area alias="publish">
-    <key alias="contentPublishedFailedByEvent"><![CDATA[
+    <key alias="contentPublishedFailedAwaitingRelease">
+    <![CDATA[
+      %0% ページは公開がスケジュールされているため、公開されませんでした。
+    ]]></key>
+    <key alias="contentPublishedFailedInvalid"><![CDATA[
+      %1% のプロパティがバリデーション定義に違反したため、%0% は公開できませんでした。
+    ]]></key>
+    <key alias="contentPublishedFailedByEvent">
+    <![CDATA[
       サードパーティのエクステンションがキャンセルされたので、%0% は公開できませんでした。
     ]]></key>
     <key alias="contentPublishedFailedByParent">
-      <![CDATA[
+    <![CDATA[
       親ページが公開されていないので、%0% は公開できませんでした。
-    ]]>
-    </key>
+    ]]></key>
     <key alias="includeUnpublished">非公開の子ページも含めます</key>
     <key alias="inProgress">公開を進めています - 少々お待ちください...</key>
     <key alias="inProgressCounter">%1% ページ中 %0% ページが公開されました...</key>
@@ -603,17 +703,28 @@ Runwayをインストールして作られた新しいウェブサイトがど�
       このページとその全ての子ページも公開したければ <em>全ての子ページを公開</em> をチェック。
       ]]></key>
   </area>
+  <area alias="colorpicker">
+    <key alias="noColors">設定済みの色はありません。</key>
+  </area>
   <area alias="relatedlinks">
     <key alias="addExternal">外部リンクを追加</key>
     <key alias="addInternal">内部リンクを追加</key>
     <key alias="addlink">追加</key>
     <key alias="caption">タイトル</key>
+    <key alias="captionPlaceholder">キャプション表示を入力</key>
+    <key alias="chooseInternal">内部リンクを選択</key>
+    <key alias="enterExternal">外部リンクを入力</key>
+    <key alias="externalLinkPlaceholder">リンクを入力</key>
     <key alias="internalPage">内部ページ</key>
+    <key alias="link">リンク</key>
     <key alias="linkurl">URL</key>
     <key alias="modeDown">下に移動</key>
     <key alias="modeUp">上に移動</key>
     <key alias="newWindow">新規ウィンドウで開く</key>
     <key alias="removeLink">リンクを削除</key>
+  </area>
+  <area alias="imagecropper">
+    <key alias="reset">リセット</key>
   </area>
   <area alias="rollback">
     <key alias="currentVersion">現在の版</key>
@@ -640,6 +751,15 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="statistics">統計</key>
     <key alias="translation">翻訳</key>
     <key alias="users">ユーザー</key>
+    <key alias="help" version="7.0">ヘルプ</key>
+    <key alias="forms">フォーム</key>
+    <key alias="analytics">アナリティクス</key>
+  </area>
+  <area alias="help">
+    <key alias="goTo">該当のヘルプへ</key>
+    <key alias="helpTopicsFor">ヘルプトピック：</key>
+    <key alias="videoChaptersFor">ヘルプの動画：</key>
+    <key alias="theBestUmbracoVideoTutorials">動画によるチュートリアル</key>
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">既定のテンプレート</key>
@@ -649,6 +769,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="nodetype">ノードのタイプ</key>
     <key alias="objecttype">タイプ</key>
     <key alias="stylesheet">スタイルシート</key>
+    <key alias="script">スクリプト</key>
     <key alias="stylesheet editor egenskab">スタイルシートのプロパティ</key>
     <key alias="tab">タブ</key>
     <key alias="tabname">タブの名前</key>
@@ -656,6 +777,9 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="contentTypeEnabled">マスターコンテンツタイプが有効</key>
     <key alias="contentTypeUses">このコンテンツタイプの使用</key>
     <key alias="asAContentMasterType">マスターコンテンツタイプについては、マスターコンテンツタイプからのタブは表示されず、マスターコンテンツタイプでのみ編集することができます。</key>
+    <key alias="noPropertiesDefinedOnTab">このタブにはプロパティが定義されていません、上部のリンクから新しいプロパティを作成してください</key>
+    <key alias="masterDocumentType">マスタードキュメントタイプ</key>
+    <key alias="createMatchingTemplate">テンプレートを作成する</key>
   </area>
   <area alias="sort">
     <key alias="sortDone">ソートが完了しました。</key>
@@ -663,6 +787,10 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="sortPleaseWait"><![CDATA[ 項目の並べ替えには少し時間がかかります。しばらくお待ちください。<br/> <br/> 並び替え中はウィンドウを閉じないでください。]]></key>
   </area>
   <area alias="speechBubbles">
+    <key alias="operationFailedHeader">失敗しました</key>
+    <key alias="invalidUserPermissionsText">不十分なユーザー権限により操作を完了できませんでした</key>
+    <key alias="operationCancelledHeader">キャンセルされました</key>
+    <key alias="operationCancelledText">サードパーティのアドインにより操作はキャンセルされました</key>
     <key alias="contentPublishedFailedByEvent">サードパーティのアドインにより公開はキャンセルされました</key>
     <key alias="contentTypeDublicatePropertyType">プロパティの方は既に存在しています</key>
     <key alias="contentTypePropertyTypeCreated">プロパティの型を作成しました</key>
@@ -684,6 +812,8 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="editContentSavedText">変更を適用する為に公開する事を忘れないでください</key>
     <key alias="editContentSendToPublish">承認へ送りました</key>
     <key alias="editContentSendToPublishText">変更は承認へと送られます</key>
+    <key alias="editMediaSaved">メディアを保存しました</key>
+    <key alias="editMediaSavedText">メディアをエラーなく保存しました</key>
     <key alias="editMemberSaved">メンバーを保存しました</key>
     <key alias="editStylesheetPropertySaved">スタイルシートのプロパティを保存しました</key>
     <key alias="editStylesheetSaved">スタイルシートを保存しました</key>
@@ -729,15 +859,53 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="insertContentAreaPlaceHolder">コンテンツ領域プレースホルダーの挿入</key>
     <key alias="insertDictionaryItem">dictionary item の挿入</key>
     <key alias="insertMacro">マクロの挿入</key>
-    <key alias="insertPageField">Umbraco ページフィールドの挿入</key>
+    <key alias="insertPageField">umbraco ページフィールドの挿入</key>
     <key alias="mastertemplate">マスターテンプレート</key>
-    <key alias="quickGuide">Umbraco テンプレートタグのクイックガイド</key>
+    <key alias="quickGuide">umbraco テンプレートタグのクイックガイド</key>
     <key alias="template">テンプレート</key>
   </area>
+
+  <area alias="grid">
+    <key alias="insertControl">挿入するアイテムを選択する</key>
+    <key alias="addRows">ここからレイアウトを選択します</key>
+    <key alias="addElement"><![CDATA[<i class="icon icon-add blue"></i> 最初の要素を追加します]]></key>
+
+    <key alias="clickToEmbed">クリックして埋め込む</key>
+    <key alias="clickToInsertImage">クリックして画像を挿入する</key>
+    <key alias="placeholderImageCaption">キャプション...</key>
+    <key alias="placeholderWriteHere">ここに記入する...</key>
+
+    <key alias="gridLayouts">レイアウト</key>
+    <key alias="gridLayoutsDetail">レイアウトは通常1つまたは2つの異なるレイアウトを必要とする、グリッドエディタの全体的な作業エリアです</key>
+    <key alias="addGridLayout">レイアウトを追加する</key>
+    <key alias="addGridLayoutDetail">追加のセクションの横幅を設定し、レイアウトを調整する</key>
+
+    <key alias="rowConfigurations">行の構成</key>
+    <key alias="rowConfigurationsDetail">定義された構成の行が水平に配置されます</key>
+    <key alias="addRowConfiguration">行の構成を追加</key>
+    <key alias="addRowConfigurationDetail">追加のセルのセル幅を設定することで調整します</key>
+
+    <key alias="columns">列</key>
+    <key alias="columnsDetails">グリッドレイアウトの列を合計した数</key>
+
+    <key alias="settings">設定</key>
+    <key alias="settingsDetails">編集者が設定できる項目</key>
+
+
+    <key alias="styles">スタイル</key>
+    <key alias="stylesDetails">編集者が設定できるスタイル</key>
+
+    <key alias="settingDialogDetails">入力されたJSONが正しい場合のみ設定が保存されます</key>
+
+    <key alias="allowAllEditors">すべてのエディタを許可する</key>
+    <key alias="allowAllRowConfigurations">すべての行の構成を許可する</key>
+  </area>
+
   <area alias="templateEditor">
     <key alias="alternativeField">代替フィールド</key>
     <key alias="alternativeText">代替テキスト</key>
     <key alias="casing">大文字小文字変換</key>
+    <key alias="encoding">エンコーディング</key>
     <key alias="chooseField">フィールドの選択</key>
     <key alias="convertLineBreaks">改行コードの変換</key>
     <key alias="convertLineBreaksHelp">改行コードをhtmlタグ &amp;lt;br&amp;gt; に変換する</key>
@@ -838,6 +1006,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="stylesheets">スタイルシート</key>
     <key alias="templates">テンプレート</key>
     <key alias="xslt">XSLT ファイル</key>
+    <key alias="analytics">アナリティクス</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">新しい更新があります</key>
@@ -864,6 +1033,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="modules">セクション</key>
     <key alias="noConsole">Umbracoへのアクセスを無効にする</key>
     <key alias="password">パスワード</key>
+    <key alias="resetPassword">パスワードのリセット</key>
     <key alias="passwordChanged">パスワードが変更されました!</key>
     <key alias="passwordConfirm">新しいパスワードの確認</key>
     <key alias="passwordEnterNew">新しいパスワードの入力</key>
@@ -882,5 +1052,9 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="usertype">ユーザーの種類</key>
     <key alias="userTypes">ユーザーの種類</key>
     <key alias="writer">投稿者</key>
+    <key alias="translator">翻訳者</key>
+    <key alias="yourProfile" version="7.0">あなたのプロフィール</key>
+    <key alias="yourHistory" version="7.0">あなたの最新の履歴</key>
+    <key alias="sessionExpires" version="7.0">セッションの期限</key>
   </area>
 </language>

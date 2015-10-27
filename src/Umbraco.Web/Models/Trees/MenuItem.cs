@@ -190,7 +190,7 @@ namespace Umbraco.Web.Models.Trees
                 .OnFailure(() => LegacyTreeDataConverter.GetLegacyConfirmView(Action, currentSection),
                            view => LaunchDialogView(
                                view,
-                               ui.GetText("defaultdialogs", "confirmdelete") + " '" + item.Name + "' ?"));
+                               ui.GetText("defaultdialogs", "confirmdelete") + " '" + (item == null ? "" : item.Name) + "' ?"));
         } 
         #endregion
 

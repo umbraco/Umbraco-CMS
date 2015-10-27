@@ -8,8 +8,8 @@ namespace Umbraco.Web.Mvc
 {
     internal sealed class SurfaceControllerResolver : ManyObjectsResolverBase<SurfaceControllerResolver, SurfaceController>
 	{
-		public SurfaceControllerResolver(IEnumerable<Type> surfaceControllers)
-			: base(surfaceControllers)
+		public SurfaceControllerResolver(IServiceProvider serviceProvider, ILogger logger, IEnumerable<Type> surfaceControllers)
+            : base(serviceProvider, logger, surfaceControllers)
 		{
 			
 		}

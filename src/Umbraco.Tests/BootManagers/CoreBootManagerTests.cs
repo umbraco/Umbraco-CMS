@@ -3,17 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Tests.TestHelpers;
 using umbraco.interfaces;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Profiling;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Tests.BootManagers
 {
     [TestFixture]
-    public class CoreBootManagerTests : BaseUmbracoApplicationTest
+    public class CoreBootManagerTests : BaseUmbracoConfigurationTest
     {
 
         private TestApp _testApp;
@@ -22,7 +28,7 @@ namespace Umbraco.Tests.BootManagers
         public override void Initialize()
         {
             base.Initialize();
-            _testApp = new TestApp();
+            _testApp = new TestApp();            
         }
 
         [TearDown]
@@ -31,16 +37,10 @@ namespace Umbraco.Tests.BootManagers
             base.TearDown();
 
             _testApp = null;
-            
-            //ApplicationEventsResolver.Reset();
-            //SqlSyntaxProvidersResolver.Reset();
+            ResolverCollection.ResetAll();
         }
 
-        protected override void FreezeResolution()
-        {
-            //don't freeze resolution, we'll do that in the boot manager
-        }
-
+     
         /// <summary>
         /// test application using a CoreBootManager instance to boot
         /// </summary>
@@ -48,7 +48,7 @@ namespace Umbraco.Tests.BootManagers
         {
             protected override IBootManager GetBootManager()
             {
-                return new TestBootManager(this);
+                return new TestBootManager(this, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
             }
         }
 
@@ -57,15 +57,33 @@ namespace Umbraco.Tests.BootManagers
         /// </summary>
         public class TestBootManager : CoreBootManager
         {
-            public TestBootManager(UmbracoApplicationBase umbracoApplication)
-                : base(umbracoApplication)
+            public TestBootManager(UmbracoApplicationBase umbracoApplication, ProfilingLogger logger)
+                : base(umbracoApplication, logger)
             {
+            }
+
+            /// <summary>
+            /// Creates and returns the application context singleton
+            /// </summary>
+            /// <param name="dbContext"></param>
+            /// <param name="serviceContext"></param>
+            protected override ApplicationContext CreateApplicationContext(DatabaseContext dbContext, ServiceContext serviceContext)
+            {
+                var appContext = base.CreateApplicationContext(dbContext, serviceContext);
+
+                var dbContextMock = new Mock<DatabaseContext>(Mock.Of<IDatabaseFactory>(), ProfilingLogger.Logger, Mock.Of<ISqlSyntaxProvider>(), "test");
+                dbContextMock.Setup(x => x.CanConnect).Returns(true);
+                appContext.DatabaseContext = dbContextMock.Object;
+
+                return appContext;
             }
 
             protected override void InitializeApplicationEventsResolver()
             {
                 //create an empty resolver so we can add our own custom ones (don't type find)
-                ApplicationEventsResolver.Current = new ApplicationEventsResolver(new Type[]
+                ApplicationEventsResolver.Current = new ApplicationEventsResolver(
+                    new ActivatorServiceProvider(), ProfilingLogger.Logger,
+                    new Type[]
                     {
                         typeof(LegacyStartupHandler),
                         typeof(TestApplicationEventHandler)
@@ -74,16 +92,13 @@ namespace Umbraco.Tests.BootManagers
                         CanResolveBeforeFrozen = true
                     };
             }
-
-            protected override void InitializeResolvers()
+            
+            protected override void InitializeLoggerResolver()
+            {                
+            }
+            
+            protected override void InitializeProfilerResolver()
             {
-                //Do nothing as we don't want to initialize all resolvers in this test
-                //We only include this resolver to not cause trouble for the database context
-                SqlSyntaxProvidersResolver.Current = new SqlSyntaxProvidersResolver(
-                    PluginManager.Current.ResolveSqlSyntaxProviders())
-                                                         {
-                                                             CanResolveBeforeFrozen = true
-                                                         };
             }
         }
 

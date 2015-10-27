@@ -1,5 +1,7 @@
 ﻿using System.Linq;
+using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven;
@@ -15,10 +17,8 @@ namespace Umbraco.Tests.Migrations.Upgrades
         [Test]
         public void Validate_AddIndexToCmsMacroTable()
         {
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
-
-            var migration = new AddIndexToCmsMacroTable(true);
-            var migrationContext = new MigrationContext(DatabaseProviders.SqlServerCE, null);
+            var migration = new AddIndexToCmsMacroTable(true, new SqlCeSyntaxProvider(), Mock.Of<ILogger>());
+            var migrationContext = new MigrationContext(DatabaseProviders.SqlServerCE, null, Mock.Of<ILogger>());
             migration.GetUpExpressions(migrationContext);
 
             Assert.AreEqual(1, migrationContext.Expressions.Count);
@@ -31,10 +31,8 @@ namespace Umbraco.Tests.Migrations.Upgrades
         [Test]
         public void Validate_AddIndexToCmsMacroPropertyTable()
         {
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
-
-            var migration = new AddIndexToCmsMacroPropertyTable(true);
-            var migrationContext = new MigrationContext(DatabaseProviders.SqlServerCE, null);
+            var migration = new AddIndexToCmsMacroPropertyTable(true, new SqlCeSyntaxProvider(), Mock.Of<ILogger>());
+            var migrationContext = new MigrationContext(DatabaseProviders.SqlServerCE, null, Mock.Of<ILogger>());
             migration.GetUpExpressions(migrationContext);
 
             Assert.AreEqual(1, migrationContext.Expressions.Count);

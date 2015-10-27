@@ -62,9 +62,20 @@ namespace Umbraco.Core.Models.PublishedContent
             // model and therefore returned the original content unchanged.
 
             var model = content.CreateModel();
-            var extended = model == content // == means the factory did not create a model
-              ? new PublishedContentExtended(content) // so we have to extend
-              : model; // else we can use what the factory returned
+            IPublishedContent extended;
+            if (model == content) // == means the factory did not create a model
+            {
+                // so we have to extend
+                var contentWithKey = content as IPublishedContentWithKey;
+                extended = contentWithKey == null
+                    ? new PublishedContentExtended(content)
+                    : new PublishedContentWithKeyExtended(contentWithKey);
+            }
+            else
+            {
+                // else we can use what the factory returned
+                extended = model;
+            }
 
             // so extended should always implement IPublishedContentExtended, however if
             // by mistake the factory returned a different object that does not implement

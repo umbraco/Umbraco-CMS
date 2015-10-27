@@ -19,12 +19,15 @@ namespace Umbraco.Tests.Persistence
 
         #region Overrides of BaseTableByTableTest
 
+        protected override ISqlSyntaxProvider SqlSyntaxProvider
+        {
+            get { return new SqlServerSyntaxProvider(); }
+        }
+
         [SetUp]
         public override void Initialize()
         {
             base.Initialize();           
-
-            SqlSyntaxContext.SqlSyntaxProvider = SqlServerSyntax.Provider;
 
             _database = new Database(@"server=.\SQLEXPRESS;database=EmptyForTest;user id=umbraco;password=umbraco",
                                      "System.Data.SqlClient");

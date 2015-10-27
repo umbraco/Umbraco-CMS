@@ -216,7 +216,6 @@ namespace umbraco.cms.businesslogic.member
         /// </summary>
         /// <param name="Text">The name of the MemberType</param>
         /// <param name="u">Creator of the MemberType</param>
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public static MemberType MakeNew(User u, string Text)
         {
             var alias = helpers.Casing.SafeAliasWithForcingCheck(Text);

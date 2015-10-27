@@ -1,14 +1,24 @@
-﻿@using System.Web.Mvc
+﻿@using System.Collections
+@using System.Net.Http
 @using System.Web.Mvc.Html
 @using Umbraco.Core
 @using ClientDependency.Core
 @using ClientDependency.Core.Mvc
+@using Microsoft.Owin.Security
+@using Newtonsoft.Json
+@using Newtonsoft.Json.Linq
+@using Umbraco.Core.IO
 @using Umbraco.Web
 @using Umbraco.Web.Editors
 @using umbraco
 @inherits System.Web.Mvc.WebViewPage
 @{
     Layout = null;
+
+    Html
+        .RequiresCss("assets/css/umbraco.css", "Umbraco")
+        .RequiresCss("lib/bootstrap-social/bootstrap-social.css", "Umbraco")
+        .RequiresCss("lib/font-awesome/css/font-awesome.min.css", "Umbraco");
 }
 
 <!DOCTYPE html>
@@ -17,10 +27,13 @@
 <head>
     <base href="@GlobalSettings.Path.EnsureEndsWith('/')" />
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Umbraco</title>
-    <link rel="stylesheet" href="assets/css/umbraco.css" />
+
+    @Html.RenderCssHere(
+        new BasicPath("Umbraco", IOHelper.ResolveUrl(SystemDirectories.Umbraco)),
+        new BasicPath("UmbracoClient", IOHelper.ResolveUrl(SystemDirectories.UmbracoClient)))
 
     @*Because we're lazy loading angular js, the embedded cloak style will not be loaded initially, but we need it*@
     <style>
@@ -30,27 +43,30 @@
     </style>
 
 </head>
-<body id="umbracoMainPageBody" ng-controller="Umbraco.AuthorizeUpgradeController">
-    
+<body id="umbracoMainPageBody" ng-controller="Umbraco.AuthorizeUpgradeController" class="login-only">
+
     <div data-backdrop="false" class="modal hide login-overlay" aria-hidden="false" style="display: block;">
-        
         <div ng-include="'views/common/dialogs/login.html'"></div>
-            
     </div>
-    
-    @*
-        These are the bare minimal server variables that are required for the application to start without being authenticated,
-        we will load the rest of the server vars after the user is authenticated.
-    *@    
+
+    <umb-notifications></umb-notifications>
+
+    @{
+        var externalLoginUrl = Url.Action("ExternalLogin", "BackOffice", new
+        {
+            area = ViewBag.UmbracoPath, 
+            //Custom redirect URL since we don't want to just redirect to the back office since this is for authing upgrades
+            redirectUrl = Url.Action("AuthorizeUpgrade", "BackOffice")
+        });
+    }
+    @Html.BareMinimumServerVariablesScript(Url, externalLoginUrl)
+
     <script type="text/javascript">
-        var Umbraco = {};
-        Umbraco.Sys = {};
-        Umbraco.Sys.ServerVariables = {
-            "umbracoUrls": {                
-                "authenticationApiBaseUrl": "@(Url.GetUmbracoApiServiceBaseUrl<AuthenticationController>(controller => controller.PostLogin(null)))",
-                "serverVarsJs": '@Url.Action("ServerVariables", "BackOffice")'
-            }
-        };       
+    document.angularReady = function (app) {
+
+        @Html.AngularExternalLoginInfoValuesScript((IEnumerable<string>)ViewBag.ExternalSignInError)
+
+    }
     </script>
 
     @*And finally we can load in our angular app*@
@@ -59,4 +75,3 @@
 
 </body>
 </html>
-

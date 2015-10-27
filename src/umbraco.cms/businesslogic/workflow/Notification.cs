@@ -81,7 +81,7 @@ namespace umbraco.cms.businesslogic.workflow
             var pUser = ApplicationContext.Current.Services.UserService.GetUserById(performingUser.Id);
 
             nService.SendNotifications(
-                pUser, documentObject.Content, action.Letter.ToString(CultureInfo.InvariantCulture), ui.Text(action.Alias), 
+                pUser, documentObject.ContentEntity, action.Letter.ToString(CultureInfo.InvariantCulture), ui.Text(action.Alias), 
                 new HttpContextWrapper(HttpContext.Current),
                 (user, strings) => ui.Text("notifications", "mailSubject", strings, mailingUser),
                 (user, strings) => UmbracoSettings.NotificationDisableHtmlEmail

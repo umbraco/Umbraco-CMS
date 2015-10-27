@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Web;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Persistence.Caching;
+
 using Umbraco.Core.Serialization;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -220,14 +222,14 @@ namespace Umbraco.Tests.Models
             ((IUmbracoEntity)content).AdditionalData.Add("test1", 123);
             ((IUmbracoEntity)content).AdditionalData.Add("test2", "hello");
 
-            var runtimeCache = new RuntimeCacheProvider();
-            runtimeCache.Save(typeof(IContent), content);
+            var runtimeCache = new ObjectCacheRuntimeCacheProvider();
+            runtimeCache.InsertCacheItem(content.Id.ToString(CultureInfo.InvariantCulture), () => content);
 
             using (DisposableTimer.DebugDuration<ContentTests>("STARTING PERF TEST WITH RUNTIME CACHE"))
             {
                 for (int j = 0; j < 1000; j++)
                 {
-                    var clone = runtimeCache.GetById(typeof(IContent), content.Id.ToGuid());
+                    var clone = runtimeCache.GetCacheItem(content.Id.ToString(CultureInfo.InvariantCulture));
                 }
             }
 
@@ -480,7 +482,6 @@ namespace Umbraco.Tests.Models
                                                                         {
                                                                             Name = "Subtitle",
                                                                             Description = "Optional subtitle",
-                                                                            HelpText = "",
                                                                             Mandatory = false,
                                                                             SortOrder = 3,
                                                                             DataTypeDefinitionId = -88
@@ -501,7 +502,7 @@ namespace Umbraco.Tests.Models
             // Act
             var propertyType = new PropertyType("test", DataTypeDatabaseType.Ntext, "subtitle")
                                    {
-                                        Name = "Subtitle", Description = "Optional subtitle", HelpText = "", Mandatory = false, SortOrder = 3, DataTypeDefinitionId = -88
+                                        Name = "Subtitle", Description = "Optional subtitle", Mandatory = false, SortOrder = 3, DataTypeDefinitionId = -88
                                    };
             contentType.PropertyGroups["Content"].PropertyTypes.Add(propertyType);
             content.Properties.Add(new Property(propertyType){Value = "This is a subtitle Test"});
@@ -523,7 +524,6 @@ namespace Umbraco.Tests.Models
                                    {
                                        Name = "Subtitle",
                                        Description = "Optional subtitle",
-                                       HelpText = "",
                                        Mandatory = false,
                                        SortOrder = 3,
                                        DataTypeDefinitionId = -88
@@ -551,7 +551,7 @@ namespace Umbraco.Tests.Models
             // Act - note that the PropertyType's properties like SortOrder is not updated through the Content object
             var propertyType = new PropertyType("test", DataTypeDatabaseType.Ntext, "title")
                                    {
-                                        Name = "Title", Description = "Title description added", HelpText = "", Mandatory = false, SortOrder = 10, DataTypeDefinitionId = -88
+                                        Name = "Title", Description = "Title description added", Mandatory = false, SortOrder = 10, DataTypeDefinitionId = -88
                                    };
             content.Properties.Add(new Property(propertyType));
 
@@ -772,7 +772,6 @@ namespace Umbraco.Tests.Models
                                    {
                                        Name = "Subtitle",
                                        Description = "Optional subtitle",
-                                       HelpText = "",
                                        Mandatory = false,
                                        SortOrder = 3,
                                        DataTypeDefinitionId = -88
@@ -798,7 +797,6 @@ namespace Umbraco.Tests.Models
                                                                                                 {
                                                                                                     Name = "Co-Author",
                                                                                                     Description = "Name of the Co-Author",
-                                                                                                    HelpText = "",
                                                                                                     Mandatory = false,
                                                                                                     SortOrder = 4,
                                                                                                     DataTypeDefinitionId = -88
@@ -830,7 +828,6 @@ namespace Umbraco.Tests.Models
                                                                                                 {
                                                                                                     Name = "Co-Author",
                                                                                                     Description = "Name of the Co-Author",
-                                                                                                    HelpText = "",
                                                                                                     Mandatory = false,
                                                                                                     SortOrder = 4,
                                                                                                     DataTypeDefinitionId = -88
@@ -864,7 +861,6 @@ namespace Umbraco.Tests.Models
                                                                                                 {
                                                                                                     Name = "Co-Author",
                                                                                                     Description = "Name of the Co-Author",
-                                                                                                    HelpText = "",
                                                                                                     Mandatory = false,
                                                                                                     SortOrder = 4,
                                                                                                     DataTypeDefinitionId = -88
@@ -877,7 +873,6 @@ namespace Umbraco.Tests.Models
                                                                                                 {
                                                                                                     Name = "Author",
                                                                                                     Description = "Name of the Author",
-                                                                                                    HelpText = "",
                                                                                                     Mandatory = false,
                                                                                                     SortOrder = 4,
                                                                                                     DataTypeDefinitionId = -88

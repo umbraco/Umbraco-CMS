@@ -1,7 +1,11 @@
-﻿using System.Web;
+using System;
+using System.ComponentModel;
+using System.Web;
 
 namespace Umbraco.Web.Media.EmbedProviders
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Obsolete("This is no longer used and will be removed from the codebase in the future, for Flickr, use the Umbraco.Web.Media.EmbedProviders.OEmbedPhoto provider")]
     public class Flickr : AbstractOEmbedProvider
     {
         public override string GetMarkup(string url, int maxWidth, int maxHeight)

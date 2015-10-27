@@ -27,7 +27,8 @@ namespace Umbraco.Web.Routing
                 //TODO: Is there a better way to extract this value? at least we're not relying on singletons here though
 		        pcr.RoutingContext.UmbracoContext.HttpContext.Request.ServerVariables["SERVER_NAME"],
                 pcr.RoutingContext.UmbracoContext.Application.Services.EntityService,
-                new PublishedContentQuery(pcr.RoutingContext.UmbracoContext.ContentCache, pcr.RoutingContext.UmbracoContext.MediaCache));
+                new PublishedContentQuery(pcr.RoutingContext.UmbracoContext.ContentCache, pcr.RoutingContext.UmbracoContext.MediaCache),
+                pcr.RoutingContext.UmbracoContext.Application.Services.DomainService);
 
 			IPublishedContent content = null;
 

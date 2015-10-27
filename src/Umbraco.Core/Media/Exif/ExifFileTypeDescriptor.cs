@@ -34,7 +34,7 @@ namespace Umbraco.Core.Media.Exif
     }
 
     /// <summary>
-    /// Expands ExifProperty objects contained in an ExifFile as seperate properties.
+    /// Expands ExifProperty objects contained in an ExifFile as separate properties.
     /// </summary>
     internal sealed class ExifFileTypeDescriptor : CustomTypeDescriptor
     {

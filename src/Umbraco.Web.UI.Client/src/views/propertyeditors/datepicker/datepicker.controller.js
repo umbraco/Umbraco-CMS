@@ -17,10 +17,22 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 
     //map the user config
     $scope.model.config = angular.extend(config, $scope.model.config);
+    //ensure the format doesn't get overwritten with an empty string
+    if ($scope.model.config.format === "" || $scope.model.config.format === undefined || $scope.model.config.format === null) {
+        $scope.model.config.format = $scope.model.config.pickTime ? "YYYY-MM-DD HH:mm:ss" : "YYYY-MM-DD";
+    }
+
+    $scope.hasDatetimePickerValue = $scope.model.value ? true : false;
+    $scope.datetimePickerValue = null;
 
     //hide picker if clicking on the document 
     $scope.hidePicker = function () {
-        $element.find("div:first").datetimepicker("hide");
+        //$element.find("div:first").datetimepicker("hide");
+        // Sometimes the statement above fails and generates errors in the browser console. The following statements fix that.
+        var dtp = $element.find("div:first");
+        if (dtp && dtp.datetimepicker) {
+            dtp.datetimepicker("hide");
+        }
     };
     $(document).bind("click", $scope.hidePicker);
 
@@ -28,19 +40,29 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
     function applyDate(e) {
         angularHelper.safeApply($scope, function() {
             // when a date is changed, update the model
-            if (e.date) {
-                if ($scope.model.config.pickTime) {
-                    $scope.model.value = e.date.format("YYYY-MM-DD HH:mm:ss");
-                }
-                else {
-                    $scope.model.value = e.date.format("YYYY-MM-DD");
-                }
+            if (e.date && e.date.isValid()) {
+                $scope.datePickerForm.datepicker.$setValidity("pickerError", true);
+                $scope.hasDatetimePickerValue = true;
+                $scope.datetimePickerValue = e.date.format($scope.model.config.format);
+            }
+            else {
+                $scope.hasDatetimePickerValue = false;
+                $scope.datetimePickerValue = null;
             }
             
             if (!$scope.model.config.pickTime) {
                 $element.find("div:first").datetimepicker("hide", 0);
             }
         });
+    }
+
+    var picker = null;
+
+    $scope.clearDate = function() {
+        $scope.hasDatetimePickerValue = false;
+        $scope.datetimePickerValue = null;
+        $scope.model.value = null;
+        $scope.datePickerForm.datepicker.$setValidity("pickerError", true);
     }
 
     //get the current user to see if we can localize this picker
@@ -55,34 +77,87 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 		$scope.model.config.language = user.locale;
 		
 
-		assetsService.load(filesToLoad).then(
-			function () {
+		assetsService.load(filesToLoad, $scope).then(
+            function () {
 				//The Datepicker js and css files are available and all components are ready to use.
 
 				// Get the id of the datepicker button that was clicked
 				var pickerId = $scope.model.alias;
 
-				// Open the datepicker and add a changeDate eventlistener
-				$element.find("div:first")
-					.datetimepicker($scope.model.config)
-					.on("dp.change", applyDate);
+			    var element = $element.find("div:first");
 
-				//manually assign the date to the plugin
-				$element.find("div:first").datetimepicker("setValue", $scope.model.value ? $scope.model.value : null);
+				// Open the datepicker and add a changeDate eventlistener
+			    element
+			        .datetimepicker(angular.extend({ useCurrent: true }, $scope.model.config))
+			        .on("dp.change", applyDate)
+			        .on("dp.error", function(a, b, c) {
+			            $scope.hasDatetimePickerValue = false;
+			            $scope.datePickerForm.datepicker.$setValidity("pickerError", false);
+			        });
+
+			    if ($scope.hasDatetimePickerValue) {
+
+			        //assign value to plugin/picker
+			        var dateVal = $scope.model.value ? moment($scope.model.value, $scope.model.config.format) : moment();
+			        element.datetimepicker("setValue", dateVal);
+			        $scope.datetimePickerValue = moment($scope.model.value).format($scope.model.config.format);
+			    }
+
+			    element.find("input").bind("blur", function() {
+			        //we need to force an apply here
+			        $scope.$apply();
+			    });
 
 				//Ensure to remove the event handler when this instance is destroyted
-				$scope.$on('$destroy', function () {
-					$element.find("div:first").datetimepicker("destroy");
-				});
+			    $scope.$on('$destroy', function () {
+			        element.find("input").unbind("blur");
+					element.datetimepicker("destroy");
+			    });
+
+
+			    var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
+			        if ($scope.hasDatetimePickerValue) {
+			            var elementData = $element.find("div:first").data().DateTimePicker;
+			            if ($scope.model.config.pickTime) {
+			                $scope.model.value = elementData.getDate().format("YYYY-MM-DD HH:mm:ss");
+			            }
+			            else {
+			                $scope.model.value = elementData.getDate().format("YYYY-MM-DD");
+			            }
+			        }
+			        else {
+			            $scope.model.value = null;
+			        }
+			    });
+			    //unbind doc click event!
+			    $scope.$on('$destroy', function () {
+			        unsubscribe();
+			    });
+
+
 			});
         });
-
         
+    });
+
+    var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
+        if ($scope.hasDatetimePickerValue) {
+            if ($scope.model.config.pickTime) {
+                $scope.model.value = $element.find("div:first").data().DateTimePicker.getDate().format("YYYY-MM-DD HH:mm:ss");
+            }
+            else {
+                $scope.model.value = $element.find("div:first").data().DateTimePicker.getDate().format("YYYY-MM-DD");
+            }
+        }
+        else {
+            $scope.model.value = null;
+        }
     });
 
     //unbind doc click event!
     $scope.$on('$destroy', function () {
         $(document).unbind("click", $scope.hidePicker);
+        unsubscribe();
     });
 }
 

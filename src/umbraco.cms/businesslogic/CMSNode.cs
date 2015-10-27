@@ -7,7 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Caching;
+
 using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
@@ -607,10 +607,7 @@ order by level,sortOrder";
                 {
                     c.Move(this);
                 }
-
-                //TODO: Properly refactor this, we're just clearing the cache so the changes will also be visible in the backoffice
-                InMemoryCacheProvider.Current.Clear();
-
+                
                 FireAfterMove(e);
             }
         }
@@ -1184,6 +1181,7 @@ order by level,sortOrder";
         {
             // attributes
             x.Attributes.Append(xmlHelper.addAttribute(xd, "id", this.Id.ToString()));
+            x.Attributes.Append(xmlHelper.addAttribute(xd, "key", this.UniqueId.ToString()));
             if (this.Level > 1)
                 x.Attributes.Append(xmlHelper.addAttribute(xd, "parentID", this.Parent.Id.ToString()));
             else

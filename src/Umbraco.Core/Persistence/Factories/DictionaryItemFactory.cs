@@ -4,7 +4,7 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class DictionaryItemFactory : IEntityFactory<IDictionaryItem, DictionaryDto>
+    internal class DictionaryItemFactory 
     {
         #region Implementation of IEntityFactory<DictionaryItem,DictionaryDto>
 

@@ -7,6 +7,7 @@ using Moq;
 using NUnit.Framework;
 using SQLCE4Umbraco;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations.Initial;
@@ -26,7 +27,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
         {
             // Arrange
             var db = GetConfiguredDatabase();
-            var schema = new DatabaseSchemaCreation(db);
+            var schema = new DatabaseSchemaCreation(db, Mock.Of<ILogger>(), new SqlCeSyntaxProvider());
 
             //Create db schema and data from old Total.sql file for Sql Ce
             string statements = GetDatabaseSpecificSqlScript();
@@ -51,7 +52,6 @@ namespace Umbraco.Tests.Migrations.Upgrades
         [SetUp]
         public virtual void Initialize()
         {
-            TestHelper.SetupLog4NetForTests();
             TestHelper.InitializeContentDirectories();
 
             Path = TestHelper.CurrentAssemblyDirectory;
@@ -73,7 +73,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
             var engine = new SqlCeEngine(settings.ConnectionString);
             engine.CreateDatabase();
 
-            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
         }
 
         [TearDown]
@@ -101,7 +101,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
 
         public UmbracoDatabase GetConfiguredDatabase()
         {
-            return new UmbracoDatabase("Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;", "System.Data.SqlServerCe.4.0");
+            return new UmbracoDatabase("Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;", "System.Data.SqlServerCe.4.0", Mock.Of<ILogger>());
         }
 
         public string GetDatabaseSpecificSqlScript()

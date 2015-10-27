@@ -118,7 +118,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You can specify to store the data in Umbraco as comma seperated or as XML. By default it is stored as XML which makes it easier to use the saved value in XSLT, however, storing it as comma seperated makes it easier to work with the data using the API such as Node factory..
+        ///   Looks up a localized string similar to You can specify to store the data in Umbraco as comma separated or as XML. By default it is stored as XML which makes it easier to use the saved value in XSLT, however, storing it as comma separated makes it easier to work with the data using the API such as Node factory..
         /// </summary>
         public static string Desc_StoreAsComma {
             get {

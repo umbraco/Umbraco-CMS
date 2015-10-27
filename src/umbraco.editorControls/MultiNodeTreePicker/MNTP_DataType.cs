@@ -77,7 +77,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
         }
 
         /// <summary>
-        /// Value indicating whether to store as comma seperated or Xml
+        /// Value indicating whether to store as comma separated or Xml
         /// </summary>
         public bool StoreAsCommaDelimited
         {

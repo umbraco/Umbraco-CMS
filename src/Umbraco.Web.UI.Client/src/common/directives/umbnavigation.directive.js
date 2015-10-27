@@ -3,7 +3,7 @@
 * @name umbraco.directives.directive:umbNavigation
 * @restrict E
 **/
-function leftColumnDirective() {
+function umbNavigationDirective() {
     return {
         restrict: "E",    // restrict to an element
         replace: true,   // replace the html element with the template
@@ -11,4 +11,4 @@ function leftColumnDirective() {
     };
 }
 
-angular.module('umbraco.directives').directive("umbNavigation", leftColumnDirective);
+angular.module('umbraco.directives').directive("umbNavigation", umbNavigationDirective);

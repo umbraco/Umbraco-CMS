@@ -148,7 +148,7 @@
         <cc1:Pane runat="server" ID="pane_pages" Text="Select the pages that contain login form and error messages">
             <cc1:PropertyPanel runat="server" ID="pp_loginPage">
                 <asp:PlaceHolder ID="ph_loginpage" runat="server" />
-                <asp:CustomValidator ErrorMessage="*" runat="server" ID="cv_loginPage" />
+                <asp:CustomValidator ErrorMessage="*" runat="server" ID="cv_loginPage" ForeColor="Red" />
                 <br />
                 <small>
                     <%=umbraco.ui.Text("paLoginPageHelp")%>
@@ -159,7 +159,7 @@
 
             <cc1:PropertyPanel runat="server" ID="pp_errorPage">
                 <asp:PlaceHolder ID="ph_errorpage" runat="server" />
-                <asp:CustomValidator ErrorMessage="*" runat="server" ID="cv_errorPage" />
+                <asp:CustomValidator ErrorMessage="*" runat="server" ID="cv_errorPage"  ForeColor="Red" />
                 <br />
                 <small>
                     <%=umbraco.ui.Text("paErrorPageHelp")%>

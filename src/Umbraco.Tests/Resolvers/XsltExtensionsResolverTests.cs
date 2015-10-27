@@ -1,9 +1,12 @@
 using System.Linq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Macros;
 using Umbraco.Core.ObjectResolution;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Core.Profiling;
 using Umbraco.Web;
 using Umbraco.Web.Macros;
 using umbraco;
@@ -11,30 +14,12 @@ using umbraco;
 namespace Umbraco.Tests.Resolvers
 {
     [TestFixture]
-    public class XsltExtensionsResolverTests
+    public class XsltExtensionsResolverTests : ResolverBaseTest
     {
-        [SetUp]
-        public void Initialize()
-        {
-            TestHelper.SetupLog4NetForTests();
-
-            ActionsResolver.Reset();
-
-            // this ensures it's reset
-            PluginManager.Current = new PluginManager(false);
-
-            // for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
-            PluginManager.Current.AssembliesToScan = new[]
-                {
-                    this.GetType().Assembly // this assembly only
-                };
-        }
-
         [TearDown]
         public void TearDown()
         {
             ActionsResolver.Reset();
-            PluginManager.Current = null;
         }
 
         // NOTE
@@ -46,7 +31,8 @@ namespace Umbraco.Tests.Resolvers
         public void Find_All_Extensions()
         {
             XsltExtensionsResolver.Current = new XsltExtensionsResolver(
-                () => PluginManager.Current.ResolveXsltExtensions());
+                new ActivatorServiceProvider(),ProfilingLogger.Logger,
+                () => PluginManager.ResolveXsltExtensions());
 
             Resolution.Freeze();
 

@@ -1,8 +1,10 @@
-﻿namespace Umbraco.Core.Auditing
+﻿using System;
+using System.ComponentModel;
+
+namespace Umbraco.Core.Auditing
 {
-    /// <summary>
-    /// Enums for vailable types of auditing
-    /// </summary>
+    [Obsolete("Use Umbraco.Core.Models.AuditType instead")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public enum AuditTypes
     {
         /// <summary>

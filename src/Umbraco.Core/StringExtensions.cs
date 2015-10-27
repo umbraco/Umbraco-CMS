@@ -15,6 +15,7 @@ using Umbraco.Core.Configuration;
 using System.Web.Security;
 using Umbraco.Core.Strings;
 using Umbraco.Core.CodeAnnotations;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Core
 {
@@ -57,6 +58,50 @@ namespace Umbraco.Core
             return fileName;
 
 
+        }
+
+        /// <summary>
+        /// Based on the input string, this will detect if the strnig is a JS path or a JS snippet.
+        /// If a path cannot be determined, then it is assumed to be a snippet the original text is returned
+        /// with an invalid attempt, otherwise a valid attempt is returned with the resolved path
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This is only used for legacy purposes for the Action.JsSource stuff and shouldn't be needed in v8
+        /// </remarks>
+        internal static Attempt<string> DetectIsJavaScriptPath(this string input)
+        {
+            //validate that this is a url, if it is not, we'll assume that it is a text block and render it as a text
+            //block instead.
+            var isValid = true;
+
+            if (Uri.IsWellFormedUriString(input, UriKind.RelativeOrAbsolute))
+            {
+                //ok it validates, but so does alert('hello'); ! so we need to do more checks
+
+                //here are the valid chars in a url without escaping
+                if (Regex.IsMatch(input, @"[^a-zA-Z0-9-._~:/?#\[\]@!$&'\(\)*\+,%;=]"))
+                    isValid = false;
+
+                //we'll have to be smarter and just check for certain js patterns now too!
+                var jsPatterns = new[] { @"\+\s*\=", @"\);", @"function\s*\(", @"!=", @"==" };
+                if (jsPatterns.Any(p => Regex.IsMatch(input, p)))
+                    isValid = false;
+
+                if (isValid)
+                {
+                    var resolvedUrlResult = IOHelper.TryResolveUrl(input);
+                    //if the resolution was success, return it, otherwise just return the path, we've detected
+                    // it's a path but maybe it's relative and resolution has failed, etc... in which case we're just
+                    // returning what was given to us.
+                    return resolvedUrlResult.Success 
+                        ? resolvedUrlResult 
+                        : Attempt.Succeed(input);
+                }
+            }
+
+            return Attempt.Fail(input);
         }
 
         /// <summary>
@@ -114,26 +159,27 @@ namespace Umbraco.Core
 
         internal static string ReplaceNonAlphanumericChars(this string input, char replacement)
         {
-            //any character that is not alphanumeric, convert to a hyphen
-            var mName = input;
-            foreach (var c in mName.ToCharArray().Where(c => !char.IsLetterOrDigit(c)))
-            {
-                mName = mName.Replace(c, replacement);
-            }
-            return mName;
+            var inputArray = input.ToCharArray();
+            var outputArray = new char[input.Length];
+            for (var i = 0; i < inputArray.Length; i++)
+                outputArray[i] = char.IsLetterOrDigit(inputArray[i]) ? inputArray[i] : replacement;
+            return new string(outputArray);
         }
+
+        private static readonly char[] CleanForXssChars = "*?(){}[];:%<>/\\|&'\"".ToCharArray();
 
         /// <summary>
         /// Cleans string to aid in preventing xss attacks.
         /// </summary>
         /// <param name="input"></param>
+        /// <param name="ignoreFromClean"></param>
         /// <returns></returns>
-        internal static string CleanForXss(this string input)
+        internal static string CleanForXss(this string input, params char[] ignoreFromClean)
         {
             //remove any html
             input = input.StripHtml();
             //strip out any potential chars involved with XSS
-            return input.ExceptChars(new HashSet<char>("*?(){}[];:%<>/\\|&'\"".ToCharArray()));
+            return input.ExceptChars(new HashSet<char>(CleanForXssChars.Except(ignoreFromClean)));
         }
 
         public static string ExceptChars(this string str, HashSet<char> toExclude)
@@ -383,6 +429,11 @@ namespace Umbraco.Core
         public static string EnsureEndsWith(this string input, char value)
         {
             return input.EndsWith(value.ToString(CultureInfo.InvariantCulture)) ? input : input + value;
+        }
+
+        public static string EnsureEndsWith(this string input, string toEndWith)
+        {
+            return input.EndsWith(toEndWith.ToString(CultureInfo.InvariantCulture)) ? input : input + toEndWith;
         }
 
         public static bool IsLowerCase(this char ch)
@@ -945,7 +996,7 @@ namespace Umbraco.Core
                 // as the ShortStringHelper is too important, so as long as it's not there
                 // already, we use a default one. That should never happen, but...
                 Logging.LogHelper.Warn<IShortStringHelper>("ShortStringHelperResolver.HasCurrent == false, fallback to default.");
-                _helper = new DefaultShortStringHelper().WithDefaultConfig();
+                _helper = new DefaultShortStringHelper(UmbracoConfig.For.UmbracoSettings()).WithDefaultConfig();
                 _helper.Freeze();
                 return _helper;
             }
@@ -1217,7 +1268,7 @@ namespace Umbraco.Core
         // other helpers may not. DefaultShortStringHelper produces better, but non-compatible, results.
 
         /// <summary>
-        /// Splits a Pascal cased string into a phrase seperated by spaces.
+        /// Splits a Pascal cased string into a phrase separated by spaces.
         /// </summary>
         /// <param name="phrase">The text to split.</param>
         /// <returns>The splitted text.</returns>
@@ -1360,6 +1411,19 @@ namespace Umbraco.Core
         internal static string ToValidXmlString(this string text)
         {
             return string.IsNullOrEmpty(text) ? text : InvalidXmlChars.Replace(text, "");
+        }
+
+        /// <summary>
+        /// Converts a string to a Guid - WARNING, depending on the string, this may not be unique
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        internal static Guid ToGuid(this string text)
+        {
+            var md5 = MD5.Create();
+            byte[] myStringBytes = Encoding.ASCII.GetBytes(text);
+            byte[] hash = md5.ComputeHash(myStringBytes);
+            return new Guid(hash);
         }
     }
 }

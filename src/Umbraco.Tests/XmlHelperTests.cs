@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -8,8 +7,10 @@ using System.Xml.XPath;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Tests.TestHelpers;
 using umbraco;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Tests.Models;
 
 namespace Umbraco.Tests
 {
@@ -19,10 +20,9 @@ namespace Umbraco.Tests
         [SetUp]
         public void Setup()
         {
-            TestHelper.SetupLog4NetForTests();
         }
 
-        [Ignore("This is a benchmark test so is ignored by default")]
+        [NUnit.Framework.Ignore("This is a benchmark test so is ignored by default")]
         [Test]
         public void Sort_Nodes_Benchmark_Legacy()
         {
@@ -64,7 +64,7 @@ namespace Umbraco.Tests
             Debug.WriteLine("Total time for " + iterations + " iterations is " + totalTime);
         }
 
-        [Ignore("This is a benchmark test so is ignored by default")]
+        [NUnit.Framework.Ignore("This is a benchmark test so is ignored by default")]
         [Test]
         public void Sort_Nodes_Benchmark_New()
         {

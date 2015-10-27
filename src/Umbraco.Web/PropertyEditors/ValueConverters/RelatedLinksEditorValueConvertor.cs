@@ -56,7 +56,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error<JsonValueConverter>("Could not parse the string " + sourceString + " to a json object", ex);
+                    LogHelper.Error<RelatedLinksEditorValueConvertor>("Could not parse the string " + sourceString + " to a json object", ex);
                 }
             }
 
@@ -95,7 +95,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error<JsonValueConverter>("Could not parse the string " + sourceString + " to a json object", ex);
+                    LogHelper.Error<RelatedLinksEditorValueConvertor>("Could not parse the string " + sourceString + " to a json object", ex);
                 }
             }
 

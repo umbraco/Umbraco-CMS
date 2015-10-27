@@ -20,7 +20,8 @@
     'lib/jquery-file-upload/jquery.fileupload-angular.js',
 
     'lib/bootstrap/js/bootstrap.2.3.2.min.js',
-	'lib/umbraco/Extensions.js',
+    'lib/bootstrap-tabdrop/bootstrap-tabdrop.js',
+    'lib/umbraco/Extensions.js',
     
     'lib/umbraco/NamespaceManager.js',
     'lib/umbraco/LegacyUmbClientMgr.js',

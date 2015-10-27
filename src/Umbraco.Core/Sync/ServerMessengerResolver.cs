@@ -3,24 +3,31 @@
 namespace Umbraco.Core.Sync
 {
     /// <summary>
-    /// A resolver to return the currently registered IServerMessenger object
+    /// Resolves the IServerMessenger object.
     /// </summary>
     public sealed class ServerMessengerResolver : SingleObjectResolverBase<ServerMessengerResolver, IServerMessenger>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ServerMessengerResolver"/> class with a messenger.
+        /// </summary>
+        /// <param name="factory">An instance of a messenger.</param>
+        /// <remarks>The resolver is created by the <c>CoreBootManager</c> and thus the constructor remains internal.</remarks>
         internal ServerMessengerResolver(IServerMessenger factory)
             : base(factory)
-        {
-        }
+        { }
 
         /// <summary>
-        /// Can be used at runtime to set a custom IServerMessenger at app startup
+        /// Sets the messenger.
         /// </summary>
-        /// <param name="serverMessenger"></param>
+        /// <param name="serverMessenger">The messenger.</param>
         public void SetServerMessenger(IServerMessenger serverMessenger)
         {
             Value = serverMessenger;
         }
 
+        /// <summary>
+        /// Gets the messenger.
+        /// </summary>
         public IServerMessenger Messenger
         {
             get { return Value; }

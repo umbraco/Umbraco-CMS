@@ -11,7 +11,7 @@ namespace Umbraco.Core.IO
 {
     public class SystemFiles
     {
-
+        [Obsolete("This file is no longer used and should not be accessed!")]
         public static string AccessXml
         {
             get

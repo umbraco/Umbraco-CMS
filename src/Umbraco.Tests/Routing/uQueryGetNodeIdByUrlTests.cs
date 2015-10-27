@@ -20,6 +20,10 @@ namespace Umbraco.Tests.Routing
 		{
 			base.Initialize();
 
+            //generate new mock settings and assign so we can configure in individual tests
+            _umbracoSettings = SettingsForTests.GenerateMockSettings();
+            SettingsForTests.ConfigureSettings(_umbracoSettings);
+
 			var url = "/test";
 			
 			var lookup = new Umbraco.Web.Routing.ContentFinderByNiceUrl();
@@ -28,7 +32,7 @@ namespace Umbraco.Tests.Routing
 			var t = Template.MakeNew("test", new User(0));
 
 			var umbracoContext = GetUmbracoContext(url, t.Id);
-            var urlProvider = new UrlProvider(umbracoContext, new IUrlProvider[] { new DefaultUrlProvider() });
+            var urlProvider = new UrlProvider(umbracoContext, _umbracoSettings.WebRouting, new IUrlProvider[] { new DefaultUrlProvider() });
 			var routingContext = new RoutingContext(
 				umbracoContext,
 				lookups,
@@ -42,9 +46,7 @@ namespace Umbraco.Tests.Routing
 			//umbracoContext.RoutingContext = routingContext;
 			Umbraco.Web.UmbracoContext.Current = routingContext.UmbracoContext;
 
-            //generate new mock settings and assign so we can configure in individual tests
-            _umbracoSettings = SettingsForTests.GenerateMockSettings();
-            SettingsForTests.ConfigureSettings(_umbracoSettings);
+            
 		}
 
         public override void TearDown()

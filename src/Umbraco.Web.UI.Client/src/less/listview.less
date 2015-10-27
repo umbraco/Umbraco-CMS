@@ -35,24 +35,42 @@
   padding: 0 0 20px 0
 }
 
-.umb-listview table form {
-  position: relative;
-  margin: 0
+/* listview search */
+.form-search {
+    .inner-addon {
+        position: relative;
+
+        [class^="icon-"], [class*=" icon-"] {
+            position: absolute;
+            padding: 5px 8px;
+            pointer-events: none;
+            top: 0;
+        }
+
+        input[type="text"] {
+            width: 190px;
+        }
+    }
+
+    /* align icon */
+    .left-addon [class^="icon-"], .left-addon [class*=" icon-"] { left: 0; right: inherit; }
+    .right-addon [class^="icon-"], .right-addon [class*=" icon-"] { right: 0; left: inherit; }
+
+    /* add padding */
+    .left-addon input[type="text"]  { padding-left: 30px !important; padding-right: 6px; }
+    .right-addon input[type="text"] { padding-right: 30px; padding-left: 6px !important; }
 }
 
-.umb-listview table form .icon-search {
-  position: absolute;
-  top: 8px;
-  left:5px;
-  color: @gray;
-  cursor:pointer;
+.umb-listview table form {
+  position: relative;
+  margin: 0;
 }
 
 .umb-listview table input[type="text"] {
   background: none;
-  border: none;
   -webkit-transition: all .5s;
   -moz-transition: all .5s;
+  -o-transition: all .5s;
   transition: all .5s;
   width: 60px;
   padding: 4px 0 4px 20px;

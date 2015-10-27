@@ -12,6 +12,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     [Migration("7.0.0", 8, GlobalSettings.UmbracoMigrationName)]
     public class AlterTagRelationsTable : MigrationBase
     {
+        public AlterTagRelationsTable(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
+        {
+        }
+
         public override void Up()
         {
             if (Context == null || Context.Database == null) return;
@@ -25,7 +29,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 
         private void Initial()
         {
-            var constraints = SqlSyntaxContext.SqlSyntaxProvider.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
+            var constraints = SqlSyntax.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
 
             //create a new col which we will make a foreign key, but first needs to be populated with data.
             Alter.Table("cmsTagRelationship").AddColumn("propertyTypeId").AsInt32().Nullable();
@@ -34,15 +38,20 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
             if (Context.CurrentDatabaseProvider == DatabaseProviders.MySql)
             {
                 Delete.ForeignKey().FromTable("cmsTagRelationship").ForeignColumn("nodeId").ToTable("umbracoNode").PrimaryColumn("id");
+                //check for another strange really old one that might have existed
+                if (constraints.Any(x => x.Item1 == "cmsTagRelationship" && x.Item2 == "tagId"))
+                {
+                    Delete.ForeignKey().FromTable("cmsTagRelationship").ForeignColumn("tagId").ToTable("cmsTags").PrimaryColumn("id");
+                }
             }
             else
             {
                 //Before we try to delete this constraint, we'll see if it exists first, some older schemas never had it and some older schema's had this named
                 // differently than the default.
 
-                var constraint = constraints
-                    .SingleOrDefault(x => x.Item1 == "cmsTagRelationship" && x.Item2 == "nodeId" && x.Item3.InvariantStartsWith("PK_") == false);
-                if (constraint != null)
+                var constraintMatches = constraints.Where(x => x.Item1 == "cmsTagRelationship" && x.Item2 == "nodeId" && x.Item3.InvariantStartsWith("PK_") == false);
+
+                foreach (var constraint in constraintMatches)
                 {
                     Delete.ForeignKey(constraint.Item3).OnTable("cmsTagRelationship");
                 }
@@ -95,7 +104,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                 var propertyTypes = propertyTypeIdRef.Where(x => x.NodeId == tr.NodeId).ToArray();
                 if (propertyTypes.Length == 0)
                 {
-                    LogHelper.Warn<AlterTagRelationsTable>("There was no cmsContent reference for cmsTagRelationship for nodeId "
+                    Logger.Warn<AlterTagRelationsTable>("There was no cmsContent reference for cmsTagRelationship for nodeId "
                         + tr.NodeId +
                         ". The new tag system only supports tags with references to content in the cmsContent and cmsPropertyType tables. This row will be deleted: "
                         + string.Format("nodeId: {0}, tagId: {1}", tr.NodeId, tr.TagId));

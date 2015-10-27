@@ -6,7 +6,7 @@
  * @description
  * The controller for the member list view
  */
-function MemberListController($scope, $routeParams, $location, $q, $window, appState, memberResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, formHelper, umbModelMapper, editorState) {
+function MemberListController($scope, $routeParams, $location, $q, $window, appState, memberResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, formHelper, umbModelMapper, editorState, localizationService) {
     
     //setup scope vars
     $scope.currentSection = appState.getSectionState("currentSection");
@@ -17,6 +17,13 @@ function MemberListController($scope, $routeParams, $location, $q, $window, appS
         .then(function (data) {
             $scope.loaded = true;
             $scope.content = data;
+
+            //translate "All Members"
+            if ($scope.content != null && $scope.content.name != null && $scope.content.name.replace(" ", "").toLowerCase() == "allmembers") {
+                localizationService.localize("member_allMembers").then(function (value) {
+                    $scope.content.name = value;
+                });
+            }
 
             editorState.set($scope.content);
 

@@ -8,6 +8,6 @@ var app = angular.module('umbraco', [
     'ngCookies'
 ]);
 
-/* For Angular 1.2: we need to load in Routing seperately
+/* For Angular 1.2: we need to load in Routing separately
 	    'ngRoute'
 */

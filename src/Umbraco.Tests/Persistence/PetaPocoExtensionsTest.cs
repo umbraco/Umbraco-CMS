@@ -222,16 +222,16 @@ namespace Umbraco.Tests.Persistence
             {
                 servers.Add(new ServerRegistrationDto
                     {
-                        Address = "address" + i,
-                        ComputerName = "computer" + i,
+                        ServerAddress = "address" + i,
+                        ServerIdentity = "computer" + i,
                         DateRegistered = DateTime.Now,
                         IsActive = true,
-                        LastNotified = DateTime.Now
+                        DateAccessed = DateTime.Now
                     });
             }
 
             // Act
-            using (DisposableTimer.TraceDuration<PetaPocoExtensionsTest>("starting insert", "finished insert"))
+            using (ProfilingLogger.TraceDuration<PetaPocoExtensionsTest>("starting insert", "finished insert"))
             {
                 db.BulkInsertRecords(servers);    
             }
@@ -251,11 +251,11 @@ namespace Umbraco.Tests.Persistence
             {
                 servers.Add(new ServerRegistrationDto
                     {
-                        Address = "address" + i,
-                        ComputerName = "computer" + i,
+                        ServerAddress = "address" + i,
+                        ServerIdentity = "computer" + i,
                         DateRegistered = DateTime.Now,
                         IsActive = true,
-                        LastNotified = DateTime.Now
+                        DateAccessed = DateTime.Now
                     });
             }
             db.OpenSharedConnection();
@@ -267,7 +267,7 @@ namespace Umbraco.Tests.Persistence
 
             // Assert
             Assert.That(sql[0],
-                        Is.EqualTo("INSERT INTO [umbracoServer] ([umbracoServer].[address], [umbracoServer].[computerName], [umbracoServer].[registeredDate], [umbracoServer].[lastNotifiedDate], [umbracoServer].[isActive]) VALUES (@0,@1,@2,@3,@4), (@5,@6,@7,@8,@9)"));
+                        Is.EqualTo("INSERT INTO [umbracoServer] ([umbracoServer].[address], [umbracoServer].[computerName], [umbracoServer].[registeredDate], [umbracoServer].[lastNotifiedDate], [umbracoServer].[isActive], [umbracoServer].[isMaster]) VALUES (@0,@1,@2,@3,@4,@5), (@6,@7,@8,@9,@10,@11)"));
         }
 
 
@@ -282,11 +282,12 @@ namespace Umbraco.Tests.Persistence
             {
                 servers.Add(new ServerRegistrationDto
                 {
-                    Address = "address" + i,
-                    ComputerName = "computer" + i,
+                    ServerAddress = "address" + i,
+                    ServerIdentity = "computer" + i,
                     DateRegistered = DateTime.Now,
                     IsActive = true,
-                    LastNotified = DateTime.Now
+                    DateAccessed = DateTime.Now,
+                    IsMaster = true
                 });
             }
             db.OpenSharedConnection();
@@ -297,7 +298,7 @@ namespace Umbraco.Tests.Persistence
             db.CloseSharedConnection();
 
             // Assert
-            Assert.That(sql.Length, Is.EqualTo(4));
+            Assert.That(sql.Length, Is.EqualTo(5));
             foreach (var s in sql)
             {
                 Assert.LessOrEqual(Regex.Matches(s, "@\\d+").Count, 2000);

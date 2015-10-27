@@ -24,7 +24,7 @@ namespace Umbraco.Web.Routing
 
             var urls = new List<string>();
 
-            if (content.HasPublishedVersion() == false)
+            if (content.HasPublishedVersion == false)
             {
                 urls.Add(ui.Text("content", "itemNotPublished", umbracoContext.Security.CurrentUser));
                 return urls;

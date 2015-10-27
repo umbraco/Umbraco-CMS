@@ -1,8 +1,12 @@
-﻿@using System.Net.Http
+﻿@using System.Collections
+@using System.Net.Http
 @using System.Web.Mvc.Html
 @using Umbraco.Core
 @using ClientDependency.Core
 @using ClientDependency.Core.Mvc
+@using Microsoft.Owin.Security
+@using Newtonsoft.Json
+@using Newtonsoft.Json.Linq
 @using Umbraco.Core.IO
 @using Umbraco.Web
 @using Umbraco.Web.Editors
@@ -10,6 +14,24 @@
 
 @inherits System.Web.Mvc.WebViewPage
 
+@{
+    var isDebug = false;
+    if (Request.RawUrl.IndexOf('?') >= 0)
+    {
+        var parsed = HttpUtility.ParseQueryString(Request.RawUrl.Split('?')[1]);
+        var attempt = parsed["umbDebug"].TryConvertTo<bool>();
+        if (attempt && attempt.Result)
+        {
+            isDebug = true;
+        }
+    }
+
+    Html
+        .RequiresCss("assets/css/umbraco.css", "Umbraco")
+        .RequiresCss("tree/treeicons.css", "UmbracoClient")
+        .RequiresCss("lib/bootstrap-social/bootstrap-social.css", "Umbraco")
+        .RequiresCss("lib/font-awesome/css/font-awesome.min.css", "Umbraco");
+}
 
 <!DOCTYPE html>
 
@@ -23,17 +45,15 @@
     <meta name="robots" content="noindex, nofollow">
 
     <title ng-bind="$root.locationTitle">Umbraco</title>
-    
-    @{ Html.RequiresCss("assets/css/umbraco.css", "Umbraco");}
-    @{ Html.RequiresCss("tree/treeicons.css", "UmbracoClient");}
+
     @Html.RenderCssHere(
         new BasicPath("Umbraco", IOHelper.ResolveUrl(SystemDirectories.Umbraco)),
         new BasicPath("UmbracoClient", IOHelper.ResolveUrl(SystemDirectories.UmbracoClient)))
-    
+
 
 </head>
 <body ng-class="{touch:touchDevice,emptySection:emptySection}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
-    <div ng-hide="!authenticated" ng-cloak id="mainwrapper"  id="mainwrapper" class="clearfix" ng-click="closeDialogs($event)">
+    <div ng-hide="!authenticated" ng-cloak id="mainwrapper" id="mainwrapper" class="clearfix" ng-click="closeDialogs($event)">
 
         <umb-navigation></umb-navigation>
 
@@ -46,42 +66,21 @@
 
     <umb-notifications></umb-notifications>
 
+    @Html.BareMinimumServerVariablesScript(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewBag.UmbracoPath }))
 
-    @*
-        These are the bare minimal server variables that are required for the application to start without being authenticated,
-        we will load the rest of the server vars after the user is authenticated.
-    *@    
     <script type="text/javascript">
-        var Umbraco = {};
-        Umbraco.Sys = {};
-        Umbraco.Sys.ServerVariables = {
-            "umbracoUrls": {                
-                "authenticationApiBaseUrl": "@(Url.GetUmbracoApiServiceBaseUrl<AuthenticationController>(controller => controller.PostLogin(null)))",
-                "serverVarsJs": '@Url.GetUrlWithCacheBust("ServerVariables", "BackOffice")'
-            },
-            "application": {
-                "applicationPath" : "@Context.Request.ApplicationPath"
-            }
-        };       
+        document.angularReady = function(app) {
+
+            @Html.AngularExternalLoginInfoValuesScript((IEnumerable<string>)ViewBag.ExternalSignInError)
+
+        }
     </script>
+    
 
     @*And finally we can load in our angular app*@
     <script type="text/javascript" src="lib/rgrove-lazyload/lazyload.js"></script>
     <script type="text/javascript" src="@Url.GetUrlWithCacheBust("Application", "BackOffice")"></script>
-    
-    @{
-        var isDebug = false;
-        if (Request.RawUrl.IndexOf('?') >= 0)
-        {
-            var parsed = HttpUtility.ParseQueryString(Request.RawUrl.Split('?')[1]);
-            var attempt = parsed["umbDebug"].TryConvertTo<bool>();
-            if (attempt && attempt.Result)
-            {
-                isDebug = true;
-            } 
-        }
-        
-    }
+
     @if (isDebug)
     {
         @Html.RenderProfiler()
@@ -89,4 +88,3 @@
 
 </body>
 </html>
-

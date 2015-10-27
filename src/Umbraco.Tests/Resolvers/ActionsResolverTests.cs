@@ -1,7 +1,11 @@
 using System.Linq;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
+using Umbraco.Core.Profiling;
 using Umbraco.Tests.TestHelpers;
 using umbraco.BasePages;
 using umbraco.interfaces;
@@ -9,30 +13,13 @@ using umbraco.interfaces;
 namespace Umbraco.Tests.Resolvers
 {
     [TestFixture]
-	public class ActionsResolverTests
-	{
-		[SetUp]
-		public void Initialize()
-		{
-            TestHelper.SetupLog4NetForTests();
-
-            ActionsResolver.Reset();
-
-			// this ensures it's reset
-			PluginManager.Current = new PluginManager(false);
-
-			// for testing, we'll specify which assemblies are scanned for the PluginTypeResolver
-			PluginManager.Current.AssembliesToScan = new[]
-				{
-					this.GetType().Assembly // this assembly only
-				};
-		}
-
+    public class ActionsResolverTests : ResolverBaseTest
+    {
+        
 		[TearDown]
 		public void TearDown()
 		{
             ActionsResolver.Reset();
-		    PluginManager.Current = null;
 		}
 
         // NOTE
@@ -44,7 +31,8 @@ namespace Umbraco.Tests.Resolvers
 		public void FindAllActions()
 		{
             ActionsResolver.Current = new ActionsResolver(
-                () => PluginManager.Current.ResolveActions());
+                new ActivatorServiceProvider(), ProfilingLogger.Logger,
+                () => PluginManager.ResolveActions());
 
             Resolution.Freeze();
 

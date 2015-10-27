@@ -1,12 +1,21 @@
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Events;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
 {
-    public class ContentTypeServiceBase
+    public class ContentTypeServiceBase : RepositoryService
     {
+        public ContentTypeServiceBase(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+            : base(provider, repositoryFactory, logger, eventMessagesFactory)
+        {
+        }
+
         /// <summary>
         /// This is called after an content type is saved and is used to update the content xml structures in the database
         /// if they are required to be updated.

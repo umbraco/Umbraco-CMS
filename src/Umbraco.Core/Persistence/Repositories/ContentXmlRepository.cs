@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence.Caching;
+
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -15,8 +17,8 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class ContentXmlRepository<TContent> : PetaPocoRepositoryBase<int, ContentXmlEntity<TContent>> 
         where TContent : IContentBase
     {
-        public ContentXmlRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache)
-            : base(work, cache)
+        public ContentXmlRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+            : base(work, cache, logger, sqlSyntax)
         {
         }
 
@@ -79,8 +81,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var poco = new ContentXmlDto
             {
-                NodeId = entity.Id, 
-                Xml = entity.Xml.ToString(SaveOptions.None)
+                NodeId = entity.Id,
+                Xml = entity.Xml.ToDataString()
             };
 
             //We need to do a special InsertOrUpdate here because we know that the ContentXmlDto table has a 1:1 relation

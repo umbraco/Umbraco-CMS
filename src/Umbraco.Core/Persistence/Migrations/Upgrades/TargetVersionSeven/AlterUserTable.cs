@@ -1,11 +1,17 @@
 ﻿using System;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 {
     [Migration("7.0.0", 3, GlobalSettings.UmbracoMigrationName)]
     public class AlterUserTable : MigrationBase
     {
+        public AlterUserTable(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
+        {
+        }
+
         public override void Up()
         {
             Delete.Column("userDefaultPermissions").FromTable("umbracoUser");

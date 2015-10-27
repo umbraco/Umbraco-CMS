@@ -222,11 +222,11 @@ angular.module("umbraco")
 
 
                     editor.on('ObjectResized', function (e) {
-                        var qs = "?width=" + e.width + "px&height=" + e.height + "px";
+                        var qs = "?width=" + e.width + "&height=" + e.height;
                         var srcAttr = $(e.target).attr("src");
                         var path = srcAttr.split("?")[0];
                         $(e.target).attr("data-mce-src", path + qs);
-
+                        
                         syncContent(editor);
                     });
 

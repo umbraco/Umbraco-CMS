@@ -27,7 +27,8 @@ namespace Umbraco.Web.WebApi
             var routeData = request.GetRouteData();
             if (routeData == null 
                 || routeData.Route == null
-                || routeData.Route.DataTokens == null 
+                || routeData.Route.DataTokens == null
+                || routeData.Route.DataTokens.ContainsKey("Namespaces") == false
                 || routeData.Route.DataTokens["Namespaces"] == null)
                 return base.SelectController(request);
             

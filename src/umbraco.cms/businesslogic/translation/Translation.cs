@@ -8,10 +8,12 @@ using umbraco.cms.businesslogic.language;
 using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.task;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 
 namespace umbraco.cms.businesslogic.translation
 {
+    [Obsolete("This will be removed in future versions, the translation utility will not work perfectly in v7.x")]
     public class Translation
     {
         public static void MakeNew(CMSNode Node, User User, User Translator, Language Language, string Comment,
@@ -95,10 +97,14 @@ namespace umbraco.cms.businesslogic.translation
             var props = d.GenericProperties;
             foreach (Property p in props)
             {
-                if (p.Value.GetType() == "".GetType())
+                var asString = p.Value as string;
+                if (asString != null)
                 {
-                    if (p.Value.ToString().Trim() != "")
-                        words += CountWordsInString(p.Value.ToString());
+                    var trimmed = asString.Trim();
+                    if (trimmed.IsNullOrWhiteSpace() == false)
+                    {
+                        words += CountWordsInString(trimmed);
+                    }
                 }
             }
 

@@ -64,7 +64,7 @@ namespace Umbraco.Tests.PropertyEditors
         {
             LegacyPropertyEditorIdToAliasConverter.CreateMappingsForCoreEditors();
 
-            Assert.AreEqual(37, LegacyPropertyEditorIdToAliasConverter.Count());
+            Assert.AreEqual(36, LegacyPropertyEditorIdToAliasConverter.Count());
         }
     }
 }

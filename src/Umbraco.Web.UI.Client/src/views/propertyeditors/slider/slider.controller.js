@@ -38,7 +38,7 @@
     /** This creates the slider with the model values - it's called on startup and if the model value changes */
     function createSlider() {
 
-        //the value that we'll give the slider - if it's a range, we store our value as a comma seperated val but this slider expects an array
+        //the value that we'll give the slider - if it's a range, we store our value as a comma separated val but this slider expects an array
         var sliderVal = null;
 
         //configure the model value based on if range is enabled or not
@@ -121,7 +121,7 @@
 
         });
 
-    //load the seperate css for the editor to avoid it blocking our js loading
+    //load the separate css for the editor to avoid it blocking our js loading
     assetsService.loadCss("lib/slider/slider.css");
 
 }

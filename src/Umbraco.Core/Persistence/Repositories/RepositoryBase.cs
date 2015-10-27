@@ -1,36 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Persistence.Caching;
+
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-
-    /// <summary>
-    /// Represent an abstract Repository, which is the base of the Repository implementations
-    /// </summary>
-    /// <typeparam name="TEntity">Type of <see cref="IAggregateRoot"/> entity for which the repository is used</typeparam>
-    /// <typeparam name="TId">Type of the Id used for this entity</typeparam>
-    internal abstract class RepositoryBase<TId, TEntity> : DisposableObject, IRepositoryQueryable<TId, TEntity>, IUnitOfWorkRepository
-        where TEntity : class, IAggregateRoot
+    internal abstract class RepositoryBase : DisposableObject
     {
         private readonly IUnitOfWork _work;
-        private readonly IRepositoryCacheProvider _cache;
+        private readonly CacheHelper _cache;
 
-        protected RepositoryBase(IUnitOfWork work)
-            : this(work, RuntimeCacheProvider.Current)
-        {
-        }
-
-        internal RepositoryBase(IUnitOfWork work, IRepositoryCacheProvider cache)
+        protected RepositoryBase(IUnitOfWork work, CacheHelper cache, ILogger logger)
         {
             if (work == null) throw new ArgumentNullException("work");
             if (cache == null) throw new ArgumentNullException("cache");
+            if (logger == null) throw new ArgumentNullException("logger");
+            Logger = logger;
             _work = work;
-            _cache = cache;
+
+            //IMPORTANT: We will force the DeepCloneRuntimeCacheProvider to be used here which is a wrapper for the underlying
+            // runtime cache to ensure that anything that can be deep cloned in/out is done so, this also ensures that our tracks
+            // changes entities are reset.
+            _cache = new CacheHelper(new DeepCloneRuntimeCacheProvider(cache.RuntimeCache), cache.StaticCache, cache.RequestCache);            
         }
 
         /// <summary>
@@ -49,22 +45,63 @@ namespace Umbraco.Core.Persistence.Repositories
             get { return (Guid)_work.Key; }
         }
 
+        protected CacheHelper RepositoryCache
+        {
+            get { return _cache; }
+        }
+
+        /// <summary>
+        /// The runtime cache used for this repo - by standard this is the runtime cache exposed by the CacheHelper but can be overridden
+        /// </summary>
+        protected virtual IRuntimeCacheProvider RuntimeCache
+        {
+            get { return _cache.RuntimeCache; }
+        }
+
+        public static string GetCacheIdKey<T>(object id)
+        {
+            return string.Format("{0}{1}", GetCacheTypeKey<T>(), id);
+        }
+
+        public static string GetCacheTypeKey<T>()
+        {
+            return string.Format("uRepo_{0}_", typeof(T).Name);
+        }
+
+        protected ILogger Logger { get; private set; }
+    }
+
+    /// <summary>
+    /// Represent an abstract Repository, which is the base of the Repository implementations
+    /// </summary>
+    /// <typeparam name="TEntity">Type of <see cref="IAggregateRoot"/> entity for which the repository is used</typeparam>
+    /// <typeparam name="TId">Type of the Id used for this entity</typeparam>
+    internal abstract class RepositoryBase<TId, TEntity> : RepositoryBase, IRepositoryQueryable<TId, TEntity>, IUnitOfWorkRepository
+        where TEntity : class, IAggregateRoot
+    {
+        protected RepositoryBase(IUnitOfWork work, CacheHelper cache, ILogger logger)
+            : base(work, cache, logger)
+        {
+        }
+
+        private readonly RepositoryCacheOptions _cacheOptions = new RepositoryCacheOptions();
+
         #region IRepository<TEntity> Members
 
         /// <summary>
         /// Adds or Updates an entity of type TEntity
         /// </summary>
-        /// <remarks>This method is backed by an <see cref="IRepositoryCacheProvider"/> cache</remarks>
+        /// <remarks>This method is backed by an <see cref="IRuntimeCacheProvider"/> cache</remarks>
         /// <param name="entity"></param>
         public void AddOrUpdate(TEntity entity)
         {
             if (entity.HasIdentity == false)
             {
-                _work.RegisterAdded(entity, this);
+                UnitOfWork.RegisterAdded(entity, this);
             }
             else
             {
-                _work.RegisterChanged(entity, this);
+                UnitOfWork.RegisterChanged(entity, this);
             }
         }
 
@@ -74,55 +111,31 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entity"></param>
         public virtual void Delete(TEntity entity)
         {
-            if (_work != null)
+            if (UnitOfWork != null)
             {
-                _work.RegisterRemoved(entity, this);
+                UnitOfWork.RegisterRemoved(entity, this);
             }
         }
 
         protected abstract TEntity PerformGet(TId id);
         /// <summary>
-        /// Gets an entity by the passed in Id
+        /// Gets an entity by the passed in Id utilizing the repository's runtime cache
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         public TEntity Get(TId id)
         {
-            var fromCache = TryGetFromCache(id);
-            if (fromCache.Success)
-            {
-                return fromCache.Result;
-            }
+            var cacheKey = GetCacheIdKey<TEntity>(id);
+            var fromCache = RuntimeCache.GetCacheItem<TEntity>(cacheKey);
+
+            if (fromCache != null) return fromCache;
 
             var entity = PerformGet(id);
-            if (entity != null)
-            {
-                _cache.Save(typeof(TEntity), entity);
-            }
-
-            if (entity != null)
-            {
-                //on initial construction we don't want to have dirty properties tracked
-                // http://issues.umbraco.org/issue/U4-1946
-                var asEntity = entity as TracksChangesEntityBase;
-                if (asEntity != null)
-                {
-                    asEntity.ResetDirtyProperties(false);
-                }
-            }
+            if (entity == null) return null;
+            
+            RuntimeCache.InsertCacheItem(cacheKey, () => entity);
 
             return entity;
-        }
-
-        protected Attempt<TEntity> TryGetFromCache(TId id)
-        {
-            Guid key = id is int ? ConvertIdToGuid(id) : ConvertStringIdToGuid(id.ToString());
-            var rEntity = _cache.GetById(typeof(TEntity), key);
-            if (rEntity != null)
-            {
-                return Attempt.Succeed((TEntity)rEntity);
-            }
-            return Attempt<TEntity>.Fail();
         }
 
         protected abstract IEnumerable<TEntity> PerformGetAll(params TId[] ids);
@@ -147,26 +160,45 @@ namespace Umbraco.Core.Persistence.Repositories
 
             if (ids.Any())
             {
-                var entities = _cache.GetByIds(
-                    typeof(TEntity), ids.Select(id => id is int ? ConvertIdToGuid(id) : ConvertStringIdToGuid(id.ToString())).ToList())
-                    .ToArray();
+                var entities = ids.Select(x => RuntimeCache.GetCacheItem<TEntity>(GetCacheIdKey<TEntity>(x))).ToArray();
 
                 if (ids.Count().Equals(entities.Count()) && entities.Any(x => x == null) == false)
-                    return entities.Select(x => (TEntity)x);
+                    return entities;
             }
             else
             {
-                var allEntities = _cache.GetAllByType(typeof(TEntity)).ToArray();
+                var allEntities = RuntimeCache.GetCacheItemsByKeySearch<TEntity>(GetCacheTypeKey<TEntity>())
+                    .WhereNotNull()
+                    .ToArray();
 
                 if (allEntities.Any())
                 {
-                    //Get count of all entities of current type (TEntity) to ensure cached result is correct
-                    var query = Query<TEntity>.Builder.Where(x => x.Id != 0);
-                    int totalCount = PerformCount(query);
 
-                    if (allEntities.Count() == totalCount)
-                        return allEntities.Select(x => (TEntity)x);
+                    if (RepositoryCacheOptions.GetAllCacheValidateCount)
+                    {
+                        //Get count of all entities of current type (TEntity) to ensure cached result is correct
+                        var query = Query<TEntity>.Builder.Where(x => x.Id != 0);
+                        int totalCount = PerformCount(query);
+
+                        if (allEntities.Count() == totalCount)
+                            return allEntities;
+                    }
+                    else
+                    {
+                        return allEntities;
+                    }
                 }
+                else if (RepositoryCacheOptions.GetAllCacheAllowZeroCount)
+                {
+                    //if the repository allows caching a zero count, then check the zero count cache
+                    var zeroCount = RuntimeCache.GetCacheItem<TEntity[]>(GetCacheTypeKey<TEntity>());
+                    if (zeroCount != null && zeroCount.Any() == false)
+                    {
+                        //there is a zero count cache so return an empty list
+                        return Enumerable.Empty<TEntity>();
+                    }
+                }
+
             }
 
             var entityCollection = PerformGetAll(ids)
@@ -178,17 +210,34 @@ namespace Umbraco.Core.Persistence.Repositories
             // coming back here we don't want to chuck it all into memory, this added cache here
             // is more for convenience when paging stuff temporarily
 
-            if (entityCollection.Length > 100) return entityCollection;
+            if (entityCollection.Length > RepositoryCacheOptions.GetAllCacheThresholdLimit) 
+                return entityCollection;
+
+            if (entityCollection.Length == 0 && RepositoryCacheOptions.GetAllCacheAllowZeroCount)
+            {
+                //there was nothing returned but we want to cache a zero count result so add an TEntity[] to the cache
+                // to signify that there is a zero count cache
+                RuntimeCache.InsertCacheItem(GetCacheTypeKey<TEntity>(), () => new TEntity[] {});
+            }
 
             foreach (var entity in entityCollection)
             {
                 if (entity != null)
                 {
-                    _cache.Save(typeof(TEntity), entity);
+                    var localCopy = entity;
+                    RuntimeCache.InsertCacheItem(GetCacheIdKey<TEntity>(entity.Id), () => localCopy);
                 }
             }
 
             return entityCollection;
+        }
+
+        /// <summary>
+        /// Returns the repository cache options
+        /// </summary>
+        protected virtual RepositoryCacheOptions RepositoryCacheOptions
+        {
+            get { return _cacheOptions; }
         }
 
         protected abstract IEnumerable<TEntity> PerformGetByQuery(IQuery<TEntity> query);
@@ -212,8 +261,8 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public bool Exists(TId id)
         {
-            var fromCache = TryGetFromCache(id);
-            if (fromCache.Success)
+            var fromCache = RuntimeCache.GetCacheItem<TEntity>(GetCacheIdKey<TEntity>(id));
+            if (fromCache != null)
             {
                 return true;
             }
@@ -244,13 +293,17 @@ namespace Umbraco.Core.Persistence.Repositories
             try
             {
                 PersistNewItem((TEntity)entity);
-                _cache.Save(typeof(TEntity), entity);
+                RuntimeCache.InsertCacheItem(GetCacheIdKey<TEntity>(entity.Id), () => entity);
+                //If there's a GetAll zero count cache, ensure it is cleared
+                RuntimeCache.ClearCacheItem(GetCacheTypeKey<TEntity>());
             }
             catch (Exception)
             {
                 //if an exception is thrown we need to remove the entry from cache, this is ONLY a work around because of the way
                 // that we cache entities: http://issues.umbraco.org/issue/U4-4259
-                _cache.Delete(typeof(TEntity), entity);
+                RuntimeCache.ClearCacheItem(GetCacheIdKey<TEntity>(entity.Id));
+                //If there's a GetAll zero count cache, ensure it is cleared
+                RuntimeCache.ClearCacheItem(GetCacheTypeKey<TEntity>());
                 throw;
             }
 
@@ -265,13 +318,17 @@ namespace Umbraco.Core.Persistence.Repositories
             try
             {
                 PersistUpdatedItem((TEntity)entity);
-                _cache.Save(typeof(TEntity), entity);
+                RuntimeCache.InsertCacheItem(GetCacheIdKey<TEntity>(entity.Id), () => entity);
+                //If there's a GetAll zero count cache, ensure it is cleared
+                RuntimeCache.ClearCacheItem(GetCacheTypeKey<TEntity>());
             }
             catch (Exception)
             {
                 //if an exception is thrown we need to remove the entry from cache, this is ONLY a work around because of the way
                 // that we cache entities: http://issues.umbraco.org/issue/U4-4259
-                _cache.Delete(typeof(TEntity), entity);
+                RuntimeCache.ClearCacheItem(GetCacheIdKey<TEntity>(entity.Id));
+                //If there's a GetAll zero count cache, ensure it is cleared
+                RuntimeCache.ClearCacheItem(GetCacheTypeKey<TEntity>());
                 throw;
             }
 
@@ -284,7 +341,9 @@ namespace Umbraco.Core.Persistence.Repositories
         public virtual void PersistDeletedItem(IEntity entity)
         {
             PersistDeletedItem((TEntity)entity);
-            _cache.Delete(typeof(TEntity), entity);
+            RuntimeCache.ClearCacheItem(GetCacheIdKey<TEntity>(entity.Id));
+            //If there's a GetAll zero count cache, ensure it is cleared
+            RuntimeCache.ClearCacheItem(GetCacheTypeKey<TEntity>());
         }
 
         #endregion
@@ -296,30 +355,6 @@ namespace Umbraco.Core.Persistence.Repositories
         protected abstract void PersistDeletedItem(TEntity item);
 
         #endregion
-
-        /// <summary>
-        /// Internal method that handles the convertion of an object Id
-        /// to an Integer and then a Guid Id.
-        /// </summary>
-        /// <remarks>In the future it should be possible to change this method
-        /// so it converts from object to guid if/when we decide to go from
-        /// int to guid based ids.</remarks>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        protected virtual Guid ConvertIdToGuid(TId id)
-        {
-            int i = 0;
-            if (int.TryParse(id.ToString(), out i))
-            {
-                return i.ToGuid();
-            }
-            return ConvertStringIdToGuid(id.ToString());
-        }
-
-        protected virtual Guid ConvertStringIdToGuid(string id)
-        {
-            return id.EncodeAsGuid();
-        }
 
         /// <summary>
         /// Dispose disposable properties

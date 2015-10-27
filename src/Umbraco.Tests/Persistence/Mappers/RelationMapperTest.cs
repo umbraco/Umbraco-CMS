@@ -11,7 +11,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_Id_Property()
         {
             // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             // Act
             string column = new RelationMapper().Map("Id");
@@ -24,7 +24,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_ChildId_Property()
         {
             // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             // Act
             string column = new RelationMapper().Map("ChildId");
@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_Datetime_Property()
         {
             // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             // Act
             string column = new RelationMapper().Map("CreateDate");
@@ -50,7 +50,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_Comment_Property()
         {
             // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             // Act
             string column = new RelationMapper().Map("Comment");
@@ -63,7 +63,7 @@ namespace Umbraco.Tests.Persistence.Mappers
         public void Can_Map_RelationType_Property()
         {
             // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
+            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             // Act
             string column = new RelationMapper().Map("RelationTypeId");

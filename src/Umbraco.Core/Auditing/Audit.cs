@@ -1,13 +1,17 @@
-﻿namespace Umbraco.Core.Auditing
+﻿using System;
+using System.ComponentModel;
+
+namespace Umbraco.Core.Auditing
 {
-	/// <summary>
-	/// Public method to create new audit trail
-	/// </summary>
+    [Obsolete("Use Umbraco.Core.Services.IAuditService instead")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class Audit
     {
-         public static void Add(AuditTypes type, string comment, int userId, int objectId)
+        public static void Add(Umbraco.Core.Auditing.AuditTypes type, string comment, int userId, int objectId)
          {
-             AuditTrail.Current.AddEntry(type, comment, userId, objectId);
+             ApplicationContext.Current.Services.AuditService.Add(
+                 Enum<Umbraco.Core.Models.AuditType>.Parse(type.ToString()), 
+                 comment, userId, objectId);
          }
     }
 }

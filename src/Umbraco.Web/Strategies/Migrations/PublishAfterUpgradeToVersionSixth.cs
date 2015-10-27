@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
@@ -14,19 +15,9 @@ namespace Umbraco.Web.Strategies.Migrations
     /// This event ensures that upgrades from (configured) versions lower then 6.0.0
     /// have their publish state updated after the database schema has been migrated.
     /// </summary>
-    public class PublishAfterUpgradeToVersionSixth : IApplicationStartupHandler
+    public class PublishAfterUpgradeToVersionSixth : MigrationStartupHander
     {
-        public PublishAfterUpgradeToVersionSixth()
-        {
-            MigrationRunner.Migrated += MigrationRunner_Migrated;
-        }
-
-        public void Unsubscribe()
-        {
-            MigrationRunner.Migrated -= MigrationRunner_Migrated;
-        }
-
-        void MigrationRunner_Migrated(MigrationRunner sender, Core.Events.MigrationEventArgs e)
+        protected override void AfterMigration(MigrationRunner sender, MigrationEventArgs e)
         {
             var target = new Version(6, 0, 0);
             if (e.ConfiguredVersion < target)
@@ -42,8 +33,6 @@ namespace Umbraco.Web.Strategies.Migrations
                     .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
                     .Where<NodeDto>(x => x.NodeObjectType == new Guid(Constants.ObjectTypes.Document))
                     .Where<NodeDto>(x => x.Path.StartsWith("-1"));
-
-                
 
                 var dtos = e.MigrationContext.Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto>(sql);
                 var toUpdate = new List<DocumentDto>();
@@ -80,6 +69,7 @@ namespace Umbraco.Web.Strategies.Migrations
                     transaction.Complete();
                 }
             }
-        }
+        }      
+        
     }
 }

@@ -15,8 +15,7 @@ namespace umbraco.MacroEngines
             Func<TSource, bool> selectorFunction,
             Func<TSource, IEnumerable<TSource>> getChildrenFunction)
         {
-        	//return Umbraco.Core.Dynamics.ExtensionMethods.Map<TSource>(source, selectorFunction, getChildrenFunction);
-		    return source.FlattenList(getChildrenFunction).Where(selectorFunction);
+		    return source.SelectRecursive(getChildrenFunction).Where(selectorFunction);
         }
 		
         public static DynamicNodeList Random(this DynamicNodeList all, int Min, int Max)

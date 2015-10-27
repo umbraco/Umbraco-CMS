@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Web.Routing;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.ObjectResolution;
@@ -31,7 +32,7 @@ namespace Umbraco.Tests.PublishedContent
 
             // this is so the model factory looks into the test assembly
             _pluginManager = PluginManager.Current;
-            PluginManager.Current = new PluginManager(false)
+            PluginManager.Current = new PluginManager(new ActivatorServiceProvider(), new NullCacheProvider(), ProfilingLogger, false)
                 {
                     AssembliesToScan = _pluginManager.AssembliesToScan
                         .Union(new[] { typeof (PublishedContentMoreTests).Assembly})
@@ -43,7 +44,7 @@ namespace Umbraco.Tests.PublishedContent
         protected override void FreezeResolution()
         {
             PropertyValueConvertersResolver.Current =
-                new PropertyValueConvertersResolver();
+                new PropertyValueConvertersResolver(new ActivatorServiceProvider(), Logger);
             var types = PluginManager.Current.ResolveTypes<PublishedContentModel>();
             PublishedContentModelFactoryResolver.Current =
                 new PublishedContentModelFactoryResolver(new PublishedContentModelFactory(types));
@@ -138,7 +139,6 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [Test]
-        [Ignore("Fails as long as PublishedContentModel is internal.")] // fixme
         public void OfType1()
         {
             var content = UmbracoContext.Current.ContentCache.GetAtRoot()
@@ -154,7 +154,6 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [Test]
-        [Ignore("Fails as long as PublishedContentModel is internal.")] // fixme
         public void OfType2()
         {
             var content = UmbracoContext.Current.ContentCache.GetAtRoot()
@@ -168,7 +167,6 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [Test]
-        [Ignore("Fails as long as PublishedContentModel is internal.")] // fixme
         public void OfType()
         {
             var content = UmbracoContext.Current.ContentCache.GetAtRoot()
@@ -195,7 +193,6 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [Test]
-        [Ignore("Fails as long as PublishedContentModel is internal.")] // fixme
         public void Issue()
         {
             var content = UmbracoContext.Current.ContentCache.GetAtRoot()
@@ -215,6 +212,16 @@ namespace Umbraco.Tests.PublishedContent
                 .OfType<ContentType2>()
                 .First();
             Assert.AreEqual(1234, content3.Prop1);
+        }
+
+        [Test]
+        public void PublishedContentQueryTypedContentList()
+        {
+            var query = new PublishedContentQuery(UmbracoContext.Current.ContentCache, UmbracoContext.Current.MediaCache);
+            var result = query.TypedContent(new[] { 1, 2, 4 }).ToArray();
+            Assert.AreEqual(2, result.Length);
+            Assert.AreEqual(1, result[0].Id);
+            Assert.AreEqual(2, result[1].Id);
         }
 
         static SolidPublishedCaches CreatePublishedContent()

@@ -1,27 +1,28 @@
 using System;
+using System.Linq;
+using System.Reflection;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Serialization;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Models
 {
     [TestFixture]
-    public class TemplateTests
+    public class TemplateTests : BaseUmbracoConfigurationTest
     {
         [Test]
         public void Can_Deep_Clone()
         {
-            var item = new Template("-1,2,3", "Test", "test")
+            var item = new Template("Test", "test")
             {
                 Id = 3,
                 CreateDate = DateTime.Now,                
                 Key = Guid.NewGuid(),
                 UpdateDate = DateTime.Now,
                 Content = "blah",
-                CreatorId = 66,
-                Level = 55,
-                ParentId = 2,
-                SortOrder = 99,
+                Path = "-1,3",
+                IsMasterTemplate = true,                
                 MasterTemplateAlias = "master",
                 MasterTemplateId = new Lazy<int>(() => 88)                
             };
@@ -30,22 +31,27 @@ namespace Umbraco.Tests.Models
 
             Assert.AreNotSame(clone, item);
             Assert.AreEqual(clone, item);
+            Assert.AreEqual(clone.Path, item.Path);
+            Assert.AreEqual(clone.IsMasterTemplate, item.IsMasterTemplate);
             Assert.AreEqual(clone.CreateDate, item.CreateDate);
             Assert.AreEqual(clone.Alias, item.Alias);
-            Assert.AreEqual(clone.CreatorId, item.CreatorId);
             Assert.AreEqual(clone.Id, item.Id);
             Assert.AreEqual(clone.Key, item.Key);
-            Assert.AreEqual(clone.Level, item.Level);
             Assert.AreEqual(clone.MasterTemplateAlias, item.MasterTemplateAlias);
             Assert.AreEqual(clone.MasterTemplateId.Value, item.MasterTemplateId.Value);
             Assert.AreEqual(clone.Name, item.Name);
-            Assert.AreEqual(clone.ParentId, item.ParentId);
-            Assert.AreEqual(clone.SortOrder, item.SortOrder);
             Assert.AreEqual(clone.UpdateDate, item.UpdateDate);
 
-            //This double verifies by reflection
+            // clone.Content should be null but getting it would lazy-load
+            var type = clone.GetType();
+            var contentField = type.BaseType.GetField("_content", BindingFlags.Instance | BindingFlags.NonPublic);
+            var value = contentField.GetValue(clone);
+            Assert.IsNull(value);
+
+            // this double verifies by reflection
+            // need to exclude content else it would lazy-load
             var allProps = clone.GetType().GetProperties();
-            foreach (var propertyInfo in allProps)
+            foreach (var propertyInfo in allProps.Where(x => x.Name != "Content"))
             {
                 Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(item, null));
             }
@@ -56,17 +62,13 @@ namespace Umbraco.Tests.Models
         {
             var ss = new SerializationService(new JsonNetSerializer());
 
-            var item = new Template("-1,2,3", "Test", "test")
+            var item = new Template("Test", "test")
             {
                 Id = 3,
                 CreateDate = DateTime.Now,
                 Key = Guid.NewGuid(),
                 UpdateDate = DateTime.Now,
                 Content = "blah",
-                CreatorId = 66,
-                Level = 55,
-                ParentId = 2,
-                SortOrder = 99,
                 MasterTemplateAlias = "master",
                 MasterTemplateId = new Lazy<int>(() => 88)
             };

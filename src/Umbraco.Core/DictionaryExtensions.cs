@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
-using System.Web.Mvc;
 using System.Web;
 
 namespace Umbraco.Core
@@ -135,20 +134,6 @@ namespace Umbraco.Core
 			return n;
 		}
 
-		/// <summary>
-		/// Converts a dictionary to a FormCollection
-		/// </summary>
-		/// <param name="d"></param>
-		/// <returns></returns>
-		public static FormCollection ToFormCollection(this IDictionary<string, object> d)
-		{
-			var n = new FormCollection();
-			foreach (var i in d)
-			{
-				n.Add(i.Key, Convert.ToString(i.Value));
-			}
-			return n;
-		}
 
 	    /// <summary>
 	    /// Merges all key/values from the sources dictionaries into the destination dictionary

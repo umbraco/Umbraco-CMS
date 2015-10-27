@@ -9,6 +9,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Profiling;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
 using umbraco.BusinessLogic;
@@ -28,8 +29,6 @@ namespace Umbraco.Web.UI.Pages
         
         private ClientTools _clientTools;
         
-        
-
 
         //We won't expose this... people should be using the DatabaseContext for custom queries if they need them.
 
@@ -41,6 +40,25 @@ namespace Umbraco.Web.UI.Pages
         //{
         //    get { return global::umbraco.BusinessLogic.Application.SqlHelper; }
         //}
+
+        /// <summary>
+        /// Returns an ILogger
+        /// </summary>
+        public ILogger Logger
+        {
+            get { return ProfilingLogger.Logger; }
+        }
+
+        /// <summary>
+        /// Returns a ProfilingLogger
+        /// </summary>
+        public ProfilingLogger ProfilingLogger
+        {
+            get { return _logger ?? (_logger = new ProfilingLogger(LoggerResolver.Current.Logger, ProfilerResolver.Current.Profiler)); }
+        }
+
+        private ProfilingLogger _logger;
+        
 
 	    private UrlHelper _url;
 		/// <summary>

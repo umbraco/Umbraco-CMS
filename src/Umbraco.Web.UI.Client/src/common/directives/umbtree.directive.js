@@ -205,8 +205,8 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                     function doLoad(tree) {
                         var childrenAndSelf = [tree].concat(tree.children);
                         scope.activeTree = _.find(childrenAndSelf, function (node) {
-                            if(node && node.metaData){
-                                return node.metaData.treeAlias === treeAlias;
+                            if(node && node.metaData && node.metaData.treeAlias) {
+                                return node.metaData.treeAlias.toUpperCase() === treeAlias.toUpperCase();
                             }
                             return false;
                         });

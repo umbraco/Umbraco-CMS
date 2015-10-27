@@ -2,61 +2,70 @@
 using System.Globalization;
 using System.Reflection;
 using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Sync;
 
 namespace Umbraco.Core.Models
 {
-    internal class ServerRegistration : Entity, IServerAddress, IAggregateRoot
+    /// <summary>
+    /// Represents a registered server in a multiple-servers environment.
+    /// </summary>
+    public class ServerRegistration : Entity, IServerRegistration
     {
         private string _serverAddress;
-        private string _computerName;
+        private string _serverIdentity;
         private bool _isActive;
+        private bool _isMaster;
 
         private static readonly PropertyInfo ServerAddressSelector = ExpressionHelper.GetPropertyInfo<ServerRegistration, string>(x => x.ServerAddress);
-        private static readonly PropertyInfo ComputerNameSelector = ExpressionHelper.GetPropertyInfo<ServerRegistration, string>(x => x.ComputerName);
+        private static readonly PropertyInfo ServerIdentitySelector = ExpressionHelper.GetPropertyInfo<ServerRegistration, string>(x => x.ServerIdentity);
         private static readonly PropertyInfo IsActiveSelector = ExpressionHelper.GetPropertyInfo<ServerRegistration, bool>(x => x.IsActive);
-
-        public ServerRegistration()
-        {
-
-        }
+        private static readonly PropertyInfo IsMasterSelector = ExpressionHelper.GetPropertyInfo<ServerRegistration, bool>(x => x.IsMaster);
 
         /// <summary>
-        /// Creates an item with pre-filled properties
+        /// Initialiazes a new instance of the <see cref="ServerRegistration"/> class.
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="serverAddress"></param>
-        /// <param name="computerName"></param>
-        /// <param name="createDate"></param>
-        /// <param name="updateDate"></param>
-        /// <param name="isActive"></param>
-        public ServerRegistration(int id, string serverAddress, string computerName, DateTime createDate, DateTime updateDate, bool isActive)
+        public ServerRegistration()
+        { }
+
+        /// <summary>
+        /// Initialiazes a new instance of the <see cref="ServerRegistration"/> class.
+        /// </summary>
+        /// <param name="id">The unique id of the server registration.</param>
+        /// <param name="serverAddress">The server url.</param>
+        /// <param name="serverIdentity">The unique server identity.</param>
+        /// <param name="registered">The date and time the registration was created.</param>
+        /// <param name="accessed">The date and time the registration was last accessed.</param>
+        /// <param name="isActive">A value indicating whether the registration is active.</param>
+        /// <param name="isMaster">A value indicating whether the registration is master.</param>
+        public ServerRegistration(int id, string serverAddress, string serverIdentity, DateTime registered, DateTime accessed, bool isActive, bool isMaster)
         {
-            UpdateDate = updateDate;
-            CreateDate = createDate;
-            Key = Id.ToString(CultureInfo.InvariantCulture).EncodeAsGuid();
+            UpdateDate = accessed;
+            CreateDate = registered;
+            Key = id.ToString(CultureInfo.InvariantCulture).EncodeAsGuid();
             Id = id;
             ServerAddress = serverAddress;
-            ComputerName = computerName;
+            ServerIdentity = serverIdentity;
             IsActive = isActive;
+            IsMaster = isMaster;
         }
 
         /// <summary>
-        /// Creates a new instance for persisting a new item
+        /// Initialiazes a new instance of the <see cref="ServerRegistration"/> class.
         /// </summary>
-        /// <param name="serverAddress"></param>
-        /// <param name="computerName"></param>
-        /// <param name="createDate"></param>
-        public ServerRegistration(string serverAddress, string computerName, DateTime createDate)
+        /// <param name="serverAddress">The server url.</param>
+        /// <param name="serverIdentity">The unique server identity.</param>
+        /// <param name="registered">The date and time the registration was created.</param>
+        public ServerRegistration(string serverAddress, string serverIdentity, DateTime registered)
         {
-            CreateDate = createDate;
-            UpdateDate = createDate;
+            CreateDate = registered;
+            UpdateDate = registered;
             Key = 0.ToString(CultureInfo.InvariantCulture).EncodeAsGuid();
             ServerAddress = serverAddress;
-            ComputerName = computerName;
+            ServerIdentity = serverIdentity;
         }
 
+        /// <summary>
+        /// Gets or sets the server url.
+        /// </summary>
         public string ServerAddress
         {
             get { return _serverAddress; }
@@ -70,19 +79,25 @@ namespace Umbraco.Core.Models
             }
         }
 
-        public string ComputerName
+        /// <summary>
+        /// Gets or sets the server unique identity.
+        /// </summary>
+        public string ServerIdentity
         {
-            get { return _computerName; }
+            get { return _serverIdentity; }
             set
             {
                 SetPropertyValueAndDetectChanges(o =>
                 {
-                    _computerName = value;
-                    return _computerName;
-                }, _computerName, ComputerNameSelector);
+                    _serverIdentity = value;
+                    return _serverIdentity;
+                }, _serverIdentity, ServerIdentitySelector);
             }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the server is active.
+        /// </summary>
         public bool IsActive
         {
             get { return _isActive; }
@@ -96,9 +111,39 @@ namespace Umbraco.Core.Models
             }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the server is master.
+        /// </summary>
+        public bool IsMaster
+        {
+            get { return _isMaster; }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _isMaster = value;
+                    return _isMaster;
+                }, _isMaster, IsMasterSelector);
+            }
+        }
+
+        /// <summary>
+        /// Gets the date and time the registration was created.
+        /// </summary>
+        public DateTime Registered { get { return CreateDate; } set { CreateDate = value; }}
+
+        /// <summary>
+        /// Gets the date and time the registration was last accessed.
+        /// </summary>
+        public DateTime Accessed { get { return UpdateDate; } set { UpdateDate = value; }}
+
+        /// <summary>
+        /// Converts the value of this instance to its equivalent string representation.
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
-            return "(" + ServerAddress + ", " + ComputerName + ", IsActive = " + IsActive + ")";
+            return string.Format("{{\"{0}\", \"{1}\", {2}active, {3}master}}", ServerAddress, ServerIdentity, IsActive ? "" : "!", IsMaster ? "" : "!");
         }
     }
 }

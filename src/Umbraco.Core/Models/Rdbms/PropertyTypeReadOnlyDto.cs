@@ -26,9 +26,6 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("Name")]
         public string Name { get; set; }
 
-        [Column("helpText")]
-        public string HelpText { get; set; }
-
         [Column("PropertyTypeSortOrder")]
         public int SortOrder { get; set; }
 

@@ -1,6 +1,7 @@
 using System.Data;
 using System.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -10,10 +11,14 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwoZero
     [Migration("7.2.0", 1, GlobalSettings.UmbracoMigrationName)]
     public class AddMissingForeignKeyForContentType : MigrationBase
     {
+        public AddMissingForeignKeyForContentType(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
+        {
+        }
+
         public override void Up()
         {
 
-            var constraints = SqlSyntaxContext.SqlSyntaxProvider.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
+            var constraints = SqlSyntax.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
 
             //if the FK doesn't exist
             if (constraints.Any(x => x.Item1.InvariantEquals("cmsContent") && x.Item2.InvariantEquals("contentType") && x.Item3.InvariantEquals("FK_cmsContent_cmsContentType_nodeId")) == false)

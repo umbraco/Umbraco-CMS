@@ -126,13 +126,13 @@ order by T.name, I.name");
             switch (systemMethod)
             {
                 case SystemMethods.NewGuid:
-                    return "NEWID()";
-                case SystemMethods.NewSequentialId:
-                    return "NEWSEQUENTIALID()";
+                    return "NEWID()";                
                 case SystemMethods.CurrentDateTime:
                     return "GETDATE()";
-                case SystemMethods.CurrentUTCDateTime:
-                    return "GETUTCDATE()";
+                //case SystemMethods.NewSequentialId:
+                //    return "NEWSEQUENTIALID()";
+                //case SystemMethods.CurrentUTCDateTime:
+                //    return "GETUTCDATE()";
             }
 
             return null;

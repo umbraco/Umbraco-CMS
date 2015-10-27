@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Linq;
+using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using umbraco.interfaces;
 
@@ -18,13 +19,14 @@ namespace Umbraco.Core.Macros
 	/// </remarks>
 	internal sealed class MacroFieldEditorsResolver : LazyManyObjectsResolverBase<MacroFieldEditorsResolver, IMacroGuiRendering>
 	{
-
-		/// <summary>
-		/// Constructor
-		/// </summary>
-		/// <param name="macroEditors"></param>		
-		internal MacroFieldEditorsResolver(Func<IEnumerable<Type>> macroEditors)
-			: base(macroEditors, ObjectLifetimeScope.Transient)
+	    /// <summary>
+	    /// Constructor
+	    /// </summary>
+	    /// <param name="serviceProvider"></param>
+	    /// <param name="logger"></param>
+	    /// <param name="macroEditors"></param>		
+	    internal MacroFieldEditorsResolver(IServiceProvider serviceProvider, ILogger logger, Func<IEnumerable<Type>> macroEditors)
+            : base(serviceProvider, logger, macroEditors, ObjectLifetimeScope.Transient)
 		{ }
 
 		/// <summary>
@@ -70,10 +72,10 @@ namespace Umbraco.Core.Macros
 		internal Control GetMacroRenderControlByType(PersistableMacroProperty prop, string uniqueId)
 		{
 			var m = MacroControlTypes.FindLast(macroGuiCcontrol => macroGuiCcontrol.ToString() == string.Format("{0}.{1}", prop.AssemblyName, prop.TypeName));
-			var instance = PluginManager.Current.CreateInstance<IMacroGuiRendering>(m);
+			var instance = ServiceProvider.GetService(m) as IMacroGuiRendering;
 			if (instance != null)
 			{
-				if (!string.IsNullOrEmpty(prop.Value))
+				if (string.IsNullOrEmpty(prop.Value) == false)
 				{
                     instance.Value = HttpUtility.HtmlDecode(prop.Value);
 				}

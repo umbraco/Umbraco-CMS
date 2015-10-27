@@ -554,6 +554,7 @@
     <key alias="password">Fyll i ditt lösenord</key>
     <key alias="search">Skriv för att söka...</key>
     <key alias="username">Fyll i ditt lösenord</key>
+    <key alias="enterTags">Skriv för att lägga till taggar (och tryck enter efter varje tagg)...</key>
   </area>
   <area alias="publicAccess">
     <key alias="paAdvanced">Rollbaserat lösenordsskydd</key>
@@ -587,16 +588,16 @@
     <key alias="publishHelp"><![CDATA[Klicka på <em>ok</em> för att publicera <strong>%0%</strong>. Därmed blir innehållet publikt.<br/><br /> Du kan publicera denna sida och alla dess undersidor genom att kryssa i <em>publicera alla undersidor</em>. ]]></key>
   </area>
   <area alias="relatedlinks">
-    <key alias="addExternal">Lägg till extern länk</key>
-    <key alias="addInternal">Lägg till intern länk</key>
-    <key alias="addlink">Lägg till</key>
+    <key alias="enterExternal">ange en extern länk</key>
+    <key alias="chooseInternal">ange en intern sida</key>
     <key alias="caption">Rubrik</key>
-    <key alias="internalPage">Intern sida</key>
-    <key alias="linkurl">URL</key>
-    <key alias="modeDown">Flytta ner</key>
-    <key alias="modeUp">Flytta upp</key>
+    <key alias="link">Länk</key>
     <key alias="newWindow">Öppna i nytt fönster</key>
-    <key alias="removeLink">Ta bort länk</key>
+    <key alias="captionPlaceholder">Ange visningstext</key>
+    <key alias="externalLinkPlaceholder">Ange adress</key>
+  </area>
+  <area alias="imagecropper">
+    <key alias="reset">Återställ</key>
   </area>
   <area alias="rollback">
     <key alias="currentVersion">Nuvarande version</key>
@@ -644,6 +645,8 @@
     <key alias="tab">Flik</key>
     <key alias="tabname">Fliknamn</key>
     <key alias="tabs">Flikar</key>
+    <key alias="masterDocumentType">Huvuddokumenttyp</key>
+    <key alias="createMatchingTemplate">Skapa matchande mall</key>
   </area>
   <area alias="sort">
     <key alias="sortDone">Sortering klar</key>
@@ -885,6 +888,7 @@
     <key alias="userTypes">Användartyper</key>
     <key alias="writer">Skribent</key>
     <key alias="yourHistory">Din nuvarande historik</key>
+    <key alias="translator">Översättare</key>
     <key alias="yourProfile">Din profil</key>
   </area>
 </language>

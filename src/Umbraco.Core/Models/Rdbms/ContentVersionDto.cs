@@ -1,6 +1,7 @@
 ﻿using System;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Models.Rdbms
 {
@@ -23,13 +24,8 @@ namespace Umbraco.Core.Models.Rdbms
         public Guid VersionId { get; set; }
 
         [Column("VersionDate")]
-        [Constraint(Default = "getdate()")]
+        [Constraint(Default = SystemMethods.CurrentDateTime)]
         public DateTime VersionDate { get; set; }
-
-        [Column("LanguageLocale")]
-        [Length(10)]
-        [NullSetting(NullSetting = NullSettings.Null)]
-        public string Language { get; set; }
 
         [ResultColumn]
         public ContentDto ContentDto { get; set; }

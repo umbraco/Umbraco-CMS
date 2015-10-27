@@ -42,5 +42,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "allowedSections")]
         public IEnumerable<string> AllowedSections { get; set; }
+
+        
     }
 }

@@ -114,9 +114,9 @@
       <Project>{651E1350-91B6-44B7-BD60-7207006D7003}</Project>
       <Name>Umbraco.Web</Name>
     </ProjectReference>
-    <Reference Include="ClientDependency.Core, Version=1.8.2.1, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\ClientDependency.1.8.3.1\lib\net45\ClientDependency.Core.dll</HintPath>
+    <Reference Include="ClientDependency.Core, Version=1.8.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ClientDependency.1.8.4\lib\net45\ClientDependency.Core.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
@@ -437,7 +437,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>MediaChooserScripts.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="MultiNodeTreePicker\MNTPResources.resx" />
+    <EmbeddedResource Include="MultiNodeTreePicker\MNTPResources.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="textfield\textFieldDataEditor.resx">
       <DependentUpon>textFieldDataEditor.cs</DependentUpon>
       <SubType>Designer</SubType>

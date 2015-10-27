@@ -6,7 +6,7 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class PropertyGroupFactory : IEntityFactory<IEnumerable<PropertyGroup>, IEnumerable<PropertyTypeGroupDto>>
+    internal class PropertyGroupFactory 
     {
         private readonly int _id;
         private readonly DateTime _createDate;
@@ -67,8 +67,8 @@ namespace Umbraco.Core.Persistence.Factories
                     propertyType.DataTypeDefinitionId = typeDto.DataTypeId;
                     propertyType.Description = typeDto.Description;
                     propertyType.Id = typeDto.Id;
+                    propertyType.Key = typeDto.UniqueId;
                     propertyType.Name = typeDto.Name;
-                    propertyType.HelpText = typeDto.HelpText;
                     propertyType.Mandatory = typeDto.Mandatory;
                     propertyType.SortOrder = typeDto.SortOrder;
                     propertyType.ValidationRegExp = typeDto.ValidationRegExp;
@@ -120,17 +120,21 @@ namespace Umbraco.Core.Persistence.Factories
         internal PropertyTypeDto BuildPropertyTypeDto(int tabId, PropertyType propertyType)
         {
             var propertyTypeDto = new PropertyTypeDto
-                                      {
-                                          Alias = propertyType.Alias,
-                                          ContentTypeId = _id,
-                                          DataTypeId = propertyType.DataTypeDefinitionId,
-                                          Description = propertyType.Description,
-                                          HelpText = propertyType.HelpText,
-                                          Mandatory = propertyType.Mandatory,
-                                          Name = propertyType.Name,
-                                          SortOrder = propertyType.SortOrder,
-                                          ValidationRegExp = propertyType.ValidationRegExp
-                                      };
+            {
+                Alias = propertyType.Alias,
+                ContentTypeId = _id,
+                DataTypeId = propertyType.DataTypeDefinitionId,
+                Description = propertyType.Description,
+                Mandatory = propertyType.Mandatory,
+                Name = propertyType.Name,
+                SortOrder = propertyType.SortOrder,
+                ValidationRegExp = propertyType.ValidationRegExp,
+                UniqueId = propertyType.HasIdentity
+                    ? propertyType.Key == Guid.Empty
+                        ? Guid.NewGuid()
+                        : propertyType.Key
+                    : Guid.NewGuid()
+            };
 
             if (tabId != default(int))
             {

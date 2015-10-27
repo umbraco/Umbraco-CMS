@@ -15,7 +15,7 @@ namespace Umbraco.Tests.UmbracoExamine
         {
             UmbracoExamineSearcher.DisableInitializationCheck = true;
             BaseUmbracoIndexer.DisableInitializationCheck = true;
-            ShortStringHelperResolver.Current = new ShortStringHelperResolver(new DefaultShortStringHelper());
+            ShortStringHelperResolver.Current = new ShortStringHelperResolver(new DefaultShortStringHelper(SettingsForTests.GetDefault()));
 
             Resolution.Freeze();
         }

@@ -39,6 +39,9 @@ namespace Umbraco.Web.PropertyEditors
         /// <returns></returns>
         public override string ConvertDbToString(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
         {
+            if (property.Value == null)
+                return null;
+
             var idAttempt = property.Value.TryConvertTo<int>();
             if (idAttempt.Success)
             {

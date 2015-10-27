@@ -1,17 +1,24 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class TemplateFactory : IEntityFactory<Template, TemplateDto>
+    internal class TemplateFactory
     {
         private readonly int _primaryKey;
         private readonly Guid _nodeObjectTypeId;
 
         public TemplateFactory()
-        {}
+        {
+            
+        }
 
         public TemplateFactory(Guid nodeObjectTypeId)
         {
@@ -25,23 +32,21 @@ namespace Umbraco.Core.Persistence.Factories
         }
 
         #region Implementation of IEntityFactory<ITemplate,TemplateDto>
-        
-        public Template BuildEntity(TemplateDto dto)
+
+        public Template BuildEntity(TemplateDto dto, IEnumerable<IUmbracoEntity> childDefinitions, Func<File, string> getFileContent)
         {
-            var template = new Template(string.Empty, dto.NodeDto.Text, dto.Alias)
+            var template = new Template(dto.NodeDto.Text, dto.Alias, getFileContent)
                                {
                                    CreateDate = dto.NodeDto.CreateDate,
                                    Id = dto.NodeId,
-                                   Key = dto.NodeDto.UniqueId.Value,
-                                   CreatorId = dto.NodeDto.UserId.Value,
-                                   Level = dto.NodeDto.Level,
-                                   ParentId = dto.NodeDto.ParentId,
-                                   SortOrder = dto.NodeDto.SortOrder,
+                                   Key = dto.NodeDto.UniqueId,                                   
                                    Path = dto.NodeDto.Path
                                };
-            
-            if(dto.Master.HasValue)
-                template.MasterTemplateId = new Lazy<int>(() => dto.Master.Value);
+
+            template.IsMasterTemplate = childDefinitions.Any(x => x.ParentId == dto.NodeId);
+
+            if(dto.NodeDto.ParentId > 0)
+                template.MasterTemplateId = new Lazy<int>(() => dto.NodeDto.ParentId);
 
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946
@@ -54,13 +59,13 @@ namespace Umbraco.Core.Persistence.Factories
             var dto = new TemplateDto
                        {
                            Alias = entity.Alias,
-                           Design = entity.Content,
+                           Design = entity.Content ?? string.Empty,
                            NodeDto = BuildNodeDto(entity)
                        };
 
-            if (entity.MasterTemplateId != null && entity.MasterTemplateId.Value != default(int))
+            if (entity.MasterTemplateId != null && entity.MasterTemplateId.Value > 0)
             {
-                dto.Master = entity.MasterTemplateId.Value;
+                dto.NodeDto.ParentId = entity.MasterTemplateId.Value;
             }
 
             if (entity.HasIdentity)
@@ -80,15 +85,13 @@ namespace Umbraco.Core.Persistence.Factories
                               {
                                   CreateDate = entity.CreateDate,
                                   NodeId = entity.Id,
-                                  Level = short.Parse(entity.Level.ToString(CultureInfo.InvariantCulture)),
+                                  Level = 1,
                                   NodeObjectType = _nodeObjectTypeId,
-                                  ParentId = entity.ParentId,
+                                  ParentId = entity.MasterTemplateId.Value,
                                   Path = entity.Path,
-                                  SortOrder = entity.SortOrder,
                                   Text = entity.Name,
                                   Trashed = false,
-                                  UniqueId = entity.Key,
-                                  UserId = entity.CreatorId
+                                  UniqueId = entity.Key
                               };
 
             return nodeDto;

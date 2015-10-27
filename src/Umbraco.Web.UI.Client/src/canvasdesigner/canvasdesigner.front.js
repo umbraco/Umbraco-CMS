@@ -19,7 +19,7 @@ var refreshLayout = function (parameters) {
 var webFontScriptLoaded = false;
 var getFont = function (font) {
     if (!webFontScriptLoaded) {
-        $.getScript('http://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js')
+        $.getScript('https://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js')
         .done(function () {
             webFontScriptLoaded = true;
             // Recursively call once webfont script is available.

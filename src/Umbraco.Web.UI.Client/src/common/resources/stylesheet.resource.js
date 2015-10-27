@@ -36,36 +36,7 @@ function stylesheetResource($q, $http, umbRequestHelper) {
                        "stylesheetApiBaseUrl",
                        "GetAll")),
                'Failed to retrieve stylesheets ');
-        },
-
-        /**
-         * @ngdoc method
-         * @name umbraco.resources.stylesheetResource#getRules
-         * @methodOf umbraco.resources.stylesheetResource
-         *
-         * @description
-         * Returns all defined child rules for a stylesheet with a given ID
-         *
-         * ##usage
-         * <pre>
-         * stylesheetResource.getRules(2345)
-         *    .then(function(rules) {
-         *        alert('its here!');
-         *    });
-         * </pre> 
-         * 
-         * @returns {Promise} resourcePromise object containing the rules.
-         *
-         */
-        getRules: function (id) {            
-            return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "stylesheetApiBaseUrl",
-                       "GetRules",
-                       [{ id: id }])),
-               'Failed to retrieve stylesheets ');
-        },
+        },       
 
         /**
          * @ngdoc method

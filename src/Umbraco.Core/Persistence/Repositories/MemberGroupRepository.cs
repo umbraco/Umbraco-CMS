@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Events;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence.Caching;
+
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -21,15 +22,8 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly CacheHelper _cacheHelper;
 
-        public MemberGroupRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper) 
-            : base(work)
-        {
-            if (cacheHelper == null) throw new ArgumentNullException("cacheHelper");
-            _cacheHelper = cacheHelper;
-        }
-
-        public MemberGroupRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, CacheHelper cacheHelper)
-            : base(work, cache)
+        public MemberGroupRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, CacheHelper cacheHelper)
+            : base(work, cache, logger, sqlSyntax)
         {
             if (cacheHelper == null) throw new ArgumentNullException("cacheHelper");
             _cacheHelper = cacheHelper;
@@ -289,7 +283,7 @@ namespace Umbraco.Core.Persistence.Repositories
                .Select("*")
                .From<NodeDto>()
                .Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId)
-               .Where("umbracoNode." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + " in (@names)", new { names = roleNames });
+               .Where("umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + " in (@names)", new { names = roleNames });
             var existingRoles = Database.Fetch<NodeDto>(existingSql).Select(x => x.Text);
             var missingRoles = roleNames.Except(existingRoles);
             var missingGroups = missingRoles.Select(x => new MemberGroup {Name = x}).ToArray();
@@ -312,9 +306,9 @@ namespace Umbraco.Core.Persistence.Repositories
             var assignedSql = new Sql();
             assignedSql.Select(string.Format(
                     "{0},{1},{2}",
-                    SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text"),
-                    SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("Member"),
-                    SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("MemberGroup")))
+                    SqlSyntax.GetQuotedColumnName("text"),
+                    SqlSyntax.GetQuotedColumnName("Member"),
+                    SqlSyntax.GetQuotedColumnName("MemberGroup")))
                 .From<NodeDto>()
                 .InnerJoin<Member2MemberGroupDto>()
                 .On<NodeDto, Member2MemberGroupDto>(dto => dto.NodeId, dto => dto.MemberGroup)
@@ -356,7 +350,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     .Select("*")
                     .From<NodeDto>()
                     .Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId)
-                    .Where("umbracoNode." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + " in (@names)", new { names = roleNames });
+                    .Where("umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + " in (@names)", new { names = roleNames });
             var existingRolesIds = Database.Fetch<NodeDto>(existingSql).Select(x => x.NodeId).ToArray();
 
             Database.Execute("DELETE FROM cmsMember2MemberGroup WHERE Member IN (@memberIds) AND MemberGroup IN (@memberGroups)",

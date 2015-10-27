@@ -30,37 +30,80 @@
         doSubmit: function() {
             var self = this;
 
-            var fileName = this._opts.nameTxtBox.val();
-            var codeVal = this._opts.editorSourceElement.val();
+            var filename = this._opts.nameTxtBox.val();
+            var codeval = this._opts.editorSourceElement.val();
             //if CodeMirror is not defined, then the code editor is disabled.
             if (typeof(CodeMirror) != "undefined") {
-                codeVal = UmbEditor.GetCode();
+                codeval = UmbEditor.GetCode();
             }
-            umbraco.presentation.webservices.codeEditorSave.SaveCss(
-                fileName, self._opts.originalFileName, codeVal, self._opts.cssId,
-                function(t) { self.submitSucces(t); },
-                function(t) { self.submitFailure(t); });
 
-
+            this.save(
+                filename,
+                self._opts.originalFileName,
+                codeval);
         },
 
-        submitSucces: function(t) {
-            if (t != 'true') {
-                top.UmbSpeechBubble.ShowMessage('error', unescape(this._opts.text.cssErrorHeader), unescape(this._opts.text.cssErrorText));
+        save: function (filename, oldName, contents) {
+            var self = this;
+
+            $.post(self._opts.restServiceLocation + "SaveStylesheet",
+                    JSON.stringify({
+                        filename: filename,
+                        oldName: oldName,
+                        contents: contents
+                    }),
+                    function (e) {
+                        if (e.success) {
+                            self.submitSuccess(e);
+                        } else {
+                            self.submitFailure(e.message, e.header);
+                        }
+                    });
+        },
+
+        submitSuccess: function (args) {
+            var msg = args.message;
+            var header = args.header;
+            var path = this._opts.treeSyncPath;
+            var pathChanged = false;
+            if (args.path) {
+                if (path != args.path) {
+                    pathChanged = true;
+                }
+                path = args.path;
+            }
+            if (args.contents) {
+                UmbEditor.SetCode(args.contents);
+            }
+
+            UmbClientMgr.mainTree().setActiveTreeType("stylesheets");
+            if (pathChanged) {
+                // file is used in url so we need to redirect
+                var qs = window.location.search;
+                if (qs.startsWith("?")) qs = qs.substring("?".length);
+                var qp1 = qs.split("&");
+                var qp2 = [];
+                for (var i = 0; i < qp1.length; i++)
+                    if (!qp1[i].startsWith("id="))
+                        qp2.push(qp1[i]);
+
+                var location = window.location.pathname + "?" + qp2.join("&") + "&id=" + args.name;
+                UmbClientMgr.contentFrame(location);
+
+                // need to do it after we navigate otherwise the navigation waits until the message timeout is done
+                top.UmbSpeechBubble.ShowMessage("save", header, msg);
             }
             else {
-                top.UmbSpeechBubble.ShowMessage('save', unescape(this._opts.text.cssSavedHeader), unescape(this._opts.text.cssSavedText));
+                top.UmbSpeechBubble.ShowMessage("save", header, msg);
+                this._opts.lttPathElement.prop("href", args.url).html(args.url);
+                this._opts.originalFileName = args.name;
+                this._opts.treeSyncPath = args.path;
+                UmbClientMgr.mainTree().syncTree(path, true);
             }
-
-            UmbClientMgr.mainTree().setActiveTreeType('stylesheets');
-            UmbClientMgr.mainTree().syncTree("-1,init," + this._opts.cssId, true);
-
-            //update the originalFileName prop
-            this._opts.originalFileName = this._opts.nameTxtBox.val();
         },
 
-        submitFailure: function(t) {
-            top.UmbSpeechBubble.ShowMessage('error', unescape(this._opts.text.cssErrorHeader), unescape(this._opts.text.cssErrorText));
+        submitFailure: function(err, header) {
+            top.UmbSpeechBubble.ShowMessage('error', header, err);
         }
     });
 })(jQuery);

@@ -13,6 +13,7 @@ using System.Web.UI.HtmlControls;
 using System.Xml;
 using System.Xml.XPath;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Web;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
@@ -355,7 +356,7 @@ namespace umbraco.presentation.developer.packages
             _installer.InstallCleanUp(packageId, dir);
 
             // Update ClientDependency version
-            var clientDependencyConfig = new Umbraco.Core.Configuration.ClientDependencyConfiguration();
+            var clientDependencyConfig = new Umbraco.Core.Configuration.ClientDependencyConfiguration(LoggerResolver.Current.Logger);
             var clientDependencyUpdated = clientDependencyConfig.IncreaseVersionNumber();
             
             //clear the tree cache - we'll do this here even though the browser will reload, but just in case it doesn't can't hurt.

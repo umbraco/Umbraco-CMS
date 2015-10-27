@@ -18,10 +18,10 @@ module.exports = function (grunt) {
     grunt.registerTask('watch-test', ['jshint:dev', 'karma:unit']);
 
     //triggered from grunt dev or grunt
-    grunt.registerTask('build', ['clean', 'concat', 'recess:min', 'recess:installer', 'recess:canvasdesigner', 'bower', 'copy']);
+    grunt.registerTask('build', ['clean:pre', 'concat', 'recess:min', 'recess:installer', 'recess:canvasdesigner', 'bower-install-simple', 'bower', 'copy', 'clean:post']);
 
     //build-dev doesn't min - we are trying to speed this up and we don't want minified stuff when we are in dev mode
-    grunt.registerTask('build-dev', ['clean', 'concat', 'recess:build', 'recess:installer', 'bower', 'copy']);
+    grunt.registerTask('build-dev', ['clean:pre', 'concat', 'recess:build', 'recess:installer', 'bower-install-simple', 'bower', 'copy']);
 
     //utillity tasks
     grunt.registerTask('docs', ['ngdocs']);
@@ -108,7 +108,10 @@ module.exports = function (grunt) {
             prod: ['<%= distdir %>/js/*.js']
         },
 
-        clean: ['<%= distdir %>/*'],
+        clean: {
+            pre: ['<%= distdir %>/*'],
+            post: ['<%= distdir %>/js/*.dev.js']
+        },
 
         copy: {
             assets: {
@@ -305,6 +308,10 @@ module.exports = function (grunt) {
 
 
         watch: {
+            docs: {
+                files: ['docs/src/**/*.md'],
+                tasks: ['watch-docs', 'timestamp']
+            },
             css: {
                 files: 'src/**/*.less',
                 tasks: ['watch-less', 'timestamp'],
@@ -347,8 +354,8 @@ module.exports = function (grunt) {
                 title: 'API Documentation'
             },
             tutorials: {
-                src: ['docs/src/tutorials/**/*.ngdoc'],
-                title: 'Tutorials'
+                src: [],
+                title: ''
             }
         },
 
@@ -407,21 +414,81 @@ module.exports = function (grunt) {
         },
 
         bower: {
-            install: {
+            dev: {
+                dest: '<%= distdir %>/lib',
                 options: {
-                    targetDir: "<%= distdir %>/lib",
-                    cleanTargetDir: false,
-                    layout: function (type, component, source) {
+                    expand: true,
+                    ignorePackages: ['blueimp-canvas-to-blob', 'blueimp-tmpl', 'bootstrap'],
+                    packageSpecific: {
+                        'typeahead.js': {                            
+                            keepExpandedHierarchy: false,
+                            files: ['dist/typeahead.bundle.min.js']
+                        },
+                        'underscore': {
+                            files: ['underscore-min.js', 'underscore-min.map']
+                        },
+                        'rgrove-lazyload': {
+                            files: ['lazyload.js']
+                        },
+                        'angular-dynamic-locale': {
+                            files: ['tmhDynamicLocale.min.js,tmhDynamicLocale.min.js.map}']
+                        },
+                        'bootstrap-social': {
+                            files: ['bootstrap-social.css']
+                        },
+                        'font-awesome': {
+                            files: ['css/font-awesome.min.css', 'fonts/*']
+                        },
+                        'jquery': {
+                            files: ['jquery.min.js', 'jquery.min.map']
+                        },
+                        'jquery-file-upload': {
+                            keepExpandedHierarchy: false,
+                            files: ['js/jquery.fileupload.js', 'js/jquery.fileupload-process.js', 'js/jquery.fileupload-angular.js', 'js/jquery.fileupload-image.js']
+                        },
+                        'jquery-ui': {
+                            keepExpandedHierarchy: false,
+                            files: ['ui/minified/jquery-ui.min.js']
+                        },
+                        'blueimp-load-image': {
+                            keepExpandedHierarchy: false,
+                            files: ['js/load-image.all.min.js']
+                        },
+                        'tinymce': {
+                            files: ['plugins/**', 'themes/**', 'tinymce.min.js']
+                        },
+                        'angular-dynamic-locale': {
+                            files: ['tmhDynamicLocale.min.js', 'tmhDynamicLocale.min.js.map']
+                        },                        
+                        'codemirror': {
+                            files: [
+                                'lib/codemirror.js',
+                                'lib/codemirror.css',
 
-                        var path = require('path');
+                                'mode/css/*',
+                                'mode/javascript/*',
+                                'mode/xml/*',
+                                'mode/htmlmixed/*',
 
-                        //this is the same as 'byComponent', however we will not allow
-                        // folders with '.' in them since the grunt copy task does not like that
-                        var componentWithoutPeriod = component.replace(".", "-");
-                        return path.join(componentWithoutPeriod, type);
+                                'addon/search/*',
+                                'addon/edit/*',
+                                'addon/selection/*',
+                                'addon/dialog/*'
+                            ]
+                        }
                     }
                 }
+            },
+            options: {
+                expand: true
             }
+        },
+
+        "bower-install-simple": {
+            options: {
+                color: true
+            },
+            "dev": {}
         }
     });
 
@@ -439,7 +506,8 @@ module.exports = function (grunt) {
 
     grunt.loadNpmTasks('grunt-open');
     grunt.loadNpmTasks('grunt-contrib-connect');
-    grunt.loadNpmTasks('grunt-bower-task');
+    grunt.loadNpmTasks("grunt-bower-install-simple");
+    grunt.loadNpmTasks('grunt-bower');
     grunt.loadNpmTasks('grunt-ngdocs');
 
 };

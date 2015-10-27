@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 
 namespace Umbraco.Core.Services
 {
@@ -10,6 +11,30 @@ namespace Umbraco.Core.Services
     /// </summary>
     public static class LocalizedTextServiceExtensions
     {
+        /// <summary>
+        /// Localize using the current thread culture
+        /// </summary>
+        /// <param name="manager"></param>
+        /// <param name="key"></param>
+        /// <param name="tokens"></param>
+        /// <returns></returns>
+        public static string Localize(this ILocalizedTextService manager, string key, string[] tokens)
+        {
+            return manager.Localize(key, Thread.CurrentThread.CurrentUICulture, tokens);
+        }
+
+        /// <summary>
+        /// Localize using the current thread culture
+        /// </summary>
+        /// <param name="manager"></param>
+        /// <param name="key"></param>
+        /// <param name="tokens"></param>
+        /// <returns></returns>
+        public static string Localize(this ILocalizedTextService manager, string key, IDictionary<string, string> tokens = null)
+        {
+            return manager.Localize(key, Thread.CurrentThread.CurrentUICulture, tokens);
+        }
+
         /// <summary>
         /// Localize a key without any variables
         /// </summary>

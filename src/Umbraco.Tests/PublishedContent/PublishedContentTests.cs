@@ -30,7 +30,7 @@ namespace Umbraco.Tests.PublishedContent
 
             // this is so the model factory looks into the test assembly
             _pluginManager = PluginManager.Current;
-            PluginManager.Current = new PluginManager(false)
+            PluginManager.Current = new PluginManager(new ActivatorServiceProvider(), CacheHelper.RuntimeCache, ProfilingLogger, false)
             {
                 AssembliesToScan = _pluginManager.AssembliesToScan
                     .Union(new[] { typeof(PublishedContentTests).Assembly })
@@ -452,6 +452,20 @@ namespace Umbraco.Tests.PublishedContent
 				Assert.AreEqual(correctOrder[i], ordered.ElementAt(i).Id);
 			}
 
+		}
+
+		[Test]
+		public void FirstChild()
+		{
+			var doc = GetNode(1173); // has child nodes
+			Assert.IsNotNull(doc.FirstChild());
+			Assert.IsNotNull(doc.FirstChild(x => true));
+			Assert.IsNotNull(doc.FirstChild<IPublishedContent>());
+
+			doc = GetNode(1175); // does not have child nodes
+			Assert.IsNull(doc.FirstChild());
+			Assert.IsNull(doc.FirstChild(x => true));
+			Assert.IsNull(doc.FirstChild<IPublishedContent>());
 		}
 
 		[Test]

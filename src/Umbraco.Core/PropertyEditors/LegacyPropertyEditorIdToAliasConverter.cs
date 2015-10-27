@@ -134,6 +134,7 @@ namespace Umbraco.Core.PropertyEditors
             CreateMap(Guid.Parse(Constants.PropertyEditors.UploadField), Constants.PropertyEditors.UploadFieldAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.XPathCheckBoxList), Constants.PropertyEditors.XPathCheckBoxListAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.XPathDropDownList), Constants.PropertyEditors.XPathDropDownListAlias);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.ImageCropper), Constants.PropertyEditors.ImageCropperAlias);
 
             //Being mapped to different editors
             //TODO: Map this somewhere!
@@ -144,10 +145,8 @@ namespace Umbraco.Core.PropertyEditors
             //Not being converted - convert to label
             CreateMap(Guid.Parse(Constants.PropertyEditors.DictionaryPicker), Constants.PropertyEditors.NoEditAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.UmbracoUserControlWrapper), Constants.PropertyEditors.NoEditAlias);
-
-            //Not ready for v7.0! - will need to create for 7.1
-            CreateMap(Guid.Parse(Constants.PropertyEditors.MacroContainer), Constants.PropertyEditors.NoEditAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.ImageCropper), Constants.PropertyEditors.NoEditAlias);
+            
+            
         }
 
     }

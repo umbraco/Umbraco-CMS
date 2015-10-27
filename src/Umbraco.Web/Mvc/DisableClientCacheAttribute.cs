@@ -13,7 +13,8 @@ namespace Umbraco.Web.Mvc
         {
             if (filterContext.IsChildAction) base.OnResultExecuting(filterContext);
 
-            filterContext.HttpContext.Response.Cache.SetExpires(DateTime.UtcNow.AddDays(-1));
+            filterContext.HttpContext.Response.Cache.SetExpires(DateTime.Now.AddDays(-10));
+            filterContext.HttpContext.Response.Cache.SetLastModified(DateTime.Now);
             filterContext.HttpContext.Response.Cache.SetValidUntilExpires(false);
             filterContext.HttpContext.Response.Cache.SetRevalidation(HttpCacheRevalidation.AllCaches);
             filterContext.HttpContext.Response.Cache.SetCacheability(HttpCacheability.NoCache);

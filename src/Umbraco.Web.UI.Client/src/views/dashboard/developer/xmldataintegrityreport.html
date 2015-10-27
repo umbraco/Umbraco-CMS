@@ -16,9 +16,9 @@
         <span ng-if="!value.checking && !value.invalid" class="text-success"><strong>Ok</strong></span>
         <span ng-if="!value.checking && value.invalid" class="text-error"><strong>Error</strong></span>
         <div ng-show="value.fix && !value.fixing">
-            <button type="button" ng-click="fix(value)" class="btn btn-warning">
-                <span ng-if="value.invalid">Fix</span>
-                <span ng-if="!value.invalid">Rebuild</span>
+            <button type="button" ng-click="fix(value)" class="btn btn-danger" ng-if="value.invalid">
+                <span>Fix</span>
+
             </button>
         </div>
         <div class="umb-loader-wrapper" ng-show="value.fixing">

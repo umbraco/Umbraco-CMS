@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web;
-
+using Moq;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Tests.TestHelpers;
 
@@ -18,8 +19,6 @@ namespace Umbraco.Tests.Resolvers
         [SetUp]
         public void Setup()
         {
-            TestHelper.SetupLog4NetForTests();
-
             ManyResolver.Reset();
         }
 
@@ -49,20 +48,20 @@ namespace Umbraco.Tests.Resolvers
 
         public sealed class ManyResolver : ManyObjectsResolverBase<ManyResolver, Resolved>
         {
-            public ManyResolver()
-                : base()
+            public ManyResolver(IServiceProvider serviceProvider, ILogger logger)
+                : base(serviceProvider, logger)
             { }
 
-            public ManyResolver(IEnumerable<Type> value)
-                : base(value)
+            public ManyResolver(IServiceProvider serviceProvider, ILogger logger, IEnumerable<Type> value)
+                : base(serviceProvider, logger, value)
             { }
 
-            public ManyResolver(IEnumerable<Type> value, ObjectLifetimeScope scope)
-                : base(value, scope)
+            public ManyResolver(IServiceProvider serviceProvider, ILogger logger, IEnumerable<Type> value, ObjectLifetimeScope scope)
+                : base(serviceProvider, logger, value, scope)
             { }
 
-            public ManyResolver(HttpContextBase httpContext)
-                : base(httpContext)
+            public ManyResolver(IServiceProvider serviceProvider, ILogger logger, HttpContextBase httpContext)
+                : base(serviceProvider, logger, httpContext)
             { }
 
             public IEnumerable<Resolved> SortedResolvedObjects { get { return GetSortedValues(); } }
@@ -76,7 +75,9 @@ namespace Umbraco.Tests.Resolvers
         [Test]
         public void ManyResolverContainsTypes()
         {
-            var resolver = new ManyResolver(new Type[] { typeof(Resolved1), typeof(Resolved2) });
+            var resolver = new ManyResolver(
+                new ActivatorServiceProvider(), Mock.Of<ILogger>(),
+                new Type[] { typeof(Resolved1), typeof(Resolved2) });
 
             Assert.IsTrue(resolver.ContainsType<Resolved1>());
             Assert.IsTrue(resolver.ContainsType<Resolved2>());
@@ -87,7 +88,7 @@ namespace Umbraco.Tests.Resolvers
         [Test]
         public void ManyResolverCanClearBeforeFreeze()
         {
-            var resolver = new ManyResolver();
+            var resolver = new ManyResolver(new ActivatorServiceProvider(), Mock.Of<ILogger>());
             resolver.AddType<Resolved1>();
             resolver.AddType<Resolved2>();
             resolver.Clear();
@@ -99,7 +100,7 @@ namespace Umbraco.Tests.Resolvers
         [ExpectedException(typeof(InvalidOperationException))]
         public void ManyResolverCannotClearOnceFrozen()
         {
-            var resolver = new ManyResolver();
+            var resolver = new ManyResolver(new ActivatorServiceProvider(), Mock.Of<ILogger>());
             resolver.AddType<Resolved1>();
             resolver.AddType<Resolved2>();
             Resolution.Freeze();
@@ -109,7 +110,7 @@ namespace Umbraco.Tests.Resolvers
         [Test]
         public void ManyResolverCanAddTypeBeforeFreeze()
         {
-            var resolver = new ManyResolver();
+            var resolver = new ManyResolver(new ActivatorServiceProvider(), Mock.Of<ILogger>());
             resolver.AddType<Resolved1>();
             resolver.AddType<Resolved2>();
 
@@ -122,7 +123,7 @@ namespace Umbraco.Tests.Resolvers
         [ExpectedException(typeof(InvalidOperationException))]
         public void ManyResolverCannotAddTypeOnceFrozen()
         {
-            var resolver = new ManyResolver();
+            var resolver = new ManyResolver(new ActivatorServiceProvider(), Mock.Of<ILogger>());
             Resolution.Freeze();
             resolver.AddType<Resolved1>();
         }
@@ -131,7 +132,7 @@ namespace Umbraco.Tests.Resolvers
         [ExpectedException(typeof(InvalidOperationException))]
         public void ManyResolverCannotAddTypeAgain()
         {
-            var resolver = new ManyResolver();
+            var resolver = new ManyResolver(new ActivatorServiceProvider(), Mock.Of<ILogger>());
             resolver.AddType<Resolved1>();
             resolver.AddType<Resolved1>();
         }
@@ -140,7 +141,7 @@ namespace Umbraco.Tests.Resolvers
         [ExpectedException(typeof(InvalidOperationException))]
         public void ManyResolverCannotAddInvalidType()
         {
-            var resolver = new ManyResolver();
+            var resolver = new ManyResolver(new ActivatorServiceProvider(), Mock.Of<ILogger>());
             //resolver.AddType<Resolved4>(); // does not compile
             resolver.AddType(typeof(Resolved4)); // throws
         }
@@ -148,7 +149,7 @@ namespace Umbraco.Tests.Resolvers
         [Test]
         public void ManyResolverCanRemoveTypeBeforeFreeze()
         {
-            var resolver = new ManyResolver(new Type[] { typeof(Resolved1), typeof(Resolved2) });
+            var resolver = new ManyResolver(new ActivatorServiceProvider(), Mock.Of<ILogger>(), new Type[] { typeof(Resolved1), typeof(Resolved2) });
             resolver.RemoveType<Resolved2>();
 
             Assert.IsTrue(resolver.ContainsType<Resolved1>());
@@ -159,7 +160,7 @@ namespace Umbraco.Tests.Resolvers
         [Test]
         public void ManyResolverCanRemoveAbsentType()
         {
-            var resolver = new ManyResolver(new Type[] { typeof(Resolved1), typeof(Resolved2) });
+            var resolver = new ManyResolver(new ActivatorServiceProvider(), Mock.Of<ILogger>(), new Type[] { typeof(Resolved1), typeof(Resolved2) });
             resolver.RemoveType<Resolved3>();
         }
 
@@ -167,7 +168,7 @@ namespace Umbraco.Tests.Resolvers
         [ExpectedException(typeof(InvalidOperationException))]
         public void ManyResolverCannotRemoveInvalidType()
         {
-            var resolver = new ManyResolver(new Type[] { typeof(Resolved1), typeof(Resolved2) });
+            var resolver = new ManyResolver(new ActivatorServiceProvider(), Mock.Of<ILogger>(), new Type[] { typeof(Resolved1), typeof(Resolved2) });
             //resolver.RemoveType<Resolved4>(); // does not compile
             resolver.RemoveType(typeof(Resolved4)); // throws
         }
@@ -176,7 +177,7 @@ namespace Umbraco.Tests.Resolvers
         [ExpectedException(typeof(InvalidOperationException))]
         public void ManyResolverCannotRemoveTypeOnceFrozen()
         {
-            var resolver = new ManyResolver(new Type[] { typeof(Resolved1), typeof(Resolved2) });
+            var resolver = new ManyResolver(new ActivatorServiceProvider(), Mock.Of<ILogger>(), new Type[] { typeof(Resolved1), typeof(Resolved2) });
             Resolution.Freeze();
             resolver.RemoveType<Resolved2>(); // throws
         }
@@ -184,7 +185,7 @@ namespace Umbraco.Tests.Resolvers
         [Test]
         public void ManyResolverCanInsertTypeBeforeFreeze()
         {
-            var resolver = new ManyResolver(new Type[] { typeof(Resolved1), typeof(Resolved2) });
+            var resolver = new ManyResolver(new ActivatorServiceProvider(), Mock.Of<ILogger>(), new Type[] { typeof(Resolved1), typeof(Resolved2) });
             resolver.InsertType<Resolved3>(0);
 
             Assert.IsTrue(resolver.ContainsType<Resolved1>());
@@ -196,7 +197,7 @@ namespace Umbraco.Tests.Resolvers
         [ExpectedException(typeof(InvalidOperationException))]
         public void ManyResolverCannotInsertTypeOnceFrozen()
         {
-            var resolver = new ManyResolver(new Type[] { typeof(Resolved1), typeof(Resolved2) });
+            var resolver = new ManyResolver(new ActivatorServiceProvider(), Mock.Of<ILogger>(), new Type[] { typeof(Resolved1), typeof(Resolved2) });
             Resolution.Freeze();
             resolver.InsertType<Resolved3>(0);
         }
@@ -205,14 +206,14 @@ namespace Umbraco.Tests.Resolvers
         [ExpectedException(typeof(InvalidOperationException))]
         public void ManyResolverCannotInsertTypeAgain()
         {
-            var resolver = new ManyResolver(new Type[] { typeof(Resolved1), typeof(Resolved2) });
+            var resolver = new ManyResolver(new ActivatorServiceProvider(), Mock.Of<ILogger>(), new Type[] { typeof(Resolved1), typeof(Resolved2) });
             resolver.InsertType<Resolved2>(0);
         }
 
         [Test]
         public void ManyResolverCanInsertInEmptyList()
         {
-            var resolver = new ManyResolver();
+            var resolver = new ManyResolver(new ActivatorServiceProvider(), Mock.Of<ILogger>());
             resolver.InsertType<Resolved2>();
         }
 
@@ -220,7 +221,7 @@ namespace Umbraco.Tests.Resolvers
         [ExpectedException(typeof(InvalidOperationException))]
         public void ManyResolverCannotInsertInvalidType()
         {
-            var resolver = new ManyResolver(new Type[] { typeof(Resolved1), typeof(Resolved2) });
+            var resolver = new ManyResolver(new ActivatorServiceProvider(), Mock.Of<ILogger>(), new Type[] { typeof(Resolved1), typeof(Resolved2) });
             //resolver.InsertType<Resolved4>(0); // does not compile
             resolver.InsertType(0, typeof(Resolved4)); // throws
         }
@@ -229,7 +230,7 @@ namespace Umbraco.Tests.Resolvers
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void ManyResolverCannotInsertTypeAtWrongIndex()
         {
-            var resolver = new ManyResolver(new Type[] { typeof(Resolved1), typeof(Resolved2) });
+            var resolver = new ManyResolver(new ActivatorServiceProvider(), Mock.Of<ILogger>(), new Type[] { typeof(Resolved1), typeof(Resolved2) });
             resolver.InsertType(99, typeof(Resolved3)); // throws
         }
 
@@ -238,7 +239,7 @@ namespace Umbraco.Tests.Resolvers
         [Test]
         public void ManyResolverCanInsertBeforeTypeBeforeFreeze()
         {
-            var resolver = new ManyResolver(new Type[] { typeof(Resolved1), typeof(Resolved2) });
+            var resolver = new ManyResolver(new ActivatorServiceProvider(), Mock.Of<ILogger>(), new Type[] { typeof(Resolved1), typeof(Resolved2) });
             resolver.InsertTypeBefore<Resolved2, Resolved3>();
 
             Assert.IsTrue(resolver.ContainsType<Resolved1>());
@@ -250,7 +251,7 @@ namespace Umbraco.Tests.Resolvers
         [ExpectedException(typeof(InvalidOperationException))]
         public void ManyResolverCannotInsertBeforeTypeOnceFrozen()
         {
-            var resolver = new ManyResolver(new Type[] { typeof(Resolved1), typeof(Resolved2) });
+            var resolver = new ManyResolver(new ActivatorServiceProvider(), Mock.Of<ILogger>(), new Type[] { typeof(Resolved1), typeof(Resolved2) });
             Resolution.Freeze();
             resolver.InsertTypeBefore<Resolved2, Resolved3>();
         }
@@ -259,7 +260,7 @@ namespace Umbraco.Tests.Resolvers
         [ExpectedException(typeof(InvalidOperationException))]
         public void ManyResolverCannotInsertBeforeTypeAgain()
         {
-            var resolver = new ManyResolver(new Type[] { typeof(Resolved1), typeof(Resolved2) });
+            var resolver = new ManyResolver(new ActivatorServiceProvider(), Mock.Of<ILogger>(), new Type[] { typeof(Resolved1), typeof(Resolved2) });
             resolver.InsertTypeBefore<Resolved2, Resolved1>();
         }
 
@@ -267,7 +268,7 @@ namespace Umbraco.Tests.Resolvers
         [ExpectedException(typeof(InvalidOperationException))]
         public void ManyResolverCannotInsertBeforeAbsentType()
         {
-            var resolver = new ManyResolver(new Type[] { typeof(Resolved1) });
+            var resolver = new ManyResolver(new ActivatorServiceProvider(), Mock.Of<ILogger>(), new Type[] { typeof(Resolved1) });
             resolver.InsertTypeBefore<Resolved2, Resolved3>();
         }
 
@@ -275,7 +276,7 @@ namespace Umbraco.Tests.Resolvers
         [ExpectedException(typeof(InvalidOperationException))]
         public void ManyResolverCannotInsertBeforeInvalidType()
         {
-            var resolver = new ManyResolver(new Type[] { typeof(Resolved1), typeof(Resolved2) });
+            var resolver = new ManyResolver(new ActivatorServiceProvider(), Mock.Of<ILogger>(), new Type[] { typeof(Resolved1), typeof(Resolved2) });
             //resolver.InsertTypeBefore<Resolved2, Resolved4>(); // does not compile
             resolver.InsertTypeBefore(typeof(Resolved2), typeof(Resolved4)); // throws
         }
@@ -288,14 +289,14 @@ namespace Umbraco.Tests.Resolvers
         [ExpectedException(typeof(InvalidOperationException))]
         public void ManyResolverCannotGetValuesBeforeFreeze()
         {
-            var resolver = new ManyResolver(new Type[] { typeof(Resolved1), typeof(Resolved2) });
+            var resolver = new ManyResolver(new ActivatorServiceProvider(), Mock.Of<ILogger>(), new Type[] { typeof(Resolved1), typeof(Resolved2) });
             var values = resolver.ResolvedObjects;
         }
 
         [Test]
         public void ManyResolverCannotGetValuesBeforeFreezeUnless()
         {
-            var resolver = new ManyResolver(new Type[] { typeof(Resolved1), typeof(Resolved2) });
+            var resolver = new ManyResolver(new ActivatorServiceProvider(), Mock.Of<ILogger>(), new Type[] { typeof(Resolved1), typeof(Resolved2) });
             resolver.CanResolveBeforeFrozen = true;
             var values = resolver.ResolvedObjects;
         }
@@ -303,7 +304,7 @@ namespace Umbraco.Tests.Resolvers
         [Test]
         public void ManyResolverCanGetValuesOnceFrozen()
         {
-            var resolver = new ManyResolver(new Type[] { typeof(Resolved1), typeof(Resolved2) });
+            var resolver = new ManyResolver(new ActivatorServiceProvider(), Mock.Of<ILogger>(), new Type[] { typeof(Resolved1), typeof(Resolved2) });
             Resolution.Freeze();
             var values = resolver.ResolvedObjects;
 
@@ -315,7 +316,7 @@ namespace Umbraco.Tests.Resolvers
         [Test]
         public void ManyResolverDefaultLifetimeScopeIsApplication()
         {
-            var resolver = new ManyResolver(new Type[] { typeof(Resolved1), typeof(Resolved2) });
+            var resolver = new ManyResolver(new ActivatorServiceProvider(), Mock.Of<ILogger>(), new Type[] { typeof(Resolved1), typeof(Resolved2) });
             Resolution.Freeze();
             var values = resolver.ResolvedObjects;
 
@@ -332,7 +333,7 @@ namespace Umbraco.Tests.Resolvers
         [Test]
         public void ManyResolverTransientLifetimeScope()
         {
-            var resolver = new ManyResolver(new Type[] { typeof(Resolved1), typeof(Resolved2) }, ObjectLifetimeScope.Transient);
+            var resolver = new ManyResolver(new ActivatorServiceProvider(), Mock.Of<ILogger>(), new Type[] { typeof(Resolved1), typeof(Resolved2) }, ObjectLifetimeScope.Transient);
             Resolution.Freeze();
             var values = resolver.ResolvedObjects;
 
@@ -349,7 +350,7 @@ namespace Umbraco.Tests.Resolvers
         [Test]
         public void ManyResolverDefaultOrderOfTypes()
         {
-            var resolver = new ManyResolver();
+            var resolver = new ManyResolver(new ActivatorServiceProvider(), Mock.Of<ILogger>());
             resolver.AddType<Resolved3>();
             resolver.InsertType<Resolved1>(0);
             resolver.InsertTypeBefore<Resolved3, Resolved2>();
@@ -367,7 +368,7 @@ namespace Umbraco.Tests.Resolvers
         {
             var httpContextFactory = new FakeHttpContextFactory("~/Home");
             var httpContext = httpContextFactory.HttpContext;
-            var resolver = new ManyResolver(httpContext);
+            var resolver = new ManyResolver(new ActivatorServiceProvider(), Mock.Of<ILogger>(), httpContext);
 
             resolver.AddType<Resolved1>();
             resolver.AddType<Resolved2>();
@@ -394,7 +395,7 @@ namespace Umbraco.Tests.Resolvers
         [Test]
         public void ManyResolverWeightedResolution()
         {
-            var resolver = new ManyResolver(new Type[] { typeof(Resolved1), typeof(Resolved2) });
+            var resolver = new ManyResolver(new ActivatorServiceProvider(), Mock.Of<ILogger>(), new Type[] { typeof(Resolved1), typeof(Resolved2) });
             Resolution.Freeze();
 
             var values = resolver.SortedResolvedObjects;

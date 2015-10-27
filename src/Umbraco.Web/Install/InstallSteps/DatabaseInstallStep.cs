@@ -21,7 +21,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
         public override InstallSetupResult Execute(object model)
         {
-            var result = _applicationContext.DatabaseContext.CreateDatabaseSchemaAndData();
+            var result = _applicationContext.DatabaseContext.CreateDatabaseSchemaAndData(_applicationContext);
 
             if (result.Success == false)
             {

@@ -11,6 +11,7 @@ using System.Web.Services;
 using System.Web.UI;
 using System.Xml;
 using System.Xml.Xsl;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Web.WebServices;
@@ -33,40 +34,26 @@ namespace umbraco.presentation.webservices
     [ScriptService]
     public class codeEditorSave : UmbracoAuthorizedWebService
     {
-       
+
+        [Obsolete("This method has been superceded by the REST service /Umbraco/RestServices/SaveFile/SaveStylesheet which is powered by the SaveFileController.")]
         [WebMethod]
         public string SaveCss(string fileName, string oldName, string fileContents, int fileID)
         {
             if (AuthorizeRequest(DefaultApps.settings.ToString()))
             {
-                string returnValue;
-                var stylesheet = new StyleSheet(fileID)
-                    {
-                        Content = fileContents, Text = fileName
-                    };
+                var stylesheet = Services.FileService.GetStylesheetByName(oldName.EnsureEndsWith(".css"));
+                if (stylesheet == null) throw new InvalidOperationException("No stylesheet found with name " + oldName);
 
-                try
+                stylesheet.Content = fileContents;
+                if (fileName.InvariantEquals(oldName) == false)
                 {
-                    stylesheet.saveCssToFile();
-                    stylesheet.Save();
-                    returnValue = "true";
-
-
-                    //deletes the old css file if the name was changed... 
-                    if (fileName.ToLowerInvariant() != oldName.ToLowerInvariant())
-                    {
-                        var p = IOHelper.MapPath(SystemDirectories.Css + "/" + oldName + ".css");
-                        if (File.Exists(p))
-                            File.Delete(p);
-                    }
-
-                }
-                catch (Exception ex)
-                {
-                    return ex.ToString();
+                    //it's changed which means we need to change the path
+                    stylesheet.Path = stylesheet.Path.TrimEnd(oldName.EnsureEndsWith(".css")) + fileName.EnsureEndsWith(".css");
                 }
 
-                return returnValue;
+                Services.FileService.SaveStylesheet(stylesheet, Security.CurrentUser.Id);
+
+                return "true";
             }
             return "false";
         }
@@ -76,6 +63,7 @@ namespace umbraco.presentation.webservices
         {
             if (AuthorizeRequest(DefaultApps.developer.ToString()))
             {
+                IOHelper.EnsurePathExists(SystemDirectories.Xslt);
 
                 // validate file
                 IOHelper.ValidateEditPath(IOHelper.MapPath(SystemDirectories.Xslt + "/" + fileName),
@@ -83,8 +71,7 @@ namespace umbraco.presentation.webservices
                 // validate extension
                 IOHelper.ValidateFileExtension(IOHelper.MapPath(SystemDirectories.Xslt + "/" + fileName),
                                                new List<string>() { "xsl", "xslt" });
-
-
+                
                 StreamWriter SW;
                 string tempFileName = IOHelper.MapPath(SystemDirectories.Xslt + "/" + DateTime.Now.Ticks + "_temp.xslt");
                 SW = File.CreateText(tempFileName);
@@ -369,6 +356,7 @@ namespace umbraco.presentation.webservices
 		//	return "false";
 		//}
 
+        [Obsolete("This method has been superceded by the REST service /Umbraco/RestServices/SaveFile/SaveScript which is powered by the SaveFileController.")]
         [WebMethod]
         public string SaveScript(string filename, string oldName, string contents)
         {
@@ -406,7 +394,10 @@ namespace umbraco.presentation.webservices
                             if (File.Exists(saveOldPath))
                                 File.Delete(saveOldPath);
                         }
-                        
+
+                        //ensure the folder exists before saving
+                        Directory.CreateDirectory(Path.GetDirectoryName(savePath));
+
                         using (var sw = File.CreateText(savePath))
                         {
                             sw.Write(val);

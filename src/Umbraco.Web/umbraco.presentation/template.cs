@@ -24,7 +24,7 @@ namespace umbraco
     /// <summary>
     /// Holds methods for parsing and building umbraco templates
     /// </summary>
-    /// 
+    [Obsolete("Do not use this class, use Umbraco.Core.Service.IFileService to work with templates")]
     public class template
     {
         #region private variables
@@ -497,8 +497,12 @@ namespace umbraco
             var t = ApplicationContext.Current.ApplicationCache.GetCacheItem(
                string.Format("{0}{1}", CacheKeys.TemplateFrontEndCacheKey, tId), () =>
                {
-                   using (var templateData = SqlHelper.ExecuteReader("select nodeId, alias, master, text, design from cmsTemplate inner join umbracoNode node on node.id = cmsTemplate.nodeId where nodeId = @templateID", SqlHelper.CreateParameter("@templateID", templateID)))
-                   {
+                   using (var templateData = SqlHelper.ExecuteReader(@"select nodeId, alias, node.parentID as master, text, design
+from cmsTemplate
+inner join umbracoNode node on (node.id = cmsTemplate.nodeId)
+where nodeId = @templateID",
+                           SqlHelper.CreateParameter("@templateID", templateID)))
+                    {
                        if (templateData.Read())
                        {
                            // Get template master and replace content where the template

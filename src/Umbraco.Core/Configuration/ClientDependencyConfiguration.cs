@@ -8,10 +8,13 @@ namespace Umbraco.Core.Configuration
 {
     internal class ClientDependencyConfiguration
     {
+        private readonly ILogger _logger;
         private readonly string _fileName;
 
-        public ClientDependencyConfiguration()
+        public ClientDependencyConfiguration(ILogger logger)
         {
+            if (logger == null) throw new ArgumentNullException("logger");
+            _logger = logger;
             _fileName = IOHelper.MapPath(string.Format("{0}/ClientDependency.config", SystemDirectories.Config));
         }
 
@@ -35,13 +38,13 @@ namespace Umbraco.Core.Configuration
                     versionAttribute.SetValue(newVersion);
                     clientDependencyConfigXml.Save(_fileName, SaveOptions.DisableFormatting);
 
-                    LogHelper.Info<ClientDependencyConfiguration>(string.Format("Updated version number from {0} to {1}", oldVersion, newVersion));
+                    _logger.Info<ClientDependencyConfiguration>(string.Format("Updated version number from {0} to {1}", oldVersion, newVersion));
                     return true;
                 }
             }
             catch (Exception ex)
             {
-                LogHelper.Error<ClientDependencyConfiguration>("Couldn't update ClientDependency version number", ex);
+                _logger.Error<ClientDependencyConfiguration>("Couldn't update ClientDependency version number", ex);
             }
 
             return false;

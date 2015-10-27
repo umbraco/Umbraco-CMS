@@ -1,48 +1,81 @@
-<div class="umb-panel" ng-controller="Umbraco.Dialogs.UserController">
-	<div class="umb-panel-header">
-		<div class="umb-el-wrap umb-panel-buttons">
-	        <div class="btn-toolbar umb-btn-toolbar">
-	        	<button ng-click="logout()" hotkey="ctrl+shift+l" class="btn btn-warning">
-	        		<localize key="general_logout">Log out</localize>
-	        	</button>
-	        </div>
-		</div>
-		<h1 class="headline">{{user.name}}</h1>
-	    <p class="muted">
-	        <small>
-	        	<localize key="user_sessionExpires" />: {{remainingAuthSeconds | timespan}}</small>	        
-	    </p>
+<div class="umb-panel umb-user-panel" ng-controller="Umbraco.Dialogs.UserController">
+    <div class="umb-panel-header">
+        <div class="umb-el-wrap umb-panel-buttons">
+            <div class="btn-toolbar umb-btn-toolbar">
+                <button ng-click="logout()" hotkey="ctrl+shift+l" class="btn btn-warning">
+                    <localize key="general_logout">Log out</localize>
+                </button>
+            </div>
+        </div>
+        <h1 class="headline">{{user.name}}</h1>
+        <p class="muted">
+            <small>
+                <localize key="user_sessionExpires" />: {{remainingAuthSeconds | timespan}}
+            </small>
+        </p>
 
-	</div>
-	
-	<div class="umb-panel-body umb-scrollable">
-		<div class="tab-content umb-control-group">
-            
-		    <div class="umb-pane" ng-if="canEditProfile">
-				<h5><localize key="user_yourProfile" /></h5>
-				<p>
-					<a 
-						href="#/users/framed/%252Fumbraco%252Fusers%252Fedituser.aspx%253Fid%253D{{user.id}}" 
-						class="btn btn-primary"
-						ng-click="close()">
-						<localize key="general_edit">Edit</localize>
-					</a>
-				</p>
-			</div>
+    </div>
 
+    <div class="umb-panel-body umb-scrollable">
+        <div class="tab-content umb-control-group">
 
-			<div class="umb-pane">
-				<h5><localize key="user_yourHistory" /></h5>
-				<ul class="umb-tree">
-						<li ng-repeat="item in history | orderBy:'time':true">
-							<a ng-href="{{item.link}}" ng-click="gotoHistory(item.link)" prevent-default>
-								<i class="{{item.icon}}"></i> {{item.name}}</a>
-						</li>
-				</ul>
-			</div>
+            <div class="umb-pane" ng-if="canEditProfile">
+                <h5><localize key="user_yourProfile" /></h5>
+                <p>
+                    <a href="#/users/framed/%252Fumbraco%252Fusers%252Fedituser.aspx%253Fid%253D{{user.id}}"
+                       class="btn btn-primary"
+                       ng-click="close()">
+                        <localize key="general_edit">Edit</localize>
+                    </a>
+                </p>
+            </div>
 
-		</div>
+            <div class="umb-pane external-logins" ng-if="externalLoginProviders.length > 0">
 
-	    <small class="umb-version">Umbraco version {{version}}</small>
-	</div>
+                <h5>External login providers</h5>
+
+                <div ng-repeat="login in externalLoginProviders">
+
+                    <form ng-if="login.linkedProviderKey == undefined" method="POST" name="externalLoginForm"
+                          action="{{externalLinkLoginFormAction}}">
+
+                        <button class="btn btn-block btn-social"
+                                ng-class="login.properties.SocialStyle"
+                                id="{{login.authType}}"
+                                name="provider"
+                                value="{{login.authType}}">
+                            <i class="fa" ng-class="login.properties.SocialIcon"></i>
+                            Link your {{login.caption}} account
+                        </button>
+                    </form>
+
+                    <button ng-if="login.linkedProviderKey != undefined"
+                            ng-click="unlink($event, login.authType, login.linkedProviderKey)"
+                            class="btn btn-block btn-social"
+                            ng-class="login.properties.SocialStyle"
+                            id="{{login.authType}}"
+                            name="provider"
+                            value="{{login.authType}}">
+                        <i class="fa" ng-class="login.properties.SocialIcon"></i>
+                        Un-link your {{login.caption}} account
+                    </button>
+                </div>
+
+            </div>
+
+            <div class="umb-pane">
+                <h5><localize key="user_yourHistory" /></h5>
+                <ul class="umb-tree">
+                    <li ng-repeat="item in history | orderBy:'time':true">
+                        <a ng-href="{{item.link}}" ng-click="gotoHistory(item.link)" prevent-default>
+                            <i class="{{item.icon}}"></i> {{item.name}}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+        <small class="umb-version">Umbraco version {{version}}</small>
+    </div>
 </div>

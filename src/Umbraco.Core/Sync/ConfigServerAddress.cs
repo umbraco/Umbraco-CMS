@@ -1,16 +1,14 @@
-﻿using System.Xml;
-using Umbraco.Core.Configuration;
+﻿using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Sync
 {
     /// <summary>
-    /// A server registration based on the legacy umbraco xml configuration in umbracoSettings
+    /// Provides the address of a server based on the Xml configuration.
     /// </summary>
     internal class ConfigServerAddress : IServerAddress
     {
-
         public ConfigServerAddress(IServer n)
         {
             var webServicesUrl = IOHelper.ResolveUrl(SystemDirectories.WebServices);
@@ -29,7 +27,6 @@ namespace Umbraco.Core.Sync
         public override string ToString()
         {
             return ServerAddress;
-        }
-        
+        }      
     }
 }

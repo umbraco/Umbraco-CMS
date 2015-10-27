@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlServerCe;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Persistence.Caching;
+
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -15,17 +18,16 @@ namespace Umbraco.Core.Persistence.Repositories
     internal abstract class PetaPocoRepositoryBase<TId, TEntity> : RepositoryBase<TId, TEntity>
         where TEntity : class, IAggregateRoot
     {
-		protected PetaPocoRepositoryBase(IDatabaseUnitOfWork work)
-			: base(work)
+        public ISqlSyntaxProvider SqlSyntax { get; private set; }
+
+        protected PetaPocoRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+            : base(work, cache, logger)
         {
+            if (sqlSyntax == null) throw new ArgumentNullException("sqlSyntax");
+            SqlSyntax = sqlSyntax;
         }
 
-		protected PetaPocoRepositoryBase(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache)
-			: base(work, cache)
-        {
-        }
-
-		/// <summary>
+        /// <summary>
 		/// Returns the database Unit of Work added to the repository
 		/// </summary>
 		protected internal new IDatabaseUnitOfWork UnitOfWork
@@ -71,8 +73,13 @@ namespace Umbraco.Core.Persistence.Repositories
             var deletes = GetDeleteClauses();
             foreach (var delete in deletes)
             {
-                Database.Execute(delete, new {Id = entity.Id});
+                Database.Execute(delete, new { Id = GetEntityId(entity) });
             }
+        }
+
+        protected virtual TId GetEntityId(TEntity entity)
+        {
+            return (TId)(object)entity.Id;
         }
     }
 }

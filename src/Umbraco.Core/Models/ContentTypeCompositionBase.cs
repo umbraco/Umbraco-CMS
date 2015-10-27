@@ -198,6 +198,11 @@ namespace Umbraco.Core.Models
         /// <returns>Returns <c>True</c> if PropertyType was added, otherwise <c>False</c></returns>
         public override bool AddPropertyType(PropertyType propertyType, string propertyGroupName)
         {
+            if (propertyType.HasIdentity == false)
+            {
+                propertyType.Key = Guid.NewGuid();
+            }
+
             if (PropertyTypeExists(propertyType.Alias) == false)
             {
                 if (PropertyGroups.Contains(propertyGroupName))

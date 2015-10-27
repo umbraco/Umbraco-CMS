@@ -74,7 +74,7 @@ namespace umbraco.cms.presentation.settings
 				}
 
 				ClientTools
-					.SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadTemplates>().Tree.Alias)
+                    .SetActiveTreeType(Constants.Trees.Templates)
                     .SyncTree(TemplateTreeSyncPath, false);
 
 				LoadScriptingTemplates();

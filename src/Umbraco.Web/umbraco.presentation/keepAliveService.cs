@@ -18,9 +18,7 @@ namespace umbraco.presentation
 
 		    var appContext = (ApplicationContext) sender;
 
-            //TODO: This won't always work, in load balanced scenarios ping will not work because 
-            // this original request url will be public and not internal to the server.
-            var url = string.Format("http://{0}/ping.aspx", appContext.OriginalRequestUrl);
+		    var url = appContext.UmbracoApplicationUrl + "/ping.aspx";
 			try
 			{
 				using (var wc = new WebClient())

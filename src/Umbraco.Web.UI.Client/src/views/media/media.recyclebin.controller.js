@@ -8,7 +8,7 @@
  * 
  */
 
-function MediaRecycleBinController($scope, $routeParams, dataTypeResource) {
+function MediaRecycleBinController($scope, $routeParams, dataTypeResource, navigationService) {
 
     //ensures the list view doesn't actually load until we query for the list view config
     // for the section
@@ -24,6 +24,8 @@ function MediaRecycleBinController($scope, $routeParams, dataTypeResource) {
 
     $scope.model = { config: { entityType: $routeParams.section } };
 
+    // sync tree node
+    navigationService.syncTree({ tree: "media", path: ["-1", $routeParams.id], forceReload: false });
 }
 
 angular.module('umbraco').controller("Umbraco.Editors.Media.RecycleBinController", MediaRecycleBinController);

@@ -508,7 +508,7 @@ angular.module('umbraco.services')
 
         /**
         * @ngdoc method
-        * @name umbraco.services.dialogService#ysodDialog
+        * @name umbraco.services.dialogService#embedDialog
         * @methodOf umbraco.services.dialogService
         * @description
         * Opens a dialog to an embed dialog 
@@ -531,7 +531,7 @@ angular.module('umbraco.services')
             var newScope = $rootScope.$new();
             newScope.error = ysodError;
             return openDialog({
-                modalClass: "umb-modal wide",
+                modalClass: "umb-modal wide ysod",
                 scope: newScope,
                 //callback: options.callback,
                 template: 'views/common/dialogs/ysod.html',

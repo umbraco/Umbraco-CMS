@@ -33,8 +33,8 @@ namespace Umbraco.Tests.Persistence.Querying
                 DatabaseContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF ", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("umbracoNode"))));
 
                 DatabaseContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("cmsTemplate"))));
-                DatabaseContext.Database.Insert("cmsTemplate", "pk", false, new TemplateDto { NodeId = 55554, Alias = "testTemplate1", Design = "", Master = null, PrimaryKey = 22221});
-                DatabaseContext.Database.Insert("cmsTemplate", "pk", false, new TemplateDto { NodeId = 55555, Alias = "testTemplate2", Design = "", Master = null, PrimaryKey = 22222 });
+                DatabaseContext.Database.Insert("cmsTemplate", "pk", false, new TemplateDto { NodeId = 55554, Alias = "testTemplate1", Design = "", PrimaryKey = 22221});
+                DatabaseContext.Database.Insert("cmsTemplate", "pk", false, new TemplateDto { NodeId = 55555, Alias = "testTemplate2", Design = "", PrimaryKey = 22222 });
                 DatabaseContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF ", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("cmsTemplate"))));
 
                 DatabaseContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("cmsContentType"))));
@@ -58,7 +58,7 @@ namespace Umbraco.Tests.Persistence.Querying
             IDictionary<int, IEnumerable<ContentTypeRepository.ContentTypeQueryMapper.AssociatedTemplate>> allAssociatedTemplates;
             IDictionary<int, IEnumerable<int>> allParentContentTypeIds;
             var contentTypes = ContentTypeRepository.ContentTypeQueryMapper.MapContentTypes(
-                new[] {99997, 99998}, DatabaseContext.Database, out allAssociatedTemplates, out allParentContentTypeIds)
+                new[] {99997, 99998}, DatabaseContext.Database, SqlSyntax, out allAssociatedTemplates, out allParentContentTypeIds)
                 .ToArray();
 
             var contentType1 = contentTypes.SingleOrDefault(x => x.Id == 99997);
@@ -111,7 +111,7 @@ namespace Umbraco.Tests.Persistence.Querying
 
             IDictionary<int, IEnumerable<int>> allParentContentTypeIds;
             var contentTypes = ContentTypeRepository.ContentTypeQueryMapper.MapMediaTypes(
-                new[] { 99997, 99998 }, DatabaseContext.Database, out allParentContentTypeIds)
+                new[] { 99997, 99998 }, DatabaseContext.Database, SqlSyntax, out allParentContentTypeIds)
                 .ToArray();
 
             var contentType1 = contentTypes.SingleOrDefault(x => x.Id == 99997);
@@ -158,13 +158,13 @@ namespace Umbraco.Tests.Persistence.Querying
                 DatabaseContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF ", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("cmsPropertyTypeGroup"))));
 
                 DatabaseContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} ON ", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("cmsPropertyType"))));
-                DatabaseContext.Database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 66662, DataTypeId = 55555, ContentTypeId = 99999, PropertyTypeGroupId = 77776, Alias = "property1", Name = "Property 1", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null });
-                DatabaseContext.Database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 66663, DataTypeId = 55555, ContentTypeId = 99999, PropertyTypeGroupId = 77776, Alias = "property2", Name = "Property 2", SortOrder = 1, Mandatory = false, ValidationRegExp = null, Description = null });
-                DatabaseContext.Database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 66664, DataTypeId = 55555, ContentTypeId = 99999, PropertyTypeGroupId = 77777, Alias = "property3", Name = "Property 3", SortOrder = 2, Mandatory = false, ValidationRegExp = null, Description = null });
-                DatabaseContext.Database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 66665, DataTypeId = 55555, ContentTypeId = 99999, PropertyTypeGroupId = 77777, Alias = "property4", Name = "Property 4", SortOrder = 3, Mandatory = false, ValidationRegExp = null, Description = null });
-                DatabaseContext.Database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 66666, DataTypeId = 55555, ContentTypeId = 99999, PropertyTypeGroupId = null, Alias = "property5", Name = "Property 5", SortOrder = 4, Mandatory = false, ValidationRegExp = null, Description = null });
-                DatabaseContext.Database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 66667, DataTypeId = 55555, ContentTypeId = 99999, PropertyTypeGroupId = 77778, Alias = "property6", Name = "Property 6", SortOrder = 5, Mandatory = false, ValidationRegExp = null, Description = null });
-                DatabaseContext.Database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 66668, DataTypeId = 55555, ContentTypeId = 99999, PropertyTypeGroupId = 77778, Alias = "property7", Name = "Property 7", SortOrder = 6, Mandatory = false, ValidationRegExp = null, Description = null });
+                DatabaseContext.Database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 66662, UniqueId = 66662.ToGuid(), DataTypeId = 55555, ContentTypeId = 99999, PropertyTypeGroupId = 77776, Alias = "property1", Name = "Property 1", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null });
+                DatabaseContext.Database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 66663, UniqueId = 66663.ToGuid(), DataTypeId = 55555, ContentTypeId = 99999, PropertyTypeGroupId = 77776, Alias = "property2", Name = "Property 2", SortOrder = 1, Mandatory = false, ValidationRegExp = null, Description = null });
+                DatabaseContext.Database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 66664, UniqueId = 66664.ToGuid(), DataTypeId = 55555, ContentTypeId = 99999, PropertyTypeGroupId = 77777, Alias = "property3", Name = "Property 3", SortOrder = 2, Mandatory = false, ValidationRegExp = null, Description = null });
+                DatabaseContext.Database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 66665, UniqueId = 66665.ToGuid(), DataTypeId = 55555, ContentTypeId = 99999, PropertyTypeGroupId = 77777, Alias = "property4", Name = "Property 4", SortOrder = 3, Mandatory = false, ValidationRegExp = null, Description = null });
+                DatabaseContext.Database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 66666, UniqueId = 66666.ToGuid(), DataTypeId = 55555, ContentTypeId = 99999, PropertyTypeGroupId = null, Alias = "property5", Name = "Property 5", SortOrder = 4, Mandatory = false, ValidationRegExp = null, Description = null });
+                DatabaseContext.Database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 66667, UniqueId = 66667.ToGuid(), DataTypeId = 55555, ContentTypeId = 99999, PropertyTypeGroupId = 77778, Alias = "property6", Name = "Property 6", SortOrder = 5, Mandatory = false, ValidationRegExp = null, Description = null });
+                DatabaseContext.Database.Insert("cmsPropertyType", "id", false, new PropertyTypeDto { Id = 66668, UniqueId = 66668.ToGuid(), DataTypeId = 55555, ContentTypeId = 99999, PropertyTypeGroupId = 77778, Alias = "property7", Name = "Property 7", SortOrder = 6, Mandatory = false, ValidationRegExp = null, Description = null });
                 DatabaseContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF ", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("cmsPropertyType"))));
 
                 transaction.Complete();
@@ -172,7 +172,7 @@ namespace Umbraco.Tests.Persistence.Querying
 
             IDictionary<int, PropertyTypeCollection> allPropTypeCollection;
             IDictionary<int, PropertyGroupCollection> allPropGroupCollection;
-            ContentTypeRepository.ContentTypeQueryMapper.MapGroupsAndProperties(new[] { 99999 }, DatabaseContext.Database, out allPropTypeCollection, out allPropGroupCollection);
+            ContentTypeRepository.ContentTypeQueryMapper.MapGroupsAndProperties(new[] { 99999 }, DatabaseContext.Database, SqlSyntax, out allPropTypeCollection, out allPropGroupCollection);
 
             var propGroupCollection = allPropGroupCollection[99999];
             var propTypeCollection = allPropTypeCollection[99999];

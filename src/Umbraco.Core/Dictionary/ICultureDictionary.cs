@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 
 namespace Umbraco.Core.Dictionary
@@ -19,5 +20,12 @@ namespace Umbraco.Core.Dictionary
 		/// Returns the current culture
 		/// </summary>
 		CultureInfo Culture { get; }
+
+        /// <summary>
+        /// Returns the child dictionary entries for a given key
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+	    IDictionary<string, string> GetChildren(string key);
 	}
 }

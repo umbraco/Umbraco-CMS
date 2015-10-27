@@ -3,31 +3,37 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence.Caching;
+
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Dynamics;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
     internal abstract class VersionableRepositoryBase<TId, TEntity> : PetaPocoRepositoryBase<TId, TEntity>
         where TEntity : class, IAggregateRoot
     {
-        protected VersionableRepositoryBase(IDatabaseUnitOfWork work) : base(work)
-        {
-        }
+        private readonly IContentSection _contentSection;
 
-        protected VersionableRepositoryBase(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache) : base(work, cache)
+        protected VersionableRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IContentSection contentSection)
+            : base(work, cache, logger, sqlSyntax)
         {
+            _contentSection = contentSection;
         }
 
         #region IRepositoryVersionable Implementation
@@ -36,14 +42,14 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = new Sql();
             sql.Select("*")
-                .From<ContentVersionDto>()
-                .InnerJoin<ContentDto>()
-                .On<ContentVersionDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-                .InnerJoin<NodeDto>()
-                .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .From<ContentVersionDto>(SqlSyntax)
+                .InnerJoin<ContentDto>(SqlSyntax)
+                .On<ContentVersionDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .InnerJoin<NodeDto>(SqlSyntax)
+                .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
                 .Where<NodeDto>(x => x.NodeId == id)
-                .OrderByDescending<ContentVersionDto>(x => x.VersionDate);
+                .OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
 
             var dtos = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sql);
             foreach (var dto in dtos)
@@ -275,7 +281,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="orderDirection">The order direction.</param>
         /// <returns></returns>
         /// <exception cref="System.ArgumentNullException">orderBy</exception>
-        protected IEnumerable<TEntity> GetPagedResultsByQuery<TDto,TContentBase>(IQuery<TEntity> query, int pageIndex, int pageSize, out int totalRecords,
+        protected IEnumerable<TEntity> GetPagedResultsByQuery<TDto, TContentBase>(IQuery<TEntity> query, long pageIndex, int pageSize, out long totalRecords,
             Tuple<string, string> nodeIdSelect,
             Func<Sql, IEnumerable<TEntity>> processQuery,
             string orderBy, 
@@ -396,7 +402,7 @@ ON cmsPropertyType.dataTypeId = cmsDataTypePreValues.datatypeNodeId", docSql.Arg
             // below if any property requires tag support
             var allPreValues = new Lazy<IEnumerable<DataTypePreValueDto>>(() =>
             {
-                var preValsSql = new Sql(@"SELECT a.id as preValId, a.value, a.sortorder, a.alias, a.datatypeNodeId
+                var preValsSql = new Sql(@"SELECT a.id, a.value, a.sortorder, a.alias, a.datatypeNodeId
 FROM cmsDataTypePreValues a
 WHERE EXISTS(
     SELECT DISTINCT b.id as preValIdInner
@@ -472,7 +478,7 @@ WHERE EXISTS(
 
                     if (result.ContainsKey(def.Id))
                     {
-                        LogHelper.Warn<VersionableRepositoryBase<TId, TEntity>>("The query returned multiple property sets for document definition " + def.Id + ", " + def.Composition.Name);
+                        Logger.Warn<VersionableRepositoryBase<TId, TEntity>>("The query returned multiple property sets for document definition " + def.Id + ", " + def.Composition.Name);
                     }
                     result[def.Id] = new PropertyCollection(properties);
                 }                
@@ -508,13 +514,16 @@ WHERE EXISTS(
             // of ContentItemBasic instances) to the database field names.
             switch (orderBy.ToUpperInvariant())
             {
+                case "UPDATEDATE":
+                    return "cmsContentVersion.VersionDate";
                 case "NAME":
                     return "umbracoNode.text";
                 case "OWNER":
                     //TODO: This isn't going to work very nicely because it's going to order by ID, not by letter
                     return "umbracoNode.nodeUser";
                 default:
-                    return orderBy;
+                    //ensure invalid SQL cannot be submitted
+                    return Regex.Replace(orderBy, @"[^\w\.,`\[\]@-]", "");
             }
         }
 
@@ -533,8 +542,54 @@ WHERE EXISTS(
                 case "VERSIONDATE":
                     return "UpdateDate";
                 default:
-                    return orderBy;
+                    //ensure invalid SQL cannot be submitted
+                    return Regex.Replace(orderBy, @"[^\w\.,`\[\]@-]", "");
             }
+        }
+
+        /// <summary>
+        /// Deletes all media files passed in.
+        /// </summary>
+        /// <param name="files"></param>
+        /// <returns></returns>
+        public virtual bool DeleteMediaFiles(IEnumerable<string> files)
+        {
+            //ensure duplicates are removed
+            files = files.Distinct();
+
+            var allsuccess = true;
+
+            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
+            Parallel.ForEach(files, file =>
+            {
+                try
+                {
+                    if (file.IsNullOrWhiteSpace()) return;
+
+                    var relativeFilePath = fs.GetRelativePath(file);
+                    if (fs.FileExists(relativeFilePath) == false) return;
+
+                    var parentDirectory = System.IO.Path.GetDirectoryName(relativeFilePath);
+
+                    // don't want to delete the media folder if not using directories.
+                    if (_contentSection.UploadAllowDirectories && parentDirectory != fs.GetRelativePath("/"))
+                    {
+                        //issue U4-771: if there is a parent directory the recursive parameter should be true
+                        fs.DeleteDirectory(parentDirectory, String.IsNullOrEmpty(parentDirectory) == false);
+                    }
+                    else
+                    {
+                        fs.DeleteFile(file, true);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.Error<VersionableRepositoryBase<TId, TEntity>>("An error occurred while deleting file attached to nodes: " + file, e);
+                    allsuccess = false;
+                }
+            });
+
+            return allsuccess;
         }
     }
 }

@@ -2,6 +2,7 @@
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Migrations.Syntax.Create.Expressions;
 using Umbraco.Core.Persistence.Migrations.Syntax.Expressions;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
 {
@@ -11,11 +12,13 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
                                                 ICreateTableColumnOptionForeignKeyCascadeSyntax
     {
         private readonly IMigrationContext _context;
+        private readonly DatabaseProviders[] _databaseProviders;
 
-        public CreateTableBuilder(CreateTableExpression expression, IMigrationContext context)
+        public CreateTableBuilder(IMigrationContext context, DatabaseProviders[] databaseProviders, CreateTableExpression expression)
             : base(expression)
         {
             _context = context;
+            _databaseProviders = databaseProviders;
         }
 
         public ColumnDefinition CurrentColumn { get; set; }
@@ -62,15 +65,12 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
         {
             CurrentColumn.IsIndexed = true;
 
-            var index = new CreateIndexExpression
-                            {
-                                Index = new IndexDefinition
-                                            {
-                                                Name = indexName,
-                                                SchemaName = Expression.SchemaName,
-                                                TableName = Expression.TableName
-                                            }
-                            };
+            var index = new CreateIndexExpression(_context.CurrentDatabaseProvider, _databaseProviders, Expression.SqlSyntax, new IndexDefinition
+            {
+                Name = indexName,
+                SchemaName = Expression.SchemaName,
+                TableName = Expression.TableName
+            });
 
             index.Index.Columns.Add(new IndexColumnDefinition
                                         {
@@ -85,6 +85,27 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
         public ICreateTableColumnOptionSyntax PrimaryKey()
         {
             CurrentColumn.IsPrimaryKey = true;
+
+            //For MySQL, the PK will be created WITH the create table expression, however for 
+            // SQL Server, the PK get's created in a different Alter table expression afterwords.
+            // MySQL will choke if the same constraint is again added afterword
+            // TODO: This is a super hack, I'd rather not add another property like 'CreatesPkInCreateTableDefinition' to check
+            // for this, but I don't see another way around. MySQL doesn't support checking for a constraint before creating
+            // it... except in a very strange way but it doesn't actually provider error feedback if it doesn't work so we cannot use
+            // it.  For now, this is what I'm doing
+            if (Expression.CurrentDatabaseProvider != DatabaseProviders.MySql)
+            {
+                var expression = new CreateConstraintExpression(_context.CurrentDatabaseProvider, _databaseProviders, Expression.SqlSyntax, ConstraintType.PrimaryKey)
+                {
+                    Constraint =
+                {
+                    TableName = CurrentColumn.TableName,
+                    Columns = new[] { CurrentColumn.Name }
+                }
+                };
+                _context.Expressions.Add(expression);
+            }
+
             return this;
         }
 
@@ -92,6 +113,29 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
         {
             CurrentColumn.IsPrimaryKey = true;
             CurrentColumn.PrimaryKeyName = primaryKeyName;
+
+            //For MySQL, the PK will be created WITH the create table expression, however for 
+            // SQL Server, the PK get's created in a different Alter table expression afterwords.
+            // MySQL will choke if the same constraint is again added afterword
+            // TODO: This is a super hack, I'd rather not add another property like 'CreatesPkInCreateTableDefinition' to check
+            // for this, but I don't see another way around. MySQL doesn't support checking for a constraint before creating
+            // it... except in a very strange way but it doesn't actually provider error feedback if it doesn't work so we cannot use
+            // it.  For now, this is what I'm doing
+
+            if (Expression.CurrentDatabaseProvider != DatabaseProviders.MySql)
+            {
+                var expression = new CreateConstraintExpression(_context.CurrentDatabaseProvider, _databaseProviders, Expression.SqlSyntax, ConstraintType.PrimaryKey)
+                {
+                    Constraint =
+                {
+                    ConstraintName = primaryKeyName,
+                    TableName = CurrentColumn.TableName,
+                    Columns = new[] { CurrentColumn.Name }
+                }
+                };
+                _context.Expressions.Add(expression);
+            }
+            
             return this;
         }
 
@@ -116,16 +160,13 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
         {
             CurrentColumn.IsUnique = true;
 
-            var index = new CreateIndexExpression
-                            {
-                                Index = new IndexDefinition
-                                            {
-                                                Name = indexName,
-                                                SchemaName = Expression.SchemaName,
-                                                TableName = Expression.TableName,
-                                                IsUnique = true
-                                            }
-                            };
+            var index = new CreateIndexExpression(_context.CurrentDatabaseProvider, _databaseProviders, Expression.SqlSyntax, new IndexDefinition
+            {
+                Name = indexName,
+                SchemaName = Expression.SchemaName,
+                TableName = Expression.TableName,
+                IsUnique = true
+            });
 
             index.Index.Columns.Add(new IndexColumnDefinition
                                         {
@@ -153,17 +194,14 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
         {
             CurrentColumn.IsForeignKey = true;
 
-            var fk = new CreateForeignKeyExpression
-                         {
-                             ForeignKey = new ForeignKeyDefinition
-                                              {
-                                                  Name = foreignKeyName,
-                                                  PrimaryTable = primaryTableName,
-                                                  PrimaryTableSchema = primaryTableSchema,
-                                                  ForeignTable = Expression.TableName,
-                                                  ForeignTableSchema = Expression.SchemaName
-                                              }
-                         };
+            var fk = new CreateForeignKeyExpression(_context.CurrentDatabaseProvider, _databaseProviders, Expression.SqlSyntax, new ForeignKeyDefinition
+            {
+                Name = foreignKeyName,
+                PrimaryTable = primaryTableName,
+                PrimaryTableSchema = primaryTableSchema,
+                ForeignTable = Expression.TableName,
+                ForeignTableSchema = Expression.SchemaName
+            });
 
             fk.ForeignKey.PrimaryColumns.Add(primaryColumnName);
             fk.ForeignKey.ForeignColumns.Add(CurrentColumn.Name);
@@ -193,17 +231,14 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Table
         public ICreateTableColumnOptionForeignKeyCascadeSyntax ReferencedBy(string foreignKeyName, string foreignTableSchema,
                                                                             string foreignTableName, string foreignColumnName)
         {
-            var fk = new CreateForeignKeyExpression
-                         {
-                             ForeignKey = new ForeignKeyDefinition
-                                              {
-                                                  Name = foreignKeyName,
-                                                  PrimaryTable = Expression.TableName,
-                                                  PrimaryTableSchema = Expression.SchemaName,
-                                                  ForeignTable = foreignTableName,
-                                                  ForeignTableSchema = foreignTableSchema
-                                              }
-                         };
+            var fk = new CreateForeignKeyExpression(_context.CurrentDatabaseProvider, _databaseProviders, Expression.SqlSyntax, new ForeignKeyDefinition
+            {
+                Name = foreignKeyName,
+                PrimaryTable = Expression.TableName,
+                PrimaryTableSchema = Expression.SchemaName,
+                ForeignTable = foreignTableName,
+                ForeignTableSchema = foreignTableSchema
+            });
 
             fk.ForeignKey.PrimaryColumns.Add(CurrentColumn.Name);
             fk.ForeignKey.ForeignColumns.Add(foreignColumnName);

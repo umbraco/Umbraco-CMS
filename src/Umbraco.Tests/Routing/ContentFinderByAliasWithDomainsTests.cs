@@ -1,51 +1,13 @@
-using System.Linq;
 using NUnit.Framework;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
-using umbraco.cms.businesslogic.language;
-using umbraco.cms.businesslogic.web;
 
 namespace Umbraco.Tests.Routing
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
+    
     [TestFixture]
     public class ContentFinderByAliasWithDomainsTests : ContentFinderByAliasTests
     {
-        public override void Initialize()
-        {
-            base.Initialize();
 
-            // ensure we can create them although the content is not in the database
-            TestHelper.DropForeignKeys("umbracoDomains");
-
-            InitializeLanguagesAndDomains();
-        }
-
-        void InitializeLanguagesAndDomains()
-        {
-            var domains = Domain.GetDomains();
-            foreach (var d in domains)
-                d.Delete();
-
-            var langs = Language.GetAllAsList();
-            foreach (var l in langs.Skip(1))
-                l.Delete();
-
-            // en-US is there by default
-            Language.MakeNew("fr-FR");
-            Language.MakeNew("de-DE");
-        }
-
-        void SetDomains1()
-        {
-            var langEn = Language.GetByCultureCode("en-US");
-            var langFr = Language.GetByCultureCode("fr-FR");
-            var langDe = Language.GetByCultureCode("de-DE");
-
-            Domain.MakeNew("domain1.com/", 1001, langDe.id);
-            Domain.MakeNew("domain1.com/en", 10011, langEn.id);
-            Domain.MakeNew("domain1.com/fr", 10012, langFr.id);
-        }
         
 
         [TestCase("http://domain1.com/this/is/my/alias", "de-DE", -1001)] // alias to domain's page fails - no alias on domain's home
@@ -60,7 +22,7 @@ namespace Umbraco.Tests.Routing
         [TestCase("http://domain1.com/en/bar/nil", "en-US", 100111)] // ok, alias includes "en/"
         public void Lookup_By_Url_Alias_And_Domain(string inputUrl, string expectedCulture, int expectedNode)
         {
-            SetDomains1();
+            //SetDomains1();
 
             var routingContext = GetRoutingContext(inputUrl);
             var url = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url

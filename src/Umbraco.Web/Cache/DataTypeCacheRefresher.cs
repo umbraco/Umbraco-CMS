@@ -5,7 +5,7 @@ using Umbraco.Core.Cache;
 using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Persistence.Caching;
+
 
 namespace Umbraco.Web.Cache
 {
@@ -27,20 +27,7 @@ namespace Umbraco.Web.Cache
             var serializer = new JavaScriptSerializer();
             var jsonObject = serializer.Deserialize<JsonPayload[]>(json);
             return jsonObject;
-        }
-
-        /// <summary>
-        /// Creates the custom Json payload used to refresh cache amongst the servers
-        /// </summary>
-        /// <param name="dataTypes"></param>
-        /// <returns></returns>
-        internal static string SerializeToJsonPayload(params global::umbraco.cms.businesslogic.datatype.DataTypeDefinition[] dataTypes)
-        {
-            var serializer = new JavaScriptSerializer();
-            var items = dataTypes.Select(FromDataTypeDefinition).ToArray();
-            var json = serializer.Serialize(items);
-            return json;
-        }
+        }   
 
         /// <summary>
         /// Creates the custom Json payload used to refresh cache amongst the servers
@@ -54,22 +41,7 @@ namespace Umbraco.Web.Cache
             var json = serializer.Serialize(items);
             return json;
         }
-
-        /// <summary>
-        /// Converts a macro to a jsonPayload object
-        /// </summary>
-        /// <param name="dataType"></param>
-        /// <returns></returns>
-        private static JsonPayload FromDataTypeDefinition(global::umbraco.cms.businesslogic.datatype.DataTypeDefinition dataType)
-        {
-            var payload = new JsonPayload
-            {
-                UniqueId = dataType.UniqueId,
-                Id = dataType.Id
-            };
-            return payload;
-        }
-
+   
         /// <summary>
         /// Converts a macro to a jsonPayload object
         /// </summary>
@@ -119,12 +91,13 @@ namespace Umbraco.Web.Cache
             //we need to clear the ContentType runtime cache since that is what caches the
             // db data type to store the value against and anytime a datatype changes, this also might change
             // we basically need to clear all sorts of runtime caches here because so many things depend upon a data type
-            RuntimeCacheProvider.Current.Clear(typeof(IContent));
-            RuntimeCacheProvider.Current.Clear(typeof(IContentType));
-            RuntimeCacheProvider.Current.Clear(typeof(IMedia));
-            RuntimeCacheProvider.Current.Clear(typeof(IMediaType));
-            RuntimeCacheProvider.Current.Clear(typeof(IMember));
-            RuntimeCacheProvider.Current.Clear(typeof(IMemberType));
+            
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IContent>();
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IContentType>();
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IMedia>();
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IMediaType>();
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IMember>();
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IMemberType>();
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
 

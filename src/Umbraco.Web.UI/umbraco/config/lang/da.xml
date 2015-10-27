@@ -8,7 +8,7 @@
     <key alias="assignDomain">Tilføj domæne</key>
     <key alias="auditTrail">Revisions spor</key>
     <key alias="browse">Gennemse elementer</key>
-	<key alias="changeDocType">Skift dokumenttype</key>
+    <key alias="changeDocType">Skift dokumenttype</key>
     <key alias="copy">Kopier</key>
     <key alias="create">Opret</key>
     <key alias="createPackage">Opret pakke</key>
@@ -26,8 +26,10 @@
     <key alias="notify">Notificeringer</key>
     <key alias="protect">Offentlig adgang</key>
     <key alias="publish">Udgiv</key>
+    <key alias="unpublish">Fortryd udgivelse</key>
     <key alias="refreshNode">Genindlæs elementer</key>
     <key alias="republish">Genudgiv hele siten</key>
+    <key alias="restore" version="7.3.0">Gendan</key>
     <key alias="rights">Rettigheder</key>
     <key alias="rollback">Fortryd ændringer</key>
     <key alias="sendtopublish">Send til udgivelse</key>
@@ -36,22 +38,29 @@
     <key alias="toPublish">Send til udgivelse</key>
     <key alias="translate">Oversæt</key>
     <key alias="update">Opdatér</key>
+    <key alias="defaultValue">Standard værdi</key>
   </area>
   <area alias="assignDomain">
+    <key alias="permissionDenied">Tilladelse nægtet.</key>
     <key alias="addNew">Tilføj nyt domæne</key>
+    <key alias="remove">fjern</key>
+    <key alias="invalidNode">Ugyldig node.</key>
+    <key alias="invalidDomain">Ugyldigt domæne-format.</key>
+    <key alias="duplicateDomain">Domæne er allerede blevet tildelt.</key>
+    <key alias="language">Sprog</key>
     <key alias="domain">Domæne</key>
     <key alias="domainCreated">Domænet '%0%' er nu oprettet og tilknyttet siden</key>
     <key alias="domainDeleted">Domænet '%0%' er nu slettet</key>
     <key alias="domainExists">Domænet '%0%' er oprettet</key>
-    <key alias="domainHelp">f.eks. ditdomaene.com, www.ditdomaene.com</key>
     <key alias="domainUpdated">Domænet '%0%' er nu opdateret</key>
     <key alias="orEdit">eller rediger nuværende domæner</key>
+    <key alias="domainHelp">f.eks. ditdomaene.com, www.ditdomaene.com</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">For</key>
   </area>
   <area alias="buttons">
-	<key alias="select">Vælg</key>
+    <key alias="select">Vælg</key>
     <key alias="selectCurrentFolder">Vælg nuværende mappe</key>
     <key alias="somethingElse">Gør noget andet</key>
     <key alias="bold">Fed</key>
@@ -71,12 +80,12 @@
     <key alias="macroInsert">Indsæt makro</key>
     <key alias="pictureInsert">Indsæt billede</key>
     <key alias="relations">Redigér relationer</key>
+    <key alias="returnToList">Tilbage til listen</key>
     <key alias="save">Gem</key>
     <key alias="saveAndPublish">Gem og udgiv</key>
     <key alias="saveToPublish">Gem og send til udgivelse</key>
-    <key alias="select">Vælg</key>
-    <key alias="somethingElse">Flere muligheder...</key>
     <key alias="showPage">Se siden</key>
+    <key alias="showPageDisabled">Preview er deaktiveret fordi der ikke er nogen skabelon tildelt</key>
     <key alias="styleChoose">Vælg formattering</key>
     <key alias="styleShow">Vis koder</key>
     <key alias="tableInsert">Indsæt tabel</key>
@@ -102,7 +111,7 @@
     <key alias="validDocTypesNote">Kun andre dokumenttyper, der er gyldige på denne placering, vises.</key>
   </area>
   <area alias="content">
-	<key alias="isPublished" version="7.2">Udgivet</key>
+    <key alias="isPublished" version="7.2">Udgivet</key>
     <key alias="about">Om siden</key>
     <key alias="alias">Alias</key>
     <key alias="alternativeTextHelp">(hvordan ville du f.eks. beskrive billedet via telefonen?)</key>
@@ -119,9 +128,9 @@
     <key alias="itemChanged">Dette punkt er ændret siden udgivelsen</key>
     <key alias="itemNotPublished">Dette punkt er endnu ikke udgivet</key>
     <key alias="lastPublished">Sidst udgivet</key>
-	<key alias="listViewNoItems" version="7.1.5">Der er ingen elementer at vise på listen.</key>
+    <key alias="listViewNoItems" version="7.1.5">Der er ingen elementer at vise på listen.</key>
     <key alias="mediatype">Medietype</key>
-	<key alias="mediaLinks">Link til medie(r)</key>
+    <key alias="mediaLinks">Link til medie(r)</key>
     <key alias="membergroup">Medlemsgruppe</key>
     <key alias="memberrole">Rolle</key>
     <key alias="membertype">Medlemstype</key>
@@ -129,24 +138,24 @@
     <key alias="nodeName">Sidetitel</key>
     <key alias="otherElements">Egenskaber</key>
     <key alias="parentNotPublished">Dette dokument er udgivet, men ikke synligt da den overliggende side '%0%' ikke er udgivet!</key>
-	<key alias="parentNotPublishedAnomaly">Upd: dette dokument er udgiver, men er ikke i cachen (intern fejl)</key>
+    <key alias="parentNotPublishedAnomaly">Upd: dette dokument er udgiver, men er ikke i cachen (intern fejl)</key>
     <key alias="publish">Udgivet</key>
     <key alias="publishStatus">Udgivelsesstatus</key>
     <key alias="releaseDate">Udgivelsesdato</key>
-	<key alias="unpublishDate">Dato for Fortryd udgivelse</key>
+    <key alias="unpublishDate">Dato for Fortryd udgivelse</key>
     <key alias="removeDate">Fjern dato</key>
     <key alias="sortDone">Sorteringrækkefølgen er opdateret</key>
     <key alias="sortHelp">For at sortere, træk siderne eller klik på en af kolonnehovederne. Du kan vælge flere sider ved at holde "shift" eller "control" nede mens du vælger.</key>
     <key alias="statistics">Statistik</key>
     <key alias="titleOptional">Titel (valgfri)</key>
-	<key alias="altTextOptional">Alternativ tekst (valgfri)</key>
+    <key alias="altTextOptional">Alternativ tekst (valgfri)</key>
     <key alias="type">Type</key>
     <key alias="unPublish">Fortryd udgivelse</key>
     <key alias="updateDate">Sidst redigeret</key>
     <key alias="updateDateDesc" version="7.0">Tidspunkt for seneste redigering</key>
     <key alias="uploadClear">Fjern fil</key>
     <key alias="urls">Link til dokument</key>
-	<key alias="memberof">Medlem af grupper(ne)</key>
+    <key alias="memberof">Medlem af grupper(ne)</key>
     <key alias="notmemberof">Ikke medlem af grupper(ne)</key>
     <key alias="childItems" version="7.0">Undersider</key>
     <key alias="target" version="7.0">Åben i vindue</key>
@@ -154,6 +163,10 @@
   <area alias="media">
     <key alias="clickToUpload">Klik for at uploade</key>
     <key alias="dropFilesHere">Slip filerne her...</key>
+  </area>
+  <area alias="member">
+    <key alias="createNewMember">Opret et nyt medlem</key>
+    <key alias="allMembers">Alle medlemmer</key>
   </area>
   <area alias="create">
     <key alias="chooseNode">Hvor ønsker du at oprette den nye %0%</key>
@@ -346,7 +359,7 @@
     <key alias="logout">Log ud</key>
     <key alias="macro">Makro</key>
     <key alias="move">Flyt</key>
-	<key alias="more">Mere</key>
+    <key alias="more">Mere</key>
     <key alias="name">Navn</key>
     <key alias="new">Ny</key>
     <key alias="next">Næste</key>
@@ -366,7 +379,7 @@
     <key alias="remaining">Mangler</key>
     <key alias="rename">Omdøb</key>
     <key alias="renew">Forny</key>
-	<key alias="required" version="7.0">Påkrævet</key>
+    <key alias="required" version="7.0">Påkrævet</key>
     <key alias="retry">Prøv igen</key>
     <key alias="rights">Rettigheder</key>
     <key alias="search">Søg</key>
@@ -407,6 +420,9 @@
     <key alias="databaseErrorWebConfig">Kunne ikke gemme web.config filen. Du bedes venligst manuelt ændre database forbindelses strengen.</key>
     <key alias="databaseFound">Din database er blevet fundet og identificeret som</key>
     <key alias="databaseHeader">Database konfiguration</key>
+    <key alias="databaseInstall"><![CDATA[
+      Klik på <strong>installér</strong> knappen for at installere Umbraco %0% databasen
+    ]]></key>
     <key alias="databaseInstall"><![CDATA[Tryk på <strong>installér</strong> knappen for at installere Umbraco %0% databasen]]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% er nu blevet kopieret til din database. Tryk på <string>Næste</strong> for at fortsætte.]]></key>
     <key alias="databaseNotFound"><![CDATA[<p>Databasen er ikke fundet. Kontrollér venligst at informationen i database forbindelsesstrengen i "web.config" filen er korrekt.</p>
@@ -669,6 +685,14 @@ Mange hilsner fra Umbraco robotten
     <key alias="translation">Oversættelse</key>
     <key alias="users">Brugere</key>
     <key alias="help">Hjælp</key>
+    <key alias="forms">Formularer</key>
+    <key alias="analytics">Analytics</key>
+  </area>
+  <area alias="help">
+    <key alias="goTo">gå til</key>
+    <key alias="helpTopicsFor">Hjælpeemner for</key>
+    <key alias="videoChaptersFor">Videokapitler for</key>
+    <key alias="theBestUmbracoVideoTutorials">De bedste Umbraco video tutorials</key>
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Standardskabelon</key>
@@ -678,6 +702,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="nodetype">Nodetype</key>
     <key alias="objecttype">Type</key>
     <key alias="stylesheet">Stylesheet</key>
+    <key alias="script">Script</key>
     <key alias="stylesheet editor egenskab">Stylesheetegenskab</key>
     <key alias="tab">Faneblad</key>
     <key alias="tabname">Titel på faneblad</key>
@@ -691,6 +716,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="sortPleaseWait"><![CDATA[Vent venligst mens siderne sorteres. Det kan tage et stykke tid<br/><br/>Luk ikke dette vindue imens]]></key>
   </area>
   <area alias="speechBubbles">
+    <key alias="operationCancelledHeader">Annulleret</key>
+    <key alias="operationCancelledText">Handlingen blev annulleret af et 3. part tilføjelsesprogram</key>
     <key alias="contentPublishedFailedByEvent">Udgivelsen blev standset af et 3. parts modul</key>
     <key alias="contentTypeDublicatePropertyType">Property type eksisterer allerede</key>
     <key alias="contentTypePropertyTypeCreated">Egenskabstype oprettet</key>
@@ -712,7 +739,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="editContentSavedText">Husk at publicere for at gøre det synligt for besøgende</key>
     <key alias="editContentSendToPublish">Send til Godkendelse</key>
     <key alias="editContentSendToPublishText">Rettelser er blevet sendt til godkendelse</key>
-	<key alias="editMediaSaved">Medie gemt</key>
+    <key alias="editMediaSaved">Medie gemt</key>
     <key alias="editMediaSavedText">Medie gemt uden problemer</key>
     <key alias="editMemberSaved">Medlem gemt</key>
     <key alias="editStylesheetPropertySaved">Stylesheetegenskab gemt</key>
@@ -720,6 +747,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="editTemplateSaved">Template gemt</key>
     <key alias="editUserError">Der er opstået en fejl under redigering</key>
     <key alias="editUserSaved">Bruger gemt</key>
+    <key alias="editUserTypeSaved">Brugertype gemt</key>
     <key alias="fileErrorHeader">Fil ikke gemt</key>
     <key alias="fileErrorText">Filen kunne ikke gemmes. Tjek filrettighederne</key>
     <key alias="fileSavedHeader">Fil gemt</key>
@@ -738,6 +766,11 @@ Mange hilsner fra Umbraco robotten
     <key alias="xsltPermissionErrorText">XSLT kunne ikke gemmes, check filrettigheder</key>
     <key alias="xsltSavedHeader">XSLT gemt</key>
     <key alias="xsltSavedText">Der var ingen fejl i din XSLT!</key>
+    <key alias="contentUnpublished">Indhold fjernet fra udgivelse</key>
+    <key alias="partialViewSavedHeader">Partial view gemt</key>
+    <key alias="partialViewSavedText">Partial view gemt uden fejl!</key>
+    <key alias="partialViewErrorHeader">Partial view ikke gemt</key>
+    <key alias="partialViewErrorText">Der opstod en fejl ved at gemme filen.</key>
   </area>
   <area alias="stylesheet">
     <key alias="aliasHelp">Bruger CSS-syntax f.eks. h1, .redheader, .blueTex</key>
@@ -778,6 +811,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="recursive">Rekursivt</key>
     <key alias="removeParagraph">Fjern paragraf-tags</key>
     <key alias="removeParagraphHelp">Fjerner eventuelle &amp;lt;P&amp;gt; omkring teksten</key>
+    <key alias="standardFields">Standard felter</key>
     <key alias="uppercase">Uppercase</key>
     <key alias="urlEncode">URL encode</key>
     <key alias="urlEncodeHelp">Hvis indholdet af felterne skal sendes til en url, skal denne slåes til så specialtegn formateres</key>
@@ -832,7 +866,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="memberType">Medlemstype</key>
     <key alias="nodeTypes">Dokumenttyper</key>
     <key alias="packager">Pakker</key>
-	<key alias="packages">Pakker</key>
+    <key alias="packages">Pakker</key>
     <key alias="python">Python</key>
     <key alias="repositories">Installer fra "repository"</key>
     <key alias="runway">Installer Runway</key>
@@ -842,6 +876,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="stylesheets">Stylesheets</key>
     <key alias="templates">Skabeloner</key>
     <key alias="xslt">XSLT-filer</key>
+    <key alias="analytics">Analytics</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Ny opdatering er klar</key>
@@ -863,16 +898,17 @@ Mange hilsner fra Umbraco robotten
     <key alias="editors">Redaktør</key>
     <key alias="excerptField">Uddragsfelt</key>
     <key alias="language">Sprog</key>
-    <key alias="loginname">Login</key>
+    <key alias="loginname">Brugernavn</key>
     <key alias="mediastartnode">Startnode i mediearkivet</key>
     <key alias="modules">Moduler</key>
     <key alias="noConsole">Deaktivér adgang til Umbraco</key>
     <key alias="password">Adgangskode</key>
+    <key alias="resetPassword">Nulstil kodeord</key>
     <key alias="passwordChanged">Dit kodeord er blevet ændret!</key>
     <key alias="passwordConfirm">Bekræft venligst dit nye kodeord</key>
     <key alias="passwordEnterNew">Indtast dit nye kodeord</key>
-	<key alias="passwordCurrent">Nuværende kodeord</key>
-	<key alias="passwordInvalid">ugyldig nuværende kodeord</key>
+    <key alias="passwordCurrent">Nuværende kodeord</key>
+    <key alias="passwordInvalid">ugyldig nuværende kodeord</key>
     <key alias="passwordIsBlank">Dit nye kodeord må ikke være tomt!</key>
     <key alias="passwordIsDifferent">Dit nye kodeord og dit bekræftede kodeord var ikke ens, forsøg venligst igen!</key>
     <key alias="passwordMismatch">Det bekræftede kodeord matcher ikke det nye kodeord</key>
@@ -881,12 +917,12 @@ Mange hilsner fra Umbraco robotten
     <key alias="permissionSelectPages">Vælg sider for at ændre deres rettigheder</key>
     <key alias="searchAllChildren">Søg alle 'børn'</key>
     <key alias="startnode">Start node</key>
-    <key alias="username">Brugernavn</key>
-    <key alias="userPermissions">Bruger tilladelser</key>
+    <key alias="username">Navn</key>
+    <key alias="userPermissions">Brugertilladelser</key>
     <key alias="usertype">Brugertype</key>
-    <key alias="userTypes">Bruger typer</key>
+    <key alias="userTypes">Brugertyper</key>
     <key alias="writer">Forfatter</key>
-
+    <key alias="translator">Oversætter</key>
     <key alias="yourProfile">Din profil</key>
     <key alias="yourHistory">Din historik</key>
     <key alias="sessionExpires">Session udløber</key>
