@@ -51,7 +51,9 @@
             state: "=?",
             shortcut: "@?",
             label: "@?",
-            labelKey: "@?"
+            labelKey: "@?",
+            icon: "@?",
+            disabled: "="
          }
       };
 

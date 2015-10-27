@@ -1,39 +1,21 @@
 <div class="umb-media-grid">
 
-   <div class="umb-media-grid__folders">
+   <a href="" ng-click="clickItem(item)" ng-repeat="item in items" ng-style="item.flexStyle" class="umb-media-grid__item" ng-hide="item.hidden">
 
-      <a href="#{{folder.editPath}}" class="umb-media-grid__folder" ng-repeat="folder in folders">
+      <div class="umb-media-grid__actions">
+         <i ng-if="onDetailsHover" class="icon-info umb-media-grid__action -not-clickable" ng-mouseover="hoverItemDetails(item, $event, true)" ng-mouseleave="hoverItemDetails(item, $event, false)"></i>
+         <i ng-if="onSelect" class="icon-check umb-media-grid__action" ng-click="selectItem(item, $event, $index)" ng-class="{'-selected': item.selected}" prevent-default></i>
+      </div>
 
-         <i class="umb-media-grid__folder-icon {{ folder.icon }}"></i>
+      <div class="umb-media-grid__item-overlay">
+         <div class="umb-media-grid__item-name">{{item.name}}</div>
+      </div>
 
-         <div class="umb-media-grid__folder-name">{{ folder.name }}</div>
+      <img class="umb-media-grid__item-image" ng-if="item.thumbnail" ng-src="{{item.thumbnail}}" alt="{{item.name}}" ng-class="{'-faded': item.selected}" />
+      <img class="umb-media-grid__item-image" ng-if="!item.thumbnail" src="assets/img/transparent.png" alt="{{item.name}}" />
 
-         <div class="umb-media-grid__select -size-20" ng-click="toggleSelectItem(folder)" ng-class="{'-selected': folder.selected}" prevent-default>
-            <i class="icon-check umb-media-grid__select-icon"></i>
-         </div>
+      <i class="umb-media-grid__item-icon {{ item.icon }}" ng-if="!item.thumbnail"></i>
 
-      </a>
-
-   </div>
-
-   <div class="umb-media-grid__media">
-
-      <a href="#{{item.editPath}}" ng-repeat="item in mediaItems" ng-style="item.flexStyle" class="umb-media-grid__item">
-
-         <div class="umb-media-grid__select" ng-click="toggleSelectItem(item)" ng-class="{'-selected': item.selected}" prevent-default>
-            <i class="icon-check umb-media-grid__select-icon"></i>
-         </div>
-
-         <div class="umb-media-grid__item-overlay">{{item.name}}</div>
-
-         <img class="umb-media-grid__item-image" ng-if="item.thumbnail" ng-src="{{item.thumbnail}}" alt="{{item.name}}" ng-class="{'-faded': item.selected}" />
-
-         <img class="umb-media-grid__item-image" ng-if="!item.thumbnail" src="assets/img/transparent.png" alt="{{item.name}}" />
-
-         <i class="umb-media-grid__item-icon {{ item.icon }}" ng-if="!item.thumbnail"></i>
-
-      </a>
-
-   </div>
+   </a>
 
 </div>
