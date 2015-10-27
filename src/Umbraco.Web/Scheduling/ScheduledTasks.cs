@@ -63,12 +63,7 @@ namespace Umbraco.Web.Scheduling
         {
             using (var wc = new HttpClient())
             {
-                var request = new HttpRequestMessage()
-                {
-                    RequestUri = new Uri(url),
-                    Method = HttpMethod.Get,
-                    Content = new StringContent(string.Empty)
-                };
+                var request = new HttpRequestMessage(HttpMethod.Get, url);
 
                 //TODO: pass custom the authorization header, currently these aren't really secured!
                 //request.Headers.Authorization = AdminTokenAuthorizeAttribute.GetAuthenticationHeaderValue(_appContext);
@@ -95,10 +90,14 @@ namespace Umbraco.Web.Scheduling
         {
             if (_appContext == null) return true; // repeat...
 
-            if (ServerEnvironmentHelper.GetStatus(_settings) == CurrentServerEnvironmentStatus.Slave)
+            switch (_appContext.GetCurrentServerRole())
             {
-                LogHelper.Debug<ScheduledTasks>("Does not run on slave servers.");
-                return false; // do NOT repeat, server status comes from config and will NOT change
+                case ServerRole.Slave:
+                    LogHelper.Debug<ScheduledTasks>("Does not run on slave servers.");
+                    return true; // DO repeat, server role can change
+                case ServerRole.Unknown:
+                    LogHelper.Debug<ScheduledTasks>("Does not run on servers with unknown role.");
+                    return true; // DO repeat, server role can change
             }
 
             // ensure we do not run if not main domain, but do NOT lock it

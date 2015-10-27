@@ -18,7 +18,7 @@ namespace Umbraco.Tests.Routing
     {
         protected override void FreezeResolution()
         {
-            SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(new SiteDomainHelper());            
+            SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(new SiteDomainHelper());
             base.FreezeResolution();
         }
 
@@ -29,20 +29,23 @@ namespace Umbraco.Tests.Routing
                 new UmbracoDomain("domain1.com/")
                 {
                     Id = 1,
-                    Language = new Language("de-DE"),
-                    RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1001}
+                    LanguageId = LangDeId,
+                    RootContentId = 1001,
+                    LanguageIsoCode = "de-DE"
                 },
                 new UmbracoDomain("domain1.com/en")
                 {
                     Id = 1,
-                    Language = new Language("en-US"),
-                    RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10011}
+                    LanguageId = LangEngId,
+                    RootContentId = 10011,
+                    LanguageIsoCode = "en-US"
                 },
                 new UmbracoDomain("domain1.com/fr")
                 {
                     Id = 1,
-                    Language = new Language("fr-FR"),
-                    RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10012}
+                    LanguageId = LangFrId,
+                    RootContentId = 10012,
+                    LanguageIsoCode = "fr-FR"
                 }
             });
         }
@@ -54,56 +57,65 @@ namespace Umbraco.Tests.Routing
                 new UmbracoDomain("domain1.com/")
                 {
                     Id = 1,
-                    Language = new Language("de-DE"),
-                    RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1001}
+                    LanguageId = LangDeId,
+                    RootContentId = 1001,
+                    LanguageIsoCode = "de-DE"
                 },
                 new UmbracoDomain("domain1.com/en")
                 {
                     Id = 1,
-                    Language = new Language("en-US"),
-                    RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10011}
+                    LanguageId = LangEngId,
+                    RootContentId = 10011,
+                    LanguageIsoCode = "en-US"
                 },
                 new UmbracoDomain("domain1.com/fr")
                 {
                     Id = 1,
-                    Language = new Language("fr-FR"),
-                    RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10012}
+                    LanguageId = LangFrId,
+                    RootContentId = 10012,
+                    LanguageIsoCode = "fr-FR"
                 },
                 new UmbracoDomain("*1001")
                 {
                     Id = 1,
-                    Language = new Language("de-DE"),
-                    RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1001}
+                    LanguageId = LangDeId,
+                    RootContentId = 1001,
+                    LanguageIsoCode = "de-DE"
                 },
                 new UmbracoDomain("*10011")
                 {
                     Id = 1,
-                    Language = new Language("cs-CZ"),
-                    RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10011}
+                    LanguageId = LangCzId,
+                    RootContentId = 10011,
+                    LanguageIsoCode = "cs-CZ"
                 },
                 new UmbracoDomain("*100112")
                 {
                     Id = 1,
-                    Language = new Language("nl-NL"),
-                    RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 100112}
+                    LanguageId = LangNlId,
+                    RootContentId = 100112,
+                    LanguageIsoCode = "nl-NL"
                 },
                 new UmbracoDomain("*1001122")
                 {
                     Id = 1,
-                    Language = new Language("da-DK"),
-                    RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1001122}
+                    LanguageId = LangDkId,
+                    RootContentId = 1001122,
+                    LanguageIsoCode = "da-DK"
                 },
                 new UmbracoDomain("*10012")
                 {
                     Id = 1,
-                    Language = new Language("nl-NL"),
-                    RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10012}
+                    LanguageId = LangNlId,
+                    RootContentId = 10012,
+                    LanguageIsoCode = "nl-NL"
                 },
                 new UmbracoDomain("*10031")
                 {
                     Id = 1,
-                    Language = new Language("nl-NL"),
-                    RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 10031}
+                    LanguageId = LangNlId,
+                    RootContentId =10031,
+                    LanguageIsoCode = "nl-NL"
                 }
             });
         }
@@ -259,7 +271,7 @@ namespace Umbraco.Tests.Routing
 
             var routingContext = GetRoutingContext(inputUrl);
             var url = routingContext.UmbracoContext.CleanedUmbracoUrl;
-                //very important to use the cleaned up umbraco url
+            //very important to use the cleaned up umbraco url
             var pcr = new PublishedContentRequest(url, routingContext);
 
             // lookup domain
@@ -307,7 +319,7 @@ namespace Umbraco.Tests.Routing
 
             var routingContext = GetRoutingContext(inputUrl);
             var url = routingContext.UmbracoContext.CleanedUmbracoUrl;
-                //very important to use the cleaned up umbraco url
+            //very important to use the cleaned up umbraco url
             var pcr = new PublishedContentRequest(url, routingContext);
 
             // lookup domain
@@ -326,7 +338,7 @@ namespace Umbraco.Tests.Routing
             Assert.AreEqual(pcr.PublishedContent.Id, expectedNode);
         }
 
-      
+
 
         #region Cases
         [TestCase(10011, "http://domain1.com/", "en-US")]
@@ -342,20 +354,23 @@ namespace Umbraco.Tests.Routing
                 new UmbracoDomain("domain1.com/")
                 {
                     Id = 1,
-                    Language = new Language("en-US"),
-                    RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1001}
+                    LanguageId = LangEngId,
+                    RootContentId = 1001,
+                    LanguageIsoCode = "en-US"
                 },
                 new UmbracoDomain("domain1.fr/")
                 {
                     Id = 1,
-                    Language = new Language("fr-FR"),
-                    RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 1001}
+                    LanguageId = LangFrId,
+                    RootContentId = 1001,
+                    LanguageIsoCode = "fr-FR"
                 },
                 new UmbracoDomain("*100112")
                 {
                     Id = 1,
-                    Language = new Language("de-DE"),
-                    RootContent = new Content("test1", -1, new ContentType(-1)) {Id = 100112}
+                    LanguageId = LangDeId,
+                    RootContentId = 100112,
+                    LanguageIsoCode = "de-DE"
                 }
             });
 
@@ -365,7 +380,7 @@ namespace Umbraco.Tests.Routing
             var content = umbracoContext.ContentCache.GetById(nodeId);
             Assert.IsNotNull(content);
 
-            var culture = Web.Models.ContentExtensions.GetCulture(umbracoContext, domainService, null, null, content.Id, content.Path, new Uri(currentUrl));
+            var culture = Web.Models.ContentExtensions.GetCulture(umbracoContext, domainService, ServiceContext.LocalizationService, null, content.Id, content.Path, new Uri(currentUrl));
             Assert.AreEqual(expectedCulture, culture.Name);
         }
     }

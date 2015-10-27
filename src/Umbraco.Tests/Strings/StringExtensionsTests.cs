@@ -24,6 +24,18 @@ namespace Umbraco.Tests.Strings
             ShortStringHelperResolver.Reset();
         }
 
+        [TestCase("hello", "world", false)]
+        [TestCase("hello", "hello", true)]
+        [TestCase("hellohellohellohellohellohellohello", "hellohellohellohellohellohellohelloo", false)]
+        [TestCase("hellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohello", "hellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohelloo", false)]
+        [TestCase("hellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohello", "hellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohellohello", true)]
+        public void String_To_Guid(string first, string second, bool result)
+        {
+            Console.WriteLine("First: " + first.ToGuid());
+            Console.WriteLine("Second: " + second.ToGuid());
+            Assert.AreEqual(result, first.ToGuid() == second.ToGuid());
+        }
+
         [TestCase("alert('hello');", false)]
         [TestCase("~/Test.js", true)]
         [TestCase("../Test.js", true)]

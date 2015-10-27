@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Text;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
@@ -29,12 +32,16 @@ namespace Umbraco.Core.Models
         private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<Template, string>(x => x.Name);
 
         public Template(string name, string alias)
-            : base(string.Empty)
+            : this(name, alias, (Func<File, string>) null)
+        { }
+
+        internal Template(string name, string alias, Func<File, string> getFileContent)
+            : base(string.Empty, getFileContent)
         {
             _name = name;
             _alias = alias.ToCleanString(CleanStringType.UnderscoreAlias);
             _masterTemplateId = new Lazy<int>(() => -1);
-        }        
+        }
 
         [Obsolete("This constructor should not be used, file path is determined by alias, setting the path here will have no affect")]
         public Template(string path, string name, string alias)
@@ -123,7 +130,6 @@ namespace Umbraco.Core.Models
                 Key = Guid.NewGuid();
         }
 
-
         public void SetMasterTemplate(ITemplate masterTemplate)
         {
             if (masterTemplate == null)
@@ -139,27 +145,9 @@ namespace Umbraco.Core.Models
            
         }
 
-        public override object DeepClone()
+        protected override void DeepCloneNameAndAlias(File clone)
         {
-        
-            //We cannot call in to the base classes to clone because the base File class treats Alias, Name.. differently so we need to manually do the clone
-
-            //Memberwise clone on Entity will work since it doesn't have any deep elements
-            // for any sub class this will work for standard properties as well that aren't complex object's themselves.
-            var clone = (Template)MemberwiseClone();
-            //turn off change tracking
-            clone.DisableChangeTracking();
-            //Automatically deep clone ref properties that are IDeepCloneable
-            DeepCloneHelper.DeepCloneRefProperties(this, clone);
-
-            //this shouldn't really be needed since we're not tracking
-            clone.ResetDirtyProperties(false);
-            //re-enable tracking
-            clone.EnableChangeTracking();
-
-            return clone;
+            // do nothing - prevents File from doing its stuff
         }
-
-        
     }
 }

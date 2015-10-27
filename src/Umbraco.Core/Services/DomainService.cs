@@ -26,10 +26,15 @@ namespace Umbraco.Core.Services
             } 
         }
 
-        public void Delete(IDomain domain)
+        public Attempt<OperationStatus> Delete(IDomain domain)
         {
-            if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IDomain>(domain), this))
-                return;
+            var evtMsgs = EventMessagesFactory.Get();
+            if (Deleting.IsRaisedEventCancelled(
+                   new DeleteEventArgs<IDomain>(domain, evtMsgs),
+                   this))
+            {
+                return Attempt.Fail(OperationStatus.Cancelled(evtMsgs));
+            }
 
             var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateDomainRepository(uow))
@@ -38,8 +43,9 @@ namespace Umbraco.Core.Services
                 uow.Commit();               
             }
 
-            var args = new DeleteEventArgs<IDomain>(domain, false);
+            var args = new DeleteEventArgs<IDomain>(domain, false, evtMsgs);
             Deleted.RaiseEvent(args, this);
+            return Attempt.Succeed(OperationStatus.Success(evtMsgs));
         }
 
         public IDomain GetByName(string name)
@@ -78,12 +84,14 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public void Save(IDomain domainEntity, bool raiseEvents = true)
+        public Attempt<OperationStatus> Save(IDomain domainEntity)
         {
-            if (raiseEvents)
+            var evtMsgs = EventMessagesFactory.Get();
+            if (Saving.IsRaisedEventCancelled(
+                    new SaveEventArgs<IDomain>(domainEntity, evtMsgs),
+                    this))
             {
-                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IDomain>(domainEntity), this))
-                    return;
+                return Attempt.Fail(OperationStatus.Cancelled(evtMsgs));
             }
 
             var uow = UowProvider.GetUnitOfWork();
@@ -93,8 +101,8 @@ namespace Umbraco.Core.Services
                 uow.Commit();
             }
 
-            if (raiseEvents)
-                Saved.RaiseEvent(new SaveEventArgs<IDomain>(domainEntity, false), this);
+            Saved.RaiseEvent(new SaveEventArgs<IDomain>(domainEntity, false, evtMsgs), this);
+            return Attempt.Succeed(OperationStatus.Success(evtMsgs));
         }
 
         #region Event Handlers

@@ -6,7 +6,7 @@
  * @description
  * The controller for deleting content
  */
-function ContentDeleteController($scope, contentResource, treeService, navigationService, editorState, $location) {
+function ContentDeleteController($scope, contentResource, treeService, navigationService, editorState, $location, dialogService, notificationsService) {
 
     $scope.performDelete = function() {
 
@@ -41,6 +41,20 @@ function ContentDeleteController($scope, contentResource, treeService, navigatio
             }
 
             navigationService.hideMenu();
+        }, function(err) {
+
+            $scope.currentNode.loading = false;
+
+            //check if response is ysod
+            if (err.status && err.status >= 500) {
+                dialogService.ysodDialog(err);
+            }
+            
+            if (err.data && angular.isArray(err.data.notifications)) {
+                for (var i = 0; i < err.data.notifications.length; i++) {
+                    notificationsService.showNotification(err.data.notifications[i]);
+                }
+            }
         });
 
     };

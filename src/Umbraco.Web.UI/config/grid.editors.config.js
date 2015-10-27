@@ -9,7 +9,6 @@
 	    "name": "Image",
 	    "alias": "media",
 	    "view": "media",
-	    "render": "eatme",
 	    "icon": "icon-picture"
 	},
 	{

@@ -5,9 +5,7 @@
     protected override void OnLoad(EventArgs e)
     {
         base.OnLoad(e);
-
         global::umbraco.presentation.preview.PreviewContent.ClearPreviewCookie();
-
         if (!Uri.IsWellFormedUriString(Request.QueryString["redir"], UriKind.Relative))
         {
             Response.Redirect("/", true);
@@ -17,7 +15,10 @@
         {
             Response.Redirect("/", true);
         }
-
+        if (Request.QueryString["redir"].StartsWith("//"))
+        {
+            Response.Redirect("/", true);
+        }
         Response.Redirect(url.ToString(), true);
     }
 

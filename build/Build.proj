@@ -144,14 +144,14 @@
         DestinationFiles="@(WebPiFiles->'$(WebPiFolder)%(RecursiveDir)%(Filename)%(Extension)')" />
 
     <!-- Zip the files -->
-    <Exec Command="..\tools\7zip\7za.exe a -r %22$(BuildZipFileNameWebPi)%22 %22$(WebPiFolderAbsolutePath)*%22 -x!dotLess.Core.dll >NUL" />
+    <Exec Command="..\tools\7zip\7za.exe a -r %22$(BuildZipFileNameWebPi)%22 %22$(WebPiFolderAbsolutePath)*%22 -x!dotLess.Core.dll -x![Content_Types].xml >NUL" />
   </Target>
 
   <Target Name="ZipWebApp" DependsOnTargets="CreateSystemFolders" >
     <Message Text="Starting to zip to $(buildDate)-$(BuildZipFileName)" Importance="high" />
 
     <Exec Command="..\tools\7zip\7za.exe a -r %22$(BuildZipFileNameBin)%22 %22$(SolutionBinFolderAbsolutePath)*%22 -x!dotLess.Core.dll >NUL" />
-    <Exec Command="..\tools\7zip\7za.exe a -r %22$(BuildZipFileName)%22 %22$(WebAppFolderAbsolutePath)*%22 -x!dotLess.Core.dll >NUL" />
+    <Exec Command="..\tools\7zip\7za.exe a -r %22$(BuildZipFileName)%22 %22$(WebAppFolderAbsolutePath)*%22 -x!dotLess.Core.dll -x![Content_Types].xml >NUL" />
 
     <Message Text="Finished zipping to build\$(BuildFolder)\$(buildDate)-$(BuildZipFileName)" Importance="high" />
   </Target>
@@ -218,6 +218,7 @@
   <Target Name="CopyTransformedConfig"  DependsOnTargets="CopyXmlDocumentation">
     <ItemGroup>
       <ConfigFiles Include="$(WebAppFolder)config\*.config;$(WebAppFolder)config\*.js" />
+      <CustomLanguageFiles Include="$(WebAppFolder)config\lang\*.xml" />
       <WebConfigTransformFile Include="$(WebAppFolder)Web.config" />
     </ItemGroup>
 
@@ -226,6 +227,11 @@
         OverwriteReadOnlyFiles="true"
         SkipUnchangedFiles="false" />
 
+    <Copy SourceFiles="@(CustomLanguageFiles)"
+      DestinationFiles="@(CustomLanguageFiles->'$(ConfigsFolder)Lang\%(RecursiveDir)%(Filename)%(Extension)')"
+      OverwriteReadOnlyFiles="true"
+      SkipUnchangedFiles="false" />
+	  
     <Copy SourceFiles="@(WebConfigTransformFile)"
       DestinationFiles="$(ConfigsFolder)Web.config.transform"
       OverwriteReadOnlyFiles="true"

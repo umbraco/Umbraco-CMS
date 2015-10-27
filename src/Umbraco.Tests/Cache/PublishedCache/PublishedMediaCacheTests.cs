@@ -10,6 +10,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
@@ -106,6 +107,14 @@ namespace Umbraco.Tests.Cache.PublishedCache
 			DoAssert(dicDoc);
 		}
 
+        [Test]
+        public void DictionaryDocument_Key()
+        {
+            var key = Guid.NewGuid();
+            var dicDoc = GetDictionaryDocument(keyVal: key);
+            DoAssert(dicDoc, keyVal: key);
+        }
+
 		[Test]
 		public void DictionaryDocument_Get_Children()
 		{
@@ -122,10 +131,12 @@ namespace Umbraco.Tests.Cache.PublishedCache
 			Assert.AreEqual(444555, dicDoc.Children.ElementAt(1).Id);
 		}
 
-		[Test]
-		public void Convert_From_Search_Result()
+		[TestCase(true)]
+        [TestCase(false)]
+        public void Convert_From_Search_Result(bool withKey)
 		{
             var ctx = GetUmbracoContext("/test", 1234);
+		    var key = Guid.NewGuid();
 
 			var result = new SearchResult()
 				{
@@ -138,6 +149,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
 			result.Fields.Add("__Path", "-1,1234");
 			result.Fields.Add("__nodeName", "Test");
 			result.Fields.Add("id", "1234");
+            if (withKey) result.Fields.Add("key", key.ToString());
 			result.Fields.Add("nodeName", "Test");
 			result.Fields.Add("nodeTypeAlias", Constants.Conventions.MediaTypes.Image);
 			result.Fields.Add("parentID", "-1");
@@ -148,21 +160,24 @@ namespace Umbraco.Tests.Cache.PublishedCache
             var store = new PublishedMediaCache(ctx.Application);
 			var doc = store.CreateFromCacheValues(store.ConvertFromSearchResult(result));
 
-			DoAssert(doc, 1234, 0, 0, "", "Image", 0, "Shannon", "", 0, 0, "-1,1234", default(DateTime), DateTime.Parse("2012-07-16T10:34:09"), 2);
+			DoAssert(doc, 1234, withKey ? key : default(Guid), 0, 0, "", "Image", 0, "Shannon", "", 0, 0, "-1,1234", default(DateTime), DateTime.Parse("2012-07-16T10:34:09"), 2);
 			Assert.AreEqual(null, doc.Parent);
 		}
 
-		[Test]
-		public void Convert_From_XPath_Navigator()
+        [TestCase(true)]
+        [TestCase(false)]
+        public void Convert_From_XPath_Navigator(bool withKey)
 		{
             var ctx = GetUmbracoContext("/test", 1234);
+            var key = Guid.NewGuid();
 
 			var xmlDoc = GetMediaXml();
+            if (withKey) ((XmlElement)xmlDoc.DocumentElement.FirstChild).SetAttribute("key", key.ToString());
 			var navigator = xmlDoc.SelectSingleNode("/root/Image").CreateNavigator();
             var cache = new PublishedMediaCache(ctx.Application);
 			var doc = cache.CreateFromCacheValues(cache.ConvertFromXPathNavigator(navigator, true));
 
-			DoAssert(doc, 2000, 0, 2, "image1", "Image", 2044, "Shannon", "Shannon2", 22, 33, "-1,2000", DateTime.Parse("2012-06-12T14:13:17"), DateTime.Parse("2012-07-20T18:50:43"), 1);
+			DoAssert(doc, 2000, withKey ? key : default(Guid), 0, 2, "image1", "Image", 2044, "Shannon", "Shannon2", 22, 33, "-1,2000", DateTime.Parse("2012-06-12T14:13:17"), DateTime.Parse("2012-07-20T18:50:43"), 1);
 			Assert.AreEqual(null, doc.Parent);
 			Assert.AreEqual(2, doc.Children.Count());
 			Assert.AreEqual(2001, doc.Children.ElementAt(0).Id);
@@ -197,6 +212,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
 
 		private Dictionary<string, string> GetDictionary(			
 			int id, 
+            Guid key,
 			int parentId,
 			string idKey,
 			string templateKey,
@@ -207,6 +223,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
 			return new Dictionary<string, string>()
 				{
 					{idKey, id.ToString()},
+                    {"key", key.ToString()},
 					{templateKey, "333"},
 					{"sortOrder", "44"},
 					{nodeNameKey, "Testing"},
@@ -232,6 +249,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
 			string nodeTypeAliasKey = "nodeTypeAlias",
 			string pathKey = "path", 
 			int idVal = 1234,
+            Guid keyVal = default(Guid),
 			int parentIdVal = 321,
 			IEnumerable<IPublishedContent> children = null)
 		{
@@ -239,10 +257,10 @@ namespace Umbraco.Tests.Cache.PublishedCache
 				children = new List<IPublishedContent>();
             var dicDoc = new PublishedMediaCache.DictionaryPublishedContent(
 				//the dictionary
-				GetDictionary(idVal, parentIdVal, idKey, templateKey, nodeNameKey, nodeTypeAliasKey, pathKey),
+				GetDictionary(idVal, keyVal, parentIdVal, idKey, templateKey, nodeNameKey, nodeTypeAliasKey, pathKey),
 				//callback to get the parent
                 d => new PublishedMediaCache.DictionaryPublishedContent(
-						GetDictionary(parentIdVal, -1, idKey, templateKey, nodeNameKey, nodeTypeAliasKey, pathKey),
+						GetDictionary(parentIdVal, default(Guid), -1, idKey, templateKey, nodeNameKey, nodeTypeAliasKey, pathKey),
 					//there is no parent
 						a => null,
 					//we're not going to test this so ignore
@@ -261,6 +279,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
 		private void DoAssert(
 			PublishedMediaCache.DictionaryPublishedContent dicDoc,
 			int idVal = 1234,
+            Guid keyVal = default(Guid),
 			int templateIdVal = 333,
 			int sortOrderVal = 44,
 			string urlNameVal = "testing",
@@ -281,7 +300,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
 			if (!updateDateVal.HasValue)
 				updateDateVal = DateTime.Parse("2012-01-03");
 
-			DoAssert((IPublishedContent)dicDoc, idVal, templateIdVal, sortOrderVal, urlNameVal, nodeTypeAliasVal, nodeTypeIdVal, writerNameVal, 
+			DoAssert((IPublishedContent)dicDoc, idVal, keyVal, templateIdVal, sortOrderVal, urlNameVal, nodeTypeAliasVal, nodeTypeIdVal, writerNameVal, 
 				creatorNameVal, writerIdVal, creatorIdVal, pathVal, createDateVal, updateDateVal, levelVal);
 
 			//now validate the parentId that has been parsed, this doesn't exist on the IPublishedContent
@@ -291,7 +310,8 @@ namespace Umbraco.Tests.Cache.PublishedCache
 		private void DoAssert(
 			IPublishedContent doc,
 			int idVal = 1234,
-			int templateIdVal = 333,
+            Guid keyVal = default(Guid),
+            int templateIdVal = 333,
 			int sortOrderVal = 44,
 			string urlNameVal = "testing",
 			string nodeTypeAliasVal = "myType",
@@ -311,6 +331,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
 				updateDateVal = DateTime.Parse("2012-01-03");
 
 			Assert.AreEqual(idVal, doc.Id);
+            Assert.AreEqual(keyVal, doc.GetKey());
 			Assert.AreEqual(templateIdVal, doc.TemplateId);
 			Assert.AreEqual(sortOrderVal, doc.SortOrder);
 			Assert.AreEqual(urlNameVal, doc.UrlName);

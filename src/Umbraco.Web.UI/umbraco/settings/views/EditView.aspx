@@ -6,6 +6,7 @@
 
 <%@ Import Namespace="Umbraco.Core" %>
 <%@ Import Namespace="Umbraco.Core.IO" %>
+<%@ Import Namespace="Umbraco.Web" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 
@@ -35,7 +36,7 @@
                     nameTxtBox: $("#<%= NameTxt.ClientID %>"),
                     aliasTxtBox: $("#<%= AliasTxt.ClientID %>"),
                     saveButton: $("#<%= ((Control)SaveButton).ClientID %>"),
-                    templateId: '<%= Request.QueryString["templateID"] %>',
+                    templateId: '<%= Request.CleanForXss("templateID") %>',
                     codeEditorElementId: '<%= editorSource.ClientID %>',
                     modalUrl: "<%= IOHelper.ResolveUrl(SystemDirectories.Umbraco) %>/dialogs/editMacro.aspx"
                 });
@@ -66,6 +67,7 @@
         <cc1:Pane ID="Pane7" runat="server" >
             
             <cc1:PropertyPanel ID="pp_name" runat="server">
+                <asp:Literal runat="server" ID="PathPrefix"></asp:Literal>
                 <asp:TextBox ID="NameTxt" runat="server"></asp:TextBox>
             </cc1:PropertyPanel>
             

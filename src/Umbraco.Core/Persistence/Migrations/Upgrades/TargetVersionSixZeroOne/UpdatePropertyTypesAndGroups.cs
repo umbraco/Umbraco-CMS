@@ -28,8 +28,11 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixZeroOne
         {
             if (database != null)
             {
-                //Fetch all PropertyTypes that belongs to a PropertyTypeGroup
-                var propertyTypes = database.Fetch<PropertyTypeDto>("WHERE propertyTypeGroupId > 0");
+                //Fetch all PropertyTypes that belongs to a PropertyTypeGroup                
+                //NOTE: We are writing the full query because we've added a column to the PropertyTypeDto in later versions so one of the columns
+                // won't exist yet
+                var propertyTypes = database.Fetch<PropertyTypeDto>("SELECT * FROM cmsPropertyType WHERE propertyTypeGroupId > 0");
+
                 var propertyGroups = database.Fetch<PropertyTypeGroupDto>("WHERE id > 0");
 
                 foreach (var propertyType in propertyTypes)

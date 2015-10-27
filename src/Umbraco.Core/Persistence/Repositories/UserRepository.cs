@@ -358,7 +358,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 return Enumerable.Empty<IUser>();
             }
 
-            var result = GetAll(pagedResult.Items.Select(x => x.Id).ToArray());
+            var ids = pagedResult.Items.Select(x => x.Id).ToArray();
+            var result = ids.Length == 0 ? Enumerable.Empty<IUser>() : GetAll(ids);
 
             //now we need to ensure this result is also ordered by the same order by clause
             return result.OrderBy(orderBy.Compile());
@@ -405,7 +406,8 @@ namespace Umbraco.Core.Persistence.Repositories
         private IEnumerable<IUser> ConvertFromDtos(IEnumerable<UserDto> dtos)
         {
             var userTypeIds = dtos.Select(x => Convert.ToInt32(x.Type)).ToArray();
-            var allUserTypes = _userTypeRepository.GetAll(userTypeIds);
+
+            var allUserTypes = userTypeIds.Length == 0 ? Enumerable.Empty<IUserType>() : _userTypeRepository.GetAll(userTypeIds);
 
             return dtos.Select(dto =>
                 {   

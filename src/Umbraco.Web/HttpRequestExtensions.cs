@@ -32,7 +32,7 @@ namespace Umbraco.Web
 		/// <returns></returns>
 		public static string GetItemAsString(this HttpRequest request, string key, string valueIfNotFound = "")
 		{
-			return new HttpRequestWrapper(request).GetItemAsString(key);
+			return new HttpRequestWrapper(request).GetItemAsString(key, valueIfNotFound);
 		}
 
 		/// <summary>
@@ -44,7 +44,7 @@ namespace Umbraco.Web
 		/// <returns></returns>
 		public static string GetItemAsString(this HttpRequestBase request, string key, string valueIfNotFound = "")
 		{
-			var val = HttpContext.Current.Request[key];
+			var val = request[key];
 			return !val.IsNullOrWhiteSpace() ? val : valueIfNotFound;
 		}
 
@@ -57,7 +57,7 @@ namespace Umbraco.Web
 		/// <returns></returns>
 		public static T GetItemAs<T>(this HttpRequestBase request, string key)
 		{
-			var val = HttpContext.Current.Request[key];
+			var val = request[key];
 			var whitespaceCheck = !val.IsNullOrWhiteSpace() ? val : string.Empty;
 			if (whitespaceCheck.IsNullOrWhiteSpace())
 				return (T) typeof (T).GetDefaultValue();

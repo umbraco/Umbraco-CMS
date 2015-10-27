@@ -119,6 +119,7 @@ namespace Umbraco.Tests.Logging
         }
 
         [Test]
+        [Ignore]
         public void CanLogAtleast1000MessagesASecond()
         {
             // Arrange

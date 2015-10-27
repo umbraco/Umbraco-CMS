@@ -11,6 +11,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using ClientDependency.Core.Config;
 using Examine;
+using Examine.Config;
 using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -83,15 +84,16 @@ namespace Umbraco.Web
         /// <returns></returns>
         protected override ServiceContext CreateServiceContext(DatabaseContext dbContext, IDatabaseFactory dbFactory)
         {
+            //use a request based messaging factory
+            var evtMsgs = new RequestLifespanMessagesFactory(new SingletonUmbracoContextAccessor());
             return new ServiceContext(
                 new RepositoryFactory(ApplicationCache, ProfilingLogger.Logger, dbContext.SqlSyntax, UmbracoConfig.For.UmbracoSettings()),
                 new PetaPocoUnitOfWorkProvider(dbFactory),
                 new FileUnitOfWorkProvider(),
-                new PublishingStrategy(),
+                new PublishingStrategy(evtMsgs, ProfilingLogger.Logger),
                 ApplicationCache,
                 ProfilingLogger.Logger,
-                //use a request based messaging factory
-                new RequestLifespanMessagesFactory(new SingletonUmbracoContextAccessor()));
+                evtMsgs);
         }
 
         /// <summary>
@@ -383,10 +385,36 @@ namespace Umbraco.Web
             }
             else
             {
+
+                // NOTE: This is IMPORTANT! ... we don't want to rebuild any index that is already flagged to be re-indexed 
+                // on startup based on our _indexesToRebuild variable and how Examine auto-rebuilds when indexes are empty
+                // this callback is used below for the DatabaseServerMessenger startup options
+                Action rebuildIndexes = () =>
+                {
+                    //If the developer has explicitly opted out of rebuilding indexes on startup then we 
+                    // should adhere to that and not do it, this means that if they are load balancing things will be
+                    // out of sync if they are auto-scaling but there's not much we can do about that.
+                    if (ExamineSettings.Instance.RebuildOnAppStart == false) return;
+
+                    if (_indexesToRebuild.Any())
+                    {
+                        var otherIndexes = ExamineManager.Instance.IndexProviderCollection.Except(_indexesToRebuild);
+                        foreach (var otherIndex in otherIndexes)
+                        {
+                            otherIndex.RebuildIndex();
+                        }
+                    }
+                    else
+                    {
+                        //rebuild them all
+                        ExamineManager.Instance.RebuildIndex();
+                    }
+                };
+
                 ServerMessengerResolver.Current.SetServerMessenger(new BatchedDatabaseServerMessenger(
                 ApplicationContext,
                 true,
-                    //Default options for web including the required callbacks to build caches
+                //Default options for web including the required callbacks to build caches
                 new DatabaseServerMessengerOptions
                 {
                     //These callbacks will be executed if the server has not been synced
@@ -397,8 +425,8 @@ namespace Umbraco.Web
                         () => global::umbraco.content.Instance.RefreshContentFromDatabase(),
                         //rebuild indexes if the server is not synced
                         // NOTE: This will rebuild ALL indexes including the members, if developers want to target specific 
-                        // indexes then they can adjust this logic themselves.
-                        () => Examine.ExamineManager.Instance.RebuildIndex()
+                        // indexes then they can adjust this logic themselves.                        
+                        rebuildIndexes
                     }
                 }));
             }

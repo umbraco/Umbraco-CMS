@@ -235,7 +235,7 @@ namespace Umbraco.Web.Routing
                        .Reverse()
                        .Select(int.Parse)
                        .TakeWhile(id => id != stopNodeId)
-                       .Select(id => domains.FirstOrDefault(d => d.RootContent.Id == id && d.IsWildcard == false))
+                       .Select(id => domains.FirstOrDefault(d => d.RootContentId == id && d.IsWildcard == false))
                        .SkipWhile(domain => domain == null)
                        .FirstOrDefault();
         }
@@ -256,7 +256,7 @@ namespace Umbraco.Web.Routing
                        .Reverse()
                        .Select(int.Parse)
                        .TakeWhile(id => id != stopNodeId)
-                       .Select(id => domains.FirstOrDefault(d => d.RootContent.Id == id && d.IsWildcard))
+                       .Select(id => domains.FirstOrDefault(d => d.RootContentId == id && d.IsWildcard))
                        .FirstOrDefault(domain => domain != null);
         }
 

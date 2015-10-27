@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Web.Http;
 using System.Web.Services.Description;
 using Umbraco.Core;
@@ -54,16 +55,24 @@ namespace Umbraco.Web.WebServices
             {
                 var wildcard = domains.FirstOrDefault(d => d.IsWildcard);
                 if (wildcard != null)
-                    wildcard.Language = language;
+                    wildcard.LanguageId = language.Id;
                 else
                 {
                     // yet there is a race condition here...
                     var newDomain = new UmbracoDomain("*" + model.NodeId)
                     {
-                        Language = Services.LocalizationService.GetLanguageById(model.Language),
-                        RootContent = Services.ContentService.GetById(model.NodeId)
+                        LanguageId = model.Language,
+                        RootContentId = model.NodeId
                     };
-                    Services.DomainService.Save(newDomain);
+
+                    var saveAttempt = Services.DomainService.Save(newDomain);
+                    if (saveAttempt == false)
+                    {
+                        var response = Request.CreateResponse(HttpStatusCode.BadRequest);
+                        response.Content = new StringContent("Saving new domain failed");
+                        response.ReasonPhrase = saveAttempt.Result.StatusType.ToString();
+                        throw new HttpResponseException(response);
+                    }
                 }
                     
             }
@@ -103,18 +112,43 @@ namespace Umbraco.Web.WebServices
                 names.Add(name);
                 var domain = domains.FirstOrDefault(d => d.DomainName.InvariantEquals(domainModel.Name));
                 if (domain != null)
-                    domain.Language = language;
+                    domain.LanguageId = language.Id;
                 else if (Services.DomainService.Exists(domainModel.Name))
+                {
                     domainModel.Duplicate = true;
+                    var xdomain = Services.DomainService.GetByName(domainModel.Name);
+                    var xrcid = xdomain.RootContentId;
+                    if (xrcid.HasValue)
+                    {
+                        var xcontent = Services.ContentService.GetById(xrcid.Value);
+                        var xnames = new List<string>();
+                        while (xcontent != null)
+                        {
+                            xnames.Add(xcontent.Name);
+                            if (xcontent.ParentId < -1)
+                                xnames.Add("Recycle Bin");
+                            xcontent = xcontent.Parent();
+                        }
+                        xnames.Reverse();
+                        domainModel.Other = "/" + string.Join("/", xnames);
+                    }
+                }
                 else
                 {
                     // yet there is a race condition here...
                     var newDomain = new UmbracoDomain(name)
                     {
-                        Language = Services.LocalizationService.GetLanguageById(domainModel.Lang),
-                        RootContent = Services.ContentService.GetById(model.NodeId)
+                        LanguageId = domainModel.Lang,
+                        RootContentId = model.NodeId
                     };
-                    Services.DomainService.Save(newDomain);
+                    var saveAttempt = Services.DomainService.Save(newDomain);
+                    if (saveAttempt == false)
+                    {
+                        var response = Request.CreateResponse(HttpStatusCode.BadRequest);
+                        response.Content = new StringContent("Saving new domain failed");
+                        response.ReasonPhrase = saveAttempt.Result.StatusType.ToString();
+                        throw new HttpResponseException(response);
+                    }
                 } 
             }
 
@@ -144,6 +178,7 @@ namespace Umbraco.Web.WebServices
             public string Name { get; private set; }
             public int Lang { get; private set; }
             public bool Duplicate { get; set; }
+            public string Other { get; set; }
         }
 
         #endregion

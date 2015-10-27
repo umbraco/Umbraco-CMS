@@ -235,13 +235,32 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork))
             {
                 var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
+                var childContentType = MockedContentTypes.CreateSimpleContentType("blah", "Blah", contentType, randomizeAliases:true);
+                repository.AddOrUpdate(childContentType);
+                unitOfWork.Commit();
 
                 // Act
-                contentType = repository.Get(contentType.Key);
+                var result = repository.Get(childContentType.Key);
 
                 // Assert
-                Assert.That(contentType, Is.Not.Null);
-                Assert.That(contentType.Id, Is.EqualTo(NodeDto.NodeIdSeed + 1));
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.Id, Is.EqualTo(childContentType.Id));
+            }
+        }
+
+        [Test]
+        public void Can_Perform_Get_By_Missing_Guid_On_ContentTypeRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                // Act
+                var result = repository.Get(Guid.NewGuid());
+
+                // Assert
+                Assert.That(result, Is.Null);
             }
         }
 

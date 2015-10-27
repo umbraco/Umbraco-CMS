@@ -80,12 +80,12 @@ namespace Umbraco.Tests.Migrations
 
             public override void Up()
             {
-                Context.Expressions.Add(new AlterColumnExpression(SqlSyntax));
+                Context.Expressions.Add(new AlterColumnExpression(DatabaseProviders.SqlServerCE, new []{DatabaseProviders.SqlServerCE}, SqlSyntax));
             }
 
             public override void Down()
             {
-                Context.Expressions.Add(new AlterColumnExpression(SqlSyntax));
+                Context.Expressions.Add(new AlterColumnExpression(DatabaseProviders.SqlServerCE, new[] { DatabaseProviders.SqlServerCE }, SqlSyntax));
             }
         }
     }

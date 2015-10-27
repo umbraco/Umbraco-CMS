@@ -44,6 +44,11 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 FormatDeleteStatement("umbracoUser2NodeNotify", "nodeId"),
                 FormatDeleteStatement("umbracoUser2NodePermission", "nodeId"),
+                @"DELETE FROM umbracoAccessRule WHERE umbracoAccessRule.accessId IN (
+                    SELECT TB1.id FROM umbracoAccess as TB1 
+                    INNER JOIN umbracoNode as TB2 ON TB1.nodeId = TB2.id 
+                    WHERE TB2.trashed = '1' AND TB2.nodeObjectType = @NodeObjectType)",
+                FormatDeleteStatement("umbracoAccess", "nodeId"),
                 FormatDeleteStatement("umbracoRelation", "parentId"),
                 FormatDeleteStatement("umbracoRelation", "childId"),
                 FormatDeleteStatement("cmsTagRelationship", "nodeId"),
@@ -75,9 +80,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
                 catch (Exception ex)
                 {
-                    trans.Dispose();
+                    // transaction will rollback
                     Logger.Error<RecycleBinRepository<TId, TEntity>>("An error occurred while emptying the Recycle Bin: " + ex.Message, ex);
-                    return false;
+                    throw;
                 }
             }
         }

@@ -28,13 +28,11 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
             var textType = SqlSyntax.GetSpecialDbType(SpecialDbTypes.NTEXT);
 
             Create.Table("umbracoCacheInstruction")
-                .WithColumn("id").AsInt32().Identity().NotNullable()
+                .WithColumn("id").AsInt32().NotNullable().PrimaryKey("PK_umbracoCacheInstruction").Identity()
                 .WithColumn("utcStamp").AsDateTime().NotNullable()
-                .WithColumn("jsonInstruction").AsCustom(textType).NotNullable();
-
-            Create.PrimaryKey("PK_umbracoCacheInstruction")
-                .OnTable("umbracoCacheInstruction")
-                .Column("id");
+                .WithColumn("jsonInstruction").AsCustom(textType).NotNullable()
+                .WithColumn("originated").AsString(500).NotNullable();
+            
         }
 
         public override void Down()

@@ -5,9 +5,9 @@
     </umb-sections>
 
     <!-- navigation container -->
-    <div id="navigation" ng-show="showNavigation" class="fill umb-modalcolumn" ng-animate="'slide'">
+    <div id="navigation" ng-show="showNavigation" class="fill umb-modalcolumn" ng-animate="'slide'" nav-resize>
 
-        <div ng-swipe-left="nav.hideNavigation()" class="navigation-inner-container span6" style="z-index: 100">
+        <div ng-swipe-left="nav.hideNavigation()" class="navigation-inner-container span6">
             
             <!-- the search -->
             <div ng-controller="Umbraco.SearchController" ng-if="authenticated">
@@ -72,7 +72,7 @@
             </div>
         </div>
 
-        <div class="offset6" style="z-index: 10">
+        <div class="offset6" id="navOffset" style="z-index: 10">
             
             <!-- The context menu -->
             <div id='contextMenu' class="umb-modalcolumn fill shadow" ng-swipe-left="nav.hideMenu()" ng-show="showContextMenu" ng-animate="'slide'">
@@ -97,4 +97,5 @@
             </div>
         </div>
     </div>
+    
 </div>

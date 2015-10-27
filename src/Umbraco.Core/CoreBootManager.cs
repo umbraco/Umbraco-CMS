@@ -159,15 +159,16 @@ namespace Umbraco.Core
         /// <returns></returns>
         protected virtual ServiceContext CreateServiceContext(DatabaseContext dbContext, IDatabaseFactory dbFactory)
         {
+            //default transient factory
+            var msgFactory = new TransientMessagesFactory();
             return new ServiceContext(
                 new RepositoryFactory(ApplicationCache, ProfilingLogger.Logger, dbContext.SqlSyntax, UmbracoConfig.For.UmbracoSettings()),
                 new PetaPocoUnitOfWorkProvider(dbFactory),
                 new FileUnitOfWorkProvider(),
-                new PublishingStrategy(),
+                new PublishingStrategy(msgFactory, ProfilingLogger.Logger),
                 ApplicationCache,
                 ProfilingLogger.Logger,
-                //default transient factory
-                new TransientMessagesFactory());
+                msgFactory);
         }
 
         /// <summary>
@@ -321,11 +322,17 @@ namespace Umbraco.Core
         {
             if (_isComplete)
                 throw new InvalidOperationException("The boot manager has already been completed");
-
+            
             FreezeResolution();
 
             //Here we need to make sure the db can be connected to
 		    EnsureDatabaseConnection();
+
+
+            //This is a special case for the user service, we need to tell it if it's an upgrade, if so we need to ensure that
+            // exceptions are bubbled up if a user is attempted to be persisted during an upgrade (i.e. when they auth to login)
+            ((UserService) ApplicationContext.Services.UserService).IsUpgrading = true;
+
 
             using (ProfilingLogger.DebugDuration<CoreBootManager>(
                 string.Format("Executing {0} IApplicationEventHandler.OnApplicationStarted", ApplicationEventsResolver.Current.ApplicationEventHandlers.Count()),
@@ -373,14 +380,19 @@ namespace Umbraco.Core
             if (ApplicationContext.IsConfigured == false) return;
             if (ApplicationContext.DatabaseContext.IsDatabaseConfigured == false) return;
 
+            //try now
+            if (ApplicationContext.DatabaseContext.CanConnect)
+                return;
+
             var currentTry = 0;
             while (currentTry < 5)
             {
+                //first wait, then retry
+                Thread.Sleep(1000);
+
                 if (ApplicationContext.DatabaseContext.CanConnect)
                     break;
 
-                //wait and retry
-                Thread.Sleep(1000);
                 currentTry++;
             }
 
@@ -388,7 +400,6 @@ namespace Umbraco.Core
             {
                 throw new UmbracoStartupFailedException("Umbraco cannot start. A connection string is configured but the Umbraco cannot connect to the database.");
             }
-
         }
 
         /// <summary>

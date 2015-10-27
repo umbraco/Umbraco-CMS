@@ -145,6 +145,7 @@ namespace UmbracoExamine
             = new List<StaticField>
             {
                 new StaticField("id", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
+                new StaticField("key", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
                 new StaticField( "version", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
                 new StaticField( "parentID", FieldIndexTypes.NOT_ANALYZED, false, string.Empty),
                 new StaticField( "level", FieldIndexTypes.NOT_ANALYZED, true, "NUMBER"),

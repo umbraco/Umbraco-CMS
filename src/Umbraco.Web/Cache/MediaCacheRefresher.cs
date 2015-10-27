@@ -30,7 +30,7 @@ namespace Umbraco.Web.Cache
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        internal static JsonPayload[] DeserializeFromJsonPayload(string json)
+        public static JsonPayload[] DeserializeFromJsonPayload(string json)
         {
             var serializer = new JavaScriptSerializer();
             var jsonObject = serializer.Deserialize<JsonPayload[]>(json);
@@ -99,14 +99,14 @@ namespace Umbraco.Web.Cache
 
         #region Sub classes
 
-        internal enum OperationType
+        public enum OperationType
         {
             Saved,
             Trashed,
             Deleted
         }
 
-        internal class JsonPayload
+        public class JsonPayload
         {
             public string Path { get; set; }
             public int Id { get; set; }

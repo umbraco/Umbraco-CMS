@@ -52,11 +52,11 @@
     <key alias="domainExists">ドメイン '%0%' は既に割り当てられています</key>
     <key alias="domainUpdated">ドメイン '%0%' は更新されました</key>
     <key alias="orEdit">ドメインの編集</key>
-    <key alias="domainHelp"><![CDATA[例: yourdomain.com, www.yourdomain.com]]></key>
+    <key alias="domainHelp"><![CDATA[例: "example.com", "www.example.com", "example.com:8080" または "https://www.example.com/". ]]></key>
     <key alias="inherit">Inherit</key>
     <key alias="setLanguage">カルチャの割り当て</key>
     <key alias="setLanguageHelp"><![CDATA[現在のノード以下のカルチャを設定します。親ノードのカルチャを継承します。]]></key>
-    <key alias="setDomains">ドメインの割り当て</key>
+    <key alias="setDomains">ドメイン割り当て</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">これらを表示</key>
@@ -165,6 +165,10 @@
   <area alias="media">
     <key alias="clickToUpload">クリックしてアップロードする</key>
     <key alias="dropFilesHere">ファイルをここへドロップ..</key>
+  </area>
+    <area alias="member">
+    <key alias="createNewMember">メンバーの新規作成</key>
+    <key alias="allMembers">全てのメンバー</key>
   </area>
   <area alias="create">
     <key alias="chooseNode">どこに新しい %0% を作りますか</key>
@@ -674,13 +678,19 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="paSimpleHelp">単一のログインとパスワードで単純に保護したい場合に適します</key>
   </area>
   <area alias="publish">
-    <key alias="contentPublishedFailedAwaitingRelease"><![CDATA[
+    <key alias="contentPublishedFailedAwaitingRelease">
+    <![CDATA[
       %0% ページは公開がスケジュールされているため、公開されませんでした。
     ]]></key>
-    <key alias="contentPublishedFailedByEvent"><![CDATA[
+    <key alias="contentPublishedFailedInvalid"><![CDATA[
+      %1% のプロパティがバリデーション定義に違反したため、%0% は公開できませんでした。
+    ]]></key>
+    <key alias="contentPublishedFailedByEvent">
+    <![CDATA[
       サードパーティのエクステンションがキャンセルされたので、%0% は公開できませんでした。
     ]]></key>
-    <key alias="contentPublishedFailedByParent"><![CDATA[
+    <key alias="contentPublishedFailedByParent">
+    <![CDATA[
       親ページが公開されていないので、%0% は公開できませんでした。
     ]]></key>
     <key alias="includeUnpublished">非公開の子ページも含めます</key>
@@ -693,12 +703,20 @@ Runwayをインストールして作られた新しいウェブサイトがど�
       このページとその全ての子ページも公開したければ <em>全ての子ページを公開</em> をチェック。
       ]]></key>
   </area>
+  <area alias="colorpicker">
+    <key alias="noColors">設定済みの色はありません。</key>
+  </area>
   <area alias="relatedlinks">
     <key alias="addExternal">外部リンクを追加</key>
     <key alias="addInternal">内部リンクを追加</key>
     <key alias="addlink">追加</key>
     <key alias="caption">タイトル</key>
+    <key alias="captionPlaceholder">キャプション表示を入力</key>
+    <key alias="chooseInternal">内部リンクを選択</key>
+    <key alias="enterExternal">外部リンクを入力</key>
+    <key alias="externalLinkPlaceholder">リンクを入力</key>
     <key alias="internalPage">内部ページ</key>
+    <key alias="link">リンク</key>
     <key alias="linkurl">URL</key>
     <key alias="modeDown">下に移動</key>
     <key alias="modeUp">上に移動</key>
@@ -737,6 +755,12 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="forms">フォーム</key>
     <key alias="analytics">アナリティクス</key>
   </area>
+  <area alias="help">
+    <key alias="goTo">該当のヘルプへ</key>
+    <key alias="helpTopicsFor">ヘルプトピック：</key>
+    <key alias="videoChaptersFor">ヘルプの動画：</key>
+    <key alias="theBestUmbracoVideoTutorials">動画によるチュートリアル</key>
+  </area>
   <area alias="settings">
     <key alias="defaulttemplate">既定のテンプレート</key>
     <key alias="dictionary editor egenskab">ディクショナリのキー</key>
@@ -763,6 +787,10 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="sortPleaseWait"><![CDATA[ 項目の並べ替えには少し時間がかかります。しばらくお待ちください。<br/> <br/> 並び替え中はウィンドウを閉じないでください。]]></key>
   </area>
   <area alias="speechBubbles">
+    <key alias="operationFailedHeader">失敗しました</key>
+    <key alias="invalidUserPermissionsText">不十分なユーザー権限により操作を完了できませんでした</key>
+    <key alias="operationCancelledHeader">キャンセルされました</key>
+    <key alias="operationCancelledText">サードパーティのアドインにより操作はキャンセルされました</key>
     <key alias="contentPublishedFailedByEvent">サードパーティのアドインにより公開はキャンセルされました</key>
     <key alias="contentTypeDublicatePropertyType">プロパティの方は既に存在しています</key>
     <key alias="contentTypePropertyTypeCreated">プロパティの型を作成しました</key>

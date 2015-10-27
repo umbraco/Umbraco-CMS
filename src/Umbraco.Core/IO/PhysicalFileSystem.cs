@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.IO; 
+using System.IO;
 using System.Linq;
 using Umbraco.Core.Logging;
 
@@ -9,7 +8,12 @@ namespace Umbraco.Core.IO
 {
     public class PhysicalFileSystem : IFileSystem
     {
-		internal string RootPath { get; private set; }
+        // the rooted, filesystem path, using directory separator chars, NOT ending with a separator
+        // eg "c:" or "c:\path\to\site" or "\\server\path"
+        private readonly string _rootPath;
+
+        // the ??? url, using url separator chars, NOT ending with a separator
+        // eg "" (?) or "/Scripts" or ???
         private readonly string _rootUrl;
 
         public PhysicalFileSystem(string virtualRoot)
@@ -18,8 +22,13 @@ namespace Umbraco.Core.IO
 			if (virtualRoot.StartsWith("~/") == false)
 				throw new ArgumentException("The virtualRoot argument must be a virtual path and start with '~/'");
 
-	        RootPath = IOHelper.MapPath(virtualRoot);
+            _rootPath = IOHelper.MapPath(virtualRoot);
+            _rootPath = EnsureDirectorySeparatorChar(_rootPath);
+            _rootPath = _rootPath.TrimEnd(Path.DirectorySeparatorChar);
+
             _rootUrl = IOHelper.ResolveUrl(virtualRoot);
+            _rootUrl = EnsureUrlSeparatorChar(_rootUrl);
+            _rootUrl = _rootUrl.TrimEnd('/');
         }
 
         public PhysicalFileSystem(string rootPath, string rootUrl)
@@ -33,18 +42,31 @@ namespace Umbraco.Core.IO
 			if (rootPath.StartsWith("~/"))
 				throw new ArgumentException("The rootPath argument cannot be a virtual path and cannot start with '~/'");
 
-            RootPath = rootPath;
-            _rootUrl = rootUrl;
+            // rootPath should be... rooted, as in, it's a root path!
+            // but the test suite App.config cannot really "root" anything so we'll have to do it here
+
+            //var localRoot = AppDomain.CurrentDomain.BaseDirectory;
+            var localRoot = IOHelper.GetRootDirectorySafe();
+            if (Path.IsPathRooted(rootPath) == false)
+            {
+                rootPath = Path.Combine(localRoot, rootPath);
+            }
+
+            rootPath = EnsureDirectorySeparatorChar(rootPath);
+            rootUrl = EnsureUrlSeparatorChar(rootUrl);
+
+            _rootPath = rootPath.TrimEnd(Path.DirectorySeparatorChar);
+            _rootUrl = rootUrl.TrimEnd('/');
         }
 
         public IEnumerable<string> GetDirectories(string path)
         {
-            path = EnsureTrailingSeparator(GetFullPath(path));
+            var fullPath = GetFullPath(path);
 
             try
             {
-                if (Directory.Exists(path))
-                    return Directory.EnumerateDirectories(path).Select(GetRelativePath);
+                if (Directory.Exists(fullPath))
+                    return Directory.EnumerateDirectories(fullPath).Select(GetRelativePath);
             }
             catch (UnauthorizedAccessException ex)
             {
@@ -65,12 +87,13 @@ namespace Umbraco.Core.IO
 
         public void DeleteDirectory(string path, bool recursive)
         {
-            if (DirectoryExists(path) == false)
+            var fullPath = GetFullPath(path);
+            if (Directory.Exists(fullPath) == false)
                 return;
 
             try
             {
-                Directory.Delete(GetFullPath(path), recursive);
+                Directory.Delete(fullPath, recursive);
             }
             catch (DirectoryNotFoundException ex)
             {
@@ -80,7 +103,8 @@ namespace Umbraco.Core.IO
 
         public bool DirectoryExists(string path)
         {
-            return Directory.Exists(GetFullPath(path));
+            var fullPath = GetFullPath(path);
+            return Directory.Exists(fullPath);
         }
 
         public void AddFile(string path, Stream stream)
@@ -90,17 +114,17 @@ namespace Umbraco.Core.IO
 
         public void AddFile(string path, Stream stream, bool overrideIfExists)
         {
-            var fsRelativePath = GetRelativePath(path);
+            var fullPath = GetFullPath(path);
+            var exists = File.Exists(fullPath);
+            if (exists && overrideIfExists == false) 
+                throw new InvalidOperationException(string.Format("A file at path '{0}' already exists", path));
 
-            var exists = FileExists(fsRelativePath);
-            if (exists && overrideIfExists == false) throw new InvalidOperationException(string.Format("A file at path '{0}' already exists", path));
-
-            EnsureDirectory(Path.GetDirectoryName(fsRelativePath));
+            Directory.CreateDirectory(Path.GetDirectoryName(fullPath)); // ensure it exists
 
             if (stream.CanSeek)
                 stream.Seek(0, 0);
 
-            using (var destination = (Stream)File.Create(GetFullPath(fsRelativePath)))
+            using (var destination = (Stream)File.Create(fullPath))
                 stream.CopyTo(destination);
         }
 
@@ -111,9 +135,7 @@ namespace Umbraco.Core.IO
 
         public IEnumerable<string> GetFiles(string path, string filter)
         {
-            var fsRelativePath = GetRelativePath(path);
-
-            var fullPath = EnsureTrailingSeparator(GetFullPath(fsRelativePath));
+            var fullPath = GetFullPath(path);
 
             try
             {
@@ -140,12 +162,13 @@ namespace Umbraco.Core.IO
 
         public void DeleteFile(string path)
         {
-            if (!FileExists(path))
+            var fullPath = GetFullPath(path);
+            if (File.Exists(fullPath) == false)
                 return;
 
             try
             {
-                File.Delete(GetFullPath(path));
+                File.Delete(fullPath);
             }
             catch (FileNotFoundException ex)
             {
@@ -155,39 +178,86 @@ namespace Umbraco.Core.IO
 
         public bool FileExists(string path)
         {
-            return File.Exists(GetFullPath(path));
+            var fullpath = GetFullPath(path);
+            return File.Exists(fullpath);
         }
 
+        // beware, many things depend on how the GetRelative/AbsolutePath methods work!
+
+        /// <summary>
+        /// Gets the relative path.
+        /// </summary>
+        /// <param name="fullPathOrUrl">The full path or url.</param>
+        /// <returns>The path, relative to this filesystem's root.</returns>
+        /// <remarks>
+        /// <para>The relative path is relative to this filesystem's root, not starting with any
+        /// directory separator. If input was recognized as a url (path), then output uses url (path) separator
+        /// chars.</para>
+        /// </remarks>
         public string GetRelativePath(string fullPathOrUrl)
         {
-            var relativePath = fullPathOrUrl
-                .TrimStart(_rootUrl)
-                .Replace('/', Path.DirectorySeparatorChar)
-                .TrimStart(RootPath)
-                .TrimStart(Path.DirectorySeparatorChar);
+            // test url
+            var path = fullPathOrUrl.Replace('\\', '/'); // ensure url separator char
 
-            return relativePath;
+            if (IOHelper.PathStartsWith(path, _rootUrl, '/')) // if it starts with the root url...
+                return path.Substring(_rootUrl.Length) // strip it
+                            .TrimStart('/'); // it's relative
+
+            // test path
+            path = EnsureDirectorySeparatorChar(fullPathOrUrl);
+
+            if (IOHelper.PathStartsWith(path, _rootPath, Path.DirectorySeparatorChar)) // if it starts with the root path
+                return path.Substring(_rootPath.Length) // strip it
+                            .TrimStart(Path.DirectorySeparatorChar); // it's relative
+
+            // unchanged - including separators
+            return fullPathOrUrl;
         }
 
+        /// <summary>
+        /// Gets the full path.
+        /// </summary>
+        /// <param name="path">The full or relative path.</param>
+        /// <returns>The full path.</returns>
+        /// <remarks>
+        /// <para>On the physical filesystem, the full path is the rooted (ie non-relative), safe (ie within this
+        /// filesystem's root) path. All separators are converted to Path.DirectorySeparatorChar.</para>
+        /// </remarks>
         public string GetFullPath(string path)
         {
-            //if the path starts with a '/' then it's most likely not a FS relative path which is required so convert it
-            if (path.StartsWith("/"))
-            {
-                path = GetRelativePath(path);
-            }
+            // normalize
+            var opath = path;
+            path = EnsureDirectorySeparatorChar(path);
 
-            return !path.StartsWith(RootPath) 
-                ? Path.Combine(RootPath, path)
-                : path;
+            // not sure what we are doing here - so if input starts with a (back) slash,
+            // we assume it's not a FS relative path and we try to convert it... but it
+            // really makes little sense?
+            if (path.StartsWith(Path.DirectorySeparatorChar.ToString()))
+                path = GetRelativePath(path);
+
+            // if already a full path, return
+            if (IOHelper.PathStartsWith(path, _rootPath, Path.DirectorySeparatorChar))
+                return path;
+
+            // else combine and sanitize, ie GetFullPath will take care of any relative
+            // segments in path, eg '../../foo.tmp' - it may throw a SecurityException
+            // if the combined path reaches illegal parts of the filesystem
+            var fpath = Path.Combine(_rootPath, path);
+            fpath = Path.GetFullPath(fpath);
+
+            // at that point, path is within legal parts of the filesystem, ie we have
+            // permissions to reach that path, but it may nevertheless be outside of
+            // our root path, due to relative segments, so better check
+            if (IOHelper.PathStartsWith(fpath, _rootPath, Path.DirectorySeparatorChar))
+                return fpath;
+
+            throw new FileSecurityException("File '" + opath + "' is outside this filesystem's root.");
         }
 
         public string GetUrl(string path)
         {
-            return _rootUrl.TrimEnd("/") + "/" + path
-                .TrimStart(Path.DirectorySeparatorChar)
-                .Replace(Path.DirectorySeparatorChar, '/')
-                .TrimEnd("/");
+            path = EnsureUrlSeparatorChar(path).Trim('/');
+            return _rootUrl + "/" + path;
         }
 
         public DateTimeOffset GetLastModified(string path)
@@ -214,9 +284,19 @@ namespace Umbraco.Core.IO
 
         protected string EnsureTrailingSeparator(string path)
         {
-            if (!path.EndsWith(Path.DirectorySeparatorChar.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal))
-                path = path + Path.DirectorySeparatorChar;
+            return path.EnsureEndsWith(Path.DirectorySeparatorChar);
+        }
 
+        protected string EnsureDirectorySeparatorChar(string path)
+        {
+            path = path.Replace('/', Path.DirectorySeparatorChar);
+            path = path.Replace('\\', Path.DirectorySeparatorChar);
+            return path;
+        }
+
+        protected string EnsureUrlSeparatorChar(string path)
+        {
+            path = path.Replace('\\', '/');
             return path;
         }
 
