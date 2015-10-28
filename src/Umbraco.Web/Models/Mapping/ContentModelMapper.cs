@@ -2,22 +2,16 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Runtime.Serialization;
-using System.Threading;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using AutoMapper;
-using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Trees;
-using umbraco;
 using Umbraco.Web.Routing;
 using umbraco.BusinessLogic.Actions;
 
@@ -78,7 +72,9 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Tabs, expression => expression.ResolveUsing<TabsAndPropertiesResolver>())
                 .ForMember(display => display.AllowedActions, expression => expression.ResolveUsing(
                     new ActionButtonsResolver(new Lazy<IUserService>(() => applicationContext.Services.UserService))))
-                .AfterMap((media, display) => AfterMap(media, display, applicationContext.Services.DataTypeService, applicationContext.Services.TextService));
+                .AfterMap((media, display) => AfterMap(media, display, applicationContext.Services.DataTypeService, applicationContext.Services.TextService,
+                    applicationContext.Services.ContentTypeService, applicationContext.Services.UserService, 
+                    UmbracoContext.Current != null && UmbracoContext.Current.Security.CurrentUser != null));
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
             config.CreateMap<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>()
@@ -119,7 +115,11 @@ namespace Umbraco.Web.Models.Mapping
         /// <param name="display"></param>
         /// <param name="dataTypeService"></param>
         /// <param name="localizedText"></param>
-        private static void AfterMap(IContent content, ContentItemDisplay display, IDataTypeService dataTypeService, ILocalizedTextService localizedText)
+        /// <param name="contentTypeService"></param>
+        /// <param name="userService"></param>
+        /// <param name="canAccessUser"></param>
+        private static void AfterMap(IContent content, ContentItemDisplay display, IDataTypeService dataTypeService, ILocalizedTextService localizedText,
+            IContentTypeService contentTypeService, IUserService userService, Boolean canAccessUser)
         {
             //map the tree node url
             if (HttpContext.Current != null)
@@ -142,8 +142,32 @@ namespace Umbraco.Web.Models.Mapping
                 TabsAndPropertiesResolver.AddListView(display, "content", dataTypeService);
             }
 
+            var currentDocumentType = contentTypeService.GetContentType(display.ContentTypeAlias);
+            var currentDocumentTypeName = currentDocumentType == null ? String.Empty : currentDocumentType.Name;
+            var docTypeValue = String.Empty;
+
+#if (DEBUG)
+            if (canAccessUser)
+            {
+                var currentUser = userService.GetUserById(UmbracoContext.Current.Security.CurrentUser.Id);
+                if (currentUser.AllowedSections.Any(x => x.Equals("settings")))
+                {
+                    var currentDocumentTypeId = currentDocumentType == null ? String.Empty : currentDocumentType.Id.ToString(CultureInfo.InvariantCulture);
+                    docTypeValue = string.Format("#/settings/framed/%252Fumbraco%252Fsettings%252FeditNodeTypeNew.aspx%253Fid%253D{0}", currentDocumentTypeId);
+                }
+            }
+#endif
+
             TabsAndPropertiesResolver.MapGenericProperties(
                 content, display,
+                new ContentPropertyDisplay
+                     {
+                        Alias = string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                        Label = localizedText.Localize("content/documentType"),
+                        Value = docTypeValue,
+                        LinkText = currentDocumentTypeName,
+                        View = "urllist" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
+                    },
                 new ContentPropertyDisplay
                     {
                         Alias = string.Format("{0}releasedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
