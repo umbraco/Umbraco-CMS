@@ -73,8 +73,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.AllowedActions, expression => expression.ResolveUsing(
                     new ActionButtonsResolver(new Lazy<IUserService>(() => applicationContext.Services.UserService))))
                 .AfterMap((media, display) => AfterMap(media, display, applicationContext.Services.DataTypeService, applicationContext.Services.TextService,
-                    applicationContext.Services.ContentTypeService, applicationContext.Services.UserService, 
-                    UmbracoContext.Current != null && UmbracoContext.Current.Security.CurrentUser != null));
+                    applicationContext.Services.ContentTypeService));
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
             config.CreateMap<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>()
@@ -116,10 +115,8 @@ namespace Umbraco.Web.Models.Mapping
         /// <param name="dataTypeService"></param>
         /// <param name="localizedText"></param>
         /// <param name="contentTypeService"></param>
-        /// <param name="userService"></param>
-        /// <param name="canAccessUser"></param>
-        private static void AfterMap(IContent content, ContentItemDisplay display, IDataTypeService dataTypeService, ILocalizedTextService localizedText,
-            IContentTypeService contentTypeService, IUserService userService, Boolean canAccessUser)
+        private static void AfterMap(IContent content, ContentItemDisplay display, IDataTypeService dataTypeService, 
+            ILocalizedTextService localizedText, IContentTypeService contentTypeService)
         {
             //map the tree node url
             if (HttpContext.Current != null)
@@ -142,67 +139,76 @@ namespace Umbraco.Web.Models.Mapping
                 TabsAndPropertiesResolver.AddListView(display, "content", dataTypeService);
             }
 
-            var currentDocumentType = contentTypeService.GetContentType(display.ContentTypeAlias);
-            var currentDocumentTypeName = currentDocumentType == null ? String.Empty : currentDocumentType.Name;
-            var docTypeValue = String.Empty;
-
-#if (DEBUG)
-            if (canAccessUser)
+            var properties = new List<ContentPropertyDisplay>
             {
-                var currentUser = userService.GetUserById(UmbracoContext.Current.Security.CurrentUser.Id);
-                if (currentUser.AllowedSections.Any(x => x.Equals("settings")))
+                new ContentPropertyDisplay
                 {
-                    var currentDocumentTypeId = currentDocumentType == null ? String.Empty : currentDocumentType.Id.ToString(CultureInfo.InvariantCulture);
-                    docTypeValue = string.Format("#/settings/framed/%252Fumbraco%252Fsettings%252FeditNodeTypeNew.aspx%253Fid%253D{0}", currentDocumentTypeId);
+                    Alias = string.Format("{0}releasedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Label = localizedText.Localize("content/releaseDate"),
+                    Value = display.ReleaseDate.HasValue ? display.ReleaseDate.Value.ToIsoString() : null,
+                    View = "datepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
+                },
+                new ContentPropertyDisplay
+                {
+                    Alias = string.Format("{0}expiredate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Label = localizedText.Localize("content/unpublishDate"),
+                    Value = display.ExpireDate.HasValue ? display.ExpireDate.Value.ToIsoString() : null,
+                    View = "datepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
+                },
+                new ContentPropertyDisplay
+                {
+                    Alias = string.Format("{0}template", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Label = "Template", //TODO: localize this?
+                    Value = display.TemplateAlias,
+                    View = "dropdown", //TODO: Hard coding until we make a real dropdown property editor to lookup
+                    Config = new Dictionary<string, object>
+                    {
+                        {"items", templateItemConfig}
+                    }
+                },
+                new ContentPropertyDisplay
+                {
+                    Alias = string.Format("{0}urls", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Label = localizedText.Localize("content/urls"),
+                    Value = string.Join(",", display.Urls),
+                    View = "urllist" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
                 }
-            }
-#endif
+            };
 
-            TabsAndPropertiesResolver.MapGenericProperties(
-                content, display,
-                new ContentPropertyDisplay
-                     {
-                        Alias = string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                        Label = localizedText.Localize("content/documentType"),
-                        Value = docTypeValue,
-                        LinkText = currentDocumentTypeName,
-                        View = "urllist" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
-                    },
-                new ContentPropertyDisplay
+            TabsAndPropertiesResolver.MapGenericProperties(content, display, properties.ToArray(),
+                genericProperties =>
+                {
+                    //TODO: This would be much nicer with the IUmbracoContextAccessor so we don't use singletons
+                    //If this is a web request and debugging is enabled and there's a user signed in and the 
+                    // user has access tot he settings section, we will 
+                    if (HttpContext.Current != null && HttpContext.Current.IsDebuggingEnabled
+                        && UmbracoContext.Current != null && UmbracoContext.Current.Security.CurrentUser != null
+                        && UmbracoContext.Current.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
                     {
-                        Alias = string.Format("{0}releasedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                        Label = localizedText.Localize("content/releaseDate"),
-                        Value = display.ReleaseDate.HasValue ? display.ReleaseDate.Value.ToIsoString() : null,
-                        View = "datepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
-                    },
-                new ContentPropertyDisplay
-                    {
-                        Alias = string.Format("{0}expiredate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                        Label = localizedText.Localize("content/unpublishDate"),
-                        Value = display.ExpireDate.HasValue ? display.ExpireDate.Value.ToIsoString() : null,
-                        View = "datepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
-                    },
-                new ContentPropertyDisplay
-                    {
-                        Alias = string.Format("{0}template", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                        Label = "Template", //TODO: localize this?
-                        Value = display.TemplateAlias,
-                        View = "dropdown", //TODO: Hard coding until we make a real dropdown property editor to lookup
-                        Config = new Dictionary<string, object>
+                        var currentDocumentType = contentTypeService.GetContentType(display.ContentTypeAlias);
+                        var currentDocumentTypeName = currentDocumentType == null ? string.Empty : currentDocumentType.Name;
+
+                        var currentDocumentTypeId = currentDocumentType == null ? string.Empty : currentDocumentType.Id.ToString(CultureInfo.InvariantCulture);
+                        //TODO: Hard coding this is not good
+                        var docTypeLink = string.Format("#/settings/framed/%252Fumbraco%252Fsettings%252FeditNodeTypeNew.aspx%253Fid%253D{0}", currentDocumentTypeId);
+
+                        //Replace the doc type property
+                        var docTypeProp = genericProperties.First(x => x.Alias == string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
+                        docTypeProp.Value = new List<object>
+                        {
+                            new
                             {
-                                {"items", templateItemConfig}
+                                linkText = currentDocumentTypeName,
+                                url = docTypeLink,
+                                target = "_self", icon = "icon-item-arrangement"
                             }
-                    },
-                new ContentPropertyDisplay
-                    {
-                        Alias = string.Format("{0}urls", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                        Label = localizedText.Localize("content/urls"),
-                        Value = string.Join(",", display.Urls),
-                        View = "urllist" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
-                    });
+                        };
+                        //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
+                        docTypeProp.View = "urllist";
+                    }
+                });
+
         }
-
-
 
         /// <summary>
         /// Gets the published date value for the IContent object
