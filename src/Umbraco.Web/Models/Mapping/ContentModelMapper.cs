@@ -45,11 +45,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(
                     dto => dto.IsContainer,
                     expression => expression.MapFrom(content => content.ContentType.IsContainer))
-                .ForMember(
-                    dto => dto.IsChildOfListView,
-                    //TODO: Fix this shorthand .Parent() lookup, at least have an overload to use the current
-                    // application context so it's testable!
-                    expression => expression.MapFrom(content => content.Parent().ContentType.IsContainer))
+                .ForMember(display => display.IsChildOfListView, expression => expression.Ignore())                
                 .ForMember(
                     dto => dto.Trashed,
                     expression => expression.MapFrom(content => content.Trashed))
@@ -118,6 +114,11 @@ namespace Umbraco.Web.Models.Mapping
         private static void AfterMap(IContent content, ContentItemDisplay display, IDataTypeService dataTypeService, 
             ILocalizedTextService localizedText, IContentTypeService contentTypeService)
         {
+            //map the IsChildOfListView (this is actually if it is a descendant of a list view!)
+            //TODO: Fix this shorthand .Ancestors() lookup, at least have an overload to use the current
+            var ancesctorListView = content.Ancestors().FirstOrDefault(x => x.ContentType.IsContainer);
+            display.IsChildOfListView = ancesctorListView != null;
+
             //map the tree node url
             if (HttpContext.Current != null)
             {
