@@ -16,11 +16,14 @@ namespace Umbraco.Web.PropertyEditors
         [PreValueField("useSeconds", "Use seconds", "boolean", Description = "Choose if seconds should be used.")]
         public string UseSeconds { get; set; }
 
-        [PreValueField("showTodayButton", "Show today button", "boolean", Description = "Choose if today button should be shown.")]
+        [PreValueField("showToday", "Show today button", "boolean", Description = "Choose if today button should be shown.")]
         public string ShowTodayButton { get; set; }
 
         [PreValueField("calendarWeeks", "Show calendar weeks", "boolean", Description = "Choose if calendar weeks should be shown.")]
         public string CalendarWeeks { get; set; }
-        
+
+        [PreValueField("minuteStepping", "Minute stepping", "number", Description = "Choose the number of minutes the time should increase/decrease (default is 1 minute).")]
+        public string MinuteStepping { get; set; }
+
     }
 }

@@ -2,30 +2,36 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 
     //setup the default config
     var config = {
-        showTodayButton: false,
-        calendarWeeks: false,
         pickDate: true,
         pickTime: true,
+        useMinutes: true,
         useSeconds: true,
+        minuteStepping: 1,
+        calendarWeeks: false,
+        showToday: false,
         format: "YYYY-MM-DD HH:mm:ss",
 		icons: {
                     time: "icon-time",
                     date: "icon-calendar",
                     up: "icon-chevron-up",
                     down: "icon-chevron-down"
-                }
-
+		},
+		daysOfWeekDisabled: []
     };
 
     //map the user config
     $scope.model.config = angular.extend(config, $scope.model.config);
 
-    if (!$scope.model.config.showTodayButton === undefined || !$scope.model.config.showTodayButton === null) {
-        $scope.model.config.showTodayButton = $scope.model.config.showTodayButton == 0 ? false : true;
+    if (!$scope.model.config.showToday === undefined || !$scope.model.config.showToday === null) {
+        $scope.model.config.showToday = $scope.model.config.showToday == 0 ? false : true;
     }
 
-    if (!$scope.model.config.calendarWeeks === undefined || !$scope.model.config.calendarWeeks === null) {
-        $scope.model.config.calendarWeeks = $scope.model.config.calendarWeeks == 0 ? false : true;
+    if (!$scope.model.config.minuteStepping === undefined || !$scope.model.config.minuteStepping === null) {
+        $scope.model.config.minuteStepping = $scope.model.config.minuteStepping;
+    }
+
+    if (!$scope.model.config.showToday === undefined || !$scope.model.config.showToday === null) {
+        $scope.model.config.showToday = $scope.model.config.showToday == 0 ? false : true;
     }
 
     if (!$scope.model.config.useSeconds === undefined || !$scope.model.config.useSeconds === null) {
@@ -107,10 +113,8 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 
         var filesToLoad = ["lib/moment/moment-with-locales.js",
 						   "lib/datetimepicker/bootstrap-datetimepicker.js"];
-
-            
+        
 		$scope.model.config.language = user.locale;
-		
 
 		assetsService.load(filesToLoad, $scope).then(
             function () {
@@ -148,7 +152,6 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 			        element.find("input").unbind("blur");
 					element.datetimepicker("destroy");
 			    });
-
 
 			    var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
 			        if ($scope.hasDatetimePickerValue) {
