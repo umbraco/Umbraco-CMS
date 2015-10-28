@@ -213,7 +213,7 @@ namespace umbraco.cms.businesslogic.web
             var noAccessContent = ApplicationContext.Current.Services.ContentService.GetById(ErrorDocumentId);
             if (noAccessContent == null) throw new NullReferenceException("No content item found with id " + ErrorDocumentId);
 
-            var entry = ApplicationContext.Current.Services.PublicAccessService.GetEntryForContent(doc.ContentEntity);
+            var entry = ApplicationContext.Current.Services.PublicAccessService.GetEntryForContent(doc.ContentEntity.Id.ToString());
             if (entry != null)
             {
                 if (Simple)
@@ -418,6 +418,12 @@ namespace umbraco.cms.businesslogic.web
         public static bool IsProtected(int DocumentId, string Path)
         {
             return ApplicationContext.Current.Services.PublicAccessService.IsProtected(Path.EnsureEndsWith("," + DocumentId));             
+        }
+
+        //return the protection status of this exact document - not based on inheritance
+        public static bool IsProtected(int DocumentId)
+        {
+            return ApplicationContext.Current.Services.PublicAccessService.IsProtected(DocumentId.ToString());
         }
 
         public static int GetErrorPage(string Path)

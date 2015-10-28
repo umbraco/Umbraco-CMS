@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Web;
@@ -11,10 +10,12 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.IO;
+using Umbraco.Core.Models;
 using Umbraco.Core.Profiling;
+using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
-using umbraco;
-using umbraco.cms.businesslogic.member;
+using Constants = Umbraco.Core.Constants;
+using Member = umbraco.cms.businesslogic.member.Member;
 
 namespace Umbraco.Web
 {
@@ -194,12 +195,123 @@ namespace Umbraco.Web
             return htmlHelper.Action(actionName, metaData.ControllerName, routeVals);
         }
 
-		#region BeginUmbracoForm
+        #region GetCropUrl
 
-		/// <summary>
-		/// Used for rendering out the Form for BeginUmbracoForm
-		/// </summary>
-		internal class UmbracoForm : MvcForm
+        /// <summary>
+        /// Gets the ImageProcessor Url of a media item by the crop alias (using default media item property alias of "umbracoFile")
+        /// </summary>
+        /// <param name="htmlHelper"></param>
+        /// <param name="mediaItem"></param>
+        /// <param name="cropAlias"></param>
+        /// <returns></returns>
+        public static IHtmlString GetCropUrl(this HtmlHelper htmlHelper, IPublishedContent mediaItem, string cropAlias)
+        {
+            return new HtmlString(mediaItem.GetCropUrl(cropAlias: cropAlias, useCropDimensions: true));
+        }
+
+        /// <summary>
+        /// Gets the ImageProcessor Url of a media item by the property alias and crop alias.
+        /// </summary>
+        /// <param name="htmlHelper"></param>
+        /// <param name="mediaItem"></param>
+        /// <param name="propertyAlias"></param>
+        /// <param name="cropAlias"></param>
+        /// <returns></returns>
+        public static IHtmlString GetCropUrl(this HtmlHelper htmlHelper, IPublishedContent mediaItem, string propertyAlias, string cropAlias)
+        {
+            return new HtmlString(mediaItem.GetCropUrl(propertyAlias: propertyAlias, cropAlias: cropAlias, useCropDimensions: true));
+        }
+
+        /// <summary>
+        /// Gets the ImageProcessor Url of a media item
+        /// </summary>
+        /// <param name="htmlHelper"></param>
+        /// <param name="mediaItem"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="propertyAlias"></param>
+        /// <param name="cropAlias"></param>
+        /// <param name="quality"></param>
+        /// <param name="imageCropMode"></param>
+        /// <param name="imageCropAnchor"></param>
+        /// <param name="preferFocalPoint"></param>
+        /// <param name="useCropDimensions"></param>
+        /// <param name="cacheBuster"></param>
+        /// <param name="furtherOptions"></param>
+        /// <param name="ratioMode"></param>
+        /// <param name="upScale"></param>
+        /// <returns></returns>
+        public static IHtmlString GetCropUrl(this HtmlHelper htmlHelper,
+            IPublishedContent mediaItem,
+            int? width = null,
+            int? height = null,
+            string propertyAlias = Constants.Conventions.Media.File,
+            string cropAlias = null,
+            int? quality = null,
+            ImageCropMode? imageCropMode = null,
+            ImageCropAnchor? imageCropAnchor = null,
+            bool preferFocalPoint = false,
+            bool useCropDimensions = false,
+            bool cacheBuster = true,
+            string furtherOptions = null,
+            ImageCropRatioMode? ratioMode = null,
+            bool upScale = true)
+        {
+            return
+                new HtmlString(mediaItem.GetCropUrl(width, height, propertyAlias, cropAlias, quality, imageCropMode,
+                    imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions, ratioMode,
+                    upScale));
+        }
+
+        /// <summary>
+        /// Gets the ImageProcessor Url from the media path
+        /// </summary>
+        /// <param name="htmlHelper"></param>
+        /// <param name="imageUrl"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="imageCropperValue"></param>
+        /// <param name="cropAlias"></param>
+        /// <param name="quality"></param>
+        /// <param name="imageCropMode"></param>
+        /// <param name="imageCropAnchor"></param>
+        /// <param name="preferFocalPoint"></param>
+        /// <param name="useCropDimensions"></param>
+        /// <param name="cacheBusterValue"></param>
+        /// <param name="furtherOptions"></param>
+        /// <param name="ratioMode"></param>
+        /// <param name="upScale"></param>
+        /// <returns></returns>
+        public static IHtmlString GetCropUrl(this HtmlHelper htmlHelper,
+            string imageUrl,
+            int? width = null,
+            int? height = null,
+            string imageCropperValue = null,
+            string cropAlias = null,
+            int? quality = null,
+            ImageCropMode? imageCropMode = null,
+            ImageCropAnchor? imageCropAnchor = null,
+            bool preferFocalPoint = false,
+            bool useCropDimensions = false,
+            string cacheBusterValue = null,
+            string furtherOptions = null,
+            ImageCropRatioMode? ratioMode = null,
+            bool upScale = true)
+        {
+            return
+                new HtmlString(imageUrl.GetCropUrl(width, height, imageCropperValue, cropAlias, quality, imageCropMode,
+                    imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode,
+                    upScale));
+        }
+
+        #endregion
+
+        #region BeginUmbracoForm
+
+        /// <summary>
+        /// Used for rendering out the Form for BeginUmbracoForm
+        /// </summary>
+        internal class UmbracoForm : MvcForm
 		{
 		    /// <summary>
 		    /// Creates an UmbracoForm

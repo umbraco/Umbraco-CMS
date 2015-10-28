@@ -349,7 +349,9 @@ namespace Umbraco.Web.Editors
                             {"trees", GetTreePluginsMetaData()}
                         }
                     },
-                    {"isDebuggingEnabled", HttpContext.IsDebuggingEnabled},
+                    {
+                        "isDebuggingEnabled", HttpContext.IsDebuggingEnabled
+                    },
                     {
                         "application", GetApplicationState()
                     },

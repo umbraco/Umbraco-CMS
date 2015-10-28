@@ -139,6 +139,12 @@ function entityResource($q, $http, umbRequestHelper) {
             _.each(ids, function(item) {
                 query += "ids=" + item + "&";
             });
+
+            // if ids array is empty we need a empty variable in the querystring otherwise the service returns a error
+            if (ids.length === 0) {
+                query += "ids=&";
+            }
+
             query += "type=" + type;
 
             return umbRequestHelper.resourcePromise(
