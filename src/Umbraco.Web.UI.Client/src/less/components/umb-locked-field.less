@@ -2,8 +2,13 @@
   font-size: 13px;
   color: #ccc;
   position: relative;
-  display: flex;
-  align-items: center;
+  display: block;
+}
+
+.umb-locked-field__wrapper {
+   display: flex;
+   align-items: center;
+   margin-bottom: 5px;
 }
 
 .umb-locked-field__toggle {
@@ -27,7 +32,7 @@
 
 input.umb-locked-field__input {
   background: rgba(255, 255, 255, 0); // if using transparent it will hide the text in safari
-  border-color:transparent;
+  border-color: transparent !important;
   font-size: 13px;
   margin-bottom: 0;
   color: #ccc;
@@ -41,13 +46,4 @@ input.umb-locked-field__input:focus {
 
 input.umb-locked-field__input.-unlocked {
    color: #515151;
-}
-
-.umb-locked-field__validation-label {
-  position: absolute;
-  top: 50%;
-  right: 0;
-  font-size: 12px;
-  color: @red;
-  transform: translate(0, -50%);
 }

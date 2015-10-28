@@ -42,8 +42,10 @@
                                    umb-auto-resize
                                    required
                                    val-server-field="{{'Groups[' + $index + '].Name'}}" />
-                            
-                            <span class="help-inline" val-msg-for="groupName" val-toggle-msg="valServerField"></span>
+
+                            <div class="umb-validation-label -arrow-left" val-msg-for="groupName" val-toggle-msg="valServerField"></div>
+                            <div class="umb-validation-label -arrow-left" val-msg-for="groupName" val-toggle-msg="required"><localize key="required"></localize></div>
+
                         </div>
                     </ng-form>
 
@@ -110,8 +112,9 @@
                                                       umb-auto-resize
                                                       required
                                                       val-server-field="{{'Groups[' + $parent.$parent.$parent.$parent.$index + '].Properties[' + $index + '].Label'}}"></textarea>
-                                            
-                                            <span class="help-inline" val-msg-for="groupName" val-toggle-msg="valServerField"></span>
+
+                                            <div class="umb-validation-label" val-msg-for="groupName" val-toggle-msg="valServerField"></div>
+                                            <div class="umb-validation-label" val-msg-for="groupName" val-toggle-msg="required">Required label</div>
                                         </div>
 
                                         <div class="umb-group-builder__property-meta-description">
