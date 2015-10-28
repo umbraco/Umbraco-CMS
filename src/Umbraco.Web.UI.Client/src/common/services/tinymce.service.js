@@ -81,7 +81,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
         * @param {Object} editor the TinyMCE editor instance        
         * @param {Object} $scope the current controller scope
         */
-        createMediaPicker: function (editor) {
+        createMediaPicker: function (editor, scope) {
             editor.addButton('umbmediapicker', {
                 icon: 'custom icon-picture',
                 tooltip: 'Media Picker',
@@ -101,45 +101,59 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                     }
 
                     userService.getCurrentUser().then(function(userData) {
-                        dialogService.mediaPicker({
-                            currentTarget: currentTarget,
-                            onlyImages: true,
-                            showDetails: true,
-                            startNodeId: userData.startMediaId,
-                            callback: function (img) {
 
-                                if (img) {
+                        scope.mediaPickerOverlay = {};
+                        scope.mediaPickerOverlay.currentTarget = currentTarget;
+                        scope.mediaPickerOverlay.onlyImages = true;
+                        scope.mediaPickerOverlay.showDetails = true;
+                        scope.mediaPickerOverlay.startNodeId = userData.startMediaId;
+                        scope.mediaPickerOverlay.view = "mediapicker";
+                        scope.mediaPickerOverlay.show = true;
 
-                                    var data = {
-                                        alt: img.altText || "",
-                                        src: (img.url) ? img.url : "nothing.jpg",
-                                        rel: img.id,
-                                        'data-id': img.id,
-                                        id: '__mcenew'
-                                    };
+                        scope.mediaPickerOverlay.submit = function(model) {
 
-                                    editor.insertContent(editor.dom.createHTML('img', data));
+                           var img = model.selectedImages[0];
 
-                                    $timeout(function () {
-                                        var imgElm = editor.dom.get('__mcenew');
-                                        var size = editor.dom.getSize(imgElm);
+                           if(img) {
 
-                                        if (editor.settings.maxImageSize && editor.settings.maxImageSize !== 0) {
-                                            var newSize = imageHelper.scaleToMaxSize(editor.settings.maxImageSize, size.w, size.h);
+                              var data = {
+                                  alt: img.altText || "",
+                                  src: (img.url) ? img.url : "nothing.jpg",
+                                  rel: img.id,
+                                  'data-id': img.id,
+                                  id: '__mcenew'
+                              };
 
-                                            var s = "width: " + newSize.width + "px; height:" + newSize.height + "px;";
-                                            editor.dom.setAttrib(imgElm, 'style', s);
-                                            editor.dom.setAttrib(imgElm, 'id', null);
+                              editor.insertContent(editor.dom.createHTML('img', data));
 
-                                            if (img.url) {
-                                                var src = img.url + "?width=" + newSize.width + "&height=" + newSize.height;
-                                                editor.dom.setAttrib(imgElm, 'data-mce-src', src);
-                                            }
-                                        }
-                                    }, 500);
-                                }
-                            }
-                        });
+                              $timeout(function () {
+                                  var imgElm = editor.dom.get('__mcenew');
+                                  var size = editor.dom.getSize(imgElm);
+
+                                  if (editor.settings.maxImageSize && editor.settings.maxImageSize !== 0) {
+                                       var newSize = imageHelper.scaleToMaxSize(editor.settings.maxImageSize, size.w, size.h);
+
+                                       var s = "width: " + newSize.width + "px; height:" + newSize.height + "px;";
+                                       editor.dom.setAttrib(imgElm, 'style', s);
+                                       editor.dom.setAttrib(imgElm, 'id', null);
+
+                                       if (img.url) {
+                                           var src = img.url + "?width=" + newSize.width + "&height=" + newSize.height;
+                                           editor.dom.setAttrib(imgElm, 'data-mce-src', src);
+                                       }
+                                  }
+                              }, 500);
+                           }
+
+                           scope.mediaPickerOverlay.show = false;
+                           scope.mediaPickerOverlay = null;
+                        };
+
+                        scope.mediaPickerOverlay.close = function(oldModel) {
+                           scope.mediaPickerOverlay.show = false;
+                           scope.mediaPickerOverlay = null;
+                        };
+
                     });
 
                     
