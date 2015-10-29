@@ -20,10 +20,12 @@ using System.Text;
 using System.Configuration;
 using System.Data.Common;
 using System.Data;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Linq.Expressions;
+using System.Threading;
 
 namespace Umbraco.Core.Persistence
 {
@@ -1802,8 +1804,53 @@ namespace Umbraco.Core.Persistence
                 return ObjectCache;
             }
 
-            static readonly ObjectCache ObjectCache = new MemoryCache("NPoco");
-            
+            //static readonly ObjectCache ObjectCache = new MemoryCache("NPoco");
+            private static readonly ObjectCache ObjectCache;
+
+            // this should probably happen somewhere else...f
+            private static void FixCurrentCulture()
+            {
+                // get the current culture
+                var currentCulture = CultureInfo.CurrentCulture;
+
+                // at the top of any culture should be the invariant culture - find it
+                var invariantCulture = currentCulture;
+                while (invariantCulture.Equals(CultureInfo.InvariantCulture) == false)
+                    invariantCulture = invariantCulture.Parent;
+
+                // now that invariant culture should be the same object as CultureInfo.InvariantCulture
+                // yet for some weird reason, sometimes it is not - and this breaks eg MemoryCache,
+                // because it ends up in PerformanceCounterLib.IsCustomCategory which does:
+                //
+                // CultureInfo culture = CultureInfo.CurrentCulture;
+                // while (culture != CultureInfo.InvariantCulture)
+                // {
+                //     library = GetPerformanceCounterLib(machine, culture);
+                //     if (library.IsCustomCategory(category))
+                //         return true;
+                //     culture = culture.Parent;
+                // }
+                //
+                // ie a reference comparisons = enters an endless loop and hangs everything.
+
+                if (ReferenceEquals(invariantCulture, CultureInfo.InvariantCulture))
+                    return;
+
+                // so if it is not the same object, replace the culture by the "fixed" version of
+                // itself - this prevents MemoryCache from dying - but it is an ugly workaround and
+                // does not explain why we would have different CultureInfo objects
+
+                var fixedCulture = CultureInfo.GetCultureInfo(currentCulture.Name);
+                Thread.CurrentThread.CurrentCulture = Thread.CurrentThread.CurrentUICulture = fixedCulture;
+            }
+
+            static ManagedCache()
+            {
+                FixCurrentCulture();
+                ObjectCache = new MemoryCache("NPoco");
+            }
+
+
         }
 
         public class PocoData

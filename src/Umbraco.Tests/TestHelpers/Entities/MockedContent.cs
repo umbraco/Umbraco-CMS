@@ -8,7 +8,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
     {
         public static Content CreateSimpleContent(IContentType contentType)
         {
-            var content = new Content("Home", -1, contentType) { Language = "en-US", Level = 1, SortOrder = 1, CreatorId = 0, WriterId = 0, Path = "-1" };
+            var content = new Content("Home", -1, contentType) { Language = "en-US", Level = 1, SortOrder = 1, CreatorId = 0, WriterId = 0 };
             object obj =
                 new
                     {
