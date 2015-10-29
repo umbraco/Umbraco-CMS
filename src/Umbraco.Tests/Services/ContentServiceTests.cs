@@ -1221,6 +1221,52 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Can_Copy_Recursive()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var temp = contentService.GetById(NodeDto.NodeIdSeed + 1);
+            Assert.AreEqual("Home", temp.Name);
+            Assert.AreEqual(2, temp.Children().Count());
+
+            // Act
+            var copy = contentService.Copy(temp, temp.ParentId, false, true, 0);
+            var content = contentService.GetById(NodeDto.NodeIdSeed + 1);
+
+            // Assert
+            Assert.That(copy, Is.Not.Null);
+            Assert.That(copy.Id, Is.Not.EqualTo(content.Id));
+            Assert.AreNotSame(content, copy);
+            Assert.AreEqual(2, copy.Children().Count());
+
+            var child = contentService.GetById(NodeDto.NodeIdSeed + 2);
+            var childCopy = copy.Children().First();
+            Assert.AreEqual(childCopy.Name, child.Name);
+            Assert.AreNotEqual(childCopy.Id, child.Id);
+            Assert.AreNotEqual(childCopy.Key, child.Key);
+        }
+
+        [Test]
+        public void Can_Copy_NonRecursive()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var temp = contentService.GetById(NodeDto.NodeIdSeed + 1);
+            Assert.AreEqual("Home", temp.Name);
+            Assert.AreEqual(2, temp.Children().Count());
+
+            // Act
+            var copy = contentService.Copy(temp, temp.ParentId, false, false, 0);
+            var content = contentService.GetById(NodeDto.NodeIdSeed + 1);
+
+            // Assert
+            Assert.That(copy, Is.Not.Null);
+            Assert.That(copy.Id, Is.Not.EqualTo(content.Id));
+            Assert.AreNotSame(content, copy);
+            Assert.AreEqual(0, copy.Children().Count());
+        }
+
+        [Test]
         public void Can_Copy_Content_With_Tags()
         {
             // Arrange

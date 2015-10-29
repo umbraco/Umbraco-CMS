@@ -182,12 +182,14 @@
     <Compile Include="Logging\ParallelForwarderTest.cs" />
     <Compile Include="Persistence\Repositories\AuditRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\DomainRepositoryTest.cs" />
+    <Compile Include="Persistence\Repositories\PartialViewRepositoryTests.cs" />
     <Compile Include="Persistence\Repositories\PublicAccessRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\TaskRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\TaskTypeRepositoryTest.cs" />
     <Compile Include="Resolvers\ResolverBaseTest.cs" />
     <Compile Include="Routing\UrlRoutingTestBase.cs" />
     <Compile Include="Security\UmbracoBackOfficeIdentityTests.cs" />
+    <Compile Include="Services\PublicAccessServiceTests.cs" />
     <Compile Include="StringNewlineExtensions.cs" />
     <Compile Include="Strings\StylesheetHelperTests.cs" />
     <Compile Include="Strings\StringValidationTests.cs" />
@@ -342,7 +344,7 @@
     <Compile Include="PublishedContent\StronglyTypedModels\TypedModelBase.cs" />
     <Compile Include="PublishedContent\StronglyTypedModels\UmbracoTemplatePage`T.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunnerTests.cs" />
-    <Compile Include="ServerEnvironmentHelperTests.cs" />
+    <Compile Include="ApplicationUrlHelperTests.cs" />
     <Compile Include="Services\FileServiceTests.cs" />
     <Compile Include="Services\LocalizedTextServiceTests.cs" />
     <Compile Include="Services\TagServiceTests.cs" />

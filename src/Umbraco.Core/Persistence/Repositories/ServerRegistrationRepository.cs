@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
-
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -15,52 +15,47 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class ServerRegistrationRepository : PetaPocoRepositoryBase<int, IServerRegistration>, IServerRegistrationRepository
     {
-        public ServerRegistrationRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-            : base(work, cache, logger, sqlSyntax)
+        private readonly ICacheProvider _staticCache;
+
+        public ServerRegistrationRepository(IDatabaseUnitOfWork work, ICacheProvider staticCache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+            : base(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax)
         {
+            _staticCache = staticCache;
+        }
+
+        protected override int PerformCount(IQuery<IServerRegistration> query)
+        {
+            throw new NotSupportedException("This repository does not support this method");
+        }
+
+        protected override bool PerformExists(int id)
+        {
+            // use the underlying GetAll which force-caches all registrations
+            return GetAll().Any(x => x.Id == id);
         }
 
         protected override IServerRegistration PerformGet(int id)
         {
-            var sql = GetBaseQuery(false);
-            sql.Where(GetBaseWhereClause(), new { Id = id });
-
-            var serverDto = Database.First<ServerRegistrationDto>(sql);
-            if (serverDto == null)
-                return null;
-
-            var factory = new ServerRegistrationFactory();
-            var entity = factory.BuildEntity(serverDto);
-
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            entity.ResetDirtyProperties(false);
-
-            return entity;
+            // use the underlying GetAll which force-caches all registrations
+            return GetAll().FirstOrDefault(x => x.Id == id);
         }
 
         protected override IEnumerable<IServerRegistration> PerformGetAll(params int[] ids)
         {
-            var factory = new ServerRegistrationFactory();
+            // we do NOT want to populate the cache on-demand, because then it might happen
+            // during a ReadCommited transaction, and reading the registrations under ReadCommited
+            // is NOT safe because they could be updated in the middle of the read.
+            //
+            // the cache is populated by ReloadCache which should only be called from methods
+            // that ensure proper locking (at least, read-lock in ReadCommited) of the repo.
 
-            if (ids.Any())
-            {
-                return Database.Fetch<ServerRegistrationDto>("WHERE id in (@ids)", new { ids = ids })
-                    .Select(x => factory.BuildEntity(x));
-            }
-
-            return Database.Fetch<ServerRegistrationDto>("WHERE id > 0")
-                .Select(x => factory.BuildEntity(x));
+            var all = _staticCache.GetCacheItem<IEnumerable<IServerRegistration>>(CacheKey, Enumerable.Empty<IServerRegistration>);
+            return ids.Length == 0 ? all : all.Where(x => ids.Contains(x.Id));
         }
 
         protected override IEnumerable<IServerRegistration> PerformGetByQuery(IQuery<IServerRegistration> query)
         {
-            var factory = new ServerRegistrationFactory();
-            var sqlClause = GetBaseQuery(false);
-            var translator = new SqlTranslator<IServerRegistration>(sqlClause, query);
-            var sql = translator.Translate();
-
-            return Database.Fetch<ServerRegistrationDto>(sql).Select(x => factory.BuildEntity(x));
+            throw new NotSupportedException("This repository does not support this method");
         }
 
         protected override Sql GetBaseQuery(bool isCount)
@@ -101,6 +96,7 @@ namespace Umbraco.Core.Persistence.Repositories
             entity.Id = id;
 
             entity.ResetDirtyProperties();
+            ReloadCache();
         }
 
         protected override void PersistUpdatedItem(IServerRegistration entity)
@@ -113,14 +109,34 @@ namespace Umbraco.Core.Persistence.Repositories
             Database.Update(dto);
 
             entity.ResetDirtyProperties();
+            ReloadCache();
+        }
+
+        public override void PersistDeletedItem(IEntity entity)
+        {
+            base.PersistDeletedItem(entity);
+            ReloadCache();
+        }
+
+        private static readonly string CacheKey = GetCacheTypeKey<IServerRegistration>() + "all";
+
+        public void ReloadCache()
+        {
+            var factory = new ServerRegistrationFactory();
+            var all = Database.Fetch<ServerRegistrationDto>("WHERE id > 0")
+                .Select(x => factory.BuildEntity(x))
+                .Cast<IServerRegistration>()
+                .ToArray();
+            _staticCache.ClearCacheItem(CacheKey);
+            _staticCache.GetCacheItem(CacheKey, () => all);
         }
 
         public void DeactiveStaleServers(TimeSpan staleTimeout)
         {
-            var timeoutDate = DateTime.UtcNow.Subtract(staleTimeout);
+            var timeoutDate = DateTime.Now.Subtract(staleTimeout);
 
-            Database.Update<ServerRegistrationDto>("SET isActive=0 WHERE lastNotifiedDate < @timeoutDate", new { timeoutDate = timeoutDate });
+            Database.Update<ServerRegistrationDto>("SET isActive=0, isMaster=0 WHERE lastNotifiedDate < @timeoutDate", new { /*timeoutDate =*/ timeoutDate });
+            ReloadCache();
         }
-
     }
 }

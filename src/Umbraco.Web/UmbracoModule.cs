@@ -20,6 +20,7 @@ using Umbraco.Web.Editors;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using umbraco;
+using Umbraco.Core.Sync;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using ObjectExtensions = Umbraco.Core.ObjectExtensions;
 using RenderingEngine = Umbraco.Core.RenderingEngine;
@@ -36,36 +37,6 @@ namespace Umbraco.Web
 	{
 		#region HttpModule event handlers
 
-	    private static void EnsureApplicationUrl(HttpRequestBase request)
-	    {
-	        var appctx = ApplicationContext.Current;
-
-            // already initialized = ok
-            // note that getting ApplicationUrl will ALSO try the various settings
-            if (appctx.UmbracoApplicationUrl.IsNullOrWhiteSpace() == false) return;
-
-            // so if we reach that point, nothing was configured
-            // use the current request as application url
-
-            // if (HTTP and SSL not required) or (HTTPS and SSL required),
-            //  use ports from request
-            // otherwise,
-            //  if non-standard ports used,
-            //  user may need to set umbracoApplicationUrl manually per 
-            //  http://our.umbraco.org/documentation/Using-Umbraco/Config-files/umbracoSettings/#ScheduledTasks
-	        var port = (request.IsSecureConnection == false && GlobalSettings.UseSSL == false)
-	                    || (request.IsSecureConnection && GlobalSettings.UseSSL)
-                ? ":" + request.ServerVariables["SERVER_PORT"]
-	            : "";
-
-	        var ssl = GlobalSettings.UseSSL ? "s" : ""; // force, whatever the first request
-            var url = "http" + ssl + "://" + request.ServerVariables["SERVER_NAME"] + port + IOHelper.ResolveUrl(SystemDirectories.Umbraco);
-
-            appctx.UmbracoApplicationUrl = UriUtility.TrimPathEndSlash(url);
-            LogHelper.Info<ApplicationContext>("ApplicationUrl: " + appctx.UmbracoApplicationUrl + " (UmbracoModule request)");
-        }
-
-
 		/// <summary>
 		/// Begins to process a request.
 		/// </summary>
@@ -73,7 +44,7 @@ namespace Umbraco.Web
         static void BeginRequest(HttpContextBase httpContext)
 		{
             // ensure application url is initialized
-            EnsureApplicationUrl(httpContext.Request);
+            ApplicationUrlHelper.EnsureApplicationUrl(ApplicationContext.Current, httpContext.Request);
 
             // do not process if client-side request
 			if (httpContext.Request.Url.IsClientSideRequest())

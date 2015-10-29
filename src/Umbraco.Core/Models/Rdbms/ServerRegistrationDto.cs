@@ -1,6 +1,7 @@
 ﻿using System;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Models.Rdbms
 {
@@ -23,7 +24,7 @@ namespace Umbraco.Core.Models.Rdbms
         public string ServerIdentity { get; set; }
 
         [Column("registeredDate")]
-        [Constraint(Default = "getdate()")]
+        [Constraint(Default = SystemMethods.CurrentDateTime)]
         public DateTime DateRegistered { get; set; }
 
         [Column("lastNotifiedDate")]
@@ -33,6 +34,7 @@ namespace Umbraco.Core.Models.Rdbms
         [Index(IndexTypes.NonClustered)]
         public bool IsActive { get; set; }
 
-
+        [Column("isMaster")]
+        public bool IsMaster { get; set; }
     }
 }

@@ -140,7 +140,8 @@ namespace Umbraco.Core.Services
             {
                 return repository.ValidateStylesheet(stylesheet);
             }
-        } 
+        }
+
         #endregion
 
         #region Scripts
@@ -251,7 +252,6 @@ namespace Umbraco.Core.Services
         }
 
         #endregion
-
 
         #region Templates
 
@@ -499,7 +499,8 @@ namespace Umbraco.Core.Services
             {
                 return repository.ValidateTemplate(template);
             }
-        } 
+        }
+
         #endregion
 
         #region Partial Views
@@ -571,20 +572,17 @@ namespace Umbraco.Core.Services
             if (CreatingPartialView.IsRaisedEventCancelled(new NewEventArgs<IPartialView>(partialView, true, partialView.Alias, -1), this))
                 return Attempt<IPartialView>.Fail();
 
-            var uow = _fileUowProvider.GetUnitOfWork();
-            string partialViewHeader = null;
-            IPartialViewRepository repository;
+            string partialViewHeader;
             switch (partialViewType)
             {
                 case PartialViewType.PartialView:
-                    repository = _repositoryFactory.CreatePartialViewRepository(uow);
                     partialViewHeader = PartialViewHeader;
                     break;
                 case PartialViewType.PartialViewMacro:
-                default:
-                    repository = _repositoryFactory.CreatePartialViewMacroRepository(uow);
                     partialViewHeader = PartialViewMacroHeader;
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException("partialViewType");
             }
 
             if (snippetName.IsNullOrWhiteSpace() == false)
@@ -610,7 +608,8 @@ namespace Umbraco.Core.Services
                 }
             }
 
-            using (repository)
+            var uow = _fileUowProvider.GetUnitOfWork();
+            using (var repository = GetPartialViewRepository(partialViewType, uow))
             {
                 repository.AddOrUpdate(partialView);
                 uow.Commit();
@@ -636,20 +635,7 @@ namespace Umbraco.Core.Services
         private bool DeletePartialViewMacro(string path, PartialViewType partialViewType, int userId = 0)
         {
             var uow = _fileUowProvider.GetUnitOfWork();
-
-            IPartialViewRepository repository;
-            switch (partialViewType)
-            {
-                case PartialViewType.PartialView:
-                    repository = _repositoryFactory.CreatePartialViewRepository(uow);
-                    break;
-                case PartialViewType.PartialViewMacro:
-                default:
-                    repository = _repositoryFactory.CreatePartialViewMacroRepository(uow);
-                    break;
-            }
-
-            using (repository)
+            using (var repository = GetPartialViewRepository(partialViewType, uow))
             {
                 var partialView = repository.Get(path);
                 if (partialView == null)
@@ -686,40 +672,35 @@ namespace Umbraco.Core.Services
                 return Attempt<IPartialView>.Fail();
 
             var uow = _fileUowProvider.GetUnitOfWork();
-
-            IPartialViewRepository repository;
-            switch (partialViewType)
-            {
-                case PartialViewType.PartialView:
-                    repository = _repositoryFactory.CreatePartialViewRepository(uow);
-                    break;
-                case PartialViewType.PartialViewMacro:
-                default:
-                    repository = _repositoryFactory.CreatePartialViewMacroRepository(uow);
-                    break;
-            }
-
-            using (repository)
+            using (var repository = GetPartialViewRepository(partialViewType, uow))
             {
                 repository.AddOrUpdate(partialView);
                 uow.Commit();
-
-                SavedPartialView.RaiseEvent(new SaveEventArgs<IPartialView>(partialView, false), this);
             }
 
             Audit(AuditType.Save, string.Format("Save {0} performed by user", partialViewType), userId, -1);
 
-            SavedPartialView.RaiseEvent(new SaveEventArgs<IPartialView>(partialView), this);
+            SavedPartialView.RaiseEvent(new SaveEventArgs<IPartialView>(partialView, false), this);
 
             return Attempt.Succeed(partialView);
         }
 
         public bool ValidatePartialView(PartialView partialView)
         {
-            var validatePath = IOHelper.ValidateEditPath(partialView.Path, new[] { SystemDirectories.MvcViews + "/Partials/", SystemDirectories.MvcViews + "/MacroPartials/" });
-            var verifyFileExtension = IOHelper.VerifyFileExtension(partialView.Path, new List<string> { "cshtml" });
+            var uow = _dataUowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreatePartialViewRepository(uow))
+            {
+                return repository.ValidatePartialView(partialView);
+            }
+        }
 
-            return validatePath && verifyFileExtension;
+        public bool ValidatePartialViewMacro(PartialView partialView)
+        {
+            var uow = _dataUowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreatePartialViewMacroRepository(uow))
+            {
+                return repository.ValidatePartialView(partialView);
+            }
         }
 
         internal string StripPartialViewHeader(string contents)
@@ -741,11 +722,19 @@ namespace Umbraco.Core.Services
                 : Attempt<string>.Fail();
         }
 
-        private enum PartialViewType
+        private IPartialViewRepository GetPartialViewRepository(PartialViewType partialViewType, IUnitOfWork uow)
         {
-            PartialView,
-            PartialViewMacro
+            switch (partialViewType)
+            {
+                case PartialViewType.PartialView:
+                    return _repositoryFactory.CreatePartialViewRepository(uow);
+                case PartialViewType.PartialViewMacro:
+                    return _repositoryFactory.CreatePartialViewMacroRepository(uow);
+            }
+            throw new ArgumentOutOfRangeException("partialViewType");
         }
+
+        #endregion
 
         private void Audit(AuditType type, string message, int userId, int objectId)
         {
@@ -756,8 +745,6 @@ namespace Umbraco.Core.Services
                 uow.Commit();
             }
         }
-
-        #endregion
 
         //TODO Method to change name and/or alias of view/masterpage template
 
@@ -853,9 +840,5 @@ namespace Umbraco.Core.Services
         public static event TypedEventHandler<IFileService, DeleteEventArgs<IPartialView>> DeletedPartialView;
 
         #endregion
-
-
-
-        
     }
 }

@@ -273,6 +273,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				values.Add("level", values["__Path"].Split(',').Length.ToString());
 			}
 
+            // because, migration
+            if (values.ContainsKey("key") == false)
+                values["key"] = Guid.Empty.ToString();
+
 		    return new CacheValues
 		    {
 		        Values = values,
@@ -321,6 +325,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 					result.Current.MoveToParent();
 				}
 			}
+            // because, migration
+		    if (values.ContainsKey("key") == false)
+		        values["key"] = Guid.Empty.ToString();
 			//add the user props
 			while (result.MoveNext())
 			{
@@ -526,7 +533,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		/// This is a helper class and definitely not intended for public use, it expects that all of the values required 
 		/// to create an IPublishedContent exist in the dictionary by specific aliases.
 		/// </remarks>
-		internal class DictionaryPublishedContent : PublishedContentBase
+		internal class DictionaryPublishedContent : PublishedContentWithKeyBase
 		{
             // note: I'm not sure this class fully complies with IPublishedContent rules especially
             // I'm not sure that _properties contains all properties including those without a value,
@@ -534,7 +541,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             // List of properties that will appear in the XML and do not match
             // anything in the ContentType, so they must be ignored.
-            private static readonly string[] IgnoredKeys = { "version", "isDoc", "key" };
+            private static readonly string[] IgnoredKeys = { "version", "isDoc" };
 
 			public DictionaryPublishedContent(
 				IDictionary<string, string> valueDictionary, 
@@ -555,6 +562,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				LoadedFromExamine = fromExamine;
 
 				ValidateAndSetProperty(valueDictionary, val => _id = int.Parse(val), "id", "nodeId", "__NodeId"); //should validate the int!
+                ValidateAndSetProperty(valueDictionary, val => _key = Guid.Parse(val), "key");
 				// wtf are we dealing with templates for medias?!
                 ValidateAndSetProperty(valueDictionary, val => _templateId = int.Parse(val), "template", "templateId");
 				ValidateAndSetProperty(valueDictionary, val => _sortOrder = int.Parse(val), "sortOrder");
@@ -663,6 +671,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 			{
 				get { return _id; }
 			}
+
+            public override Guid Key { get { return _key; } }
 
 			public override int TemplateId
 			{
@@ -803,6 +813,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
 			private readonly List<string> _keysAdded = new List<string>();
 			private int _id;
+		    private Guid _key;
 			private int _templateId;
 			private int _sortOrder;
 			private string _name;

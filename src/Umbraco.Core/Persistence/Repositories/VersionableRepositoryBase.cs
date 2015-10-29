@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -41,14 +42,14 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = new Sql();
             sql.Select("*")
-                .From<ContentVersionDto>()
-                .InnerJoin<ContentDto>()
-                .On<ContentVersionDto, ContentDto>(left => left.NodeId, right => right.NodeId)
-                .InnerJoin<NodeDto>()
-                .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .From<ContentVersionDto>(SqlSyntax)
+                .InnerJoin<ContentDto>(SqlSyntax)
+                .On<ContentVersionDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .InnerJoin<NodeDto>(SqlSyntax)
+                .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
                 .Where<NodeDto>(x => x.NodeId == id)
-                .OrderByDescending<ContentVersionDto>(x => x.VersionDate);
+                .OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
 
             var dtos = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sql);
             foreach (var dto in dtos)
@@ -513,13 +514,16 @@ WHERE EXISTS(
             // of ContentItemBasic instances) to the database field names.
             switch (orderBy.ToUpperInvariant())
             {
+                case "UPDATEDATE":
+                    return "cmsContentVersion.VersionDate";
                 case "NAME":
                     return "umbracoNode.text";
                 case "OWNER":
                     //TODO: This isn't going to work very nicely because it's going to order by ID, not by letter
                     return "umbracoNode.nodeUser";
                 default:
-                    return orderBy;
+                    //ensure invalid SQL cannot be submitted
+                    return Regex.Replace(orderBy, @"[^\w\.,`\[\]@-]", "");
             }
         }
 
@@ -538,7 +542,8 @@ WHERE EXISTS(
                 case "VERSIONDATE":
                     return "UpdateDate";
                 default:
-                    return orderBy;
+                    //ensure invalid SQL cannot be submitted
+                    return Regex.Replace(orderBy, @"[^\w\.,`\[\]@-]", "");
             }
         }
 

@@ -45,22 +45,16 @@ namespace Umbraco.Web
 
         private void UmbracoModule_RouteAttempt(object sender, RoutableAttemptEventArgs e)
         {
+            // as long as umbraco is ready & configured, sync
             switch (e.Outcome)
             {
                 case EnsureRoutableOutcome.IsRoutable:
-                    Sync();
-                    break;
                 case EnsureRoutableOutcome.NotDocumentRequest:
-                    //so it's not a document request, we'll check if it's a back office request
-                    if (e.HttpContext.Request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath))
-                    {
-                        //it's a back office request, we should sync!
-                        Sync();
-                    }
+                case EnsureRoutableOutcome.NoContent:
+                    Sync();
                     break;
                 //case EnsureRoutableOutcome.NotReady:
                 //case EnsureRoutableOutcome.NotConfigured:
-                //case EnsureRoutableOutcome.NoContent:
                 //default:
                 //    break;
             }
@@ -91,7 +85,11 @@ namespace Umbraco.Web
             var instructions = batch.SelectMany(x => x.Instructions).ToArray();
             batch.Clear();
             if (instructions.Length == 0) return;
+            WriteInstructions(instructions);
+        }
 
+        private void WriteInstructions(RefreshInstruction[] instructions)
+        {
             var dto = new CacheInstructionDto
             {
                 UtcStamp = DateTime.UtcNow,
@@ -102,21 +100,25 @@ namespace Umbraco.Web
             ApplicationContext.DatabaseContext.Database.Insert(dto);
         }
 
-        protected ICollection<RefreshInstructionEnvelope> GetBatch(bool ensureHttpContext)
+        protected ICollection<RefreshInstructionEnvelope> GetBatch(bool create)
         {
-            var httpContext = UmbracoContext.Current == null ? null : UmbracoContext.Current.HttpContext;
-            if (httpContext == null)
-            {
-                if (ensureHttpContext)
-                    throw new NotSupportedException("Cannot execute without a valid/current UmbracoContext with an HttpContext assigned.");
-                return null;
-            }
+            // try get the http context from the UmbracoContext, we do this because in the case we are launching an async
+            // thread and we know that the cache refreshers will execute, we will ensure the UmbracoContext and therefore we
+            // can get the http context from it
+            var httpContext = (UmbracoContext.Current == null ? null : UmbracoContext.Current.HttpContext)
+                // if this is null, it could be that an async thread is calling this method that we weren't aware of and the UmbracoContext
+                // wasn't ensured at the beginning of the thread. We can try to see if the HttpContext.Current is available which might be 
+                // the case if the asp.net synchronization context has kicked in
+                ?? (HttpContext.Current == null ? null : new HttpContextWrapper(HttpContext.Current));
+
+            // if no context was found, return null - we cannot not batch
+            if (httpContext == null) return null;
 
             var key = typeof (BatchedDatabaseServerMessenger).Name;
 
             // no thread-safety here because it'll run in only 1 thread (request) at a time
             var batch = (ICollection<RefreshInstructionEnvelope>)httpContext.Items[key];
-            if (batch == null && ensureHttpContext)
+            if (batch == null && create)
                 httpContext.Items[key] = batch = new List<RefreshInstructionEnvelope>();
             return batch;
         }
@@ -130,11 +132,13 @@ namespace Umbraco.Web
             string json = null)
         {
             var batch = GetBatch(true);
-            if (batch == null)
-                throw new Exception("Failed to get a batch.");
+            var instructions = RefreshInstruction.GetInstructions(refresher, messageType, ids, idType, json);
 
-            batch.Add(new RefreshInstructionEnvelope(servers, refresher,
-                RefreshInstruction.GetInstructions(refresher, messageType, ids, idType, json)));
+            // batch if we can, else write to DB immediately
+            if (batch == null)
+                WriteInstructions(instructions.ToArray());
+            else
+                batch.Add(new RefreshInstructionEnvelope(servers, refresher, instructions));
         }        
     }
 }

@@ -40,6 +40,7 @@
     
 
         <cc1:Pane runat="server" ID="pane_domains">
+            <small class="help-inline"><%=umbraco.ui.Text("assignDomain", "domainHelp") %></small>
             <cc1:PropertyPanel runat="server">
                 <table class="table domains" data-bind="visible: domains().length > 0">
                     <thead>
@@ -51,7 +52,7 @@
                     </thead>
                     <tbody data-bind="foreach: domains">
                         <tr>
-                            <td valign="top"><input class="domain" data-bind="value: Name, uniqueName: true"  /><input type="hidden" value="0" data-bind="uniqueName: true"/></td>
+                            <td valign="top"><input class="domain duplicate" data-bind="value: Name, uniqueName: true"  /><input type="hidden" value="" data-bind="uniqueName: true"/></td>
                             <td valign="top"><select class="language" data-bind="options: $parent.languages, optionsText: 'Code', optionsValue: 'Id', value: Lang, uniqueName: true"></select></td>
                             <td valign="top"><a href="#" class="btn btn-danger" data-bind="click: $parent.removeDomain"><i class="icon icon-trash"></i></a></td>
                         </tr>
@@ -60,7 +61,6 @@
             </cc1:PropertyPanel>
             
             <cc1:PropertyPanel runat="server">
-                <small data-bind="visible: domains().length == 0" class="help-inline"><%=umbraco.ui.Text("assignDomain", "domainHelp") %></small>    
                 <button class="btn" data-bind="click: addDomain"><%=umbraco.ui.Text("assignDomain", "addNew") %></button>        
             </cc1:PropertyPanel>
 

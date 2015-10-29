@@ -300,8 +300,10 @@
     <Compile Include="BatchedDatabaseServerMessengerStartup.cs" />
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
+    <Compile Include="Install\InstallSteps\Version73FileCleanup.cs" />
     <Compile Include="Media\EmbedProviders\Flickr.cs" />
     <Compile Include="Models\ContentEditing\SimpleNotificationModel.cs" />
+    <Compile Include="Models\PublishedContentWithKeyBase.cs" />
     <Compile Include="PropertyEditors\DatePreValueEditor.cs" />
     <Compile Include="RequestLifespanMessagesFactory.cs" />
     <Compile Include="Scheduling\LatchedBackgroundTaskBase.cs" />
@@ -1828,10 +1830,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\users\UserPermissions.cs" />
     <Compile Include="umbraco.presentation\umbraco\users\UserTypeTasks.cs" />
-    <Compile Include="umbraco.presentation\umbraco\webService.asmx.cs">
-      <DependentUpon>webService.asmx</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\webservices\ajaxHelpers.cs" />
     <Compile Include="umbraco.presentation\umbraco\webservices\CacheRefresher.asmx.cs">
       <DependentUpon>CacheRefresher.asmx</DependentUpon>
@@ -2117,7 +2115,6 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
-    <Content Include="umbraco.presentation\umbraco\webService.asmx" />
     <Content Include="umbraco.presentation\umbraco\webservices\CacheRefresher.asmx">
       <SubType>Form</SubType>
     </Content>

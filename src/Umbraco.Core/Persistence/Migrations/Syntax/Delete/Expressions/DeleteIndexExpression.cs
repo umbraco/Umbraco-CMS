@@ -5,23 +5,26 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 {
     public class DeleteIndexExpression : MigrationExpressionBase
     {
-        public DeleteIndexExpression()
+
+        public DeleteIndexExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax)
+            : base(current, databaseProviders, sqlSyntax)
         {
             Index = new IndexDefinition();
         }
 
-        public DeleteIndexExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders) : base(current, databaseProviders)
+        public DeleteIndexExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax, IndexDefinition index) 
+            : base(current, databaseProviders, sqlSyntax)
         {
-            Index = new IndexDefinition();
+            Index = index;
         }
 
-        public virtual IndexDefinition Index { get; set; }
+        public IndexDefinition Index { get; private set; }
 
         public override string ToString()
         {
-            return string.Format(SqlSyntaxContext.SqlSyntaxProvider.DropIndex,
-                                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedName(Index.Name),
-                                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(Index.TableName));
+            return string.Format(SqlSyntax.DropIndex,
+                                 SqlSyntax.GetQuotedName(Index.Name),
+                                 SqlSyntax.GetQuotedTableName(Index.TableName));
         }
     }
 }

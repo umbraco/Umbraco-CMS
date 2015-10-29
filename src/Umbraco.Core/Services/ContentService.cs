@@ -445,6 +445,9 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         public IEnumerable<IContent> GetAncestors(IContent content)
         {
+            //null check otherwise we get exceptions
+            if (content.Path.IsNullOrWhiteSpace()) return Enumerable.Empty<IContent>();
+
             var ids = content.Path.Split(',').Where(x => x != Constants.System.Root.ToInvariantString() && x != content.Id.ToString(CultureInfo.InvariantCulture)).Select(int.Parse).ToArray();
             if (ids.Any() == false)
                 return new List<IContent>();
@@ -1408,10 +1411,22 @@ namespace Umbraco.Core.Services
                     if (success)
                         repository.DeleteMediaFiles(files);
                 }
-
-
             }
             Audit(AuditType.Delete, "Empty Content Recycle Bin performed by user", 0, Constants.System.RecycleBinContent);
+        }
+
+        /// <summary>
+        /// Copies an <see cref="IContent"/> object by creating a new Content object of the same type and copies all data from the current 
+        /// to the new copy which is returned. Recursively copies all children.
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to copy</param>
+        /// <param name="parentId">Id of the Content's new Parent</param>
+        /// <param name="relateToOriginal">Boolean indicating whether the copy should be related to the original</param>
+        /// <param name="userId">Optional Id of the User copying the Content</param>
+        /// <returns>The newly created <see cref="IContent"/> object</returns>
+        public IContent Copy(IContent content, int parentId, bool relateToOriginal, int userId = 0)
+        {
+            return Copy(content, parentId, relateToOriginal, true, userId);
         }
 
         /// <summary>
@@ -1421,9 +1436,10 @@ namespace Umbraco.Core.Services
         /// <param name="content">The <see cref="IContent"/> to copy</param>
         /// <param name="parentId">Id of the Content's new Parent</param>
         /// <param name="relateToOriginal">Boolean indicating whether the copy should be related to the original</param>
+        /// <param name="recursive">A value indicating whether to recursively copy children.</param>
         /// <param name="userId">Optional Id of the User copying the Content</param>
         /// <returns>The newly created <see cref="IContent"/> object</returns>
-        public IContent Copy(IContent content, int parentId, bool relateToOriginal, int userId = 0)
+        public IContent Copy(IContent content, int parentId, bool relateToOriginal, bool recursive, int userId = 0)
         {
             //TODO: This all needs to be managed correctly so that the logic is submitted in one
             // transaction, the CRUD needs to be moved to the repo
@@ -1466,13 +1482,16 @@ namespace Umbraco.Core.Services
                     }
                 }
 
-                //Look for children and copy those as well
-                var children = GetChildren(content.Id);
-                foreach (var child in children)
+                if (recursive)
                 {
-                    //TODO: This shouldn't recurse back to this method, it should be done in a private method
-                    // that doesn't have a nested lock and so we can perform the entire operation in one commit.
-                    Copy(child, copy.Id, relateToOriginal, userId);
+                    //Look for children and copy those as well
+                    var children = GetChildren(content.Id);
+                    foreach (var child in children)
+                    {
+                        //TODO: This shouldn't recurse back to this method, it should be done in a private method
+                        // that doesn't have a nested lock and so we can perform the entire operation in one commit.
+                        Copy(child, copy.Id, relateToOriginal, true, userId);
+                    }
                 }
 
                 Copied.RaiseEvent(new CopyEventArgs<IContent>(content, copy, false, parentId, relateToOriginal), this);
@@ -1818,14 +1837,18 @@ namespace Umbraco.Core.Services
 
                 //Publish and then update the database with new status
                 var publishedOutcome = internalStrategy.PublishWithChildrenInternal(list, userId, includeUnpublished).ToArray();
+                var published = publishedOutcome
+                    .Where(x => x.Success || x.Result.StatusType == PublishStatusType.SuccessAlreadyPublished)
+                    // ensure proper order (for events) - cannot publish a child before its parent!
+                    .OrderBy(x => x.Result.ContentItem.Level)
+                    .ThenBy(x => x.Result.ContentItem.SortOrder);
 
                 var uow = UowProvider.GetUnitOfWork();
                 using (var repository = RepositoryFactory.CreateContentRepository(uow))
                 {
                     //NOTE The Publish with subpages-dialog was used more as a republish-type-thing, so we'll have to include PublishStatusType.SuccessAlreadyPublished
                     //in the updated-list, so the Published event is triggered with the expected set of pages and the xml is updated.
-                    foreach (var item in publishedOutcome.Where(
-                        x => x.Success || x.Result.StatusType == PublishStatusType.SuccessAlreadyPublished))
+                    foreach (var item in published)
                     {
                         item.Result.ContentItem.WriterId = userId;
                         repository.AddOrUpdate(item.Result.ContentItem);

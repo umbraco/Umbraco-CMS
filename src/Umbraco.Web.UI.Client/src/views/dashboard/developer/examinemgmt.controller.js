@@ -43,7 +43,7 @@ function examineMgmtController($scope, umbRequestHelper, $log, $http, $q, $timeo
         umbRequestHelper.resourcePromise(
                 $http.get(umbRequestHelper.getApiUrl("examineMgmtBaseUrl", "GetSearchResults", {
                     searcherName: searcher.name,
-                    query: searcher.searchText,
+                    query: encodeURIComponent(searcher.searchText),
                     queryType: searcher.searchType
                 })),
                 'Failed to search')

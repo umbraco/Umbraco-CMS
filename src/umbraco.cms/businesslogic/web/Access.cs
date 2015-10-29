@@ -71,12 +71,12 @@ namespace umbraco.cms.businesslogic.web
             if (e.Cancel) return;
 
 
-            var entry = ApplicationContext.Current.Services.PublicAccessService.AddOrUpdateRule(
+            var entry = ApplicationContext.Current.Services.PublicAccessService.AddRule(
                 doc.ContentEntity,
                 Constants.Conventions.PublicAccess.MemberRoleRuleType,
                 role);
 
-            if (entry == null)
+            if (entry.Success == false && entry.Result.Entity == null)
             {
                 throw new Exception("Document is not protected!");
             }
@@ -95,12 +95,14 @@ namespace umbraco.cms.businesslogic.web
             if (content == null)
                 throw new Exception("No content found with document id " + DocumentId);
 
-            var entry = ApplicationContext.Current.Services.PublicAccessService.AddOrUpdateRule(
-                content, 
-                Constants.Conventions.PublicAccess.MemberGroupIdRuleType, 
-                MemberGroupId.ToString(CultureInfo.InvariantCulture));
-
-            Save();
+            if (ApplicationContext.Current.Services.PublicAccessService.AddRule(
+                content,
+                Constants.Conventions.PublicAccess.MemberGroupIdRuleType,
+                MemberGroupId.ToString(CultureInfo.InvariantCulture)))
+            {
+                Save();
+            }
+            
         }
 
         [Obsolete("This method is no longer supported. Use the ASP.NET MemberShip methods instead", true)]
@@ -111,12 +113,14 @@ namespace umbraco.cms.businesslogic.web
             if (content == null)
                 throw new Exception("No content found with document id " + DocumentId);
 
-            ApplicationContext.Current.Services.PublicAccessService.AddOrUpdateRule(
-                content, 
-                Constants.Conventions.PublicAccess.MemberIdRuleType, 
-                MemberId.ToString(CultureInfo.InvariantCulture));
-
-            Save();
+            if (ApplicationContext.Current.Services.PublicAccessService.AddRule(
+                content,
+                Constants.Conventions.PublicAccess.MemberIdRuleType,
+                MemberId.ToString(CultureInfo.InvariantCulture)))
+            {
+                Save();
+            }
+            
         }
 
         public static void AddMembershipUserToDocument(int documentId, string membershipUserName)
@@ -128,19 +132,22 @@ namespace umbraco.cms.businesslogic.web
 
             if (e.Cancel) return;
 
-            var entry = ApplicationContext.Current.Services.PublicAccessService.AddOrUpdateRule(
+            var entry = ApplicationContext.Current.Services.PublicAccessService.AddRule(
                 doc.ContentEntity, 
                 Constants.Conventions.PublicAccess.MemberUsernameRuleType, 
                 membershipUserName);
 
-            if (entry == null)
+            if (entry.Success == false && entry.Result.Entity == null)
             {
                 throw new Exception("Document is not protected!");
             }
 
-            Save();
-   
-            new Access().FireAfterAddMembershipUserToDocument(doc, membershipUserName, e);
+            if (entry)
+            {
+                Save();
+                new Access().FireAfterAddMembershipUserToDocument(doc, membershipUserName, e);
+            }
+            
         }
 
         [Obsolete("This method is no longer supported. Use the ASP.NET MemberShip methods instead", true)]
@@ -148,16 +155,20 @@ namespace umbraco.cms.businesslogic.web
         {
             var doc = new Document(DocumentId);
 
-            var entry = ApplicationContext.Current.Services.PublicAccessService.AddOrUpdateRule(
+            var entry = ApplicationContext.Current.Services.PublicAccessService.AddRule(
                 doc.ContentEntity, 
                 Constants.Conventions.PublicAccess.MemberGroupIdRuleType, 
                 MemberGroupId.ToString(CultureInfo.InvariantCulture));
 
-            if (entry == null)
+            if (entry.Success == false && entry.Result.Entity == null)
             {
                 throw new Exception("Document is not protected!");
             }
-            Save();
+
+            if (entry)
+            {
+                Save();
+            }
         }
 
         public static void RemoveMembershipRoleFromDocument(int documentId, string role)
@@ -168,14 +179,15 @@ namespace umbraco.cms.businesslogic.web
 
             if (e.Cancel) return;
 
-            ApplicationContext.Current.Services.PublicAccessService.RemoveRule(
+            if (ApplicationContext.Current.Services.PublicAccessService.RemoveRule(
                 doc.ContentEntity,
                 Constants.Conventions.PublicAccess.MemberRoleRuleType,
-                role);
-
-            Save();
-
-            new Access().FireAfterRemoveMemberShipRoleFromDocument(doc, role, e);
+                role))
+            {
+                Save();
+                new Access().FireAfterRemoveMemberShipRoleFromDocument(doc, role, e);
+            };
+            
         }
 
         public static bool RenameMemberShipRole(string oldRolename, string newRolename)
@@ -201,7 +213,7 @@ namespace umbraco.cms.businesslogic.web
             var noAccessContent = ApplicationContext.Current.Services.ContentService.GetById(ErrorDocumentId);
             if (noAccessContent == null) throw new NullReferenceException("No content item found with id " + ErrorDocumentId);
 
-            var entry = ApplicationContext.Current.Services.PublicAccessService.GetEntryForContent(doc.ContentEntity);
+            var entry = ApplicationContext.Current.Services.PublicAccessService.GetEntryForContent(doc.ContentEntity.Id.ToString());
             if (entry != null)
             {
                 if (Simple)
@@ -222,11 +234,12 @@ namespace umbraco.cms.businesslogic.web
                     new List<PublicAccessRule>());
             }
 
-            ApplicationContext.Current.Services.PublicAccessService.Save(entry);
-
-            Save();
-
-            new Access().FireAfterAddProtection(new Document(DocumentId), e);
+            if (ApplicationContext.Current.Services.PublicAccessService.Save(entry))
+            {
+                Save();
+                new Access().FireAfterAddProtection(new Document(DocumentId), e);
+            }
+            
         }
 
         public static void RemoveProtection(int DocumentId)
@@ -405,6 +418,12 @@ namespace umbraco.cms.businesslogic.web
         public static bool IsProtected(int DocumentId, string Path)
         {
             return ApplicationContext.Current.Services.PublicAccessService.IsProtected(Path.EnsureEndsWith("," + DocumentId));             
+        }
+
+        //return the protection status of this exact document - not based on inheritance
+        public static bool IsProtected(int DocumentId)
+        {
+            return ApplicationContext.Current.Services.PublicAccessService.IsProtected(DocumentId.ToString());
         }
 
         public static int GetErrorPage(string Path)

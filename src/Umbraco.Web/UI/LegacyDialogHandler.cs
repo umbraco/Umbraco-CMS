@@ -193,10 +193,18 @@ namespace Umbraco.Web.UI
             typeInstance.Alias = text;
 
             // check for returning url
-            var returnUrlTask = typeInstance as LegacyDialogTask;
-
-            returnUrlTask.AdditionalValues = additionalValues;
-
+            ITaskReturnUrl returnUrlTask = typeInstance as LegacyDialogTask;
+            if (returnUrlTask != null)
+            {
+                // if castable to LegacyDialogTask: add in additionalValues
+                ((LegacyDialogTask) returnUrlTask).AdditionalValues = additionalValues;
+            }
+            else
+            {
+                // otherwise cast to returnUrl interface
+                returnUrlTask = typeInstance as ITaskReturnUrl;
+            }
+            
             typeInstance.Save();
             
             return returnUrlTask != null

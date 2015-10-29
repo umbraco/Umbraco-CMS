@@ -9,7 +9,7 @@
         assetsService.load([
             //"lib/spectrum/tinycolor.js",
             "lib/spectrum/spectrum.js"          
-        ]).then(function () {
+        ], $scope).then(function () {
             var elem = $element.find("input");
             elem.spectrum({
                 color: null,

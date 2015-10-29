@@ -1021,7 +1021,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Id of the User deleting the Media</param>
         public void Delete(IMedia media, int userId = 0)
         {
-            
+            ((IMediaServiceOperations)this).Delete(media, userId);
         }
 
         

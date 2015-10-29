@@ -285,6 +285,14 @@ namespace Umbraco.Web.Editors
                     else
                     {
                         AddCancelMessage(display);
+
+                        //If the item is new and the operation was cancelled, we need to return a different
+                        // status code so the UI can handle it since it won't be able to redirect since there
+                        // is no Id to redirect to!
+                        if (saveStatus.Result.StatusType == OperationStatusType.FailedCancelledByEvent && IsCreatingAction(contentItem.Action))
+                        {
+                            throw new HttpResponseException(Request.CreateValidationErrorResponse(display));
+                        }
                     }
                     
                     break;                
@@ -463,7 +471,7 @@ namespace Umbraco.Web.Editors
                 {
                     tempFiles.Notifications.Add(new Notification(
                         Services.TextService.Localize("speechBubbles/operationFailedHeader"),
-                        "Cannot upload file " + file + ", it is not an approved file type",
+                        "Cannot upload file " + file.Headers.ContentDisposition.FileName + ", it is not an approved file type",
                         SpeechBubbleIcon.Warning));
                 }
             }

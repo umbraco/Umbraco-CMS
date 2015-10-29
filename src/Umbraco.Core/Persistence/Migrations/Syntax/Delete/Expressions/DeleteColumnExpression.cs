@@ -7,13 +7,13 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 {
     public class DeleteColumnExpression : MigrationExpressionBase
     {
-        public DeleteColumnExpression()
-        {
-            ColumnNames = new List<string>();
-        }
+        //public DeleteColumnExpression()
+        //{
+        //    ColumnNames = new List<string>();
+        //}
 
-        public DeleteColumnExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders)
-            : base(current, databaseProviders)
+        public DeleteColumnExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax)
+            : base(current, databaseProviders, sqlSyntax)
         {
             ColumnNames = new List<string>();
         }
@@ -31,9 +31,9 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
             foreach (string columnName in ColumnNames)
             {
                 if (ColumnNames.First() != columnName) sb.AppendLine(";");
-                sb.AppendFormat(SqlSyntaxContext.SqlSyntaxProvider.DropColumn,
-                                SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(TableName),
-                                SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(columnName));
+                sb.AppendFormat(SqlSyntax.DropColumn,
+                                SqlSyntax.GetQuotedTableName(TableName),
+                                SqlSyntax.GetQuotedColumnName(columnName));
             }
 
             return sb.ToString();

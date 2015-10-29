@@ -51,7 +51,6 @@ namespace Umbraco.Tests.Services
 			Content trashed = MockedContent.CreateSimpleContent(contentType, "Text Page Deleted", -20);
 			trashed.Trashed = true;
 			ServiceContext.ContentService.Save(trashed, 0);
-            
-		}
+        }
 	}
 }

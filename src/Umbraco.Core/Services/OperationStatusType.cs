@@ -1,7 +1,7 @@
 namespace Umbraco.Core.Services
 {
     /// <summary>
-    /// A status type of the result of publishing a content item
+    /// A status type of the result of saving an item
     /// </summary>
     /// <remarks>
     /// Anything less than 10 = Success!

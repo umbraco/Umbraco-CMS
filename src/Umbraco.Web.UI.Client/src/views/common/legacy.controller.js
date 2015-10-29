@@ -9,7 +9,7 @@
 */
 function LegacyController($scope, $routeParams, $element) {
 
-    var url = decodeURIComponent($routeParams.url.toLowerCase().replace(/javascript\:/g, ""));
+    var url = decodeURIComponent($routeParams.url.replace(/javascript\:/gi, ""));
     //split into path and query
     var urlParts = url.split("?");
     var extIndex = urlParts[0].lastIndexOf(".");

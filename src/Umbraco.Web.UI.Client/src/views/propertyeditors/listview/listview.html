@@ -1,7 +1,7 @@
 <div class="umb-editor umb-listview" ng-controller="Umbraco.PropertyEditors.ListViewController" ng-switch="isNew">
-    
+
     <div class="row-fluid" ng-switch-when="true">
-        
+
     </div>
 
     <div class="row-fluid" ng-switch-when="false">
@@ -14,15 +14,14 @@
                 </a>
                 <ul class="dropdown-menu">
                     <li ng-repeat="contentType in listViewAllowedTypes">
-                        <a
-                            href="#/{{entityType}}/{{entityType}}/edit/{{contentId}}?doctype={{contentType.alias}}&create=true">
+                        <a href="#/{{entityType}}/{{entityType}}/edit/{{contentId}}?doctype={{contentType.alias}}&create=true">
                             <i class="icon-{{contentType.cssClass}}"></i>
                             {{contentType.name}}
                         </a>
                     </li>
                 </ul>
             </div>
-            
+
             <div class="btn-group" ng-show="isAnythingSelected()" ng-if="entityType === 'content' && !isTrashed && options.allowBulkPublish">
                 <a class="btn btn-success" ng-disabled="actionInProgress" ng-click="publish()" prevent-default>
                     <localize key="actions_publish">Publish</localize>
@@ -38,13 +37,14 @@
                     <localize key="actions_delete">Delete</localize>
                 </a>
             </div>
-            <span ng-bind="bulkStatus" ng-show="isAnythingSelected()"></span>
-            
+
             <div class="umb-loader-wrapper" ng-show="actionInProgress">
                 <div class="umb-loader"></div>
             </div>
 
-            <form class="form-search pull-right" novalidate>
+            <span ng-bind="bulkStatus" ng-show="isAnythingSelected()" class="pull-right"></span>
+
+            <form class="form-search pull-right" novalidate ng-show="!actionInProgress">
                 <div class="inner-addon left-addon">
                     <i class="icon icon-search" ng-click="enterSearch($event)"></i>
                     <input type="text" class="form-control" localize="placeholder" placeholder="@general_typeToSearch" ng-model="options.filter" prevent-enter-submit no-dirty-check>
@@ -66,7 +66,7 @@
                     </td>
 
                     <td ng-repeat="column in options.includeProperties">
-                        <a href="#" ng-click="sort(column.alias, column.allowSorting)" ng-class="{'sortable':column.allowSorting}" prevent-default>                          
+                        <a href="#" ng-click="sort(column.alias, column.allowSorting)" ng-class="{'sortable':column.allowSorting}" prevent-default>
                             <span ng-bind="column.header"></span>
                             <i class="icon" ng-class="{'icon-navigation-up': isSortDirection(column.alias, 'asc'), 'icon-navigation-down': isSortDirection(column.alias, 'desc')}"></i>
                         </a>
@@ -118,8 +118,8 @@
                                 <li ng-repeat="pgn in pagination"
                                     ng-class="{active:pgn.isActive}">
 
-                                    <a href="#" ng-click="goToPage(pgn.val - 1)" prevent-default 
-                                       ng-bind="pgn.name ? pgn.name : pgn.val" 
+                                    <a href="#" ng-click="goToPage(pgn.val - 1)" prevent-default
+                                       ng-bind="pgn.name ? pgn.name : pgn.val"
                                        ng-if="pgn.val != '...'"></a>
                                     <span ng-bind="pgn.val" ng-if="pgn.val == '...'"></span>
                                 </li>

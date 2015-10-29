@@ -178,45 +178,48 @@ namespace Umbraco.Web.Models.Mapping
                 display.TreeNodeUrl = url;
             }
 
-            TabsAndPropertiesResolver.MapGenericProperties(
-                member, display,
+            var genericProperties = new List<ContentPropertyDisplay>
+            {
                 GetLoginProperty(memberService, member, display),
                 new ContentPropertyDisplay
-                    {
-                        Alias = string.Format("{0}email", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                        Label = ui.Text("general", "email"),
-                        Value = display.Email,
-                        View = "email",
-                        Validation = { Mandatory = true }        
-                    },
+                {
+                    Alias = string.Format("{0}email", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Label = ui.Text("general", "email"),
+                    Value = display.Email,
+                    View = "email",
+                    Validation = {Mandatory = true}
+                },
                 new ContentPropertyDisplay
+                {
+                    Alias = string.Format("{0}password", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Label = ui.Text("password"),
+                    //NOTE: The value here is a json value - but the only property we care about is the generatedPassword one if it exists, the newPassword exists
+                    // only when creating a new member and we want to have a generated password pre-filled.
+                    Value = new Dictionary<string, object>
                     {
-                        Alias = string.Format("{0}password", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                        Label = ui.Text("password"),
-                        //NOTE: The value here is a json value - but the only property we care about is the generatedPassword one if it exists, the newPassword exists
-                        // only when creating a new member and we want to have a generated password pre-filled.
-                        Value = new Dictionary<string, object>
-                            {
-                                {"generatedPassword", member.GetAdditionalDataValueIgnoreCase("GeneratedPassword", null) },
-                                {"newPassword", member.GetAdditionalDataValueIgnoreCase("NewPassword", null) },
-                            },
-                        //TODO: Hard coding this because the changepassword doesn't necessarily need to be a resolvable (real) property editor
-                        View = "changepassword",
-                        //initialize the dictionary with the configuration from the default membership provider
-                        Config = new Dictionary<string, object>(membersProvider.GetConfiguration())
-                            {
-                                //the password change toggle will only be displayed if there is already a password assigned.
-                                {"hasPassword", member.RawPasswordValue.IsNullOrWhiteSpace() == false}
-                            }
+                        {"generatedPassword", member.GetAdditionalDataValueIgnoreCase("GeneratedPassword", null)},
+                        {"newPassword", member.GetAdditionalDataValueIgnoreCase("NewPassword", null)},
                     },
-                new ContentPropertyDisplay
+                    //TODO: Hard coding this because the changepassword doesn't necessarily need to be a resolvable (real) property editor
+                    View = "changepassword",
+                    //initialize the dictionary with the configuration from the default membership provider
+                    Config = new Dictionary<string, object>(membersProvider.GetConfiguration())
                     {
-                        Alias = string.Format("{0}membergroup", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                        Label = ui.Text("content", "membergroup"),
-                        Value = GetMemberGroupValue(display.Username),
-                        View = "membergroups",
-                        Config = new Dictionary<string, object> { { "IsRequired", true } }
-                    });
+                        //the password change toggle will only be displayed if there is already a password assigned.
+                        {"hasPassword", member.RawPasswordValue.IsNullOrWhiteSpace() == false}
+                    }
+                },
+                new ContentPropertyDisplay
+                {
+                    Alias = string.Format("{0}membergroup", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Label = ui.Text("content", "membergroup"),
+                    Value = GetMemberGroupValue(display.Username),
+                    View = "membergroups",
+                    Config = new Dictionary<string, object> {{"IsRequired", true}}
+                }
+            };
+
+            TabsAndPropertiesResolver.MapGenericProperties(member, display, genericProperties);
 
             //check if there's an approval field
             var provider = membersProvider as global::umbraco.providers.members.UmbracoMembershipProvider;
@@ -273,10 +276,10 @@ namespace Umbraco.Web.Models.Mapping
             var result = new Dictionary<string, bool>();
             foreach (var role in Roles.GetAllRoles().Distinct())
             {
-                result.Add(role, false);
                 // if a role starts with __umbracoRole we won't show it as it's an internal role used for public access
                 if (role.StartsWith(Constants.Conventions.Member.InternalRolePrefix) == false)
                 {
+                    result.Add(role, false);
                     if (username.IsNullOrWhiteSpace()) continue;
                     if (Roles.IsUserInRole(username, role))
                     {

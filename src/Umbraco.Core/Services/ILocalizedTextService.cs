@@ -47,5 +47,13 @@ namespace Umbraco.Core.Services
         /// to resolve the full culture if possible.
         /// </remarks>
         CultureInfo ConvertToSupportedCultureWithRegionCode(CultureInfo currentCulture);
+
+        /// <summary>
+        /// HAAAAAAAAAAACK! Used for backwards compat to convert a user's real culture code to a region code - normally this would be two letters
+        /// TODO: REmove in v8
+        /// </summary>
+        /// <param name="currentCulture"></param>
+        /// <returns></returns>
+        string ConvertToRegionCodeFromSupportedCulture(CultureInfo currentCulture);
     }
 }

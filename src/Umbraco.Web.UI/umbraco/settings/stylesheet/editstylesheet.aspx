@@ -1,5 +1,6 @@
 <%@ Page Language="c#" MasterPageFile="../../masterpages/umbracoPage.Master" CodeBehind="editstylesheet.aspx.cs" AutoEventWireup="True"
     Inherits="Umbraco.Web.UI.Umbraco.Settings.Stylesheet.EditStyleSheet" ValidateRequest="False" %>
+<%@ Import Namespace="Umbraco.Core" %>
 
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="cdf" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
@@ -13,16 +14,12 @@
             $(document).ready(function () {
                 var editor = new Umbraco.Editors.EditStyleSheet({
                     nameTxtBox: $('#<%= NameTxt.ClientID %>'),
-                    originalFileName: '<%= NameTxt.Text.Replace("\\", "\\\\") %>',
-                    cssId: '<%= Request.QueryString["id"] %>',
+                    originalFileName: '<%= NameTxt.Text %>',
                     saveButton: $("#<%= ((Control)SaveButton).ClientID %>"),
                     editorSourceElement: $('#<%= editorSource.ClientID %>'), 
-                    text: {
-                        cssErrorHeader: '<%= HttpUtility.JavaScriptStringEncode(umbraco.ui.Text("speechBubbles", "cssErrorHeader")) %>',
-                        cssSavedHeader: '<%= HttpUtility.JavaScriptStringEncode(umbraco.ui.Text("speechBubbles", "cssSavedHeader")) %>',
-                        cssSavedText: '<%= HttpUtility.JavaScriptStringEncode(umbraco.ui.Text("speechBubbles", "cssSavedText")) %>',
-                        cssErrorText: 'Please make sure that you have permissions set correctly',
-                    }
+                    restServiceLocation: "<%= Url.GetSaveFileServicePath() %>",
+                    treeSyncPath: "<%= TreeSyncPath %>",
+                    lttPathElement: $('#<%= lttPath.ClientID %>')
                 });
                 editor.init();
                 

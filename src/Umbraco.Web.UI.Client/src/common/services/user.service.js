@@ -1,5 +1,5 @@
 angular.module('umbraco.services')
-    .factory('userService', function ($rootScope, eventsService, $q, $location, $log, securityRetryQueue, authResource, dialogService, $timeout, angularHelper) {
+    .factory('userService', function ($rootScope, eventsService, $q, $location, $log, securityRetryQueue, authResource, dialogService, $timeout, angularHelper, $http) {
 
         var currentUser = null;
         var lastUserId = null;
@@ -250,7 +250,7 @@ angular.module('umbraco.services')
                             }
 
                             setCurrentUser(data);
-                            currentUser.avatar = '//www.gravatar.com/avatar/' + data.emailHash + '?s=40&d=404';
+
                             deferred.resolve(currentUser);
                         });
 

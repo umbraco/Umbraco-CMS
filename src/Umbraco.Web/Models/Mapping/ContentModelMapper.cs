@@ -2,22 +2,16 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Runtime.Serialization;
-using System.Threading;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using AutoMapper;
-using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Trees;
-using umbraco;
 using Umbraco.Web.Routing;
 using umbraco.BusinessLogic.Actions;
 
@@ -51,11 +45,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(
                     dto => dto.IsContainer,
                     expression => expression.MapFrom(content => content.ContentType.IsContainer))
-                .ForMember(
-                    dto => dto.IsChildOfListView,
-                    //TODO: Fix this shorthand .Parent() lookup, at least have an overload to use the current
-                    // application context so it's testable!
-                    expression => expression.MapFrom(content => content.Parent().ContentType.IsContainer))
+                .ForMember(display => display.IsChildOfListView, expression => expression.Ignore())                
                 .ForMember(
                     dto => dto.Trashed,
                     expression => expression.MapFrom(content => content.Trashed))
@@ -78,7 +68,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Tabs, expression => expression.ResolveUsing<TabsAndPropertiesResolver>())
                 .ForMember(display => display.AllowedActions, expression => expression.ResolveUsing(
                     new ActionButtonsResolver(new Lazy<IUserService>(() => applicationContext.Services.UserService))))
-                .AfterMap((media, display) => AfterMap(media, display, applicationContext.Services.DataTypeService, applicationContext.Services.TextService));
+                .AfterMap((media, display) => AfterMap(media, display, applicationContext.Services.DataTypeService, applicationContext.Services.TextService,
+                    applicationContext.Services.ContentTypeService));
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
             config.CreateMap<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>()
@@ -119,8 +110,37 @@ namespace Umbraco.Web.Models.Mapping
         /// <param name="display"></param>
         /// <param name="dataTypeService"></param>
         /// <param name="localizedText"></param>
-        private static void AfterMap(IContent content, ContentItemDisplay display, IDataTypeService dataTypeService, ILocalizedTextService localizedText)
+        /// <param name="contentTypeService"></param>
+        private static void AfterMap(IContent content, ContentItemDisplay display, IDataTypeService dataTypeService, 
+            ILocalizedTextService localizedText, IContentTypeService contentTypeService)
         {
+            //map the IsChildOfListView (this is actually if it is a descendant of a list view!)
+            //TODO: Fix this shorthand .Ancestors() lookup, at least have an overload to use the current
+            if (content.HasIdentity)
+            {
+                var ancesctorListView = content.Ancestors().FirstOrDefault(x => x.ContentType.IsContainer);
+                display.IsChildOfListView = ancesctorListView != null;
+            }
+            else
+            {
+                //it's new so it doesn't have a path, so we need to look this up by it's parent + ancestors
+                var parent = content.Parent();
+                if (parent == null)
+                {
+                    display.IsChildOfListView = false;
+                }
+                else if (parent.ContentType.IsContainer)
+                {
+                    display.IsChildOfListView = true;
+                }
+                else
+                {
+                    var ancesctorListView = parent.Ancestors().FirstOrDefault(x => x.ContentType.IsContainer);
+                    display.IsChildOfListView = ancesctorListView != null;
+                }
+            }
+            
+
             //map the tree node url
             if (HttpContext.Current != null)
             {
@@ -142,43 +162,76 @@ namespace Umbraco.Web.Models.Mapping
                 TabsAndPropertiesResolver.AddListView(display, "content", dataTypeService);
             }
 
-            TabsAndPropertiesResolver.MapGenericProperties(
-                content, display,
+            var properties = new List<ContentPropertyDisplay>
+            {
                 new ContentPropertyDisplay
-                    {
-                        Alias = string.Format("{0}releasedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                        Label = localizedText.Localize("content/releaseDate"),
-                        Value = display.ReleaseDate.HasValue ? display.ReleaseDate.Value.ToIsoString() : null,
-                        View = "datepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
-                    },
+                {
+                    Alias = string.Format("{0}releasedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Label = localizedText.Localize("content/releaseDate"),
+                    Value = display.ReleaseDate.HasValue ? display.ReleaseDate.Value.ToIsoString() : null,
+                    View = "datepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
+                },
                 new ContentPropertyDisplay
-                    {
-                        Alias = string.Format("{0}expiredate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                        Label = localizedText.Localize("content/unpublishDate"),
-                        Value = display.ExpireDate.HasValue ? display.ExpireDate.Value.ToIsoString() : null,
-                        View = "datepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
-                    },
+                {
+                    Alias = string.Format("{0}expiredate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Label = localizedText.Localize("content/unpublishDate"),
+                    Value = display.ExpireDate.HasValue ? display.ExpireDate.Value.ToIsoString() : null,
+                    View = "datepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
+                },
                 new ContentPropertyDisplay
+                {
+                    Alias = string.Format("{0}template", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Label = "Template", //TODO: localize this?
+                    Value = display.TemplateAlias,
+                    View = "dropdown", //TODO: Hard coding until we make a real dropdown property editor to lookup
+                    Config = new Dictionary<string, object>
                     {
-                        Alias = string.Format("{0}template", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                        Label = "Template", //TODO: localize this?
-                        Value = display.TemplateAlias,
-                        View = "dropdown", //TODO: Hard coding until we make a real dropdown property editor to lookup
-                        Config = new Dictionary<string, object>
+                        {"items", templateItemConfig}
+                    }
+                },
+                new ContentPropertyDisplay
+                {
+                    Alias = string.Format("{0}urls", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Label = localizedText.Localize("content/urls"),
+                    Value = string.Join(",", display.Urls),
+                    View = "urllist" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
+                }
+            };
+
+            TabsAndPropertiesResolver.MapGenericProperties(content, display, properties.ToArray(),
+                genericProperties =>
+                {
+                    //TODO: This would be much nicer with the IUmbracoContextAccessor so we don't use singletons
+                    //If this is a web request and debugging is enabled and there's a user signed in and the 
+                    // user has access tot he settings section, we will 
+                    if (HttpContext.Current != null && HttpContext.Current.IsDebuggingEnabled
+                        && UmbracoContext.Current != null && UmbracoContext.Current.Security.CurrentUser != null
+                        && UmbracoContext.Current.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
+                    {
+                        var currentDocumentType = contentTypeService.GetContentType(display.ContentTypeAlias);
+                        var currentDocumentTypeName = currentDocumentType == null ? string.Empty : currentDocumentType.Name;
+
+                        var currentDocumentTypeId = currentDocumentType == null ? string.Empty : currentDocumentType.Id.ToString(CultureInfo.InvariantCulture);
+                        //TODO: Hard coding this is not good
+                        var docTypeLink = string.Format("#/settings/framed/%252Fumbraco%252Fsettings%252FeditNodeTypeNew.aspx%253Fid%253D{0}", currentDocumentTypeId);
+
+                        //Replace the doc type property
+                        var docTypeProp = genericProperties.First(x => x.Alias == string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
+                        docTypeProp.Value = new List<object>
+                        {
+                            new
                             {
-                                {"items", templateItemConfig}
+                                linkText = currentDocumentTypeName,
+                                url = docTypeLink,
+                                target = "_self", icon = "icon-item-arrangement"
                             }
-                    },
-                new ContentPropertyDisplay
-                    {
-                        Alias = string.Format("{0}urls", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                        Label = localizedText.Localize("content/urls"),
-                        Value = string.Join(",", display.Urls),
-                        View = "urllist" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
-                    });
+                        };
+                        //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
+                        docTypeProp.View = "urllist";
+                    }
+                });
+
         }
-
-
 
         /// <summary>
         /// Gets the published date value for the IContent object
@@ -221,8 +274,16 @@ namespace Umbraco.Web.Models.Mapping
                 }
                 var svc = _userService.Value;
 
-                var permissions = svc.GetPermissions(UmbracoContext.Current.Security.CurrentUser, source.Id)
-                                              .FirstOrDefault();
+                var permissions = svc.GetPermissions(
+                    //TODO: This is certainly not ideal usage here - perhaps the best way to deal with this in the future is
+                    // with the IUmbracoContextAccessor. In the meantime, if used outside of a web app this will throw a null
+                    // refrence exception :(
+                    UmbracoContext.Current.Security.CurrentUser,
+                    // Here we need to do a special check since this could be new content, in which case we need to get the permissions
+                    // from the parent, not the existing one otherwise permissions would be coming from the root since Id is 0.
+                    source.HasIdentity ? source.Id : source.ParentId)
+                    .FirstOrDefault();
+
                 if (permissions == null)
                 {
                     return Enumerable.Empty<char>();
