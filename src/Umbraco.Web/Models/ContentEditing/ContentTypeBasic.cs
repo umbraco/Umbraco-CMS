@@ -48,7 +48,7 @@ namespace Umbraco.Web.Models.ContentEditing
             {
                 return IconIsClass
                            ? string.Empty
-                           : IOHelper.ResolveUrl("~/umbraco/images/umbraco/" + Icon);
+                           : IOHelper.ResolveUrl("images/umbraco/" + Icon);
             }
         }
 
