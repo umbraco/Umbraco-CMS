@@ -1966,6 +1966,10 @@ namespace Umbraco.Core.Services
                 var uow = UowProvider.GetUnitOfWork();
                 using (var repository = RepositoryFactory.CreateContentRepository(uow))
                 {
+                    if (published == false)
+                    {
+                        content.ChangePublishedState(PublishedState.Saved);
+                    }
                     //Since this is the Save and Publish method, the content should be saved even though the publish fails or isn't allowed
                     if (content.HasIdentity == false)
                     {
