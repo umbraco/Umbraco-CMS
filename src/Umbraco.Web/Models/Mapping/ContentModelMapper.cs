@@ -125,7 +125,11 @@ namespace Umbraco.Web.Models.Mapping
             {
                 //it's new so it doesn't have a path, so we need to look this up by it's parent + ancestors
                 var parent = content.Parent();
-                if (parent.ContentType.IsContainer)
+                if (parent == null)
+                {
+                    display.IsChildOfListView = false;
+                }
+                else if (parent.ContentType.IsContainer)
                 {
                     display.IsChildOfListView = true;
                 }
