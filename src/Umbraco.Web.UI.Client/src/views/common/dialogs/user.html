@@ -60,7 +60,7 @@
                             ng-click="unlink($event, login.authType, login.linkedProviderKey)"
                             class="btn btn-block btn-social"
                             ng-class="login.properties.SocialStyle"
-                            id="Button1"
+                            id="{{login.authType}}"
                             name="provider"
                             value="{{login.authType}}">
                         <i class="fa" ng-class="login.properties.SocialIcon"></i>
