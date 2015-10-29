@@ -6,7 +6,7 @@
             ui-sortable
             ng-model="renderModel">
             	
-            <li ng-repeat="node in renderModel">
+            <li ng-repeat="node in renderModel" ng-attr-title="Path: {{node.path}}">
 
                 <i class="icon icon-navigation handle"></i>
 
