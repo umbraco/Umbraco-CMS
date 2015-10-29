@@ -47,7 +47,7 @@ namespace Umbraco.Web.Trees
                             language.Id.ToString(CultureInfo.InvariantCulture), "-1", queryStrings, language.CultureInfo.DisplayName, "icon-flag-alt", false,
                             //TODO: Rebuild the language editor in angular, then we dont need to have this at all (which is just a path to the legacy editor)
                             "/" + queryStrings.GetValue<string>("application") + "/framed/" +
-                            Uri.EscapeDataString("/umbraco/settings/editLanguage.aspx?id=" + language.Id)));
+                            Uri.EscapeDataString("settings/editLanguage.aspx?id=" + language.Id)));
                 }
             }
 
