@@ -79,7 +79,7 @@
                         if (data.required) {
                             code = "\n@RenderSection(\"" + data.name + "\", true);\n";
                         } else {
-                            code = "\n@RenderSection(\"" + data.name + "\");\n";
+                            code = "\n@RenderSection(\"" + data.name + "\" false);\n";
                         }
                     }
 
