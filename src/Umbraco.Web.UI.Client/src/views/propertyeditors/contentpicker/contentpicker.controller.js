@@ -150,7 +150,7 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
 
         if (currIds.indexOf(item.id) < 0) {
             item.icon = iconHelper.convertFromLegacyIcon(item.icon);
-            $scope.renderModel.push({ name: item.name, id: item.id, icon: item.icon });
+            $scope.renderModel.push({ name: item.name, id: item.id, icon: item.icon, path: item.path });
         }
     };
 
@@ -182,7 +182,7 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
            
             if (entity) {
                 entity.icon = iconHelper.convertFromLegacyIcon(entity.icon);
-                $scope.renderModel.push({ name: entity.name, id: entity.id, icon: entity.icon });
+                $scope.renderModel.push({ name: entity.name, id: entity.id, icon: entity.icon, path: entity.path });
             }
             
            
