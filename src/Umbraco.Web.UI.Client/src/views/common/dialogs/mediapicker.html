@@ -100,10 +100,11 @@
 
                         <input type="text"
                                class="input-foldername input-mini inline"
-                               ng-show="showFolderInput"
+                               ng-if="showFolderInput"
                                ng-model="newFolderName"
                                ng-keydown="submitFolder($event)"
-                               on-blur="showFolderInput = false">
+                               on-blur="showFolderInput = false"
+                               focus-when="{{showFolderInput}}">
                     </li>
                 </ul>
             </div>
