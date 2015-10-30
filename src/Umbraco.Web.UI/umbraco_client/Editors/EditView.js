@@ -189,8 +189,12 @@
                     
                     top.UmbSpeechBubble.ShowMessage('save', header, msg);
 
-                    this._opts.originalFileName = args.name;
-                    this._opts.treeSyncPath = args.path;
+                    if (args && args.name) {
+                        this._opts.originalFileName = args.name;
+                    }
+                    if (args && args.path) {
+                        this._opts.treeSyncPath = args.path;
+                    }
 
                     UmbClientMgr.mainTree().syncTree(path, true, null, newFilePath.split("/")[1]);
                 }                

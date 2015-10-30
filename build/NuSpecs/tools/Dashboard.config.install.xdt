@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <dashBoard xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
-  <section alias="StartupSettingsDashboardSection" xdt:Locator="Match(alias)">
+  <section alias="StartupSettingsDashboardSection" xdt:Locator="Match(alias)" xdt:Transform="InsertIfMissing">
     <tab caption="Get Started" xdt:Locator="Match(caption)" xdt:Transform="Remove" />
     <tab caption="Welcome"  xdt:Locator="Match(caption)" xdt:Transform="InsertIfMissing">
       <control showOnce="true" addPanel="true" panelCaption="" xdt:Transform="InsertIfMissing">
@@ -20,7 +20,7 @@
     </tab>
   </section>
 
-  <section alias="StartupDeveloperDashboardSection" xdt:Locator="Match(alias)">
+  <section alias="StartupDeveloperDashboardSection" xdt:Locator="Match(alias)" xdt:Transform="InsertIfMissing">
     <tab caption="Get Started" xdt:Locator="Match(caption)" xdt:Transform="Replace">
       <control showOnce="true" addPanel="true" panelCaption="">
         views/dashboard/developer/developerdashboardvideos.html
@@ -29,7 +29,7 @@
     <tab caption="Examine Management" xdt:Locator="Match(caption)" xdt:Transform="Remove" />
   </section>
   
-  <section alias="StartupDeveloperDashboardSection" xdt:Locator="Match(alias)">
+  <section alias="StartupDeveloperDashboardSection" xdt:Locator="Match(alias)" xdt:Transform="InsertIfMissing">
       <tab caption="Examine Management" xdt:Locator="Match(caption)" xdt:Transform="InsertIfMissing">
       <control>
         views/dashboard/developer/examinemanagement.html
@@ -39,10 +39,10 @@
       <control>
         views/dashboard/developer/xmldataintegrityreport.html
       </control>
-    </tab>	
+    </tab>  
   </section>
   
-  <section alias="StartupMediaDashboardSection" xdt:Locator="Match(alias)">
+  <section alias="StartupMediaDashboardSection" xdt:Locator="Match(alias)" xdt:Transform="InsertIfMissing">
     <tab caption="Get Started" xdt:Locator="Match(caption)" xdt:Transform="Remove" />
     <tab caption="Content"  xdt:Locator="Match(caption)" xdt:Transform="InsertIfMissing" />
     <tab caption="Content"  xdt:Locator="Match(caption)" xdt:Transform="Replace">
@@ -52,7 +52,7 @@
     </tab>
   </section>
   
-  <section alias="StartupDashboardSection" xdt:Locator="Match(alias)">
+  <section alias="StartupDashboardSection" xdt:Locator="Match(alias)" xdt:Transform="InsertIfMissing">
     <tab caption="Get Started" xdt:Locator="Match(caption)" xdt:Transform="Remove" />
     <tab caption="Get Started" xdt:Transform="Insert">
       <access>
@@ -72,7 +72,7 @@
     <tab caption="Last Edits" xdt:Locator="Match(caption)" xdt:Transform="Remove" />
   </section>
   
-  <section alias="StartupMemberDashboardSection" xdt:Locator="Match(alias)">
+  <section alias="StartupMemberDashboardSection" xdt:Locator="Match(alias)" xdt:Transform="InsertIfMissing">
     <tab caption="Get Started" xdt:Locator="Match(caption)" xdt:Transform="Remove" />
     <tab caption="Get Started" xdt:Transform="Insert">
       <control showOnce="true" addPanel="true" panelCaption="">
