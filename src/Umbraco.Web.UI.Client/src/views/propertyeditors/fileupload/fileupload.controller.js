@@ -63,10 +63,8 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
 
         _.each($scope.persistedFiles, function (file) {
 
-            var thumbnailUrl = umbRequestHelper.getApiUrl(
-                        "imagesApiBaseUrl",
-                        "GetBigThumbnail",
-                        [{ originalImagePath: file.file }]);
+            //get default big thumbnail from image processor
+            var thumbnailUrl = file.file + "?width=500";
 
             file.thumbnail = thumbnailUrl;
         });
@@ -154,10 +152,8 @@ angular.module("umbraco")
 
                     if (mediaHelper.detectIfImageByExtension(property.value)) {
 
-                        var thumbnailUrl = umbRequestHelper.getApiUrl(
-                            "imagesApiBaseUrl",
-                            "GetBigThumbnail",
-                            [{ originalImagePath: property.value }]);
+                        //get default big thumbnail from image processor
+                        var thumbnailUrl = property.value + "?width=500";
                             
                         return thumbnailUrl;
                     }

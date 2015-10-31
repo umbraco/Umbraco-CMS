@@ -303,14 +303,8 @@ function mediaHelper(umbRequestHelper) {
                 return null;
             }
 
-            //get the proxy url for big thumbnails (this ensures one is always generated)
-            var thumbnailUrl = umbRequestHelper.getApiUrl(
-                "imagesApiBaseUrl",
-                "GetBigThumbnail",
-                [{ originalImagePath: imagePath }]);
-
-            //var ext = imagePath.substr(imagePath.lastIndexOf('.'));
-            //return imagePath.substr(0, imagePath.lastIndexOf('.')) + "_big-thumb" + ".jpg";
+            //get default big thumbnail from image processor
+            var thumbnailUrl = imagePath + "?width=500";
 
             return thumbnailUrl;
         },
