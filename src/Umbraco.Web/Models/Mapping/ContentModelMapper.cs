@@ -202,10 +202,9 @@ namespace Umbraco.Web.Models.Mapping
                 genericProperties =>
                 {
                     //TODO: This would be much nicer with the IUmbracoContextAccessor so we don't use singletons
-                    //If this is a web request and debugging is enabled and there's a user signed in and the 
-                    // user has access tot he settings section, we will 
-                    if (HttpContext.Current != null && HttpContext.Current.IsDebuggingEnabled
-                        && UmbracoContext.Current != null && UmbracoContext.Current.Security.CurrentUser != null
+                    //If this is a web request and there's a user signed in and the 
+                    // user has access to the settings section, we will 
+                    if (HttpContext.Current != null && UmbracoContext.Current != null && UmbracoContext.Current.Security.CurrentUser != null
                         && UmbracoContext.Current.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
                     {
                         var currentDocumentType = contentTypeService.GetContentType(display.ContentTypeAlias);
