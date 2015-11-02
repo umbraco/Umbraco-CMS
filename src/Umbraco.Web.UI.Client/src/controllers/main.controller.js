@@ -88,27 +88,32 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
             tmhDynamicLocale.set($scope.user.locale);
         }
 
-        if($scope.user.emailHash){
-            $timeout(function () {                
-                //yes this is wrong.. 
-                $("#avatar-img").fadeTo(1000, 0, function () {
-                    $timeout(function () {
-                        //this can be null if they time out
-                        if ($scope.user && $scope.user.emailHash) {
-                            var avatarBaseUrl = "//www.gravatar.com/avatar/",
-                                hash = $scope.user.emailHash;
+        if ($scope.user.emailHash) {
 
-                            $scope.avatar = [
-                                { value: avatarBaseUrl + hash + ".jpg?s=30&d=mm" },
-                                { value: avatarBaseUrl + hash + ".jpg?s=60&d=mm" },
-                                { value: avatarBaseUrl + hash + ".jpg?s=90&d=mm" }
-                            ];
-                        }
+            //let's attempt to load the avatar, it might not exist or we might not have 
+            // internet access so we'll detect it first
+            $http.get("https://www.gravatar.com/avatar/" + $scope.user.emailHash + ".jpg?s=64&d=404")
+                .then(
+                    function successCallback(response) {                        
+                        $("#avatar-img").fadeTo(1000, 0, function () {
+                            $scope.$apply(function () {
+                                //this can be null if they time out
+                                if ($scope.user && $scope.user.emailHash) {
+	                            var avatarBaseUrl = "https://www.gravatar.com/avatar/",
+	                                hash = $scope.user.emailHash;
+
+	                            $scope.avatar = [
+	                                { value: avatarBaseUrl + hash + ".jpg?s=30&d=mm" },
+	                                { value: avatarBaseUrl + hash + ".jpg?s=60&d=mm" },
+	                                { value: avatarBaseUrl + hash + ".jpg?s=90&d=mm" }
+	                            ];
+                                }
+                            });
+                            $("#avatar-img").fadeTo(1000, 1);
+                        });
+                    }, function errorCallback(response) {
+                        //cannot load it from the server so we cannot do anything
                     });
-                    $("#avatar-img").fadeTo(1000, 1);
-                });
-                
-              }, 3000);  
         }
 
     }));
