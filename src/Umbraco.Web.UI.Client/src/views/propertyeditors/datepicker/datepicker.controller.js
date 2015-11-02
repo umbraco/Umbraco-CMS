@@ -11,10 +11,10 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
         showToday: false,
         format: "YYYY-MM-DD HH:mm:ss",
 		icons: {
-                    time: "icon-time",
-                    date: "icon-calendar",
-                    up: "icon-chevron-up",
-                    down: "icon-chevron-down"
+            time: "icon-time",
+            date: "icon-calendar",
+            up: "icon-chevron-up",
+            down: "icon-chevron-down"
 		},
 		daysOfWeekDisabled: []
     };
@@ -22,33 +22,38 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
     //map the user config
     $scope.model.config = angular.extend(config, $scope.model.config);
 
-    if (!$scope.model.config.showToday === undefined || !$scope.model.config.showToday === null) {
+    if ($scope.model.config.showToday !== undefined || !$scope.model.config.showToday !== null) {
         $scope.model.config.showToday = $scope.model.config.showToday == 0 ? false : true;
     }
 
-    if (!$scope.model.config.minuteStepping === undefined || !$scope.model.config.minuteStepping === null) {
-        $scope.model.config.minuteStepping = $scope.model.config.minuteStepping;
+    if ($scope.model.config.minuteStepping !== undefined || $scope.model.config.minuteStepping !== null) {
+        $scope.model.config.minuteStepping = parseInt($scope.model.config.minuteStepping) > 0 ? parseInt($scope.model.config.minuteStepping) : 1;
     }
 
-    if (!$scope.model.config.showToday === undefined || !$scope.model.config.showToday === null) {
+    if ($scope.model.config.showToday !== undefined || $scope.model.config.showToday !== null) {
         $scope.model.config.showToday = $scope.model.config.showToday == 0 ? false : true;
     }
 
-    if (!$scope.model.config.useSeconds === undefined || !$scope.model.config.useSeconds === null) {
+    if ($scope.model.config.calendarWeeks !== undefined || $scope.model.config.calendarWeeks !== null) {
+        $scope.model.config.calendarWeeks = $scope.model.config.calendarWeeks == 0 ? false : true;
+    }
+
+    /*if ($scope.model.config.useSeconds !== undefined || $scope.model.config.useSeconds !== null) {
         $scope.model.config.useSeconds = $scope.model.config.useSeconds == 0 ? false : true;
     }
 
-    if (!$scope.model.config.pickTime === undefined || !$scope.model.config.pickTime === null) {
+    if ($scope.model.config.pickTime !== undefined || !$scope.model.config.pickTime !== null) {
         $scope.model.config.pickTime = $scope.model.config.pickTime == 0 ? false : true;
     }
 
-    if (!$scope.model.config.pickDate === undefined || !$scope.model.config.pickDate === null) {
+    if ($scope.model.config.pickDate !== undefined || !$scope.model.config.pickDate !== null) {
         $scope.model.config.pickDate = $scope.model.config.pickDate == 0 ? false : true;
-    }
+    }*/
 
     //ensure the format doesn't get overwritten with an empty string
     if ($scope.model.config.format === "" || $scope.model.config.format === undefined || $scope.model.config.format === null) {
-        $scope.model.config.format = "YYYY-MM-DD";
+        $scope.model.config.format = $scope.model.config.pickTime ? "YYYY-MM-DD HH:mm:ss" : "YYYY-MM-DD";
+        /*$scope.model.config.format = "YYYY-MM-DD";
 
         if ($scope.model.config.pickTime) {
             if ($scope.model.config.useSeconds) {
@@ -57,8 +62,14 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
             else {
                 $scope.model.config.format = "YYYY-MM-DD HH:mm";
             }
-        }
+        }*/
     }
+
+    //set value of these boolean properties based on config format - in v4 and v5 of the datepicker plugin it decide the "viewModes" based on format
+    $scope.model.config.useSeconds = containsChar($scope.model.config.format, "s") ? true : false;
+    $scope.model.config.useMinutes = containsChar($scope.model.config.format, "m") ? true : false;
+    $scope.model.config.pickTime = containsChar($scope.model.config.format, "H") || containsChar($scope.model.config.format, "m") ? true : false;
+    $scope.model.config.pickDate = containsChar($scope.model.config.format, "Y") || containsChar($scope.model.config.format, "M") || containsChar($scope.model.config.format, "D") ? true : false;
 
     $scope.hasDatetimePickerValue = $scope.model.value ? true : false;
     $scope.datetimePickerValue = null;
@@ -96,6 +107,10 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
             }
         });
     }
+
+    function containsChar(string, it) {
+        return string.indexOf(it) != -1;
+    };
 
     var picker = null;
 

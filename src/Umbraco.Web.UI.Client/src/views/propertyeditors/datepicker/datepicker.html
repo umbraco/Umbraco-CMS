@@ -17,10 +17,16 @@
         <span class="help-inline" val-msg-for="datepicker" val-toggle-msg="required">Required</span>
         <span class="help-inline" val-msg-for="datepicker" val-toggle-msg="valServer">{{datePickerForm.datepicker.errorMsg}}</span>
         <span class="help-inline" val-msg-for="datepicker" val-toggle-msg="pickerError">Invalid date</span>
-        
+
         <p ng-show="hasDatetimePickerValue === true || datePickerForm.datepicker.$error.pickerError === true">
-            <a href ng-click="clearDate()"><i class="icon-delete"></i><small><localize key="content_removeDate">Clear date</localize></small></a>
+            <a href ng-click="clearDate()">
+                <i class="icon-delete"></i>
+                <small>
+                    <localize key="content_removeDate" ng-show="!onlyTimePicker">Clear date</localize>
+                    <localize key="content_removeTime" ng-show="onlyTimePicker">Clear time</localize>
+                </small>
+            </a>
         </p>
-         
+
     </ng-form>
 </div>
