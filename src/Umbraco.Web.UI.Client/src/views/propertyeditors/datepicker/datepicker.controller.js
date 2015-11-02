@@ -22,14 +22,6 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
     //map the user config
     $scope.model.config = angular.extend(config, $scope.model.config);
 
-    if ($scope.model.config.showToday !== undefined || !$scope.model.config.showToday !== null) {
-        $scope.model.config.showToday = $scope.model.config.showToday == 0 ? false : true;
-    }
-
-    if ($scope.model.config.minuteStepping !== undefined || $scope.model.config.minuteStepping !== null) {
-        $scope.model.config.minuteStepping = parseInt($scope.model.config.minuteStepping) > 0 ? parseInt($scope.model.config.minuteStepping) : 1;
-    }
-
     if ($scope.model.config.showToday !== undefined || $scope.model.config.showToday !== null) {
         $scope.model.config.showToday = $scope.model.config.showToday == 0 ? false : true;
     }
@@ -38,31 +30,21 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
         $scope.model.config.calendarWeeks = $scope.model.config.calendarWeeks == 0 ? false : true;
     }
 
-    /*if ($scope.model.config.useSeconds !== undefined || $scope.model.config.useSeconds !== null) {
-        $scope.model.config.useSeconds = $scope.model.config.useSeconds == 0 ? false : true;
+    if ($scope.model.config.minuteStepping !== undefined || $scope.model.config.minuteStepping !== null) {
+        $scope.model.config.minuteStepping = parseInt($scope.model.config.minuteStepping) > 0 ? parseInt($scope.model.config.minuteStepping) : 1;
     }
 
-    if ($scope.model.config.pickTime !== undefined || !$scope.model.config.pickTime !== null) {
-        $scope.model.config.pickTime = $scope.model.config.pickTime == 0 ? false : true;
+    if ($scope.model.config.minDate !== "" || $scope.model.config.minDate !== undefined || $scope.model.config.minDate !== null) {
+        $scope.model.config.minDate = new Date($scope.model.config.minDate);
     }
 
-    if ($scope.model.config.pickDate !== undefined || !$scope.model.config.pickDate !== null) {
-        $scope.model.config.pickDate = $scope.model.config.pickDate == 0 ? false : true;
-    }*/
+    if ($scope.model.config.maxDate !== "" || $scope.model.config.maxDate !== undefined || $scope.model.config.maxDate !== null) {
+        $scope.model.config.maxDate = new Date($scope.model.config.maxDate);
+    }
 
     //ensure the format doesn't get overwritten with an empty string
     if ($scope.model.config.format === "" || $scope.model.config.format === undefined || $scope.model.config.format === null) {
         $scope.model.config.format = $scope.model.config.pickTime ? "YYYY-MM-DD HH:mm:ss" : "YYYY-MM-DD";
-        /*$scope.model.config.format = "YYYY-MM-DD";
-
-        if ($scope.model.config.pickTime) {
-            if ($scope.model.config.useSeconds) {
-                $scope.model.config.format = "YYYY-MM-DD HH:mm:ss";
-            }
-            else {
-                $scope.model.config.format = "YYYY-MM-DD HH:mm";
-            }
-        }*/
     }
 
     //set value of these boolean properties based on config format - in v4 and v5 of the datepicker plugin it decide the "viewModes" based on format

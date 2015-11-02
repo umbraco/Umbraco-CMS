@@ -15,10 +15,6 @@ namespace Umbraco.Web.PropertyEditors
                     //NOTE: This is very important that we do not use .Net format's there, this format
                     // is the correct format for the JS picker we are using so you cannot capitalize the HH, they need to be 'hh'
                     {"format", "YYYY-MM-DD HH:mm:ss"},
-                    /*{"pickDate", true},
-                    {"pickTime", true},
-                    {"useMinutes", true},
-                    {"useSeconds", true},*/
                     {"minuteStepping", 1},
                     {"calendarWeeks", false},
                     {"showToday", false}

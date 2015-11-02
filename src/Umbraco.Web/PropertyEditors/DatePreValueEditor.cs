@@ -16,16 +16,13 @@ namespace Umbraco.Web.PropertyEditors
         [PreValueField("minuteStepping", "Minute stepping", "number", Description = "Choose the number of minutes the time should increase/decrease (default is 1 minute).")]
         public string MinuteStepping { get; set; }
 
+        [PreValueField("minDate", "Min. date", "textstring", Description = "Choose the minimum date (optional - default: year 1900).")]
+        public string MinDate { get; set; }
+
+        [PreValueField("maxDate", "Max. date", "textstring", Description = "Choose the maximum date (optional - default: now + 100 years).")]
+        public string MaxDate { get; set; }
+
         [PreValueField("daysOfWeekDisabled", "Days of week disabled", "views/propertyeditors/datepicker/weekdays.prevalues.html", Description = "Select the days of week that should be disabled (default is none).")]
-        public string DaysOfWeekDisabled { get; set; }
-
-        /*[PreValueField("pickDate", "Pick date", "boolean", Description = "Choose if editor should be able to pick date.")]
-        public string PickDate { get; set; }
-
-        [PreValueField("pickTime", "Pick time", "boolean", Description = "Choose if editor should be able to pick time.")]
-        public string PickTime { get; set; }
-
-        [PreValueField("useSeconds", "Use seconds", "boolean", Description = "Choose if seconds should be used.")]
-        public string UseSeconds { get; set; }*/
+        public string[] DaysOfWeekDisabled { get; set; }
     }
 }
