@@ -480,24 +480,37 @@ namespace Umbraco.Core.Models
         /// <param name="propertyTypeAlias">Alias of the PropertyType to move</param>
         /// <param name="propertyGroupName">Name of the PropertyGroup to move the PropertyType to</param>
         /// <returns></returns>
+        /// <remarks>If <paramref name="propertyGroupName"/> is null then the property is moved back to 
+        /// "generic properties" ie does not have a tab anymore.</remarks>
         public bool MovePropertyType(string propertyTypeAlias, string propertyGroupName)
         {
-            if (PropertyTypes.Any(x => x.Alias == propertyTypeAlias) == false || PropertyGroups.Any(x => x.Name == propertyGroupName) == false)
-                return false;
+            // note: not dealing with alias casing at all here?
 
-            var propertyType = PropertyTypes.First(x => x.Alias == propertyTypeAlias);
-            //The PropertyType already belongs to a PropertyGroup, so we have to remove the PropertyType from that group
-            if (PropertyGroups.Any(x => x.PropertyTypes.Any(y => y.Alias == propertyTypeAlias)))
-            {
-                var oldPropertyGroup = PropertyGroups.First(x => x.PropertyTypes.Any(y => y.Alias == propertyTypeAlias));
-                oldPropertyGroup.PropertyTypes.RemoveItem(propertyTypeAlias);
-            }
+            // get property, ensure it exists
+            var propertyType = PropertyTypes.FirstOrDefault(x => x.Alias == propertyTypeAlias);
+            if (propertyType == null) return false;
 
+            // get new group, if required, and ensure it exists
+            var newPropertyGroup = propertyGroupName == null
+                ? null
+                : PropertyGroups.FirstOrDefault(x => x.Name == propertyGroupName);
+            if (propertyGroupName != null && newPropertyGroup == null) return false;
+
+            // get old group
+            var oldPropertyGroup = PropertyGroups.FirstOrDefault(x => 
+                x.PropertyTypes.Any(y => y.Alias == propertyTypeAlias));
+
+            // reset PropertyGroupId, which will be re-evaluated when the content type
+            // is saved - what is important is group.PropertyTypes - see code in
+            // ContentTypeBaseRepository.PersistUpdatedBaseContentType
             propertyType.PropertyGroupId = new Lazy<int>(() => default(int));
-            propertyType.ResetDirtyProperties();
+            propertyType.ResetDirtyProperties(); // PropertyGroupId must not be dirty
 
-            var propertyGroup = PropertyGroups.First(x => x.Name == propertyGroupName);
-            propertyGroup.PropertyTypes.Add(propertyType);
+            // remove from old group, if any - add to new group, if any
+            if (oldPropertyGroup != null)
+                oldPropertyGroup.PropertyTypes.RemoveItem(propertyTypeAlias);
+            if (newPropertyGroup != null)
+                newPropertyGroup.PropertyTypes.Add(propertyType);
 
             return true;
         }
