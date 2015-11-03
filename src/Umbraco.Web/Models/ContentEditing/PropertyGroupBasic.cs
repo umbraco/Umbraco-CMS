@@ -13,6 +13,12 @@ namespace Umbraco.Web.Models.ContentEditing
             Properties = new List<TPropertyType>();
         }
 
+        // a special id we use for generic properties
+        public const int GenericPropertiesGroupId = -666;
+
+        [IgnoreDataMember]
+        public bool IsGenericProperties { get { return Id == GenericPropertiesGroupId; } }
+
         //Indicate if this tab was inherited
         [DataMember(Name = "inherited")]
         public bool Inherited { get; set; }

@@ -398,9 +398,9 @@ namespace Umbraco.Tests.Models.Mapping
 
             //TODO: Now we need to assert all of the more complicated parts
 
-            Assert.AreEqual(contentType.CompositionPropertyGroups.Select(x => x.Name).Distinct().Count(), result.Groups.Count(x => x.Id != -666));
-            Assert.AreEqual(1, result.Groups.Count(x => x.Id == -666));
-            Assert.AreEqual(contentType.PropertyGroups.Count(), result.Groups.Count(x => x.Inherited == false && x.Id != -666));
+            Assert.AreEqual(contentType.CompositionPropertyGroups.Select(x => x.Name).Distinct().Count(), result.Groups.Count(x => x.IsGenericProperties == false));
+            Assert.AreEqual(1, result.Groups.Count(x => x.IsGenericProperties));
+            Assert.AreEqual(contentType.PropertyGroups.Count(), result.Groups.Count(x => x.Inherited == false && x.IsGenericProperties == false));
 
             var allPropertiesMapped = result.Groups.SelectMany(x => x.Properties).ToArray();
             var allPropertyIdsMapped = allPropertiesMapped.Select(x => x.Id).ToArray();

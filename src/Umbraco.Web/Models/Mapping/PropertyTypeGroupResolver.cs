@@ -91,23 +91,23 @@ namespace Umbraco.Web.Models.Mapping
 
             //process generic properties assigned to this content item (without a group)
 
-            //NOTE: -666 is just a thing that is checked during mapping the other direction, it's a 'special' id 
+            //NOTE: GenericPropertiesGroupId is just a thing that is checked during mapping the other direction, it's a 'special' id 
 
             var entityGenericProperties = source.PropertyTypes.Where(x => x.PropertyGroupId == null);
-            genericProperties.AddRange(MapProperties(entityGenericProperties, source, -666, false));
+            genericProperties.AddRange(MapProperties(entityGenericProperties, source, PropertyGroupDisplay.GenericPropertiesGroupId, false));
 
             //process generic properties from compositions (ensures properties are flagged as inherited)
             var currentGenericPropertyIds = genericProperties.Select(x => x.Id).ToArray();
             var compositionGenericProperties = source.CompositionPropertyTypes
                 .Where(x => x.PropertyGroupId == null && currentGenericPropertyIds.Contains(x.Id) == false);
-            genericProperties.AddRange(MapProperties(compositionGenericProperties, source, -666, true));
+            genericProperties.AddRange(MapProperties(compositionGenericProperties, source, PropertyGroupDisplay.GenericPropertiesGroupId, true));
 
             //now add the group if there are any generic props
             if (genericProperties.Any())
             {
                 var genericTab = new PropertyGroupDisplay
                 {
-                    Id = -666, Name = "Generic properties", ParentGroupId = 0, ContentTypeId = source.Id, SortOrder = 999, Inherited = false, Properties = genericProperties
+                    Id = PropertyGroupDisplay.GenericPropertiesGroupId, Name = "Generic properties", ParentGroupId = 0, ContentTypeId = source.Id, SortOrder = 999, Inherited = false, Properties = genericProperties
                 };
                 groups.Add(0, genericTab);
             }
