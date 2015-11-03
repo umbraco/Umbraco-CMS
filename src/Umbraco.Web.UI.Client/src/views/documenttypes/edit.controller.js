@@ -149,11 +149,6 @@
             // reformat allowed content types to array if id's
             vm.contentType.allowedContentTypes = contentTypeHelper.createIdArray(vm.contentType.allowedContentTypes);
 
-            // update placeholder template information on new doc types
-            if (!$routeParams.notemplate && vm.contentType.id === 0) {
-                vm.contentType = contentTypeHelper.updateTemplatePlaceholder(vm.contentType);
-            }
-
             contentEditingHelper.contentEditorPerformSave({
                 statusMessage: "Saving...",
                 saveMethod: contentTypeResource.save,

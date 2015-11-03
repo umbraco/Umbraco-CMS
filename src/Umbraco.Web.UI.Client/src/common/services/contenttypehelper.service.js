@@ -240,26 +240,6 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter) {
 
           return array;
 
-        },
-
-        updateTemplatePlaceholder: function(contentType) {
-
-          // update default template
-          if(contentType.defaultTemplate !== null && contentType.defaultTemplate.placeholder) {
-            contentType.defaultTemplate.name = contentType.name;
-            contentType.defaultTemplate.alias = contentType.alias;
-          }
-
-          // update allowed template
-          angular.forEach(contentType.allowedTemplates, function(allowedTemplate){
-            if(allowedTemplate.placeholder) {
-              allowedTemplate.name = contentType.name;
-              allowedTemplate.alias = contentType.alias;
-            }
-          });
-
-          return contentType;
-
         }
 
     };
