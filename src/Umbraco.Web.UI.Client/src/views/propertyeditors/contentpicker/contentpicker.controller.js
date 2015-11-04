@@ -1,7 +1,7 @@
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
 
-function contentPickerController($scope, dialogService, entityResource, editorState, $log, iconHelper, $routeParams, fileManager, contentEditingHelper, contentResource, navigationService) {
+function contentPickerController($location, $scope, dialogService, entityResource, editorState, $log, iconHelper, $routeParams, fileManager, contentEditingHelper, contentResource, navigationService) {
 
     function trim(str, chr) {
         var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^' + chr + '+|' + chr + '+$', 'g');
@@ -150,7 +150,8 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
             .getById(id)
             .then(function (data) {
                 navigationService.syncTree({ tree: "content", path: data.path, forceReload: false, activate: true });
-                //TODO: Need to load node too: https://our.umbraco.org/forum/developers/api-questions/72584-programmatically-load-content-node-in-back-office
+                var routePath = "content/content/edit/" + id.toString();
+                $location.path(routePath).search("");
             });
     }
         
