@@ -1,0 +1,199 @@
+// // //
+// New list view styles
+// // //
+
+
+// Tooltip in table header
+.select-all:hover {
+    .tooltip {
+        opacity: 1;
+        left: 60px;
+        transform: translate(0px, 2px);
+        background: @white;
+
+        color: @black;
+    }
+}
+
+
+// Table styles
+.umb-table {
+    border: 1px solid @grayLight;
+    width: 100%;
+}
+
+.umb-table td {
+    padding-top: 16px;
+    padding-bottom: 16px;
+}
+
+.umb-table th {
+  font-weight: normal
+}
+
+
+
+// Table head styles
+.umb-table thead {
+    background-color: @white;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+
+.umb-table thead a {
+    cursor: default;
+    color: fade(@gray, 75%);
+    text-decoration: none;
+    position: relative;
+
+    &:hover {
+        color: @black;
+        text-decoration: none;
+    }
+}
+
+.umb-table thead i {
+    position: absolute;
+    padding-left: 3px;
+    padding-top: 1px;
+
+}
+
+.umb-table thead .sortable:hover {
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.umb-table thead input[type="checkbox"] {
+  margin-left: 7px;
+}
+
+
+
+// Table body styles
+.umb-table tbody + tbody {
+    border-top: 1px solid @grayLighter;
+}
+
+.umb-table tbody td {
+  position: relative;
+}
+
+.umb-table tbody td,
+.umb-table tbody th {
+    border-top: 1px solid @grayLight;
+}
+
+.umb-table tbody tr {
+    color: @gray;
+    font-size: 13px;
+    user-select: none;
+
+    &:hover {
+        background-color: fade(@blue, 5%);
+    }
+}
+
+.umb-table tbody input[type="checkbox"] {
+    display: none;
+    margin-left: 7px;
+    z-index: 5;
+}
+
+.umb-table tbody .selected,
+.umb-table tbody .selected:hover {
+    background-color: fade(@blue, 7%);
+}
+
+.umb-table tbody tr i {
+    font-size: 20px;
+}
+
+.umb-table tbody tr a {
+    color: @black;
+    font-weight: bold;
+    font-size: 14px;
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.umb-table tbody i {
+  display: block;
+  top: 10px;
+  left:6px;
+  padding: 0 0 0 4px;
+  z-index: 6;
+  width: 20px;
+  height: 20px;
+}
+
+
+// Table foot
+
+.umb-table tfoot {
+	background: @grayLighter;
+}
+
+.umb-table tfoot td:last-child {
+  border-left: none
+}
+
+.umb-table tfoot th {
+	padding: 0 20px;
+}
+
+
+
+// Form/caption
+.umb-table caption {
+  background: @white;
+  text-align: left;
+  vertical-align: middle;
+}
+
+
+.umb-table form {
+  position: relative;
+  margin: 0;
+}
+
+.umb-table input[type="text"] {
+  background: none;
+  -webkit-transition: all .5s;
+  -moz-transition: all .5s;
+  -o-transition: all .5s;
+  transition: all .5s;
+  width: 60px;
+  padding: 4px 0 4px 20px;
+  border: 1px solid @grayLight;
+}
+
+
+// Table input
+.umb-table input::-webkit-input-placeholder {
+   color: @gray;
+}
+
+.umb-table input:-moz-placeholder {
+   color: @gray;
+}
+
+.umb-table input::-moz-placeholder {
+   color: @gray;
+}
+
+.umb-table input:-ms-input-placeholder {
+   color: @gray;
+}
+
+.umb-table input[type="text"]:focus {
+  width: 200px;
+  border: 1px solid @grayLight;
+  background: @white;
+  color: @black
+}
