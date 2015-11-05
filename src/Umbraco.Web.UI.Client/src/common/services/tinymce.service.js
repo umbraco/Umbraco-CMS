@@ -61,11 +61,22 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                 icon: 'custom icon-tv',
                 tooltip: 'Embed',
                 onclick: function () {
-                    dialogService.embedDialog({
-                        callback: function (data) {
-                            editor.insertContent(data);
-                        }
-                    });
+
+                   $scope.embedOverlay = {};
+                   $scope.embedOverlay.view = "rteembed";
+                   $scope.embedOverlay.show = true;
+
+                   $scope.embedOverlay.submit = function(model) {
+                      editor.insertContent(model.form.preview);
+                      $scope.embedOverlay.show = true;
+                      $scope.embedOverlay = null;
+                   };
+
+                   $scope.embedOverlay.close = function(oldModel) {
+                      $scope.embedOverlay.show = true;
+                      $scope.embedOverlay = null;
+                   };
+
                 }
             });
         },
