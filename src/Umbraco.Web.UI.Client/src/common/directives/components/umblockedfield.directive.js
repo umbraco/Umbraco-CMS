@@ -13,7 +13,7 @@
 
 	    function link(scope, el, attr, ngModel) {
 
-			var input = el.children('.umb-locked-field__input');
+			var input = el.find('.umb-locked-field__input');
 
 			function activate() {
 
