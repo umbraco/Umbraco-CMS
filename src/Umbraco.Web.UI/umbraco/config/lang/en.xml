@@ -366,6 +366,8 @@
     <key alias="login">Login</key>
     <key alias="logoff">Log off</key>
     <key alias="logout">Logout</key>
+    <key alias="showPassword">Show password</key>
+    <key alias="hidePassword">Hide password</key>
     <key alias="macro">Macro</key>
     <key alias="move">Move</key>
     <key alias="more">More</key>

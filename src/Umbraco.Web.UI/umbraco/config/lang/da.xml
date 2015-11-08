@@ -357,6 +357,8 @@
     <key alias="login">Login</key>
     <key alias="logoff">Log af</key>
     <key alias="logout">Log ud</key>
+    <key alias="showPassword">Vis kodeord</key>
+    <key alias="hidePassword">Skjul kodeord</key>
     <key alias="macro">Makro</key>
     <key alias="move">Flyt</key>
     <key alias="more">Mere</key>

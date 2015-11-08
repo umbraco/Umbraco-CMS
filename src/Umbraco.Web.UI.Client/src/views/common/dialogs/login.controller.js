@@ -1,5 +1,5 @@
 ﻿angular.module("umbraco").controller("Umbraco.Dialogs.LoginController",
-    function ($scope, localizationService, userService, externalLoginInfo) {
+    function ($scope, $timeout, localizationService, userService, externalLoginInfo) {
 
         /**
          * @ngdoc function
@@ -17,6 +17,28 @@
         }); // weekday[d.getDay()];
 
         $scope.errorMsg = "";
+
+        localizationService.localize("general_showPassword").then(function (label) {
+            $scope.showPasswordText = label;
+        });
+
+        localizationService.localize("general_hidePassword").then(function (label) {
+            $scope.hidePasswordText = label;
+        });
+
+        // hide password as default
+        $scope.showpassword = false;
+
+        // ensure title is binded on init
+        $timeout(function () {
+            $scope.showHidePasswordTitle = $scope.showpassword == false ? $scope.showPasswordText : $scope.hidePasswordText;
+        }, 0);
+
+        // Hide & show password function
+        $scope.showHidePassword = function () {
+            $scope.showpassword = $scope.showpassword == false ? true : false;
+            $scope.showHidePasswordTitle = $scope.showpassword == false ? $scope.showPasswordText : $scope.hidePasswordText;
+        };
 
         $scope.externalLoginFormAction = Umbraco.Sys.ServerVariables.umbracoUrls.externalLoginsUrl;
         $scope.externalLoginProviders = externalLoginInfo.providers;
