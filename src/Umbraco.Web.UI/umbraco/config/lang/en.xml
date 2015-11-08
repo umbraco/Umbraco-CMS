@@ -366,8 +366,6 @@
     <key alias="login">Login</key>
     <key alias="logoff">Log off</key>
     <key alias="logout">Logout</key>
-    <key alias="showPassword">Show password</key>
-    <key alias="hidePassword">Hide password</key>
     <key alias="macro">Macro</key>
     <key alias="move">Move</key>
     <key alias="more">More</key>
@@ -563,6 +561,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="greeting6">Happy Caturday</key>
     <key alias="instruction">Log in below</key>
     <key alias="timeout">Session timed out</key>
+    <key alias="showPassword">Show password</key>
+    <key alias="hidePassword">Hide password</key>
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com</a></p> ]]></key>
   </area>
   <area alias="main">

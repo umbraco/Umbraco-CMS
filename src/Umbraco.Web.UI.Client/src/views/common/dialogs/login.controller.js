@@ -18,11 +18,11 @@
 
         $scope.errorMsg = "";
 
-        localizationService.localize("general_showPassword").then(function (label) {
+        localizationService.localize("login_showPassword").then(function (label) {
             $scope.showPasswordText = label;
         });
 
-        localizationService.localize("general_hidePassword").then(function (label) {
+        localizationService.localize("login_hidePassword").then(function (label) {
             $scope.hidePasswordText = label;
         });
 

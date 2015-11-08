@@ -358,8 +358,6 @@
     <key alias="login">Anmelden</key>
     <key alias="logoff">Abmelden</key>
     <key alias="logout">Abmelden</key>
-    <key alias="showPassword">Passwort anzeigen</key>
-    <key alias="hidePassword">Passwort ausblenden</key>
     <key alias="macro">Makro</key>
     <key alias="move">Verschieben</key>
     <key alias="more">Mehr</key>
@@ -533,7 +531,9 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="greeting6">Wunderbaren sonnigen Samstag</key>
     <key alias="instruction">Hier anmelden:</key>
     <key alias="timeout">Die Sitzung ist abgelaufen</key>
-	<key alias="bottomText">&lt;p style="text-align:right;"&gt;&amp;copy; 2001 - %0% &lt;br /&gt;&lt;a href="http://umbraco.com" style="text-decoration: none" target="_blank"&gt;umbraco.org&lt;/a&gt;&lt;/p&gt; </key>
+    <key alias="showPassword">Passwort anzeigen</key>
+    <key alias="hidePassword">Passwort ausblenden</key>
+    <key alias="bottomText">&lt;p style="text-align:right;"&gt;&amp;copy; 2001 - %0% &lt;br /&gt;&lt;a href="http://umbraco.com" style="text-decoration: none" target="_blank"&gt;umbraco.org&lt;/a&gt;&lt;/p&gt; </key>
   </area>
   <area alias="main">
     <key alias="dashboard">Armaturenbrett</key>
