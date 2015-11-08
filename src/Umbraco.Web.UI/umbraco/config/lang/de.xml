@@ -358,6 +358,8 @@
     <key alias="login">Anmelden</key>
     <key alias="logoff">Abmelden</key>
     <key alias="logout">Abmelden</key>
+    <key alias="showPassword">Passwort anzeigen</key>
+    <key alias="hidePassword">Passwort ausblenden</key>
     <key alias="macro">Makro</key>
     <key alias="move">Verschieben</key>
     <key alias="more">Mehr</key>

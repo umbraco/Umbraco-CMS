@@ -41,7 +41,7 @@
 
                 <div class="control-group" ng-class="{error: loginForm.password.$invalid}">
                     <input type="{{showpassword ? 'text' : 'password'}}" ng-model="password" name="password" class="input-xlarge password" ng-class="{'has-password': password.length > 0}" localize="placeholder" placeholder="@placeholders_password" autocomplete="off" />
-                    <a href="#" class="showhide-password" ng-show="password.length > 0" ng-click="showHidePassword()" prevent-default>
+                    <a href="#" class="showhide-password" ng-show="password.length > 0" ng-click="showHidePassword()" ng-attr-title="{{showHidePasswordTitle}}" prevent-default>
                         <i ng-class="{'icon-eye': !showpassword, 'icon-eye-off': showpassword}"></i>
                     </a>
                 </div>
