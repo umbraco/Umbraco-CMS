@@ -78,12 +78,7 @@
         </umb-tab-view>
 
 
-        <ul class="umb-panel-footer-nav nav nav-pills" ng-if="ancestors && ancestors.length > 0">
-            <li ng-repeat="ancestor in ancestors">
-                <a href="#/content/content/edit/{{ancestor.id}}">{{ancestor.name}}</a>
-            </li>
-            <li></li>
-        </ul>
+        <umb-breadcrumb-nav class="umb-panel-footer-nav nav nav-pills" node-id="content.id" kind="'content'" ng-if="showBreadcrumb"></umb-breadcrumb-nav>
 
     </umb-panel>
 </form>

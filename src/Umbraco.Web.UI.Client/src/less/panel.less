@@ -41,6 +41,9 @@
 .umb-panel-body.with-footer {
     bottom: 90px;
 }
+.umb-panel-body.with-footer-and-breadcrumb {
+    bottom: 121px;
+}
 
 .umb-panel.editor-breadcrumb .umb-panel-body, .umb-panel.editor-breadcrumb .umb-bottom-bar {
     bottom: 31px !important;
@@ -143,6 +146,13 @@
     bottom: 0px;
     left: 0px;
     right: 0px;
+}
+
+// Adjust vertical layout to fit a breadcrumb in the footer.
+.umb-modal .umb-panel-footer.containing-breadcrumb .umb-panel-buttons {
+    // Forces the element to have a height.
+    overflow: hidden;
+    margin-bottom: 31px;
 }
 
 

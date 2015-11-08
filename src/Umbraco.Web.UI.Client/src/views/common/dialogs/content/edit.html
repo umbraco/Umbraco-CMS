@@ -11,7 +11,7 @@
 			    ng-model="content.name"/>
 		</div>
 
-		<div class="umb-panel-body with-footer">
+		<div class="umb-panel-body with-footer-and-breadcrumb">
             <div id="tab{{tab.id}}" ng-repeat="tab in content.tabs">
                 <div class="umb-pane" ng-if="!tab.hide">
                     <h5>{{tab.label}}</h5>
@@ -24,7 +24,7 @@
 		</div>
 
 
-		<div class="umb-panel-footer" >
+		<div class="umb-panel-footer containing-breadcrumb">
 			<div class="umb-el-wrap umb-panel-buttons">
 		        <div class="btn-toolbar umb-btn-toolbar pull-right">
 		        	<a href ng-click="close()" class="btn btn-link">
@@ -55,6 +55,9 @@
 		        </div>
 
 		      </div>
+
+              <umb-breadcrumb-nav class="umb-panel-footer-nav nav nav-pills" node-id="content.id" kind="'content'" ng-if="showBreadcrumb"></umb-breadcrumb-nav>
+
 			</div>
 		</div>
 	</div>

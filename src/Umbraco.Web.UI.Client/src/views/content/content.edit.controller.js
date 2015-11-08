@@ -32,15 +32,11 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
 
         editorState.set($scope.content);
 
-        //We fetch all ancestors of the node to generate the footer breadcrumb navigation
+        // Don't show the footer breadcrumb if this content is being created.
         if (!$routeParams.create) {
-            if (content.parentId && content.parentId != -1) {
-                entityResource.getAncestors(content.id, "document")
-               .then(function (anc) {
-                   $scope.ancestors = anc;
-               });
-            }
+            $scope.showBreadcrumb = true;
         }
+
     }
 
     /** Syncs the content item to it's tree node - this occurs on first load and after saving */

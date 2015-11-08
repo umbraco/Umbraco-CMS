@@ -51,6 +51,12 @@ function ContentEditDialogController($scope, editorState, $routeParams, $q, $tim
         $scope.content.isDialogEditor = true;
 
         editorState.set($scope.content);
+
+        // Don't show the footer breadcrumb if this content is being created.
+        if (!$routeParams.create) {
+            $scope.showBreadcrumb = true;
+        }
+
     }
 
     //check if the entity is being passed in, otherwise load it from the server
