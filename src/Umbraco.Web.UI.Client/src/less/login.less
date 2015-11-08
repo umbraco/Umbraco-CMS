@@ -30,6 +30,37 @@
     text-align: right;
 }
 
+.login-overlay .form .control-group {
+    position: relative;
+}
+
+.login-overlay .form .control-group .showhide-password {
+    position: absolute;
+    right: 0;
+    color: #ccc;
+    padding: 5px 10px;
+    font-size: 18px;
+    text-decoration: none;
+}
+
+.login-overlay .form .control-group .showhide-password > [class^="icon-"],
+.login-overlay .form .control-group .showhide-password > [class*=" icon-"] {
+    display: inline-block;
+    height: 18px;
+    width: 18px;
+}
+
+.login-overlay .form .control-group input.password.has-password {
+    padding-right: 36px;
+    width: 240px;
+}
+
+.login-overlay .form .control-group input.password:focus + .showhide-password,
+.login-overlay .form .control-group input.password + .showhide-password:hover {
+    color: #555;
+}
+    
+
 .login-overlay h1 {
     display: block;
     text-align: right;

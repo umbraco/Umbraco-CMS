@@ -18,6 +18,13 @@
 
         $scope.errorMsg = "";
 
+        // hide password as default
+        $scope.showpassword = false;
+        // Hide & show password function
+        $scope.showHidePassword = function () {
+            $scope.showpassword = $scope.showpassword == false ? true : false;
+        };
+
         $scope.externalLoginFormAction = Umbraco.Sys.ServerVariables.umbracoUrls.externalLoginsUrl;
         $scope.externalLoginProviders = externalLoginInfo.providers;
         $scope.externalLoginInfo = externalLoginInfo;
