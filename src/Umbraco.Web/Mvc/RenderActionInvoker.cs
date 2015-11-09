@@ -10,30 +10,33 @@ namespace Umbraco.Web.Mvc
 	/// <summary>
 	/// Ensures that if an action for the Template name is not explicitly defined by a user, that the 'Index' action will execute
 	/// </summary>
-    public class RenderActionInvoker : AsyncControllerActionInvoker
-	{        
-		/// <summary>
-		/// Ensures that if an action for the Template name is not explicitly defined by a user, that the 'Index' action will execute
-		/// </summary>
-		/// <param name="controllerContext"></param>
-		/// <param name="controllerDescriptor"></param>
-		/// <param name="actionName"></param>
-		/// <returns></returns>
-		protected override ActionDescriptor FindAction(ControllerContext controllerContext, ControllerDescriptor controllerDescriptor, string actionName)
-		{
-			var ad = base.FindAction(controllerContext, controllerDescriptor, actionName);
+	public class CustomActionInvoker : AsyncControllerActionInvoker
+    {
+        private static readonly ConcurrentDictionary<Type, ActionDescriptor> IndexDescriptors = new ConcurrentDictionary<Type, ActionDescriptor>(); 
 
-			//now we need to check if it exists, if not we need to return the Index by default
-			if (ad == null)
-			{
-                //check if the controller is an instance of IRenderMvcController
-				if (controllerContext.Controller is IRenderMvcController)
-				{
-					return controllerDescriptor.FindAction(controllerContext, "Index");
+        protected override ActionDescriptor FindAction(ControllerContext controllerContext, ControllerDescriptor controllerDescriptor, string actionName)
+        {
+            var ad = base.FindAction(controllerContext, controllerDescriptor, actionName);
+
+            if (ad == null)
+            {
+                if (controllerContext.Controller is IRenderMvcController)
+                {
+                    return IndexDescriptors.GetOrAdd(controllerContext.Controller.GetType(), type =>
+                    {
+                        var methodInfo = controllerContext.Controller.GetType().GetMethods()
+                            .First(x => x.Name == "Index" &&
+                                        x.GetCustomAttributes(typeof (NonActionAttribute), false).Any() == false);
+
+                        return typeof (Task).IsAssignableFrom(methodInfo.ReturnType)
+                            ? new TaskAsyncActionDescriptor(methodInfo, "Index", controllerDescriptor)
+                            : (ActionDescriptor) new ReflectedActionDescriptor(methodInfo, "Index", controllerDescriptor);
+                    });
                 }
-			}
-			return ad;
-		}
+            }
 
-	}
+            return ad;
+        }
+    }
+
 }
