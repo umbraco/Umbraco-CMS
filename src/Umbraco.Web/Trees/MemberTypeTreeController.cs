@@ -12,7 +12,7 @@ using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Trees
 {
-    [UmbracoTreeAuthorize(Constants.Trees.DataTypes)]
+    [UmbracoTreeAuthorize(Constants.Trees.MemberTypes)]
     [Tree(Constants.Applications.Members, Constants.Trees.MemberTypes, null, sortOrder:2  )]
     [Umbraco.Web.Mvc.PluginController("UmbracoTrees")]
     [CoreTree]

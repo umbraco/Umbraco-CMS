@@ -137,17 +137,15 @@ namespace Umbraco.Web.Editors
 
             return Request.CreateResponse(HttpStatusCode.OK);
         }
-
+        
         public HttpResponseMessage PostCreateFolder(int parentId, string name)
         {
             var result = Services.ContentTypeService.CreateFolder(parentId, name, Security.CurrentUser.Id);
 
             return result
                 ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id 
-                : Request.CreateValidationErrorResponse(result.Exception.Message);
+                : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
         }
-
-        
 
         public ContentTypeDisplay PostSave(ContentTypeSave contentTypeSave)
         {

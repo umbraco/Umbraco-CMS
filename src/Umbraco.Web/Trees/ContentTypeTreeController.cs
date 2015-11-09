@@ -15,7 +15,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Trees
 {
-    [UmbracoTreeAuthorize(Constants.Trees.DataTypes)]
+    [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
     [Tree(Constants.Applications.Settings, Constants.Trees.DocumentTypes, null, sortOrder: 6)]
     [Umbraco.Web.Mvc.PluginController("UmbracoTrees")]
     [CoreTree]
@@ -36,7 +36,8 @@ namespace Umbraco.Web.Trees
                         var node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, "icon-folder", dt.HasChildren(), "");
                         node.Path = dt.Path;
                         node.NodeType = "container";
-                        
+                        //TODO: This isn't the best way to ensure a noop process for clicking a node but it works for now.
+                        node.AdditionalData["jsClickCallback"] = "javascript:void(0);";
                         return node;
                     }));
 
@@ -45,7 +46,11 @@ namespace Umbraco.Web.Trees
                     .OrderBy(entity => entity.Name)
                     .Select(dt =>
                     {
-                        var node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, "icon-item-arrangement", false);
+                        var node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, "icon-item-arrangement", 
+                            //NOTE: This is legacy now but we need to support upgrades. From 7.4+ we don't allow 'child' creations since
+                            // this is an organiational thing and we do that with folders now.
+                            dt.HasChildren());
+
                         node.Path = dt.Path;
                         return node;
                     }));
