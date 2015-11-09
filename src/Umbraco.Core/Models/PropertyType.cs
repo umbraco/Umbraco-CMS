@@ -401,6 +401,9 @@ namespace Umbraco.Core.Models
                 if (DataTypeDatabaseType == DataTypeDatabaseType.Integer && type == typeof(int))
                     return true;
 
+                if (DataTypeDatabaseType == DataTypeDatabaseType.Decimal && type == typeof(decimal))
+                    return true;
+
                 if (DataTypeDatabaseType == DataTypeDatabaseType.Date && type == typeof(DateTime))
                     return true;
 
