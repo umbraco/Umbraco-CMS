@@ -8,6 +8,30 @@ function contentPickerController($location, $scope, dialogService, entityResourc
         return str.replace(rgxtrim, '');
     }
 
+    // Populates the name path of the entity (inclusive of the entity).
+    // Example: "Home > Blog > Post 1".
+    function populateNamePath(nodeId, entityType, renderModel) {
+
+        // Only works for content/media (i.e., not for members).
+        var lowerEntityType = entityType.toLowerCase();
+        if (lowerEntityType != "document" && lowerEntityType != "media") {
+            return;
+        }
+
+        // Fetch ancestors and set path.
+        entityResource
+            .getAncestors(nodeId, lowerEntityType)
+            .then(function (anc) {
+                if (anc && anc.length >= 1) {
+                    var names = _.map(anc, function (item) {
+                        return item.name;
+                    });
+                    renderModel.namePath = names.join(" > ");
+                }
+            });
+
+    }
+
     function startWatch() {
         //We need to watch our renderModel so that we can update the underlying $scope.model.value properly, this is required
         // because the ui-sortable doesn't dispatch an event after the digest of the sort operation. Any of the events for UI sortable
@@ -66,11 +90,13 @@ function contentPickerController($location, $scope, dialogService, entityResourc
     $scope.model.config.multiPicker = ($scope.model.config.multiPicker === "1" ? true : false);
     $scope.model.config.showEditButton = ($scope.model.config.showEditButton === "1" ? true : false);
 
-    var entityType = $scope.model.config.startNode.type === "member"
+    var nodeType = $scope.model.config.startNode.type.toLowerCase();
+    var entityType = nodeType === "member"
         ? "Member"
         : $scope.model.config.startNode.type === "media"
         ? "Media"
         : "Document";
+    $scope.showOpenButton = nodeType === "content" || nodeType === "media";
 
     //the dialog options for the picker
     var dialogOptions = {
@@ -146,13 +172,14 @@ function contentPickerController($location, $scope, dialogService, entityResourc
     $scope.showNode = function (index) {
         var item = $scope.renderModel[index];
         var id = item.id;
-        contentResource
-            .getById(id)
-            .then(function (data) {
-                navigationService.syncTree({ tree: "content", path: data.path, forceReload: false, activate: true });
-                var routePath = "content/content/edit/" + id.toString();
-                $location.path(routePath).search("");
+        entityResource.getPath(id, entityType).then(function (path) {
+            navigationService.changeSection(nodeType);
+            navigationService.showTree(nodeType, {
+                tree: nodeType, path: path, forceReload: false, activate: true
             });
+            var routePath = nodeType + "/" + nodeType + "/edit/" + id.toString();
+            $location.path(routePath).search("");
+        });
     }
         
     $scope.add = function (item) {
@@ -162,7 +189,9 @@ function contentPickerController($location, $scope, dialogService, entityResourc
 
         if (currIds.indexOf(item.id) < 0) {
             item.icon = iconHelper.convertFromLegacyIcon(item.icon);
-            $scope.renderModel.push({ name: item.name, id: item.id, icon: item.icon });
+            var renderModel = { name: item.name, id: item.id, icon: item.icon };
+            $scope.renderModel.push(renderModel);
+            populateNamePath(item.id, entityType, renderModel);
         }
     };
 
@@ -194,7 +223,9 @@ function contentPickerController($location, $scope, dialogService, entityResourc
            
             if (entity) {
                 entity.icon = iconHelper.convertFromLegacyIcon(entity.icon);
-                $scope.renderModel.push({ name: entity.name, id: entity.id, icon: entity.icon });
+                var renderModel = { name: entity.name, id: entity.id, icon: entity.icon };
+                $scope.renderModel.push(renderModel);
+                populateNamePath(id, entityType, renderModel);
             }
             
            

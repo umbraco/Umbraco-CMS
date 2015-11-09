@@ -16,8 +16,8 @@
                     {{node.name}}
                 </a>
                 
-                <div ng-if="!dialogEditor">
-                    <small><a href ng-click="showNode($index)"><localize key="open">Open</localize></a></small>
+                <div ng-if="!dialogEditor && (showOpenButton || model.config.showEditButton)">
+                    <small ng-if="showOpenButton"><a href ng-click="showNode($index)" title="{{node.namePath}}"><localize key="open">Open</localize></a></small>
                     <small ng-if="model.config.showEditButton"><a href umb-launch-mini-editor="node"><localize key="edit">Edit</localize></a></small>
                 </div>
             </li>
