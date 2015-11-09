@@ -46,7 +46,6 @@ namespace Umbraco.Web.Security.Identity
         {
             if (authenticationDescription.Properties.ContainsKey("ExternalSignInAutoLinkOptions") == false) return null;
             var options = authenticationDescription.Properties["ExternalSignInAutoLinkOptions"] as ExternalSignInAutoLinkOptions;
-            if (options == null) return null;
             return options;
         }
 
