@@ -469,18 +469,16 @@ module.exports = function (grunt) {
                         'rgrove-lazyload': {
                             files: ['lazyload.js']
                         },
-                        'angular-dynamic-locale': {
-                            files: ['tmhDynamicLocale.min.js,tmhDynamicLocale.min.js.map}']
-                        },
                         'bootstrap-social': {
                             files: ['bootstrap-social.css']
                         },
                         'font-awesome': {
                             files: ['css/font-awesome.min.css', 'fonts/*']
                         },
-                        'jquery': {
-                            files: ['jquery.min.js', 'jquery.min.map']
-                        },
+                        "jquery": {
+                            keepExpandedHierarchy: false,
+                            files: ['dist/jquery.min.js', 'dist/jquery.min.map']
+                        },                        
                         'jquery-ui': {
                             keepExpandedHierarchy: false,
                             files: ['ui/minified/jquery-ui.min.js']
