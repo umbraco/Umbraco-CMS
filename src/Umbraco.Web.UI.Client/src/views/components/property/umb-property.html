@@ -6,9 +6,9 @@
             
             <div class="umb-el-wrap">
                 
-                <label class="control-label" ng-hide="property.hideLabel" for="{{property.alias}}">
-                    {{property.label}} 
-                    <small ng-bind="property.description"></small>
+                <label class="control-label" ng-hide="property.hideLabel" for="{{property.alias}}" ng-attr-title="{{propertyAlias}}">
+                    {{property.label}}
+                    <small ng-bind-html="property.description"></small>
                 </label>
 
                 <div class="controls" ng-transclude>

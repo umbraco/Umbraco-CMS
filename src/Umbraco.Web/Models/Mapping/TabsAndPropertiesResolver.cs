@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Web;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -17,7 +18,7 @@ namespace Umbraco.Web.Models.Mapping
     /// Creates the tabs collection with properties assigned for display models
     /// </summary>
     internal class TabsAndPropertiesResolver : ValueResolver<IContentBase, IEnumerable<Tab<ContentPropertyDisplay>>>
-    {
+    {        
         private ICultureDictionary _cultureDictionary;
         protected IEnumerable<string> IgnoreProperties { get; set; }
 
@@ -27,7 +28,7 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         public TabsAndPropertiesResolver(IEnumerable<string> ignoreProperties)
-        {
+        {         
             if (ignoreProperties == null) throw new ArgumentNullException("ignoreProperties");
             IgnoreProperties = ignoreProperties;
         }
@@ -40,6 +41,7 @@ namespace Umbraco.Web.Models.Mapping
         /// <param name="customProperties">
         /// Any additional custom properties to assign to the generic properties tab. 
         /// </param>
+        /// <param name="onGenericPropertiesMapped"></param>
         /// <remarks>
         /// The generic properties tab is mapped during AfterMap and is responsible for 
         /// setting up the properties such as Created date, updated date, template selected, etc...
@@ -47,11 +49,10 @@ namespace Umbraco.Web.Models.Mapping
         public static void MapGenericProperties<TPersisted>(
             TPersisted content,
             ContentItemDisplayBase<ContentPropertyDisplay, TPersisted> display,
-            params ContentPropertyDisplay[] customProperties)
+            IEnumerable<ContentPropertyDisplay> customProperties = null,
+            Action<List<ContentPropertyDisplay>> onGenericPropertiesMapped = null)
             where TPersisted : IContentBase
         {
-            
-
             var genericProps = display.Tabs.Single(x => x.Id == 0);
 
             //store the current props to append to the newly inserted ones
@@ -60,55 +61,66 @@ namespace Umbraco.Web.Models.Mapping
             var labelEditor = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View;
 
             var contentProps = new List<ContentPropertyDisplay>
+            {
+                new ContentPropertyDisplay
                 {
-                    new ContentPropertyDisplay
-                        {
-                            Alias = string.Format("{0}id", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                            Label = "Id",
-                            Value = Convert.ToInt32(display.Id).ToInvariantString() + "<br/><small class='muted'>" + display.Key + "</small>",
-                            View = labelEditor
-                        },
-                    new ContentPropertyDisplay
-                        {
-                            Alias = string.Format("{0}creator", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                            Label = ui.Text("content", "createBy"),
-                            Description = ui.Text("content", "createByDesc"), //TODO: Localize this
-                            Value = display.Owner.Name,
-                            View = labelEditor
-                        },
-                    new ContentPropertyDisplay
-                        {
-                            Alias = string.Format("{0}createdate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                            Label = ui.Text("content", "createDate"),
-                            Description = ui.Text("content", "createDateDesc"), 
-                            Value = display.CreateDate.ToIsoString(),
-                            View = labelEditor
-                        },
-                     new ContentPropertyDisplay
-                        {
-                            Alias = string.Format("{0}updatedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                            Label = ui.Text("content", "updateDate"),
-                            Description = ui.Text("content", "updateDateDesc"), 
-                            Value = display.UpdateDate.ToIsoString(),
-                            View = labelEditor
-                        },                    
-                    new ContentPropertyDisplay
-                        {
-                            Alias = string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                            Label = ui.Text("content", "documentType"),
-                            Value = TranslateItem(display.ContentTypeName, CreateDictionary()),
-                            View = labelEditor
-                        }
-                };
+                    Alias = string.Format("{0}id", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Label = "Id",
+                    Value = Convert.ToInt32(display.Id).ToInvariantString() + "<br/><small class='muted'>" + display.Key + "</small>",
+                    View = labelEditor
+                },
+                new ContentPropertyDisplay
+                {
+                    Alias = string.Format("{0}creator", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Label = ui.Text("content", "createBy"),
+                    Description = ui.Text("content", "createByDesc"), //TODO: Localize this
+                    Value = display.Owner.Name,
+                    View = labelEditor
+                },
+                new ContentPropertyDisplay
+                {
+                    Alias = string.Format("{0}createdate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Label = ui.Text("content", "createDate"),
+                    Description = ui.Text("content", "createDateDesc"),
+                    Value = display.CreateDate.ToIsoString(),
+                    View = labelEditor
+                },
+                new ContentPropertyDisplay
+                {
+                    Alias = string.Format("{0}updatedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Label = ui.Text("content", "updateDate"),
+                    Description = ui.Text("content", "updateDateDesc"),
+                    Value = display.UpdateDate.ToIsoString(),
+                    View = labelEditor
+                },
+                new ContentPropertyDisplay
+                {
+                    Alias = string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Label = ui.Text("content", "documentType"),
+                    Value = TranslateItem(display.ContentTypeName, CreateDictionary()),
+                    View = labelEditor
+                }
+            };
 
-            //add the custom ones
-            contentProps.AddRange(customProperties);
+            if (customProperties != null)
+            {
+                //add the custom ones
+                contentProps.AddRange(customProperties);
+            }
 
             //now add the user props
             contentProps.AddRange(currProps);
 
+            //callback
+            if (onGenericPropertiesMapped != null)
+            {
+                onGenericPropertiesMapped(contentProps);
+            }
+
             //re-assign
             genericProps.Properties = contentProps;
+
+           
 
         }
 

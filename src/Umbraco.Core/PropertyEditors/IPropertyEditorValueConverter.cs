@@ -2,6 +2,7 @@ using System;
 
 namespace Umbraco.Core.PropertyEditors
 {
+    /// <summary>
     /// Maps a property source value to a data object.
     /// </summary>
     // todo: drop IPropertyEditorValueConverter support (when?).

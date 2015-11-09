@@ -19,7 +19,6 @@ using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.businesslogic.Exceptions;
 using umbraco.cms.businesslogic.media;
-using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
 using umbraco.controls;
 using umbraco.presentation.channels.businesslogic;
@@ -28,7 +27,9 @@ using umbraco.providers;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core.IO;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;
 
 namespace umbraco.cms.presentation.user
 {
@@ -106,8 +107,8 @@ namespace umbraco.cms.presentation.user
                     userType.Items.Add(li);
                 }
             }
-
-            var userCulture = Services.TextService.ConvertToSupportedCultureWithRegionCode(new CultureInfo(u.Language));
+            
+            var userCulture = UserExtensions.GetUserCulture(u.Language, Services.TextService);
 
             // Populate ui language lsit
             foreach (var lang in Services.TextService.GetSupportedCultures())

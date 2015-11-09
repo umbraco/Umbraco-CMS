@@ -14,6 +14,9 @@ using Umbraco.Core.Xml;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using System.Collections.Generic;
+using System.IO;
+using System.Web.Mvc;
+using System.Web.Routing;
 using Umbraco.Core.Cache;
 
 namespace Umbraco.Web
@@ -1170,52 +1173,44 @@ namespace Umbraco.Web
 
         #region canvasdesigner
         
-        public HtmlString EnableCanvasDesigner()
+        [Obsolete("Use EnableCanvasDesigner on the HtmlHelper extensions instead")]
+        public IHtmlString EnableCanvasDesigner()
         {
             return EnableCanvasDesigner(string.Empty, string.Empty);
         }
 
-        public HtmlString EnableCanvasDesigner(string canvasdesignerConfigPath)
+        [Obsolete("Use EnableCanvasDesigner on the HtmlHelper extensions instead")]
+        public IHtmlString EnableCanvasDesigner(string canvasdesignerConfigPath)
         {
             return EnableCanvasDesigner(canvasdesignerConfigPath, string.Empty);
         }
 
-        public HtmlString EnableCanvasDesigner(string canvasdesignerConfigPath, string canvasdesignerPalettesPath)
+        [Obsolete("Use EnableCanvasDesigner on the HtmlHelper extensions instead")]
+        public IHtmlString EnableCanvasDesigner(string canvasdesignerConfigPath, string canvasdesignerPalettesPath)
         {
+            var html = CreateHtmlHelper("");
+            var urlHelper = new UrlHelper(UmbracoContext.HttpContext.Request.RequestContext);
+            return html.EnableCanvasDesigner(urlHelper, UmbracoContext, canvasdesignerConfigPath, canvasdesignerPalettesPath);
+        }
 
-            string previewLink = @"<script src=""/Umbraco/lib/jquery/jquery.min.js"" type=""text/javascript""></script>" +
-                                 @"<script src=""{0}"" type=""text/javascript""></script>" +
-                                 @"<script src=""{1}"" type=""text/javascript""></script>" +
-                                 @"<script type=""text/javascript"">var pageId = '{2}'</script>" +
-                                 @"<script src=""/umbraco/js/canvasdesigner.front.js"" type=""text/javascript""></script>";
-
-            string noPreviewLinks = @"<link href=""{0}"" type=""text/css"" rel=""stylesheet"" data-title=""canvasdesignerCss"" />";
-
-            // Get page value
-            int pageId = UmbracoContext.PublishedContentRequest.UmbracoPage.PageID;
-            string[] path = UmbracoContext.PublishedContentRequest.UmbracoPage.SplitPath;
-            string result = string.Empty;
-            string cssPath = CanvasDesignerUtility.GetStylesheetPath(path, false);
-
-            if (UmbracoContext.Current.InPreviewMode)
+        [Obsolete("This shouldn't need to be used but because the obsolete extension methods above don't have access to the current HtmlHelper, we need to create a fake one, unfortunately however this will not pertain the current views viewdata, tempdata or model state so should not be used")]
+        private HtmlHelper CreateHtmlHelper(object model)
+        {
+            var cc = new ControllerContext
             {
-                canvasdesignerConfigPath = !string.IsNullOrEmpty(canvasdesignerConfigPath) ? canvasdesignerConfigPath : "/umbraco/js/canvasdesigner.config.js";
-                canvasdesignerPalettesPath = !string.IsNullOrEmpty(canvasdesignerPalettesPath) ? canvasdesignerPalettesPath : "/umbraco/js/canvasdesigner.palettes.js";
-                
-                if (!string.IsNullOrEmpty(cssPath))
-                    result = string.Format(noPreviewLinks, cssPath) + Environment.NewLine;
+                RequestContext = UmbracoContext.HttpContext.Request.RequestContext
+            };
+            var viewContext = new ViewContext(cc, new FakeView(), new ViewDataDictionary(model), new TempDataDictionary(), new StringWriter());
+            var htmlHelper = new HtmlHelper(viewContext, new ViewPage());
+            return htmlHelper;
+        }
 
-                result = result + string.Format(previewLink, canvasdesignerConfigPath, canvasdesignerPalettesPath, pageId);
-            }
-            else
+        [Obsolete("This shouldn't need to be used but because the obsolete extension methods above don't have access to the current HtmlHelper, we need to create a fake one, unfortunately however this will not pertain the current views viewdata, tempdata or model state so should not be used")]
+        private class FakeView : IView
+        {
+            public void Render(ViewContext viewContext, TextWriter writer)
             {
-                // Get css path for current page
-                if (!string.IsNullOrEmpty(cssPath))
-                    result = string.Format(noPreviewLinks, cssPath);
             }
-
-            return new HtmlString(result);
-
         }
 
         #endregion
