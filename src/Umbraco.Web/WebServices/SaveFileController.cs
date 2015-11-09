@@ -132,7 +132,7 @@ namespace Umbraco.Web.WebServices
             }
 
 
-            return Success(ui.Text("speechBubbles", "partialViewSavedText"), ui.Text("speechBubbles", "partialViewSavedHeader"), new { name = view.Name, path = view.Path });
+            return Success(ui.Text("speechBubbles", "partialViewSavedText"), ui.Text("speechBubbles", "partialViewSavedHeader"), new { name = currentView.Name, path = currentView.Path });
         }
 
         /// <summary>
