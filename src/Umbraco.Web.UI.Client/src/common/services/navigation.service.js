@@ -2,14 +2,14 @@
  * @ngdoc service
  * @name umbraco.services.navigationService
  *
- * @requires $rootScope 
+ * @requires $rootScope
  * @requires $routeParams
  * @requires $log
  * @requires $location
  * @requires dialogService
  * @requires treeService
  * @requires sectionResource
- *	
+ *
  * @description
  * Service to handle the main application navigation. Responsible for invoking the tree
  * Section navigation and search, and maintain their state for the entire application lifetime
@@ -17,10 +17,10 @@
  */
 function navigationService($rootScope, $routeParams, $log, $location, $q, $timeout, $injector, dialogService, umbModelMapper, treeService, notificationsService, historyService, appState, angularHelper) {
 
-    
+
     //used to track the current dialog object
     var currentDialog = null;
-    
+
     //the main tree event handler, which gets assigned via the setupTreeEvents method
     var mainTreeEventHandler = null;
     //tracks the user profile dialog
@@ -35,8 +35,8 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             appState.setMenuState("showMenuDialog", false);
             appState.setGlobalState("stickyNavigation", false);
             appState.setGlobalState("showTray", false);
-            
-            //$("#search-form input").focus();    
+
+            //$("#search-form input").focus();
             break;
         case 'menu':
             appState.setGlobalState("navMode", "menu");
@@ -87,7 +87,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
         /** initializes the navigation service */
         init: function() {
 
-            //keep track of the current section - initially this will always be undefined so 
+            //keep track of the current section - initially this will always be undefined so
             // no point in setting it now until it changes.
             $rootScope.$watch(function () {
                 return $routeParams.section;
@@ -95,7 +95,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 appState.setSectionState("currentSection", newVal);
             });
 
-            
+
         },
 
         /**
@@ -107,7 +107,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
          * Shows the legacy iframe and loads in the content based on the source url
          * @param {String} source The URL to load into the iframe
          */
-        loadLegacyIFrame: function (source) {            
+        loadLegacyIFrame: function (source) {
             $location.path("/" + appState.getSectionState("currentSection") + "/framed/" + encodeURIComponent(source));
         },
 
@@ -149,7 +149,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
         showTree: function (sectionAlias, syncArgs) {
             if (sectionAlias !== appState.getSectionState("currentSection")) {
                 appState.setSectionState("currentSection", sectionAlias);
-                
+
                 if (syncArgs) {
                     this.syncTree(syncArgs);
                 }
@@ -165,7 +165,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             appState.setGlobalState("showTray", false);
         },
 
-        /** 
+        /**
             Called to assign the main tree event handler - this is called by the navigation controller.
             TODO: Potentially another dev could call this which would kind of mung the whole app so potentially there's a better way.
         */
@@ -179,7 +179,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
 
             //when a tree node is synced this event will fire, this allows us to set the currentNode
             mainTreeEventHandler.bind("treeSynced", function (ev, args) {
-                
+
                 if (args.activate === undefined || args.activate === true) {
                     //set the current selected node
                     appState.setTreeState("selectedNode", args.node);
@@ -196,7 +196,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
 
                 //Set the current action node (this is not the same as the current selected node!)
                 appState.setMenuState("currentNode", args.node);
-                
+
                 if (args.event && args.event.altKey) {
                     args.skipDefault = true;
                 }
@@ -220,7 +220,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 ev.preventDefault();
 
                 if (n.metaData && n.metaData["jsClickCallback"] && angular.isString(n.metaData["jsClickCallback"]) && n.metaData["jsClickCallback"] !== "") {
-                    //this is a legacy tree node!                
+                    //this is a legacy tree node!
                     var jsPrefix = "javascript:";
                     var js;
                     if (n.metaData["jsClickCallback"].startsWith(jsPrefix)) {
@@ -243,7 +243,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 else if (n.routePath) {
                     //add action to the history service
                     historyService.add({ name: n.name, link: n.routePath, icon: n.icon });
-                    
+
                     //put this node into the tree state
                     appState.setTreeState("selectedNode", args.node);
                     //when a node is clicked we also need to set the active menu node to this node
@@ -269,7 +269,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
          * The path format is: ["itemId","itemId"], and so on
          * so to sync to a specific document type node do:
          * <pre>
-         * navigationService.syncTree({tree: 'content', path: ["-1","123d"], forceReload: true});  
+         * navigationService.syncTree({tree: 'content', path: ["-1","123d"], forceReload: true});
          * </pre>
          * @param {Object} args arguments passed to the function
          * @param {String} args.tree the tree alias to sync to
@@ -287,7 +287,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             if (!args.tree) {
                 throw "args.tree cannot be null";
             }
-            
+
             if (mainTreeEventHandler) {
                 //returns a promise
                 return mainTreeEventHandler.syncTree(args);
@@ -297,8 +297,8 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             return angularHelper.rejectedPromise();
         },
 
-        /** 
-            Internal method that should ONLY be used by the legacy API wrapper, the legacy API used to 
+        /**
+            Internal method that should ONLY be used by the legacy API wrapper, the legacy API used to
             have to set an active tree and then sync, the new API does this in one method by using syncTree
         */
         _syncPath: function(path, forceReload) {
@@ -322,8 +322,8 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             }
         },
 
-        /** 
-            Internal method that should ONLY be used by the legacy API wrapper, the legacy API used to 
+        /**
+            Internal method that should ONLY be used by the legacy API wrapper, the legacy API used to
             have to set an active tree and then sync, the new API does this in one method by using syncTreePath
         */
         _setActiveTreeType: function (treeAlias, loadChildren) {
@@ -331,7 +331,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 mainTreeEventHandler._setActiveTreeType(treeAlias, loadChildren);
             }
         },
-        
+
         /**
          * @ngdoc method
          * @name umbraco.services.navigationService#hideTree
@@ -356,7 +356,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
          * @methodOf umbraco.services.navigationService
          *
          * @description
-         * Hides the tree by hiding the containing dom element. 
+         * Hides the tree by hiding the containing dom element.
          * This always returns a promise!
          *
          * @param {Event} event the click event triggering the method, passed from the DOM element
@@ -382,7 +382,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
 
                             //NOTE: This is assigning the current action node - this is not the same as the currently selected node!
                             appState.setMenuState("currentNode", args.node);
-                            
+
                             //ensure the current dialog is cleared before creating another!
                             if (currentDialog) {
                                 dialogService.close(currentDialog);
@@ -400,13 +400,13 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                         }
                     }
 
-                    //there is no default or we couldn't find one so just continue showing the menu                    
+                    //there is no default or we couldn't find one so just continue showing the menu
 
                     setMode("menu");
 
                     appState.setMenuState("currentNode", args.node);
                     appState.setMenuState("menuActions", data.menuItems);
-                    appState.setMenuState("dialogTitle", args.node.name);                    
+                    appState.setMenuState("dialogTitle", args.node.name);
 
                     //we're not opening a dialog, return null.
                     deferred.resolve(null);
@@ -437,7 +437,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 throw "action cannot be null";
             }
             if (!node) {
-                throw "node cannot be null";                
+                throw "node cannot be null";
             }
             if (!section) {
                 throw "section cannot be null";
@@ -456,9 +456,9 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 var menuAction = action.metaData["jsAction"].split('.');
                 if (menuAction.length !== 2) {
 
-                    //if it is not two parts long then this most likely means that it's a legacy action                         
+                    //if it is not two parts long then this most likely means that it's a legacy action
                     var js = action.metaData["jsAction"].replace("javascript:", "");
-                    //there's not really a different way to acheive this except for eval 
+                    //there's not really a different way to acheive this except for eval
                     eval(js);
                 }
                 else {
@@ -551,7 +551,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 modalClass: "umb-modal-left",
                 show: true
             });
-            
+
             return service.helpDialog;
         },
 
@@ -564,13 +564,13 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
          * Opens a dialog, for a given action on a given tree node
          * uses the dialogService to inject the selected action dialog
          * into #dialog div.umb-panel-body
-         * the path to the dialog view is determined by: 
+         * the path to the dialog view is determined by:
          * "views/" + current tree + "/" + action alias + ".html"
          * The dialog controller will get passed a scope object that is created here with the properties:
          *  scope.currentNode = the selected tree node
          *  scope.currentAction = the selected menu item
          *  so that the dialog controllers can use these properties
-         * 
+         *
          * @param {Object} args arguments passed to the function
          * @param {Scope} args.scope current scope passed to the dialog
          * @param {Object} args.action the clicked action containing `name` and `alias`
@@ -590,6 +590,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             //ensure the current dialog is cleared before creating another!
             if (currentDialog) {
                 dialogService.close(currentDialog);
+                currentDialog = null;
             }
 
             setMode("dialog");
@@ -649,14 +650,14 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             }
 
             //TODO: some action's want to launch a new window like live editing, we support this in the menu item's metadata with
-            // a key called: "actionUrlMethod" which can be set to either: Dialog, BlankWindow. Normally this is always set to Dialog 
-            // if a URL is specified in the "actionUrl" metadata. For now I'm not going to implement launching in a blank window, 
+            // a key called: "actionUrlMethod" which can be set to either: Dialog, BlankWindow. Normally this is always set to Dialog
+            // if a URL is specified in the "actionUrl" metadata. For now I'm not going to implement launching in a blank window,
             // though would be v-easy, just not sure we want to ever support that?
 
             var dialog = dialogService.open(
                 {
                     container: $("#dialog div.umb-modalcolumn-body"),
-                    //The ONLY reason we're passing in scope to the dialogService (which is legacy functionality) is 
+                    //The ONLY reason we're passing in scope to the dialogService (which is legacy functionality) is
                     // for backwards compatibility since many dialogs require $scope.currentNode or $scope.currentAction
                     // to exist
                     scope: dialogScope,
@@ -685,9 +686,9 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
 	     * hides the currently open dialog
 	     */
         hideDialog: function (showMenu) {
-            
+
             setMode("default");
-          
+
             if(showMenu){
                 this.showMenu(undefined, { skipDefault: true, node: appState.getMenuState("currentNode") });
             }

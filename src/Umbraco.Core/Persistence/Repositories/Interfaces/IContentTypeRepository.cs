@@ -19,5 +19,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <returns></returns>
         IEnumerable<string> GetAllPropertyTypeAliases();
+
+        Attempt<int> CreateFolder(int parentId, string name, int userId);
     }
 }

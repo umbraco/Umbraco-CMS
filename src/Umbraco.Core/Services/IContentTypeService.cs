@@ -11,6 +11,15 @@ namespace Umbraco.Core.Services
     public interface IContentTypeService : IService
     {
         /// <summary>
+        /// Validates the composition, if its invalid a list of property type aliases that were duplicated is returned
+        /// </summary>
+        /// <param name="compo"></param>
+        /// <returns></returns>
+        Attempt<string[]> ValidateComposition(IContentTypeComposition compo);
+
+        Attempt<int> CreateFolder(int parentId, string name, int userId = 0);
+
+        /// <summary>
         /// Gets all property type aliases.
         /// </summary>
         /// <returns></returns>

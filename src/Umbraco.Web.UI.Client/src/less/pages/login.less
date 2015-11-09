@@ -1,0 +1,82 @@
+// Login
+// -------------------------
+
+.login-overlay {
+    width: 100%;
+    height: 100%;
+    background: @blackLight url(../img/application/logo.png) no-repeat 25px 30px fixed !important;
+    background-size: 30px 30px !important;
+    color: @white;
+    position: absolute;
+    z-index: 10000;
+    top: 0px;
+    left: 0px;
+    margin: 0 !Important;
+    padding: 0;
+    border-radius: 0;
+}
+
+.login-overlay .umb-modalcolumn {
+    background: none;
+    border: none;
+}
+
+.login-overlay .form {
+    position:fixed;
+    display: block;
+    top: 100px;
+    left: 165px;
+    width: 370px;
+    text-align: right;
+}
+
+.login-overlay h1 {
+    display: block;
+    text-align: right;
+    color: @white;
+    font-size: 18px;
+    font-weight: normal;
+}
+
+.login-overlay .alert.alert-error {
+    display: inline-block;
+    padding-right: 6px;
+    padding-left: 6px;
+    margin-top: 10px;
+    text-align: center;
+}
+
+@media (max-width: 565px) {
+  // Remove padding on login-form on smaller devices
+  .login-overlay .form {
+    left: inherit;
+    right:25px;
+  }
+}
+
+#hrOr {
+    height: 30px;
+    text-align: center;
+    position: relative;
+    padding-top: 20px;
+}
+
+#hrOr hr {
+    margin: 0px;
+    border: none;
+    background-color: @gray;
+    height: 1px;
+}
+
+#hrOr div {
+    background-color: black;
+    position: relative;
+    top: -16px;
+    border: 1px solid @gray;
+    padding: 4px;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    margin: auto;
+    color: @grayLight;
+}

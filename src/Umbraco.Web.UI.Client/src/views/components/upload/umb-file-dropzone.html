@@ -1,0 +1,114 @@
+<div class="umb-file-dropzone-directive">
+
+<ng-form name="uploadForm">
+
+<!-- Drag and drop files area -->
+    <div ngf-drop
+        ng-hide="hideDropzone"
+        ng-model="filesHolder"
+        ngf-change="handleFiles($files, $event)"
+        class="dropzone"
+        ngf-drag-over-class="drag-over"
+        ngf-multiple="true"
+        ngf-allow-dir="true"
+        ngf-pattern="{{ accept }}"
+        ngf-max-size="{{ maxFileSize }}"
+        ng-class="{'is-small': compact!=='false' || (done.length+queue.length) > 0 }">
+
+
+        <div class="content" >
+            <!-- Drag and drop illustration -->
+            <svg class="illustration" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+         viewBox="0 0 140 75" enable-background="new 0 0 140 75" xml:space="preserve">
+                <path fill="#FFFFFF" stroke="#D9D9D9" d="M132.4,68.6H43.1c-0.5,0-1-0.4-1-1V7.1c0-0.6,0.5-1,1-1h89.4c0.6,0,1,0.4,1,1v60.5
+        C133.4,68.2,133,68.6,132.4,68.6z"/>
+                <line fill="none" stroke="#D9D9D9" x1="42.1" y1="16.4" x2="133.4" y2="16.4"/>
+                <circle fill="#DF7F48" cx="47" cy="11.6" r="1.5"/>
+                <circle fill="#DF7F48" cx="52.5" cy="11.6" r="1.5"/>
+                <circle fill="#DF7F48" cx="58" cy="11.6" r="1.5"/>
+                <g>
+                    <g>
+                        <path fill="none" stroke="#D9D9D9" stroke-linecap="round" stroke-linejoin="round" d="M64.2,44.1c-12.7-11.9-32.7-11.7-45.1,0.8"
+                            />
+                        <g>
+                            <polygon fill="#D9D9D9" points="64.4,38.9 63.4,39 63.9,43.9 58.9,44 59,45 65,44.9 			"/>
+                        </g>
+                    </g>
+                </g>
+                <rect x="4.8" y="23.9" fill="#FFFFFF" stroke="#D9D9D9" stroke-linecap="round" stroke-linejoin="round" width="30" height="25"/>
+                <path fill="#FFFFFF" stroke="#D9D9D9" stroke-linecap="round" stroke-linejoin="round" d="M4.8,48.9c0,0,0-12.5,15-12.5
+        s15,12.5,15,12.5H4.8z"/>
+                <circle fill="#FFFFFF" stroke="#D9D9D9" stroke-linecap="round" stroke-linejoin="round" cx="28.7" cy="30.8" r="2.5"/>
+            </svg>
+
+            <!-- Select files -->
+            <div class="file-select"
+                 ngf-select
+                 ng-model="filesHolder"
+                 ngf-change="handleFiles($files, $event)"
+                 ngf-multiple="true"
+                 ngf-pattern="{{ accept }}"
+                 ngf-max-size="{{ maxFileSize }}">
+                - or click here to choose files
+            </div>
+        </div>
+    </div>
+
+    <!-- List of uploading/uploaded files  -->
+    <ul class="file-list" ng-show="done.length > 0 || queue.length > 0 || rejected.length > 0">
+
+        <!-- make list sort order the same as photo grid. The last uploaded photo in the top -->
+        <li class="file" ng-repeat="file in done">
+
+            <!-- file name -->
+            <div class="file-description">{{ file.name }}</div>
+
+            <!-- upload success -->
+            <div class="file-icon" ng-if="file.uploadStatus == 'done'">
+                <i class="icon icon-check color-green"></i>
+            </div>
+
+        </li>
+
+        <li class="file" ng-if="currentFile">
+            <!-- file name -->
+            <div class="file-name">{{ currentFile.name }}</div>
+
+            <!-- upload progress bar -->
+            <div class="file-progress">
+                <span class="file-progress-indicator"
+                ng-style="{'width': currentFile.uploadProgress + '%'}"></span>
+            </div>
+        </li>
+
+        <!-- make list sort order the same as photo grid. The last uploaded photo in the top -->
+        <li class="file" ng-repeat="queued in queue">
+            <!-- file name -->
+            <div class="file-name">{{ queued.name }}</div>
+        </li>
+
+        <li class="file" ng-repeat="file in rejected">
+
+            <!-- file name -->
+            <div class="file-description">
+
+               {{ file.name }}
+
+               <span class="file-error" ng-if="file.$error">
+                  <span ng-if="file.$error === 'pattern'" class="errorMessage color-red">( Only allowed file types are: "{{ accept }}" )</span>
+                  <span ng-if="file.$error === 'maxSize'" class="errorMessage color-red">( Max file size is " {{ maxFileSize }} " )</span>
+               </span>
+
+            </div>
+
+            <!-- upload error -->
+            <div class="file-icon">
+               <i class="icon icon-delete color-red"></i>
+            </div>
+
+        </li>
+    </ul>
+
+</ng-form>
+
+</div>

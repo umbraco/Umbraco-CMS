@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 
@@ -53,6 +54,8 @@ namespace Umbraco.Tests.TestHelpers.Entities
 
             //ensure that nothing is marked as dirty
             contentType.ResetDirtyProperties(false);
+
+            contentType.SetDefaultTemplate(new Template("Textpage", "textpage"));
 
             return contentType;
         }
@@ -179,10 +182,23 @@ namespace Umbraco.Tests.TestHelpers.Entities
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.TinyMCEAlias, DataTypeDatabaseType.Ntext) { Alias = RandomAlias("bodyText", randomizeAliases), Name = "Body Text", Description = "",  Mandatory = false, SortOrder = 2, DataTypeDefinitionId = -87 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext) { Alias = RandomAlias("author", randomizeAliases) , Name = "Author", Description = "Name of the author",  Mandatory = false, SortOrder = 3, DataTypeDefinitionId = -88 });
 
-            contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = propertyGroupName, SortOrder = 1 });
+            var pg = new PropertyGroup(contentCollection) {Name = propertyGroupName, SortOrder = 1};
+            contentType.PropertyGroups.Add(pg);
+
+            if (parent != null)
+            {
+                var foundPg = parent.PropertyGroups.FirstOrDefault(x => x.Name == propertyGroupName);
+                if (foundPg != null)
+                {
+                    //this exists on the parent, so set the parent id
+                    pg.ParentId = foundPg.Id;    
+                }
+            }
 
             //ensure that nothing is marked as dirty
             contentType.ResetDirtyProperties(false);
+
+            contentType.SetDefaultTemplate(new Template("Textpage", "textpage"));
 
 			return contentType;
 		}	    
@@ -395,6 +411,21 @@ namespace Umbraco.Tests.TestHelpers.Entities
             contentType.ResetDirtyProperties(false);
 
             return contentType;
+        }
+
+        public static void EnsureAllIds(ContentType contentType, int seedId)
+        {
+            //ensure everything has ids
+            contentType.Id = seedId;
+            var itemid = seedId + 1;
+            foreach (var propertyGroup in contentType.PropertyGroups)
+            {
+                propertyGroup.Id = itemid++;
+            }
+            foreach (var propertyType in contentType.PropertyTypes)
+            {
+                propertyType.Id = itemid++;
+            }
         }
 
         private static string RandomAlias(string alias, bool randomizeAliases)

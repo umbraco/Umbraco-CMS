@@ -118,6 +118,21 @@ namespace Umbraco.Web.Editors
             return foundMedia.Select(Mapper.Map<IMedia, MediaItemDisplay>);
         }
 
+        /// <summary>
+        /// Returns media items known to be a container of other media items
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>>))]
+        public IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildFolders(int id = -1)
+        {
+            //Suggested convention for folder mediatypes - we can make this more or less complicated as long as we document it...
+            //if you create a media type, which has an alias that ends with ...Folder then its a folder: ex: "secureFolder", "bannerFolder", "Folder"
+            var folderTypes = Services.ContentTypeService.GetAllMediaTypes().ToArray().Where(x => x.Alias.EndsWith("Folder")).Select(x => x.Id);
+
+            var children = (id < 0) ? Services.MediaService.GetRootMedia() : Services.MediaService.GetById(id).Children();
+            return children.Where(x =>  folderTypes.Contains(x.ContentTypeId)).Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>);
+        }
 
         /// <summary>
         /// Returns the root media objects
@@ -409,7 +424,7 @@ namespace Umbraco.Web.Editors
             {
                 return Request.CreateValidationErrorResponse("The request was not formatted correctly, the currentFolder is not an integer");
             }
-
+            
             //ensure the user has access to this folder by parent id!
             if (CheckPermissions(
                new Dictionary<string, object>(), 
@@ -423,9 +438,47 @@ namespace Umbraco.Web.Editors
                         Services.TextService.Localize("speechBubbles/invalidUserPermissionsText"),
                         SpeechBubbleIcon.Warning)));
             }
-
+            
             var tempFiles = new PostedFiles();
+            var mediaService = ApplicationContext.Services.MediaService;
 
+
+            //in case we pass a path with a folder in it, we will create it and upload media to it.
+            if (result.FormData.ContainsKey("path"))
+            {
+
+                var folders = result.FormData["path"].Split('/');
+
+                for (int i = 0; i < folders.Length-1; i++)
+                {
+                    var folderName = folders[i];
+
+                    //get current parent
+                    var mediaRoot = mediaService.GetById(parentId);
+
+                    //if the media root is null, something went wrong, we'll abort
+                    if (mediaRoot == null)
+                        return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "The folder: " + folderName + " could not be used for storing images, its ID: " + parentId + " returned null");
+
+                    //look for matching folder
+                    var folderMediaItem = mediaRoot.Children().FirstOrDefault(x => x.Name == folderName && x.ContentType.Alias == Core.Constants.Conventions.MediaTypes.Folder);
+                    if (folderMediaItem == null)
+                    {
+                        //if null, create a folder
+                        folderMediaItem = mediaService.CreateMedia(folderName, mediaRoot, Constants.Conventions.MediaTypes.Folder);
+                        mediaService.Save(folderMediaItem);
+
+                        //set the media root to the folder id so uploaded files will end there.
+                        parentId = folderMediaItem.Id;
+                    }
+                    else
+                    {
+                        parentId = folderMediaItem.Id;
+                    }
+                    
+                }
+            }
+  
             //get the files
             foreach (var file in result.FileData)
             {
@@ -439,7 +492,6 @@ namespace Umbraco.Web.Editors
                     if (UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes.Contains(ext))
                         mediaType = Constants.Conventions.MediaTypes.Image;
 
-                    var mediaService = ApplicationContext.Services.MediaService;
                     var f = mediaService.CreateMedia(fileName, parentId, mediaType, Security.CurrentUser.Id);
 
                     var fileInfo = new FileInfo(file.LocalFileName);
@@ -533,8 +585,9 @@ namespace Umbraco.Web.Editors
                 //cannot move if the content item is not allowed at the root
                 if (toMove.ContentType.AllowedAsRoot == false)
                 {
-                    throw new HttpResponseException(
-                        Request.CreateValidationErrorResponse(ui.Text("moveOrCopy", "notAllowedAtRoot", Security.CurrentUser)));
+                    var notificationModel = new SimpleNotificationModel();
+                    notificationModel.AddErrorNotification(Services.TextService.Localize("moveOrCopy/notAllowedAtRoot"), "");
+                    throw new HttpResponseException(Request.CreateValidationErrorResponse(notificationModel));
                 }
             }
             else
@@ -549,15 +602,17 @@ namespace Umbraco.Web.Editors
                 if (parent.ContentType.AllowedContentTypes.Select(x => x.Id).ToArray()
                     .Any(x => x.Value == toMove.ContentType.Id) == false)
                 {
-                    throw new HttpResponseException(
-                        Request.CreateValidationErrorResponse(ui.Text("moveOrCopy", "notAllowedByContentType", Security.CurrentUser)));
+                    var notificationModel = new SimpleNotificationModel();
+                    notificationModel.AddErrorNotification(Services.TextService.Localize("moveOrCopy/notAllowedByContentType"), "");
+                    throw new HttpResponseException(Request.CreateValidationErrorResponse(notificationModel));
                 }
 
                 // Check on paths
                 if ((string.Format(",{0},", parent.Path)).IndexOf(string.Format(",{0},", toMove.Id), StringComparison.Ordinal) > -1)
                 {
-                    throw new HttpResponseException(
-                        Request.CreateValidationErrorResponse(ui.Text("moveOrCopy", "notAllowedByPath", Security.CurrentUser)));
+                    var notificationModel = new SimpleNotificationModel();
+                    notificationModel.AddErrorNotification(Services.TextService.Localize("moveOrCopy/notAllowedByPath"), "");
+                    throw new HttpResponseException(Request.CreateValidationErrorResponse(notificationModel));
                 }
             }
 

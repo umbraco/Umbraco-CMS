@@ -1,0 +1,61 @@
+<div ng-controller="Umbraco.Editors.MediaTypes.EditController as vm">
+
+   <umb-load-indicator ng-if="vm.page.loading"></umb-load-indicator>
+
+    <form novalidate name="contentTypeForm"
+          ng-show="!vm.page.loading"
+          ng-submit="vm.save()"
+          val-form-manager>
+        <umb-editor-view>
+
+            <umb-editor-header
+                    name="vm.contentType.name"
+                    alias="vm.contentType.alias"
+                    description="vm.contentType.description"
+                    navigation="vm.page.navigation"
+                    icon="vm.contentType.icon">
+            </umb-editor-header>
+
+            <umb-editor-container class="editors-document-type-container">
+
+                <div class="editors-document-type-canvas">
+
+                    <umb-editor-sub-views ng-if="!vm.page.loading" sub-views="vm.page.navigation" model="vm.contentType"></umb-editor-sub-views>
+
+                </div>
+
+            </umb-editor-container>
+
+
+            <umb-editor-footer>
+
+               <umb-editor-footer-content-left>
+
+                  <umb-keyboard-shortcuts-overview
+                    model="vm.page.keyboardShortcutsOverview">
+                  </umb-keyboard-shortcuts-overview>
+
+               </umb-editor-footer-content-left>
+
+               <umb-editor-footer-content-right>
+
+                  <umb-button
+                     type="submit"
+                     state="vm.page.saveButtonState"
+                     button-style="success"
+                     shortcut="ctrl+s"
+                     label="Save"
+                     label-key="buttons_save">
+                  </umb-button>
+
+               </umb-editor-footer-content-right>
+
+
+            </umb-editor-footer>
+
+        </umb-editor-view>
+
+
+    </form>
+
+</div>

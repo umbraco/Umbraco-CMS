@@ -1,0 +1,54 @@
+<div ng-controller="Umbraco.PropertyEditors.ListView.ListLayoutController as vm">
+
+   <table class="table table-striped">
+       <thead>
+           <tr>
+               <td style="width: 35px">
+                   <input type="checkbox" ng-click="vm.selectAll($event)" ng-checked="vm.isSelectedAll()">
+               </td>
+               <td>
+                   <a href="#" ng-click="vm.sort('Name', true)" prevent-default class="sortable">
+                       <localize key="general_name">Name</localize>
+                       <i class="icon" ng-class="{'icon-navigation-up': vm.isSortDirection('Name', 'asc'), 'icon-navigation-down': vm.isSortDirection('Name', 'desc')}"></i>
+                   </a>
+               </td>
+
+               <td ng-repeat="column in options.includeProperties">
+                   <a href="#" ng-click="vm.sort(column.alias, column.allowSorting)" ng-class="{'sortable':column.allowSorting}" prevent-default>
+                       <span ng-bind="column.header"></span>
+                       <i class="icon" ng-class="{'icon-navigation-up': vm.isSortDirection(column.alias, 'asc'), 'icon-navigation-down': vm.isSortDirection(column.alias, 'desc')}"></i>
+                   </a>
+               </td>
+           </tr>
+       </thead>
+
+       <tbody ng-show="items.length === 0">
+           <tr>
+               <td colspan="{{options.includeProperties.length + 2}}">
+                   <p><localize key="content_listViewNoItems">There are no items show in the list.</localize></p>
+               </td>
+           </tr>
+       </tbody>
+
+       <tbody ng-show="items.length > 0">
+           <tr ng-repeat="item in items"
+               ng-class="{selected:item.selected}">
+
+               <td>
+                   <i class="icon {{item.icon}}" ng-class="getIcon(item)"></i>
+                   <input type="checkbox" ng-click="vm.selectItem(item)" ng-model="item.selected" no-dirty-check>
+               </td>
+               <td>
+                   <a ng-class="{inactive: (entityType === 'content' && !item.published) || isTrashed}"
+                      href="#{{item.editPath}}"
+                      ng-bind="item.name"></a>
+               </td>
+
+               <td ng-repeat="column in options.includeProperties">
+                   <span>{{item[column.alias]}}</span>
+               </td>
+           </tr>
+       </tbody>
+
+   </table>
+</div>
