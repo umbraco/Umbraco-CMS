@@ -21,5 +21,11 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "notifications")]
         public List<Notification> Notifications { get; private set; }
+
+        /// <summary>
+        ///  A default msg 
+        /// </summary>
+        [DataMember(Name = "message")]
+        public string Message { get; set; }
     }
 }

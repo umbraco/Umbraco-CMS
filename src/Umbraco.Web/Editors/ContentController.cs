@@ -602,8 +602,12 @@ namespace Umbraco.Web.Editors
                 //cannot move if the content item is not allowed at the root
                 if (toMove.ContentType.AllowedAsRoot == false)
                 {
-                    var notificationModel = new SimpleNotificationModel();
-                    notificationModel.AddErrorNotification(Services.TextService.Localize("moveOrCopy/notAllowedAtRoot"), "");
+                    var msg = Services.TextService.Localize("moveOrCopy/notAllowedAtRoot");
+                    var notificationModel = new SimpleNotificationModel
+                    {
+                        Message = msg
+                    };
+                    notificationModel.AddErrorNotification(msg, "");
                     throw new HttpResponseException( Request.CreateValidationErrorResponse(notificationModel));
                 }
             }
@@ -621,16 +625,24 @@ namespace Umbraco.Web.Editors
                 if (parent.ContentType.AllowedContentTypes.Select(x => x.Id).ToArray()
                     .Any(x => x.Value == toMove.ContentType.Id) == false)
                 {
-                    var notificationModel = new SimpleNotificationModel();
-                    notificationModel.AddErrorNotification(Services.TextService.Localize("moveOrCopy/notAllowedByContentType"), "");
+                    var msg = Services.TextService.Localize("moveOrCopy/notAllowedByContentType");
+                    var notificationModel = new SimpleNotificationModel
+                    {
+                        Message = msg
+                    };
+                    notificationModel.AddErrorNotification(msg, "");
                     throw new HttpResponseException(Request.CreateValidationErrorResponse(notificationModel));
                 }
 
                 // Check on paths
                 if ((string.Format(",{0},", parent.Path)).IndexOf(string.Format(",{0},", toMove.Id), StringComparison.Ordinal) > -1)
                 {
-                    var notificationModel = new SimpleNotificationModel();
-                    notificationModel.AddErrorNotification(Services.TextService.Localize("moveOrCopy/notAllowedByPath"), "");
+                    var msg = Services.TextService.Localize("moveOrCopy/notAllowedByPath");
+                    var notificationModel = new SimpleNotificationModel
+                    {
+                        Message = msg
+                    };
+                    notificationModel.AddErrorNotification(msg, "");
                     throw new HttpResponseException(Request.CreateValidationErrorResponse(notificationModel));
                 }
             }
