@@ -1,9 +1,14 @@
 (function() {
     "use strict";
 
-    function ListViewListLayoutController($scope, listViewHelper, $location) {
+    function ListViewListLayoutController($scope, listViewHelper, $location, mediaHelper) {
 
         var vm = this;
+
+
+        vm.nodeId = $scope.contentId;
+        vm.acceptedFileTypes = mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
+        vm.activeDrag = false;
 
         vm.selectItem = selectItem;
         vm.clickItem = clickItem;
@@ -11,6 +16,10 @@
         vm.isSelectedAll = isSelectedAll;
         vm.isSortDirection = isSortDirection;
         vm.sort = sort;
+        vm.dragEnter = dragEnter;
+        vm.dragLeave = dragLeave;
+  		vm.onFilesQueue = onFilesQueue;
+        vm.onUploadComplete = onUploadComplete;
 
         function selectAll($event) {
             listViewHelper.selectAllItems($scope.items, $scope.selection, $event);
@@ -37,6 +46,23 @@
                 listViewHelper.setSorting(field, allow, $scope.options);
                 $scope.getContent($scope.contentId);
             }
+        }
+
+        // Dropzone upload functions
+        function dragEnter(el, event) {
+           vm.activeDrag = true;
+        }
+
+        function dragLeave(el, event) {
+           vm.activeDrag = false;
+        }
+
+  		function onFilesQueue() {
+  			vm.activeDrag = false;
+  		}
+
+        function onUploadComplete() {
+           $scope.getContent($scope.contentId);
         }
 
     }
