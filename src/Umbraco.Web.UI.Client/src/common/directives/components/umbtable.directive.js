@@ -26,7 +26,7 @@
         };
 
         scope.isSelectedAll = function() {
-            if(scope.onSelectedAll) {
+            if(scope.onSelectedAll && scope.items && scope.items.length > 0) {
                 return scope.onSelectedAll();
             }
         };
@@ -36,7 +36,7 @@
                 return scope.onSortingDirection(col, direction);
             }
         };
-        
+
         scope.sort = function(field, allow) {
             if(scope.onSort) {
                 scope.onSort(field, allow);

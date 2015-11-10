@@ -1,59 +1,66 @@
-<table class="umb-table">
+<div class="umb-table">
 
-    <thead>
-        <tr>
-            <td style="width: 35px" class="select-all">
-                <label for="checkall" class="tooltip">Select all</label>
-                <input id="checkall" type="checkbox" ng-click="selectAll($event)" ng-checked="isSelectedAll()">
-            </td>
-            <td>
-                <a href="#" ng-click="sort('Name', true)" prevent-default class="sortable">
+    <div class="umb-table-head">
+        <div class="umb-table-row">
+
+            <div class="umb-table-cell">
+                <input class="umb-table__input" type="checkbox"
+                ng-click="selectAll($event)"
+                ng-checked="isSelectedAll()"
+                >
+            </div>
+            <div class="umb-table-cell umb-table-body__title">
+                <a class="umb-table-head__link sortable" href="#"ng-click="sort('Name', true)" prevent-default>
                     <localize key="general_name">Name</localize>
-                    <i class="icon" ng-class="{'icon-navigation-up': isSortDirection('Name', 'asc'), 'icon-navigation-down': isSortDirection('Name', 'desc')}"></i>
+                    <i class="umb-table-head__icon icon" ng-class="{'icon-navigation-up': isSortDirection('Name', 'asc'), 'icon-navigation-down': isSortDirection('Name', 'desc')}"></i>
                 </a>
-            </td>
+            </div>
 
-            <td ng-repeat="column in itemProperties">
-                <a href="#" ng-click="sort(column.alias, column.allowSorting)" ng-class="{'sortable':column.allowSorting}" prevent-default>
+            <div class="umb-table-cell" ng-repeat="column in itemProperties">
+                <a class="umb-table-head__link" title="Sort by {{ column.header }}" href="#"
+                ng-click="sort(column.alias, column.allowSorting)"
+                ng-class="{'sortable':column.allowSorting}" prevent-default>
                     <span ng-bind="column.header"></span>
-                    <i class="icon" ng-class="{'icon-navigation-up': isSortDirection(column.alias, 'asc'), 'icon-navigation-down': isSortDirection(column.alias, 'desc')}"></i>
+                    <i class="umb-table-head__icon icon" ng-class="{'icon-navigation-up': isSortDirection(column.alias, 'asc'), 'icon-navigation-down': isSortDirection(column.alias, 'desc')}"></i>
                 </a>
-            </td>
-        </tr>
-    </thead>
+            </div>
+
+        </div>
+    </div>
 
 
-
-    <tbody ng-show="items.length === 0">
-        <tr>
-            <td colspan="{{itemProperties.length + 2}}">
+    <div class="umb-table-body" ng-show="!items">
+        <div class="umb-table-row">
+            <div class="umb-table-cell" colspan="{{itemProperties.length + 2}}">
                 <p><localize key="content_listViewNoItems">There are no items show in the list.</localize></p>
-            </td>
-        </tr>
-    </tbody>
+            </div>
+        </div>
+    </div>
 
 
-
-    <tbody ng-show="items.length > 0">
-        <tr ng-repeat="item in items"
-            ng-class="{selected:item.selected}"
+    <div class="umb-table-body" ng-show="items.length > 0">
+        <div class="umb-table-row"
+            ng-repeat="item in items"
+            ng-class="{'-selected':item.selected}"
             ng-click="selectItem(item, $index, $event)"
             >
 
-            <td>
-                <i class="icon {{item.icon}}" ng-class="getIcon(item)"></i>
-            </td>
+            <div class="umb-table-cell">
+                <i class="umb-table-body__icon umb-table-body__fileicon {{item.icon}}" ng-class="getIcon(item)"></i>
+                <i class="umb-table-body__icon umb-table-body__checkicon icon-check"></i>
+            </div>
 
-            <td>
-                <a href="" ng-class="{inactive: (entityType === 'content' && !item.published) || isTrashed}"
+            <div class="umb-table-cell umb-table-body__title">
+                <a  title="{{ item.name }}" class="umb-table-body__link" href="" ng-class="{inactive: (entityType === 'content' && !item.published) || isTrashed}"
                     ng-click="clickItem(item, $event)"
-                    ng-bind="item.name"></a>
-            </td>
+                    ng-bind="item.name">
+                </a>
+            </div>
 
-            <td ng-repeat="column in itemProperties">
+            <div class="umb-table-cell" ng-repeat="column in itemProperties">
                 <span>{{item[column.alias]}}</span>
-            </td>
-        </tr>
-    </tbody>
+            </div>
+        </div>
+    </div>
 
-</table>
+</div>
