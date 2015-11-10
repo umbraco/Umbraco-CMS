@@ -297,7 +297,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 //If there's a GetAll zero count cache, ensure it is cleared
                 RuntimeCache.ClearCacheItem(GetCacheTypeKey<TEntity>());
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 //if an exception is thrown we need to remove the entry from cache, this is ONLY a work around because of the way
                 // that we cache entities: http://issues.umbraco.org/issue/U4-4259
