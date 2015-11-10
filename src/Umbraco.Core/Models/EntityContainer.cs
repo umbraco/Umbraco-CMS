@@ -7,11 +7,17 @@ namespace Umbraco.Core.Models
     /// </summary>
     public sealed class EntityContainer : UmbracoEntity, IAggregateRoot
     {
-        public EntityContainer(int parentId, string name, int userId)
+        public EntityContainer()
+        {            
+        }
+
+        public EntityContainer(int id, int parentId, string name, int userId, string path)
         {
+            Id = id;
             ParentId = parentId;
             Name = name;
             CreatorId = userId;
+            Path = path;
         }
     }
 }

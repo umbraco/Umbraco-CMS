@@ -54,7 +54,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public EntityContainer CreateFolder(int parentId, string name, int userId)
         {
-            var container = new EntityContainer(parentId, name, userId);
+            var container = new EntityContainer
+            {
+                ParentId = parentId,
+                Name = name,
+                CreatorId = userId
+            };
             _containerRepository.AddOrUpdate(container);
             return container;
         }

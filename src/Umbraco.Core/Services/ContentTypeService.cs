@@ -43,11 +43,13 @@ namespace Umbraco.Core.Services
 
         public Attempt<int> CreateContentTypeFolder(int parentId, string name, int userId = 0)
         {
-            using (var repo = RepositoryFactory.CreateContentTypeRepository(UowProvider.GetUnitOfWork()))
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateContentTypeRepository(uow))
             {
                 try
                 {
                     var container = repo.CreateFolder(parentId, name, userId);
+                    uow.Commit();
                     return Attempt.Succeed(container.Id);
                 }
                 catch (Exception ex)
@@ -60,11 +62,13 @@ namespace Umbraco.Core.Services
 
         public Attempt<int> CreateMediaTypeFolder(int parentId, string name, int userId = 0)
         {
-            using (var repo = RepositoryFactory.CreateMediaTypeRepository(UowProvider.GetUnitOfWork()))
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateMediaTypeRepository(uow))
             {
                 try
                 {
                     var container = repo.CreateFolder(parentId, name, userId);
+                    uow.Commit();
                     return Attempt.Succeed(container.Id);
                 }
                 catch (System.Exception ex)
@@ -77,18 +81,22 @@ namespace Umbraco.Core.Services
 
         public void DeleteContentTypeFolder(int folderId, int userId = 0)
         {
-            using (var repo = RepositoryFactory.CreateContentTypeRepository(UowProvider.GetUnitOfWork()))
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateContentTypeRepository(uow))
             {
                 repo.DeleteFolder(folderId);
+                uow.Commit();
                 //TODO: Audit trail ?
             }
         }
 
         public void DeleteMediaTypeFolder(int folderId, int userId = 0)
         {
-            using (var repo = RepositoryFactory.CreateMediaTypeRepository(UowProvider.GetUnitOfWork()))
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateMediaTypeRepository(uow))
             {
                 repo.DeleteFolder(folderId);
+                uow.Commit();
                 //TODO: Audit trail ?
             }
         }

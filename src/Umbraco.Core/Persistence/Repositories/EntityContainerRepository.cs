@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -14,7 +17,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// An internal repository for managing entity containers such as doc type, media type, data type containers
     /// </summary>
     /// <remarks>
-    /// All we're supporting here is creating and deleting
+    /// All we're supporting here is a single get, creating and deleting
     /// </remarks>
     internal class EntityContainerRepository : PetaPocoRepositoryBase<int, EntityContainer>
     {
@@ -29,9 +32,32 @@ namespace Umbraco.Core.Persistence.Repositories
             _entityObjectType = entityObjectType;
         }
 
+        /// <summary>
+        /// Do not cache anything
+        /// </summary>
+        protected override IRuntimeCacheProvider RuntimeCache
+        {
+            get { return new NullCacheProvider(); }
+        }
+
         protected override EntityContainer PerformGet(int id)
         {
-            throw new NotImplementedException();
+            var sql = GetBaseQuery(false);
+            sql.Where(GetBaseWhereClause(), new { Id = id, NodeObjectType = _containerObjectType });
+
+            var containerDto = Database.Fetch<NodeDto>(sql).FirstOrDefault();
+            if (containerDto == null)
+                return null;
+
+            var entity = new EntityContainer(containerDto.NodeId,
+                containerDto.ParentId, containerDto.Text, containerDto.UserId ?? 0,
+                containerDto.Path);
+
+            //on initial construction we don't want to have dirty properties tracked
+            // http://issues.umbraco.org/issue/U4-1946
+            entity.ResetDirtyProperties(false);
+
+            return entity;
         }
 
         protected override IEnumerable<EntityContainer> PerformGetAll(params int[] ids)
@@ -46,12 +72,21 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override Sql GetBaseQuery(bool isCount)
         {
-            throw new NotImplementedException();
+            var sql = new Sql();
+            if (isCount)
+            {
+                sql.Select("COUNT(*)").From<NodeDto>(SqlSyntax);
+            }
+            else
+            {
+                sql.Select("*").From<NodeDto>(SqlSyntax);
+            }
+            return sql;
         }
 
         protected override string GetBaseWhereClause()
         {
-            throw new NotImplementedException();
+            return "umbracoNode.id = @Id and nodeObjectType = @NodeObjectType";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
@@ -77,7 +112,8 @@ namespace Umbraco.Core.Persistence.Repositories
             var children = Database.Fetch<NodeDto>(
                 new Sql().Select("*")
                     .From<NodeDto>(SqlSyntax)
-                    .Where<NodeDto>(dto => dto.ParentId == entity.Id && (dto.NodeObjectType == _entityObjectType || dto.NodeObjectType == _containerObjectType)));
+                    .Where("parentID=@parentID AND (nodeObjectType=@entityObjectType OR nodeObjectType=@containerObjectType)",
+                        new {parentID = entity.ParentId, entityObjectType = _entityObjectType, containerObjectType = _containerObjectType}));
 
             foreach (var childDto in children)
             {
@@ -136,10 +172,14 @@ namespace Umbraco.Core.Persistence.Repositories
                 UserId = entity.CreatorId
             };
 
-            Database.Save(nodeDto);
+            var id = Convert.ToInt32(Database.Insert(nodeDto));
+
             //update the path
             nodeDto.Path = nodeDto.Path + "," + nodeDto.NodeId;
             Database.Save(nodeDto);
+
+            entity.Id = id;
+            entity.Path = nodeDto.Path;
 
             entity.ResetDirtyProperties();
         }
