@@ -11,17 +11,16 @@
     min-width: 640px;
 }
 
-
-.umb-table a:focus {
-    outline: none;
-    text-decoration: none;
+.umb-table a {
+    &:focus {
+        outline: none;
+        text-decoration: none;
+    }
 }
-
 
 input.umb-table__input {
     margin: 0 auto;
 }
-
 
 
 
@@ -35,8 +34,6 @@ input.umb-table__input {
     font-size: 11px;
     font-weight: 600;
 }
-
-
 
 .umb-table-head__link {
     position: relative;
@@ -62,8 +59,6 @@ input.umb-table__input {
     }
 }
 
-
-
 .umb-table-thead__icon {
     position: absolute;
 
@@ -71,6 +66,8 @@ input.umb-table__input {
     padding-left: 3px;
 
     font-size: 13px;
+
+    cursor: default;
 }
 
 .umb-table-thead .sortable:hover {
@@ -90,7 +87,7 @@ input.umb-table__input {
     font-size: 13px;
 
     &:hover {
-        background-color: fade(@grayLighter, 80%);
+        background-color: fade(@grayLighter, 90%);
     }
 }
 
@@ -107,20 +104,28 @@ input.umb-table__input {
     }
 }
 
-
 .umb-table-body__icon {
     margin: 0 auto;
 
     font-size: 22px;
-    color: @blue;
+    color: @blueDark;
 }
-
 
 .umb-table-body__checkicon {
     display: none;
     font-size: 16px;
 }
 
+.umb-table-body__empty { // Styles of no items in the listview
+    font-size: 16px;
+    text-align: center;
+
+    color: fade(@grayLight, 85%);
+
+    padding: 20px 0;
+
+    height: 100%;
+}
 
 // Show checkmark when checked, hide file icon
 .-selected {
@@ -148,9 +153,7 @@ input.umb-table__input {
 
 .umb-table-row.-selected,
 .umb-table-row.-selected:hover {
-    background-color: fade(@blue, 7%);
-    // font-weight: bold;
-    color: @black;
+    background-color: fade(@blueDark, 4%);
 }
 
 
@@ -172,8 +175,10 @@ input.umb-table__input {
 
 .umb-table-cell > * {
     overflow: hidden;
-    // white-space: nowrap; // Enable this to keep string on one line
+    white-space: nowrap; // Disable/Enable this to keep string on one line
     text-overflow: ellipsis;
+
+    cursor: default;
 }
 
 .umb-table-cell:first-of-type {
@@ -185,6 +190,7 @@ input.umb-table__input {
 
 
 //NOTE Gives the title more wieght in width compared to other cells
-.umb-table-body__title {
+.umb-table__name {
     flex: 1 1 25%;
+    max-width: 25%;
 }
