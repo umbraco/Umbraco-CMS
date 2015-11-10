@@ -19,9 +19,9 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
         $scope.model.creatingFolder = true;
     }
 
-    $scope.createFolder = function () {
+    $scope.createContainer = function () {
         if (formHelper.submitForm({ scope: $scope, formCtrl: this.createFolderForm, statusMessage: "Creating folder..." })) {
-            contentTypeResource.createFolder(node.id, $scope.model.folderName).then(function (folderId) {
+            contentTypeResource.createContainer(node.id, $scope.model.folderName).then(function (folderId) {
 
                 navigationService.hideMenu();
                 var currPath = node.path ? node.path : "-1";

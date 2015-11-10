@@ -88,7 +88,7 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                 'Failed to save data for content type id ' + contentType.id);
         },
 
-        createFolder: function(parentId, name) {
+        createContainer: function(parentId, name) {
 
             return umbRequestHelper.resourcePromise(
                  $http.post(

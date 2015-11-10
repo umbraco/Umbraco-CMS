@@ -20,7 +20,7 @@ namespace Umbraco.Core.Persistence.Repositories
     {
 
         public MediaTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-            : base(work, cache, logger, sqlSyntax)
+            : base(work, cache, logger, sqlSyntax, new Guid(Constants.ObjectTypes.MediaTypeContainer))
         {
         }
 
@@ -43,7 +43,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                var sql = new Sql().Select("id").From<NodeDto>().Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId);
+                var sql = new Sql().Select("id").From<NodeDto>(SqlSyntax).Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId);
                 var allIds = Database.Fetch<int>(sql).ToArray();
                 return ContentTypeQueryMapper.GetMediaTypes(allIds, Database, SqlSyntax, this);
             }
@@ -54,7 +54,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IMediaType>(sqlClause, query);
             var sql = translator.Translate()
-                .OrderBy<NodeDto>(x => x.Text);
+                .OrderBy<NodeDto>(x => x.Text, SqlSyntax);
 
             var dtos = Database.Fetch<ContentTypeDto, NodeDto>(sql);
             return dtos.Any()
@@ -84,9 +84,9 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*")
-                .From<ContentTypeDto>()
-                .InnerJoin<NodeDto>()
-                .On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .From<ContentTypeDto>(SqlSyntax)
+                .InnerJoin<NodeDto>(SqlSyntax)
+                .On<ContentTypeDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
         }
@@ -165,14 +165,7 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         #endregion
-
-        /// <summary>
-        /// The container object type - used for organizing content types
-        /// </summary>
-        protected override Guid ContainerObjectTypeId
-        {
-            get { throw new NotImplementedException(); }
-        }
+        
         
         protected override IMediaType PerformGet(Guid id)
         {

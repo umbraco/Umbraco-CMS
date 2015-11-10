@@ -41,6 +41,58 @@ namespace Umbraco.Core.Services
             _mediaService = mediaService;
         }
 
+        public Attempt<int> CreateContentTypeFolder(int parentId, string name, int userId = 0)
+        {
+            using (var repo = RepositoryFactory.CreateContentTypeRepository(UowProvider.GetUnitOfWork()))
+            {
+                try
+                {
+                    var container = repo.CreateFolder(parentId, name, userId);
+                    return Attempt.Succeed(container.Id);
+                }
+                catch (Exception ex)
+                {
+                    return Attempt<int>.Fail(ex);
+                }
+                //TODO: Audit trail ?
+            }
+        }
+
+        public Attempt<int> CreateMediaTypeFolder(int parentId, string name, int userId = 0)
+        {
+            using (var repo = RepositoryFactory.CreateMediaTypeRepository(UowProvider.GetUnitOfWork()))
+            {
+                try
+                {
+                    var container = repo.CreateFolder(parentId, name, userId);
+                    return Attempt.Succeed(container.Id);
+                }
+                catch (System.Exception ex)
+                {
+                    return Attempt<int>.Fail(ex);
+                }
+                //TODO: Audit trail ?
+            }
+        }
+
+        public void DeleteContentTypeFolder(int folderId, int userId = 0)
+        {
+            using (var repo = RepositoryFactory.CreateContentTypeRepository(UowProvider.GetUnitOfWork()))
+            {
+                repo.DeleteFolder(folderId);
+                //TODO: Audit trail ?
+            }
+        }
+
+        public void DeleteMediaTypeFolder(int folderId, int userId = 0)
+        {
+            using (var repo = RepositoryFactory.CreateMediaTypeRepository(UowProvider.GetUnitOfWork()))
+            {
+                repo.DeleteFolder(folderId);
+                //TODO: Audit trail ?
+            }
+        }
+
         /// <summary>
         /// Gets all property type aliases.
         /// </summary>

@@ -28,72 +28,35 @@ namespace Umbraco.Core.Persistence.Repositories
         where TEntity : class, IContentTypeComposition
     {
 
-        protected ContentTypeBaseRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        protected ContentTypeBaseRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax,
+            Guid containerType)
             : base(work, cache, logger, sqlSyntax)
         {
             _guidRepo = new GuidReadOnlyContentTypeBaseRepository(this, work, cache, logger, sqlSyntax);
+            _containerRepository = new EntityContainerRepository(work, cache, logger, sqlSyntax, containerType, NodeObjectTypeId);
         }
 
+        private readonly EntityContainerRepository _containerRepository;
         private readonly GuidReadOnlyContentTypeBaseRepository _guidRepo;
-
+        
         /// <summary>
-        /// The container object type - used for organizing content types
+        /// Deletes a folder - this will move all contained content types into their parent
         /// </summary>
-        protected abstract Guid ContainerObjectTypeId { get; }
-
-        public Attempt<int> CreateFolder(int parentId, string name, int userId)
+        /// <param name="folderId"></param>
+        /// <returns>
+        /// Returns the content types moved
+        /// </returns>
+        public void DeleteFolder(int folderId)
         {
-            name = name.Trim();
+            var found = _containerRepository.Get(folderId);
+            _containerRepository.Delete(found);           
+        }
 
-            Mandate.ParameterNotNullOrEmpty(name, "name");
-
-            var exists = Database.FirstOrDefault<NodeDto>(
-                new Sql().Select("*")
-                    .From<NodeDto>(SqlSyntax)
-                    .Where<NodeDto>(dto => dto.ParentId == parentId && dto.Text == name && dto.NodeObjectType == ContainerObjectTypeId));
-
-            if (exists != null)
-            {
-                return Attempt.Fail(exists.NodeId, new InvalidOperationException("A folder with the same name already exists"));
-            }
-
-            var level = 0;
-            var path = "-1";
-            if (parentId > -1)
-            {
-                var parent = Database.FirstOrDefault<NodeDto>(
-                    new Sql().Select("*")
-                        .From<NodeDto>(SqlSyntax)
-                        .Where<NodeDto>(dto => dto.NodeId == parentId && dto.NodeObjectType == ContainerObjectTypeId));
-
-                if (parent == null)
-                {
-                    return Attempt.Fail(0, new NullReferenceException("No content type container found with parent id " + parentId));
-                }
-                level = parent.Level;
-                path = parent.Path;
-            }
-
-            var folder = new NodeDto
-            {
-                CreateDate = DateTime.Now,
-                Level = Convert.ToInt16(level + 1),
-                NodeObjectType = ContainerObjectTypeId,
-                ParentId = parentId,
-                Path = path,
-                SortOrder = 0,
-                Text = name,
-                Trashed = false,
-                UniqueId = Guid.NewGuid(),
-                UserId = userId
-            };
-
-            Database.Save(folder);
-            //update the path
-            folder.Path = folder.Path + "," + folder.NodeId;
-            Database.Save(folder);
-
-            return Attempt.Succeed(folder.NodeId);
+        public EntityContainer CreateFolder(int parentId, string name, int userId)
+        {
+            var container = new EntityContainer(parentId, name, userId);
+            _containerRepository.AddOrUpdate(container);
+            return container;
         }
 
         /// <summary>
@@ -105,15 +68,15 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sqlClause = new Sql();
             sqlClause.Select("*")
-               .From<PropertyTypeGroupDto>()
-               .RightJoin<PropertyTypeDto>()
-               .On<PropertyTypeGroupDto, PropertyTypeDto>(left => left.Id, right => right.PropertyTypeGroupId)
-               .InnerJoin<DataTypeDto>()
-               .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId);
+               .From<PropertyTypeGroupDto>(SqlSyntax)
+               .RightJoin<PropertyTypeDto>(SqlSyntax)
+               .On<PropertyTypeGroupDto, PropertyTypeDto>(SqlSyntax, left => left.Id, right => right.PropertyTypeGroupId)
+               .InnerJoin<DataTypeDto>(SqlSyntax)
+               .On<PropertyTypeDto, DataTypeDto>(SqlSyntax, left => left.DataTypeId, right => right.DataTypeId);
 
             var translator = new SqlTranslator<PropertyType>(sqlClause, query);
             var sql = translator.Translate()
-                                .OrderBy<PropertyTypeDto>(x => x.PropertyTypeGroupId);
+                                .OrderBy<PropertyTypeDto>(x => x.PropertyTypeGroupId, SqlSyntax);
 
             var dtos = Database.Fetch<PropertyTypeGroupDto, PropertyTypeDto, DataTypeDto, PropertyTypeGroupDto>(new GroupPropertyTypeRelator().Map, sql);
 

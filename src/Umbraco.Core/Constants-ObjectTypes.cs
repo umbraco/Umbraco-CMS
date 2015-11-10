@@ -10,6 +10,11 @@ namespace Umbraco.Core
         public static class ObjectTypes
         {
             /// <summary>
+            /// Guid for a member type container
+            /// </summary>
+            public const string MemberTypeContainer = "02348110-FC53-4565-9B01-0E186B6B9E7C";
+
+            /// <summary>
             /// Guid for a doc type container
             /// </summary>
             public const string DocumentTypeContainer = "2F7A2769-6B0B-4468-90DD-AF42D64F7F16";
@@ -102,6 +107,8 @@ namespace Umbraco.Core
             /// Guid for a Lock object.
             /// </summary>
             public const string LockObject = "87A9F1FF-B1E4-4A25-BABB-465A4A47EC41";
+
+            
         }
     }
 }

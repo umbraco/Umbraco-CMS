@@ -118,29 +118,16 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [HttpDelete]
         [HttpPost]
-        public HttpResponseMessage DeleteContainerById(int id)
+        public HttpResponseMessage DeleteContainer(int id)
         {
-            //TODO: This needs to be implemented correctly
-
-            var foundType = Services.EntityService.Get(id);
-            if (foundType == null)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
-
-            if (foundType.HasChildren())
-            {
-                throw new HttpResponseException(HttpStatusCode.Forbidden);
-            }
-
-            //TODO: what service to use to delete?
+            Services.ContentTypeService.DeleteContentTypeFolder(id, Security.CurrentUser.Id);
 
             return Request.CreateResponse(HttpStatusCode.OK);
         }
         
-        public HttpResponseMessage PostCreateFolder(int parentId, string name)
+        public HttpResponseMessage PostCreateContainer(int parentId, string name)
         {
-            var result = Services.ContentTypeService.CreateFolder(parentId, name, Security.CurrentUser.Id);
+            var result = Services.ContentTypeService.CreateContentTypeFolder(parentId, name, Security.CurrentUser.Id);
 
             return result
                 ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id 

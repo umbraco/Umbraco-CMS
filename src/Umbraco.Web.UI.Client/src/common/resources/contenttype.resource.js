@@ -109,7 +109,7 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                $http.post(
                    umbRequestHelper.getApiUrl(
                        "contentTypeApiBaseUrl",
-                       "DeleteContainerById",
+                       "DeleteContainer",
                        [{ id: id }])),
                'Failed to delete content type contaier');
         },
@@ -166,14 +166,14 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                 'Failed to save data for content type id ' + contentType.id);
         },
 
-        createFolder: function(parentId, name) {
+        createContainer: function(parentId, name) {
 
             return umbRequestHelper.resourcePromise(
-                 $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostCreateFolder", { parentId: parentId, name: name })),
+                 $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostCreateContainer", { parentId: parentId, name: name })),
                 'Failed to create a folder under parent id ' + parentId);
 
         }
-
+        
     };
 }
 angular.module('umbraco.resources').factory('contentTypeResource', contentTypeResource);

@@ -22,7 +22,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ITemplateRepository _templateRepository;
 
         public ContentTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, ITemplateRepository templateRepository)
-            : base(work, cache, logger, sqlSyntax)
+            : base(work, cache, logger, sqlSyntax, new Guid(Constants.ObjectTypes.DocumentTypeContainer))
         {
             _templateRepository = templateRepository;
         }
@@ -96,11 +96,11 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = new Sql();
 
             sql.Select(isCount ? "COUNT(*)" : "*")
-               .From<ContentTypeDto>()
-               .InnerJoin<NodeDto>()
-               .On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-               .LeftJoin<DocumentTypeDto>()
-               .On<DocumentTypeDto, ContentTypeDto>(left => left.ContentTypeNodeId, right => right.NodeId)
+               .From<ContentTypeDto>(SqlSyntax)
+               .InnerJoin<NodeDto>(SqlSyntax)
+               .On<ContentTypeDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+               .LeftJoin<DocumentTypeDto>(SqlSyntax)
+               .On<DocumentTypeDto, ContentTypeDto>(SqlSyntax ,left => left.ContentTypeNodeId, right => right.NodeId)
                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
 
             return sql;
@@ -241,14 +241,7 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         #endregion
-
-        /// <summary>
-        /// The container object type - used for organizing content types
-        /// </summary>
-        protected override Guid ContainerObjectTypeId
-        {
-            get { return new Guid(Constants.ObjectTypes.DocumentTypeContainer); }
-        }
+        
         
         protected override IContentType PerformGet(Guid id)
         {
