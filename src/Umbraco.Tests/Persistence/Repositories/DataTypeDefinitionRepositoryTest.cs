@@ -90,7 +90,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            int id;
+            var id = 0;
             using (var repository = CreateRepository(unitOfWork))
             {
                 var dataTypeDefinition = new DataTypeDefinition(-1, new Guid(Constants.PropertyEditors.RadioButtonList)) { Name = "test" };
@@ -101,11 +101,19 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
             using (var repository = CreateRepository(unitOfWork))
             {
+                var dataTypeDefinition = repository.Get(id);
+                Assert.IsNotNull(dataTypeDefinition);
+                Assert.AreEqual("test", dataTypeDefinition.Name);
+            }
+            using (var repository = CreateRepository(unitOfWork))
+            {
                 var dataTypeDefinition = new DataTypeDefinition(-1, new Guid(Constants.PropertyEditors.RadioButtonList)) { Name = "test" };
                 repository.AddOrUpdate(dataTypeDefinition);
 
-                Assert.Throws<DuplicateNameException>(unitOfWork.Commit);
-                
+                unitOfWork.Commit();
+                Assert.AreNotEqual(0, dataTypeDefinition.Id); // has been saved
+                Assert.AreNotEqual(id, dataTypeDefinition.Id); // as a new one
+                Assert.AreEqual("test (1)", dataTypeDefinition.Name); // with a new name
             }
         }
 
