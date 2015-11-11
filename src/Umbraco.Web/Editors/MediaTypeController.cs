@@ -102,6 +102,29 @@ namespace Umbraco.Web.Editors
                                .Select(Mapper.Map<IMediaType, ContentTypeBasic>);
         }
 
+        /// <summary>
+        /// Deletes a document type container wth a given ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [HttpPost]
+        public HttpResponseMessage DeleteContainer(int id)
+        {
+            Services.ContentTypeService.DeleteMediaTypeFolder(id, Security.CurrentUser.Id);
+
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
+        public HttpResponseMessage PostCreateContainer(int parentId, string name)
+        {
+            var result = Services.ContentTypeService.CreateMediaTypeFolder(parentId, name, Security.CurrentUser.Id);
+
+            return result
+                ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id 
+                : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
+        }
+
         public ContentTypeCompositionDisplay PostSave(ContentTypeSave contentTypeSave)
         {
             var savedCt = PerformPostSave<IMediaType, ContentTypeCompositionDisplay>(

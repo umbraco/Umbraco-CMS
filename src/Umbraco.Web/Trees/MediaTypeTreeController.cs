@@ -17,8 +17,9 @@ namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.MediaTypes)]
     [Tree(Constants.Applications.Settings, Constants.Trees.MediaTypes, null, sortOrder:5)]
-    [Umbraco.Web.Mvc.PluginController("UmbracoTrees")]
+    [Mvc.PluginController("UmbracoTrees")]
     [CoreTree]
+    [LegacyBaseTree(typeof(loadMediaTypes))]
     public class MediaTypeTreeController : TreeController
     {
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
@@ -28,15 +29,16 @@ namespace Umbraco.Web.Trees
 
             var nodes = new TreeNodeCollection();
 
-            //TODO: MediaTypeContainers
             nodes.AddRange(
-                Services.EntityService.GetChildren(intId.Result, UmbracoObjectTypes.DocumentTypeContainer)
+                Services.EntityService.GetChildren(intId.Result, UmbracoObjectTypes.MediaTypeContainer)
                     .OrderBy(entity => entity.Name)
                     .Select(dt =>
                     {
-                        var node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, "icon-folder", dt.HasChildren(),
-                            queryStrings.GetValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/list/" + dt.Id);
+                        var node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, "icon-folder", dt.HasChildren(), "");
                         node.Path = dt.Path;
+                        node.NodeType = "container";
+                        //TODO: This isn't the best way to ensure a noop process for clicking a node but it works for now.
+                        node.AdditionalData["jsClickCallback"] = "javascript:void(0);";
                         return node;
                     }));
 
@@ -71,7 +73,7 @@ namespace Umbraco.Web.Trees
             }
             else
             {
-                var container = Services.EntityService.Get(int.Parse(id), UmbracoObjectTypes.DocumentTypeContainer);
+                var container = Services.EntityService.Get(int.Parse(id), UmbracoObjectTypes.MediaTypeContainer);
                 if (container != null)
                 {
                     //set the default to create

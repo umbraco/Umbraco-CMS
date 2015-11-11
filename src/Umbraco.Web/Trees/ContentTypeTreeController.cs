@@ -17,8 +17,9 @@ namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
     [Tree(Constants.Applications.Settings, Constants.Trees.DocumentTypes, null, sortOrder: 6)]
-    [Umbraco.Web.Mvc.PluginController("UmbracoTrees")]
+    [Mvc.PluginController("UmbracoTrees")]
     [CoreTree]
+    [LegacyBaseTree(typeof(loadNodeTypes))]
     public class ContentTypeTreeController : TreeController
     {
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
@@ -83,7 +84,6 @@ namespace Umbraco.Web.Trees
                     // root actions              
                     menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
                    
-
                     if (container.HasChildren() == false)
                     {
                         //can delete doc type

@@ -79,6 +79,17 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                'Failed to retrieve content type');
         },
 
+        deleteContainerById: function (id) {
+
+            return umbRequestHelper.resourcePromise(
+               $http.post(
+                   umbRequestHelper.getApiUrl(
+                       "mediaTypeApiBaseUrl",
+                       "DeleteContainer",
+                       [{ id: id }])),
+               'Failed to delete content type contaier');
+        },
+
         save: function (contentType) {
 
             var saveModel = umbDataFormatter.formatContentTypePostData(contentType);
@@ -94,7 +105,7 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                  $http.post(
                     umbRequestHelper.getApiUrl(
                        "mediaTypeApiBaseUrl",
-                       "PostCreateFolder",
+                       "PostCreateContainer",
                        { parentId: parentId, name: name })),
                 'Failed to create a folder under parent id ' + parentId);
         }
