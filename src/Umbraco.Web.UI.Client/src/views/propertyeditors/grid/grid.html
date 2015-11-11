@@ -1,4 +1,4 @@
-<div ng-controller="Umbraco.PropertyEditors.GridController" class="usky-grid umb-editor umb-grid" id="usky-grid">
+<div ng-controller="Umbraco.PropertyEditors.GridController" class="umb-grid umb-editor umb-grid" id="umb-grid">
 
     <div ng-if="contentReady">
 
@@ -28,7 +28,7 @@
                 <div class="preview-overlay">
                 </div>
 
-                <small>{{layout.name}}</small>
+                <small>{{template.name}}</small>
 
             </div> <!-- .templates-preview-rows -->
 
@@ -38,11 +38,11 @@
         </div> <!-- .templates-preview -->
         <!-- template picker end -->
         <!-- Grids -->
-        <div class="usky-grid-width">
+        <div class="umb-grid-width">
             <div class="tb">
 
                 <!-- for each column in model -->
-                <div class="usky-column td"
+                <div class="umb-column td"
                      ng-class="{last:$last}"
                      ng-repeat="section in model.value.sections"
                      ng-init="initSection(section)"
@@ -52,12 +52,12 @@
 
                         <!-- for each row in template section -->
                         <div ng-repeat="row in section.rows"
-                             class="usky-row"
+                             class="umb-row"
                              ng-mouseenter="setCurrentRow(row)"
                              ng-mouseleave="disableCurrentRow()">
 
                             <!-- Row tool -->
-                            <div class="row-tools" ng-animate="'fade'" 
+                            <div class="row-tools" ng-animate="'fade'"
                                 ng-if="currentRow === row && currentControl === null">
 
                                 <!-- delete row -->
@@ -99,22 +99,22 @@
                             </div>
 
                             <!-- row container -->
-                            <div class="{{row.cssClass}} mainContainer usky-row-inner"
+                            <div class="{{row.cssClass}} mainContainer umb-row-inner"
                                  ng-class="{last:$last,
                                             first:$first,
-                                            warnhighlight:currentWarnhighlightRow == row, 
+                                            warnhighlight:currentWarnhighlightRow == row,
                                             infohighlight:currentInfohighlightRow == row,
                                             selectedRow:currentRow == row && currentControl === null}">
 
                                 <ins class="item-label">{{row.name}}</ins>
-                                    
+
                                 <div class="mainTb">
                                     <div class="tb">
                                         <div class="tr">
 
                                             <!-- Areas in row -->
                                             <div ng-style="{width: area.$percentage + '%'}"
-                                                 class="td mainTd usky-cell"
+                                                 class="td mainTd umb-cell"
                                                  ng-class="{last:$last,first:$first, infohighlight:currentInfohighlightArea == area,
                                                             warnhighlight:currentWarnhighlightArea == area}"
                                                  ng-repeat="area in row.areas" ui-sortable="sortableOptionsCell" ng-model="area.controls">
@@ -124,7 +124,7 @@
                                                      ng-mouseover="setCurrentControl(control)"
                                                      ng-mouseleave="disableCurrentControl(control)"
                                                      ng-animate="'fade'"
-                                                     class="usky-control">
+                                                     class="umb-control">
 
                                                     <!-- Filled cell tools -->
                                                     <div class="cell-tools"
@@ -172,29 +172,35 @@
 
                                                     </div>
 
-                                                    <div class="usky-control-inner" ng-class="{last:$last,
+                                                    <div class="umb-control-inner" ng-class="{last:$last,
                                                                infohighlight:currentInfohighlightControl == control,
                                                                warnhighlight:currentWarnhighlightControl == control,
                                                                selectedControl:currentControl == control}">
-                                                        
+
                                                         <ins class="item-label">{{control.editor.name}}</ins>
 
                                                         <!-- Redering the editor for specific control -->
                                                         <div ng-if="control && control.$editorPath"
                                                              ng-include="control.$editorPath"
-                                                             class="usky-cell-{{control.editor.view}}">
+                                                             class="umb-cell-{{control.editor.view}}">
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <!-- Controls repeat end -->
                                                 <!-- if area is empty tools -->
-                                                <div class="usky-control usky-control-placeholder"
+
+                                                <!--
+                                                <div class="umb-control umb-control-placeholder"
                                                      ng-if="area.controls.length == 0">
                                                     <div class="help-text" style="margin-bottom: 15px">
                                                         <localize key="grid_addElement"/>
                                                     </div><br />
                                                 </div>
+                                                --->
 
+                                                <a href="" class="cell-tools-add">Add editor</a>
+
+                                                <!--
                                                 <div class="cell-tools-add"
                                                      ng-class="{emptyArea:area.controls.length == 0}"
                                                      ng-if="!currentToolsControl"
@@ -206,6 +212,7 @@
 
                                                     <div ng-if="overlayMenu.show && overlayMenu.key == area.$uniqueId" ng-include="'views/propertyeditors/grid/dialogs/additem.html'"></div>
                                                 </div>
+                                                --->
 
                                             </div>
                                             <!-- cells repeat end -->

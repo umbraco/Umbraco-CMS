@@ -5,13 +5,13 @@
          overflow-y:hidden!important;
       }
 
-.usky-grid IFRAME {overflow:hidden;}
+.umb-grid IFRAME {overflow:hidden;}
 
 
  // Sortabel
  // -------------------------
 
- .usky-grid .ui-sortable-helper  {
+ .umb-grid .ui-sortable-helper  {
      position:absolute !important;
      border: dashed 1px #000 !important;
      background: #ccc;
@@ -26,7 +26,7 @@
      box-shadow:         3px 3px 12px 0px rgba(50, 50, 50, 0.45);
  }
 
- .usky-grid .ui-sortable-helper *{
+ .umb-grid .ui-sortable-helper *{
      border: none !important;
      background: none !important;
      color: #999 !important;
@@ -34,11 +34,11 @@
      margin: 0 !important;
  }
 
- .usky-grid .ui-sortable-helper .cell-tools{
+ .umb-grid .ui-sortable-helper .cell-tools{
      display: none !important;
  }
 
- .usky-grid .ui-sortable-placeholder{
+ .umb-grid .ui-sortable-placeholder{
      border: 2px dashed @grayLight;
      padding: 20px;
      font-family: icomoon;
@@ -50,11 +50,11 @@
      background-color:@grayLighter;
  }
 
- .usky-grid .ui-sortable-placeholder:hover{
+ .umb-grid .ui-sortable-placeholder:hover{
      border-color: @gray;
  }
 
- .usky-grid .ui-sortable-placeholder:before{
+ .umb-grid .ui-sortable-placeholder:before{
      content: "\e1bd";
  }
 
@@ -62,22 +62,22 @@
 
  // utils
  // -------------------------
- .usky-grid-width {
+ .umb-grid-width {
      margin: 20px auto;
      width:100%;
  }
- .usky-grid  .right {
+ .umb-grid  .right {
      float:right;
  }
 
 
  // general layout components
  // -------------------------
- .usky-grid  .tb {
+ .umb-grid  .tb {
      width: 100%;
  }
 
- .usky-grid  .td {
+ .umb-grid  .td {
      width: 100%;
      display: inline-block;
      vertical-align:top;
@@ -85,23 +85,23 @@
      box-sizing: border-box;
  }
 
- .usky-grid .tb:hover .td{
+ .umb-grid .tb:hover .td{
      border-right:1px dashed rgba(182, 182, 182, 0.3);
  }
- .usky-grid  .td.last {
+ .umb-grid  .td.last {
      border-right:1px dashed rgba(182, 182, 182, 0.0) !important;
  }
- .usky-grid  .tr {
+ .umb-grid  .tr {
  }
 
- .usky-grid  .middle {
+ .umb-grid  .middle {
      text-align: center;
  }
 
- .usky-grid  .mainTb {
+ .umb-grid  .mainTb {
      border-collapse: separate;
  }
- .usky-grid  .mainTd {
+ .umb-grid  .mainTd {
      position:relative;
  }
 
@@ -109,27 +109,29 @@
 
  // COLUMN
  // -------------------------
- .usky-grid  .usky-column {
+ .umb-grid  .umb-column {
 
  }
- .usky-grid  .usky-column.last {
+ .umb-grid  .umb-column.last {
 
  }
 
 
  // ROW
  // -------------------------
-.usky-grid .usky-row{
+.umb-grid .umb-row{
      position: relative;
-     border: 1px dashed rgba(0,0,0,0);
+     //border: 1px dashed rgba(0,0,0,0);
+
+     margin-bottom: 40px;
 }
 
-.umb-grid .tb:hover .usky-row{
+.umb-grid .tb:hover .umb-row{
     border-bottom:1px dashed rgba(182, 182, 182, 0) !important;
 }
 
 /*
-.usky-grid .selectedRow {
+.umb-grid .selectedRow {
      border: 1px solid rgba(182, 182, 182, 0.3);
 }*/
 
@@ -138,13 +140,15 @@
 
 // CELL
 // -------------------------
-.usky-grid .usky-cell{
+.umb-grid .umb-cell{
      position: relative;
      border: 1px dashed rgba(0,0,0,0);
      min-height:127px;
+
+     background-color: @grayLighter;
 }
 
-.usky-grid  .cell-tools {
+.umb-grid  .cell-tools {
     transition: all .20s ease-in-out;
     -moz-transition: all .20s ease-in-out;
     -webkit-transition: all .20s ease-in-out;
@@ -159,15 +163,16 @@
 //special rule to ensure forms doesnt overrride (forms will align in a later release)
 .umb-grid .cell-tools{width: 50px !important;}
 
-.usky-grid  .cell-tools.with-prompt {
+.umb-grid  .cell-tools.with-prompt {
     width:200px;
 }
 
-.usky-grid .cell-tools:hover{
+.umb-grid .cell-tools:hover{
     opacity: 1;
 }
 
-.usky-grid  .cell-tools-add {
+/*
+.umb-grid  .cell-tools-add {
     position: absolute;
     text-align: center;
     bottom: 0px;
@@ -179,12 +184,15 @@
         margin: 0 0 1px 0;
     }
 }
+*/
 
-.usky-grid  .usky-control:hover .cell-tools-add{
+/*
+.umb-grid  .umb-control:hover .cell-tools-add{
     opacity: 1;
 }
+*/
 
-.usky-grid  .cell-tools-remove {
+.umb-grid  .cell-tools-remove {
     display:inline-block;
     position: absolute;
     top: 0px;
@@ -193,12 +201,12 @@
     z-index: 500;
 }
 
-.usky-grid .cell-tools-remove .iconBox:hover, .usky-grid .cell-tools-remove .iconBox:hover *{
+.umb-grid .cell-tools-remove .iconBox:hover, .umb-grid .cell-tools-remove .iconBox:hover *{
     background: @red !important;
     border-color: @red !important;
 }
 
-.usky-grid  .cell-tools-move {
+.umb-grid  .cell-tools-move {
     display:inline-block;
     position: absolute;
     top: 33px;
@@ -207,7 +215,7 @@
     cursor: move
 }
 
-.usky-grid .cell-tools-edit{
+.umb-grid .cell-tools-edit{
     position: absolute;
     top: 66px;
     right: 5px;
@@ -216,7 +224,7 @@
 
 // CONTROL
 // -------------------------
-.usky-grid .usky-control {
+.umb-grid .umb-control {
     /*transition: all .20s ease-in-out;
     -moz-transition: all .20s ease-in-out;
     -webkit-transition: all .20s ease-in-out;*/
@@ -234,29 +242,41 @@
     margin: 10px 0 0 0;
 }
 
-.usky-grid  .usky-control:hover{
+.umb-grid  .umb-control:hover{
     /*border: 1px solid rgba(182, 182, 182, 0.3);*/
     /*border-bottom: 1px solid rgba(182, 182, 182, 0.3);*/
 }
 
-.usky-grid  .usky-control-placeholder:hover{
+.umb-grid  .umb-control-placeholder:hover{
     /*border: 1px solid rgba(182, 182, 182, 0);*/
     /*border-bottom:1px solid rgba(182, 182, 182, 0.0) !important;*/
 }
 
-.usky-grid .warnhighlight, .usky-grid  .td.last.warnhighlight{
+.umb-grid .warnhighlight, .umb-grid  .td.last.warnhighlight{
      border: 1px dashed @red !important;
 }
 
-.usky-grid .infohighlight, .usky-grid  .td.last.infohighlight{
+.umb-grid .infohighlight, .umb-grid  .td.last.infohighlight{
      border: 1px dashed @blue !important;
 }
 
-.usky-grid .warnhighlight > ins.item-label{border-color: @red; color: @red;}
-.usky-grid .infohighlight > ins.item-label{border-color: @blue; color: @blue;}
+.umb-grid ins.item-label {
+   text-transform: uppercase;
+   font-size: 13px;
+   color: @gray;
+   margin-bottom: 20px;
+   font-weight: bold;
+   text-decoration: none;
+   display: block;
+}
 
+/*
+.umb-grid .warnhighlight > ins.item-label{border-color: @red; color: @red;}
+.umb-grid .infohighlight > ins.item-label{border-color: @blue; color: @blue;}
+*/
 
-.usky-grid ins.item-label {
+/*
+.umb-grid ins.item-label {
     position: absolute;
     top: -22px;
     left: -1px;
@@ -272,25 +292,27 @@
     overflow: hidden;
 }
 
-.usky-grid .usky-row-inner > ins.item-label{
+.umb-grid .umb-row-inner > ins.item-label{
     top: -20px;
     left: 0px;
 }
+*/
 
-.usky-grid .usky-control-inner.selectedControl , .usky-grid .usky-row-inner.selectedRow{
-    border: 1px dashed @grayLight;
+/*
+.umb-grid .umb-control-inner.selectedControl , .umb-grid .umb-row-inner.selectedRow{
+    //border: 1px dashed @grayLight;
 
     > ins.item-label {
         display: block;
         z-index:100000;
     }
 }
-
+*/
 
 
 // CONTROL PLACEHOLDER
 // -------------------------
-.usky-grid  .usky-control-placeholder {
+.umb-grid  .umb-control-placeholder {
     min-height: 20px;
     position: relative;
     text-align: center;
@@ -298,14 +320,14 @@
     cursor: text;
 }
 
-.usky-grid  .usky-control-placeholder .placeholder{
+.umb-grid  .umb-control-placeholder .placeholder{
     font-size: 14px; opacity: 0.7; text-align: left;
     padding: 5px;
     border:1px solid rgba(182, 182, 182, 0.3);
     height: 20px;
 }
 
-.usky-grid  .usky-control-placeholder:hover .placeholder{
+.umb-grid  .umb-control-placeholder:hover .placeholder{
     border:1px solid rgba(182, 182, 182, 0.8);
 }
 
@@ -316,7 +338,7 @@
 
 // EDITOR PLACEHOLDER
 // -------------------------
-.usky-grid .usky-editor-placeholder{
+.umb-grid .umb-editor-placeholder{
     min-height: 65px;
     padding: 20px;
     padding-bottom: 30px;
@@ -326,7 +348,7 @@
     text-align: center;
     text-align: -moz-center;
 }
-.usky-grid .usky-editor-placeholder i{
+.umb-grid .umb-editor-placeholder i{
     color: @grayLighter;
     font-size: 85px;
     line-height: 85px;
@@ -338,7 +360,7 @@
 
 // Form elements
 // -------------------------
- .usky-grid  textarea.textstring{
+ .umb-grid  textarea.textstring{
      display: block;
      overflow: hidden;
      border: none;
@@ -348,11 +370,11 @@
      color: @gray;
  }
 
-.usky-grid .usky-cell-rte textarea{
+.umb-grid .umb-cell-rte textarea{
      display: none !important
 }
 
-.usky-grid .usky-cell-media .caption{
+.umb-grid .umb-cell-media .caption{
      display: block;
      overflow: hidden;
      border: none;
@@ -363,17 +385,17 @@
      font-style: italic;
 }
 
- .usky-grid  .cellPanelRte {
+ .umb-grid  .cellPanelRte {
      min-height:60px;
  }
 
- .usky-grid .usky-cell-embed iframe {
+ .umb-grid .umb-cell-embed iframe {
      width: 100%;
 }
 
 // ICONS
 // -------------------------
- .usky-grid  .iconBox {
+ .umb-grid  .iconBox {
      padding: 4px 6px 4px 6px;
      display: inline-block;
      cursor: pointer;
@@ -383,30 +405,30 @@
      margin: 2px;
  }
 
-  .usky-grid  .iconBox span.prompt {
+  .umb-grid  .iconBox span.prompt {
       display:block;
       white-space: nowrap;
       text-align:center;
 
   }
 
-  .usky-grid  .iconBox span.prompt > a {
+  .umb-grid  .iconBox span.prompt > a {
       text-decoration:underline;
   }
 
- .usky-grid .iconBox:hover, .usky-grid .iconBox:hover *{
+ .umb-grid .iconBox:hover, .umb-grid .iconBox:hover *{
           background: @blue !important;
           color: white !important;
           border-color: @blue !important;
           text-decoration:none;
  }
 
- .usky-grid  .iconBox a:hover {
+ .umb-grid  .iconBox a:hover {
      text-decoration:none;
      color: white !important;
  }
 
- .usky-grid  .iconBox.selected {
+ .umb-grid  .iconBox.selected {
      -webkit-appearance: none;
      background-image: -moz-linear-gradient(top,#e6e6e6,#bfbfbf);
      background-image: -webkit-gradient(linear,0 0,0 100%,from(#e6e6e6),to(#bfbfbf));
@@ -427,14 +449,14 @@
      background: transparent;
  }
 
- .usky-grid  .iconBox i {
+ .umb-grid  .iconBox i {
      font-size:16px !important;
      color: #5F5F5F;
      display:block;
  }
 
 
- .usky-grid  ul {
+ .umb-grid  ul {
      display:inline-block;
      list-style:none;
      padding:0;
@@ -442,7 +464,7 @@
      text-align:center;
  }
 
- .usky-grid  .help-text {
+ .umb-grid  .help-text {
      background: @grayLighter;
      color: @gray;
      font-size: 14px;
@@ -452,7 +474,7 @@
      clear: both;
  }
 
- .usky-grid  ul li {
+ .umb-grid  ul li {
      display: inline-block;
      width: 120px;
      margin: 8px 8px 0px 8px;
@@ -463,17 +485,17 @@
 
  // TINYMCE EDITOR
  // -------------------------
- .usky-grid .mce-panel {
+ .umb-grid .mce-panel {
      border: none !important;
      clear:both;
  }
 
- .usky-grid .mce-btn button {
+ .umb-grid .mce-btn button {
      padding: 8px 6px;
      line-height: inherit;
  }
 
- .usky-grid .mce-toolbar {
+ .umb-grid .mce-toolbar {
      border: 1px solid rgba(207, 207, 207, 0.7);
      background-color: rgba(250, 250, 250, 1);
      z-index: 100;
@@ -492,20 +514,20 @@
      margin: 0;
  }
 
- .usky-grid  .mce-panel {
+ .umb-grid  .mce-panel {
      background: transparent !important;
  }
- .usky-grid  .mce-floatpanel {
+ .umb-grid  .mce-floatpanel {
      background-color: #F7F7F7 !important;
  }
 
-.usky-cell-rte{
+.umb-cell-rte{
     border: 1px solid @grayLighter;
 }
 
  // MEDIA EDITOR
  // -------------------------
- .usky-grid  .fullSizeImage {
+ .umb-grid  .fullSizeImage {
      width:100%
  }
 
@@ -516,17 +538,17 @@
  /* Width */
  /**************************************************************************************************/
 
- .usky-grid  .boxWidth {
+ .umb-grid  .boxWidth {
      text-align:right;
      margin-bottom: 10px;
  }
 
- .usky-grid  .boxWidth input {
+ .umb-grid  .boxWidth input {
      text-align: center;
      width: 40px;
  }
 
- .usky-grid  .boxWidth label {
+ .umb-grid  .boxWidth label {
      font-size: 10px;
      padding: 0;
      margin: 5px 5px 0 0;
@@ -539,27 +561,27 @@
  /* Margin control */
  /**************************************************************************************************/
 
- .usky-grid .usky-cell{
+ .umb-grid .umb-cell{
     padding-top: 5px;
     padding-bottom: 15px;
  }
 
- .usky-grid .usky-control{
+ .umb-grid .umb-control{
      margin: 10px 0 0 0;
      padding: 5px;
      border: 1px dashed transparent;
  }
 
- .usky-grid .usky-templates-columns{
+ .umb-grid .umb-templates-columns{
      margin-top: 30px;
  }
 
- .usky-grid .usky-row-inner{
-    margin-right: 45px;
-    border: 1px dashed transparent;
+ .umb-grid .umb-row-inner{
+    //margin-right: 45px;
+    //border: 1px dashed transparent;
  }
 
- .usky-grid .usky-control-inner {
+ .umb-grid .umb-control-inner {
     padding: 5px;
     margin-right: 45px;
     margin-bottom: 15px;
@@ -575,24 +597,24 @@
  /* template */
  /**************************************************************************************************/
 
- .usky-grid .uSky-templates {
+ .umb-grid .umb-templates {
      text-align:center;
      overflow:hidden;
      width:100%;
  }
 
- .usky-grid .uSky-templates-template {
+ .umb-grid .umb-templates-template {
      display:inline-block;
      width:100px;
      padding-right: 30px;
      margin: 20px;
  }
 
- .usky-grid .uSky-templates-template a.tb:hover {
+ .umb-grid .umb-templates-template a.tb:hover {
      border:5px solid @blue;
  }
 
- .usky-grid .uSky-templates-template .tb {
+ .umb-grid .umb-templates-template .tb {
      width:100%;
      height:150px;
      padding:10px;
@@ -602,22 +624,22 @@
      position: relative;
  }
 
- .usky-grid .uSky-templates-template .tr {
+ .umb-grid .umb-templates-template .tr {
      height: 100%;
      position: relative;
  }
 
- .usky-grid .uSky-templates-template .tb .uSky-templates-column {
+ .umb-grid .umb-templates-template .tb .umb-templates-column {
      height:100%;
      border: 1px dashed @grayLight;
      border-right: none;
  }
 
- .usky-grid .uSky-templates-template .tb .uSky-templates-column.last {
+ .umb-grid .umb-templates-template .tb .umb-templates-column.last {
      border-right: 1px dashed @grayLight !important;
  }
 
- .usky-grid a.uSky-templates-column:hover, .usky-grid a.uSky-templates-column.selected{
+ .umb-grid a.umb-templates-column:hover, .umb-grid a.umb-templates-column.selected{
     background-color: @blue;
  }
 
@@ -627,7 +649,7 @@
  /**************************************************************************************************/
 
 /* New template preview */
-.usky-grid {
+.umb-grid {
 
 	.templates-preview {
 		display: inline-block;
@@ -692,7 +714,6 @@
 
 		.preview-col {
 			height: 180px;
-			border: dashed 1px @grayLight;
 		}
 
 		.preview-cell {
@@ -759,7 +780,7 @@
  /**************************************************************************************************/
  /* overlay */
  /**************************************************************************************************/
- .usky-grid  .cell-tools-menu{
+ .umb-grid  .cell-tools-menu{
      position: absolute;
      width: 360px;
      height: 380px;
@@ -778,20 +799,20 @@
  }
 
 
- .usky-grid .cell-tools-menu h5{
+ .umb-grid .cell-tools-menu h5{
      border-bottom: 1px solid #d9d9d9;
      color: #999;
      padding: 10px;
      margin-top: 0;
  }
 
- .usky-grid .elements{
+ .umb-grid .elements{
      display: block;
      padding: 0;
      margin: 0;
  }
 
- .usky-grid .elements li{
+ .umb-grid .elements li{
      display: inline-block;
      width: 90px;
      height: 80px;
@@ -801,17 +822,17 @@
      font-size: 11px;
  }
 
- .usky-grid .elements li:hover, .usky-grid .elements li:hover *{
+ .umb-grid .elements li:hover, .umb-grid .elements li:hover *{
      background: #2e8aea;
      color: white;
  }
 
- .usky-grid .elements a{
+ .umb-grid .elements a{
      color: #222;
      text-decoration: none;
  }
 
- .usky-grid .elements i{
+ .umb-grid .elements i{
      font-size: 30px;
      line-height: 50px;
      color: #999;
@@ -822,21 +843,21 @@
  /**************************************************************************************************/
  /* Configuration specific styles */
  /**************************************************************************************************/
-.usky-grid-configuration .uSky-templates{
+.umb-grid-configuration .umb-templates{
     text-align: left;
 }
 
-.usky-grid-configuration ul{
+.umb-grid-configuration ul{
     display: block;
 }
 
-.usky-grid-configuration ul li{
+.umb-grid-configuration ul li{
     display: block;
     width: auto;
     text-align: left;
 }
 
-.usky-grid-configuration .uSky-templates .uSky-templates-template .tb{
+.umb-grid-configuration .umb-templates .umb-templates-template .tb{
     max-height: 50px;
     border-width: 2px !important;
     padding: 0px;
@@ -844,16 +865,16 @@
     overflow: hidden;
 }
 
-.usky-grid-configuration .uSky-templates .uSky-templates-template span{
+.umb-grid-configuration .umb-templates .umb-templates-template span{
     background: @grayLight;
     display: inline-block;
 }
 
-.usky-grid-configuration .uSky-templates .uSky-templates-template .tb:hover{
+.umb-grid-configuration .umb-templates .umb-templates-template .tb:hover{
     border-width: 2px !important;
 }
 
-.usky-grid-configuration .uSky-templates-column{
+.umb-grid-configuration .umb-templates-column{
     display: block;
     float: left;
     margin-left: -1px;
@@ -861,11 +882,11 @@
     background: @grayLight;
 }
 
-.usky-grid-configuration .uSky-templates-column.last{
+.umb-grid-configuration .umb-templates-column.last{
     margin-right: -1px;
 }
 
-.usky-grid-configuration .uSky-templates-column.add{
+.umb-grid-configuration .umb-templates-column.add{
     text-align: center;
     font-size: 20px;
     line-height: 70px;
@@ -874,24 +895,24 @@
     background: white;
 }
 
-.usky-grid-configuration .mainTdpt{
+.umb-grid-configuration .mainTdpt{
     height: initial;
     border: none;
 }
 
-.usky-grid-configuration .uSky-templates-rows .uSky-templates-row{
+.umb-grid-configuration .umb-templates-rows .umb-templates-row{
     margin: 0px 50px 20px 0px;
     width: 60px;
 }
 
-.usky-grid-configuration .uSky-templates-rows .uSky-templates-row .tb{
+.umb-grid-configuration .umb-templates-rows .umb-templates-row .tb{
     border-width: 2px !important;
     padding: 0px;
     border-spacing:2px;
 }
 
-.usky-grid-configuration .uSky-templates-rows .mainTdpt{
+.umb-grid-configuration .umb-templates-rows .mainTdpt{
     height: 10px !important;
 }
 
-.usky-grid-configuration a.uSky-templates-column{height: 70px !important;}
+.umb-grid-configuration a.umb-templates-column{height: 70px !important;}
