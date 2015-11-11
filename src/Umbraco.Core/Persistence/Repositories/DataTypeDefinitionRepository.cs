@@ -27,6 +27,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly CacheHelper _cacheHelper;
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly DataTypePreValueRepository _preValRepository;
+        private readonly EntityContainerRepository _containerRepository;
 
         public DataTypeDefinitionRepository(IDatabaseUnitOfWork work, CacheHelper cache, CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider sqlSyntax,
             IContentTypeRepository contentTypeRepository)
@@ -35,10 +36,31 @@ namespace Umbraco.Core.Persistence.Repositories
             _cacheHelper = cacheHelper;
             _contentTypeRepository = contentTypeRepository;
             _preValRepository = new DataTypePreValueRepository(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax);
-
+            _containerRepository = new EntityContainerRepository(work, cache, logger, sqlSyntax, new Guid(Constants.ObjectTypes.DataTypeContainer), NodeObjectTypeId);
         }
 
-     
+        /// <summary>
+        /// Deletes a folder - this will move all contained entities into their parent
+        /// </summary>
+        /// <param name="folderId"></param>
+        public void DeleteContainer(int folderId)
+        {
+            var found = _containerRepository.Get(folderId);
+            _containerRepository.Delete(found);
+        }
+
+        public EntityContainer CreateContainer(int parentId, string name, int userId)
+        {
+            var container = new EntityContainer
+            {
+                ParentId = parentId,
+                Name = name,
+                CreatorId = userId
+            };
+            _containerRepository.AddOrUpdate(container);
+            return container;
+        }
+
         #region Overrides of RepositoryBase<int,DataTypeDefinition>
 
         protected override IDataTypeDefinition PerformGet(int id)

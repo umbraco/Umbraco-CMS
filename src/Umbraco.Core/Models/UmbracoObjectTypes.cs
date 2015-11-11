@@ -128,9 +128,9 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Media type container
         /// </summary>
-        [UmbracoObjectType(Constants.ObjectTypes.MemberTypeContainer)]
-        [FriendlyName("Member Type Container")]
-        MemberTypeContainer
+        [UmbracoObjectType(Constants.ObjectTypes.DataTypeContainer)]
+        [FriendlyName("Data Type Container")]
+        DataTypeContainer
 
 
     }

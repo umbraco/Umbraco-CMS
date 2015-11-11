@@ -120,14 +120,14 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public HttpResponseMessage DeleteContainer(int id)
         {
-            Services.ContentTypeService.DeleteContentTypeFolder(id, Security.CurrentUser.Id);
+            Services.ContentTypeService.DeleteContentTypeContainer(id, Security.CurrentUser.Id);
 
             return Request.CreateResponse(HttpStatusCode.OK);
         }
         
         public HttpResponseMessage PostCreateContainer(int parentId, string name)
         {
-            var result = Services.ContentTypeService.CreateContentTypeFolder(parentId, name, Security.CurrentUser.Id);
+            var result = Services.ContentTypeService.CreateContentTypeContainer(parentId, name, Security.CurrentUser.Id);
 
             return result
                 ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id 

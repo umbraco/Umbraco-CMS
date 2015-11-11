@@ -22,7 +22,7 @@ namespace Umbraco.Core.Persistence.Repositories
     {
 
         public MemberTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-            : base(work, cache, logger, sqlSyntax, new Guid(Constants.ObjectTypes.MemberTypeContainer))
+            : base(work, cache, logger, sqlSyntax)
         {
         }
 

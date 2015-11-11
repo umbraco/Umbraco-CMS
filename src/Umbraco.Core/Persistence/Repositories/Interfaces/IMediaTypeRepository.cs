@@ -21,12 +21,12 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="name"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        EntityContainer CreateFolder(int parentId, string name, int userId);
+        EntityContainer CreateContainer(int parentId, string name, int userId);
 
         /// <summary>
         /// Deletes a folder - this will move all contained content types into their parent
         /// </summary>
         /// <param name="folderId"></param>        
-        void DeleteFolder(int folderId);
+        void DeleteContainer(int folderId);
     }
 }

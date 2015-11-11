@@ -41,14 +41,14 @@ namespace Umbraco.Core.Services
             _mediaService = mediaService;
         }
 
-        public Attempt<int> CreateContentTypeFolder(int parentId, string name, int userId = 0)
+        public Attempt<int> CreateContentTypeContainer(int parentId, string name, int userId = 0)
         {
             var uow = UowProvider.GetUnitOfWork();
             using (var repo = RepositoryFactory.CreateContentTypeRepository(uow))
             {
                 try
                 {
-                    var container = repo.CreateFolder(parentId, name, userId);
+                    var container = repo.CreateContainer(parentId, name, userId);
                     uow.Commit();
                     return Attempt.Succeed(container.Id);
                 }
@@ -60,14 +60,14 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public Attempt<int> CreateMediaTypeFolder(int parentId, string name, int userId = 0)
+        public Attempt<int> CreateMediaTypeContainer(int parentId, string name, int userId = 0)
         {
             var uow = UowProvider.GetUnitOfWork();
             using (var repo = RepositoryFactory.CreateMediaTypeRepository(uow))
             {
                 try
                 {
-                    var container = repo.CreateFolder(parentId, name, userId);
+                    var container = repo.CreateContainer(parentId, name, userId);
                     uow.Commit();
                     return Attempt.Succeed(container.Id);
                 }
@@ -79,23 +79,23 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public void DeleteContentTypeFolder(int folderId, int userId = 0)
+        public void DeleteContentTypeContainer(int folderId, int userId = 0)
         {
             var uow = UowProvider.GetUnitOfWork();
             using (var repo = RepositoryFactory.CreateContentTypeRepository(uow))
             {
-                repo.DeleteFolder(folderId);
+                repo.DeleteContainer(folderId);
                 uow.Commit();
                 //TODO: Audit trail ?
             }
         }
 
-        public void DeleteMediaTypeFolder(int folderId, int userId = 0)
+        public void DeleteMediaTypeContainer(int folderId, int userId = 0)
         {
             var uow = UowProvider.GetUnitOfWork();
             using (var repo = RepositoryFactory.CreateMediaTypeRepository(uow))
             {
-                repo.DeleteFolder(folderId);
+                repo.DeleteContainer(folderId);
                 uow.Commit();
                 //TODO: Audit trail ?
             }

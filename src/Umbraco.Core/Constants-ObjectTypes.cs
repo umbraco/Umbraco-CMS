@@ -10,9 +10,9 @@ namespace Umbraco.Core
         public static class ObjectTypes
         {
             /// <summary>
-            /// Guid for a member type container
+            /// Guid for a data type container
             /// </summary>
-            public const string MemberTypeContainer = "02348110-FC53-4565-9B01-0E186B6B9E7C";
+            public const string DataTypeContainer = "521231E3-8B37-469C-9F9D-51AFC91FEB7B";
 
             /// <summary>
             /// Guid for a doc type container

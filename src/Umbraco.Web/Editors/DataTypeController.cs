@@ -162,7 +162,28 @@ namespace Umbraco.Web.Editors
             return Mapper.Map<PropertyEditor, IEnumerable<PreValueFieldDisplay>>(propEd);            
         }
 
-        //TODO: Generally there probably won't be file uploads for pre-values but we should allow them just like we do for the content editor
+        /// <summary>
+        /// Deletes a data type container wth a given ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [HttpPost]
+        public HttpResponseMessage DeleteContainer(int id)
+        {
+            Services.DataTypeService.DeleteContainer(id, Security.CurrentUser.Id);
+
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
+        public HttpResponseMessage PostCreateContainer(int parentId, string name)
+        {
+            var result = Services.DataTypeService.CreateContainer(parentId, name, Security.CurrentUser.Id);
+
+            return result
+                ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id 
+                : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
+        }
 
         /// <summary>
         /// Saves the data type

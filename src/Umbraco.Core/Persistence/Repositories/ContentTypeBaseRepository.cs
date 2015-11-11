@@ -36,24 +36,32 @@ namespace Umbraco.Core.Persistence.Repositories
             _containerRepository = new EntityContainerRepository(work, cache, logger, sqlSyntax, containerType, NodeObjectTypeId);
         }
 
+        protected ContentTypeBaseRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+            : base(work, cache, logger, sqlSyntax)
+        {
+            _guidRepo = new GuidReadOnlyContentTypeBaseRepository(this, work, cache, logger, sqlSyntax);
+            _containerRepository = null;
+        }
+
         private readonly EntityContainerRepository _containerRepository;
         private readonly GuidReadOnlyContentTypeBaseRepository _guidRepo;
-        
+
         /// <summary>
-        /// Deletes a folder - this will move all contained content types into their parent
+        /// Deletes a folder - this will move all contained entities into their parent
         /// </summary>
-        /// <param name="folderId"></param>
-        /// <returns>
-        /// Returns the content types moved
-        /// </returns>
-        public void DeleteFolder(int folderId)
+        /// <param name="folderId"></param>        
+        public void DeleteContainer(int folderId)
         {
+            if (_containerRepository == null) throw new NotSupportedException("The repository type " + GetType() + " does not support containers");
+
             var found = _containerRepository.Get(folderId);
             _containerRepository.Delete(found);           
         }
 
-        public EntityContainer CreateFolder(int parentId, string name, int userId)
+        public EntityContainer CreateContainer(int parentId, string name, int userId)
         {
+            if (_containerRepository == null) throw new NotSupportedException("The repository type " + GetType() + " does not support containers");
+
             var container = new EntityContainer
             {
                 ParentId = parentId,

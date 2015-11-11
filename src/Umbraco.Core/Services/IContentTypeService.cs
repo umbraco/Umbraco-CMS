@@ -17,10 +17,10 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         Attempt<string[]> ValidateComposition(IContentTypeComposition compo);
 
-        Attempt<int> CreateContentTypeFolder(int parentId, string name, int userId = 0);
-        Attempt<int> CreateMediaTypeFolder(int parentId, string name, int userId = 0);
-        void DeleteMediaTypeFolder(int folderId, int userId = 0);
-        void DeleteContentTypeFolder(int folderId, int userId = 0);
+        Attempt<int> CreateContentTypeContainer(int parentId, string name, int userId = 0);
+        Attempt<int> CreateMediaTypeContainer(int parentId, string name, int userId = 0);
+        void DeleteMediaTypeContainer(int folderId, int userId = 0);
+        void DeleteContentTypeContainer(int folderId, int userId = 0);
 
         /// <summary>
         /// Gets all property type aliases.

@@ -10,6 +10,9 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IDataTypeService : IService
     {
+        Attempt<int> CreateContainer(int parentId, string name, int userId = 0);
+        void DeleteContainer(int folderId, int userId = 0);
+
         /// <summary>
         /// Gets a <see cref="IDataTypeDefinition"/> by its Name
         /// </summary>

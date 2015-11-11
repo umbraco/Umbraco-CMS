@@ -26,6 +26,36 @@ namespace Umbraco.Core.Services
         {
         }
 
+        public Attempt<int> CreateContainer(int parentId, string name, int userId = 0)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateDataTypeDefinitionRepository(uow))
+            {
+                try
+                {
+                    var container = repo.CreateContainer(parentId, name, userId);
+                    uow.Commit();
+                    return Attempt.Succeed(container.Id);
+                }
+                catch (Exception ex)
+                {
+                    return Attempt<int>.Fail(ex);
+                }
+                //TODO: Audit trail ?
+            }
+        }
+
+        public void DeleteContainer(int folderId, int userId = 0)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateDataTypeDefinitionRepository(uow))
+            {
+                repo.DeleteContainer(folderId);
+                uow.Commit();
+                //TODO: Audit trail ?
+            }
+        }
+
         /// <summary>
         /// Gets a <see cref="IDataTypeDefinition"/> by its Name
         /// </summary>

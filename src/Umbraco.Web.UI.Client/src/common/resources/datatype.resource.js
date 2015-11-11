@@ -220,6 +220,17 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 "Failed to delete item " + id);
         },
 
+        deleteContainerById: function (id) {
+
+            return umbRequestHelper.resourcePromise(
+               $http.post(
+                   umbRequestHelper.getApiUrl(
+                       "dataTypeApiBaseUrl",
+                       "DeleteContainer",
+                       [{ id: id }])),
+               'Failed to delete content type contaier');
+        },
+
 
 
         /**
@@ -303,6 +314,17 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
             return umbRequestHelper.resourcePromise(
                  $http.post(umbRequestHelper.getApiUrl("dataTypeApiBaseUrl", "PostSave"), saveModel),
                 "Failed to save data for data type id " + dataType.id);
+        },
+
+        createContainer: function (parentId, name) {
+
+            return umbRequestHelper.resourcePromise(
+                 $http.post(
+                    umbRequestHelper.getApiUrl(
+                       "dataTypeApiBaseUrl",
+                       "PostCreateContainer",
+                       { parentId: parentId, name: name })),
+                'Failed to create a folder under parent id ' + parentId);
         }
     };
 }

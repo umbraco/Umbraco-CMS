@@ -12,6 +12,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
 using umbraco;
 using umbraco.BusinessLogic.Actions;
+using Umbraco.Core.Services;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
@@ -24,20 +25,33 @@ namespace Umbraco.Web.Trees
     {
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
-            //we only support one tree level for data types
-            if (id != Constants.System.Root.ToInvariantString())
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
+            var intId = id.TryConvertTo<int>();
+            if (intId == false) throw new InvalidOperationException("Id must be an integer");        
+            
+            var nodes = new TreeNodeCollection();
 
+            //Folders first
+            nodes.AddRange(
+               Services.EntityService.GetChildren(intId.Result, UmbracoObjectTypes.MediaTypeContainer)
+                   .OrderBy(entity => entity.Name)
+                   .Select(dt =>
+                   {
+                       var node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, "icon-folder", dt.HasChildren(), "");
+                       node.Path = dt.Path;
+                       node.NodeType = "container";
+                        //TODO: This isn't the best way to ensure a noop process for clicking a node but it works for now.
+                        node.AdditionalData["jsClickCallback"] = "javascript:void(0);";
+                       return node;
+                   }));
+
+            //Normal nodes
             var sysIds = GetSystemIds();
-
-            var collection = new TreeNodeCollection();
-            collection.AddRange(
+            nodes.AddRange(
                 Services.DataTypeService.GetAllDataTypeDefinitions()
                     .OrderBy(x => x.Name)
                     .Select(dt => CreateTreeNode(id, queryStrings, sysIds, dt)));
-            return collection;
+
+            return nodes;
         }
 
         private IEnumerable<int> GetSystemIds()
@@ -75,18 +89,40 @@ namespace Umbraco.Web.Trees
 
             if (id == Constants.System.Root.ToInvariantString())
             {
+                //set the default to create
+                menu.DefaultMenuAlias = ActionNew.Instance.Alias;
+
                 // root actions              
-                menu.Items.Add<CreateChildEntity, ActionNew>(ui.Text("actions", ActionNew.Instance.Alias));
+                menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
                 menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
                 return menu;
             }
 
-            var sysIds = GetSystemIds();
-
-            if (sysIds.Contains(int.Parse(id)) == false)
+            var container = Services.EntityService.Get(int.Parse(id), UmbracoObjectTypes.DataTypeContainer);
+            if (container != null)
             {
-                //only have delete for each node
-                menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));    
+                //set the default to create
+                menu.DefaultMenuAlias = ActionNew.Instance.Alias;
+
+                // root actions              
+                menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
+                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)));
+
+                if (container.HasChildren() == false)
+                {
+                    //can delete data type
+                    menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
+                }
+            }
+            else
+            {
+                var sysIds = GetSystemIds();
+
+                if (sysIds.Contains(int.Parse(id)) == false)
+                {
+                    //only have delete for each node
+                    menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
+                }
             }
             
             return menu;

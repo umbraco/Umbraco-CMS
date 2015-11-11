@@ -71,29 +71,27 @@ namespace Umbraco.Web.Trees
                 menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)));
                 return menu;
             }
-            else
+
+            var container = Services.EntityService.Get(int.Parse(id), UmbracoObjectTypes.MediaTypeContainer);
+            if (container != null)
             {
-                var container = Services.EntityService.Get(int.Parse(id), UmbracoObjectTypes.MediaTypeContainer);
-                if (container != null)
-                {
-                    //set the default to create
-                    menu.DefaultMenuAlias = ActionNew.Instance.Alias;
+                //set the default to create
+                menu.DefaultMenuAlias = ActionNew.Instance.Alias;
 
-                    // root actions              
-                    menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
-                    menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)));
+                // root actions              
+                menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
+                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)));
 
-                    if (container.HasChildren() == false)
-                    {
-                        //can delete doc type
-                        menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
-                    }
-                }
-                else
+                if (container.HasChildren() == false)
                 {
-                    //delete doc type
+                    //can delete doc type
                     menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
                 }
+            }
+            else
+            {
+                //delete doc type
+                menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
             }
 
             return menu;
