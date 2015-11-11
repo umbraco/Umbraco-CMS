@@ -25,7 +25,7 @@
 
                   <div ng-repeat="property in tab.properties" ng-switch on="property.serverSide">
 
-                     <div class="span12 clearfix" ng-switch-when="false">
+                     <div class="span12 umb-dashboard-control clearfix" ng-switch-when="false">
                         <h3 ng-show="property.caption">{{property.caption}}</h3>
                         <div ng-include="property.path"></div>
                      </div>
