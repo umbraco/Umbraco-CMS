@@ -20,7 +20,7 @@ namespace umbraco.cms.businesslogic.translation
                                    bool IncludeSubpages, bool SendEmail)
         {
             // Get translation taskType for obsolete task constructor
-            var taskType = ApplicationContext.Current.Services.TaskService.GetTaskTypeById(1);
+            var taskType = ApplicationContext.Current.Services.TaskService.GetTaskTypeByAlias("toTranslate");
 
             // Create pending task
             Task t = new Task(new Umbraco.Core.Models.Task(taskType));
