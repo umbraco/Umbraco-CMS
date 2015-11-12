@@ -1,5 +1,5 @@
 angular.module("umbraco")
-    .controller("Umbraco.Dialogs.UserController", function ($scope, $location, $timeout, userService, historyService, eventsService, externalLoginInfo, authResource) {
+    .controller("Umbraco.Dialogs.UserController", function ($scope, $location, $timeout, userService, historyService, eventsService, externalLoginInfo, authResource, currentUserResource, formHelper) {
 
         $scope.history = historyService.getCurrent();
         $scope.version = Umbraco.Sys.ServerVariables.application.version + " assembly: " + Umbraco.Sys.ServerVariables.application.assemblyVersion;
@@ -101,5 +101,45 @@ angular.module("umbraco")
             }
 
         });
+
+        //create the initial model for change password property editor
+        $scope.changePasswordModel = {
+            alias: "_umb_password",
+            view: "changepassword",
+            config: {},
+            value: {}
+        };
+
+        //go get the config for the membership provider and add it to the model
+        currentUserResource.getMembershipProviderConfig().then(function (data) {
+            $scope.changePasswordModel.config = data;
+            //ensure the hasPassword config option is set to true (the user of course has a password already assigned)
+            //this will ensure the oldPassword is shown so they can change it
+            $scope.changePasswordModel.config.hasPassword = true;
+            $scope.changePasswordModel.config.disableToggle = true;
+        });
+
+        ////this is the model we will pass to the service
+        //$scope.profile = {};
+
+        $scope.changePassword = function () {
+
+            if (formHelper.submitForm({ scope: $scope })) {
+                currentUserResource.changePassword($scope.changePasswordModel.value).then(function (data) {
+
+                    //if the password has been reset, then update our model
+                    if (data.value) {
+                        $scope.changePasswordModel.value.generatedPassword = data.value;
+                    }
+
+                    formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+
+                }, function (err) {
+
+                    formHelper.handleError(err);
+
+                });
+            }
+        };
 
     });
