@@ -986,7 +986,9 @@ namespace Umbraco.Tests.Services
             Assert.That(contentType, Is.Not.Null);
 
             var compositionPropertyGroups = contentType.CompositionPropertyGroups;
-            Assert.That(compositionPropertyGroups.Count(x => x.Name.Equals("Content_")), Is.EqualTo(0));
+
+            // now it is still 1, because we don't propagate renames anymore
+            Assert.That(compositionPropertyGroups.Count(x => x.Name.Equals("Content_")), Is.EqualTo(1));
 
             var propertyTypeCount = contentType.PropertyTypes.Count();
             var compPropertyTypeCount = contentType.CompositionPropertyTypes.Count();
@@ -1059,7 +1061,9 @@ namespace Umbraco.Tests.Services
 
             var advancedPageReloaded = service.GetContentType("advancedPage");
             var contentUnderscoreTabExists = advancedPageReloaded.CompositionPropertyGroups.Any(x => x.Name.Equals("Content_"));
-            Assert.That(contentUnderscoreTabExists, Is.False);
+
+            // now is true, because we don't propagate renames anymore
+            Assert.That(contentUnderscoreTabExists, Is.True);
 
             var numberOfContentTabs = advancedPageReloaded.CompositionPropertyGroups.Count(x => x.Name.Equals("Content"));
             Assert.That(numberOfContentTabs, Is.EqualTo(4));
