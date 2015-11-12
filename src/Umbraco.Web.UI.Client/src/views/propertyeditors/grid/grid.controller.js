@@ -173,38 +173,27 @@ angular.module("umbraco")
         // *********************************************
         // Add items overlay menu
         // *********************************************
-        $scope.overlayMenu = {
-            show: false,
-            style: {},
-            area: undefined,
-            key: undefined
-        };
+       $scope.openEditorOverlay = function(event, area, index, key) {
 
-        $scope.addItemOverlay = function (event, area, index, key) {
-            $scope.overlayMenu.area = area;
-            $scope.overlayMenu.index = index;
-            $scope.overlayMenu.style = {};
-            $scope.overlayMenu.key = key;
+          $scope.editorOverlay = {};
+          $scope.editorOverlay.view = "itempicker";
+          $scope.editorOverlay.title = "Insert editor";
+          $scope.editorOverlay.availableItems = area.$allowedEditors;
+          $scope.editorOverlay.event = event;
+          $scope.editorOverlay.show = true;
 
-            //todo calculate position...
-            var offset = $(event.target).offset();
-            var height = $(window).height();
+          $scope.editorOverlay.chooseItem = function(item) {
+             $scope.addControl(item, area, index);
+             $scope.editorOverlay.show = false;
+             $scope.editorOverlay = null;
+          };
 
-            if ((height - offset.top) < 250) {
-                $scope.overlayMenu.style.bottom = 0;
-                $scope.overlayMenu.style.top = "initial";
-            } else if (offset.top < 300) {
-                $scope.overlayMenu.style.top = 190;
-            }
+          $scope.editorOverlay.close = function(oldModel) {
+             $scope.editorOverlay.show = false;
+             $scope.editorOverlay = null;
+          };
 
-            $scope.overlayMenu.show = true;
-        };
-
-        $scope.closeItemOverlay = function () {
-            $scope.currentControl = null;
-            $scope.overlayMenu.show = false;
-            $scope.overlayMenu.key = undefined;
-        };
+       };
 
         // *********************************************
         // Template management functions
@@ -398,7 +387,7 @@ angular.module("umbraco")
         };
 
         $scope.addControl = function (editor, cell, index, initialize) {
-            $scope.closeItemOverlay();
+
             initialize = (initialize !== false);
 
             var newControl = {
