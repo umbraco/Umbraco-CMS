@@ -40,7 +40,7 @@ function DataTypeCreateController($scope, $location, navigationService, dataType
 
     $scope.createDataType = function() {
         $location.search('create', null);
-        $location.path("/settings/datatype/edit/" + node.id).search("create", "true");
+        $location.path("/developer/datatypes/edit/" + node.id).search("create", "true");
         navigationService.hideMenu();
     }
 }

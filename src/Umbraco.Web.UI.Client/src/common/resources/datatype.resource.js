@@ -181,13 +181,13 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
          * @returns {Promise} resourcePromise object containing the data type scaffold.
          *
          */
-        getScaffold: function () {
+        getScaffold: function (parentId) {
 
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "dataTypeApiBaseUrl",
-                       "GetEmpty")),
+                       "GetEmpty", { parentId: parentId })),
                "Failed to retrieve data for empty datatype");
         },
         /**

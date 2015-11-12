@@ -52,7 +52,7 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
         $scope.page.loading = true;
 
         //we are creating so get an empty data type item
-        dataTypeResource.getScaffold()
+        dataTypeResource.getScaffold($routeParams.id)
             .then(function(data) {
 
                 $scope.preValuesLoaded = true;
@@ -91,7 +91,7 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
                 // if there are any and then clear them so the collection no longer persists them.
                 serverValidationManager.executeAndClearAllSubscriptions();
 
-                navigationService.syncTree({ tree: "datatypes", path: [String(data.id)] }).then(function (syncArgs) {
+                navigationService.syncTree({ tree: "datatypes", path: data.path }).then(function (syncArgs) {
                     $scope.page.menu.currentNode = syncArgs.node;
                 });
 
@@ -152,7 +152,7 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
                     //share state
                     editorState.set($scope.content);
 
-                    navigationService.syncTree({ tree: "datatypes", path: [String(data.id)], forceReload: true }).then(function (syncArgs) {
+                    navigationService.syncTree({ tree: "datatypes", path: data.path, forceReload: true }).then(function (syncArgs) {
                         $scope.page.menu.currentNode = syncArgs.node;
                     });
 

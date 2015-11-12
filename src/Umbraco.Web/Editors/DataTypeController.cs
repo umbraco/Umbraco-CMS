@@ -80,9 +80,9 @@ namespace Umbraco.Web.Editors
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
-        public DataTypeDisplay GetEmpty()
+        public DataTypeDisplay GetEmpty(int parentId)
         {
-            var dt = new DataTypeDefinition("");
+            var dt = new DataTypeDefinition(parentId, "");
             return Mapper.Map<IDataTypeDefinition, DataTypeDisplay>(dt);
         }
 

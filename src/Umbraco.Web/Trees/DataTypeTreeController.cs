@@ -12,6 +12,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
 using umbraco;
 using umbraco.BusinessLogic.Actions;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Services;
 using Constants = Umbraco.Core.Constants;
 
@@ -32,7 +33,7 @@ namespace Umbraco.Web.Trees
 
             //Folders first
             nodes.AddRange(
-               Services.EntityService.GetChildren(intId.Result, UmbracoObjectTypes.MediaTypeContainer)
+               Services.EntityService.GetChildren(intId.Result, UmbracoObjectTypes.DataTypeContainer)
                    .OrderBy(entity => entity.Name)
                    .Select(dt =>
                    {
@@ -46,10 +47,20 @@ namespace Umbraco.Web.Trees
 
             //Normal nodes
             var sysIds = GetSystemIds();
+
             nodes.AddRange(
-                Services.DataTypeService.GetAllDataTypeDefinitions()
-                    .OrderBy(x => x.Name)
-                    .Select(dt => CreateTreeNode(id, queryStrings, sysIds, dt)));
+                Services.EntityService.GetChildren(intId.Result, UmbracoObjectTypes.DataType)
+                    .OrderBy(entity => entity.Name)
+                    .Select(dt =>
+                    {
+                        var node = CreateTreeNode(dt.Id.ToInvariantString(), id, queryStrings, dt.Name, "icon-autofill", false);
+                        node.Path = dt.Path;
+                        if (sysIds.Contains(dt.Id))
+                        {
+                            node.Icon = "icon-thumbnail-list";
+                        }
+                        return node;
+                    }));
 
             return nodes;
         }
@@ -64,25 +75,7 @@ namespace Umbraco.Web.Trees
             };
             return systemIds;
         } 
-
-        private TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, IEnumerable<int> systemIds, IDataTypeDefinition dt)
-        {
-            var node = CreateTreeNode(
-                dt.Id.ToInvariantString(),
-                id,
-                queryStrings,
-                dt.Name,
-                "icon-autofill",
-                false);
-
-            if (systemIds.Contains(dt.Id))
-            {
-                node.Icon = "icon-thumbnail-list";
-            }
-
-            return node;
-        }
-
+        
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
             var menu = new MenuItemCollection();
