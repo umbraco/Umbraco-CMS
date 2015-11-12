@@ -53,6 +53,7 @@ namespace Umbraco.Core.Persistence.Factories
                 group.Name = groupDto.Text;
                 group.SortOrder = groupDto.SortOrder;
                 group.PropertyTypes = new PropertyTypeCollection();
+                group.Key = groupDto.UniqueId;
 
                 //Because we are likely to have a group with no PropertyTypes we need to ensure that these are excluded
                 var typeDtos = groupDto.PropertyTypeDtos.Where(x => x.Id > 0);
@@ -103,7 +104,12 @@ namespace Umbraco.Core.Persistence.Factories
                              {
                                  ContentTypeNodeId = _id,
                                  SortOrder = propertyGroup.SortOrder,
-                                 Text = propertyGroup.Name
+                                 Text = propertyGroup.Name,
+                                 UniqueId = propertyGroup.HasIdentity
+                                    ? propertyGroup.Key == Guid.Empty
+                                        ? Guid.NewGuid()
+                                        : propertyGroup.Key
+                                    : Guid.NewGuid()
                              };
 
             if (propertyGroup.ParentId.HasValue)
