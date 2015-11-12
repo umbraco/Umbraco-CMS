@@ -100,7 +100,7 @@
 
                         <input type="text"
                                class="input-foldername input-mini inline"
-                               ng-if="showFolderInput"
+                               ng-show="showFolderInput"
                                ng-model="newFolderName"
                                ng-keydown="submitFolder($event)"
                                on-blur="showFolderInput = false"
