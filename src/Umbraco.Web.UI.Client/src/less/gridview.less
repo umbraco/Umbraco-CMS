@@ -149,24 +149,40 @@
 
 // CELL
 // -------------------------
-.umb-grid .umb-cell{
+.umb-grid .umb-cell {
      position: relative;
      background-color: #ffffff;
      padding: 10px;
 }
 
 .umb-grid .umb-cell-content {
-   background-color: @grayLighter;
    min-height: 130px;
    display: block;
-   border: 2px solid transparent;
    box-sizing: border-box;
-   transition: border 100ms linear;
 }
 
-.umb-grid .umb-cell-content:hover {
-   border: 2px solid @blue;
+.umb-grid .umb-cell-content.-placeholder {
+   background-color: @grayLighter;
+   border-width: 2px;
+   border-style: solid;
+   border-color: transparent;
+   transition: border-color 100ms linear;
+}
+
+.umb-grid .umb-cell-content.-placeholder:hover {
+   border-color: @blue;
    cursor: pointer;
+}
+
+.umb-grid .umb-cell-content.-has-editors {
+   background-color: transparent;
+   border-style: solid;
+   border-width: 1px;
+   border-color: @grayLight;
+}
+
+.umb-grid .umb-cell-content.-has-editors:hover {
+   cursor: auto;
 }
 
 .umb-grid  .cell-tools {
@@ -193,11 +209,22 @@
 }
 
 .umb-grid .cell-tools-add {
+   color: @blue;
+}
+
+.umb-grid .cell-tools-add.-center {
    position: absolute;
    top: 50%;
    left: 50%;
    transform: translate(-50%, -50%);
    color: @blue;
+}
+
+.umb-grid .cell-tools-add.-bar {
+   display: block;
+   background: @grayLighter;
+   text-align: center;
+   padding: 5px;
 }
 
 .umb-grid .cell-tools-add:hover,
