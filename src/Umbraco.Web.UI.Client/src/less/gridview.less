@@ -95,19 +95,24 @@
  }
  */
 
+/*
  .umb-grid  .tr {
  }
+ */
 
  .umb-grid  .middle {
      text-align: center;
  }
 
+/*
  .umb-grid  .mainTb {
      border-collapse: separate;
  }
+ */
  .umb-grid  .mainTd {
      position:relative;
  }
+
 
 
 
@@ -146,15 +151,20 @@
 // -------------------------
 .umb-grid .umb-cell{
      position: relative;
-     border: 2px solid transparent;
-     //border: 1px dashed rgba(0,0,0,0);
-     min-height:127px;
-     background-color: @grayLighter;
-     box-sizing: border-box;
-     transition: border 100ms linear;
+     background-color: #ffffff;
+     padding: 10px;
 }
 
-.umb-grid .umb-cell:hover {
+.umb-grid .umb-cell-content {
+   background-color: @grayLighter;
+   min-height: 130px;
+   display: block;
+   border: 2px solid transparent;
+   box-sizing: border-box;
+   transition: border 100ms linear;
+}
+
+.umb-grid .umb-cell-content:hover {
    border: 2px solid @blue;
    cursor: pointer;
 }
@@ -218,11 +228,11 @@
 
 .umb-grid  .cell-tools-remove {
     display:inline-block;
-    position: absolute;
-    top: 0px;
-    right: 5px;
-    text-align: right;
-    z-index: 500;
+    //position: absolute;
+    //top: 0px;
+    //right: 5px;
+    //text-align: right;
+    //z-index: 500;
 }
 
 .umb-grid .cell-tools-remove .iconBox:hover, .umb-grid .cell-tools-remove .iconBox:hover *{
@@ -232,11 +242,11 @@
 
 .umb-grid  .cell-tools-move {
     display:inline-block;
-    position: absolute;
-    top: 33px;
-    right: 5px;
-    z-index: 500;
-    cursor: move
+    //position: absolute;
+    //top: 33px;
+    //right: 5px;
+    //z-index: 500;
+    //cursor: move
 }
 
 .umb-grid .cell-tools-edit{
@@ -286,14 +296,28 @@
 }
 */
 
+.umb-grid .umb-row-title {
+   margin-bottom: 20px;
+   display: block;
+   padding-left: 10px;
+   padding-right: 10px;
+}
+
 .umb-grid ins.item-label {
    text-transform: uppercase;
    font-size: 13px;
    color: @gray;
-   margin-bottom: 20px;
    font-weight: bold;
    text-decoration: none;
-   display: block;
+   display: inline-block;
+}
+
+.umb-grid .row-tools {
+   display: inline-block;
+}
+
+.umb-grid .umb-add-row {
+   text-align: center;
 }
 
 /*

@@ -51,62 +51,61 @@
                     <div ui-sortable="sortableOptions" ng-model="section.rows">
 
                         <!-- for each row in template section -->
-                        <div ng-repeat="row in section.rows"
-                             class="umb-row"
-                             ng-mouseenter="setCurrentRow(row)"
-                             ng-mouseleave="disableCurrentRow()">
+                        <!-- ng-mouseenter="setCurrentRow(row)" -->
+                        <!-- ng-mouseleave="disableCurrentRow()"  -->
+                        <div ng-repeat="row in section.rows" class="umb-row">
 
-                            <!-- Row tool -->
-                            <div class="row-tools" ng-animate="'fade'"
-                                ng-if="currentRow === row && currentControl === null">
+                            <div class="umb-row-title">
 
-                                <!-- delete row -->
-                                <div class="cell-tools-remove">
-                                    <div class="iconBox"
-                                         ng-click="showPrompt(row)"
-                                         ng-mouseover="setWarnighlightRow(row)"
-                                         ng-mouseleave="disableWarnhighlightRow(row)">
+                               <ins class="item-label">{{row.name}}</ins>
 
-                                        <span class="prompt" ng-if="row.deletePrompt">
-                                            <localize key="general_areyousure" />
-                                            <a href ng-click="removeRow(section, $index)"><localize key="general_yes" /></a>
-                                            <a href ng-click="clearPrompt(row, $event)"><localize key="general_no" /></a>
-                                        </span>
+                               <!-- Row tool -->
+                               <div class="row-tools">
 
-                                        <i ng-if="!row.deletePrompt" class="icon icon-trash" title="@general_delete" localize="title"></i>
-                                    </div>
-                                </div>
+                                   <!-- delete row -->
+                                   <div class="cell-tools-remove">
+                                       <div ng-click="showPrompt(row)"
+                                            ng-mouseover="setWarnighlightRow(row)"
+                                            ng-mouseleave="disableWarnhighlightRow(row)">
 
-                                <div class="cell-tools-move">
-                                    <a class="iconBox"
-                                       ng-mouseover="setInfohighlightRow(row)"
-                                       ng-mouseleave="disableInfohighlightRow(row)"
-                                       href>
-                                        <i class="icon icon-navigation" title="@general_move" localize="title"></i>
-                                    </a>
-                                </div>
+                                           <span class="prompt" ng-if="row.deletePrompt">
+                                               <localize key="general_areyousure" />
+                                               <a href ng-click="removeRow(section, $index)"><localize key="general_yes" /></a>
+                                               <a href ng-click="clearPrompt(row, $event)"><localize key="general_no" /></a>
+                                           </span>
 
-                                <div class="cell-tools-edit" ng-if="hasSettings">
-                                    <a class="iconBox"
-                                       ng-mouseover="setInfohighlightRow(row)"
-                                       ng-mouseleave="disableInfohighlightRow(row)"
-                                       ng-click="editGridItemSettings(row, 'row')"
-                                       href>
-                                        <i class="icon icon-settings" title="@grid_settings" localize="title"></i>
-                                    </a>
-                                </div>
+                                           <i ng-if="!row.deletePrompt" class="icon icon-trash" title="@general_delete" localize="title"></i>
+                                       </div>
+                                   </div>
+
+                                   <div class="cell-tools-move">
+                                       <a ng-mouseover="setInfohighlightRow(row)"
+                                          ng-mouseleave="disableInfohighlightRow(row)"
+                                          href>
+                                           <i class="icon icon-navigation" title="@general_move" localize="title"></i>
+                                       </a>
+                                   </div>
+
+                                   <div class="cell-tools-edit" ng-if="hasSettings">
+                                       <a ng-mouseover="setInfohighlightRow(row)"
+                                          ng-mouseleave="disableInfohighlightRow(row)"
+                                          ng-click="editGridItemSettings(row, 'row')"
+                                          href>
+                                           <i class="icon icon-settings" title="@grid_settings" localize="title"></i>
+                                       </a>
+                                   </div>
+
+                               </div>
 
                             </div>
 
                             <!-- row container -->
-                            <div class="{{row.cssClass}} mainContainer umb-row-inner"
+                            <div class="{{row.cssClass}} umb-row-inner"
                                  ng-class="{last:$last,
                                             first:$first,
                                             warnhighlight:currentWarnhighlightRow == row,
                                             infohighlight:currentInfohighlightRow == row,
                                             selectedRow:currentRow == row && currentControl === null}">
-
-                                <ins class="item-label">{{row.name}}</ins>
 
                                 <div class="mainTb">
                                     <div class="tb">
@@ -117,77 +116,84 @@
                                                  class="td mainTd umb-cell"
                                                  ng-class="{last:$last,first:$first, infohighlight:currentInfohighlightArea == area,
                                                             warnhighlight:currentWarnhighlightArea == area}"
-                                                 ng-repeat="area in row.areas" ui-sortable="sortableOptionsCell" ng-model="area.controls">
+                                                 ng-repeat="area in row.areas"
+                                                 ui-sortable="sortableOptionsCell"
+                                                 ng-model="area.controls"
+                                                 ng-click="addItemOverlay($event, area, 0, area.$uniqueId);">
 
-                                                <!-- Controls in areas -->
-                                                <div ng-repeat="control in area.controls"
-                                                     ng-mouseover="setCurrentControl(control)"
-                                                     ng-mouseleave="disableCurrentControl(control)"
-                                                     ng-animate="'fade'"
-                                                     class="umb-control">
+                                                <div class="umb-cell-content">
 
-                                                    <!-- Filled cell tools -->
-                                                    <div class="cell-tools"
-                                                         ng-class="{'with-prompt': control.deletePrompt}"
-                                                         ng-animate="'fade'"
-                                                         ng-if="control && (currentControl == control)">
+                                                   <!-- Controls in areas -->
+                                                   <div ng-repeat="control in area.controls"
+                                                        ng-mouseover="setCurrentControl(control)"
+                                                        ng-mouseleave="disableCurrentControl(control)"
+                                                        ng-animate="'fade'"
+                                                        class="umb-control">
 
-                                                        <!-- delete control -->
-                                                        <div class="cell-tools-remove">
-                                                            <div class="iconBox"
-                                                                 ng-click="showPrompt(control)"
-                                                                 ng-mouseover="setWarnhighlightControl(control)"
-                                                                 ng-mouseleave="disableWarnhighlightControl(control)">
+                                                       <!-- Filled cell tools -->
+                                                       <div class="cell-tools"
+                                                            ng-class="{'with-prompt': control.deletePrompt}"
+                                                            ng-animate="'fade'"
+                                                            ng-if="control && (currentControl == control)">
 
-                                                                <span class="prompt" ng-if="control.deletePrompt">
-                                                                    <localize key="general_areyousure" />
-                                                                    <a href ng-click="removeControl(area, $index)"><localize key="general_yes" /></a>
-                                                                    <a href ng-click="clearPrompt(control, $event)"><localize key="general_no" /></a>
-                                                                </span>
+                                                           <!-- delete control -->
+                                                           <div class="cell-tools-remove">
+                                                               <div class="iconBox"
+                                                                    ng-click="showPrompt(control)"
+                                                                    ng-mouseover="setWarnhighlightControl(control)"
+                                                                    ng-mouseleave="disableWarnhighlightControl(control)">
 
-                                                                <i ng-if="!control.deletePrompt" class="icon icon-trash" title="@general_delete" localize="title"></i>
-                                                            </div>
-                                                        </div>
+                                                                   <span class="prompt" ng-if="control.deletePrompt">
+                                                                       <localize key="general_areyousure" />
+                                                                       <a href ng-click="removeControl(area, $index)"><localize key="general_yes" /></a>
+                                                                       <a href ng-click="clearPrompt(control, $event)"><localize key="general_no" /></a>
+                                                                   </span>
 
-                                                        <!-- move control -->
-                                                        <div class="cell-tools-move">
-                                                            <a class="iconBox"
-                                                               ng-mouseover="setInfohighlightControl(control)"
-                                                               ng-mouseleave="disableInfohighlightControl(control)"
-                                                               href>
-                                                                <i class="icon icon-navigation" title="@general_move" localize="title"></i>
-                                                            </a>
-                                                        </div>
+                                                                   <i ng-if="!control.deletePrompt" class="icon icon-trash" title="@general_delete" localize="title"></i>
+                                                               </div>
+                                                           </div>
 
-                                                        <!-- setting area -->
-                                                        <div class="cell-tools-edit" ng-if="hasSettings && $first">
-                                                            <a class="iconBox"
-                                                               ng-mouseover="setInfohighlightArea(area)"
-                                                               ng-mouseleave="disableInfohighlightArea(area)"
-                                                               ng-click="editGridItemSettings(area, 'cell')"
-                                                               href>
-                                                                <i class="icon icon-settings" title="@grid_settings" localize="title"></i>
-                                                            </a>
-                                                        </div>
+                                                           <!-- move control -->
+                                                           <div class="cell-tools-move">
+                                                               <a class="iconBox"
+                                                                  ng-mouseover="setInfohighlightControl(control)"
+                                                                  ng-mouseleave="disableInfohighlightControl(control)"
+                                                                  href>
+                                                                   <i class="icon icon-navigation" title="@general_move" localize="title"></i>
+                                                               </a>
+                                                           </div>
 
-                                                    </div>
+                                                           <!-- setting area -->
+                                                           <div class="cell-tools-edit" ng-if="hasSettings && $first">
+                                                               <a class="iconBox"
+                                                                  ng-mouseover="setInfohighlightArea(area)"
+                                                                  ng-mouseleave="disableInfohighlightArea(area)"
+                                                                  ng-click="editGridItemSettings(area, 'cell')"
+                                                                  href>
+                                                                   <i class="icon icon-settings" title="@grid_settings" localize="title"></i>
+                                                               </a>
+                                                           </div>
 
-                                                    <div class="umb-control-inner" ng-class="{last:$last,
-                                                               infohighlight:currentInfohighlightControl == control,
-                                                               warnhighlight:currentWarnhighlightControl == control,
-                                                               selectedControl:currentControl == control}">
+                                                       </div>
 
-                                                        <ins class="item-label">{{control.editor.name}}</ins>
+                                                       <div class="umb-control-inner" ng-class="{last:$last,
+                                                                  infohighlight:currentInfohighlightControl == control,
+                                                                  warnhighlight:currentWarnhighlightControl == control,
+                                                                  selectedControl:currentControl == control}">
 
-                                                        <!-- Redering the editor for specific control -->
-                                                        <div ng-if="control && control.$editorPath"
-                                                             ng-include="control.$editorPath"
-                                                             class="umb-cell-{{control.editor.view}}">
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                           <ins class="item-label">{{control.editor.name}}</ins>
+
+                                                           <!-- Redering the editor for specific control -->
+                                                           <div ng-if="control && control.$editorPath"
+                                                                ng-include="control.$editorPath"
+                                                                class="umb-cell-{{control.editor.view}}">
+                                                           </div>
+                                                       </div>
+                                                   </div>
                                                 <!-- Controls repeat end -->
                                                 <!-- if area is empty tools -->
+
+                                                </div>
 
                                                 <!--
                                                 <div class="umb-control umb-control-placeholder"
@@ -229,7 +235,20 @@
                     <!-- row sortable end -->
                     <!-- column tools -->
 
-                    <div class="templates-preview">
+                    <div class="umb-add-row">
+
+                       <a href=""
+                          class="iconBox"
+                          ng-click="toggleAddRow()"
+                          ng-if="!showRowConfigurations">
+
+                          <i class=" icon icon-add" title="@general_add" localize="title"></i>
+
+                       </a>
+
+                    </div>
+
+                    <div class="templates-preview" ng-if="showRowConfigurations">
 
                         <div class="preview-rows columns"
                              ng-repeat="layout in  section.$allowedLayouts"
