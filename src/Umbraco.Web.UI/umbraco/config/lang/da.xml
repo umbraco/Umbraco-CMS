@@ -923,6 +923,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="userTypes">Brugertyper</key>
     <key alias="writer">Forfatter</key>
     <key alias="translator">Oversætter</key>
+    <key alias="change">Skift</key>
     <key alias="yourProfile">Din profil</key>
     <key alias="yourHistory">Din historik</key>
     <key alias="sessionExpires">Session udløber</key>
