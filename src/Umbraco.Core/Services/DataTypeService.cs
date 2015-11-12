@@ -45,12 +45,12 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public void DeleteContainer(int folderId, int userId = 0)
+        public void DeleteContainer(int containerId, int userId = 0)
         {
             var uow = UowProvider.GetUnitOfWork();
             using (var repo = RepositoryFactory.CreateDataTypeDefinitionRepository(uow))
             {
-                repo.DeleteContainer(folderId);
+                repo.DeleteContainer(containerId);
                 uow.Commit();
                 //TODO: Audit trail ?
             }

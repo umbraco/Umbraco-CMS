@@ -7,7 +7,7 @@ namespace Umbraco.Core.Persistence.Repositories
     public interface IDataTypeDefinitionRepository : IRepositoryQueryable<int, IDataTypeDefinition>
     {
         EntityContainer CreateContainer(int parentId, string name, int userId);
-        void DeleteContainer(int folderId);
+        void DeleteContainer(int containerId);
 
         PreValueCollection GetPreValuesCollectionByDataTypeId(int dataTypeId);
         string GetPreValueAsString(int preValueId);

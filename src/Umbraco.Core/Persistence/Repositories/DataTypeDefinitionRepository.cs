@@ -42,10 +42,10 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// Deletes a folder - this will move all contained entities into their parent
         /// </summary>
-        /// <param name="folderId"></param>
-        public void DeleteContainer(int folderId)
+        /// <param name="containerId"></param>
+        public void DeleteContainer(int containerId)
         {
-            var found = _containerRepository.Get(folderId);
+            var found = _containerRepository.Get(containerId);
             _containerRepository.Delete(found);
         }
 

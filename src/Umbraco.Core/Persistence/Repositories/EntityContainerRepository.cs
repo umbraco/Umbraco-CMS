@@ -113,7 +113,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 new Sql().Select("*")
                     .From<NodeDto>(SqlSyntax)
                     .Where("parentID=@parentID AND (nodeObjectType=@entityObjectType OR nodeObjectType=@containerObjectType)",
-                        new {parentID = entity.ParentId, entityObjectType = _entityObjectType, containerObjectType = _containerObjectType}));
+                        new {parentID = entity.Id, entityObjectType = _entityObjectType, containerObjectType = _containerObjectType}));
 
             foreach (var childDto in children)
             {

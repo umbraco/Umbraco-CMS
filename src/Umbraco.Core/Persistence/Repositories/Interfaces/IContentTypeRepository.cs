@@ -32,7 +32,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// Deletes a folder - this will move all contained content types into their parent
         /// </summary>
-        /// <param name="folderId"></param>
-        void DeleteContainer(int folderId);
+        /// <param name="containerId"></param>
+        void DeleteContainer(int containerId);
     }
 }
