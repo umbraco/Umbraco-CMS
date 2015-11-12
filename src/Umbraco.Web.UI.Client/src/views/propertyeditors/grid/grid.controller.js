@@ -9,7 +9,7 @@ angular.module("umbraco")
         $scope.currentControl = null;
         $scope.openRTEToolbarId = null;
         $scope.hasSettings = false;
-        $scope.showRowConfigurations = false;
+        $scope.showRowConfigurations = true;
 
         // *********************************************
         // Sortable options
