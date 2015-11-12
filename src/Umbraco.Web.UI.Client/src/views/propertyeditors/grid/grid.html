@@ -118,7 +118,7 @@
                                                  ng-repeat="area in row.areas"
                                                  ui-sortable="sortableOptionsCell"
                                                  ng-model="area.controls"
-                                                 ng-click="addItemOverlay($event, area, 0, area.$uniqueId);">
+                                                 ng-click="openEditorOverlay($event, area, 0, area.$uniqueId);">
 
                                                 <div class="umb-cell-content">
 
@@ -284,5 +284,12 @@
             </div>
         </div>
     </div>
+
+    <umb-overlay
+      ng-if="editorOverlay.show"
+      model="editorOverlay"
+      view="editorOverlay.view"
+      position="target">
+    </umb-overlay>
 
 </div>
