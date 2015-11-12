@@ -9,6 +9,7 @@ angular.module("umbraco")
         $scope.currentControl = null;
         $scope.openRTEToolbarId = null;
         $scope.hasSettings = false;
+        $scope.showRowConfigurations = false;
 
         // *********************************************
         // Sortable options
@@ -277,6 +278,9 @@ angular.module("umbraco")
             if (row) {
                 section.rows.push(row);
             }
+
+            $scope.showRowConfigurations = false;
+
         };
 
         $scope.removeRow = function (section, $index) {
@@ -286,6 +290,10 @@ angular.module("umbraco")
                 $scope.openRTEToolbarId = null;
 
                 //$scope.initContent();
+            }
+
+            if(section.rows.length === 0) {
+               $scope.showRowConfigurations = true;
             }
         };
 
@@ -436,6 +444,10 @@ angular.module("umbraco")
 
         $scope.showPrompt = function (scopedObject) {
             scopedObject.deletePrompt = true;
+        };
+
+        $scope.toggleAddRow = function() {
+          $scope.showRowConfigurations = !$scope.showRowConfigurations;
         };
 
 
