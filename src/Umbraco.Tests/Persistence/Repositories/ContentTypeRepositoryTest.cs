@@ -136,10 +136,12 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 // Act
                 var contentType = (IContentType)MockedContentTypes.CreateSimpleContentType("test", "Test", propertyGroupName: "testGroup");
-                var display = Mapper.Map<ContentTypeCompositionDisplay>(contentType);
-                //simulate what would happen in the controller, we'd never map to a 'existing' content type,
-                // we'd map to an new content type when updating.
-                var mapped = Mapper.Map<IContentType>(display);
+
+                // there is NO mapping from display to contentType, but only from save
+                // to contentType, so if we want to test, let's to it properly!
+                var display = Mapper.Map<ContentTypeDisplay>(contentType);
+                var save = MapToContentTypeSave(display);
+                var mapped = Mapper.Map<IContentType>(save);
 
                 repository.AddOrUpdate(mapped);
                 unitOfWork.Commit();
@@ -196,6 +198,47 @@ namespace Umbraco.Tests.Persistence.Repositories
             
         }
 
+        // this is for tests only because it makes no sense at all to have such a
+        // mapping defined, we only need it for the weird tests that use it
+        private ContentTypeSave MapToContentTypeSave(ContentTypeDisplay display)
+        {
+            return new ContentTypeSave
+            {
+                // EntityBasic
+                Name = display.Name,
+                Icon = display.Icon,
+                Trashed = display.Trashed,
+                Key = display.Key,
+                ParentId = display.ParentId,
+                //Alias = display.Alias,
+                Path = display.Path,
+                //AdditionalData = display.AdditionalData,
+
+                // ContentTypeBasic
+                Alias = display.Alias,
+                UpdateDate = display.UpdateDate,
+                CreateDate = display.CreateDate,
+                Description = display.Description,
+                Thumbnail = display.Thumbnail,
+
+                // ContentTypeSave
+                CompositeContentTypes = display.CompositeContentTypes,
+                IsContainer = display.IsContainer,
+                AllowAsRoot = display.AllowAsRoot,
+                AllowedTemplates = display.AllowedTemplates.Select(x => x.Alias),
+                AllowedContentTypes = display.AllowedContentTypes,
+                DefaultTemplate = display.DefaultTemplate == null ? null : display.DefaultTemplate.Alias,
+                Groups = display.Groups.Select(x => new PropertyGroupBasic<PropertyTypeBasic>
+                {
+                    Inherited = x.Inherited,
+                    Id = x.Id,
+                    Properties = x.Properties,
+                    SortOrder = x.SortOrder,
+                    Name = x.Name
+                }).ToArray()
+            };
+        }
+
         [Test]
         public void Can_Perform_Update_On_ContentTypeRepository_After_Model_Mapping()
         {
@@ -207,21 +250,22 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
 
-                var display = Mapper.Map<ContentTypeCompositionDisplay>(contentType);
+                // there is NO mapping from display to contentType, but only from save
+                // to contentType, so if we want to test, let's to it properly!
+                var display = Mapper.Map<ContentTypeDisplay>(contentType);
+                var save = MapToContentTypeSave(display);
 
-                display.Thumbnail = "Doc2.png";
-                var contentGroup = display.Groups.Single(x => x.Name == "Content");
-
-                //add property
+                // modify...
+                save.Thumbnail = "Doc2.png";
+                var contentGroup = save.Groups.Single(x => x.Name == "Content");
                 contentGroup.Properties = contentGroup.Properties.Concat(new[]
                 {
-                    new PropertyTypeDisplay()
+                    new PropertyTypeBasic
                     {
                         Alias = "subtitle",
-                        Editor = "test",
                         Label = "Subtitle",
                         Description = "Optional Subtitle",
-                        Validation = new PropertyTypeValidation()
+                        Validation = new PropertyTypeValidation
                         {
                             Mandatory = false,
                             Pattern = ""
@@ -231,9 +275,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                     }
                 });
 
-                //simulate what would happen in the controller, we'd never map to a 'new' content type,
-                // we'd map to an existing content type when updating.
-                var mapped = Mapper.Map(display, contentType);
+                var mapped = Mapper.Map(save, contentType);
+
+                // just making sure
+                Assert.AreEqual(mapped.Thumbnail, "Doc2.png");
+                Assert.IsTrue(mapped.PropertyTypes.Any(x => x.Alias == "subtitle"));
 
                 repository.AddOrUpdate(mapped);
                 unitOfWork.Commit();
