@@ -243,6 +243,19 @@ namespace Umbraco.Web.Editors
             return basics;
         }
 
+        /// <summary>
+        /// Move the media type
+        /// </summary>
+        /// <param name="move"></param>
+        /// <returns></returns>
+        public HttpResponseMessage PostMove(MoveOrCopy move)
+        {
+            return PerformMove(
+                move,
+                getContentType: i => Services.ContentTypeService.GetContentType(i),
+                doMove: (type, i) => Services.ContentTypeService.MoveContentType(type, i));
+        }
+
 
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Events;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -10,6 +12,7 @@ using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -23,9 +26,7 @@ namespace Umbraco.Core.Persistence.Repositories
             : base(work, cache, logger, sqlSyntax, new Guid(Constants.ObjectTypes.MediaTypeContainer))
         {
         }
-
-        #region Overrides of RepositoryBase<int,IMedia>
-
+        
         protected override IMediaType PerformGet(int id)
         {
             var contentTypes = ContentTypeQueryMapper.GetMediaTypes(
@@ -61,10 +62,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 ? GetAll(dtos.DistinctBy(x => x.NodeId).Select(x => x.NodeId).ToArray())
                 : Enumerable.Empty<IMediaType>();
         }
-
-        #endregion
-
-
+        
         /// <summary>
         /// Gets all entities of the specified <see cref="PropertyType"/> query
         /// </summary>
@@ -76,10 +74,8 @@ namespace Umbraco.Core.Persistence.Repositories
             return ints.Any()
                 ? GetAll(ints)
                 : Enumerable.Empty<IMediaType>();
-        }
-
-        #region Overrides of PetaPocoRepositoryBase<int,IMedia>
-
+        }       
+        
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sql = new Sql();
@@ -119,11 +115,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             get { return new Guid(Constants.ObjectTypes.MediaType); }
         }
-
-        #endregion
-
-        #region Unit of Work Implementation
-
+        
         protected override void PersistNewItem(IMediaType entity)
         {
             ((MediaType)entity).AddingEntity();
@@ -163,9 +155,6 @@ namespace Umbraco.Core.Persistence.Repositories
 
             entity.ResetDirtyProperties();
         }
-
-        #endregion
-        
         
         protected override IMediaType PerformGet(Guid id)
         {

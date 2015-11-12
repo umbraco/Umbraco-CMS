@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Querying;
 
@@ -28,5 +29,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="folderId"></param>        
         void DeleteContainer(int folderId);
+
+        IEnumerable<MoveEventInfo<IMediaType>> Move(IMediaType toMove, int parentId);
     }
 }

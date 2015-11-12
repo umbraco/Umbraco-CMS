@@ -32,6 +32,49 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Can_Move()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var container = repository.CreateContainer(-1, "blah", 0);
+                unitOfWork.Commit();
+
+                var container2 = repository.CreateContainer(container.Id, "blah2", 0);
+                unitOfWork.Commit();
+
+                var contentType = (IMediaType)MockedContentTypes.CreateVideoMediaType();
+                contentType.ParentId = container2.Id;
+                repository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
+
+                //create a 
+                var contentType2 = (IMediaType)new MediaType(contentType, "hello")
+                {
+                    Name = "Blahasdfsadf"
+                };
+                contentType.ParentId = contentType.Id;
+                repository.AddOrUpdate(contentType2);
+                unitOfWork.Commit();
+
+                var result = repository.Move(contentType, container.Id).ToArray();
+                unitOfWork.Commit();
+
+                Assert.AreEqual(2, result.Count());
+
+                //re-get
+                contentType = repository.Get(contentType.Id);
+                contentType2 = repository.Get(contentType2.Id);
+
+                Assert.AreEqual(container.Id, contentType.ParentId);
+                Assert.AreNotEqual(result.Single(x => x.Entity.Id == contentType.Id).OriginalPath, contentType.Path);
+                Assert.AreNotEqual(result.Single(x => x.Entity.Id == contentType2.Id).OriginalPath, contentType2.Path);
+            }
+            
+        }
+
+        [Test]
         public void Can_Create_Container()
         {
             var provider = new PetaPocoUnitOfWorkProvider(Logger);

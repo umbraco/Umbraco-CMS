@@ -14,6 +14,7 @@ using System.Net;
 using Umbraco.Core.PropertyEditors;
 using System;
 using System.Net.Http;
+using System.Text;
 using Umbraco.Web.WebApi;
 using ContentType = System.Net.Mime.ContentType;
 using Umbraco.Core.Services;
@@ -186,5 +187,19 @@ namespace Umbraco.Web.Editors
 
             return basics;
         }
+
+        /// <summary>
+        /// Move the media type
+        /// </summary>
+        /// <param name="move"></param>
+        /// <returns></returns>
+        public HttpResponseMessage PostMove(MoveOrCopy move)
+        {
+            return PerformMove(
+                move, 
+                getContentType: i => Services.ContentTypeService.GetMediaType(i), 
+                doMove:         (type, i) => Services.ContentTypeService.MoveMediaType(type, i));            
+        }
+        
     }
 }
