@@ -191,7 +191,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
                 if (foundPg != null)
                 {
                     //this exists on the parent, so set the parent id
-                    pg.ParentId = foundPg.Id;    
+                    pg.SetLazyParentId(new Lazy<int?>(() => foundPg.Id));
                 }
             }
 

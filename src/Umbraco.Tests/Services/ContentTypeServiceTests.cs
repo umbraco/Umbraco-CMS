@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 
@@ -509,7 +510,7 @@ namespace Umbraco.Tests.Services
 
             // Assert
             Assert.That(added, Is.True);
-            Assert.Throws<Exception>(() => service.Save(composition));
+            Assert.Throws<InvalidCompositionException>(() => service.Save(composition));
             Assert.DoesNotThrow(() => service.GetContentType("simpleChildPage"));
         }
 
@@ -555,9 +556,9 @@ namespace Umbraco.Tests.Services
             Assert.That(addedToMeta, Is.True);
             Assert.That(addedToSeo, Is.True);
 
-            Assert.Throws<Exception>(() => service.Save(basePage));
-            Assert.Throws<Exception>(() => service.Save(metaComposition));
-            Assert.Throws<Exception>(() => service.Save(seoComposition));
+            Assert.Throws<InvalidCompositionException>(() => service.Save(basePage));
+            Assert.Throws<InvalidCompositionException>(() => service.Save(metaComposition));
+            Assert.Throws<InvalidCompositionException>(() => service.Save(seoComposition));
 
             Assert.DoesNotThrow(() => service.GetContentType("contentPage"));
             Assert.DoesNotThrow(() => service.GetContentType("advancedPage"));
@@ -621,7 +622,7 @@ namespace Umbraco.Tests.Services
             Assert.That(titleAdded, Is.True);
             Assert.That(compositionAdded, Is.True);
 
-            Assert.Throws<Exception>(() => service.Save(basePage));
+            Assert.Throws<InvalidCompositionException>(() => service.Save(basePage));
 
             Assert.DoesNotThrow(() => service.GetContentType("contentPage"));
             Assert.DoesNotThrow(() => service.GetContentType("advancedPage"));
@@ -700,7 +701,7 @@ namespace Umbraco.Tests.Services
             Assert.That(seoCompositionAdded, Is.True);
             Assert.That(metaCompositionAdded, Is.True);
 
-            Assert.Throws<Exception>(() => service.Save(metaComposition));
+            Assert.Throws<InvalidCompositionException>(() => service.Save(metaComposition));
 
             Assert.DoesNotThrow(() => service.GetContentType("contentPage"));
             Assert.DoesNotThrow(() => service.GetContentType("advancedPage"));
@@ -887,7 +888,7 @@ namespace Umbraco.Tests.Services
             Assert.That(titleAdded, Is.True);
             Assert.That(subtitleAdded, Is.True);
 
-            Assert.Throws<Exception>(() => service.Save(advancedPage));
+            Assert.Throws<InvalidCompositionException>(() => service.Save(advancedPage));
 
             Assert.DoesNotThrow(() => service.GetContentType("contentPage"));
             Assert.DoesNotThrow(() => service.GetContentType("advancedPage"));
