@@ -7,6 +7,8 @@
         <div class="templates-preview"
              ng-show="!model.value || model.value == ''">
 
+             <p><span class="help-text"><localize key="grid_addRows"/></span></p>
+
             <div class="preview-rows layout"
                  ng-repeat="template in model.config.items.templates"
                  ng-click="addTemplate(template)">
@@ -31,9 +33,6 @@
                 <small>{{template.name}}</small>
 
             </div> <!-- .templates-preview-rows -->
-
-            <p><span class="help-text"><localize key="grid_addRows"/></span></p>
-
 
         </div> <!-- .templates-preview -->
         <!-- template picker end -->
@@ -250,6 +249,10 @@
 
                     <div class="templates-preview" ng-if="showRowConfigurations">
 
+                        <p>
+                            <span class="help-text"><localize key="grid_addRows" /></span>
+                        </p>
+
                         <div class="preview-rows columns"
                              ng-repeat="layout in  section.$allowedLayouts"
                              ng-show="layout.areas.length > 0"
@@ -272,11 +275,6 @@
                             <small>{{layout.name}}</small>
 
                         </div> <!-- .templates-preview-rows -->
-
-                        <p>
-                            <span class="help-text"><localize key="grid_addRows" /></span>
-                        </p>
-
 
                     </div> <!-- .templates-preview -->
                     <!-- column tools end -->
