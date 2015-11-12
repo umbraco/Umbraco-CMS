@@ -323,24 +323,33 @@
 }
 */
 
-.umb-grid .umb-row-title {
+.umb-grid .umb-row-title-bar {
    margin-bottom: 20px;
-   display: block;
+   display: flex;
    padding-left: 10px;
    padding-right: 10px;
 }
 
-.umb-grid ins.item-label {
-   text-transform: uppercase;
-   font-size: 13px;
-   color: @gray;
-   font-weight: bold;
-   text-decoration: none;
-   display: inline-block;
+.umb-grid .umb-row-title {
+    display: inline-block;
+    font-size: 15px;
+}
+
+.umb-grid .umb-row-title p{
+    font-weight: bold;
+    color: @black;
 }
 
 .umb-grid .row-tools {
    display: inline-block;
+   margin-left: 10px;
+   font-size: 18px;
+   color: @gray;
+}
+
+.row-tools i:hover {
+    color: @blueDark;
+    cursor: pointer;
 }
 
 .umb-grid .umb-add-row {

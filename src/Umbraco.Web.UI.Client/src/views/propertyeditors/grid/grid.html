@@ -54,9 +54,12 @@
                         <!-- ng-mouseleave="disableCurrentRow()"  -->
                         <div ng-repeat="row in section.rows" class="umb-row">
 
-                            <div class="umb-row-title">
+                            <div class="umb-row-title-bar">
 
-                               <ins class="item-label">{{row.name}}</ins>
+                                <div class="umb-row-title">
+                                    <p>{{row.name}}</p>
+                                </div>
+
 
                                <!-- Row tool -->
                                <div class="row-tools">
@@ -78,11 +81,11 @@
                                    </div>
 
                                    <div class="cell-tools-move">
-                                       <a ng-mouseover="setInfohighlightRow(row)"
+                                       <div ng-mouseover="setInfohighlightRow(row)"
                                           ng-mouseleave="disableInfohighlightRow(row)"
                                           href>
                                            <i class="icon icon-navigation" title="@general_move" localize="title"></i>
-                                       </a>
+                                       </div>
                                    </div>
 
                                    <div class="cell-tools-edit" ng-if="hasSettings">
