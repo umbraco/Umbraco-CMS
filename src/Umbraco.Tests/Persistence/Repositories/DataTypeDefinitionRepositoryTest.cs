@@ -17,6 +17,7 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -56,6 +57,50 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Pre_Value_Cache_Key_Tests(string cacheKey, int preValueId, bool outcome)
         {
             Assert.AreEqual(outcome, Regex.IsMatch(cacheKey, DataTypeDefinitionRepository.GetCacheKeyRegex(preValueId)));
+        }
+
+        [Test]
+        public void Can_Move()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var container = repository.CreateContainer(-1, "blah", 0);
+                unitOfWork.Commit();
+
+                var container2 = repository.CreateContainer(container.Id, "blah2", 0);
+                unitOfWork.Commit();
+
+                var dataType = (IDataTypeDefinition) new DataTypeDefinition(container2.Id, Constants.PropertyEditors.RadioButtonListAlias)
+                {
+                    Name = "dt1"
+                };
+                repository.AddOrUpdate(dataType);
+                unitOfWork.Commit();
+
+                //create a 
+                var dataType2 = (IDataTypeDefinition)new DataTypeDefinition(dataType.Id, Constants.PropertyEditors.RadioButtonListAlias)
+                {
+                    Name = "dt2"
+                };
+                repository.AddOrUpdate(dataType2);
+                unitOfWork.Commit();
+
+                var result = repository.Move(dataType, container.Id).ToArray();
+                unitOfWork.Commit();
+
+                Assert.AreEqual(2, result.Count());
+
+                //re-get
+                dataType = repository.Get(dataType.Id);
+                dataType2 = repository.Get(dataType2.Id);
+
+                Assert.AreEqual(container.Id, dataType.ParentId);
+                Assert.AreNotEqual(result.Single(x => x.Entity.Id == dataType.Id).OriginalPath, dataType.Path);
+                Assert.AreNotEqual(result.Single(x => x.Entity.Id == dataType2.Id).OriginalPath, dataType2.Path);
+            }
+
         }
 
         [Test]

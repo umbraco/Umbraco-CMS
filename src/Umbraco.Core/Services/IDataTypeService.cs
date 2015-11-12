@@ -154,5 +154,7 @@ namespace Umbraco.Core.Services
         /// <param name="id">Id of the PreValue to retrieve the value from</param>
         /// <returns>PreValue as a string</returns>
         string GetPreValueAsString(int id);
+
+        Attempt<OperationStatus<MoveOperationStatusType>> Move(IDataTypeDefinition toMove, int parentId);
     }
 }

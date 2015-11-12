@@ -45,6 +45,9 @@ namespace Umbraco.Web.Trees
                        return node;
                    }));
 
+            //if the request is for folders only then just return
+            if (queryStrings["foldersonly"].IsNullOrWhiteSpace() == false && queryStrings["foldersonly"] == "1") return nodes;
+
             //Normal nodes
             var sysIds = GetSystemIds();
 
