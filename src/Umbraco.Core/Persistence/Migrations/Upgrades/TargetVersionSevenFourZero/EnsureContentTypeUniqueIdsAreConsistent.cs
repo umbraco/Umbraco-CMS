@@ -1,5 +1,8 @@
+using System;
+using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourZero
@@ -19,18 +22,24 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourZer
         
         public override void Up()
         {
-            var sql = @"select umbracoNode.id,
-	                      cmsContentType.alias
-                      from umbracoNode
-                      inner join cmsContentType
-                      on umbracoNode.id = cmsContentType.nodeId
-                      where nodeObjectType = '" + Constants.ObjectTypes.DocumentType + "'";
-            var rows = Context.Database.Fetch<dynamic>(sql);
+            var docTypeGuid = new Guid(Constants.ObjectTypes.DocumentType);
+            var mediaTypeGuid = new Guid(Constants.ObjectTypes.MediaType);
+            var memberTypeGuid = new Guid(Constants.ObjectTypes.MemberType);
+
+            var sql = new Sql()
+                .Select("umbracoNode.id,cmsContentType.alias,umbracoNode.nodeObjectType")
+                .From<NodeDto>(SqlSyntax)
+                .InnerJoin<ContentTypeDto>(SqlSyntax)
+                .On<NodeDto, ContentTypeDto>(SqlSyntax, dto => dto.NodeId, dto => dto.NodeId);
+
+            var rows = Context.Database.Fetch<dynamic>(sql)
+                .Where(x => x.nodeObjectType == docTypeGuid || x.nodeObjectType == mediaTypeGuid || x.nodeObjectType == memberTypeGuid);
             foreach (var row in rows)
             {
                 // casting to string to gain access to ToGuid extension method.
                 var alias = (string)row.alias.ToString();
-                var consistentGuid = (alias + Constants.ObjectTypes.DocumentType).ToGuid();
+                var nodeType = ((Guid) row.nodeObjectType).ToString();
+                var consistentGuid = (alias + nodeType).ToGuid();
                 Update.Table("umbracoNode").Set(new { uniqueID = consistentGuid }).Where(new { id = row.id });
             }
         }
