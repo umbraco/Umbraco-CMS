@@ -19,9 +19,9 @@ function MediaTypesCreateController($scope, $location, navigationService, mediaT
         $scope.model.creatingFolder = true;
     }
 
-    $scope.createFolder = function () {
+    $scope.createContainer = function () {
         if (formHelper.submitForm({ scope: $scope, formCtrl: this.createFolderForm, statusMessage: "Creating folder..." })) {
-            mediaTypeResource.createFolder(node.id, $scope.model.folderName).then(function (folderId) {
+            mediaTypeResource.createContainer(node.id, $scope.model.folderName).then(function (folderId) {
 
                 navigationService.hideMenu();
                 var currPath = node.path ? node.path : "-1";

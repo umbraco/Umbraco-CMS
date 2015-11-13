@@ -336,6 +336,7 @@
     <Compile Include="Events\RollbackEventArgs.cs" />
     <Compile Include="Events\SaveEventArgs.cs" />
     <Compile Include="Events\SendToPublishEventArgs.cs" />
+    <Compile Include="Exceptions\DataOperationException.cs" />
     <Compile Include="Exceptions\InvalidCompositionException.cs" />
     <Compile Include="Exceptions\UmbracoStartupFailedException.cs" />
     <Compile Include="FileResources\Files.Designer.cs">
@@ -357,6 +358,7 @@
     <Compile Include="Manifest\GridEditorConverter.cs" />
     <Compile Include="Models\AuditItem.cs" />
     <Compile Include="Models\AuditType.cs" />
+    <Compile Include="Models\EntityContainer.cs" />
     <Compile Include="Models\Identity\IdentityModelMappings.cs" />
     <Compile Include="Models\Identity\IdentityUser.cs" />
     <Compile Include="Models\Identity\IdentityUserClaim.cs" />
@@ -444,6 +446,7 @@
     <Compile Include="Persistence\RecordPersistenceType.cs" />
     <Compile Include="Persistence\Relators\AccessRulesRelator.cs" />
     <Compile Include="Persistence\Repositories\AuditRepository.cs" />
+    <Compile Include="Persistence\Repositories\EntityContainerRepository.cs" />
     <Compile Include="Persistence\Repositories\DeepCloneRuntimeCacheProvider.cs" />
     <Compile Include="Persistence\Repositories\DomainRepository.cs" />
     <Compile Include="Persistence\Repositories\ExternalLoginRepository.cs" />
@@ -497,6 +500,7 @@
     <Compile Include="Services\ITaskService.cs" />
     <Compile Include="Services\LocalizedTextServiceSupplementaryFileSource.cs" />
     <Compile Include="Services\MigrationEntryService.cs" />
+    <Compile Include="Services\MoveOperationStatusType.cs" />
     <Compile Include="Services\PublicAccessService.cs" />
     <Compile Include="Services\PublicAccessServiceExtensions.cs" />
     <Compile Include="Services\RepositoryService.cs" />

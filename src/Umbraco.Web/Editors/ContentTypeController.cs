@@ -118,36 +118,21 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [HttpDelete]
         [HttpPost]
-        public HttpResponseMessage DeleteContainerById(int id)
+        public HttpResponseMessage DeleteContainer(int id)
         {
-            //TODO: This needs to be implemented correctly
-
-            var foundType = Services.EntityService.Get(id);
-            if (foundType == null)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
-
-            if (foundType.HasChildren())
-            {
-                throw new HttpResponseException(HttpStatusCode.Forbidden);
-            }
-
-            //TODO: what service to use to delete?
+            Services.ContentTypeService.DeleteContentTypeContainer(id, Security.CurrentUser.Id);
 
             return Request.CreateResponse(HttpStatusCode.OK);
         }
-
-        public HttpResponseMessage PostCreateFolder(int parentId, string name)
+        
+        public HttpResponseMessage PostCreateContainer(int parentId, string name)
         {
-            var result = Services.ContentTypeService.CreateFolder(parentId, name, Security.CurrentUser.Id);
+            var result = Services.ContentTypeService.CreateContentTypeContainer(parentId, name, Security.CurrentUser.Id);
 
             return result
                 ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id 
-                : Request.CreateValidationErrorResponse(result.Exception.Message);
+                : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
         }
-
-        
 
         public ContentTypeDisplay PostSave(ContentTypeSave contentTypeSave)
         {
@@ -256,6 +241,19 @@ namespace Umbraco.Web.Editors
             }
 
             return basics;
+        }
+
+        /// <summary>
+        /// Move the media type
+        /// </summary>
+        /// <param name="move"></param>
+        /// <returns></returns>
+        public HttpResponseMessage PostMove(MoveOrCopy move)
+        {
+            return PerformMove(
+                move,
+                getContentType: i => Services.ContentTypeService.GetContentType(i),
+                doMove: (type, i) => Services.ContentTypeService.MoveContentType(type, i));
         }
 
 

@@ -1,6 +1,6 @@
 angular.module("umbraco")
-.controller("Umbraco.Editors.DocumentTypes.MoveController",
-    function ($scope, contentTypeResource, treeService, navigationService, notificationsService, appState) {
+.controller("Umbraco.Editors.DataType.MoveController",
+    function ($scope, dataTypeResource, treeService, navigationService, notificationsService, appState) {
         var dialogOptions = $scope.dialogOptions;
         $scope.dialogTreeEventHandler = $({});
 
@@ -22,7 +22,7 @@ angular.module("umbraco")
             $scope.busy = true;
             $scope.error = false;
 
-            contentTypeResource.move({ parentId: $scope.target.id, id: dialogOptions.currentNode.id })
+            dataTypeResource.move({ parentId: $scope.target.id, id: dialogOptions.currentNode.id })
                 .then(function (path) {
                     $scope.error = false;
                     $scope.success = true;
@@ -37,11 +37,11 @@ angular.module("umbraco")
                     //we need to do a double sync here: first sync to the moved content - but don't activate the node,
                     //then sync to the currenlty edited content (note: this might not be the content that was moved!!)
 
-                    navigationService.syncTree({ tree: "documentTypes", path: path, forceReload: true, activate: false }).then(function (args) {
+                    navigationService.syncTree({ tree: "dataTypes", path: path, forceReload: true, activate: false }).then(function (args) {
                         if (activeNode) {
                             var activeNodePath = treeService.getPath(activeNode).join();
                             //sync to this node now - depending on what was copied this might already be synced but might not be
-                            navigationService.syncTree({ tree: "documentTypes", path: activeNodePath, forceReload: false, activate: true });
+                            navigationService.syncTree({ tree: "dataTypes", path: activeNodePath, forceReload: false, activate: true });
                         }
                     });
 

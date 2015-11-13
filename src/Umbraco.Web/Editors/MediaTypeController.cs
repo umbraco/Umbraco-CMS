@@ -14,6 +14,7 @@ using System.Net;
 using Umbraco.Core.PropertyEditors;
 using System;
 using System.Net.Http;
+using System.Text;
 using Umbraco.Web.WebApi;
 using ContentType = System.Net.Mime.ContentType;
 using Umbraco.Core.Services;
@@ -82,9 +83,9 @@ namespace Umbraco.Web.Editors
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
-        public ContentTypeCompositionDisplay GetEmpty()
+        public ContentTypeCompositionDisplay GetEmpty(int parentId)
         {
-            var ct = new MediaType(-1);
+            var ct = new MediaType(parentId);
             ct.Icon = "icon-picture";
 
             var dto = Mapper.Map<IMediaType, ContentTypeCompositionDisplay>(ct);
@@ -100,6 +101,29 @@ namespace Umbraco.Web.Editors
             
             return Services.ContentTypeService.GetAllMediaTypes()
                                .Select(Mapper.Map<IMediaType, ContentTypeBasic>);
+        }
+
+        /// <summary>
+        /// Deletes a document type container wth a given ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [HttpPost]
+        public HttpResponseMessage DeleteContainer(int id)
+        {
+            Services.ContentTypeService.DeleteMediaTypeContainer(id, Security.CurrentUser.Id);
+
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
+        public HttpResponseMessage PostCreateContainer(int parentId, string name)
+        {
+            var result = Services.ContentTypeService.CreateMediaTypeContainer(parentId, name, Security.CurrentUser.Id);
+
+            return result
+                ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id 
+                : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
         }
 
         public ContentTypeCompositionDisplay PostSave(ContentTypeSave contentTypeSave)
@@ -163,5 +187,19 @@ namespace Umbraco.Web.Editors
 
             return basics;
         }
+
+        /// <summary>
+        /// Move the media type
+        /// </summary>
+        /// <param name="move"></param>
+        /// <returns></returns>
+        public HttpResponseMessage PostMove(MoveOrCopy move)
+        {
+            return PerformMove(
+                move, 
+                getContentType: i => Services.ContentTypeService.GetMediaType(i), 
+                doMove:         (type, i) => Services.ContentTypeService.MoveMediaType(type, i));            
+        }
+        
     }
 }

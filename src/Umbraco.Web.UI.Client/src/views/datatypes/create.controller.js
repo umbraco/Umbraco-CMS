@@ -1,12 +1,12 @@
 /**
  * @ngdoc controller
- * @name Umbraco.Editors.MemberType.CreateController
+ * @name Umbraco.Editors.DataType.CreateController
  * @function
  *
  * @description
- * The controller for the member type creation dialog
+ * The controller for the data type creation dialog
  */
-function MemberTypesCreateController($scope, $location, navigationService, memberTypeResource, formHelper, appState) {
+function DataTypeCreateController($scope, $location, navigationService, dataTypeResource, formHelper, appState) {
 
     $scope.model = {
         folderName: "",
@@ -21,11 +21,11 @@ function MemberTypesCreateController($scope, $location, navigationService, membe
 
     $scope.createContainer = function () {
         if (formHelper.submitForm({ scope: $scope, formCtrl: this.createFolderForm, statusMessage: "Creating folder..." })) {
-            memberTypeResource.createContainer(node.id, $scope.model.folderName).then(function (folderId) {
+            dataTypeResource.createContainer(node.id, $scope.model.folderName).then(function (folderId) {
 
                 navigationService.hideMenu();
                 var currPath = node.path ? node.path : "-1";
-                navigationService.syncTree({ tree: "membertypes", path: currPath + "," + folderId, forceReload: true, activate: true });
+                navigationService.syncTree({ tree: "datatypes", path: currPath + "," + folderId, forceReload: true, activate: true });
 
                 formHelper.resetForm({ scope: $scope });
 
@@ -38,11 +38,11 @@ function MemberTypesCreateController($scope, $location, navigationService, membe
         };
     }
 
-    $scope.createMemberType = function() {
+    $scope.createDataType = function() {
         $location.search('create', null);
-        $location.path("/settings/membertypes/edit/" + node.id).search("create", "true");
+        $location.path("/developer/datatypes/edit/" + node.id).search("create", "true");
         navigationService.hideMenu();
     }
 }
 
-angular.module('umbraco').controller("Umbraco.Editors.MemberTypes.CreateController", MemberTypesCreateController);
+angular.module('umbraco').controller("Umbraco.Editors.DataType.CreateController", DataTypeCreateController);

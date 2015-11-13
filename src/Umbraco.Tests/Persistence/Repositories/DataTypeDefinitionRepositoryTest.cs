@@ -17,6 +17,7 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -59,6 +60,150 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Can_Move()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var container = repository.CreateContainer(-1, "blah", 0);
+                unitOfWork.Commit();
+
+                var container2 = repository.CreateContainer(container.Id, "blah2", 0);
+                unitOfWork.Commit();
+
+                var dataType = (IDataTypeDefinition) new DataTypeDefinition(container2.Id, Constants.PropertyEditors.RadioButtonListAlias)
+                {
+                    Name = "dt1"
+                };
+                repository.AddOrUpdate(dataType);
+                unitOfWork.Commit();
+
+                //create a 
+                var dataType2 = (IDataTypeDefinition)new DataTypeDefinition(dataType.Id, Constants.PropertyEditors.RadioButtonListAlias)
+                {
+                    Name = "dt2"
+                };
+                repository.AddOrUpdate(dataType2);
+                unitOfWork.Commit();
+
+                var result = repository.Move(dataType, container.Id).ToArray();
+                unitOfWork.Commit();
+
+                Assert.AreEqual(2, result.Count());
+
+                //re-get
+                dataType = repository.Get(dataType.Id);
+                dataType2 = repository.Get(dataType2.Id);
+
+                Assert.AreEqual(container.Id, dataType.ParentId);
+                Assert.AreNotEqual(result.Single(x => x.Entity.Id == dataType.Id).OriginalPath, dataType.Path);
+                Assert.AreNotEqual(result.Single(x => x.Entity.Id == dataType2.Id).OriginalPath, dataType2.Path);
+            }
+
+        }
+
+        [Test]
+        public void Can_Create_Container()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            EntityContainer container;
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                container = repository.CreateContainer(-1, "blah", 0);
+                unitOfWork.Commit();                
+                Assert.That(container.Id, Is.GreaterThan(0));
+            }
+            using (var entityRepo = new EntityContainerRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax,
+                    new Guid(Constants.ObjectTypes.DataTypeContainer), new Guid(Constants.ObjectTypes.DataType)))
+            {
+                var found = entityRepo.Get(container.Id);
+                Assert.IsNotNull(found);
+            }
+        }
+
+        [Test]
+        public void Can_Delete_Container()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            EntityContainer container;
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                container = repository.CreateContainer(-1, "blah", 0);
+                unitOfWork.Commit();
+            }
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                // Act
+                repository.DeleteContainer(container.Id);
+                unitOfWork.Commit();
+
+                using (var entityRepo = new EntityContainerRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax,
+                    new Guid(Constants.ObjectTypes.DataTypeContainer), new Guid(Constants.ObjectTypes.DataType)))
+                {
+                    var found = entityRepo.Get(container.Id);
+                    Assert.IsNull(found);
+                }
+            }
+        }
+
+        [Test]
+        public void Can_Create_Container_Containing_Data_Types()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            EntityContainer container;
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                container = repository.CreateContainer(-1, "blah", 0);
+                unitOfWork.Commit();
+
+                var dataTypeDefinition = new DataTypeDefinition(container.Id, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
+                repository.AddOrUpdate(dataTypeDefinition);
+                unitOfWork.Commit();
+
+                Assert.AreEqual(container.Id, dataTypeDefinition.ParentId);
+            }
+        }
+
+        [Test]
+        public void Can_Delete_Container_Containing_Data_Types()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            EntityContainer container;
+            IDataTypeDefinition dataType;
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                container = repository.CreateContainer(-1, "blah", 0);
+                unitOfWork.Commit();
+
+                dataType = new DataTypeDefinition(container.Id, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
+                repository.AddOrUpdate(dataType);
+                unitOfWork.Commit();                
+            }
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                // Act
+                repository.DeleteContainer(container.Id);
+                unitOfWork.Commit();
+
+                using (var entityRepo = new EntityContainerRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax,
+                    new Guid(Constants.ObjectTypes.DataTypeContainer), new Guid(Constants.ObjectTypes.DataType)))
+                {
+                    var found = entityRepo.Get(container.Id);
+                    Assert.IsNull(found);
+                }
+
+                dataType = repository.Get(dataType.Id);
+                Assert.IsNotNull(dataType);
+                Assert.AreEqual(-1, dataType.ParentId);
+            }
+        }
+
+        [Test]
         public void Can_Create()
         {
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
@@ -85,39 +230,6 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        [Test]
-        public void Cannot_Create_Duplicate_Name()
-        {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            var id = 0;
-            using (var repository = CreateRepository(unitOfWork))
-            {
-                var dataTypeDefinition = new DataTypeDefinition(-1, new Guid(Constants.PropertyEditors.RadioButtonList)) { Name = "test" };
-                repository.AddOrUpdate(dataTypeDefinition);
-                unitOfWork.Commit();
-                id = dataTypeDefinition.Id;
-                Assert.That(id, Is.GreaterThan(0));
-            }
-            using (var repository = CreateRepository(unitOfWork))
-            {
-                var dataTypeDefinition = repository.Get(id);
-                Assert.IsNotNull(dataTypeDefinition);
-                Assert.AreEqual("test", dataTypeDefinition.Name);
-            }
-            using (var repository = CreateRepository(unitOfWork))
-            {
-                var dataTypeDefinition = new DataTypeDefinition(-1, new Guid(Constants.PropertyEditors.RadioButtonList)) { Name = "test" };
-                repository.AddOrUpdate(dataTypeDefinition);
-
-                unitOfWork.Commit();
-                Assert.AreNotEqual(0, dataTypeDefinition.Id); // has been saved
-                Assert.AreNotEqual(id, dataTypeDefinition.Id); // as a new one
-                Assert.AreEqual("test (1)", dataTypeDefinition.Name); // with a new name
-            }
-        }
-
-      
 
         [Test]
         public void Can_Perform_Get_On_DataTypeDefinitionRepository()

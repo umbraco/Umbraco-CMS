@@ -602,13 +602,9 @@ namespace Umbraco.Web.Editors
                 //cannot move if the content item is not allowed at the root
                 if (toMove.ContentType.AllowedAsRoot == false)
                 {
-                    var msg = Services.TextService.Localize("moveOrCopy/notAllowedAtRoot");
-                    var notificationModel = new SimpleNotificationModel
-                    {
-                        Message = msg
-                    };
-                    notificationModel.AddErrorNotification(msg, "");
-                    throw new HttpResponseException( Request.CreateValidationErrorResponse(notificationModel));
+                    throw new HttpResponseException(
+                        Request.CreateNotificationValidationErrorResponse(
+                            Services.TextService.Localize("moveOrCopy/notAllowedAtRoot")));
                 }
             }
             else
@@ -619,31 +615,21 @@ namespace Umbraco.Web.Editors
                     throw new HttpResponseException(HttpStatusCode.NotFound);
                 }
 
-                
-
                 //check if the item is allowed under this one
                 if (parent.ContentType.AllowedContentTypes.Select(x => x.Id).ToArray()
                     .Any(x => x.Value == toMove.ContentType.Id) == false)
                 {
-                    var msg = Services.TextService.Localize("moveOrCopy/notAllowedByContentType");
-                    var notificationModel = new SimpleNotificationModel
-                    {
-                        Message = msg
-                    };
-                    notificationModel.AddErrorNotification(msg, "");
-                    throw new HttpResponseException(Request.CreateValidationErrorResponse(notificationModel));
+                    throw new HttpResponseException(
+                        Request.CreateNotificationValidationErrorResponse(
+                            Services.TextService.Localize("moveOrCopy/notAllowedByContentType")));
                 }
 
                 // Check on paths
                 if ((string.Format(",{0},", parent.Path)).IndexOf(string.Format(",{0},", toMove.Id), StringComparison.Ordinal) > -1)
-                {
-                    var msg = Services.TextService.Localize("moveOrCopy/notAllowedByPath");
-                    var notificationModel = new SimpleNotificationModel
-                    {
-                        Message = msg
-                    };
-                    notificationModel.AddErrorNotification(msg, "");
-                    throw new HttpResponseException(Request.CreateValidationErrorResponse(notificationModel));
+                {                    
+                    throw new HttpResponseException(
+                        Request.CreateNotificationValidationErrorResponse(
+                            Services.TextService.Localize("moveOrCopy/notAllowedByPath")));
                 }
             }
 

@@ -1,5 +1,5 @@
-<div class="umb-dialog umb-pane" ng-controller="Umbraco.Editors.MediaTypes.MoveController">
-    
+<div class="umb-dialog umb-pane" ng-controller="Umbraco.Editors.DataType.MoveController">
+
     <div class="umb-dialog-body">
         <div class="umb-pane">
 
@@ -24,8 +24,8 @@
             <div ng-hide="success">
 
                 <div>
-                    <umb-tree section="settings"
-                              treealias="mediaTypes"
+                    <umb-tree section="developer"
+                              treealias="dataTypes"
                               customtreeparams="foldersonly=1"
                               hideheader="false"
                               hideoptions="true"
@@ -47,5 +47,4 @@
             <localize key="actions_move">Move</localize>
         </button>
     </div>
-
 </div>

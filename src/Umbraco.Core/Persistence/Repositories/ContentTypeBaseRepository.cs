@@ -6,6 +6,8 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Umbraco.Core.Events;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -16,6 +18,7 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Relators;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -28,72 +31,90 @@ namespace Umbraco.Core.Persistence.Repositories
         where TEntity : class, IContentTypeComposition
     {
 
+        protected ContentTypeBaseRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax,
+            Guid containerType)
+            : base(work, cache, logger, sqlSyntax)
+        {
+            _guidRepo = new GuidReadOnlyContentTypeBaseRepository(this, work, cache, logger, sqlSyntax);
+            ContainerRepository = new EntityContainerRepository(work, cache, logger, sqlSyntax, containerType, NodeObjectTypeId);
+        }
+
         protected ContentTypeBaseRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
         {
             _guidRepo = new GuidReadOnlyContentTypeBaseRepository(this, work, cache, logger, sqlSyntax);
+            ContainerRepository = null;
         }
 
+        protected EntityContainerRepository ContainerRepository { get; private set; }
         private readonly GuidReadOnlyContentTypeBaseRepository _guidRepo;
 
-        /// <summary>
-        /// The container object type - used for organizing content types
-        /// </summary>
-        protected abstract Guid ContainerObjectTypeId { get; }
-
-        public Attempt<int> CreateFolder(int parentId, string name, int userId)
+        public IEnumerable<MoveEventInfo<TEntity>> Move(TEntity toMove, int parentId)
         {
-            name = name.Trim();
-
-            Mandate.ParameterNotNullOrEmpty(name, "name");
-
-            var exists = Database.FirstOrDefault<NodeDto>(
-                new Sql().Select("*")
-                    .From<NodeDto>(SqlSyntax)
-                    .Where<NodeDto>(dto => dto.ParentId == parentId && dto.Text == name && dto.NodeObjectType == ContainerObjectTypeId));
-
-            if (exists != null)
+            if (parentId > 0)
             {
-                return Attempt.Fail(exists.NodeId, new InvalidOperationException("A folder with the same name already exists"));
-            }
+                var container = ContainerRepository.Get(parentId);
+                if (container == null)
+                    throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound);
 
-            var level = 0;
-            var path = "-1";
-            if (parentId > -1)
-            {
-                var parent = Database.FirstOrDefault<NodeDto>(
-                    new Sql().Select("*")
-                        .From<NodeDto>(SqlSyntax)
-                        .Where<NodeDto>(dto => dto.NodeId == parentId && dto.NodeObjectType == ContainerObjectTypeId));
-
-                if (parent == null)
+                // Check on paths
+                if ((string.Format(",{0},", container.Path)).IndexOf(string.Format(",{0},", toMove.Id), StringComparison.Ordinal) > -1)
                 {
-                    return Attempt.Fail(0, new NullReferenceException("No content type container found with parent id " + parentId));
+                    throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedNotAllowedByPath);
                 }
-                level = parent.Level;
-                path = parent.Path;
             }
 
-            var folder = new NodeDto
+            //used to track all the moved entities to be given to the event
+            var moveInfo = new List<MoveEventInfo<TEntity>>
             {
-                CreateDate = DateTime.Now,
-                Level = Convert.ToInt16(level + 1),
-                NodeObjectType = ContainerObjectTypeId,
-                ParentId = parentId,
-                Path = path,
-                SortOrder = 0,
-                Text = name,
-                Trashed = false,
-                UniqueId = Guid.NewGuid(),
-                UserId = userId
+                new MoveEventInfo<TEntity>(toMove, toMove.Path, parentId)
             };
 
-            Database.Save(folder);
-            //update the path
-            folder.Path = folder.Path + "," + folder.NodeId;
-            Database.Save(folder);
+            //do the move to a new parent
+            toMove.ParentId = parentId;
+            //schedule it for updating in the transaction
+            AddOrUpdate(toMove);
 
-            return Attempt.Succeed(folder.NodeId);
+            //update all descendants
+            var descendants = this.GetByQuery(
+                new Query<TEntity>().Where(type => type.Path.StartsWith(toMove.Path + ",")));
+            foreach (var descendant in descendants)
+            {
+                moveInfo.Add(new MoveEventInfo<TEntity>(descendant, descendant.Path, descendant.ParentId));
+
+                //all we're doing here is setting the parent Id to be dirty so that it resets the path/level/etc...
+                descendant.ParentId = descendant.ParentId;
+                //schedule it for updating in the transaction
+                AddOrUpdate(descendant);
+            }
+
+            return moveInfo;
+        }
+
+        /// <summary>
+        /// Deletes a folder - this will move all contained entities into their parent
+        /// </summary>
+        /// <param name="containerId"></param>        
+        public void DeleteContainer(int containerId)
+        {
+            if (ContainerRepository == null) throw new NotSupportedException("The repository type " + GetType() + " does not support containers");
+
+            var found = ContainerRepository.Get(containerId);
+            ContainerRepository.Delete(found);           
+        }
+
+        public EntityContainer CreateContainer(int parentId, string name, int userId)
+        {
+            if (ContainerRepository == null) throw new NotSupportedException("The repository type " + GetType() + " does not support containers");
+
+            var container = new EntityContainer
+            {
+                ParentId = parentId,
+                Name = name,
+                CreatorId = userId
+            };
+            ContainerRepository.AddOrUpdate(container);
+            return container;
         }
 
         /// <summary>
@@ -105,15 +126,15 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sqlClause = new Sql();
             sqlClause.Select("*")
-               .From<PropertyTypeGroupDto>()
-               .RightJoin<PropertyTypeDto>()
-               .On<PropertyTypeGroupDto, PropertyTypeDto>(left => left.Id, right => right.PropertyTypeGroupId)
-               .InnerJoin<DataTypeDto>()
-               .On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId);
+               .From<PropertyTypeGroupDto>(SqlSyntax)
+               .RightJoin<PropertyTypeDto>(SqlSyntax)
+               .On<PropertyTypeGroupDto, PropertyTypeDto>(SqlSyntax, left => left.Id, right => right.PropertyTypeGroupId)
+               .InnerJoin<DataTypeDto>(SqlSyntax)
+               .On<PropertyTypeDto, DataTypeDto>(SqlSyntax, left => left.DataTypeId, right => right.DataTypeId);
 
             var translator = new SqlTranslator<PropertyType>(sqlClause, query);
             var sql = translator.Translate()
-                                .OrderBy<PropertyTypeDto>(x => x.PropertyTypeGroupId);
+                                .OrderBy<PropertyTypeDto>(x => x.PropertyTypeGroupId, SqlSyntax);
 
             var dtos = Database.Fetch<PropertyTypeGroupDto, PropertyTypeDto, DataTypeDto, PropertyTypeGroupDto>(new GroupPropertyTypeRelator().Map, sql);
 

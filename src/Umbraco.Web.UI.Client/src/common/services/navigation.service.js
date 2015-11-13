@@ -108,7 +108,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
          * @param {String} source The URL to load into the iframe
          */
         loadLegacyIFrame: function (source) {
-            $location.path("/" + appState.getSectionState("currentSection") + "/framed/" + encodeURIComponent(source));
+            $location.path("/" + appState.getSectionState("currentSection").toLowerCase() + "/framed/" + encodeURIComponent(source));
         },
 
         /**
@@ -132,7 +132,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             appState.setSectionState("currentSection", sectionAlias);
             this.showTree(sectionAlias);
 
-            $location.path(sectionAlias);
+            $location.path(sectionAlias.toLowerCase());
         },
 
         /**
@@ -250,10 +250,10 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                     appState.setMenuState("currentNode", args.node);
 
                     //not legacy, lets just set the route value and clear the query string if there is one.
-                    $location.path(n.routePath).search("");
+                    $location.path(n.routePath.toLowerCase()).search("");
                 }
                 else if (args.element.section) {
-                    $location.path(args.element.section).search("");
+                    $location.path(args.element.section.toLowerCase()).search("");
                 }
 
                 service.hideNavigation();
@@ -446,7 +446,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             if (action.metaData && action.metaData["actionRoute"] && angular.isString(action.metaData["actionRoute"])) {
                 //first check if the menu item simply navigates to a route
                 var parts = action.metaData["actionRoute"].split("?");
-                $location.path(parts[0]).search(parts.length > 1 ? parts[1] : "");
+                $location.path(parts[0].toLowerCase()).search(parts.length > 1 ? parts[1] : "");
                 this.hideNavigation();
                 return;
             }
