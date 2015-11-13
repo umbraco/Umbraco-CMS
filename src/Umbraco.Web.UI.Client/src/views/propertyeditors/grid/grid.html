@@ -52,7 +52,10 @@
                         <!-- for each row in template section -->
                         <!-- ng-mouseenter="setCurrentRow(row)" -->
                         <!-- ng-mouseleave="disableCurrentRow()"  -->
-                        <div ng-repeat="row in section.rows" class="umb-row">
+                        <div class="umb-row"
+                             ng-repeat="row in section.rows"
+                             ng-click="clickRow(row)"
+                             ng-class="{'-active': currentRow === row}">
 
                             <div class="umb-row-title-bar">
 
@@ -62,7 +65,7 @@
 
 
                                <!-- Row tool -->
-                               <div class="row-tools">
+                               <div class="row-tools" ng-show="currentRow === row">
 
                                    <!-- delete row -->
                                    <div class="cell-tools-remove">
@@ -121,9 +124,11 @@
                                                     'last':$last,
                                                     'first':$first,
                                                     'infohighlight':currentInfohighlightArea == area,
-                                                    'warnhighlight':currentWarnhighlightArea == area}"
+                                                    'warnhighlight':currentWarnhighlightArea == area,
+                                                    '-active': currentCell == area}"
                                                  ui-sortable="sortableOptionsCell"
-                                                 ng-model="area.controls">
+                                                 ng-model="area.controls"
+                                                 ng-click="clickCell(area)">
 
                                                  <!-- Cell placeholder -->
                                                  <div class="umb-cell-content -placeholder"
@@ -134,12 +139,15 @@
 
                                                  <!-- Cell with editors -->
                                                  <div class="umb-cell-content -has-editors"
-                                                      ng-if="area.controls.length > 0">
+                                                      ng-if="area.controls.length > 0"
+                                                      ng-class="{'-active': currentCell == area}">
 
                                                       <!-- Controls in areas -->
+                                                      <!-- ng-mouseover="setCurrentControl(control)" -->
+                                                      <!-- ng-mouseleave="disableCurrentControl(control)" -->
                                                       <div ng-repeat="control in area.controls"
-                                                          ng-mouseover="setCurrentControl(control)"
-                                                          ng-mouseleave="disableCurrentControl(control)"
+                                                          ng-click="clickControl(control)"
+                                                          ng-class="{'-active': currentControl === control}"
                                                           ng-animate="'fade'"
                                                           class="umb-control">
 
@@ -194,13 +202,24 @@
                                                                      warnhighlight:currentWarnhighlightControl == control,
                                                                      selectedControl:currentControl == control}">
 
-                                                             <ins class="item-label">{{control.editor.name}}</ins>
+                                                               <div class="umb-control-bar">
+
+                                                                  <div class="umb-control-title">
+                                                                     {{control.editor.name}}
+                                                                  </div>
+
+                                                                  <div class="umb-control-tools">
+
+                                                                  </div>
+
+                                                               </div>
 
                                                              <!-- Redering the editor for specific control -->
                                                              <div ng-if="control && control.$editorPath"
                                                                    ng-include="control.$editorPath"
                                                                    class="umb-cell-{{control.editor.view}}">
                                                              </div>
+
                                                           </div>
                                                       </div>
                                                    <!-- Controls repeat end -->

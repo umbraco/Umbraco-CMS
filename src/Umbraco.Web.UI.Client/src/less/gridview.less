@@ -123,23 +123,10 @@
 
  // ROW
  // -------------------------
-.umb-grid .umb-row{
+.umb-grid .umb-row {
      position: relative;
-     //border: 1px dashed rgba(0,0,0,0);
-
      margin-bottom: 40px;
 }
-
-.umb-grid .tb:hover .umb-row{
-    border-bottom:1px dashed rgba(182, 182, 182, 0) !important;
-}
-
-/*
-.umb-grid .selectedRow {
-     border: 1px solid rgba(182, 182, 182, 0.3);
-}*/
-
-
 
 
 // CELL
@@ -151,12 +138,13 @@
 }
 
 .umb-grid .umb-cell-content {
-   min-height: 130px;
    display: block;
    box-sizing: border-box;
+   padding-top: 20px;
 }
 
 .umb-grid .umb-cell-content.-placeholder {
+   min-height: 130px;
    background-color: @grayLighter;
    border-width: 2px;
    border-style: solid;
@@ -178,6 +166,10 @@
 
 .umb-grid .umb-cell-content.-has-editors:hover {
    cursor: auto;
+}
+
+.umb-grid .umb-cell-content.-has-editors.-active {
+   border-color: @blue;
 }
 
 .umb-grid  .cell-tools {
@@ -281,21 +273,11 @@
 // CONTROL
 // -------------------------
 .umb-grid .umb-control {
-    /*transition: all .20s ease-in-out;
-    -moz-transition: all .20s ease-in-out;
-    -webkit-transition: all .20s ease-in-out;*/
-    position:relative;
-    display:block;
-
-    /*
-    border: 1px dashed rgba(255, 0, 0, .0);
-    border-bottom-width: 1px;
-    */
-
-    -webkit-background-clip: padding-box; /* for Safari */
-    background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
-
-    margin: 10px 0 0 0;
+   position:relative;
+   display:block;
+   margin-left: 10px;
+   margin-right: 10px;
+   margin-bottom: 10px;
 }
 
 .umb-grid  .umb-control:hover{
@@ -650,13 +632,17 @@
  }
  */
 
- .umb-grid .umb-control{
-     margin: 10px 0 0 0;
-     padding: 5px;
-     border: 1px dashed transparent;
+ .umb-grid .umb-control {
+     border-width: 1px;
+     border-style: solid;
+     border-color: transparent;
  }
 
- .umb-grid .umb-templates-columns{
+ .umb-grid .umb-control.-active {
+    border-color: @blue;
+}
+
+ .umb-grid .umb-templates-columns {
      margin-top: 30px;
  }
 
@@ -666,13 +652,20 @@
  }
 
  .umb-grid .umb-control-inner {
-    padding: 5px;
-    margin-right: 45px;
-    margin-bottom: 15px;
-
-    border: 1px dashed transparent;
-    min-height: 60px;
     position:relative;
+ }
+
+ .umb-grid .umb-control-bar {
+    opacity: 0;
+    background: @blue;
+    padding: 2px 10px;
+    display: block;
+    color: #ffffff;
+    font-size: 10px;
+ }
+
+  .umb-grid .umb-control.-active .umb-control-bar {
+     opacity: 1;
  }
 
 

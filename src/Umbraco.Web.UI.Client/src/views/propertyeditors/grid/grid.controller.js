@@ -213,12 +213,9 @@ angular.module("umbraco")
         // Row management function
         // *********************************************
 
-        $scope.setCurrentRow = function (row) {
-            $scope.currentRow = row;
-        };
-
-        $scope.disableCurrentRow = function () {
-            $scope.currentRow = null;
+        $scope.clickRow = function (row) {
+           $scope.currentRow = null;
+           $scope.currentRow = row;
         };
 
         $scope.setWarnighlightRow = function (row) {
@@ -308,6 +305,11 @@ angular.module("umbraco")
         // Area management functions
         // *********************************************
 
+        $scope.clickCell = function (cell) {
+           $scope.currentCell = null;
+           $scope.currentCell = cell;
+        };
+
         $scope.setCurrentCell = function (cell) {
             $scope.currentCell = cell;
         };
@@ -337,8 +339,9 @@ angular.module("umbraco")
         // *********************************************
         // Control management functions
         // *********************************************
-        $scope.setCurrentControl = function (Control) {
-            $scope.currentControl = Control;
+        $scope.clickControl = function (control) {
+            $scope.currentControl = null;
+            $scope.currentControl = control;
         };
 
         $scope.disableCurrentControl = function (Control) {
