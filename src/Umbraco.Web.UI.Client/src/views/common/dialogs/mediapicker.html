@@ -107,7 +107,8 @@
                                ng-show="showFolderInput"
                                ng-model="newFolderName"
                                ng-keydown="submitFolder($event)"
-                               on-blur="showFolderInput = false">
+                               on-blur="showFolderInput = false"
+                               focus-when="{{showFolderInput}}">
                     </li>
                 </ul>
             </div>

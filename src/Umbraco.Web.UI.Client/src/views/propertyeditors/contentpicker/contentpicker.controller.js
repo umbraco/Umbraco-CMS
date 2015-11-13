@@ -49,7 +49,8 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
     //the default pre-values
     var defaultConfig = {
         multiPicker: false,
-        showEditButton: false,        
+        showEditButton: false,
+        showPathOnHover: false,
         startNode: {
             query: "",
             type: "content",
@@ -65,6 +66,7 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
     //Umbraco persists boolean for prevalues as "0" or "1" so we need to convert that!
     $scope.model.config.multiPicker = ($scope.model.config.multiPicker === "1" ? true : false);
     $scope.model.config.showEditButton = ($scope.model.config.showEditButton === "1" ? true : false);
+    $scope.model.config.showPathOnHover = ($scope.model.config.showPathOnHover === "1" ? true : false);
 
     var entityType = $scope.model.config.startNode.type === "member"
         ? "Member"
@@ -170,7 +172,7 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
 
         if (currIds.indexOf(item.id) < 0) {
             item.icon = iconHelper.convertFromLegacyIcon(item.icon);
-            $scope.renderModel.push({ name: item.name, id: item.id, icon: item.icon });
+            $scope.renderModel.push({ name: item.name, id: item.id, icon: item.icon, path: item.path });
         }
     };
 
@@ -202,7 +204,7 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
            
             if (entity) {
                 entity.icon = iconHelper.convertFromLegacyIcon(entity.icon);
-                $scope.renderModel.push({ name: entity.name, id: entity.id, icon: entity.icon });
+                $scope.renderModel.push({ name: entity.name, id: entity.id, icon: entity.icon, path: entity.path });
             }
             
            
