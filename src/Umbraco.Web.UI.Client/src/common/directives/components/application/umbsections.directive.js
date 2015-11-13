@@ -94,7 +94,17 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 				navigationService.showHelpDialog();
 			};
 
-			scope.sectionClick = function (section) {
+			scope.sectionClick = function (event, section) {
+
+			    if (event.ctrlKey ||
+			        event.shiftKey ||
+			        event.metaKey || // apple
+			        (event.button && event.button === 1) // middle click, >IE9 + everyone else
+			    ) {
+			        return;
+			    }
+
+
 			    if (navigationService.userDialog) {
 			        navigationService.userDialog.close();
 			    }
