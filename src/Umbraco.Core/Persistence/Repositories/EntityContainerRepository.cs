@@ -49,7 +49,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (containerDto == null)
                 return null;
 
-            var entity = new EntityContainer(containerDto.NodeId,
+            var entity = new EntityContainer(containerDto.NodeId, containerDto.UniqueId,
                 containerDto.ParentId, containerDto.Text, containerDto.UserId ?? 0,
                 containerDto.Path);
 
@@ -186,6 +186,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistUpdatedItem(EntityContainer entity)
         {
+            // note: don't forget to handle UniqueID!
             throw new NotImplementedException();
         }
     }

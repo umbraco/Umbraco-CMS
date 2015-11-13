@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Models.EntityBase;
+﻿using System;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
@@ -11,9 +12,10 @@ namespace Umbraco.Core.Models
         {            
         }
 
-        public EntityContainer(int id, int parentId, string name, int userId, string path)
+        public EntityContainer(int id, Guid uniqueId, int parentId, string name, int userId, string path)
         {
             Id = id;
+            Key = uniqueId;
             ParentId = parentId;
             Name = name;
             CreatorId = userId;
