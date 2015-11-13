@@ -7,8 +7,6 @@
 
         <ng-switch on="currentNode.nodeType">
             <div ng-switch-when="container">
-                <p>Any item that exists in this folder will be moved to the parent folder</p>
-
                 <umb-confirm on-confirm="performContainerDelete"
                              on-cancel="cancel">
                 </umb-confirm>
