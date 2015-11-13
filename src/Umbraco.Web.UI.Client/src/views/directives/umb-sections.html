@@ -31,7 +31,7 @@
         </ul>
     </div>
 
-    <div id="applications-tray" ng-show="showTray" ng-animate="trayAnimation()">
+    <div id="applications-tray" ng-show="showTray" ng-animate="trayAnimation()" style="display: none;">
         <ul class="sections sections-tray">
             <li ng-repeat="section in sections | limitTo: overflowingSections" ng-class="{current: section.alias == currentSection}">
                 <a href="#/{{section.alias}}"
