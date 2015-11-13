@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
     <title>Umbraco Canvas Designer</title>
-    <link href="/Umbraco/assets/css/canvasdesigner.css" type="text/css" rel="stylesheet" />
-    <link href="/Umbraco/lib/spectrum/spectrum.css" type="text/css" rel="stylesheet" />
-    <link href="/Umbraco/lib/jquery-ui/jquery-ui-1.10.4.custom.min.css" type="text/css" rel="stylesheet" />
+    <link href="../assets/css/canvasdesigner.css" type="text/css" rel="stylesheet" />
+    <link href="../lib/spectrum/spectrum.css" type="text/css" rel="stylesheet" />
+    <link href="../lib/jquery-ui/jquery-ui-1.10.4.custom.min.css" type="text/css" rel="stylesheet" />
 </head>
 
 <body id="canvasdesignerPanel" ng-mouseover="outlinePositionHide()" ng-class="{ leftOpen: (showStyleEditor || showPalettePicker) && !showDevicesPreview }" ng-controller="Umbraco.canvasdesignerController">
@@ -20,7 +20,7 @@
         <div class="fix-left-menu selected">
 
             <div class="avatar">
-                <img ng-src="/umbraco/assets/img/application/logo.png">
+                <img ng-src="../assets/img/application/logo.png">
             </div>
 
             <ul class="sections" ng-class="{selected: showDevicesPreview}">
@@ -125,7 +125,7 @@
                         <div class="canvasdesigner-panel-container" ng-show="categoriesVisibility[category] === true">
                             <div class="canvasdesigner-panel-property" ng-repeat="item in configItem.editors" ng-show="item.category == category">
                                 <h5>{{item.name}} <i class="icon icon-help-alt"></i></h5>
-                                <div ng-include="'/Umbraco/preview/editors/' + item.type + '.html'"></div>
+                                <div ng-include="'../preview/editors/' + item.type + '.html'"></div>
                             </div>
                         </div>
                     </div>
@@ -154,8 +154,8 @@
         <p>Styles saved and published</p>
     </div>
 
-    <script src="/umbraco/lib/rgrove-lazyload/lazyload.js"></script>
-    <script src="/umbraco/js/canvasdesigner.loader.js"></script>
+    <script src="../lib/rgrove-lazyload/lazyload.js"></script>
+    <script src="../js/canvasdesigner.loader.js"></script>
 
 </body>
 

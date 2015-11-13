@@ -109,7 +109,7 @@ namespace Umbraco.Web.Models.Trees
                     return IOHelper.ResolveUrl("~" + Icon.TrimStart('~'));
 
                 //legacy icon path
-                return IOHelper.ResolveUrl("~/umbraco/images/umbraco/" + Icon);
+                return IOHelper.ResolveUrl("images/umbraco/" + Icon);
             }
         }
 
