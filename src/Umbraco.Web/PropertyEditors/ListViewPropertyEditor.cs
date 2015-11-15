@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Umbraco.Core;
-using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
@@ -24,6 +19,7 @@ namespace Umbraco.Web.PropertyEditors
                 return new Dictionary<string, object>
                 {
                     {"pageSize", "10"},
+                    {"displayAtTabNumber", "1"},
                     {"orderBy", "SortOrder"},
                     {"orderDirection", "asc"},
                     {
@@ -40,6 +36,8 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class ListViewPreValueEditor : PreValueEditor
         {
+            [PreValueField("displayAtTabNumber", "Display At Tab Number", "number", Description = "Which tab position that the list of child items will be displayed")]
+            public int DisplayAtTabNumber { get; set; }
 
             [PreValueField("pageSize", "Page Size", "number", Description = "Number of items per page")]
             public int PageSize { get; set; }
@@ -55,7 +53,5 @@ namespace Umbraco.Web.PropertyEditors
                 Description = "The properties that will be displayed for each column")]
             public object IncludeProperties { get; set; }
         }
-
-
     }
 }
