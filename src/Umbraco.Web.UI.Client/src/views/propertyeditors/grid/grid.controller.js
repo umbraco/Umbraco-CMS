@@ -428,7 +428,8 @@ angular.module("umbraco")
             //populate control
             $scope.initControl(newControl, index + 1);
 
-            cell.controls.splice(index + 1, 0, newControl);
+            cell.controls.push(newControl);
+
         };
 
         $scope.addTinyMce = function (cell) {
