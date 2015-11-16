@@ -202,14 +202,14 @@
 
                                                                <div class="umb-control-bar">
 
-                                                                  <div class="umb-control-title">
+                                                                  <div class="umb-control-title" ng-if="currentControl == control">
                                                                      <div class="umb-control-tool">
                                                                         <i class="umb-control-tool-icon icon-navigation"></i>
                                                                      </div>
                                                                      {{control.editor.name}}
                                                                   </div>
 
-                                                                  <div class="umb-control-tools">
+                                                                  <div class="umb-control-tools" ng-if="currentControl == control">
                                                                      <div class="umb-control-tool" ng-click="removeControl(area, $index)">
                                                                         <i class="umb-control-tool-icon icon-trash"></i>
                                                                      </div>
