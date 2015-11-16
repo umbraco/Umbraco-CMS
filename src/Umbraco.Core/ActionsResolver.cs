@@ -11,7 +11,7 @@ namespace Umbraco.Core
 	/// <summary>
 	/// A resolver to return all IAction objects
 	/// </summary>
-	internal sealed class ActionsResolver : LazyManyObjectsResolverBase<ActionsResolver, IAction>
+	public sealed class ActionsResolver : LazyManyObjectsResolverBase<ActionsResolver, IAction>
 	{
 	    /// <summary>
 	    /// Constructor
