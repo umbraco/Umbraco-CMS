@@ -131,9 +131,9 @@ namespace Umbraco.Web.Trees
 
             return Services.FileService.DetermineTemplateRenderingEngine(template) == RenderingEngine.WebForms
                 ? "/" + queryStrings.GetValue<string>("application") + "/framed/" +
-                  Uri.EscapeDataString("/umbraco/settings/editTemplate.aspx?templateID=" + template.Id)
+                  Uri.EscapeDataString("settings/editTemplate.aspx?templateID=" + template.Id)
                 : "/" + queryStrings.GetValue<string>("application") + "/framed/" +
-                  Uri.EscapeDataString("/umbraco/settings/Views/EditView.aspx?treeType=" + Constants.Trees.Templates + "&templateID=" + template.Id);
+                  Uri.EscapeDataString("settings/Views/EditView.aspx?treeType=" + Constants.Trees.Templates + "&templateID=" + template.Id);
         }
     }
 }

@@ -48,9 +48,9 @@
   <system.web xdt:Transform="InsertIfMissing" />
   <system.web>
     <siteMap xdt:Transform="Remove" />
-	<siteMap xdt:Transform="Insert">
-      <providers xdt:Transform="Insert">
-        <remove name="MySqlSiteMapProvider"  xdt:Transform="Insert" />
+	<siteMap xdt:Transform="InsertIfMissing">
+      <providers xdt:Transform="InsertIfMissing">
+        <remove name="MySqlSiteMapProvider"  xdt:Transform="InsertIfMissing" />
       </providers>
       </siteMap>	
     <httpRuntime xdt:Transform="InsertIfMissing" />
@@ -81,6 +81,10 @@
     </compilation>
 
     <compilation>
+      <assemblies>
+        <remove assembly="System.Web.Http" xdt:Locator="Match(assembly)" xdt:Transform="Remove" />
+        <remove assembly="System.Net.Http" xdt:Locator="Match(assembly)" xdt:Transform="Remove" />
+      </assemblies>
       <assemblies>
         <remove assembly="System.Web.Http" xdt:Locator="Match(assembly)" xdt:Transform="InsertBefore(/configuration/system.web/compilation/assemblies/add)" />
         <remove assembly="System.Net.Http" xdt:Locator="Match(assembly)" xdt:Transform="InsertBefore(/configuration/system.web/compilation/assemblies/add)" />

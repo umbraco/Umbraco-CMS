@@ -985,6 +985,7 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="usertype">Gebruikerstype</key>
     <key alias="userTypes">Gebruikerstypes</key>
     <key alias="writer">Auteur</key>
+    <key alias="change">Wijzig</key>
 
     <key alias="yourProfile" version="7.0">Je profiel</key>
     <key alias="yourHistory" version="7.0">Je recente historie</key>

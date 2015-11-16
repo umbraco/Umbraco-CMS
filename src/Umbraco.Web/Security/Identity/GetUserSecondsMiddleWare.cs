@@ -83,7 +83,7 @@ namespace Umbraco.Web.Security.Identity
                             var cookieOptions = new CookieOptions
                             {
                                 Path = "/",
-                                Domain = _authOptions.CookieDomain,
+                                Domain = _authOptions.CookieDomain ?? "FALSE",
                                 Expires = DateTime.Now.AddMinutes(_authOptions.LoginTimeoutMinutes),
                                 HttpOnly = true,
                                 Secure = _authOptions.CookieSecure == CookieSecureOption.Always
