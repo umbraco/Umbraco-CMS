@@ -8,10 +8,10 @@ angular.module("umbraco")
             });
 
 			$scope.submitClass = function(icon){
-				if($scope.color)
-				{
+				if($scope.color) {
 					$scope.submit(icon + " " + $scope.color);
-				}else{
+				}
+				else {
 					$scope.submit(icon);	
 				}
 			};
