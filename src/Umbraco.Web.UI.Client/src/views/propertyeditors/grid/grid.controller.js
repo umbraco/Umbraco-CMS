@@ -213,9 +213,14 @@ angular.module("umbraco")
         // Row management function
         // *********************************************
 
-        $scope.clickRow = function (row) {
+        $scope.clickRow = function (row, event) {
            $scope.currentRow = null;
+           $scope.currentCell = null;
+           $scope.currentControl = null;
+
            $scope.currentRow = row;
+
+           event.stopPropagation();
         };
 
         $scope.setWarnighlightRow = function (row) {
@@ -305,9 +310,16 @@ angular.module("umbraco")
         // Area management functions
         // *********************************************
 
-        $scope.clickCell = function (cell) {
+        $scope.clickCell = function (cell, row, event) {
+
+           $scope.currentRow = null;
            $scope.currentCell = null;
+           $scope.currentControl = null;
+
+           $scope.currentRow = row;
            $scope.currentCell = cell;
+
+           event.stopPropagation();
         };
 
         $scope.setCurrentCell = function (cell) {
@@ -339,9 +351,16 @@ angular.module("umbraco")
         // *********************************************
         // Control management functions
         // *********************************************
-        $scope.clickControl = function (control) {
+        $scope.clickControl = function (control, cell, row, event) {
+            $scope.currentRow = null;
+            $scope.currentCell = null;
             $scope.currentControl = null;
+
+            $scope.currentRow = row;
+            $scope.currentCell = cell;
             $scope.currentControl = control;
+
+            event.stopPropagation();
         };
 
         $scope.disableCurrentControl = function (Control) {
@@ -402,6 +421,9 @@ angular.module("umbraco")
             if (index === undefined) {
                 index = cell.controls.length;
             }
+
+            $scope.currentControl = null;
+            $scope.currentControl = newControl;
 
             //populate control
             $scope.initControl(newControl, index + 1);

@@ -177,6 +177,11 @@
    border-color: @blue;
 }
 
+.umb-grid .umb-cell-tool {
+
+}
+
+/*
 .umb-grid  .cell-tools {
     transition: all .20s ease-in-out;
     -moz-transition: all .20s ease-in-out;
@@ -199,6 +204,7 @@
 .umb-grid .cell-tools:hover{
     opacity: 1;
 }
+*/
 
 .umb-grid .cell-tools-add {
    color: @blue;
@@ -665,16 +671,33 @@
  .umb-grid .umb-control-bar {
     opacity: 0;
     background: @blue;
-    padding: 2px 10px;
-    display: block;
+    padding: 2px 5px;
     color: #ffffff;
     font-size: 10px;
+    height: 0;
+    display: flex;
+    transition: height 0.1s ease-in, opacity 0.1s ease-in;
+    align-items: center;
+ }
+
+ .umb-grid .umb-control-title {
+    display: flex;
+    align-items: center;
  }
 
   .umb-grid .umb-control.-active .umb-control-bar {
      opacity: 1;
+     height: 25px;
  }
 
+.umb-grid .umb-control-tools {
+   margin-left: auto;
+}
+
+.umb-grid .umb-control-tool {
+   font-size: 16px;
+   margin-right: 5px;
+}
 
 
  /**************************************************************************************************/
