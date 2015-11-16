@@ -145,7 +145,7 @@
 .umb-grid .umb-cell-content {
    display: block;
    box-sizing: border-box;
-   padding-top: 20px;
+   padding-top: 30px;
 }
 
 .umb-grid .umb-cell-content.-placeholder {
@@ -177,8 +177,20 @@
    border-color: @blue;
 }
 
-.umb-grid .umb-cell-tool {
+.umb-grid .cell-tools {
+   position: absolute;
+   top: 15px;
+   right: 15px;
+   color: @gray;
+   font-size: 16px;
+}
 
+.umb-grid .cell-tool {
+   cursor: pointer;
+}
+
+.umb-grid .cell-tool:hover {
+   color: @blueDark;
 }
 
 /*
