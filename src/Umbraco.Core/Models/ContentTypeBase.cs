@@ -373,6 +373,7 @@ namespace Umbraco.Core.Models
             {
                 _propertyGroups = value;
                 _propertyGroups.CollectionChanged += PropertyGroupsChanged;
+                PropertyGroupsChanged(_propertyGroups, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
             }
         }
 
@@ -401,6 +402,7 @@ namespace Umbraco.Core.Models
             {
                 _propertyTypes = new PropertyTypeCollection(value);
                 _propertyTypes.CollectionChanged += PropertyTypesChanged;
+                PropertyTypesChanged(_propertyTypes, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
             }
         }
 
