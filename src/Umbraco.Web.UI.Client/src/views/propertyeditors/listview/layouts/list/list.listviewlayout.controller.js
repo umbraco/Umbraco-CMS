@@ -1,99 +1,72 @@
 (function() {
-   "use strict";
+    "use strict";
 
-   function ListViewListLayoutController($scope) {
+    function ListViewListLayoutController($scope, listViewHelper, $location, mediaHelper) {
 
-      var vm = this;
+        var vm = this;
 
-      vm.selectItem = selectItem;
-      vm.selectAll = selectAll;
-      vm.isSelectedAll = isSelectedAll;
-      vm.isSortDirection = isSortDirection;
-      vm.sort = sort;
 
-      function selectAll($event) {
-         var checkbox = $event.target;
-         var clearSelection = false;
+        vm.nodeId = $scope.contentId;
+        vm.acceptedFileTypes = mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
+        vm.activeDrag = false;
 
-         if (!angular.isArray($scope.items)) {
-            return;
-         }
+        vm.selectItem = selectItem;
+        vm.clickItem = clickItem;
+        vm.selectAll = selectAll;
+        vm.isSelectedAll = isSelectedAll;
+        vm.isSortDirection = isSortDirection;
+        vm.sort = sort;
+        vm.dragEnter = dragEnter;
+        vm.dragLeave = dragLeave;
+  		vm.onFilesQueue = onFilesQueue;
+        vm.onUploadComplete = onUploadComplete;
 
-         $scope.selection.length = 0;
+        function selectAll($event) {
+            listViewHelper.selectAllItems($scope.items, $scope.selection, $event);
+        }
 
-         for (var i = 0; i < $scope.items.length; i++) {
+        function isSelectedAll() {
+            return listViewHelper.isSelectedAll($scope.items, $scope.selection);
+        }
 
-            var entity = $scope.items[i];
+        function selectItem(selectedItem, $index, $event) {
+            listViewHelper.selectHandler(selectedItem, $index, $scope.items, $scope.selection, $event);
+        }
 
-            if (checkbox.checked) {
-               $scope.selection.push({id: entity.id});
-            } else {
-               clearSelection = true;
+        function clickItem(item) {
+            $location.path($scope.entityType + '/' + $scope.entityType + '/edit/' + item.id);
+        }
+
+        function isSortDirection(col, direction) {
+            return listViewHelper.setSortingDirection(col, direction, $scope.options);
+        }
+
+        function sort(field, allow) {
+            if (allow) {
+                listViewHelper.setSorting(field, allow, $scope.options);
+                $scope.getContent($scope.contentId);
             }
+        }
 
-            entity.selected = checkbox.checked;
+        // Dropzone upload functions
+        function dragEnter(el, event) {
+           vm.activeDrag = true;
+        }
 
-         }
+        function dragLeave(el, event) {
+           vm.activeDrag = false;
+        }
 
-         if (clearSelection) {
-            $scope.selection.length = 0;
-         }
+  		function onFilesQueue() {
+  			vm.activeDrag = false;
+  		}
 
-      }
+        function onUploadComplete() {
+           $scope.getContent($scope.contentId);
+        }
 
-      function selectItem(item) {
+    }
 
-         var selection = $scope.selection;
-         var isSelected = false;
-
-         for (var i = 0; selection.length > i; i++) {
-            var selectedItem = selection[i];
-
-            if (item.id === selectedItem.id) {
-               isSelected = true;
-               selection.splice(i, 1);
-               item.selected = false;
-            }
-         }
-
-         if (!isSelected) {
-            selection.push({id: item.id});
-            item.selected = true;
-         }
-
-      }
-
-      function isSelectedAll() {
-         if (!angular.isArray($scope.items)) {
-            return false;
-         }
-         return _.every($scope.items, function(item) {
-            return item.selected;
-         });
-      }
-
-      function isSortDirection(col, direction) {
-          return $scope.options.orderBy.toUpperCase() == col.toUpperCase() && $scope.options.orderDirection == direction;
-      }
-
-      function sort(field, allow) {
-          if (allow) {
-             $scope.options.orderBy = field;
-
-             if ($scope.options.orderDirection === "desc") {
-                  $scope.options.orderDirection = "asc";
-             }
-             else {
-                  $scope.options.orderDirection = "desc";
-             }
-
-             $scope.getContent($scope.contentId);
-
-          }
-      }
-
-   }
-
-   angular.module("umbraco").controller("Umbraco.PropertyEditors.ListView.ListLayoutController", ListViewListLayoutController);
+    angular.module("umbraco").controller("Umbraco.PropertyEditors.ListView.ListLayoutController", ListViewListLayoutController);
 
 })();
