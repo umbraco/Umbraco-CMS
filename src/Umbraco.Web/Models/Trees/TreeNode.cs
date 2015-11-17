@@ -2,6 +2,7 @@
 using Umbraco.Core.IO;
 using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Trees
@@ -109,7 +110,7 @@ namespace Umbraco.Web.Models.Trees
                     return IOHelper.ResolveUrl("~" + Icon.TrimStart('~'));
 
                 //legacy icon path
-                return IOHelper.ResolveUrl("~/umbraco/images/umbraco/" + Icon);
+                return string.Format("{0}images/umbraco/{1}", GlobalSettings.Path.EnsureEndsWith("/"), Icon);                
             }
         }
 
