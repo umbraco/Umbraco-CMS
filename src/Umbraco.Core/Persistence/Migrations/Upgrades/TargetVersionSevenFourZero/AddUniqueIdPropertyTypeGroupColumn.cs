@@ -7,18 +7,16 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourZero
 {
-    
     [Migration("7.4.0", 2, GlobalSettings.UmbracoMigrationName)]
     public class AddUniqueIdPropertyTypeGroupColumn : MigrationBase
     {
         public AddUniqueIdPropertyTypeGroupColumn(ISqlSyntaxProvider sqlSyntax, ILogger logger)
             : base(sqlSyntax, logger)
-        {
-        }
+        { }
 
         public override void Up()
         {
-            //Don't exeucte if the column is already there
+            // don't execute if the column is already there
             var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToArray();
 
             if (columns.Any(x => x.TableName.InvariantEquals("cmsPropertyTypeGroup") && x.ColumnName.InvariantEquals("uniqueID")) == false)
@@ -77,7 +75,6 @@ ON cmsContentType.nodeId = umbracoNode.id"))
         }
 
         public override void Down()
-        {
-        }
+        { }
     }
 }

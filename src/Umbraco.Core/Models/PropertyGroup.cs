@@ -17,7 +17,6 @@ namespace Umbraco.Core.Models
     public class PropertyGroup : Entity, IEquatable<PropertyGroup>
     {
         private string _name;
-        private Lazy<int?> _parentId;
         private int _sortOrder;
         private PropertyTypeCollection _propertyTypes;
 
@@ -31,7 +30,6 @@ namespace Umbraco.Core.Models
         }
 
         private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<PropertyGroup, string>(x => x.Name);
-        private static readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<PropertyGroup, int?>(x => x.ParentId);
         private static readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<PropertyGroup, int>(x => x.SortOrder);
         private readonly static PropertyInfo PropertyTypeCollectionSelector = ExpressionHelper.GetPropertyInfo<PropertyGroup, PropertyTypeCollection>(x => x.PropertyTypes);
         void PropertyTypesChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -53,29 +51,6 @@ namespace Umbraco.Core.Models
                     _name = value;
                     return _name;
                 }, _name, NameSelector);
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the Id of the Parent PropertyGroup.
-        /// </summary>
-        /// <remarks>
-        /// A Parent PropertyGroup corresponds to an inherited PropertyGroup from a composition.
-        /// If a PropertyType is inserted into an inherited group then a new group will be created with an Id reference to the parent.
-        /// </remarks>
-        [DataMember]
-        public int? ParentId
-        {
-            get
-            {
-                if (_parentId == null)
-                    return default(int?);
-                return _parentId.Value;
-            }
-            set
-            {
-                _parentId = new Lazy<int?>(() => value);
-                OnPropertyChanged(ParentIdSelector);
             }
         }
 
@@ -115,15 +90,6 @@ namespace Umbraco.Core.Models
                 
                 _propertyTypes.CollectionChanged += PropertyTypesChanged;
             }
-        }
-
-        /// <summary>
-        /// Sets the ParentId from the lazy integer id
-        /// </summary>
-        /// <param name="id">Id of the Parent</param>
-        internal void SetLazyParentId(Lazy<int?> id)
-        {
-            _parentId = id;
         }
 
         public bool Equals(PropertyGroup other)

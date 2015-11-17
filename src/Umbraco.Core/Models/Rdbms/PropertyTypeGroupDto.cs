@@ -21,12 +21,6 @@ namespace Umbraco.Core.Models.Rdbms
         [PrimaryKeyColumn(IdentitySeed = 12)]
         public int Id { get; set; }
 
-        [Column("parentGroupId")]
-        [NullSetting(NullSetting = NullSettings.Null)]
-        //[Constraint(Default = "NULL")]
-        [ForeignKey(typeof(PropertyTypeGroupDto))]
-        public int? ParentGroupId { get; set; }
-
         [Column("contenttypeNodeId")]
         [ForeignKey(typeof(ContentTypeDto), Column = "nodeId")]
         public int ContentTypeNodeId { get; set; }

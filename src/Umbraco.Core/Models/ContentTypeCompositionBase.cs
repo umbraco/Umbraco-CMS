@@ -157,31 +157,44 @@ namespace Umbraco.Core.Models
 
         /// <summary>
         /// Adds a PropertyGroup.
-        /// This method will also check if a group already exists with the same name and link it to the parent.
         /// </summary>
         /// <param name="groupName">Name of the PropertyGroup to add</param>
         /// <returns>Returns <c>True</c> if a PropertyGroup with the passed in name was added, otherwise <c>False</c></returns>
         public override bool AddPropertyGroup(string groupName)
         {
-            if (PropertyGroups.Any(x => x.Name == groupName))
-                return false;
+            return AddAndReturnPropertyGroup(groupName) != null;
+        }
 
-            var propertyGroup = new PropertyGroup {Name = groupName, SortOrder = 0};
+        private PropertyGroup AddAndReturnPropertyGroup(string name)
+        {
+            // ensure we don't have it already
+            if (PropertyGroups.Any(x => x.Name == name))
+                return null;
 
-            if (CompositionPropertyGroups.Any(x => x.Name == groupName))
+            // create the new group
+            var group = new PropertyGroup { Name = name, SortOrder = 0 };
+
+            // check if it is inherited - there might be more than 1 but we want the 1st, to
+            // reuse its sort order - if there are more than 1 and they have different sort
+            // orders... there isn't much we can do anyways
+            var inheritGroup = CompositionPropertyGroups.FirstOrDefault(x => x.Name == name);
+            if (inheritGroup == null)
             {
-                var firstGroup = CompositionPropertyGroups.First(x => x.Name == groupName && x.ParentId.HasValue == false);
-                propertyGroup.SetLazyParentId(new Lazy<int?>(() => firstGroup.Id));
+                // no, just local, set sort order
+                var lastGroup = PropertyGroups.LastOrDefault();
+                if (lastGroup != null)
+                    group.SortOrder = lastGroup.SortOrder + 1;
+            }
+            else
+            {
+                // yes, inherited, re-use sort order
+                group.SortOrder = inheritGroup.SortOrder;
             }
 
-            if (PropertyGroups.Any())
-            {
-                var last = PropertyGroups.Last();
-                propertyGroup.SortOrder = last.SortOrder + 1;
-            }
+            // add
+            PropertyGroups.Add(group);
 
-            PropertyGroups.Add(propertyGroup);
-            return true;
+            return group;
         }
 
         /// <summary>
@@ -193,38 +206,24 @@ namespace Umbraco.Core.Models
         public override bool AddPropertyType(PropertyType propertyType, string propertyGroupName)
         {
             if (propertyType.HasIdentity == false)
-            {
                 propertyType.Key = Guid.NewGuid();
-            }
 
-            if (PropertyTypeExists(propertyType.Alias) == false)
-            {
-                if (PropertyGroups.Contains(propertyGroupName))
-                {
-                    propertyType.PropertyGroupId = new Lazy<int>(() => PropertyGroups[propertyGroupName].Id);
-                    PropertyGroups[propertyGroupName].PropertyTypes.Add(propertyType);
-                }
-                else
-                {
-                    //If the PropertyGroup doesn't already exist we create a new one 
-                    var propertyTypes = new List<PropertyType> { propertyType };
-                    var propertyGroup = new PropertyGroup(new PropertyTypeCollection(propertyTypes)) { Name = propertyGroupName, SortOrder = 1 };
-                    //and check if its an inherited PropertyGroup, which exists in the composition
-                    if (CompositionPropertyGroups.Any(x => x.Name == propertyGroupName))
-                    {
-                        var parentPropertyGroup = CompositionPropertyGroups.First(x => x.Name == propertyGroupName && x.ParentId.HasValue == false);
-                        propertyGroup.SortOrder = parentPropertyGroup.SortOrder;
-                        //propertyGroup.ParentId = parentPropertyGroup.Id;
-                        propertyGroup.SetLazyParentId(new Lazy<int?>(() => parentPropertyGroup.Id));
-                    }
+            // ensure no duplicate alias - over all composition properties
+            if (PropertyTypeExists(propertyType.Alias))
+                return false;
 
-                    PropertyGroups.Add(propertyGroup);
-                }
+            // get and ensure a group local to this content type
+            var group = PropertyGroups.Contains(propertyGroupName) 
+                ? PropertyGroups[propertyGroupName] 
+                : AddAndReturnPropertyGroup(propertyGroupName);
+            if (group == null)
+                return false;
 
-                return true;
-            }
+            // add property to group
+            propertyType.PropertyGroupId = new Lazy<int>(() => group.Id);
+            group.PropertyTypes.Add(propertyType);
 
-            return false;
+            return true;
         }
 
         /// <summary>

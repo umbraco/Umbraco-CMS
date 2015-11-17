@@ -410,6 +410,7 @@
     <Compile Include="Persistence\Mappers\MigrationEntryMapper.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFourZero\AddDataDecimalColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFourZero\AddUniqueIdPropertyTypeGroupColumn.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFourZero\RemoveParentIdPropertyTypeGroupColumn.cs" />
     <Compile Include="Persistence\Mappers\TaskTypeMapper.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeTwo\EnsureMigrationsTableIdentityIsCorrect.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFourZero\EnsureContentTypeUniqueIdsAreConsistent.cs" />
@@ -728,7 +729,6 @@
     <Compile Include="Persistence\Factories\MacroFactory.cs" />
     <Compile Include="Persistence\Factories\ModelFactoryConfiguration.cs" />
     <Compile Include="Persistence\Factories\MemberFactory.cs" />
-    <Compile Include="Persistence\Factories\MemberTypeFactory.cs" />
     <Compile Include="Persistence\Factories\MemberTypeReadOnlyFactory.cs" />
     <Compile Include="Persistence\Factories\ServerRegistrationFactory.cs" />
     <Compile Include="Persistence\Factories\TagFactory.cs" />
@@ -804,7 +804,6 @@
     <Compile Include="Persistence\Factories\DictionaryTranslationFactory.cs" />
     <Compile Include="Persistence\Factories\LanguageFactory.cs" />
     <Compile Include="Persistence\Factories\MediaFactory.cs" />
-    <Compile Include="Persistence\Factories\MediaTypeFactory.cs" />
     <Compile Include="Persistence\Factories\PropertyFactory.cs" />
     <Compile Include="Persistence\Factories\PropertyGroupFactory.cs" />
     <Compile Include="Persistence\Factories\RelationFactory.cs" />
@@ -1130,7 +1129,7 @@
     <Compile Include="Models\Rdbms\DataTypePreValueDto.cs" />
     <Compile Include="Models\Rdbms\DictionaryDto.cs" />
     <Compile Include="Models\Rdbms\DocumentDto.cs" />
-    <Compile Include="Models\Rdbms\DocumentTypeDto.cs" />
+    <Compile Include="Models\Rdbms\ContentTypeTemplateDto.cs" />
     <Compile Include="Models\Rdbms\DomainDto.cs" />
     <Compile Include="Models\Rdbms\LanguageDto.cs" />
     <Compile Include="Models\Rdbms\LanguageTextDto.cs" />

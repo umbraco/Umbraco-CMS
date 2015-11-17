@@ -1162,7 +1162,6 @@ namespace Umbraco.Tests.Services
 
             var contentType = service.GetContentType("contentPage");
             var propertyGroup = contentType.PropertyGroups["Content"];
-            Assert.That(propertyGroup.ParentId.HasValue, Is.False);
         }
 
         [Test]
@@ -1247,7 +1246,6 @@ namespace Umbraco.Tests.Services
 
             var contentType = service.GetContentType("contentPage");
             var propertyGroup = contentType.PropertyGroups["Content"];
-            Assert.That(propertyGroup.ParentId.HasValue, Is.False);
 
             var numberOfContentTabs = contentType.CompositionPropertyGroups.Count(x => x.Name.Equals("Content"));
             Assert.That(numberOfContentTabs, Is.EqualTo(3));
@@ -1266,7 +1264,6 @@ namespace Umbraco.Tests.Services
             var propertyGroupReloaded = contentPageReloaded.PropertyGroups["Content"];
             var hasDescriptionPropertyType = propertyGroupReloaded.PropertyTypes.Contains("description");
             Assert.That(hasDescriptionPropertyType, Is.True);
-            Assert.That(propertyGroupReloaded.ParentId.HasValue, Is.False);
 
             var descriptionPropertyTypeReloaded = propertyGroupReloaded.PropertyTypes["description"];
             Assert.That(descriptionPropertyTypeReloaded.PropertyGroupId.IsValueCreated, Is.False);

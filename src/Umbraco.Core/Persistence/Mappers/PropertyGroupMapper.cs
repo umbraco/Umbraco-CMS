@@ -33,7 +33,6 @@ namespace Umbraco.Core.Persistence.Mappers
         {
             CacheMap<PropertyGroup, PropertyTypeGroupDto>(src => src.Id, dto => dto.Id);
             CacheMap<PropertyGroup, PropertyTypeGroupDto>(src => src.Key, dto => dto.UniqueId);
-            CacheMap<PropertyGroup, PropertyTypeGroupDto>(src => src.ParentId, dto => dto.ParentGroupId);
             CacheMap<PropertyGroup, PropertyTypeGroupDto>(src => src.SortOrder, dto => dto.SortOrder);
             CacheMap<PropertyGroup, PropertyTypeGroupDto>(src => src.Name, dto => dto.Text);
         }

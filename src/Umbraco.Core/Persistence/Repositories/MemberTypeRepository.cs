@@ -102,7 +102,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 "cmsPropertyType.validationRegExp", "cmsPropertyType.dataTypeId", "cmsPropertyType.sortOrder AS PropertyTypeSortOrder",
                 "cmsPropertyType.propertyTypeGroupId AS PropertyTypesGroupId", "cmsMemberType.memberCanEdit", "cmsMemberType.viewOnProfile",
                 "cmsDataType.propertyEditorAlias", "cmsDataType.dbType", "cmsPropertyTypeGroup.id AS PropertyTypeGroupId", 
-                "cmsPropertyTypeGroup.text AS PropertyGroupName", "cmsPropertyTypeGroup.parentGroupId",
+                "cmsPropertyTypeGroup.text AS PropertyGroupName",
                 "cmsPropertyTypeGroup.sortorder AS PropertyGroupSortOrder", "cmsPropertyTypeGroup.contenttypeNodeId")
                 .From<NodeDto>()
                 .InnerJoin<ContentTypeDto>().On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
@@ -182,12 +182,10 @@ namespace Umbraco.Core.Persistence.Repositories
                 entity.AddPropertyType(standardPropertyType.Value, Constants.Conventions.Member.StandardPropertiesGroupName);
             }
 
-            var factory = new MemberTypeFactory(NodeObjectTypeId);
-            var dto = factory.BuildDto(entity);
+            var factory = new ContentTypeFactory();
 
             EnsureExplicitDataTypeForBuiltInProperties(entity);
-
-            PersistNewBaseContentType(dto, entity);
+            PersistNewBaseContentType(entity);
 
             //Handles the MemberTypeDto (cmsMemberType table)
             var memberTypeDtos = factory.BuildMemberTypeDtos(entity);
@@ -219,17 +217,13 @@ namespace Umbraco.Core.Persistence.Repositories
                 entity.SortOrder = maxSortOrder + 1;
             }
 
-            var factory = new MemberTypeFactory(NodeObjectTypeId);
-            var dto = factory.BuildDto(entity);
+            var factory = new ContentTypeFactory();
 
             EnsureExplicitDataTypeForBuiltInProperties(entity);
+            PersistUpdatedBaseContentType(entity);
 
-            PersistUpdatedBaseContentType(dto, entity);
-
-            //Remove existing entries before inserting new ones
+            // remove and insert - handle cmsMemberType table
             Database.Delete<MemberTypeDto>("WHERE NodeId = @Id", new { Id = entity.Id });
-
-            //Handles the MemberTypeDto (cmsMemberType table)
             var memberTypeDtos = factory.BuildMemberTypeDtos(entity);
             foreach (var memberTypeDto in memberTypeDtos)
             {

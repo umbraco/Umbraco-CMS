@@ -120,10 +120,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             ((MediaType)entity).AddingEntity();
 
-            var factory = new MediaTypeFactory(NodeObjectTypeId);
-            var dto = factory.BuildDto(entity);
-
-            PersistNewBaseContentType(dto, entity);
+            PersistNewBaseContentType(entity);
 
             entity.ResetDirtyProperties();
         }
@@ -148,10 +145,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 entity.SortOrder = maxSortOrder + 1;
             }
 
-            var factory = new MediaTypeFactory(NodeObjectTypeId);
-            var dto = factory.BuildDto(entity);
-            
-            PersistUpdatedBaseContentType(dto, entity);
+            PersistUpdatedBaseContentType(entity);
 
             entity.ResetDirtyProperties();
         }

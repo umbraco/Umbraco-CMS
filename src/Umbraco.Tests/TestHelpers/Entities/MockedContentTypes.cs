@@ -185,16 +185,6 @@ namespace Umbraco.Tests.TestHelpers.Entities
             var pg = new PropertyGroup(contentCollection) {Name = propertyGroupName, SortOrder = 1};
             contentType.PropertyGroups.Add(pg);
 
-            if (parent != null)
-            {
-                var foundPg = parent.PropertyGroups.FirstOrDefault(x => x.Name == propertyGroupName);
-                if (foundPg != null)
-                {
-                    //this exists on the parent, so set the parent id
-                    pg.SetLazyParentId(new Lazy<int?>(() => foundPg.Id));
-                }
-            }
-
             //ensure that nothing is marked as dirty
             contentType.ResetDirtyProperties(false);
 

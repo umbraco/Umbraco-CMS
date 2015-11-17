@@ -127,66 +127,152 @@ namespace Umbraco.Web.Models.Mapping
 
                 .AfterMap((source, dest) =>
                 {
+                    // handle property groups and property types
+                    // note that ContentTypeSave has
+                    // - all groups, inherited and local; only *one* occurence per group *name*
+                    // - potentially including the generic properties group
+                    // - all properties, inherited and local
+                    //
+                    // also, see PropertyTypeGroupResolver.ResolveCore:
+                    // - if a group is local *and* inherited, then Inherited is true
+                    //   and the identifier is the identifier of the *local* group
+                    //
+                    // IContentTypeComposition AddPropertyGroup, AddPropertyType methods do some
+                    // unique-alias-checking, etc that is *not* compatible with re-mapping everything
+                    // the way we do it here, so we should exclusively do it by
+                    // - managing a property group's PropertyTypes collection
+                    // - managing the content type's PropertyTypes collection (for generic properties)
 
-                    var addedProperties = new List<string>();
-
-                    //get all properties from groups that are not generic properties or inhertied
-                    var selfNonGenericGroups = source.Groups.Where(x => x.Inherited == false && x.IsGenericProperties == false).ToArray();
-
-                    foreach (var group in selfNonGenericGroups)
+                    // handle actual groups (non-generic-properties)
+                    var destOrigGroups = dest.PropertyGroups.ToArray(); // local groups
+                    var destOrigProperties = dest.PropertyTypes.ToArray(); // get_PropertyTypes returns grouped props too
+                    var destGroups = new List<PropertyGroup>();
+                    var sourceGroups = source.Groups.Where(x => x.IsGenericProperties == false).ToArray();
+                    foreach (var sourceGroup in sourceGroups)
                     {
-                        //use underlying logic to add the property group which should wire most things up for us
-                        dest.AddPropertyGroup(group.Name);
+                        // get the dest group
+                        var destGroup = MapSaveGroup(sourceGroup, destOrigGroups);
 
-                        //now update that group with the values from the display object
-                        Mapper.Map(group, dest.PropertyGroups[group.Name]);
+                        // handle local properties
+                        var destProperties = sourceGroup.Properties
+                            .Where(x => x.Inherited == false)
+                            .Select(x => MapSaveProperty(x, destOrigProperties))
+                            .ToArray();
 
-                        foreach (var propType in group.Properties.Where(x => x.Inherited == false))
-                        {
-                            //update existing
-                            if (propType.Id > 0)
-                            {
-                                var currentPropertyType = dest.PropertyTypes.FirstOrDefault(x => x.Id == propType.Id);
-                                Mapper.Map(propType, currentPropertyType);
-                            }
-                            else
-                            {
-                                //add new
-                                var mapped = Mapper.Map<PropertyType>(propType);
-                                dest.AddPropertyType(mapped, group.Name);
-                            }
+                        // if the group has no local properties, skip it, ie sort-of garbage-collect
+                        // local groups which would not have local properties anymore
+                        if (destProperties.Length == 0)
+                            continue;
 
-                            addedProperties.Add(propType.Alias);
-                        }
+                        // ensure no duplicate alias, then assign the group properties collection
+                        EnsureUniqueAliases(destProperties);
+                        destGroup.PropertyTypes = new PropertyTypeCollection(destProperties);
+                        destGroups.Add(destGroup);
                     }
 
-                    //Groups to remove
-                    var groupsToRemove = dest.PropertyGroups.Select(x => x.Name).Except(selfNonGenericGroups.Select(x => x.Name)).ToArray();
-                    foreach (var toRemove in groupsToRemove)
+                    // ensure no duplicate name, then assign the groups collection
+                    EnsureUniqueNames(destGroups);
+                    dest.PropertyGroups = new PropertyGroupCollection(destGroups);
+
+                    // because the property groups collection was rebuilt, there is no need to remove
+                    // the old groups - they are just gone and will be cleared by the repository
+
+                    // handle non-grouped (ie generic) properties
+                    var genericPropertiesGroup = source.Groups.FirstOrDefault(x => x.IsGenericProperties);
+                    if (genericPropertiesGroup != null)
                     {
-                        dest.RemovePropertyGroup(toRemove);
+                        // handle local properties
+                        var destProperties = genericPropertiesGroup.Properties
+                            .Where(x => x.Inherited == false)
+                            .Select(x => MapSaveProperty(x, destOrigProperties))
+                            .ToArray();
+
+                        // ensure no duplicate alias, then assign the generic properties collection
+                        EnsureUniqueAliases(destProperties);
+
+                        // set_PropertyTypes sets generic properties *only*
+                        // this is all very awkward
+                        var dest2 = dest as ContentTypeBase;
+                        if (dest2 == null)
+                            throw new InvalidOperationException("Cannot map if dest is not ContentTypeBase.");
+                        dest2.PropertyTypes = new PropertyTypeCollection(destProperties);
                     }
 
-                    //add generic properties
-                    var genericProperties = source.Groups.FirstOrDefault(x => x.IsGenericProperties);
-                    if (genericProperties != null)
-                    {
-                        foreach (var propertyTypeBasic in genericProperties.Properties.Where(x => x.Inherited == false))
-                        {
-                            dest.AddPropertyType(Mapper.Map<PropertyType>(propertyTypeBasic));
-                            addedProperties.Add(propertyTypeBasic.Alias);
-                        }
-                    }
-
-                    //remove deleted types
-                    foreach (var removedType in dest.PropertyTypes
-                        .Where(x => addedProperties.Contains(x.Alias) == false).ToList())
-                    {
-                        dest.RemovePropertyType(removedType.Alias);
-                    }
-
-
+                    // because all property collections were rebuilt, there is no need to remove
+                    // some old properties, they are just gone and will be cleared by the repository
                 });
+        }
+
+        private static PropertyGroup MapSaveGroup(PropertyGroupBasic<PropertyTypeBasic> sourceGroup, IEnumerable<PropertyGroup> destOrigGroups)
+        {
+            PropertyGroup destGroup;
+            if (sourceGroup.Id > 0)
+            {
+                // update an existing group
+                // ensure it is still there, then map/update
+                destGroup = destOrigGroups.FirstOrDefault(x => x.Id == sourceGroup.Id);
+                if (destGroup != null)
+                {
+                    Mapper.Map(sourceGroup, destGroup);
+                    return destGroup;
+                }
+
+                // force-clear the ID as it does not match anything
+                sourceGroup.Id = 0;
+            }
+
+            // insert a new group, or update an existing group that has
+            // been deleted in the meantime and we need to re-create
+            // map/create
+            destGroup = Mapper.Map<PropertyGroup>(sourceGroup);
+            return destGroup;
+        }
+
+        private static PropertyType MapSaveProperty(PropertyTypeBasic sourceProperty, IEnumerable<PropertyType> destOrigProperties)
+        {
+            PropertyType destProperty;
+            if (sourceProperty.Id > 0)
+            {
+                // updateg an existing property
+                // ensure it is still there, then map/update
+                destProperty = destOrigProperties.FirstOrDefault(x => x.Id == sourceProperty.Id);
+                if (destProperty != null)
+                {
+                    Mapper.Map(sourceProperty, destProperty);
+                    return destProperty;
+                }
+
+                // force-clear the ID as it does not match anything
+                sourceProperty.Id = 0;
+            }
+
+            // insert a new property, or update an existing property that has 
+            // been deletedin the meantime and we need to re-create
+            // map/create
+            destProperty = Mapper.Map<PropertyType>(sourceProperty);
+            return destProperty;
+        }
+
+        private static void EnsureUniqueAliases(IEnumerable<PropertyType> properties)
+        {
+            var propertiesA = properties.ToArray();
+            var distinctProperties = propertiesA
+                .Select(x => x.Alias.ToUpperInvariant())
+                .Distinct()
+                .Count();
+            if (distinctProperties != propertiesA.Length)
+                throw new InvalidOperationException("Cannot map properties due to alias conflict.");
+        }
+
+        private static void EnsureUniqueNames(IEnumerable<PropertyGroup> groups)
+        {
+            var groupsA = groups.ToArray();
+            var distinctProperties = groupsA
+                .Select(x => x.Name.ToUpperInvariant())
+                .Distinct()
+                .Count();
+            if (distinctProperties != groupsA.Length)
+                throw new InvalidOperationException("Cannot map groups due to name conflict.");
         }
     }
 }

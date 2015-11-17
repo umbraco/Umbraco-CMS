@@ -885,10 +885,12 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
 
                 PropertyTypes.Controls.Add(new LiteralControl("<div class='genericPropertyListBox'><h2 data-tabname='" + tabName + "' class=\"propertypaneTitel\">Tab: " + tabCaption + "</h2>"));
 
-                var propertyGroup = propertyTypeGroups.SingleOrDefault(x => x.ParentId == tab.Id);
-                var propertyTypes = (propertyGroup == null
-                    ? tab.GetPropertyTypes(_contentType.Id, false)
-                    : propertyGroup.GetPropertyTypes()).ToArray();
+                // fixme - cannot use ParentId anymore - and I have no idea what we are trying to do here ;-(
+                //var propertyGroup = propertyTypeGroups.SingleOrDefault(x => x.ParentId == tab.Id);
+                //var propertyTypes = (propertyGroup == null
+                //    ? tab.GetPropertyTypes(_contentType.Id, false)
+                //    : propertyGroup.GetPropertyTypes()).ToArray();
+                var propertyTypes = tab.GetPropertyTypes(_contentType.Id, false).ToArray();
 
                 var propertyGroupId = tab.Id;
 
@@ -1122,14 +1124,14 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                     else
                     {
                         //Find the PropertyGroup by its Id and then set the PropertyType on that group
-                        var exists = contentTypeItem.CompositionPropertyGroups.Any(x => x.Id == gpData.Tab);
-                        if (exists)
+                        var existing = contentTypeItem.CompositionPropertyGroups.FirstOrDefault(x => x.Id == gpData.Tab);
+                        if (existing != null)
                         {
-                            var propertyGroup = contentTypeItem.CompositionPropertyGroups.First(x => x.Id == gpData.Tab);
-                            contentTypeItem.AddPropertyType(propertyType, propertyGroup.Name);
+                            contentTypeItem.AddPropertyType(propertyType, existing.Name);
                         }
                         else
                         {
+                            // if the tab we picked is gone, re-create it
                             var tab = gpData.Tabs.FirstOrDefault(x => x.Id == gpData.Tab);
                             if (tab != null)
                             {
@@ -1168,23 +1170,24 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 propertyType.DataTypeDefinitionId = dataTypeDefinition.Id;
                 propertyType.PropertyEditorAlias = dataTypeDefinition.PropertyEditorAlias;
 
-                if (propertyType.PropertyGroupId == null || propertyType.PropertyGroupId.Value != gpw.GenricPropertyControl.Tab)
+                if (propertyType.PropertyGroupId == null 
+                    || propertyType.PropertyGroupId.Value != gpw.GenricPropertyControl.Tab)
                 {
                     if (gpw.GenricPropertyControl.Tab == 0)
                     {
+                        // moving to generic properties
                         propertyType.PropertyGroupId = new Lazy<int>(() => 0);
                     }
                     else if (contentTypeItem.PropertyGroups.Any(x => x.Id == gpw.GenricPropertyControl.Tab))
                     {
+                        // moving to a tab that is local to the content type
                         propertyType.PropertyGroupId = new Lazy<int>(() => gpw.GenricPropertyControl.Tab);
-                    }
-                    else if (contentTypeItem.PropertyGroups.Any(x => x.ParentId == gpw.GenricPropertyControl.Tab))
-                    {
-                        var propertyGroup = contentTypeItem.PropertyGroups.First(x => x.ParentId == gpw.GenricPropertyControl.Tab);
-                        propertyType.PropertyGroupId = new Lazy<int>(() => propertyGroup.Id);
                     }
                     else
                     {
+                        // moving to a tab that is not local, ie an inherited tab
+                        // get the tab from the composition tabs, just so we have its name,
+                        // and add the property with that tab name, and this will create the local tab
                         var propertyGroup = contentTypeItem.CompositionPropertyGroups.First(x => x.Id == gpw.GenricPropertyControl.Tab);
                         contentTypeItem.AddPropertyGroup(propertyGroup.Name);
                         contentTypeItem.MovePropertyType(propertyType.Alias, propertyGroup.Name);
@@ -1346,9 +1349,12 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
             dt.Columns.Add("id");
             dt.Columns.Add("order");
 
+            // working on the LOCAL groups only...
+            // and I guess the ParentId thing was to prevent renaming inherited tabs?!
+            // nothing makes sense here
             foreach (var grp in _contentType.PropertyTypeGroups.OrderBy(p => p.SortOrder))
             {
-                if (grp.ContentTypeId == _contentType.Id && grp.ParentId == 0)
+                if (grp.ContentTypeId == _contentType.Id /*&& grp.ParentId == 0*/)
                 {
                     DataRow dr = dt.NewRow();
                     dr["name"] = grp.Name;

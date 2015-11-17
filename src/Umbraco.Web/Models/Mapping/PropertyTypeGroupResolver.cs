@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -11,8 +9,6 @@ using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    
-
     internal class PropertyTypeGroupResolver : ValueResolver<IContentTypeComposition, IEnumerable<PropertyGroupDisplay>>
     {
         private readonly ApplicationContext _applicationContext;
@@ -25,157 +21,155 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         /// <summary>
-        /// Will recursively check all compositions (of compositions) to find the content type that contains the 
-        /// tabId being searched for.
+        /// Gets the content type that defines a property group, within a composition.
         /// </summary>
-        /// <param name="ct"></param>
-        /// <param name="tabId"></param>
-        /// <returns></returns>
-        private IContentTypeComposition GetContentTypeFromTabId(IContentTypeComposition ct, int tabId)
+        /// <param name="contentType">The composition.</param>
+        /// <param name="propertyGroupId">The identifier of the property group.</param>
+        /// <returns>The composition content type that defines the specified property group.</returns>
+        private static IContentTypeComposition GetContentTypeForPropertyGroup(IContentTypeComposition contentType, int propertyGroupId)
         {
-            if (ct.PropertyGroups.Any(x => x.Id == tabId)) return ct;
+            // test local groups
+            if (contentType.PropertyGroups.Any(x => x.Id == propertyGroupId))
+                return contentType;
 
-            foreach (var composition in ct.ContentTypeComposition)
-            {
-                var found = GetContentTypeFromTabId(composition, tabId);
-                if (found != null) return found;
-            }
-
-            return null;
+            // test composition types groups
+            // .ContentTypeComposition is just the local ones, not recursive,
+            // so we have to recurse here
+            return contentType.ContentTypeComposition
+                .Select(x => GetContentTypeForPropertyGroup(x, propertyGroupId))
+                .FirstOrDefault(x => x != null);
         }
 
         protected override IEnumerable<PropertyGroupDisplay> ResolveCore(IContentTypeComposition source)
         {
-            var groups = new Dictionary<int,PropertyGroupDisplay>();
+            // deal with groups
+            var groups = new List<PropertyGroupDisplay>();
 
-            //for storing generic properties
-            var genericProperties = new List<PropertyTypeDisplay>();
-
-            //add groups directly assigned to this content type
+            // add groups local to this content type
             foreach (var tab in source.PropertyGroups)
             {
-                var group = new PropertyGroupDisplay()
+                var group = new PropertyGroupDisplay
                 {
-                    Id = tab.Id, Inherited = false, Name = tab.Name, SortOrder = tab.SortOrder, ContentTypeId = source.Id
+                    Id = tab.Id,
+                    Inherited = false,
+                    Name = tab.Name,
+                    SortOrder = tab.SortOrder,
+                    ContentTypeId = source.Id
                 };
-
-                if (tab.ParentId.HasValue)
-                    group.ParentGroupId = tab.ParentId.Value;
 
                 group.Properties = MapProperties(tab.PropertyTypes, source, tab.Id, false);
-                groups.Add(tab.Id, group);
+                groups.Add(group);
             }         
 
-            //add groups not assigned to this content type (via compositions)
+            // add groups inherited through composition
+            var localGroupIds = groups.Select(x => x.Id).ToArray();
             foreach (var tab in source.CompositionPropertyGroups)
             {
-                if (groups.ContainsKey(tab.Id)) continue;
+                // skip those that are local to this content type
+                if (localGroupIds.Contains(tab.Id)) continue;
 
-                var composition = GetContentTypeFromTabId(source, tab.Id);
-                if (composition == null) 
-                    throw new InvalidOperationException("The tabId " + tab.Id + " was not found on any of the content type's compositions");
+                // get the content type that defines this group
+                var definingContentType = GetContentTypeForPropertyGroup(source, tab.Id);
+                if (definingContentType == null) 
+                    throw new Exception("PropertyGroup with id=" + tab.Id + " was not found on any of the content type's compositions.");
 
-                var group = new PropertyGroupDisplay()
+                var group = new PropertyGroupDisplay
                 {
-                    Id = tab.Id, Inherited = true, Name = tab.Name, SortOrder = tab.SortOrder, ContentTypeId = composition.Id,
-                    ParentTabContentTypes = new[] {composition.Id},
-                    ParentTabContentTypeNames = new[] {composition.Name}
+                    Id = tab.Id,
+                    Inherited = true,
+                    Name = tab.Name,
+                    SortOrder = tab.SortOrder,
+                    ContentTypeId = definingContentType.Id,
+                    ParentTabContentTypes = new[] { definingContentType.Id },
+                    ParentTabContentTypeNames = new[] { definingContentType.Name }
                 };
 
-                if (tab.ParentId.HasValue)
-                    group.ParentGroupId = tab.ParentId.Value;
-
-                group.Properties = MapProperties(tab.PropertyTypes, composition, tab.Id, true);
-                groups.Add(tab.Id, group);
+                group.Properties = MapProperties(tab.PropertyTypes, definingContentType, tab.Id, true);
+                groups.Add(group);
             }
 
-            //process generic properties assigned to this content item (without a group)
+            // deal with generic properties
+            var genericProperties = new List<PropertyTypeDisplay>();
 
-            //NOTE: GenericPropertiesGroupId is just a thing that is checked during mapping the other direction, it's a 'special' id 
-
+            // add generic properties local to this content type
             var entityGenericProperties = source.PropertyTypes.Where(x => x.PropertyGroupId == null);
             genericProperties.AddRange(MapProperties(entityGenericProperties, source, PropertyGroupDisplay.GenericPropertiesGroupId, false));
 
-            //process generic properties from compositions (ensures properties are flagged as inherited)
-            var currentGenericPropertyIds = genericProperties.Select(x => x.Id).ToArray();
+            // add generic properties inherited through compositions
+            var localGenericPropertyIds = genericProperties.Select(x => x.Id).ToArray();
             var compositionGenericProperties = source.CompositionPropertyTypes
-                .Where(x => x.PropertyGroupId == null && currentGenericPropertyIds.Contains(x.Id) == false);
+                .Where(x => x.PropertyGroupId == null // generic
+                    && localGenericPropertyIds.Contains(x.Id) == false); // skip those that are local
             genericProperties.AddRange(MapProperties(compositionGenericProperties, source, PropertyGroupDisplay.GenericPropertiesGroupId, true));
 
-            //now add the group if there are any generic props
+            // if there are any generic properties, add the corresponding tab
             if (genericProperties.Any())
             {
                 var genericTab = new PropertyGroupDisplay
                 {
-                    Id = PropertyGroupDisplay.GenericPropertiesGroupId, Name = "Generic properties", ParentGroupId = 0, ContentTypeId = source.Id, SortOrder = 999, Inherited = false, Properties = genericProperties
+                    Id = PropertyGroupDisplay.GenericPropertiesGroupId, 
+                    Name = "Generic properties",
+                    ContentTypeId = source.Id, 
+                    SortOrder = 999,
+                    Inherited = false, 
+                    Properties = genericProperties
                 };
-                groups.Add(0, genericTab);
+                groups.Add(genericTab);
             }
 
-
-            //merge tabs based on names (magic and insanity)
-            var nameGroupedGroups = groups.Values.GroupBy(x => x.Name).ToArray();
-            if (nameGroupedGroups.Any(x => x.Count() > 1))
+            // now merge tabs based on names
+            // as for one name, we might have one local tab, plus some inherited tabs
+            var groupsGroupsByName = groups.GroupBy(x => x.Name).ToArray();
+            groups = new List<PropertyGroupDisplay>(); // start with a fresh list
+            foreach (var groupsByName in groupsGroupsByName)
             {
-                var sortedGroups = new List<PropertyGroupDisplay>();
-
-                foreach (var groupOfGroups in nameGroupedGroups)
+                // single group, just use it
+                if (groupsByName.Count() == 1)
                 {
-                    //single name groups
-                    if (groupOfGroups.Count() == 1)
-                    {
-                        sortedGroups.Add(groupOfGroups.First());
-                    }
-                    else
-                    {
-                        //multiple name groups
-
-                        //find the mother tab - if we have our own use it. otherwise pick a random inherited one - since it wont matter
-                        var mainTab = groupOfGroups.FirstOrDefault(x => x.Inherited == false) ?? groupOfGroups.First();
-
-                        //take all properties from all the other tabs and merge into one tab
-                        var properties = new List<PropertyTypeDisplay>();
-                        properties.AddRange(groupOfGroups.Where(x => x.Id != mainTab.Id).SelectMany(x => x.Properties));
-                        properties.AddRange(mainTab.Properties);
-                        mainTab.Properties = properties;
-
-                        //lock the tab
-                        mainTab.Inherited = true;
-
-                        //collect all the involved content types
-                        var parents = groupOfGroups.Where(x => x.ContentTypeId != source.Id).ToList();
-                        mainTab.ParentTabContentTypes = parents.SelectMany(x => x.ParentTabContentTypes).ToArray();
-                        mainTab.ParentTabContentTypeNames = parents.SelectMany(x => x.ParentTabContentTypeNames).ToArray();
-                        sortedGroups.Add(mainTab);
-                    }
+                    groups.Add(groupsByName.First());
+                    continue;
                 }
 
-                return sortedGroups.OrderBy(x => x.SortOrder);
+                // multiple groups, merge
+                var group = groupsByName.FirstOrDefault(x => x.Inherited == false) // try local
+                    ?? groupsByName.First(); // else pick one randomly
+                groups.Add(group);
+
+                // in case we use the local one, flag as inherited
+                group.Inherited = true;
+
+                // merge (and sort) properties
+                var properties = groupsByName.SelectMany(x => x.Properties).OrderBy(x => x.SortOrder).ToArray();
+                group.Properties = properties;
+
+                // collect parent group info
+                var parentGroups = groupsByName.Where(x => x.ContentTypeId != source.Id).ToArray();
+                group.ParentTabContentTypes = parentGroups.SelectMany(x => x.ParentTabContentTypes).ToArray();
+                group.ParentTabContentTypeNames = parentGroups.SelectMany(x => x.ParentTabContentTypeNames).ToArray();
             }
 
-
-            return groups.Values.OrderBy(x => x.SortOrder);
+            return groups.OrderBy(x => x.SortOrder);
         }
 
         private IEnumerable<PropertyTypeDisplay> MapProperties(IEnumerable<PropertyType> properties, IContentTypeBase contentType, int groupId, bool inherited)
         {
             var mappedProperties = new List<PropertyTypeDisplay>();
+
             foreach (var p in properties.Where(x => x.DataTypeDefinitionId != 0) )
             {
-                var editor = _propertyEditorResolver.Value.GetByAlias(p.PropertyEditorAlias);
-                var preVals = _applicationContext.Services.DataTypeService.GetPreValuesCollectionByDataTypeId(p.DataTypeDefinitionId);
+                var propertyEditor = _propertyEditorResolver.Value.GetByAlias(p.PropertyEditorAlias);
+                var preValues = _applicationContext.Services.DataTypeService.GetPreValuesCollectionByDataTypeId(p.DataTypeDefinitionId);
 
-                mappedProperties.Add(
-                    new PropertyTypeDisplay()
+                mappedProperties.Add(new PropertyTypeDisplay
                     {
                         Id = p.Id,
                         Alias = p.Alias,
                         Description = p.Description,
                         Editor = p.PropertyEditorAlias,
-                        Validation = new PropertyTypeValidation() { Mandatory = p.Mandatory, Pattern = p.ValidationRegExp },
+                        Validation = new PropertyTypeValidation { Mandatory = p.Mandatory, Pattern = p.ValidationRegExp },
                         Label = p.Name,
-                        View = editor.ValueEditor.View,
-                        Config = editor.PreValueEditor.ConvertDbToEditor(editor.DefaultPreValues, preVals) ,
+                        View = propertyEditor.ValueEditor.View,
+                        Config = propertyEditor.PreValueEditor.ConvertDbToEditor(propertyEditor.DefaultPreValues, preValues) ,
                         //Value = "",
                         ContentTypeId = contentType.Id,
                         ContentTypeName = contentType.Name,
