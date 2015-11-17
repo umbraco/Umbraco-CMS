@@ -152,6 +152,7 @@ namespace Umbraco.Core.Services
         {
             var contentType = FindContentTypeByAlias(contentTypeAlias);
             var content = new Content(name, parentId, contentType);
+            content.Path = string.Concat(content.Parent().IfNotNull(x => x.Path, content.ParentId.ToString()), ",", content.Id);
 
             if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parentId), this))
             {
@@ -192,6 +193,7 @@ namespace Umbraco.Core.Services
         {
             var contentType = FindContentTypeByAlias(contentTypeAlias);
             var content = new Content(name, parent, contentType);
+            content.Path = string.Concat(parent.Path, ",", content.Id);
 
             if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parent), this))
             {
@@ -226,6 +228,7 @@ namespace Umbraco.Core.Services
         {
             var contentType = FindContentTypeByAlias(contentTypeAlias);
             var content = new Content(name, parentId, contentType);
+            content.Path = string.Concat(content.Parent().IfNotNull(x => x.Path, content.ParentId.ToString()), ",", content.Id);
 
             //NOTE: I really hate the notion of these Creating/Created events - they are so inconsistent, I've only just found
             // out that in these 'WithIdentity' methods, the Saving/Saved events were not fired, wtf. Anyways, they're added now.
@@ -278,6 +281,7 @@ namespace Umbraco.Core.Services
         {
             var contentType = FindContentTypeByAlias(contentTypeAlias);
             var content = new Content(name, parent, contentType);
+            content.Path = string.Concat(parent.Path, ",", content.Id);
 
             //NOTE: I really hate the notion of these Creating/Created events - they are so inconsistent, I've only just found
             // out that in these 'WithIdentity' methods, the Saving/Saved events were not fired, wtf. Anyways, they're added now.
