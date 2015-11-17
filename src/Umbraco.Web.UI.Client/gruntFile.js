@@ -476,8 +476,7 @@ module.exports = function (grunt) {
                             files: ['css/font-awesome.min.css', 'fonts/*']
                         },
                         "jquery": {
-                            keepExpandedHierarchy: false,
-                            files: ['dist/jquery.min.js', 'dist/jquery.min.map']
+                            files: ['jquery.min.js', 'jquery.min.map']
                         },                        
                         'jquery-ui': {
                             keepExpandedHierarchy: false,
