@@ -1,7 +1,8 @@
 angular.module("umbraco").controller('Umbraco.Dialogs.Template.SnippetController',
-		function($scope, $http, dialogService) {
+		function($scope) {
 		    $scope.type = $scope.dialogOptions.type;
-		    $scope.section = {};
-		    $scope.section.name = "";
-		    $scope.section.required = false;          
+		    $scope.section = {
+                name: "",
+                required: false
+		    };
 		});

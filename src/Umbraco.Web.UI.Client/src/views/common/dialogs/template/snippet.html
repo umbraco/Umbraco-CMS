@@ -1,39 +1,33 @@
 <form novalidate name="contentForm"
-    ng-controller="Umbraco.Dialogs.Template.SnippetController"
-    ng-submit="close()"
-    val-form-manager>
-	
-	<style>
+      ng-controller="Umbraco.Dialogs.Template.SnippetController"
+      ng-submit="close()"
+      val-form-manager>
+    <div class="umb-panel">
 
-	</style>
+        <div class="umb-panel-header">
+            <h1 class="headline" style="margin: 10px 0 0 0">Configure the section</h1>
+        </div>
 
-	<div class="umb-panel">
-
-		<div class="umb-panel-header">
-		    <h1 class="headline" style="margin: 10px 0 0 0">Configure the section</h1>
-		</div>
-
-	    <div class="umb-panel-body with-footer umb-querybuilder">
+        <div class="umb-panel-body with-footer umb-querybuilder">
             <label>
                 Section name:
-                <input type="text" ng-model="section.name" />
+                <input type="text" ng-model="section.name"/>
             </label>
             <label ng-show="type === 'rendersection'">
-                Required?
-                <input type="checkbox" ng-checked="section.required" ng-model="section.required" />
+                <localize key="general_required">Required</localize>?
+                <input type="checkbox" ng-checked="section.required" ng-model="section.required"/>
             </label>
-	    </div>	
+        </div>
 
-		<div class="umb-panel-footer" >
-			<div class="umb-el-wrap umb-panel-buttons">
-		        <div class="btn-toolbar umb-btn-toolbar pull-right">
-		            <a href ng-click="close()" class="btn btn-link">
-		                <localize key="general_close">Close</localize>
-		            </a>
-                    
+        <div class="umb-panel-footer">
+            <div class="umb-el-wrap umb-panel-buttons">
+                <div class="btn-toolbar umb-btn-toolbar pull-right">
+                    <a href ng-click="close()" class="btn btn-link">
+                        <localize key="general_close">Close</localize>
+                    </a>
                     <a href ng-click="submit(section)" class="btn btn-primary">Insert</a>
-		        </div>
-	      </div>
-		</div>
-	</div>
+                </div>
+            </div>
+        </div>
+    </div>
 </form>
