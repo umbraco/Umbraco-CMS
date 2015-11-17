@@ -310,8 +310,8 @@ namespace Umbraco.Web.Mvc
             //check if that controller exists
             if (controllerType != null)
             {
-                //ensure the controller is of type 'IRenderMvcController' and ControllerBase
-                if (TypeHelper.IsTypeAssignableFrom<IRenderMvcController>(controllerType)
+                //ensure the controller is of type IRenderMvcController/IAsyncRenderMvcController and ControllerBase
+                if ((TypeHelper.IsTypeAssignableFrom<IRenderMvcController>(controllerType) || TypeHelper.IsTypeAssignableFrom<IAsyncRenderMvcController>(controllerType))
                     && TypeHelper.IsTypeAssignableFrom<ControllerBase>(controllerType))
                 {
                     //set the controller and name to the custom one
@@ -325,10 +325,11 @@ namespace Umbraco.Web.Mvc
                 else
                 {
                     LogHelper.Warn<RenderRouteHandler>(
-                        "The current Document Type {0} matches a locally declared controller of type {1}. Custom Controllers for Umbraco routing must implement '{2}' and inherit from '{3}'.",
+                        "The current Document Type {0} matches a locally declared controller of type {1}. Custom Controllers for Umbraco routing must implement either '{2}' or '{3}' and inherit from '{4}'.",
                         () => publishedContentRequest.PublishedContent.DocumentTypeAlias,
                         () => controllerType.FullName,
                         () => typeof(IRenderMvcController).FullName,
+                        () => typeof(IAsyncRenderMvcController).FullName,
                         () => typeof(ControllerBase).FullName);
 
                     //we cannot route to this custom controller since it is not of the correct type so we'll continue with the defaults
