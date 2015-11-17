@@ -55,6 +55,11 @@ namespace Umbraco.Core
             public const string DocumentType = "A2CB7800-F571-4787-9638-BC48539A0EFB";
 
             /// <summary>
+            /// Guid for a Document Type object.
+            /// </summary>
+            public static readonly Guid DocumentTypeGuid = new Guid(DocumentType);
+
+            /// <summary>
             /// Guid for a Media object.
             /// </summary>
             public const string Media = "B796F64C-1F99-4FFB-B886-4BF4BC011A9C";
@@ -70,6 +75,11 @@ namespace Umbraco.Core
             public const string MediaType = "4EA4382B-2F5A-4C2B-9587-AE9B3CF3602E";
 
             /// <summary>
+            /// Guid for a Media Type object.
+            /// </summary>
+            public static readonly Guid MediaTypeGuid = new Guid(MediaType);
+
+            /// <summary>
             /// Guid for a Member object.
             /// </summary>
             public const string Member = "39EB0F98-B348-42A1-8662-E7EB18487560";
@@ -83,6 +93,11 @@ namespace Umbraco.Core
             /// Guid for a Member Type object.
             /// </summary>
             public const string MemberType = "9B5416FB-E72F-45A9-A07B-5A9A2709CE43";
+
+            /// <summary>
+            /// Guid for a Member Type object.
+            /// </summary>
+            public static readonly Guid MemberTypeGuid = new Guid(MemberType);
 
             /// <summary>
             /// Guid for a Stylesheet object.
