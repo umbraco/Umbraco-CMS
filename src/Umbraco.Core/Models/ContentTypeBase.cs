@@ -378,40 +378,30 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// List of PropertyTypes available on this ContentType.
-        /// This list aggregates PropertyTypes across the PropertyGroups.
+        /// Gets all property types, across all property groups.
         /// </summary>
-        /// <remarks>
-        /// 
-        /// The setter is used purely to set the property types that DO NOT belong to a group!
-        /// 
-        /// Marked as DoNotClone because the result of this property is not the natural result of the data, it is 
-        /// a union of data so when auto-cloning if the setter is used it will be setting the unnatural result of the 
-        /// data. We manually clone this instead. 
-        /// </remarks>
         [IgnoreDataMember]
         [DoNotClone]
         public virtual IEnumerable<PropertyType> PropertyTypes
         {
             get
             {
-                var types = _propertyTypes.Union(PropertyGroups.SelectMany(x => x.PropertyTypes));
-                return types;
+                return _propertyTypes.Union(PropertyGroups.SelectMany(x => x.PropertyTypes));
             }
-            internal set
+        }
+
+        /// <summary>
+        /// Gets or sets the property types that are not in a group.
+        /// </summary>
+        public IEnumerable<PropertyType> NoGroupPropertyTypes
+        {
+            get { return _propertyTypes; }
+            set
             {
                 _propertyTypes = new PropertyTypeCollection(value);
                 _propertyTypes.CollectionChanged += PropertyTypesChanged;
                 PropertyTypesChanged(_propertyTypes, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
             }
-        }
-
-        /// <summary>
-        /// Returns the property type collection containing types that are non-groups - used for tests
-        /// </summary>
-        internal IEnumerable<PropertyType> NonGroupedPropertyTypes
-        {
-            get { return _propertyTypes; }
         }
 
             /// <summary>

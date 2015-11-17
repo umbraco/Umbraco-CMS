@@ -51,7 +51,7 @@ namespace Umbraco.Core.Persistence.Factories
                 memberType.MemberTypePropertyTypes.Add(standardPropertyType.Key,
                     new MemberTypePropertyProfileAccess(false, false));
             }
-            memberType.PropertyTypes = propertyTypes;
+            memberType.NoGroupPropertyTypes = propertyTypes;
 
             return memberType;
         }

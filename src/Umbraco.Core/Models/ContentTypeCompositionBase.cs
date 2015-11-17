@@ -37,16 +37,21 @@ namespace Umbraco.Core.Models
                 x => x.ContentTypeComposition);
 
         /// <summary>
-        /// List of ContentTypes that make up a composition of PropertyGroups and PropertyTypes for the current ContentType
+        /// Gets or sets the content types that compose this content type.
         /// </summary>
         [DataMember]
         public IEnumerable<IContentTypeComposition> ContentTypeComposition
         {
             get { return _contentTypeComposition; }
+            set
+            {
+                _contentTypeComposition = value.ToList();
+                OnPropertyChanged(ContentTypeCompositionSelector);
+            }
         }
 
         /// <summary>
-        /// Returns a list of <see cref="PropertyGroup"/> objects from the composition
+        /// Gets the property groups for the entire composition.
         /// </summary>
         [IgnoreDataMember]
         public IEnumerable<PropertyGroup> CompositionPropertyGroups
@@ -59,7 +64,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Returns a list of <see cref="PropertyType"/> objects from the composition
+        /// Gets the property types for the entire composition.
         /// </summary>
         [IgnoreDataMember]
         public IEnumerable<PropertyType> CompositionPropertyTypes
@@ -72,10 +77,10 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Adds a new ContentType to the list of composite ContentTypes
+        /// Adds a content type to the composition.
         /// </summary>
-        /// <param name="contentType"><see cref="ContentType"/> to add</param>
-        /// <returns>True if ContentType was added, otherwise returns False</returns>
+        /// <param name="contentType">The content type to add.</param>
+        /// <returns>True if the content type was added, otherwise false.</returns>
         public bool AddContentType(IContentTypeComposition contentType)
         {
             if (contentType.ContentTypeComposition.Any(x => x.CompositionAliases().Any(ContentTypeCompositionExists)))
@@ -104,10 +109,10 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Removes a ContentType with the supplied alias from the the list of composite ContentTypes
+        /// Removes a content type with a specified alias from the composition.
         /// </summary>
-        /// <param name="alias">Alias of a <see cref="ContentType"/></param>
-        /// <returns>True if ContentType was removed, otherwise returns False</returns>
+        /// <param name="alias">The alias of the content type to remove.</param>
+        /// <returns>True if the content type was removed, otherwise false.</returns>
         public bool RemoveContentType(string alias)
         {
             if (ContentTypeCompositionExists(alias))

@@ -120,6 +120,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.SortOrder, expression => expression.Ignore())
                 //ignore, we'll do this in after map
                 .ForMember(dto => dto.PropertyGroups, expression => expression.Ignore())
+                .ForMember(dto => dto.NoGroupPropertyTypes, expression => expression.Ignore())
                 
                 .ForMember(
                     dto => dto.AllowedContentTypes,
@@ -145,7 +146,7 @@ namespace Umbraco.Web.Models.Mapping
 
                     // handle actual groups (non-generic-properties)
                     var destOrigGroups = dest.PropertyGroups.ToArray(); // local groups
-                    var destOrigProperties = dest.PropertyTypes.ToArray(); // get_PropertyTypes returns grouped props too
+                    var destOrigProperties = dest.PropertyTypes.ToArray(); // all properties, in groups or not
                     var destGroups = new List<PropertyGroup>();
                     var sourceGroups = source.Groups.Where(x => x.IsGenericProperties == false).ToArray();
                     foreach (var sourceGroup in sourceGroups)
@@ -189,13 +190,7 @@ namespace Umbraco.Web.Models.Mapping
 
                         // ensure no duplicate alias, then assign the generic properties collection
                         EnsureUniqueAliases(destProperties);
-
-                        // set_PropertyTypes sets generic properties *only*
-                        // this is all very awkward
-                        var dest2 = dest as ContentTypeBase;
-                        if (dest2 == null)
-                            throw new InvalidOperationException("Cannot map if dest is not ContentTypeBase.");
-                        dest2.PropertyTypes = new PropertyTypeCollection(destProperties);
+                        dest.NoGroupPropertyTypes = new PropertyTypeCollection(destProperties);
                     }
 
                     // because all property collections were rebuilt, there is no need to remove

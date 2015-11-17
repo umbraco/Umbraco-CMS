@@ -671,7 +671,7 @@ AND umbracoNode.id <> @id",
                 foreach (var contentType in contentTypes)
                 {
                     contentType.PropertyGroups = allPropGroups[contentType.Id];
-                    ((ContentTypeBase)contentType).PropertyTypes = allPropTypes[contentType.Id];
+                    contentType.NoGroupPropertyTypes = allPropTypes[contentType.Id];
                 }
 
                 //NOTE: SQL call #3++
