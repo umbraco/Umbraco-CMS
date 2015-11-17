@@ -323,6 +323,23 @@
 }
 */
 
+.umb-grid .umb-control-click-overlay {
+   position: absolute;
+   width: 100%;
+   height: 100%;
+   z-index: 1000;
+   top: 0;
+   left: 0;
+   opacity: 0;
+   cursor: pointer;
+}
+
+.umb-grid .umb-control-click-overlay:hover {
+   opacity: 0.1;
+   background-color: @blue;
+   transition: opacity 0.1s;
+}
+
 .umb-grid .umb-row-title-bar {
    margin-bottom: 15px;
    display: flex;
