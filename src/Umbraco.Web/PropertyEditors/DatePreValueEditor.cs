@@ -8,7 +8,7 @@ namespace Umbraco.Web.PropertyEditors
         public string DefaultValue { get; set; }
 
         [PreValueField("showToday", "Show today", "boolean", Description = "Choose if today should be shown.")]
-        public string ShowToday { get; set; }
+        public bool ShowToday { get; set; }
 
         [PreValueField("calendarWeeks", "Show calendar weeks", "boolean", Description = "Choose if calendar weeks should be shown.")]
         public string CalendarWeeks { get; set; }

@@ -1,23 +1,7 @@
-﻿<div>
-    <div>
-        <label><input type="checkbox" name="weekdays" value="mon" /> Monday</label>
+﻿<div ng-controller="Umbraco.PrevalueEditors.WeekdaysController">
+    <div ng-repeat="day in weekdays">
+        <label><input type="checkbox" name="weekdays" ng-model="selectedDays" ng-checked="selectedDays[day.id]" /> {{day.name}}</label>
+        <br />
+        {{day.name}} : {{selectedDays[day.id]}} : {{selectedDays}}
     </div>
-    <div>
-        <label><input type="checkbox" name="weekdays" value="tue" /> Tuesday</label>
-    </div>
-    <div>
-        <label><input type="checkbox" name="weekdays" value="wed" /> Wednesday</label>
-    </div>
-    <div>
-        <label><input type="checkbox" name="weekdays" value="thu" /> Thursday</label>
-    </div>
-    <div>
-        <label><input type="checkbox" name="weekdays" value="fri" /> Friday</label>
-    </div>
-    <div>
-        <label><input type="checkbox" name="weekdays" value="sat" /> Saturday</label>
-    </div>
-    <div>
-        <label><input type="checkbox" name="weekdays" value="sun" /> Sunday</label>
-    </div>    
 </div>

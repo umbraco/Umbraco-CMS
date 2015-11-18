@@ -22,9 +22,12 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
     //map the user config
     $scope.model.config = angular.extend(config, $scope.model.config);
 
-    if ($scope.model.config.showToday !== undefined || $scope.model.config.showToday !== null) {
-        $scope.model.config.showToday = $scope.model.config.showToday == 0 ? false : true;
-    }
+    //Umbraco persists boolean for prevalues as "0" or "1" so we need to convert that!
+    $scope.model.config.showToday = ($scope.model.config.showToday == 0 ? false : true);
+
+    //if ($scope.model.config.showToday !== undefined || $scope.model.config.showToday !== null) {
+    //    $scope.model.config.showToday = $scope.model.config.showToday == 0 ? false : true;
+    //}
 
     if ($scope.model.config.calendarWeeks !== undefined || $scope.model.config.calendarWeeks !== null) {
         $scope.model.config.calendarWeeks = $scope.model.config.calendarWeeks == 0 ? false : true;
