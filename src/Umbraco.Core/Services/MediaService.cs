@@ -190,9 +190,10 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IMedia"/></returns>
         public IMedia CreateMediaWithIdentity(string name, IMedia parent, string mediaTypeAlias, int userId = 0)
         {
+            if (parent == null) throw new ArgumentNullException("parent");
+
             var mediaType = FindMediaTypeByAlias(mediaTypeAlias);
             var media = new Models.Media(name, parent, mediaType);
-            media.Path = string.Concat(parent.Path, ",", media.Id);
 
             //NOTE: I really hate the notion of these Creating/Created events - they are so inconsistent, I've only just found
             // out that in these 'WithIdentity' methods, the Saving/Saved events were not fired, wtf. Anyways, they're added now.

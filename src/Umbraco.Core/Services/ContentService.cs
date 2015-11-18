@@ -282,9 +282,10 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="IContent"/></returns>
         public IContent CreateContentWithIdentity(string name, IContent parent, string contentTypeAlias, int userId = 0)
         {
+            if (parent == null) throw new ArgumentNullException("parent");
+
             var contentType = FindContentTypeByAlias(contentTypeAlias);
             var content = new Content(name, parent, contentType);
-            content.Path = string.Concat(parent.Path, ",", content.Id);
 
             //NOTE: I really hate the notion of these Creating/Created events - they are so inconsistent, I've only just found
             // out that in these 'WithIdentity' methods, the Saving/Saved events were not fired, wtf. Anyways, they're added now.
