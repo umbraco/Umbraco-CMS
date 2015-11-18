@@ -63,6 +63,7 @@ namespace Umbraco.Core.Services
         {
             var mediaType = FindMediaTypeByAlias(mediaTypeAlias);
             var media = new Models.Media(name, parentId, mediaType);
+            media.Path = string.Concat(media.Parent().IfNotNull(x => x.Path, media.ParentId.ToString()), ",", media.Id);
 
             if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parentId), this))
             {
@@ -97,6 +98,8 @@ namespace Umbraco.Core.Services
         {
             var mediaType = FindMediaTypeByAlias(mediaTypeAlias);
             var media = new Models.Media(name, parent, mediaType);
+            media.Path = string.Concat(parent.Path, ",", media.Id);
+
             if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMedia>(media, mediaTypeAlias, parent), this))
             {
                 media.WasCancelled = true;
@@ -129,6 +132,7 @@ namespace Umbraco.Core.Services
         {
             var mediaType = FindMediaTypeByAlias(mediaTypeAlias);
             var media = new Models.Media(name, parentId, mediaType);
+            media.Path = string.Concat(media.Parent().IfNotNull(x => x.Path, media.ParentId.ToString()), ",", media.Id);
 
             //NOTE: I really hate the notion of these Creating/Created events - they are so inconsistent, I've only just found
             // out that in these 'WithIdentity' methods, the Saving/Saved events were not fired, wtf. Anyways, they're added now.
@@ -186,6 +190,7 @@ namespace Umbraco.Core.Services
         {
             var mediaType = FindMediaTypeByAlias(mediaTypeAlias);
             var media = new Models.Media(name, parent, mediaType);
+            media.Path = string.Concat(parent.Path, ",", media.Id);
 
             //NOTE: I really hate the notion of these Creating/Created events - they are so inconsistent, I've only just found
             // out that in these 'WithIdentity' methods, the Saving/Saved events were not fired, wtf. Anyways, they're added now.
