@@ -13,11 +13,9 @@
 
  .umb-grid .ui-sortable-helper  {
      position:absolute !important;
-    //  border: dashed 1px #000 !important;
      background-color: @blue;
-     opacity: 0.4;
-     height: auto !important;
-     width: 150px !important;
+     height: 50px !important;
+     width: 50px !important;
      overflow: hidden;
      padding: 5px;
      border-radius:2px;
@@ -26,15 +24,15 @@
      box-shadow: 3px 3px 12px 0px rgba(50, 50, 50, 0.45);
  }
 
- // .umb-grid .ui-sortable-helper:after {
- //     line-height: 15px;
- //     font-size: 25px;
- //     content: "\e14e";
- //     color: #ffffff;
- // }
+ .umb-grid .ui-sortable-helper:after {
+     line-height: 50px;
+     font-size: 25px;
+     content: "\e14e";
+     color: #ffffff;
+ }
 
  .umb-grid .ui-sortable-helper *{
-    //  display: none;
+     display: none;
      border: none !important;
      background: none !important;
      color: #ffffff !important;
@@ -51,7 +49,6 @@
  .umb-grid .ui-sortable-placeholder{
     position: absolute;
     width: 100%;
-    color: @gray;
     background-color:@blue;
     height: 2px;
     margin-bottom: 20px;
@@ -75,15 +72,6 @@
     right: -5px;
     content: "\e0d7";
 }
- // .umb-grid .ui-sortable-placeholder:hover{
- //     border-color: @gray;
- // }
- //
- // .umb-grid .ui-sortable-placeholder:before{
- //     content: "\e1bd";
- // }
-
-
 
  // utils
  // -------------------------

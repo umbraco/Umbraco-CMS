@@ -22,18 +22,19 @@ angular.module("umbraco")
             cursor: "move",
             placeholder: "ui-sortable-placeholder",
             handle: ".cell-tools-move",
+            helper: "clone",
             forcePlaceholderSize: true,
             tolerance: "pointer",
             zIndex: 999999999999999999,
             scrollSensitivity: 100,
-            cursorAt: {
-                top: 45,
-                left: 90
-            },
+            // cursorAt: {
+            //     top: 45,
+            //     left: 90
+            // },
 
             sort: function (event, ui) {
                 /* prevent vertical scroll out of the screen */
-                var max = $(".usky-grid").width() - 150;
+                var max = $(".umb-grid").width() - 150;
                 if (parseInt(ui.helper.css("left")) > max) {
                     ui.helper.css({ "left": max + "px" });
                 }
@@ -43,6 +44,10 @@ angular.module("umbraco")
             },
 
             start: function (e, ui) {
+
+                ui.item.context.style.opacity = "0.5";
+                ui.item.context.style.display = "block";
+
                 draggedRteSettings = {};
                 ui.item.find(".mceNoEditor").each(function () {
                     // remove all RTEs in the dragged row and save their settings
@@ -53,6 +58,9 @@ angular.module("umbraco")
             },
 
             stop: function (e, ui) {
+
+                ui.item.context.style.opacity = "1";
+
                 // reset all RTEs affected by the dragging
                 ui.item.parents(".usky-column").find(".mceNoEditor").each(function () {
                     var id = $(this).attr("id");
