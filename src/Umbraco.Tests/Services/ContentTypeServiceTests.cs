@@ -1168,6 +1168,8 @@ namespace Umbraco.Tests.Services
         {
             var service = ServiceContext.ContentTypeService;
             var basePage = (IContentType)MockedContentTypes.CreateBasicContentType();
+            basePage.AddPropertyGroup("Content");
+            basePage.AddPropertyGroup("Meta");
             service.Save(basePage);
 
             var authorPropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext, "author")
@@ -1179,6 +1181,16 @@ namespace Umbraco.Tests.Services
                 DataTypeDefinitionId = -88
             };
             var authorAdded = basePage.AddPropertyType(authorPropertyType, "Content");
+            var titlePropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext, "title")
+            {
+                Name = "Title",
+                Description = "",
+                Mandatory = false,
+                SortOrder = 1,
+                DataTypeDefinitionId = -88
+            };
+            var titleAdded = basePage.AddPropertyType(authorPropertyType, "Meta");
+
             service.Save(basePage);
 
             basePage = service.GetContentType(basePage.Id);

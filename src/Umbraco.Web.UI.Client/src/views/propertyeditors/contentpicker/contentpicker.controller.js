@@ -1,7 +1,7 @@
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
 
-function contentPickerController($scope, dialogService, entityResource, editorState, $log, iconHelper, $routeParams, fileManager, contentEditingHelper) {
+function contentPickerController($scope, dialogService, entityResource, editorState, $log, iconHelper, $routeParams, fileManager, contentEditingHelper, angularHelper) {
 
     function trim(str, chr) {
         var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^' + chr + '+|' + chr + '+$', 'g');
@@ -49,7 +49,8 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
     //the default pre-values
     var defaultConfig = {
         multiPicker: false,
-        showEditButton: false,        
+        showEditButton: false,
+        showPathOnHover: false,
         startNode: {
             query: "",
             type: "content",
@@ -65,6 +66,7 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
     //Umbraco persists boolean for prevalues as "0" or "1" so we need to convert that!
     $scope.model.config.multiPicker = ($scope.model.config.multiPicker === "1" ? true : false);
     $scope.model.config.showEditButton = ($scope.model.config.showEditButton === "1" ? true : false);
+    $scope.model.config.showPathOnHover = ($scope.model.config.showPathOnHover === "1" ? true : false);
 
     var entityType = $scope.model.config.startNode.type === "member"
         ? "Member"
@@ -87,6 +89,7 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
                 $scope.clear();
                 $scope.add(data);
             }
+        angularHelper.getCurrentForm($scope).$setDirty();
         },
         treeAlias: $scope.model.config.startNode.type,
         section: $scope.model.config.startNode.type
@@ -141,6 +144,7 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
 
     $scope.remove = function (index) {
         $scope.renderModel.splice(index, 1);
+        angularHelper.getCurrentForm($scope).$setDirty();
     };
         
     $scope.add = function (item) {
@@ -150,7 +154,7 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
 
         if (currIds.indexOf(item.id) < 0) {
             item.icon = iconHelper.convertFromLegacyIcon(item.icon);
-            $scope.renderModel.push({ name: item.name, id: item.id, icon: item.icon });
+            $scope.renderModel.push({ name: item.name, id: item.id, icon: item.icon, path: item.path });
         }
     };
 
@@ -182,7 +186,7 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
            
             if (entity) {
                 entity.icon = iconHelper.convertFromLegacyIcon(entity.icon);
-                $scope.renderModel.push({ name: entity.name, id: entity.id, icon: entity.icon });
+                $scope.renderModel.push({ name: entity.name, id: entity.id, icon: entity.icon, path: entity.path });
             }
             
            

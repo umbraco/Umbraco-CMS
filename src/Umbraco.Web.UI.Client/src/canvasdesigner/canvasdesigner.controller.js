@@ -24,7 +24,7 @@ var app = angular.module("Umbraco.canvasdesigner", ['colorpicker', 'ui.slider', 
     ];
     $scope.previewDevice = $scope.devices[0];
 
-    var apiController = "/Umbraco/Api/Canvasdesigner/";
+    var apiController = "../Api/Canvasdesigner/";
 
     /*****************************************************************************/
     /* Preview devices */
@@ -40,7 +40,7 @@ var app = angular.module("Umbraco.canvasdesigner", ['colorpicker', 'ui.slider', 
     /*****************************************************************************/
 
     $scope.exitPreview = function () {
-        window.top.location.href = "/umbraco/endPreview.aspx?redir=%2f" + $scope.pageId;
+        window.top.location.href = "../endPreview.aspx?redir=%2f" + $scope.pageId;
     };
 
     /*****************************************************************************/

@@ -1,6 +1,6 @@
 //this controller simply tells the dialogs service to open a memberPicker window
 //with a specified callback, this callback will receive an object with a selection on it
-function memberPickerController($scope, dialogService, entityResource, $log, iconHelper){
+function memberPickerController($scope, dialogService, entityResource, $log, iconHelper, angularHelper){
 
     function trim(str, chr) {
         var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^' + chr + '+|' + chr + '+$', 'g');
@@ -27,6 +27,7 @@ function memberPickerController($scope, dialogService, entityResource, $log, ico
                 $scope.clear();
                 $scope.add(data);
             }
+            angularHelper.getCurrentForm($scope).$setDirty();
         }
     };
 

@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
 using System.Web.Security;
@@ -284,6 +285,9 @@ namespace Umbraco.Web.Editors
                 case ContentSaveAction.SaveNew:
                     MembershipCreateStatus status;
                     CreateWithMembershipProvider(contentItem, out status);
+
+                    // save the ID of the creator
+                    contentItem.PersistedContent.CreatorId = Security.CurrentUser.Id;
                     break;
                 default:
                     //we don't support anything else for members

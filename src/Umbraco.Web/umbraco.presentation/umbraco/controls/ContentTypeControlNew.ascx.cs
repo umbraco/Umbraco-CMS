@@ -1475,7 +1475,8 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                     var propertyGroup = _contentType.ContentTypeItem.PropertyGroups.FirstOrDefault(x => x.Id == propertyGroupId);
                     if (propertyGroup != null && string.IsNullOrEmpty(propertyGroup.Name) == false)
                     {
-                        _contentType.ContentTypeItem.PropertyGroups.Remove(propertyGroup.Name);
+                        // use RemovePropertyGroup so properties become generic
+                        _contentType.ContentTypeItem.RemovePropertyGroup(propertyGroup.Name);
                         _contentType.Save();
                     }
                 //}
