@@ -55,7 +55,8 @@
                         <div class="umb-row"
                              ng-repeat="row in section.rows"
                              ng-click="clickRow(row, $event)"
-                             ng-class="{'-active': currentRow === row}">
+                             ng-class="{'-active': currentRow === row}"
+                             on-outside-click="clickOutsideRow()">
 
                             <div class="umb-row-title-bar">
 

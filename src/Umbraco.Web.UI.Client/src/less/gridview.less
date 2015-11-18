@@ -144,21 +144,29 @@
 .umb-grid .umb-row {
      position: relative;
      margin-bottom: 40px;
+     padding-top: 10px;
 }
 
+.umb-grid .umb-row.-active {
+   background-color: @blue;
+}
+
+.umb-grid .umb-row.-active .row-tools,
+.umb-grid .umb-row.-active .umb-row-title {
+   color: #ffffff;
+}
 
 // CELL
 // -------------------------
 .umb-grid .umb-cell {
      position: relative;
-     background-color: #ffffff;
-     padding: 10px;
 }
 
 .umb-grid .umb-cell-content {
    display: block;
    box-sizing: border-box;
    padding-top: 30px;
+   margin: 10px;
 }
 
 .umb-grid .umb-cell-content.-placeholder {
@@ -176,10 +184,14 @@
 }
 
 .umb-grid .umb-cell-content.-has-editors {
-   background-color: transparent;
+   background-color: #ffffff;
    border-style: solid;
    border-width: 1px;
    border-color: @grayLight;
+}
+
+.umb-grid .umb-row.-active .umb-cell-content.-has-editors {
+   border-color: transparent;
 }
 
 .umb-grid .umb-cell-content.-has-editors:hover {
@@ -354,7 +366,6 @@
 }
 
 .umb-grid .umb-row-title-bar {
-   margin-bottom: 15px;
    display: flex;
    padding-left: 10px;
    padding-right: 10px;
