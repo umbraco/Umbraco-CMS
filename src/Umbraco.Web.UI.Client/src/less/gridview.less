@@ -13,38 +13,68 @@
 
  .umb-grid .ui-sortable-helper  {
      position:absolute !important;
-     border: dashed 1px #000 !important;
-     background: #ffffff;
+    //  border: dashed 1px #000 !important;
+     background-color: @blue;
      opacity: 0.4;
-     height: 160px !important;
-     width: 320px !important;
+     height: auto !important;
+     width: 150px !important;
      overflow: hidden;
      padding: 5px;
-     border-radius:5px;
-    //  -webkit-box-shadow: 3px 3px 12px 0px rgba(50, 50, 50, 0.45);
-    //  -moz-box-shadow:    3px 3px 12px 0px rgba(50, 50, 50, 0.45);
-    //  box-shadow:         3px 3px 12px 0px rgba(50, 50, 50, 0.45);
+     border-radius:2px;
+     text-align: center;
+     font-family: "icomoon";
+     box-shadow: 3px 3px 12px 0px rgba(50, 50, 50, 0.45);
  }
+
+ // .umb-grid .ui-sortable-helper:after {
+ //     line-height: 15px;
+ //     font-size: 25px;
+ //     content: "\e14e";
+ //     color: #ffffff;
+ // }
 
  .umb-grid .ui-sortable-helper *{
+    //  display: none;
      border: none !important;
      background: none !important;
-     color: #999 !important;
+     color: #ffffff !important;
      padding: 0 !important;
      margin: 0 !important;
+     font-size: 12px !important;
  }
 
- .umb-grid .ui-sortable-helper .cell-tools{
+ .umb-grid .ui-sortable-helper .umb-row-title-bar,
+ .umb-grid .ui-sortable-helper .cell-tools-add {
      display: none !important;
  }
 
  .umb-grid .ui-sortable-placeholder{
+    position: absolute;
+    width: 100%;
     color: @gray;
     background-color:@blue;
     height: 2px;
     margin-bottom: 20px;
  }
 
+.umb-grid .ui-sortable-placeholder:before,
+.umb-grid .ui-sortable-placeholder:after {
+    position: absolute;
+    top: -9px;
+    font-family: "icomoon";
+    font-size: 18px;
+    color: @blue;
+ }
+
+ .umb-grid .ui-sortable-placeholder:before {
+     left: -5px;
+     content: "\e0e9";
+ }
+
+.umb-grid .ui-sortable-placeholder:after {
+    right: -5px;
+    content: "\e0d7";
+}
  // .umb-grid .ui-sortable-placeholder:hover{
  //     border-color: @gray;
  // }
@@ -114,7 +144,7 @@
  // COLUMN
  // -------------------------
  .umb-grid  .umb-column {
-
+    position: relative;
  }
  .umb-grid  .umb-column.last {
 
