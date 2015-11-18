@@ -54,15 +54,12 @@
                         <!-- ng-mouseleave="disableCurrentRow()"  -->
                         <div class="umb-row"
                              ng-repeat="row in section.rows"
-                             ng-click="clickRow(row)"
+                             ng-click="clickRow(row, $event)"
                              ng-class="{'-active': currentRow === row}">
 
                             <div class="umb-row-title-bar">
 
-                                <div class="umb-row-title">
-                                    <p>{{row.name}}</p>
-                                </div>
-
+                                <div class="umb-row-title">{{row.name}}</div>
 
                                <!-- Row tool -->
                                <div class="row-tools" ng-show="currentRow === row">
@@ -128,7 +125,7 @@
                                                     '-active': currentCell == area}"
                                                  ui-sortable="sortableOptionsCell"
                                                  ng-model="area.controls"
-                                                 ng-click="clickCell(area)">
+                                                 ng-click="clickCell(area, row, $event)">
 
                                                  <!-- Cell placeholder -->
                                                  <div class="umb-cell-content -placeholder"
@@ -142,22 +139,27 @@
                                                       ng-if="area.controls.length > 0"
                                                       ng-class="{'-active': currentCell == area}">
 
+                                                      <div class="cell-tools" ng-if="currentCell == area">
+                                                         <div class="cell-tool" ng-click="editGridItemSettings(area, 'cell')">
+                                                            <i class="icon-settings"></i>
+                                                         </div>
+                                                      </div>
+
                                                       <!-- Controls in areas -->
                                                       <!-- ng-mouseover="setCurrentControl(control)" -->
                                                       <!-- ng-mouseleave="disableCurrentControl(control)" -->
                                                       <div ng-repeat="control in area.controls"
-                                                          ng-click="clickControl(control)"
+                                                          ng-click="clickControl(control, area, row, $event)"
                                                           ng-class="{'-active': currentControl === control}"
                                                           ng-animate="'fade'"
                                                           class="umb-control">
 
-                                                          <!-- Filled cell tools -->
+                                                          <!-- Filled cell tools
                                                           <div class="cell-tools"
                                                                ng-class="{'with-prompt': control.deletePrompt}"
                                                                ng-animate="'fade'"
                                                                ng-if="control && (currentControl == control)">
 
-                                                             <!-- delete control -->
                                                              <div class="cell-tools-remove">
                                                                   <div class="iconBox"
                                                                        ng-click="showPrompt(control)"
@@ -174,7 +176,6 @@
                                                                   </div>
                                                              </div>
 
-                                                             <!-- move control -->
                                                              <div class="cell-tools-move">
                                                                   <a class="iconBox"
                                                                      ng-mouseover="setInfohighlightControl(control)"
@@ -184,7 +185,6 @@
                                                                   </a>
                                                              </div>
 
-                                                             <!-- setting area -->
                                                              <div class="cell-tools-edit" ng-if="hasSettings && $first">
                                                                   <a class="iconBox"
                                                                      ng-mouseover="setInfohighlightArea(area)"
@@ -196,6 +196,9 @@
                                                              </div>
 
                                                           </div>
+                                                          -->
+
+                                                          <div class="umb-control-click-overlay" ng-if="currentControl !== control"></div>
 
                                                           <div class="umb-control-inner" ng-class="{last:$last,
                                                                      infohighlight:currentInfohighlightControl == control,
@@ -204,12 +207,17 @@
 
                                                                <div class="umb-control-bar">
 
-                                                                  <div class="umb-control-title">
+                                                                  <div class="umb-control-title" ng-if="currentControl == control">
+                                                                     <div class="umb-control-tool">
+                                                                        <i class="umb-control-tool-icon icon-navigation"></i>
+                                                                     </div>
                                                                      {{control.editor.name}}
                                                                   </div>
 
-                                                                  <div class="umb-control-tools">
-
+                                                                  <div class="umb-control-tools" ng-if="currentControl == control">
+                                                                     <div class="umb-control-tool" ng-click="removeControl(area, $index)">
+                                                                        <i class="umb-control-tool-icon icon-trash"></i>
+                                                                     </div>
                                                                   </div>
 
                                                                </div>
