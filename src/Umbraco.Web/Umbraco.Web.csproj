@@ -304,7 +304,8 @@
     <Compile Include="Media\EmbedProviders\Flickr.cs" />
     <Compile Include="Models\ContentEditing\SimpleNotificationModel.cs" />
     <Compile Include="Models\PublishedContentWithKeyBase.cs" />
-    <Compile Include="Mvc\IAsyncRenderMvcController.cs" />
+    <Compile Include="Mvc\IRenderController.cs" />
+    <Compile Include="Mvc\RenderIndexActionSelectorAttribute.cs" />
     <Compile Include="PropertyEditors\DatePreValueEditor.cs" />
     <Compile Include="RequestLifespanMessagesFactory.cs" />
     <Compile Include="Scheduling\LatchedBackgroundTaskBase.cs" />
