@@ -223,6 +223,12 @@ angular.module("umbraco")
            event.stopPropagation();
         };
 
+        $scope.clickOutsideRow = function() {
+           $scope.currentRow = null;
+           $scope.currentCell = null;
+           $scope.currentControl = null;
+        };
+
         $scope.setWarnighlightRow = function (row) {
             $scope.currentWarnhighlightRow = row;
         };
