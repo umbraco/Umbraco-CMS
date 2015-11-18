@@ -21,26 +21,26 @@ angular.module("umbraco")
             distance: 10,
             cursor: "move",
             placeholder: "ui-sortable-placeholder",
-            handle: ".cell-tools-move",
+            handle: ".umb-row-title-bar",
             helper: "clone",
             forcePlaceholderSize: true,
             tolerance: "pointer",
             zIndex: 999999999999999999,
             scrollSensitivity: 100,
-            // cursorAt: {
-            //     top: 45,
-            //     left: 90
-            // },
+            cursorAt: {
+                top: 40,
+                left: 60
+            },
 
             sort: function (event, ui) {
                 /* prevent vertical scroll out of the screen */
-                var max = $(".umb-grid").width() - 150;
-                if (parseInt(ui.helper.css("left")) > max) {
-                    ui.helper.css({ "left": max + "px" });
-                }
-                if (parseInt(ui.helper.css("left")) < 20) {
-                    ui.helper.css({ "left": 20 });
-                }
+                // var max = $(".umb-grid").width() - 150;
+                // if (parseInt(ui.helper.css("left")) > max) {
+                //     ui.helper.css({ "left": max + "px" });
+                // }
+                // if (parseInt(ui.helper.css("left")) < 20) {
+                //     ui.helper.css({ "left": 20 });
+                // }
             },
 
             start: function (e, ui) {
@@ -53,7 +53,7 @@ angular.module("umbraco")
                     // remove all RTEs in the dragged row and save their settings
                     var id = $(this).attr("id");
                     draggedRteSettings[id] = _.findWhere(tinyMCE.editors, { id: id }).settings;
-                    tinyMCE.execCommand("mceRemoveEditor", false, id);
+                    // tinyMCE.execCommand("mceRemoveEditor", false, id);
                 });
             },
 
@@ -62,7 +62,7 @@ angular.module("umbraco")
                 ui.item.context.style.opacity = "1";
 
                 // reset all RTEs affected by the dragging
-                ui.item.parents(".usky-column").find(".mceNoEditor").each(function () {
+                ui.item.parents(".umb-column").find(".mceNoEditor").each(function () {
                     var id = $(this).attr("id");
                     draggedRteSettings[id] = draggedRteSettings[id] || _.findWhere(tinyMCE.editors, { id: id }).settings;
                     tinyMCE.execCommand("mceRemoveEditor", false, id);
