@@ -6,11 +6,11 @@
  * @description
  * The controller for the doc type creation dialog
  */
-function DocumentTypesCreateController($scope, $location, navigationService, contentTypeResource, formHelper, appState) {
+function DocumentTypesCreateController($scope, $location, navigationService, contentTypeResource, formHelper, appState, notificationsService) {
 
     $scope.model = {
         folderName: "",
-        creatingFolder: false
+        creatingFolder: false,        
     };
 
     var node = $scope.dialogOptions.currentNode;
@@ -19,9 +19,9 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
         $scope.model.creatingFolder = true;
     }
 
-    $scope.createFolder = function () {
+    $scope.createContainer = function () {
         if (formHelper.submitForm({ scope: $scope, formCtrl: this.createFolderForm, statusMessage: "Creating folder..." })) {
-            contentTypeResource.createFolder(node.id, $scope.model.folderName).then(function (folderId) {
+            contentTypeResource.createContainer(node.id, $scope.model.folderName).then(function (folderId) {
 
                 navigationService.hideMenu();
                 var currPath = node.path ? node.path : "-1";
@@ -29,12 +29,18 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
 
                 formHelper.resetForm({ scope: $scope });
 
-                var section = appState.getSectionState("currentSection");
-                $location.path("/" + section + "/documenttypes/list/" + folderId);
-
+                var section = appState.getSectionState("currentSection"); 
+                
             }, function(err) {
 
-               //TODO: Handle errors
+                $scope.error = err;
+
+                //show any notifications
+                if (angular.isArray(err.data.notifications)) {
+                    for (var i = 0; i < err.data.notifications.length; i++) {
+                        notificationsService.showNotification(err.data.notifications[i]);
+                    }
+                }
             });
         };
     }

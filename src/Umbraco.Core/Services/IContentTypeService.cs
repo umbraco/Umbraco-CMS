@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Services
 {
@@ -17,7 +18,10 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         Attempt<string[]> ValidateComposition(IContentTypeComposition compo);
 
-        Attempt<int> CreateFolder(int parentId, string name, int userId = 0);
+        Attempt<int> CreateContentTypeContainer(int parentId, string name, int userId = 0);
+        Attempt<int> CreateMediaTypeContainer(int parentId, string name, int userId = 0);
+        void DeleteMediaTypeContainer(int folderId, int userId = 0);
+        void DeleteContentTypeContainer(int folderId, int userId = 0);
 
         /// <summary>
         /// Gets all property type aliases.
@@ -258,5 +262,8 @@ namespace Umbraco.Core.Services
         /// <param name="id">Id of the <see cref="IMediaType"/></param>
         /// <returns>True if the media type has any children otherwise False</returns>
         bool MediaTypeHasChildren(Guid id);
+
+        Attempt<OperationStatus<MoveOperationStatusType>> MoveMediaType(IMediaType toMove, int parentId);
+        Attempt<OperationStatus<MoveOperationStatusType>> MoveContentType(IContentType toMove, int parentId);
     }
 }

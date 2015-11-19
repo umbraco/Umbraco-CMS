@@ -19,6 +19,7 @@ using Umbraco.Web.WebApi.Filters;
 using umbraco;
 using Constants = Umbraco.Core.Constants;
 using System.Net.Http;
+using System.Text;
 
 namespace Umbraco.Web.Editors
 {
@@ -80,9 +81,9 @@ namespace Umbraco.Web.Editors
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
-        public DataTypeDisplay GetEmpty()
+        public DataTypeDisplay GetEmpty(int parentId)
         {
-            var dt = new DataTypeDefinition("");
+            var dt = new DataTypeDefinition(parentId, "");
             return Mapper.Map<IDataTypeDefinition, DataTypeDisplay>(dt);
         }
 
@@ -162,7 +163,28 @@ namespace Umbraco.Web.Editors
             return Mapper.Map<PropertyEditor, IEnumerable<PreValueFieldDisplay>>(propEd);            
         }
 
-        //TODO: Generally there probably won't be file uploads for pre-values but we should allow them just like we do for the content editor
+        /// <summary>
+        /// Deletes a data type container wth a given ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [HttpPost]
+        public HttpResponseMessage DeleteContainer(int id)
+        {
+            Services.DataTypeService.DeleteContainer(id, Security.CurrentUser.Id);
+
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
+        public HttpResponseMessage PostCreateContainer(int parentId, string name)
+        {
+            var result = Services.DataTypeService.CreateContainer(parentId, name, Security.CurrentUser.Id);
+
+            return result
+                ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id 
+                : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
+        }
 
         /// <summary>
         /// Saves the data type
@@ -205,6 +227,44 @@ namespace Umbraco.Web.Editors
 
             //now return the updated model
             return display;
+        }
+
+        /// <summary>
+        /// Move the media type
+        /// </summary>
+        /// <param name="move"></param>
+        /// <returns></returns>
+        public HttpResponseMessage PostMove(MoveOrCopy move)
+        {
+            var toMove = Services.DataTypeService.GetDataTypeDefinitionById(move.Id);
+            if (toMove == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+
+            var result = Services.DataTypeService.Move(toMove, move.ParentId);
+            if (result.Success)
+            {
+                var response = Request.CreateResponse(HttpStatusCode.OK);
+                response.Content = new StringContent(toMove.Path, Encoding.UTF8, "application/json");
+                return response;
+            }
+
+            switch (result.Result.StatusType)
+            {
+                case MoveOperationStatusType.FailedParentNotFound:
+                    return Request.CreateResponse(HttpStatusCode.NotFound);
+                case MoveOperationStatusType.FailedCancelledByEvent:
+                    //returning an object of INotificationModel will ensure that any pending 
+                    // notification messages are added to the response.
+                    return Request.CreateValidationErrorResponse(new SimpleNotificationModel());
+                case MoveOperationStatusType.FailedNotAllowedByPath:
+                    var notificationModel = new SimpleNotificationModel();
+                    notificationModel.AddErrorNotification(Services.TextService.Localize("moveOrCopy/notAllowedByPath"), "");
+                    return Request.CreateValidationErrorResponse(notificationModel);
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         #region ReadOnly actions to return basic data - allow access for: content ,media, members, settings, developer

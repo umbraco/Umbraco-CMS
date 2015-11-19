@@ -64,8 +64,7 @@ angular.module("umbraco")
 
             //queue rules loading
             angular.forEach(editorConfig.stylesheets, function (val, key) {
-                stylesheets.push("../css/" + val + ".css?" + new Date().getTime());
-
+                stylesheets.push(Umbraco.Sys.ServerVariables.umbracoSettings.cssPath + "/" + val + ".css?" + new Date().getTime());
                 await.push(stylesheetResource.getRulesByName(val).then(function (rules) {
                     angular.forEach(rules, function (rule) {
                         var r = {};

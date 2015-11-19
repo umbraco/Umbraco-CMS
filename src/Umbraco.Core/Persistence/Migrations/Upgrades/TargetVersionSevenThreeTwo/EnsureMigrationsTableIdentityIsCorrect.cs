@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
@@ -18,13 +19,28 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeTw
 
         public override void Up()
         {
-            Delete.FromTable("umbracoMigration").AllRows();
-            var migrations = Context.Database.Fetch<MigrationDto>(new Sql().Select("*").From<MigrationDto>(SqlSyntax));
-            foreach (var migration in migrations)
+            // Due to the delayed execution of migrations, we have to wrap this code in Execute.Code to ensure the previous
+            // migration steps (esp. creating the migrations table) have completed before trying to fetch migrations from
+            // this table.
+            List<MigrationDto> migrations = null;
+            Execute.Code(db =>
             {
-                Insert.IntoTable("umbracoMigration")
-                    .Row(new {name = migration.Name, createDate = migration.CreateDate, version = migration.Version});
-            }
+                migrations = Context.Database.Fetch<MigrationDto>(new Sql().Select("*").From<MigrationDto>(SqlSyntax));
+                return string.Empty;
+            });
+            Delete.FromTable("umbracoMigration").AllRows();
+            Execute.Code(database =>
+            {
+                if (migrations != null)
+                {
+                    foreach (var migration in migrations)
+                    {
+                        database.Insert("umbracoMigration", "id", true,
+                            new {name = migration.Name, createDate = migration.CreateDate, version = migration.Version});
+                    }
+                }
+                return string.Empty;
+            });
         }
 
         public override void Down()

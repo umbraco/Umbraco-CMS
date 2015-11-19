@@ -130,8 +130,8 @@ namespace Umbraco.Web.Models.Mapping
 
                     var addedProperties = new List<string>();
 
-                    //get all properties from groups that are not generic properties or inhertied (-666 id)
-                    var selfNonGenericGroups = source.Groups.Where(x => x.Inherited == false && x.Id != -666).ToArray();
+                    //get all properties from groups that are not generic properties or inhertied
+                    var selfNonGenericGroups = source.Groups.Where(x => x.Inherited == false && x.IsGenericProperties == false).ToArray();
 
                     foreach (var group in selfNonGenericGroups)
                     {
@@ -168,7 +168,7 @@ namespace Umbraco.Web.Models.Mapping
                     }
 
                     //add generic properties
-                    var genericProperties = source.Groups.FirstOrDefault(x => x.Id == -666);
+                    var genericProperties = source.Groups.FirstOrDefault(x => x.IsGenericProperties);
                     if (genericProperties != null)
                     {
                         foreach (var propertyTypeBasic in genericProperties.Properties.Where(x => x.Inherited == false))

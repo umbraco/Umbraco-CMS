@@ -15,10 +15,11 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Trees
 {
-    [UmbracoTreeAuthorize(Constants.Trees.DataTypes)]
+    [UmbracoTreeAuthorize(Constants.Trees.MediaTypes)]
     [Tree(Constants.Applications.Settings, Constants.Trees.MediaTypes, null, sortOrder:5)]
-    [Umbraco.Web.Mvc.PluginController("UmbracoTrees")]
+    [Mvc.PluginController("UmbracoTrees")]
     [CoreTree]
+    [LegacyBaseTree(typeof(loadMediaTypes))]
     public class MediaTypeTreeController : TreeController
     {
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
@@ -28,17 +29,21 @@ namespace Umbraco.Web.Trees
 
             var nodes = new TreeNodeCollection();
 
-            //TODO: MediaTypeContainers
             nodes.AddRange(
-                Services.EntityService.GetChildren(intId.Result, UmbracoObjectTypes.DocumentTypeContainer)
+                Services.EntityService.GetChildren(intId.Result, UmbracoObjectTypes.MediaTypeContainer)
                     .OrderBy(entity => entity.Name)
                     .Select(dt =>
                     {
-                        var node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, "icon-folder", dt.HasChildren(),
-                            queryStrings.GetValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/list/" + dt.Id);
+                        var node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, "icon-folder", dt.HasChildren(), "");
                         node.Path = dt.Path;
+                        node.NodeType = "container";
+                        //TODO: This isn't the best way to ensure a noop process for clicking a node but it works for now.
+                        node.AdditionalData["jsClickCallback"] = "javascript:void(0);";
                         return node;
                     }));
+
+            //if the request is for folders only then just return
+            if (queryStrings["foldersonly"].IsNullOrWhiteSpace() == false && queryStrings["foldersonly"] == "1") return nodes;
 
             nodes.AddRange(
                 Services.EntityService.GetChildren(intId.Result, UmbracoObjectTypes.MediaType)
@@ -52,8 +57,6 @@ namespace Umbraco.Web.Trees
 
             return nodes;
         }
-
-
 
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
@@ -69,29 +72,26 @@ namespace Umbraco.Web.Trees
                 menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)));
                 return menu;
             }
-            else
+
+            var container = Services.EntityService.Get(int.Parse(id), UmbracoObjectTypes.MediaTypeContainer);
+            if (container != null)
             {
-                var container = Services.EntityService.Get(int.Parse(id), UmbracoObjectTypes.DocumentTypeContainer);
-                if (container != null)
-                {
-                    //set the default to create
-                    menu.DefaultMenuAlias = ActionNew.Instance.Alias;
+                //set the default to create
+                menu.DefaultMenuAlias = ActionNew.Instance.Alias;
 
-                    // root actions              
-                    menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
-                    menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)));
-
-                    if (container.HasChildren() == false)
-                    {
-                        //can delete doc type
-                        menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
-                    }
-                }
-                else
+                menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
+                
+                if (container.HasChildren() == false)
                 {
-                    //delete doc type
+                    //can delete doc type
                     menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
-                }
+                }                
+                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), hasSeparator: true);
+            }
+            else
+            {                
+                menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
+                menu.Items.Add<ActionMove>(Services.TextService.Localize(string.Format("actions/{0}", ActionMove.Instance.Alias)), hasSeparator: true);
             }
 
             return menu;

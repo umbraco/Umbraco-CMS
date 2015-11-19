@@ -1,7 +1,7 @@
 <div class="umbracoDialog umb-dialog-body with-footer" ng-controller="Umbraco.Editors.DocumentTypes.CreateController">
 
     <div class="umb-pane" ng-if="!model.creatingFolder">
-        <h5><localize key="create_createUnder">Create a page under</localize> {{currentNode.name}}</h5>
+        <h5><localize key="create_createUnder">Create an item under</localize> {{currentNode.name}}</h5>
 
         <ul class="umb-actions umb-actions-child">
             <li>
@@ -33,8 +33,13 @@
 
     <div class="umb-pane" ng-if="model.creatingFolder">
         <form novalidate name="createFolderForm"
-              ng-submit="createFolder()"
+              ng-submit="createContainer()"
               val-form-manager>
+            
+            <div ng-show="error">
+                <h5 class="text-error">{{error.errorMsg}}</h5>
+                <p class="text-error">{{error.data.message}}</p>
+            </div>
 
             <umb-control-group label="Enter a folder name" hide-label="false">
                 <input type="text" name="folderName" ng-model="model.folderName" class="umb-textstring textstring input-block-level" required />

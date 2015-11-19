@@ -56,7 +56,7 @@ angular.module("umbraco.directives")
                         if(scope.configuration && scope.configuration.stylesheets){
                             angular.forEach(scope.configuration.stylesheets, function(stylesheet, key){
 
-                                    stylesheets.push("/css/" + stylesheet + ".css");
+                                    stylesheets.push(Umbraco.Sys.ServerVariables.umbracoSettings.cssPath + "/" + stylesheet + ".css");
                                     await.push(stylesheetResource.getRulesByName(stylesheet).then(function (rules) {
                                         angular.forEach(rules, function (rule) {
                                           var r = {};

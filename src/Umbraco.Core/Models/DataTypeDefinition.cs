@@ -49,8 +49,6 @@ namespace Umbraco.Core.Models
             _additionalData = new Dictionary<string, object>();
         }
 
-        [Obsolete("Don't use this, parentId is always -1 for data types")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
         public DataTypeDefinition(int parentId, string propertyEditorAlias)
         {
             _parentId = parentId;

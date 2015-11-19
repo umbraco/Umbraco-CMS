@@ -12,6 +12,7 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
 using umbraco.interfaces;
+using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.Services
 {
@@ -24,6 +25,36 @@ namespace Umbraco.Core.Services
         public DataTypeService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
+        }
+
+        public Attempt<int> CreateContainer(int parentId, string name, int userId = 0)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateDataTypeDefinitionRepository(uow))
+            {
+                try
+                {
+                    var container = repo.CreateContainer(parentId, name, userId);
+                    uow.Commit();
+                    return Attempt.Succeed(container.Id);
+                }
+                catch (Exception ex)
+                {
+                    return Attempt<int>.Fail(ex);
+                }
+                //TODO: Audit trail ?
+            }
+        }
+
+        public void DeleteContainer(int containerId, int userId = 0)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateDataTypeDefinitionRepository(uow))
+            {
+                repo.DeleteContainer(containerId);
+                uow.Commit();
+                //TODO: Audit trail ?
+            }
         }
 
         /// <summary>
@@ -151,6 +182,41 @@ namespace Umbraco.Core.Services
             {
                 return repository.GetPreValueAsString(id);
             }
+        }
+
+        public Attempt<OperationStatus<MoveOperationStatusType>> Move(IDataTypeDefinition toMove, int parentId)
+        {
+            var evtMsgs = EventMessagesFactory.Get();
+
+            if (Moving.IsRaisedEventCancelled(
+                  new MoveEventArgs<IDataTypeDefinition>(evtMsgs, new MoveEventInfo<IDataTypeDefinition>(toMove, toMove.Path, parentId)),
+                  this))
+            {
+                return Attempt.Fail(
+                    new OperationStatus<MoveOperationStatusType>(
+                        MoveOperationStatusType.FailedCancelledByEvent, evtMsgs));
+            }
+
+            var moveInfo = new List<MoveEventInfo<IDataTypeDefinition>>();
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(uow))
+            {
+                try
+                {
+                    moveInfo.AddRange(repository.Move(toMove, parentId));
+                }
+                catch (DataOperationException<MoveOperationStatusType> ex)
+                {
+                    return Attempt.Fail(
+                        new OperationStatus<MoveOperationStatusType>(ex.Operation, evtMsgs));
+                }
+                uow.Commit();
+            }
+
+            Moved.RaiseEvent(new MoveEventArgs<IDataTypeDefinition>(false, evtMsgs, moveInfo.ToArray()), this);
+
+            return Attempt.Succeed(
+                new OperationStatus<MoveOperationStatusType>(MoveOperationStatusType.Success, evtMsgs));
         }
 
         /// <summary>
@@ -401,8 +467,18 @@ namespace Umbraco.Core.Services
         /// Occurs after Save
         /// </summary>
 		public static event TypedEventHandler<IDataTypeService, SaveEventArgs<IDataTypeDefinition>> Saved;
+
+        /// <summary>
+        /// Occurs before Move
+        /// </summary>
+        public static event TypedEventHandler<IDataTypeService, MoveEventArgs<IDataTypeDefinition>> Moving;
+
+        /// <summary>
+        /// Occurs after Move
+        /// </summary>
+        public static event TypedEventHandler<IDataTypeService, MoveEventArgs<IDataTypeDefinition>> Moved;
         #endregion
 
-        
+
     }
 }

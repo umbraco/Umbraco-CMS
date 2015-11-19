@@ -32,7 +32,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
-            sql.OrderByDescending<NodeDto>(x => x.NodeId);
+            sql.OrderByDescending<NodeDto>(x => x.NodeId, SqlSyntax);
 
             var dtos =
                 Database.Fetch<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto, MemberTypeReadOnlyDto>(
@@ -240,15 +240,7 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         #endregion
-
-        /// <summary>
-        /// The container object type - used for organizing content types
-        /// </summary>
-        protected override Guid ContainerObjectTypeId
-        {
-            get { throw new NotImplementedException(); }
-        }
-
+        
         /// <summary>
         /// Override so we can specify explicit db type's on any property types that are built-in.
         /// </summary>

@@ -533,6 +533,18 @@ namespace Umbraco.Core.Models
         /// <param name="propertyGroupName">Name of the <see cref="PropertyGroup"/> to remove</param>
         public void RemovePropertyGroup(string propertyGroupName)
         {
+            // if no group exists with that name, do nothing
+            var group = PropertyGroups[propertyGroupName];
+            if (group == null) return;
+
+            // re-assign the group's properties to no group
+            foreach (var property in group.PropertyTypes)
+            {
+                property.PropertyGroupId = new Lazy<int>(() => 0);
+                _propertyTypes.Add(property);
+            }
+
+            // actually remove the group
             PropertyGroups.RemoveItem(propertyGroupName);
             OnPropertyChanged(PropertyGroupCollectionSelector);
         }

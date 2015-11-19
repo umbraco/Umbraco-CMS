@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Querying;
 
@@ -20,6 +21,21 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         IEnumerable<string> GetAllPropertyTypeAliases();
 
-        Attempt<int> CreateFolder(int parentId, string name, int userId);
+        /// <summary>
+        /// Creates a folder for content types
+        /// </summary>
+        /// <param name="parentId"></param>
+        /// <param name="name"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        EntityContainer CreateContainer(int parentId, string name, int userId);
+
+        /// <summary>
+        /// Deletes a folder - this will move all contained content types into their parent
+        /// </summary>
+        /// <param name="containerId"></param>
+        void DeleteContainer(int containerId);
+
+        IEnumerable<MoveEventInfo<IContentType>> Move(IContentType toMove, int parentId);
     }
 }

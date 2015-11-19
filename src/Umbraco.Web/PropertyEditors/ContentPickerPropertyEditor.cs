@@ -13,7 +13,8 @@ namespace Umbraco.Web.PropertyEditors
             _internalPreValues = new Dictionary<string, object>
                 {                 
                     {"showEditButton", "0"},
-                    {"startNodeId", "-1"}
+                    {"startNodeId", "-1"},
+                    {"showPathOnHover", "0"}
                 };
         }
 
@@ -37,6 +38,8 @@ namespace Umbraco.Web.PropertyEditors
             [PreValueField("startNodeId", "Start node", "treepicker")]
             public int StartNodeId { get; set; }
 
+            [PreValueField("showPathOnHover", "Show path when hovering items", "boolean")]
+            public bool ShowPathOnHover { get; set; }
         }
     }
 }

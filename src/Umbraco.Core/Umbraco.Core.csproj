@@ -86,7 +86,7 @@
     </Reference>
     <Reference Include="MySql.Data">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\MySql.Data.6.9.7\lib\net45\MySql.Data.dll</HintPath>
+      <HintPath>..\packages\MySql.Data.6.9.8\lib\net45\MySql.Data.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -336,6 +336,7 @@
     <Compile Include="Events\RollbackEventArgs.cs" />
     <Compile Include="Events\SaveEventArgs.cs" />
     <Compile Include="Events\SendToPublishEventArgs.cs" />
+    <Compile Include="Exceptions\DataOperationException.cs" />
     <Compile Include="Exceptions\InvalidCompositionException.cs" />
     <Compile Include="Exceptions\UmbracoStartupFailedException.cs" />
     <Compile Include="FileResources\Files.Designer.cs">
@@ -357,6 +358,7 @@
     <Compile Include="Manifest\GridEditorConverter.cs" />
     <Compile Include="Models\AuditItem.cs" />
     <Compile Include="Models\AuditType.cs" />
+    <Compile Include="Models\EntityContainer.cs" />
     <Compile Include="Models\Identity\IdentityModelMappings.cs" />
     <Compile Include="Models\Identity\IdentityUser.cs" />
     <Compile Include="Models\Identity\IdentityUserClaim.cs" />
@@ -407,7 +409,9 @@
     <Compile Include="Persistence\Mappers\DomainMapper.cs" />
     <Compile Include="Persistence\Mappers\MigrationEntryMapper.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFourZero\AddDataDecimalColumn.cs" />
+    <Compile Include="Persistence\Mappers\TaskTypeMapper.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeTwo\EnsureMigrationsTableIdentityIsCorrect.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFourZero\EnsureContentTypeUniqueIdsAreConsistent.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\AddExternalLoginsTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\AddForeignKeysForLanguageAndDictionaryTables.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\AddServerRegistrationColumnsAndLock.cs" />
@@ -443,6 +447,7 @@
     <Compile Include="Persistence\RecordPersistenceType.cs" />
     <Compile Include="Persistence\Relators\AccessRulesRelator.cs" />
     <Compile Include="Persistence\Repositories\AuditRepository.cs" />
+    <Compile Include="Persistence\Repositories\EntityContainerRepository.cs" />
     <Compile Include="Persistence\Repositories\DeepCloneRuntimeCacheProvider.cs" />
     <Compile Include="Persistence\Repositories\DomainRepository.cs" />
     <Compile Include="Persistence\Repositories\ExternalLoginRepository.cs" />
@@ -496,6 +501,7 @@
     <Compile Include="Services\ITaskService.cs" />
     <Compile Include="Services\LocalizedTextServiceSupplementaryFileSource.cs" />
     <Compile Include="Services\MigrationEntryService.cs" />
+    <Compile Include="Services\MoveOperationStatusType.cs" />
     <Compile Include="Services\PublicAccessService.cs" />
     <Compile Include="Services\PublicAccessServiceExtensions.cs" />
     <Compile Include="Services\RepositoryService.cs" />
@@ -1284,6 +1290,7 @@
     <Compile Include="Sync\ApplicationUrlHelper.cs" />
     <Compile Include="Sync\RefreshMethodType.cs" />
     <Compile Include="Sync\ServerMessengerBase.cs" />
+    <Compile Include="ThreadExtensions.cs" />
     <Compile Include="TopologicalSorter.cs" />
     <Compile Include="Strings\DefaultUrlSegmentProvider.cs" />
     <Compile Include="Strings\IUrlSegmentProvider.cs" />

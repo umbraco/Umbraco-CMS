@@ -12,7 +12,7 @@
          var item = null;
 
          if ($event.shiftKey === true) {
-
+             
             if(selectedIndex > firstSelectedIndex) {
 
                start = firstSelectedIndex;
@@ -94,11 +94,89 @@
          }
       }
 
+      function selectAllItems(items, selection, $event) {
+
+          var checkbox = $event.target;
+          var clearSelection = false;
+
+          if (!angular.isArray(items)) {
+             return;
+          }
+
+          selection.length = 0;
+
+          for (var i = 0; i < items.length; i++) {
+
+             var item = items[i];
+
+             if (checkbox.checked) {
+                selection.push({id: item.id});
+             } else {
+                clearSelection = true;
+             }
+
+             item.selected = checkbox.checked;
+
+          }
+
+          if (clearSelection) {
+             selection.length = 0;
+         }
+
+      }
+
+      function isSelectedAll(items, selection) {
+
+          var numberOfSelectedItem = 0;
+
+          for(var itemIndex = 0; items.length > itemIndex; itemIndex++) {
+              var item = items[itemIndex];
+
+              for(var selectedIndex = 0; selection.length > selectedIndex; selectedIndex++) {
+                  var selectedItem = selection[selectedIndex];
+
+                  if(item.id === selectedItem.id) {
+                      numberOfSelectedItem++;
+                  }
+              }
+
+          }
+
+          if(numberOfSelectedItem === items.length) {
+              return true;
+          }
+
+      }
+
+
+      function setSortingDirection(col, direction, options) {
+          return options.orderBy.toUpperCase() === col.toUpperCase() && options.orderDirection === direction;
+      }
+
+
+      function setSorting(field, allow, options) {
+          if (allow) {
+              options.orderBy = field;
+
+              if (options.orderDirection === "desc") {
+                  options.orderDirection = "asc";
+              } else {
+                  options.orderDirection = "desc";
+              }
+          }
+      }
+
+
+
       var service = {
          selectHandler: selectHandler,
          selectItem: selectItem,
          deselectItem: deselectItem,
-         clearSelection: clearSelection
+         clearSelection: clearSelection,
+         selectAllItems: selectAllItems,
+         isSelectedAll: isSelectedAll,
+         setSortingDirection: setSortingDirection,
+         setSorting: setSorting
       };
 
       return service;
