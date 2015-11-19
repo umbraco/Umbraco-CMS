@@ -78,8 +78,8 @@ angular.module("umbraco")
             distance: 10,
             cursor: "move",
             placeholder: "ui-sortable-placeholder",
-            handle: ".cell-tools-move",
-            connectWith: ".usky-cell",
+            handle: ".umb-control-bar",
+            connectWith: ".umb-cell-content",
             forcePlaceholderSize: true,
             tolerance: "pointer",
             zIndex: 999999999999999999,
@@ -91,13 +91,13 @@ angular.module("umbraco")
 
             sort: function (event, ui) {
                 /* prevent vertical scroll out of the screen */
-                var position = parseInt(ui.item.parent().offset().left) + parseInt(ui.helper.css("left")) - parseInt($(".usky-grid").offset().left);
-                var max = $(".usky-grid").width() - 220;
+                var position = parseInt(ui.item.parent().offset().left) + parseInt(ui.helper.css("left")) - parseInt($(".umb-grid").offset().left);
+                var max = $(".umb-grid").width() - 220;
                 if (position > max) {
-                    ui.helper.css({ "left": max - parseInt(ui.item.parent().offset().left) + parseInt($(".usky-grid").offset().left) + "px" });
+                    ui.helper.css({ "left": max - parseInt(ui.item.parent().offset().left) + parseInt($(".umb-grid").offset().left) + "px" });
                 }
                 if (position < 0) {
-                    ui.helper.css({ "left": 0 - parseInt(ui.item.parent().offset().left) + parseInt($(".usky-grid").offset().left) + "px" });
+                    ui.helper.css({ "left": 0 - parseInt(ui.item.parent().offset().left) + parseInt($(".umb-grid").offset().left) + "px" });
                 }
             },
 
@@ -116,12 +116,12 @@ angular.module("umbraco")
             },
 
             update: function (event, ui) {
-                // add all RTEs which are affected by the dragging
+                /* add all RTEs which are affected by the dragging */
                 if (!ui.sender) {
                     if (cancelMove) {
                         ui.item.sortable.cancel();
                     }
-                    ui.item.parents(".usky-cell").find(".mceNoEditor").each(function () {
+                    ui.item.parents(".usky-cell.content").find(".mceNoEditor").each(function () {
                         if ($.inArray($(this).attr("id"), notIncludedRte) < 0) {
                             notIncludedRte.splice(0, 0, $(this).attr("id"));
                         }
@@ -153,7 +153,7 @@ angular.module("umbraco")
             },
 
             stop: function (e, ui) {
-                ui.item.parents(".usky-cell").find(".mceNoEditor").each(function () {
+                ui.item.parents(".umb-cell-content").find(".mceNoEditor").each(function () {
                     if ($.inArray($(this).attr("id"), notIncludedRte) < 0) {
                         // add all dragged's neighbouring RTEs in the new cell
                         notIncludedRte.splice(0, 0, $(this).attr("id"));
