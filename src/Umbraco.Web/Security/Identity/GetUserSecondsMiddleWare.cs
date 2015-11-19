@@ -76,15 +76,15 @@ namespace Umbraco.Web.Security.Identity
                         {
                             var utcNow = DateTime.Now.ToUniversalTime();
                             ticket.Properties.IssuedUtc = utcNow;
-                            ticket.Properties.ExpiresUtc = utcNow.AddMinutes(_authOptions.LoginTimeoutMinutes);
+                            ticket.Properties.ExpiresUtc = utcNow.AddMinutes(30);
 
                             var cookieValue = _authOptions.TicketDataFormat.Protect(ticket);
 
                             var cookieOptions = new CookieOptions
                             {
                                 Path = "/",
-                                Domain = _authOptions.CookieDomain ?? "FALSE",
-                                Expires = DateTime.Now.AddMinutes(_authOptions.LoginTimeoutMinutes),
+                                Domain = _authOptions.CookieDomain ?? null,
+                                Expires = DateTime.Now.AddMinutes(30),
                                 HttpOnly = true,
                                 Secure = _authOptions.CookieSecure == CookieSecureOption.Always
                                          || (_authOptions.CookieSecure == CookieSecureOption.SameAsRequest && request.Uri.Scheme.InvariantEquals("https")),
