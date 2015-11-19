@@ -98,13 +98,13 @@ namespace Umbraco.Web.Security.Identity
 
                             remainingSeconds = (ticket.Properties.ExpiresUtc.Value - DateTime.Now.ToUniversalTime()).TotalSeconds;
                         }
-                        else if (remainingSeconds <=30) 
+                        else if (remainingSeconds <= 30)
                         {
                             //NOTE: We are using 30 seconds because that is what is coded into angular to force logout to give some headway in
                             // the timeout process.
 
                             _logger.WriteCore(TraceEventType.Information, 0,
-                                string.Format("User logged will be logged out due to timeout: {0}, IP Address: {1}", ticket.Identity.Name, request.RemoteIpAddress), 
+                                string.Format("User logged will be logged out due to timeout: {0}, IP Address: {1}", ticket.Identity.Name, request.RemoteIpAddress),
                                 null, null);
                         }
 
