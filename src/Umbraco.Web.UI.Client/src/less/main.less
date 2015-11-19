@@ -546,38 +546,43 @@ height:1px;
 
 // Input label styles
 // @Simon: not sure where to put this part yet
-// --- TODO Needs to be divided into the right .less files
+// --- TODO Needs to be divided into the right .less directories
+
 
 // Titles for input fields
 .input-label--title {
 	font-weight: bold;
 	color: @black;
+
 	margin-bottom: 3px;
 }
+
 
 // Used for input checkmark fields
 .input-label--small {
 	display: inline;
 
 	font-size: 12px;
-	color: fade(@black, 70);
 	font-weight: bold;
+	color: fade(@black, 70);
 
 	&:hover {
 		color: @black;
 	}
 }
 
-// Checked state of the input-label--small
-input:checked + .input-label--small {
+input[type=checkbox]:checked + .input-label--small {
 	color: @blue;
 }
+
 
 // Use this for headers in the panels
 .panel-dialog--header {
 	border-bottom: 1px solid @gray;
+
 	margin: 10px 0;
 	padding-bottom: 10px;
+
 	font-size: @fontSizeLarge;
 	font-weight: bold;
 	line-height: 20px;
