@@ -202,10 +202,9 @@ namespace Umbraco.Web.Models.Mapping
                 genericProperties =>
                 {
                     //TODO: This would be much nicer with the IUmbracoContextAccessor so we don't use singletons
-                    //If this is a web request and debugging is enabled and there's a user signed in and the 
-                    // user has access tot he settings section, we will 
-                    if (HttpContext.Current != null && HttpContext.Current.IsDebuggingEnabled
-                        && UmbracoContext.Current != null && UmbracoContext.Current.Security.CurrentUser != null
+                    //If this is a web request and there's a user signed in and the 
+                    // user has access to the settings section, we will 
+                    if (HttpContext.Current != null && UmbracoContext.Current != null && UmbracoContext.Current.Security.CurrentUser != null
                         && UmbracoContext.Current.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
                     {
                         var currentDocumentType = contentTypeService.GetContentType(display.ContentTypeAlias);
@@ -213,7 +212,7 @@ namespace Umbraco.Web.Models.Mapping
 
                         var currentDocumentTypeId = currentDocumentType == null ? string.Empty : currentDocumentType.Id.ToString(CultureInfo.InvariantCulture);
                         //TODO: Hard coding this is not good
-                        var docTypeLink = string.Format("#/settings/framed/%252Fumbraco%252Fsettings%252FeditNodeTypeNew.aspx%253Fid%253D{0}", currentDocumentTypeId);
+                        var docTypeLink = string.Format("#/settings/framed/settings%252FeditNodeTypeNew.aspx%253Fid%253D{0}", currentDocumentTypeId);
 
                         //Replace the doc type property
                         var docTypeProp = genericProperties.First(x => x.Alias == string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
