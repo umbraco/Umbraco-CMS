@@ -460,8 +460,19 @@ namespace UmbracoExamine
             if (xDoc != null)
             {
                 var rootNode = xDoc.Root;
-
-                AddNodesToIndex(rootNode.Elements(), type);
+                if (rootNode != null)
+                {
+                    //the result will either be a single doc with an id as the root, or it will
+                    // be multiple docs with a <nodes> wrapper, we need to check for this
+                    if (rootNode.HasAttributes)
+                    {
+                        AddNodesToIndex(new[] {rootNode}, type);
+                    }
+                    else
+                    {
+                        AddNodesToIndex(rootNode.Elements(), type);
+                    }
+                }
             }
 
         }
