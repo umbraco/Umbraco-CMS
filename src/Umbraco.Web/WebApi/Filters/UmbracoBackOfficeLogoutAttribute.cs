@@ -17,7 +17,13 @@ namespace Umbraco.Web.WebApi.Filters
         {            
             if (context.Response == null) return;
             if (context.Response.IsSuccessStatusCode == false) return;
+
+            //this clears out all of our cookies
             context.Response.UmbracoLogoutWebApi();
+
+            //this calls the underlying owin sign out logic - which should call the 
+            // auth providers middleware callbacks if using custom auth middleware
+            context.Request.TryGetOwinContext().Result.Authentication.SignOut();
         }
     }
 }
