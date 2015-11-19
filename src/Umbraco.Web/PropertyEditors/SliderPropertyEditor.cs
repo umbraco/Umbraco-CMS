@@ -41,7 +41,7 @@ namespace Umbraco.Web.PropertyEditors
             [PreValueField("handle", "Handle", "views/propertyeditors/slider/handle.prevalues.html", Description = "Handle shape. Default is \"round\"")]
             public string Handle { get; set; }
 
-            [PreValueField("reversed", "Reversed", "number", Description = "Whether or not the slider should be reversed")]
+            [PreValueField("reversed", "Reversed", "boolean", Description = "Whether or not the slider should be reversed")]
             public string Reversed { get; set; }
 
         }
