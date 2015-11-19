@@ -32,8 +32,17 @@ namespace Umbraco.Web.PropertyEditors
             [PreValueField("step", "Step increments", "number")]
             public int StepIncrements { get; set; }
 
+            [PreValueField("precision", "Precision", "number", Description = "The number of digits shown after the decimal. Defaults to the number of digits after the decimal of step value.")]
+            public int Precision { get; set; }
+
             [PreValueField("orientation", "Orientation", "views/propertyeditors/slider/orientation.prevalues.html")]
             public string Orientation { get; set; }
+
+            [PreValueField("handle", "Handle", "views/propertyeditors/slider/handle.prevalues.html", Description = "Handle shape. Default is \"round\"")]
+            public string Handle { get; set; }
+
+            [PreValueField("reversed", "Reversed", "number", Description = "Whether or not the slider should be reversed")]
+            public string Reversed { get; set; }
 
         }
     }

@@ -34,6 +34,17 @@
     else {
         $scope.model.config.step = parseFloat($scope.model.config.step);
     }
+
+    if (!$scope.model.config.handle) {
+        $scope.model.config.handle = "round";
+    }
+
+    if (!$scope.model.config.reversed) {
+        $scope.model.config.reversed = false;
+    }
+    else {
+        $scope.model.config.reversed = $scope.model.config.reversed === "1" ? true : false;
+    }
     
     /** This creates the slider with the model values - it's called on startup and if the model value changes */
     function createSlider() {
@@ -81,7 +92,10 @@
             orientation: $scope.model.config.orientation,
             selection: "after",
             step: $scope.model.config.step,
+            precision: $scope.model.config.precision,
             tooltip: "show",
+            handle: $scope.model.config.handle,
+            reversed: $scope.model.config.reversed,
             //set the slider val - we cannot do this with data- attributes when using ranges
             value: sliderVal
         }).on('slideStop', function () {
@@ -122,7 +136,7 @@
         });
 
     //load the separate css for the editor to avoid it blocking our js loading
-    assetsService.loadCss("lib/slider/slider.css");
+    assetsService.loadCss("lib/slider/bootstrap-slider.css");
 
 }
 angular.module("umbraco").controller("Umbraco.PropertyEditors.SliderController", sliderController);
