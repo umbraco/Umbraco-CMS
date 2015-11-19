@@ -543,14 +543,31 @@ height:1px;
 	display: inline;
 }
 
-//NOTE titles for input fields
+
+//TODO Needs to be moved out in other files
+// Titles for input fields
 .input-label--title {
 	font-weight: bold;
 	color: @black;
 	margin-bottom: 3px;
 }
 
-//NOTE Use this for headers in the panels
+// Used for input checkmark fields
+.input-label--small {
+	display: inline;
+	font-size: 12px;
+	color: #b3b3b3;
+
+	&:hover {
+		color: @black;
+	}
+}
+// Checked state of the input-label--small
+input:checked + .input-label--small {
+	color: @blue;
+}
+
+// Use this for headers in the panels
 .panel-dialog--header {
 	border-bottom: 1px solid @gray;
 	margin: 10px 0;
