@@ -5,17 +5,21 @@
     <div class="umb-panel">
 
         <div class="umb-panel-header">
-            <h1 class="headline" style="margin: 10px 0 0 0">Configure the section</h1>
+            <h4 class="panel-dialog--header" style="border-bottom: 1px solid whitesmoke">Configure the section</h4>
         </div>
 
         <div class="umb-panel-body with-footer umb-querybuilder">
             <label>
-                Section name:
+                <div class="input-label--title">
+                    Section name:
+                </div>
                 <input type="text" ng-model="section.name"/>
             </label>
             <label ng-show="type === 'rendersection'">
-                <localize key="general_required">Required</localize>?
-                <input type="checkbox" ng-checked="section.required" ng-model="section.required"/>
+                <input style="margin: 0;" type="checkbox" ng-checked="section.required" ng-model="section.required"/>
+                <small class="small inline">
+                    <localize key="general_required">Required</localize>
+                </small>
             </label>
         </div>
 
