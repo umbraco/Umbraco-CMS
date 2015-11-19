@@ -47,7 +47,7 @@
             <form class="form-search pull-right" novalidate ng-show="!actionInProgress">
                 <div class="inner-addon left-addon">
                     <i class="icon icon-search" ng-click="enterSearch($event)"></i>
-                    <input type="text" class="form-control" localize="placeholder" placeholder="@general_typeToSearch" ng-model="options.filter" prevent-enter-submit no-dirty-check>
+                    <input type="text" class="form-control" localize="placeholder" placeholder="@general_typeToSearch" ng-model="options.filter" ng-keydown="filterResults($event)" prevent-enter-submit no-dirty-check>
                 </div>
             </form>
         </div>
