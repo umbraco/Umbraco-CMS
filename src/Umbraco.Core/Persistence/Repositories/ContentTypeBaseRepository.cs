@@ -30,38 +30,25 @@ namespace Umbraco.Core.Persistence.Repositories
     internal abstract class ContentTypeBaseRepository<TEntity> : PetaPocoRepositoryBase<int, TEntity>, IReadRepository<Guid, TEntity>
         where TEntity : class, IContentTypeComposition
     {
-
-        protected ContentTypeBaseRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax,
-            Guid containerType)
-            : base(work, cache, logger, sqlSyntax)
-        {
-            _guidRepo = new GuidReadOnlyContentTypeBaseRepository(this, work, cache, logger, sqlSyntax);
-            ContainerRepository = new EntityContainerRepository(work, cache, logger, sqlSyntax, containerType, NodeObjectTypeId);
-        }
-
         protected ContentTypeBaseRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
         {
             _guidRepo = new GuidReadOnlyContentTypeBaseRepository(this, work, cache, logger, sqlSyntax);
-            ContainerRepository = null;
         }
 
-        protected EntityContainerRepository ContainerRepository { get; private set; }
         private readonly GuidReadOnlyContentTypeBaseRepository _guidRepo;
 
-        public IEnumerable<MoveEventInfo<TEntity>> Move(TEntity toMove, int parentId)
+        public IEnumerable<MoveEventInfo<TEntity>> Move(TEntity toMove, EntityContainer container)
         {
-            if (parentId > 0)
+            var parentId = -1;
+            if (container != null)
             {
-                var container = ContainerRepository.Get(parentId);
-                if (container == null)
-                    throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound);
-
                 // Check on paths
                 if ((string.Format(",{0},", container.Path)).IndexOf(string.Format(",{0},", toMove.Id), StringComparison.Ordinal) > -1)
                 {
                     throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedNotAllowedByPath);
                 }
+                parentId = container.Id;
             }
 
             //used to track all the moved entities to be given to the event
@@ -89,32 +76,6 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             return moveInfo;
-        }
-
-        /// <summary>
-        /// Deletes a folder - this will move all contained entities into their parent
-        /// </summary>
-        /// <param name="containerId"></param>        
-        public void DeleteContainer(int containerId)
-        {
-            if (ContainerRepository == null) throw new NotSupportedException("The repository type " + GetType() + " does not support containers");
-
-            var found = ContainerRepository.Get(containerId);
-            ContainerRepository.Delete(found);           
-        }
-
-        public EntityContainer CreateContainer(int parentId, string name, int userId)
-        {
-            if (ContainerRepository == null) throw new NotSupportedException("The repository type " + GetType() + " does not support containers");
-
-            var container = new EntityContainer
-            {
-                ParentId = parentId,
-                Name = name,
-                CreatorId = userId
-            };
-            ContainerRepository.AddOrUpdate(container);
-            return container;
         }
 
         /// <summary>

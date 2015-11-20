@@ -23,7 +23,7 @@ namespace Umbraco.Core.Persistence.Repositories
     {
 
         public MediaTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-            : base(work, cache, logger, sqlSyntax, new Guid(Constants.ObjectTypes.MediaTypeContainer))
+            : base(work, cache, logger, sqlSyntax)
         {
         }
         

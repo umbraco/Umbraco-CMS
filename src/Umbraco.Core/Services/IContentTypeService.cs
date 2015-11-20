@@ -20,8 +20,14 @@ namespace Umbraco.Core.Services
 
         Attempt<int> CreateContentTypeContainer(int parentId, string name, int userId = 0);
         Attempt<int> CreateMediaTypeContainer(int parentId, string name, int userId = 0);
+        void SaveContentTypeContainer(EntityContainer container, int userId = 0);
+        void SaveMediaTypeContainer(EntityContainer container, int userId = 0);
+        EntityContainer GetContentTypeContainer(int containerId);
+        EntityContainer GetContentTypeContainer(Guid containerId);
+        EntityContainer GetMediaTypeContainer(int containerId);
+        EntityContainer GetMediaTypeContainer(Guid containerId);
         void DeleteMediaTypeContainer(int folderId, int userId = 0);
-        void DeleteContentTypeContainer(int folderId, int userId = 0);
+        void DeleteContentTypeContainer(int containerId, int userId = 0);
 
         /// <summary>
         /// Gets all property type aliases.
@@ -263,7 +269,7 @@ namespace Umbraco.Core.Services
         /// <returns>True if the media type has any children otherwise False</returns>
         bool MediaTypeHasChildren(Guid id);
 
-        Attempt<OperationStatus<MoveOperationStatusType>> MoveMediaType(IMediaType toMove, int parentId);
-        Attempt<OperationStatus<MoveOperationStatusType>> MoveContentType(IContentType toMove, int parentId);
+        Attempt<OperationStatus<MoveOperationStatusType>> MoveMediaType(IMediaType toMove, int containerId);
+        Attempt<OperationStatus<MoveOperationStatusType>> MoveContentType(IContentType toMove, int containerId);
     }
 }

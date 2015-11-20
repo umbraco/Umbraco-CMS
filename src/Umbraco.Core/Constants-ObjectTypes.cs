@@ -15,6 +15,11 @@ namespace Umbraco.Core
             public const string DataTypeContainer = "521231E3-8B37-469C-9F9D-51AFC91FEB7B";
 
             /// <summary>
+            /// Guid for a data type container
+            /// </summary>
+            public static readonly Guid DataTypeContainerGuid = new Guid(DataTypeContainer);
+
+            /// <summary>
             /// Guid for a doc type container
             /// </summary>
             public const string DocumentTypeContainer = "2F7A2769-6B0B-4468-90DD-AF42D64F7F16";
@@ -22,7 +27,17 @@ namespace Umbraco.Core
             /// <summary>
             /// Guid for a doc type container
             /// </summary>
+            public static readonly Guid DocumentTypeContainerGuid = new Guid(DocumentTypeContainer);
+
+            /// <summary>
+            /// Guid for a doc type container
+            /// </summary>
             public const string MediaTypeContainer = "42AEF799-B288-4744-9B10-BE144B73CDC4";
+
+            /// <summary>
+            /// Guid for a doc type container
+            /// </summary>
+            public static readonly Guid MediaTypeContainerGuid = new Guid(MediaTypeContainer);
 
             /// <summary>
             /// Guid for a Content Item object.
@@ -43,6 +58,11 @@ namespace Umbraco.Core
             /// Guid for a DataType object.
             /// </summary>
             public const string DataType = "30A2A501-1978-4DDB-A57B-F7EFED43BA3C";
+
+            /// <summary>
+            /// Guid for a DataType object.
+            /// </summary>
+            public static readonly Guid DataTypeGuid = new Guid(DataType);
 
             /// <summary>
             /// Guid for a Document object.

@@ -11,6 +11,9 @@ namespace Umbraco.Core.Services
     public interface IDataTypeService : IService
     {
         Attempt<int> CreateContainer(int parentId, string name, int userId = 0);
+        void SaveContainer(EntityContainer container, int userId = 0);
+        EntityContainer GetContainer(int containerId);
+        EntityContainer GetContainer(Guid containerId);
         void DeleteContainer(int containerId, int userId = 0);
 
         /// <summary>
