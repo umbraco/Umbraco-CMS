@@ -12,8 +12,10 @@
                     <i class="{{node.icon}} hover-hide"></i> 
                     {{node.name}}
                 </a>
-                <div ng-if="!dialogEditor && model.config.showEditButton">
-                    <small><a href umb-launch-mini-editor="node"><localize key="edit">Edit</localize></a></small>
+                
+                <div ng-if="!dialogEditor && ((model.config.showOpenButton && allowOpenButton) || model.config.showEditButton)">
+                    <small ng-if="model.config.showOpenButton && allowOpenButton"><a href ng-click="showNode($index)" ng-attr-title="{{model.config.showPathOnHover && 'Path: ' + node.path || undefined}}"><localize key="open">Open</localize></a></small>
+                    <small ng-if="model.config.showEditButton"><a href umb-launch-mini-editor="node"><localize key="edit">Edit</localize></a></small>
                 </div>
             </li>
         </ul>
@@ -34,11 +36,10 @@
         <div class="help-inline" val-msg-for="minCount" val-toggle-msg="minCount">
             You need to add at least {{model.config.minNumber}} items
         </div>
-        
+
         <div class="help-inline" val-msg-for="maxCount" val-toggle-msg="maxCount">
             You can only have {{model.config.maxNumber}} items selected
         </div>
-        
 
     </ng-form>
 </div>
