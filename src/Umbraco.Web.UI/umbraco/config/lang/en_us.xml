@@ -25,7 +25,7 @@
     <key alias="protect">Public access</key>
     <key alias="publish">Publish</key>
     <key alias="unpublish">Unpublish</key>
-    <key alias="refreshNode">Reload nodes</key>
+    <key alias="refreshNode">Reload</key>
     <key alias="republish">Republish entire site</key>
     <key alias="restore" version="7.3.0">Restore</key>
     <key alias="rights">Permissions</key>
