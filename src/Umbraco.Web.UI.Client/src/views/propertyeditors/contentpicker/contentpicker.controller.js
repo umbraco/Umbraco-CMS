@@ -76,6 +76,7 @@ function contentPickerController($scope, dialogService, entityResource, editorSt
         ? "Media"
         : "Document";
     $scope.allowOpenButton = entityType === "Document" || entityType === "Media";
+    $scope.allowEditButton = entityType === "Document";
 
     //the dialog options for the picker
     var dialogOptions = {

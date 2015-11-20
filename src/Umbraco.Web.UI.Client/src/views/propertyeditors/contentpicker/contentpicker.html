@@ -13,9 +13,9 @@
                     {{node.name}}
                 </a>
                 
-                <div ng-if="!dialogEditor && ((model.config.showOpenButton && allowOpenButton) || model.config.showEditButton)">
-                    <small ng-if="model.config.showOpenButton && allowOpenButton"><a href ng-click="showNode($index)" ng-attr-title="{{model.config.showPathOnHover && 'Path: ' + node.path || undefined}}"><localize key="open">Open</localize></a></small>
-                    <small ng-if="model.config.showEditButton"><a href umb-launch-mini-editor="node"><localize key="edit">Edit</localize></a></small>
+                <div ng-if="!dialogEditor && ((model.config.showOpenButton && allowOpenButton) || (model.config.showEditButton && allowEditButton))">
+                    <small ng-if="model.config.showOpenButton && allowOpenButton"><a href ng-click="showNode($index)"><localize key="open">Open</localize></a></small>
+                    <small ng-if="model.config.showEditButton && allowEditButton"><a href umb-launch-mini-editor="node"><localize key="edit">Edit</localize></a></small>
                 </div>
             </li>
         </ul>

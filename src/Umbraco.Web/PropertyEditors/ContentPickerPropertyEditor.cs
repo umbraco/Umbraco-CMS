@@ -12,9 +12,9 @@ namespace Umbraco.Web.PropertyEditors
         {
             _internalPreValues = new Dictionary<string, object>
             {
+                {"startNodeId", "-1"},
                 {"showOpenButton", "0"},
                 {"showEditButton", "0"},
-                {"startNodeId", "-1"},
                 {"showPathOnHover", "0"}
             };
         }
