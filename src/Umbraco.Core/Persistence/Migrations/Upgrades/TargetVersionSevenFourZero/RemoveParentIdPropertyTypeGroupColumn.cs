@@ -20,6 +20,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourZer
             if (columns.Any(x => x.TableName.InvariantEquals("cmsPropertyTypeGroup") && x.ColumnName.InvariantEquals("parentGroupId")) == false)
                 return;
 
+            Delete.ForeignKey("FK_cmsPropertyTypeGroup_cmsPropertyTypeGroup_id").OnTable("cmsPropertyTypeGroup");
             Delete.Column("parentGroupId").FromTable("cmsPropertyTypeGroup");
         }
 
