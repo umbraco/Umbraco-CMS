@@ -49,7 +49,9 @@ namespace Umbraco.Web.Editors
         /// 
         /// </param>
         /// <returns></returns>
-        public HttpResponseMessage GetMacroResultAsHtmlForEditor(string macroAlias, int pageId, [FromUri]IDictionary<string, object> macroParams)
+        [HttpPost]
+        [HttpGet]
+        public HttpResponseMessage GetMacroResultAsHtmlForEditor(string macroAlias, int pageId, [FromBody]IDictionary<string, object> macroParams)
         {
             // note - here we should be using the cache, provided that the preview content is in the cache...
 

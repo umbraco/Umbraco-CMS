@@ -36,7 +36,7 @@ function macroResource($q, $http, umbRequestHelper) {
          * @methodOf umbraco.resources.macroResource
          *
          * @description
-         * Gets the result of a macro as html to display in the rich text editor
+         * Gets the result of a macro as html to display in the rich text editor or in the Grid
          *
          * @param {int} macroId The macro id to get parameters for
          * @param {int} pageId The current page id
@@ -47,37 +47,28 @@ function macroResource($q, $http, umbRequestHelper) {
 
             //need to format the query string for the custom dictionary
             var query = "macroAlias=" + macroAlias + "&pageId=" + pageId;
+            var macroParams = {};
             if (macroParamDictionary) {
-                var counter = 0;
                 _.each(macroParamDictionary, function (val, key) {
                     //check for null
                     val = val ? val : "";
                     //need to detect if the val is a string or an object
                     if (!angular.isString(val)) {
                         //if it's not a string we'll send it through the json serializer
-                        var json = angular.toJson(val);
-                        //then we need to url encode it so that it's safe
-                        val = encodeURIComponent(json);
+                        val = angular.toJson(val);
                     }
-                    else {
-                        //we still need to encode the string, it could contain line breaks, etc...
-                        val = encodeURIComponent(val);
-                    }
-
-                    query += "&macroParams[" + counter + "].key=" + key + "&macroParams[" + counter + "].value=" + val;
-                    counter++;
+                    macroParams[key] = val;
                 });
             }
 
             return umbRequestHelper.resourcePromise(
-               $http.get(
+               $http.post(
                    umbRequestHelper.getApiUrl(
                        "macroApiBaseUrl",
                        "GetMacroResultAsHtmlForEditor",
-                       query)),
+                       query), JSON.stringify(macroParams)),
                'Failed to retrieve macro result for macro with alias  ' + macroAlias);
         }
-            
     };
 }
 
