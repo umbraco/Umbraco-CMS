@@ -45,28 +45,14 @@ function macroResource($q, $http, umbRequestHelper) {
          */
         getMacroResultAsHtmlForEditor: function (macroAlias, pageId, macroParamDictionary) {
 
-            //need to format the query string for the custom dictionary
             var query = "macroAlias=" + macroAlias + "&pageId=" + pageId;
-            var macroParams = {};
-            if (macroParamDictionary) {
-                _.each(macroParamDictionary, function (val, key) {
-                    //check for null
-                    val = val ? val : "";
-                    //need to detect if the val is a string or an object
-                    if (!angular.isString(val)) {
-                        //if it's not a string we'll send it through the json serializer
-                        val = angular.toJson(val);
-                    }
-                    macroParams[key] = val;
-                });
-            }
 
             return umbRequestHelper.resourcePromise(
                $http.post(
                    umbRequestHelper.getApiUrl(
                        "macroApiBaseUrl",
                        "GetMacroResultAsHtmlForEditor",
-                       query), JSON.stringify(macroParams)),
+                       query), JSON.stringify(macroParamDictionary)),
                'Failed to retrieve macro result for macro with alias  ' + macroAlias);
         }
     };
