@@ -162,6 +162,7 @@
 }
 
 .umb-grid .umb-row.-active .row-tools,
+.umb-grid .umb-row.-active .row-tools a,
 .umb-grid .umb-row.-active .umb-row-title {
    color: #ffffff;
 }
@@ -189,8 +190,8 @@
     min-height: 130px;
     background-color: @grayLighter;
     border-width: 2px;
-    border-style: solid;
-    border-color: transparent;
+    border-style: dashed;
+    border-color: @grayLight;
     transition: border-color 100ms linear;
 }
 
@@ -207,7 +208,7 @@
 }
 
 .umb-grid .umb-row.-active .umb-cell-content.-has-editors {
-   // border-color: transparent;
+   // border-color: @grayLight;
 }
 
 .umb-grid .umb-cell-content.-has-editors:hover {
@@ -220,10 +221,14 @@
 
 .umb-grid .cell-tools {
    position: absolute;
-   top: 15px;
-   right: 15px;
+   top: 10px;
+   right: 10px;
    color: @gray;
    font-size: 16px;
+}
+
+.umb-grid .umb-row.-editor-active .cell-tools-edit a {
+    color: @gray;
 }
 
 .umb-grid .cell-tool {
@@ -277,6 +282,9 @@
    background: @grayLighter;
    text-align: center;
    padding: 5px;
+   border: 1px dashed #ccc;
+   margin: 10px;
+   border-radius: 5px;
 }
 
 .umb-grid .cell-tools-add:hover,
@@ -329,9 +337,11 @@
 }
 
 .umb-grid .cell-tools-edit{
-    position: absolute;
-    top: 66px;
-    right: 5px;
+    display: inline-block;
+    color: white;
+    // position: absolute;
+    // top: 66px;
+    // right: 5px;
 }
 
 
@@ -340,6 +350,7 @@
 .umb-grid .umb-control {
    position:relative;
    display:block;
+   overflow: hidden;
    margin-left: 10px;
    margin-right: 10px;
    margin-bottom: 10px;
@@ -838,8 +849,8 @@
 		-moz-box-sizing: border-box;
 		box-sizing: border-box;
 		width: 125px;
-		margin: 35px 40px 15px 0;
-		border: 2px solid @grayLight; /* @grayLight */
+		margin: 15px;
+		border: 3px solid @grayLight; /* @grayLight */
 		transition: border 200ms linear;
 
         &.prevalues-rows {
@@ -886,7 +897,7 @@
 	}
 
 	.preview-rows.columns {
-		min-height: 18px;
+		min-height: 16px;
 		line-height: 11px;
 		padding: 1px;
 

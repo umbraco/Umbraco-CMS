@@ -34,17 +34,18 @@ angular.module("umbraco")
 
             sort: function (event, ui) {
                 /* prevent vertical scroll out of the screen */
-                // var max = $(".umb-grid").width() - 150;
-                // if (parseInt(ui.helper.css("left")) > max) {
-                //     ui.helper.css({ "left": max + "px" });
-                // }
-                // if (parseInt(ui.helper.css("left")) < 20) {
-                //     ui.helper.css({ "left": 20 });
-                // }
+                var max = $(".umb-grid").width() - 150;
+                if (parseInt(ui.helper.css("left")) > max) {
+                    ui.helper.css({ "left": max + "px" });
+                }
+                if (parseInt(ui.helper.css("left")) < 20) {
+                    ui.helper.css({ "left": 20 });
+                }
             },
 
             start: function (e, ui) {
 
+                // Fade out row when sorting
                 ui.item.context.style.opacity = "0.5";
                 ui.item.context.style.display = "block";
 
@@ -59,6 +60,7 @@ angular.module("umbraco")
 
             stop: function (e, ui) {
 
+                // Fade in row when sorting stops
                 ui.item.context.style.opacity = "1";
 
                 // reset all RTEs affected by the dragging
@@ -140,7 +142,7 @@ angular.module("umbraco")
             start: function (e, ui) {
                 // reset dragged RTE settings in case a RTE isn't dragged
                 draggedRteSettings = undefined;
-
+                ui.item.context.style.display = "block";
                 ui.item.find(".mceNoEditor").each(function () {
                     notIncludedRte = [];
 
