@@ -44,7 +44,10 @@ namespace Umbraco.Web.PropertyEditors
             [PreValueField("tooltip", "Tooltip", "views/propertyeditors/slider/tooltip.prevalues.html", Description = "Whether to show the tooltip on drag, hide the tooltip, or always show the tooltip. Accepts: 'show', 'hide', or 'always'")]
             public string Tooltip { get; set; }
 
-            [PreValueField("tooltip_split", "Tooltip split", "boolean", Description = "If false show one tootip if true show two tooltips one for each handler")]
+            [PreValueField("tooltipFormat", "Tooltip format", "textstring", Description = "The value wanted to be displayed in the tooltip. Use {0} and {1} for current values - {1} is only for range slider and if not using tooltip split.")]
+            public string TooltipFormat { get; set; }
+
+            [PreValueField("tooltipSplit", "Tooltip split", "boolean", Description = "If false show one tootip if true show two tooltips one for each handler")]
             public string TooltipSplit { get; set; }
 
             [PreValueField("tooltipPosition", "Tooltip position", "textstring", Description = "Position of tooltip, relative to slider. Accepts 'top'/'bottom' for horizontal sliders and 'left'/'right' for vertically orientated sliders. Default positions are 'top' for horizontal and 'right' for vertical slider.")]
