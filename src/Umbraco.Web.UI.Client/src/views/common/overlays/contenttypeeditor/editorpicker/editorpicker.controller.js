@@ -95,7 +95,10 @@
 
          if(editor.id === null) {
 
-            dataTypeResource.getScaffold().then(function(dataType) {
+            // add scaffold in data type root
+            var parentId = -1;
+
+            dataTypeResource.getScaffold(parentId).then(function(dataType) {
 
               // set alias
               dataType.selectedEditor = editor.alias;
