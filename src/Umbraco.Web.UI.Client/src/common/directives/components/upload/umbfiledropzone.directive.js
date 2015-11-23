@@ -144,33 +144,61 @@ angular.module("umbraco.directives")
 
 				}).success(function (data, status, headers, config) {
 
-					// set done status on file
-					file.uploadStatus = "done";
+					if(data.notifications && data.notifications.length > 0) {
 
-					// set date/time for when done - used for sorting
-					file.doneDate = new Date();
+						// set error status on file
+						file.uploadStatus = "error";
 
-					scope.done.push(file);
+						// Throw message back to user with the cause of the error
+						file.serverErrorMessage = data.notifications[0].message;
+
+						// Put the file in the rejected pool
+						scope.rejected.push(file);
+
+					} else {
+
+						// set done status on file
+						file.uploadStatus = "done";
+
+						// set date/time for when done - used for sorting
+						file.doneDate = new Date();
+
+						// Put the file in the done pool
+						scope.done.push(file);
+
+					}
+
 					scope.currentFile = undefined;
 
 					//after processing, test if everthing is done
 					_processQueueItem();
 
 				}).error( function (evt, status, headers, config) {
+
+					// set status done
 					file.uploadStatus = "error";
 
 					//if the service returns a detailed error
 					if(evt.InnerException){
-						file.errorMessage = evt.InnerException.ExceptionMessage;
+						file.serverErrorMessage = evt.InnerException.ExceptionMessage;
 
 						//Check if its the common "too large file" exception
 						if(evt.InnerException.StackTrace && evt.InnerException.StackTrace.indexOf("ValidateRequestEntityLength") > 0){
-							file.errorMessage = "File too large to upload";
+							file.serverErrorMessage = "File too large to upload";
 						}
 					}
 
+					if(evt.Message) {
+						file.serverErrorMessage = evt.Message;
+					}
+
+					// If file not found, server will return a 404 and display this message
+					if(status === 404 ) {
+						file.serverErrorMessage = "File not found";
+					}
+
 					//after processing, test if everthing is done
-					scope.done.push(file);
+					scope.rejected.push(file);
 					scope.currentFile = undefined;
 
 					_processQueueItem();
