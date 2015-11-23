@@ -51,7 +51,7 @@ function macroResource($q, $http, umbRequestHelper) {
                $http.post(
                    umbRequestHelper.getApiUrl(
                        "macroApiBaseUrl",
-                       "GetMacroResultAsHtmlForEditor",
+                       "GetMacroResultAsHtmlForEditorUsingHttpPost",
                        query), JSON.stringify(macroParamDictionary)),
                'Failed to retrieve macro result for macro with alias  ' + macroAlias);
         }
