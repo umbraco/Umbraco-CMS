@@ -582,6 +582,9 @@ angular.module("umbraco")
                         }
                     }
                 });
+
+                // if there is more than one row added - hide row add tools
+                $scope.showRowConfigurations = false;
             }
         };
 
