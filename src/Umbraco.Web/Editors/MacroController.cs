@@ -52,51 +52,7 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public HttpResponseMessage GetMacroResultAsHtmlForEditor(string macroAlias, int pageId, [FromUri] IDictionary<string, object> macroParams)
         {
-            // note - here we should be using the cache, provided that the preview content is in the cache...
-
-            var doc = Services.ContentService.GetById(pageId);
-            if (doc == null)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
-
-            //need to get a legacy macro object - eventually we'll have a new format but nto yet
-            var macro = new macro(macroAlias);
-            if (macro == null)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
-
-            //if it isn't supposed to be rendered in the editor then return an empty string
-            if (macro.DontRenderInEditor)
-            {
-                var response = Request.CreateResponse();
-                //need to create a specific content result formatted as html since this controller has been configured
-                //with only json formatters.
-                response.Content = new StringContent(string.Empty, Encoding.UTF8, "text/html");
-
-                return response;
-            }
-
-            //because macro's are filled with insane legacy bits and pieces we need all sorts of wierdness to make them render.
-            //the 'easiest' way might be to create an IPublishedContent manually and populate the legacy 'page' object with that
-            //and then set the legacy parameters.
-
-            var legacyPage = new global::umbraco.page(doc);
-            UmbracoContext.HttpContext.Items["pageID"] = doc.Id;
-            UmbracoContext.HttpContext.Items["pageElements"] = legacyPage.Elements;
-            UmbracoContext.HttpContext.Items[global::Umbraco.Core.Constants.Conventions.Url.AltTemplate] = null;
-
-            var renderer = new UmbracoComponentRenderer(UmbracoContext);
-
-            var result = Request.CreateResponse();
-            //need to create a specific content result formatted as html since this controller has been configured
-            //with only json formatters.
-            result.Content = new StringContent(
-                renderer.RenderMacro(macro, macroParams, legacyPage).ToString(),
-                Encoding.UTF8,
-                "text/html");
-            return result;
+            return GetMacroResultAsHtml(macroAlias, pageId, macroParams);
         }
 
         /// <summary>
@@ -110,6 +66,11 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [HttpPost]
         public HttpResponseMessage GetMacroResultAsHtmlForEditorUsingHttpPost(string macroAlias, int pageId, [FromBody]IDictionary<string, object> macroParams)
+        {
+            return GetMacroResultAsHtml(macroAlias, pageId, macroParams);
+        }
+
+        private HttpResponseMessage GetMacroResultAsHtml(string macroAlias, int pageId, IDictionary<string, object> macroParams)
         {
             // note - here we should be using the cache, provided that the preview content is in the cache...
 
