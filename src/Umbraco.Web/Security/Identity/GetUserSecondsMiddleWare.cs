@@ -76,15 +76,15 @@ namespace Umbraco.Web.Security.Identity
                         {
                             var utcNow = DateTime.Now.ToUniversalTime();
                             ticket.Properties.IssuedUtc = utcNow;
-                            ticket.Properties.ExpiresUtc = utcNow.AddMinutes(_authOptions.LoginTimeoutMinutes);
+                            ticket.Properties.ExpiresUtc = utcNow.AddMinutes(30);
 
                             var cookieValue = _authOptions.TicketDataFormat.Protect(ticket);
 
                             var cookieOptions = new CookieOptions
                             {
                                 Path = "/",
-                                Domain = _authOptions.CookieDomain ?? "FALSE",
-                                Expires = DateTime.Now.AddMinutes(_authOptions.LoginTimeoutMinutes),
+                                Domain = _authOptions.CookieDomain ?? null,
+                                Expires = DateTime.Now.AddMinutes(30),
                                 HttpOnly = true,
                                 Secure = _authOptions.CookieSecure == CookieSecureOption.Always
                                          || (_authOptions.CookieSecure == CookieSecureOption.SameAsRequest && request.Uri.Scheme.InvariantEquals("https")),
@@ -98,13 +98,13 @@ namespace Umbraco.Web.Security.Identity
 
                             remainingSeconds = (ticket.Properties.ExpiresUtc.Value - DateTime.Now.ToUniversalTime()).TotalSeconds;
                         }
-                        else if (remainingSeconds <=30) 
+                        else if (remainingSeconds <= 30)
                         {
                             //NOTE: We are using 30 seconds because that is what is coded into angular to force logout to give some headway in
                             // the timeout process.
 
                             _logger.WriteCore(TraceEventType.Information, 0,
-                                string.Format("User logged will be logged out due to timeout: {0}, IP Address: {1}", ticket.Identity.Name, request.RemoteIpAddress), 
+                                string.Format("User logged will be logged out due to timeout: {0}, IP Address: {1}", ticket.Identity.Name, request.RemoteIpAddress),
                                 null, null);
                         }
 

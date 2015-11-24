@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Web;
 using System.Web.Security;
@@ -8,8 +9,9 @@ using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
-using umbraco;
+using Microsoft.AspNet.Identity.Owin;
 using umbraco.businesslogic.Exceptions;
+using Umbraco.Web.Models.ContentEditing;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using User = umbraco.BusinessLogic.User;
 
@@ -84,32 +86,27 @@ namespace Umbraco.Web.Security
         /// <returns>returns the number of seconds until their session times out</returns>
         public virtual double PerformLogin(int userId)
         {
+            var owinCtx = _httpContext.GetOwinContext();
+            
             var user = _applicationContext.Services.UserService.GetUserById(userId);
-            return PerformLogin(user).GetRemainingAuthSeconds();
+            var userDetail = Mapper.Map<UserDetail>(user);
+            //update the userDetail and set their remaining seconds
+            userDetail.SecondsUntilTimeout = TimeSpan.FromMinutes(GlobalSettings.TimeOutInMinutes).TotalSeconds;            
+            var principal = _httpContext.SetPrincipalForRequest(user);
+            owinCtx.Authentication.SignIn((UmbracoBackOfficeIdentity)principal.Identity);
+            return TimeSpan.FromMinutes(GlobalSettings.TimeOutInMinutes).TotalSeconds;
         }
 
-        /// <summary>
-        /// Logs the user in
-        /// </summary>
-        /// <param name="user"></param>
-        /// <returns>returns the Forms Auth ticket created which is used to log them in</returns>
+        [Obsolete("This method should not be used, login is performed by the OWIN pipeline, use the overload that returns double and accepts a UserId instead")]
         public virtual FormsAuthenticationTicket PerformLogin(IUser user)
         {
-            //clear the external cookie - we do this without owin context because we're writing cookies directly to httpcontext 
-            // and cookie handling is different with httpcontext vs webapi and owin, normally we'd do:
-            //_httpContext.GetOwinContext().Authentication.SignOut(Constants.Security.BackOfficeExternalAuthenticationType);
-
             var externalLoginCookie = _httpContext.Request.Cookies.Get(Constants.Security.BackOfficeExternalCookieName);
             if (externalLoginCookie != null)
             {
                 externalLoginCookie.Expires = DateTime.Now.AddYears(-1);
                 _httpContext.Response.Cookies.Set(externalLoginCookie);
             }
-
             var ticket = _httpContext.CreateUmbracoAuthTicket(Mapper.Map<UserData>(user));
-            
-            LogHelper.Info<WebSecurity>("User Id: {0} logged in", () => user.Id);
-
             return ticket;
         }
 
@@ -119,6 +116,7 @@ namespace Umbraco.Web.Security
         public virtual void ClearCurrentLogin()
         {
             _httpContext.UmbracoLogout();
+            _httpContext.GetOwinContext().Authentication.SignOut();
         }
 
         /// <summary>
