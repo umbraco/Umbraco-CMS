@@ -9,6 +9,8 @@
     'lib/angular/1.1.5/angular-mobile.js',
     'lib/angular/1.1.5/angular-sanitize.min.js',
 
+    'lib/ng-caps-lock/ng-caps-lock.min.js',
+
     'lib/angular/angular-ui-sortable.js',
 
     'lib/angular-dynamic-locale/tmhDynamicLocale.min.js',
