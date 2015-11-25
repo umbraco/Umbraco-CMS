@@ -11,11 +11,12 @@ namespace Umbraco.Web.PropertyEditors
         public ContentPickerPropertyEditor()
         {
             _internalPreValues = new Dictionary<string, object>
-                {                 
-                    {"showEditButton", "0"},
-                    {"startNodeId", "-1"},
-                    {"showPathOnHover", "0"}
-                };
+            {
+                {"startNodeId", "-1"},
+                {"showOpenButton", "0"},
+                {"showEditButton", "0"},
+                {"showPathOnHover", "0"}
+            };
         }
 
         private IDictionary<string, object> _internalPreValues;
@@ -32,6 +33,9 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class ContentPickerPreValueEditor : PreValueEditor
         {
+            [PreValueField("showOpenButton", "Show open button", "boolean")]
+            public string ShowOpenButton { get; set; }
+
             [PreValueField("showEditButton", "Show edit button (this feature is in preview!)", "boolean")]
             public string ShowEditButton { get; set; }
             
