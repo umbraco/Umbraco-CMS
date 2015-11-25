@@ -17,7 +17,7 @@ angular.module("umbraco")
 
         var draggedRteSettings;
 
-        $scope.sortableOptions = {
+        $scope.sortableOptionsRow = {
             distance: 10,
             cursor: "move",
             placeholder: "ui-sortable-placeholder",
@@ -46,8 +46,8 @@ angular.module("umbraco")
             start: function (e, ui) {
 
                 // Fade out row when sorting
-                ui.item.context.style.opacity = "0.5";
                 ui.item.context.style.display = "block";
+                ui.item.context.style.opacity = "0.5";
 
                 draggedRteSettings = {};
                 ui.item.find(".mceNoEditor").each(function () {
@@ -81,6 +81,7 @@ angular.module("umbraco")
             cursor: "move",
             placeholder: "ui-sortable-placeholder",
             handle: ".umb-control-bar",
+            helper: "clone",
             connectWith: ".umb-cell-content",
             forcePlaceholderSize: true,
             tolerance: "pointer",
@@ -140,6 +141,11 @@ angular.module("umbraco")
             },
 
             start: function (e, ui) {
+
+                // fade out control when sorting
+                ui.item.context.style.display = "block";
+                ui.item.context.style.opacity = "0.5";
+
                 // reset dragged RTE settings in case a RTE isn't dragged
                 draggedRteSettings = undefined;
                 ui.item.context.style.display = "block";
@@ -155,6 +161,10 @@ angular.module("umbraco")
             },
 
             stop: function (e, ui) {
+
+                // Fade in control when sorting stops
+                ui.item.context.style.opacity = "1";
+
                 ui.item.parents(".umb-cell-content").find(".mceNoEditor").each(function () {
                     if ($.inArray($(this).attr("id"), notIncludedRte) < 0) {
                         // add all dragged's neighbouring RTEs in the new cell

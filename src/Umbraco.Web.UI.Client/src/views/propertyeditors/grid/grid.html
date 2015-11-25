@@ -35,6 +35,7 @@
 
         </div> <!-- .templates-preview -->
         <!-- template picker end -->
+
         <!-- Grids -->
         <div class="umb-grid-width">
             <div class="tb">
@@ -45,7 +46,7 @@
                      ng-init="initSection(section)"
                      ng-style="{width: section.$percentage + '%'}">
 
-                    <div ui-sortable="sortableOptions" ng-model="section.rows">
+                    <div ui-sortable="sortableOptionsRow" ng-model="section.rows">
 
                         <!-- for each row in template section -->
                         <!-- ng-mouseenter="setCurrentRow(row)" -->
@@ -58,8 +59,6 @@
                                      '-active': row.active,
                                      '-active-child': hasActiveChild(row, 'row')}"
                              on-outside-click="clickOutsideRow($index, section.rows)">
-
-
 
                             <div class="umb-row-title-bar">
 
@@ -108,7 +107,7 @@
                                                     '-has-config' :hasConfig(area),
                                                     '-active': area.active,
                                                     '-active-child': hasActiveChild(area, 'cell')}"
-                                                ng-model="area.controls"
+                                                 ng-model="area.controls"
                                                  ng-click="clickCell($index, row.areas)"
                                                  on-outside-click="clickOutsideCell($index, row.areas)">
 
@@ -120,8 +119,7 @@
                                                  <!-- Cell with editors -->
                                                  <div class="umb-cell-content -has-editors"
                                                       ng-if="area.controls.length > 0"
-                                                      ng-class="{'-active': area.active}"
-                                                      ui-sortable="sortableOptionsCell">
+                                                      ng-class="{'-active': area.active}">
 
                                                       <div class="umb-grid-has-config" ng-if="hasConfig(area)">
                                                          Styles is applied
@@ -133,54 +131,57 @@
                                                          </div>
                                                       </div>
 
-                                                      <!-- Controls in areas -->
-                                                      <div
-                                                          class="umb-control"
-                                                          ng-repeat="control in area.controls"
-                                                          ng-click="clickControl($index, area.controls)"
-                                                          ng-class="{'-active': control.active}"
-                                                          on-outside-click="clickOutsideControl($index, area.controls)">
+                                                      <div ui-sortable="sortableOptionsCell" ng-model="area.controls">
 
-                                                          <div class="umb-control-click-overlay" ng-show="!control.active"></div>
+                                                          <!-- for each control in areas -->
+                                                          <div class="umb-control"
+                                                              ng-repeat="control in area.controls"
+                                                              ng-click="clickControl($index, area.controls)"
+                                                              ng-class="{'-active': control.active}"
+                                                              on-outside-click="clickOutsideControl($index, area.controls)">
 
-                                                          <div class="umb-control-inner">
+                                                              <div class="umb-control-click-overlay" ng-show="!control.active"></div>
 
-                                                               <div class="umb-control-bar">
+                                                              <div class="umb-control-inner">
 
-                                                                  <div class="umb-control-title" ng-if="control.active">
-                                                                     {{control.editor.name}}
-                                                                  </div>
+                                                                   <div class="umb-control-bar">
 
-                                                                  <div class="umb-tools" ng-if="control.active">
+                                                                      <div class="umb-control-title" ng-if="control.active">
+                                                                         {{control.editor.name}}
+                                                                      </div>
 
-                                                                    <div class="umb-control-tool">
-                                                                        <i class="umb-control-tool-icon icon-trash"  ng-click="togglePrompt(control)"></i>
-                                                                        <umb-confirm-action
-                                                                            ng-if="control.deletePrompt"
-                                                                            direction="left"
-                                                                            on-confirm="removeControl(area, $index)"
-                                                                            on-cancel="hidePrompt(control)">
-                                                                        </umb-confirm-action>
-                                                                    </div>
+                                                                      <div class="umb-tools" ng-if="control.active">
 
-                                                                  </div>
+                                                                        <div class="umb-control-tool">
+                                                                            <i class="umb-control-tool-icon icon-trash"  ng-click="togglePrompt(control)"></i>
+                                                                            <umb-confirm-action
+                                                                                ng-if="control.deletePrompt"
+                                                                                direction="left"
+                                                                                on-confirm="removeControl(area, $index)"
+                                                                                on-cancel="hidePrompt(control)">
+                                                                            </umb-confirm-action>
+                                                                        </div>
 
-                                                               </div>
+                                                                      </div>
 
-                                                             <!-- Redering the editor for specific control -->
-                                                             <div ng-if="control && control.$editorPath"
-                                                                   ng-include="control.$editorPath"
-                                                                   class="umb-cell-{{control.editor.view}}">
-                                                             </div>
+                                                                   </div>
 
+                                                                 <!-- Redering the editor for specific control -->
+                                                                 <div ng-if="control && control.$editorPath"
+                                                                       ng-include="control.$editorPath"
+                                                                       class="umb-cell-{{control.editor.view}}">
+                                                                 </div>
+
+                                                              </div>
                                                           </div>
-                                                      </div>
-                                                   <!-- Controls repeat end -->
-                                                   <!-- if area is empty tools -->
 
-                                                <div class="umb-grid-add-more-content">
-                                                    <div class="cell-tools-add -bar newbtn" ng-click="openEditorOverlay($event, area, 0, area.$uniqueId);">+ Add content</div>
-                                                </div>
+                                                      </div>
+                                                      <!-- Controls repeat end -->
+
+                                                      <!-- if area is empty tools -->
+                                                      <div class="umb-grid-add-more-content">
+                                                          <div class="cell-tools-add -bar newbtn" ng-click="openEditorOverlay($event, area, 0, area.$uniqueId);">+ Add content</div>
+                                                      </div>
 
                                                  </div>
 
