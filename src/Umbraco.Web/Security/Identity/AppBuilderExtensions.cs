@@ -171,8 +171,10 @@ namespace Umbraco.Web.Security.Identity
             app.Use(typeof(CookieAuthenticationMiddleware), app, options);
             app.UseStageMarker(PipelineStage.Authenticate);
             
-            //Then our custom middleware
+            //Then our custom middlewares
             app.Use(typeof(ForceRenewalCookieAuthenticationMiddleware), app, options);
+            app.UseStageMarker(PipelineStage.Authenticate);
+            app.Use(typeof(FixWindowsAuthMiddlware));
             app.UseStageMarker(PipelineStage.Authenticate);
 
             return app;

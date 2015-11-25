@@ -310,6 +310,7 @@
     <Compile Include="RequestLifespanMessagesFactory.cs" />
     <Compile Include="Scheduling\LatchedBackgroundTaskBase.cs" />
     <Compile Include="Security\Identity\ExternalSignInAutoLinkOptions.cs" />
+    <Compile Include="Security\Identity\FixWindowsAuthMiddlware.cs" />
     <Compile Include="Security\Identity\ForceRenewalCookieAuthenticationHandler.cs" />
     <Compile Include="Security\Identity\ForceRenewalCookieAuthenticationMiddleware.cs" />
     <Compile Include="Security\Identity\GetUserSecondsMiddleWare.cs" />
