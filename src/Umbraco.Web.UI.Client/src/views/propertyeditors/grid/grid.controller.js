@@ -82,7 +82,7 @@ angular.module("umbraco")
             placeholder: "ui-sortable-placeholder",
             handle: ".umb-control-bar",
             helper: "clone",
-            connectWith: ".umb-cell-content",
+            connectWith: ".umb-cell-inner",
             forcePlaceholderSize: true,
             tolerance: "pointer",
             zIndex: 999999999999999999,
@@ -93,6 +93,7 @@ angular.module("umbraco")
             },
 
             sort: function (event, ui) {
+
                 /* prevent vertical scroll out of the screen */
                 var position = parseInt(ui.item.parent().offset().left) + parseInt(ui.helper.css("left")) - parseInt($(".umb-grid").offset().left);
                 var max = $(".umb-grid").width() - 220;
@@ -105,6 +106,7 @@ angular.module("umbraco")
             },
 
             over: function (event, ui) {
+
                 var allowedEditors = $(event.target).scope().area.allowed;
 
                 if ($.inArray(ui.item.scope().control.editor.alias, allowedEditors) < 0 && allowedEditors) {
@@ -115,7 +117,6 @@ angular.module("umbraco")
                     ui.placeholder.show();
                     cancelMove = false;
                 }
-
             },
 
             update: function (event, ui) {
@@ -124,7 +125,7 @@ angular.module("umbraco")
                     if (cancelMove) {
                         ui.item.sortable.cancel();
                     }
-                    ui.item.parents(".usky-cell.content").find(".mceNoEditor").each(function () {
+                    ui.item.parents(".umb-cell.content").find(".mceNoEditor").each(function () {
                         if ($.inArray($(this).attr("id"), notIncludedRte) < 0) {
                             notIncludedRte.splice(0, 0, $(this).attr("id"));
                         }
