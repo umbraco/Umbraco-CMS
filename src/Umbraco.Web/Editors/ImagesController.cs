@@ -113,7 +113,7 @@ namespace Umbraco.Web.Editors
 
             var imagePath = imageProp.Value.ToString();
             var response = Request.CreateResponse( HttpStatusCode.Found );
-            response.Headers.Location = new Uri( string.Format( "{0}?rnd={1}&width={2}", imagePath, string.Format( "{0:yyyyMMddHHmmss}", media.UpdateDate ), width ), UriKind.Relative );
+            response.Headers.Location = new Uri( string.Format( "{0}?rnd={1}&width={2}", imagePath, string.Format( "{0:yyyyMMddHHmm}", media.UpdateDate ), width ), UriKind.Relative );
             return response;
         }
     }
