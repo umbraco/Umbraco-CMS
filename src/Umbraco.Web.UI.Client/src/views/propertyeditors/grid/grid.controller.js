@@ -473,8 +473,12 @@ angular.module("umbraco")
             e.stopPropagation();
         };
 
-        $scope.showPrompt = function (scopedObject) {
-            scopedObject.deletePrompt = true;
+        $scope.togglePrompt = function (scopedObject) {
+            scopedObject.deletePrompt = !scopedObject.deletePrompt;
+        };
+
+        $scope.hidePrompt = function (scopedObject) {
+            scopedObject.deletePrompt = false;
         };
 
         $scope.toggleAddRow = function() {

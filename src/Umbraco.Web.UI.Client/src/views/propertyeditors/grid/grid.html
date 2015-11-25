@@ -67,30 +67,6 @@
                                <!-- Row tool -->
                                <div class="row-tools" ng-show="currentRow === row">
 
-                                   <!-- delete row -->
-                                   <div class="cell-tools-remove">
-                                       <div ng-click="showPrompt(row)"
-                                            ng-mouseover="setWarnighlightRow(row)"
-                                            ng-mouseleave="disableWarnhighlightRow(row)">
-
-                                           <span class="prompt" ng-if="row.deletePrompt">
-                                               <localize key="general_areyousure" />
-                                               <a href ng-click="removeRow(section, $index)"><localize key="general_yes" /></a>
-                                               <a href ng-click="clearPrompt(row, $event)"><localize key="general_no" /></a>
-                                           </span>
-
-                                           <i ng-if="!row.deletePrompt" class="icon icon-trash" title="@general_delete" localize="title"></i>
-                                       </div>
-                                   </div>
-
-                                   <!-- <div class="cell-tools-move">
-                                       <div ng-mouseover="setInfohighlightRow(row)"
-                                          ng-mouseleave="disableInfohighlightRow(row)"
-                                          href>
-                                           <i class="icon icon-navigation" title="@general_move" localize="title"></i>
-                                       </div>
-                                   </div> -->
-
                                    <div class="cell-tools-edit" ng-if="hasSettings">
                                        <a ng-mouseover="setInfohighlightRow(row)"
                                           ng-mouseleave="disableInfohighlightRow(row)"
@@ -99,6 +75,16 @@
                                            <i class="icon icon-settings" title="@grid_settings" localize="title"></i>
                                        </a>
                                    </div>
+
+                                    <div class="cell-tools-remove">
+                                        <i class="icon-trash" ng-click="togglePrompt(row)"></i>
+                                        <umb-confirm-action
+                                            ng-if="row.deletePrompt"
+                                            direction="right"
+                                            on-confirm="removeRow(section, $index)"
+                                            on-cancel="hidePrompt(row)">
+                                        </umb-confirm-action>
+                                    </div>
 
                                </div>
 
@@ -167,16 +153,21 @@
                                                                <div class="umb-control-bar">
 
                                                                   <div class="umb-control-title" ng-if="currentControl == control">
-                                                                     <!-- <div class="umb-control-tool">
-                                                                        <i class="umb-control-tool-icon icon-navigation"></i>
-                                                                     </div> -->
                                                                      {{control.editor.name}}
                                                                   </div>
 
                                                                   <div class="umb-control-tools" ng-if="currentControl == control">
-                                                                     <div class="umb-control-tool" ng-click="removeControl(area, $index)">
-                                                                        <i class="umb-control-tool-icon icon-trash"></i>
-                                                                     </div>
+
+                                                                    <div class="umb-control-tool">
+                                                                        <i class="umb-control-tool-icon icon-trash"  ng-click="togglePrompt(control)"></i>
+                                                                        <umb-confirm-action
+                                                                            ng-if="control.deletePrompt"
+                                                                            direction="right"
+                                                                            on-confirm="removeControl(area, $index)"
+                                                                            on-cancel="hidePrompt(control)">
+                                                                        </umb-confirm-action>
+                                                                    </div>
+
                                                                   </div>
 
                                                                </div>

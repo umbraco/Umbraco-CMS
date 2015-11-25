@@ -157,6 +157,16 @@
 
       }
 
+      /* ---------- DELETE PROMT ---------- */
+
+      scope.togglePrompt = function (object) {
+          object.deletePrompt = !object.deletePrompt;
+      };
+
+      scope.hidePrompt = function (object) {
+          object.deletePrompt = false;
+      };
+
       /* ---------- TOOLBAR ---------- */
 
       scope.toggleSortingMode = function(tool) {
@@ -404,13 +414,13 @@
         }
       };
 
-      scope.deleteProperty = function(tab, propertyIndex, group) {
+      scope.deleteProperty = function(tab, propertyIndex) {
 
         // remove property
         tab.properties.splice(propertyIndex, 1);
 
         // if the last property in group is an placeholder - remove add new tab placeholder
-        if(group.properties.length === 1 && group.properties[0].propertyState === "init") {
+        if(tab.properties.length === 1 && tab.properties[0].propertyState === "init") {
 
           angular.forEach(scope.model.groups, function(group, index, groups){
             if(group.tabState === 'init') {
