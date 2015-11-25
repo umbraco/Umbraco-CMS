@@ -41,6 +41,7 @@
 
                 <div class="control-group" ng-class="{error: loginForm.password.$invalid}">
                     <input type="password" ng-model="password" name="password" class="input-xlarge" localize="placeholder" placeholder="@placeholders_password" autocomplete="off" />
+                    <p class="caps-lock-alert" ng-show="isCapsLockOn"><i class="icon-alert"></i> <localize key="login_capsLockIsOn">Caps Lock is on</localize></p>
                 </div>
 
                 <button type="submit" class="btn" val-trigger-change="#login .form input"><localize key="general_login">Login</localize></button>

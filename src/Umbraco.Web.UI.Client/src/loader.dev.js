@@ -10,7 +10,9 @@ LazyLoad.js(
         'lib/angular/1.1.5/angular-mobile.js',
         'lib/angular/1.1.5/angular-sanitize.min.js',
 
-        'lib/angular/angular-ui-sortable.js',
+        'lib/angular/ng-caps-lock.js',
+
+        'lib/ngCapsLock/angular-ui-sortable.js',
 
         'lib/angular-dynamic-locale/tmhDynamicLocale.min.js',
 
