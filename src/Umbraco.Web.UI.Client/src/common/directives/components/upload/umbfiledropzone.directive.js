@@ -179,17 +179,16 @@ angular.module("umbraco.directives")
 					file.uploadStatus = "error";
 
 					//if the service returns a detailed error
-					if(evt.InnerException){
-						file.serverErrorMessage = evt.InnerException.ExceptionMessage;
+					if (evt.InnerException) {
+					    file.serverErrorMessage = evt.InnerException.ExceptionMessage;
 
-						//Check if its the common "too large file" exception
-						if(evt.InnerException.StackTrace && evt.InnerException.StackTrace.indexOf("ValidateRequestEntityLength") > 0){
-							file.serverErrorMessage = "File too large to upload";
-						}
-					}
+					    //Check if its the common "too large file" exception
+					    if (evt.InnerException.StackTrace && evt.InnerException.StackTrace.indexOf("ValidateRequestEntityLength") > 0) {
+					        file.serverErrorMessage = "File too large to upload";
+					    }
 
-					if(evt.Message) {
-						file.serverErrorMessage = evt.Message;
+					} else if (evt.Message) {
+					    file.serverErrorMessage = evt.Message;
 					}
 
 					// If file not found, server will return a 404 and display this message
