@@ -133,23 +133,8 @@
     padding-top: 10px;
 }
 
-.umb-grid .umb-row.-active {
-    background-color: @blue;
-}
-
-.umb-grid .umb-row.-active.-editor-active {
-    background-color: @grayLighter;
-}
-
-.umb-grid .umb-row.-active .row-tools,
-.umb-grid .umb-row.-active .row-tools a,
-.umb-grid .umb-row.-active .umb-row-title {
-    color: #ffffff;
-}
-
-.umb-grid .umb-row.-active.-editor-active .row-tools,
-.umb-grid .umb-row.-active.-editor-active .umb-row-title {
-    color: @gray;
+.umb-grid .row-tools a {
+    text-decoration: none;
 }
 
 
@@ -183,21 +168,18 @@
     }
 }
 
+.umb-grid .umb-cell-content {
+    border: 1px solid transparent;
+}
 
 .umb-grid .umb-cell-content.-has-editors {
     background-color: #ffffff;
-    border-style: solid;
-    border-width: 1px;
-    border-color: @grayLight;
 
     &:hover {
         cursor: auto;
     }
 }
 
-.umb-grid .umb-cell-content.-has-editors.-active {
-    border-color: @blue // TODO change color of border to bring to focus to the editor (rgba(113, 136, 160, 0.44);)
-}
 
 
 .umb-grid .cell-tools {
@@ -206,10 +188,6 @@
     right: 10px;
     color: @gray;
     font-size: 16px;
-}
-
-.umb-grid .umb-row.-editor-active .cell-tools-edit a {
-    color: @gray;
 }
 
 
@@ -309,10 +287,12 @@
 
 .umb-grid .umb-row-title {
     display: inline-block;
-    font-size: 15px;
     cursor: pointer;
+    font-size: 15px;
     font-weight: bold;
     color: @black;
+
+    margin-right: 6px;
 }
 
 .umb-grid .row-tools {
@@ -320,11 +300,9 @@
     margin-left: 10px;
     font-size: 18px;
     color: @gray;
-    animation: fadeInLeft 0.25s;
 }
 
-.row-tools i:hover {
-    color: @blueDark;
+.umb-grid .row-tool {
     cursor: pointer;
 }
 
@@ -383,6 +361,122 @@
 
 
 
+// Active states
+// -------------------------
+
+// Row states
+.umb-grid .umb-row.-active {
+    background-color: @blue;
+
+    .row-tool,
+    .umb-row-title {
+        color: #fff;
+    }
+
+    .umb-grid-has-config {
+        color: fade(@white, 66);
+    }
+
+    .umb-cell {
+        .umb-grid-has-config {
+            color: fade(@black, 44);
+        }
+    }
+
+    .umb-cell .umb-cell-content {
+        border-color: transparent;
+    }
+}
+
+
+.umb-grid .umb-row.-active-child {
+    background-color: @grayLighter;
+
+
+    .umb-row-title {
+        color: @gray;
+    }
+
+    .row-tool {
+        color: fade(@black, 23);
+    }
+
+    .umb-grid-has-config {
+        color: fade(@black, 44);
+    }
+}
+
+
+// Cell states
+.umb-grid .umb-row .umb-cell .umb-cell-content {
+    border-color: @grayLight;
+}
+
+.umb-grid .umb-row .umb-cell.-active {
+    .umb-cell-content {
+        box-shadow: 3px 3px 6px rgba(0, 0, 0, .07);
+        border-color: @blue;
+    }
+}
+
+.umb-grid .umb-row .umb-cell.-active-child {
+    .cell-tool {
+        color: fade(@black, 23);
+    }
+
+    .umb-cell-content {
+            border-color: rgba(113, 136, 160, .44);
+    }
+}
+
+
+
+
+
+// Title bar and tools
+.umb-grid .umb-row-title-bar {
+    display: flex;
+}
+
+.umb-grid .umb-grid-right {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.umb-grid .umb-tools {
+    margin-left: auto;
+}
+
+
+// Add more content button
+.umb-grid-add-more-content {
+    text-align: center;
+}
+
+.umb-grid .newbtn {
+    width: auto;
+    padding: 6px 15px;
+    border-style: solid;
+
+    font-size: 12px;
+    font-weight: bold;
+
+    display: inline-block;
+
+    margin: 10px auto 20px;
+
+    border-color: #E2E2E2;
+
+    &:hover {
+        cursor: pointer;
+        opacity: .77;
+    }
+}
+
+
+
+
 // Form elements
 // -------------------------
 .umb-grid textarea.textstring {
@@ -416,6 +510,10 @@
 
 .umb-grid .umb-cell-embed iframe {
     width: 100%;
+}
+
+.umb-grid .umb-cell-rte {
+    border-color: transparent;
 }
 
 
@@ -793,55 +891,19 @@
 // Has Config
 // -------------------------
 
-.umb-grid-has-config {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.umb-grid .umb-grid-has-config {
+    display: inline;
 
     font-size: 12px;
     color: fade(@black, 44);
-
-    margin-left: 6px;
 }
 
-.umb-row.-active {
-    .umb-grid-has-config {
-        color: fade(@white, 66);
-    }
-
-    .umb-cell {
-        .umb-grid-has-config {
-            color: fade(@black, 44);
-        }
-    }
-}
-
-.umb-row.-active.-editor-active {
-    .umb-grid-has-config {
-        color: fade(@black, 44);
-    }
-}
-
-.umb-cell {
+.umb-grid .umb-cell {
     .umb-grid-has-config {
         position: absolute;
         top: 10px;
         left: 10px;
     }
-
-    &.-active {
-        .umb-grid-has-config {
-            color: @blue;
-        }
-    }
-
-    &.-has-config {
-        .cell-tools {
-            color: @blue;
-        }
-    }
-
-
 }
 
 

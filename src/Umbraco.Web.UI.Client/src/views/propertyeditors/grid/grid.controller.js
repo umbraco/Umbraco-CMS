@@ -219,6 +219,34 @@ angular.module("umbraco")
            return hasSettings;
        };
 
+       $scope.hasActiveChild = function(object, type) {
+
+           if (type === "row") {
+
+               var row = object;
+
+               for (var i = 0; row.areas.length > i; i++) {
+                   var cell = row.areas[i];
+                   if (cell.active) {
+                       return true;
+                   }
+               }
+
+           } else if (type === "cell") {
+
+               var cell = object;
+
+               for (var i = 0; cell.controls.length > i; i++) {
+                   var control = cell.controls[i];
+                   if (control.active) {
+                       return true;
+                   }
+               }
+
+           }
+
+       };
+
         // *********************************************
         // Template management functions
         // *********************************************
@@ -237,36 +265,12 @@ angular.module("umbraco")
         // Row management function
         // *********************************************
 
-        $scope.clickRow = function (row, event) {
-           $scope.currentRow = null;
-           $scope.currentCell = null;
-           $scope.currentControl = null;
-
-           $scope.currentRow = row;
-
-           event.stopPropagation();
+        $scope.clickRow = function(index, rows) {
+            rows[index].active = true;
         };
 
-        $scope.clickOutsideRow = function() {
-           $scope.currentRow = null;
-           $scope.currentCell = null;
-           $scope.currentControl = null;
-        };
-
-        $scope.setWarnighlightRow = function (row) {
-            $scope.currentWarnhighlightRow = row;
-        };
-
-        $scope.disableWarnhighlightRow = function () {
-            $scope.currentWarnhighlightRow = null;
-        };
-
-        $scope.setInfohighlightRow = function (row) {
-            $scope.currentInfohighlightRow = row;
-        };
-
-        $scope.disableInfohighlightRow = function () {
-            $scope.currentInfohighlightRow = null;
+        $scope.clickOutsideRow = function(index, rows) {
+            rows[index].active = false;
         };
 
         function getAllowedLayouts(section) {
@@ -340,24 +344,12 @@ angular.module("umbraco")
         // Area management functions
         // *********************************************
 
-        $scope.clickCell = function (cell, row, event) {
-
-           $scope.currentRow = null;
-           $scope.currentCell = null;
-           $scope.currentControl = null;
-
-           $scope.currentRow = row;
-           $scope.currentCell = cell;
-
-           event.stopPropagation();
+        $scope.clickCell = function(index, cells) {
+            cells[index].active = true;
         };
 
-        $scope.setCurrentCell = function (cell) {
-            $scope.currentCell = cell;
-        };
-
-        $scope.disableCurrentCell = function () {
-            $scope.currentCell = null;
+        $scope.clickOutsideCell = function(index, cells) {
+            cells[index].active = false;
         };
 
         $scope.cellPreview = function (cell) {
@@ -369,56 +361,16 @@ angular.module("umbraco")
             }
         };
 
-        $scope.setInfohighlightArea = function (cell) {
-            $scope.currentInfohighlightArea = cell;
-        };
-
-        $scope.disableInfohighlightArea = function () {
-            $scope.currentInfohighlightArea = null;
-        };
-
 
         // *********************************************
         // Control management functions
         // *********************************************
-        $scope.clickControl = function (control, cell, row, event) {
-            $scope.currentRow = null;
-            $scope.currentCell = null;
-            $scope.currentControl = null;
-
-            $scope.currentRow = row;
-            $scope.currentCell = cell;
-            $scope.currentControl = control;
-
-            event.stopPropagation();
+        $scope.clickControl = function (index, controls) {
+            controls[index].active = true;
         };
 
-        $scope.disableCurrentControl = function (Control) {
-            $scope.currentControl = null;
-        };
-
-        $scope.setCurrentToolsControl = function (Control) {
-            $scope.currentToolsControl = Control;
-        };
-
-        $scope.disableCurrentToolsControl = function (Control) {
-            $scope.currentToolsControl = null;
-        };
-
-        $scope.setWarnhighlightControl = function (Control) {
-            $scope.currentWarnhighlightControl = Control;
-        };
-
-        $scope.disableWarnhighlightControl = function (Control) {
-            $scope.currentWarnhighlightControl = null;
-        };
-
-        $scope.setInfohighlightControl = function (Control) {
-            $scope.currentInfohighlightControl = Control;
-        };
-
-        $scope.disableInfohighlightControl = function (Control) {
-            $scope.currentInfohighlightControl = null;
+        $scope.clickOutsideControl = function (index, controls) {
+            controls[index].active = false;
         };
 
 
@@ -452,8 +404,7 @@ angular.module("umbraco")
                 index = cell.controls.length;
             }
 
-            $scope.currentControl = null;
-            $scope.currentControl = newControl;
+            newControl.active = true;
 
             //populate control
             $scope.initControl(newControl, index + 1);
