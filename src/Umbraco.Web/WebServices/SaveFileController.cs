@@ -26,6 +26,7 @@ namespace Umbraco.Web.WebServices
     /// This isn't fully implemented yet but we should migrate all of the logic in the umbraco.presentation.webservices.codeEditorSave
     /// over to this controller.
     /// </remarks>
+    [ValidateMvcAngularAntiForgeryToken]
     public class SaveFileController : UmbracoAuthorizedController
     {
         /// <summary>

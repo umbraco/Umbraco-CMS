@@ -13,6 +13,7 @@ using Umbraco.Web.WebApi;
 //using umbraco.cms.businesslogic.language;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.WebServices
 {
@@ -20,6 +21,7 @@ namespace Umbraco.Web.WebServices
     /// A REST controller used for managing domains.
     /// </summary>
     /// <remarks>Nothing to do with Active Directory.</remarks>
+    [ValidateAngularAntiForgeryToken]
     public class DomainsApiController : UmbracoAuthorizedApiController
     {
         [HttpPost]
