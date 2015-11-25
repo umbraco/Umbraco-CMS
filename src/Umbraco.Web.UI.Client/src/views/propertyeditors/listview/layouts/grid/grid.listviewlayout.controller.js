@@ -15,6 +15,7 @@
 
       vm.nodeId = $scope.contentId;
       vm.acceptedFileTypes = mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
+      vm.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB";
       vm.activeDrag = false;
       vm.mediaDetailsTooltip = {};
 

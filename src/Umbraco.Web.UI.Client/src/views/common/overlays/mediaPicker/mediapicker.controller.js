@@ -12,6 +12,7 @@ angular.module("umbraco")
             $scope.cropSize = dialogOptions.cropSize;
             $scope.lastOpenedNode = $cookieStore.get("umbLastOpenedMediaNodeId");
             $scope.acceptedFileTypes = mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
+            $scope.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB";
 
             $scope.model.selectedImages = [];
 
