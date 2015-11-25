@@ -56,9 +56,12 @@
                              ng-repeat="row in section.rows"
                              ng-click="clickRow(row, $event)"
                              ng-class="{
+                                     '-has-config': hasConfig(row),
                                      '-active': currentRow === row,
                                      '-editor-active': currentCell !== null && currentRow === row || currentControl !== null && currentRow === row}"
                              on-outside-click="clickOutsideRow()">
+
+
 
                             <div class="umb-row-title-bar">
 
@@ -88,6 +91,10 @@
 
                                </div>
 
+                               <div class="umb-grid-has-config" ng-if="hasConfig(row)">
+                                  Styles is applied
+                               </div>
+
                             </div>
 
                             <!-- row container -->
@@ -111,6 +118,7 @@
                                                     'first':$first,
                                                     'infohighlight':currentInfohighlightArea == area,
                                                     'warnhighlight':currentWarnhighlightArea == area,
+                                                    '-has-config' :hasConfig(area),
                                                     '-active': currentCell == area}"
                                                     ng-model="area.controls"
                                                  ng-click="clickCell(area, row, $event)">
@@ -127,6 +135,10 @@
                                                       ng-if="area.controls.length > 0"
                                                       ng-class="{'-active': currentCell == area}"
                                                       ui-sortable="sortableOptionsCell">
+
+                                                      <div class="umb-grid-has-config" ng-if="hasConfig(area)">
+                                                         Styles is applied
+                                                      </div>
 
                                                       <div class="cell-tools" ng-if="currentCell == area">
                                                          <div class="cell-tool" ng-click="editGridItemSettings(area, 'cell')">

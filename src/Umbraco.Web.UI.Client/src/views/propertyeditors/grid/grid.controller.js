@@ -205,6 +205,20 @@ angular.module("umbraco")
 
        };
 
+
+       // Check if row/cell has any styles or configerations, return true/false
+       $scope.hasConfig = function(object) {
+           var hasSettings = false;
+
+           if(_.isEmpty(object.styles) && _.isEmpty(object.config)) {
+               hasSettings = false;
+           } else {
+               hasSettings = true;
+           }
+
+           return hasSettings;
+       };
+
         // *********************************************
         // Template management functions
         // *********************************************
@@ -609,6 +623,7 @@ angular.module("umbraco")
                 original = angular.copy(original);
                 original.styles = row.styles;
                 original.config = row.config;
+
 
                 //sync area configuration
                 _.each(original.areas, function (area, areaIndex) {
