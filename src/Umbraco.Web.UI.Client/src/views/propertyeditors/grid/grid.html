@@ -58,7 +58,8 @@
                                      '-has-config': hasConfig(row),
                                      '-active': row.active,
                                      '-active-child': hasActiveChild(row, 'row')}"
-                             on-outside-click="clickOutsideRow($index, section.rows)">
+                             on-outside-click="clickOutsideRow($index, section.rows)"
+                             bind-click-on="{{row.active}}">
 
                             <div class="umb-row-title-bar">
 
@@ -109,7 +110,8 @@
                                                     '-active-child': hasActiveChild(area, 'cell')}"
                                                  ng-model="area.controls"
                                                  ng-click="clickCell($index, row.areas)"
-                                                 on-outside-click="clickOutsideCell($index, row.areas)">
+                                                 on-outside-click="clickOutsideCell($index, row.areas)"
+                                                 bind-click-on="{{area.active}}">
 
                                                  <!-- Cell placeholder -->
                                                  <div class="umb-cell-content -placeholder" ng-if="area.controls.length === 0">
@@ -138,7 +140,8 @@
                                                               ng-repeat="control in area.controls"
                                                               ng-click="clickControl($index, area.controls)"
                                                               ng-class="{'-active': control.active}"
-                                                              on-outside-click="clickOutsideControl($index, area.controls)">
+                                                              on-outside-click="clickOutsideControl($index, area.controls)"
+                                                              bind-click-on="{{control.active}}">
 
                                                               <div class="umb-control-click-overlay" ng-show="!control.active"></div>
 

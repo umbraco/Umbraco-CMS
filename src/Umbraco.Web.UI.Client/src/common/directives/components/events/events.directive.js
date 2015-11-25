@@ -173,8 +173,24 @@ angular.module('umbraco.directives')
                 scope.$apply(attrs.onOutsideClick);
         }
 
+
         $timeout(function(){
-            $(document).on("click", oneTimeClick);
+
+            if ("bindClickOn" in attrs) {
+
+                scope.$watch(function() {
+                    return attrs.bindClickOn;
+                }, function(newValue) {
+                    if (newValue === "true") {
+                        $(document).on("click", oneTimeClick);
+                    } else {
+                        $(document).off("click", oneTimeClick);
+                    }
+                });
+
+            } else {
+                $(document).on("click", oneTimeClick);
+            }
 
             scope.$on("$destroy", function() {
                 $(document).off("click", oneTimeClick);
