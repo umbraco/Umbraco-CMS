@@ -50,14 +50,14 @@ namespace Umbraco.Web.Security
         /// This will set a an authenticated IPrincipal to the current request given the IUser object
         /// </summary>
         /// <param name="httpContext"></param>
-        /// <param name="user"></param>
+        /// <param name="userData"></param>
         /// <returns></returns>
-        internal static IPrincipal SetPrincipalForRequest(this HttpContextBase httpContext, IUser user)
+        internal static IPrincipal SetPrincipalForRequest(this HttpContextBase httpContext, UserData userData)
         {
             var principal = new ClaimsPrincipal(
                 new UmbracoBackOfficeIdentity(
                     new ClaimsIdentity(),
-                    Mapper.Map<UserData>(user)));
+                    userData));
 
             //It is actually not good enough to set this on the current app Context and the thread, it also needs
             // to be set explicitly on the HttpContext.Current !! This is a strange web api thing that is actually 

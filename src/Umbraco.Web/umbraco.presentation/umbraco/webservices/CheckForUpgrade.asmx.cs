@@ -56,9 +56,8 @@ namespace umbraco.presentation.webservices
 
             // Check for current install Id
             Guid installId = Guid.NewGuid();
-            BusinessLogic.StateHelper.Cookies.Cookie installCookie = 
-                new BusinessLogic.StateHelper.Cookies.Cookie("umb_installId", 1);
-            if (!String.IsNullOrEmpty(installCookie.GetValue()))
+            var installCookie = new BusinessLogic.StateHelper.Cookies.Cookie("umb_installId", 1);
+            if (string.IsNullOrEmpty(installCookie.GetValue()) == false)
             {
                 if (Guid.TryParse(installCookie.GetValue(), out installId))
                 {
@@ -70,8 +69,8 @@ namespace umbraco.presentation.webservices
             }
             installCookie.SetValue(installId.ToString());
 
-            string dbProvider = String.Empty;
-            if (!String.IsNullOrEmpty(global::Umbraco.Core.Configuration.GlobalSettings.ConfigurationStatus))
+            string dbProvider = string.Empty;
+            if (string.IsNullOrEmpty(global::Umbraco.Core.Configuration.GlobalSettings.ConfigurationStatus) == false)
             dbProvider = ApplicationContext.Current.DatabaseContext.DatabaseProvider.ToString();
 
             var check = new global::Umbraco.Web.org.umbraco.update.CheckForUpgrade();
