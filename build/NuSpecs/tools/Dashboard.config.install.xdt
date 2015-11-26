@@ -62,13 +62,6 @@
         views/dashboard/default/startupdashboardintro.html
       </control>
     </tab>
-    <tab caption="Change password" xdt:Locator="Match(caption)" xdt:Transform="Remove" />
-    <tab caption="Change Password" xdt:Locator="Match(caption)" xdt:Transform="Remove" />
-    <tab caption="Change Password" xdt:Transform="Insert">
-      <control showOnce="false" addPanel="false" panelCaption="">
-        views/dashboard/ChangePassword.html
-      </control>
-    </tab>
     <tab caption="Last Edits" xdt:Locator="Match(caption)" xdt:Transform="Remove" />
   </section>
   
