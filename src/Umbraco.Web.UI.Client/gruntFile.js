@@ -459,10 +459,7 @@ module.exports = function (grunt) {
                         },
                         'angular-dynamic-locale': {
                             files: ['tmhDynamicLocale.min.js', 'tmhDynamicLocale.min.js.map']
-                        },
-                        'ng-caps-lock': {
-                            files: ['ng-caps-lock.min.js']
-                        },
+                        },                        
                         'codemirror': {
                             files: [
                                 'lib/codemirror.js',
