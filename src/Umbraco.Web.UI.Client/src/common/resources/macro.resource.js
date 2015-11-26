@@ -45,15 +45,16 @@ function macroResource($q, $http, umbRequestHelper) {
          */
         getMacroResultAsHtmlForEditor: function (macroAlias, pageId, macroParamDictionary) {
 
-            var query = "macroAlias=" + macroAlias + "&pageId=" + pageId;
-
             return umbRequestHelper.resourcePromise(
-               $http.post(
-                   umbRequestHelper.getApiUrl(
-                       "macroApiBaseUrl",
-                       "GetMacroResultAsHtmlForEditorUsingHttpPost",
-                       query), JSON.stringify(macroParamDictionary)),
-               'Failed to retrieve macro result for macro with alias  ' + macroAlias);
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "macroApiBaseUrl",
+                        "GetMacroResultAsHtmlForEditor"), {
+                        macroAlias: macroAlias,
+                        pageId: pageId,
+                        macroParams: macroParamDictionary
+                    }),
+                'Failed to retrieve macro result for macro with alias  ' + macroAlias);
         }
     };
 }

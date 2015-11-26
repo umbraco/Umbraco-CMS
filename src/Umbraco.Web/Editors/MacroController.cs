@@ -60,14 +60,19 @@ namespace Umbraco.Web.Editors
         /// Using HTTP POST instead of GET allows for more parameters to be passed as it's not dependant on URL-length limitations like GET.
         /// The method using GET is kept to maintain backwards compatibility
         /// </summary>
-        /// <param name="macroAlias"></param>
-        /// <param name="pageId"></param>
-        /// <param name="macroParams"></param>
+        /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
-        public HttpResponseMessage GetMacroResultAsHtmlForEditorUsingHttpPost(string macroAlias, int pageId, [FromBody]IDictionary<string, object> macroParams)
+        public HttpResponseMessage GetMacroResultAsHtmlForEditor(MacroParameterModel model)
         {
-            return GetMacroResultAsHtml(macroAlias, pageId, macroParams);
+            return GetMacroResultAsHtml(model.MacroAlias, model.PageId, model.MacroParams);
+        }
+
+        public class MacroParameterModel
+        {
+            public string MacroAlias { get; set; }
+            public int PageId { get; set; }
+            public IDictionary<string, object> MacroParams { get; set; }
         }
 
         private HttpResponseMessage GetMacroResultAsHtml(string macroAlias, int pageId, IDictionary<string, object> macroParams)
