@@ -146,6 +146,8 @@ angular.module('umbraco.directives')
 .directive('onOutsideClick', function ($timeout) {
     return function (scope, element, attrs) {
 
+        var eventBindings = [];
+
         function oneTimeClick(event) {
                 var el = event.target.nodeName;
                 //ignore link and button clicks
@@ -178,7 +180,7 @@ angular.module('umbraco.directives')
 
             if ("bindClickOn" in attrs) {
 
-                scope.$watch(function() {
+                eventBindings.push(scope.$watch(function() {
                     return attrs.bindClickOn;
                 }, function(newValue) {
                     if (newValue === "true") {
@@ -186,7 +188,7 @@ angular.module('umbraco.directives')
                     } else {
                         $(document).off("click", oneTimeClick);
                     }
-                });
+                }));
 
             } else {
                 $(document).on("click", oneTimeClick);
@@ -194,6 +196,12 @@ angular.module('umbraco.directives')
 
             scope.$on("$destroy", function() {
                 $(document).off("click", oneTimeClick);
+
+                // unbind watchers
+                for (var e in eventBindings) {
+                    eventBindings[e]();
+                }
+
             });
         }); // Temp removal of 1 sec timeout to prevent bug where overlay does not open. We need to find a better solution.
 
