@@ -69,7 +69,7 @@ ON cmsContentType.nodeId = umbracoNode.id"))
                     }
 
                     // set the Unique Id to the one we've generated
-                    Update.Table("cmsPropertyTypeGroup").Set(new { uniqueID = guid }).Where(new { id = data.ptId });
+                    Update.Table("cmsPropertyTypeGroup").Set(new { uniqueID = guid }).Where(new { id = data.grId });
                 }
             }
         }
