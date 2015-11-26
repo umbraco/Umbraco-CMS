@@ -154,7 +154,7 @@
     margin: 10px;
 }
 
-.umb-grid .umb-cell-content.-placeholder {
+.umb-grid .umb-row .umb-cell-content.-placeholder {
     min-height: 130px;
     background-color: @grayLighter;
     border-width: 2px;
@@ -416,7 +416,7 @@
 
 
 // Cell states
-.umb-grid .umb-row .umb-cell .umb-cell-content {
+.umb-grid .umb-row .umb-cell .umb-cell-content:not(.-placeholder) {
     border-color: @grayLight;
 }
 
