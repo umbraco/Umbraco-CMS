@@ -114,7 +114,10 @@ namespace Umbraco.Web.WebServices
                 names.Add(name);
                 var domain = domains.FirstOrDefault(d => d.DomainName.InvariantEquals(domainModel.Name));
                 if (domain != null)
+                {
                     domain.LanguageId = language.Id;
+                    Services.DomainService.Save(domain);
+                }
                 else if (Services.DomainService.Exists(domainModel.Name))
                 {
                     domainModel.Duplicate = true;
