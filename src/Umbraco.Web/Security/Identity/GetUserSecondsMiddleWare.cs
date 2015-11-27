@@ -24,6 +24,7 @@ namespace Umbraco.Web.Security.Identity
         private readonly UmbracoBackOfficeCookieAuthOptions _authOptions;
         private readonly ISecuritySection _security;
         private readonly ILogger _logger;
+        private const int PersistentLoginSlidingMinutes = 30;
 
         public GetUserSecondsMiddleWare(
             OwinMiddleware next,
@@ -59,7 +60,7 @@ namespace Umbraco.Web.Security.Identity
                     if (ticket != null)
                     {
                         var remainingSeconds = ticket.Properties.ExpiresUtc.HasValue
-                            ? (ticket.Properties.ExpiresUtc.Value - DateTime.Now.ToUniversalTime()).TotalSeconds
+                            ? (ticket.Properties.ExpiresUtc.Value - _authOptions.SystemClock.UtcNow).TotalSeconds
                             : 0;
 
                         response.ContentType = "application/json; charset=utf-8";
@@ -67,28 +68,41 @@ namespace Umbraco.Web.Security.Identity
                         response.Headers.Add("Cache-Control", new[] { "no-cache" });
                         response.Headers.Add("Pragma", new[] { "no-cache" });
                         response.Headers.Add("Expires", new[] { "-1" });
-                        response.Headers.Add("Date", new[] { DateTime.Now.ToUniversalTime().ToString("R") });
+                        response.Headers.Add("Date", new[] { _authOptions.SystemClock.UtcNow.ToString("R") });
 
                         //Ok, so here we need to check if we want to process/renew the auth ticket for each 
                         // of these requests. If that is the case, the user will really never be logged out until they
                         // close their browser (there will be edge cases of that, especially when debugging)
                         if (_security.KeepUserLoggedIn)
                         {
-                            var utcNow = DateTime.Now.ToUniversalTime();
-                            ticket.Properties.IssuedUtc = utcNow;
-                            ticket.Properties.ExpiresUtc = utcNow.AddMinutes(30);
+                            var currentUtc = _authOptions.SystemClock.UtcNow;
+                            var issuedUtc = ticket.Properties.IssuedUtc;
+                            var expiresUtc = ticket.Properties.ExpiresUtc;
 
-                            var cookieValue = _authOptions.TicketDataFormat.Protect(ticket);
+                            if (expiresUtc.HasValue && issuedUtc.HasValue)
+                            {
+                                var timeElapsed = currentUtc.Subtract(issuedUtc.Value);
+                                var timeRemaining = expiresUtc.Value.Subtract(currentUtc);
 
-                            var cookieOptions = _authOptions.CreateRequestCookieOptions(context, ticket);
+                                //if it's time to renew, then do it
+                                if (timeRemaining < timeElapsed)
+                                {
+                                    ticket.Properties.IssuedUtc = currentUtc;
+                                    ticket.Properties.ExpiresUtc = currentUtc.AddMinutes(PersistentLoginSlidingMinutes);
 
-                            _authOptions.CookieManager.AppendResponseCookie(
-                                context,
-                                _authOptions.CookieName,
-                                cookieValue,
-                                cookieOptions);
+                                    var cookieValue = _authOptions.TicketDataFormat.Protect(ticket);
 
-                            remainingSeconds = (ticket.Properties.ExpiresUtc.Value - DateTime.Now.ToUniversalTime()).TotalSeconds;
+                                    var cookieOptions = _authOptions.CreateRequestCookieOptions(context, ticket);
+
+                                    _authOptions.CookieManager.AppendResponseCookie(
+                                        context,
+                                        _authOptions.CookieName,
+                                        cookieValue,
+                                        cookieOptions);
+
+                                    remainingSeconds = (ticket.Properties.ExpiresUtc.Value - currentUtc).TotalSeconds;
+                                }
+                            }                            
                         }
                         else if (remainingSeconds <= 30)
                         {
