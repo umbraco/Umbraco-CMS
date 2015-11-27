@@ -80,15 +80,7 @@ namespace Umbraco.Web.Security.Identity
 
                             var cookieValue = _authOptions.TicketDataFormat.Protect(ticket);
 
-                            var cookieOptions = new CookieOptions
-                            {
-                                Path = "/",
-                                Domain = _authOptions.CookieDomain ?? null,
-                                Expires = DateTime.Now.AddMinutes(30),
-                                HttpOnly = true,
-                                Secure = _authOptions.CookieSecure == CookieSecureOption.Always
-                                         || (_authOptions.CookieSecure == CookieSecureOption.SameAsRequest && request.Uri.Scheme.InvariantEquals("https")),
-                            };
+                            var cookieOptions = _authOptions.CreateRequestCookieOptions(context, ticket);
 
                             _authOptions.CookieManager.AppendResponseCookie(
                                 context,

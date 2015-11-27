@@ -10,13 +10,20 @@ namespace Umbraco.Web.Security.Identity
     /// </summary>
     internal class ForceRenewalCookieAuthenticationMiddleware : CookieAuthenticationMiddleware
     {
-        public ForceRenewalCookieAuthenticationMiddleware(OwinMiddleware next, IAppBuilder app, CookieAuthenticationOptions options) : base(next, app, options)
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+
+        public ForceRenewalCookieAuthenticationMiddleware(
+            OwinMiddleware next, 
+            IAppBuilder app, 
+            UmbracoBackOfficeCookieAuthOptions options,
+            IUmbracoContextAccessor umbracoContextAccessor) : base(next, app, options)
         {
-        }        
+            _umbracoContextAccessor = umbracoContextAccessor;
+        }
 
         protected override AuthenticationHandler<CookieAuthenticationOptions> CreateHandler()
         {
-            return new ForceRenewalCookieAuthenticationHandler();
+            return new ForceRenewalCookieAuthenticationHandler(_umbracoContextAccessor);
         }
     }
 }

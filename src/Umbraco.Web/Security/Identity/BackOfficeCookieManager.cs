@@ -50,6 +50,7 @@ namespace Umbraco.Web.Security.Identity
         /// </summary>
         /// <param name="ctx"></param>
         /// <param name="originalRequestUrl"></param>
+        /// <param name="checkForceAuthTokens"></param>
         /// <returns></returns>
         /// <remarks>
         /// We auth the request when:
@@ -58,14 +59,14 @@ namespace Umbraco.Web.Security.Identity
         /// * it is a /base request
         /// * it is a preview request
         /// </remarks>
-        internal static bool ShouldAuthenticateRequest(IOwinContext ctx, Uri originalRequestUrl)
+        internal bool ShouldAuthenticateRequest(IOwinContext ctx, Uri originalRequestUrl, bool checkForceAuthTokens = true)
         {
             var request = ctx.Request;
             var httpCtx = ctx.TryGetHttpContext();
             
             if (//check the explicit flag
-                ctx.Get<bool?>("umbraco-force-auth") != null
-                || (httpCtx.Success && httpCtx.Result.Items["umbraco-force-auth"] != null)
+                (checkForceAuthTokens && ctx.Get<bool?>("umbraco-force-auth") != null)
+                || (checkForceAuthTokens && httpCtx.Success && httpCtx.Result.Items["umbraco-force-auth"] != null)
                 //check back office
                 || request.Uri.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath)
                 //check installer
