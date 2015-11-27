@@ -198,6 +198,7 @@ angular.module("umbraco")
 
           $scope.editorOverlay = {};
           $scope.editorOverlay.view = "itempicker";
+          $scope.editorOverlay.filter = false;
           $scope.editorOverlay.title = "Insert editor";
           $scope.editorOverlay.availableItems = area.$allowedEditors;
           $scope.editorOverlay.event = event;
