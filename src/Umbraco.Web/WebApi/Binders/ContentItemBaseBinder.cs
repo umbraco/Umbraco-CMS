@@ -162,7 +162,7 @@ namespace Umbraco.Web.WebApi.Binders
                 //finally, let's lookup the real content item and create the DTO item
                 model.PersistedContent = GetExisting(model);                
             }
-
+            
             //create the dto from the persisted model
             if (model.PersistedContent != null)
             {
@@ -173,7 +173,9 @@ namespace Umbraco.Web.WebApi.Binders
                 //now map all of the saved values to the dto
                 MapPropertyValuesFromSaved(model, model.ContentDto);    
             }
-            
+
+            model.Name = model.Name.Trim();
+
             return model;
         }
 
