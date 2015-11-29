@@ -166,7 +166,7 @@
                     </td>
                     <td>                        
                         <asp:RequiredFieldValidator ID="RequiredFieldValidator6" runat="server" ControlToValidate="macroPropertySortOrder" Display="Dynamic" ForeColor="#b94a48">Required<br/></asp:RequiredFieldValidator>
-                         <asp:RegularExpressionValidator ID="RegularExpressionValidator1" runat="server" ControlToValidate="macroPropertySortOrder" Display="Dynamic" ForeColor="Red" ValidationExpression="^\d+$">Numbers only<br/></asp:RegularExpressionValidator>
+                         <asp:RegularExpressionValidator ID="RegularExpressionValidator1" runat="server" ControlToValidate="macroPropertySortOrder" Display="Dynamic" ForeColor="#b94a48" ValidationExpression="^\d+$">Numbers only<br/></asp:RegularExpressionValidator>
                         <asp:TextBox runat="server" ID="macroPropertySortOrder" Text='<%#Eval("SortOrder")%>' />
                     </td>
                     <td>
