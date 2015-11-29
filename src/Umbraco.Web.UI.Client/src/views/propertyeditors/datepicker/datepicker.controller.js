@@ -33,6 +33,10 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
         $scope.model.config.calendarWeeks = $scope.model.config.calendarWeeks == 0 ? false : true;
     }
 
+    if ($scope.model.config.daysOfWeekDisabled !== undefined || $scope.model.config.daysOfWeekDisabled !== null) {
+        $scope.model.config.daysOfWeekDisabled = angular.isArray($scope.model.config.daysOfWeekDisabled) ? $scope.model.config.daysOfWeekDisabled : [];
+    }
+
     if ($scope.model.config.minuteStepping !== undefined || $scope.model.config.minuteStepping !== null) {
         $scope.model.config.minuteStepping = parseInt($scope.model.config.minuteStepping) > 0 ? parseInt($scope.model.config.minuteStepping) : 1;
     }
