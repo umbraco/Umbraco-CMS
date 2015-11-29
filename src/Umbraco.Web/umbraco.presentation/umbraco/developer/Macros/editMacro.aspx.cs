@@ -193,7 +193,7 @@ namespace umbraco.cms.presentation.developer
 
 		public void macroPropertyBind()
 		{
-			macroProperties.DataSource = _macro.Properties;
+			macroProperties.DataSource = _macro.Properties.OrderBy(x => x.SortOrder);
 			macroProperties.DataBind();
 		}
 
@@ -333,24 +333,25 @@ namespace umbraco.cms.presentation.developer
             SetMacroValuesFromPostBack(_macro, Convert.ToInt32(tempCachePeriod), tempMacroAssembly, tempMacroType);
 
             // Save elements
-            var sort = 0;
             foreach (RepeaterItem item in macroProperties.Items)
             {
                 var macroPropertyId = (HtmlInputHidden)item.FindControl("macroPropertyID");
                 var macroElementName = (TextBox)item.FindControl("macroPropertyName");
                 var macroElementAlias = (TextBox)item.FindControl("macroPropertyAlias");
+                var macroElementSortOrder = (TextBox)item.FindControl("macroPropertySortOrder");
                 var macroElementType = (DropDownList)item.FindControl("macroPropertyType");
 
                 var prop = _macro.Properties.Single(x => x.Id == int.Parse(macroPropertyId.Value));
-                
+                var sortOrder = 0;
+                int.TryParse(macroElementSortOrder.Text, out sortOrder);
+
                 _macro.Properties.UpdateProperty(
                     prop.Alias,
                     macroElementName.Text.Trim(),
-                    sort,
+                    sortOrder,
                     macroElementType.SelectedValue,                    
                     macroElementAlias.Text.Trim());
 
-                sort++;
             }
 
             Services.MacroService.Save(_macro);
@@ -368,6 +369,8 @@ namespace umbraco.cms.presentation.developer
                     new LiteralControl("<br/><button onClick=\"UmbClientMgr.openModalWindow('developer/macros/assemblyBrowser.aspx?fileName=" + macroAssembly.Text +
                         "&macroID=" + Request.QueryString["macroID"] + "&type=" + macroType.Text +
                             "', 'Browse Properties', true, 500, 475); return false\" class=\"guiInputButton\"><img src=\"../../images/editor/propertiesNew.gif\" align=\"absmiddle\" style=\"width: 18px; height: 17px; padding-right: 5px;\"/> Browse properties</button>"));
+
+            macroPropertyBind();
         }
 
 	    /// <summary>
