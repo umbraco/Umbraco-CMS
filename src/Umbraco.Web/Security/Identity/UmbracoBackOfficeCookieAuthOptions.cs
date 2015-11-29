@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.Owin;
+using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -18,6 +20,29 @@ namespace Umbraco.Web.Security.Identity
         public UmbracoBackOfficeCookieAuthOptions()
             : this(UmbracoConfig.For.UmbracoSettings().Security, GlobalSettings.TimeOutInMinutes, GlobalSettings.UseSSL)
         {            
+        }
+
+        public CookieOptions CreateRequestCookieOptions(IOwinContext ctx, AuthenticationTicket ticket)
+        {
+            if (ctx == null) throw new ArgumentNullException("ctx");
+            if (ticket == null) throw new ArgumentNullException("ticket");
+
+            var cookieOptions = new CookieOptions
+            {
+                Path = "/",
+                Domain = this.CookieDomain ?? null,
+                Expires = DateTime.Now.AddMinutes(30),
+                HttpOnly = true,
+                Secure = this.CookieSecure == CookieSecureOption.Always
+                                         || (this.CookieSecure == CookieSecureOption.SameAsRequest && ctx.Request.IsSecure),
+            };
+
+            if (ticket.Properties.IsPersistent && ticket.Properties.ExpiresUtc.HasValue)
+            {
+                cookieOptions.Expires = ticket.Properties.ExpiresUtc.Value.ToUniversalTime().DateTime;
+            }
+
+            return cookieOptions;
         }
 
         public UmbracoBackOfficeCookieAuthOptions(            

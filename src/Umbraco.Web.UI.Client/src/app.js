@@ -7,7 +7,6 @@ var app = angular.module('umbraco', [
     'ngCookies',
     'ngSanitize',
     'ngMobile',
-    'ngCapsLock',
     'blueimp.fileupload',
     'tmh.dynamicLocale'
 ]);
