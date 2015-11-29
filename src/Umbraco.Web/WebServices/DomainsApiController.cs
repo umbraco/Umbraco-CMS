@@ -13,6 +13,7 @@ using Umbraco.Web.WebApi;
 //using umbraco.cms.businesslogic.language;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.WebServices
 {
@@ -20,6 +21,7 @@ namespace Umbraco.Web.WebServices
     /// A REST controller used for managing domains.
     /// </summary>
     /// <remarks>Nothing to do with Active Directory.</remarks>
+    [ValidateAngularAntiForgeryToken]
     public class DomainsApiController : UmbracoAuthorizedApiController
     {
         [HttpPost]
@@ -112,7 +114,10 @@ namespace Umbraco.Web.WebServices
                 names.Add(name);
                 var domain = domains.FirstOrDefault(d => d.DomainName.InvariantEquals(domainModel.Name));
                 if (domain != null)
+                {
                     domain.LanguageId = language.Id;
+                    Services.DomainService.Save(domain);
+                }
                 else if (Services.DomainService.Exists(domainModel.Name))
                 {
                     domainModel.Duplicate = true;

@@ -53,6 +53,11 @@ namespace Umbraco.Core.Security
             switch (result)
             {
                 case SignInStatus.Success:
+                    _logger.WriteCore(TraceEventType.Information, 0,
+                        string.Format(
+                            "User: {0} logged in from IP address {1}",
+                            userName,
+                            _request.RemoteIpAddress), null, null);
                     break;
                 case SignInStatus.LockedOut:
                     _logger.WriteCore(TraceEventType.Information, 0,

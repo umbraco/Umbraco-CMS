@@ -7,6 +7,7 @@ using umbraco.cms.presentation.Trees;
 using umbraco.cms.businesslogic.web;
 using System.Linq;
 using umbraco.controls;
+using Umbraco.Core;
 
 namespace umbraco.settings
 {
@@ -117,7 +118,7 @@ namespace umbraco.settings
             templateList.Items.Clear();
             templateList.Items.AddRange(templates.ConvertAll(item =>
             {
-                var li = new ListItem { Text = item.Name, Value = item.Id.ToString(CultureInfo.InvariantCulture), Selected = item.Selected };
+                var li = new ListItem { Text = Server.HtmlEncode(item.Name), Value = item.Id.ToString(CultureInfo.InvariantCulture), Selected = item.Selected };
                 return li;
             }).ToArray());
 
@@ -127,7 +128,7 @@ namespace umbraco.settings
             ddlTemplates.Items.Insert(0, new ListItem(ui.Text("choose") + "...", "0"));
             ddlTemplates.Items.AddRange(templates.ConvertAll(item =>
             {
-                var li = new ListItem { Text = item.Name, Value = item.Id.ToString(CultureInfo.InvariantCulture) };
+                var li = new ListItem { Text = Server.HtmlEncode(item.Name), Value = item.Id.ToString(CultureInfo.InvariantCulture) };
                 return li;
             }).ToArray());
 
