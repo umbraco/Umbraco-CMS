@@ -155,7 +155,27 @@ namespace Umbraco.Web.Security.Identity
                 UmbracoConfig.For.UmbracoSettings().Security,
                 app.CreateLogger<GetUserSecondsMiddleWare>());
 
-            app.UseCookieAuthentication(authOptions);
+            app.UseUmbracoBackOfficeCookieAuthentication(authOptions);
+
+            return app;
+        }
+
+        internal static IAppBuilder UseUmbracoBackOfficeCookieAuthentication(this IAppBuilder app, CookieAuthenticationOptions options)
+        {
+            if (app == null)
+            {
+                throw new ArgumentNullException("app");
+            }
+
+            //First the normal cookie middleware
+            app.Use(typeof(CookieAuthenticationMiddleware), app, options);
+            app.UseStageMarker(PipelineStage.Authenticate);
+            
+            //Then our custom middlewares
+            app.Use(typeof(ForceRenewalCookieAuthenticationMiddleware), app, options);
+            app.UseStageMarker(PipelineStage.Authenticate);
+            app.Use(typeof(FixWindowsAuthMiddlware));
+            app.UseStageMarker(PipelineStage.Authenticate);
 
             return app;
         }

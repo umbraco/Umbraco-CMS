@@ -36,7 +36,7 @@ namespace Umbraco.Web.Security.Identity
             }
             
             SlidingExpiration = true;
-            ExpireTimeSpan = TimeSpan.FromMinutes(GlobalSettings.TimeOutInMinutes);
+            ExpireTimeSpan = TimeSpan.FromMinutes(LoginTimeoutMinutes);
             CookieDomain = securitySection.AuthCookieDomain;
             CookieName = securitySection.AuthCookieName;
             CookieHttpOnly = true;
