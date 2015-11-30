@@ -217,48 +217,6 @@ angular.module("umbraco")
 
        };
 
-
-       // Check if row/cell has any styles or configerations, return true/false
-       $scope.hasConfig = function(object) {
-           var hasSettings = false;
-
-           if(_.isEmpty(object.styles) && _.isEmpty(object.config)) {
-               hasSettings = false;
-           } else {
-               hasSettings = true;
-           }
-
-           return hasSettings;
-       };
-
-       $scope.hasActiveChild = function(object, type) {
-
-           if (type === "row") {
-
-               var row = object;
-
-               for (var i = 0; row.areas.length > i; i++) {
-                   var cell = row.areas[i];
-                   if (cell.active) {
-                       return true;
-                   }
-               }
-
-           } else if (type === "cell") {
-
-               var cell = object;
-
-               for (var i = 0; cell.controls.length > i; i++) {
-                   var control = cell.controls[i];
-                   if (control.active) {
-                       return true;
-                   }
-               }
-
-           }
-
-       };
-
         // *********************************************
         // Template management functions
         // *********************************************
@@ -343,25 +301,36 @@ angular.module("umbraco")
                     config: $scope.model.config,
                     itemType: itemType,
                     callback: function (data) {
-
                         gridItem.styles = data.styles;
                         gridItem.config = data.config;
-
+                        gridItem.hasConfig = gridItemHasConfig(data.styles, data.config);
                     }
                 });
 
         };
 
+        function gridItemHasConfig(styles, config) {
+
+            if(_.isEmpty(styles) && _.isEmpty(config)) {
+                return false;
+            } else {
+                return true;
+            }
+
+        }
+
         // *********************************************
         // Area management functions
         // *********************************************
 
-        $scope.clickCell = function(index, cells) {
+        $scope.clickCell = function(index, cells, row) {
             cells[index].active = true;
+            row.hasActiveChild = true;
         };
 
-        $scope.clickOutsideCell = function(index, cells) {
+        $scope.clickOutsideCell = function(index, cells, row) {
             cells[index].active = false;
+            row.hasActiveChild = hasActiveChild(row, cells);
         };
 
         $scope.cellPreview = function (cell) {
@@ -377,13 +346,33 @@ angular.module("umbraco")
         // *********************************************
         // Control management functions
         // *********************************************
-        $scope.clickControl = function (index, controls) {
+        $scope.clickControl = function (index, controls, cell) {
             controls[index].active = true;
+            cell.hasActiveChild = true;
         };
 
-        $scope.clickOutsideControl = function (index, controls) {
+        $scope.clickOutsideControl = function (index, controls, cell) {
             controls[index].active = false;
+            cell.hasActiveChild = hasActiveChild(cell, controls);
         };
+
+        function hasActiveChild(item, children) {
+
+            var activeChild = false;
+
+            for(var i = 0; children.length > i; i++) {
+                var child = children[i];
+
+                if(child.active) {
+                    activeChild = true;
+                }
+            }
+
+            if(activeChild) {
+                return true;
+            }
+
+        }
 
 
         var guid = (function () {
@@ -586,6 +575,7 @@ angular.module("umbraco")
                 original = angular.copy(original);
                 original.styles = row.styles;
                 original.config = row.config;
+                original.hasConfig = gridItemHasConfig(row.styles, row.config);
 
 
                 //sync area configuration
@@ -598,6 +588,7 @@ angular.module("umbraco")
                         if (currentArea) {
                             area.config = currentArea.config;
                             area.styles = currentArea.styles;
+                            area.hasConfig = gridItemHasConfig(currentArea.styles, currentArea.config);
                         }
 
                         //set editor permissions

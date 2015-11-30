@@ -55,9 +55,9 @@
                              ng-repeat="row in section.rows"
                              ng-click="clickRow($index, section.rows)"
                              ng-class="{
-                                     '-has-config': hasConfig(row),
+                                     '-has-config': row.hasConfig,
                                      '-active': row.active,
-                                     '-active-child': hasActiveChild(row, 'row')}"
+                                     '-active-child': row.hasActiveChild}"
                              on-outside-click="clickOutsideRow($index, section.rows)"
                              bind-click-on="{{row.active}}">
 
@@ -66,7 +66,7 @@
                                 <div class=".umb-grid-right">
                                     <div class="umb-row-title">{{row.name}}</div>
 
-                                    <div class="umb-grid-has-config" ng-if="hasConfig(row)">
+                                    <div class="umb-grid-has-config" ng-if="row.hasConfig">
                                         Styles is applied
                                     </div>
                                 </div>
@@ -105,12 +105,12 @@
                                                  ng-repeat="area in row.areas"
                                                  ng-style="{width: area.$percentage + '%'}"
                                                  ng-class="{
-                                                    '-has-config' :hasConfig(area),
+                                                    '-has-config': area.hasConfig,
                                                     '-active': area.active,
-                                                    '-active-child': hasActiveChild(area, 'cell')}"
+                                                    '-active-child': area.hasActiveChild}"
                                                  ng-model="area.controls"
-                                                 ng-click="clickCell($index, row.areas)"
-                                                 on-outside-click="clickOutsideCell($index, row.areas)"
+                                                 ng-click="clickCell($index, row.areas, row)"
+                                                 on-outside-click="clickOutsideCell($index, row.areas, row)"
                                                  bind-click-on="{{area.active}}">
 
                                                  <!-- Cell placeholder -->
@@ -123,7 +123,7 @@
                                                       ng-if="area.controls.length > 0"
                                                       ng-class="{'-active': area.active}">
 
-                                                      <div class="umb-grid-has-config" ng-if="hasConfig(area)">
+                                                      <div class="umb-grid-has-config" ng-if="area.hasConfig">
                                                          Styles is applied
                                                       </div>
 
@@ -138,9 +138,9 @@
                                                           <!-- for each control in areas -->
                                                           <div class="umb-control"
                                                               ng-repeat="control in area.controls"
-                                                              ng-click="clickControl($index, area.controls)"
+                                                              ng-click="clickControl($index, area.controls, area)"
                                                               ng-class="{'-active': control.active}"
-                                                              on-outside-click="clickOutsideControl($index, area.controls)"
+                                                              on-outside-click="clickOutsideControl($index, area.controls, area)"
                                                               bind-click-on="{{control.active}}">
 
                                                               <div class="umb-control-click-overlay" ng-show="!control.active"></div>
