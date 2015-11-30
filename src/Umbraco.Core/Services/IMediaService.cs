@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
@@ -369,5 +370,12 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user creating the media item</param>
         /// <returns><see cref="IMedia"/></returns>
         IMedia CreateMediaWithIdentity(string name, int parentId, string mediaTypeAlias, int userId = 0);
+
+        /// <summary>
+        /// Gets the content of a media as a stream.
+        /// </summary>
+        /// <param name="path">The filesystem path to the media.</param>
+        /// <returns>The content of the media.</returns>
+        Stream GetMediaFileStream(string path);
     }
 }

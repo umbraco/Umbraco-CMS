@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Services
@@ -224,5 +225,12 @@ namespace Umbraco.Core.Services
         /// templates in business logic. Without this, it could cause the wrong rendering engine to be used for a package.
         /// </remarks>
         RenderingEngine DetermineTemplateRenderingEngine(ITemplate template);
+
+        /// <summary>
+        /// Gets the content of a template as a stream.
+        /// </summary>
+        /// <param name="path">The filesystem path to the template.</param>
+        /// <returns>The content of the template.</returns>
+        Stream GetTemplateFileStream(string path);
     }
 }

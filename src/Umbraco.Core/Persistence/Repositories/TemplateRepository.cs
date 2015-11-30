@@ -475,6 +475,25 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
+        public Stream GetFileStream(string filename)
+        {
+            var ext = Path.GetExtension(filename);
+            IFileSystem fs;
+            switch (ext)
+            {
+                case ".cshtml":
+                case ".vbhtml":
+                    fs = _viewsFileSystem;
+                    break;
+                case ".master":
+                    fs = _masterpagesFileSystem;
+                    break;
+                default:
+                    throw new Exception("Unsupported extension " + ext + ".");
+            }
+            return fs.OpenFile(filename);
+        }
+
         #region Implementation of ITemplateRepository
 
         public ITemplate Get(string alias)
