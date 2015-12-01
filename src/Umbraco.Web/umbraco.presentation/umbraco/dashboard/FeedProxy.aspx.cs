@@ -27,7 +27,9 @@ namespace dashboardUtilities
                         if (Uri.TryCreate(url, UriKind.Absolute, out requestUri))
                         {
                             var feedProxyXml = xmlHelper.OpenAsXmlDocument(IOHelper.MapPath(SystemFiles.FeedProxyConfig));
-                            if (feedProxyXml != null && feedProxyXml.SelectSingleNode(string.Concat("//allow[@host = '", requestUri.Host, "']")) != null)
+                            if (feedProxyXml != null 
+                                && feedProxyXml.SelectSingleNode(string.Concat("//allow[@host = '", requestUri.Host, "']")) != null
+                                && requestUri.Port == 80)
                             {
                                 using (var client = new WebClient())
                                 {

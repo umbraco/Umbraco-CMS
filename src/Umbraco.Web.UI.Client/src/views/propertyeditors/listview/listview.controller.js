@@ -212,11 +212,23 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
                 $scope.reloadView($scope.contentId);
             }
         });
-    }, 200));
+    }, 1000));
 
-    $scope.enterSearch = function($event) {
+    $scope.filterResults = function (ev) {
+        //13: enter
+
+        switch (ev.keyCode) {
+            case 13:
+                $scope.options.pageNumber = 1;
+                $scope.actionInProgress = true;
+                $scope.reloadView($scope.contentId);
+                break;
+        }
+    };
+
+    $scope.enterSearch = function ($event) {
         $($event.target).next().focus();
-    }
+    };
 
     $scope.isAnythingSelected = function() {
        if ($scope.selection.length === 0) {
@@ -461,4 +473,4 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
 }
 
 
-angular.module("umbraco").controller("Umbraco.PropertyEditors.ListViewController", listViewController);
+angular.module("umbraco").controller("Umbraco.PropertyEditors.ListViewController", listViewController);

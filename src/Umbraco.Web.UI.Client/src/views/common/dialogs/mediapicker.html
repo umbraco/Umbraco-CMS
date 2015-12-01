@@ -1,5 +1,7 @@
-<div ng-controller="Umbraco.Dialogs.MediaPickerController"
-    id="fileupload">
+<form ng-controller="Umbraco.Dialogs.MediaPickerController" id="fileupload"
+      method="POST"
+      enctype="multipart/form-data"
+      umb-image-upload="options">
 
     <div class="umb-panel umb-dialogs-mediapicker" ng-if="target">
         <div class="umb-panel-body no-header with-footer compact">
@@ -67,14 +69,14 @@
           
         <div class="umb-panel-header">
 
-            <div class="umb-el-wrap umb-panel-buttons">
+            <div class="umb-el-wrap umb-panel-buttons umb-mediapicker-upload">
                 <div class="span5">
-                    <div class="form-search">
-                        <i class="icon-search"></i>
-                        <input type="text"
-                               ng-model="searchTerm"
-                               class="umb-search-field search-query"
-                               placeholder="Filter...">
+	                <div class="form-search">
+	                    <i class="icon-search"></i>
+	                    <input type="text"
+	                            ng-model="searchTerm"
+	                            class="umb-search-field search-query"
+	                            placeholder="Filter...">
                     </div>
                 </div>
 

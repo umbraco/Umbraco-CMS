@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -15,10 +11,12 @@ namespace Umbraco.Web.PropertyEditors
         public MultiNodeTreePickerPropertyEditor()
         {
             _internalPreValues = new Dictionary<string, object>
-                {
-                    {"multiPicker", "1"},
-                    {"showEditButton", "0"}
-                };
+            {
+                {"multiPicker", "1"},
+                {"showOpenButton", "0"},
+                {"showEditButton", "0"},
+                {"showPathOnHover", "0"}
+            };
         }
         
         protected override PreValueEditor CreatePreValueEditor()
@@ -47,8 +45,15 @@ namespace Umbraco.Web.PropertyEditors
             [PreValueField("maxNumber", "Maximum number of items", "number")]
             public string MaxNumber { get; set; }
 
+
+            [PreValueField("showOpenButton", "Show open button", "boolean")]
+            public string ShowOpenButton { get; set; }
+
             [PreValueField("showEditButton", "Show edit button (this feature is in preview!)", "boolean")]
             public string ShowEditButton { get; set; }
+
+            [PreValueField("showPathOnHover", "Show path when hovering items", "boolean")]
+            public bool ShowPathOnHover { get; set; }
 
             /// <summary>
             /// This ensures the multiPicker pre-val is set based on the maxNumber of nodes set

@@ -207,6 +207,9 @@ namespace UmbracoExamine
                 if (e.Fields.ContainsKey("_searchEmail") == false)
                     e.Fields.Add("_searchEmail", e.Node.Attribute("email").Value.Replace(".", " ").Replace("@", " "));
             }
+            
+            if (e.Fields.ContainsKey(IconFieldName) == false)
+                e.Fields.Add(IconFieldName, (string)e.Node.Attribute("icon"));
         }
 
         private static XElement GetMemberItem(int nodeId)

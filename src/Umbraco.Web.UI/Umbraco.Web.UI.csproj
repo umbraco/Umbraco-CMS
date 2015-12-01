@@ -40,7 +40,8 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile />
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort />
+    <IISExpressSSLPort>
+    </IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
@@ -1856,6 +1857,7 @@
     <Content Include="Umbraco\Images\Editor\newdocument.gif" />
     <Content Include="Umbraco\Images\Editor\opacity.png" />
     <Content Include="Umbraco\Images\Editor\outdent.gif" />
+    <Content Include="Umbraco\Images\Editor\renderbody.gif" />
     <Content Include="Umbraco\Images\Editor\removeformat.gif" />
     <Content Include="Umbraco\Images\Editor\separator.gif" />
     <Content Include="Umbraco\Images\Editor\showStyles.png" />
