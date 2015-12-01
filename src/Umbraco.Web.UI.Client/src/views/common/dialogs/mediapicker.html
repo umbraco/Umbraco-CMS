@@ -70,17 +70,15 @@
         <div class="umb-panel-header">
 
             <div class="umb-el-wrap umb-panel-buttons umb-mediapicker-upload">
-                <div class="span5">
-	                <div class="form-search">
-	                    <i class="icon-search"></i>
-	                    <input type="text"
-	                            ng-model="searchTerm"
-	                            class="umb-search-field search-query"
-	                            placeholder="Filter...">
-                    </div>
+	            <div class="form-search">
+	                <i class="icon-search"></i>
+	                <input type="text"
+	                       ng-model="searchTerm"
+	                       class="umb-search-field search-query"
+	                       placeholder="Filter...">
                 </div>
 
-                <div class="pull-right">
+                <div class="upload-button">
                     <button class="btn fileinput-button" ng-click="upload()" ng-class="{disabled: disabled}">
                         <i class="icon-page-up"></i>
                         <localize key="general_upload">Upload</localize>
