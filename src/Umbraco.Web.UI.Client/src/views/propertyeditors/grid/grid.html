@@ -123,6 +123,12 @@
                                                       ng-if="area.controls.length > 0"
                                                       ng-class="{'-active': area.active}">
 
+                                                      <!-- disable drop overlay -->
+                                                      <div class="disable-drop" ng-if="area.dropNotAllowed">
+                                                          <i class="icon-delete disable-drop-icon"></i>
+                                                          This content is not allowed here
+                                                      </div>
+
                                                       <div class="umb-grid-has-config" ng-if="area.hasConfig">
                                                          Styles is applied
                                                       </div>

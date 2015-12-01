@@ -110,6 +110,11 @@ angular.module("umbraco")
                 var allowedEditors = $(event.target).scope().area.allowed;
 
                 if ($.inArray(ui.item.scope().control.editor.alias, allowedEditors) < 0 && allowedEditors) {
+
+                    $scope.$apply(function () {
+                        $(event.target).scope().area.dropNotAllowed = true;
+                    });
+
                     ui.placeholder.hide();
                     cancelMove = true;
                 }
@@ -117,6 +122,12 @@ angular.module("umbraco")
                     ui.placeholder.show();
                     cancelMove = false;
                 }
+            },
+
+            out: function(event, ui) {
+                $scope.$apply(function () {
+                    $(event.target).scope().area.dropNotAllowed = false;
+                });
             },
 
             update: function (event, ui) {
