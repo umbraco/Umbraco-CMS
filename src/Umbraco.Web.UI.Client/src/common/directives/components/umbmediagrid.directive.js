@@ -25,10 +25,7 @@
          }
 
          function setItemData(item) {
-
              item.isFolder = !mediaHelper.hasFilePropertyType(item);
-             item.hidden = item.isFolder;
-
              if(!item.isFolder){
                  item.thumbnail = mediaHelper.resolveFile(item, true);
                  item.image = mediaHelper.resolveFile(item, false);

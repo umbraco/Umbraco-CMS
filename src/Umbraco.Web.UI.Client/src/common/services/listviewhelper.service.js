@@ -57,7 +57,7 @@
                isSelected = true;
             }
          }
-         if(!isSelected && !item.hidden) {
+         if(!isSelected) {
             selection.push({id: item.id});
             item.selected = true;
          }

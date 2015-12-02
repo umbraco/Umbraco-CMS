@@ -1,4 +1,4 @@
-<div ng-controller="Umbraco.PropertyEditors.ListView.GridLayoutController as vm">
+<div ng-controller="Umbraco.PropertyEditors.ListView.GridLayoutController as vm" ng-if="items">
 
    <div
       ng-if="entityType !== 'media'">
@@ -35,7 +35,7 @@
       </umb-folder-grid>
 
       <umb-media-grid
-         items="items"
+         items="vm.itemsWithoutFolders"
          on-details-hover="vm.hoverMediaItemDetails"
          on-select="vm.selectItem"
          on-click="vm.clickItem">
