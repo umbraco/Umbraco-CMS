@@ -113,15 +113,10 @@
                                                  on-outside-click="clickOutsideCell($index, row.areas, row)"
                                                  bind-click-on="{{area.active}}">
 
-                                                 <!-- Cell placeholder -->
-                                                 <div class="umb-cell-content -placeholder" ng-if="area.controls.length === 0">
-                                                      <div href="" class="cell-tools-add -center" ng-click="openEditorOverlay($event, area, 0, area.$uniqueId);">Add content</div>
-                                                 </div>
-
-                                                 <!-- Cell with editors -->
-                                                 <div class="umb-cell-content -has-editors"
-                                                      ng-if="area.controls.length > 0"
-                                                      ng-class="{'-active': area.active}">
+                                                 <!-- Cell -->
+                                                 <div class="umb-cell-content"
+                                                      ng-class="{'-active': area.active,
+                                                                  '-has-editors': area.controls.length > 0}">
 
                                                       <!-- disable drop overlay -->
                                                       <div class="disable-drop" ng-if="area.dropNotAllowed">
@@ -140,6 +135,11 @@
                                                       </div>
 
                                                       <div class="umb-cell-inner" ui-sortable="sortableOptionsCell" ng-model="area.controls">
+                                                        
+                                                          <!-- Control placeholder -->
+                                                          <div class="umb-cell-placeholder" ng-if="area.controls.length === 0">
+                                                               <div href="" class="cell-tools-add -center" ng-click="openEditorOverlay($event, area, 0, area.$uniqueId);">Add content</div>
+                                                          </div>
 
                                                           <!-- for each control in areas -->
                                                           <div class="umb-control"
@@ -188,7 +188,7 @@
                                                       <!-- Controls repeat end -->
 
                                                       <!-- if area is empty tools -->
-                                                      <div class="umb-grid-add-more-content">
+                                                      <div class="umb-grid-add-more-content" ng-if="area.controls.length > 0">
                                                           <div class="cell-tools-add -bar newbtn" ng-click="openEditorOverlay($event, area, 0, area.$uniqueId);">+ Add content</div>
                                                       </div>
 

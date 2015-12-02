@@ -106,7 +106,6 @@ angular.module("umbraco")
             },
 
             over: function (event, ui) {
-
                 var allowedEditors = $(event.target).scope().area.allowed;
 
                 if ($.inArray(ui.item.scope().control.editor.alias, allowedEditors) < 0 && allowedEditors) {
@@ -149,7 +148,6 @@ angular.module("umbraco")
                         }
                     });
                 }
-
             },
 
             start: function (e, ui) {
@@ -170,6 +168,11 @@ angular.module("umbraco")
                     // remove the dragged RTE
                     tinyMCE.execCommand("mceRemoveEditor", false, $(this).attr("id"));
                 });
+            },
+
+            beforeStop: function (e, ui) {
+                var cell = $(e.toElement).scope().area;
+                cell.hasActiveChild = true;
             },
 
             stop: function (e, ui) {
@@ -198,6 +201,13 @@ angular.module("umbraco")
                         }
                     });
                 }, 500, false);
+
+                $scope.$apply(function () {
+
+                    var cell = $(e.target).scope().area;
+                    cell.hasActiveChild = hasActiveChild(cell, cell.controls);
+                    cell.active = false;
+                });
             }
 
         };
