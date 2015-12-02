@@ -172,7 +172,9 @@ angular.module("umbraco")
 
             beforeStop: function (e, ui) {
                 var cell = $(e.toElement).scope().area;
-                cell.hasActiveChild = true;
+                if(cell != undefined && cell.dropNotAllowed == false){
+                    cell.hasActiveChild = true;
+                }
             },
 
             stop: function (e, ui) {
