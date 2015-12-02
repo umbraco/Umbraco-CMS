@@ -449,53 +449,47 @@ namespace Umbraco.Web.Editors
 
 		        var folders = result.FormData["path"].Split('/');
 
-		        for (int i = 0; i < folders.Length - 1; i++)
-		        {
-			        var folderName = folders[i];
-			        IMedia folderMediaItem;
+	            for (int i = 0; i < folders.Length - 1; i++)
+	            {
+	                var folderName = folders[i];
+	                IMedia folderMediaItem;
 
-			        //if uploading directly to media root and not a subfolder
-			        if (parentId == -1)
-			        {
-				        //look for matching folder
-				        folderMediaItem =
-					        mediaService.GetRootMedia()
-						        .FirstOrDefault(
-							        x => x.Name == folderName && x.ContentType.Alias == Constants.Conventions.MediaTypes.Folder);
-				        if (folderMediaItem == null)
-				        {
-					        //if null, create a folder
-					        folderMediaItem = mediaService.CreateMedia(folderName, -1, Constants.Conventions.MediaTypes.Folder);
-					        mediaService.Save(folderMediaItem);
-				        }
-			        }
-			        else
-			        {
-				        //get current parent
-				        var mediaRoot = mediaService.GetById(parentId);
+	                //if uploading directly to media root and not a subfolder
+	                if (parentId == -1)
+	                {
+	                    //look for matching folder
+	                    folderMediaItem =
+	                        mediaService.GetRootMedia().FirstOrDefault(x => x.Name == folderName && x.ContentType.Alias == Constants.Conventions.MediaTypes.Folder);
+	                    if (folderMediaItem == null)
+	                    {
+	                        //if null, create a folder
+	                        folderMediaItem = mediaService.CreateMedia(folderName, -1, Constants.Conventions.MediaTypes.Folder);
+	                        mediaService.Save(folderMediaItem);
+	                    }
+	                }
+	                else
+	                {
+	                    //get current parent
+	                    var mediaRoot = mediaService.GetById(parentId);
 
-				        //if the media root is null, something went wrong, we'll abort
-				        if (mediaRoot == null)
-					        return Request.CreateErrorResponse(HttpStatusCode.InternalServerError,
-						        "The folder: " + folderName + " could not be used for storing images, its ID: " + parentId +
-						        " returned null");
+	                    //if the media root is null, something went wrong, we'll abort
+	                    if (mediaRoot == null)
+	                        return Request.CreateErrorResponse(HttpStatusCode.InternalServerError,
+	                            "The folder: " + folderName + " could not be used for storing images, its ID: " + parentId +
+	                            " returned null");
 
-				        //look for matching folder
-				        folderMediaItem =
-					        mediaRoot.Children()
-						        .FirstOrDefault(
-							        x => x.Name == folderName && x.ContentType.Alias == Constants.Conventions.MediaTypes.Folder);
-				        if (folderMediaItem == null)
-				        {
-					        //if null, create a folder
-					        folderMediaItem = mediaService.CreateMedia(folderName, mediaRoot,
-						        Constants.Conventions.MediaTypes.Folder);
-					        mediaService.Save(folderMediaItem);
-				        }
-			        }
-			        //set the media root to the folder id so uploaded files will end there.
-			        parentId = folderMediaItem.Id;
-		        }
+	                    //look for matching folder
+	                    folderMediaItem = mediaRoot.Children().FirstOrDefault(x => x.Name == folderName && x.ContentType.Alias == Constants.Conventions.MediaTypes.Folder);
+	                    if (folderMediaItem == null)
+	                    {
+	                        //if null, create a folder
+	                        folderMediaItem = mediaService.CreateMedia(folderName, mediaRoot, Constants.Conventions.MediaTypes.Folder);
+	                        mediaService.Save(folderMediaItem);
+	                    }
+	                }
+	                //set the media root to the folder id so uploaded files will end there.
+	                parentId = folderMediaItem.Id;
+	            }
 	        }
 
 	        //get the files
