@@ -118,7 +118,15 @@ angular.module("umbraco")
                     cancelMove = true;
                 }
                 else {
-                    ui.placeholder.show();
+                    if ($(event.target).scope().area.controls.length == 0){
+
+                        $scope.$apply(function () {
+                            $(event.target).scope().area.dropOnEmpty = true;
+                        });
+                        ui.placeholder.hide();
+                    } else {
+                        ui.placeholder.show();
+                    }
                     cancelMove = false;
                 }
             },
@@ -126,6 +134,7 @@ angular.module("umbraco")
             out: function(event, ui) {
                 $scope.$apply(function () {
                     $(event.target).scope().area.dropNotAllowed = false;
+                    $(event.target).scope().area.dropOnEmpty = false;
                 });
             },
 
@@ -173,7 +182,7 @@ angular.module("umbraco")
             beforeStop: function (e, ui) {
                 var cell = $(e.toElement).scope().area;
                 if(cell != undefined && cell.dropNotAllowed == false){
-                    cell.hasActiveChild = true;
+                    hasActiveChild(cell, cell.controls);
                 }
             },
 

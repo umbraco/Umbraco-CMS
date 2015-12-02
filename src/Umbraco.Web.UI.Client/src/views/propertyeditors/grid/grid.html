@@ -119,9 +119,15 @@
                                                                   '-has-editors': area.controls.length > 0}">
 
                                                       <!-- disable drop overlay -->
-                                                      <div class="disable-drop" ng-if="area.dropNotAllowed">
-                                                          <i class="icon-delete disable-drop-icon"></i>
+                                                      <div class="drop-overlay -disable" ng-if="area.dropNotAllowed">
+                                                          <i class="icon-delete drop-icon"></i>
                                                           This content is not allowed here
+                                                      </div>
+
+                                                      <!-- allow drop overlay -->
+                                                      <div class="drop-overlay -allow" ng-if="area.dropOnEmpty">
+                                                          <i class="icon-download drop-icon"></i>
+                                                          This content is allowed here
                                                       </div>
 
                                                       <div class="umb-grid-has-config" ng-if="area.hasConfig">
@@ -135,7 +141,7 @@
                                                       </div>
 
                                                       <div class="umb-cell-inner" ui-sortable="sortableOptionsCell" ng-model="area.controls">
-                                                        
+
                                                           <!-- Control placeholder -->
                                                           <div class="umb-cell-placeholder" ng-if="area.controls.length === 0">
                                                                <div href="" class="cell-tools-add -center" ng-click="openEditorOverlay($event, area, 0, area.$uniqueId);">Add content</div>

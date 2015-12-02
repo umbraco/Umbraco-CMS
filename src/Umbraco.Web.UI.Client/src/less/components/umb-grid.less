@@ -243,14 +243,13 @@
     color: @white;
 }
 
-.umb-grid .disable-drop {
+.umb-grid .drop-overlay {
     position: absolute;
     z-index: 10;
     top: 0;
     left: 0;
     background: #ffffff;
     opacity: 0.9;
-    color: @red;
     width: 100%;
     height: 100%;
     display: flex;
@@ -265,10 +264,19 @@
     flex-direction: column;
 }
 
-.umb-grid .disable-drop-icon {
+.drop-overlay.-disable {
+    color: @red;
+}
+
+.drop-overlay.-allow {
+    color: @green;
+}
+
+.umb-grid .drop-overlay .drop-icon {
     font-size: 40px;
     margin-bottom: 20px;
 }
+
 
 
 // CONTROL
