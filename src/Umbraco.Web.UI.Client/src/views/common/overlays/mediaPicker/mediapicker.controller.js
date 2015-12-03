@@ -12,6 +12,7 @@ angular.module("umbraco")
             $scope.cropSize = dialogOptions.cropSize;
             $scope.lastOpenedNode = $cookieStore.get("umbLastOpenedMediaNodeId");
             $scope.acceptedFileTypes = mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
+            $scope.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB";
 
             $scope.model.selectedImages = [];
 
@@ -178,7 +179,7 @@ angular.module("umbraco")
             //default root item
             if (!$scope.target) {
 
-               if($scope.lastOpenedNode) {
+               if($scope.lastOpenedNode && $scope.lastOpenedNode !== -1) {
 
                   entityResource.getById($scope.lastOpenedNode, "media")
                      .then(function(node){
@@ -186,13 +187,15 @@ angular.module("umbraco")
                         // make sure that las opened node is on the same path as start node
                         var nodePath = node.path.split(",");
 
-                        if(nodePath.indexOf($scope.startNodeId) !== -1) {
+                        if(nodePath.indexOf($scope.startNodeId.toString()) !== -1) {
                            $scope.gotoFolder({id: $scope.lastOpenedNode, name: "Media", icon: "icon-folder"});
                         } else {
                            $scope.gotoFolder({id: $scope.startNodeId, name: "Media", icon: "icon-folder"});
                         }
 
-                     });
+                    }, function (err) {
+                        $scope.gotoFolder({id: $scope.startNodeId, name: "Media", icon: "icon-folder"});
+                    });
 
                } else {
 

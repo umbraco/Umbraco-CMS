@@ -43,7 +43,7 @@
 			public const string Users = "users";
 
             /// <summary>
-            /// Application alias for the users section.
+            /// Application alias for the forms section.
             /// </summary>
             public const string Forms = "forms";
 		}

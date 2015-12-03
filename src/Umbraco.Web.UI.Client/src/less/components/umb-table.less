@@ -51,14 +51,13 @@ input.umb-table__input {
         text-decoration: none;
         color: fade(@gray, 75%);
     }
+}
 
-
-    &.sortable {
-        &:hover {
-            text-decoration: none;
-            cursor: pointer;
-            color: @black;
-        }
+.umb-table-head__link .sortable {
+    &:hover {
+        text-decoration: none;
+        cursor: pointer;
+        color: @black;
     }
 }
 
@@ -119,11 +118,12 @@ input.umb-table__input {
     font-size: 16px;
 }
 
-.umb-table-body__empty { // Styles of no items in the listview
+// Styles of no items in the listview
+.umb-table-body__empty {
     font-size: 16px;
     text-align: center;
 
-    color: fade(@grayLight, 85%);
+    color: @gray;
 
     padding: 20px 0;
 
@@ -178,7 +178,7 @@ input.umb-table__input {
 
 .umb-table-cell > * {
     overflow: hidden;
-    white-space: nowrap; // Disable/Enable this to keep string on one line
+    white-space: nowrap; //NOTE Disable/Enable this to keep textstring on one line
     text-overflow: ellipsis;
 
     cursor: default;
@@ -192,7 +192,7 @@ input.umb-table__input {
 }
 
 
-//NOTE Gives the title more wieght in width compared to other cells
+// Increases the space for the name cell
 .umb-table__name {
     flex: 1 1 25%;
     max-width: 25%;

@@ -67,7 +67,7 @@ namespace umbraco.cms.presentation.developer.RelationTypes.TreeMenu
 		/// </summary>
 		public string JsSource
 		{
-			get { return "~/umbraco/developer/RelationTypes/TreeMenu/ActionDeleteRelationType.js"; }
+			get { return "developer/RelationTypes/TreeMenu/ActionDeleteRelationType.js"; }
 		}
 
 		/// <summary>

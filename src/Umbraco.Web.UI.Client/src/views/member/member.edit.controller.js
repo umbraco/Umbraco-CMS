@@ -10,16 +10,17 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
 
     //setup scope vars
     $scope.page = {};
-    $scope.page.loading = false;
+    $scope.page.loading = true;
     $scope.page.menu = {};
     $scope.page.menu.currentSection = appState.getSectionState("currentSection");
     $scope.page.menu.currentNode = null; //the editors affiliated node
     $scope.page.nameLocked = false;
     $scope.page.listViewPath = null;
     $scope.page.saveButtonState = "init";
+    $scope.busy = false;
 
     $scope.page.listViewPath = ($routeParams.page && $routeParams.listName)
-        ? "/member/members/list/" + $routeParams.listName + "?page=" + $routeParams.page
+        ? "/member/member/list/" + $routeParams.listName + "?page=" + $routeParams.page
         : null;
 
     //build a path to sync the tree with
@@ -32,8 +33,6 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
         //if there is no doc type specified then we are going to assume that
         // we are not using the umbraco membership provider
         if ($routeParams.doctype) {
-
-           $scope.page.loading = true;
 
             //we are creating so get an empty member item
             memberResource.getScaffold($routeParams.doctype)
@@ -50,8 +49,6 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                 });
         }
         else {
-
-           $scope.page.loading = true;
 
             memberResource.getScaffold()
                 .then(function (data) {
@@ -75,13 +72,12 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
         //TODO: Why is this here - I don't understand why this would ever be an integer? This will not work when we support non-umbraco membership providers.
 
         if ($routeParams.id && $routeParams.id.length < 9) {
+
             entityResource.getById($routeParams.id, "Member").then(function(entity) {
-                $location.path("/member/members/edit/" + entity.key);
+                $location.path("/member/member/edit/" + entity.key);
             });
         }
         else {
-
-           $scope.page.loading = true;
 
             //we are editing so get the content item from the server
             memberResource.getByKey($routeParams.id)
@@ -96,7 +92,7 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                     var path = buildTreePath(data);
 
                     //sync the tree (only for ui purposes)
-                    navigationService.syncTree({ tree: "members", path: path.split(",") });
+                    navigationService.syncTree({ tree: "member", path: path.split(",") });
 
                     //it's the initial load of the editor, we need to get the tree node
                     // from the server so that we can load in the actions menu.
@@ -154,7 +150,7 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                     var path = buildTreePath(data);
 
                     //sync the tree (only for ui purposes)
-                    navigationService.syncTree({ tree: "members", path: path.split(","), forceReload: true });
+                    navigationService.syncTree({ tree: "member", path: path.split(","), forceReload: true });
 
             }, function (err) {
 

@@ -142,6 +142,20 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void GetAncestors_Returns_Empty_List_When_Path_Is_Null()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+
+            // Act
+            var current = new Mock<IContent>();
+            var res = contentService.GetAncestors(current.Object);
+
+            // Assert
+            Assert.IsEmpty(res);
+        }
+
+        [Test]
         public void Tags_For_Entity_Are_Not_Exposed_Via_Tag_Api_When_Content_Is_Recycled()
         {
             var contentService = ServiceContext.ContentService;

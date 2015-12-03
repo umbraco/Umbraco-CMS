@@ -1,4 +1,4 @@
-function listViewController($rootScope, $scope, $routeParams, $injector, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q, mediaResource, listViewHelper) {
+function listViewController($rootScope, $scope, $routeParams, $injector, $cookieStore, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q, mediaResource, listViewHelper) {
 
     //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content
     // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -70,7 +70,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         ],
         layout: {
            layouts: $scope.model.config.layouts,
-           activeLayout: getFirstAllowedLayout($scope.model.config.layouts)
+           activeLayout: listViewHelper.getLayout($routeParams.id, $scope.model.config.layouts)
         },
         allowBulkPublish: true,
         allowBulkUnpublish: true,
@@ -99,23 +99,9 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         }
     });
 
-    function getFirstAllowedLayout(layouts) {
-
-       var firstAllowedLayout = {};
-
-       for (var i = 0; layouts.length > i; i++) {
-
-          var layout = layouts[i];
-
-          if (layout.selected === true) {
-             firstAllowedLayout = layout;
-             break;
-          }
-
-       }
-
-       return firstAllowedLayout;
-    }
+    $scope.selectLayout = function(selectedLayout) {
+        $scope.options.layout.activeLayout = listViewHelper.setLayout($routeParams.id, selectedLayout, $scope.model.config.layouts);
+    };
 
     function showNotificationsAndReset(err, reload, successMsg) {
 
@@ -212,11 +198,23 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
                 $scope.reloadView($scope.contentId);
             }
         });
-    }, 200));
+    }, 1000));
 
-    $scope.enterSearch = function($event) {
+    $scope.filterResults = function (ev) {
+        //13: enter
+
+        switch (ev.keyCode) {
+            case 13:
+                $scope.options.pageNumber = 1;
+                $scope.actionInProgress = true;
+                $scope.reloadView($scope.contentId);
+                break;
+        }
+    };
+
+    $scope.enterSearch = function ($event) {
         $($event.target).next().focus();
-    }
+    };
 
     $scope.isAnythingSelected = function() {
        if ($scope.selection.length === 0) {
@@ -461,4 +459,4 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
 }
 
 
-angular.module("umbraco").controller("Umbraco.PropertyEditors.ListViewController", listViewController);
+angular.module("umbraco").controller("Umbraco.PropertyEditors.ListViewController", listViewController);

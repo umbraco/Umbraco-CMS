@@ -24,7 +24,13 @@
             <div class="umb-group-builder__group" ng-if="tab.tabState !== 'init'" ng-class="{'-active':tab.tabState=='active', '-inherited': tab.inherited, 'umb-group-builder__group-handle -sortable': sortingMode && !tab.inherited}" ng-click="activateGroup(tab)">
 
                 <div class="umb-group-builder__group-remove" ng-if="!sortingMode && tab.properties.length <= 1 && model.groups.length > 1">
-                    <umb-confirm-delete confirm-action="removeGroup($index)"></umbraco-confirm-delete>
+                    <i class="icon-trash" ng-click="togglePrompt(tab)"></i>
+                    <umb-confirm-action
+                        ng-if="tab.deletePrompt"
+                        direction="left"
+                        on-confirm="removeGroup($index)"
+                        on-cancel="hidePrompt(tab)">
+                    </umb-confirm-action>
                 </div>
 
                 <div class="umb-group-builder__group-title-wrapper">
@@ -97,7 +103,7 @@
 
                                 <ng-form name="propertyTypeForm">
                                     <div class="control-group -no-margin" ng-if="!sortingMode">
-                                        
+
                                         <div class="umb-group-builder__property-meta-alias" ng-if="property.inherited">{{ property.alias }}</div>
                                         <umb-locked-field ng-if="!property.inherited"
                                                           locked="locked"
@@ -146,17 +152,23 @@
                             </div>
 
                             <!-- row tools -->
-                            <div tabindex="-1" class="umb-group-builder__property-actions" ng-if="!sortingMode">
+                            <div class="umb-group-builder__property-actions" ng-if="!sortingMode">
 
                                 <div ng-if="!property.inherited">
 
                                     <!-- delete property -->
                                     <div class="umb-group-builder__property-action">
-                                      <umb-confirm-delete confirm-action="deleteProperty(tab, $index, tab)"></umbraco-confirm-delete>
+                                        <i class="icon-trash" ng-click="togglePrompt(property)"></i>
+                                        <umb-confirm-action
+                                            ng-if="property.deletePrompt"
+                                            direction="left"
+                                            on-confirm="deleteProperty(tab, $index)"
+                                            on-cancel="hidePrompt(property)">
+                                        </umb-confirm-action>
                                     </div>
 
                                     <!-- settings for property -->
-                                    <a href="" class="umb-group-builder__property-action" ng-click="editPropertyTypeSettings(property, tab)">
+                                    <div class="umb-group-builder__property-action" ng-click="editPropertyTypeSettings(property, tab)">
                                         <i class="icon icon-settings"></i>
                                     </a>
 

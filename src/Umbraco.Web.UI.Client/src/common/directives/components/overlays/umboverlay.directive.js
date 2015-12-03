@@ -144,8 +144,12 @@
 
          function setTargetPosition() {
 
-            var viewportWidth = null;
-            var viewportHeight = null;
+            var container = $("#contentwrapper");
+            var containerLeft = container[0].offsetLeft;
+            var containerRight = containerLeft + container[0].offsetWidth;
+            var containerTop = container[0].offsetTop;
+            var containerBottom = containerTop + container[0].offsetHeight;
+
             var mousePositionClickX = null;
             var mousePositionClickY = null;
             var elementHeight = null;
@@ -161,10 +165,6 @@
             // if mouse click position is know place element with mouse in center
             if (scope.model.event && scope.model.event) {
 
-               // viewport size
-               viewportWidth = $(window).innerWidth();
-               viewportHeight = $(window).innerHeight();
-
                // click position
                mousePositionClickX = scope.model.event.pageX;
                mousePositionClickY = scope.model.event.pageY;
@@ -179,15 +179,27 @@
 
                // check to see if element is outside screen
                // outside right
-               if (position.left + elementWidth > viewportWidth) {
-                  position.right = 0;
+               if (position.left + elementWidth > containerRight) {
+                  position.right = 10;
                   position.left = "inherit";
                }
 
                // outside bottom
-               if (position.top + elementHeight > viewportHeight) {
-                  position.bottom = 0;
+               if (position.top + elementHeight > containerBottom) {
+                  position.bottom = 10;
                   position.top = "inherit";
+               }
+
+               // outside left
+               if (position.left < containerLeft) {
+                  position.left = containerLeft + 10;
+                  position.right = "inherit";
+               }
+
+               // outside top
+               if (position.top < containerTop) {
+                  position.top = 10;
+                  position.bottom = "inherit";
                }
 
                el.css(position);

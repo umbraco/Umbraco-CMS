@@ -560,8 +560,7 @@ namespace Umbraco.Core.Models
                         //Additional thumbnails configured as prevalues on the DataType
                         if (thumbnailSizes != null)
                         {
-                            var sep = (thumbnailSizes.Contains("") == false && thumbnailSizes.Contains(",")) ? ',' : ';';
-                            foreach (var thumb in thumbnailSizes.Split(sep))
+							foreach (var thumb in thumbnailSizes.Split(new[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries))
                             {
                                 int thumbSize;
                                 if (thumb != "" && int.TryParse(thumb, out thumbSize))

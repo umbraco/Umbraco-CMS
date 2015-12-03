@@ -64,7 +64,7 @@ namespace Umbraco.Core.Models
         [IgnoreDataMember]
         public CultureInfo CultureInfo
         {
-            get { return CultureInfo.CreateSpecificCulture(IsoCode); }
+            get { return CultureInfo.GetCultureInfo(IsoCode); }
         }
     }
 }

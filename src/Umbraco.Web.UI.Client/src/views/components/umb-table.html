@@ -1,6 +1,8 @@
 <div>
+
     <div class="umb-table" ng-if="items">
 
+        <!-- Listviews head section -->
         <div class="umb-table-head">
             <div class="umb-table-row">
 
@@ -31,7 +33,7 @@
             </div>
         </div>
 
-
+        <!-- Listview body section -->
         <div class="umb-table-body">
             <div class="umb-table-row"
                 ng-repeat="item in items"
@@ -61,6 +63,7 @@
 
     </div>
 
+    <!-- If list is empty, then display -->
     <div ng-if="!items" class="umb-table-body__empty">
         <localize key="content_listViewNoItems">There are no items show in the list.</localize>
     </div>

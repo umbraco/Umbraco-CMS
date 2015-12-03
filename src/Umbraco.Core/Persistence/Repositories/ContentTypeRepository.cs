@@ -172,12 +172,12 @@ namespace Umbraco.Core.Persistence.Repositories
             ((ContentType)entity).AddingEntity();
 
             PersistNewBaseContentType(entity);
-            PersisteTemplates(entity, false);
+            PersistTemplates(entity, false);
 
             entity.ResetDirtyProperties();
         }
 
-        protected void PersisteTemplates(IContentType entity, bool clearAll)
+        protected void PersistTemplates(IContentType entity, bool clearAll)
         {
             // remove and insert, if required
             Database.Delete<ContentTypeTemplateDto>("WHERE contentTypeNodeId = @Id", new { Id = entity.Id });
@@ -225,7 +225,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             PersistUpdatedBaseContentType(entity);
-            PersisteTemplates(entity, true);
+            PersistTemplates(entity, true);
 
             entity.ResetDirtyProperties();
         }

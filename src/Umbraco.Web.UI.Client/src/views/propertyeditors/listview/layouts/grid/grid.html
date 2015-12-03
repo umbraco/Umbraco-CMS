@@ -1,4 +1,4 @@
-<div ng-controller="Umbraco.PropertyEditors.ListView.GridLayoutController as vm">
+<div ng-controller="Umbraco.PropertyEditors.ListView.GridLayoutController as vm" ng-if="items">
 
    <div
       ng-if="entityType !== 'media'">
@@ -22,6 +22,7 @@
          parent-id="{{vm.nodeId}}"
          files-uploaded="vm.onUploadComplete"
          accept="{{vm.acceptedFileTypes}}"
+         max-file-size="{{vm.maxFileSize}}"
          hide-dropzone="{{!vm.activeDrag && items.length > 0 }}"
          compact="{{ items.length > 0 }}"
          files-queued="vm.onFilesQueue">
@@ -35,7 +36,7 @@
       </umb-folder-grid>
 
       <umb-media-grid
-         items="items"
+         items="vm.itemsWithoutFolders"
          on-details-hover="vm.hoverMediaItemDetails"
          on-select="vm.selectItem"
          on-click="vm.clickItem">

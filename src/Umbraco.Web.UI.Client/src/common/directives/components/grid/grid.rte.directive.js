@@ -101,7 +101,8 @@ angular.module("umbraco.directives")
                                 relative_urls: false,
                                 toolbar: toolbar,
                                 content_css: stylesheets.join(','),
-                                style_formats: styleFormats
+                                style_formats: styleFormats,
+                                autoresize_bottom_margin: 0
                             };
 
 
@@ -122,11 +123,6 @@ angular.module("umbraco.directives")
 
                                     editor.getBody().setAttribute('spellcheck', true);
 
-                                    //hide toolbar by default
-                                    $(editor.editorContainer)
-                                        .find(".mce-toolbar")
-                                        .css("visibility", "hidden");
-
                                     //force overflow to hidden to prevent no needed scroll
                                     editor.getBody().style.overflow = "hidden";
 
@@ -137,32 +133,6 @@ angular.module("umbraco.directives")
                                     }, 400);
 
                                 });
-                                
-                                // pin toolbar to top of screen if we have focus and it scrolls off the screen
-                                var pinToolbar = function () {
-
-                                    var _toolbar = $(editor.editorContainer).find(".mce-toolbar");
-                                    var toolbarHeight = _toolbar.height();
-
-                                    var _tinyMce = $(editor.editorContainer);
-                                    var tinyMceRect = _tinyMce[0].getBoundingClientRect();
-                                    var tinyMceTop = tinyMceRect.top;
-                                    var tinyMceBottom = tinyMceRect.bottom;
-
-                                    if (tinyMceTop < 100 && (tinyMceBottom > (100 + toolbarHeight))) {
-                                        _toolbar
-                                            .css("visibility", "visible")
-                                            .css("position", "fixed")
-                                            .css("top", "100px")
-                                            .css("margin-top", "0");
-                                    } else {
-                                        _toolbar
-                                            .css("visibility", "visible")
-                                            .css("position", "absolute")
-                                            .css("top", "auto")
-                                            .css("margin-top", (-toolbarHeight - 2) + "px");
-                                    }
-                                };
 
                                 //when we leave the editor (maybe)
                                 editor.on('blur', function (e) {
@@ -177,8 +147,6 @@ angular.module("umbraco.directives")
                                             scope.onBlur();
                                         }
 
-                                        _toolbar.css("visibility", "hidden");
-                                        $('.umb-panel-body').off('scroll', pinToolbar);
                                     });
                                 });
 
@@ -190,8 +158,6 @@ angular.module("umbraco.directives")
                                             scope.onFocus();
                                         }
 
-                                        pinToolbar();
-                                        $('.umb-panel-body').on('scroll', pinToolbar);
                                     });
                                 });
 
@@ -203,8 +169,6 @@ angular.module("umbraco.directives")
                                             scope.onClick();
                                         }
 
-                                        pinToolbar();
-                                        $('.umb-panel-body').on('scroll', pinToolbar);
                                     });
                                 });
 

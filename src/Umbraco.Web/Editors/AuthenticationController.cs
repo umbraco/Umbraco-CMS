@@ -177,19 +177,14 @@ namespace Umbraco.Web.Editors
                     //get the user
                     var user = Security.GetBackOfficeUser(loginModel.Username);
                     var userDetail = Mapper.Map<UserDetail>(user);
-
+                    //update the userDetail and set their remaining seconds
+                    userDetail.SecondsUntilTimeout = TimeSpan.FromMinutes(GlobalSettings.TimeOutInMinutes).TotalSeconds;
+                    
                     //create a response with the userDetail object
                     var response = Request.CreateResponse(HttpStatusCode.OK, userDetail);
 
-                    //set the response cookies with the ticket (NOTE: This needs to be done with the custom webapi extension because
-                    // we cannot mix HttpContext.Response.Cookies and the way WebApi/Owin work)
-                    var ticket = response.UmbracoLoginWebApi(user);
-
-                    //This ensure the current principal is set, otherwise any logic executing after this wouldn't actually be authenticated
-                    http.Result.AuthenticateCurrentRequest(ticket, false);
-
-                    //update the userDetail and set their remaining seconds
-                    userDetail.SecondsUntilTimeout = ticket.GetRemainingAuthSeconds();
+                    //ensure the user is set for the current request
+                    Request.SetPrincipalForRequest(user);
 
                     return response;
 
@@ -241,11 +236,12 @@ namespace Umbraco.Web.Editors
         /// Logs the current user out
         /// </summary>
         /// <returns></returns>
-        [UmbracoBackOfficeLogout]
         [ClearAngularAntiForgeryToken]
         [ValidateAngularAntiForgeryToken]
         public HttpResponseMessage PostLogout()
         {
+            Request.TryGetOwinContext().Result.Authentication.SignOut();
+
             Logger.Info<AuthenticationController>("User {0} from IP address {1} has logged out",
                             () => User.Identity == null ? "UNKNOWN" : User.Identity.Name,
                             () => TryGetOwinContext().Result.Request.RemoteIpAddress);
