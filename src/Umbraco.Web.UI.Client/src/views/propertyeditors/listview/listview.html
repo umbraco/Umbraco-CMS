@@ -51,11 +51,14 @@
          <umb-editor-sub-header-content-right>
 
             <umb-editor-sub-header-section ng-if="!isAnythingSelected()">
+
                <umb-layout-selector
                   ng-if="options.layout.layouts"
                   layouts="options.layout.layouts"
-                  active-layout="options.layout.activeLayout">
+                  active-layout="options.layout.activeLayout"
+                  on-layout-select="selectLayout">
                </umb-layout-selector>
+
             </umb-editor-sub-header-section>
 
             <umb-editor-sub-header-section ng-if="!actionInProgress && !isAnythingSelected()">
