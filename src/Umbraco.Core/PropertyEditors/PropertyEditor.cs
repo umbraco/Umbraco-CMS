@@ -24,6 +24,10 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         public PropertyEditor()             
         {
+            //defaults
+            Icon = Constants.Icons.PropertyEditor;
+            Group = "common";
+
             //assign properties based on the attribute if it is found
             _attribute = GetType().GetCustomAttribute<PropertyEditorAttribute>(false);
             if (_attribute != null)
@@ -32,6 +36,8 @@ namespace Umbraco.Core.PropertyEditors
                 Alias = _attribute.Alias;
                 Name = _attribute.Name;
                 IsParameterEditor = _attribute.IsParameterEditor;
+                Icon = _attribute.Icon;
+                Group = _attribute.Group;
             }
         }
 
@@ -64,6 +70,19 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         [JsonProperty("name", Required = Required.Always)]
         public string Name { get; internal set; }
+
+        /// <summary>
+        /// The icon of the property editor - if not set it uses a default icon
+        /// </summary>
+        [JsonProperty("icon")]
+        public string Icon { get; internal set; }
+
+        /// <summary>
+        /// The group of the property editor - if not set the editor will list as a generic editor
+        /// </summary>
+        [JsonProperty("group")]
+        public string Group { get; internal set; }
+
 
         [JsonProperty("editor", Required = Required.Always)]        
         public PropertyValueEditor ValueEditor

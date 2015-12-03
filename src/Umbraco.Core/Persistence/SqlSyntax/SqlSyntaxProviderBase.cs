@@ -32,6 +32,13 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                                   FormatPrimaryKey,
                                   FormatIdentity
                               };
+
+            //defaults for all providers
+            StringLengthColumnDefinitionFormat = StringLengthUnicodeColumnDefinitionFormat;
+            StringColumnDefinition = string.Format(StringLengthColumnDefinitionFormat, DefaultStringLength);
+            DecimalColumnDefinition = string.Format(DecimalColumnDefinitionFormat, DefaultDecimalPrecision, DefaultDecimalScale);
+
+            InitColumnTypeMap();
         }
 
         public string GetWildcardPlaceholder()
@@ -41,9 +48,12 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         public string StringLengthNonUnicodeColumnDefinitionFormat = "VARCHAR({0})";
         public string StringLengthUnicodeColumnDefinitionFormat = "NVARCHAR({0})";
+        public string DecimalColumnDefinitionFormat = "DECIMAL({0},{1})";
 
         public string DefaultValueFormat = "DEFAULT ({0})";
         public int DefaultStringLength = 255;
+        public int DefaultDecimalPrecision = 20;
+        public int DefaultDecimalScale = 9;
 
         //Set by Constructor
         public string StringColumnDefinition;
@@ -55,7 +65,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         public string GuidColumnDefinition = "GUID";
         public string BoolColumnDefinition = "BOOL";
         public string RealColumnDefinition = "DOUBLE";
-        public string DecimalColumnDefinition = "DECIMAL";
+        public string DecimalColumnDefinition;
         public string BlobColumnDefinition = "BLOB";
         public string DateTimeColumnDefinition = "DATETIME";
         public string TimeColumnDefinition = "DATETIME";
@@ -429,6 +439,13 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             {
                 var valueOrDefault = column.Size != default(int) ? column.Size : DefaultStringLength;
                 return string.Format(StringLengthColumnDefinitionFormat, valueOrDefault);
+            }
+
+            if (type == typeof(decimal))
+            {
+                var precision = column.Size != default(int) ? column.Size : DefaultDecimalPrecision;
+                var scale = column.Precision != default(int) ? column.Precision : DefaultDecimalScale;
+                return string.Format(DecimalColumnDefinitionFormat, precision, scale);
             }
 
             string definition = DbTypeMap.ColumnTypeMap.First(x => x.Key == type).Value;

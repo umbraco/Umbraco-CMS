@@ -1,0 +1,12 @@
+﻿<div class="umb-editor">
+    <input name="decimalField" 
+           type="number"
+           pattern="[0-9]+([,\.][0-9]+)?"
+           class="umb-editor umb-number"
+           ng-model="model.value"
+           val-server="value"
+           fix-number min="{{model.config.min}}" max="{{model.config.max}}" step="{{model.config.step}}" />
+    
+    <span class="help-inline" val-msg-for="decimalField" val-toggle-msg="number">Not a number</span>
+    <span class="help-inline" val-msg-for="decimalField" val-toggle-msg="valServer">{{propertyForm.requiredField.errorMsg}}</span>
+</div>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -29,6 +30,7 @@ namespace Umbraco.Web.Models.ContentEditing
         public string Icon { get; set; }
 
         [DataMember(Name = "trashed")]
+        [ReadOnly(true)]
         public bool Trashed { get; set; }
 
         /// <summary>
@@ -44,8 +46,11 @@ namespace Umbraco.Web.Models.ContentEditing
         /// <summary>
         /// This will only be populated for some entities like macros
         /// </summary>
+        /// <remarks>
+        /// This is overrideable to specify different validation attributes if required
+        /// </remarks>
         [DataMember(Name = "alias")]
-        public string Alias { get; set; }
+        public virtual string Alias { get; set; }
 
         /// <summary>
         /// The path of the entity
@@ -57,6 +62,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// A collection of extra data that is available for this specific entity/entity type
         /// </summary>
         [DataMember(Name = "metaData")]
+        [ReadOnly(true)]
         public IDictionary<string, object> AdditionalData { get; private set; } 
     }
 }

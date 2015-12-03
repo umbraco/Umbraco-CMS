@@ -15,19 +15,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     {
         public SqlCeSyntaxProvider()
         {
-            StringLengthColumnDefinitionFormat = StringLengthUnicodeColumnDefinitionFormat;
-            StringColumnDefinition = string.Format(StringLengthColumnDefinitionFormat, DefaultStringLength);
-
-            AutoIncrementDefinition = "IDENTITY(1,1)";
-            StringColumnDefinition = "NVARCHAR(255)";
-            GuidColumnDefinition = "UniqueIdentifier";
-            RealColumnDefinition = "FLOAT";
-            BoolColumnDefinition = "BIT";
-            DecimalColumnDefinition = "DECIMAL(38,6)";
-            TimeColumnDefinition = "TIME"; //SQLSERVER 2008+
-            BlobColumnDefinition = "VARBINARY(MAX)";
-
-            InitColumnTypeMap();
+            
         }
 
         public override bool SupportsClustered()

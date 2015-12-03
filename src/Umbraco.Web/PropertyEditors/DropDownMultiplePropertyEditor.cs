@@ -15,7 +15,7 @@ namespace Umbraco.Web.PropertyEditors
     [ParameterEditor("propertyTypePickerMultiple", "Name", "textbox")]
     [ParameterEditor("contentTypeMultiple", "Name", "textbox")]
     [ParameterEditor("tabPickerMultiple", "Name", "textbox")]
-    [PropertyEditor(Constants.PropertyEditors.DropDownListMultipleAlias, "Dropdown list multiple", "dropdown")]
+    [PropertyEditor(Constants.PropertyEditors.DropDownListMultipleAlias, "Dropdown list multiple", "dropdown", Group = "lists", Icon="icon-bulleted-list")]
     public class DropDownMultiplePropertyEditor : DropDownMultipleWithKeysPropertyEditor
     {
         protected override PropertyValueEditor CreateValueEditor()

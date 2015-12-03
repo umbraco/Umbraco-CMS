@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
 using System.Linq;
+using System.Reflection;
 using System.Web;
 using System.Web.Configuration;
 using System.Web.Http;
@@ -103,10 +104,10 @@ namespace Umbraco.Web
         public override IBootManager Initialize()
         {
              //This is basically a hack for this item: http://issues.umbraco.org/issue/U4-5976
-            // when Examine initializes it will try to rebuild if the indexes are empty, however in many cases not all of Examine's 
-            // event handlers will be assigned during bootup when the rebuilding starts which is a problem. So with the examine 0.1.58.2941 build
-            // it has an event we can subscribe to in order to cancel this rebuilding process, but what we'll do is cancel it and postpone the rebuilding until the
-            // boot process has completed. It's a hack but it works.
+             // when Examine initializes it will try to rebuild if the indexes are empty, however in many cases not all of Examine's 
+             // event handlers will be assigned during bootup when the rebuilding starts which is a problem. So with the examine 0.1.58.2941 build
+             // it has an event we can subscribe to in order to cancel this rebuilding process, but what we'll do is cancel it and postpone the rebuilding until the
+             // boot process has completed. It's a hack but it works.
             ExamineManager.Instance.BuildingEmptyIndexOnStartup += OnInstanceOnBuildingEmptyIndexOnStartup;
 
             base.Initialize();

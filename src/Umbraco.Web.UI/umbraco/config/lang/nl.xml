@@ -915,7 +915,7 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="cacheBrowser">Cachebrowser</key>
     <key alias="contentRecycleBin">Prullenbak</key>
     <key alias="createdPackages">Gemaakte packages</key>
-    <key alias="datatype">Datatypes</key>
+    <key alias="dataTypes">Datatypes</key>
     <key alias="dictionary">Woordenboek</key>
     <key alias="installedPackages">Geïnstalleerde packages</key>
     <key alias="installSkin">Installeer skin</key>
@@ -925,10 +925,10 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="macros">Macro's</key>
     <key alias="mediaTypes">Mediatypes</key>
     <key alias="member">Leden</key>
-    <key alias="memberGroup">Ledengroepen</key>
+    <key alias="memberGroups">Ledengroepen</key>
     <key alias="memberRoles">Rollen</key>
-    <key alias="memberType">Ledentypes</key>
-    <key alias="nodeTypes">Documenttypes</key>
+    <key alias="memberTypes">Ledentypes</key>
+    <key alias="documentTypes">Documenttypes</key>
     <key alias="packager">Packages</key>
     <key alias="packages">Packages</key>
     <key alias="python">Python-bestanden</key>

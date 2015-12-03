@@ -204,7 +204,8 @@ namespace Umbraco.Tests.TestHelpers
         {
             PropertyEditorResolver.Current = new PropertyEditorResolver(
                 new ActivatorServiceProvider(), Logger,
-                () => PluginManager.Current.ResolvePropertyEditors());
+                () => PluginManager.Current.ResolvePropertyEditors(),
+                ApplicationContext.ApplicationCache.RuntimeCache);
 
             DataTypesResolver.Current = new DataTypesResolver(
                 new ActivatorServiceProvider(), Logger,

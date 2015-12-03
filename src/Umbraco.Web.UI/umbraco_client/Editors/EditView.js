@@ -36,6 +36,10 @@
             
             UmbEditor.Insert("@Umbraco.RenderMacro(\"" + alias + "\")", "", this._opts.codeEditorElementId);
         },
+
+        insertRenderBody: function() {
+            UmbEditor.Insert("@RenderBody()", "", this._opts.codeEditorElementId);
+        },
         
         openMacroModal: function (alias) {
             /// <summary>callback used to display the modal dialog to insert a macro with parameters</summary>
@@ -51,6 +55,37 @@
                 callback: function (data) {
                     UmbEditor.Insert(data.syntax, '', self._opts.codeEditorElementId);
                 }
+            });
+        },
+
+        openSnippetModal: function (type) {
+            /// <summary>callback used to display the modal dialog to insert a macro with parameters</summary>
+
+            var self = this;
+
+            UmbClientMgr.openAngularModalWindow({
+                template: "views/common/dialogs/template/snippet.html",
+                callback: function (data) {
+
+                    var code = "";
+
+                    if (type === 'section') {
+                        code = "\n@section " + data.name + "{\n";
+                        code += "<!-- Content here -->\n" +
+                            "}\n";
+                    }
+
+                    if (type === 'rendersection') {
+                        if (data.required) {
+                            code = "\n@RenderSection(\"" + data.name + "\", true);\n";
+                        } else {
+                            code = "\n@RenderSection(\"" + data.name + "\" false);\n";
+                        }
+                    }
+
+                    UmbEditor.Insert(code, '', self._opts.codeEditorElementId);
+                },
+                type: type
             });
         },
 

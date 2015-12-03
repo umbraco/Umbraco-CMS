@@ -3,6 +3,8 @@ angular.module("umbraco")
 
         $scope.history = historyService.getCurrent();
         $scope.version = Umbraco.Sys.ServerVariables.application.version + " assembly: " + Umbraco.Sys.ServerVariables.application.assemblyVersion;
+        $scope.showPasswordFields = false;
+        $scope.changePasswordButtonState = "init";
 
         $scope.externalLoginProviders = externalLoginInfo.providers;
         $scope.externalLinkLoginFormAction = Umbraco.Sys.ServerVariables.umbracoUrls.externalLinkLoginsUrl;
@@ -47,7 +49,7 @@ angular.module("umbraco")
                     updateTimeout();
                 }
 
-            }, 1000, false); // 1 second, do NOT execute a global digest    
+            }, 1000, false); // 1 second, do NOT execute a global digest
         }
 
         function updateUserInfo() {
@@ -102,30 +104,34 @@ angular.module("umbraco")
 
         });
 
+        /* ---------- UPDATE PASSWORD ---------- */
+
         //create the initial model for change password property editor
         $scope.changePasswordModel = {
-            alias: "_umb_password",
-            view: "changepassword",
-            config: {},
-            value: {}
+           alias: "_umb_password",
+           view: "changepassword",
+           config: {},
+           value: {}
         };
 
         //go get the config for the membership provider and add it to the model
-        currentUserResource.getMembershipProviderConfig().then(function (data) {
-            $scope.changePasswordModel.config = data;
-            //ensure the hasPassword config option is set to true (the user of course has a password already assigned)
-            //this will ensure the oldPassword is shown so they can change it
-            $scope.changePasswordModel.config.hasPassword = true;
-            $scope.changePasswordModel.config.disableToggle = true;
+        currentUserResource.getMembershipProviderConfig().then(function(data) {
+           $scope.changePasswordModel.config = data;
+           //ensure the hasPassword config option is set to true (the user of course has a password already assigned)
+           //this will ensure the oldPassword is shown so they can change it
+           // disable reset password functionality beacuse it does not make sense inside the backoffice
+           $scope.changePasswordModel.config.hasPassword = true;
+           $scope.changePasswordModel.config.disableToggle = true;
+           $scope.changePasswordModel.config.enableReset = false;
         });
 
-        ////this is the model we will pass to the service
-        //$scope.profile = {};
+        $scope.changePassword = function() {
 
-        $scope.changePassword = function () {
+           if (formHelper.submitForm({ scope: $scope })) {
 
-            if (formHelper.submitForm({ scope: $scope })) {
-                currentUserResource.changePassword($scope.changePasswordModel.value).then(function (data) {
+                $scope.changePasswordButtonState = "busy";
+
+                currentUserResource.changePassword($scope.changePasswordModel.value).then(function(data) {
 
                     //if the password has been reset, then update our model
                     if (data.value) {
@@ -134,12 +140,28 @@ angular.module("umbraco")
 
                     formHelper.resetForm({ scope: $scope, notifications: data.notifications });
 
+                    $scope.changePasswordButtonState = "success";
+
                 }, function (err) {
 
                     formHelper.handleError(err);
 
+                    $scope.changePasswordButtonState = "error";
+
                 });
+
             }
+
         };
+
+        $scope.togglePasswordFields = function() {
+           clearPasswordFields();
+           $scope.showPasswordFields = !$scope.showPasswordFields;
+        }
+
+        function clearPasswordFields() {
+           $scope.changePasswordModel.value.newPassword = "";
+           $scope.changePasswordModel.confirm = "";
+        }
 
     });

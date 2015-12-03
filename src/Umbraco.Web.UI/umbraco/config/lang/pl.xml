@@ -673,7 +673,7 @@ Miłego dnia!]]></key>
     <key alias="cacheBrowser">Cache przeglądarki</key>
     <key alias="contentRecycleBin">Kosz</key>
     <key alias="createdPackages">Utworzone pakiety</key>
-    <key alias="datatype">Typy danych</key>
+    <key alias="dataTypes">Typy danych</key>
     <key alias="dictionary">Słownik</key>
     <key alias="installedPackages">Zainstalowane pakiety</key>
     <key alias="installSkin">TRANSLATE ME: 'Install skin'</key>
@@ -683,10 +683,10 @@ Miłego dnia!]]></key>
     <key alias="macros">Makra</key>
     <key alias="mediaTypes">Typy mediów</key>
     <key alias="member">Członkowie</key>
-    <key alias="memberGroup">Grupy członków</key>
+    <key alias="memberGroups">Grupy członków</key>
     <key alias="memberRoles">Role</key>
-    <key alias="memberType">Typ członka</key>
-    <key alias="nodeTypes">Typy dokumentów</key>
+    <key alias="memberTypes">Typ członka</key>
+    <key alias="documentTypes">Typy dokumentów</key>
     <key alias="packager">Pakiety</key>
     <key alias="packages">Pakiety</key>
     <key alias="python">Pliki Python</key>

@@ -40,7 +40,8 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile />
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort />
+    <IISExpressSSLPort>
+    </IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
@@ -1856,6 +1857,7 @@
     <Content Include="Umbraco\Images\Editor\newdocument.gif" />
     <Content Include="Umbraco\Images\Editor\opacity.png" />
     <Content Include="Umbraco\Images\Editor\outdent.gif" />
+    <Content Include="Umbraco\Images\Editor\renderbody.gif" />
     <Content Include="Umbraco\Images\Editor\removeformat.gif" />
     <Content Include="Umbraco\Images\Editor\separator.gif" />
     <Content Include="Umbraco\Images\Editor\showStyles.png" />
@@ -1952,7 +1954,9 @@
     <Content Include="Umbraco\PartialViewMacros\Templates\SiteMap.cshtml" />
     <Content Include="Umbraco\Views\AuthorizeUpgrade.cshtml" />
     <Content Include="Umbraco\Translation\translationTasks.dtd" />
-    <Content Include="Views\Web.config" />
+    <Content Include="Views\Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -2411,9 +2415,9 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.0\x86\*.* "$(TargetDir)x86\" 
         <WebProjectProperties>
           <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>7310</DevelopmentServerPort>
+          <DevelopmentServerPort>7400</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:7320</IISUrl>
+          <IISUrl>http://localhost:7400</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

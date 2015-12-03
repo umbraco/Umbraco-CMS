@@ -1,0 +1,10 @@
+<div>
+    <span ng-show="!enableLock">{{ alias }}</span>
+    <div ng-show="enableLock">
+    <umb-locked-field
+      locked="locked"
+      ng-model="alias"
+      placeholder-text="placeholderText">
+    </umb-locked-field>
+    </div>
+</div>
