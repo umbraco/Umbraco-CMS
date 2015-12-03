@@ -46,32 +46,19 @@
          function setActiveLayout(layouts) {
 
             for (var i = 0; layouts.length > i; i++) {
-
                var layout = layouts[i];
-
-               if(layout.name === scope.activeLayout.name && layout.path === scope.activeLayout.path) {
+               if(layout.path === scope.activeLayout.path) {
                   layout.active = true;
                }
-
             }
 
          }
 
          scope.pickLayout = function(selectedLayout) {
-
-            for (var i = 0; scope.layouts.length > i; i++) {
-
-               var layout = scope.layouts[i];
-
-               layout.active = false;
-            }
-
-            selectedLayout.active = true;
-
-            scope.activeLayout = selectedLayout;
-
-            scope.layoutDropDownIsOpen = false;
-
+             if(scope.onLayoutSelect) {
+                 scope.onLayoutSelect(selectedLayout);
+                 scope.layoutDropDownIsOpen = false;
+             }
          };
 
          scope.toggleLayoutDropdown = function() {
@@ -92,7 +79,8 @@
          templateUrl: 'views/components/umb-layout-selector.html',
          scope: {
             layouts: '=',
-            activeLayout: '='
+            activeLayout: '=',
+            onLayoutSelect: "="
          },
          link: link
       };

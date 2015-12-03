@@ -31,7 +31,7 @@ function MemberListController($scope, $routeParams, $location, $q, $window, appS
 
             editorState.set($scope.content);
 
-            navigationService.syncTree({ tree: "members", path: data.path.split(",") }).then(function (syncArgs) {
+            navigationService.syncTree({ tree: "member", path: data.path.split(",") }).then(function (syncArgs) {
                 $scope.currentNode = syncArgs.node;
             });
 
