@@ -121,6 +121,8 @@ namespace Umbraco.Web.Models.Mapping
                 //ignore, we'll do this in after map
                 .ForMember(dto => dto.PropertyGroups, expression => expression.Ignore())
                 .ForMember(dto => dto.NoGroupPropertyTypes, expression => expression.Ignore())
+                // ignore, composition is managed in AfterMapContentTypeSaveToEntity
+                .ForMember(dest => dest.ContentTypeComposition, opt => opt.Ignore())
                 
                 .ForMember(
                     dto => dto.AllowedContentTypes,
