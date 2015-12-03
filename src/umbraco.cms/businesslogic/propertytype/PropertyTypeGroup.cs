@@ -49,17 +49,6 @@ namespace umbraco.cms.businesslogic.propertytype
         public IEnumerable<PropertyTypeGroup> GetPropertyTypeGroups()
         {
             return Enumerable.Empty<PropertyTypeGroup>();
-
-            //var ptgs = new List<PropertyTypeGroup>();
-            //using (var dr = SqlHelper.ExecuteReader(@"SELECT id FROM cmsPropertyTypeGroup WHERE parentGroupId = @id", SqlHelper.CreateParameter("@id", Id)))
-            //{
-            //    while (dr.Read())
-            //    {
-            //        ptgs.Add(GetPropertyTypeGroup(dr.GetInt("id")));
-            //    }
-            //}
-
-            //return ptgs;
         }
 
         public void Save()
