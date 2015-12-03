@@ -20,7 +20,7 @@ function MemberDeleteController($scope, memberResource, treeService, navigationS
 
             //if the current edited item is the same one as we're deleting, we need to navigate elsewhere
             if (editorState.current && editorState.current.key == $scope.currentNode.id) {
-                $location.path("/member/members/list/" + ($routeParams.listName ? $routeParams.listName : 'all-members'));
+                $location.path("/member/member/list/" + ($routeParams.listName ? $routeParams.listName : 'all-members'));
             }
 
             navigationService.hideMenu();
