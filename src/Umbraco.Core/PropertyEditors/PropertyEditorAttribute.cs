@@ -20,6 +20,8 @@ namespace Umbraco.Core.PropertyEditors
 
             //defaults
             ValueType = "string";
+            Icon = Constants.Icons.PropertyEditor;
+            Group = "common";
         }
 
         public PropertyEditorAttribute(string alias, string name)
@@ -32,6 +34,8 @@ namespace Umbraco.Core.PropertyEditors
 
             //defaults
             ValueType = "string";
+            Icon = Constants.Icons.PropertyEditor;
+            Group = "common";
         }
 
         public PropertyEditorAttribute(string alias, string name, string valueType, string editorView)
@@ -45,6 +49,9 @@ namespace Umbraco.Core.PropertyEditors
             Name = name;
             ValueType = valueType;
             EditorView = editorView;
+
+            Icon = Constants.Icons.PropertyEditor;
+            Group = "common";
         }
 
         public string Alias { get; private set; }
@@ -57,5 +64,16 @@ namespace Umbraco.Core.PropertyEditors
         /// If this is is true than the editor will be displayed full width without a label
         /// </summary>
         public bool HideLabel { get; set; }
+
+        /// <summary>
+        /// Optional, If this is set, datatypes using the editor will display this icon instead of the default system one.
+        /// </summary>
+        public string Icon { get; set; }
+
+        /// <summary>
+        /// Optional - if this is set, the datatype ui will display the editor in this group instead of the default one, by default an editor does not have a group.
+        /// The group has no effect on how a property editor is stored or referenced.
+        /// </summary>
+        public string Group { get; set; }
     }
 }

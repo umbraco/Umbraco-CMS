@@ -1,0 +1,5 @@
+<div class="umb-editor-toolbar">
+    <div class="umb-editor-toolbar__tool" ng-repeat="tool in tools" ng-click="tool.action(tool)">
+        <i class="umb-editor-toolbar__tool-icon {{tool.icon}}"></i> {{ tool.name }}
+    </div>
+</div>

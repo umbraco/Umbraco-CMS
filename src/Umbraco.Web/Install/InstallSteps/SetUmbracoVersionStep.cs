@@ -43,14 +43,8 @@ namespace Umbraco.Web.Install.InstallSteps
             var security = new WebSecurity(_httpContext, _applicationContext);
             security.PerformLogin(0);
 
-            ////Clear the auth cookie - this is required so that the login screen is displayed after upgrade and so the 
-            //// csrf anti-forgery tokens are created, otherwise there will just be JS errors if the user has an old 
-            //// login token from a previous version when we didn't have csrf tokens in place
-            //var security = new WebSecurity(new HttpContextWrapper(Context), ApplicationContext.Current);
-            //security.ClearCurrentLogin();
-
             //reports the ended install
-            InstallHelper ih = new InstallHelper(UmbracoContext.Current);
+            var ih = new InstallHelper(UmbracoContext.Current);
             ih.InstallStatus(true, "");
 
             return null;

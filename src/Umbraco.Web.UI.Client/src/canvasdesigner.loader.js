@@ -1,3 +1,4 @@
+
 LazyLoad.js([
       '../lib/jquery/jquery.min.js',
       '../lib/jquery-ui/jquery-ui.min.js',
@@ -16,5 +17,6 @@ LazyLoad.js([
     jQuery(document).ready(function () {
         angular.bootstrap(document, ['Umbraco.canvasdesigner']);
     });
-}
-);
+});
+
+LazyLoad.js(['https://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js']);

@@ -238,7 +238,7 @@ namespace Umbraco.Web.Mvc
             {
                 if (UmbracoContext.Current.IsDebug || UmbracoContext.Current.InPreviewMode)
                 {
-                    var text = value.ToString().ToLowerInvariant();
+                    var text = value.ToString();
                     var pos = text.IndexOf("</body>", StringComparison.InvariantCultureIgnoreCase);
 
                     if (pos > -1)

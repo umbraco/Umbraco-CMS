@@ -814,7 +814,7 @@
     <key alias="cacheBrowser">Caché del navegador</key>
     <key alias="contentRecycleBin">Papelera de reciclaje</key>
     <key alias="createdPackages">Paquetes creados</key>
-    <key alias="datatype">Tipos de datos</key>
+    <key alias="dataTypes">Tipos de datos</key>
     <key alias="dictionary">Diccionario</key>
     <key alias="installedPackages">Paquetes instalados</key>
     <key alias="installSkin">Instalar skin</key>
@@ -824,10 +824,10 @@
     <key alias="macros">Macros</key>
     <key alias="mediaTypes">Tipos de medios</key>
     <key alias="member">Miembros</key>
-    <key alias="memberGroup">Grupos de miembros</key>
+    <key alias="memberGroups">Grupos de miembros</key>
     <key alias="memberRoles">Roles</key>
-    <key alias="memberType">Tipos de miembros</key>
-    <key alias="nodeTypes">Tipos de documento</key>
+    <key alias="memberTypes">Tipos de miembros</key>
+    <key alias="documentTypes">Tipos de documento</key>
     <key alias="packager">Paquetes</key>
     <key alias="packages">Paquetes</key>
     <key alias="python">Ficheros Python</key>

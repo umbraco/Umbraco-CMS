@@ -52,6 +52,7 @@
 
 
 </head>
+<noscript><h5><strong>&nbsp; JavaScript is disabled. Please enable to continue!</strong></h5></noscript>
 <body ng-class="{touch:touchDevice,emptySection:emptySection}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
     <div ng-hide="!authenticated" ng-cloak id="mainwrapper" id="mainwrapper" class="clearfix" ng-click="closeDialogs($event)">
 
@@ -60,11 +61,10 @@
         <section id="contentwrapper">
             <div id="contentcolumn" ng-view>
             </div>
+            <umb-notifications></umb-notifications>
         </section>
 
     </div>
-
-    <umb-notifications></umb-notifications>
 
     @Html.BareMinimumServerVariablesScript(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewBag.UmbracoPath }))
 
@@ -75,7 +75,7 @@
 
         }
     </script>
-    
+
 
     @*And finally we can load in our angular app*@
     <script type="text/javascript" src="lib/rgrove-lazyload/lazyload.js"></script>

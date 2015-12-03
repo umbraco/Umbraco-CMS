@@ -28,8 +28,8 @@
         table.relations td.DataType {}
                 
         /* direction icons */
-        table.relations td.parentToChild { background-image: url('/umbraco/developer/RelationTypes/Images/ParentToChild.png'); }
-        table.relations td.bidirectional { background-image: url('/umbraco/developer/RelationTypes/Images/Bidirectional.png'); }
+        table.relations td.parentToChild { background-image: url('../../developer/RelationTypes/Images/ParentToChild.png'); }
+        table.relations td.bidirectional { background-image: url('../../developer/RelationTypes/Images/Bidirectional.png'); }
     </style>  
   
     <script type="text/javascript">

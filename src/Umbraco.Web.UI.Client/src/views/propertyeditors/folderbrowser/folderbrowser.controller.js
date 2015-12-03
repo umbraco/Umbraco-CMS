@@ -1,20 +1,29 @@
 angular.module("umbraco")
 
+//this controller is obsolete and should not be used anymore
+//it proxies everything to the system media list view which has overtaken
+//all the work this property editor used to perform
 .controller("Umbraco.PropertyEditors.FolderBrowserController",
-    function ($rootScope, $scope, $routeParams, $timeout, editorState, navigationService) {
+    function ($rootScope, $scope, contentTypeResource) {
+        //get the system media listview
+        contentTypeResource.getPropertyTypeScaffold(-96)
+            .then(function(dt) {
 
-        var dialogOptions = $scope.dialogOptions;
-        $scope.creating = $routeParams.create;
-        $scope.nodeId = $routeParams.id;
+                $scope.fakeProperty = {
+                    alias: "contents",
+                    config: dt.config,
+                    description: "",
+                    editor: dt.editor,
+                    hideLabel: true,
+                    id: 1,
+                    label: "Contents:",
+                    validation: {
+                        mandatory: false,
+                        pattern: null
+                    },
+                    value: "",
+                    view: dt.view
+                };
 
-        $scope.onUploadComplete = function () {
-
-            //sync the tree - don't force reload since we're not updating this particular node (i.e. its name or anything),
-            // then we'll get the resulting tree node which we can then use to reload it's children.
-            var path = editorState.current.path;
-            navigationService.syncTree({ tree: "media", path: path, forceReload: false }).then(function (syncArgs) {
-                navigationService.reloadNode(syncArgs.node);
-            });
-
-        }
+        });
 });

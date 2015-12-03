@@ -75,13 +75,16 @@ else
 
             @if (registerModel.MemberProperties != null)
             {
+                @*
+                    It will only displays properties marked as "Member can edit" on the "Info" tab of the Member Type.
+                *@
                 for (var i = 0; i < registerModel.MemberProperties.Count; i++)
                 {
                     @Html.LabelFor(m => registerModel.MemberProperties[i].Value, registerModel.MemberProperties[i].Name)
-                    @* 
-                        By default this will render a textbox but if you want to change the editor template for this property you can 
+                    @*
+                        By default this will render a textbox but if you want to change the editor template for this property you can
                         easily change it. For example, if you wanted to render a custom editor for this field called "MyEditor" you would
-                        create a file at ~/Views/Shared/EditorTemplates/MyEditor.cshtml", then you will change the next line of code to 
+                        create a file at ~/Views/Shared/EditorTemplates/MyEditor.cshtml", then you will change the next line of code to
                         render your specific editor template like:
                         @Html.EditorFor(m => profileModel.MemberProperties[i].Value, "MyEditor")
                     *@

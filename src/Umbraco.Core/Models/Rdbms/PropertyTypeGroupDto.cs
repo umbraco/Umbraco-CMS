@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Models.Rdbms
 {
@@ -9,15 +11,15 @@ namespace Umbraco.Core.Models.Rdbms
     [ExplicitColumns]
     internal class PropertyTypeGroupDto
     {
+        public PropertyTypeGroupDto()
+        {
+            //by default always create a new guid
+            UniqueId = Guid.NewGuid();
+        }
+
         [Column("id")]
         [PrimaryKeyColumn(IdentitySeed = 12)]
         public int Id { get; set; }
-
-        [Column("parentGroupId")]
-        [NullSetting(NullSetting = NullSettings.Null)]
-        //[Constraint(Default = "NULL")]
-        [ForeignKey(typeof(PropertyTypeGroupDto))]
-        public int? ParentGroupId { get; set; }
 
         [Column("contenttypeNodeId")]
         [ForeignKey(typeof(ContentTypeDto), Column = "nodeId")]
@@ -31,5 +33,11 @@ namespace Umbraco.Core.Models.Rdbms
 
         [ResultColumn]
         public List<PropertyTypeDto> PropertyTypeDtos { get; set; }
+
+        [Column("uniqueID")]
+        [NullSetting(NullSetting = NullSettings.NotNull)]
+        [Constraint(Default = SystemMethods.NewGuid)]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_cmsPropertyTypeGroupUniqueID")]
+        public Guid UniqueId { get; set; }
     }
 }

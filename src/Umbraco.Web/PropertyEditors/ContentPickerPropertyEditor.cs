@@ -4,17 +4,19 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.ContentPickerAlias, "Content Picker", "INT", "contentpicker", IsParameterEditor = true)]
+    [PropertyEditor(Constants.PropertyEditors.ContentPickerAlias, "Content Picker", "INT", "contentpicker", IsParameterEditor = true, Group = "Pickers")]
     public class ContentPickerPropertyEditor : PropertyEditor
     {
 
         public ContentPickerPropertyEditor()
         {
             _internalPreValues = new Dictionary<string, object>
-                {                 
-                    {"showEditButton", "0"},
-                    {"startNodeId", "-1"}
-                };
+            {
+                {"startNodeId", "-1"},
+                {"showOpenButton", "0"},
+                {"showEditButton", "0"},
+                {"showPathOnHover", "0"}
+            };
         }
 
         private IDictionary<string, object> _internalPreValues;
@@ -31,12 +33,17 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class ContentPickerPreValueEditor : PreValueEditor
         {
+            [PreValueField("showOpenButton", "Show open button", "boolean")]
+            public string ShowOpenButton { get; set; }
+
             [PreValueField("showEditButton", "Show edit button (this feature is in preview!)", "boolean")]
             public string ShowEditButton { get; set; }
             
             [PreValueField("startNodeId", "Start node", "treepicker")]
             public int StartNodeId { get; set; }
 
+            [PreValueField("showPathOnHover", "Show path when hovering items", "boolean")]
+            public bool ShowPathOnHover { get; set; }
         }
     }
 }

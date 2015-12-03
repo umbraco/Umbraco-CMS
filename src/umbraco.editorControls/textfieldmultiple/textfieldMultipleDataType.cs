@@ -42,7 +42,7 @@ namespace umbraco.editorControls.textfieldmultiple
 
 		public override string DataTypeName 
 		{
-			get {return "Textbox multiple";}
+			get {return "Textarea";}
 		}
 
 		public override interfaces.IDataPrevalue PrevalueEditor 

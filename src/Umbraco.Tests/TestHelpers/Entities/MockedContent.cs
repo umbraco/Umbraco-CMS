@@ -92,7 +92,8 @@ namespace Umbraco.Tests.TestHelpers.Entities
             content.SetValue("label", "Non-editable label");
             content.SetValue("dateTime", DateTime.Now.AddDays(-20));
             content.SetValue("colorPicker", "black");
-            content.SetValue("folderBrowser", "");
+            //that one is gone in 7.4
+            //content.SetValue("folderBrowser", "");
             content.SetValue("ddlMultiple", "1234,1235");
             content.SetValue("rbList", "random");
             content.SetValue("date", DateTime.Now.AddDays(-10));

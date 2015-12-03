@@ -305,7 +305,7 @@ namespace Umbraco.Tests.Persistence
                 DatabaseSchemaHelper.CreateTable<NodeDto>();
                 DatabaseSchemaHelper.CreateTable<ContentTypeDto>();
                 DatabaseSchemaHelper.CreateTable<TemplateDto>();
-                DatabaseSchemaHelper.CreateTable<DocumentTypeDto>();
+                DatabaseSchemaHelper.CreateTable<ContentTypeTemplateDto>();
 
                 //transaction.Complete();
             }

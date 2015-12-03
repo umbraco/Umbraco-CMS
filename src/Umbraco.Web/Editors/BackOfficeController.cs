@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using System.Web.Configuration;
 using System.Web.Mvc;
 using System.Web.UI;
 using ClientDependency.Core.Config;
@@ -177,6 +179,13 @@ namespace Umbraco.Web.Editors
             return new JsonNetResult { Data = gridConfig.EditorsConfig.Editors, Formatting = Formatting.Indented };
         }
 
+        private string GetMaxRequestLength()
+        {
+            var section = ConfigurationManager.GetSection("system.web/httpRuntime") as HttpRuntimeSection;
+            if (section == null) return string.Empty;
+            return section.MaxRequestLength.ToString();
+        }
+
         /// <summary>
         /// Returns the JavaScript object representing the static server variables javascript object
         /// </summary>
@@ -340,7 +349,12 @@ namespace Umbraco.Web.Editors
                                 "imageFileTypes",
                                 string.Join(",", UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes)
                             },
+                            {
+                                "maxFileSize",
+                                GetMaxRequestLength()
+                            },
                             {"keepUserLoggedIn", UmbracoConfig.For.UmbracoSettings().Security.KeepUserLoggedIn},
+                            {"cssPath", IOHelper.ResolveUrl(SystemDirectories.Css).TrimEnd('/')},
                         }
                     },
                     {
@@ -758,12 +772,29 @@ namespace Umbraco.Web.Editors
                 //Ensure the forms auth module doesn't do a redirect!
                 context.HttpContext.Response.SuppressFormsAuthenticationRedirect = true;
 
+                var owinCtx = context.HttpContext.GetOwinContext();
+
+                //First, see if a custom challenge result callback is specified for the provider
+                // and use it instead of the default if one is supplied.
+                var loginProvider = owinCtx.Authentication
+                    .GetExternalAuthenticationTypes()
+                    .FirstOrDefault(p => p.AuthenticationType == LoginProvider);
+                if (loginProvider != null)
+                {
+                    var providerChallengeResult = loginProvider.GetSignInChallengeResult(owinCtx);
+                    if (providerChallengeResult != null)
+                    {
+                        owinCtx.Authentication.Challenge(providerChallengeResult, LoginProvider);
+                        return;
+                    }
+                }
+
                 var properties = new AuthenticationProperties() { RedirectUri = RedirectUri.EnsureEndsWith('/') };
                 if (UserId != null)
                 {
                     properties.Dictionary[XsrfKey] = UserId;
                 }
-                context.HttpContext.GetOwinContext().Authentication.Challenge(properties, LoginProvider);
+                owinCtx.Authentication.Challenge(properties, LoginProvider);
             }
         }
     }

@@ -1,0 +1,39 @@
+.umb-sub-views-nav {
+  list-style: none;
+  display: flex;
+  margin: 0;
+}
+
+.umb-sub-views-nav-item {
+  text-align: center;
+  margin-left: 20px;
+  cursor: pointer;
+  display: block;
+}
+
+.umb-sub-views-nav-item:focus {
+  outline: none;
+}
+
+.umb-sub-views-nav-item:hover,
+.umb-sub-views-nav-item:focus {
+  text-decoration: none;
+}
+
+.umb-sub-views-nav-item.is-active {
+  color: @blue;
+}
+
+.show-validation .umb-sub-views-nav-item.-has-error {
+  color: @red;
+}
+
+.umb-sub-views-nav-item .icon {
+  font-size: 24px;
+  display: block;
+  text-align: center;
+}
+
+.umb-sub-views-nav-item-text {
+  font-size: 11px;
+}

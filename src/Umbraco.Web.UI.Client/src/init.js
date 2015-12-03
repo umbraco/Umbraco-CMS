@@ -9,8 +9,8 @@ app.run(['userService', '$log', '$rootScope', '$location', 'navigationService', 
             beforeSend: function (xhr) {
                 xhr.setRequestHeader("X-XSRF-TOKEN", $cookies["XSRF-TOKEN"]);
             }
-        }); 
-        
+        });
+
         /** Listens for authentication and checks if our required assets are loaded, if/once they are we'll broadcast a ready event */
         eventsService.on("app.authenticated", function(evt, data) {
             assetsService._loadInitAssets().then(function() {
@@ -24,14 +24,14 @@ app.run(['userService', '$log', '$rootScope', '$location', 'navigationService', 
 
         /** execute code on each successful route */
         $rootScope.$on('$routeChangeSuccess', function(event, current, previous) {
-            
+
             if(current.params.section){
                 $rootScope.locationTitle = current.params.section + " - " + $location.$$host;
             }
             else {
                 $rootScope.locationTitle = "Umbraco - " + $location.$$host;
             }
-            
+
             //reset the editorState on each successful route chage
             editorState.reset();
 
@@ -49,25 +49,17 @@ app.run(['userService', '$log', '$rootScope', '$location', 'navigationService', 
             var returnPath = null;
             if (rejection.path == "/login" || rejection.path.startsWith("/login/")) {
                 //Set the current path before redirecting so we know where to redirect back to
-                returnPath = encodeURIComponent($location.url());                                
+                returnPath = encodeURIComponent($location.url());
             }
 
             $location.path(rejection.path)
             if (returnPath) {
                 $location.search("returnPath", returnPath);
             }
-            
+
         });
 
 
-        /** For debug mode, always clear template cache to cut down on 
-            dev frustration and chrome cache on templates */
-        if(Umbraco.Sys.ServerVariables.isDebuggingEnabled){
-            $rootScope.$on('$viewContentLoaded', function() {
-              $templateCache.removeAll();
-            });
-        }
-        
         /* this will initialize the navigation service once the application has started */
         navigationService.init();
 

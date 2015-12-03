@@ -137,8 +137,7 @@ namespace Umbraco.Web.PropertyEditors
                                 {
                                     var thumbnailSizes = thumbs.First().Value.Value;
                                     // additional thumbnails configured as prevalues on the DataType
-                                    var sep = (thumbnailSizes.Contains("") == false && thumbnailSizes.Contains(",")) ? ',' : ';';
-                                    foreach (var thumb in thumbnailSizes.Split(sep))
+									foreach (var thumb in thumbnailSizes.Split(new[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries))
                                     {
                                         int thumbSize;
                                         if (thumb == "" || int.TryParse(thumb, out thumbSize) == false) continue;

@@ -294,6 +294,14 @@
             </cc1:PropertyPanel>
         </cc1:Pane>
 
+        <cc1:Pane ID="pane_uninstalled" runat="server" Text="Package has been uninstalled" Visible="false">
+            <cc1:PropertyPanel runat="server">
+               
+                <p><%= umbraco.ui.Text("packager", "packageUninstalledText") %></p>
+
+            </cc1:PropertyPanel>
+        </cc1:Pane>
+
         <cc1:Pane ID="pane_refresh" runat="server" Text="Browser is reloading" Visible="false">
             <cc1:PropertyPanel runat="server">
                 

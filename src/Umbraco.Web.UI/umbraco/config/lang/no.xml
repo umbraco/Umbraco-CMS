@@ -746,7 +746,7 @@ Vennlig hilsen Umbraco roboten
     <key alias="cacheBrowser">Hurtigbufferleser</key>
     <key alias="contentRecycleBin">Papirkurv</key>
     <key alias="createdPackages">Opprettede pakker</key>
-    <key alias="datatype">Datatyper</key>
+    <key alias="dataTypes">Datatyper</key>
     <key alias="dictionary">Ordbok</key>
     <key alias="installedPackages">Installerte pakker</key>
     <key alias="installSkin">Installer utseende</key>
@@ -756,10 +756,10 @@ Vennlig hilsen Umbraco roboten
     <key alias="macros">Makroer</key>
     <key alias="mediaTypes">Mediatyper</key>
     <key alias="member">Medlemmer</key>
-    <key alias="memberGroup">Medlemsgrupper</key>
+    <key alias="memberGroups">Medlemsgrupper</key>
     <key alias="memberRoles">Roller</key>
-    <key alias="memberType">Medlemstyper</key>
-    <key alias="nodeTypes">Dokumenttyper</key>
+    <key alias="memberTypes">Medlemstyper</key>
+    <key alias="documentTypes">Dokumenttyper</key>
     <key alias="packager">Pakker</key>
     <key alias="packages">Pakker</key>
     <key alias="python">Python Filer</key>

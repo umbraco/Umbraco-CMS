@@ -100,6 +100,8 @@ namespace Umbraco.Core.Services
 
             xml.Add(new XAttribute("loginName", member.Username));
             xml.Add(new XAttribute("email", member.Email));
+            
+            xml.Add(new XAttribute("icon", member.ContentType.Icon));
 
             return xml;
         }
