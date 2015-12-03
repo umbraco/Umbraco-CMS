@@ -10,6 +10,7 @@
            parent-id="{{vm.nodeId}}"
            files-uploaded="vm.onUploadComplete"
            accept="{{vm.acceptedFileTypes}}"
+           max-file-size="{{vm.maxFileSize}}"
            hide-dropzone="{{!vm.activeDrag && items.length > 0 }}"
            compact="{{ items.length > 0 }}"
            files-queued="vm.onFilesQueue">

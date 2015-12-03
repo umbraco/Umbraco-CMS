@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Routing;
 using Moq;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -60,7 +61,7 @@ namespace Umbraco.Tests.TestHelpers
 
             //Cookie collection
 		    var cookieCollection = new HttpCookieCollection();
-            cookieCollection.Add(new HttpCookie(Constants.Web.AuthCookieName, "FBA996E7-D6BE-489B-B199-2B0F3D2DD826"));
+            cookieCollection.Add(new HttpCookie("UMB_UCONTEXT", "FBA996E7-D6BE-489B-B199-2B0F3D2DD826"));
 
 		    //Request
             var requestMock = new Mock<HttpRequestBase>();

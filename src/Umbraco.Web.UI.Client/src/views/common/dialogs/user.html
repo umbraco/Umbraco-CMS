@@ -8,6 +8,7 @@
             </div>
         </div>
         <h1 class="headline">{{user.name}}</h1>
+        <small class="umb-version">Umbraco version {{version}}</small>
         <p class="muted">
             <small>
                 <localize key="user_sessionExpires" />: {{remainingAuthSeconds | timespan}}
@@ -114,6 +115,5 @@
 
             </div>
 
-        <small class="umb-version">Umbraco version {{version}}</small>
     </div>
 </div>

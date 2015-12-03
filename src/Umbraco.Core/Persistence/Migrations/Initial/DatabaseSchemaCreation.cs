@@ -44,7 +44,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                               {4, typeof (ContentVersionDto)},
                                                                               {5, typeof (DocumentDto)},
                                                                               
-                                                                              {6, typeof (DocumentTypeDto)},
+                                                                              {6, typeof (ContentTypeTemplateDto)},
                                                                               {7, typeof (DataTypeDto)},
                                                                               {8, typeof (DataTypePreValueDto)},
                                                                               {9, typeof (DictionaryDto)},

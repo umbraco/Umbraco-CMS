@@ -31,54 +31,49 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixZeroOne
                 //Fetch all PropertyTypes that belongs to a PropertyTypeGroup                
                 //NOTE: We are writing the full query because we've added a column to the PropertyTypeDto in later versions so one of the columns
                 // won't exist yet
-                var propertyTypes = database.Fetch<PropertyTypeDto>("SELECT * FROM cmsPropertyType WHERE propertyTypeGroupId > 0");
+                var propertyTypes = database.Fetch<dynamic>("SELECT * FROM cmsPropertyType WHERE propertyTypeGroupId > 0");
 
                 var propertyGroups = database.Fetch<PropertyTypeGroupDto>("WHERE id > 0");
 
                 foreach (var propertyType in propertyTypes)
                 {
-                    //Get the PropertyTypeGroup that the current PropertyType references
-                    var parentPropertyTypeGroup = propertyGroups.FirstOrDefault(x => x.Id == propertyType.PropertyTypeGroupId);
-                    if (parentPropertyTypeGroup != null)
+                    // get the PropertyTypeGroup of the current PropertyType, skip if not found
+                    var propertyTypeGroup = propertyGroups.FirstOrDefault(x => x.Id == propertyType.propertyTypeGroupId);
+                    if (propertyTypeGroup == null) continue;
+
+                    // if the PropretyTypeGroup belongs to the same content type as the PropertyType, then fine
+                    if (propertyTypeGroup.ContentTypeNodeId == propertyType.contentTypeId) continue;
+
+                    // else we want to assign the PropertyType to a proper PropertyTypeGroup
+                    // ie one that does belong to the same content - look for it
+                    var okPropertyTypeGroup = propertyGroups.FirstOrDefault(x =>
+                        x.Text == propertyTypeGroup.Text && // same name
+                        x.ContentTypeNodeId == propertyType.contentTypeId); // but for proper content type
+
+                    if (okPropertyTypeGroup == null)
                     {
-                        //If the ContentType is the same on the PropertyType and the PropertyTypeGroup the group is valid and we skip to the next
-                        if (parentPropertyTypeGroup.ContentTypeNodeId == propertyType.ContentTypeId) continue;
-
-                        //Check if the 'new' PropertyTypeGroup has already been created
-                        var existingPropertyTypeGroup =
-                            propertyGroups.FirstOrDefault(
-                                x =>
-                                x.ParentGroupId == parentPropertyTypeGroup.Id && x.Text == parentPropertyTypeGroup.Text &&
-                                x.ContentTypeNodeId == propertyType.ContentTypeId);
-
-                        //This should ensure that we don't create duplicate groups for a single ContentType
-                        if (existingPropertyTypeGroup == null)
+                        // does not exist, create a new PropertyTypeGroup,
+                        var propertyGroup = new PropertyTypeGroupDto
                         {
+                            ContentTypeNodeId = propertyType.contentTypeId,
+                            Text = propertyTypeGroup.Text,
+                            SortOrder = propertyTypeGroup.SortOrder
+                        };
 
-                            //Create a new PropertyTypeGroup that references the parent group that the PropertyType was referencing pre-6.0.1
-                            var propertyGroup = new PropertyTypeGroupDto
-                                                    {
-                                                        ContentTypeNodeId = propertyType.ContentTypeId,
-                                                        ParentGroupId = parentPropertyTypeGroup.Id,
-                                                        Text = parentPropertyTypeGroup.Text,
-                                                        SortOrder = parentPropertyTypeGroup.SortOrder
-                                                    };
+                        // save + add to list of groups
+                        int id = Convert.ToInt16(database.Insert(propertyGroup));
+                        propertyGroup.Id = id;
+                        propertyGroups.Add(propertyGroup);
 
-                            //Save the PropertyTypeGroup in the database and update the list of groups with this new group
-                            int id = Convert.ToInt16(database.Insert(propertyGroup));
-                            propertyGroup.Id = id;
-                            propertyGroups.Add(propertyGroup);
-                            //Update the reference to the new PropertyTypeGroup on the current PropertyType
-                            propertyType.PropertyTypeGroupId = id;
-                            database.Update(propertyType);
-                        }
-                        else
-                        {
-                            //Update the reference to the existing PropertyTypeGroup on the current PropertyType
-                            propertyType.PropertyTypeGroupId = existingPropertyTypeGroup.Id;
-                            database.Update(propertyType);
-                        }
+                        // update the PropertyType to use the new PropertyTypeGroup
+                        propertyType.propertyTypeGroupId = id;
                     }
+                    else
+                    {
+                        // exists, update PropertyType to use the PropertyTypeGroup
+                        propertyType.propertyTypeGroupId = okPropertyTypeGroup.Id;
+                    }
+                    database.Update("cmsPropertyType", "id", propertyType);
                 }
             }
 

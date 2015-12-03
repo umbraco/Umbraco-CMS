@@ -15,8 +15,10 @@
 
       vm.nodeId = $scope.contentId;
       vm.acceptedFileTypes = mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
+      vm.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB";
       vm.activeDrag = false;
       vm.mediaDetailsTooltip = {};
+      vm.itemsWithoutFolders = [];
 
       vm.dragEnter = dragEnter;
       vm.dragLeave = dragLeave;
@@ -26,6 +28,26 @@
       vm.selectItem = selectItem;
       vm.selectFolder = selectFolder;
       vm.clickItem = clickItem;
+
+      function activate() {
+          vm.itemsWithoutFolders = filterOutFolders($scope.items);
+      }
+
+      function filterOutFolders(items) {
+
+          var newArray = [];
+
+          for (var i = 0; items.length > i; i++) {
+              var item = items[i];
+              var isFolder = !mediaHelper.hasFilePropertyType(item);
+
+              if (!isFolder) {
+                  newArray.push(item);
+              }
+          }
+
+          return newArray;
+      }
 
       function dragEnter(el, event) {
          vm.activeDrag = true;
@@ -60,7 +82,7 @@
       }
 
       function selectItem(selectedItem, $event, index) {
-         listViewHelper.selectHandler(selectedItem, index, $scope.items, $scope.selection, $event);
+         listViewHelper.selectHandler(selectedItem, index, vm.itemsWithoutFolders, $scope.selection, $event);
       }
 
       function selectFolder(selectedItem, $event, index) {
@@ -70,6 +92,8 @@
       function clickItem(item) {
          $location.path($scope.entityType + '/' + $scope.entityType + '/edit/' + item.id);
       }
+
+      activate();
 
    }
 

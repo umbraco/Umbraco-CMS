@@ -40,8 +40,16 @@
   padding: 10px;
 }
 
-.umb-contentpicker small a {
+.umb-contentpicker small {
+
+  &:not(:last-child) {
+    padding-right: 3px;
+    border-right: 1px solid @grayMed;
+  }
+
+  a {
     color: @gray;
+  }
 }
 
 /* CODEMIRROR DATATYPE */

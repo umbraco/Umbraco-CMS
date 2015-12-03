@@ -1,9 +1,103 @@
 (function() {
    'use strict';
 
-   function listViewHelper() {
+   function listViewHelper($cookieStore) {
 
       var firstSelectedIndex = 0;
+
+      function getLayout(nodeId, availableLayouts) {
+
+          var storedLayouts = [];
+
+          if ($cookieStore.get("umblistViewLayout")) {
+              storedLayouts = $cookieStore.get("umblistViewLayout");
+          }
+
+          if (storedLayouts && storedLayouts.length > 0) {
+              for (var i = 0; storedLayouts.length > i; i++) {
+                  var layout = storedLayouts[i];
+                  if (layout.nodeId === nodeId) {
+                      return setLayout(nodeId, layout, availableLayouts);
+                  }
+              }
+
+          }
+
+          return getFirstAllowedLayout(availableLayouts);
+
+      }
+
+      function setLayout(nodeId, selectedLayout, availableLayouts) {
+
+          var activeLayout = {};
+          var layoutFound = false;
+
+          for (var i = 0; availableLayouts.length > i; i++) {
+              var layout = availableLayouts[i];
+              if (layout.path === selectedLayout.path) {
+                  activeLayout = layout;
+                  layout.active = true;
+                  layoutFound = true;
+              } else {
+                  layout.active = false;
+              }
+          }
+
+          if(!layoutFound) {
+              activeLayout = getFirstAllowedLayout(availableLayouts);
+          }
+
+          setLayoutCookie(nodeId, activeLayout);
+
+          return activeLayout;
+
+      }
+
+      function setLayoutCookie(nodeId, selectedLayout) {
+
+          var layoutFound = false;
+          var storedLayouts = [];
+
+          if($cookieStore.get("umblistViewLayout")) {
+              storedLayouts = $cookieStore.get("umblistViewLayout");
+          }
+
+          if(storedLayouts.length > 0) {
+              for(var i = 0; storedLayouts.length > i; i++) {
+                  var layout = storedLayouts[i];
+                  if(layout.nodeId === nodeId) {
+                      layout.path = selectedLayout.path;
+                      layoutFound = true;
+                  }
+              }
+          }
+
+          if(!layoutFound) {
+              var cookieObject = {
+                  "nodeId": nodeId,
+                  "path": selectedLayout.path
+              };
+              storedLayouts.push(cookieObject);
+          }
+
+          document.cookie="umblistViewLayout=" + JSON.stringify(storedLayouts);
+
+      }
+
+      function getFirstAllowedLayout(layouts) {
+
+         var firstAllowedLayout = {};
+
+         for (var i = 0; layouts.length > i; i++) {
+            var layout = layouts[i];
+            if (layout.selected === true) {
+               firstAllowedLayout = layout;
+               break;
+            }
+         }
+
+         return firstAllowedLayout;
+      }
 
       function selectHandler(selectedItem, selectedIndex, items, selection, $event) {
 
@@ -57,7 +151,7 @@
                isSelected = true;
             }
          }
-         if(!isSelected && !item.hidden) {
+         if(!isSelected) {
             selection.push({id: item.id});
             item.selected = true;
          }
@@ -169,6 +263,10 @@
 
 
       var service = {
+         getLayout: getLayout,
+         getFirstAllowedLayout: getFirstAllowedLayout,
+         setLayout: setLayout,
+         setLayoutCookie: setLayoutCookie,
          selectHandler: selectHandler,
          selectItem: selectItem,
          deselectItem: deselectItem,

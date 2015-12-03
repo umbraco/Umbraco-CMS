@@ -27,14 +27,22 @@ namespace Umbraco.Core.Services
         {
         }
 
+        #region Containers
+
         public Attempt<int> CreateContainer(int parentId, string name, int userId = 0)
         {
             var uow = UowProvider.GetUnitOfWork();
-            using (var repo = RepositoryFactory.CreateDataTypeDefinitionRepository(uow))
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow))
             {
                 try
                 {
-                    var container = repo.CreateContainer(parentId, name, userId);
+                    var container = new EntityContainer(Constants.ObjectTypes.DataTypeGuid)
+                    {
+                        Name = name,
+                        ParentId = parentId,
+                        CreatorId = userId
+                    };
+                    repo.AddOrUpdate(container);
                     uow.Commit();
                     return Attempt.Succeed(container.Id);
                 }
@@ -46,16 +54,61 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public void DeleteContainer(int containerId, int userId = 0)
+        public EntityContainer GetContainer(int containerId)
         {
             var uow = UowProvider.GetUnitOfWork();
-            using (var repo = RepositoryFactory.CreateDataTypeDefinitionRepository(uow))
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow))
             {
-                repo.DeleteContainer(containerId);
+                var container = repo.Get(containerId);
+                return container != null && container.ContainedObjectType == Constants.ObjectTypes.DataTypeGuid
+                    ? container
+                    : null;
+            }
+        }
+
+        public EntityContainer GetContainer(Guid containerId)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow))
+            {
+                var container = repo.Get(containerId);
+                return container != null && container.ContainedObjectType == Constants.ObjectTypes.DataTypeGuid
+                    ? container
+                    : null;
+            }
+        }
+
+        public void SaveContainer(EntityContainer container, int userId = 0)
+        {
+            if (container.ContainedObjectType != Constants.ObjectTypes.DataTypeGuid) 
+                throw new InvalidOperationException("Not a data type container.");
+            if (container.HasIdentity && container.IsPropertyDirty("ParentId"))
+                throw new InvalidOperationException("Cannot save a container with a modified parent, move the container instead.");
+
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow))
+            {
+                repo.AddOrUpdate(container);
                 uow.Commit();
                 //TODO: Audit trail ?
             }
         }
+
+        public void DeleteContainer(int containerId, int userId = 0)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow))
+            {
+                var container = repo.Get(containerId);
+                if (container == null) return;
+                if (container.ContainedObjectType != Constants.ObjectTypes.DataTypeGuid) return;
+                repo.Delete(container);
+                uow.Commit();
+                //TODO: Audit trail ?
+            }
+        }
+
+        #endregion
 
         /// <summary>
         /// Gets a <see cref="IDataTypeDefinition"/> by its Name
@@ -199,11 +252,19 @@ namespace Umbraco.Core.Services
 
             var moveInfo = new List<MoveEventInfo<IDataTypeDefinition>>();
             var uow = UowProvider.GetUnitOfWork();
+            using (var containerRepository = RepositoryFactory.CreateEntityContainerRepository(uow))
             using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(uow))
             {
                 try
                 {
-                    moveInfo.AddRange(repository.Move(toMove, parentId));
+                    EntityContainer container = null;
+                    if (parentId > 0)
+                    {
+                        container = containerRepository.Get(parentId);
+                        if (container == null || container.ContainedObjectType != Constants.ObjectTypes.DataTypeGuid)
+                            throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound);
+                    }
+                    moveInfo.AddRange(repository.Move(toMove, container));
                 }
                 catch (DataOperationException<MoveOperationStatusType> ex)
                 {

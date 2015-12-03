@@ -154,8 +154,39 @@
                 saveMethod: contentTypeResource.save,
                 scope: $scope,
                 content: vm.contentType,
-                //no-op for rebind callback... we don't really need to rebind for content types
-                rebindCallback: angular.noop
+                // we need to rebind... the IDs that have been created!
+                rebindCallback: function (origContentType, savedContentType) {
+                    vm.contentType.id = savedContentType.id;
+                    vm.contentType.groups.forEach(function(group) {
+                        if (!group.name) return;
+
+                        var k = 0;
+                        while (k < savedContentType.groups.length && savedContentType.groups[k].name != group.name)
+                            k++;
+                        if (k == savedContentType.groups.length) {
+                            group.id = 0;
+                            return;
+                        }
+
+                        var savedGroup = savedContentType.groups[k];
+                        if (!group.id) group.id = savedGroup.id;
+
+                        group.properties.forEach(function (property) {
+                            if (property.id || !property.alias) return;
+
+                            k = 0;
+                            while (k < savedGroup.properties.length && savedGroup.properties[k].alias != property.alias)
+                                k++;
+                            if (k == savedGroup.properties.length) {
+                                property.id = 0;
+                                return;
+                            }
+
+                            var savedProperty = savedGroup.properties[k];
+                            property.id = savedProperty.id;
+                        });
+                    });
+                }
             }).then(function (data) {
                 //success            
                 syncTreeNode(vm.contentType, data.path);

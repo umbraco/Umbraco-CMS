@@ -49,7 +49,33 @@ namespace Umbraco.Web.Editors
         /// 
         /// </param>
         /// <returns></returns>
-        public HttpResponseMessage GetMacroResultAsHtmlForEditor(string macroAlias, int pageId, [FromUri]IDictionary<string, object> macroParams)
+        [HttpGet]
+        public HttpResponseMessage GetMacroResultAsHtmlForEditor(string macroAlias, int pageId, [FromUri] IDictionary<string, object> macroParams)
+        {
+            return GetMacroResultAsHtml(macroAlias, pageId, macroParams);
+        }
+
+        /// <summary>
+        /// Gets a rendered macro as html for rendering in the rich text editor.
+        /// Using HTTP POST instead of GET allows for more parameters to be passed as it's not dependant on URL-length limitations like GET.
+        /// The method using GET is kept to maintain backwards compatibility
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public HttpResponseMessage GetMacroResultAsHtmlForEditor(MacroParameterModel model)
+        {
+            return GetMacroResultAsHtml(model.MacroAlias, model.PageId, model.MacroParams);
+        }
+
+        public class MacroParameterModel
+        {
+            public string MacroAlias { get; set; }
+            public int PageId { get; set; }
+            public IDictionary<string, object> MacroParams { get; set; }
+        }
+
+        private HttpResponseMessage GetMacroResultAsHtml(string macroAlias, int pageId, IDictionary<string, object> macroParams)
         {
             // note - here we should be using the cache, provided that the preview content is in the cache...
 
@@ -81,7 +107,7 @@ namespace Umbraco.Web.Editors
             //the 'easiest' way might be to create an IPublishedContent manually and populate the legacy 'page' object with that
             //and then set the legacy parameters.
 
-            var legacyPage = new global::umbraco.page(doc);                    
+            var legacyPage = new global::umbraco.page(doc);
             UmbracoContext.HttpContext.Items["pageID"] = doc.Id;
             UmbracoContext.HttpContext.Items["pageElements"] = legacyPage.Elements;
             UmbracoContext.HttpContext.Items[global::Umbraco.Core.Constants.Conventions.Url.AltTemplate] = null;

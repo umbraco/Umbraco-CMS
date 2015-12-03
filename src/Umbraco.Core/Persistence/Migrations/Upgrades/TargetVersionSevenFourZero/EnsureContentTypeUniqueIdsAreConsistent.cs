@@ -17,35 +17,39 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourZer
     {
         public EnsureContentTypeUniqueIdsAreConsistent(ISqlSyntaxProvider sqlSyntax, ILogger logger)
             : base(sqlSyntax, logger)
-        {
-        }
+        { }
         
         public override void Up()
         {
-            var docTypeGuid = new Guid(Constants.ObjectTypes.DocumentType);
-            var mediaTypeGuid = new Guid(Constants.ObjectTypes.MediaType);
-            var memberTypeGuid = new Guid(Constants.ObjectTypes.MemberType);
+            var objectTypes = new[]
+            {
+                Constants.ObjectTypes.DocumentTypeGuid,
+                Constants.ObjectTypes.MediaTypeGuid,
+                Constants.ObjectTypes.MemberTypeGuid,
+            };
 
             var sql = new Sql()
                 .Select("umbracoNode.id,cmsContentType.alias,umbracoNode.nodeObjectType")
                 .From<NodeDto>(SqlSyntax)
                 .InnerJoin<ContentTypeDto>(SqlSyntax)
-                .On<NodeDto, ContentTypeDto>(SqlSyntax, dto => dto.NodeId, dto => dto.NodeId);
+                .On<NodeDto, ContentTypeDto>(SqlSyntax, dto => dto.NodeId, dto => dto.NodeId)
+                .WhereIn<NodeDto>(x => x.NodeObjectType, objectTypes);
 
-            var rows = Context.Database.Fetch<dynamic>(sql)
-                .Where(x => x.nodeObjectType == docTypeGuid || x.nodeObjectType == mediaTypeGuid || x.nodeObjectType == memberTypeGuid);
+            var rows = Context.Database.Fetch<dynamic>(sql);
+
             foreach (var row in rows)
             {
-                // casting to string to gain access to ToGuid extension method.
-                var alias = (string)row.alias.ToString();
-                var nodeType = ((Guid) row.nodeObjectType).ToString();
-                var consistentGuid = (alias + nodeType).ToGuid();
-                Update.Table("umbracoNode").Set(new { uniqueID = consistentGuid }).Where(new { id = row.id });
+                // create a consistent guid from
+                // alias + object type
+                var guidSource = ((string) row.alias) + ((Guid) row.nodeObjectType);
+                var guid = guidSource.ToGuid();
+
+                // set the Unique Id to the one we've generated
+                Update.Table("umbracoNode").Set(new { uniqueID = guid }).Where(new { id = row.id });
             }
         }
 
         public override void Down()
-        {
-        }
+        { }
     }
 }

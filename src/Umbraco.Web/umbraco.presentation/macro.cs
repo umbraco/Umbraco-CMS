@@ -1705,6 +1705,10 @@ namespace umbraco
 
                 // propagate the user's context
                 // zb-00004 #29956 : refactor cookies names & handling
+
+                //TODO: This is the worst thing ever. This will also not work if people decide to put their own
+                // custom auth system in place.
+
                 HttpCookie inCookie = StateHelper.Cookies.UserContext.RequestCookie;
                 var cookie = new Cookie(inCookie.Name, inCookie.Value, inCookie.Path,
                                         HttpContext.Current.Request.ServerVariables["SERVER_NAME"]);

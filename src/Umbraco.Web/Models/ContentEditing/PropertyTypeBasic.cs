@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Models.ContentEditing
@@ -6,11 +7,17 @@ namespace Umbraco.Web.Models.ContentEditing
     [DataContract(Name = "propertyType")]
     public class PropertyTypeBasic
     {
-        //indicates if this property was inherited
+        /// <summary>
+        /// Gets a value indicating whether the property type is inherited through
+        /// content types composition.
+        /// </summary>
+        /// <remarks>Inherited is true when the property is defined by a content type
+        /// higher in the composition, and not by the content type currently being
+        /// edited.</remarks>
         [DataMember(Name = "inherited")]
         public bool Inherited { get; set; }
 
-        //TODO: Required ?
+        // needed - so we can handle alias renames
         [DataMember(Name = "id")]
         public int Id { get; set; }
 
