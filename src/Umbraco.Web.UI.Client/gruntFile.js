@@ -477,10 +477,10 @@ module.exports = function (grunt) {
                         },
                         "jquery": {
                             files: ['jquery.min.js', 'jquery.min.map']
-                        },                        
+                        },
                         'jquery-ui': {
                             keepExpandedHierarchy: false,
-                            files: ['ui/minified/jquery-ui.min.js']
+                            files: ['jquery-ui.min.js']
                         },
                         'tinymce': {
                             files: ['plugins/**', 'themes/**', 'tinymce.min.js']

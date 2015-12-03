@@ -22,7 +22,7 @@
         "rgrove-lazyload": "*",
         "bootstrap-social": "~4.8.0",
         "jquery": "2.0.3",
-        "jquery-ui": "1.10.3",
+        "jquery-ui": "1.11.4",
         "angular-dynamic-locale": "~0.1.27",
         "ng-file-upload": "~7.3.8",
         "tinymce": "~4.1.10",
