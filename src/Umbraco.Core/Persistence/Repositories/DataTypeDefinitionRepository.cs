@@ -29,7 +29,6 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly CacheHelper _cacheHelper;
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly DataTypePreValueRepository _preValRepository;
-        private readonly EntityContainerRepository _containerRepository;
 
         public DataTypeDefinitionRepository(IDatabaseUnitOfWork work, CacheHelper cache, CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider sqlSyntax,
             IContentTypeRepository contentTypeRepository)
@@ -38,29 +37,6 @@ namespace Umbraco.Core.Persistence.Repositories
             _cacheHelper = cacheHelper;
             _contentTypeRepository = contentTypeRepository;
             _preValRepository = new DataTypePreValueRepository(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax);
-            _containerRepository = new EntityContainerRepository(work, cache, logger, sqlSyntax, new Guid(Constants.ObjectTypes.DataTypeContainer), NodeObjectTypeId);
-        }
-
-        /// <summary>
-        /// Deletes a folder - this will move all contained entities into their parent
-        /// </summary>
-        /// <param name="containerId"></param>
-        public void DeleteContainer(int containerId)
-        {
-            var found = _containerRepository.Get(containerId);
-            _containerRepository.Delete(found);
-        }
-
-        public EntityContainer CreateContainer(int parentId, string name, int userId)
-        {
-            var container = new EntityContainer
-            {
-                ParentId = parentId,
-                Name = name,
-                CreatorId = userId
-            };
-            _containerRepository.AddOrUpdate(container);
-            return container;
         }
 
         #region Overrides of RepositoryBase<int,DataTypeDefinition>
@@ -355,19 +331,17 @@ AND umbracoNode.id <> @id",
             AddOrUpdatePreValues(dtd, values);
         }
 
-        public IEnumerable<MoveEventInfo<IDataTypeDefinition>> Move(IDataTypeDefinition toMove, int parentId)
+        public IEnumerable<MoveEventInfo<IDataTypeDefinition>> Move(IDataTypeDefinition toMove, EntityContainer container)
         {
-            if (parentId > 0)
+            var parentId = -1;
+            if (container != null)
             {
-                var container = _containerRepository.Get(parentId);
-                if (container == null)
-                    throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound);
-
                 // Check on paths
                 if ((string.Format(",{0},", container.Path)).IndexOf(string.Format(",{0},", toMove.Id), StringComparison.Ordinal) > -1)
                 {
                     throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedNotAllowedByPath);
                 }
+                parentId = container.Id;
             }
 
             //used to track all the moved entities to be given to the event

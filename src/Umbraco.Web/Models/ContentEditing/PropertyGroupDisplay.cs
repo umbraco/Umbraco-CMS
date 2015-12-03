@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -17,20 +13,24 @@ namespace Umbraco.Web.Models.ContentEditing
             ParentTabContentTypeNames = new List<string>();
             ParentTabContentTypes = new List<int>();
         }
-        
-        [DataMember(Name = "parentGroupId")]
-        [ReadOnly(true)]
-        public int ParentGroupId { get; set; }
-        
-        //SD: Seems strange that this is required
+
+        /// <summary>
+        /// Gets the context content type.
+        /// </summary>
         [DataMember(Name = "contentTypeId")]
         [ReadOnly(true)]
         public int ContentTypeId { get; set; }
 
+        /// <summary>
+        /// Gets the identifiers of the content types that define this group.
+        /// </summary>
         [DataMember(Name = "parentTabContentTypes")]
         [ReadOnly(true)]
         public IEnumerable<int> ParentTabContentTypes { get; set; }
 
+        /// <summary>
+        /// Gets the name of the content types that define this group.
+        /// </summary>
         [DataMember(Name = "parentTabContentTypeNames")]
         [ReadOnly(true)]
         public IEnumerable<string> ParentTabContentTypeNames { get; set; }

@@ -56,6 +56,17 @@ namespace Umbraco.Tests.Persistence.Repositories
             return contentTypeRepository;
         }
 
+        private MediaTypeRepository CreateMediaTypeRepository(IDatabaseUnitOfWork unitOfWork)
+        {
+            var contentTypeRepository = new MediaTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
+            return contentTypeRepository;
+        }
+
+        private EntityContainerRepository CreateContainerRepository(IDatabaseUnitOfWork unitOfWork)
+        {
+            return new EntityContainerRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
+        }
+
         //TODO Add test to verify SetDefaultTemplates updates both AllowedTemplates and DefaultTemplate(id).
 
 
@@ -100,12 +111,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
+            using (var containerRepository = CreateContainerRepository(unitOfWork))
             using (var repository = CreateRepository(unitOfWork))
             {
-                var container = repository.CreateContainer(-1, "blah", 0);
+                var container1 = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid) { Name = "blah1" };
+                containerRepository.AddOrUpdate(container1);
                 unitOfWork.Commit();
 
-                var container2 = repository.CreateContainer(container.Id, "blah2", 0);
+                var container2 = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid) { Name = "blah2", ParentId = container1.Id };
+                containerRepository.AddOrUpdate(container2);
                 unitOfWork.Commit();
 
                 var contentType = (IContentType) MockedContentTypes.CreateBasicContentType("asdfasdf");
@@ -122,7 +136,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 repository.AddOrUpdate(contentType2);
                 unitOfWork.Commit();
 
-                var result = repository.Move(contentType, container.Id).ToArray();
+                var result = repository.Move(contentType, container1).ToArray();
                 unitOfWork.Commit();
 
                 Assert.AreEqual(2, result.Count());
@@ -131,7 +145,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 contentType = repository.Get(contentType.Id);
                 contentType2 = repository.Get(contentType2.Id);
 
-                Assert.AreEqual(container.Id, contentType.ParentId);
+                Assert.AreEqual(container1.Id, contentType.ParentId);
                 Assert.AreNotEqual(result.Single(x => x.Entity.Id == contentType.Id).OriginalPath, contentType.Path);
                 Assert.AreNotEqual(result.Single(x => x.Entity.Id == contentType2.Id).OriginalPath, contentType2.Path);
             }
@@ -144,16 +158,16 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             EntityContainer container;
-            using (var repository = CreateRepository(unitOfWork))
+            using (var containerRepository = CreateContainerRepository(unitOfWork))
             {
-                container = repository.CreateContainer(-1, "blah", 0);
+                container = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid) { Name = "blah" };
+                containerRepository.AddOrUpdate(container);
                 unitOfWork.Commit();
                 Assert.That(container.Id, Is.GreaterThan(0));
             }
-            using (var entityRepo = new EntityContainerRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax,
-                    new Guid(Constants.ObjectTypes.DocumentTypeContainer), new Guid(Constants.ObjectTypes.DocumentType)))
+            using (var containerRepository = CreateContainerRepository(unitOfWork))
             {
-                var found = entityRepo.Get(container.Id);
+                var found = containerRepository.Get(container.Id);
                 Assert.IsNotNull(found);
             }
         }
@@ -164,23 +178,22 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             EntityContainer container;
-            using (var repository = CreateRepository(unitOfWork))
+            using (var containerRepository = CreateContainerRepository(unitOfWork))
             {
-                container = repository.CreateContainer(-1, "blah", 0);
+                container = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid) { Name = "blah" };
+                containerRepository.AddOrUpdate(container);
                 unitOfWork.Commit();
             }
-            using (var repository = CreateRepository(unitOfWork))
+            using (var containerRepository = CreateContainerRepository(unitOfWork))
             {
                 // Act
-                repository.DeleteContainer(container.Id);
+                containerRepository.Delete(container);
                 unitOfWork.Commit();
-
-                using (var entityRepo = new EntityContainerRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax,
-                    new Guid(Constants.ObjectTypes.DocumentTypeContainer), new Guid(Constants.ObjectTypes.DocumentType)))
-                {
-                    var found = entityRepo.Get(container.Id);
-                    Assert.IsNull(found);
-                }
+            }
+            using (var containerRepository = CreateContainerRepository(unitOfWork))
+            {
+                var found = containerRepository.Get(container.Id);
+                Assert.IsNull(found);
             }
         }
 
@@ -189,10 +202,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
-            EntityContainer container;
+            using (var containerRepository = CreateContainerRepository(unitOfWork))
             using (var repository = CreateRepository(unitOfWork))
             {
-                container = repository.CreateContainer(-1, "blah", 0);
+                var container = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah" };
+                containerRepository.AddOrUpdate(container);
                 unitOfWork.Commit();
 
                 var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test", propertyGroupName: "testGroup");
@@ -210,29 +224,28 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             EntityContainer container;
-            IContentType contentType;
-            using (var repository = CreateRepository(unitOfWork))
+            IMediaType contentType;
+            using (var containerRepository = CreateContainerRepository(unitOfWork))
+            using (var repository = CreateMediaTypeRepository(unitOfWork))
             {
-                container = repository.CreateContainer(-1, "blah", 0);
+                container = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah" };
+                containerRepository.AddOrUpdate(container);
                 unitOfWork.Commit();
 
-                contentType = MockedContentTypes.CreateSimpleContentType("test", "Test", propertyGroupName: "testGroup");
+                contentType = MockedContentTypes.CreateSimpleMediaType("test", "Test", propertyGroupName: "testGroup");
                 contentType.ParentId = container.Id;
                 repository.AddOrUpdate(contentType);
                 unitOfWork.Commit();
             }
-            using (var repository = CreateRepository(unitOfWork))
+            using (var containerRepository = CreateContainerRepository(unitOfWork))
+            using (var repository = CreateMediaTypeRepository(unitOfWork))
             {
                 // Act
-                repository.DeleteContainer(container.Id);
+                containerRepository.Delete(container);
                 unitOfWork.Commit();
 
-                using (var entityRepo = new EntityContainerRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax,
-                    new Guid(Constants.ObjectTypes.DocumentTypeContainer), new Guid(Constants.ObjectTypes.DocumentType)))
-                {
-                    var found = entityRepo.Get(container.Id);
-                    Assert.IsNull(found);
-                }
+                var found = containerRepository.Get(container.Id);
+                Assert.IsNull(found);
 
                 contentType = repository.Get(contentType.Id);
                 Assert.IsNotNull(contentType);

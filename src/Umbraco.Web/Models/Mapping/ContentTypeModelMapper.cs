@@ -158,8 +158,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(type => type.Key, expression => expression.Ignore())
                 .ForMember(type => type.HelpText, expression => expression.Ignore())
                 .ForMember(type => type.HasIdentity, expression => expression.Ignore())
-                //ignore because this is set in the ctor
-                .ForMember(type => type.Alias, expression => expression.Ignore())
+                //ignore because this is set in the ctor NOT ON UPDATE, STUPID!
+                //.ForMember(type => type.Alias, expression => expression.Ignore())
                 //ignore because this is obsolete and shouldn't be used
                 .ForMember(type => type.DataTypeId, expression => expression.Ignore())
                 .ForMember(type => type.Mandatory, expression => expression.MapFrom(display => display.Validation.Mandatory))
@@ -203,17 +203,22 @@ namespace Umbraco.Web.Models.Mapping
                 });
 
             config.CreateMap<PropertyGroupBasic<PropertyTypeBasic>, PropertyGroup>()
-                    .ForMember(dest => dest.Id, expression => expression.Condition(source => source.Id > 0))
-                    .ForMember(g => g.Key, expression => expression.Ignore())
-                    .ForMember(g => g.HasIdentity, expression => expression.Ignore())
-                    .ForMember(dto => dto.CreateDate, expression => expression.Ignore())
-                    .ForMember(dto => dto.UpdateDate, expression => expression.Ignore())
-                    .ForMember(g => g.ParentId, expression => expression.Ignore())
-                    .ForMember(g => g.PropertyTypes, expression => expression.MapFrom(basic => basic.Properties.Select(Mapper.Map<PropertyType>)));
+                    .ForMember(dest => dest.Id, map => map.Condition(source => source.Id > 0))
+                    .ForMember(dest => dest.Key, map => map.Ignore())
+                    .ForMember(dest => dest.HasIdentity, map => map.Ignore())
+                    .ForMember(dest => dest.CreateDate, map => map.Ignore())
+                    .ForMember(dest => dest.UpdateDate, map => map.Ignore())
+                    // fixme
+                    // this is basically *replacing* dest properties by a mapped version of
+                    // *every* source properties (including, I guess, inherited properties?)
+                    // also, ContentTypeModelMapperExtensions will map properties *again* so
+                    // this makes little sense - ignore for now
+                    .ForMember(dest => dest.PropertyTypes, map => map.Ignore());
+                    //.ForMember(dest => dest.PropertyTypes, map => map.MapFrom(source =>
+                    //    source.Properties.Select(Mapper.Map<PropertyType>)));
 
             config.CreateMap<PropertyGroupBasic<PropertyTypeBasic>, PropertyGroupDisplay>()
                 .ForMember(dest => dest.Id, expression => expression.Condition(source => source.Id > 0))
-                .ForMember(g => g.ParentGroupId, expression => expression.Ignore())
                 .ForMember(g => g.ContentTypeId, expression => expression.Ignore())
                 .ForMember(g => g.ParentTabContentTypes, expression => expression.Ignore())
                 .ForMember(g => g.ParentTabContentTypeNames, expression => expression.Ignore())

@@ -246,7 +246,10 @@ namespace Umbraco.Tests.Models.Mapping
         [Test]
         public void PropertyGroupBasic_To_PropertyGroup()
         {
-            var basic = new PropertyGroupBasic<PropertyTypeBasic>()
+            _dataTypeService.Setup(x => x.GetDataTypeDefinitionById(It.IsAny<int>()))
+                .Returns(new DataTypeDefinition("test"));
+
+            var basic = new PropertyGroupBasic<PropertyTypeBasic>
             {
                 Id = 222,
                 Name = "Group 1",
@@ -286,7 +289,19 @@ namespace Umbraco.Tests.Models.Mapping
                 }
             };
 
-            var result = Mapper.Map<PropertyGroup>(basic);
+            var contentType = new ContentTypeSave
+            {
+                Id = 0,
+                ParentId = -1,
+                Alias = "alias",
+                AllowedTemplates = Enumerable.Empty<string>(),
+                Groups = new[] { basic }
+            };
+
+            // proper group properties mapping takes place when mapping the content type,
+            // not when mapping the group - because of inherited properties and such
+            //var result = Mapper.Map<PropertyGroup>(basic);
+            var result = Mapper.Map<IContentType>(contentType).PropertyGroups[0];
 
             Assert.AreEqual(basic.Name, result.Name);
             Assert.AreEqual(basic.Id, result.Id);

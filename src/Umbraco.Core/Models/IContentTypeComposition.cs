@@ -8,17 +8,17 @@ namespace Umbraco.Core.Models
     public interface IContentTypeComposition : IContentTypeBase
     {
         /// <summary>
-        /// Gets a list of ContentTypes that make up a composition of PropertyGroups and PropertyTypes for the current ContentType
+        /// Gets or sets the content types that compose this content type.
         /// </summary>
-        IEnumerable<IContentTypeComposition> ContentTypeComposition { get; }
+        IEnumerable<IContentTypeComposition> ContentTypeComposition { get; set;  }
 
         /// <summary>
-        /// Gets a list of <see cref="PropertyGroup"/> objects from the composition
+        /// Gets the property groups for the entire composition.
         /// </summary>
         IEnumerable<PropertyGroup> CompositionPropertyGroups { get; }
 
         /// <summary>
-        /// Gets a list of <see cref="PropertyType"/> objects from the composition
+        /// Gets the property types for the entire composition.
         /// </summary>
         IEnumerable<PropertyType> CompositionPropertyTypes { get; }
 
