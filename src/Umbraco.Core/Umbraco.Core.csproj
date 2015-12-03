@@ -1333,6 +1333,9 @@
     <Compile Include="Constants-PropertyEditors.cs">
       <DependentUpon>Constants.cs</DependentUpon>
     </Compile>
+    <Compile Include="Constants-PropertyTypeGroups.cs">
+      <DependentUpon>Constants.cs</DependentUpon>
+    </Compile>
     <Compile Include="Constants-Packaging.cs">
       <DependentUpon>Constants.cs</DependentUpon>
     </Compile>

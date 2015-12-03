@@ -46,19 +46,19 @@ ON cmsContentType.nodeId = umbracoNode.id"))
                     // see BaseDataCreation... built-in groups have their own guids
                     if (data.grId == 3)
                     {
-                        guid = new Guid("79ED4D07-254A-42CF-8FA9-EBE1C116A596");
+                        guid = new Guid(Constants.PropertyTypeGroups.Image);
                     }
                     else if (data.grId == 4)
                     {
-                        guid = new Guid("50899F9C-023A-4466-B623-ABA9049885FE");
+                        guid = new Guid(Constants.PropertyTypeGroups.File);
                     }
                     else if (data.grId == 5)
                     {
-                        guid = new Guid("79995FA2-63EE-453C-A29B-2E66F324CDBE");
+                        guid = new Guid(Constants.PropertyTypeGroups.Contents);
                     }
                     else if (data.grId == 11)
                     {
-                        guid = new Guid("0756729D-D665-46E3-B84A-37ACEAA614F8");
+                        guid = new Guid(Constants.PropertyTypeGroups.Membership);
                     }
                     else
                     {
