@@ -8,7 +8,6 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Media;
-using Umbraco.Core.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
@@ -37,8 +36,15 @@ namespace Umbraco.Web.Editors
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound);
             }
+            var imageProp = media.Properties[Constants.Conventions.Media.File];
+            if (imageProp == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound);
+            }
 
-            return GetResized(media, 500);
+            var imagePath = imageProp.Value.ToString();
+
+            return GetBigThumbnail(imagePath);
         }
 
         /// <summary>
@@ -54,7 +60,7 @@ namespace Umbraco.Web.Editors
             if (string.IsNullOrWhiteSpace(originalImagePath))
                 return Request.CreateResponse(HttpStatusCode.OK);
 
-            return GetResized(originalImagePath, 500);
+            return GetResized(originalImagePath, 500, "big-thumb");
         }
 
         /// <summary>
@@ -73,8 +79,15 @@ namespace Umbraco.Web.Editors
             {
                 return new HttpResponseMessage(HttpStatusCode.NotFound);
             }
+            var imageProp = media.Properties[Constants.Conventions.Media.File];
+            if (imageProp == null)
+            {
+                return new HttpResponseMessage(HttpStatusCode.NotFound);
+            }
 
-            return GetResized( media, 500 );
+            var imagePath = imageProp.Value.ToString();
+
+            return GetResized(imagePath, width);
         }
 
         /// <summary>
@@ -88,32 +101,31 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         public HttpResponseMessage GetResized(string imagePath, int width)
         {
-            var media = Services.MediaService.GetMediaByPath( imagePath );
-            if (media == null)
-            {
-                return new HttpResponseMessage( HttpStatusCode.NotFound );
-            }
-
-            return GetResized( media, 500 );
+            return GetResized(imagePath, width, Convert.ToString(width));
         }
 
         /// <summary>
-        /// Gets a resized image by redirecting to ImageProcessor
+        /// Gets a resized image - if the requested max width is greater than the original image, only the original image will be returned.
         /// </summary>
-        /// <param name="media"></param>
+        /// <param name="imagePath"></param>
         /// <param name="width"></param>
+        /// <param name="suffix"></param>
         /// <returns></returns>
-        private HttpResponseMessage GetResized(IMedia media, int width)
+        private HttpResponseMessage GetResized(string imagePath, int width, string suffix)
         {
-            var imageProp = media.Properties[Constants.Conventions.Media.File];
-            if (imageProp == null)
+            var mediaFileSystem = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
+            var ext = Path.GetExtension(imagePath);
+
+            //we need to check if it is an image by extension
+            if (UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes.InvariantContains(ext.TrimStart('.')) == false)
             {
-                return Request.CreateResponse( HttpStatusCode.NotFound );
+                return Request.CreateResponse(HttpStatusCode.NotFound);
             }
 
-            var imagePath = imageProp.Value.ToString();
+            //redirect to ImageProcessor thumbnail with rnd generated from last write time of original media file
+            var fullOrgPath = mediaFileSystem.GetFullPath(mediaFileSystem.GetRelativePath(imagePath));
             var response = Request.CreateResponse( HttpStatusCode.Found );
-            response.Headers.Location = new Uri( string.Format( "{0}?rnd={1}&width={2}", imagePath, string.Format( "{0:yyyyMMddHHmmss}", media.UpdateDate ), width ), UriKind.Relative );
+            response.Headers.Location = new Uri( string.Format( "{0}?rnd={1}&width={2}", imagePath, string.Format( "{0:yyyyMMddHHmmss}", System.IO.File.GetLastWriteTime( fullOrgPath ) ), width ), UriKind.Relative );
             return response;
         }
     }
