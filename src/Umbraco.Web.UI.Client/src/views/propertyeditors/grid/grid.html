@@ -7,7 +7,7 @@
         <div class="templates-preview"
              ng-show="!model.value || model.value == ''">
 
-             <p><!--<span class="help-text"><localize key="grid_addRows"/></span>--><strong>Choose layout for this section</strong></p>
+             <p><strong><localize key="grid_addLayout" /></strong></p>
 
             <div class="preview-rows layout"
                  ng-repeat="template in model.config.items.templates"
@@ -67,7 +67,7 @@
                                     <div class="umb-row-title">{{row.name}}</div>
 
                                     <div class="umb-grid-has-config" ng-if="row.hasConfig">
-                                        Styles is applied
+                                        <localize key="grid_stylesApplied" />
                                     </div>
                                 </div>
 
@@ -121,17 +121,17 @@
                                                       <!-- disable drop overlay -->
                                                       <div class="drop-overlay -disable" ng-if="area.dropNotAllowed">
                                                           <i class="icon-delete drop-icon"></i>
-                                                          This content is not allowed here
+                                                          <localize key="grid_contentNotAllowed" />
                                                       </div>
 
                                                       <!-- allow drop overlay -->
                                                       <div class="drop-overlay -allow" ng-if="area.dropOnEmpty">
                                                           <i class="icon-download drop-icon"></i>
-                                                          This content is allowed here
+                                                          <localize key="grid_contentAllowed" />
                                                       </div>
 
                                                       <div class="umb-grid-has-config" ng-if="area.hasConfig">
-                                                         Styles is applied
+                                                         <localize key="grid_stylesApplied" />
                                                       </div>
 
                                                       <div class="cell-tools" ng-if="area.active">
@@ -144,7 +144,7 @@
 
                                                           <!-- Control placeholder -->
                                                           <div class="umb-cell-placeholder" ng-if="area.controls.length === 0" ng-click="openEditorOverlay($event, area, 0, area.$uniqueId);">
-                                                               <div href="" class="cell-tools-add -center">Add content</div>
+                                                               <div href="" class="cell-tools-add -center"><localize key="grid_addElement" /></div>
                                                           </div>
 
                                                           <!-- for each control in areas -->
@@ -195,7 +195,7 @@
 
                                                       <!-- if area is empty tools -->
                                                       <div class="umb-grid-add-more-content" ng-if="area.controls.length > 0">
-                                                          <div class="cell-tools-add -bar newbtn" ng-click="openEditorOverlay($event, area, 0, area.$uniqueId);">+ Add content</div>
+                                                          <div class="cell-tools-add -bar newbtn" ng-click="openEditorOverlay($event, area, 0, area.$uniqueId);">+ <localize key="grid_addElement" /></div>
                                                       </div>
 
                                                  </div>
@@ -231,7 +231,7 @@
 
                     <div class="templates-preview" ng-if="showRowConfigurations">
 
-                        <p ng-hide="section.rows.length > 0"><strong>Choose row</strong><!-- <span class="help-text"><localize key="grid_addRows" /></span> --></p>
+                        <p ng-hide="section.rows.length > 0"><strong><localize key="grid_addRows" /></strong></p>
 
                         <div class="preview-rows columns"
                              ng-repeat="layout in  section.$allowedLayouts"
