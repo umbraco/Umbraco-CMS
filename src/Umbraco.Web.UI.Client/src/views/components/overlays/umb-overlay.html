@@ -2,11 +2,8 @@
   <form name="overlayForm" ng-submit="submitForm(model)" novalidate val-form-manager>
 
     <div class="umb-overlay-header">
-      <h4>{{model.title}}
-        <a class="pull-right" href ng-click="closeOverLay()">
-          <i class="icon-delete"></i>
-        </a>
-      </h4>
+      <h4>{{model.title}}</h4>
+      <p class="umb-overlay__subtitle">{{model.subtitle}}</p>
     </div>
 
     <div class="umb-overlay-container" ng-transclude>
