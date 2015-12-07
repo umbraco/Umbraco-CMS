@@ -626,9 +626,14 @@ Mange hilsner fra Umbraco robotten
     <key alias="reset">Nulstil</key>
   </area>
   <area alias="grid">
-    <key alias="insertControl">Indsæt element</key>
-    <key alias="addRows">Tilføj rækker til dit layout</key>
-    <key alias="addElement"><![CDATA[Kom i gang ved at trykke på <i class=" icon icon-add blue"></i> nedenfor og tilføje det første element]]></key>
+    <key alias="insertControl">Vælg indholdstype</key>
+    <key alias="chooseLayout">Vælg layout</key>
+    <key alias="addRows">Tilføj række</key>
+    <key alias="addElement">Tilføj indhold</key>
+    <key alias="stylesApplied">Styles applied</key>
+
+    <key alias="contentNotAllowed">Indholdet er ikke tilladt her</key>
+    <key alias="contentAllowed">Indholdet er tilladt her</key>
 
     <key alias="clickToEmbed">Klik for at indlejre</key>
     <key alias="clickToInsertImage">Klik for at indsætte et billede</key>

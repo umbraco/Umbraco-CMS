@@ -729,8 +729,12 @@
   </area>
   <area alias="grid">
     <key alias="insertControl">Lägg till</key>
+    <key alias="chooseLayout">Choose layout</key>
     <key alias="addRows">Lägg till rad</key>
     <key alias="addElement"><![CDATA[Klicka på <i class="icon icon-add blue"></i> nedan för att lägga till ditt första element]]></key>
+    <key alias="stylesApplied">Styles applied</key>
+    <key alias="contentNotAllowed">Indholdet er ikke tilladt her</key>
+    <key alias="contentAllowed">Indholdet er tilladt her</key>
     <key alias="clickToEmbed">Klicka för att lägga in</key>
     <key alias="clickToInsertImage">Klicka för att lägga till bild</key>
     <key alias="placeholderImageCaption">Bildtext...</key>

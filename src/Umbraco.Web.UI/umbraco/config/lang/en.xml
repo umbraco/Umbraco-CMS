@@ -869,27 +869,25 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="quickGuide">Quick Guide to Umbraco template tags</key>
     <key alias="template">Template</key>
   </area>
-
   <area alias="grid">
-    <key alias="insertControl">Insert control</key>
-    <key alias="addLayout">Choose a layout</key>
-    <key alias="addRows">Choose a row</key>
+    <key alias="insertControl">Choose type of content</key>
+    <key alias="chooseLayout">Choose a layout</key>
+    <key alias="addRows">Add a row</key>
     <key alias="addElement">Add content</key>
     <key alias="stylesApplied">Styles applied</key>
-    
+
     <key alias="contentNotAllowed">This content is not allowed here</key>
-    <key alias="contentAllowed"></key>
-    
+    <key alias="contentAllowed">This content is allowed here</key>
+
     <key alias="clickToEmbed">Click to embed</key>
     <key alias="clickToInsertImage">Click to insert image</key>
     <key alias="placeholderImageCaption">Image caption...</key>
     <key alias="placeholderWriteHere">Write here...</key>
-    
+
     <key alias="gridLayouts">Grid Layouts</key>
     <key alias="gridLayoutsDetail">Layouts are the overall work area for the grid editor, usually you only need one or two different layouts</key>
     <key alias="addGridLayout">Add Grid Layout</key>
     <key alias="addGridLayoutDetail">Adjust the layout by setting column widths and adding additional sections</key>
-    
     <key alias="rowConfigurations">Row configurations</key>
     <key alias="rowConfigurationsDetail">Rows are predefined cells arranged horizontally</key>
     <key alias="addRowConfiguration">Add row configuration</key>
