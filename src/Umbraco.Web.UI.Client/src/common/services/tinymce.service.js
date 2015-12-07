@@ -63,11 +63,11 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                 onclick: function () {
 
                    $scope.embedOverlay = {};
-                   $scope.embedOverlay.view = "rteembed";
+                   $scope.embedOverlay.view = "embed";
                    $scope.embedOverlay.show = true;
 
                    $scope.embedOverlay.submit = function(model) {
-                      editor.insertContent(model.form.preview);
+                      editor.insertContent(model.embed.preview);
                       $scope.embedOverlay.show = true;
                       $scope.embedOverlay = null;
                    };
