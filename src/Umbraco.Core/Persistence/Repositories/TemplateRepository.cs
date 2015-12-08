@@ -202,29 +202,7 @@ namespace Umbraco.Core.Persistence.Repositories
             template.Path = nodeDto.Path;
 
             //now do the file work
-
-            if (DetermineTemplateRenderingEngine(entity) == RenderingEngine.Mvc)
-            {
-                var result = _viewHelper.CreateView(template, true);
-                if (result != entity.Content)
-                {
-                    entity.Content = result;
-                    //re-persist it... though we don't really care about the templates in the db do we??!!
-                    dto.Design = result;
-                    Database.Update(dto);
-                }
-            }
-            else
-            {
-                var result = _masterPageHelper.CreateMasterPage(template, this, true);
-                if (result != entity.Content)
-                {
-                    entity.Content = result;
-                    //re-persist it... though we don't really care about the templates in the db do we??!!
-                    dto.Design = result;
-                    Database.Update(dto);
-                }
-            }
+            SaveFile(template, dto);
 
             template.ResetDirtyProperties();
 
@@ -274,35 +252,45 @@ namespace Umbraco.Core.Persistence.Repositories
             template.IsMasterTemplate = axisDefs.Any(x => x.ParentId == dto.NodeId);
 
             //now do the file work
-
-            if (DetermineTemplateRenderingEngine(entity) == RenderingEngine.Mvc)
-            {
-                var result = _viewHelper.UpdateViewFile(entity, originalAlias);
-                if (result != entity.Content)
-                {
-                    entity.Content = result;
-                    //re-persist it... though we don't really care about the templates in the db do we??!!
-                    dto.Design = result;
-                    Database.Update(dto);
-                }
-            }
-            else
-            {
-                var result = _masterPageHelper.UpdateMasterPageFile(entity, originalAlias, this);
-                if (result != entity.Content)
-                {
-                    entity.Content = result;
-                    //re-persist it... though we don't really care about the templates in the db do we??!!
-                    dto.Design = result;
-                    Database.Update(dto);
-                }
-            }
+            SaveFile((Template) entity, dto, originalAlias);
 
             entity.ResetDirtyProperties();
 
             // ensure that from now on, content is lazy-loaded
             if (template.GetFileContent == null)
                 template.GetFileContent = file => GetFileContent((Template) file, false);
+        }
+
+        private void SaveFile(Template template, TemplateDto dto, string originalAlias = null)
+        {
+            string content;
+
+            if (template._useExistingContent)
+            {
+                content = _viewHelper.GetFileContents(template); // BUT the template does not exist yet?!
+                template._useExistingContent = false; // reset
+            }
+            else
+            {
+                if (DetermineTemplateRenderingEngine(template) == RenderingEngine.Mvc)
+                {
+                    content = originalAlias == null
+                        ? _viewHelper.CreateView(template, true)
+                        : _viewHelper.UpdateViewFile(template, originalAlias);
+                }
+                else
+                {
+                    content = originalAlias == null
+                        ? _masterPageHelper.CreateMasterPage(template, this, true)
+                        : _masterPageHelper.UpdateMasterPageFile(template, originalAlias, this);
+                }
+            }
+
+            template.Content = content;
+
+            if (dto.Design == content) return;
+            dto.Design = content;
+            Database.Update(dto); // though... we don't care about the db value really??!!
         }
 
         protected override void PersistDeletedItem(ITemplate entity)
@@ -475,9 +463,19 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
-        public Stream GetFileStream(string filename)
+        public Stream GetFileStream(string filepath)
         {
-            var ext = Path.GetExtension(filename);
+            return GetFileSystem(filepath).OpenFile(filepath);
+        }
+
+        public void SetFile(string filepath, Stream content)
+        {
+            GetFileSystem(filepath).AddFile(filepath, content, true);
+        }
+
+        private IFileSystem GetFileSystem(string filepath)
+        {
+            var ext = Path.GetExtension(filepath);
             IFileSystem fs;
             switch (ext)
             {
@@ -491,7 +489,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 default:
                     throw new Exception("Unsupported extension " + ext + ".");
             }
-            return fs.OpenFile(filename);
+            return fs;
         }
 
         #region Implementation of ITemplateRepository

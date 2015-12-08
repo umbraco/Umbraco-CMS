@@ -374,8 +374,29 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets the content of a media as a stream.
         /// </summary>
-        /// <param name="path">The filesystem path to the media.</param>
+        /// <param name="filepath">The filesystem path to the media.</param>
         /// <returns>The content of the media.</returns>
-        Stream GetMediaFileStream(string path);
+        Stream GetMediaFileStream(string filepath);
+
+        /// <summary>
+        /// Sets the content of a media.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the media.</param>
+        /// <param name="content">The content of the media.</param>
+        void SetMediaFile(string filepath, Stream content);
+
+        /// <summary>
+        /// Deletes a media file and all thumbnails.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the media.</param>
+        void DeleteMediaFile(string filepath);
+
+        /// <summary>
+        /// Generates thumbnails.
+        /// </summary>
+        /// <param name="filepath">The filesystem-relative path to the original image.</param>
+        /// <param name="propertyType">The property type.</param>
+        /// <remarks>This should be obsoleted, we should not generate thumbnails.</remarks>
+        void GenerateThumbnails(string filepath, PropertyType propertyType);
     }
 }

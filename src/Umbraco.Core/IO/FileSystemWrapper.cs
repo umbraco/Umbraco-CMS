@@ -48,9 +48,9 @@ namespace Umbraco.Core.IO
 			_wrapped.AddFile(path, stream);
 		}
 
-		public void AddFile(string path, Stream stream, bool overrideIfExists)
+		public void AddFile(string path, Stream stream, bool overrideExisting)
 		{
-			_wrapped.AddFile(path, stream, overrideIfExists);
+			_wrapped.AddFile(path, stream, overrideExisting);
 		}
 
 		public IEnumerable<string> GetFiles(string path)

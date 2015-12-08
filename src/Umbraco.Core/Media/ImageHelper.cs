@@ -3,36 +3,52 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-using System.Globalization;
 using System.IO;
 using System.Linq;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Media.Exif;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Media
 {
     /// <summary>
-    /// A helper class used for imaging
+    /// Provides helper methods for managing images.
     /// </summary>
     internal static class ImageHelper
     {
+        private static readonly Dictionary<int, string> DefaultSizes = new Dictionary<int, string>
+        {
+            { 100, "thumb" },
+            { 500, "big-thumb" }
+        };
+
         /// <summary>
-        /// Gets the dimensions of an image based on a stream
+        /// Gets a value indicating whether the file extension corresponds to an image.
         /// </summary>
-        /// <param name="imageStream"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// First try with EXIF, this is because it is insanely faster and doesn't use any memory to read exif data than to load in the entire
-        /// image via GDI. Otherwise loading an image into GDI consumes a crazy amount of memory on large images.
-        /// 
-        /// Of course EXIF data might not exist in every file and can only exist in JPGs
-        /// </remarks>
-        public static Size GetDimensions(Stream imageStream)
+        /// <param name="extension">The file extension.</param>
+        /// <returns>A value indicating whether the file extension corresponds to an image.</returns>
+        public static bool IsImageFile(string extension)
+        {
+            if (extension == null) return false;
+            extension = extension.TrimStart('.');
+            return UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes.InvariantContains(extension);
+        }
+
+        /// <summary>
+        /// Gets the dimensions of an image.
+        /// </summary>
+        /// <param name="stream">A stream containing the image bytes.</param>
+        /// <returns>The dimension of the image.</returns>
+        /// <remarks>First try with EXIF as it is faster and does not load the entire image
+        /// in memory. Fallback to GDI which means loading the image in memory and thus
+        /// use potentially large amounts of memory.</remarks>
+        public static Size GetDimensions(Stream stream)
         {
             //Try to load with exif 
             try
             {
-                var jpgInfo = ImageFile.FromStream(imageStream);
+                var jpgInfo = ImageFile.FromStream(stream);
 
                 if (jpgInfo.Format != ImageFileFormat.Unknown
                     && jpgInfo.Properties.ContainsKey(ExifTag.PixelYDimension)
@@ -52,16 +68,20 @@ namespace Umbraco.Core.Media
             }
 
             //we have no choice but to try to read in via GDI
-            using (var image = Image.FromStream(imageStream))
+            using (var image = Image.FromStream(stream))
             {
 
                 var fileWidth = image.Width;
                 var fileHeight = image.Height;
                 return new Size(fileWidth, fileHeight);
-            }
-           
+            }           
         }
 
+        /// <summary>
+        /// Gets the MIME type of an image.
+        /// </summary>
+        /// <param name="image">The image.</param>
+        /// <returns>The MIME type of the image.</returns>
         public static string GetMimeType(this Image image)
         {
             var format = image.RawFormat;
@@ -69,172 +89,226 @@ namespace Umbraco.Core.Media
             return codec.MimeType;
         }
 
-        /// <summary>
-        /// Creates the thumbnails if the image is larger than all of the specified ones.
-        /// </summary>
-        /// <param name="fs"></param>
-        /// <param name="fileName"></param>
-        /// <param name="extension"></param>
-        /// <param name="originalImage"></param>
-        /// <param name="additionalThumbSizes"></param>
-        /// <returns></returns>
-        internal static IEnumerable<ResizedImage> GenerateMediaThumbnails(
+        #region GenerateThumbnails
+
+        public static IEnumerable<ResizedImage> GenerateThumbnails(
+            IFileSystem fs,
+            Image image,
+            string filepath,
+            string preValue)
+        {
+            if (string.IsNullOrWhiteSpace(preValue))
+                return GenerateThumbnails(fs, image, filepath);
+
+            var additionalSizes = new List<int>();
+            var sep = preValue.Contains(",") ? "," : ";";
+            var values = preValue.Split(new[] { sep }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var value in values)
+            {
+                int size;
+                if (int.TryParse(value, out size))
+                    additionalSizes.Add(size);
+            }
+
+            return GenerateThumbnails(fs, image, filepath, additionalSizes);
+        }
+
+        public static IEnumerable<ResizedImage> GenerateThumbnails(
+            IFileSystem fs,
+            Image image,
+            string filepath, 
+            IEnumerable<int> additionalSizes = null)
+        {
+            var w = image.Width;
+            var h = image.Height;
+
+            var sizes = additionalSizes == null ? DefaultSizes.Keys : DefaultSizes.Keys.Concat(additionalSizes);
+
+            // start with default sizes,
+            // add additional sizes,
+            // filter out duplicates,
+            // filter out those that would be larger that the original image
+            // and create the thumbnail
+            return sizes
+                .Distinct()
+                .Where(x => w >= x && h >= x)
+                .Select(x => GenerateResized(fs, image, filepath, DefaultSizes.ContainsKey(x) ? DefaultSizes[x] : "", x))
+                .ToList(); // now
+        }
+
+        public static IEnumerable<ResizedImage> GenerateThumbnails(
             IFileSystem fs, 
-            string fileName, 
-            string extension, 
-            Image originalImage,
-            IEnumerable<int> additionalThumbSizes)
+            Stream filestream,
+            string filepath,
+            PropertyType propertyType)
         {
-
-            var result = new List<ResizedImage>();
-
-            var allSizesDictionary = new Dictionary<int,string> {{100,"thumb"}, {500,"big-thumb"}};
-            
-            //combine the static dictionary with the additional sizes with only unique values
-            var allSizes = allSizesDictionary.Select(kv => kv.Key)
-                .Union(additionalThumbSizes.Where(x => x > 0).Distinct());
-
-            var sizesDictionary = allSizes.ToDictionary(s => s, s => allSizesDictionary.ContainsKey(s) ? allSizesDictionary[s]: "");
-
-            foreach (var s in sizesDictionary)
+            // get the original image from the original stream
+            if (filestream.CanSeek) filestream.Seek(0, 0); // fixme - what if we cannot seek?
+            using (var image = Image.FromStream(filestream))
             {
-                var size = s.Key;
-                var name = s.Value;
-                if (originalImage.Width >= size && originalImage.Height >= size)
+                return GenerateThumbnails(fs, image, filepath, propertyType);
+            }
+        }
+
+        public static IEnumerable<ResizedImage> GenerateThumbnails(
+            IFileSystem fs, 
+            Image image,
+            string filepath,
+            PropertyType propertyType)
+        {
+            // if the editor is an upload field, check for additional thumbnail sizes
+            // that can be defined in the prevalue for the property data type. otherwise,
+            // just use the default sizes.
+            var sizes = propertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias
+                ? ApplicationContext.Current.Services.DataTypeService
+                    .GetPreValuesByDataTypeId(propertyType.DataTypeDefinitionId)
+                    .FirstOrDefault()
+                : string.Empty;
+
+            return GenerateThumbnails(fs, image, filepath, sizes);
+        }
+
+        #endregion
+
+        #region GenerateResized - Generate at resized filepath derived from origin filepath
+
+        public static ResizedImage GenerateResized(IFileSystem fs, Image originImage, string originFilepath, string sizeName, int maxWidthHeight)
+        {
+            return GenerateResized(fs, originImage, originFilepath, sizeName, maxWidthHeight, -1, -1);
+        }
+
+        public static ResizedImage GenerateResized(IFileSystem fs, Image originImage, string originFilepath, string sizeName, int fixedWidth, int fixedHeight)
+        {
+            return GenerateResized(fs, originImage, originFilepath, sizeName, -1, fixedWidth, fixedHeight);
+        }
+
+        public static ResizedImage GenerateResized(IFileSystem fs, Image originImage, string originFilepath, string sizeName, int maxWidthHeight, int fixedWidth, int fixedHeight)
+        {
+            if (string.IsNullOrWhiteSpace(sizeName))
+                sizeName = "UMBRACOSYSTHUMBNAIL";
+            var extension = Path.GetExtension(originFilepath) ?? string.Empty;
+            var filebase = originFilepath.TrimEnd(extension);
+            var resizedFilepath = filebase + "_" + sizeName + ".jpg";
+
+            return GenerateResizedAt(fs, originImage, resizedFilepath, maxWidthHeight, fixedWidth, fixedHeight);
+        }
+
+        #endregion
+
+        #region GenerateResizedAt - Generate at specified resized filepath
+
+        public static ResizedImage GenerateResizedAt(IFileSystem fs, Image originImage, string resizedFilepath, int maxWidthHeight)
+        {
+            return GenerateResizedAt(fs, originImage, resizedFilepath, maxWidthHeight, -1, -1);
+        }
+
+        public static ResizedImage GenerateResizedAt(IFileSystem fs, Image originImage, int fixedWidth, int fixedHeight, string resizedFilepath)
+        {
+            return GenerateResizedAt(fs, originImage, resizedFilepath, -1, fixedWidth, fixedHeight);
+        }
+
+        public static ResizedImage GenerateResizedAt(IFileSystem fs, Image originImage, string resizedFilepath, int maxWidthHeight, int fixedWidth, int fixedHeight)
+        {
+            // target dimensions
+            int width, height;
+
+            // if maxWidthHeight then get ratio
+            if (maxWidthHeight > 0)
+            {
+                var fx = (float) originImage.Size.Width / maxWidthHeight;
+                var fy = (float) originImage.Size.Height / maxWidthHeight;
+                var f = Math.Max(fx, fy); // fit in thumbnail size
+                width = (int) Math.Round(originImage.Size.Width / f);
+                height = (int) Math.Round(originImage.Size.Height / f);
+                if (width == 0) width = 1;
+                if (height == 0) height = 1;
+            }
+            else if (fixedWidth > 0 && fixedHeight > 0)
+            {
+                width = fixedWidth;
+                height = fixedHeight;
+            }
+            else
+            {
+                width = height = 1;
+            }
+
+            // create new image with best quality settings
+            using (var bitmap = new Bitmap(width, height))
+            using (var graphics = Graphics.FromImage(bitmap))
+            {
+                // if the image size is rather large we cannot use the best quality interpolation mode
+                // because we'll get out of mem exceptions. So we detect how big the image is and use
+                // the mid quality interpolation mode when the image size exceeds our max limit.
+                graphics.InterpolationMode = originImage.Width > 5000 || originImage.Height > 5000
+                    ? InterpolationMode.Bilinear // mid quality
+                    : InterpolationMode.HighQualityBicubic; // best quality
+
+                // everything else is best-quality
+                graphics.SmoothingMode = SmoothingMode.HighQuality;                    
+                graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                graphics.CompositingQuality = CompositingQuality.HighQuality;
+
+                // copy the old image to the new and resize
+                var rect = new Rectangle(0, 0, width, height);
+                graphics.DrawImage(originImage, rect, 0, 0, originImage.Width, originImage.Height, GraphicsUnit.Pixel);
+
+                // copy metadata
+                // fixme - er... no?
+
+                // get an encoder - based upon the file type
+                var extension = (Path.GetExtension(resizedFilepath) ?? "").TrimStart('.').ToLowerInvariant();
+                var encoders = ImageCodecInfo.GetImageEncoders();
+                var encoder = extension == "png" || extension == "gif"
+                    ? encoders.Single(t => t.MimeType.Equals("image/png"))
+                    : encoders.Single(t => t.MimeType.Equals("image/jpeg"));
+
+                // set compresion ratio to 90%
+                var encoderParams = new EncoderParameters();
+                encoderParams.Param[0] = new EncoderParameter(Encoder.Quality, 90L);
+
+                // save the new image
+                using (var stream = new MemoryStream())
                 {
-                    result.Add(Resize(fs, fileName, extension, size, name, originalImage));
+                    bitmap.Save(stream, encoder, encoderParams);
+                    stream.Seek(0, 0);
+                    if (resizedFilepath.Contains("UMBRACOSYSTHUMBNAIL"))
+                    {
+                        var filepath = resizedFilepath.Replace("UMBRACOSYSTHUMBNAIL", maxWidthHeight.ToInvariantString());
+                        fs.AddFile(filepath, stream);
+                        // TODO: Remove this, this is ONLY here for backwards compatibility but it is essentially completely unusable see U4-5385
+                        stream.Seek(0, 0);
+                        resizedFilepath = resizedFilepath.Replace("UMBRACOSYSTHUMBNAIL", width + "x" + height);
+                    }
+
+                    fs.AddFile(resizedFilepath, stream);
                 }
+
+                return new ResizedImage(resizedFilepath, width, height);
             }
-
-            return result;
         }
 
-        /// <summary>
-        /// Performs an image resize
-        /// </summary>
-        /// <param name="fileSystem"></param>
-        /// <param name="path"></param>
-        /// <param name="extension"></param>
-        /// <param name="maxWidthHeight"></param>
-        /// <param name="fileNameAddition"></param>
-        /// <param name="originalImage"></param>
-        /// <returns></returns>
-        private static ResizedImage Resize(IFileSystem fileSystem, string path, string extension, int maxWidthHeight, string fileNameAddition, Image originalImage)
+        #endregion
+
+        #region Inner classes
+
+        public class ResizedImage
         {
-            var fileNameThumb = String.IsNullOrEmpty(fileNameAddition)
-                                            ? string.Format("{0}_UMBRACOSYSTHUMBNAIL.jpg", path.Substring(0, path.LastIndexOf(".")))
-                                            : string.Format("{0}_{1}.jpg", path.Substring(0, path.LastIndexOf(".")), fileNameAddition);
+            public ResizedImage()
+            { }
 
-            var thumb = GenerateThumbnail(
-                originalImage,
-                maxWidthHeight,
-                fileNameThumb,
-                extension,
-                fileSystem);
-
-            return thumb;
-        }
-
-        internal static ResizedImage GenerateThumbnail(Image image, int maxWidthHeight, string thumbnailFileName, string extension, IFileSystem fs)
-        {
-            return GenerateThumbnail(image, maxWidthHeight, -1, -1, thumbnailFileName, extension, fs);
-        }
-
-        internal static ResizedImage GenerateThumbnail(Image image, int fixedWidth, int fixedHeight, string thumbnailFileName, string extension, IFileSystem fs)
-        {
-            return GenerateThumbnail(image, -1, fixedWidth, fixedHeight, thumbnailFileName, extension, fs);
-        }
-
-        private static ResizedImage GenerateThumbnail(Image image, int maxWidthHeight, int fixedWidth, int fixedHeight, string thumbnailFileName, string extension, IFileSystem fs)
-        {
-            // Generate thumbnail
-            float f = 1;
-            if (maxWidthHeight >= 0)
+            public ResizedImage(string filepath, int width, int height)
             {
-                var fx = (float)image.Size.Width / maxWidthHeight;
-                var fy = (float)image.Size.Height / maxWidthHeight;
-
-                // must fit in thumbnail size
-                f = Math.Max(fx, fy);
+                Filepath = filepath;
+                Width = width;
+                Height = height;
             }
 
-            //depending on if we are doing fixed width resizing or not.
-            fixedWidth = (maxWidthHeight > 0) ? image.Width : fixedWidth;
-            fixedHeight = (maxWidthHeight > 0) ? image.Height : fixedHeight;
-
-            var widthTh = (int)Math.Round(fixedWidth / f);
-            var heightTh = (int)Math.Round(fixedHeight / f);
-
-            // fixes for empty width or height
-            if (widthTh == 0)
-                widthTh = 1;
-            if (heightTh == 0)
-                heightTh = 1;
-
-            // Create new image with best quality settings
-            using (var bp = new Bitmap(widthTh, heightTh))
-            {
-                using (var g = Graphics.FromImage(bp))
-                {
-                    //if the image size is rather large we cannot use the best quality interpolation mode
-                    // because we'll get out of mem exceptions. So we'll detect how big the image is and use
-                    // the mid quality interpolation mode when the image size exceeds our max limit.
-
-                    if (image.Width > 5000 || image.Height > 5000)
-                    {
-                        //use mid quality
-                        g.InterpolationMode = InterpolationMode.Bilinear;
-                    }
-                    else
-                    {
-                        //use best quality
-                        g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                    }
-                    
-
-                    g.SmoothingMode = SmoothingMode.HighQuality;                    
-                    g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                    g.CompositingQuality = CompositingQuality.HighQuality;
-
-                    // Copy the old image to the new and resized
-                    var rect = new Rectangle(0, 0, widthTh, heightTh);
-                    g.DrawImage(image, rect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel);
-
-                    // Copy metadata
-                    var imageEncoders = ImageCodecInfo.GetImageEncoders();
-
-                    var codec = extension.ToLower() == "png" || extension.ToLower() == "gif"
-                        ? imageEncoders.Single(t => t.MimeType.Equals("image/png"))
-                        : imageEncoders.Single(t => t.MimeType.Equals("image/jpeg"));
-
-                    // Set compresion ratio to 90%
-                    var ep = new EncoderParameters();
-                    ep.Param[0] = new EncoderParameter(Encoder.Quality, 90L);
-
-                    // Save the new image using the dimensions of the image
-                    var predictableThumbnailName = thumbnailFileName.Replace("UMBRACOSYSTHUMBNAIL", maxWidthHeight.ToString(CultureInfo.InvariantCulture));
-                    using (var ms = new MemoryStream())
-                    {
-                        bp.Save(ms, codec, ep);
-                        ms.Seek(0, 0);
-
-                        fs.AddFile(predictableThumbnailName, ms);
-                    }
-
-                    // TODO: Remove this, this is ONLY here for backwards compatibility but it is essentially completely unusable see U4-5385
-                    var newFileName = thumbnailFileName.Replace("UMBRACOSYSTHUMBNAIL", string.Format("{0}x{1}", widthTh, heightTh));
-                    using (var ms = new MemoryStream())
-                    {
-                        bp.Save(ms, codec, ep);
-                        ms.Seek(0, 0);
-
-                        fs.AddFile(newFileName, ms);
-                    }
-
-                    return new ResizedImage(widthTh, heightTh, newFileName);
-                }
-            }
+            public string Filepath { get; set; }
+            public int Width { get; set; }
+            public int Height { get; set; }
         }
 
+        #endregion
     }
 }

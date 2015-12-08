@@ -59,8 +59,15 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// Gets the content of a template as a stream.
         /// </summary>
-        /// <param name="path">The filesystem path to the template.</param>
+        /// <param name="filepath">The filesystem path to the template.</param>
         /// <returns>The content of the template.</returns>
-        Stream GetFileStream(string path);
+        Stream GetFileStream(string filepath);
+
+        /// <summary>
+        /// Sets the content of a template.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the template.</param>
+        /// <param name="content">The content of the template.</param>
+        void SetFile(string filepath, Stream content);
     }
 }

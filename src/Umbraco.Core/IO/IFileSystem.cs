@@ -19,7 +19,7 @@ namespace Umbraco.Core.IO
         
         void AddFile(string path, Stream stream);
 
-        void AddFile(string path, Stream stream, bool overrideIfExists);
+        void AddFile(string path, Stream stream, bool overrideExisting);
 
         IEnumerable<string> GetFiles(string path);
 
@@ -30,7 +30,6 @@ namespace Umbraco.Core.IO
         void DeleteFile(string path);
 
         bool FileExists(string path);
-
 
         string GetRelativePath(string fullPathOrUrl);
 

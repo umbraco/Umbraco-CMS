@@ -33,17 +33,13 @@ namespace Umbraco.Web.Editors
         {
             var media = Services.MediaService.GetById(mediaId);
             if (media == null)
-            {
                 return Request.CreateResponse(HttpStatusCode.NotFound);
-            }
+            
             var imageProp = media.Properties[Constants.Conventions.Media.File];
             if (imageProp == null)
-            {
                 return Request.CreateResponse(HttpStatusCode.NotFound);
-            }
 
             var imagePath = imageProp.Value.ToString();
-
             return GetBigThumbnail(imagePath);
         }
 
@@ -57,10 +53,9 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         public HttpResponseMessage GetBigThumbnail(string originalImagePath)
         {
-            if (string.IsNullOrWhiteSpace(originalImagePath))
-                return Request.CreateResponse(HttpStatusCode.OK);
-
-            return GetResized(originalImagePath, 500, "big-thumb");
+            return string.IsNullOrWhiteSpace(originalImagePath) 
+                ? Request.CreateResponse(HttpStatusCode.OK) 
+                : GetResized(originalImagePath, 500, "big-thumb");
         }
 
         /// <summary>
@@ -76,17 +71,13 @@ namespace Umbraco.Web.Editors
         {
             var media = Services.MediaService.GetById(mediaId);
             if (media == null)
-            {
                 return new HttpResponseMessage(HttpStatusCode.NotFound);
-            }
+            
             var imageProp = media.Properties[Constants.Conventions.Media.File];
             if (imageProp == null)
-            {
                 return new HttpResponseMessage(HttpStatusCode.NotFound);
-            }
 
             var imagePath = imageProp.Value.ToString();
-
             return GetResized(imagePath, width);
         }
 
@@ -111,63 +102,43 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="imagePath"></param>
         /// <param name="width"></param>
-        /// <param name="suffix"></param>
+        /// <param name="sizeName"></param>
         /// <returns></returns>
-        private HttpResponseMessage GetResized(string imagePath, int width, string suffix)
+        private HttpResponseMessage GetResized(string imagePath, int width, string sizeName)
         {
-            var mediaFileSystem = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
+            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
             var ext = Path.GetExtension(imagePath);
 
-            //we need to check if it is an image by extension
-            if (UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes.InvariantContains(ext.TrimStart('.')) == false)
-            {
+            // we need to check if it is an image by extension
+            if (ImageHelper.IsImageFile(ext) == false)
                 return Request.CreateResponse(HttpStatusCode.NotFound);
-            }
 
-            var thumbFilePath = imagePath.TrimEnd(ext) + "_" + suffix + ".jpg";
-            var fullOrgPath = mediaFileSystem.GetFullPath(mediaFileSystem.GetRelativePath(imagePath));
-            var fullNewPath = mediaFileSystem.GetFullPath(mediaFileSystem.GetRelativePath(thumbFilePath));
-            var thumbIsNew = mediaFileSystem.FileExists(fullNewPath) == false;
-            if (thumbIsNew)
+            var resizedPath = imagePath.TrimEnd(ext) + "_" + sizeName + ".jpg";
+            var generate = fs.FileExists(resizedPath) == false;
+            if (generate)
             {
-                //we need to generate it
-                if (mediaFileSystem.FileExists(fullOrgPath) == false)
-                {
+                // we need to generate it - if we have a source
+                if (fs.FileExists(imagePath) == false)
                     return Request.CreateResponse(HttpStatusCode.NotFound);
-                }
 
-                using (var fileStream = mediaFileSystem.OpenFile(fullOrgPath))
+                using (var fileStream = fs.OpenFile(imagePath))
+                using (var originalImage = Image.FromStream(fileStream))
                 {
-                    if (fileStream.CanSeek) fileStream.Seek(0, 0);
-                    using (var originalImage = Image.FromStream(fileStream))
-                    {
-                        //If it is bigger, then do the resize
-                        if (originalImage.Width >= width && originalImage.Height >= width)
-                        {
-                            ImageHelper.GenerateThumbnail(
-                                originalImage,
-                                width,
-                                fullNewPath,
-                                "jpg",
-                                mediaFileSystem);
-                        }
-                        else
-                        {
-                            //just return the original image
-                            fullNewPath = fullOrgPath;
-                        }
-                        
-                    }
+                    // if original image is bigger than requested size, then resize, else return original image
+                    if (originalImage.Width >= width && originalImage.Height >= width)
+                        ImageHelper.GenerateResizedAt(fs, originalImage, resizedPath, width);
+                    else
+                        resizedPath = imagePath;
                 }
             }
 
             var result = Request.CreateResponse(HttpStatusCode.OK);
             //NOTE: That we are not closing this stream as the framework will do that for us, if we try it will
             // fail. See http://stackoverflow.com/questions/9541351/returning-binary-file-from-controller-in-asp-net-web-api
-            var stream = mediaFileSystem.OpenFile(fullNewPath);
+            var stream = fs.OpenFile(resizedPath);
             if (stream.CanSeek) stream.Seek(0, 0);
             result.Content = new StreamContent(stream);
-            result.Headers.Date = mediaFileSystem.GetLastModified(imagePath);
+            result.Headers.Date = fs.GetLastModified(imagePath);
             result.Content.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
             return result;
         }
