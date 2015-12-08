@@ -619,7 +619,7 @@ Miłego dnia!]]></key>
     <key alias="chooseLayout">Choose a layout</key>
     <key alias="addRows">Add a row</key>
     <key alias="addElement">Add content</key>
-    <key alias="stylesApplied">Styles applied</key>
+    <key alias="settingsApplied">Settings applied</key>
 
     <key alias="contentNotAllowed">This content is not allowed here</key>
     <key alias="contentAllowed">This content is allowed here</key>

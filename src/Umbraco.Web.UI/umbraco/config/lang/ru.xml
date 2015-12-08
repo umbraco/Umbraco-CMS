@@ -421,8 +421,8 @@
     <key alias="clickToEmbed">Кликните для встраивания</key>
     <key alias="clickToInsertImage">Кликните для вставки изображения</key>
     <key alias="columns">Колонки</key>
-    <key alias="contentNotAllowed">Indholdet er ikke tilladt her</key>
-    <key alias="contentAllowed">Indholdet er tilladt her</key>
+    <key alias="contentNotAllowed">This content is not allowed here</key>
+    <key alias="contentAllowed">This content is allowed here</key>
     <key alias="columnsDetails">Суммарное число колонок в шаблоне сетки</key>
     <key alias="gridLayouts">Шаблоны сетки</key>
     <key alias="gridLayoutsDetail">Шаблоны являются рабочим пространством для редактора сетки, обычно Вам понадобится не более одного или двух шаблонов</key>
@@ -433,6 +433,7 @@
     <key alias="rowConfigurationsDetail">Строки - это последовательности ячеек с горизонтальным расположением</key>
     <key alias="settingDialogDetails">Установки будут сохранены только если они указаны в корректном формате json</key>
     <key alias="settings">Установки</key>
+    <key alias="settingsApplied">Settings applied</key>
     <key alias="settingsDetails">Задайте установки, доступные редакторам для изменения</key>
     <key alias="styles">Стили</key>
     <key alias="stylesDetails">Задайте стили, доступные редакторам для изменения</key>

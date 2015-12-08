@@ -874,7 +874,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="chooseLayout">Choose a layout</key>
     <key alias="addRows">Add a row</key>
     <key alias="addElement">Add content</key>
-    <key alias="stylesApplied">Styles applied</key>
+    <key alias="settingsApplied">Settings applied</key>
 
     <key alias="contentNotAllowed">This content is not allowed here</key>
     <key alias="contentAllowed">This content is allowed here</key>
@@ -895,7 +895,7 @@ To manage your website, simply open the Umbraco back office and start adding con
 
     <key alias="columns">Columns</key>
     <key alias="columnsDetails">Total combined number of columns in the grid layout</key>
-    
+
     <key alias="settings">Settings</key>
     <key alias="settingsDetails">Configure what settings editors can change</key>
 

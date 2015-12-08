@@ -630,7 +630,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="chooseLayout">Vælg layout</key>
     <key alias="addRows">Tilføj række</key>
     <key alias="addElement">Tilføj indhold</key>
-    <key alias="stylesApplied">Styles applied</key>
+    <key alias="settingsApplied">Instillinger tilføjet</key>
 
     <key alias="contentNotAllowed">Indholdet er ikke tilladt her</key>
     <key alias="contentAllowed">Indholdet er tilladt her</key>
