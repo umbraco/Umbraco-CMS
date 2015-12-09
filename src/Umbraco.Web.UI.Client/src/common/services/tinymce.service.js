@@ -485,29 +485,41 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                         };
                     }
 
-                    dialogService.macroPicker({
-                        dialogData : dialogData,
-                        callback: function(data) {
+                    $scope.macroPickerOverlay = {};
+                    $scope.macroPickerOverlay.view = "macropicker";
+                    $scope.macroPickerOverlay.dialogData = dialogData;
+                    $scope.macroPickerOverlay.show = true;
 
-                            //put the macro syntax in comments, we will parse this out on the server side to be used
-                            //for persisting.
-                            var macroSyntaxComment = "<!-- " + data.syntax + " -->";
-                            //create an id class for this element so we can re-select it after inserting
-                            var uniqueId = "umb-macro-" + editor.dom.uniqueId();
-                            var macroDiv = editor.dom.create('div',
-                                {
-                                    'class': 'umb-macro-holder ' + data.macroAlias + ' mceNonEditable ' + uniqueId
-                                },
-                                macroSyntaxComment + '<ins>Macro alias: <strong>' + data.macroAlias + '</strong></ins>');
+                    $scope.macroPickerOverlay.submit = function(model) {
 
-                            editor.selection.setNode(macroDiv);
-                            
-                            var $macroDiv = $(editor.dom.select("div.umb-macro-holder." + uniqueId));
+                        var macroObject = macroService.collectValueData(model.selectedMacro, model.macroParams, dialogData.renderingEngine);
 
-                            //async load the macro content
-                            loadMacroContent($macroDiv, data);                          
-                        }
-                    });
+                        //put the macro syntax in comments, we will parse this out on the server side to be used
+                        //for persisting.
+                        var macroSyntaxComment = "<!-- " + macroObject.syntax + " -->";
+                        //create an id class for this element so we can re-select it after inserting
+                        var uniqueId = "umb-macro-" + editor.dom.uniqueId();
+                        var macroDiv = editor.dom.create('div',
+                            {
+                                'class': 'umb-macro-holder ' + macroObject.macroAlias + ' mceNonEditable ' + uniqueId
+                            },
+                            macroSyntaxComment + '<ins>Macro alias: <strong>' + macroObject.macroAlias + '</strong></ins>');
+
+                        editor.selection.setNode(macroDiv);
+
+                        var $macroDiv = $(editor.dom.select("div.umb-macro-holder." + uniqueId));
+
+                        //async load the macro content
+                        loadMacroContent($macroDiv, macroObject);
+
+                        $scope.macroPickerOverlay.show = false;
+                        $scope.macroPickerOverlay = null;
+                    };
+
+                    $scope.macroPickerOverlay.close = function(oldModel) {
+                        $scope.macroPickerOverlay.show = false;
+                        $scope.macroPickerOverlay = null;
+                    };
 
                 }
             });
