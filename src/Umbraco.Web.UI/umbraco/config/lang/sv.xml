@@ -378,6 +378,7 @@
     <key alias="showPageOnSend">Vilken sida skall visas när formuläret är skickat</key>
     <key alias="size">Storlek</key>
     <key alias="sort">Sortera</key>
+    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
     <key alias="type">Skriv</key>
     <key alias="typeToSearch">Skriv för att söka...</key>
     <key alias="up">Upp</key>

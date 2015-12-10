@@ -67,7 +67,7 @@
   <area alias="buttons">
     <key alias="select">Select</key>
     <key alias="selectCurrentFolder">Select current folder</key>
-    <key alias="somethingElse">Do something else</key>    
+    <key alias="somethingElse">Do something else</key>
     <key alias="bold">Bold</key>
     <key alias="deindent">Cancel Paragraph Indent</key>
     <key alias="formFieldInsert">Insert form field</key>
@@ -404,6 +404,7 @@
     <key alias="showPageOnSend">Show page on Send</key>
     <key alias="size">Size</key>
     <key alias="sort">Sort</key>
+    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
     <key alias="type">Type</key>
     <key alias="typeToSearch">Type to search...</key>
     <key alias="up">Up</key>

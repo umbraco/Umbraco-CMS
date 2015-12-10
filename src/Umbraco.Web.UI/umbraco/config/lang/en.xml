@@ -404,6 +404,7 @@
     <key alias="showPageOnSend">Show page on Send</key>
     <key alias="size">Size</key>
     <key alias="sort">Sort</key>
+    <key alias="submit">Submit</key> <!-- TODO: Add to other languasge files -->
     <key alias="type">Type</key>
     <key alias="typeToSearch">Type to search...</key>
     <key alias="up">Up</key>

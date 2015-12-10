@@ -394,6 +394,7 @@
     <key alias="showPageOnSend">送信後にページを表示</key>
     <key alias="size">サイズ</key>
     <key alias="sort">並べ替え</key>
+    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
     <key alias="type">型</key>
     <key alias="typeToSearch">検索...</key>
     <key alias="up">上</key>

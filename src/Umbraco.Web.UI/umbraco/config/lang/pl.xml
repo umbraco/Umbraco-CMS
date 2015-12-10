@@ -307,6 +307,7 @@ Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
     <key alias="showPageOnSend">Pokaż stronę "wyślij"</key>
     <key alias="size">Rozmiar</key>
     <key alias="sort">Sortuj</key>
+    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
     <key alias="type">Typ</key>
     <key alias="typeToSearch">Szukaj</key>
     <key alias="up">W górę</key>

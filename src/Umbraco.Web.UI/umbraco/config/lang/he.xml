@@ -316,6 +316,7 @@
     <key alias="showPageOnSend">הצג עמוד בשליחה</key>
     <key alias="size">גודל</key>
     <key alias="sort">סדר</key>
+    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
     <key alias="type">סוג</key>
     <key alias="typeToSearch">הקלד לחיפוש...</key>
     <key alias="up">למעלה</key>

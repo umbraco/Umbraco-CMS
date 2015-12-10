@@ -375,6 +375,7 @@
     <key alias="showPageOnSend">Zobrazit stránku při odeslání</key>
     <key alias="size">Rozměr</key>
     <key alias="sort">Seřadit</key>
+    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
     <key alias="type">Typ</key>
     <key alias="typeToSearch">Pro hledání pište...</key>
     <key alias="up">Nahoru</key>
