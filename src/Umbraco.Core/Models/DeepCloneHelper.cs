@@ -79,6 +79,12 @@ namespace Umbraco.Core.Models
                     else
                     {
                         //its a custom IEnumerable, we'll try to create it
+                        if (propertyInfo.PropertyType.IsAbstract || propertyInfo.PropertyType.IsInterface)
+                        {
+                            //these will always produce an exception, skipping early
+                            continue;
+                        }
+                        
                         try
                         {
                             var custom = Activator.CreateInstance(propertyInfo.PropertyType);
