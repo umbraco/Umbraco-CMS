@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -26,7 +27,7 @@ namespace Umbraco.Core.Models.EntityBase
         /// <summary>
         /// Tracks the properties that have changed
         /// </summary>
-        private IDictionary<string, bool> _propertyChangedInfo = new Dictionary<string, bool>();
+        private ConcurrentDictionary<string, bool> _propertyChangedInfo = new ConcurrentDictionary<string, bool>();
 
         /// <summary>
         /// Tracks the properties that we're changed before the last commit (or last call to ResetDirtyProperties)
@@ -135,12 +136,12 @@ namespace Umbraco.Core.Models.EntityBase
 
             //NOTE: We cannot .Clear() because when we memberwise clone this will be the SAME
             // instance as the one on the clone, so we need to create a new instance.
-            _propertyChangedInfo = new Dictionary<string, bool>();
+            _propertyChangedInfo = new ConcurrentDictionary<string, bool>();
         }
 
         protected void ResetChangeTrackingCollections()
         {
-            _propertyChangedInfo = new Dictionary<string, bool>();
+            _propertyChangedInfo = new ConcurrentDictionary<string, bool>();
             _lastPropertyChangedInfo = new Dictionary<string, bool>();
         }
 
