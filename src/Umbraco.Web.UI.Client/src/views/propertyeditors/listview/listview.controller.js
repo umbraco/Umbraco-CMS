@@ -111,8 +111,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
             // Open ysod overlay
             $scope.ysodOverlay = {
                 view : "ysod",
-                errorMsg : err.errorMsg,
-                data : err.data,
+                error : err,
                 show : true
             };
         }

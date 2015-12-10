@@ -5,9 +5,9 @@ angular.module("umbraco")
             $scope.model.title = "Received an error from the server";
         }
 
-        if ($scope.model.data && $scope.model.data.StackTrace) {
+        if ($scope.model.error && $scope.model.error.data && $scope.model.error.data.StackTrace) {
             //trim whitespace
-            $scope.model.data.StackTrace = $scope.model.data.StackTrace.trim();
+            $scope.model.error.data.StackTrace = $scope.model.error.data.StackTrace.trim();
         }
 
     });
