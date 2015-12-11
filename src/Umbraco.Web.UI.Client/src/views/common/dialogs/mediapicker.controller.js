@@ -10,7 +10,7 @@ angular.module("umbraco")
             $scope.multiPicker = (dialogOptions.multiPicker && dialogOptions.multiPicker !== "0") ? true : false;
             $scope.startNodeId = dialogOptions.startNodeId ? dialogOptions.startNodeId : -1;
             $scope.cropSize = dialogOptions.cropSize;
-            
+
             $scope.filesUploading = 0;
             $scope.dropping = false;
             $scope.progress = 0;
@@ -27,19 +27,18 @@ angular.module("umbraco")
 
             //preload selected item
             $scope.target = undefined;
-            if(dialogOptions.currentTarget){
+            if(dialogOptions.currentTarget) {
                 $scope.target = dialogOptions.currentTarget;
             }
 
             $scope.submitFolder = function(e) {
                 if (e.keyCode === 13) {
                     e.preventDefault();
-                    
+                    $scope.showFolderInput = false;
+
                     mediaResource
                         .addFolder($scope.newFolderName, $scope.options.formData.currentFolder)
                         .then(function(data) {
-                            $scope.showFolderInput = false;
-                            $scope.newFolderName = "";
 
                             //we've added a new folder so lets clear the tree cache for that specific item
                             treeService.clearCache({
@@ -61,7 +60,7 @@ angular.module("umbraco")
                 if (folder.id > 0) {
                     entityResource.getAncestors(folder.id, "media")
                         .then(function(anc) {
-                            // anc.splice(0,1);  
+                            // anc.splice(0,1);
                             $scope.path = _.filter(anc, function (f) {
                                 return f.path.indexOf($scope.startNodeId) !== -1;
                             });
@@ -79,9 +78,9 @@ angular.module("umbraco")
                     });
 
                 $scope.options.formData.currentFolder = folder.id;
-                $scope.currentFolder = folder;      
+                $scope.currentFolder = folder;
             };
-            
+
             //This executes prior to the whole processing which we can use to get the UI going faster,
             //this also gives us the start callback to invoke to kick of the whole thing
             $scope.$on('fileuploadadd', function (e, data) {
@@ -107,7 +106,7 @@ angular.module("umbraco")
                 }
             });
 
-            // All these sit-ups are to add dropzone area and make sure it gets removed if dragging is aborted! 
+            // All these sit-ups are to add dropzone area and make sure it gets removed if dragging is aborted!
             $scope.$on('fileuploaddragover', function (e, data) {
                 if (!$scope.dragClearTimeout) {
                     $scope.$apply(function () {
@@ -125,12 +124,12 @@ angular.module("umbraco")
 
             $scope.clickHandler = function(image, ev, select) {
                 ev.preventDefault();
-                
+
                 if (image.isFolder && !select) {
                     $scope.gotoFolder(image);
                 }else{
                     eventsService.emit("dialogs.mediaPicker.select", image);
-                    
+
                     //we have 3 options add to collection (if multi) show details, or submit it right back to the callback
                     if ($scope.multiPicker) {
                         $scope.select(image);
@@ -152,10 +151,23 @@ angular.module("umbraco")
                 $scope.target = undefined;
             };
 
-           
+            if (!$scope.target) {
 
-            //default root item
-            if(!$scope.target){
-                $scope.gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });  
+                // Check start node is in the path of the requested node to open on (if passed).  It might not be if there are multiple media pickers
+                // with different start nodes.  If it's not, we'll reset to present from the start node.
+                if (dialogOptions.openAtNodeId && dialogOptions.openAtNodeId !== $scope.startNodeId) {
+                    entityResource.getById(dialogOptions.openAtNodeId, "media")
+                        .then(function (openAtNode) {
+                            var openAtNodeId = $scope.startNodeId;
+                            if (openAtNode.path.split(',').indexOf($scope.startNodeId)) {
+                                openAtNodeId = openAtNode.id;
+                            }
+
+                            $scope.gotoFolder({ id: openAtNodeId, name: "Media", icon: "icon-folder" });
+                        });
+                } else {
+                    $scope.gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });
+                }
+
             }
         });
