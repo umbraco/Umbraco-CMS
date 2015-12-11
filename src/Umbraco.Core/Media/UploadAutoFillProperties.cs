@@ -5,6 +5,7 @@ using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Media
@@ -121,12 +122,21 @@ namespace Umbraco.Core.Media
             }
             else
             {
-                var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
-                using (var filestream = fs.OpenFile(filepath))
+                // if anything goes wrong, just reset the properties
+                try
                 {
-                    var extension = (Path.GetExtension(filepath) ?? "").TrimStart('.');
-                    var size = ImageHelper.IsImageFile(extension) ? (Size?) ImageHelper.GetDimensions(filestream) : null;
-                    SetProperties(content, autoFillConfig, size, filestream.Length, extension);
+                    using (var filestream = MediaHelper.FileSystem.OpenFile(filepath))
+                    {
+                        var extension = (Path.GetExtension(filepath) ?? "").TrimStart('.');
+                        var size = ImageHelper.IsImageFile(extension) ? (Size?)ImageHelper.GetDimensions(filestream) : null;
+                        SetProperties(content, autoFillConfig, size, filestream.Length, extension);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.Error(typeof(UploadAutoFillProperties), "Could not populate upload auto-fill properties for file \""
+                        + filepath + "\".", ex);
+                    ResetProperties(content, autoFillConfig);
                 }
             }
         }
