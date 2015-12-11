@@ -1,7 +1,7 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.RTEController",
-    function ($rootScope, $scope, $q, dialogService, $log, imageHelper, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource) {
-        
+    function ($rootScope, $scope, $q, dialogService, $log, imageHelper, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource, macroService) {
+
         $scope.isLoading = true;
 
         //To id the html textarea we need to use the datetime ticks because we can have multiple rte's per a single property alias
@@ -229,15 +229,57 @@ angular.module("umbraco")
                         syncContent(editor);
                     });
 
-
                     //Create the insert media plugin
-                    tinyMceService.createMediaPicker(editor, $scope);
+                    tinyMceService.createMediaPicker(editor, $scope, function(currentTarget, userData){
+
+                        $scope.mediaPickerOverlay = {
+                            currentTarget: currentTarget,
+                            onlyImages: true,
+                            showDetails: true,
+                            startNodeId: userData.startMediaId,
+                            view: "mediapicker",
+                            show: true,
+                            submit: function(model) {
+                                tinyMceService.insertMediaInEditor(editor, model.selectedImages[0]);
+                                $scope.mediaPickerOverlay.show = false;
+                                $scope.mediaPickerOverlay = null;
+                            }
+                        };
+
+                    });
 
                     //Create the embedded plugin
-                    tinyMceService.createInsertEmbeddedMedia(editor, $scope);
+                    tinyMceService.createInsertEmbeddedMedia(editor, $scope, function() {
+
+                      $scope.embedOverlay = {
+                          view: "embed",
+                          show: true,
+                          submit: function(model) {
+                              tinyMceService.insertEmbeddedMediaInEditor(editor, model.embed.preview);
+                              $scope.embedOverlay.show = false;
+                              $scope.embedOverlay = null;
+                          }
+                      };
+
+                    });
+
 
                     //Create the insert macro plugin
-                    tinyMceService.createInsertMacro(editor, $scope);
+                    tinyMceService.createInsertMacro(editor, $scope, function(dialogData) {
+
+                        $scope.macroPickerOverlay = {
+                            view: "macropicker",
+                            dialogData: dialogData,
+                            show: true,
+                            submit: function(model) {
+                                var macroObject = macroService.collectValueData(model.selectedMacro, model.macroParams, dialogData.renderingEngine);
+                                tinyMceService.insertMacroInEditor(editor, macroObject, $scope);
+                                $scope.macroPickerOverlay.show = false;
+                                $scope.macroPickerOverlay = null;
+                            }
+                        };
+
+                    });
                 };
 
 

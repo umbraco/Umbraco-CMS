@@ -56,29 +56,20 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
         * @param {Object} editor the TinyMCE editor instance        
         * @param {Object} $scope the current controller scope
         */
-        createInsertEmbeddedMedia: function (editor, $scope) {
+        createInsertEmbeddedMedia: function (editor, scope, callback) {
             editor.addButton('umbembeddialog', {
                 icon: 'custom icon-tv',
                 tooltip: 'Embed',
                 onclick: function () {
-
-                   $scope.embedOverlay = {};
-                   $scope.embedOverlay.view = "embed";
-                   $scope.embedOverlay.show = true;
-
-                   $scope.embedOverlay.submit = function(model) {
-                      editor.insertContent(model.embed.preview);
-                      $scope.embedOverlay.show = true;
-                      $scope.embedOverlay = null;
-                   };
-
-                   $scope.embedOverlay.close = function(oldModel) {
-                      $scope.embedOverlay.show = true;
-                      $scope.embedOverlay = null;
-                   };
-
+                    if (callback) {
+                        callback();
+                    }
                 }
             });
+        },
+
+        insertEmbeddedMediaInEditor: function(editor, preview) {
+            editor.insertContent(preview);
         },
 
         /**
@@ -92,7 +83,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
         * @param {Object} editor the TinyMCE editor instance        
         * @param {Object} $scope the current controller scope
         */
-        createMediaPicker: function (editor, scope) {
+        createMediaPicker: function (editor, scope, callback) {
             editor.addButton('umbmediapicker', {
                 icon: 'custom icon-picture',
                 tooltip: 'Media Picker',
@@ -112,64 +103,46 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                     }
 
                     userService.getCurrentUser().then(function(userData) {
-
-                        scope.mediaPickerOverlay = {};
-                        scope.mediaPickerOverlay.currentTarget = currentTarget;
-                        scope.mediaPickerOverlay.onlyImages = true;
-                        scope.mediaPickerOverlay.showDetails = true;
-                        scope.mediaPickerOverlay.startNodeId = userData.startMediaId;
-                        scope.mediaPickerOverlay.view = "mediapicker";
-                        scope.mediaPickerOverlay.show = true;
-
-                        scope.mediaPickerOverlay.submit = function(model) {
-
-                           var img = model.selectedImages[0];
-
-                           if(img) {
-
-                              var data = {
-                                  alt: img.altText || "",
-                                  src: (img.url) ? img.url : "nothing.jpg",
-                                  rel: img.id,
-                                  'data-id': img.id,
-                                  id: '__mcenew'
-                              };
-
-                              editor.insertContent(editor.dom.createHTML('img', data));
-
-                              $timeout(function () {
-                                  var imgElm = editor.dom.get('__mcenew');
-                                  var size = editor.dom.getSize(imgElm);
-
-                                  if (editor.settings.maxImageSize && editor.settings.maxImageSize !== 0) {
-                                       var newSize = imageHelper.scaleToMaxSize(editor.settings.maxImageSize, size.w, size.h);
-
-                                       var s = "width: " + newSize.width + "px; height:" + newSize.height + "px;";
-                                       editor.dom.setAttrib(imgElm, 'style', s);
-                                       editor.dom.setAttrib(imgElm, 'id', null);
-
-                                       if (img.url) {
-                                           var src = img.url + "?width=" + newSize.width + "&height=" + newSize.height;
-                                           editor.dom.setAttrib(imgElm, 'data-mce-src', src);
-                                       }
-                                  }
-                              }, 500);
-                           }
-
-                           scope.mediaPickerOverlay.show = false;
-                           scope.mediaPickerOverlay = null;
-                        };
-
-                        scope.mediaPickerOverlay.close = function(oldModel) {
-                           scope.mediaPickerOverlay.show = false;
-                           scope.mediaPickerOverlay = null;
-                        };
-
+                        if(callback) {
+                            callback(currentTarget, userData);
+                        }
                     });
 
-                    
                 }
             });
+        },
+
+        insertMediaInEditor: function(editor, img) {
+            if(img) {
+
+               var data = {
+                   alt: img.altText || "",
+                   src: (img.url) ? img.url : "nothing.jpg",
+                   rel: img.id,
+                   'data-id': img.id,
+                   id: '__mcenew'
+               };
+
+               editor.insertContent(editor.dom.createHTML('img', data));
+
+               $timeout(function () {
+                   var imgElm = editor.dom.get('__mcenew');
+                   var size = editor.dom.getSize(imgElm);
+
+                   if (editor.settings.maxImageSize && editor.settings.maxImageSize !== 0) {
+                        var newSize = imageHelper.scaleToMaxSize(editor.settings.maxImageSize, size.w, size.h);
+
+                        var s = "width: " + newSize.width + "px; height:" + newSize.height + "px;";
+                        editor.dom.setAttrib(imgElm, 'style', s);
+                        editor.dom.setAttrib(imgElm, 'id', null);
+
+                        if (img.url) {
+                            var src = img.url + "?width=" + newSize.width + "&height=" + newSize.height;
+                            editor.dom.setAttrib(imgElm, 'data-mce-src', src);
+                        }
+                   }
+               }, 500);
+            }
         },
 
         /**
@@ -183,8 +156,10 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
         * @param {Object} editor the TinyMCE editor instance      
         * @param {Object} $scope the current controller scope
         */
-        createInsertMacro: function (editor, $scope) {
-            
+        createInsertMacro: function (editor, $scope, callback) {
+
+            var createInsertMacroScope = this;
+
             /** Adds custom rules for the macro plugin and custom serialization */
             editor.on('preInit', function (args) {
                 //this is requires so that we tell the serializer that a 'div' is actually allowed in the root, otherwise the cleanup will strip it out
@@ -220,45 +195,6 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                 return null;
             }
 
-            /** loads in the macro content async from the server */
-            function loadMacroContent($macroDiv, macroData) {
-                
-                //if we don't have the macroData, then we'll need to parse it from the macro div
-                if (!macroData) {                    
-                    var contents = $macroDiv.contents();
-                    var comment = _.find(contents, function (item) {
-                        return item.nodeType === 8;
-                    });
-                    if (!comment) {
-                        throw "Cannot parse the current macro, the syntax in the editor is invalid";
-                    }
-                    var syntax = comment.textContent.trim();
-                    var parsed = macroService.parseMacroSyntax(syntax);
-                    macroData = parsed;
-                }
-
-                var $ins = $macroDiv.find("ins");
-
-                //show the throbber
-                $macroDiv.addClass("loading");
-
-                var contentId = $routeParams.id;
-
-                //need to wrap in safe apply since this might be occuring outside of angular
-                angularHelper.safeApply($scope, function() {
-                    macroResource.getMacroResultAsHtmlForEditor(macroData.macroAlias, contentId, macroData.macroParamsDictionary)
-                    .then(function (htmlResult) {
-
-                        $macroDiv.removeClass("loading");
-                        htmlResult = htmlResult.trim();
-                        if (htmlResult !== "") {
-                            $ins.html(htmlResult);
-                        }
-                    });
-                });
-                
-            }
-            
             /** Adds the button instance */
             editor.addButton('umbmacro', {
                 icon: 'custom icon-settings-alt',
@@ -361,8 +297,8 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                         
                         //get all macro divs and load their content
                         $(editor.dom.select(".umb-macro-holder.mceNonEditable")).each(function() {
-                            loadMacroContent($(this));
-                        });                        
+                            createInsertMacroScope.loadMacroContent($(this), null, $scope);
+                        });
 
                     });
                     
@@ -485,44 +421,73 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                         };
                     }
 
-                    $scope.macroPickerOverlay = {};
-                    $scope.macroPickerOverlay.view = "macropicker";
-                    $scope.macroPickerOverlay.dialogData = dialogData;
-                    $scope.macroPickerOverlay.show = true;
-
-                    $scope.macroPickerOverlay.submit = function(model) {
-
-                        var macroObject = macroService.collectValueData(model.selectedMacro, model.macroParams, dialogData.renderingEngine);
-
-                        //put the macro syntax in comments, we will parse this out on the server side to be used
-                        //for persisting.
-                        var macroSyntaxComment = "<!-- " + macroObject.syntax + " -->";
-                        //create an id class for this element so we can re-select it after inserting
-                        var uniqueId = "umb-macro-" + editor.dom.uniqueId();
-                        var macroDiv = editor.dom.create('div',
-                            {
-                                'class': 'umb-macro-holder ' + macroObject.macroAlias + ' mceNonEditable ' + uniqueId
-                            },
-                            macroSyntaxComment + '<ins>Macro alias: <strong>' + macroObject.macroAlias + '</strong></ins>');
-
-                        editor.selection.setNode(macroDiv);
-
-                        var $macroDiv = $(editor.dom.select("div.umb-macro-holder." + uniqueId));
-
-                        //async load the macro content
-                        loadMacroContent($macroDiv, macroObject);
-
-                        $scope.macroPickerOverlay.show = false;
-                        $scope.macroPickerOverlay = null;
-                    };
-
-                    $scope.macroPickerOverlay.close = function(oldModel) {
-                        $scope.macroPickerOverlay.show = false;
-                        $scope.macroPickerOverlay = null;
-                    };
+                    if(callback) {
+                        callback(dialogData);
+                    }
 
                 }
             });
+        },
+
+        insertMacroInEditor: function(editor, macroObject, $scope) {
+
+            //put the macro syntax in comments, we will parse this out on the server side to be used
+            //for persisting.
+            var macroSyntaxComment = "<!-- " + macroObject.syntax + " -->";
+            //create an id class for this element so we can re-select it after inserting
+            var uniqueId = "umb-macro-" + editor.dom.uniqueId();
+            var macroDiv = editor.dom.create('div',
+                {
+                    'class': 'umb-macro-holder ' + macroObject.macroAlias + ' mceNonEditable ' + uniqueId
+                },
+                macroSyntaxComment + '<ins>Macro alias: <strong>' + macroObject.macroAlias + '</strong></ins>');
+
+            editor.selection.setNode(macroDiv);
+
+            var $macroDiv = $(editor.dom.select("div.umb-macro-holder." + uniqueId));
+
+            //async load the macro content
+            this.loadMacroContent($macroDiv, macroObject, $scope);
+
+        },
+
+        /** loads in the macro content async from the server */
+        loadMacroContent: function($macroDiv, macroData, $scope) {
+
+            //if we don't have the macroData, then we'll need to parse it from the macro div
+            if (!macroData) {
+                var contents = $macroDiv.contents();
+                var comment = _.find(contents, function (item) {
+                    return item.nodeType === 8;
+                });
+                if (!comment) {
+                    throw "Cannot parse the current macro, the syntax in the editor is invalid";
+                }
+                var syntax = comment.textContent.trim();
+                var parsed = macroService.parseMacroSyntax(syntax);
+                macroData = parsed;
+            }
+
+            var $ins = $macroDiv.find("ins");
+
+            //show the throbber
+            $macroDiv.addClass("loading");
+
+            var contentId = $routeParams.id;
+
+            //need to wrap in safe apply since this might be occuring outside of angular
+            angularHelper.safeApply($scope, function() {
+                macroResource.getMacroResultAsHtmlForEditor(macroData.macroAlias, contentId, macroData.macroParamsDictionary)
+                .then(function (htmlResult) {
+
+                    $macroDiv.removeClass("loading");
+                    htmlResult = htmlResult.trim();
+                    if (htmlResult !== "") {
+                        $ins.html(htmlResult);
+                    }
+                });
+            });
+
         }
     };
 }

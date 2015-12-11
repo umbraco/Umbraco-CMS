@@ -7,7 +7,10 @@ angular.module("umbraco.directives")
                 onClick: '&',
                 onFocus: '&',
                 onBlur: '&',
-                configuration:"="
+                configuration:"=",
+                onMediaPickerClick: "=",
+                onEmbedClick: "=",
+                onMacroPickerClick: "="
             },
             template: "<textarea ng-model=\"value\" rows=\"10\" class=\"mceNoEditor\" style=\"overflow:hidden\" id=\"{{uniqueId}}\"></textarea>",
             replace: true,
@@ -207,16 +210,25 @@ angular.module("umbraco.directives")
 
 
                                 //Create the insert media plugin
-                                tinyMceService.createMediaPicker(editor, scope);
+                                tinyMceService.createMediaPicker(editor, scope, function(currentTarget, userData){
+                                    if(scope.onMediaPickerClick) {
+                                        scope.onMediaPickerClick(editor, currentTarget, userData);
+                                    }
+                                });
 
                                 //Create the embedded plugin
-                                tinyMceService.createInsertEmbeddedMedia(editor, scope);
-
-                                //Create the insert link plugin
-                                //tinyMceService.createLinkPicker(editor, scope);
+                                tinyMceService.createInsertEmbeddedMedia(editor, scope, function(){
+                                    if(scope.onEmbedClick) {
+                                        scope.onEmbedClick(editor);
+                                    }
+                                });
 
                                 //Create the insert macro plugin
-                                tinyMceService.createInsertMacro(editor, scope);
+                                tinyMceService.createInsertMacro(editor, scope, function(dialogData){
+                                    if(scope.onMacroPickerClick) {
+                                        scope.onMacroPickerClick(editor, dialogData);
+                                    }
+                                });
 
                             };
 
