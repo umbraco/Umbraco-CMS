@@ -6,32 +6,20 @@
       function link(scope, el, attr, ctrl) {
 
          scope.openIconPicker = function() {
-
-            scope.dialogModel = {};
-            scope.dialogModel.title = "Choose icon";
-            scope.dialogModel.view = "iconPicker";
-            scope.showDialog = true;
-
-            scope.dialogModel.pickIcon = function(icon, color) {
-
-               if (color) {
-                  scope.icon = icon + " " + color;
-               } else {
-                  scope.icon = icon;
-               }
-
-               scope.showDialog = false;
-               scope.dialogModel = null;
-
+            scope.dialogModel = {
+                view: "iconpicker",
+                show: true,
+                submit: function(model) {
+                    if (model.color) {
+                       scope.icon = model.icon + " " + model.color;
+                    } else {
+                       scope.icon = model.icon;
+                    }
+                    scope.dialogModel.show = false;
+                    scope.dialogModel = null;
+                }
             };
-
-            scope.dialogModel.close = function() {
-               scope.showDialog = false;
-               scope.dialogModel = null;
-            };
-
          };
-
       }
 
       var directive = {

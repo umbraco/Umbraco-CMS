@@ -228,26 +228,19 @@ angular.module("umbraco")
         // Add items overlay menu
         // *********************************************
        $scope.openEditorOverlay = function(event, area, index, key) {
-
-          $scope.editorOverlay = {};
-          $scope.editorOverlay.view = "itempicker";
-          $scope.editorOverlay.filter = false;
-          $scope.editorOverlay.title = localizationService.localize("grid_insertControl").then(function (value) {return value;});
-          $scope.editorOverlay.availableItems = area.$allowedEditors;
-          $scope.editorOverlay.event = event;
-          $scope.editorOverlay.show = true;
-
-          $scope.editorOverlay.chooseItem = function(item) {
-             $scope.addControl(item, area, index);
-             $scope.editorOverlay.show = false;
-             $scope.editorOverlay = null;
+          $scope.editorOverlay = {
+              view: "itempicker",
+              filter: false,
+              title: localizationService.localize("grid_insertControl").then(function (value) {return value;}),
+              availableItems: area.$allowedEditors,
+              event: event,
+              show: true,
+              submit: function(model) {
+                  $scope.addControl(model.selectedItem, area, index);
+                  $scope.editorOverlay.show = false;
+                  $scope.editorOverlay = null;
+              }
           };
-
-          $scope.editorOverlay.close = function(oldModel) {
-             $scope.editorOverlay.show = false;
-             $scope.editorOverlay = null;
-          };
-
        };
 
         // *********************************************

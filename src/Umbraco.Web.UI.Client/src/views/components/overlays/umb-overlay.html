@@ -24,7 +24,7 @@
         <div class="umb-overlay-drawer">
             <div class="umb-overlay-drawer-content">
                 <umb-button action="closeOverLay()" button-style="link" label-key="{{model.closeButtonLabelKey}}" label="{{model.closeButtonLabel}}" type="button"></umb-button>
-                <umb-button button-style="success" label-key="{{model.submitButtonLabelKey}}" label="{{model.submitButtonLabel}}" ng-if="model.submit" type="submit"></umb-button>
+                <umb-button button-style="success" label-key="{{model.submitButtonLabelKey}}" label="{{model.submitButtonLabel}}" ng-if="model.submit && model.hideSubmitButton !== true" type="submit"></umb-button>
             </div>
         </div>
     </form>
