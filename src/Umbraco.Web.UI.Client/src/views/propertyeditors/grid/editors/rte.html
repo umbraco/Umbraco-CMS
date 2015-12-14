@@ -5,10 +5,18 @@
 		configuration="model.config.rte"
 		value="control.value"
 		unique-id="control.$uniqueId"
+		on-link-picker-click="vm.openLinkPicker"
 		on-media-picker-click="vm.openMediaPicker"
 		on-embed-click="vm.openEmbed"
 		on-macro-picker-click="vm.openMacroPicker">
 	</div>
+
+	<umb-overlay
+	   ng-if="vm.linkPickerOverlay.show"
+	   model="vm.linkPickerOverlay"
+	   position="right"
+	   view="vm.linkPickerOverlay.view">
+	</umb-overlay>
 
 	<umb-overlay
 	   ng-if="vm.mediaPickerOverlay.show"

@@ -5,9 +5,23 @@
 
         var vm = this;
 
+        vm.openLinkPicker = openLinkPicker;
         vm.openMediaPicker = openMediaPicker;
         vm.openMacroPicker = openMacroPicker;
         vm.openEmbed = openEmbed;
+
+        function openLinkPicker(editor, currentTarget, anchorElement) {
+            vm.linkPickerOverlay = {
+                view: "linkpicker",
+                currentTarget: currentTarget,
+                show: true,
+                submit: function(model) {
+                    tinyMceService.insertLinkInEditor(editor, model.target, anchorElement);
+                    vm.linkPickerOverlay.show = false;
+                    vm.linkPickerOverlay = null;
+                }
+            };
+        }
 
         function openMediaPicker(editor, currentTarget, userData) {
             vm.mediaPickerOverlay = {

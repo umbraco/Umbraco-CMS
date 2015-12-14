@@ -4,6 +4,13 @@
               ng-model="model.value" rows="10"
               id="{{textAreaHtmlId}}"></textarea>
 
+    <umb-overlay
+        ng-if="linkPickerOverlay.show"
+        model="linkPickerOverlay"
+        view="linkPickerOverlay.view"
+        position="right">
+    </umb-overlay>
+
    <umb-overlay
       ng-if="mediaPickerOverlay.show"
       model="mediaPickerOverlay"

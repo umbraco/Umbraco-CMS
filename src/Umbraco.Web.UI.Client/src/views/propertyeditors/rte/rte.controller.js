@@ -229,6 +229,19 @@ angular.module("umbraco")
                         syncContent(editor);
                     });
 
+                    tinyMceService.createLinkPicker(editor, $scope, function(currentTarget, anchorElement) {
+                        $scope.linkPickerOverlay = {
+                            view: "linkpicker",
+                            currentTarget: currentTarget,
+                            show: true,
+                            submit: function(model) {
+                                tinyMceService.insertLinkInEditor(editor, model.target, anchorElement);
+                                $scope.linkPickerOverlay.show = false;
+                                $scope.linkPickerOverlay = null;
+                            }
+                        };
+                    });
+
                     //Create the insert media plugin
                     tinyMceService.createMediaPicker(editor, $scope, function(currentTarget, userData){
 

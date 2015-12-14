@@ -10,7 +10,8 @@ angular.module("umbraco.directives")
                 configuration:"=",
                 onMediaPickerClick: "=",
                 onEmbedClick: "=",
-                onMacroPickerClick: "="
+                onMacroPickerClick: "=",
+                onLinkPickerClick: "="
             },
             template: "<textarea ng-model=\"value\" rows=\"10\" class=\"mceNoEditor\" style=\"overflow:hidden\" id=\"{{uniqueId}}\"></textarea>",
             replace: true,
@@ -208,6 +209,12 @@ angular.module("umbraco.directives")
                                     $(e.target).attr("data-mce-src", path + qs);
                                 });
 
+                                //Create the insert link plugin
+                                tinyMceService.createLinkPicker(editor, scope, function(currentTarget, anchorElement){
+                                    if(scope.onLinkPickerClick) {
+                                        scope.onLinkPickerClick(editor, currentTarget, anchorElement);
+                                    }
+                                });
 
                                 //Create the insert media plugin
                                 tinyMceService.createMediaPicker(editor, scope, function(currentTarget, userData){
