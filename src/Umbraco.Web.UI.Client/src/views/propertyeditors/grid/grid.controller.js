@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.GridController",
-    function ($scope, $http, assetsService, $rootScope, dialogService, gridService, mediaResource, imageHelper, $timeout, umbRequestHelper) {
+    function ($scope, $http, assetsService, localizationService, $rootScope, dialogService, gridService, mediaResource, imageHelper, $timeout, umbRequestHelper) {
 
         // Grid status variables
         $scope.currentRow = null;
@@ -231,7 +231,7 @@ angular.module("umbraco")
           $scope.editorOverlay = {};
           $scope.editorOverlay.view = "itempicker";
           $scope.editorOverlay.filter = false;
-          $scope.editorOverlay.title = "Insert editor";
+          $scope.editorOverlay.title = localizationService.localize("grid_insertControl").then(function (value) {return value;});
           $scope.editorOverlay.availableItems = area.$allowedEditors;
           $scope.editorOverlay.event = event;
           $scope.editorOverlay.show = true;

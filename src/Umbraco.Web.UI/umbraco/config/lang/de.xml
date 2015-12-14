@@ -801,8 +801,13 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
   </area>
   <area alias="grid">
     <key alias="insertControl">Typ auswählen</key>
-    <key alias="addRows">Wählen Sie ein Layout für diese Seite</key>
-    <key alias="addElement"><![CDATA[Zum starten klicken Sie bitte unterhalb auf <i class="icon icon-add blue"></i> und fügen Sie ihr erstes Element hinzu.]]></key>
+    <key alias="addLayout">Wählen Sie ein Layout für diese Seite</key>
+    <key alias="addRows">Wählen Sie ein Reihe</key>
+    <key alias="addElement">Element hinzufügen</key>
+    <key alias="settingsApplied">Settings applied</key>
+
+    <key alias="contentNotAllowed">This content is not allowed here</key>
+    <key alias="contentAllowed">This content is allowed here</key>
 
     <key alias="clickToEmbed">Klicken zum Einfügen</key>
     <key alias="clickToInsertImage">Klicken zum Bild Einfügen</key>
