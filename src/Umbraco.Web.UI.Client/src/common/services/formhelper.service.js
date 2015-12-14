@@ -50,7 +50,7 @@ function formHelper(angularHelper, serverValidationManager, $timeout, notificati
             }
             
             //the first thing any form must do is broadcast the formSubmitting event
-            args.scope.$broadcast("formSubmitting", { scope: args.scope });
+            args.scope.$broadcast("formSubmitting", { scope: args.scope, action: args.action });
 
             //then check if the form is valid
             if (!args.skipValidation) {                
