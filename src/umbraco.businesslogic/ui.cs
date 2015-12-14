@@ -28,7 +28,7 @@ namespace umbraco
     /// The ui class handles the multilingual text in the umbraco back-end.
     /// Provides access to language settings and language files used in the umbraco back-end.
     /// </summary>
-    [Obsolete("Use the ILocalizedTextService instead which is the ApplicationContext.Services")]
+    [Obsolete("Use the ILocalizedTextService instead which is on the ApplicationContext.Services.TextService")]
     public class ui
     {
         private static readonly string UmbracoDefaultUiLanguage = GlobalSettings.DefaultUILanguage;

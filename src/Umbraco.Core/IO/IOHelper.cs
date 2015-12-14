@@ -6,6 +6,7 @@ using System.IO;
 using System.Configuration;
 using System.Web;
 using System.Text.RegularExpressions;
+using System.Web.Hosting;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 
@@ -51,7 +52,23 @@ namespace Umbraco.Core.IO
                 return VirtualPathUtility.ToAbsolute(virtualPath, SystemDirectories.Root);
         }
 
-		[Obsolete("Use Umbraco.Web.Templates.TemplateUtilities.ResolveUrlsFromTextString instead, this method on this class will be removed in future versions")]
+        public static Attempt<string> TryResolveUrl(string virtualPath)
+        {
+            try
+            {
+                if (virtualPath.StartsWith("~"))
+                    return Attempt.Succeed(virtualPath.Replace("~", SystemDirectories.Root).Replace("//", "/"));
+                if (Uri.IsWellFormedUriString(virtualPath, UriKind.Absolute))
+                    return Attempt.Succeed(virtualPath);
+                return Attempt.Succeed(VirtualPathUtility.ToAbsolute(virtualPath, SystemDirectories.Root));
+            }
+            catch (Exception ex)
+            {
+                return Attempt.Fail(virtualPath, ex);
+            }
+        }
+
+	    [Obsolete("Use Umbraco.Web.Templates.TemplateUtilities.ResolveUrlsFromTextString instead, this method on this class will be removed in future versions")]
         internal static string ResolveUrlsFromTextString(string text)
         {
             if (UmbracoConfig.For.UmbracoSettings().Content.ResolveUrlsFromTextString)
@@ -67,7 +84,7 @@ namespace Umbraco.Core.IO
 						if (tag.Groups[1].Success)
 							url = tag.Groups[1].Value;
 
-						if (string.IsNullOrEmpty(url) == false)
+						if (String.IsNullOrEmpty(url) == false)
 						{
 							string resolvedUrl = (url.Substring(0, 1) == "/") ? ResolveUrl(url.Substring(1)) : ResolveUrl(url);
 							text = text.Replace(url, resolvedUrl);
@@ -92,10 +109,10 @@ namespace Umbraco.Core.IO
             if (useHttpContext && HttpContext.Current != null)
             {
                 //string retval;
-                if (string.IsNullOrEmpty(path) == false && (path.StartsWith("~") || path.StartsWith(SystemDirectories.Root)))
-                    return System.Web.Hosting.HostingEnvironment.MapPath(path);
+                if (String.IsNullOrEmpty(path) == false && (path.StartsWith("~") || path.StartsWith(SystemDirectories.Root)))
+                    return HostingEnvironment.MapPath(path);
                 else
-                    return System.Web.Hosting.HostingEnvironment.MapPath("~/" + path.TrimStart('/'));
+                    return HostingEnvironment.MapPath("~/" + path.TrimStart('/'));
             }
 
         	var root = GetRootDirectorySafe();
@@ -115,7 +132,7 @@ namespace Umbraco.Core.IO
         {
             string retval = ConfigurationManager.AppSettings[settingsKey];
 
-            if (string.IsNullOrEmpty(retval))
+            if (String.IsNullOrEmpty(retval))
                 retval = standardPath;
 
             return retval.TrimEnd('/');
@@ -135,12 +152,7 @@ namespace Umbraco.Core.IO
         /// <returns>A value indicating whether the filepath is valid.</returns>
         internal static bool VerifyEditPath(string filePath, string validDir)
         {
-            if (filePath.StartsWith(MapPath(SystemDirectories.Root)) == false)
-                filePath = MapPath(filePath);
-            if (validDir.StartsWith(MapPath(SystemDirectories.Root)) == false)
-                validDir = MapPath(validDir);
-
-            return filePath.StartsWith(validDir);
+            return VerifyEditPath(filePath, new[] { validDir });
         }
 
         /// <summary>
@@ -165,15 +177,31 @@ namespace Umbraco.Core.IO
         /// <returns>A value indicating whether the filepath is valid.</returns>
         internal static bool VerifyEditPath(string filePath, IEnumerable<string> validDirs)
         {
+            // this is called from ScriptRepository, PartialViewRepository, etc.
+            // filePath is the fullPath (rooted, filesystem path, can be trusted)
+            // validDirs are virtual paths (eg ~/Views)
+            //
+            // except that for templates, filePath actually is a virtual path
+
+            //TODO
+            // what's below is dirty, there are too many ways to get the root dir, etc.
+            // not going to fix everything today
+
+            var mappedRoot = MapPath(SystemDirectories.Root);
+            if (filePath.StartsWith(mappedRoot) == false)
+                filePath = MapPath(filePath);
+
+            // yes we can (see above)
+            //// don't trust what we get, it may contain relative segments
+            //filePath = Path.GetFullPath(filePath);
+
             foreach (var dir in validDirs)
             {
                 var validDir = dir;
-                if (filePath.StartsWith(MapPath(SystemDirectories.Root)) == false)
-                    filePath = MapPath(filePath);
-                if (validDir.StartsWith(MapPath(SystemDirectories.Root)) == false)
+                if (validDir.StartsWith(mappedRoot) == false)
                     validDir = MapPath(validDir);
 
-                if (filePath.StartsWith(validDir))
+                if (PathStartsWith(filePath, validDir, Path.DirectorySeparatorChar))
                     return true;
             }
 
@@ -202,11 +230,8 @@ namespace Umbraco.Core.IO
         /// <returns>A value indicating whether the filepath is valid.</returns>
         internal static bool VerifyFileExtension(string filePath, List<string> validFileExtensions)
         {
-            if (filePath.StartsWith(MapPath(SystemDirectories.Root)) == false)
-                filePath = MapPath(filePath);
-            var f = new FileInfo(filePath);
-            
-            return validFileExtensions.Contains(f.Extension.Substring(1));
+            var ext = Path.GetExtension(filePath);
+            return ext != null && validFileExtensions.Contains(ext.TrimStart('.'));
         }
 
         /// <summary>
@@ -223,6 +248,16 @@ namespace Umbraco.Core.IO
             return true;
         }
 
+        public static bool PathStartsWith(string path, string root, char separator)
+        {
+            // either it is identical to root,
+            // or it is root + separator + anything
+
+            if (path.StartsWith(root, StringComparison.OrdinalIgnoreCase) == false) return false;
+            if (path.Length == root.Length) return true;
+            if (path.Length < root.Length) return false;
+            return path[root.Length] == separator;
+        }
 
         /// <summary>
         /// Returns the path to the root of the application, by getting the path to where the assembly where this
@@ -232,7 +267,7 @@ namespace Umbraco.Core.IO
         /// <returns></returns>
         internal static string GetRootDirectorySafe()
         {
-            if (string.IsNullOrEmpty(_rootDir) == false)
+            if (String.IsNullOrEmpty(_rootDir) == false)
             {
                 return _rootDir;
             }
@@ -241,7 +276,7 @@ namespace Umbraco.Core.IO
 			var uri = new Uri(codeBase);
 			var path = uri.LocalPath;
         	var baseDirectory = Path.GetDirectoryName(path);
-            if (string.IsNullOrEmpty(baseDirectory))
+            if (String.IsNullOrEmpty(baseDirectory))
                 throw new Exception("No root directory could be resolved. Please ensure that your Umbraco solution is correctly configured.");
 
             _rootDir = baseDirectory.Contains("bin")
@@ -253,8 +288,8 @@ namespace Umbraco.Core.IO
 
         internal static string GetRootDirectoryBinFolder()
         {
-            string binFolder = string.Empty;
-            if (string.IsNullOrEmpty(_rootDir))
+            string binFolder = String.Empty;
+            if (String.IsNullOrEmpty(_rootDir))
             {
                 binFolder = Assembly.GetExecutingAssembly().GetAssemblyFile().Directory.FullName;
                 return binFolder;
@@ -298,5 +333,25 @@ namespace Umbraco.Core.IO
             // use string extensions
             return filePath.ToSafeFileName();
         }
+
+	    public static void EnsurePathExists(string path)
+	    {
+	        var absolutePath = IOHelper.MapPath(path);
+	        if (Directory.Exists(absolutePath) == false)
+	            Directory.CreateDirectory(absolutePath);
+	    }
+
+	    public static void EnsureFileExists(string path, string contents)
+	    {
+	        var absolutePath = IOHelper.MapPath(path);
+	        if (File.Exists(absolutePath) == false)
+	        {
+                using (var writer = File.CreateText(absolutePath))
+                {
+                    writer.Write(contents);
+                }
+	        }
+	            
+	    }
     }
 }

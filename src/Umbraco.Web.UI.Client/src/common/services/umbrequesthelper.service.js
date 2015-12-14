@@ -248,7 +248,7 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                         //This is a bit of a hack to check if the error is due to a file being uploaded that is too large,
                         // we have to just check for the existence of a string value but currently that is the best way to
                         // do this since it's very hacky/difficult to catch this on the server
-                        if (data.indexOf("Maximum request length exceeded") >= 0) {
+                        if (typeof data !== "undefined" && typeof data.indexOf === "function" && data.indexOf("Maximum request length exceeded") >= 0) {
                             notificationsService.error("Server error", "The uploaded file was too large, check with your site administrator to adjust the maximum size allowed");
                         }                        
                         else if (Umbraco.Sys.ServerVariables["isDebuggingEnabled"] === true) {

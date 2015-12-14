@@ -64,22 +64,23 @@ namespace umbraco.cms.businesslogic.web
 
         public Language Language
         {
-            get { return new Language(DomainEntity.Language); }
-            set { DomainEntity.Language = value.LanguageEntity; }
+            get
+            {
+                if (DomainEntity.LanguageId.HasValue == false) return null;
+                var lang = ApplicationContext.Current.Services.LocalizationService.GetLanguageById(DomainEntity.LanguageId.Value);
+                if (lang == null) throw new InvalidOperationException("No language exists with id " + DomainEntity.LanguageId.Value);
+                return new Language(lang);
+            }
+            set
+            {
+                DomainEntity.LanguageId = value.LanguageEntity.Id;
+            }
         }
 
         public int RootNodeId
         {
-            get { return DomainEntity.RootContent.Id; }
-            set
-            {
-                var content = ApplicationContext.Current.Services.ContentService.GetById(value);
-                if (content == null)
-                {
-                    throw new NullReferenceException("No content found with id " + value);
-                }
-                DomainEntity.RootContent = content;
-            }
+            get { return DomainEntity.RootContentId ?? -1; }
+            set { DomainEntity.RootContentId = value; }
         }
 
         public int Id
@@ -106,9 +107,10 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel) 
             {
-                ApplicationContext.Current.Services.DomainService.Save(DomainEntity);
-
-                FireAfterSave(e);
+                if (ApplicationContext.Current.Services.DomainService.Save(DomainEntity))
+                {
+                    FireAfterSave(e);
+                }
             }
         }
 
@@ -135,7 +137,7 @@ namespace umbraco.cms.businesslogic.web
         public static int GetRootFromDomain(string DomainName)
         {
             var found = ApplicationContext.Current.Services.DomainService.GetByName(DomainName);
-            return found == null ? -1 : found.RootContent.Id;
+            return found == null ? -1 : found.RootContentId ?? -1;
         }
 
         public static Domain[] GetDomainsById(int nodeId)
@@ -159,21 +161,18 @@ namespace umbraco.cms.businesslogic.web
 
         public static void MakeNew(string DomainName, int RootNodeId, int LanguageId)
         {
-            var content = ApplicationContext.Current.Services.ContentService.GetById(RootNodeId);
-            if (content == null) throw new NullReferenceException("No content exists with id " + RootNodeId);
-            var lang = ApplicationContext.Current.Services.LocalizationService.GetLanguageById(LanguageId);
-            if (lang == null) throw new NullReferenceException("No language exists with id " + LanguageId);
-
             var domain = new UmbracoDomain(DomainName)
             {
-                RootContent = content,
-                Language = lang
+                RootContentId = RootNodeId,
+                LanguageId = LanguageId
             };
-            ApplicationContext.Current.Services.DomainService.Save(domain);
-
-            var e = new NewEventArgs();
-            var legacyModel = new Domain(domain);
-            legacyModel.OnNew(e);
+            if (ApplicationContext.Current.Services.DomainService.Save(domain))
+            {
+                var e = new NewEventArgs();
+                var legacyModel = new Domain(domain);
+                legacyModel.OnNew(e);
+            }
+            
         }
 
         #endregion

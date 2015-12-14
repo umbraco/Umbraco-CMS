@@ -11,6 +11,7 @@ namespace Umbraco.Web.Models.ContentEditing
         protected ContentItemDisplayBase()
         {
             Notifications = new List<Notification>();
+            Errors = new Dictionary<string, object>();
         }
 
         /// <summary>

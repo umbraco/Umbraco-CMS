@@ -242,6 +242,27 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
-        
+        protected override IContentType PerformGet(Guid id)
+        {
+            var contentTypes = ContentTypeQueryMapper.GetContentTypes(
+                new[] { id }, Database, SqlSyntax, this, _templateRepository);
+
+            var contentType = contentTypes.SingleOrDefault();
+            return contentType;
+        }
+
+        protected override IEnumerable<IContentType> PerformGetAll(params Guid[] ids)
+        {
+            if (ids.Any())
+            {
+                return ContentTypeQueryMapper.GetContentTypes(ids, Database, SqlSyntax, this, _templateRepository);
+            }
+            else
+            {
+                var sql = new Sql().Select("id").From<NodeDto>(SqlSyntax).Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId);
+                var allIds = Database.Fetch<int>(sql).ToArray();
+                return ContentTypeQueryMapper.GetContentTypes(allIds, Database, SqlSyntax, this, _templateRepository);
+            }
+        }
     }
 }

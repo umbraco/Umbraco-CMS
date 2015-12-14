@@ -8,7 +8,7 @@
     'lib/angular/1.1.5/angular-cookies.min.js',
     'lib/angular/1.1.5/angular-mobile.js',
     'lib/angular/1.1.5/angular-sanitize.min.js',
-
+    
     'lib/angular/angular-ui-sortable.js',
 
     'lib/angular-dynamic-locale/tmhDynamicLocale.min.js',
@@ -20,7 +20,8 @@
     'lib/jquery-file-upload/jquery.fileupload-angular.js',
 
     'lib/bootstrap/js/bootstrap.2.3.2.min.js',
-	'lib/umbraco/Extensions.js',
+    'lib/bootstrap-tabdrop/bootstrap-tabdrop.js',
+    'lib/umbraco/Extensions.js',
     
     'lib/umbraco/NamespaceManager.js',
     'lib/umbraco/LegacyUmbClientMgr.js',

@@ -45,6 +45,27 @@ namespace Umbraco.Tests.Services
         //TODO Add test to delete specific version (with and without deleting prior versions) and versions by date.
 
         [Test]
+        public void Remove_Scheduled_Publishing_Date()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+
+            // Act
+            var content = contentService.CreateContentWithIdentity("Test", -1, "umbTextpage", 0);
+
+            content.ReleaseDate = DateTime.Now.AddHours(2);
+            contentService.Save(content, 0);
+
+            content = contentService.GetById(content.Id);
+            content.ReleaseDate = null;
+            contentService.Save(content, 0);
+
+
+            // Assert
+            Assert.IsTrue(contentService.PublishWithStatus(content).Success);
+        }
+
+        [Test]
         public void Count_All()
         {
             // Arrange
@@ -118,6 +139,20 @@ namespace Umbraco.Tests.Services
 
             // Assert
             Assert.AreEqual(20, contentService.CountDescendants(parent.Id));
+        }
+
+        [Test]
+        public void GetAncestors_Returns_Empty_List_When_Path_Is_Null()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+
+            // Act
+            var current = new Mock<IContent>();
+            var res = contentService.GetAncestors(current.Object);
+
+            // Assert
+            Assert.IsEmpty(res);
         }
 
         [Test]
@@ -1200,6 +1235,52 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Can_Copy_Recursive()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var temp = contentService.GetById(NodeDto.NodeIdSeed + 1);
+            Assert.AreEqual("Home", temp.Name);
+            Assert.AreEqual(2, temp.Children().Count());
+
+            // Act
+            var copy = contentService.Copy(temp, temp.ParentId, false, true, 0);
+            var content = contentService.GetById(NodeDto.NodeIdSeed + 1);
+
+            // Assert
+            Assert.That(copy, Is.Not.Null);
+            Assert.That(copy.Id, Is.Not.EqualTo(content.Id));
+            Assert.AreNotSame(content, copy);
+            Assert.AreEqual(2, copy.Children().Count());
+
+            var child = contentService.GetById(NodeDto.NodeIdSeed + 2);
+            var childCopy = copy.Children().First();
+            Assert.AreEqual(childCopy.Name, child.Name);
+            Assert.AreNotEqual(childCopy.Id, child.Id);
+            Assert.AreNotEqual(childCopy.Key, child.Key);
+        }
+
+        [Test]
+        public void Can_Copy_NonRecursive()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var temp = contentService.GetById(NodeDto.NodeIdSeed + 1);
+            Assert.AreEqual("Home", temp.Name);
+            Assert.AreEqual(2, temp.Children().Count());
+
+            // Act
+            var copy = contentService.Copy(temp, temp.ParentId, false, false, 0);
+            var content = contentService.GetById(NodeDto.NodeIdSeed + 1);
+
+            // Assert
+            Assert.That(copy, Is.Not.Null);
+            Assert.That(copy.Id, Is.Not.EqualTo(content.Id));
+            Assert.AreNotSame(content, copy);
+            Assert.AreEqual(0, copy.Children().Count());
+        }
+
+        [Test]
         public void Can_Copy_Content_With_Tags()
         {
             // Arrange
@@ -1529,7 +1610,7 @@ namespace Umbraco.Tests.Services
             var templateRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
             var tagRepository = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
             contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, templateRepository);
-            var repository = new ContentRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, contentTypeRepository, templateRepository, tagRepository);
+            var repository = new ContentRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
             return repository;
         }
     }

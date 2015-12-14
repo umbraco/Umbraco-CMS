@@ -6,6 +6,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Configuration;
 using System.Xml.Linq;
+using Semver;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -13,6 +14,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.Migrations.Initial;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core
 {
@@ -28,8 +30,6 @@ namespace Umbraco.Core
         private readonly ILogger _logger;
         private readonly SqlSyntaxProviders _syntaxProviders;
         private bool _configured;
-        private bool _canConnect;
-        private volatile bool _connectCheck = false;
         private readonly object _locker = new object();
         private string _connectionString;
         private string _providerName;
@@ -90,7 +90,7 @@ namespace Umbraco.Core
         /// This should not be used for CRUD operations or queries against the
         /// standard Umbraco tables! Use the Public services for that.
         /// </remarks>
-        public UmbracoDatabase Database
+        public virtual UmbracoDatabase Database
         {
             get { return _factory.CreateDatabase(); }
         }
@@ -98,7 +98,7 @@ namespace Umbraco.Core
         /// <summary>
         /// Boolean indicating whether the database has been configured
         /// </summary>
-        public bool IsDatabaseConfigured
+        public virtual bool IsDatabaseConfigured
         {
             get { return _configured; }
         }
@@ -106,33 +106,21 @@ namespace Umbraco.Core
         /// <summary>
         /// Determines if the db can be connected to
         /// </summary>
-        public bool CanConnect
+        public virtual bool CanConnect
         {
             get
             {
                 if (IsDatabaseConfigured == false) return false;
-
-                //double check lock so that it is only checked once and is fast
-                if (_connectCheck == false)
-                {
-                    lock (_locker)
-                    {
-                        if (_canConnect == false)
-                        {
-                            _canConnect = DbConnectionExtensions.IsConnectionAvailable(ConnectionString, DatabaseProvider);
-                            _connectCheck = true;
-                        }
-                    }
-                }
-
-                return _canConnect;
+                var canConnect = DbConnectionExtensions.IsConnectionAvailable(ConnectionString, DatabaseProvider);
+                LogHelper.Info<DatabaseContext>("CanConnect = " + canConnect);
+                return canConnect;
             }
         }
 
         /// <summary>
         /// Gets the configured umbraco db connection string.
         /// </summary>
-        public string ConnectionString
+        public virtual string ConnectionString
         {
             get { return _connectionString; }
         }
@@ -150,7 +138,7 @@ namespace Umbraco.Core
                 _providerName = "System.Data.SqlClient";
                 if (ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName] != null)
                 {
-                    if (!string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName))
+                    if (string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName) == false)
                         _providerName = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName;
                 }
                 else
@@ -164,7 +152,7 @@ namespace Umbraco.Core
         /// <summary>
         /// Returns the Type of DatabaseProvider used
         /// </summary>
-        public DatabaseProviders DatabaseProvider
+        public virtual DatabaseProviders DatabaseProvider
         {
             get
             {
@@ -541,7 +529,7 @@ namespace Umbraco.Core
             return _result;
         }
 
-        internal Result CreateDatabaseSchemaAndData()
+        internal Result CreateDatabaseSchemaAndData(ApplicationContext applicationContext)
         {   
             try
             {
@@ -578,12 +566,15 @@ namespace Umbraco.Core
                 message = GetResultMessageForMySql();
 
                 var schemaResult = ValidateDatabaseSchema();
-                var installedVersion = schemaResult.DetermineInstalledVersion();
+                
+                var installedSchemaVersion = schemaResult.DetermineInstalledVersion();
                 
                 //If Configuration Status is empty and the determined version is "empty" its a new install - otherwise upgrade the existing
-                if (string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus) && installedVersion.Equals(new Version(0, 0, 0)))
+                if (string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus) && installedSchemaVersion.Equals(new Version(0, 0, 0)))
                 {
-                    database.CreateDatabaseSchema();
+                    var helper = new DatabaseSchemaHelper(database, _logger, SqlSyntax);
+                    helper.CreateDatabaseSchema(true, applicationContext);
+
                     message = message + "<p>Installation completed!</p>";
 
                     //now that everything is done, we need to determine the version of SQL server that is executing
@@ -612,7 +603,7 @@ namespace Umbraco.Core
         /// This assumes all of the previous checks are done!
         /// </summary>
         /// <returns></returns>
-        internal Result UpgradeSchemaAndData()
+        internal Result UpgradeSchemaAndData(IMigrationEntryService migrationEntryService)
         {
             try
             {
@@ -631,16 +622,56 @@ namespace Umbraco.Core
                 var message = GetResultMessageForMySql();
 
                 var schemaResult = ValidateDatabaseSchema();
-                var installedVersion = schemaResult.DetermineInstalledVersion();
+
+                var installedSchemaVersion = new SemVersion(schemaResult.DetermineInstalledVersion());
+
+                var installedMigrationVersion = new SemVersion(0);
+                //we cannot check the migrations table if it doesn't exist, this will occur when upgrading to 7.3
+                if (schemaResult.ValidTables.Any(x => x.InvariantEquals("umbracoMigration")))
+                {
+                    installedMigrationVersion = schemaResult.DetermineInstalledVersionByMigrations(migrationEntryService);    
+                }
+
+                var targetVersion = UmbracoVersion.Current;
                 
+                //In some cases - like upgrading from 7.2.6 -> 7.3, there will be no migration information in the database and therefore it will
+                // return a version of 0.0.0 and we don't necessarily want to run all migrations from 0 -> 7.3, so we'll just ensure that the 
+                // migrations are run for the target version
+                if (installedMigrationVersion == new SemVersion(new Version(0, 0, 0)) && installedSchemaVersion > new SemVersion(new Version(0, 0, 0)))
+                {
+                    //set the installedMigrationVersion to be one less than the target so the latest migrations are guaranteed to execute
+                    installedMigrationVersion = new SemVersion(targetVersion.SubtractRevision());
+                }
+                
+                //Figure out what our current installed version is. If the web.config doesn't have a version listed, then we'll use the minimum
+                // version detected between the schema installed and the migrations listed in the migration table. 
+                // If there is a version in the web.config, we'll take the minimum between the listed migration in the db and what
+                // is declared in the web.config.
+                
+                var currentInstalledVersion = string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus)
+                    //Take the minimum version between the detected schema version and the installed migration version
+                    ? new[] {installedSchemaVersion, installedMigrationVersion}.Min()
+                    //Take the minimum version between the installed migration version and the version specified in the config
+                    : new[] { SemVersion.Parse(GlobalSettings.ConfigurationStatus), installedMigrationVersion }.Min();
+
+                //Ok, another edge case here. If the current version is a pre-release, 
+                // then we want to ensure all migrations for the current release are executed. 
+                if (currentInstalledVersion.Prerelease.IsNullOrWhiteSpace() == false)
+                {
+                    currentInstalledVersion  = new SemVersion(currentInstalledVersion.GetVersion().SubtractRevision());
+                }
+
                 //DO the upgrade!
 
-                var currentVersion = string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus)
-                                                ? installedVersion
-                                                : new Version(GlobalSettings.ConfigurationStatus);
-                var targetVersion = UmbracoVersion.Current;
-                var runner = new MigrationRunner(_logger, currentVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
+                var runner = new MigrationRunner(migrationEntryService, _logger, currentInstalledVersion, UmbracoVersion.GetSemanticVersion(), GlobalSettings.UmbracoMigrationName);
+
                 var upgraded = runner.Execute(database, true);
+
+                if (upgraded == false)
+                {
+                    throw new ApplicationException("Upgrading failed, either an error occurred during the upgrade process or an event canceled the upgrade process, see log for full details");
+                }
+
                 message = message + "<p>Upgrade completed!</p>";
 
                 //now that everything is done, we need to determine the version of SQL server that is executing

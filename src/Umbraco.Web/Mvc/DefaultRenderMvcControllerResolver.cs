@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Web.Mvc;
@@ -36,6 +37,8 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Returns an instance of the default controller instance.
         /// </summary>
+        [Obsolete("This method will be removed in future versions and should not be used to resolve a controller instance, the IControllerFactory is used for that purpose")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public IRenderMvcController GetControllerInstance()
         {
             //try the dependency resolver, then the activator
@@ -64,9 +67,9 @@ namespace Umbraco.Web.Mvc
         /// <param name="type"></param>
         private void ValidateType(Type type)
         {
-            if (TypeHelper.IsTypeAssignableFrom<IRenderMvcController>(type) == false)
+            if (TypeHelper.IsTypeAssignableFrom<IRenderController>(type) == false)
             {
-                throw new InvalidOperationException("The Type specified (" + type + ") is not of type " + typeof(IRenderMvcController));
+                throw new InvalidOperationException("The Type specified (" + type + ") is not of type " + typeof (IRenderController));
             }
         }
 

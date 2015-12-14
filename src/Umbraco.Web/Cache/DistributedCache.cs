@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Sync;
@@ -192,24 +193,27 @@ namespace Umbraco.Web.Cache
         public void RefreshAll(Guid factoryGuid)
         {
             if (factoryGuid == Guid.Empty) return;
-            RefreshAll(factoryGuid, true);
+
+            ServerMessengerResolver.Current.Messenger.PerformRefreshAll(
+                ServerRegistrarResolver.Current.Registrar.Registrations,
+                GetRefresherById(factoryGuid));
         }
 
-        /// <summary>
-        /// Notifies the distributed cache of a global invalidation for a specified <see cref="ICacheRefresher"/>.
-        /// </summary>
-        /// <param name="factoryGuid">The unique identifier of the ICacheRefresher.</param>
-        /// <param name="allServers">If true, all servers in the load balancing environment are notified; otherwise,
-        /// only the local server is notified.</param>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method is no longer in use and does not work as advertised, the allServers parameter doesnt have any affect for database server messengers, do not use!")]
         public void RefreshAll(Guid factoryGuid, bool allServers)
         {
             if (factoryGuid == Guid.Empty) return;
-
-            ServerMessengerResolver.Current.Messenger.PerformRefreshAll(
-                allServers 
-                    ? ServerRegistrarResolver.Current.Registrar.Registrations
-                    : Enumerable.Empty<IServerAddress>(), //this ensures it will only execute against the current server
-                GetRefresherById(factoryGuid));
+            if (allServers)
+            {
+                RefreshAll(factoryGuid);
+            }
+            else
+            {
+                ServerMessengerResolver.Current.Messenger.PerformRefreshAll(
+                    Enumerable.Empty<IServerAddress>(),
+                    GetRefresherById(factoryGuid));
+            }
         }
 
         /// <summary>

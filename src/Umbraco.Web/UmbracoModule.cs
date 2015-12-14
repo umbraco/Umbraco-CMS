@@ -20,6 +20,7 @@ using Umbraco.Web.Editors;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using umbraco;
+using Umbraco.Core.Sync;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using ObjectExtensions = Umbraco.Core.ObjectExtensions;
 using RenderingEngine = Umbraco.Core.RenderingEngine;
@@ -42,31 +43,10 @@ namespace Umbraco.Web
 		/// <param name="httpContext"></param>
         static void BeginRequest(HttpContextBase httpContext)
 		{
+            // ensure application url is initialized
+            ApplicationUrlHelper.EnsureApplicationUrl(ApplicationContext.Current, httpContext.Request);
 
-            //we need to set the initial url in our ApplicationContext, this is so our keep alive service works and this must
-            //exist on a global context because the keep alive service doesn't run in a web context.
-            //we are NOT going to put a lock on this because locking will slow down the application and we don't really care
-            //if two threads write to this at the exact same time during first page hit.
-            //see: http://issues.umbraco.org/issue/U4-2059
-            if (ApplicationContext.Current.OriginalRequestUrl.IsNullOrWhiteSpace())
-            {
-                // If (HTTP and SSL not required) or (HTTPS and SSL required), use ports from request to configure OriginalRequestUrl.
-                // Otherwise, user may need to set baseUrl manually per http://our.umbraco.org/documentation/Using-Umbraco/Config-files/umbracoSettings/#ScheduledTasks if non-standard ports used.
-                if ((!httpContext.Request.IsSecureConnection && !GlobalSettings.UseSSL) || (httpContext.Request.IsSecureConnection && GlobalSettings.UseSSL))
-                {
-                    // Use port from request.
-                    ApplicationContext.Current.OriginalRequestUrl = string.Format("{0}:{1}{2}", httpContext.Request.ServerVariables["SERVER_NAME"], httpContext.Request.ServerVariables["SERVER_PORT"], IOHelper.ResolveUrl(SystemDirectories.Umbraco));
-                }
-                else
-                {
-                    // Omit port entirely.
-                    ApplicationContext.Current.OriginalRequestUrl = string.Format("{0}{1}", httpContext.Request.ServerVariables["SERVER_NAME"], IOHelper.ResolveUrl(SystemDirectories.Umbraco));
-                }
-
-                LogHelper.Info<UmbracoModule>("Setting OriginalRequestUrl: " + ApplicationContext.Current.OriginalRequestUrl);
-            }
-
-			// do not process if client-side request
+            // do not process if client-side request
 			if (httpContext.Request.Url.IsClientSideRequest())
 				return;
 
@@ -169,72 +149,7 @@ namespace Umbraco.Web
 		#endregion
 
 		#region Methods
-
-        /// <summary>
-        /// Determines if we should authenticate the request
-        /// </summary>
-        /// <param name="request"></param>
-        /// <param name="originalRequestUrl"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// We auth the request when:
-        /// * it is a back office request
-        /// * it is an installer request
-        /// * it is a /base request
-        /// * it is a preview request
-        /// </remarks>
-        internal static bool ShouldAuthenticateRequest(HttpRequestBase request, Uri originalRequestUrl)
-        {
-            if (//check back office
-                request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath)
-                //check installer
-                || request.Url.IsInstallerRequest()
-                //detect in preview
-                || (request.HasPreviewCookie() && request.Url != null && request.Url.AbsolutePath.StartsWith(IOHelper.ResolveUrl(SystemDirectories.Umbraco)) == false)
-                //check for base
-                || BaseRest.BaseRestHandler.IsBaseRestRequest(originalRequestUrl))
-            {
-                return true;
-            }
-            return false;
-        }
-
-        private static readonly ConcurrentHashSet<string> IgnoreTicketRenewUrls = new ConcurrentHashSet<string>(); 
-        /// <summary>
-        /// Determines if the authentication ticket should be renewed with a new timeout
-        /// </summary>
-        /// <param name="url"></param>
-        /// <param name="httpContext"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// We do not want to renew the ticket when we are checking for the user's remaining timeout unless -
-        /// UmbracoConfig.For.UmbracoSettings().Security.KeepUserLoggedIn == true
-        /// </remarks>
-        internal static bool ShouldIgnoreTicketRenew(Uri url, HttpContextBase httpContext)
-        {
-            //this setting will renew the ticket for all requests.
-            if (UmbracoConfig.For.UmbracoSettings().Security.KeepUserLoggedIn)
-            {
-                return false;
-            }
-
-            //initialize the ignore ticket urls - we don't need to lock this, it's concurrent and a hashset
-            // we don't want to have to gen the url each request so this will speed things up a teeny bit.
-            if (IgnoreTicketRenewUrls.Any() == false)
-            {                
-                var urlHelper = new UrlHelper(new RequestContext(httpContext, new RouteData()));
-                var checkSessionUrl = urlHelper.GetUmbracoApiService<AuthenticationController>(controller => controller.GetRemainingTimeoutSeconds());
-                IgnoreTicketRenewUrls.Add(checkSessionUrl);
-            }
-
-            if (IgnoreTicketRenewUrls.Any(x => url.AbsolutePath.StartsWith(x)))
-            {
-                return true;
-            }
-
-            return false;            
-        }
-
+        
 		/// <summary>
 		/// Checks the current request and ensures that it is routable based on the structure of the request and URI
 		/// </summary>		

@@ -19,7 +19,9 @@ namespace Umbraco.Core.Models.Rdbms
         public Guid UniqueId { get; set; }
 
         [Column("parent")]
-        public Guid Parent { get; set; }
+        [NullSetting(NullSetting = NullSettings.Null)]
+        [ForeignKey(typeof(DictionaryDto), Column = "id")]
+        public Guid? Parent { get; set; }
 
         [Column("key")]
         [Length(1000)]

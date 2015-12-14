@@ -1,7 +1,7 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Dialogs.MediaPickerController",
-        function ($scope, mediaResource, umbRequestHelper, entityResource, $log, mediaHelper, eventsService, treeService, $cookies, $element, $timeout) {
+        function ($scope, mediaResource, umbRequestHelper, entityResource, $log, mediaHelper, eventsService, treeService, $cookies, $element, $timeout, notificationsService) {
 
             var dialogOptions = $scope.dialogOptions;
 
@@ -34,11 +34,12 @@ angular.module("umbraco")
             $scope.submitFolder = function(e) {
                 if (e.keyCode === 13) {
                     e.preventDefault();
-                    $scope.showFolderInput = false;
-
+                    
                     mediaResource
                         .addFolder($scope.newFolderName, $scope.options.formData.currentFolder)
                         .then(function(data) {
+                            $scope.showFolderInput = false;
+                            $scope.newFolderName = "";
 
                             //we've added a new folder so lets clear the tree cache for that specific item
                             treeService.clearCache({
@@ -80,7 +81,7 @@ angular.module("umbraco")
                 $scope.options.formData.currentFolder = folder.id;
                 $scope.currentFolder = folder;      
             };
-
+            
             //This executes prior to the whole processing which we can use to get the UI going faster,
             //this also gives us the start callback to invoke to kick of the whole thing
             $scope.$on('fileuploadadd', function (e, data) {
@@ -97,6 +98,12 @@ angular.module("umbraco")
                         $scope.progress = 0;
                         $scope.gotoFolder($scope.currentFolder);
                     });
+                }
+                //Show notifications!!!!
+                if (data.result && data.result.notifications && angular.isArray(data.result.notifications)) {
+                    for (var n = 0; n < data.result.notifications.length; n++) {
+                        notificationsService.showNotification(data.result.notifications[n]);
+                    }
                 }
             });
 

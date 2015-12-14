@@ -13,9 +13,11 @@ using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Search;
 using Umbraco.Web.WebApi;
+using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.WebServices
 {
+    [ValidateAngularAntiForgeryToken]
     public class ExamineManagementApiController : UmbracoAuthorizedApiController
     {
         /// <summary>
@@ -164,12 +166,23 @@ namespace Umbraco.Web.WebServices
             var msg = ValidateLuceneIndexer(indexerName, out indexer);
             if (msg.IsSuccessStatusCode)
             {
+                //remove it in case there's a handler there alraedy
+                indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;
+                //now add a single handler
+                indexer.IndexOperationComplete += Indexer_IndexOperationComplete;
+
+                var cacheKey = "temp_indexing_op_" + indexer.Name;
+                //put temp val in cache which is used as a rudimentary way to know when the indexing is done
+                ApplicationContext.ApplicationCache.RuntimeCache.InsertCacheItem(cacheKey, () => "tempValue", TimeSpan.FromMinutes(5), isSliding: false);
+
                 try
                 {
                     indexer.RebuildIndex();
                 }
                 catch (Exception ex)
                 {
+                    //ensure it's not listening
+                    indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;
                     LogHelper.Error<ExamineManagementApiController>("An error occurred rebuilding index", ex);
                     var response = Request.CreateResponse(HttpStatusCode.Conflict);
                     response.Content = new StringContent(string.Format("The index could not be rebuilt at this time, most likely there is another thread currently writing to the index. Error: {0}", ex));
@@ -180,14 +193,26 @@ namespace Umbraco.Web.WebServices
             return msg;
         }
 
+        //static listener so it's not GC'd
+        private static void Indexer_IndexOperationComplete(object sender, EventArgs e)
+        {
+            var indexer = (LuceneIndexer) sender;
+
+            //ensure it's not listening anymore
+            indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;
+
+            var cacheKey = "temp_indexing_op_" + indexer.Name;
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(cacheKey);
+        }
+
         /// <summary>
         /// Check if the index has been rebuilt
         /// </summary>
         /// <param name="indexerName"></param>
         /// <returns></returns>
         /// <remarks>
-        /// This is kind of rudimentary since there's no way we can know that the index has rebuilt, we'll just check
-        /// if the index is locked based on Lucene apis
+        /// This is kind of rudimentary since there's no way we can know that the index has rebuilt, we 
+        /// have a listener for the index op complete so we'll just check if that key is no longer there in the runtime cache
         /// </remarks>
         public ExamineIndexerModel PostCheckRebuildIndex(string indexerName)
         {
@@ -195,9 +220,11 @@ namespace Umbraco.Web.WebServices
             var msg = ValidateLuceneIndexer(indexerName, out indexer);
             if (msg.IsSuccessStatusCode)
             {
-                var isLocked = indexer.IsIndexLocked();
-                return isLocked
-                    ? null
+                var cacheKey = "temp_indexing_op_" + indexerName;
+                var found = ApplicationContext.ApplicationCache.RuntimeCache.GetCacheItem(cacheKey);                
+                //if its still there then it's not done
+                return found != null
+                    ? null 
                     : CreateModel(indexer);
             }
             throw new HttpResponseException(msg);
@@ -233,19 +260,37 @@ namespace Umbraco.Web.WebServices
                 //ignore these properties
                                   .Where(x => new[] {"IndexerData", "Description", "WorkingFolder"}.InvariantContains(x.Name) == false)
                                   .OrderBy(x => x.Name);
+								  
             foreach (var p in props)
             {
-                indexerModel.ProviderProperties.Add(p.Name, p.GetValue(indexer, null).ToString());
+                var val = p.GetValue(indexer, null);
+                if (val == null)
+                {
+                    LogHelper.Warn<ExamineManagementApiController>("Property value was null when setting up property on indexer: " + indexer.Name + " property: " + p.Name);
+                    val = string.Empty;
+                }
+                indexerModel.ProviderProperties.Add(p.Name, val.ToString());
             }
 
             var luceneIndexer = indexer as LuceneIndexer;
-            if (luceneIndexer != null && luceneIndexer.IndexExists())
+            if (luceneIndexer != null)
             {                
                 indexerModel.IsLuceneIndex = true;
-                indexerModel.DocumentCount = luceneIndexer.GetIndexDocumentCount();
-                indexerModel.FieldCount = luceneIndexer.GetIndexFieldCount();
-                indexerModel.IsOptimized = luceneIndexer.IsIndexOptimized();
-                indexerModel.DeletionCount = luceneIndexer.GetDeletedDocumentsCount();                
+
+                if (luceneIndexer.IndexExists())
+                {
+                    indexerModel.DocumentCount = luceneIndexer.GetIndexDocumentCount();
+                    indexerModel.FieldCount = luceneIndexer.GetIndexFieldCount();
+                    indexerModel.IsOptimized = luceneIndexer.IsIndexOptimized();
+                    indexerModel.DeletionCount = luceneIndexer.GetDeletedDocumentsCount();
+                }
+                else
+                {
+                    indexerModel.DocumentCount = 0;
+                    indexerModel.FieldCount = 0;
+                    indexerModel.IsOptimized = true;
+                    indexerModel.DeletionCount = 0;
+                }
             }
             return indexerModel;
         }

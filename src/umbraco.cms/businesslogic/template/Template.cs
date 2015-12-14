@@ -256,6 +256,7 @@ namespace umbraco.cms.businesslogic.template
                 foreach (var t in GetAllAsList().FindAll(t => t.MasterTemplate == Id))
                 {
                     t.MasterTemplate = 0;
+                    t.Save();
                 }
             }
 
@@ -263,6 +264,9 @@ namespace umbraco.cms.businesslogic.template
 
             // remove from documents
             Document.RemoveTemplateFromDocument(this.Id);
+
+            //save it
+            Save();
         }
 
         public void RemoveFromDocumentTypes()

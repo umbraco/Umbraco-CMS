@@ -1,5 +1,5 @@
 /**
-* @description Utillity directives for key and field events
+* @description Utility directives for key and field events
 **/
 angular.module('umbraco.directives')
 

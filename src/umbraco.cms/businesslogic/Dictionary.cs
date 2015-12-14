@@ -93,8 +93,8 @@ namespace umbraco.cms.businesslogic
 
             [Obsolete("This is no longer used and will be removed from the codebase in future versions")]
             public bool IsTopMostItem()
-            { 
-                return _dictionaryItem.ParentId == new Guid(Constants.Conventions.Localization.DictionaryItemRootId);
+            {
+                return _dictionaryItem.ParentId.HasValue == false;
             }
 
             /// <summary>
@@ -105,9 +105,9 @@ namespace umbraco.cms.businesslogic
                 get
                 {
                     //EnsureCache();
-                    if (_parent == null)
+                    if (_parent == null && _dictionaryItem.ParentId.HasValue)
                     {
-                        var p = ApplicationContext.Current.Services.LocalizationService.GetDictionaryItemById(_dictionaryItem.ParentId);
+                        var p = ApplicationContext.Current.Services.LocalizationService.GetDictionaryItemById(_dictionaryItem.ParentId.Value);
 
                         if (p == null)
                         {
@@ -325,7 +325,9 @@ namespace umbraco.cms.businesslogic
                 if (!hasKey(key))
                 {
                     var item = ApplicationContext.Current.Services.LocalizationService.CreateDictionaryItemWithIdentity(
-                        key, parentId, defaultValue);
+                        key,
+                        parentId == TopLevelParent ? (Guid?)null : parentId, 
+                        defaultValue);
 
                     return item.Id;
                 }

@@ -21,26 +21,30 @@ namespace Umbraco.Core.Persistence.Repositories
         public LanguageRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
         {
+            //Custom cache options for better performance
+            _cacheOptions = new RepositoryCacheOptions
+            {
+                GetAllCacheAllowZeroCount = true,
+                GetAllCacheValidateCount = false
+            };
+        }
+
+        private readonly RepositoryCacheOptions _cacheOptions;
+
+        /// <summary>
+        /// Returns the repository cache options
+        /// </summary>
+        protected override RepositoryCacheOptions RepositoryCacheOptions
+        {
+            get { return _cacheOptions; }
         }
 
         #region Overrides of RepositoryBase<int,Language>
 
         protected override ILanguage PerformGet(int id)
         {
-            var sql = GetBaseQuery(false);
-            sql.Where(GetBaseWhereClause(), new { Id = id });
-
-            var languageDto = Database.FirstOrDefault<LanguageDto>(sql);
-            if (languageDto == null)
-                return null;
-
-            var entity = ConvertFromDto(languageDto);
-
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            ((Entity)entity).ResetDirtyProperties(false);
-
-            return entity;
+            //use the underlying GetAll which will force cache all domains
+            return GetAll().FirstOrDefault(x => x.Id == id);
         }
 
         protected override IEnumerable<ILanguage> PerformGetAll(params int[] ids)
@@ -155,94 +159,16 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public ILanguage GetByCultureName(string cultureName)
         {
-            var cultureNameRepo = new LanguageByCultureNameRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax);
-            return cultureNameRepo.Get(cultureName);
+            //use the underlying GetAll which will force cache all domains
+            return GetAll().FirstOrDefault(x => x.CultureName.InvariantEquals(cultureName));
         }
 
         public ILanguage GetByIsoCode(string isoCode)
         {
-            var isoRepo = new LanguageByIsoCodeRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax);
-            return isoRepo.Get(isoCode);
+            //use the underlying GetAll which will force cache all domains
+            return GetAll().FirstOrDefault(x => x.IsoCode.InvariantEquals(isoCode));
         }
 
-        /// <summary>
-        /// Inner repository for looking up languages by ISO code, this deals with caching by a string key
-        /// </summary>
-        private class LanguageByIsoCodeRepository : SimpleGetRepository<string, ILanguage, LanguageDto>
-        {
-            private readonly LanguageRepository _languageRepository;
-
-            public LanguageByIsoCodeRepository(LanguageRepository languageRepository, IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-                : base(work, cache, logger, sqlSyntax)
-            {
-                _languageRepository = languageRepository;
-            }
-
-            protected override Sql GetBaseQuery(bool isCount)
-            {
-                return _languageRepository.GetBaseQuery(isCount);
-            }
-
-            protected override string GetBaseWhereClause()
-            {
-                return "umbracoLanguage.languageISOCode = @Id";
-            }
-
-            protected override ILanguage ConvertToEntity(LanguageDto dto)
-            {
-                var factory = new LanguageFactory();
-                return factory.BuildEntity(dto);
-            }
-
-            protected override object GetBaseWhereClauseArguments(string id)
-            {
-                return new {Id = id};
-            }
-
-            protected override string GetWhereInClauseForGetAll()
-            {
-                return "umbracoLanguage.languageISOCode in (@ids)";
-            }
-        }
-
-        /// <summary>
-        /// Inner repository for looking up languages by culture name, this deals with caching by a string key
-        /// </summary>
-        private class LanguageByCultureNameRepository : SimpleGetRepository<string, ILanguage, LanguageDto>
-        {
-            private readonly LanguageRepository _languageRepository;
-
-            public LanguageByCultureNameRepository(LanguageRepository languageRepository, IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-                : base(work, cache, logger, sqlSyntax)
-            {
-                _languageRepository = languageRepository;
-            }
-
-            protected override Sql GetBaseQuery(bool isCount)
-            {
-                return _languageRepository.GetBaseQuery(isCount);
-            }
-
-            protected override string GetBaseWhereClause()
-            {
-                return "umbracoLanguage.languageCultureName = @Id";
-            }
-
-            protected override ILanguage ConvertToEntity(LanguageDto dto)
-            {
-                var factory = new LanguageFactory();
-                return factory.BuildEntity(dto);
-            }
-
-            protected override object GetBaseWhereClauseArguments(string id)
-            {
-                return new {Id = id};
-            }
-
-            protected override string GetWhereInClauseForGetAll()
-            {
-                return "umbracoLanguage.languageCultureName in (@ids)";
-            }
-        }
+   
     }
 }

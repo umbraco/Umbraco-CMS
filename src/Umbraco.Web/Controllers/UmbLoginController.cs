@@ -25,6 +25,8 @@ namespace Umbraco.Web.Controllers
                 return CurrentUmbracoPage();
             }
 
+            TempData["LoginSuccess"] = true;
+
             //if there is a specified path to redirect to then use it
             if (model.RedirectUrl.IsNullOrWhiteSpace() == false)
             {
@@ -32,7 +34,7 @@ namespace Umbraco.Web.Controllers
             }
 
             //redirect to current page by default
-            TempData["LoginSuccess"] = true;
+            
             return RedirectToCurrentUmbracoPage();
             //return RedirectToCurrentUmbracoUrl();
         }

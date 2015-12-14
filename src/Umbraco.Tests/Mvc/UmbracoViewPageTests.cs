@@ -18,6 +18,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Security;
 using umbraco.BusinessLogic;
 using Umbraco.Core;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Tests.PublishedContent;
@@ -400,6 +401,7 @@ namespace Umbraco.Tests.Mvc
                     new Mock<IDatabaseUnitOfWorkProvider>().Object,
                     new RepositoryFactory(CacheHelper.CreateDisabledCacheHelper(), logger, Mock.Of<ISqlSyntaxProvider>(), umbracoSettings),
                     logger,
+                    new TransientMessagesFactory(),
                     new Mock<IEntityService>().Object),
                 new Mock<IMemberGroupService>().Object,
                 new Mock<IMemberTypeService>().Object,
@@ -431,7 +433,12 @@ namespace Umbraco.Tests.Mvc
                 urlProvider);
             umbracoContext.RoutingContext = routingContext;
 
-            var request = new PublishedContentRequest(new Uri("http://localhost/dang"), routingContext);
+            var request = new PublishedContentRequest(
+                new Uri("http://localhost/dang"), 
+                routingContext,
+               settings.WebRouting,
+                s => Enumerable.Empty<string>());
+
             request.Culture = CultureInfo.InvariantCulture;
             umbracoContext.PublishedContentRequest = request;
 

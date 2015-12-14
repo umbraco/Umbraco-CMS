@@ -67,29 +67,26 @@ function openMemberGroup(id) {
             Array.Sort(roles);
 
             foreach(string role in roles) {
-//            MemberGroup[] MemberGroups = MemberGroup.GetAll;
-            
-//            for (int i = 0; i < MemberGroups.Length; i++)
-//            {
-                XmlTreeNode xNode = XmlTreeNode.Create(this);
-                xNode.NodeID = role;
-                xNode.Text = role;
-                xNode.Action = "javascript:openMemberGroup('" + HttpContext.Current.Server.UrlEncode(role.Replace("'", "\\'")) + "');";
-                xNode.Icon = "icon-users";
-                if (!Member.IsUsingUmbracoRoles())
+                if (role.StartsWith(Constants.Conventions.Member.InternalRolePrefix) == false)
                 {
-                    xNode.Menu = null;
-                }
+                    XmlTreeNode xNode = XmlTreeNode.Create(this);
+                    xNode.NodeID = role;
+                    xNode.Text = role;
+                    xNode.Action = "javascript:openMemberGroup('" + HttpContext.Current.Server.UrlEncode(role.Replace("'", "\\'")) + "');";
+                    xNode.Icon = "icon-users";
+                    if (!Member.IsUsingUmbracoRoles())
+                    {
+                        xNode.Menu = null;
+                    }
 
-                OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
-                if (xNode != null)
-                {
-                    tree.Add(xNode);
+                    OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                    if (xNode != null)
+                    {
+                        tree.Add(xNode);
+                    }
+                    OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
                 }
-                OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
             }
         }
-
 	}
-    
 }

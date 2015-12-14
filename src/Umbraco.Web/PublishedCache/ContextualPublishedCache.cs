@@ -25,15 +25,6 @@ namespace Umbraco.Web.PublishedCache
         }
 
         /// <summary>
-        /// Informs the contextual cache that content has changed.
-        /// </summary>
-        /// <remarks>The contextual cache may, although that is not mandatory, provide an immutable snapshot of
-        /// the content over the duration of the context. If you make changes to the content and do want to have
-        /// the cache update its snapshot, you have to explicitely ask it to do so by calling ContentHasChanged.</remarks>
-        public virtual void ContentHasChanged()
-        { }
-
-        /// <summary>
         /// Gets a content identified by its unique identifier.
         /// </summary>
         /// <param name="contentId">The content unique identifier.</param>

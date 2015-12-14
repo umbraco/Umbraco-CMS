@@ -35,7 +35,7 @@ namespace Umbraco.Core.Cache
         {
             const string prefix = CacheItemPrefix + "-";
             return _cache.Cast<DictionaryEntry>()
-                .Where(x => x.Key is string && ((string) x.Key).StartsWith(prefix));
+                .Where(x => x.Key is string && ((string)x.Key).StartsWith(prefix));
         }
 
         protected override void RemoveEntry(string key)
@@ -191,7 +191,7 @@ namespace Umbraco.Core.Cache
             var value = result.Value; // force evaluation now - this may throw if cacheItem throws, and then nothing goes into cache
             if (value == null) return; // do not store null values (backward compat)
 
-            cacheKey = GetCacheKey(cacheKey);           
+            cacheKey = GetCacheKey(cacheKey);
 
             var absolute = isSliding ? System.Web.Caching.Cache.NoAbsoluteExpiration : (timeout == null ? System.Web.Caching.Cache.NoAbsoluteExpiration : DateTime.Now.Add(timeout.Value));
             var sliding = isSliding == false ? System.Web.Caching.Cache.NoSlidingExpiration : (timeout ?? System.Web.Caching.Cache.NoSlidingExpiration);

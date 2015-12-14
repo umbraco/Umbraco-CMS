@@ -136,6 +136,26 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Can_Perform_Get_By_Guid_On_MediaTypeRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var mediaType = repository.Get(1033); //File
+
+                // Act
+                mediaType = repository.Get(mediaType.Key); 
+
+                // Assert
+                Assert.That(mediaType, Is.Not.Null);
+                Assert.That(mediaType.Id, Is.EqualTo(1033));
+                Assert.That(mediaType.Name, Is.EqualTo(Constants.Conventions.MediaTypes.File));
+            }
+        }
+
+        [Test]
         public void Can_Perform_GetAll_On_MediaTypeRepository()
         {
             // Arrange
@@ -149,6 +169,31 @@ namespace Umbraco.Tests.Persistence.Repositories
                     DatabaseContext.Database.ExecuteScalar<int>(
                         "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
                         new {NodeObjectType = new Guid(Constants.ObjectTypes.MediaType)});
+
+                // Assert
+                Assert.That(mediaTypes.Any(), Is.True);
+                Assert.That(mediaTypes.Count(), Is.EqualTo(count));
+            }
+        }
+
+        [Test]
+        public void Can_Perform_GetAll_By_Guid_On_MediaTypeRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var allGuidIds = repository.GetAll().Select(x => x.Key).ToArray();
+
+                // Act
+
+                var mediaTypes = repository.GetAll(allGuidIds);
+
+                int count =
+                    DatabaseContext.Database.ExecuteScalar<int>(
+                        "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
+                        new { NodeObjectType = new Guid(Constants.ObjectTypes.MediaType) });
 
                 // Assert
                 Assert.That(mediaTypes.Any(), Is.True);

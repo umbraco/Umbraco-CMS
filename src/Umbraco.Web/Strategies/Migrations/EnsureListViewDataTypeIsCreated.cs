@@ -31,9 +31,6 @@ namespace Umbraco.Web.Strategies.Migrations
 
         private void EnsureListViewDataTypeCreated(MigrationEventArgs e)
         {
-            var exists = e.MigrationContext.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode WHERE id=1037");
-            if (exists > 0) return;
-
             using (var transaction = e.MigrationContext.Database.GetTransaction())
             {
                 try

@@ -101,6 +101,7 @@ namespace Umbraco.Core.Models.EntityBase
         /// the new api, which also needs to take effect in the legacy api.
         /// </summary>
         [IgnoreDataMember]
+        [Obsolete("Anytime there's a cancellable method it needs to return an Attempt so we know the outcome instead of this hack, not all services have been updated to use this though yet.")]
         internal bool WasCancelled
         {
             get { return _wasCancelled; }

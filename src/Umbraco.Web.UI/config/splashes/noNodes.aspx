@@ -16,14 +16,7 @@
  <meta name="description" content="">
  <meta name="author" content="">
 
- <link href='//fonts.googleapis.com/css?family=Open+Sans:300,400,700,600' rel='stylesheet' type='text/css'>
- <link href='//fonts.googleapis.com/css?family=Asap:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
-
  <link rel="stylesheet" href="../../Umbraco/assets/css/nonodes.style.min.css" />
-
- <!--[if lt IE 9]>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.7.1/modernizr.min.js"></script>
- <![endif]-->
 
 </head>
 <body>
@@ -62,7 +55,7 @@
 
 </section>
 
-<script src="//code.jquery.com/jquery-latest.min.js"></script>
+<script src="https://code.jquery.com/jquery-latest.min.js"></script>
 
 </body>
 </html>

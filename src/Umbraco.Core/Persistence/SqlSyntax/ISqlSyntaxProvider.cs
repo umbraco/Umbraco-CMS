@@ -54,6 +54,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string DeleteConstraint { get; }
         string CreateForeignKeyConstraint { get; }
         string DeleteDefaultConstraint { get; }
+        string FormatDateTime(DateTime date, bool includeTime = true);
         string Format(TableDefinition table);
         string Format(IEnumerable<ColumnDefinition> columns);
         List<string> Format(IEnumerable<IndexDefinition> indexes);

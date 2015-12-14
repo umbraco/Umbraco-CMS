@@ -83,7 +83,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 NodeId = entity.Id,
                 Timestamp = DateTime.Now,
                 VersionId = entity.Version,
-                Xml = entity.Xml.ToString(SaveOptions.None)
+                Xml = entity.Xml.ToDataString()
             };
 
             //We need to do a special InsertOrUpdate here because we know that the PreviewXmlDto table has a composite key and thus

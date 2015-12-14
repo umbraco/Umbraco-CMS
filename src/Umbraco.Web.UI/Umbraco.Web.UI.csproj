@@ -40,13 +40,15 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile />
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort />
+    <IISExpressSSLPort>
+    </IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
     <MvcProjectUpgradeChecked>true</MvcProjectUpgradeChecked>
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>bin\</OutputPath>
@@ -106,41 +108,41 @@
       <Project>{07fbc26b-2927-4a22-8d96-d644c667fecc}</Project>
       <Name>UmbracoExamine</Name>
     </ProjectReference>
-    <Reference Include="AutoMapper, Version=3.3.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\AutoMapper.3.3.1\lib\net40\AutoMapper.dll</HintPath>
+    <Reference Include="AutoMapper, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.3.0.0\lib\net40\AutoMapper.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="AutoMapper.Net4, Version=3.3.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\AutoMapper.3.3.1\lib\net40\AutoMapper.Net4.dll</HintPath>
+    <Reference Include="AutoMapper.Net4, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.3.0.0\lib\net40\AutoMapper.Net4.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="ClientDependency.Core, Version=1.8.3.1, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\ClientDependency.1.8.3.1\lib\net45\ClientDependency.Core.dll</HintPath>
+    <Reference Include="ClientDependency.Core, Version=1.8.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ClientDependency.1.8.4\lib\net45\ClientDependency.Core.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="ClientDependency.Core.Mvc, Version=1.8.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\ClientDependency-Mvc.1.8.0.0\lib\net45\ClientDependency.Core.Mvc.dll</HintPath>
+      <HintPath>..\packages\ClientDependency-Mvc5.1.8.0.0\lib\net45\ClientDependency.Core.Mvc.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="dotless.Core, Version=1.4.1.0, Culture=neutral, PublicKeyToken=96b446c9e63eae34, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\dotless.1.4.1.0\lib\dotless.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Examine">
-      <HintPath>..\packages\Examine.0.1.63.0\lib\Examine.dll</HintPath>
+    <Reference Include="Examine, Version=0.1.68.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Examine.0.1.68.0\lib\Examine.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
-    <Reference Include="ImageProcessor, Version=1.8.8.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\ImageProcessor.1.9.5.0\lib\ImageProcessor.dll</HintPath>
+    <Reference Include="ImageProcessor, Version=2.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ImageProcessor.2.3.0.0\lib\net45\ImageProcessor.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="ImageProcessor.Web, Version=3.3.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\ImageProcessor.Web.3.3.1.0\lib\net45\ImageProcessor.Web.dll</HintPath>
+    <Reference Include="ImageProcessor.Web, Version=4.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ImageProcessor.Web.4.4.0.0\lib\net45\ImageProcessor.Web.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -151,12 +153,12 @@
       <HintPath>..\packages\Lucene.Net.2.9.4.1\lib\net40\Lucene.Net.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.AspNet.Identity.Core">
-      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.0\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.AspNet.Identity.Owin, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.2.2.0\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.2.2.1\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Owin">
@@ -183,20 +185,16 @@
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Web.Mvc.FixedDisplayModes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Microsoft.AspNet.Mvc.FixedDisplayModes.1.0.1\lib\net40\Microsoft.Web.Mvc.FixedDisplayModes.dll</HintPath>
-    </Reference>
     <Reference Include="MiniProfiler, Version=2.1.0.0, Culture=neutral, PublicKeyToken=b44f9351044011a3, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\MiniProfiler.2.1.0\lib\net40\MiniProfiler.dll</HintPath>
     </Reference>
     <Reference Include="MySql.Data">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\MySql.Data.6.9.6\lib\net45\MySql.Data.dll</HintPath>
+      <HintPath>..\packages\MySql.Data.6.9.8\lib\net45\MySql.Data.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Owin">
@@ -251,9 +249,9 @@
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web.Extensions.Design" />
-    <Reference Include="System.Web.Helpers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.Helpers.dll</HintPath>
       <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.Helpers.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.Http, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -263,28 +261,28 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.5.2.3\lib\net45\System.Web.Http.WebHost.dll</HintPath>
     </Reference>
-    <Reference Include="System.Web.Mvc, Version=4.0.0.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+    <Reference Include="System.Web.Mvc, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.3\lib\net45\System.Web.Mvc.dll</HintPath>
       <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.Mvc.4.0.40804.0\lib\net40\System.Web.Mvc.dll</HintPath>
     </Reference>
-    <Reference Include="System.Web.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.3\lib\net45\System.Web.Razor.dll</HintPath>
       <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.Razor.2.0.30506.0\lib\net40\System.Web.Razor.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.Services">
       <Name>System.Web.Services</Name>
     </Reference>
-    <Reference Include="System.Web.WebPages, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.dll</HintPath>
       <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.dll</HintPath>
     </Reference>
-    <Reference Include="System.Web.WebPages.Deployment, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
       <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.Deployment.dll</HintPath>
     </Reference>
-    <Reference Include="System.Web.WebPages.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
       <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.Razor.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml">
       <Name>System.XML</Name>
@@ -743,158 +741,6 @@
     <Content Include="Umbraco_Client\Application\JQuery\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Umbraco_Client\Application\JQuery\jquery.validate.min.js" />
     <Content Include="Umbraco_Client\Application\JQuery\jquery.validate.unobtrusive.min.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Lib\codemirror.css" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Lib\codemirror.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Lib\Util\closetag.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Lib\Util\dialog.css" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Lib\Util\dialog.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Lib\Util\foldcode.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Lib\Util\formatting.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Lib\Util\javascript-hint.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Lib\Util\loadmode.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Lib\Util\match-highlighter.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Lib\Util\multiplex.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Lib\Util\overlay.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Lib\Util\pig-hint.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Lib\Util\razor-hint.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Lib\Util\razor-hints.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Lib\Util\runmode-standalone.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Lib\Util\runmode.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Lib\Util\search.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Lib\Util\searchcursor.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Lib\Util\simple-hint.css" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Lib\Util\simple-hint-customized.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Lib\Util\simple-hint.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Lib\Util\xml-hint.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Clike\clike.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Clike\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Clike\scala.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Clojure\clojure.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Clojure\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Coffeescript\coffeescript.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Coffeescript\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Commonlisp\commonlisp.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Commonlisp\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Css\css.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Css\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Css\test.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Diff\diff.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Diff\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Ecl\ecl.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Ecl\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Erlang\erlang.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Erlang\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Gfm\gfm.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Gfm\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Go\go.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Go\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Groovy\groovy.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Groovy\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Haskell\haskell.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Haskell\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Haxe\haxe.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Haxe\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Htmlembedded\htmlembedded.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Htmlembedded\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Htmlmixed\htmlmixed.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Htmlmixed\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Javascript\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Javascript\javascript.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Jinja2\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Jinja2\jinja2.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Less\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Less\less.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Lua\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Lua\lua.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Markdown\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Markdown\markdown.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Markdown\test.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Mysql\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Mysql\mysql.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Ntriples\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Ntriples\ntriples.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Ocaml\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Ocaml\ocaml.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Pascal\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Pascal\pascal.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Perl\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Perl\perl.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Php\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Php\php.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Pig\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Pig\pig.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Plsql\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Plsql\plsql.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Properties\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Properties\properties.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Python\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Python\LICENSE.txt" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Python\python.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Razor\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Razor\razor.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Rpm\Changes\changes.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Rpm\Changes\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Rpm\Spec\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Rpm\Spec\spec.css" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Rpm\Spec\spec.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Rst\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Rst\rst.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Ruby\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Ruby\ruby.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Rust\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Rust\rust.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\R\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\R\r.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Scheme\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Scheme\scheme.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Shell\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Shell\shell.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Sieve\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Sieve\sieve.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Smalltalk\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Smalltalk\smalltalk.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Smarty\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Smarty\smarty.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Sparql\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Sparql\sparql.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Stex\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Stex\stex.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Stex\test.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Stex\test.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Tiddlywiki\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Tiddlywiki\tiddlywiki.css" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Tiddlywiki\tiddlywiki.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Tiki\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Tiki\tiki.css" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Tiki\tiki.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Vbscript\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Vbscript\vbscript.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Vb\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Vb\LICENSE.txt" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Vb\vb.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Velocity\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Velocity\velocity.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Verilog\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Verilog\verilog.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Xml\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Xml\xml.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Xquery\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Xquery\xquery.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Yaml\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Yaml\yaml.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Theme\ambiance.css" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Theme\blackboard.css" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Theme\cobalt.css" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Theme\eclipse.css" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Theme\elegant.css" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Theme\erlang-dark.css" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Theme\lesser-dark.css" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Theme\monokai.css" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Theme\neat.css" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Theme\night.css" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Theme\rubyblue.css" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Theme\vibrant-ink.css" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Theme\xq-dark.css" />
     <Content Include="Umbraco_Client\ContextMenu\Css\jquery.contextMenu.css" />
     <Content Include="Umbraco_Client\ContextMenu\Js\jquery.contextMenu.js" />
     <Content Include="Umbraco_Client\Dialogs\SortDialog.css" />
@@ -1829,14 +1675,6 @@
     <Content Include="Umbraco_Client\Application\JQuery\VerticalAlign.js" />
     <Content Include="Umbraco_Client\Application\UrlEncoder.js" />
     <Content Include="Umbraco_Client\CodeArea\UmbracoEditor.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Css\csscolors.css" />
-    <Content Include="Umbraco_Client\CodeMirror\Css\docs.css" />
-    <Content Include="Umbraco_Client\CodeMirror\Css\jscolors.css" />
-    <Content Include="Umbraco_Client\CodeMirror\Css\people.jpg" />
-    <Content Include="Umbraco_Client\CodeMirror\Css\pythoncolors.css" />
-    <Content Include="Umbraco_Client\CodeMirror\Css\sparqlcolors.css" />
-    <Content Include="Umbraco_Client\CodeMirror\Css\umbracoCustom.css" />
-    <Content Include="Umbraco_Client\CodeMirror\Css\xmlcolors.css" />
     <Content Include="Umbraco_Client\Tree\UmbracoContext.js" />
     <Content Include="Umbraco_Client\Tree\jquery.tree.checkbox.js" />
     <Content Include="Umbraco_Client\Tree\jquery.tree.contextmenu.js" />
@@ -2019,6 +1857,7 @@
     <Content Include="Umbraco\Images\Editor\newdocument.gif" />
     <Content Include="Umbraco\Images\Editor\opacity.png" />
     <Content Include="Umbraco\Images\Editor\outdent.gif" />
+    <Content Include="Umbraco\Images\Editor\renderbody.gif" />
     <Content Include="Umbraco\Images\Editor\removeformat.gif" />
     <Content Include="Umbraco\Images\Editor\separator.gif" />
     <Content Include="Umbraco\Images\Editor\showStyles.png" />
@@ -2115,14 +1954,6 @@
     <Content Include="Umbraco\PartialViewMacros\Templates\SiteMap.cshtml" />
     <Content Include="Umbraco\Views\AuthorizeUpgrade.cshtml" />
     <Content Include="Umbraco\Translation\translationTasks.dtd" />
-    <None Include="Umbraco_client\CodeMirror\js\mode\coffeescript\LICENSE" />
-    <None Include="Umbraco_client\CodeMirror\js\mode\pascal\LICENSE" />
-    <None Include="Umbraco_client\CodeMirror\js\mode\perl\LICENSE" />
-    <Content Include="Umbraco_client\CodeMirror\js\mode\razor\LICENSE" />
-    <None Include="Umbraco_client\CodeMirror\js\mode\ruby\LICENSE" />
-    <None Include="Umbraco_client\CodeMirror\js\mode\r\LICENSE" />
-    <Content Include="Umbraco_client\CodeMirror\js\mode\sieve\LICENSE" />
-    <None Include="Umbraco_client\CodeMirror\js\mode\xquery\LICENSE" />
     <Content Include="Views\Web.config" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -2429,7 +2260,6 @@
     <Content Include="Umbraco\Users\EditUser.aspx" />
     <Content Include="Umbraco\Users\EditUserType.aspx" />
     <!--<Content Include="Umbraco\users\PermissionEditor.aspx" />-->
-    <Content Include="Umbraco\webService.asmx" />
     <Content Include="Umbraco\Webservices\ajax.js" />
     <Content Include="Umbraco\Webservices\CacheRefresher.asmx">
       <SubType>Form</SubType>
@@ -2535,7 +2365,6 @@
     <Content Include="Umbraco\Webservices\TagsAutoCompleteHandler.ashx" />
     <Content Include="Umbraco\Webservices\UltimatePickerAutoCompleteHandler.ashx" />
     <Content Include="Umbraco\Webservices\MediaUploader.ashx" />
-    <None Include="Umbraco_Client\CodeMirror\LICENSE" />
     <None Include="web.Template.config">
       <SubType>Designer</SubType>
     </None>
@@ -2554,20 +2383,13 @@
     <Content Include="Config\log4net.config" />
     <Content Include="Config\FileSystemProviders.config" />
     <Content Include="Config\EmbeddedMedia.config" />
-    <Content Include="Xslt\Web.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Code\" />
     <Folder Include="App_Data\" />
-    <Folder Include="App_Plugins\" />
-    <Folder Include="Css\" />
-    <Folder Include="MasterPages\" />
     <Folder Include="Media\" />
-    <Folder Include="Scripts\" />
     <Folder Include="Umbraco\preview\" />
     <Folder Include="Umbraco_Client\FolderBrowser\Images\" />
     <Folder Include="Umbraco_Client\Tags\images\" />
-    <Folder Include="UserControls\" />
     <Folder Include="Views\MacroPartials\" />
   </ItemGroup>
   <PropertyGroup>
@@ -2591,9 +2413,9 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.0\x86\*.* "$(TargetDir)x86\" 
         <WebProjectProperties>
           <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>7300</DevelopmentServerPort>
+          <DevelopmentServerPort>7340</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:7300</IISUrl>
+          <IISUrl>http://localhost:7340</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
@@ -2635,5 +2457,4 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.0\x86\*.* "$(TargetDir)x86\" 
     <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=317567." HelpKeyword="BCLBUILD2001" />
     <Error Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568." HelpKeyword="BCLBUILD2002" />
   </Target>
-  <Import Project="..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets" Condition="Exists('..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets')" />
 </Project>

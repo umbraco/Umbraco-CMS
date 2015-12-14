@@ -397,9 +397,11 @@ namespace umbraco.presentation.developer.packages
 
                     if (int.TryParse(li.Value, out nId))
                     {
-                        var s = new Template(nId);
-                        s.RemoveAllReferences();
-                        s.delete();
+                        var found = ApplicationContext.Services.FileService.GetTemplate(nId);
+                        if (found != null)
+                        {
+                            ApplicationContext.Services.FileService.DeleteTemplate(found.Alias, UmbracoUser.Id);
+                        }
                         _pack.Data.Templates.Remove(nId.ToString());
                     }
                 }

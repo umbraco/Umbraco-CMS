@@ -32,7 +32,7 @@ namespace Umbraco.Web.Routing
             {
                 var name = domain.DomainName.ToCSharpString();
                 throw new ArgumentException(string.Format("Failed to parse invalid domain: node id={0}, hostname=\"{1}\"."
-                    + " Hostname should be a valid uri.", domain.RootContent.Id, name), "domain");
+                    + " Hostname should be a valid uri.", domain.RootContentId, name), "domain");
             }
         }
 

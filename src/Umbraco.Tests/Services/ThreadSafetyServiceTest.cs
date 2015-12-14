@@ -18,6 +18,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using umbraco.editorControls.tinyMCE3;
 using umbraco.interfaces;
+using Umbraco.Core.Events;
 
 namespace Umbraco.Tests.Services
 {
@@ -49,13 +50,15 @@ namespace Umbraco.Tests.Services
 			//we need a new Database object for each thread.
             var repositoryFactory = new RepositoryFactory(cacheHelper, Logger, SqlSyntax, SettingsForTests.GenerateMockSettings());
 			_uowProvider = new PerThreadPetaPocoUnitOfWorkProvider(_dbFactory);
-            ApplicationContext.Services = new ServiceContext(
+		    var evtMsgs = new TransientMessagesFactory();
+		    ApplicationContext.Services = new ServiceContext(
                 repositoryFactory,
                 _uowProvider, 
                 new FileUnitOfWorkProvider(), 
-                new PublishingStrategy(), 
+                new PublishingStrategy(evtMsgs, Logger), 
                 cacheHelper, 
-                Logger);
+                Logger,
+                evtMsgs);
 
 			CreateTestData();
 		}

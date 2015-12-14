@@ -62,6 +62,13 @@ namespace Umbraco.Core.Services
         IEnumerable<IDictionaryItem> GetDictionaryItemChildren(Guid parentId);
 
         /// <summary>
+        /// Gets a list of descendants for a <see cref="IDictionaryItem"/>
+        /// </summary>
+        /// <param name="parentId">Id of the parent, null will return all dictionary items</param>
+        /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
+        IEnumerable<IDictionaryItem> GetDictionaryItemDescendants(Guid? parentId);
+
+        /// <summary>
         /// Gets the root/top <see cref="IDictionaryItem"/> objects
         /// </summary>
         /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>

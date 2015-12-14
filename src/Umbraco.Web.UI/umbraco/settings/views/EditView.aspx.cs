@@ -66,7 +66,7 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 	            {
 	                return TreeDefinitionCollection.Instance.FindTree<PartialViewsTree>().Tree.Alias;
 	            }
-	            return Request.QueryString["treeType"];
+	            return Request.CleanForXss("treeType");
 	        }
 	    }
 
@@ -114,28 +114,23 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 					NameTxt.Text = _template.GetRawText();
 					AliasTxt.Text = _template.Alias;
 					editorSource.Text = _template.Design;
-
+				    PathPrefix.Visible = false;
 				}
 				else
 				{
 					//configure editor for editing a file....
 
 					NameTxt.Text = OriginalFileName;
-					var file = IOHelper.MapPath(SystemDirectories.MvcViews.EnsureEndsWith('/') + OriginalFileName);
+				    var svce = ApplicationContext.Current.Services.FileService;
+                    var file = EditorType == ViewEditorType.PartialView
+				        ? svce.GetPartialView(OriginalFileName)
+                        : svce.GetPartialViewMacro(OriginalFileName);
+				    editorSource.Text = file.Content;
 
-                    // validate file path
-                    if (file.StartsWith(IOHelper.MapPath(SystemDirectories.MvcViews.EnsureEndsWith('/')))) {
-
-					using (var sr = File.OpenText(file))
-					{
-						var s = sr.ReadToEnd();
-						editorSource.Text = s;
-					}
-                    } else
-                    {
-                        throw new ArgumentException("Couldn't open file - illegal path");
-                    }
-				
+                    const string prefixFormat = "<span style=\"display: inline-block; height: 20px; line-height: 20px; margin-bottom: 0px; padding: 4px 6px;\">{0}</span>";
+                    PathPrefix.Text = string.Format(prefixFormat, EditorType == ViewEditorType.PartialView
+				        ? "Partials/"
+				        : "MacroPartials/");
 				}							
 			}
             
@@ -253,29 +248,33 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 		/// </summary>
 		private void InitializeEditorForTemplate()
 		{
-			
-			//TODO: implement content placeholders, etc... just like we had in v5
 
-			//Panel1.Menu.InsertSplitter();
+            //TODO: implement content placeholders, etc... just like we had in v5
 
-			//MenuIconI umbContainer = Panel1.Menu.NewIcon();
-			//umbContainer.ImageURL = UmbracoPath + "/images/editor/masterpagePlaceHolder.gif";
-			//umbContainer.AltText = ui.Text("template", "insertContentAreaPlaceHolder");
-			//umbContainer.OnClickCommand =
-			//	ClientTools.Scripts.OpenModalWindow(
-			//		IOHelper.ResolveUrl(SystemDirectories.Umbraco) +
-			//		"/dialogs/insertMasterpagePlaceholder.aspx?&id=" + _template.Id,
-			//		ui.Text("template", "insertContentAreaPlaceHolder"), 470, 320);
+            editorSource.Menu.InsertSplitter();
 
-			//MenuIconI umbContent = Panel1.Menu.NewIcon();
-			//umbContent.ImageURL = UmbracoPath + "/images/editor/masterpageContent.gif";
-			//umbContent.AltText = ui.Text("template", "insertContentArea");
-			//umbContent.OnClickCommand =
-			//	ClientTools.Scripts.OpenModalWindow(
-			//		IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/insertMasterpageContent.aspx?id=" +
-			//		_template.Id, ui.Text("template", "insertContentArea"), 470, 300);
-			
-		}
+            MenuIconI umbRenderBody = editorSource.Menu.NewIcon();
+            umbRenderBody.ImageURL = UmbracoPath + "/images/editor/renderbody.gif";
+            //umbContainer.AltText = ui.Text("template", "insertContentAreaPlaceHolder");
+            umbRenderBody.AltText = "Insert @RenderBody()";
 
-	}
+            umbRenderBody.OnClickCommand = "editViewEditor.insertRenderBody()";
+
+            MenuIconI umbSection = editorSource.Menu.NewIcon();
+            umbSection.ImageURL = UmbracoPath + "/images/editor/masterpagePlaceHolder.gif";
+            //umbContainer.AltText = ui.Text("template", "insertContentAreaPlaceHolder");
+            umbSection.AltText = "Insert Section";
+
+            umbSection.OnClickCommand = "editViewEditor.openSnippetModal('section')";
+
+            MenuIconI umbRenderSection = editorSource.Menu.NewIcon();
+            umbRenderSection.ImageURL = UmbracoPath + "/images/editor/masterpageContent.gif";
+            //umbContainer.AltText = ui.Text("template", "insertContentAreaPlaceHolder");
+            umbRenderSection.AltText = "Insert @RenderSection";
+
+            umbRenderSection.OnClickCommand = "editViewEditor.openSnippetModal('rendersection')";
+
+        }
+
+    }
 }

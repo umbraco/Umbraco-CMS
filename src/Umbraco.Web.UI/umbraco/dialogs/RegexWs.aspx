@@ -1,4 +1,5 @@
 <%@ Page Language="C#" AutoEventWireup="true" MasterPageFile="../masterpages/umbracoDialog.Master" CodeBehind="RegexWs.aspx.cs" Inherits="umbraco.presentation.dialogs.RegexWs" %>
+<%@ Import Namespace="Umbraco.Web" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 
@@ -40,7 +41,7 @@
 <asp:Content ContentPlaceHolderID="head" runat="server">
   <script type="text/javascript">
 	  function chooseRegex(regex) {
-		var target = top.right.document.getElementById('<%= Request.QueryString["target"] %>');
+		var target = top.right.document.getElementById('<%= Request.CleanForXss("target") %>');
 		target.value = regex;
 		UmbClientMgr.closeModalWindow(); 
 	}

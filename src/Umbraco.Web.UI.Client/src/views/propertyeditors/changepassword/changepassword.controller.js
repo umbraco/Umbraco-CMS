@@ -61,7 +61,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.ChangePasswordCont
             if (!isNew) {
                 $scope.model.confirm = "";
             }
-            else if ($scope.model.value.newPassword.length > 0) {
+            else if ($scope.model.value.newPassword && $scope.model.value.newPassword.length > 0) {
                 //if it is new and a new password has been set, then set the confirm password too
                 $scope.model.confirm = $scope.model.value.newPassword;
             }

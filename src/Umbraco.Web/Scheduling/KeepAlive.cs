@@ -1,47 +1,78 @@
 using System;
 using System.Net;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Sync;
 
 namespace Umbraco.Web.Scheduling
 {
-    internal class KeepAlive
+    internal class KeepAlive : RecurringTaskBase
     {
-        public static void Start(ApplicationContext appContext, IUmbracoSettingsSection settings)
+        private readonly ApplicationContext _appContext;
+
+        public KeepAlive(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds, 
+            ApplicationContext appContext)
+            : base(runner, delayMilliseconds, periodMilliseconds)
         {
+            _appContext = appContext;
+        }
+
+        public override bool PerformRun()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override async Task<bool> PerformRunAsync(CancellationToken token)
+        {
+            if (_appContext == null) return true; // repeat...
+
+            // ensure we do not run if not main domain, but do NOT lock it
+            if (_appContext.MainDom.IsMainDom == false)
+            {
+                LogHelper.Debug<ScheduledPublishing>("Does not run if not MainDom.");
+                return false; // do NOT repeat, going down
+            }
+
             using (DisposableTimer.DebugDuration<KeepAlive>(() => "Keep alive executing", () => "Keep alive complete"))
-            {                
-                var umbracoBaseUrl = ServerEnvironmentHelper.GetCurrentServerUmbracoBaseUrl(
-                    appContext,
-                    settings);
+            {
+                string umbracoAppUrl = null;
 
-                if (string.IsNullOrWhiteSpace(umbracoBaseUrl))
+                try
                 {
-                    LogHelper.Warn<KeepAlive>("No url for service (yet), skip.");
+                    umbracoAppUrl = _appContext.UmbracoApplicationUrl;
+                    if (umbracoAppUrl.IsNullOrWhiteSpace())
+                    {
+                        LogHelper.Warn<KeepAlive>("No url for service (yet), skip.");
+                        return true; // repeat
+                    }
+
+                    var url = umbracoAppUrl + "/ping.aspx";
+                    using (var wc = new HttpClient())
+                    {
+                        var request = new HttpRequestMessage(HttpMethod.Get, url);
+                        var result = await wc.SendAsync(request, token);
+                    }
                 }
-                else
+                catch (Exception e)
                 {
-                    var url = string.Format("{0}ping.aspx", umbracoBaseUrl.EnsureEndsWith('/'));
-
-                    try
-                    {
-                        using (var wc = new WebClient())
-                        {
-                            wc.DownloadString(url);
-                        }
-                    }
-                    catch (Exception ee)
-                    {
-                        LogHelper.Error<KeepAlive>(
-                        string.Format("Error in ping. The base url used in the request was: {0}, see http://our.umbraco.org/documentation/Using-Umbraco/Config-files/umbracoSettings/#ScheduledTasks documentation for details on setting a baseUrl if this is in error", umbracoBaseUrl)
-                        , ee);
-                    }
+                    LogHelper.Error<KeepAlive>(string.Format("Failed (at \"{0}\").", umbracoAppUrl), e);
                 }
             }
-            
+
+            return true; // repeat
+        }
+
+        public override bool IsAsync
+        {
+            get { return true; }
+        }
+
+        public override bool RunsOnShutdown
+        {
+            get { return false; }
         }
     }
 }

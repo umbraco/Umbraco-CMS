@@ -11,6 +11,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using umbraco.interfaces;
 using System.Linq;
+using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
 namespace Umbraco.Web.Cache
 {
@@ -29,7 +30,7 @@ namespace Umbraco.Web.Cache
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        internal static JsonPayload[] DeserializeFromJsonPayload(string json)
+        public static JsonPayload[] DeserializeFromJsonPayload(string json)
         {
             var serializer = new JavaScriptSerializer();
             var jsonObject = serializer.Deserialize<JsonPayload[]>(json);
@@ -98,14 +99,14 @@ namespace Umbraco.Web.Cache
 
         #region Sub classes
 
-        internal enum OperationType
+        public enum OperationType
         {
             Saved,
             Trashed,
             Deleted
         }
 
-        internal class JsonPayload
+        public class JsonPayload
         {
             public string Path { get; set; }
             public int Id { get; set; }
@@ -184,9 +185,11 @@ namespace Umbraco.Web.Cache
                             if (idPart == payload.Id.ToString(CultureInfo.InvariantCulture))
                                 ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(
                                     string.Format("{0}_{1}", CacheKeys.MediaCacheKey, payload.Id));
-
                         }   
-                    }                    
+                    }
+
+                    // published cache...
+                    PublishedMediaCache.ClearCache(payload.Id);
                 });
 
             

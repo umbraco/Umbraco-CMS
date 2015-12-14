@@ -137,9 +137,23 @@ namespace Umbraco.Core.Models
                 new DelegateEqualityComparer<object>(
                     (o, o1) =>
                     {
-                        //Custom comparer for enumerable if it is enumerable
                         if (o == null && o1 == null) return true;
+
+                        //custom comparer for strings.                        
+                        if (o is string || o1 is string)                            
+                        {
+                            //if one is null and another is empty then they are the same
+                            if ((o as string).IsNullOrWhiteSpace() && (o1 as string).IsNullOrWhiteSpace())
+                            {
+                                return true;   
+                            }
+                            if (o == null || o1 == null) return false;
+                            return o.Equals(o1);
+                        }
+                        
                         if (o == null || o1 == null) return false;
+
+                        //Custom comparer for enumerable if it is enumerable
                         var enum1 = o as IEnumerable;
                         var enum2 = o1 as IEnumerable;
                         if (enum1 != null && enum2 != null)

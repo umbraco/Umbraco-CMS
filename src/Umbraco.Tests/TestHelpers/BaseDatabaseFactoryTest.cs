@@ -30,6 +30,7 @@ using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using umbraco.BusinessLogic;
+using Umbraco.Core.Events;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -75,11 +76,12 @@ namespace Umbraco.Tests.TestHelpers
 
             var repositoryFactory = new RepositoryFactory(cacheHelper, Logger, SqlSyntax, SettingsForTests.GenerateMockSettings());
 
+            var evtMsgs = new TransientMessagesFactory();
             _appContext = new ApplicationContext(
                 //assign the db context
                 new DatabaseContext(dbFactory, Logger, SqlSyntax, "System.Data.SqlServerCe.4.0"),
                 //assign the service context
-                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper, Logger),
+                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy(evtMsgs, Logger), cacheHelper, Logger, evtMsgs),
                 cacheHelper,
                 ProfilingLogger)
             {
@@ -97,7 +99,7 @@ namespace Umbraco.Tests.TestHelpers
                 InitializeDatabase();
 
                 //ensure the configuration matches the current version for tests
-                SettingsForTests.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
+                SettingsForTests.ConfigurationStatus = UmbracoVersion.GetSemanticVersion().ToSemanticString();
             }
         }
 
@@ -162,7 +164,7 @@ namespace Umbraco.Tests.TestHelpers
 
             //if this is the first test in the session, always ensure a new db file is created
             if (_isFirstRunInTestSession || File.Exists(_dbPath) == false
-                || DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerTest
+                || (DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerTest || DatabaseTestBehavior == DatabaseBehavior.EmptyDbFilePerTest)
                 || (_isFirstTestInFixture && DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerFixture))
             {
                 
@@ -180,7 +182,7 @@ namespace Umbraco.Tests.TestHelpers
                 //Create the Sql CE database
                 using (ProfilingLogger.TraceDuration<BaseDatabaseFactoryTest>("Create database file"))
                 {
-                    if (_dbBytes != null)
+                    if (DatabaseTestBehavior != DatabaseBehavior.EmptyDbFilePerTest && _dbBytes != null)
                     {
                         File.WriteAllBytes(_dbPath, _dbBytes);
                     }
@@ -226,7 +228,7 @@ namespace Umbraco.Tests.TestHelpers
         /// </summary>
         protected virtual void InitializeDatabase()
         {
-            if (DatabaseTestBehavior == DatabaseBehavior.NoDatabasePerFixture)
+            if (DatabaseTestBehavior == DatabaseBehavior.NoDatabasePerFixture || DatabaseTestBehavior == DatabaseBehavior.EmptyDbFilePerTest)
                 return;
 
             //create the schema and load default data if:

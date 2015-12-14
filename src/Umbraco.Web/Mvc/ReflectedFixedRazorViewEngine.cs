@@ -7,6 +7,7 @@ namespace Umbraco.Web.Mvc
     /// <summary>
     /// This is here to support compatibility with both MVC4 and MVC5
     /// </summary>
+    [Obsolete("MVC5 does not have a 'fixed' viewengine so there's no reason to use this any more", false)]
     public abstract class ReflectedFixedRazorViewEngine : IViewEngine
     {
         protected ReflectedFixedRazorViewEngine()

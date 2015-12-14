@@ -5,8 +5,6 @@ using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
-    //TODO: Need to custom serialize this
-
     [Serializable]
     [DataContract(IsReference = true)]
     public class UmbracoDomain : Entity, IDomain
@@ -16,25 +14,32 @@ namespace Umbraco.Core.Models
             _domainName = domainName;
         }
 
-        private IContent _content;
-        private ILanguage _language;
+        public UmbracoDomain(string domainName, string languageIsoCode)
+            : this(domainName)
+        {
+            LanguageIsoCode = languageIsoCode;
+        }
+
+        private int? _contentId;
+        private int? _languageId;
         private string _domainName;
 
-        private static readonly PropertyInfo DefaultLanguageSelector = ExpressionHelper.GetPropertyInfo<UmbracoDomain, ILanguage>(x => x.Language);
+        private static readonly PropertyInfo ContentSelector = ExpressionHelper.GetPropertyInfo<UmbracoDomain, int?>(x => x.RootContentId);
+        private static readonly PropertyInfo DefaultLanguageSelector = ExpressionHelper.GetPropertyInfo<UmbracoDomain, int?>(x => x.LanguageId);
         private static readonly PropertyInfo DomainNameSelector = ExpressionHelper.GetPropertyInfo<UmbracoDomain, string>(x => x.DomainName);
-        private static readonly PropertyInfo ContentSelector = ExpressionHelper.GetPropertyInfo<UmbracoDomain, IContent>(x => x.RootContent);
+        
 
         [DataMember]
-        public ILanguage Language
+        public int? LanguageId
         {
-            get { return _language; }
+            get { return _languageId; }
             set
             {
                 SetPropertyValueAndDetectChanges(o =>
                 {
-                    _language = value;
-                    return _language;
-                }, _language, DefaultLanguageSelector);
+                    _languageId = value;
+                    return _languageId;
+                }, _languageId, DefaultLanguageSelector);
             }
         }
 
@@ -53,16 +58,16 @@ namespace Umbraco.Core.Models
         }
 
         [DataMember]
-        public IContent RootContent
+        public int? RootContentId
         {
-            get { return _content; }
+            get { return _contentId; }
             set
             {
                 SetPropertyValueAndDetectChanges(o =>
                 {
-                    _content = value;
-                    return _content;
-                }, _content, ContentSelector);
+                    _contentId = value;
+                    return _contentId;
+                }, _contentId, ContentSelector);
             }
         }
 
@@ -70,5 +75,10 @@ namespace Umbraco.Core.Models
         {
             get { return string.IsNullOrWhiteSpace(DomainName) || DomainName.StartsWith("*"); }
         }
+
+        /// <summary>
+        /// Readonly value of the language ISO code for the domain
+        /// </summary>
+        public string LanguageIsoCode { get; internal set; }
     }
 }

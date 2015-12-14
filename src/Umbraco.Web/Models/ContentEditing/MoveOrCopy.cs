@@ -33,6 +33,13 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "relateToOriginal", IsRequired = true)]
         [Required]
         public bool RelateToOriginal { get; set; }
+
+        /// <summary>
+        /// Boolean indicating whether copying the object should be recursive
+        /// </summary>
+        [DataMember(Name = "recursive", IsRequired = true)]
+        [Required]
+        public bool Recursive { get; set; }
     }
 
 }

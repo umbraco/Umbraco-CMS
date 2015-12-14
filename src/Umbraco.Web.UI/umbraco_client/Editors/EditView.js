@@ -8,24 +8,6 @@
         //private methods/variables
         _opts: null,
 
-        _updateNewFileProperties: function(filePath) {
-            /// <summary>Updates the current treeSyncPath and original file name to have the new file name</summary>
-            
-            //update the originalFileName prop
-            this._opts.originalFileName = filePath;
-
-            //re-create the new path
-            var subPath = this._opts.treeSyncPath.split(",");
-            //remove the last element
-            subPath.pop();
-            //add the new element
-            var parts = filePath.split("/");
-            //remove the first bit which will either be "Partials" or "MacroPartials"
-            parts.shift();
-            subPath.push(parts.join("/"));
-            this._opts.treeSyncPath = subPath.join();
-        },
-
         // Constructor
         constructor: function (opts) {
             // Merge options with default
@@ -54,6 +36,10 @@
             
             UmbEditor.Insert("@Umbraco.RenderMacro(\"" + alias + "\")", "", this._opts.codeEditorElementId);
         },
+
+        insertRenderBody: function() {
+            UmbEditor.Insert("@RenderBody()", "", this._opts.codeEditorElementId);
+        },
         
         openMacroModal: function (alias) {
             /// <summary>callback used to display the modal dialog to insert a macro with parameters</summary>
@@ -69,6 +55,37 @@
                 callback: function (data) {
                     UmbEditor.Insert(data.syntax, '', self._opts.codeEditorElementId);
                 }
+            });
+        },
+
+        openSnippetModal: function (type) {
+            /// <summary>callback used to display the modal dialog to insert a macro with parameters</summary>
+
+            var self = this;
+
+            UmbClientMgr.openAngularModalWindow({
+                template: "views/common/dialogs/template/snippet.html",
+                callback: function (data) {
+
+                    var code = "";
+
+                    if (type === 'section') {
+                        code = "\n@section " + data.name + "{\n";
+                        code += "<!-- Content here -->\n" +
+                            "}\n";
+                    }
+
+                    if (type === 'rendersection') {
+                        if (data.required) {
+                            code = "\n@RenderSection(\"" + data.name + "\", true);\n";
+                        } else {
+                            code = "\n@RenderSection(\"" + data.name + "\" false);\n";
+                        }
+                    }
+
+                    UmbEditor.Insert(code, '', self._opts.codeEditorElementId);
+                },
+                type: type
             });
         },
 
@@ -207,8 +224,12 @@
                     
                     top.UmbSpeechBubble.ShowMessage('save', header, msg);
 
-                    //then we need to update our current tree sync path to represent the new one
-                    this._updateNewFileProperties(newFilePath);
+                    if (args && args.name) {
+                        this._opts.originalFileName = args.name;
+                    }
+                    if (args && args.path) {
+                        this._opts.treeSyncPath = args.path;
+                    }
 
                     UmbClientMgr.mainTree().syncTree(path, true, null, newFilePath.split("/")[1]);
                 }                

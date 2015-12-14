@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Moq;
@@ -119,6 +121,26 @@ p{font-size:2em;}"));
         }
 
         [Test]
+        public void Throws_When_Adding_Duplicate_Properties()
+        {
+            // Arrange
+            var provider = new FileUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+
+            var repository = new StylesheetRepository(unitOfWork, _fileSystem);
+
+            // Act
+            var stylesheet = new Stylesheet("test-update.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
+            repository.AddOrUpdate(stylesheet);
+            unitOfWork.Commit();
+
+            stylesheet.AddProperty(new StylesheetProperty("Test", "p", "font-size:2em;"));
+
+            Assert.Throws<DuplicateNameException>(() => stylesheet.AddProperty(new StylesheetProperty("test", "p", "font-size:2em;")));
+
+        }
+
+        [Test]
         public void Can_Perform_Delete()
         {
             // Arrange
@@ -220,18 +242,95 @@ p{font-size:2em;}"));
             Assert.That(exists, Is.True);
         }
 
+        [Test]
+        public void PathTests()
+        {
+            // unless noted otherwise, no changes / 7.2.8
+
+            var provider = new FileUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var repository = new StylesheetRepository(unitOfWork, _fileSystem);
+
+            var stylesheet = new Stylesheet("test-path-1.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
+            repository.AddOrUpdate(stylesheet);
+            unitOfWork.Commit();
+            Assert.IsTrue(_fileSystem.FileExists("test-path-1.css"));
+            Assert.AreEqual("test-path-1.css", stylesheet.Path);
+            Assert.AreEqual("/css/test-path-1.css", stylesheet.VirtualPath);
+
+            stylesheet = new Stylesheet("path-2/test-path-2.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
+            repository.AddOrUpdate(stylesheet);
+            unitOfWork.Commit();
+            Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-2.css"));
+            Assert.AreEqual("path-2\\test-path-2.css", stylesheet.Path); // fixed in 7.3 - 7.2.8 does not update the path
+            Assert.AreEqual("/css/path-2/test-path-2.css", stylesheet.VirtualPath);
+
+            stylesheet = repository.Get("path-2/test-path-2.css");
+            Assert.IsNotNull(stylesheet);
+            Assert.AreEqual("path-2\\test-path-2.css", stylesheet.Path);
+            Assert.AreEqual("/css/path-2/test-path-2.css", stylesheet.VirtualPath);
+
+            stylesheet = new Stylesheet("path-2\\test-path-3.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
+            repository.AddOrUpdate(stylesheet);
+            unitOfWork.Commit();
+            Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-3.css"));
+            Assert.AreEqual("path-2\\test-path-3.css", stylesheet.Path);
+            Assert.AreEqual("/css/path-2/test-path-3.css", stylesheet.VirtualPath);
+
+            stylesheet = repository.Get("path-2/test-path-3.css");
+            Assert.IsNotNull(stylesheet);
+            Assert.AreEqual("path-2\\test-path-3.css", stylesheet.Path);
+            Assert.AreEqual("/css/path-2/test-path-3.css", stylesheet.VirtualPath);
+
+            stylesheet = repository.Get("path-2\\test-path-3.css");
+            Assert.IsNotNull(stylesheet);
+            Assert.AreEqual("path-2\\test-path-3.css", stylesheet.Path);
+            Assert.AreEqual("/css/path-2/test-path-3.css", stylesheet.VirtualPath);
+
+            stylesheet = new Stylesheet("\\test-path-4.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
+            Assert.Throws<FileSecurityException>(() => // fixed in 7.3 - 7.2.8 used to strip the \
+            {
+                repository.AddOrUpdate(stylesheet);
+            });
+
+            // fixed in 7.3 - 7.2.8 used to throw
+            stylesheet = repository.Get("missing.css");
+            Assert.IsNull(stylesheet);
+
+            // fixed in 7.3 - 7.2.8 used to...
+            Assert.Throws<FileSecurityException>(() =>
+            {
+                stylesheet = repository.Get("\\test-path-4.css"); // outside the filesystem, does not exist
+            });
+            Assert.Throws<FileSecurityException>(() =>
+            {
+                stylesheet = repository.Get("../packages.config"); // outside the filesystem, exists
+            });
+        }
+
         [TearDown]
-        public void TearDown()
+        public override void TearDown()
         {
             base.TearDown();
 
             //Delete all files
-            var files = _fileSystem.GetFiles("", "*.css");
+            Purge((PhysicalFileSystem) _fileSystem, "");
+            _fileSystem = null;
+        }
+
+        private void Purge(PhysicalFileSystem fs, string path)
+        {
+            var files = fs.GetFiles(path, "*.css");
             foreach (var file in files)
             {
-                _fileSystem.DeleteFile(file);
+                fs.DeleteFile(file);
             }
-            _fileSystem = null;
+            var dirs = fs.GetDirectories(path);
+            foreach (var dir in dirs)
+            {
+                Purge(fs, dir);
+                fs.DeleteDirectory(dir);
+            }
         }
 
         protected Stream CreateStream(string contents = null)

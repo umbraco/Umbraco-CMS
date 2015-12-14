@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Semver;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Migrations.Initial
 {
@@ -35,7 +37,20 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         internal IEnumerable<DbIndexDefinition> DbIndexDefinitions { get; set; }
 
         /// <summary>
-        /// Determines the version of the currently installed database.
+        /// Checks in the db which version is installed based on the migrations that have been run
+        /// </summary>
+        /// <param name="migrationEntryService"></param>
+        /// <returns></returns>
+        public SemVersion DetermineInstalledVersionByMigrations(IMigrationEntryService migrationEntryService)
+        {
+            var allMigrations = migrationEntryService.GetAll(GlobalSettings.UmbracoMigrationName);
+            var mostrecent = allMigrations.OrderByDescending(x => x.Version).Select(x => x.Version).FirstOrDefault();
+
+            return mostrecent ?? new SemVersion(new Version(0, 0, 0));
+        }
+
+        /// <summary>
+        /// Determines the version of the currently installed database by detecting the current database structure
         /// </summary>
         /// <returns>
         /// A <see cref="Version"/> with Major and Minor values for 

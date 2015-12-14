@@ -64,6 +64,13 @@ function umbImageFolder($rootScope, assetsService, $timeout, $log, umbRequestHel
                         found.completed = true;
                     }
 
+                    //Show notifications!!!!
+                    if (data.result && data.result.notifications && angular.isArray(data.result.notifications)) {
+                        for (var n = 0; n < data.result.notifications.length; n++) {
+                            notificationsService.showNotification(data.result.notifications[n]);
+                        }
+                    }
+
                     //when none are left resync everything
                     var remaining = _.filter(scope.files, function (file) { return file.completed !== true; });
                     if (remaining.length === 0) {

@@ -140,12 +140,11 @@ namespace Umbraco.Web.Macros
             string output;
             using (var controller = new PartialViewMacroController(macro, content))
             {
-				//bubble up the model state from the main view context to our custom controller.
-				//when merging we'll create a new dictionary, otherwise you might run into an enumeration error
-				// caused from ModelStateDictionary
-				controller.ModelState.Merge(new ModelStateDictionary(viewContext.ViewData.ModelState));
+                controller.ViewData = viewContext.ViewData;
+                
 				controller.ControllerContext = new ControllerContext(request, controller);
-				//call the action to render
+
+                //call the action to render
                 var result = controller.Index();
 				output = controller.RenderViewResultAsString(result);
             }

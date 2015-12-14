@@ -108,7 +108,8 @@ namespace Umbraco.Core.Persistence
                 _sqlSyntax,
                 CreateContentTypeRepository(uow),
                 CreateTemplateRepository(uow),
-                CreateTagRepository(uow))
+                CreateTagRepository(uow),
+                _settings.Content)
             {
                 EnsureUniqueNaming = _settings.Content.EnsureUniqueNaming
             };
@@ -158,7 +159,8 @@ namespace Umbraco.Core.Persistence
                 _cacheHelper,
                 _logger, _sqlSyntax,
                 CreateMediaTypeRepository(uow),
-                CreateTagRepository(uow)) { EnsureUniqueNaming = _settings.Content.EnsureUniqueNaming };
+                CreateTagRepository(uow),
+                _settings.Content);
         }
 
         public virtual IMediaTypeRepository CreateMediaTypeRepository(IDatabaseUnitOfWork uow)
@@ -216,11 +218,19 @@ namespace Umbraco.Core.Persistence
                 _settings.Templates);
         }
 
-        internal virtual ServerRegistrationRepository CreateServerRegistrationRepository(IDatabaseUnitOfWork uow)
+        public virtual IMigrationEntryRepository CreateMigrationEntryRepository(IDatabaseUnitOfWork uow)
+        {
+            return new MigrationEntryRepository(
+                uow,
+                CacheHelper.CreateDisabledCacheHelper(), //never cache
+                _logger, _sqlSyntax);
+        }
+
+        public virtual IServerRegistrationRepository CreateServerRegistrationRepository(IDatabaseUnitOfWork uow)
         {
             return new ServerRegistrationRepository(
                 uow,
-                CacheHelper.CreateDisabledCacheHelper(), //never cache
+                _cacheHelper.StaticCache,
                 _logger, _sqlSyntax);
         }
 
@@ -258,7 +268,8 @@ namespace Umbraco.Core.Persistence
                 _logger, _sqlSyntax,
                 CreateMemberTypeRepository(uow),
                 CreateMemberGroupRepository(uow),
-                CreateTagRepository(uow));
+                CreateTagRepository(uow),
+                _settings.Content);
         }
 
         public virtual IMemberTypeRepository CreateMemberTypeRepository(IDatabaseUnitOfWork uow)
@@ -283,7 +294,7 @@ namespace Umbraco.Core.Persistence
 
         public IDomainRepository CreateDomainRepository(IDatabaseUnitOfWork uow)
         {
-            return new DomainRepository(uow, _cacheHelper, _logger, _sqlSyntax, CreateContentRepository(uow), CreateLanguageRepository(uow));
+            return new DomainRepository(uow, _cacheHelper, _logger, _sqlSyntax);
         }
 
         public ITaskTypeRepository CreateTaskTypeRepository(IDatabaseUnitOfWork uow)

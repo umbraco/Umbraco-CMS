@@ -201,6 +201,29 @@ namespace Umbraco.Tests.Macros
         }
 
         [Test]
+        public void Format_RTE_Data_For_Editor_With_Multiple_Macros()
+        {
+            var content = @"<p>asdfasdf</p>
+<?UMBRACO_MACRO macroAlias=""Breadcrumb"" />
+<p>asdfsadf</p>
+<p> </p>
+<?UMBRACO_MACRO macroAlias=""login"" />
+<p> </p>";
+            var result = MacroTagParser.FormatRichTextPersistedDataForEditor(content, new Dictionary<string, string>());
+
+            Assert.AreEqual(@"<p>asdfasdf</p>
+<div class=""umb-macro-holder mceNonEditable"">
+<!-- <?UMBRACO_MACRO macroAlias=""Breadcrumb"" /> -->
+<ins>Macro alias: <strong>Breadcrumb</strong></ins></div>
+<p>asdfsadf</p>
+<p> </p>
+<div class=""umb-macro-holder mceNonEditable"">
+<!-- <?UMBRACO_MACRO macroAlias=""login"" /> -->
+<ins>Macro alias: <strong>login</strong></ins></div>
+<p> </p>".Replace(Environment.NewLine, string.Empty), result.Replace(Environment.NewLine, string.Empty));
+        }
+
+        [Test]
         public void Format_RTE_Data_For_Editor_With_Params_Closing_Tag()
         {
             var content = @"<p>asdfasdf</p>

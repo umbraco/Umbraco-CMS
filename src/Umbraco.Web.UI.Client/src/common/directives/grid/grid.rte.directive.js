@@ -56,7 +56,7 @@ angular.module("umbraco.directives")
                         if(scope.configuration && scope.configuration.stylesheets){
                             angular.forEach(scope.configuration.stylesheets, function(stylesheet, key){
 
-                                    stylesheets.push("/css/" + stylesheet + ".css");
+                                    stylesheets.push(Umbraco.Sys.ServerVariables.umbracoSettings.cssPath + "/" + stylesheet + ".css");
                                     await.push(stylesheetResource.getRulesByName(stylesheet).then(function (rules) {
                                         angular.forEach(rules, function (rule) {
                                           var r = {};
@@ -235,7 +235,7 @@ angular.module("umbraco.directives")
                                 });
 
                                 editor.on('ObjectResized', function (e) {
-                                    var qs = "?width=" + e.width + "px&height=" + e.height + "px";
+                                    var qs = "?width=" + e.width + "&height=" + e.height;
                                     var srcAttr = $(e.target).attr("src");
                                     var path = srcAttr.split("?")[0];
                                     $(e.target).attr("data-mce-src", path + qs);

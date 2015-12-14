@@ -479,18 +479,10 @@ permission char (1) NOT NULL
 ; 
 ALTER TABLE umbracoUser2NodePermission ADD CONSTRAINT PK_umbracoUser2NodePermission PRIMARY KEY CLUSTERED  (userId, nodeId, permission) 
 ; 
-CREATE TABLE umbracoUserLogins 
-( 
-contextId CHAR(36) NOT NULL, 
-userID int NOT NULL, 
-timeout bigint NOT NULL 
-) 
- 
-; 
 INSERT INTO umbracoNode (id, trashed, parentID, nodeUser, level, path, sortOrder, uniqueID, text, nodeObjectType, createDate) VALUES 
 	(-92, 0, -1, 0, 11, '-1,-92', 37, 'f0bc4bfb-b499-40d6-ba86-058885a5178c', 'Label', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '2004/09/30 14:01:49.920'),
 	(-90, 0, -1, 0, 11, '-1,-90', 35, '84c6b441-31df-4ffe-b67e-67d5bc3ae65a', 'Upload', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '2004/09/30 14:01:49.920'),
-	(-89, 0, -1, 0, 11, '-1,-89', 34, 'c6bac0dd-4ab9-45b1-8e30-e4b619ee5da3', 'Textbox multiple', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '2004/09/30 14:01:49.920'),
+	(-89, 0, -1, 0, 11, '-1,-89', 34, 'c6bac0dd-4ab9-45b1-8e30-e4b619ee5da3', 'Textarea', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '2004/09/30 14:01:49.920'),
 	(-88, 0, -1, 0, 11, '-1,-88', 33, '0cc0eba1-9960-42c9-bf9b-60e150b429ae', 'Textstring', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '2004/09/30 14:01:49.920'),
 	(-87, 0, -1, 0, 11, '-1,-87', 32, 'ca90c950-0aff-4e72-b976-a30b1ac57dad', 'Richtext editor', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '2004/09/30 14:01:49.920'),
 	(-51, 0, -1, 0, 11, '-1,-51', 4, '2e6d3631-066e-44b8-aec4-96f09099b2b5', 'Numeric', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '2004/09/30 14:01:49.920'),

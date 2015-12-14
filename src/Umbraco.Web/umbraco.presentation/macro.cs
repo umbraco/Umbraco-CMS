@@ -1578,7 +1578,7 @@ namespace umbraco
             //Trace out to profiling... doesn't actually profile, just for informational output.
             if (excludeProfiling == false)
             {
-                using (ProfilerResolver.Current.Profiler.Step(string.Format("{0}", message)))
+                using (ApplicationContext.Current.ProfilingLogger.TraceDuration<macro>(string.Format("{0}", message)))
                 {
                 }
             }
@@ -1592,7 +1592,7 @@ namespace umbraco
             //Trace out to profiling... doesn't actually profile, just for informational output.
             if (excludeProfiling == false)
             {
-                using (ProfilerResolver.Current.Profiler.Step(string.Format("Warning: {0}", message)))
+                using (ApplicationContext.Current.ProfilingLogger.TraceDuration<macro>(string.Format("Warning: {0}", message)))
                 {
                 }
             }
@@ -1606,7 +1606,7 @@ namespace umbraco
             //Trace out to profiling... doesn't actually profile, just for informational output.
             if (excludeProfiling == false)
             {
-                using (ProfilerResolver.Current.Profiler.Step(string.Format("{0}, Error: {1}", message, ex)))
+                using (ApplicationContext.Current.ProfilingLogger.TraceDuration<macro>(string.Format("{0}, Error: {1}", message, ex)))
                 {
                 }
             }
@@ -1705,6 +1705,10 @@ namespace umbraco
 
                 // propagate the user's context
                 // zb-00004 #29956 : refactor cookies names & handling
+
+                //TODO: This is the worst thing ever. This will also not work if people decide to put their own
+                // custom auth system in place.
+
                 HttpCookie inCookie = StateHelper.Cookies.UserContext.RequestCookie;
                 var cookie = new Cookie(inCookie.Name, inCookie.Value, inCookie.Path,
                                         HttpContext.Current.Request.ServerVariables["SERVER_NAME"]);

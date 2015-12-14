@@ -4,11 +4,11 @@
 * @restrict E
 **/
 angular.module("umbraco.directives")
-.directive('umbTab', function(){
-	return {
+.directive('umbTab', function ($parse, $timeout) {
+    return {
 		restrict: 'E',
-		replace: true,
-		transclude: 'true',
-		templateUrl: 'views/directives/umb-tab.html'
-	};
+		replace: true,		
+        transclude: 'true',
+		templateUrl: 'views/directives/umb-tab.html'		
+    };
 });

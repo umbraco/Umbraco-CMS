@@ -21,31 +21,8 @@ namespace Umbraco.Core.Services
     public class DataTypeService : RepositoryService, IDataTypeService
     {
 
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public DataTypeService()
-            : this(new RepositoryFactory())
-        {}
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public DataTypeService(RepositoryFactory repositoryFactory)
-			: this(new PetaPocoUnitOfWorkProvider(), repositoryFactory)
-        {
-        }
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public DataTypeService(IDatabaseUnitOfWorkProvider provider)
-            : this(provider, new RepositoryFactory())
-        {
-        }
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-		public DataTypeService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory)
-            : this(provider, repositoryFactory, LoggerResolver.Current.Logger)
-        {
-        }
-
-        public DataTypeService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger)
-            : base(provider, repositoryFactory, logger)
+        public DataTypeService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+            : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
         }
 

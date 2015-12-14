@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
@@ -279,19 +280,22 @@ AND umbracoNode.id <> @id",
             return GetAndCachePreValueCollection(dataTypeId);
         }
 
+        internal static string GetCacheKeyRegex(int preValueId)
+        {
+            return CacheKeys.DataTypePreValuesCacheKey + @"[-\d]+-([\d]*,)*" + preValueId + @"(?!\d)[,\d$]*";
+        }
+
         public string GetPreValueAsString(int preValueId)
         {
             //We need to see if we can find the cached PreValueCollection based on the cache key above
 
-            var regex = CacheKeys.DataTypePreValuesCacheKey + @"[\d]+-[,\d]*" + preValueId + @"[,\d$]*";
-
-            var cached = _cacheHelper.RuntimeCache.GetCacheItemsByKeyExpression<PreValueCollection>(regex);
+            var cached = _cacheHelper.RuntimeCache.GetCacheItemsByKeyExpression<PreValueCollection>(GetCacheKeyRegex(preValueId));
             if (cached != null && cached.Any())
             {
                 //return from the cache
                 var collection = cached.First();
-                var preVal = collection.FormatAsDictionary().Single(x => x.Value.Id == preValueId);
-                return preVal.Value.Value;
+				var preVal = collection.FormatAsDictionary().Single(x => x.Value.Id == preValueId);
+				return preVal.Value.Value;
             }
 
             //go and find the data type id for the pre val id passed in
@@ -485,15 +489,10 @@ AND umbracoNode.id <> @id",
                     throw new InvalidOperationException("Cannot insert a pre value for a data type that has no identity");
                 }
 
-                //Cannot add a duplicate alias
-                var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsDataTypePreValues
-WHERE alias = @alias
-AND datatypeNodeId = @dtdid",
-                        new { alias = entity.Alias, dtdid = entity.DataType.Id });
-                if (exists > 0)
-                {
-                    throw new DuplicateNameException("A pre value with the alias " + entity.Alias + " already exists for this data type");
-                }
+                //NOTE: We used to check that the Alias was unique for the given DataTypeNodeId prevalues list, BUT
+                // in reality there is no need to check the uniqueness of this alias because the only way that this code executes is 
+                // based on an IDictionary<string, PreValue> dictionary being passed to this repository and a dictionary
+                // must have unique aliases by definition, so there is no need for this additional check
 
                 var dto = new DataTypePreValueDto
                 {
@@ -511,21 +510,12 @@ AND datatypeNodeId = @dtdid",
                 {
                     throw new InvalidOperationException("Cannot update a pre value for a data type that has no identity");
                 }
-
-                //Cannot change to a duplicate alias
-                var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsDataTypePreValues
-WHERE alias = @alias
-AND datatypeNodeId = @dtdid
-AND id <> @id",
-                        new { id = entity.Id, alias = entity.Alias, dtdid = entity.DataType.Id });
-
-
-                var excludedDataTypes = new string[] { "Umbraco.CheckBoxList", "Umbraco.DropDown", "Umbraco.DropDownMultiple", "Umbraco.DropdownlistMultiplePublishKeys", "Umbraco.DropdownlistPublishingKeys", "Umbraco.RadioButtonList" };
-
-                if (exists > 0 && excludedDataTypes.Contains(entity.DataType.PropertyEditorAlias) == false)
-                {
-                    throw new DuplicateNameException("A pre value with the alias " + entity.Alias + " already exists for this data type");
-                }
+                
+                //NOTE: We used to check that the Alias was unique for the given DataTypeNodeId prevalues list, BUT
+                // this causes issues when sorting the pre-values (http://issues.umbraco.org/issue/U4-5670) but in reality
+                // there is no need to check the uniqueness of this alias because the only way that this code executes is 
+                // based on an IDictionary<string, PreValue> dictionary being passed to this repository and a dictionary
+                // must have unique aliases by definition, so there is no need for this additional check
 
                 var dto = new DataTypePreValueDto
                 {

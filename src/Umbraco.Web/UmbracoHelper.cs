@@ -14,6 +14,9 @@ using Umbraco.Core.Xml;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using System.Collections.Generic;
+using System.IO;
+using System.Web.Mvc;
+using System.Web.Routing;
 using Umbraco.Core.Cache;
 
 namespace Umbraco.Web
@@ -32,7 +35,7 @@ namespace Umbraco.Web
         private IUmbracoComponentRenderer _componentRenderer;        
         private PublishedContentQuery _query;
         private MembershipHelper _membershipHelper;
-        private ITagQuery _tag;
+        private TagQuery _tag;
         private IDataTypeService _dataTypeService;
         private UrlProvider _urlProvider;
         private ICultureDictionary _cultureDictionary;
@@ -40,9 +43,18 @@ namespace Umbraco.Web
         /// <summary>
         /// Lazy instantiates the tag context
         /// </summary>
-        public ITagQuery TagQuery
+        public TagQuery TagQuery
         {
-            get { return _tag ?? (_tag = new TagQuery(UmbracoContext.Application.Services.TagService, _typedQuery)); }
+            //TODO: Unfortunately we cannot change this return value to be ITagQuery
+            // since it's a breaking change, need to fix it for v8
+            // http://issues.umbraco.org/issue/U4-6899
+
+            get
+            {
+                return _tag ??
+                       (_tag = new TagQuery(UmbracoContext.Application.Services.TagService,
+                           _typedQuery ?? ContentQuery));
+            }
         }
 
         /// <summary>
@@ -154,7 +166,7 @@ namespace Umbraco.Web
             if (membershipHelper == null) throw new ArgumentNullException("membershipHelper");
 
             _umbracoContext = umbracoContext;
-            _tag = tagQuery;
+            _tag = new TagQuery(tagQuery);
             _dataTypeService = dataTypeService;
             _urlProvider = urlProvider;
             _cultureDictionary = cultureDictionary;
@@ -312,7 +324,7 @@ namespace Umbraco.Web
             bool formatAsDateWithTime = false,
             string formatAsDateWithTimeSeparator = "")
 		{			
-            return _componentRenderer.Field(AssignedContentItem, fieldAlias, altFieldAlias,
+            return UmbracoComponentRenderer.Field(AssignedContentItem, fieldAlias, altFieldAlias,
                 altText, insertBefore, insertAfter, recursive, convertLineBreaks, removeParagraphTags,
                 casing, encoding, formatAsDate, formatAsDateWithTime, formatAsDateWithTimeSeparator);
 		}
@@ -345,7 +357,7 @@ namespace Umbraco.Web
             bool formatAsDateWithTime = false,
             string formatAsDateWithTimeSeparator = "")
 		{
-            return _componentRenderer.Field(currentPage, fieldAlias, altFieldAlias,
+            return UmbracoComponentRenderer.Field(currentPage, fieldAlias, altFieldAlias,
                 altText, insertBefore, insertAfter, recursive, convertLineBreaks, removeParagraphTags,
                 casing, encoding, formatAsDate, formatAsDateWithTime, formatAsDateWithTimeSeparator);
 		}
@@ -575,27 +587,57 @@ namespace Umbraco.Web
             return ContentQuery.TypedContent(ConvertIdsObjectToInts(ids));
 		}
 
+        /// <summary>
+        /// Gets the contents corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The content identifiers.</param>
+        /// <returns>The existing contents corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
 		public IEnumerable<IPublishedContent> TypedContent(params int[] ids)
 		{
             return ContentQuery.TypedContent(ids);
 		}
 
-		public IEnumerable<IPublishedContent> TypedContent(params string[] ids)
+        /// <summary>
+        /// Gets the contents corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The content identifiers.</param>
+        /// <returns>The existing contents corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
+        public IEnumerable<IPublishedContent> TypedContent(params string[] ids)
 		{
             return ContentQuery.TypedContent(ConvertIdsObjectToInts(ids));
 		}
 
-		public IEnumerable<IPublishedContent> TypedContent(IEnumerable<object> ids)
+        /// <summary>
+        /// Gets the contents corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The content identifiers.</param>
+        /// <returns>The existing contents corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
+        public IEnumerable<IPublishedContent> TypedContent(IEnumerable<object> ids)
 		{
             return ContentQuery.TypedContent(ConvertIdsObjectToInts(ids));
 		}
 
-		public IEnumerable<IPublishedContent> TypedContent(IEnumerable<string> ids)
+        /// <summary>
+        /// Gets the contents corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The content identifiers.</param>
+        /// <returns>The existing contents corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
+        public IEnumerable<IPublishedContent> TypedContent(IEnumerable<string> ids)
 		{
             return ContentQuery.TypedContent(ConvertIdsObjectToInts(ids));
 		}
 
-		public IEnumerable<IPublishedContent> TypedContent(IEnumerable<int> ids)
+        /// <summary>
+        /// Gets the contents corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The content identifiers.</param>
+        /// <returns>The existing contents corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
+        public IEnumerable<IPublishedContent> TypedContent(IEnumerable<int> ids)
 		{
             return ContentQuery.TypedContent(ids);
 		}
@@ -642,32 +684,68 @@ namespace Umbraco.Web
             return ContentQuery.ContentSingleAtXPath(xpath, vars);
         }
 
+        /// <summary>
+        /// Gets the contents corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The content identifiers.</param>
+        /// <returns>The existing contents corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
         public dynamic Content(params object[] ids)
 		{
             return ContentQuery.Content(ConvertIdsObjectToInts(ids));
 		}
 
-		public dynamic Content(params int[] ids)
+        /// <summary>
+        /// Gets the contents corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The content identifiers.</param>
+        /// <returns>The existing contents corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
+        public dynamic Content(params int[] ids)
 		{
             return ContentQuery.Content(ids);
 		}
 
-		public dynamic Content(params string[] ids)
+        /// <summary>
+        /// Gets the contents corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The content identifiers.</param>
+        /// <returns>The existing contents corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
+        public dynamic Content(params string[] ids)
 		{
             return ContentQuery.Content(ConvertIdsObjectToInts(ids));
 		}
 
-		public dynamic Content(IEnumerable<object> ids)
+        /// <summary>
+        /// Gets the contents corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The content identifiers.</param>
+        /// <returns>The existing contents corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
+        public dynamic Content(IEnumerable<object> ids)
 		{
             return ContentQuery.Content(ConvertIdsObjectToInts(ids));
 		}
 
-		public dynamic Content(IEnumerable<int> ids)
+        /// <summary>
+        /// Gets the contents corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The content identifiers.</param>
+        /// <returns>The existing contents corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
+        public dynamic Content(IEnumerable<int> ids)
 		{
             return ContentQuery.Content(ids);
 		}
 
-		public dynamic Content(IEnumerable<string> ids)
+        /// <summary>
+        /// Gets the contents corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The content identifiers.</param>
+        /// <returns>The existing contents corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
+        public dynamic Content(IEnumerable<string> ids)
 		{
             return ContentQuery.Content(ConvertIdsObjectToInts(ids));
 		}
@@ -749,32 +827,68 @@ namespace Umbraco.Web
             return ConvertIdObjectToInt(id, out intId) ? ContentQuery.TypedMedia(intId) : null;
 		}
 
-		public IEnumerable<IPublishedContent> TypedMedia(params object[] ids)
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public IEnumerable<IPublishedContent> TypedMedia(params object[] ids)
 		{
             return ContentQuery.TypedMedia(ConvertIdsObjectToInts(ids));
 		}
 
-		public IEnumerable<IPublishedContent> TypedMedia(params int[] ids)
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public IEnumerable<IPublishedContent> TypedMedia(params int[] ids)
 		{
             return ContentQuery.TypedMedia(ids);
 		}
 
-		public IEnumerable<IPublishedContent> TypedMedia(params string[] ids)
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public IEnumerable<IPublishedContent> TypedMedia(params string[] ids)
 		{
             return ContentQuery.TypedMedia(ConvertIdsObjectToInts(ids));
 		}
 
-		public IEnumerable<IPublishedContent> TypedMedia(IEnumerable<object> ids)
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public IEnumerable<IPublishedContent> TypedMedia(IEnumerable<object> ids)
 		{
             return ContentQuery.TypedMedia(ConvertIdsObjectToInts(ids));
 		}
 
-		public IEnumerable<IPublishedContent> TypedMedia(IEnumerable<int> ids)
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public IEnumerable<IPublishedContent> TypedMedia(IEnumerable<int> ids)
 		{
             return ContentQuery.TypedMedia(ids);
 		}
 
-		public IEnumerable<IPublishedContent> TypedMedia(IEnumerable<string> ids)
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public IEnumerable<IPublishedContent> TypedMedia(IEnumerable<string> ids)
 		{
             return ContentQuery.TypedMedia(ConvertIdsObjectToInts(ids));
 		}
@@ -801,32 +915,68 @@ namespace Umbraco.Web
             return ConvertIdObjectToInt(id, out intId) ? ContentQuery.Media(intId) : DynamicNull.Null;
 		}
 
-		public dynamic Media(params object[] ids)
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public dynamic Media(params object[] ids)
 		{
             return ContentQuery.Media(ConvertIdsObjectToInts(ids));
 		}
 
-		public dynamic Media(params int[] ids)
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public dynamic Media(params int[] ids)
 		{
             return ContentQuery.Media(ids);
 		}
 
-		public dynamic Media(params string[] ids)
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public dynamic Media(params string[] ids)
 		{
             return ContentQuery.Media(ConvertIdsObjectToInts(ids));
 		}
 
-		public dynamic Media(IEnumerable<object> ids)
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public dynamic Media(IEnumerable<object> ids)
 		{
             return ContentQuery.Media(ConvertIdsObjectToInts(ids));
 		}
 
-		public dynamic Media(IEnumerable<int> ids)
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public dynamic Media(IEnumerable<int> ids)
 		{
             return ContentQuery.Media(ids);
 		}
 
-		public dynamic Media(IEnumerable<string> ids)
+        /// <summary>
+        /// Gets the medias corresponding to the identifiers.
+        /// </summary>
+        /// <param name="ids">The media identifiers.</param>
+        /// <returns>The existing medias corresponding to the identifiers.</returns>
+        /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
+        public dynamic Media(IEnumerable<string> ids)
 		{
             return ContentQuery.Media(ConvertIdsObjectToInts(ids));
 		}
@@ -1023,52 +1173,44 @@ namespace Umbraco.Web
 
         #region canvasdesigner
         
-        public HtmlString EnableCanvasDesigner()
+        [Obsolete("Use EnableCanvasDesigner on the HtmlHelper extensions instead")]
+        public IHtmlString EnableCanvasDesigner()
         {
             return EnableCanvasDesigner(string.Empty, string.Empty);
         }
 
-        public HtmlString EnableCanvasDesigner(string canvasdesignerConfigPath)
+        [Obsolete("Use EnableCanvasDesigner on the HtmlHelper extensions instead")]
+        public IHtmlString EnableCanvasDesigner(string canvasdesignerConfigPath)
         {
             return EnableCanvasDesigner(canvasdesignerConfigPath, string.Empty);
         }
 
-        public HtmlString EnableCanvasDesigner(string canvasdesignerConfigPath, string canvasdesignerPalettesPath)
+        [Obsolete("Use EnableCanvasDesigner on the HtmlHelper extensions instead")]
+        public IHtmlString EnableCanvasDesigner(string canvasdesignerConfigPath, string canvasdesignerPalettesPath)
         {
+            var html = CreateHtmlHelper("");
+            var urlHelper = new UrlHelper(UmbracoContext.HttpContext.Request.RequestContext);
+            return html.EnableCanvasDesigner(urlHelper, UmbracoContext, canvasdesignerConfigPath, canvasdesignerPalettesPath);
+        }
 
-            string previewLink = @"<script src=""/Umbraco/lib/jquery/jquery.min.js"" type=""text/javascript""></script>" +
-                                 @"<script src=""{0}"" type=""text/javascript""></script>" +
-                                 @"<script src=""{1}"" type=""text/javascript""></script>" +
-                                 @"<script type=""text/javascript"">var pageId = '{2}'</script>" +
-                                 @"<script src=""/umbraco/js/canvasdesigner.front.js"" type=""text/javascript""></script>";
-
-            string noPreviewLinks = @"<link href=""{0}"" type=""text/css"" rel=""stylesheet"" data-title=""canvasdesignerCss"" />";
-
-            // Get page value
-            int pageId = UmbracoContext.PublishedContentRequest.UmbracoPage.PageID;
-            string[] path = UmbracoContext.PublishedContentRequest.UmbracoPage.SplitPath;
-            string result = string.Empty;
-            string cssPath = CanvasDesignerUtility.GetStylesheetPath(path, false);
-
-            if (UmbracoContext.Current.InPreviewMode)
+        [Obsolete("This shouldn't need to be used but because the obsolete extension methods above don't have access to the current HtmlHelper, we need to create a fake one, unfortunately however this will not pertain the current views viewdata, tempdata or model state so should not be used")]
+        private HtmlHelper CreateHtmlHelper(object model)
+        {
+            var cc = new ControllerContext
             {
-                canvasdesignerConfigPath = !string.IsNullOrEmpty(canvasdesignerConfigPath) ? canvasdesignerConfigPath : "/umbraco/js/canvasdesigner.config.js";
-                canvasdesignerPalettesPath = !string.IsNullOrEmpty(canvasdesignerPalettesPath) ? canvasdesignerPalettesPath : "/umbraco/js/canvasdesigner.palettes.js";
-                
-                if (!string.IsNullOrEmpty(cssPath))
-                    result = string.Format(noPreviewLinks, cssPath) + Environment.NewLine;
+                RequestContext = UmbracoContext.HttpContext.Request.RequestContext
+            };
+            var viewContext = new ViewContext(cc, new FakeView(), new ViewDataDictionary(model), new TempDataDictionary(), new StringWriter());
+            var htmlHelper = new HtmlHelper(viewContext, new ViewPage());
+            return htmlHelper;
+        }
 
-                result = result + string.Format(previewLink, canvasdesignerConfigPath, canvasdesignerPalettesPath, pageId);
-            }
-            else
+        [Obsolete("This shouldn't need to be used but because the obsolete extension methods above don't have access to the current HtmlHelper, we need to create a fake one, unfortunately however this will not pertain the current views viewdata, tempdata or model state so should not be used")]
+        private class FakeView : IView
+        {
+            public void Render(ViewContext viewContext, TextWriter writer)
             {
-                // Get css path for current page
-                if (!string.IsNullOrEmpty(cssPath))
-                    result = string.Format(noPreviewLinks, cssPath);
             }
-
-            return new HtmlString(result);
-
         }
 
         #endregion

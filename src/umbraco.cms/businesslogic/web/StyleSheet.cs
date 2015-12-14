@@ -225,7 +225,7 @@ namespace umbraco.cms.businesslogic.web
 
         public static StyleSheet GetByName(string name)
         {
-            var found = ApplicationContext.Current.Services.FileService.GetStylesheetByName(name.EnsureEndsWith(".css"));
+            var found = ApplicationContext.Current.Services.FileService.GetStylesheetByName(name);
             if (found == null) return null;
             return new StyleSheet(found);
         }

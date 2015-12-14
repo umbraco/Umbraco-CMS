@@ -74,6 +74,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                                                 serialized["alias"] = found.Alias;
                                                 serialized["view"] = found.View;
                                                 serialized["render"] = found.Render;
+                                                serialized["icon"] = found.Icon;
                                                 serialized["config"] = JObject.FromObject(found.Config);
 
                                                 control["editor"] = serialized;

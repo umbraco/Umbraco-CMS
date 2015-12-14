@@ -46,6 +46,7 @@ namespace Umbraco.Web.Mvc
         /// <remarks>
         /// This is the same as applying the [AllowAnonymous] attribute
         /// </remarks>
+        [Obsolete("Use [AllowAnonymous] instead")]
         public bool AllowAll { get; set; }
 
         /// <summary>

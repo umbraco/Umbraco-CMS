@@ -49,7 +49,7 @@ namespace Umbraco.Core.Cache
             {
                 if (MemoryCache[key] == null) return;
                 MemoryCache.Remove(key);
-            }            
+            }
         }
 
         public virtual void ClearCacheObjectTypes(string typeName)
@@ -137,7 +137,7 @@ namespace Umbraco.Core.Cache
                     .Select(x => x.Key)
                     .ToArray()) // ToArray required to remove
                     MemoryCache.Remove(key);
-            }            
+            }
         }
 
         public virtual void ClearCacheByKeyExpression(string regexString)
@@ -149,7 +149,7 @@ namespace Umbraco.Core.Cache
                     .Select(x => x.Key)
                     .ToArray()) // ToArray required to remove
                     MemoryCache.Remove(key);
-            }     
+            }
         }
 
         #endregion
@@ -201,7 +201,7 @@ namespace Umbraco.Core.Cache
             return GetCacheItem(cacheKey, getCacheItem, null);
         }
 
-        public object GetCacheItem(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal,CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
+        public object GetCacheItem(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
         {
             // see notes in HttpRuntimeCacheProvider
 
@@ -264,7 +264,7 @@ namespace Umbraco.Core.Cache
             {
                 policy.ChangeMonitors.Add(new HostFileChangeMonitor(dependentFiles.ToList()));
             }
-            
+
             if (removedCallback != null)
             {
                 policy.RemovedCallback = arguments =>
@@ -295,6 +295,5 @@ namespace Umbraco.Core.Cache
             }
             return policy;
         }
-        
     }
 }

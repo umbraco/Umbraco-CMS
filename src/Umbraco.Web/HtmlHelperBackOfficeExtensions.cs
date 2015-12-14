@@ -47,10 +47,10 @@ namespace Umbraco.Web
             </script>";
 
             return html.Raw(str);
-        }
+        }      
 
         /// <summary>
-        /// Used to render the script tag that will pass in the angular externalLoginInfo service on page load
+        /// Used to render the script that will pass in the angular externalLoginInfo service on page load
         /// </summary>
         /// <param name="html"></param>
         /// <param name="externalLoginErrors"></param>
@@ -66,10 +66,6 @@ namespace Umbraco.Web
                     properties = p.Properties
                 })
                 .ToArray();
-
-
-            //define a callback that is executed when we bootstrap angular, this is used to inject angular values
-            //with server side info
 
             var sb = new StringBuilder();
             sb.AppendLine();

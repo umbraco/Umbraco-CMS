@@ -541,16 +541,7 @@ CREATE TABLE [umbracoUser2NodePermission]
  
 ; 
 ALTER TABLE [umbracoUser2NodePermission] ADD CONSTRAINT [PK_umbracoUser2NodePermission] PRIMARY KEY CLUSTERED  ([userId], [nodeId], [permission]) 
-; 
-CREATE TABLE [umbracoUserLogins] 
-( 
-[contextID] [uniqueidentifier] NOT NULL, 
-[userID] [int] NOT NULL, 
-[timeout] [bigint] NOT NULL 
-) 
 ;
-CREATE CLUSTERED INDEX umbracoUserLogins_Index ON umbracoUserLogins (contextID)
-; 
 ALTER TABLE [umbracoAppTree] ADD 
 CONSTRAINT [FK_umbracoAppTree_umbracoApp] FOREIGN KEY ([appAlias]) REFERENCES [umbracoApp] ([appAlias]) 
 ; 
@@ -633,7 +624,7 @@ ALTER TABLE [umbracoNode] DROP CONSTRAINT [FK_umbracoNode_umbracoNode]
 SET IDENTITY_INSERT [umbracoNode] ON 
 INSERT INTO [umbracoNode] ([id], [trashed], [parentID], [nodeUser], [level], [path], [sortOrder], [uniqueID], [text], [nodeObjectType], [createDate]) VALUES (-92, 0, -1, 0, 11, N'-1,-92', 37, 'f0bc4bfb-b499-40d6-ba86-058885a5178c', N'Label', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '20040930 14:01:49.920') 
 INSERT INTO [umbracoNode] ([id], [trashed], [parentID], [nodeUser], [level], [path], [sortOrder], [uniqueID], [text], [nodeObjectType], [createDate]) VALUES (-90, 0, -1, 0, 11, N'-1,-90', 35, '84c6b441-31df-4ffe-b67e-67d5bc3ae65a', N'Upload', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '20040930 14:01:49.920') 
-INSERT INTO [umbracoNode] ([id], [trashed], [parentID], [nodeUser], [level], [path], [sortOrder], [uniqueID], [text], [nodeObjectType], [createDate]) VALUES (-89, 0, -1, 0, 11, N'-1,-89', 34, 'c6bac0dd-4ab9-45b1-8e30-e4b619ee5da3', N'Textbox multiple', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '20040930 14:01:49.920') 
+INSERT INTO [umbracoNode] ([id], [trashed], [parentID], [nodeUser], [level], [path], [sortOrder], [uniqueID], [text], [nodeObjectType], [createDate]) VALUES (-89, 0, -1, 0, 11, N'-1,-89', 34, 'c6bac0dd-4ab9-45b1-8e30-e4b619ee5da3', N'Textarea', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '20040930 14:01:49.920') 
 INSERT INTO [umbracoNode] ([id], [trashed], [parentID], [nodeUser], [level], [path], [sortOrder], [uniqueID], [text], [nodeObjectType], [createDate]) VALUES (-88, 0, -1, 0, 11, N'-1,-88', 33, '0cc0eba1-9960-42c9-bf9b-60e150b429ae', N'Textstring', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '20040930 14:01:49.920') 
 INSERT INTO [umbracoNode] ([id], [trashed], [parentID], [nodeUser], [level], [path], [sortOrder], [uniqueID], [text], [nodeObjectType], [createDate]) VALUES (-87, 0, -1, 0, 11, N'-1,-87', 32, 'ca90c950-0aff-4e72-b976-a30b1ac57dad', N'Richtext editor', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '20040930 14:01:49.920') 
 INSERT INTO [umbracoNode] ([id], [trashed], [parentID], [nodeUser], [level], [path], [sortOrder], [uniqueID], [text], [nodeObjectType], [createDate]) VALUES (-51, 0, -1, 0, 11, N'-1,-51', 4, '2e6d3631-066e-44b8-aec4-96f09099b2b5', N'Numeric', '30a2a501-1978-4ddb-a57b-f7efed43ba3c', '20040930 14:01:49.920') 

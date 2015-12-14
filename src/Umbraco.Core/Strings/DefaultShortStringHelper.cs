@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Globalization;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Core.Strings
 {
@@ -18,10 +19,20 @@ namespace Umbraco.Core.Strings
     /// </remarks>
     public class DefaultShortStringHelper : IShortStringHelper
     {
+        private readonly IUmbracoSettingsSection _umbracoSettings;
+
         #region Ctor and vars
 
+        [Obsolete("Use the other ctor that specifies all dependencies")]
         public DefaultShortStringHelper()
         {
+            _umbracoSettings = _umbracoSettings;
+            InitializeLegacyUrlReplaceCharacters();
+        }
+
+        public DefaultShortStringHelper(IUmbracoSettingsSection umbracoSettings)
+        {
+            _umbracoSettings = umbracoSettings;
             InitializeLegacyUrlReplaceCharacters();
         }
 
@@ -57,7 +68,7 @@ namespace Umbraco.Core.Strings
 
         private void InitializeLegacyUrlReplaceCharacters()
         {
-            foreach (var node in UmbracoConfig.For.UmbracoSettings().RequestHandler.CharCollection)
+            foreach (var node in _umbracoSettings.RequestHandler.CharCollection)
             {
                 if(string.IsNullOrEmpty(node.Char) == false)
                     _urlReplaceCharacters[node.Char] = node.Replacement;
@@ -146,7 +157,7 @@ namespace Umbraco.Core.Strings
                 PreFilter = ApplyUrlReplaceCharacters,
                 PostFilter = x => CutMaxLength(x, 240),
                 IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_', // letter, digit or underscore
-                StringType = (UmbracoConfig.For.UmbracoSettings().RequestHandler.ConvertUrlsToAscii ? CleanStringType.Ascii : CleanStringType.Utf8) | CleanStringType.LowerCase,
+                StringType = (_umbracoSettings.RequestHandler.ConvertUrlsToAscii ? CleanStringType.Ascii : CleanStringType.Utf8) | CleanStringType.LowerCase,
                 BreakTermsOnUpper = false,
                 Separator = '-'
             }).WithConfig(CleanStringType.FileName, new Config
@@ -323,7 +334,7 @@ function validateSafeAlias(input, value, immediate, callback) {{
         public string GetShortStringServicesJavaScript(string controllerPath)
         {
                 return string.Format(SssjsFormat,
-                    UmbracoConfig.For.UmbracoSettings().Content.ForceSafeAliases ? "true" : "false", controllerPath);
+                    _umbracoSettings.Content.ForceSafeAliases ? "true" : "false", controllerPath);
         }
 
         #endregion

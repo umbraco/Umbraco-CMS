@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -15,7 +16,6 @@ using Microsoft.Owin;
 using Newtonsoft.Json;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Membership;
-using Microsoft.Owin;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Security
@@ -157,9 +157,6 @@ namespace Umbraco.Core.Security
             return new HttpContextWrapper(http).GetCurrentIdentity(authenticateRequestIfNotFound);
         }
 
-        /// <summary>
-        /// This clears the forms authentication cookie
-        /// </summary>
         public static void UmbracoLogout(this HttpContextBase http)
         {
             if (http == null) throw new ArgumentNullException("http");
@@ -170,6 +167,8 @@ namespace Umbraco.Core.Security
         /// This clears the forms authentication cookie for webapi since cookies are handled differently
         /// </summary>
         /// <param name="response"></param>
+        [Obsolete("Use OWIN IAuthenticationManager.SignOut instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static void UmbracoLogoutWebApi(this HttpResponseMessage response)
         {
             if (response == null) throw new ArgumentNullException("response");
@@ -195,11 +194,8 @@ namespace Umbraco.Core.Security
             response.Headers.AddCookies(new[] { authCookie, prevCookie, extLoginCookie });
         }
 
-        /// <summary>
-        /// This adds the forms authentication cookie for webapi since cookies are handled differently
-        /// </summary>
-        /// <param name="response"></param>
-        /// <param name="user"></param>
+        [Obsolete("Use WebSecurity.SetPrincipalForRequest")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static FormsAuthenticationTicket UmbracoLoginWebApi(this HttpResponseMessage response, IUser user)
         {
             if (response == null) throw new ArgumentNullException("response");
@@ -250,26 +246,29 @@ namespace Umbraco.Core.Security
             if (http == null) throw new ArgumentNullException("http");
             new HttpContextWrapper(http).UmbracoLogout();
         }
-
+        
         /// <summary>
-        /// Renews the Umbraco authentication ticket
+        /// This will force ticket renewal in the OWIN pipeline
         /// </summary>
         /// <param name="http"></param>
         /// <returns></returns>
         public static bool RenewUmbracoAuthTicket(this HttpContextBase http)
         {
             if (http == null) throw new ArgumentNullException("http");
-            return RenewAuthTicket(http,
-                UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName,
-                UmbracoConfig.For.UmbracoSettings().Security.AuthCookieDomain,
-                //Umbraco has always persisted it's original cookie for 1 day so we'll keep it that way
-                1440);
+            http.Items["umbraco-force-auth"] = true;
+            return true;
         }
 
+        /// <summary>
+        /// This will force ticket renewal in the OWIN pipeline
+        /// </summary>
+        /// <param name="http"></param>
+        /// <returns></returns>
         internal static bool RenewUmbracoAuthTicket(this HttpContext http)
         {
             if (http == null) throw new ArgumentNullException("http");
-            return new HttpContextWrapper(http).RenewUmbracoAuthTicket();
+            http.Items["umbraco-force-auth"] = true;
+            return true;
         }
 
         /// <summary>
@@ -390,8 +389,7 @@ namespace Umbraco.Core.Security
                     //ensure there's def an expired cookie
                     http.Response.Cookies.Add(new HttpCookie(c) { Expires = DateTime.Now.AddYears(-1) });
                 }               
-            }            
-
+            }
         }
 
         private static FormsAuthenticationTicket GetAuthTicket(this HttpContextBase http, string cookieName)
@@ -430,51 +428,6 @@ namespace Umbraco.Core.Security
             }
             //get the ticket
             return FormsAuthentication.Decrypt(formsCookie);
-        }
-
-        /// <summary>
-        /// Renews the forms authentication ticket & cookie
-        /// </summary>
-        /// <param name="http"></param>
-        /// <param name="cookieName"></param>
-        /// <param name="cookieDomain"></param>
-        /// <param name="minutesPersisted"></param>
-        /// <returns>true if there was a ticket to renew otherwise false if there was no ticket</returns>
-        private static bool RenewAuthTicket(this HttpContextBase http, string cookieName, string cookieDomain, int minutesPersisted)
-        {
-            if (http == null) throw new ArgumentNullException("http");
-            //get the ticket
-            var ticket = GetAuthTicket(http, cookieName);
-            //renew the ticket
-            var renewed = FormsAuthentication.RenewTicketIfOld(ticket);
-            if (renewed == null)
-            {
-                return false;
-            }
-
-            //get the request cookie to get it's expiry date, 
-            //NOTE: this will never be null becaues we already do this
-            // check in teh GetAuthTicket.
-            var formsCookie = http.Request.Cookies[cookieName];
-            
-            //encrypt it
-            var hash = FormsAuthentication.Encrypt(renewed);
-            //write it to the response
-            var cookie = new HttpCookie(cookieName, hash)
-                {                    
-                    Expires = DateTime.Now.AddMinutes(minutesPersisted),
-                    Domain = cookieDomain
-                };
-
-            if (GlobalSettings.UseSSL)
-                cookie.Secure = true;
-
-            //ensure http only, this should only be able to be accessed via the server
-            cookie.HttpOnly = true;
-
-            //rewrite the cooke
-            http.Response.Cookies.Set(cookie);
-            return true;
         }
 
         /// <summary>

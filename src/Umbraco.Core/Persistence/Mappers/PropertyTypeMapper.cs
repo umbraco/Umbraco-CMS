@@ -33,6 +33,7 @@ namespace Umbraco.Core.Persistence.Mappers
         {
             if(PropertyInfoCache.IsEmpty)
             {
+                CacheMap<PropertyType, PropertyTypeDto>(src => src.Key, dto => dto.UniqueId);
                 CacheMap<PropertyType, PropertyTypeDto>(src => src.Id, dto => dto.Id);
                 CacheMap<PropertyType, PropertyTypeDto>(src => src.Alias, dto => dto.Alias);
                 CacheMap<PropertyType, PropertyTypeDto>(src => src.DataTypeDefinitionId, dto => dto.DataTypeId);

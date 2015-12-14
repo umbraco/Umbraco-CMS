@@ -38,15 +38,20 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
             if (Context.CurrentDatabaseProvider == DatabaseProviders.MySql)
             {
                 Delete.ForeignKey().FromTable("cmsTagRelationship").ForeignColumn("nodeId").ToTable("umbracoNode").PrimaryColumn("id");
+                //check for another strange really old one that might have existed
+                if (constraints.Any(x => x.Item1 == "cmsTagRelationship" && x.Item2 == "tagId"))
+                {
+                    Delete.ForeignKey().FromTable("cmsTagRelationship").ForeignColumn("tagId").ToTable("cmsTags").PrimaryColumn("id");
+                }
             }
             else
             {
                 //Before we try to delete this constraint, we'll see if it exists first, some older schemas never had it and some older schema's had this named
                 // differently than the default.
 
-                var constraint = constraints
-                    .SingleOrDefault(x => x.Item1 == "cmsTagRelationship" && x.Item2 == "nodeId" && x.Item3.InvariantStartsWith("PK_") == false);
-                if (constraint != null)
+                var constraintMatches = constraints.Where(x => x.Item1 == "cmsTagRelationship" && x.Item2 == "nodeId" && x.Item3.InvariantStartsWith("PK_") == false);
+
+                foreach (var constraint in constraintMatches)
                 {
                     Delete.ForeignKey(constraint.Item3).OnTable("cmsTagRelationship");
                 }

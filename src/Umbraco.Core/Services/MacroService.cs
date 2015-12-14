@@ -20,26 +20,8 @@ namespace Umbraco.Core.Services
     public class MacroService : RepositoryService, IMacroService
     {
 
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public MacroService()
-            : this(new PetaPocoUnitOfWorkProvider(), new RepositoryFactory())
-        {
-        }
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public MacroService(IDatabaseUnitOfWorkProvider provider)
-            : this(provider, new RepositoryFactory())
-        {
-        }
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public MacroService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory)
-            : this(provider, repositoryFactory, LoggerResolver.Current.Logger)
-        {
-        }
-
-        public MacroService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger)
-            : base(provider, repositoryFactory, logger)
+        public MacroService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+            : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
         }
 

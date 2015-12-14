@@ -77,6 +77,7 @@ namespace umbraco.editorControls.userControlGrapper
 		private void populateUserControls(string path)
 		{
 			DirectoryInfo di = new DirectoryInfo(path);
+            if (di.Exists == false) return;
 
 			foreach (FileInfo uc in di.GetFiles("*.ascx"))
 			{

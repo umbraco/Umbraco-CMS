@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.ConstrainedExecution;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -63,18 +64,31 @@ namespace Umbraco.Core
             // for anonymous semaphore, use the unique releaser, else create a new one
             return _semaphore != null
                 ? _releaser // (IDisposable)new SemaphoreSlimReleaser(_semaphore)
-                : (IDisposable)new NamedSemaphoreReleaser(_semaphore2);
+                : new NamedSemaphoreReleaser(_semaphore2);
         }
 
         public Task<IDisposable> LockAsync()
         {
             var wait = _semaphore != null 
-                ? _semaphore.WaitAsync() 
-                : WaitOneAsync(_semaphore2);
+                ? _semaphore.WaitAsync()
+                : _semaphore2.WaitOneAsync();
 
             return wait.IsCompleted 
                 ? _releaserTask ?? Task.FromResult(CreateReleaser()) // anonymous vs named
                 : wait.ContinueWith((_, state) => (((AsyncLock) state).CreateReleaser()),
+                    this, CancellationToken.None,
+                    TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
+        }
+
+        public Task<IDisposable> LockAsync(int millisecondsTimeout)
+        {
+            var wait = _semaphore != null
+                ? _semaphore.WaitAsync(millisecondsTimeout)
+                : _semaphore2.WaitOneAsync(millisecondsTimeout);
+
+            return wait.IsCompleted
+                ? _releaserTask ?? Task.FromResult(CreateReleaser()) // anonymous vs named
+                : wait.ContinueWith((_, state) => (((AsyncLock)state).CreateReleaser()),
                     this, CancellationToken.None,
                     TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
         }
@@ -104,38 +118,55 @@ namespace Umbraco.Core
         private class NamedSemaphoreReleaser : CriticalFinalizerObject, IDisposable
         {
             private readonly Semaphore _semaphore;
+            private GCHandle _handle;
 
             internal NamedSemaphoreReleaser(Semaphore semaphore)
             {
                 _semaphore = semaphore;
+                _handle = GCHandle.Alloc(_semaphore);
             }
 
             public void Dispose()
             {
                 Dispose(true);
-                GC.SuppressFinalize(this);
+                GC.SuppressFinalize(this); // finalize will not run
             }
 
             private void Dispose(bool disposing)
             {
                 // critical
+                _handle.Free();
                 _semaphore.Release();
+                _semaphore.Dispose();
             }
 
-            // we WANT to release the semaphore because it's a system object
-            // ie a critical non-managed resource - so we inherit from CriticalFinalizerObject
-            // which means that the finalizer "should" run in all situations
+            // we WANT to release the semaphore because it's a system object, ie a critical 
+            // non-managed resource - and if it is not released then noone else can acquire
+            // the lock - so we inherit from CriticalFinalizerObject which means that the 
+            // finalizer "should" run in all situations - there is always a chance that it
+            // does not run and the semaphore remains "acquired" but then chances are the
+            // whole process (w3wp.exe...) is going down, at which point the semaphore will
+            // be destroyed by Windows.
 
-            // however... that can fail with System.ObjectDisposedException because the
-            // underlying handle was closed... because we cannot guarantee that the semaphore
-            // is not gone already... unless we get a GCHandle = GCHandle.Alloc(_semaphore);
-            // which should keep it around and then we free the handle?
+            // however, the semaphore is a managed object, and so when the finalizer runs it
+            // might have been finalized already, and then we get a, ObjectDisposedException
+            // in the finalizer - which is bad.
 
-            // so... I'm not sure this is safe really...
+            // in order to prevent this we do two things
+            // - use a GCHandler to ensure the semaphore is still there when the finalizer
+            //   runs, so we can actually release it
+            // - wrap the finalizer code in a try...catch to make sure it never throws
 
             ~NamedSemaphoreReleaser()
             {
-                Dispose(false);
+                try
+                {
+                    Dispose(false);
+                }
+                catch
+                {
+                    // we do NOT want the finalizer to throw - never ever
+                }
             }
         }
 
@@ -167,41 +198,6 @@ namespace Umbraco.Core
             {
                 Dispose(false);
             }
-        }
-
-        // http://stackoverflow.com/questions/25382583/waiting-on-a-named-semaphore-with-waitone100-vs-waitone0-task-delay100
-        // http://blog.nerdbank.net/2011/07/c-await-for-waithandle.html
-        // F# has a AwaitWaitHandle method that accepts a time out... and seems pretty complex...
-        // version below should be OK
-
-        private static Task WaitOneAsync(WaitHandle handle)
-        {
-            var tcs = new TaskCompletionSource<object>();
-            var callbackHandleInitLock = new object();
-            lock (callbackHandleInitLock)
-            {
-                RegisteredWaitHandle callbackHandle = null;
-                // ReSharper disable once RedundantAssignment
-                callbackHandle = ThreadPool.RegisterWaitForSingleObject(
-                    handle,
-                    (state, timedOut) =>
-                    {
-                        tcs.SetResult(null);
-
-                        // we take a lock here to make sure the outer method has completed setting the local variable callbackHandle.
-                        lock (callbackHandleInitLock)
-                        {
-                            // ReSharper disable once PossibleNullReferenceException
-                            // ReSharper disable once AccessToModifiedClosure
-                            callbackHandle.Unregister(null);
-                        }
-                    },
-                    /*state:*/ null,
-                    /*millisecondsTimeOutInterval:*/ Timeout.Infinite,
-                    /*executeOnlyOnce:*/ true);
-            }
-
-            return tcs.Task;
         }
     }
 }

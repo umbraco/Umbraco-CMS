@@ -14,26 +14,8 @@ namespace Umbraco.Core.Services
     public class MemberGroupService : RepositoryService, IMemberGroupService
     {
 
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public MemberGroupService(RepositoryFactory repositoryFactory)
-            : this(new PetaPocoUnitOfWorkProvider(), repositoryFactory)
-        {
-        }
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public MemberGroupService(IDatabaseUnitOfWorkProvider provider)
-            : this(provider, new RepositoryFactory())
-        {
-        }
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public MemberGroupService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory)
-            : this(provider, repositoryFactory, LoggerResolver.Current.Logger)
-        {            
-        }
-
-        public MemberGroupService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger)
-            : base(provider, repositoryFactory, logger)
+        public MemberGroupService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+            : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
             //Proxy events!
             MemberGroupRepository.SavedMemberGroup += MemberGroupRepository_SavedMemberGroup;
