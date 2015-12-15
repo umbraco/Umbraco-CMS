@@ -262,7 +262,7 @@ namespace Umbraco.Core.Services
             }
             
             // Fall back to English by default if we can't find the key
-            found = FindTranslation(xmlSource, new CultureInfo("en-GB"), area, key);
+            found = FindTranslation(xmlSource, new CultureInfo("en-US"), area, key);
             if (found != null)
                 return ParseTokens(found.Value, tokens);
 
