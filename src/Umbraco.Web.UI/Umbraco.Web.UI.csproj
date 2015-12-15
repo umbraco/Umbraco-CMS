@@ -1696,7 +1696,7 @@
     <Content Include="Umbraco\Config\Lang\fr.xml" />
     <Content Include="Umbraco\Config\Lang\it.xml" />
     <Content Include="Umbraco\Config\Lang\nl.xml" />
-    <Content Include="Umbraco\Config\Lang\no.xml" />
+    <Content Include="Umbraco\Config\Lang\nb.xml" />
     <Content Include="Umbraco\Config\Lang\sv.xml" />
     <Content Include="Umbraco\Css\permissionsEditor.css" />
     <Content Include="Umbraco\Dialogs\mediaPicker.aspx" />
