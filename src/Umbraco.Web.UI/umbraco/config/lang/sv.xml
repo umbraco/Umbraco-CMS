@@ -392,6 +392,8 @@
     <key alias="width">Bredd</key>
     <key alias="view">Titta på</key>
     <key alias="yes">Ja</key>
+    <key alias="reorder">Reorder</key>
+    <key alias="reorderDone">I am done reordering</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Bakgrundsfärg</key>
@@ -732,6 +734,7 @@
     <key alias="chooseLayout">Choose layout</key>
     <key alias="addRows">Lägg till rad</key>
     <key alias="addElement">Add content</key>
+    <key alias="dropElement">Drop content</key>
     <key alias="stylesApplied">Styles applied</key>
     <key alias="contentNotAllowed">Indholdet er ikke tilladt her</key>
     <key alias="contentAllowed">Indholdet er tilladt her</key>

@@ -420,6 +420,8 @@
     <key alias="yes">Yes</key>
     <key alias="folder">Folder</key>
     <key alias="searchResults">Search results</key>
+    <key alias="reorder">Reorder</key>
+    <key alias="reorderDone">I am done reordering</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Background colour</key>
@@ -880,6 +882,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="chooseLayout">Choose a layout</key>
     <key alias="addRows">Add a row</key>
     <key alias="addElement">Add content</key>
+    <key alias="dropElement">Drop content</key>
     <key alias="settingsApplied">Settings applied</key>
 
     <key alias="contentNotAllowed">This content is not allowed here</key>

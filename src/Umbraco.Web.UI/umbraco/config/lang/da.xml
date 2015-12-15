@@ -405,6 +405,8 @@
     <key alias="yes">Ja</key>
     <key alias="folder">Mappe</key>
     <key alias="searchResults">Søgeresultater</key>
+    <key alias="reorder">Reorder</key>
+    <key alias="reorderDone">I am done reordering</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Baggrundsfarve</key>
@@ -630,6 +632,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="chooseLayout">Vælg layout</key>
     <key alias="addRows">Tilføj række</key>
     <key alias="addElement">Tilføj indhold</key>
+    <key alias="dropElement">Slip indhold</key>
     <key alias="settingsApplied">Instillinger tilføjet</key>
 
     <key alias="contentNotAllowed">Indholdet er ikke tilladt her</key>
@@ -872,7 +875,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="memberTypes">Medlemstype</key>
     <key alias="documentTypes">Dokumenttyper</key>
     <key alias="relationTypes">Dokumenttyper</key>
-    
+
     <key alias="packager">Pakker</key>
     <key alias="packages">Pakker</key>
     <key alias="python">Python</key>

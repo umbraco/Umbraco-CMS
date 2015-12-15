@@ -407,6 +407,8 @@
     <key alias="welcome">Bienvenido...</key>
     <key alias="width">Ancho</key>
     <key alias="yes">Si</key>
+    <key alias="reorder">Reorder</key>
+    <key alias="reorderDone">I am done reordering</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Color de fondo</key>
@@ -720,6 +722,7 @@
     <key alias="chooseLayout">Choose layout</key>
     <key alias="addRows">Añade más filas</key>
     <key alias="addElement">Add content</key>
+    <key alias="dropElement">Drop content</key>
     <key alias="settingsApplied">Settings applied</key>
 
     <key alias="contentNotAllowed">This content is not allowed here</key>

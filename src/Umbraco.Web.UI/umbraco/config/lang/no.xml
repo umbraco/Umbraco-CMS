@@ -334,6 +334,8 @@
     <key alias="width">Bredde</key>
     <key alias="yes">Ja</key>
     <key alias="folder">Mappe</key>
+    <key alias="reorder">Reorder</key>
+    <key alias="reorderDone">I am done reordering</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Bakgrunnsfarge</key>
@@ -679,6 +681,7 @@ Vennlig hilsen Umbraco roboten
     <key alias="chooseLayout">Choose a layout</key>
     <key alias="addRows">Add a row</key>
     <key alias="addElement">Add content</key>
+    <key alias="dropElement">Drop content</key>
     <key alias="settingsApplied">Settings applied</key>
 
     <key alias="contentNotAllowed">This content is not allowed here</key>
