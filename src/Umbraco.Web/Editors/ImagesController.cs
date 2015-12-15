@@ -124,7 +124,7 @@ namespace Umbraco.Web.Editors
                 return Request.CreateResponse(HttpStatusCode.NotFound);
             }
 
-            var thumbFilePath = imagePath.TrimEnd(ext) + "_" + suffix + ".jpg";
+            var thumbFilePath = imagePath.TrimEnd(ext) + "_" + suffix + ext;
             var fullOrgPath = mediaFileSystem.GetFullPath(mediaFileSystem.GetRelativePath(imagePath));
             var fullNewPath = mediaFileSystem.GetFullPath(mediaFileSystem.GetRelativePath(thumbFilePath));
             var thumbIsNew = mediaFileSystem.FileExists(fullNewPath) == false;
@@ -148,7 +148,7 @@ namespace Umbraco.Web.Editors
                                 originalImage,
                                 width,
                                 fullNewPath,
-                                "jpg",
+                                ext.Replace(".", ""),
                                 mediaFileSystem);
                         }
                         else
@@ -168,7 +168,8 @@ namespace Umbraco.Web.Editors
             if (stream.CanSeek) stream.Seek(0, 0);
             result.Content = new StreamContent(stream);
             result.Headers.Date = mediaFileSystem.GetLastModified(imagePath);
-            result.Content.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
+            result.Content.Headers.ContentType = new MediaTypeHeaderValue(System.Web.MimeMapping.GetMimeMapping(imagePath));
+            
             return result;
         }
     }
