@@ -131,7 +131,7 @@ namespace Umbraco.Web.Security
             var userData = Mapper.Map<UserData>(user);
             _httpContext.SetPrincipalForRequest(userData);
 
-            SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false).Wait();
+            SignInManager.SignInAsync(user, isPersistent: true, rememberBrowser: false).Wait();
             return TimeSpan.FromMinutes(GlobalSettings.TimeOutInMinutes).TotalSeconds;
         }
 
@@ -162,7 +162,9 @@ namespace Umbraco.Web.Security
         public virtual void ClearCurrentLogin()
         {
             _httpContext.UmbracoLogout();
-            _httpContext.GetOwinContext().Authentication.SignOut();
+            _httpContext.GetOwinContext().Authentication.SignOut(
+                Core.Constants.Security.BackOfficeAuthenticationType,
+                Core.Constants.Security.BackOfficeExternalAuthenticationType);
         }
 
         /// <summary>
