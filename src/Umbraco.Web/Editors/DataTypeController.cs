@@ -27,11 +27,11 @@ namespace Umbraco.Web.Editors
     /// The API controller used for editing data types
     /// </summary>
     /// <remarks>
-    /// This controller is decorated with the UmbracoApplicationAuthorizeAttribute which means that any user requesting
-    /// access to ALL of the methods on this controller will need access to the developer application.
+    /// The security for this controller is defined to allow full CRUD access to data types if the user has access to either:
+    /// Content Types, Member Types or Media Types ... and of course to Data Types
     /// </remarks>
     [PluginController("UmbracoApi")]
-    [UmbracoTreeAuthorize(Constants.Trees.DataTypes)]
+    [UmbracoTreeAuthorize(Constants.Trees.DataTypes, Constants.Trees.DocumentTypes, Constants.Trees.MediaTypes, Constants.Trees.MemberTypes)]
     [EnableOverrideAuthorization]
     public class DataTypeController : UmbracoAuthorizedJsonController
     {
@@ -76,7 +76,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
             
-            Services.DataTypeService.Delete(foundType, UmbracoUser.Id);
+            Services.DataTypeService.Delete(foundType, Security.CurrentUser.Id);
 
             return Request.CreateResponse(HttpStatusCode.OK);
         }
