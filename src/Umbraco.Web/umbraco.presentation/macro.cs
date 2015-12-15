@@ -304,6 +304,7 @@ namespace umbraco
                     var macroType = Model.MacroType != MacroTypes.Unknown
                                         ? (int)Model.MacroType
                                         : MacroType;
+                    var textService = ApplicationContext.Current.Services.TextService;
 
                     switch (macroType)
                     {
@@ -324,11 +325,7 @@ namespace umbraco
                                                 Behaviour = UmbracoConfig.For.UmbracoSettings().Content.MacroErrorBehaviour
                                             };
 
-                                    var errorMessage = ApplicationContext.Current.Services.TextService.Localize("errors/macroErrorLoadingPartialView", new[] { ScriptFile });
-                                    if (errorMessage.Equals("[macroErrorLoadingPartialView]")) // This check can be removed when key is added to every language file
-                                    {
-                                        errorMessage = "Error loading Partial View script (file: " + ScriptFile + ")";
-                                    }
+                                    var errorMessage = textService.Localize("errors/macroErrorLoadingPartialView", new[] { ScriptFile });
                                     return GetControlForErrorBehavior(errorMessage, macroErrorEventArgs);
                                 };
 
@@ -401,7 +398,8 @@ namespace umbraco
                                         Behaviour = UmbracoConfig.For.UmbracoSettings().Content.MacroErrorBehaviour
                                     };
 
-                                    macroControl = GetControlForErrorBehavior("Error loading userControl '" + Model.TypeName + "'", macroErrorEventArgs);
+                                    var errorMessage = textService.Localize("errors/macroErrorLoadingUsercontrol", new[] { Model.TypeName });
+                                    macroControl = GetControlForErrorBehavior(errorMessage, macroErrorEventArgs);
                                     //if it is null, then we are supposed to throw the (original) exception
                                     // see: http://issues.umbraco.org/issue/U4-497 at the end
                                     if (macroControl == null)
@@ -442,7 +440,8 @@ namespace umbraco
                                         Behaviour = UmbracoConfig.For.UmbracoSettings().Content.MacroErrorBehaviour
                                     };
 
-                                    macroControl = GetControlForErrorBehavior("Error loading customControl (Assembly: " + Model.TypeAssembly + ", Type: '" + Model.TypeName + "'", macroErrorEventArgs);
+                                    var errorMessage = textService.Localize("errors/macroErrorLoadingCustomControl", new[] { Model.TypeAssembly, Model.TypeName });
+                                    macroControl = GetControlForErrorBehavior(errorMessage, macroErrorEventArgs);
                                     //if it is null, then we are supposed to throw the (original) exception
                                     // see: http://issues.umbraco.org/issue/U4-497 at the end
                                     if (macroControl == null)
@@ -474,7 +473,8 @@ namespace umbraco
                                                 Behaviour = UmbracoConfig.For.UmbracoSettings().Content.MacroErrorBehaviour
                                             };
 
-                                    return GetControlForErrorBehavior("Error loading MacroEngine script (file: " + ScriptFile + ")", macroErrorEventArgs);
+                                    var errorMessage = textService.Localize("errors/macroErrorLoadingMacroEngineScript", new[] { ScriptFile });
+                                    return GetControlForErrorBehavior(errorMessage, macroErrorEventArgs);
                                 };
 
                             using (DisposableTimer.DebugDuration<macro>("Executing MacroEngineScript: " + ScriptFile))
@@ -923,7 +923,8 @@ namespace umbraco
                                            "</b><br/><p>" + HttpContext.Current.Server.HtmlEncode(outerXml) +
                                            "</p></div>");
                 }
-
+                
+                var textService = ApplicationContext.Current.Services.TextService;
                 try
                 {
                     var xsltFile = getXslt(XsltFile);
@@ -945,7 +946,9 @@ namespace umbraco
                             LogHelper.WarnWithException<macro>("Error parsing XSLT file", e);
 
                             var macroErrorEventArgs = new MacroErrorEventArgs { Name = Model.Name, Alias = Model.Alias, ItemKey = Model.Xslt, Exception = e, Behaviour = UmbracoConfig.For.UmbracoSettings().Content.MacroErrorBehaviour };
-                            var macroControl = GetControlForErrorBehavior("Error parsing XSLT file: \\xslt\\" + XsltFile, macroErrorEventArgs);
+
+                            var errorMessage = textService.Localize("errors/macroErrorParsingXSLTFile", new[] { XsltFile });
+                            var macroControl = GetControlForErrorBehavior(errorMessage, macroErrorEventArgs);
                             //if it is null, then we are supposed to throw the (original) exception
                             // see: http://issues.umbraco.org/issue/U4-497 at the end
                             if (macroControl == null && throwError)
@@ -963,7 +966,8 @@ namespace umbraco
 
                     // Invoke any error handlers for this macro
                     var macroErrorEventArgs = new MacroErrorEventArgs { Name = Model.Name, Alias = Model.Alias, ItemKey = Model.Xslt, Exception = e, Behaviour = UmbracoConfig.For.UmbracoSettings().Content.MacroErrorBehaviour };
-                    var macroControl = GetControlForErrorBehavior("Error reading XSLT file: \\xslt\\" + XsltFile, macroErrorEventArgs);
+                    var errorMessage = textService.Localize("errors/macroErrorReadingXSLTFile", new[] { XsltFile });
+                    var macroControl = GetControlForErrorBehavior(errorMessage + XsltFile, macroErrorEventArgs);
                     //if it is null, then we are supposed to throw the (original) exception
                     // see: http://issues.umbraco.org/issue/U4-497 at the end
                     if (macroControl == null && throwError)
