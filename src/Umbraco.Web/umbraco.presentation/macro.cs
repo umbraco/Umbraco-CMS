@@ -24,6 +24,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Macros;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Core.Xml.XPath;
 using Umbraco.Core.Profiling;
 using umbraco.interfaces;
@@ -322,7 +323,13 @@ namespace umbraco
                                                 Exception = e,
                                                 Behaviour = UmbracoConfig.For.UmbracoSettings().Content.MacroErrorBehaviour
                                             };
-                                    return GetControlForErrorBehavior("Error loading Partial View script (file: " + ScriptFile + ")", macroErrorEventArgs);
+
+                                    var errorMessage = ApplicationContext.Current.Services.TextService.Localize("errors/macroErrorLoadingPartialView",new[]{ScriptFile});
+                                    if (errorMessage.Equals("[macroErrorLoadingPartialView]")) // This check can be removed when key is added to every language file
+                                    {
+                                        errorMessage = "Error loading Partial View script (file: " + ScriptFile + ")";
+                                    }
+                                    return GetControlForErrorBehavior(errorMessage, macroErrorEventArgs);
                                 };
 
                             using (DisposableTimer.DebugDuration<macro>("Executing Partial View: " + Model.TypeName))
