@@ -254,21 +254,33 @@ namespace Umbraco.Core.Services
                 return "[" + key + "]";                
             }
 
-            var cultureSource = xmlSource[culture].Value;
-            
-            var xpath = area.IsNullOrWhiteSpace()
-                    ? string.Format("//key [@alias = '{0}']", key)
-                    : string.Format("//area [@alias = '{0}']/key [@alias = '{1}']", area, key);
-
-            var found = cultureSource.XPathSelectElement(xpath);
+            var found = FindTranslation(xmlSource, culture, area, key);
 
             if (found != null)
             {
                 return ParseTokens(found.Value, tokens);
             }
+            
+            // Fall back to English by default if we can't find the key
+            found = FindTranslation(xmlSource, new CultureInfo("en-US"), area, key);
+            if (found != null)
+                return ParseTokens(found.Value, tokens);
 
-            //NOTE: Based on how legacy works, the default text does not contain the area, just the key
+            // If it can't be found in either file, fall back  to the default, showing just the key in square brackets
+            // NOTE: Based on how legacy works, the default text does not contain the area, just the key
             return "[" + key + "]";
+        }
+
+        private XElement FindTranslation(IDictionary<CultureInfo, Lazy<XDocument>> xmlSource, CultureInfo culture, string area, string key)
+        {
+            var cultureSource = xmlSource[culture].Value;
+
+            var xpath = area.IsNullOrWhiteSpace()
+                ? string.Format("//key [@alias = '{0}']", key)
+                : string.Format("//area [@alias = '{0}']/key [@alias = '{1}']", area, key);
+
+            var found = cultureSource.XPathSelectElement(xpath);
+            return found;
         }
 
         /// <summary>
