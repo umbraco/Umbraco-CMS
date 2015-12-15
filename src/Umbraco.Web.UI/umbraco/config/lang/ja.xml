@@ -410,6 +410,8 @@
     <key alias="yes">はい</key>
     <key alias="folder">フォルダー</key>
     <key alias="searchResults">検索結果</key>
+    <key alias="reorder">Reorder</key>
+    <key alias="reorderDone">I am done reordering</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">背景色</key>
@@ -870,6 +872,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="addLayout">Choose a layout</key>
     <key alias="addRows">ここからレイアウトを選択します</key>
     <key alias="addElement"><![CDATA[<i class="icon icon-add blue"></i> 最初の要素を追加します]]></key>
+    <key alias="dropElement">Drop content</key>
     <key alias="settingsApplied">Settings applied</key>
 
     <key alias="contentNotAllowed">This content is not allowed here</key>

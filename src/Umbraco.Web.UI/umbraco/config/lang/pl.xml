@@ -321,6 +321,8 @@ Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
     <key alias="welcome">Witaj...</key>
     <key alias="width">Szerokość</key>
     <key alias="yes">Tak</key>
+    <key alias="reorder">Reorder</key>
+    <key alias="reorderDone">I am done reordering</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Kolor tła</key>
@@ -619,6 +621,7 @@ Miłego dnia!]]></key>
     <key alias="chooseLayout">Choose a layout</key>
     <key alias="addRows">Add a row</key>
     <key alias="addElement">Add content</key>
+    <key alias="dropElement">Drop content</key>
     <key alias="settingsApplied">Settings applied</key>
 
     <key alias="contentNotAllowed">This content is not allowed here</key>
