@@ -19,7 +19,9 @@ namespace Umbraco.Web.WebApi.Filters
             
             //this calls the underlying owin sign out logic - which should call the 
             // auth providers middleware callbacks if using custom auth middleware
-            context.Request.TryGetOwinContext().Result.Authentication.SignOut();
+            context.Request.TryGetOwinContext().Result.Authentication.SignOut(
+                Core.Constants.Security.BackOfficeAuthenticationType,
+                Core.Constants.Security.BackOfficeExternalAuthenticationType);
         }
     }
 }
