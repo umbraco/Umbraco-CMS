@@ -7,6 +7,16 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
 
     return {
 
+        getAvailableCompositeContentTypes: function (contentTypeId) {
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "mediaTypeApiBaseUrl",
+                       "GetAvailableCompositeMediaTypes",
+                       [{ contentTypeId: contentTypeId }])),
+               'Failed to retrieve data for content type id ' + contentTypeId);
+        },
+
         /**
          * @ngdoc method
          * @name umbraco.resources.mediaTypeResource#getAllowedTypes

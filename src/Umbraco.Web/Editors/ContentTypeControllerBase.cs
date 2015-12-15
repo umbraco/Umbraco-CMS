@@ -46,36 +46,128 @@ namespace Umbraco.Web.Editors
         {
         }
 
-        protected internal DataTypeBasic GetAssignedListViewDataType(int contentTypeId)
+        /// <summary>
+        /// Returns the available composite content types for a given content type
+        /// </summary>
+        /// <returns></returns>
+        protected IEnumerable<EntityBasic> PerformGetAvailableCompositeContentTypes(int contentTypeId, UmbracoObjectTypes type)
         {
-            var objectType = Services.EntityService.GetObjectType(contentTypeId);
+            IContentTypeComposition source = null;
 
-            switch (objectType)
+            //below is all ported from the old doc type editor and comes with the same weaknesses /insanity / magic
+            
+            IContentTypeComposition[] allContentTypes;
+
+            switch (type)
             {
-                case UmbracoObjectTypes.MemberType:     
-                    var memberType = Services.MemberTypeService.Get(contentTypeId);
-                    var dtMember = Services.DataTypeService.GetDataTypeDefinitionByName(Constants.Conventions.DataTypes.ListViewPrefix + memberType.Alias);
-                    return dtMember == null
-                        ? Mapper.Map<IDataTypeDefinition, DataTypeBasic>(
-                            Services.DataTypeService.GetDataTypeDefinitionByName(Constants.Conventions.DataTypes.ListViewPrefix + "Member"))
-                        : Mapper.Map<IDataTypeDefinition, DataTypeBasic>(dtMember);
-                case UmbracoObjectTypes.MediaType:                
-                    var mediaType = Services.ContentTypeService.GetMediaType(contentTypeId);
-                    var dtMedia = Services.DataTypeService.GetDataTypeDefinitionByName(Constants.Conventions.DataTypes.ListViewPrefix + mediaType.Alias);
-                    return dtMedia == null
-                        ? Mapper.Map<IDataTypeDefinition, DataTypeBasic>(
-                            Services.DataTypeService.GetDataTypeDefinitionByName(Constants.Conventions.DataTypes.ListViewPrefix + "Media"))
-                        : Mapper.Map<IDataTypeDefinition, DataTypeBasic>(dtMedia);
                 case UmbracoObjectTypes.DocumentType:
-                    var docType = Services.ContentTypeService.GetContentType(contentTypeId);
-                    var dtDoc = Services.DataTypeService.GetDataTypeDefinitionByName(Constants.Conventions.DataTypes.ListViewPrefix + docType.Alias);
-                    return dtDoc == null
-                        ? Mapper.Map<IDataTypeDefinition, DataTypeBasic>(
-                            Services.DataTypeService.GetDataTypeDefinitionByName(Constants.Conventions.DataTypes.ListViewPrefix + "Content"))
-                        : Mapper.Map<IDataTypeDefinition, DataTypeBasic>(dtDoc);
+                    if (contentTypeId > 0)
+                    {
+                        source = Services.ContentTypeService.GetContentType(contentTypeId);
+                        if (source == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+                    }
+                    allContentTypes = Services.ContentTypeService.GetAllContentTypes().Cast<IContentTypeComposition>().ToArray();
+                    break;
+
+                case UmbracoObjectTypes.MediaType:
+                    if (contentTypeId > 0)
+                    {
+                        source = Services.ContentTypeService.GetMediaType(contentTypeId);
+                        if (source == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+                    }
+                    allContentTypes = Services.ContentTypeService.GetAllMediaTypes().Cast<IContentTypeComposition>().ToArray();
+                    break;
+
+                case UmbracoObjectTypes.MemberType:
+                    if (contentTypeId > 0)
+                    {
+                        source = Services.MemberTypeService.Get(contentTypeId);
+                        if (source == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+                    }
+                    allContentTypes = Services.MemberTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
+                    break;
+
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException("The entity type was not a content type");
             }
+
+            // note: there are many sanity checks missing here and there ;-((
+            // make sure once and for all
+            //if (allContentTypes.Any(x => x.ParentId > 0 && x.ContentTypeComposition.Any(y => y.Id == x.ParentId) == false))
+            //    throw new Exception("A parent does not belong to a composition.");
+
+            // find out if any content type uses this content type
+            var isUsing = allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == contentTypeId)).ToArray();
+            if (isUsing.Length > 0)
+            {
+                //if already in use a composition, do not allow any composited types
+                return new List<EntityBasic>();
+            }
+
+            // if it is not used then composition is possible
+            // hashset guarantees unicity on Id
+            var list = new HashSet<IContentTypeComposition>(new DelegateEqualityComparer<IContentTypeComposition>(
+                (x, y) => x.Id == y.Id,
+                x => x.Id));
+
+            // usable types are those that are top-level
+            var usableContentTypes = allContentTypes
+                .Where(x => x.ContentTypeComposition.Any() == false).ToArray();
+            foreach (var x in usableContentTypes)
+                list.Add(x);
+
+            // indirect types are those that we use, directly or indirectly
+            var indirectContentTypes = GetIndirect(source).ToArray();
+            foreach (var x in indirectContentTypes)
+                list.Add(x);
+
+            //// directContentTypes are those we use directly
+            //// they are already in indirectContentTypes, no need to add to the list
+            //var directContentTypes = source.ContentTypeComposition.ToArray();
+
+            //var enabled = usableContentTypes.Select(x => x.Id) // those we can use
+            //    .Except(indirectContentTypes.Select(x => x.Id)) // except those that are indirectly used
+            //    .Union(directContentTypes.Select(x => x.Id)) // but those that are directly used
+            //    .Where(x => x != source.ParentId) // but not the parent
+            //    .Distinct()
+            //    .ToArray();
+
+            return list
+                .Where(x => x.Id != contentTypeId)
+                .OrderBy(x => x.Name)
+                .Select(Mapper.Map<IContentTypeComposition, EntityBasic>)
+                .Select(x =>
+                {
+                    x.Name = TranslateItem(x.Name);
+                    return x;
+                })
+                .ToList();
+        }
+
+        private static IEnumerable<IContentTypeComposition> GetIndirect(IContentTypeComposition ctype)
+        {
+            // hashset guarantees unicity on Id
+            var all = new HashSet<IContentTypeComposition>(new DelegateEqualityComparer<IContentTypeComposition>(
+                (x, y) => x.Id == y.Id,
+                x => x.Id));
+
+            var stack = new Stack<IContentTypeComposition>();
+
+            if (ctype != null)
+            {
+                foreach (var x in ctype.ContentTypeComposition)
+                    stack.Push(x);
+            }
+
+            while (stack.Count > 0)
+            {
+                var x = stack.Pop();
+                all.Add(x);
+                foreach (var y in x.ContentTypeComposition)
+                    stack.Push(y);
+            }
+
+            return all;
         }
 
         /// <summary>

@@ -26,7 +26,7 @@ namespace Umbraco.Web.UI.Umbraco.Controls
             base.OnLoad(e);
 
             DataTypeControllerUrl = Url.GetUmbracoApiServiceBaseUrl<DataTypeController>(x => x.GetById(0));
-            ContentTypeControllerUrl = Url.GetUmbracoApiServiceBaseUrl<ContentTypeController>(x => x.GetAssignedListViewDataType(0));
+            //ContentTypeControllerUrl = Url.GetUmbracoApiServiceBaseUrl<ContentTypeController>(x => x.GetAssignedListViewDataType(0));
         }
 
         protected void dgTabs_PreRender(object sender, EventArgs e)
