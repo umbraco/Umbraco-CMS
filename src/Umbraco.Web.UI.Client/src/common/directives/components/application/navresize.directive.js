@@ -63,7 +63,7 @@ angular.module("umbraco.directives")
 
                         navInnerContainer.css("width", "");
                         $("#contentwrapper").css("left", "");
-                        $("#umb-notification").css("left" "");
+                        $("#umb-notifications-wrapper").css("left" "");
                         $("#navOffset").css("margin-left", "");
 
                         resizeEnabled = false;
