@@ -1404,9 +1404,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Strings\Notes.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="FileResources\Files.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Files.Designer.cs</LastGenOutput>

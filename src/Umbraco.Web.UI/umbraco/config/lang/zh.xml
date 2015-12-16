@@ -363,6 +363,8 @@
     <key alias="welcome">欢迎…</key>
     <key alias="width">宽</key>
     <key alias="yes">是</key>
+    <key alias="reorder">Reorder</key>
+    <key alias="reorderDone">I am done reordering</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">背景色</key>
@@ -778,6 +780,7 @@
     <key alias="chooseLayout">Choose a layout</key>
     <key alias="addRows">Add a row</key>
     <key alias="addElement">Add content</key>
+    <key alias="dropElement">Drop content</key>
     <key alias="settingsApplied">Settings applied</key>
 
     <key alias="contentNotAllowed">This content is not allowed here</key>

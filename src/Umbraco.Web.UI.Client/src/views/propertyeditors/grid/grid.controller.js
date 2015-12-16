@@ -10,6 +10,8 @@ angular.module("umbraco")
         $scope.openRTEToolbarId = null;
         $scope.hasSettings = false;
         $scope.showRowConfigurations = true;
+        $scope.sortMode = false;
+        $scope.reorderKey = "general_reorder";
 
         // *********************************************
         // Sortable options
@@ -80,7 +82,7 @@ angular.module("umbraco")
             distance: 10,
             cursor: "move",
             placeholder: "ui-sortable-placeholder",
-            handle: ".umb-control-bar",
+            handle: ".umb-control-handle",
             helper: "clone",
             connectWith: ".umb-cell-inner",
             forcePlaceholderSize: true,
@@ -170,12 +172,17 @@ angular.module("umbraco")
                 ui.item.context.style.display = "block";
                 ui.item.find(".mceNoEditor").each(function () {
                     notIncludedRte = [];
+                    var editors = _.findWhere(tinyMCE.editors, { id: $(this).attr("id") });
 
                     // save the dragged RTE settings
-                    draggedRteSettings = _.findWhere(tinyMCE.editors, { id: $(this).attr("id") }).settings;
+                    if(editors) {
+                        draggedRteSettings = editors.settings;
 
-                    // remove the dragged RTE
-                    tinyMCE.execCommand("mceRemoveEditor", false, $(this).attr("id"));
+                        // remove the dragged RTE
+                        tinyMCE.execCommand("mceRemoveEditor", false, $(this).attr("id"));
+
+                    }
+
                 });
             },
 
@@ -221,6 +228,15 @@ angular.module("umbraco")
                 });
             }
 
+        };
+
+        $scope.toggleSortMode = function() {
+            $scope.sortMode = !$scope.sortMode;
+            if($scope.sortMode) {
+                $scope.reorderKey = "general_reorderDone";
+            } else {
+                $scope.reorderKey = "general_reorder";
+            }
         };
 
         // *********************************************

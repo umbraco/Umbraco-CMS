@@ -110,7 +110,7 @@ namespace umbraco.controls.Images
                 }
 
                 string ext = MediaItemPath.Substring(MediaItemPath.LastIndexOf(".") + 1, MediaItemPath.Length - MediaItemPath.LastIndexOf(".") - 1);
-                MediaItemThumbnailPath = MediaItemPath.Replace("." + ext, "_thumb.jpg");
+                MediaItemThumbnailPath = MediaItemPath.Replace("." + ext, "_thumb." + ext);
 
                 ImageFound = true;
             }

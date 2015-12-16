@@ -323,6 +323,8 @@
     <key alias="welcome">Benvenuto...</key>
     <key alias="width">Larghezza</key>
     <key alias="yes">Si</key>
+    <key alias="reorder">Reorder</key>
+    <key alias="reorderDone">I am done reordering</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Colore di sfondo</key>
@@ -697,6 +699,7 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="chooseLayout">Choose a layout</key>
     <key alias="addRows">Add a row</key>
     <key alias="addElement">Add content</key>
+    <key alias="dropElement">Drop content</key>
     <key alias="settingsApplied">Settings applied</key>
 
     <key alias="contentNotAllowed">This content is not allowed here</key>

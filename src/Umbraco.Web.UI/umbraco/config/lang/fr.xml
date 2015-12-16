@@ -396,6 +396,8 @@
     <key alias="yes">Oui</key>
     <key alias="folder">Dossier</key>
     <key alias="searchResults">Résultats de recherche</key>
+    <key alias="reorder">Reorder</key>
+    <key alias="reorderDone">I am done reordering</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Background color</key>
@@ -838,6 +840,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="chooseLayout">Choose a layout</key>
     <key alias="addRows">Add a row</key>
     <key alias="addElement">Add content</key>
+    <key alias="dropElement">Drop content</key>
     <key alias="settingsApplied">Settings applied</key>
 
     <key alias="contentNotAllowed">This content is not allowed here</key>

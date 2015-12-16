@@ -19,7 +19,7 @@ angular.module("umbraco.directives")
                var ua = window.navigator.userAgent;
                var msie = ua.indexOf("MSIE ");
 
-               if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
+               if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./) || navigator.userAgent.match(/Edge\/\d+/)) {
                   return true;
                } else {
                   return false;

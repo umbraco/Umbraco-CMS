@@ -400,6 +400,8 @@
     <key alias="welcome">Добро пожаловать...</key>
     <key alias="width">Ширина</key>
     <key alias="yes">Да</key>
+    <key alias="reorder">Reorder</key>
+    <key alias="reorderDone">I am done reordering</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Цвет фона</key>
@@ -410,6 +412,7 @@
   </area>
   <area alias="grid">
     <key alias="addElement">Add content</key>
+    <key alias="dropElement">Drop content</key>
     <key alias="addGridLayout">Добавить шаблон сетки</key>
     <key alias="addGridLayoutDetail">Настройте шаблон, задавая ширину колонок или добавляя дополнительные секции</key>
     <key alias="addRowConfiguration">Добавить конфигурацию строки</key>

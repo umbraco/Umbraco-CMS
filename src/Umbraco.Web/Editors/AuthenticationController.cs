@@ -97,7 +97,7 @@ namespace Umbraco.Web.Editors
             if (result.Succeeded)
             {
                 var user = await UserManager.FindByIdAsync(User.Identity.GetUserId<int>());
-                await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                await SignInManager.SignInAsync(user, isPersistent: true, rememberBrowser: false);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             else
@@ -240,7 +240,9 @@ namespace Umbraco.Web.Editors
         [ValidateAngularAntiForgeryToken]
         public HttpResponseMessage PostLogout()
         {
-            Request.TryGetOwinContext().Result.Authentication.SignOut();
+            Request.TryGetOwinContext().Result.Authentication.SignOut(
+                Core.Constants.Security.BackOfficeAuthenticationType,
+                Core.Constants.Security.BackOfficeExternalAuthenticationType);
 
             Logger.Info<AuthenticationController>("User {0} from IP address {1} has logged out",
                             () => User.Identity == null ? "UNKNOWN" : User.Identity.Name,
