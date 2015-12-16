@@ -159,7 +159,7 @@
       <delete assembly="umbraco" type="MemberTypeTasks" />
     </tasks>
   </nodeType>
-  <nodeType alias="memberGroup">
+  <nodeType alias="memberGroups">
     <header>membergroup</header>
     <usercontrol>/create/simple.ascx</usercontrol>
     <tasks>

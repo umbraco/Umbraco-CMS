@@ -555,7 +555,7 @@ INSERT INTO umbracoAppTree (appAlias, treeAlias, treeSilent, treeInitialize, tre
 	
 	('media', 'media', 0, 1, 0, 'Medier', 'folder.gif', 'folder_o.gif', 'umbraco', 'loadMedia'),
 	('member', 'member', 0, 1, 0, 'Medlemmer', 'folder.gif', 'folder_o.gif', 'umbraco', 'loadMembers'),
-	('member', 'memberGroup', 0, 1, 1, 'MemberGroups', 'folder.gif', 'folder_o.gif', 'umbraco', 'loadMemberGroups'),
+	('member', 'memberGroups', 0, 1, 1, 'MemberGroups', 'folder.gif', 'folder_o.gif', 'umbraco', 'loadMemberGroups'),
 	('member', 'memberType', 0, 1, 2, 'Medlemstyper', 'folder.gif', 'folder_o.gif', 'umbraco', 'loadMemberTypes'),
 	('settings', 'languages', 0, 1, 4, 'Languages', 'folder.gif', 'folder_o.gif', 'umbraco', 'loadLanguages'),
 	('settings', 'mediaTypes', 0, 1, 5, 'Medietyper', 'folder.gif', 'folder_o.gif', 'umbraco', 'loadMediaTypes'),
