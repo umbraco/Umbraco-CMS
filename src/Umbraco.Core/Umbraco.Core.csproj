@@ -408,6 +408,7 @@
     <Compile Include="Persistence\Mappers\AccessMapper.cs" />
     <Compile Include="Persistence\Mappers\DomainMapper.cs" />
     <Compile Include="Persistence\Mappers\MigrationEntryMapper.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFourZero\FixListViewMediaSortOrder.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFourZero\AddDataDecimalColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFourZero\AddUniqueIdPropertyTypeGroupColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFourZero\RemoveParentIdPropertyTypeGroupColumn.cs" />
