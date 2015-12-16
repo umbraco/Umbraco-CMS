@@ -27,10 +27,11 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourZer
                 .WithColumn("compositeChecksum").AsString(32).Nullable();
 
             Create.Table("umbracoDeployDependency")
-                .WithColumn("id").AsInt32().Identity().PrimaryKey("PK_umbracoDeployDependency")
                 .WithColumn("sourceId").AsInt32().NotNullable().ForeignKey("FK_umbracoDeployDependency_umbracoDeployChecksum_id1", "umbracoDeployChecksum", "id")
                 .WithColumn("targetId").AsInt32().NotNullable().ForeignKey("FK_umbracoDeployDependency_umbracoDeployChecksum_id2", "umbracoDeployChecksum", "id")
                 .WithColumn("mode").AsInt32().NotNullable();
+
+            Create.PrimaryKey("PK_umbracoDeployDependency").OnTable("umbracoDeployDependency").Columns(new[] {"sourceId", "targetId"});
 
             Create.Index("IX_umbracoDeployChecksum").OnTable("umbracoDeployChecksum")
                   .OnColumn("entityType")

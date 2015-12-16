@@ -4,15 +4,11 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 namespace Umbraco.Core.Models.Rdbms
 {
     [TableName("umbracoDeployDependency")]
-    [PrimaryKey("id")]
     [ExplicitColumns]
     internal class UmbracoDeployDependencyDto
-    {
-        [Column("id")]
-        [PrimaryKeyColumn(Name = "PK_umbracoDeployDependency")]
-        public int Id { get; set; }
-
+    {   
         [Column("sourceId")]
+        [PrimaryKeyColumn(AutoIncrement = false, Clustered = true, Name = "PK_umbracoDeployDependency", OnColumns = "sourceId, targetId")]
         [ForeignKey(typeof(UmbracoDeployChecksumDto), Name = "FK_umbracoDeployDependency_umbracoDeployChecksum_id1")]
         [NullSetting(NullSetting = NullSettings.NotNull)]
         public int SourceId { get; set; }
