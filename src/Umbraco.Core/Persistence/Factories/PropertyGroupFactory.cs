@@ -99,9 +99,7 @@ namespace Umbraco.Core.Persistence.Factories
                                  ContentTypeNodeId = _contentTypeId,
                                  SortOrder = propertyGroup.SortOrder,
                                  Text = propertyGroup.Name,
-                                 UniqueId = propertyGroup.Key == Guid.Empty
-                                    ? Guid.NewGuid()
-                                    : propertyGroup.Key
+                                 UniqueId = propertyGroup.Key
                              };
 
             if (propertyGroup.HasIdentity)
@@ -124,9 +122,7 @@ namespace Umbraco.Core.Persistence.Factories
                 Name = propertyType.Name,
                 SortOrder = propertyType.SortOrder,
                 ValidationRegExp = propertyType.ValidationRegExp,
-                UniqueId = propertyType.Key == Guid.Empty
-                    ? Guid.NewGuid()
-                    : propertyType.Key
+                UniqueId = propertyType.Key
             };
 
             if (tabId != default(int))
