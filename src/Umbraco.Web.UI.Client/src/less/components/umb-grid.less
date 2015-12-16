@@ -413,6 +413,10 @@
 .umb-grid .umb-row.-active {
     background-color: @blue;
 
+    .umb-row-title-bar {
+        cursor: move;
+    }
+
     .row-tool,
     .umb-row-title {
         color: #fff;
@@ -437,6 +441,9 @@
 .umb-grid .umb-row.-active-child {
     background-color: @grayLighter;
 
+    .umb-row-title-bar {
+        cursor: default;
+    }
 
     .umb-row-title {
         color: @gray;
@@ -736,6 +743,7 @@
 .umb-grid .umb-control.-active .umb-control-bar {
     opacity: 1;
     height: 25px;
+    cursor: move;
 }
 
 .umb-grid .umb-control-tools {
