@@ -21,14 +21,14 @@
 			{
 				active: true,
 				id: 1,
-				label: "Default",
+				label: "Available Editors",
 				alias: "Default",
 				typesAndEditors: []
 			},
 			{
 				active: false,
 				id: 2,
-				label: "Reuse",
+				label: "Re-use",
 				alias: "Reuse",
 				userConfigured: []
 			}
@@ -41,14 +41,14 @@
 
 		function activate() {
 
-			getAllUserConfiguredDataTypes();
-			getAllTypesAndEditors();
+			getAllDataTypes();
+			getGroupedPropertyEditors();
 
 		}
 
-		function getAllTypesAndEditors() {
+		function getGroupedPropertyEditors() {
 
-			dataTypeResource.getAllTypesAndEditors().then(function(data){
+			dataTypeResource.getGroupedPropertyEditors().then(function(data){
 				vm.tabs[0].typesAndEditors = data;
 				vm.tabsLoaded = vm.tabsLoaded + 1;
 				checkIfTabContentIsLoaded();
@@ -56,9 +56,9 @@
 
 		}
 
-		function getAllUserConfiguredDataTypes() {
+		function getAllDataTypes() {
 
-			dataTypeResource.getAllUserConfigured().then(function(data){
+		    dataTypeResource.getAll().then(function (data) {
 				vm.tabs[1].userConfigured = data;
 				vm.tabsLoaded = vm.tabsLoaded + 1;
 				checkIfTabContentIsLoaded();
