@@ -170,6 +170,14 @@
 
         function init(contentType) {
 
+            //get available composite types
+            mediaTypeResource.getAvailableCompositeContentTypes(contentType.id).then(function (result) {
+                contentType.availableCompositeContentTypes = result;
+
+                // convert icons for composite content types
+                iconHelper.formatContentTypeIcons(contentType.availableCompositeContentTypes);
+            });
+
             // set all tab to inactive
             if (contentType.groups.length !== 0) {
                 angular.forEach(contentType.groups, function (group) {
@@ -198,9 +206,6 @@
         }
 
         function convertLegacyIcons(contentType) {
-
-            // convert icons for composite content types
-            iconHelper.formatContentTypeIcons(contentType.availableCompositeContentTypes);
 
             // make array to store contentType icon
             var contentTypeArray = [];

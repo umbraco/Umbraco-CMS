@@ -221,8 +221,8 @@
             //get available composite types
             contentTypeResource.getAvailableCompositeContentTypes(contentType.id).then(function (result) {
                 contentType.availableCompositeContentTypes = result;
-                // convert legacy icons
-                convertLegacyIcons(contentType);
+                // convert icons for composite content types
+                iconHelper.formatContentTypeIcons(contentType.availableCompositeContentTypes);
             });
 
             // set all tab to inactive
@@ -260,9 +260,6 @@
         }
 
         function convertLegacyIcons(contentType) {
-
-            // convert icons for composite content types
-            iconHelper.formatContentTypeIcons(contentType.availableCompositeContentTypes);
 
             // make array to store contentType icon
             var contentTypeArray = [];
