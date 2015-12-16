@@ -187,13 +187,6 @@ angular.module("umbraco")
                 });
             },
 
-            beforeStop: function (e, ui) {
-                var cell = $(e.toElement).scope().area;
-                if(cell != undefined && cell.dropNotAllowed == false){
-                    hasActiveChild(cell, cell.controls);
-                }
-            },
-
             stop: function (e, ui) {
 
                 // Fade in control when sorting stops
