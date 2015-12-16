@@ -1,0 +1,79 @@
+﻿/* set default selection color */
+.slider-track .slider-selection {
+	background: #89cdef;
+}
+
+/* custom styling for triangle */
+.slider.slider-horizontal .slider-tick.triangle,
+.slider.slider-horizontal .slider-handle.triangle {
+    box-shadow: none;
+    border-width: 0 12px 15px 12px !important;
+    margin-left: -12px;
+    margin-top: -5px !important;
+}
+
+.slider.slider-vertical .slider-tick.triangle,
+.slider.slider-vertical .slider-handle.triangle {
+    box-shadow: none;
+    border-width: 12px 0 12px 15px !important;
+    margin-top: -12px;
+}
+
+/* for custom handle remove box-shadow */
+.slider-track .slider-handle.custom {
+    box-shadow: none;
+    margin-left: -8px;
+}
+
+/* for custom handle add text-shadow */
+.slider-track .slider-handle.custom::before {
+    text-shadow: 0 1px 2px rgba(0,0,0,.05);
+    color: #337ab7;
+    font-size: 26px;
+}
+
+/* we make each tick a bit more clear */
+.slider .slider-tick {
+    background-image: -webkit-linear-gradient(top, #e6e6e6 0, #dedede 100%);
+    background-image: -o-linear-gradient(top, #e6e6e6 0, #dedede 100%);
+    background-image: linear-gradient(to bottom, #e6e6e6 0, #dedede 100%);
+}
+
+.slider .slider-tick.in-selection {
+    background-image: -webkit-linear-gradient(top, #89cdef 0, #81bfde 100%);
+    background-image: -o-linear-gradient(top, #89cdef 0, #81bfde 100%);
+    background-image: linear-gradient(to bottom, #89cdef 0, #81bfde 100%);
+}
+
+/* horizontal - triangle border-bottom color */
+.slider.slider-horizontal .slider-tick.triangle {
+    border-bottom-color: #dedede;
+}
+.slider.slider-horizontal .slider-handle.triangle {
+    border-bottom-color: #0480be;
+}
+.slider.slider-horizontal .slider-tick.triangle.in-selection {
+    border-bottom-color: #81bfde;
+}
+
+/* vertical - triangle border-left color */
+.slider.slider-vertical .slider-tick.triangle {
+    border-left-color: #dedede;
+}
+.slider.slider-vertical .slider-handle.triangle {
+    border-left-color: #0480be;
+}
+.slider.slider-vertical .slider-tick.triangle.in-selection {
+    border-left-color: #81bfde;
+}
+
+.slider.slider-horizontal {
+    width: 400px;
+    max-width: 100%;
+}
+
+@media only screen and (max-width: 767px) {
+    .slider.slider-horizontal {
+        width: 100%;
+    }
+}
