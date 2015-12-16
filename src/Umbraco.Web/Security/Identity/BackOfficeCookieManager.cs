@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Web;
 using Microsoft.Owin;
 using Microsoft.Owin.Infrastructure;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Security.Identity
@@ -17,10 +20,19 @@ namespace Umbraco.Web.Security.Identity
     internal class BackOfficeCookieManager : ChunkingCookieManager, ICookieManager
     {
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly string[] _explicitPaths;
+        private readonly string _getRemainingSecondsPath;
 
         public BackOfficeCookieManager(IUmbracoContextAccessor umbracoContextAccessor)
+            : this(umbracoContextAccessor, null)
+        {
+            
+        }
+        public BackOfficeCookieManager(IUmbracoContextAccessor umbracoContextAccessor, IEnumerable<string> explicitPaths)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
+            _explicitPaths = explicitPaths == null ? null : explicitPaths.ToArray();
+            _getRemainingSecondsPath = string.Format("{0}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds", GlobalSettings.Path);
         }
 
         /// <summary>
@@ -64,9 +76,18 @@ namespace Umbraco.Web.Security.Identity
             var request = ctx.Request;
             var httpCtx = ctx.TryGetHttpContext();
             
+            //check the explicit paths
+            if (_explicitPaths != null)
+            {
+                return _explicitPaths.Any(x => x.InvariantEquals(request.Uri.AbsolutePath));
+            }
+            
+            //check user seconds path
+            if (request.Uri.AbsolutePath.InvariantEquals(_getRemainingSecondsPath)) return false;
+
             if (//check the explicit flag
                 (checkForceAuthTokens && ctx.Get<bool?>("umbraco-force-auth") != null)
-                || (checkForceAuthTokens && httpCtx.Success && httpCtx.Result.Items["umbraco-force-auth"] != null)
+                || (checkForceAuthTokens && httpCtx.Success && httpCtx.Result.Items["umbraco-force-auth"] != null)                
                 //check back office
                 || request.Uri.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath)
                 //check installer
