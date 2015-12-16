@@ -174,11 +174,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 Path = path,
                 SortOrder = 0,
                 Text = entity.Name,
-                UserId = entity.CreatorId
+                UserId = entity.CreatorId,
+                UniqueId = entity.Key
             };
-
-            if (entity.Key != default(Guid))
-                nodeDto.UniqueId = entity.Key;
 
             // insert, get the id, update the path with the id
             var id = Convert.ToInt32(Database.Insert(nodeDto));
@@ -187,7 +185,6 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // refresh the entity
             entity.Id = id;
-            entity.Key = nodeDto.UniqueId;
             entity.Path = nodeDto.Path;
             entity.Level = nodeDto.Level;
             entity.SortOrder = 0;

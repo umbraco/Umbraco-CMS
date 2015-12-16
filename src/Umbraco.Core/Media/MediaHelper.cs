@@ -165,9 +165,6 @@ namespace Umbraco.Core.Media
             if (string.IsNullOrWhiteSpace(oldpath))
                 fs.DeleteFile(oldpath, true);
 
-            // sanity check - fixme - every entity should be created with a proper Guid
-            if (content.Key == Guid.Empty) content.Key = Guid.NewGuid();
-
             // get the filepath, store the data
             // use oldpath as "prevpath" to try and reuse the folder, in original number-based scheme
             var filepath = GetMediaPath(filename, oldpath, content.Key, propertyType.Key);
@@ -200,9 +197,6 @@ namespace Umbraco.Core.Media
             // ensure we have a file to copy
             var fs = FileSystem;
             if (fs.FileExists(sourcepath) == false) return null;
-
-            // sanity check - fixme - every entity should be created with a proper Guid
-            if (content.Key == Guid.Empty) content.Key = Guid.NewGuid();
 
             // get the filepath
             var filename = Path.GetFileName(sourcepath);

@@ -101,9 +101,6 @@ namespace Umbraco.Web.Editors
                 {
                     d.Add("files", files);
                     // add extra things needed to figure out where to put the files
-                    // fixme - every entity should have a Guid when created - would that be breaking?
-                    if (contentItem.PersistedContent.Key == Guid.Empty)
-                        contentItem.PersistedContent.Key = Guid.NewGuid();
                     d.Add("cuid", contentItem.PersistedContent.Key);
                     d.Add("puid", dboProperty.PropertyType.Key);
                 }

@@ -28,18 +28,6 @@ namespace Umbraco.Core.Models
        
         public Guid AccessEntryId { get; internal set; }
 
-        /// <summary>
-        /// Method to call on entity saved when first added
-        /// </summary>
-        internal override void AddingEntity()
-        {
-            if (Key == default(Guid))
-            {                
-                Key = Guid.NewGuid();       
-            }
-            base.AddingEntity();
-        }
-
         public string RuleValue
         {
             get { return _ruleValue; }
