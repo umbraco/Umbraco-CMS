@@ -12,7 +12,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourZer
     /// alias, so we need to ensure that these are initially consistent on
     /// all environments (based on the alias).
     /// </summary>
-    [Migration("7.4.0", 2, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.4.0", 3, GlobalSettings.UmbracoMigrationName)]
     public class EnsureContentTypeUniqueIdsAreConsistent : MigrationBase
     {
         public EnsureContentTypeUniqueIdsAreConsistent(ISqlSyntaxProvider sqlSyntax, ILogger logger)
