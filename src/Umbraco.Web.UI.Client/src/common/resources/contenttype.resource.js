@@ -7,15 +7,14 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
 
     return {
 
-        getAssignedListViewDataType: function (contentTypeId) {
-
+        getAvailableCompositeContentTypes: function (contentTypeId) {
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "contentTypeApiBaseUrl",
-                       "GetAssignedListViewDataType",
+                       "GetAvailableCompositeContentTypes",
                        [{ contentTypeId: contentTypeId }])),
-               'Failed to retrieve data for content id ' + contentTypeId);
+               'Failed to retrieve data for content type id ' + contentTypeId);
         },
 
 
@@ -34,19 +33,19 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
          *        $scope.type = type;
          *    });
          * </pre>
-         * @param {Int} contentId id of the content item to retrive allowed child types for
+         * @param {Int} contentTypeId id of the content item to retrive allowed child types for
          * @returns {Promise} resourcePromise object.
          *
          */
-        getAllowedTypes: function (contentId) {
+        getAllowedTypes: function (contentTypeId) {
 
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "contentTypeApiBaseUrl",
                        "GetAllowedChildren",
-                       [{ contentId: contentId }])),
-               'Failed to retrieve data for content id ' + contentId);
+                       [{ contentId: contentTypeId }])),
+               'Failed to retrieve data for content id ' + contentTypeId);
         },
 
 
