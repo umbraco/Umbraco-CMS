@@ -22,7 +22,8 @@ namespace Umbraco.Web.Editors
 {
     //TODO:  We'll need to be careful about the security on this controller, when we start implementing 
     // methods to modify content types we'll need to enforce security on the individual methods, we
-    // cannot put security on the whole controller because things like GetAllowedChildren are required for content editing.
+    // cannot put security on the whole controller because things like 
+    //  GetAllowedChildren, GetPropertyTypeScaffold, GetAllPropertyTypeAliases are required for content editing.
 
     /// <summary>
     /// An API controller used for dealing with content types
@@ -85,11 +86,24 @@ namespace Umbraco.Web.Editors
         /// Gets all user defined properties.
         /// </summary>
         /// <returns></returns>
+        [UmbracoTreeAuthorize(
+            Constants.Trees.DocumentTypes, Constants.Trees.Content,
+            Constants.Trees.MediaTypes, Constants.Trees.Media,
+            Constants.Trees.MemberTypes, Constants.Trees.Members)]
         public IEnumerable<string> GetAllPropertyTypeAliases()
         {
             return ApplicationContext.Services.ContentTypeService.GetAllPropertyTypeAliases();
         }
 
+        public IEnumerable<EntityBasic> GetAvailableCompositeContentTypes(int contentTypeId)
+        {
+            return PerformGetAvailableCompositeContentTypes(contentTypeId, UmbracoObjectTypes.DocumentType);
+        }
+
+        [UmbracoTreeAuthorize(
+            Constants.Trees.DocumentTypes, Constants.Trees.Content, 
+            Constants.Trees.MediaTypes, Constants.Trees.Media,
+            Constants.Trees.MemberTypes, Constants.Trees.Members)]
         public ContentPropertyDisplay GetPropertyTypeScaffold(int id)
         {
             var dataTypeDiff = Services.DataTypeService.GetDataTypeDefinitionById(id);
