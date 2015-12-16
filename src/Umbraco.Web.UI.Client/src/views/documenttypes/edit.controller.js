@@ -236,7 +236,6 @@
 
                 });
             }
-
             
 
             // sort properties after sort order

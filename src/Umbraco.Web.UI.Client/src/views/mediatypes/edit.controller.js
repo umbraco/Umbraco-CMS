@@ -170,6 +170,13 @@
 
         function init(contentType) {
 
+            //get available composite types
+            mediaTypeResource.getAvailableCompositeContentTypes(contentType.id).then(function (result) {
+                contentType.availableCompositeContentTypes = result;
+                // convert legacy icons
+                convertLegacyIcons(contentType);
+            });
+
             // set all tab to inactive
             if (contentType.groups.length !== 0) {
                 angular.forEach(contentType.groups, function (group) {
@@ -181,10 +188,7 @@
 
                 });
             }
-
-            // convert legacy icons
-            convertLegacyIcons(contentType);
-
+            
             // sort properties after sort order
             angular.forEach(contentType.groups, function (group) {
                 group.properties = $filter('orderBy')(group.properties, 'sortOrder');
