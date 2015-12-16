@@ -309,6 +309,7 @@
     <key alias="showPageOnSend">Mostra la pagina inviata</key>
     <key alias="size">Dimensione</key>
     <key alias="sort">Ordina</key>
+    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
     <key alias="type">Tipo</key>
     <key alias="typeToSearch"><![CDATA[Parola da cercare...]]></key>
     <key alias="up">Su</key>

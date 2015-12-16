@@ -158,9 +158,10 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
 
                     //show a ysod dialog
                     if (Umbraco.Sys.ServerVariables["isDebuggingEnabled"] === true) {
-                        dialogService.ysodDialog({
-                            errorMsg: result.errorMsg,
-                            data: result.data
+                        eventsService.emit('app.ysod',
+                        {
+                            errorMsg: 'An error occured',
+                            data: data
                         });
                     }
                     else {
@@ -253,8 +254,9 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                         }                        
                         else if (Umbraco.Sys.ServerVariables["isDebuggingEnabled"] === true) {
                             //show a ysod dialog
-                            dialogService.ysodDialog({
-                                errorMsg: 'An error occurred',
+                            eventsService.emit('app.ysod',
+                            {
+                                errorMsg: 'An error occured',
                                 data: data
                             });
                         }

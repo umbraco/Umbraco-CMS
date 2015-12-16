@@ -7,7 +7,7 @@
 (function() {
    'use strict';
 
-   function OverlayDirective($timeout, formHelper, overlayHelper) {
+   function OverlayDirective($timeout, formHelper, overlayHelper, localizationService) {
 
       function link(scope, el, attr, ctrl) {
 
@@ -20,6 +20,8 @@
          function activate() {
 
             setView();
+
+            setButtonText();
 
             registerOverlay();
 
@@ -48,6 +50,15 @@
 
             }
 
+         }
+
+         function setButtonText() {
+             if (!scope.model.closeButtonLabelKey && !scope.model.closeButtonLabel) {
+                 scope.model.closeButtonLabel = localizationService.localize("general_close").then(function (value) {return value;});
+             }
+             if (!scope.model.submitButtonLabelKey && !scope.model.submitButtonLabel) {
+                 scope.model.submitButtonLabel = localizationService.localize("general_submit").then(function (value) {return value;});
+             }
          }
 
          function registerOverlay() {
@@ -234,6 +245,7 @@
                scope.model = modelCopy;
                scope.model.close(scope.model);
             } else {
+                scope.model.show = false;
                scope.model = null;
             }
 

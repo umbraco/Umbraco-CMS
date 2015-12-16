@@ -153,6 +153,51 @@ function macroService() {
 
             macroString += ")";
             return macroString;
+        },
+
+        collectValueData: function(macro, macroParams, renderingEngine) {
+
+            var paramDictionary = {};
+            var macroAlias = macro.alias;
+            var syntax;
+
+            _.each(macroParams, function (item) {
+
+                var val = item.value;
+
+                if (item.value !== null && item.value !== undefined && !_.isString(item.value)) {
+                    try {
+                        val = angular.toJson(val);
+                    }
+                    catch (e) {
+                        // not json
+                    }
+                }
+
+                //each value needs to be xml escaped!! since the value get's stored as an xml attribute
+                paramDictionary[item.alias] = _.escape(val);
+
+            });
+
+            //get the syntax based on the rendering engine
+            if (renderingEngine && renderingEngine === "WebForms") {
+                syntax = this.generateWebFormsSyntax({ macroAlias: macroAlias, macroParamsDictionary: paramDictionary });
+            }
+            else if (renderingEngine && renderingEngine === "Mvc") {
+                syntax = this.generateMvcSyntax({ macroAlias: macroAlias, macroParamsDictionary: paramDictionary });
+            }
+            else {
+                syntax = this.generateMacroSyntax({ macroAlias: macroAlias, macroParamsDictionary: paramDictionary });
+            }
+
+            var macroObject = {
+                "macroParamsDictionary": paramDictionary,
+                "macroAlias": macroAlias,
+                "syntax": syntax
+            };
+
+            return macroObject;
+
         }
 
     };

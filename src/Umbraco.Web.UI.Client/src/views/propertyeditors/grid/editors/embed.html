@@ -6,5 +6,12 @@
 	</div>
 
 	<div ng-if="control.value" ng-bind-html-unsafe="control.value"></div>
-</div>
 
+	<umb-overlay
+		ng-if="embedDialog.show"
+		model="embedDialog"
+		view="embedDialog.view"
+		position="right">
+	</umb-overlay>
+
+</div>

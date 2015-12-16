@@ -44,4 +44,19 @@
             </li>
         </ul>
     </div>
+
+    <umb-overlay
+      ng-if="helpDialog.show"
+      model="helpDialog"
+      view="helpDialog.view"
+      position="left">
+    </umb-overlay>
+
+    <umb-overlay
+      ng-if="userDialog.show"
+      model="userDialog"
+      view="userDialog.view"
+      position="left">
+    </umb-overlay>
+
 </div>

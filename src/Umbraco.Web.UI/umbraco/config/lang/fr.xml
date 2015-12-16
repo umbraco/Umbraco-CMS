@@ -380,6 +380,7 @@
     <key alias="showPageOnSend">Afficher la page à l'envoi</key>
     <key alias="size">Taille</key>
     <key alias="sort">Trier</key>
+    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
     <key alias="type">Type</key>
     <key alias="typeToSearch">Rechercher...</key>
     <key alias="up">Haut</key>

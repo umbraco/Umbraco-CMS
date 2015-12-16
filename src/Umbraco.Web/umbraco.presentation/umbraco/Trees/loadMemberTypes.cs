@@ -102,7 +102,7 @@ function openMemberType(id) {
                 treeElement.SetAttribute("src", "");
                 treeElement.SetAttribute("icon", "icon-users");
                 treeElement.SetAttribute("openIcon", "icon-users");
-                treeElement.SetAttribute("nodeType", "memberType");
+                treeElement.SetAttribute("nodeType", "memberTypes");
                 root.AppendChild(treeElement);
             }
         }

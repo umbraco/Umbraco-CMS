@@ -45,29 +45,20 @@
         }
 
         function addChild($event) {
-           vm.childNodeSelectorOverlay = {};
-           vm.childNodeSelectorOverlay.view = "itempicker";
-           vm.childNodeSelectorOverlay.title = "Choose child node";
-           vm.childNodeSelectorOverlay.availableItems = vm.contentTypes;
-           vm.childNodeSelectorOverlay.selectedItems = vm.selectedChildren;
-           vm.childNodeSelectorOverlay.event = $event;
-           vm.childNodeSelectorOverlay.show = true;
-
-           vm.childNodeSelectorOverlay.chooseItem = function(item) {
-
-             vm.selectedChildren.push(item);
-             $scope.model.allowedContentTypes.push(item.id);
-
-             vm.childNodeSelectorOverlay.show = false;
-             vm.childNodeSelectorOverlay = null;
-
-           };
-
-           vm.childNodeSelectorOverlay.close = function(oldModel) {
-             vm.childNodeSelectorOverlay.show = false;
-             vm.childNodeSelectorOverlay = null;
-           };
-
+            vm.childNodeSelectorOverlay = {
+                view: "itempicker",
+                title: "Choose child node",
+                availableItems: vm.contentTypes,
+                selectedItems: vm.selectedChildren,
+                event: $event,
+                show: true,
+                submit: function(model) {
+                    vm.selectedChildren.push(model.selectedItem);
+                    $scope.model.allowedContentTypes.push(model.selectedItem.id);
+                    vm.childNodeSelectorOverlay.show = false;
+                    vm.childNodeSelectorOverlay = null;
+                }
+            };
         }
 
         function removeChild(selectedChild, index) {

@@ -1,15 +1,28 @@
-<div ng-controller="Umbraco.Overlays.MediaPickerController" id="fileupload">
+<form ng-controller="Umbraco.Overlays.MediaPickerController" id="fileupload"
+      method="POST"
+      enctype="multipart/form-data"
+      umb-image-upload="options">
 
    <div
       on-drag-leave="dragLeave()"
       on-drag-end="dragLeave()"
       on-drag-enter="dragEnter()">
 
-      <div class="umb-control-group">
+      <div class="umb-control-group umb-mediapicker-upload">
 
          <div class="form-search">
             <i class="icon-search"></i>
             <input class="umb-search-field search-query" ng-model="searchTerm" placeholder="Filter..." type="text">
+         </div>
+
+         <div class="upload-button">
+             <umb-button
+                type="button"
+                key="general_upload"
+                label="Upload"
+                action="upload()"
+                disabled="disabled">
+             </umb-button>
          </div>
 
       </div>
@@ -36,6 +49,7 @@
                   class="input-foldername input-mini inline"
                   ng-show="showFolderInput"
                   ng-model="newFolderName"
+                  ng-keydown="enterSubmitFolder($event)"
                   on-blur="submitFolder()"
                   focus-when="{{showFolderInput}}" />
                </li>
@@ -48,19 +62,16 @@
          files-uploaded="onUploadComplete"
          files-queued="onFilesQueue"
          accept="{{acceptedFileTypes}}"
-         max-file-size="{{maxFileSize}}">
+         max-file-size="{{maxFileSize}}"
+         hide-dropzone="{{!activeDrag && images.length > 0 }}"
+         compact="{{ images.length > 0 }}">
       </umb-file-dropzone>
 
-      <umb-photo-folder
-         min-height="105"
-         min-width="150"
-         max-height="250"
-         ideal-items-per-row="3"
-         on-click="clickHandler"
-         ng-model="images"
-         images-only="{{onlyImages}}"
-         filter-by="searchTerm">
-      </umb-photo-folder>
+      <umb-media-grid
+         items="images"
+         filter-by="searchTerm"
+         on-click="clickHandler">
+      </umb-media-grid>
 
    </div>
 
@@ -113,4 +124,4 @@
 
 	</umb-overlay>
 
-</div>
+</form>

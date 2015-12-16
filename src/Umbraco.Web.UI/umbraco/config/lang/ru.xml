@@ -386,6 +386,7 @@
     <key alias="showPageOnSend">Показать страницу при отправке</key>
     <key alias="size">Размер</key>
     <key alias="sort">Сортировать</key>
+    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
     <key alias="type">Тип</key>
     <key alias="typeToSearch">Что искать?</key>
     <key alias="up">Вверх</key>

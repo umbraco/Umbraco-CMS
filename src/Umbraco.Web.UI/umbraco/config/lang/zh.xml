@@ -349,6 +349,7 @@
     <key alias="showPageOnSend">在发送时预览</key>
     <key alias="size">大小</key>
     <key alias="sort">排序</key>
+    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
     <key alias="type">类型</key>
     <key alias="typeToSearch">输入内容开始查找…</key>
     <key alias="up">上</key>

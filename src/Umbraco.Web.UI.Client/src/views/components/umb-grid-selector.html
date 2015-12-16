@@ -34,12 +34,10 @@
     </div>
 
     <umb-overlay
-            ng-style=""
-            ng-if="showDialog"
-            model="dialogModel"
-            animation="slide-in-right"
-            position="target"
-            view="dialogModel.view">
+        ng-if="dialogModel.show"
+        model="dialogModel"
+        position="target"
+        view="dialogModel.view">
     </umb-overlay>
 
 </div>

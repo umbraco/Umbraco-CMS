@@ -397,6 +397,7 @@
     <key alias="showPageOnSend">Toon pagina bij versturen</key>
     <key alias="size">Formaat</key>
     <key alias="sort">Sorteren</key>
+    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
     <key alias="type">Type</key>
     <key alias="typeToSearch">Type om te zoeken...</key>
     <key alias="up">Omhoog</key>

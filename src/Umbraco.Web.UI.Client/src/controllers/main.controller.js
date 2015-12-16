@@ -118,6 +118,14 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
 
     }));
 
+    evts.push(eventsService.on("app.ysod", function(name, error) {
+        $scope.ysodOverlay = {
+            view: "ysod",
+            error: error,
+            show:  true
+        };
+    }));
+
     //ensure to unregister from all events!
     $scope.$on('$destroy', function () {
         for (var e in evts) {

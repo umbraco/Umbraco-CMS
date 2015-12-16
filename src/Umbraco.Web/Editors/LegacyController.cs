@@ -52,7 +52,7 @@ namespace Umbraco.Web.Editors
             if (httpContextAttempt.Success)
             {
                 //this is a hack check based on legacy
-                if (nodeType == "memberGroup")
+                if (nodeType == "memberGroups")
                 {
                     LegacyDialogHandler.Delete(httpContextAttempt.Result, UmbracoUser, nodeType, 0, alias);
                     return Request.CreateResponse(HttpStatusCode.OK);

@@ -390,6 +390,7 @@
     <key alias="showPageOnSend">Seite beim Senden anzeigen</key>
     <key alias="size">Größe</key>
     <key alias="sort">Sortieren</key>
+    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
     <key alias="type">Typ</key>
     <key alias="typeToSearch">Durchsuchen ...</key>
     <key alias="up">nach oben</key>

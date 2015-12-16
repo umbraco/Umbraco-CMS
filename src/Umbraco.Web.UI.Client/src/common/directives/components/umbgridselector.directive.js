@@ -33,32 +33,25 @@
             };
 
             scope.openItemPicker = function($event){
-                scope.dialogModel = {};
-                scope.dialogModel.title = "Choose " + scope.itemLabel;
-                scope.dialogModel.availableItems = scope.availableItems;
-                scope.dialogModel.selectedItems = scope.selectedItems;
-                scope.dialogModel.event = $event;
-                scope.dialogModel.view = "itemPicker";
-                scope.showDialog = true;
+                scope.dialogModel = {
+                    view: "itempicker",
+                    title: "Choose " + scope.itemLabel,
+                    availableItems: scope.availableItems,
+                    selectedItems: scope.selectedItems,
+                    event: $event,
+                    show: true,
+                    submit: function(model) {
+                        scope.selectedItems.push(model.selectedItem);
 
-                scope.dialogModel.chooseItem = function(selectedItem) {
+                        // if no default item - set item as default
+                        if(scope.defaultItem === null) {
+                            scope.setAsDefaultItem(model.selectedItem);
+                        }
 
-                    scope.selectedItems.push(selectedItem);
-
-                    // if no default item - set item as default
-                    if(scope.defaultItem === null) {
-                        scope.setAsDefaultItem(selectedItem);
+                        scope.dialogModel.show = false;
+                        scope.dialogModel = null;
                     }
-
-                    scope.showDialog = false;
-                    scope.dialogModel = null;
                 };
-
-                scope.dialogModel.close = function(){
-                    scope.showDialog = false;
-                    scope.dialogModel = null;
-                };
-
             };
 
             scope.setAsDefaultItem = function(selectedItem) {

@@ -63,6 +63,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
           $scope.mediaPickerOverlay.startNodeId = $scope.model.config.startNodeId;
           $scope.mediaPickerOverlay.multiPicker = multiPicker;
           $scope.mediaPickerOverlay.view = "mediaPicker";
+          $scope.mediaPickerOverlay.title = "Select media";
           $scope.mediaPickerOverlay.show = true;
 
           $scope.mediaPickerOverlay.submit = function(model) {

@@ -107,7 +107,13 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
 
         //check if response is ysod
         if(err.status && err.status >= 500) {
-            dialogService.ysodDialog(err);
+
+            // Open ysod overlay
+            $scope.ysodOverlay = {
+                view : "ysod",
+                error : err,
+                show : true
+            };
         }
 
         $timeout(function() {

@@ -309,6 +309,7 @@
     <key alias="showPageOnSend">전송된 페이지보기</key>
     <key alias="size">사이즈</key>
     <key alias="sort">정렬</key>
+    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
     <key alias="type">타입</key>
     <key alias="typeToSearch">검색유형...</key>
     <key alias="up">위로</key>
