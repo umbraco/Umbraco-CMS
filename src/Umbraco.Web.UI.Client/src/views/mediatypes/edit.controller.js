@@ -167,7 +167,7 @@
             mediaTypeResource.getAvailableCompositeContentTypes(contentType.id).then(function (result) {
                 contentType.availableCompositeContentTypes = result;
                 // convert legacy icons
-                convertLegacyIcons(contentType);
+                iconHelper.formatContentTypeIcons(contentType.availableCompositeContentTypes);
             });
 
             // set all tab to inactive
@@ -186,6 +186,9 @@
             angular.forEach(contentType.groups, function (group) {
                 group.properties = $filter('orderBy')(group.properties, 'sortOrder');
             });
+
+            // convert icons for content type
+            convertLegacyIcons(contentType);
 
             //set a shared state
             editorState.set(contentType);

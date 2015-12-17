@@ -242,6 +242,9 @@
                 contentType.allowedTemplates = contentTypeHelper.insertTemplatePlaceholder(contentType.allowedTemplates);
             }
 
+            // convert icons for content type
+            convertLegacyIcons(contentType);
+
             //set a shared state
             editorState.set(contentType);
 
