@@ -21,14 +21,14 @@
 			{
 				active: true,
 				id: 1,
-				label: "Default",
+				label: "Available Editors",
 				alias: "Default",
 				typesAndEditors: []
 			},
 			{
 				active: false,
 				id: 2,
-				label: "Reuse",
+				label: "Re-use",
 				alias: "Reuse",
 				userConfigured: []
 			}
@@ -38,17 +38,18 @@
 		vm.showDetailsOverlay = showDetailsOverlay;
 		vm.hideDetailsOverlay = hideDetailsOverlay;
       vm.pickEditor = pickEditor;
+      vm.pickDataType = pickDataType;
 
 		function activate() {
 
-			getAllUserConfiguredDataTypes();
-			getAllTypesAndEditors();
+			getGroupedDataTypes();
+			getGroupedPropertyEditors();
 
 		}
 
-		function getAllTypesAndEditors() {
+		function getGroupedPropertyEditors() {
 
-			dataTypeResource.getAllTypesAndEditors().then(function(data){
+			dataTypeResource.getGroupedPropertyEditors().then(function(data){
 				vm.tabs[0].typesAndEditors = data;
 				vm.tabsLoaded = vm.tabsLoaded + 1;
 				checkIfTabContentIsLoaded();
@@ -56,9 +57,9 @@
 
 		}
 
-		function getAllUserConfiguredDataTypes() {
+		function getGroupedDataTypes() {
 
-			dataTypeResource.getAllUserConfigured().then(function(data){
+		    dataTypeResource.getGroupedDataTypes().then(function (data) {
 				vm.tabs[1].userConfigured = data;
 				vm.tabsLoaded = vm.tabsLoaded + 1;
 				checkIfTabContentIsLoaded();
@@ -93,58 +94,51 @@
 
       function pickEditor(editor) {
 
-         if(editor.id === null) {
+          var parentId = -1;
 
-            // add scaffold in data type root
-            var parentId = -1;
+          dataTypeResource.getScaffold(parentId).then(function(dataType) {
 
-            dataTypeResource.getScaffold(parentId).then(function(dataType) {
+            // set alias
+            dataType.selectedEditor = editor.alias;
 
-              // set alias
-              dataType.selectedEditor = editor.alias;
+            // set name
+            var nameArray = [];
 
-              // set name
-              var nameArray = [];
+            if($scope.model.contentTypeName) {
+              nameArray.push($scope.model.contentTypeName);
+            }
 
-              if($scope.model.contentTypeName) {
-                nameArray.push($scope.model.contentTypeName);
-              }
+            if($scope.model.property.label) {
+              nameArray.push($scope.model.property.label);
+            }
 
-              if($scope.model.property.label) {
-                nameArray.push($scope.model.property.label);
-              }
+            if(editor.name) {
+              nameArray.push(editor.name);
+            }
 
-              if(editor.name) {
-                nameArray.push(editor.name);
-              }
+            // make name
+            dataType.name = nameArray.join(" - ");
 
-              // make name
-              dataType.name = nameArray.join(" - ");
+            // get pre values
+            dataTypeResource.getPreValues(dataType.selectedEditor).then(function(preValues) {
 
-              // get pre values
-              dataTypeResource.getPreValues(dataType.selectedEditor).then(function(preValues) {
+              dataType.preValues = preValues;
 
-                dataType.preValues = preValues;
-
-                openEditorSettingsOverlay(dataType, true);
-
-              });
+              openEditorSettingsOverlay(dataType, true);
 
             });
 
-         } else {
+          });
 
-            dataTypeResource.getById(editor.id).then(function(dataType) {
+      }
 
-               contentTypeResource.getPropertyTypeScaffold(dataType.id).then(function(propertyType) {
+      function pickDataType(selectedDataType) {
 
-                  submitOverlay(dataType, propertyType, false);
-
-               });
-
-            });
-
-         }
+          dataTypeResource.getById(selectedDataType.id).then(function(dataType) {
+             contentTypeResource.getPropertyTypeScaffold(dataType.id).then(function(propertyType) {
+                submitOverlay(dataType, propertyType, false);
+             });
+          });
 
       }
 

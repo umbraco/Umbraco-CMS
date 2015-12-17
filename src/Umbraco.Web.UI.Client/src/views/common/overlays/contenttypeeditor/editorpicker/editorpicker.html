@@ -42,15 +42,25 @@
 				</div>
 
 				<div ng-if="tab.alias==='Reuse'">
-					<h5>Your configurations</h5>
-					<ul class="umb-card-grid" ng-mouseleave="vm.hideDetailsOverlay()">
-						<li ng-repeat="configuredDataType in tab.userConfigured | orderBy:'name' | filter: vm.searchTerm" ng-mouseover="vm.showDetailsOverlay(configuredDataType)">
-							<a href="" ng-click="vm.pickEditor(configuredDataType)">
-								<i class="{{ configuredDataType.icon }}" ng-class="{'icon-autofill': configuredDataType.icon == null}"></i>
-								{{ configuredDataType.name }}
-							</a>
-						</li>
-					</ul>
+
+					<div ng-repeat="(key,value) in tab.userConfigured">
+
+						<div ng-if="(value | filter:vm.searchTerm).length > 0">
+							<h5>{{key}}</h5>
+
+							<ul class="umb-card-grid" ng-mouseleave="vm.hideDetailsOverlay()">
+								<li ng-repeat="dataType in value | orderBy:'name' | filter: vm.searchTerm" ng-mouseover="vm.showDetailsOverlay(dataType)">
+									<a href="" ng-click="vm.pickDataType(dataType)">
+										<i class="{{ dataType.icon }}" ng-class="{'icon-autofill': dataType.icon == null}"></i>
+										{{ dataType.name }}
+									</a>
+								</li>
+							</ul>
+
+						</div>
+
+					</div>
+
 				</div>
 
 			</umb-tab>

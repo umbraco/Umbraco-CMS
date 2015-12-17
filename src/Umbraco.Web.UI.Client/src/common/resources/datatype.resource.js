@@ -114,28 +114,17 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
                        "GetAll")),
                "Failed to retrieve data");
         },
-
-        getAllUserConfigured: function () {
-
+     
+        getGroupedDataTypes: function () {
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "dataTypeApiBaseUrl",
-                        "GetAllUserConfigured")),
+                        "GetGroupedDataTypes")),
                 "Failed to retrieve data");
         },
 
-        getAllUserPropertyEditors: function () {
-
-            return umbRequestHelper.resourcePromise(
-                $http.get(
-                    umbRequestHelper.getApiUrl(
-                        "dataTypeApiBaseUrl",
-                        "GetAllUserPropertyEditors")),
-                "Failed to retrieve data");
-        },
-
-        getAllTypesAndEditors : function(){
+        getGroupedPropertyEditors : function(){
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
