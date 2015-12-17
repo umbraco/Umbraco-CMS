@@ -110,7 +110,6 @@
         ];
 
         if ($routeParams.create) {
-
             vm.page.loading = true;
 
             //we are creating so get an empty data type item
@@ -124,7 +123,6 @@
 				});
         }
         else {
-
             vm.page.loading = true;
 
             contentTypeResource.getById($routeParams.id).then(function (dt) {
@@ -141,7 +139,6 @@
         /* ---------- SAVE ---------- */
 
         function save() {
-
             var deferred = $q.defer();
 
             vm.page.saveButtonState = "busy";
@@ -206,18 +203,15 @@
                         });
                     });
                 }
-
                 vm.page.saveButtonState = "error";
 
                 deferred.reject(err);
             });
-
             return deferred.promise;
 
         }
 
         function init(contentType) {
-
             //get available composite types
             contentTypeResource.getAvailableCompositeContentTypes(contentType.id).then(function (result) {
                 contentType.availableCompositeContentTypes = result;
@@ -237,8 +231,6 @@
                 });
             }
 
-            
-
             // sort properties after sort order
             angular.forEach(contentType.groups, function (group) {
                 group.properties = $filter('orderBy')(group.properties, 'sortOrder');
@@ -250,17 +242,16 @@
                 contentType.allowedTemplates = contentTypeHelper.insertTemplatePlaceholder(contentType.allowedTemplates);
             }
 
-            
+            // convert icons for content type
+            convertLegacyIcons(contentType);
 
             //set a shared state
             editorState.set(contentType);
 
             vm.contentType = contentType;
-
         }
 
         function convertLegacyIcons(contentType) {
-
             // make array to store contentType icon
             var contentTypeArray = [];
 
@@ -272,11 +263,9 @@
 
             // set icon back on contentType
             contentType.icon = contentTypeArray[0].icon;
-
         }
 
         function getDataTypeDetails(property) {
-
             if (property.propertyState !== "init") {
 
                 dataTypeResource.getById(property.dataTypeId)
@@ -287,18 +276,14 @@
             }
         }
 
-
         /** Syncs the content type  to it's tree node - this occurs on first load and after saving */
         function syncTreeNode(dt, path, initialLoad) {
-
             navigationService.syncTree({ tree: "documenttypes", path: path.split(","), forceReload: initialLoad !== true }).then(function (syncArgs) {
                 vm.currentNode = syncArgs.node;
             });
-
         }
 
     }
 
     angular.module("umbraco").controller("Umbraco.Editors.DocumentTypes.EditController", DocumentTypesEditController);
-
 })();
