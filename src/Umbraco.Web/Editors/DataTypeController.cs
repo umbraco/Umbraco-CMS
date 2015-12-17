@@ -286,9 +286,41 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Returns all Property Editors - if a Property Editor has no pre-values and a data type exists for this property editor than it's
-        /// configuration is returned instead of a non-configured property editor, this is because only one data type with this Property Editor should exist
-        /// (since it cannot be configured differently)
+        /// Returns all data types grouped by their property editor group
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members
+        /// </remarks>    
+        [UmbracoTreeAuthorize(
+            Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
+            Constants.Applications.Settings, Constants.Applications.Developer)]
+        public IDictionary<string, IEnumerable<DataTypeBasic>> GetGroupedDataTypes()
+        {
+            var datadefs = Services.DataTypeService
+                .GetAllDataTypeDefinitions();
+
+            var datatypes = new List<DataTypeBasic>();
+
+            var propertyEditors = PropertyEditorResolver.Current.PropertyEditors.ToArray();
+            foreach (var datatype in datadefs)
+            {
+                var propertyEditor = propertyEditors.Single(x => x.Name == datatype.PropertyEditorAlias);
+                var hasPrevalues = propertyEditor.PreValueEditor.Fields.Any();
+                var basic = Mapper.Map<DataTypeBasic>(propertyEditor);
+                basic.HasPrevalues = hasPrevalues;
+                datatypes.Add(basic);
+            }
+
+            var grouped = datatypes
+                .GroupBy(x => x.Group.IsNullOrWhiteSpace() ? "" : x.Group.ToLower())
+                .ToDictionary(group => group.Key, group => group.OrderBy(d => d.Name).AsEnumerable());
+
+            return grouped;
+        }
+
+        /// <summary>
+        /// Returns all property editors grouped
         /// </summary>
         /// <returns></returns>
         /// <remarks>
@@ -299,41 +331,20 @@ namespace Umbraco.Web.Editors
             Constants.Applications.Settings, Constants.Applications.Developer)]
         public IDictionary<string, IEnumerable<DataTypeBasic>> GetGroupedPropertyEditors()
         {
-            var datadefs = Services.DataTypeService
-                .GetAllDataTypeDefinitions()
-                .ToArray();
-
             var datatypes = new List<DataTypeBasic>();
             
             var propertyEditors = PropertyEditorResolver.Current.PropertyEditors;
             foreach (var propertyEditor in propertyEditors)
             {
                 var hasPrevalues = propertyEditor.PreValueEditor.Fields.Any();
-
-                //check if a data type exists for this property editor
-                var dataDef = datadefs.FirstOrDefault(x => x.PropertyEditorAlias == propertyEditor.Alias);
-
-                //if no prevalues and a datatype exists with this property editor
-                if (hasPrevalues == false && dataDef != null)
-                {
-                    //exclude system list views
-                    if (dataDef.Name.InvariantStartsWith(Constants.Conventions.DataTypes.ListViewPrefix) == false)
-                    {
-                        datatypes.Add(Mapper.Map<DataTypeBasic>(dataDef));
-                    }
-                }
-                else
-                {
-                    //else, just add a clean property editor
-                    var basic = Mapper.Map<DataTypeBasic>(propertyEditor);
-                    basic.HasPrevalues = hasPrevalues;
-                    datatypes.Add(basic);
-                }
+                var basic = Mapper.Map<DataTypeBasic>(propertyEditor);
+                basic.HasPrevalues = hasPrevalues;
+                datatypes.Add(basic);
             }
 
             var grouped = datatypes
                 .GroupBy(x => x.Group.IsNullOrWhiteSpace() ? "" : x.Group.ToLower())
-                .ToDictionary(group => group.Key, group => group.AsEnumerable());
+                .ToDictionary(group => group.Key, group => group.OrderBy(d => d.Name).AsEnumerable());
 
             return grouped;
         }

@@ -115,6 +115,15 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
                "Failed to retrieve data");
         },
      
+        getGroupedDataTypes: function () {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "dataTypeApiBaseUrl",
+                        "GetGroupedDataTypes")),
+                "Failed to retrieve data");
+        },
+
         getGroupedPropertyEditors : function(){
             return umbRequestHelper.resourcePromise(
                 $http.get(
