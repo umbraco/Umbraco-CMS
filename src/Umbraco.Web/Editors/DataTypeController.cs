@@ -297,22 +297,19 @@ namespace Umbraco.Web.Editors
             Constants.Applications.Settings, Constants.Applications.Developer)]
         public IDictionary<string, IEnumerable<DataTypeBasic>> GetGroupedDataTypes()
         {
-            var datadefs = Services.DataTypeService
-                .GetAllDataTypeDefinitions();
-
-            var datatypes = new List<DataTypeBasic>();
+            var dataTypes = Services.DataTypeService
+                     .GetAllDataTypeDefinitions()
+                     .Select(Mapper.Map<IDataTypeDefinition, DataTypeBasic>);
 
             var propertyEditors = PropertyEditorResolver.Current.PropertyEditors.ToArray();
-            foreach (var datatype in datadefs)
+
+            foreach (var dataType in dataTypes)
             {
-                var propertyEditor = propertyEditors.Single(x => x.Name == datatype.PropertyEditorAlias);
-                var hasPrevalues = propertyEditor.PreValueEditor.Fields.Any();
-                var basic = Mapper.Map<DataTypeBasic>(propertyEditor);
-                basic.HasPrevalues = hasPrevalues;
-                datatypes.Add(basic);
+                var propertyEditor = propertyEditors.Single(x => x.Alias == dataType.Alias);
+                dataType.HasPrevalues = propertyEditor.PreValueEditor.Fields.Any(); ;
             }
 
-            var grouped = datatypes
+            var grouped = dataTypes
                 .GroupBy(x => x.Group.IsNullOrWhiteSpace() ? "" : x.Group.ToLower())
                 .ToDictionary(group => group.Key, group => group.OrderBy(d => d.Name).AsEnumerable());
 
