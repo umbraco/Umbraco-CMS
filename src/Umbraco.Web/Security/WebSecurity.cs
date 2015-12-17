@@ -462,7 +462,6 @@ namespace Umbraco.Web.Security
         protected override void DisposeResources()
         {
             _httpContext = null;
-            _applicationContext = null;
         }
 
         
