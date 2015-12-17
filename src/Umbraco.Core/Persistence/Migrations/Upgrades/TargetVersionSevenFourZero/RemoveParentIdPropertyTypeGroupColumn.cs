@@ -5,7 +5,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourZero
 {
-    [Migration("7.4.0", 3, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.4.0", 4, GlobalSettings.UmbracoMigrationName)]
     public class RemoveParentIdPropertyTypeGroupColumn : MigrationBase
     {
         public RemoveParentIdPropertyTypeGroupColumn(ISqlSyntaxProvider sqlSyntax, ILogger logger)
