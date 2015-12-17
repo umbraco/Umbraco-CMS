@@ -286,8 +286,9 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Returns all configured data types and all potential data types that could exist based on unused property editors grouped
-        /// by their property editor defined group.
+        /// Returns all Property Editors - if a Property Editor has no pre-values and a data type exists for this property editor than it's
+        /// configuration is returned instead of a non-configured property editor, this is because only one data type with this Property Editor should exist
+        /// (since it cannot be configured differently)
         /// </summary>
         /// <returns></returns>
         /// <remarks>
@@ -298,15 +299,36 @@ namespace Umbraco.Web.Editors
             Constants.Applications.Settings, Constants.Applications.Developer)]
         public IDictionary<string, IEnumerable<DataTypeBasic>> GetGroupedPropertyEditors()
         {
+            var datadefs = Services.DataTypeService
+                .GetAllDataTypeDefinitions()
+                .ToArray();
+
             var datatypes = new List<DataTypeBasic>();
             
             var propertyEditors = PropertyEditorResolver.Current.PropertyEditors;
             foreach (var propertyEditor in propertyEditors)
             {
                 var hasPrevalues = propertyEditor.PreValueEditor.Fields.Any();
-                var basic = Mapper.Map<DataTypeBasic>(propertyEditor);
-                basic.HasPrevalues = hasPrevalues;
-                datatypes.Add(basic);
+
+                //check if a data type exists for this property editor
+                var dataDef = datadefs.FirstOrDefault(x => x.PropertyEditorAlias == propertyEditor.Alias);
+
+                //if no prevalues and a datatype exists with this property editor
+                if (hasPrevalues == false && dataDef != null)
+                {
+                    //exclude system list views
+                    if (dataDef.Name.InvariantStartsWith(Constants.Conventions.DataTypes.ListViewPrefix) == false)
+                    {
+                        datatypes.Add(Mapper.Map<DataTypeBasic>(dataDef));
+                    }
+                }
+                else
+                {
+                    //else, just add a clean property editor
+                    var basic = Mapper.Map<DataTypeBasic>(propertyEditor);
+                    basic.HasPrevalues = hasPrevalues;
+                    datatypes.Add(basic);
+                }
             }
 
             var grouped = datatypes
