@@ -11,7 +11,6 @@ using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
-using umbraco.presentation.nodeFactory;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -23,7 +22,6 @@ using Umbraco.Web;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Scheduling;
 using File = System.IO.File;
-using Node = umbraco.NodeFactory.Node;
 using Task = System.Threading.Tasks.Task;
 
 namespace umbraco
@@ -198,28 +196,7 @@ namespace umbraco
                 var attr = ((XmlElement)node).GetAttributeNode("sortOrder");
                 attr.Value = d.sortOrder.ToString();
                 xmlContentCopy = GetAddOrUpdateXmlNode(xmlContentCopy, d.Id, d.Level, parentId, node);
-
-                // update sitemapprovider
-                if (updateSitemapProvider && SiteMap.Provider is UmbracoSiteMapProvider)
-                {
-                    try
-                    {
-                        var prov = (UmbracoSiteMapProvider)SiteMap.Provider;
-                        var n = new Node(d.Id, true);
-                        if (string.IsNullOrEmpty(n.Url) == false && n.Url != "/#")
-                        {
-                            prov.UpdateNode(n);
-                        }
-                        else
-                        {
-                            LogHelper.Debug<content>(string.Format("Can't update Sitemap Provider due to empty Url in node id: {0}", d.Id));
-                        }
-                    }
-                    catch (Exception ee)
-                    {
-                        LogHelper.Error<content>(string.Format("Error adding node to Sitemap Provider in PublishNodeDo(): {0}", d.Id), ee);
-                    }
-                }
+                
             }
 
             return xmlContentCopy;
@@ -243,9 +220,7 @@ namespace umbraco
         /// <param name="parentId">The parent node identifier.</param>
         public void SortNodes(int parentId)
         {
-            var childNodesXPath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema
-                ? "./node"
-                : "./* [@id]";
+            var childNodesXPath = "./* [@id]";
 
             using (var safeXml = GetSafeXmlWriter(false))
             {
@@ -422,13 +397,7 @@ namespace umbraco
 
                 //SD: changed to fire event BEFORE running the sitemap!! argh.
                 FireAfterClearDocumentCache(doc, e);
-
-                // update sitemapprovider
-                if (SiteMap.Provider is UmbracoSiteMapProvider)
-                {
-                    var prov = (UmbracoSiteMapProvider)SiteMap.Provider;
-                    prov.RemoveNode(doc.Id);
-                }                
+                
             }
         }
 
@@ -624,37 +593,14 @@ order by umbracoNode.level, umbracoNode.sortOrder";
 
             if (hierarchy.TryGetValue(parentId, out children))
             {
-                XmlNode childContainer = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ||
-                                         String.IsNullOrEmpty(UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME)
-                                             ? parentNode
-                                             : parentNode.SelectSingleNode(
-                                                 UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME);
-
-                if (!UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema &&
-                    !String.IsNullOrEmpty(UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME))
-                {
-                    if (childContainer == null)
-                    {
-                        childContainer = xmlHelper.addTextNode(parentNode.OwnerDocument,
-                                                               UmbracoSettings.
-                                                                   TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME, "");
-                        parentNode.AppendChild(childContainer);
-                    }
-                }
+                XmlNode childContainer = parentNode;
+                
 
                 foreach (int childId in children)
                 {
                     XmlNode childNode = nodeIndex[childId];
 
-                    if (UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ||
-                        String.IsNullOrEmpty(UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME))
-                    {
-                        parentNode.AppendChild(childNode);
-                    }
-                    else
-                    {
-                        childContainer.AppendChild(childNode);
-                    }
+                    parentNode.AppendChild(childNode);
 
                     // Recursively build the content tree under the current child
                     GenerateXmlDocument(hierarchy, nodeIndex, childId, childNode);
@@ -717,13 +663,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         private static bool XmlIsImmutable
         {
             get { return UmbracoConfig.For.UmbracoSettings().Content.CloneXmlContent; }
-        }
-
-        // whether to use the legacy schema
-        private static bool UseLegacySchema
-        {
-            get { return UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema; }
-        }
+        }        
 
         // whether to keep version of everything (incl. medias & members) in cmsPreviewXml
         // for audit purposes - false by default, not in umbracoSettings.config
@@ -969,22 +909,12 @@ order by umbracoNode.level, umbracoNode.sortOrder";
 
         private static string ChildNodesXPath
         {
-            get
-            {
-                return UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema
-                    ? "./node"
-                    : "./* [@id]";
-            }
+            get { return "./* [@id]"; }
         }
 
         private static string DataNodesXPath
         {
-            get
-            {
-                return UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema
-                    ? "./data"
-                    : "./* [not(@id)]";
-            }
+            get { return "./* [not(@id)]"; }
         }
 
         #endregion
@@ -1209,7 +1139,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
 
             // if the document is not there already then it's a new document
             // we must make sure that its document type exists in the schema
-            if (currentNode == null && UseLegacySchema == false)
+            if (currentNode == null)
             {
                 var xml2 = EnsureSchema(docNode.Name, xml);
                 if (ReferenceEquals(xml, xml2) == false)

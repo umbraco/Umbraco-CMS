@@ -90,7 +90,13 @@ namespace umbraco.cms.businesslogic
                     throw new ArgumentException("No id " + id + " exists in dictionary");
                 }
             }
-            
+
+            [Obsolete("This is no longer used and will be removed from the codebase in future versions")]
+            public bool IsTopMostItem()
+            {
+                return _dictionaryItem.ParentId.HasValue == false;
+            }
+
             /// <summary>
             /// Returns the parent.
             /// </summary>

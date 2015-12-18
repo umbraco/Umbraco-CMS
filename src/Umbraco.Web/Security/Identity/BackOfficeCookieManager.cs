@@ -93,9 +93,7 @@ namespace Umbraco.Web.Security.Identity
                 //check installer
                 || request.Uri.IsInstallerRequest()
                 //detect in preview
-                || (request.HasPreviewCookie() && request.Uri != null && request.Uri.AbsolutePath.StartsWith(IOHelper.ResolveUrl(SystemDirectories.Umbraco)) == false)
-                //check for base
-                || BaseRest.BaseRestHandler.IsBaseRestRequest(originalRequestUrl))
+                || (request.HasPreviewCookie() && request.Uri != null && request.Uri.AbsolutePath.StartsWith(IOHelper.ResolveUrl(SystemDirectories.Umbraco)) == false))
             {
                 return true;
             }

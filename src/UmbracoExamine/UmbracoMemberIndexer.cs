@@ -28,6 +28,7 @@ namespace UmbracoExamine
     {
 
         private readonly IMemberService _memberService;
+        private readonly IDataTypeService _dataTypeService;
 
         /// <summary>
         /// Default constructor
@@ -36,6 +37,7 @@ namespace UmbracoExamine
             : base()
         {
             _memberService = ApplicationContext.Current.Services.MemberService;
+            _dataTypeService = ApplicationContext.Current.Services.DataTypeService;
         }
 
         /// <summary>

@@ -13,6 +13,11 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.FolderBrowserAlias, "(Obsolete) Folder Browser", "folderbrowser", HideLabel=true, Icon="icon-folder", Group="media")]
     public class FolderBrowserPropertyEditor : PropertyEditor
     {
-
+        /// <summary>
+        /// The constructor will setup the property editor based on the attribute if one is found
+        /// </summary>
+        public FolderBrowserPropertyEditor(ILogger logger) : base(logger)
+        {
+        }
     }
 }

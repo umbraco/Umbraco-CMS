@@ -3,14 +3,12 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Collections.Generic;
-using System.Security.Claims;
-using System.ServiceModel.Channels;
 using System.Threading.Tasks;
 using System.Web.Http;
 using AutoMapper;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin;
-using Microsoft.Owin.Security;
+using Umbraco.Core;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
@@ -20,10 +18,8 @@ using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Microsoft.AspNet.Identity.Owin;
 using Umbraco.Core.Logging;
-using Newtonsoft.Json.Linq;
-using Umbraco.Core.Models.Identity;
+using Umbraco.Core.Configuration;
 using Umbraco.Web.Security.Identity;
-using IUser = Umbraco.Core.Models.Membership.IUser;
 
 namespace Umbraco.Web.Editors
 {

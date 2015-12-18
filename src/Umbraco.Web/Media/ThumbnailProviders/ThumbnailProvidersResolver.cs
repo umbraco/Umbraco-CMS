@@ -13,7 +13,7 @@ using umbraco.BusinessLogic.Utils;
 
 namespace Umbraco.Web.Media.ThumbnailProviders
 {
-    public sealed class ThumbnailProvidersResolver : ManyObjectsResolverBase<ThumbnailProvidersResolver, IThumbnailProvider>
+    public sealed class ThumbnailProvidersResolver : ContainerManyObjectsResolver<ThumbnailProvidersResolver, IThumbnailProvider>
     {
 	    /// <summary>
 	    /// Constructor
