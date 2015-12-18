@@ -19,7 +19,6 @@ namespace Umbraco.Web.Models.ContentEditing
             Groups = new List<PropertyGroupDisplay>();
             AllowedContentTypes = new List<int>();
             CompositeContentTypes = new List<string>();
-            AvailableCompositeContentTypes = new List<EntityBasic>();
             Notifications = new List<Notification>();
         }
 
@@ -44,11 +43,7 @@ namespace Umbraco.Web.Models.ContentEditing
         //Compositions
         [DataMember(Name = "compositeContentTypes")]
         public IEnumerable<string> CompositeContentTypes { get; set; }
-
-        [DataMember(Name = "availableCompositeContentTypes")]
-        [ReadOnly(true)]
-        public IEnumerable<EntityBasic> AvailableCompositeContentTypes { get; set; }
-
+        
         [DataMember(Name = "allowAsRoot")]
         public bool AllowAsRoot { get; set; }
 

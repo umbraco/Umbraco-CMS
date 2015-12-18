@@ -363,13 +363,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\Controls\ContentTypeControlNew.ascx.cs">
-      <DependentUpon>ContentTypeControlNew.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Controls\ContentTypeControlNew.ascx.designer.cs">
-      <DependentUpon>ContentTypeControlNew.ascx</DependentUpon>
-    </Compile>
     <Compile Include="Umbraco\Controls\Images\ImageViewer.ascx.cs">
       <DependentUpon>ImageViewer.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -530,13 +523,6 @@
     <Compile Include="Umbraco\Search\QuickSearch.ascx.designer.cs">
       <DependentUpon>QuickSearch.ascx</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\Settings\EditNodeTypeNew.aspx.cs">
-      <DependentUpon>EditNodeTypeNew.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Settings\EditNodeTypeNew.aspx.designer.cs">
-      <DependentUpon>EditNodeTypeNew.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Umbraco\Settings\EditTemplate.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -596,7 +582,6 @@
     <Content Include="Umbraco\create.aspx" />
     <Content Include="Umbraco\Logout.aspx" />
     <Content Include="Umbraco\umbraco.aspx" />
-    <Content Include="Umbraco_Client\Editors\EditContentType.js" />
     <Content Include="Umbraco_Client\IconPicker\iconpicker.js" />
     <Compile Include="Umbraco\umbraco.aspx.cs">
       <DependentUpon>umbraco.aspx</DependentUpon>
@@ -1652,8 +1637,6 @@
     <Content Include="Umbraco\Controls\ProgressBar.ascx" />
     <Content Include="Umbraco_Client\DateTimePicker\datetimepicker.css" />
     <Content Include="Umbraco_Client\DateTimePicker\timepicker.js" />
-    <Content Include="Umbraco\Controls\ContentTypeControlNew.ascx" />
-    <Content Include="Umbraco\Controls\GenericProperties\GenericProperty.ascx" />
     <Content Include="Umbraco\Create\DlrScripting.ascx" />
     <Content Include="Umbraco\Images\Umbraco\developerRuby.gif" />
     <Content Include="Umbraco\Images\Umbraco\developerScript.gif" />
@@ -2022,7 +2005,6 @@
       <SubType>UserControl</SubType>
     </Content>
     <Content Include="Umbraco\Css\background.gif" />
-    <Content Include="Umbraco_Client\GenericProperty\genericproperty.css" />
     <Content Include="Umbraco\Css\splitter.gif" />
     <Content Include="Umbraco\Css\umbracoGui.css" />
     <Content Include="Umbraco\Dashboard\LatestEdits.ascx" />
@@ -2231,7 +2213,6 @@
     <Content Include="Umbraco\Images\Umbraco\userGroup.gif" />
     <Content Include="Umbraco\Images\Umbraco\userType.gif" />
     <Content Include="Umbraco\Js\dualSelectBox.js" />
-    <Content Include="Umbraco_Client\GenericProperty\genericProperty.js" />
     <Content Include="Umbraco\Js\guiFunctions.js" />
     <Content Include="Umbraco\Js\language.aspx" />
     <Content Include="Umbraco\Js\umbracoCheckKeys.js" />
@@ -2243,15 +2224,9 @@
     <Content Include="Umbraco\Members\EditMemberGroup.aspx">
       <SubType>Form</SubType>
     </Content>
-    <Content Include="Umbraco\Members\EditMemberType.aspx" />
-    <Content Include="Umbraco\ping.aspx">
-      <SubType>Form</SubType>
-    </Content>
     <Content Include="Umbraco\publishStatus.aspx" />
     <Content Include="Umbraco\Settings\EditDictionaryItem.aspx" />
     <Content Include="Umbraco\Settings\editLanguage.aspx" />
-    <Content Include="Umbraco\Settings\EditMediaType.aspx" />
-    <Content Include="Umbraco\Settings\EditNodeTypeNew.aspx" />
     <Content Include="Umbraco\Settings\editTemplate.aspx" />
     <Content Include="Umbraco\Settings\Modals\ShowUmbracoTags.aspx" />
     <Content Include="Umbraco\Settings\Stylesheet\editstylesheet.aspx" />

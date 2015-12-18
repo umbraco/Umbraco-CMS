@@ -33,7 +33,8 @@ angular.module("umbraco.install").factory('installerService', function($rootScop
 					"Umbraco has been around since 2005, that's a looong time in IT",
 					"More than 400 people from all over the world meet each year in Denmark in June for our annual conference <a target='_blank' href='http://codegarden15.com'>CodeGarden</a>", 
 					"While you are installing Umbraco someone else on the other side of the planet is probably doing it too",
-					"You can extend Umbraco without modifying the source code and using either JavaScript or C#"
+					"You can extend Umbraco without modifying the source code using either JavaScript or C#",
+					"Umbraco was installed in more than 165 countries in 2015"
 					 ];
 
     /**

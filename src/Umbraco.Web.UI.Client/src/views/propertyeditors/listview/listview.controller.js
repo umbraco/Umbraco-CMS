@@ -107,7 +107,13 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
 
         //check if response is ysod
         if(err.status && err.status >= 500) {
-            dialogService.ysodDialog(err);
+
+            // Open ysod overlay
+            $scope.ysodOverlay = {
+                view : "ysod",
+                error : err,
+                show : true
+            };
         }
 
         $timeout(function() {
@@ -151,6 +157,8 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
 
     $scope.reloadView = function (id) {
 
+      $scope.viewLoaded = false;
+
       listViewHelper.clearSelection($scope.listViewResultSet.items, $scope.folders, $scope.selection);
 
          if($scope.entityType === 'media') {
@@ -184,6 +192,8 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
                 //reload!
                 $scope.reloadView(id);
             }
+
+            $scope.viewLoaded = true;
 
         });
     };

@@ -148,7 +148,8 @@
             items: '=',
             onDetailsHover: "=",
             onSelect: '=',
-            onClick: '='
+            onClick: '=',
+            filterBy: "="
          },
          link: link
       };

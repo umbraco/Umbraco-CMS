@@ -87,11 +87,43 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 			window.onresize = calculateHeight;
 
 			scope.avatarClick = function(){
-				navigationService.showUserDialog();
+
+                if(!scope.userDialog) {
+
+                    scope.userDialog = {};
+                    scope.userDialog.view = "user";
+                    scope.userDialog.show = true;
+
+                    scope.userDialog.close = function(oldModel) {
+                        scope.userDialog.show = false;
+                        scope.userDialog = null;
+                    };
+
+                } else {
+                    scope.userDialog.show = false;
+                    scope.userDialog = null;
+                }
+
 			};
 
 			scope.helpClick = function(){
-				navigationService.showHelpDialog();
+
+                if(!scope.helpDialog) {
+
+                    scope.helpDialog = {};
+                    scope.helpDialog.show = true;
+                    scope.helpDialog.view = "help";
+
+                    scope.helpDialog.close = function(oldModel) {
+                        scope.helpDialog.show = false;
+                        scope.helpDialog = null;
+                    };
+
+                } else {
+                    scope.helpDialog.show = false;
+                    scope.helpDialog = null;
+                }
+
 			};
 
 			scope.sectionClick = function (event, section) {

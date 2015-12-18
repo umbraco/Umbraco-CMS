@@ -1,8 +1,9 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.GridController",
-    function ($scope, $http, assetsService, $rootScope, dialogService, gridService, mediaResource, imageHelper, $timeout, umbRequestHelper) {
+    function ($scope, $http, assetsService, localizationService, $rootScope, dialogService, gridService, mediaResource, imageHelper, $timeout, umbRequestHelper) {
 
         // Grid status variables
+        var placeHolder = "";
         $scope.currentRow = null;
         $scope.currentCell = null;
         $scope.currentToolsControl = null;
@@ -10,6 +11,8 @@ angular.module("umbraco")
         $scope.openRTEToolbarId = null;
         $scope.hasSettings = false;
         $scope.showRowConfigurations = true;
+        $scope.sortMode = false;
+        $scope.reorderKey = "general_reorder";
 
         // *********************************************
         // Sortable options
@@ -80,7 +83,7 @@ angular.module("umbraco")
             distance: 10,
             cursor: "move",
             placeholder: "ui-sortable-placeholder",
-            handle: ".umb-control-bar",
+            handle: ".umb-control-handle",
             helper: "clone",
             connectWith: ".umb-cell-inner",
             forcePlaceholderSize: true,
@@ -170,20 +173,18 @@ angular.module("umbraco")
                 ui.item.context.style.display = "block";
                 ui.item.find(".mceNoEditor").each(function () {
                     notIncludedRte = [];
+                    var editors = _.findWhere(tinyMCE.editors, { id: $(this).attr("id") });
 
                     // save the dragged RTE settings
-                    draggedRteSettings = _.findWhere(tinyMCE.editors, { id: $(this).attr("id") }).settings;
+                    if(editors) {
+                        draggedRteSettings = editors.settings;
 
-                    // remove the dragged RTE
-                    tinyMCE.execCommand("mceRemoveEditor", false, $(this).attr("id"));
+                        // remove the dragged RTE
+                        tinyMCE.execCommand("mceRemoveEditor", false, $(this).attr("id"));
+
+                    }
+
                 });
-            },
-
-            beforeStop: function (e, ui) {
-                var cell = $(e.toElement).scope().area;
-                if(cell != undefined && cell.dropNotAllowed == false){
-                    hasActiveChild(cell, cell.controls);
-                }
             },
 
             stop: function (e, ui) {
@@ -223,30 +224,32 @@ angular.module("umbraco")
 
         };
 
+        $scope.toggleSortMode = function() {
+            $scope.sortMode = !$scope.sortMode;
+            if($scope.sortMode) {
+                $scope.reorderKey = "general_reorderDone";
+            } else {
+                $scope.reorderKey = "general_reorder";
+            }
+        };
+
         // *********************************************
         // Add items overlay menu
         // *********************************************
        $scope.openEditorOverlay = function(event, area, index, key) {
-
-          $scope.editorOverlay = {};
-          $scope.editorOverlay.view = "itempicker";
-          $scope.editorOverlay.filter = false;
-          $scope.editorOverlay.title = "Insert editor";
-          $scope.editorOverlay.availableItems = area.$allowedEditors;
-          $scope.editorOverlay.event = event;
-          $scope.editorOverlay.show = true;
-
-          $scope.editorOverlay.chooseItem = function(item) {
-             $scope.addControl(item, area, index);
-             $scope.editorOverlay.show = false;
-             $scope.editorOverlay = null;
+          $scope.editorOverlay = {
+              view: "itempicker",
+              filter: false,
+              title: localizationService.localize("grid_insertControl").then(function (value) {return value;}),
+              availableItems: area.$allowedEditors,
+              event: event,
+              show: true,
+              submit: function(model) {
+                  $scope.addControl(model.selectedItem, area, index);
+                  $scope.editorOverlay.show = false;
+                  $scope.editorOverlay = null;
+              }
           };
-
-          $scope.editorOverlay.close = function(oldModel) {
-             $scope.editorOverlay.show = false;
-             $scope.editorOverlay = null;
-          };
-
        };
 
         // *********************************************
@@ -326,19 +329,93 @@ angular.module("umbraco")
 
         $scope.editGridItemSettings = function (gridItem, itemType) {
 
-            dialogService.open(
-                {
-                    template: "views/propertyeditors/grid/dialogs/config.html",
-                    gridItem: gridItem,
-                    config: $scope.model.config,
-                    itemType: itemType,
-                    callback: function (data) {
-                        gridItem.styles = data.styles;
-                        gridItem.config = data.config;
-                        gridItem.hasConfig = gridItemHasConfig(data.styles, data.config);
+            placeHolder = "{0}";
+            var styles = _.filter( angular.copy($scope.model.config.items.styles), function(item){return (item.applyTo === undefined || item.applyTo === itemType); });
+            var config = _.filter( angular.copy($scope.model.config.items.config), function(item){return (item.applyTo === undefined || item.applyTo === itemType); });
+
+            if(angular.isObject(gridItem.config)){
+                _.each(config, function(cfg){
+                    var val = gridItem.config[cfg.key];
+                    if(val){
+                        cfg.value = stripModifier(val, cfg.modifier);
+                    }
+                });
+            }
+
+            if(angular.isObject(gridItem.styles)){
+                _.each(styles, function(style){
+                    var val = gridItem.styles[style.key];
+                    if(val){
+                        style.value = stripModifier(val, style.modifier);
+                    }
+                });
+            }
+
+            $scope.gridItemSettingsDialog = {};
+            $scope.gridItemSettingsDialog.view = "views/propertyeditors/grid/dialogs/config.html";
+            $scope.gridItemSettingsDialog.title = "Settings";
+            $scope.gridItemSettingsDialog.styles = styles;
+            $scope.gridItemSettingsDialog.config = config;
+
+            $scope.gridItemSettingsDialog.show = true;
+
+            $scope.gridItemSettingsDialog.submit = function(model) {
+
+                var styleObject = {};
+                var configObject = {};
+
+                _.each(model.styles, function(style){
+                    if(style.value){
+                        styleObject[style.key] = addModifier(style.value, style.modifier);
+                    }
+                });
+                _.each(model.config, function (cfg) {
+                    if (cfg.value) {
+                        configObject[cfg.key] = addModifier(cfg.value, cfg.modifier);
                     }
                 });
 
+                gridItem.styles = styleObject;
+                gridItem.config = configObject;
+                gridItem.hasConfig = gridItemHasConfig(styleObject, configObject);
+
+                $scope.gridItemSettingsDialog.show = false;
+                $scope.gridItemSettingsDialog = null;
+            };
+
+            $scope.gridItemSettingsDialog.close = function(oldModel) {
+                $scope.gridItemSettingsDialog.show = false;
+                $scope.gridItemSettingsDialog = null;
+            };
+
+        };
+
+        function stripModifier(val, modifier) {
+            if (!val || !modifier || modifier.indexOf(placeHolder) < 0) {
+                return val;
+            } else {
+                var paddArray = modifier.split(placeHolder);
+                if(paddArray.length == 1){
+                    if (modifier.indexOf(placeHolder) === 0) {
+                        return val.slice(0, -paddArray[0].length);
+                    } else {
+                        return val.slice(paddArray[0].length, 0);
+                    }
+                } else {
+                    if (paddArray[1].length === 0) {
+                        return val.slice(paddArray[0].length);
+                    }
+                    return val.slice(paddArray[0].length, -paddArray[1].length);
+                }
+            }
+        }
+
+        var addModifier = function(val, modifier){
+            if (!modifier || modifier.indexOf(placeHolder) < 0) {
+                return val;
+            } else {
+                return modifier.replace(placeHolder, val);
+            }
         };
 
         function gridItemHasConfig(styles, config) {

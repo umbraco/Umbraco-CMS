@@ -10,7 +10,6 @@
     "use strict";
 
     function MediaTypesEditController($scope, $routeParams, mediaTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter, $q, localizationService) {
-
         var vm = this;
 
         vm.save = save;
@@ -96,22 +95,20 @@
         ];
 
         if ($routeParams.create) {
-
             vm.page.loading = true;
 
             //we are creating so get an empty data type item
             mediaTypeResource.getScaffold($routeParams.id)
-				.then(function (dt) {
-				    init(dt);
+                .then(function(dt) {
+                    init(dt);
 
-				    vm.page.loading = false;
-				});
+                    vm.page.loading = false;
+                });
         }
         else {
-
             vm.page.loading = true;
 
-            mediaTypeResource.getById($routeParams.id).then(function (dt) {
+            mediaTypeResource.getById($routeParams.id).then(function(dt) {
                 init(dt);
 
                 syncTreeNode(vm.contentType, dt.path, true);
@@ -120,11 +117,9 @@
             });
         }
 
-
         /* ---------- SAVE ---------- */
 
         function save() {
-
             var deferred = $q.defer();
 
             vm.page.saveButtonState = "busy";
@@ -165,10 +160,15 @@
             });
 
             return deferred.promise;
-
         }
 
         function init(contentType) {
+            //get available composite types
+            mediaTypeResource.getAvailableCompositeContentTypes(contentType.id).then(function (result) {
+                contentType.availableCompositeContentTypes = result;
+                // convert legacy icons
+                iconHelper.formatContentTypeIcons(contentType.availableCompositeContentTypes);
+            });
 
             // set all tab to inactive
             if (contentType.groups.length !== 0) {
@@ -181,27 +181,22 @@
 
                 });
             }
-
-            // convert legacy icons
-            convertLegacyIcons(contentType);
-
+            
             // sort properties after sort order
             angular.forEach(contentType.groups, function (group) {
                 group.properties = $filter('orderBy')(group.properties, 'sortOrder');
             });
 
+            // convert icons for content type
+            convertLegacyIcons(contentType);
+
             //set a shared state
             editorState.set(contentType);
 
             vm.contentType = contentType;
-
         }
 
         function convertLegacyIcons(contentType) {
-
-            // convert icons for composite content types
-            iconHelper.formatContentTypeIcons(contentType.availableCompositeContentTypes);
-
             // make array to store contentType icon
             var contentTypeArray = [];
 
@@ -213,33 +208,27 @@
 
             // set icon back on contentType
             contentType.icon = contentTypeArray[0].icon;
-
         }
 
         function getDataTypeDetails(property) {
-
             if (property.propertyState !== "init") {
 
                 dataTypeResource.getById(property.dataTypeId)
-					.then(function (dataType) {
-					    property.dataTypeIcon = dataType.icon;
-					    property.dataTypeName = dataType.name;
-					});
+                    .then(function(dataType) {
+                        property.dataTypeIcon = dataType.icon;
+                        property.dataTypeName = dataType.name;
+                    });
             }
         }
 
 
         /** Syncs the content type  to it's tree node - this occurs on first load and after saving */
         function syncTreeNode(dt, path, initialLoad) {
-
-            navigationService.syncTree({ tree: "mediatypes", path: path.split(","), forceReload: initialLoad !== true }).then(function (syncArgs) {
+            navigationService.syncTree({ tree: "mediatypes", path: path.split(","), forceReload: initialLoad !== true }).then(function(syncArgs) {
                 vm.currentNode = syncArgs.node;
             });
-
         }
-
     }
 
     angular.module("umbraco").controller("Umbraco.Editors.MediaTypes.EditController", MediaTypesEditController);
-
 })();

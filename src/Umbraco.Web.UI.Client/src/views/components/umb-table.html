@@ -37,9 +37,14 @@
         <div class="umb-table-body">
             <div class="umb-table-row"
                 ng-repeat="item in items"
-                ng-class="{'-selected':item.selected}"
+                ng-class="{
+                    '-selected':item.selected,
+                    '-published':item.published,
+                    '-unpublished':!item.published
+                }"
                 ng-click="selectItem(item, $index, $event)"
                 >
+
 
                 <div class="umb-table-cell">
                     <i class="umb-table-body__icon umb-table-body__fileicon {{item.icon}}" ng-class="getIcon(item)"></i>
@@ -48,7 +53,6 @@
 
                 <div class="umb-table-cell umb-table__name">
                     <a title="{{ item.name }}" class="umb-table-body__link" href=""
-                        ng-class="{inactive: (entityType === 'content' && !item.published) || isTrashed}"
                         ng-click="clickItem(item, $event)"
                         ng-bind="item.name">
                     </a>
@@ -64,7 +68,7 @@
     </div>
 
     <!-- If list is empty, then display -->
-    <div ng-if="!items" class="umb-table-body__empty">
+    <div ng-if="!items" class="umb-empty-state-text -center">
         <localize key="content_listViewNoItems">There are no items show in the list.</localize>
     </div>
 

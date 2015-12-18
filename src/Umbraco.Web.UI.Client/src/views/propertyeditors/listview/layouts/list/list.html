@@ -1,4 +1,6 @@
-<div ng-controller="Umbraco.PropertyEditors.ListView.ListLayoutController as vm">
+<div
+    ng-class="{'-content':(entityType === 'content')}"
+    ng-controller="Umbraco.PropertyEditors.ListView.ListLayoutController as vm">
 
     <div
         ng-if="entityType === 'media'"

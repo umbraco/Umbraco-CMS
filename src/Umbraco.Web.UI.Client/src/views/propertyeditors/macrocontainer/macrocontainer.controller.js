@@ -43,21 +43,33 @@ angular.module('umbraco')
 				var macro = $scope.renderModel[index];
 				dialogData["macroData"] = macro;
 			}
-			
-			dialogService.macroPicker({
-				dialogData : dialogData,
-				callback: function(data) {
 
-					collectDetails(data);
+			$scope.macroPickerOverlay = {};
+			$scope.macroPickerOverlay.view = "macropicker";
+			$scope.macroPickerOverlay.dialogData = dialogData;
+			$scope.macroPickerOverlay.show = true;
 
-					//update the raw syntax and the list...
-					if(index !== null && $scope.renderModel[index]) {
-						$scope.renderModel[index] = data;
-					} else {
-						$scope.renderModel.push(data);
-					}
+			$scope.macroPickerOverlay.submit = function(model) {
+
+				var macroObject = macroService.collectValueData(model.selectedMacro, model.macroParams, dialogData.renderingEngine);
+				collectDetails(macroObject);
+
+				//update the raw syntax and the list...
+				if(index !== null && $scope.renderModel[index]) {
+					$scope.renderModel[index] = macroObject;
+				} else {
+					$scope.renderModel.push(macroObject);
 				}
-			});
+
+				$scope.macroPickerOverlay.show = false;
+				$scope.macroPickerOverlay = null;
+			};
+
+			$scope.macroPickerOverlay.close = function(oldModel) {
+				$scope.macroPickerOverlay.show = false;
+				$scope.macroPickerOverlay = null;
+			};
+
 		}
 
 

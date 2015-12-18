@@ -56,7 +56,6 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.CreateDate, expression => expression.Ignore())
                 .ForMember(dto => dto.UpdateDate, expression => expression.Ignore())                
                 .ForMember(dto => dto.ListViewEditorName, expression => expression.Ignore())
-                .ForMember(dto => dto.AvailableCompositeContentTypes, expression => expression.Ignore())
                 .ForMember(dto => dto.Notifications, expression => expression.Ignore())
                 .ForMember(dto => dto.Errors, expression => expression.Ignore());
         }
@@ -77,11 +76,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(
                     dto => dto.AllowedContentTypes,
                     expression => expression.MapFrom(dto => dto.AllowedContentTypes.Select(x => x.Id.Value)))
-
-                .ForMember(
-                    dto => dto.AvailableCompositeContentTypes,
-                    expression => expression.ResolveUsing(new AvailableCompositeContentTypesResolver(applicationContext)))
-
+                    
                 .ForMember(
                     dto => dto.CompositeContentTypes,
                     expression => expression.MapFrom(dto => dto.ContentTypeComposition))

@@ -1,7 +1,7 @@
 (function() {
   'use strict';
 
-  function ListViewDirective(contentTypeResource, dataTypeResource, dataTypeHelper) {
+  function ListViewSettingsDirective(contentTypeResource, dataTypeResource, dataTypeHelper) {
 
     function link(scope, el, attr, ctrl) {
 
@@ -135,7 +135,7 @@
     var directive = {
       restrict: 'E',
       replace: true,
-      templateUrl: 'views/components/umb-list-view.html',
+      templateUrl: 'views/components/umb-list-view-settings.html',
       scope: {
         enableListView: "=",
         listViewName: "=",
@@ -148,6 +148,6 @@
     return directive;
   }
 
-  angular.module('umbraco.directives').directive('umbListView', ListViewDirective);
+  angular.module('umbraco.directives').directive('umbListViewSettings', ListViewSettingsDirective);
 
 })();

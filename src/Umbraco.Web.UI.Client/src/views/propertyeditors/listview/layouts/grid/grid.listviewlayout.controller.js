@@ -37,13 +37,17 @@
 
           var newArray = [];
 
-          for (var i = 0; items.length > i; i++) {
-              var item = items[i];
-              var isFolder = !mediaHelper.hasFilePropertyType(item);
+          if(items && items.length ) {
 
-              if (!isFolder) {
-                  newArray.push(item);
+              for (var i = 0; items.length > i; i++) {
+                  var item = items[i];
+                  var isFolder = !mediaHelper.hasFilePropertyType(item);
+
+                  if (!isFolder) {
+                      newArray.push(item);
+                  }
               }
+
           }
 
           return newArray;

@@ -134,6 +134,7 @@
       </umb-editor-sub-header>
 
       <umb-list-view-layout
+         ng-if="viewLoaded"
          content-id="contentId"
          folders="folders"
          items="listViewResultSet.items"
@@ -166,6 +167,13 @@
       model="copyDialog"
       position="right"
       view="copyDialog.view">
+    </umb-overlay>
+
+    <umb-overlay
+        ng-if="ysodOverlay.show"
+        model="ysodOverlay"
+        position="right"
+        view="ysodOverlay.view">
     </umb-overlay>
 
 </div>

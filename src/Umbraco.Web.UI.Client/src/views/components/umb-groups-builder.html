@@ -156,6 +156,11 @@
 
                                 <div ng-if="!property.inherited">
 
+                                    <!-- settings for property -->
+                                    <div class="umb-group-builder__property-action" ng-click="editPropertyTypeSettings(property, tab)">
+                                        <i class="icon icon-settings"></i>
+                                    </div>
+
                                     <!-- delete property -->
                                     <div class="umb-group-builder__property-action">
                                         <i class="icon-trash" ng-click="togglePrompt(property)"></i>
@@ -166,11 +171,6 @@
                                             on-cancel="hidePrompt(property)">
                                         </umb-confirm-action>
                                     </div>
-
-                                    <!-- settings for property -->
-                                    <div class="umb-group-builder__property-action" ng-click="editPropertyTypeSettings(property, tab)">
-                                        <i class="icon icon-settings"></i>
-                                    </a>
 
                                 </div>
 

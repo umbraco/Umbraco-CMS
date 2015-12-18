@@ -31,6 +31,7 @@ angular.module("umbraco.directives")
                             resize: function(e, ui) {
                                 var wrapper = $("#mainwrapper");
                                 var contentPanel = $("#contentwrapper");
+                                var umbNotification = $("#umb-notifications-wrapper");
                                 var apps = $("#applications");
                                 var bottomBar = contentPanel.find(".umb-bottom-bar");
                                 var navOffeset = $("#navOffset");
@@ -39,6 +40,7 @@ angular.module("umbraco.directives")
 
                                 contentPanel.css({ left: leftPanelWidth });
                                 bottomBar.css({ left: leftPanelWidth });
+                                umbNotification.css({ left: leftPanelWidth });
 
                                 navOffeset.css({ "margin-left": ui.element.outerWidth() });
                             },
@@ -55,11 +57,13 @@ angular.module("umbraco.directives")
                     if (resizeEnabled) {
                         //kill the resize
                         element.resizable("destroy");
-
                         element.css("width", "");
+
                         var navInnerContainer = element.find(".navigation-inner-container");
+
                         navInnerContainer.css("width", "");
                         $("#contentwrapper").css("left", "");
+                        $("#umb-notifications-wrapper").css("left", "");
                         $("#navOffset").css("margin-left", "");
 
                         resizeEnabled = false;

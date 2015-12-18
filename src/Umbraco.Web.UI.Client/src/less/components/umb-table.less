@@ -96,11 +96,6 @@ input.umb-table__input {
 .umb-table-body__link {
     text-decoration: none;
 
-    color: @black;
-
-    font-size: 14px;
-    font-weight: bold;
-
     &:hover {
         text-decoration: underline;
     }
@@ -116,6 +111,12 @@ input.umb-table__input {
 .umb-table-body__checkicon {
     display: none;
     font-size: 16px;
+}
+
+.umb-table-body .umb-table__name {
+    color: @black;
+    font-size: 14px;
+    font-weight: bold;
 }
 
 // Styles of no items in the listview
@@ -140,6 +141,29 @@ input.umb-table__input {
         display: inline-block;
     }
 }
+
+
+// Styling for when item is published or not
+.-published {
+
+}
+
+.-content .-unpublished {
+    .umb-table__name > * {
+        opacity: .4;
+    }
+
+    .umb-table-body__icon {
+        opacity: .4;
+    }
+}
+
+.-selected.-unpublished {
+    .umb-table-body__icon {
+        opacity: 1;
+    }
+}
+
 
 
 

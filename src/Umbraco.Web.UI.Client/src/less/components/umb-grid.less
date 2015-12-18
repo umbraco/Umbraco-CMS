@@ -175,6 +175,10 @@
     }
 }
 
+.umb-grid .umb-cell-content.-has-editors.-collapsed {
+    padding-top: 10px;
+}
+
 
 
 .umb-grid .cell-tools {
@@ -289,6 +293,19 @@
     margin-bottom: 10px;
 }
 
+.umb-control-collapsed {
+    background-color: @grayLighter;
+    padding: 5px 10px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: transparent;
+    cursor: move;
+}
+
+.umb-control-collapsed:hover {
+    border-color: @blue;
+}
+
 .umb-grid .umb-control-click-overlay {
     position: absolute;
     width: 100%;
@@ -396,6 +413,10 @@
 .umb-grid .umb-row.-active {
     background-color: @blue;
 
+    .umb-row-title-bar {
+        cursor: move;
+    }
+
     .row-tool,
     .umb-row-title {
         color: #fff;
@@ -420,6 +441,9 @@
 .umb-grid .umb-row.-active-child {
     background-color: @grayLighter;
 
+    .umb-row-title-bar {
+        cursor: default;
+    }
 
     .umb-row-title {
         color: @gray;
@@ -719,6 +743,7 @@
 .umb-grid .umb-control.-active .umb-control-bar {
     opacity: 1;
     height: 25px;
+    cursor: move;
 }
 
 .umb-grid .umb-control-tools {

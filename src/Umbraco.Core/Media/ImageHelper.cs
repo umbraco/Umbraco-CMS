@@ -188,7 +188,7 @@ namespace Umbraco.Core.Media
                 sizeName = "UMBRACOSYSTHUMBNAIL";
             var extension = Path.GetExtension(originFilepath) ?? string.Empty;
             var filebase = originFilepath.TrimEnd(extension);
-            var resizedFilepath = filebase + "_" + sizeName + ".jpg";
+            var resizedFilepath = filebase + "_" + sizeName + extension;
 
             return GenerateResizedAt(fs, originImage, resizedFilepath, maxWidthHeight, fixedWidth, fixedHeight);
         }
@@ -259,9 +259,29 @@ namespace Umbraco.Core.Media
                 // get an encoder - based upon the file type
                 var extension = (Path.GetExtension(resizedFilepath) ?? "").TrimStart('.').ToLowerInvariant();
                 var encoders = ImageCodecInfo.GetImageEncoders();
-                var encoder = extension == "png" || extension == "gif"
-                    ? encoders.Single(t => t.MimeType.Equals("image/png"))
-                    : encoders.Single(t => t.MimeType.Equals("image/jpeg"));
+                ImageCodecInfo encoder;
+                switch (extension)
+                {
+                    case "png":
+                        encoder = encoders.Single(t => t.MimeType.Equals("image/png"));
+                        break;
+                    case "gif":
+                        encoder = encoders.Single(t => t.MimeType.Equals("image/gif"));
+                        break;
+                    case "tif":
+                    case "tiff":
+                        encoder = encoders.Single(t => t.MimeType.Equals("image/tiff"));
+                        break;
+                    case "bmp":
+                        encoder = encoders.Single(t => t.MimeType.Equals("image/bmp"));
+                        break;
+                    // TODO: this is dirty, defaulting to jpg but the return value of this thing is used all over the
+                    // place so left it here, but it needs to not set a codec if it doesn't know which one to pick 
+                    // Note: when fixing this: both .jpg and .jpeg should be handled as extensions
+                    default:
+                        encoder = encoders.Single(t => t.MimeType.Equals("image/jpeg"));
+                        break;
+                }
 
                 // set compresion ratio to 90%
                 var encoderParams = new EncoderParameters();
@@ -276,6 +296,12 @@ namespace Umbraco.Core.Media
                     {
                         var filepath = resizedFilepath.Replace("UMBRACOSYSTHUMBNAIL", maxWidthHeight.ToInvariantString());
                         fs.AddFile(filepath, stream);
+                        if (extension != "jpg")
+                        {
+                            filepath = filepath.TrimEnd(extension) + "jpg";
+                            stream.Seek(0, 0);
+                            fs.AddFile(filepath, stream);
+                        }
                         // TODO: Remove this, this is ONLY here for backwards compatibility but it is essentially completely unusable see U4-5385
                         stream.Seek(0, 0);
                         resizedFilepath = resizedFilepath.Replace("UMBRACOSYSTHUMBNAIL", width + "x" + height);

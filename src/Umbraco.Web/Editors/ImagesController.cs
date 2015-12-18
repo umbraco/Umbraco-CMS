@@ -113,7 +113,7 @@ namespace Umbraco.Web.Editors
             if (ImageHelper.IsImageFile(ext) == false)
                 return Request.CreateResponse(HttpStatusCode.NotFound);
 
-            var resizedPath = imagePath.TrimEnd(ext) + "_" + sizeName + ".jpg";
+            var resizedPath = imagePath.TrimEnd(ext) + "_" + sizeName + ext;
             var generate = fs.FileExists(resizedPath) == false;
             if (generate)
             {
@@ -139,7 +139,8 @@ namespace Umbraco.Web.Editors
             if (stream.CanSeek) stream.Seek(0, 0);
             result.Content = new StreamContent(stream);
             result.Headers.Date = fs.GetLastModified(imagePath);
-            result.Content.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
+            result.Content.Headers.ContentType = new MediaTypeHeaderValue(System.Web.MimeMapping.GetMimeMapping(imagePath));
+            
             return result;
         }
     }
