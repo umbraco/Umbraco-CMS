@@ -87,10 +87,7 @@ namespace Umbraco.Core
         {
             if (_isInitialized)
                 throw new InvalidOperationException("The boot manager has already been initialized");
-
-            InitializeLoggerResolver();
-            InitializeProfilerResolver();
-
+            
             ProfilingLogger = ProfilingLogger?? new ProfilingLogger(LoggerResolver.Current.Logger, ProfilerResolver.Current.Profiler);
 
             _timer = ProfilingLogger.TraceDuration<CoreBootManager>(
@@ -165,13 +162,16 @@ namespace Umbraco.Core
                 () => PluginManager.ResolveAssignedMapperTypes()));
             container.Register<RepositoryFactory>();
             container.Register<ServiceContext>(factory => new ServiceContext(
+
                 factory.GetInstance<RepositoryFactory>(),
                 factory.GetInstance<IDatabaseUnitOfWorkProvider>(),
                 factory.GetInstance<IUnitOfWorkProvider>(),
                 factory.GetInstance<BasePublishingStrategy>(),
                 factory.GetInstance<CacheHelper>(),
                 factory.GetInstance<ILogger>(),
+                factory.GetInstance<IEventMessagesFactory>(),
                 factory.GetAllInstances<IUrlSegmentProvider>()));
+
             container.Register<ApplicationContext>(new PerContainerLifetime());
             container.Register<MediaFileSystem>(factory => FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>());
 
@@ -395,7 +395,7 @@ namespace Umbraco.Core
             // dist calls enabled, in which case we'll use the config server registrar
             if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled)
             {
-                ServerRegistrarResolver.Current = new ServerRegistrarResolver(new ConfigServerRegistrar());
+                ServerRegistrarResolver.Current = new ServerRegistrarResolver(new ConfigServerRegistrar(UmbracoConfig.For.UmbracoSettings()));
             }
             else
             {
@@ -404,15 +404,16 @@ namespace Umbraco.Core
                         new Lazy<IServerRegistrationService>(() => ApplicationContext.Services.ServerRegistrationService),
                         new DatabaseServerRegistrarOptions()));
             }
-            
+
 
             //by default we'll use the database server messenger with default options (no callbacks),
             // this will be overridden in the web startup
             ServerMessengerResolver.Current = new ServerMessengerResolver(
-                new DatabaseServerMessenger(ApplicationContext, true, new DatabaseServerMessengerOptions()));
+                Container,
+                factory => new DatabaseServerMessenger(ApplicationContext, true, new DatabaseServerMessengerOptions()));
 
             MappingResolver.Current = new MappingResolver(
-                ServiceProvider, ProfilingLogger.Logger,
+                Container, ProfilingLogger.Logger,
                 () => PluginManager.ResolveAssignedMapperTypes());
 
            

@@ -6,7 +6,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Execute.Expressions
     public class ExecuteCodeStatementExpression : MigrationExpressionBase
     {
         public ExecuteCodeStatementExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax)
-            : base(current, databaseProviders, sqlSyntax)
+            : base(sqlSyntax, current, databaseProviders)
         {
         }
 

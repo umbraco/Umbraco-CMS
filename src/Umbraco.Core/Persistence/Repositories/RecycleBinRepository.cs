@@ -8,7 +8,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
-
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -18,8 +18,8 @@ namespace Umbraco.Core.Persistence.Repositories
     internal abstract class RecycleBinRepository<TId, TEntity> : VersionableRepositoryBase<TId, TEntity>, IRecycleBinRepository<TEntity> 
         where TEntity : class, IUmbracoEntity
     {
-        protected RecycleBinRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IContentSection contentSection)
-            : base(work, cache, logger, sqlSyntax, contentSection)
+        protected RecycleBinRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IContentSection contentSection, IMappingResolver mappingResolver)
+            : base(work, cache, logger, sqlSyntax, contentSection, mappingResolver)
         {
         }
 
@@ -27,7 +27,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public virtual IEnumerable<TEntity> GetEntitiesInRecycleBin()
         {
-            return GetByQuery(new Query<TEntity>().Where(entity => entity.Trashed));
+            return GetByQuery(Query.Where(entity => entity.Trashed));
         }
 
         /// <summary>
@@ -116,10 +116,10 @@ namespace Umbraco.Core.Persistence.Repositories
             //Alias: Constants.Conventions.Media.File and PropertyEditorAlias: Constants.PropertyEditors.UploadField
             var sql = new Sql();
             sql.Select("DISTINCT(dataNvarchar)")
-                .From<PropertyDataDto>()
-                .InnerJoin<NodeDto>().On<PropertyDataDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .InnerJoin<PropertyTypeDto>().On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
-                .InnerJoin<DataTypeDto>().On<PropertyTypeDto, DataTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
+                .From<PropertyDataDto>(SqlSyntax)
+                .InnerJoin<NodeDto>(SqlSyntax).On<PropertyDataDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .InnerJoin<PropertyTypeDto>(SqlSyntax).On<PropertyDataDto, PropertyTypeDto>(SqlSyntax, left => left.PropertyTypeId, right => right.Id)
+                .InnerJoin<DataTypeDto>(SqlSyntax).On<PropertyTypeDto, DataTypeDto>(SqlSyntax, left => left.DataTypeId, right => right.DataTypeId)
                 .Where("umbracoNode.trashed = '1' AND umbracoNode.nodeObjectType = @NodeObjectType AND dataNvarchar IS NOT NULL AND (cmsPropertyType.Alias = @FileAlias OR cmsDataType.propertyEditorAlias = @PropertyEditorAlias)",
                     new { FileAlias = Constants.Conventions.Media.File, NodeObjectType = NodeObjectTypeId, PropertyEditorAlias = Constants.PropertyEditors.UploadFieldAlias });
 

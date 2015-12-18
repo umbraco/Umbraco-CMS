@@ -20,10 +20,14 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         public ISqlSyntaxProvider SqlSyntax { get; private set; }
 
+        private QueryFactory _queryFactory;
         /// <summary>
         /// Returns the Query factory
         /// </summary>
-        public QueryFactory QueryFactory { get; private set; }
+        public override QueryFactory QueryFactory
+        {
+            get { return _queryFactory; }
+        }
 
         /// <summary>
         /// Used to create a new query instance
@@ -39,7 +43,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             if (sqlSyntax == null) throw new ArgumentNullException("sqlSyntax");
             SqlSyntax = sqlSyntax;
-            QueryFactory = new QueryFactory(SqlSyntax, mappingResolver);
+            _queryFactory = new QueryFactory(SqlSyntax, mappingResolver);
         }
 
         /// <summary>

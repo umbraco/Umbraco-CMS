@@ -20,6 +20,7 @@ namespace Umbraco.Core.Persistence.Migrations
     /// </summary>
     public class MigrationRunner
     {
+        private readonly IMigrationResolver _resolver;
         private readonly IMigrationEntryService _migrationEntryService;
         private readonly ILogger _logger;
         private readonly SemVersion _currentVersion;
@@ -27,28 +28,16 @@ namespace Umbraco.Core.Persistence.Migrations
         private readonly string _productName;
         private readonly IMigration[] _migrations;
 
-
-        [Obsolete("Use the ctor that specifies all dependencies instead")]
-        public MigrationRunner(ILogger logger, Version currentVersion, Version targetVersion, string productName)
-            : this(logger, currentVersion, targetVersion, productName, null)
+        public MigrationRunner(IMigrationResolver resolver, IMigrationEntryService migrationEntryService, ILogger logger, SemVersion currentVersion, SemVersion targetVersion, string productName, params IMigration[] migrations)
         {
-        }
-
-        [Obsolete("Use the ctor that specifies all dependencies instead")]
-        public MigrationRunner(ILogger logger, Version currentVersion, Version targetVersion, string productName, params IMigration[] migrations)
-            : this(ApplicationContext.Current.Services.MigrationEntryService, logger, new SemVersion(currentVersion), new SemVersion(targetVersion), productName, migrations)
-        {
-            
-        }
-
-        public MigrationRunner(IMigrationEntryService migrationEntryService, ILogger logger, SemVersion currentVersion, SemVersion targetVersion, string productName, params IMigration[] migrations)
-        {
+            if (resolver == null) throw new ArgumentNullException("resolver");
             if (migrationEntryService == null) throw new ArgumentNullException("migrationEntryService");
             if (logger == null) throw new ArgumentNullException("logger");
             if (currentVersion == null) throw new ArgumentNullException("currentVersion");
             if (targetVersion == null) throw new ArgumentNullException("targetVersion");
             Mandate.ParameterNotNullOrEmpty(productName, "productName");
 
+            _resolver = resolver;
             _migrationEntryService = migrationEntryService;
             _logger = logger;
             _currentVersion = currentVersion;
@@ -56,17 +45,6 @@ namespace Umbraco.Core.Persistence.Migrations
             _productName = productName;
             //ensure this is null if there aren't any
             _migrations = migrations.Length == 0 ? null : migrations;
-        }
-
-        /// <summary>
-        /// Executes the migrations against the database.
-        /// </summary>
-        /// <param name="database">The PetaPoco Database, which the migrations will be run against</param>
-        /// <param name="isUpgrade">Boolean indicating whether this is an upgrade or downgrade</param>
-        /// <returns><c>True</c> if migrations were applied, otherwise <c>False</c></returns>
-        public virtual bool Execute(Database database, bool isUpgrade = true)
-        {
-            return Execute(database, database.GetDatabaseProvider(), isUpgrade);
         }
 
         /// <summary>

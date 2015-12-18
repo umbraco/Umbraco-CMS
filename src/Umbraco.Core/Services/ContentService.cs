@@ -46,7 +46,8 @@ namespace Umbraco.Core.Services
             IEventMessagesFactory eventMessagesFactory,
             IPublishingStrategy publishingStrategy,
             IDataTypeService dataTypeService,
-            IUserService userService)
+            IUserService userService,
+            IEnumerable<IUrlSegmentProvider> urlSegmentProviders)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
             if (publishingStrategy == null) throw new ArgumentNullException("publishingStrategy");

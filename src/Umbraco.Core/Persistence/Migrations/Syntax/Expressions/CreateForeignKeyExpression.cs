@@ -6,13 +6,13 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Expressions
     public class CreateForeignKeyExpression : MigrationExpressionBase
     {
         public CreateForeignKeyExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax, ForeignKeyDefinition fkDef)
-            : base(current, databaseProviders, sqlSyntax)
+            : base(sqlSyntax, current, databaseProviders)
         {
             ForeignKey = fkDef;
         }
 
         public CreateForeignKeyExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax)
-            : base(current, databaseProviders, sqlSyntax)
+            : base(sqlSyntax, current, databaseProviders)
         {
             ForeignKey = new ForeignKeyDefinition();
         }

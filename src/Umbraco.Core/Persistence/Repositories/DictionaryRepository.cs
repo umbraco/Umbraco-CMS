@@ -36,7 +36,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = GetBaseQuery(false)
                 .Where(GetBaseWhereClause(), new {Id = id})
-                .OrderBy<DictionaryDto>(x => x.UniqueId, SqlSyntax);
+                .OrderBy<DictionaryDto>(SqlSyntax, x => x.UniqueId);
 
             var dto = Database.Fetch<DictionaryDto, LanguageTextDto, DictionaryDto>(new DictionaryLanguageTextRelator().Map, sql).FirstOrDefault();
             if (dto == null)
@@ -74,7 +74,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IDictionaryItem>(sqlClause, query);
             var sql = translator.Translate();
-            sql.OrderBy<DictionaryDto>(x => x.UniqueId, SqlSyntax);
+            sql.OrderBy<DictionaryDto>(SqlSyntax, x => x.UniqueId);
 
             //This will be cached
             var allLanguages = _languageRepository.GetAll().ToArray();
@@ -251,7 +251,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private IEnumerable<IDictionaryItem> GetRootDictionaryItems()
         {
-            var query = Query<IDictionaryItem>.Builder.Where(x => x.ParentId == null);
+            var query = Query.Where(x => x.ParentId == null);
             return GetByQuery(query);
         }
 
@@ -270,12 +270,12 @@ namespace Umbraco.Core.Persistence.Repositories
                     .Select(@group =>
                     {
                         var sqlClause = GetBaseQuery(false)
-                            .Where<DictionaryDto>(x => x.Parent != null)
+                            .Where<DictionaryDto>(SqlSyntax, x => x.Parent != null)
                             .Where(string.Format("{0} IN (@parentIds)", SqlSyntax.GetQuotedColumnName("parent")), new { parentIds = @group });
 
-                        var translator = new SqlTranslator<IDictionaryItem>(sqlClause, Query<IDictionaryItem>.Builder);
+                        var translator = new SqlTranslator<IDictionaryItem>(sqlClause, Query);
                         var sql = translator.Translate();
-                        sql.OrderBy<DictionaryDto>(x => x.UniqueId, SqlSyntax);
+                        sql.OrderBy<DictionaryDto>(SqlSyntax, x => x.UniqueId);
 
                         return Database.Fetch<DictionaryDto, LanguageTextDto, DictionaryDto>(new DictionaryLanguageTextRelator().Map, sql)
                             .Select(x => ConvertFromDto(x, allLanguages));

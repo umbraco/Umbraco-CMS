@@ -92,6 +92,11 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public abstract Query<TEntity> Query { get; }
 
+        /// <summary>
+        /// Returns a query factory instance
+        /// </summary>
+        public abstract QueryFactory QueryFactory { get; }
+
         #region IRepository<TEntity> Members
 
         /// <summary>

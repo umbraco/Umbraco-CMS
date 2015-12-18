@@ -184,7 +184,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     UserId = userId
                 }).ToArray();
 
-                _unitOfWork.Database.BulkInsertRecords(actions, trans);
+                _unitOfWork.Database.BulkInsertRecords(_sqlSyntax, actions, trans);
 
                 trans.Complete();
 

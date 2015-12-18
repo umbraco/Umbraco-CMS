@@ -16,7 +16,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourZer
 
         public override void Up()
         {
-            var mediaListviewIncludeProperties = Context.Database.Fetch<DataTypePreValueDto>(new Sql().Select("*").From<DataTypePreValueDto>(SqlSyntax).Where<DataTypePreValueDto>(x => x.Id == -9)).FirstOrDefault();
+            var mediaListviewIncludeProperties = Context.Database.Fetch<DataTypePreValueDto>(
+                new Sql().Select("*").From<DataTypePreValueDto>(SqlSyntax).Where<DataTypePreValueDto>(SqlSyntax, x => x.Id == -9)).FirstOrDefault();
             if (mediaListviewIncludeProperties != null)
             {
                 if (mediaListviewIncludeProperties.Value.Contains("\"alias\":\"sort\""))

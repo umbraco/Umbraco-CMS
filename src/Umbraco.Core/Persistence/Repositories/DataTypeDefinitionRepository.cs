@@ -277,6 +277,8 @@ AND umbracoNode.id <> @id",
 
         #endregion
 
+      
+        
         public PreValueCollection GetPreValuesCollectionByDataTypeId(int dataTypeId)
         {
             var cached = _cacheHelper.RuntimeCache.GetCacheItemsByKeySearch<PreValueCollection>(GetPrefixedCacheKey(dataTypeId));
@@ -357,8 +359,7 @@ AND umbracoNode.id <> @id",
             AddOrUpdate(toMove);
 
             //update all descendants
-            var descendants = this.GetByQuery(
-                new Query<IDataTypeDefinition>().Where(type => type.Path.StartsWith(toMove.Path + ",")));
+            var descendants = this.GetByQuery(Query.Where(type => type.Path.StartsWith(toMove.Path + ",")));
             foreach (var descendant in descendants)
             {
                 moveInfo.Add(new MoveEventInfo<IDataTypeDefinition>(descendant, descendant.Path, descendant.ParentId));
@@ -382,7 +383,7 @@ AND umbracoNode.id <> @id",
                 var sql = new Sql().Select("*")
                                    .From<DataTypePreValueDto>(SqlSyntax)
                                    .Where<DataTypePreValueDto>(SqlSyntax, dto => dto.DataTypeNodeId == dataType.Id)
-                                   .OrderBy<DataTypePreValueDto>(dto => dto.SortOrder, SqlSyntax);
+                                   .OrderBy<DataTypePreValueDto>(SqlSyntax, dto => dto.SortOrder);
                 currentVals = Database.Fetch<DataTypePreValueDto>(sql).ToArray();
             }
 

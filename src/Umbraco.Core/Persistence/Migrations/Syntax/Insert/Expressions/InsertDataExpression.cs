@@ -11,7 +11,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Insert.Expressions
         private readonly List<InsertionDataDefinition> _rows = new List<InsertionDataDefinition>();
         
         public InsertDataExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax) 
-            : base(current, databaseProviders, sqlSyntax)
+            : base(sqlSyntax, current, databaseProviders)
         {
         }
 

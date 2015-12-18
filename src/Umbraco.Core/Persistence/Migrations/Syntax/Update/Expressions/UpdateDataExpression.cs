@@ -6,7 +6,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Update.Expressions
     public class UpdateDataExpression : MigrationExpressionBase
     {
         public UpdateDataExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax) 
-            : base(current, databaseProviders, sqlSyntax)
+            : base(sqlSyntax, current, databaseProviders)
         {
         }
 

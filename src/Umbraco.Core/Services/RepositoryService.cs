@@ -2,6 +2,8 @@ using System;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
@@ -15,7 +17,7 @@ namespace Umbraco.Core.Services
         protected IEventMessagesFactory EventMessagesFactory { get; private set; }
         protected RepositoryFactory RepositoryFactory { get; private set; }
         protected IDatabaseUnitOfWorkProvider UowProvider { get; private set; }
-
+        
         protected RepositoryService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
         {
             if (provider == null) throw new ArgumentNullException("provider");

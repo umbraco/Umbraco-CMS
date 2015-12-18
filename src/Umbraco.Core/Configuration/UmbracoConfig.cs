@@ -105,10 +105,7 @@ namespace Umbraco.Core.Configuration
 
             return _umbracoSettings;
         }
-        
      
-        }
-
         /// <summary>
         /// Only for testing
         /// </summary>
@@ -129,6 +126,7 @@ namespace Umbraco.Core.Configuration
             }
 
             return _gridConfig;
+        }
 
         //TODO: Add other configurations here !
     }

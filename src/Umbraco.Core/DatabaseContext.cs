@@ -589,7 +589,7 @@ namespace Umbraco.Core
         /// This assumes all of the previous checks are done!
         /// </summary>
         /// <returns></returns>
-        internal Result UpgradeSchemaAndData(IMigrationEntryService migrationEntryService)
+        internal Result UpgradeSchemaAndData(IMigrationEntryService migrationEntryService, IMigrationResolver migrationResolver)
         {
             try
             {
@@ -649,9 +649,10 @@ namespace Umbraco.Core
 
                 //DO the upgrade!
 
-                var runner = new MigrationRunner(migrationEntryService, _logger, currentInstalledVersion, UmbracoVersion.GetSemanticVersion(), GlobalSettings.UmbracoMigrationName);
+                var runner = new MigrationRunner(migrationResolver, migrationEntryService, _logger, currentInstalledVersion, UmbracoVersion.GetSemanticVersion(), GlobalSettings.UmbracoMigrationName);
 
-
+                var upgraded = runner.Execute(database, DatabaseProvider, SqlSyntax, true);
+                
                 if (upgraded == false)
                 {
                     throw new ApplicationException("Upgrading failed, either an error occurred during the upgrade process or an event canceled the upgrade process, see log for full details");

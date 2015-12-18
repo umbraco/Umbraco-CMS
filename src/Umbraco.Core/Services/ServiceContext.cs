@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using log4net;
 using Umbraco.Core.Logging;
 using System.IO;
@@ -9,6 +10,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
 using umbraco.interfaces;
 using Umbraco.Core.Events;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Services
 {
@@ -157,6 +159,7 @@ namespace Umbraco.Core.Services
         /// <param name="cache"></param>
         /// <param name="logger"></param>
         /// <param name="eventMessagesFactory"></param>
+        /// <param name="urlSegmentProviders"></param>
         public ServiceContext(
             RepositoryFactory repositoryFactory,
             IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider, 
@@ -164,7 +167,8 @@ namespace Umbraco.Core.Services
             BasePublishingStrategy publishingStrategy, 
             CacheHelper cache, 
             ILogger logger,
-            IEventMessagesFactory eventMessagesFactory)
+            IEventMessagesFactory eventMessagesFactory,
+            IEnumerable<IUrlSegmentProvider> urlSegmentProviders)
         {
             if (repositoryFactory == null) throw new ArgumentNullException("repositoryFactory");
             if (dbUnitOfWorkProvider == null) throw new ArgumentNullException("dbUnitOfWorkProvider");
@@ -176,7 +180,8 @@ namespace Umbraco.Core.Services
 
             BuildServiceCache(dbUnitOfWorkProvider, fileUnitOfWorkProvider, publishingStrategy, cache,
                               repositoryFactory,
-                              logger, eventMessagesFactory);
+                              logger, eventMessagesFactory,
+                              urlSegmentProviders);
         }
 
         /// <summary>
@@ -189,7 +194,8 @@ namespace Umbraco.Core.Services
             CacheHelper cache,
             RepositoryFactory repositoryFactory,
             ILogger logger,
-            IEventMessagesFactory eventMessagesFactory)
+            IEventMessagesFactory eventMessagesFactory,
+            IEnumerable<IUrlSegmentProvider> urlSegmentProviders)
         {
             var provider = dbUnitOfWorkProvider;
             var fileProvider = fileUnitOfWorkProvider;

@@ -13,7 +13,7 @@ namespace Umbraco.Core.Sync
         /// <summary>
         /// Initializes a new instance of the <see cref="ServerRegistrarResolver"/> class with a registrar.
         /// </summary>
-        /// <param name="factory">An instance of a registrar.</param>
+        /// <param name="value">An instance of a registrar.</param>
         /// <remarks>The resolver is created by the <c>CoreBootManager</c> and thus the constructor remains internal.</remarks>
         public ServerRegistrarResolver(IServerRegistrar value) : base(value)
         {

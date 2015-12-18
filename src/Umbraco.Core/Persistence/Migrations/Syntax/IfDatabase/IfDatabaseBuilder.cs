@@ -22,7 +22,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.IfDatabase
 
         public ICreateBuilder Create
         {
-            get { return new CreateBuilder(_context, _sqlSyntax, _databaseProviders); }
+            get { return new CreateBuilder(_context, _databaseProviders); }
         }
 
         public IExecuteBuilder Execute
@@ -32,7 +32,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.IfDatabase
 
         public IDeleteBuilder Delete
         {
-            get { return new DeleteBuilder(_context, _sqlSyntax, _databaseProviders); }
+            get { return new DeleteBuilder(_context, _databaseProviders); }
         }
 
         public IRenameBuilder Rename

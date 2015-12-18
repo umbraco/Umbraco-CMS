@@ -119,7 +119,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(UowProvider.GetUnitOfWork()))
             {
-                return repository.GetByQuery(new Query<IDataTypeDefinition>().Where(x => x.Name == name)).FirstOrDefault();
+                return repository.GetByQuery(QueryFactory.Create<IDataTypeDefinition>().Where(x => x.Name == name)).FirstOrDefault();
             }
         }
 
@@ -145,9 +145,8 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IDataTypeDefinition>.Builder.Where(x => x.Key == id);
+                var query = QueryFactory.Create<IDataTypeDefinition>().Where(x => x.Key == id);
                 var definitions = repository.GetByQuery(query);
-
                 return definitions.FirstOrDefault();
             }
         }
@@ -173,9 +172,8 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IDataTypeDefinition>.Builder.Where(x => x.PropertyEditorAlias == propertyEditorAlias);
+                var query = QueryFactory.Create<IDataTypeDefinition>().Where(x => x.PropertyEditorAlias == propertyEditorAlias);
                 var definitions = repository.GetByQuery(query);
-
                 return definitions;
             }
         }
@@ -475,27 +473,6 @@ namespace Umbraco.Core.Services
 	        }
 
 	        Audit(AuditType.Delete, string.Format("Delete DataTypeDefinition performed by user"), userId, dataTypeDefinition.Id);
-        }
-
-        /// <summary>
-        /// Gets the <see cref="IDataType"/> specified by it's unique ID
-        /// </summary>
-        /// <param name="id">Id of the DataType, which corresponds to the Guid Id of the control</param>
-        /// <returns><see cref="IDataType"/> object</returns>
-        [Obsolete("IDataType is obsolete and is no longer used, it will be removed from the codebase in future versions")]
-        public IDataType GetDataTypeById(Guid id)
-        {
-            return DataTypesResolver.Current.GetById(id);
-        }
-
-        /// <summary>
-        /// Gets a complete list of all registered <see cref="IDataType"/>'s
-        /// </summary>
-        /// <returns>An enumerable list of <see cref="IDataType"/> objects</returns>
-        [Obsolete("IDataType is obsolete and is no longer used, it will be removed from the codebase in future versions")]
-        public IEnumerable<IDataType> GetAllDataTypes()
-        {
-            return DataTypesResolver.Current.DataTypes;
         }
 
         private void Audit(AuditType type, string message, int userId, int objectId)

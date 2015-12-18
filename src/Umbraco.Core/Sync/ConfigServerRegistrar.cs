@@ -18,7 +18,7 @@ namespace Umbraco.Core.Sync
         private readonly string _umbracoApplicationUrl;
 
         public ConfigServerRegistrar(IUmbracoSettingsSection settings)
-            : this(settings.DistributedCall.Servers)
+            : this(settings.DistributedCall)
         { }
 
         // for tests

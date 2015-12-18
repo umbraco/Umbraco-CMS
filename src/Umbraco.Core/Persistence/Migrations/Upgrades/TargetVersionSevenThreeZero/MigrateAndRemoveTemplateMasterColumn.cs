@@ -74,7 +74,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
             Execute.Code(database =>
             {
                 //NOTE: we are using dynamic because we need to get the data in a column that no longer exists in the schema
-                var templates = database.Fetch<dynamic>(new Sql().Select("*").From<TemplateDto>());
+                var templates = database.Fetch<dynamic>(new Sql().Select("*").From<TemplateDto>(SqlSyntax));
                 foreach (var template in templates)
                 {
                     var sql = string.Format(SqlSyntax.UpdateData,

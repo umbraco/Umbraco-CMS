@@ -85,7 +85,10 @@ namespace Umbraco.Core.Services
                         case UmbracoObjectTypes.Member:
                         case UmbracoObjectTypes.DataType:
                         case UmbracoObjectTypes.DocumentTypeContainer:
-                            return uow.Database.ExecuteScalar<int?>(new Sql().Select("id").From<NodeDto>().Where<NodeDto>(dto => dto.UniqueId == key));
+                            return uow.Database.ExecuteScalar<int?>(
+                                new Sql().Select("id")
+                                    .From<NodeDto>(SqlSyntax)
+                                    .Where<NodeDto>(SqlSyntax, dto => dto.UniqueId == key));
                         case UmbracoObjectTypes.RecycleBin:
                         case UmbracoObjectTypes.Stylesheet:
                         case UmbracoObjectTypes.MemberGroup:
@@ -123,7 +126,10 @@ namespace Umbraco.Core.Services
                         case UmbracoObjectTypes.DocumentType:
                         case UmbracoObjectTypes.Member:
                         case UmbracoObjectTypes.DataType:
-                            return uow.Database.ExecuteScalar<Guid?>(new Sql().Select("uniqueID").From<NodeDto>().Where<NodeDto>(dto => dto.NodeId == id));
+                            return uow.Database.ExecuteScalar<Guid?>(
+                                new Sql().Select("uniqueID")
+                                    .From<NodeDto>(SqlSyntax)
+                                    .Where<NodeDto>(SqlSyntax, dto => dto.NodeId == id));
                         case UmbracoObjectTypes.RecycleBin:
                         case UmbracoObjectTypes.Stylesheet:
                         case UmbracoObjectTypes.MemberGroup:
@@ -317,7 +323,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateEntityRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IUmbracoEntity>.Builder.Where(x => x.ParentId == parentId);
+                var query = QueryFactory.Create<IUmbracoEntity>().Where(x => x.ParentId == parentId);
                 var contents = repository.GetByQuery(query);
 
                 return contents;
@@ -335,7 +341,7 @@ namespace Umbraco.Core.Services
             var objectTypeId = umbracoObjectType.GetGuid();
             using (var repository = RepositoryFactory.CreateEntityRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IUmbracoEntity>.Builder.Where(x => x.ParentId == parentId);
+                var query = QueryFactory.Create<IUmbracoEntity>().Where(x => x.ParentId == parentId);
                 var contents = repository.GetByQuery(query, objectTypeId);
 
                 return contents;
@@ -353,7 +359,7 @@ namespace Umbraco.Core.Services
             {
                 var entity = repository.Get(id);
                 var pathMatch = entity.Path + ",";
-                var query = Query<IUmbracoEntity>.Builder.Where(x => x.Path.StartsWith(pathMatch) && x.Id != id);
+                var query = QueryFactory.Create<IUmbracoEntity>().Where(x => x.Path.StartsWith(pathMatch) && x.Id != id);
                 var entities = repository.GetByQuery(query);
 
                 return entities;
@@ -372,7 +378,7 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateEntityRepository(UowProvider.GetUnitOfWork()))
             {
                 var entity = repository.Get(id);
-                var query = Query<IUmbracoEntity>.Builder.Where(x => x.Path.StartsWith(entity.Path) && x.Id != id);
+                var query = QueryFactory.Create<IUmbracoEntity>().Where(x => x.Path.StartsWith(entity.Path) && x.Id != id);
                 var entities = repository.GetByQuery(query, objectTypeId);
 
                 return entities;
@@ -389,7 +395,7 @@ namespace Umbraco.Core.Services
             var objectTypeId = umbracoObjectType.GetGuid();
             using (var repository = RepositoryFactory.CreateEntityRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = Query<IUmbracoEntity>.Builder.Where(x => x.ParentId == -1);
+                var query = QueryFactory.Create<IUmbracoEntity>().Where(x => x.ParentId == -1);
                 var entities = repository.GetByQuery(query, objectTypeId);
 
                 return entities;
@@ -486,7 +492,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                var sql = new Sql().Select("nodeObjectType").From<NodeDto>().Where<NodeDto>(x => x.NodeId == id);
+                var sql = new Sql().Select("nodeObjectType").From<NodeDto>(SqlSyntax).Where<NodeDto>(SqlSyntax, x => x.NodeId == id);
                 var nodeObjectTypeId = uow.Database.ExecuteScalar<Guid>(sql);
                 var objectTypeId = nodeObjectTypeId;
                 return UmbracoObjectTypesExtensions.GetUmbracoObjectType(objectTypeId);
@@ -502,7 +508,7 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                var sql = new Sql().Select("nodeObjectType").From<NodeDto>().Where<NodeDto>(x => x.UniqueId == key);
+                var sql = new Sql().Select("nodeObjectType").From<NodeDto>(SqlSyntax).Where<NodeDto>(SqlSyntax, x => x.UniqueId == key);
                 var nodeObjectTypeId = uow.Database.ExecuteScalar<Guid>(sql);
                 var objectTypeId = nodeObjectTypeId;
                 return UmbracoObjectTypesExtensions.GetUmbracoObjectType(objectTypeId);

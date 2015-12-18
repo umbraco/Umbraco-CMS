@@ -8,7 +8,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Expressions
     {
 
         public AlterColumnExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax)
-            : base(current, databaseProviders, sqlSyntax)
+            : base(sqlSyntax, current, databaseProviders)
         {
             Column = new ColumnDefinition() { ModificationType = ModificationType.Alter };
         }

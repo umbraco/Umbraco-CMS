@@ -13,6 +13,7 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 
 using Umbraco.Core.Persistence.Factories;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -34,8 +35,8 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly MasterPageHelper _masterPageHelper;
         private readonly RepositoryCacheOptions _cacheOptions;
 
-        internal TemplateRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IFileSystem masterpageFileSystem, IFileSystem viewFileSystem, ITemplatesSection templateConfig)
-            : base(work, cache, logger, sqlSyntax)
+        internal TemplateRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IFileSystem masterpageFileSystem, IFileSystem viewFileSystem, ITemplatesSection templateConfig, IMappingResolver mappingResolver)
+            : base(work, cache, logger, sqlSyntax, mappingResolver)
         {
             _masterpagesFileSystem = masterpageFileSystem;
             _viewsFileSystem = viewFileSystem;
@@ -67,7 +68,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override ITemplate PerformGet(int id)
         {
-            var sql = GetBaseQuery(false).Where<TemplateDto>(x => x.NodeId == id);
+            var sql = GetBaseQuery(false).Where<TemplateDto>(SqlSyntax, x => x.NodeId == id);
             var result = Database.Fetch<TemplateDto, NodeDto>(sql).FirstOrDefault();
             if (result == null) return null;
 
@@ -88,7 +89,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                sql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+                sql.Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
             }
 
             var dtos = Database.Fetch<TemplateDto, NodeDto>(sql);
@@ -137,7 +138,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .From<TemplateDto>(SqlSyntax)
                 .InnerJoin<NodeDto>(SqlSyntax)
                 .On<TemplateDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
+                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
         }
 
@@ -479,7 +480,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public ITemplate Get(string alias)
         {
-            var sql = GetBaseQuery(false).Where<TemplateDto>(x => x.Alias == alias);
+            var sql = GetBaseQuery(false).Where<TemplateDto>(SqlSyntax, x => x.Alias == alias);
 
             var dto = Database.Fetch<TemplateDto, NodeDto>(sql).FirstOrDefault();
 
@@ -510,11 +511,11 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false);         
             if (masterTemplateId <= 0)
             {
-                sql.Where<NodeDto>(x => x.ParentId <= 0);
+                sql.Where<NodeDto>(SqlSyntax, x => x.ParentId <= 0);
             }
             else
             {
-                sql.Where<NodeDto>(x => x.ParentId == masterTemplateId);
+                sql.Where<NodeDto>(SqlSyntax, x => x.ParentId == masterTemplateId);
             }
 
             var dtos = Database.Fetch<TemplateDto, NodeDto>(sql).ToArray();
@@ -529,16 +530,16 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false);
             if (alias.IsNullOrWhiteSpace())
             {
-                sql.Where<NodeDto>(x => x.ParentId <= 0);
+                sql.Where<NodeDto>(SqlSyntax, x => x.ParentId <= 0);
             }
             else
             {
                 //unfortunately SQLCE doesn't support scalar subqueries in the where clause, otherwise we could have done this
                 // in a single query, now we have to lookup the path to acheive the same thing
-                var parent = Database.ExecuteScalar<int?>(new Sql().Select("nodeId").From<TemplateDto>(SqlSyntax).Where<TemplateDto>(dto => dto.Alias == alias));
+                var parent = Database.ExecuteScalar<int?>(new Sql().Select("nodeId").From<TemplateDto>(SqlSyntax).Where<TemplateDto>(SqlSyntax, dto => dto.Alias == alias));
                 if (parent.HasValue == false) return Enumerable.Empty<ITemplate>();
 
-                sql.Where<NodeDto>(x => x.ParentId == parent.Value);
+                sql.Where<NodeDto>(SqlSyntax, x => x.ParentId == parent.Value);
             }
 
             var dtos = Database.Fetch<TemplateDto, NodeDto>(sql).ToArray();
@@ -560,7 +561,7 @@ namespace Umbraco.Core.Persistence.Repositories
                         .From<TemplateDto>(SqlSyntax)
                         .InnerJoin<NodeDto>(SqlSyntax)
                         .On<TemplateDto, NodeDto>(SqlSyntax, dto => dto.NodeId, dto => dto.NodeId)
-                        .Where<NodeDto>(dto => dto.NodeId == masterTemplateId));
+                        .Where<NodeDto>(SqlSyntax, dto => dto.NodeId == masterTemplateId));
 
                 if (path.IsNullOrWhiteSpace()) return Enumerable.Empty<ITemplate>();
 
@@ -798,7 +799,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private bool AliasAlreadExists(ITemplate template)
         {
-            var sql = GetBaseQuery(true).Where<TemplateDto>(x => x.Alias == template.Alias && x.NodeId != template.Id);
+            var sql = GetBaseQuery(true).Where<TemplateDto>(SqlSyntax, x => x.Alias == template.Alias && x.NodeId != template.Id);
             var count = Database.ExecuteScalar<int>(sql);
             return count > 0;
         }

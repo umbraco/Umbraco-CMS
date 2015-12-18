@@ -6,7 +6,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
     {
         
         public DeleteTableExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax) 
-            : base(current, databaseProviders, sqlSyntax)
+            : base(sqlSyntax, current, databaseProviders)
         {
         }
 

@@ -34,7 +34,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected ContentTypeBaseRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
             : base(work, cache, logger, sqlSyntax, mappingResolver)
         {
-            _guidRepo = new GuidReadOnlyContentTypeBaseRepository(this, work, cache, logger, sqlSyntax);
+            _guidRepo = new GuidReadOnlyContentTypeBaseRepository(this, work, cache, logger, sqlSyntax, mappingResolver);
         }
 
         private readonly GuidReadOnlyContentTypeBaseRepository _guidRepo;
@@ -65,7 +65,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //update all descendants
             var descendants = this.GetByQuery(
-                new Query<TEntity>().Where(type => type.Path.StartsWith(toMove.Path + ",")));
+                Query.Where(type => type.Path.StartsWith(toMove.Path + ",")));
             foreach (var descendant in descendants)
             {
                 moveInfo.Add(new MoveEventInfo<TEntity>(descendant, descendant.Path, descendant.ParentId));
@@ -96,7 +96,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var translator = new SqlTranslator<PropertyType>(sqlClause, query);
             var sql = translator.Translate()
-                                .OrderBy<PropertyTypeDto>(x => x.PropertyTypeGroupId, SqlSyntax);
+                                .OrderBy<PropertyTypeDto>(SqlSyntax, x => x.PropertyTypeGroupId);
 
             var dtos = Database.Fetch<PropertyTypeGroupDto, PropertyTypeDto, DataTypeDto, PropertyTypeGroupDto>(new GroupPropertyTypeRelator().Map, sql);
 
@@ -1225,8 +1225,8 @@ AND umbracoNode.id <> @id",
 
             public GuidReadOnlyContentTypeBaseRepository(
                 ContentTypeBaseRepository<TEntity> parentRepo,
-                IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-                : base(work, cache, logger, sqlSyntax)
+                IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
+                : base(work, cache, logger, sqlSyntax, mappingResolver)
             {
                 _parentRepo = parentRepo;
             }
