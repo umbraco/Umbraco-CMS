@@ -121,7 +121,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var sql = new Sql().Select("*")
                 .From<MigrationDto>(SqlSyntax)
-                .Where<MigrationDto>(x => x.Name.InvariantEquals(migrationName) && x.Version == versionString);
+                .Where<MigrationDto>(SqlSyntax, x => x.Name.InvariantEquals(migrationName) && x.Version == versionString);
 
             var result = Database.FirstOrDefault<MigrationDto>(sql);
 

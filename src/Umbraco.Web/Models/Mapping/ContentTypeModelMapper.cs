@@ -9,7 +9,6 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
 using System.Collections.Generic;
 using AutoMapper.Internal;
-using Property = umbraco.NodeFactory.Property;
 
 namespace Umbraco.Web.Models.Mapping
 {

@@ -8,9 +8,11 @@ using System.Web;
 using System.Web.Configuration;
 using System.Web.Http;
 using System.Web.Http.Dispatcher;
-
+using System.Web.Mvc;
 using System.Web.Routing;
-
+using ClientDependency.Core.Config;
+using Examine;
+using Examine.Config;
 using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;

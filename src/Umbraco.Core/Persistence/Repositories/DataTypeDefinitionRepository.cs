@@ -475,7 +475,7 @@ AND umbracoNode.id <> @id",
             var sql = new Sql();
             sql.Select("*")
                .From<NodeDto>(SqlSyntax)
-               .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId && x.Text.StartsWith(nodeName));
+               .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId && x.Text.StartsWith(nodeName));
 
             int uniqueNumber = 1;
             var currentName = nodeName;

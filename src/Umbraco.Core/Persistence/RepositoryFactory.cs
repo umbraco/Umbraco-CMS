@@ -22,6 +22,12 @@ namespace Umbraco.Core.Persistence
         private readonly IUmbracoSettingsSection _settings;
         private readonly IMappingResolver _mappingResolver;
 
+        public ISqlSyntaxProvider SqlSyntax
+        {
+            get { return _sqlSyntax; }
+        }
+
+
         #region Ctors
 
         public RepositoryFactory(CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider sqlSyntax, IUmbracoSettingsSection settings, IMappingResolver mappingResolver)
@@ -80,7 +86,7 @@ namespace Umbraco.Core.Persistence
         {
             return new TagRepository(
                 uow,
-                _cacheHelper, _logger, _sqlSyntax);
+                _cacheHelper, _logger, _sqlSyntax, _mappingResolver);
         }
 
         public virtual IContentRepository CreateContentRepository(IDatabaseUnitOfWork uow)
@@ -199,7 +205,7 @@ namespace Umbraco.Core.Persistence
                 _logger, _sqlSyntax,
                 new PhysicalFileSystem(SystemDirectories.Masterpages),
                 new PhysicalFileSystem(SystemDirectories.MvcViews),
-                _settings.Templates);
+                _settings.Templates, _mappingResolver);
         }
 
         public virtual IMigrationEntryRepository CreateMigrationEntryRepository(IDatabaseUnitOfWork uow)

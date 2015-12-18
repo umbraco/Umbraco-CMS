@@ -382,7 +382,7 @@ namespace Umbraco.Core.Services
             {
                 var found = GetContentType(id);
                 if (found == null) return Enumerable.Empty<IContentType>();
-                var query = QueryFactory.Create<IContentType>().Where(x => x.ParentId == found.Id);
+                var query = repository.Query.Where(x => x.ParentId == found.Id);
                 var contentTypes = repository.GetByQuery(query);
                 return contentTypes;
             }
@@ -414,7 +414,7 @@ namespace Umbraco.Core.Services
             {
                 var found = GetContentType(id);
                 if (found == null) return false;
-                var query = QueryFactory.Create<IContentType>().Where(x => x.ParentId == found.Id);
+                var query = repository.Query.Where(x => x.ParentId == found.Id);
                 int count = repository.Count(query);
                 return count > 0;
             }
@@ -766,7 +766,7 @@ namespace Umbraco.Core.Services
             {
                 var found = GetMediaType(id);
                 if (found == null) return Enumerable.Empty<IMediaType>();
-                var query = QueryFactory.Create<IMediaType>().Where(x => x.ParentId == found.Id);
+                var query = repository.Query.Where(x => x.ParentId == found.Id);
                 var contentTypes = repository.GetByQuery(query);
                 return contentTypes;
             }
@@ -798,7 +798,7 @@ namespace Umbraco.Core.Services
             {
                 var found = GetMediaType(id);
                 if (found == null) return false;
-                var query = QueryFactory.Create<IMediaType>().Where(x => x.ParentId == found.Id);
+                var query = repository.Query.Where(x => x.ParentId == found.Id);
                 int count = repository.Count(query);
                 return count > 0;
             }
