@@ -682,14 +682,16 @@ namespace Umbraco.Core.Persistence.Repositories
         public RenderingEngine DetermineTemplateRenderingEngine(ITemplate template)
         {
             var engine = _templateConfig.DefaultRenderingEngine;
-
-            if (template.Content.IsNullOrWhiteSpace() == false && MasterPageHelper.IsMasterPageSyntax(template.Content))
+            var viewHelper = new ViewHelper(_viewsFileSystem);
+            if (!viewHelper.ViewExists(template))
             {
-                //there is a design but its definitely a webforms design
-                return RenderingEngine.WebForms;
+                if (template.Content.IsNullOrWhiteSpace() == false && MasterPageHelper.IsMasterPageSyntax(template.Content))
+                {
+                    //there is a design but its definitely a webforms design and we haven't got a MVC view already for it
+                    return RenderingEngine.WebForms;
+                }
             }
 
-            var viewHelper = new ViewHelper(_viewsFileSystem);
             var masterPageHelper = new MasterPageHelper(_masterpagesFileSystem);
 
             switch (engine)

@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Umbraco.Core;
@@ -7,6 +8,22 @@ namespace Umbraco.Web.Security.Identity
 {
     public static class AuthenticationOptionsExtensions
     {
+     
+        public static void SetSignInChallengeResultCallback(
+            this AuthenticationOptions authOptions,
+            Func<IOwinContext, AuthenticationProperties> authProperties)
+        {   
+            authOptions.Description.Properties["ChallengeResultCallback"] = authProperties;
+        }
+        
+        public static AuthenticationProperties GetSignInChallengeResult(this AuthenticationDescription authenticationDescription, IOwinContext ctx)
+        {
+            if (authenticationDescription.Properties.ContainsKey("ChallengeResultCallback") == false) return null;
+            var cb = authenticationDescription.Properties["ChallengeResultCallback"] as Func<IOwinContext, AuthenticationProperties>;
+            if (cb == null) return null;
+            return cb(ctx);
+        }
+
         /// <summary>
         /// Used during the External authentication process to assign external sign-in options
         /// that are used by the Umbraco authentication process.

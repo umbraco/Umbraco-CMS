@@ -1,6 +1,9 @@
-﻿using Microsoft.Owin;
+﻿using System;
+using System.Web;
+using Microsoft.Owin;
 using Microsoft.Owin.Infrastructure;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Security.Identity
 {
@@ -33,13 +36,49 @@ namespace Umbraco.Web.Security.Identity
                 return null;
             }
             
-            return UmbracoModule.ShouldAuthenticateRequest(
-                context.HttpContextFromOwinContext().Request, 
+            return ShouldAuthenticateRequest(
+                context, 
                 _umbracoContextAccessor.Value.OriginalRequestUrl) == false 
                 //Don't auth request, don't return a cookie
                 ? null 
                 //Return the default implementation
                 : base.GetRequestCookie(context, key);
+        }
+
+        /// <summary>
+        /// Determines if we should authenticate the request
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="originalRequestUrl"></param>
+        /// <param name="checkForceAuthTokens"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// We auth the request when:
+        /// * it is a back office request
+        /// * it is an installer request
+        /// * it is a /base request
+        /// * it is a preview request
+        /// </remarks>
+        internal bool ShouldAuthenticateRequest(IOwinContext ctx, Uri originalRequestUrl, bool checkForceAuthTokens = true)
+        {
+            var request = ctx.Request;
+            var httpCtx = ctx.TryGetHttpContext();
+            
+            if (//check the explicit flag
+                (checkForceAuthTokens && ctx.Get<bool?>("umbraco-force-auth") != null)
+                || (checkForceAuthTokens && httpCtx.Success && httpCtx.Result.Items["umbraco-force-auth"] != null)
+                //check back office
+                || request.Uri.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath)
+                //check installer
+                || request.Uri.IsInstallerRequest()
+                //detect in preview
+                || (request.HasPreviewCookie() && request.Uri != null && request.Uri.AbsolutePath.StartsWith(IOHelper.ResolveUrl(SystemDirectories.Umbraco)) == false)
+                //check for base
+                || BaseRest.BaseRestHandler.IsBaseRestRequest(originalRequestUrl))
+            {
+                return true;
+            }
+            return false;
         }
 
     }

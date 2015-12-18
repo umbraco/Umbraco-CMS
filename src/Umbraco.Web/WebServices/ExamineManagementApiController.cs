@@ -13,9 +13,11 @@ using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Search;
 using Umbraco.Web.WebApi;
+using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.WebServices
 {
+    [ValidateAngularAntiForgeryToken]
     public class ExamineManagementApiController : UmbracoAuthorizedApiController
     {
         /// <summary>
@@ -258,9 +260,16 @@ namespace Umbraco.Web.WebServices
                 //ignore these properties
                                   .Where(x => new[] {"IndexerData", "Description", "WorkingFolder"}.InvariantContains(x.Name) == false)
                                   .OrderBy(x => x.Name);
+								  
             foreach (var p in props)
             {
-                indexerModel.ProviderProperties.Add(p.Name, p.GetValue(indexer, null).ToString());
+                var val = p.GetValue(indexer, null);
+                if (val == null)
+                {
+                    LogHelper.Warn<ExamineManagementApiController>("Property value was null when setting up property on indexer: " + indexer.Name + " property: " + p.Name);
+                    val = string.Empty;
+                }
+                indexerModel.ProviderProperties.Add(p.Name, val.ToString());
             }
 
             var luceneIndexer = indexer as LuceneIndexer;

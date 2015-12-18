@@ -62,18 +62,16 @@
     <div class="umb-panel umb-dialogs-mediapicker browser" ng-hide="target" ng-style="{opacity: dropping == true ? '0.25' : '1.0'}">
         <div class="umb-panel-header">
 
-            <div class="umb-el-wrap umb-panel-buttons">
-                <div class="span5">
-                    <div class="form-search">
-                        <i class="icon-search"></i>
-                        <input type="text"
-                               ng-model="searchTerm"
-                               class="umb-search-field search-query"
-                               placeholder="Filter...">
-                    </div>
+            <div class="umb-el-wrap umb-panel-buttons umb-mediapicker-upload">
+                <div class="form-search">
+                    <i class="icon-search"></i>
+                    <input type="text"
+                            ng-model="searchTerm"
+                            class="umb-search-field search-query"
+                            placeholder="Filter...">
                 </div>
 
-                <div class="pull-right">
+                <div class="upload-button">
                     <span class="btn fileinput-button" ng-class="{disabled: disabled}">
                         <i class="icon-page-up"></i>
                         <input type="file" name="files[]" multiple ng-disabled="disabled" class="uploader">
@@ -103,7 +101,8 @@
                                ng-show="showFolderInput"
                                ng-model="newFolderName"
                                ng-keydown="submitFolder($event)"
-                               on-blur="showFolderInput = false">
+                               on-blur="showFolderInput = false"
+                               focus-when="{{showFolderInput}}">
                     </li>
                 </ul>
             </div>

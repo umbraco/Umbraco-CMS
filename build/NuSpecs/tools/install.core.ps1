@@ -57,13 +57,25 @@ if ($project) {
 		if(Test-Path $umbracoBinFolder\ImageProcessor.dll) { Remove-Item $umbracoBinFolder\ImageProcessor.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\ImageProcessor.Web.dll) { Remove-Item $umbracoBinFolder\ImageProcessor.Web.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Lucene.Net.dll) { Remove-Item $umbracoBinFolder\Lucene.Net.dll -Force -Confirm:$false }
+		if(Test-Path $umbracoBinFolder\Microsoft.AspNet.Identity.Core.dll) { Remove-Item $umbracoBinFolder\Microsoft.AspNet.Identity.Core.dll -Force -Confirm:$false }
+		if(Test-Path $umbracoBinFolder\Microsoft.AspNet.Identity.Owin.dll) { Remove-Item $umbracoBinFolder\Microsoft.AspNet.Identity.Owin.dll -Force -Confirm:$false }
+		if(Test-Path $umbracoBinFolder\Microsoft.Owin.dll) { Remove-Item $umbracoBinFolder\Microsoft.Owin.dll -Force -Confirm:$false }
+		if(Test-Path $umbracoBinFolder\Microsoft.Owin.Host.SystemWeb.dll) { Remove-Item $umbracoBinFolder\Microsoft.Owin.Host.SystemWeb.dll -Force -Confirm:$false }
+		if(Test-Path $umbracoBinFolder\Microsoft.Owin.Security.dll) { Remove-Item $umbracoBinFolder\Microsoft.Owin.Security.dll -Force -Confirm:$false }
+		if(Test-Path $umbracoBinFolder\Microsoft.Owin.Security.Cookies.dll) { Remove-Item $umbracoBinFolder\Microsoft.Owin.Security.Cookies.dll -Force -Confirm:$false }
+		if(Test-Path $umbracoBinFolder\Microsoft.Owin.Security.OAuth.dll) { Remove-Item $umbracoBinFolder\Microsoft.Owin.Security.OAuth.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Microsoft.Web.Infrastructure.dll) { Remove-Item $umbracoBinFolder\Microsoft.Web.Infrastructure.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Microsoft.Web.Helpers.dll) { Remove-Item $umbracoBinFolder\Microsoft.Web.Helpers.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Microsoft.Web.Mvc.FixedDisplayModes.dll) { Remove-Item $umbracoBinFolder\Microsoft.Web.Mvc.FixedDisplayModes.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\MiniProfiler.dll) { Remove-Item $umbracoBinFolder\MiniProfiler.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\MySql.Data.dll) { Remove-Item $umbracoBinFolder\MySql.Data.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Newtonsoft.Json.dll) { Remove-Item $umbracoBinFolder\Newtonsoft.Json.dll -Force -Confirm:$false }
+		if(Test-Path $umbracoBinFolder\Owin.dll) { Remove-Item $umbracoBinFolder\Owin.dll -Force -Confirm:$false }
+		if(Test-Path $umbracoBinFolder\Semver.dll) { Remove-Item $umbracoBinFolder\Semver.dll -Force -Confirm:$false }
+		if(Test-Path $umbracoBinFolder\System.Net.Http.Extensions.dll) { Remove-Item $umbracoBinFolder\System.Net.Http.Extensions.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\System.Net.Http.Formatting.dll) { Remove-Item $umbracoBinFolder\System.Net.Http.Formatting.dll -Force -Confirm:$false }
+		if(Test-Path $umbracoBinFolder\System.Net.Http.Primitives.dll) { Remove-Item $umbracoBinFolder\System.Net.Http.Primitives.dll -Force -Confirm:$false }	
+		if(Test-Path $umbracoBinFolder\System.Web.Helpers.dll) { Remove-Item $umbracoBinFolder\System.Web.Helpers.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\System.Web.Http.dll) { Remove-Item $umbracoBinFolder\System.Web.Http.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\System.Web.Http.WebHost.dll) { Remove-Item $umbracoBinFolder\System.Web.Http.WebHost.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\System.Web.Mvc.dll) { Remove-Item $umbracoBinFolder\System.Web.Mvc.dll -Force -Confirm:$false }

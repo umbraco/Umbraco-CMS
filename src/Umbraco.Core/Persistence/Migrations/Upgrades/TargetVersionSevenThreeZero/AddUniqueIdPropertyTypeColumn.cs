@@ -6,6 +6,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZero
 {
+    
     [Migration("7.3.0", 13, GlobalSettings.UmbracoMigrationName)]
     public class AddUniqueIdPropertyTypeColumn : MigrationBase
     {
@@ -35,13 +36,17 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                 // the already existing data, see: http://issues.umbraco.org/issue/U4-6942
 
                 foreach (var data in Context.Database.Query<dynamic>(@"
-SELECT cmsPropertyType.id ptId, cmsPropertyType.Alias ptAlias, cmsContentType.alias ctAlias
+SELECT cmsPropertyType.id ptId, cmsPropertyType.Alias ptAlias, cmsContentType.alias ctAlias, umbracoNode.nodeObjectType nObjType
 FROM cmsPropertyType
 INNER JOIN cmsContentType
-ON cmsPropertyType.contentTypeId = cmsContentType.nodeId"))
+ON cmsPropertyType.contentTypeId = cmsContentType.nodeId
+INNER JOIN umbracoNode
+ON cmsContentType.nodeId = umbracoNode.id"))
                 {
-                    //create a guid from the concatenation of the property type alias + the doc type alias
-                    string concatAlias = data.ptAlias + data.ctAlias;
+                    //create a guid from the concatenation of the:
+                    // property type alias + the doc type alias + the content type node object type
+                    // - the latter is required because there can be a content type and media type with the same alias!!
+                    string concatAlias = data.ptAlias + data.ctAlias + data.nObjType;
                     var ptGuid = concatAlias.ToGuid();
 
                     //set the Unique Id to the one we've generated

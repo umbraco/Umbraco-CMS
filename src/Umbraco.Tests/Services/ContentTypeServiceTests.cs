@@ -1164,6 +1164,48 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Can_Remove_PropertyGroup_Without_Removing_Property_Types()
+        {
+            var service = ServiceContext.ContentTypeService;
+            var basePage = (IContentType)MockedContentTypes.CreateBasicContentType();
+            basePage.AddPropertyGroup("Content");
+            basePage.AddPropertyGroup("Meta");
+            service.Save(basePage);
+
+            var authorPropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext, "author")
+            {
+                Name = "Author",
+                Description = "",
+                Mandatory = false,
+                SortOrder = 1,
+                DataTypeDefinitionId = -88
+            };
+            var authorAdded = basePage.AddPropertyType(authorPropertyType, "Content");
+            var titlePropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext, "title")
+            {
+                Name = "Title",
+                Description = "",
+                Mandatory = false,
+                SortOrder = 1,
+                DataTypeDefinitionId = -88
+            };
+            var titleAdded = basePage.AddPropertyType(authorPropertyType, "Meta");
+
+            service.Save(basePage);
+
+            basePage = service.GetContentType(basePage.Id);
+
+            var totalPt = basePage.PropertyTypes.Count();
+
+            basePage.RemovePropertyGroup("Content");
+            service.Save(basePage);
+
+            basePage = service.GetContentType(basePage.Id);
+
+            Assert.AreEqual(totalPt, basePage.PropertyTypes.Count());
+        }
+
+        [Test]
         public void Can_Add_PropertyGroup_With_Same_Name_On_Parent_and_Child()
         {
             /*

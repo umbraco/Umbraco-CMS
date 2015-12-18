@@ -180,6 +180,7 @@
     <Compile Include="Logging\AsyncRollingFileAppenderTest.cs" />
     <Compile Include="Logging\DebugAppender.cs" />
     <Compile Include="Logging\ParallelForwarderTest.cs" />
+    <Compile Include="Mvc\RenderIndexActionSelectorAttributeTests.cs" />
     <Compile Include="Persistence\Repositories\AuditRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\DomainRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\PartialViewRepositoryTests.cs" />
@@ -361,6 +362,7 @@
     <Compile Include="Services\MacroServiceTests.cs" />
     <Compile Include="Services\UserServiceTests.cs" />
     <Compile Include="Manifest\ManifestParserTests.cs" />
+    <Compile Include="Templates\TemplateRepositoryTests.cs" />
     <Compile Include="TestHelpers\BaseSeleniumTest.cs" />
     <Compile Include="Integration\InstallPackage.cs" />
     <Compile Include="CoreXml\NavigableNavigatorTests.cs" />

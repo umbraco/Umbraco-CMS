@@ -145,6 +145,8 @@ namespace Umbraco.Web
             });
             ClientDependencySettings.Instance.MvcRendererCollection.Add(renderer);
             
+            // Disable the X-AspNetMvc-Version HTTP Header
+            MvcHandler.DisableMvcResponseHeader = true;
 
             InstallHelper insHelper = new InstallHelper(UmbracoContext.Current);
             insHelper.DeleteLegacyInstaller();

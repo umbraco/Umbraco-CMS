@@ -10,11 +10,6 @@ var canvasdesignerConfig = {
         selector: "body",
         editors: [
             {
-                type: "wide",
-                category: "Dimension",
-                name: "Layout"
-            },
-            {
                 type: "background",
                 category: "Color",
                 name: "Background",

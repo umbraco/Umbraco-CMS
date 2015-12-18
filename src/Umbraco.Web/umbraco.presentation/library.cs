@@ -602,7 +602,7 @@ namespace umbraco
                 XmlDocument mXml = new XmlDocument();
                 mXml.LoadXml(m.ToXml(mXml, false).OuterXml);
                 XPathNavigator xp = mXml.CreateNavigator();
-                return xp.Select("/node");
+                return xp.Select("/node()");
             }
 
             XmlDocument xd = new XmlDocument();

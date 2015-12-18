@@ -7,9 +7,9 @@ The easiest way to get started is to run `build/build.bat` which will build both
  
 If you're interested in making changes to Belle make sure to read the [Belle ReadMe file](src/Umbraco.Web.UI.Client/README.md). Note that you can always [download a nightly build](http://nightly.umbraco.org/umbraco%207.0.0/) so you don't have to build the code yourself.
 
-## Watch a five minute introduction video ##
+## Watch a introduction video ##
 
-[![ScreenShot](http://umbraco.com/images/whatisumbraco.png)](http://umbraco.org/help-and-support/video-tutorials/getting-started/what-is-umbraco)
+[![ScreenShot](http://umbraco.com/images/whatisumbraco.png)](https://umbraco.tv/videos/umbraco-v7/content-editor/basics/introduction/cms-explanation/)
 
 ## Umbraco - the simple, flexible and friendly ASP.NET CMS ##
 

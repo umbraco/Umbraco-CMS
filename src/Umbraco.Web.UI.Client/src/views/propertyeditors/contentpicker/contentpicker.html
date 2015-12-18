@@ -5,18 +5,17 @@
         <ul class="unstyled list-icons" 
             ui-sortable
             ng-model="renderModel">
-            	
-            <li ng-repeat="node in renderModel">
-
+            <li ng-repeat="node in renderModel" ng-attr-title="{{model.config.showPathOnHover && 'Path: ' + node.path || undefined}}">
                 <i class="icon icon-navigation handle"></i>
-
                 <a href="#" prevent-default ng-click="remove($index)">
                     <i class="icon icon-delete red hover-show"></i>
                     <i class="{{node.icon}} hover-hide"></i> 
                     {{node.name}}
                 </a>
-                <div ng-if="!dialogEditor && model.config.showEditButton">
-                    <small><a href umb-launch-mini-editor="node"><localize key="edit">Edit</localize></a></small>
+                
+                <div ng-if="!dialogEditor && ((model.config.showOpenButton && allowOpenButton) || (model.config.showEditButton && allowEditButton))">
+                    <small ng-if="model.config.showOpenButton && allowOpenButton"><a href ng-click="showNode($index)"><localize key="open">Open</localize></a></small>
+                    <small ng-if="model.config.showEditButton && allowEditButton"><a href umb-launch-mini-editor="node"><localize key="edit">Edit</localize></a></small>
                 </div>
             </li>
         </ul>
@@ -37,11 +36,10 @@
         <div class="help-inline" val-msg-for="minCount" val-toggle-msg="minCount">
             You need to add at least {{model.config.minNumber}} items
         </div>
-        
+
         <div class="help-inline" val-msg-for="maxCount" val-toggle-msg="maxCount">
             You can only have {{model.config.maxNumber}} items selected
         </div>
-        
 
     </ng-form>
 </div>

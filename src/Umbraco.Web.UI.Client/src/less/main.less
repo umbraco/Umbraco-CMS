@@ -133,7 +133,7 @@ h5{
 .umb-control-group label.control-label {
   text-align: left
 }
-.umb-control-group label .help-block, 
+.umb-control-group label .help-block,
 .umb-control-group label small {
   font-size: 11px;
   color: #a0a0a0;
@@ -148,6 +148,11 @@ h5{
   padding-top: 5px;
   margin-left: 240px;
 }
+
+.umb-user-panel .controls-row {
+    margin-left: 0px;
+}
+
 .controls-row label {
   display: inline-block
 }
@@ -189,7 +194,7 @@ h5{
 
 .umb-dashboard-control a{text-decoration: underline;}
 
-.umb-dashboard-control 
+.umb-dashboard-control
   iframe{ position: absolute; display: block; width: 99%; height: 99%; overflow: auto !important;}
 
 
@@ -234,16 +239,16 @@ table thead a {
 
 .umb-table tbody.ui-sortable tr.ui-sortable-helper {
   background-color: @sortableHelperBg;
-  border: none; 
+  border: none;
 }
-.umb-table tbody.ui-sortable tr.ui-sortable-helper td 
+.umb-table tbody.ui-sortable tr.ui-sortable-helper td
  {
     border:none;
 }
 
 .umb-table tbody.ui-sortable tr.ui-sortable-placeholder {
   background-color: @sortablePlaceholderBg;
-  border:none;   
+  border:none;
 }
 
 .umb-table tbody.ui-sortable tr.ui-sortable-placeholder td
@@ -363,7 +368,7 @@ table thead a {
   background: @inputBorder;
   height: 1px;
   margin: 20px 0 0 0;
-  width: 82%; 
+  width: 82%;
   float: left;
 }
 
@@ -432,7 +437,7 @@ table thead a {
     color:@green;
 }
 
-// Loading Animation 
+// Loading Animation
 // ------------------------
 
 .umb-loader{
@@ -518,11 +523,67 @@ height:1px;
 }
 
 .umb-loader-wrapper {
-    
+
     position: absolute;
     right: 0;
     left: 0;
     margin: 10px 0;
-    overflow: hidden; 
+    overflow: hidden;
 
+}
+
+
+// Helpers
+
+.strong {
+	font-weight: bold;
+}
+
+.inline {
+	display: inline;
+}
+
+
+// Input label styles
+// @Simon: not sure where to put this part yet
+// --- TODO Needs to be divided into the right .less directories
+
+
+// Titles for input fields
+.input-label--title {
+	font-weight: bold;
+	color: @black;
+
+	margin-bottom: 3px;
+}
+
+
+// Used for input checkmark fields
+.input-label--small {
+	display: inline;
+
+	font-size: 12px;
+	font-weight: bold;
+	color: fade(@black, 70);
+
+	&:hover {
+		color: @black;
+	}
+}
+
+input[type=checkbox]:checked + .input-label--small {
+	color: @blue;
+}
+
+
+// Use this for headers in the panels
+.panel-dialog--header {
+	border-bottom: 1px solid @gray;
+
+	margin: 10px 0;
+	padding-bottom: 10px;
+
+	font-size: @fontSizeLarge;
+	font-weight: bold;
+	line-height: 20px;
 }

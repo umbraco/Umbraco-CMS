@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Web.Http;
 using System.Web.Services.Description;
 using Umbraco.Core;
@@ -12,6 +13,7 @@ using Umbraco.Web.WebApi;
 //using umbraco.cms.businesslogic.language;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.WebServices
 {
@@ -19,6 +21,7 @@ namespace Umbraco.Web.WebServices
     /// A REST controller used for managing domains.
     /// </summary>
     /// <remarks>Nothing to do with Active Directory.</remarks>
+    [ValidateAngularAntiForgeryToken]
     public class DomainsApiController : UmbracoAuthorizedApiController
     {
         [HttpPost]
@@ -111,9 +114,30 @@ namespace Umbraco.Web.WebServices
                 names.Add(name);
                 var domain = domains.FirstOrDefault(d => d.DomainName.InvariantEquals(domainModel.Name));
                 if (domain != null)
+                {
                     domain.LanguageId = language.Id;
+                    Services.DomainService.Save(domain);
+                }
                 else if (Services.DomainService.Exists(domainModel.Name))
+                {
                     domainModel.Duplicate = true;
+                    var xdomain = Services.DomainService.GetByName(domainModel.Name);
+                    var xrcid = xdomain.RootContentId;
+                    if (xrcid.HasValue)
+                    {
+                        var xcontent = Services.ContentService.GetById(xrcid.Value);
+                        var xnames = new List<string>();
+                        while (xcontent != null)
+                        {
+                            xnames.Add(xcontent.Name);
+                            if (xcontent.ParentId < -1)
+                                xnames.Add("Recycle Bin");
+                            xcontent = xcontent.Parent();
+                        }
+                        xnames.Reverse();
+                        domainModel.Other = "/" + string.Join("/", xnames);
+                    }
+                }
                 else
                 {
                     // yet there is a race condition here...
@@ -159,6 +183,7 @@ namespace Umbraco.Web.WebServices
             public string Name { get; private set; }
             public int Lang { get; private set; }
             public bool Duplicate { get; set; }
+            public string Other { get; set; }
         }
 
         #endregion

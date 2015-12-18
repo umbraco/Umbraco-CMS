@@ -70,7 +70,7 @@ namespace umbraco.presentation.dialogs
 
                 // Translators
                 foreach (var u in BusinessLogic.User.getAll())
-                    if (u.UserType.Alias.ToLower() == "translator")
+                    if (u.UserType.Alias.ToLower() == "translator" || UserHasTranslatePermission(u, _currentPage))
                         translator.Items.Add(new ListItem(u.Name, u.Id.ToString()));
 
                 if (translator.Items.Count == 0) {
@@ -82,6 +82,12 @@ namespace umbraco.presentation.dialogs
                 // send button
                 doTranslation.Text = ui.Text("general", "ok", base.getUser());
             }
+        }
+
+        private bool UserHasTranslatePermission(BusinessLogic.User u, CMSNode node)
+        {
+            //the permissions column in umbracoUserType is legacy and needs to be rewritten but for now this is the only way to test 
+            return u.GetPermissions(node.Path).Contains("4");
         }
 
         protected void doTranslation_Click(object sender, EventArgs e)

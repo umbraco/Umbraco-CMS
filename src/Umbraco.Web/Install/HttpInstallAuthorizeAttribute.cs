@@ -5,6 +5,7 @@ using System.Web.Http.Controllers;
 using Umbraco.Core;
 using Umbraco.Web.Security;
 using umbraco.BasePages;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Install
 {
@@ -52,6 +53,7 @@ namespace Umbraco.Web.Install
                     return true;
                 }
                 var umbCtx = GetUmbracoContext();
+
                 //otherwise we need to ensure that a user is logged in
                 var isLoggedIn = GetUmbracoContext().Security.ValidateCurrentUser();
                 if (isLoggedIn)
@@ -60,8 +62,9 @@ namespace Umbraco.Web.Install
                 }
                 return false;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                LogHelper.Error<HttpInstallAuthorizeAttribute>("An error occurred determining authorization", ex);
                 return false;
             }
 	    }

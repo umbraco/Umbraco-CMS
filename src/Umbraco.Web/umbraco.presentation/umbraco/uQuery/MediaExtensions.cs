@@ -216,7 +216,7 @@ namespace umbraco
 				if (!string.IsNullOrEmpty(url))
 				{
 					var extension = media.GetProperty<string>(Constants.Conventions.Media.Extension);
-                    return url.Replace(string.Concat(".", extension), "_thumb.jpg", StringComparison.InvariantCultureIgnoreCase);
+                    return url.Replace(string.Concat(".", extension), "_thumb." + extension, StringComparison.InvariantCultureIgnoreCase);
 				}
 			}
 

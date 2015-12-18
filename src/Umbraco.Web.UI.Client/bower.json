@@ -23,7 +23,7 @@
     "jquery": "2.0.3",
     "jquery-file-upload": "~9.4.0",
     "jquery-ui": "1.10.3",
-    "angular-dynamic-locale": "~0.1.27",
+    "angular-dynamic-locale": "0.1.27",
     "tinymce": "~4.1.10",
     "codemirror": "~5.3.0"
   }

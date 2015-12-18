@@ -491,7 +491,7 @@ namespace Umbraco.Web.Editors
         {
             var toCopy = ValidateMoveOrCopy(copy);
 
-            var c = Services.ContentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal);
+            var c = Services.ContentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal, copy.Recursive);
 
             var response = Request.CreateResponse(HttpStatusCode.OK);
             response.Content = new StringContent(c.Path, Encoding.UTF8, "application/json");
