@@ -378,7 +378,6 @@ namespace Umbraco.Tests.Mvc
         ServiceContext GetServiceContext()
         {
             return MockHelper.GetMockedServiceContext();
-                    new TransientMessagesFactory(),
         }
 
         ViewContext GetViewContext()

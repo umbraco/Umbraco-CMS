@@ -221,8 +221,8 @@ namespace Umbraco.Core.Sync
 
             var sql = new Sql().Select("*")
                 .From<CacheInstructionDto>(_appContext.DatabaseContext.SqlSyntax)
-                .Where<CacheInstructionDto>(dto => dto.Id > _lastId)
-                .OrderBy<CacheInstructionDto>(dto => dto.Id, _appContext.DatabaseContext.SqlSyntax);
+                .Where<CacheInstructionDto>(_appContext.DatabaseContext.SqlSyntax, dto => dto.Id > _lastId)
+                .OrderBy<CacheInstructionDto>(_appContext.DatabaseContext.SqlSyntax, dto => dto.Id);
 
             var dtos = _appContext.DatabaseContext.Database.Fetch<CacheInstructionDto>(sql);
             if (dtos.Count <= 0) return;
@@ -295,7 +295,7 @@ namespace Umbraco.Core.Sync
         {
             var sql = new Sql().Select("*")
                 .From<CacheInstructionDto>(_appContext.DatabaseContext.SqlSyntax)
-                .Where<CacheInstructionDto>(dto => dto.Id == _lastId);
+                .Where<CacheInstructionDto>(_appContext.DatabaseContext.SqlSyntax, dto => dto.Id == _lastId);
 
             var dtos = _appContext.DatabaseContext.Database.Fetch<CacheInstructionDto>(sql);
             if (dtos.Count == 0)

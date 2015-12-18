@@ -8,11 +8,9 @@ using System.Web;
 using System.Web.Configuration;
 using System.Web.Http;
 using System.Web.Http.Dispatcher;
-using System.Web.Mvc;
+
 using System.Web.Routing;
-using ClientDependency.Core.Config;
-using Examine;
-using Examine.Config;
+
 using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -80,26 +78,6 @@ namespace Umbraco.Web
             : base(umbracoApplication, logger)
         {
             _isForTesting = isForTesting;
-        }
-
-        /// <summary>
-        /// Creates and returns the service context for the app
-        /// </summary>
-        /// <param name="dbContext"></param>
-        /// <param name="dbFactory"></param>
-        /// <returns></returns>
-        protected override ServiceContext CreateServiceContext(DatabaseContext dbContext, IDatabaseFactory dbFactory)
-        {
-            //use a request based messaging factory
-            var evtMsgs = new RequestLifespanMessagesFactory(new SingletonUmbracoContextAccessor());
-            return new ServiceContext(
-                new RepositoryFactory(ApplicationCache, ProfilingLogger.Logger, dbContext.SqlSyntax, UmbracoConfig.For.UmbracoSettings()),
-                new PetaPocoUnitOfWorkProvider(dbFactory),
-                new FileUnitOfWorkProvider(),
-                new PublishingStrategy(evtMsgs, ProfilingLogger.Logger),
-                ApplicationCache,
-                ProfilingLogger.Logger,
-                evtMsgs);
         }
 
         /// <summary>
@@ -174,6 +152,8 @@ namespace Umbraco.Web
         protected override IProfiler CreateProfiler()
         {
             return new WebProfiler();
+        }
+
         /// Ensure that the OnApplicationStarted methods of the IApplicationEvents are called
         /// </summary>
         /// <param name="afterComplete"></param>

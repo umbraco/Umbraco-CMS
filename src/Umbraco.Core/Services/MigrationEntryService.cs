@@ -70,7 +70,7 @@ namespace Umbraco.Core.Services
             var uow = UowProvider.GetUnitOfWork();
             using (var repo = RepositoryFactory.CreateMigrationEntryRepository(uow))
             {
-                var query = Query<IMigrationEntry>.Builder
+                var query = repo.Query
                     .Where(x => x.MigrationName.ToUpper() == migrationName.ToUpper());
                 return repo.GetByQuery(query);
             }

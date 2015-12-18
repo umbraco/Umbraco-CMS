@@ -916,9 +916,7 @@ namespace umbraco.cms.businesslogic.web
                                   : ApplicationContext.Current.Services.ContentService.GetDescendants(ContentEntity);
 
             return descendants.Select(x => new Document(x.Id, true));
-        }
-
-            x.Attributes.Append(addAttribute(xd, "key", UniqueId.ToString()));
+        }        
 
         public override List<CMSPreviewNode> GetNodesForPreview(bool childrenOnly)
         {

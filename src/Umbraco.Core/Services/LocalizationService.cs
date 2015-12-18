@@ -176,7 +176,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateDictionaryRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = QueryFactory.Create<IDictionaryItem>().Where(x => x.ParentId == null);
+                var query = repository.Query.Create<IDictionaryItem>().Where(x => x.ParentId == null);
                 var items = repository.GetByQuery(query);
 
                 return items;

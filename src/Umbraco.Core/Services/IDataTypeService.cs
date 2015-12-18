@@ -80,14 +80,6 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets a <see cref="IDataTypeDefinition"/> by its control Id
         /// </summary>
-        /// <param name="id">Id of the DataType control</param>
-        /// <returns><see cref="IDataTypeDefinition"/></returns>
-        [Obsolete("Property editor's are defined by a string alias from version 7 onwards, use the overload GetDataTypeDefinitionByPropertyEditorAlias instead")]
-        IEnumerable<IDataTypeDefinition> GetDataTypeDefinitionByControlId(Guid id);
-
-        /// <summary>
-        /// Gets a <see cref="IDataTypeDefinition"/> by its control Id
-        /// </summary>
         /// <param name="propertyEditorAlias">Alias of the property editor</param>
         /// <returns>Collection of <see cref="IDataTypeDefinition"/> objects with a matching contorl id</returns>
         IEnumerable<IDataTypeDefinition> GetDataTypeDefinitionByPropertyEditorAlias(string propertyEditorAlias);

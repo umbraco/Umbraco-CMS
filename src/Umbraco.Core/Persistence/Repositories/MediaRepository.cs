@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -245,6 +246,42 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 pageIndex++;
             } while (processed < total);
+        }
+
+        public IMedia GetMediaByPath(string mediaPath)
+        {
+            var umbracoFileValue = mediaPath;
+            const string Pattern = ".*[_][0-9]+[x][0-9]+[.].*";
+            var isResized = Regex.IsMatch(mediaPath, Pattern);
+
+            // If the image has been resized we strip the "_403x328" of the original "/media/1024/koala_403x328.jpg" url.
+            if (isResized)
+            {
+                var underscoreIndex = mediaPath.LastIndexOf('_');
+                var dotIndex = mediaPath.LastIndexOf('.');
+                umbracoFileValue = string.Concat(mediaPath.Substring(0, underscoreIndex), mediaPath.Substring(dotIndex));
+            }
+
+            Func<string, Sql> createSql = url => new Sql().Select("*")
+                                                  .From<PropertyDataDto>(SqlSyntax)
+                                                  .InnerJoin<PropertyTypeDto>(SqlSyntax)
+                                                  .On<PropertyDataDto, PropertyTypeDto>(SqlSyntax, left => left.PropertyTypeId, right => right.Id)
+                                                  .Where<PropertyTypeDto>(SqlSyntax, x => x.Alias == "umbracoFile")
+                                                  .Where<PropertyDataDto>(SqlSyntax, x => x.VarChar == url);
+
+            var sql = createSql(umbracoFileValue);
+
+            var propertyDataDto = Database.Fetch<PropertyDataDto, PropertyTypeDto>(sql).FirstOrDefault();
+
+            // If the stripped-down url returns null, we try again with the original url. 
+            // Previously, the function would fail on e.g. "my_x_image.jpg"
+            if (propertyDataDto == null)
+            {
+                sql = createSql(mediaPath);
+                propertyDataDto = Database.Fetch<PropertyDataDto, PropertyTypeDto>(sql).FirstOrDefault();
+            }
+
+            return propertyDataDto == null ? null : Get(propertyDataDto.NodeId);
         }
 
         public void AddOrUpdateContentXml(IMedia content, Func<IMedia, XElement> xml)

@@ -265,10 +265,7 @@ namespace umbraco.cms.businesslogic
         {
             SqlHelper.ExecuteNonQuery("delete from cmsContentXml where nodeId = @nodeId", SqlHelper.CreateParameter("@nodeId", this.Id));
         }
-
-
-       
-            x.Attributes.Append(XmlHelper.AddAttribute(xd, "key", this.UniqueId.ToString()));
+        
 
         /// <summary>
         /// Deletes the current Content object, must be overridden in the child class.
