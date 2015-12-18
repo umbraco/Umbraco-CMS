@@ -28,8 +28,8 @@
 							<h5>{{key}}</h5>
 
 							<ul class="umb-card-grid" ng-mouseleave="vm.hideDetailsOverlay()">
-								<li ng-repeat="systemDataType in value | orderBy:'name' | filter: vm.searchTerm" ng-mouseover="vm.showDetailsOverlay(systemDataType)">
-									<a href="" ng-click="vm.pickEditor(systemDataType)">
+								<li ng-repeat="systemDataType in value | orderBy:'name' | filter: vm.searchTerm" ng-mouseover="vm.showDetailsOverlay(systemDataType)" class="-four-in-row">
+									<a href="" ng-click="vm.pickEditor(systemDataType)" title="{{ systemDataType.name }}">
 										<i class="{{ systemDataType.icon }}" ng-class="{'icon-autofill': systemDataType.icon == null}"></i>
 										{{ systemDataType.name }}
 									</a>
@@ -49,8 +49,8 @@
 							<h5>{{key}}</h5>
 
 							<ul class="umb-card-grid" ng-mouseleave="vm.hideDetailsOverlay()">
-								<li ng-repeat="dataType in value | orderBy:'name' | filter: vm.searchTerm" ng-mouseover="vm.showDetailsOverlay(dataType)">
-									<a href="" ng-click="vm.pickDataType(dataType)">
+								<li ng-repeat="dataType in value | orderBy:'name' | filter: vm.searchTerm" ng-mouseover="vm.showDetailsOverlay(dataType)" class="-four-in-row">
+									<a href="" ng-click="vm.pickDataType(dataType)" title="{{ dataType.name }}">
 										<i class="{{ dataType.icon }}" ng-class="{'icon-autofill': dataType.icon == null}"></i>
 										{{ dataType.name }}
 									</a>
