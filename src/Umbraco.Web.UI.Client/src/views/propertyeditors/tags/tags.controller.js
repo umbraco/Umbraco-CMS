@@ -7,7 +7,7 @@ angular.module("umbraco")
         $scope.isLoading = true;
         $scope.tagToAdd = "";
 
-        assetsService.loadJs("lib/typeahead-js/typeahead.bundle.min.js").then(function () {
+        assetsService.loadJs("lib/typeahead.js/typeahead.bundle.min.js").then(function () {
 
             $scope.isLoading = false;
 
@@ -20,7 +20,9 @@ angular.module("umbraco")
                         $scope.model.value = [];
                     }
                     else {
-                        $scope.model.value = $scope.model.value.split(",");
+                       if($scope.model.value.length > 0) {
+                          $scope.model.value = $scope.model.value.split(",");
+                       }
                     }
                 }
             }
@@ -188,4 +190,4 @@ angular.module("umbraco")
         });
 
     }
-);
+);

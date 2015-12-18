@@ -1,5 +1,42 @@
-<div
-	unique-id="control.$uniqueId"
-    value="control.value"
-    grid-rte configuration="model.config.rte">
+<div ng-controller="Umbraco.PropertyEditors.Grid.RichTextEditorController as vm">
+
+	<div
+		grid-rte
+		configuration="model.config.rte"
+		value="control.value"
+		unique-id="control.$uniqueId"
+		on-link-picker-click="vm.openLinkPicker"
+		on-media-picker-click="vm.openMediaPicker"
+		on-embed-click="vm.openEmbed"
+		on-macro-picker-click="vm.openMacroPicker">
+	</div>
+
+	<umb-overlay
+	   ng-if="vm.linkPickerOverlay.show"
+	   model="vm.linkPickerOverlay"
+	   position="right"
+	   view="vm.linkPickerOverlay.view">
+	</umb-overlay>
+
+	<umb-overlay
+	   ng-if="vm.mediaPickerOverlay.show"
+	   model="vm.mediaPickerOverlay"
+	   position="right"
+	   view="vm.mediaPickerOverlay.view">
+	</umb-overlay>
+
+	<umb-overlay
+	   ng-if="vm.embedOverlay.show"
+	   model="vm.embedOverlay"
+	   position="right"
+	   view="vm.embedOverlay.view">
+	</umb-overlay>
+
+	<umb-overlay
+		ng-if="vm.macroPickerOverlay.show"
+		model="vm.macroPickerOverlay"
+		view="vm.macroPickerOverlay.view"
+		position="right">
+	</umb-overlay>
+
 </div>

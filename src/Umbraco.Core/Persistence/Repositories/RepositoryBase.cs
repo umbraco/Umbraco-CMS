@@ -22,7 +22,11 @@ namespace Umbraco.Core.Persistence.Repositories
             if (logger == null) throw new ArgumentNullException("logger");
             Logger = logger;
             _work = work;
-            _cache = cache;
+
+            //IMPORTANT: We will force the DeepCloneRuntimeCacheProvider to be used here which is a wrapper for the underlying
+            // runtime cache to ensure that anything that can be deep cloned in/out is done so, this also ensures that our tracks
+            // changes entities are reset.
+            _cache = new CacheHelper(new DeepCloneRuntimeCacheProvider(cache.RuntimeCache), cache.StaticCache, cache.RequestCache);            
         }
 
         /// <summary>
@@ -127,20 +131,17 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public TEntity Get(TId id)
         {
-            return RuntimeCache.GetCacheItem<TEntity>(
-                GetCacheIdKey<TEntity>(id), () =>
-                {
-                    var entity = PerformGet(id);
-                    if (entity == null) return null;
-                    //on initial construction we don't want to have dirty properties tracked
-                    // http://issues.umbraco.org/issue/U4-1946
-                    var asEntity = entity as TracksChangesEntityBase;
-                    if (asEntity != null)
-                    {
-                        asEntity.ResetDirtyProperties(false);
-                    }
-                    return entity;
-                });
+            var cacheKey = GetCacheIdKey<TEntity>(id);
+            var fromCache = RuntimeCache.GetCacheItem<TEntity>(cacheKey);
+
+            if (fromCache != null) return fromCache;
+
+            var entity = PerformGet(id);
+            if (entity == null) return null;
+            
+            RuntimeCache.InsertCacheItem(cacheKey, () => entity);
+
+            return entity;
         }
 
         protected abstract IEnumerable<TEntity> PerformGetAll(params TId[] ids);
@@ -302,7 +303,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 //If there's a GetAll zero count cache, ensure it is cleared
                 RuntimeCache.ClearCacheItem(GetCacheTypeKey<TEntity>());
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 //if an exception is thrown we need to remove the entry from cache, this is ONLY a work around because of the way
                 // that we cache entities: http://issues.umbraco.org/issue/U4-4259

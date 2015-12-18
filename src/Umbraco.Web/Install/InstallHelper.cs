@@ -46,6 +46,7 @@ namespace Umbraco.Web.Install
                 new UpgradeStep(),
                 new FilePermissionsStep(),
                 new MajorVersion7UpgradeReport(_umbContext.Application),
+                new Version73FileCleanup(_umbContext.HttpContext, _umbContext.Application.ProfilingLogger.Logger),
                 new DatabaseConfigureStep(_umbContext.Application),
                 new DatabaseInstallStep(_umbContext.Application),
                 new DatabaseUpgradeStep(_umbContext.Application),
@@ -102,9 +103,9 @@ namespace Umbraco.Web.Install
                 string userAgent = _umbContext.HttpContext.Request.UserAgent;
 
                 // Check for current install Id
-                Guid installId = Guid.NewGuid();
-                StateHelper.Cookies.Cookie installCookie = new StateHelper.Cookies.Cookie("umb_installId", 1);
-                if (!String.IsNullOrEmpty(installCookie.GetValue()))
+                var installId = Guid.NewGuid();
+                var installCookie = new StateHelper.Cookies.Cookie("umb_installId", 1);
+                if (string.IsNullOrEmpty(installCookie.GetValue()) == false)
                 {
                     if (Guid.TryParse(installCookie.GetValue(), out installId))
                     {
@@ -115,13 +116,13 @@ namespace Umbraco.Web.Install
                 }
                 installCookie.SetValue(installId.ToString());
 
-                string dbProvider = String.Empty;
-                if (!IsBrandNewInstall)
+                string dbProvider = string.Empty;
+                if (IsBrandNewInstall == false)
                     dbProvider = ApplicationContext.Current.DatabaseContext.DatabaseProvider.ToString();
 
                 org.umbraco.update.CheckForUpgrade check = new org.umbraco.update.CheckForUpgrade();
                 check.Install(installId,
-                    !IsBrandNewInstall,
+                    IsBrandNewInstall == false,
                     isCompleted,
                     DateTime.Now,
                     UmbracoVersion.Current.Major,
@@ -134,7 +135,7 @@ namespace Umbraco.Web.Install
             }
             catch (Exception ex)
             {
-
+                LogHelper.Error<InstallHelper>("An error occurred in InstallStatus trying to check upgrades", ex);
             }
         }
 

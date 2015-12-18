@@ -3,10 +3,13 @@ using System.IO;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Threading;
 using AutoMapper;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Events;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.LightInject;
 using Umbraco.Core.Logging;
@@ -51,8 +54,8 @@ namespace Umbraco.Core
         private bool _isStarted = false;
         private bool _isComplete = false;
         private readonly UmbracoApplicationBase _umbracoApplication;
-
         protected ApplicationContext ApplicationContext { get; private set; }
+        protected CacheHelper ApplicationCache { get; private set; }
 
         protected UmbracoApplicationBase UmbracoApplication
         {
@@ -72,27 +75,32 @@ namespace Umbraco.Core
             _umbracoApplication = umbracoApplication;            
         }
 
+        internal CoreBootManager(UmbracoApplicationBase umbracoApplication, ProfilingLogger logger)
+        {
+            if (umbracoApplication == null) throw new ArgumentNullException("umbracoApplication");
+            if (logger == null) throw new ArgumentNullException("logger");
+            _umbracoApplication = umbracoApplication;
+            ProfilingLogger = logger;
+        }
+
         public virtual IBootManager Initialize()
         {
             if (_isInitialized)
                 throw new InvalidOperationException("The boot manager has already been initialized");
 
-            //Create logger/profiler, and their resolvers, these are special resolvers that can be resolved before frozen so we can start logging
-            LoggerResolver.Current = new LoggerResolver(_umbracoApplication.Logger) { CanResolveBeforeFrozen = true };
-            var profiler = CreateProfiler();
-            ProfilerResolver.Current = new ProfilerResolver(profiler) {CanResolveBeforeFrozen = true};
-            ProfilingLogger = new ProfilingLogger(_umbracoApplication.Logger, profiler);
+            InitializeLoggerResolver();
+            InitializeProfilerResolver();
 
-            _timer = ProfilingLogger.DebugDuration<CoreBootManager>("Umbraco application starting", "Umbraco application startup complete");
+            ProfilingLogger = ProfilingLogger?? new ProfilingLogger(LoggerResolver.Current.Logger, ProfilerResolver.Current.Profiler);
 
-            //create the plugin manager
-            //TODO: this is currently a singleton but it would be better if it weren't. Unfortunately the only way to get
-            // rid of this singleton would be to put it into IoC and then use the ServiceLocator pattern.
+            _timer = ProfilingLogger.TraceDuration<CoreBootManager>(
+                string.Format("Umbraco {0} application starting on {1}", UmbracoVersion.GetSemanticVersion().ToSemanticString(), NetworkHelper.MachineName),
+                "Umbraco application startup complete");
             _cacheHelper = CreateApplicationCache();
             ServiceProvider = new ActivatorServiceProvider();
             PluginManager.Current = PluginManager = new PluginManager(ServiceProvider, _cacheHelper.RuntimeCache, ProfilingLogger, true);
 
-            //build up core IoC servoces
+            ApplicationCache = CreateApplicationCache();
             ConfigureCoreServices(Container);
 
             //set the singleton resolved from the core container
@@ -118,6 +126,7 @@ namespace Umbraco.Core
             InitializeModelMappers();
 
             //now we need to call the initialize methods
+            //TODO: Make sure to try/catch the OnApplicationInitialized!!
             Parallel.ForEach(_appStartupEvtContainer.GetAllInstances<IApplicationEventHandler>(), x => x.OnApplicationInitialized(UmbracoApplication, ApplicationContext));
 
             _isInitialized = true;
@@ -258,6 +267,7 @@ namespace Umbraco.Core
             if (_isStarted)
                 throw new InvalidOperationException("The boot manager has already been initialized");
 
+            //TODO: Make sure to try/catch the OnApplicationInitialized!!    
             //call OnApplicationStarting of each application events handler
             Parallel.ForEach(_appStartupEvtContainer.GetAllInstances<IApplicationEventHandler>(), x => x.OnApplicationStarting(UmbracoApplication, ApplicationContext));
 
@@ -280,11 +290,23 @@ namespace Umbraco.Core
         {
             if (_isComplete)
                 throw new InvalidOperationException("The boot manager has already been completed");
-
+            
             FreezeResolution();
 
+            //Here we need to make sure the db can be connected to
+		    EnsureDatabaseConnection();
+
+
+            //This is a special case for the user service, we need to tell it if it's an upgrade, if so we need to ensure that
+            // exceptions are bubbled up if a user is attempted to be persisted during an upgrade (i.e. when they auth to login)
+            ((UserService) ApplicationContext.Services.UserService).IsUpgrading = true;
+
+
+            
             //call OnApplicationStarting of each application events handler
+            //TODO: Make sure to try/catch the OnApplicationInitialized!!
             Parallel.ForEach(_appStartupEvtContainer.GetAllInstances<IApplicationEventHandler>(), x => x.OnApplicationStarted(UmbracoApplication, ApplicationContext));
+
 
             //end the current scope which was created to intantiate all of the startup handlers
             _appStartupEvtContainer.EndCurrentScope();
@@ -302,6 +324,36 @@ namespace Umbraco.Core
             //stop the timer and log the output
             _timer.Dispose();
             return this;
+		}
+
+        /// <summary>
+        /// We cannot continue if the db cannot be connected to
+        /// </summary>
+        private void EnsureDatabaseConnection()
+        {
+            if (ApplicationContext.IsConfigured == false) return;
+            if (ApplicationContext.DatabaseContext.IsDatabaseConfigured == false) return;
+
+            //try now
+            if (ApplicationContext.DatabaseContext.CanConnect)
+                return;
+
+            var currentTry = 0;
+            while (currentTry < 5)
+            {
+                //first wait, then retry
+                Thread.Sleep(1000);
+
+                if (ApplicationContext.DatabaseContext.CanConnect)
+                    break;
+
+                currentTry++;
+            }
+
+            if (currentTry == 5)
+            {
+                throw new UmbracoStartupFailedException("Umbraco cannot start. A connection string is configured but the Umbraco cannot connect to the database.");
+            }
         }
 
         /// <summary>
@@ -336,17 +388,34 @@ namespace Umbraco.Core
                     new Lazy<Type>(() => typeof (DelimitedManifestValueValidator)),
                     new Lazy<Type>(() => typeof (EmailValidator)),
                     new Lazy<Type>(() => typeof (IntegerValidator)),
+                    new Lazy<Type>(() => typeof (DecimalValidator)),
                 });
 
-            //by default we'll use the standard configuration based sync
-            ServerRegistrarResolver.Current = new ServerRegistrarResolver(Container, typeof(ConfigServerRegistrar));
+            //by default we'll use the db server registrar unless the developer has the legacy
+            // dist calls enabled, in which case we'll use the config server registrar
+            if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled)
+            {
+                ServerRegistrarResolver.Current = new ServerRegistrarResolver(new ConfigServerRegistrar());
+            }
+            else
+            {
+                ServerRegistrarResolver.Current = new ServerRegistrarResolver(
+                    new DatabaseServerRegistrar(
+                        new Lazy<IServerRegistrationService>(() => ApplicationContext.Services.ServerRegistrationService),
+                        new DatabaseServerRegistrarOptions()));
+            }
+            
 
-            //by default (outside of the web) we'll use the default server messenger without
-            //supplying a username/password, this will automatically disable distributed calls
-            // .. we'll override this in the WebBootManager
-            ServerMessengerResolver.Current = new ServerMessengerResolver(Container, typeof (WebServiceServerMessenger));
+            //by default we'll use the database server messenger with default options (no callbacks),
+            // this will be overridden in the web startup
+            ServerMessengerResolver.Current = new ServerMessengerResolver(
+                new DatabaseServerMessenger(ApplicationContext, true, new DatabaseServerMessengerOptions()));
 
+            MappingResolver.Current = new MappingResolver(
+                ServiceProvider, ProfilingLogger.Logger,
+                () => PluginManager.ResolveAssignedMapperTypes());
 
+           
             //RepositoryResolver.Current = new RepositoryResolver(
             //    new RepositoryFactory(ApplicationCache));
 

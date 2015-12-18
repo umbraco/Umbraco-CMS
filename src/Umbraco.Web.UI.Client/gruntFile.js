@@ -1,6 +1,6 @@
 module.exports = function (grunt) {
 
-    
+
 
     // Default task.
     grunt.registerTask('default', ['jshint:dev', 'build', 'karma:unit']);
@@ -11,17 +11,17 @@ module.exports = function (grunt) {
     //TODO: Too much watching, this brings windows to it's knees when in dev mode
     //run by the watch task
     grunt.registerTask('watch-js', ['jshint:dev', 'concat', 'copy:app', 'copy:mocks', 'copy:canvasdesigner', 'copy:vs', 'karma:unit']);
-    grunt.registerTask('watch-less', ['recess:build', 'recess:installer', 'recess:canvasdesigner', 'copy:canvasdesigner', 'copy:assets', 'copy:vs']);
+    grunt.registerTask('watch-less', ['recess:build', 'recess:installer', 'recess:canvasdesigner', 'postcss', 'copy:canvasdesigner', 'copy:assets', 'copy:vs']);
     grunt.registerTask('watch-html', ['copy:views', 'copy:vs']);
     grunt.registerTask('watch-installer', ['concat:install', 'concat:installJs', 'copy:installer', 'copy:vs']);
     grunt.registerTask('watch-canvasdesigner', ['copy:canvasdesigner', 'concat:canvasdesignerJs', 'copy:vs']);
     grunt.registerTask('watch-test', ['jshint:dev', 'karma:unit']);
 
-    //triggered from grunt dev or grunt
-    grunt.registerTask('build', ['clean', 'concat', 'recess:min', 'recess:installer', 'recess:canvasdesigner', 'bower', 'copy']);
+    //triggered from grunt
+    grunt.registerTask('build', ['concat', 'recess:build', 'recess:installer', 'recess:canvasdesigner', 'postcss', 'bower-install-simple', 'bower', 'copy', 'clean:post']);
 
-    //build-dev doesn't min - we are trying to speed this up and we don't want minified stuff when we are in dev mode
-    grunt.registerTask('build-dev', ['clean', 'concat', 'recess:build', 'recess:installer', 'bower', 'copy']);
+    //triggered from grunt dev vs or grunt vs
+    grunt.registerTask('build-dev', ['clean:pre', 'concat', 'recess:build', 'recess:installer', 'postcss', 'bower-install-simple', 'bower', 'copy']);
 
     //utillity tasks
     grunt.registerTask('docs', ['ngdocs']);
@@ -42,14 +42,14 @@ module.exports = function (grunt) {
                     port: 9990,
                     hostname: '0.0.0.0',
                     base: './build',
-                    middleware: function (connect, options) {
+                    middleware: function(connect, options) {
                         return [
-                          //uncomment to enable CSP
-                          // util.csp(),
-                          //util.rewrite(),
-                          connect.favicon('images/favicon.ico'),
-                          connect.static(options.base),
-                          connect.directory(options.base)
+                            //uncomment to enable CSP
+                            // util.csp(),
+                            //util.rewrite(),
+                            connect.favicon('images/favicon.ico'),
+                            connect.static(options.base),
+                            connect.directory(options.base)
                         ];
                     }
                 }
@@ -60,13 +60,13 @@ module.exports = function (grunt) {
                     port: 8880,
                     hostname: '0.0.0.0',
                     base: './docs/api',
-                    middleware: function (connect, options) {
+                    middleware: function(connect, options) {
                         return [
-                          //uncomment to enable CSP
-                          // util.csp(),
-                          //util.rewrite(),
-                          connect.static(options.base),
-                          connect.directory(options.base)
+                            //uncomment to enable CSP
+                            // util.csp(),
+                            //util.rewrite(),
+                            connect.static(options.base),
+                            connect.directory(options.base)
                         ];
                     }
                 }
@@ -86,13 +86,16 @@ module.exports = function (grunt) {
         vsdir: '../Umbraco.Web.UI/umbraco',
         pkg: grunt.file.readJSON('package.json'),
         banner:
-        '/*! <%= pkg.title || pkg.name %>\n' +
-        '<%= pkg.homepage ? " * " + pkg.homepage + "\\n" : "" %>' +
-        ' * Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author %>;\n' +
-        ' * Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %>\n */\n',
+            '/*! <%= pkg.title || pkg.name %>\n' +
+                '<%= pkg.homepage ? " * " + pkg.homepage + "\\n" : "" %>' +
+                ' * Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author %>;\n' +
+                ' * Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %>\n */\n',
         src: {
             js: ['src/**/*.js', 'src/*.js'],
+
             common: ['src/common/**/*.js'],
+            controllers: ['src/**/*.controller.js'],
+
             specs: ['test/**/*.spec.js'],
             scenarios: ['test/**/*.scenario.js'],
             samples: ['sample files/*.js'],
@@ -108,7 +111,10 @@ module.exports = function (grunt) {
             prod: ['<%= distdir %>/js/*.js']
         },
 
-        clean: ['<%= distdir %>/*'],
+        clean: {
+            pre: ['<%= distdir %>/*'],
+            post: ['<%= distdir %>/js/*.dev.js']
+        },
 
         copy: {
             assets: {
@@ -137,23 +143,27 @@ module.exports = function (grunt) {
             vendor: {
                 files: [{ dest: '<%= distdir %>/lib', src: '**', expand: true, cwd: 'lib/' }]
             },
+
             views: {
-                files: [{ dest: '<%= distdir %>/views', src: ['**/*.*', '!**/*.controller.js'], expand: true, cwd: 'src/views/' }]
+                files: [{ dest: '<%= distdir %>/views', src: ['**/*.*', '!**/*.controller.js'], expand: true, cwd: 'src/views' }]
             },
+
             app: {
                 files: [
                     { dest: '<%= distdir %>/js', src: '*.js', expand: true, cwd: 'src/' }
                 ]
             },
+
             mocks: {
                 files: [{ dest: '<%= distdir %>/js', src: '*.js', expand: true, cwd: 'src/common/mocks/' }]
             },
+
             vs: {
                 files: [
                     //everything except the index.html root file!
                     //then we need to figure out how to not copy all the test stuff either!?
                     { dest: '<%= vsdir %>/assets', src: '**', expand: true, cwd: '<%= distdir %>/assets' },
-                    { dest: '<%= vsdir %>/js', src: '**', expand: true, cwd: '<%= distdir %>/js' },                    
+                    { dest: '<%= vsdir %>/js', src: '**', expand: true, cwd: '<%= distdir %>/js' },
                     { dest: '<%= vsdir %>/views', src: '**', expand: true, cwd: '<%= distdir %>/views' },
                     { dest: '<%= vsdir %>/preview', src: '**', expand: true, cwd: '<%= distdir %>/preview' },
                     { dest: '<%= vsdir %>/lib', src: '**', expand: true, cwd: '<%= distdir %>/lib' }
@@ -191,10 +201,12 @@ module.exports = function (grunt) {
                     footer: "\n\n})();"
                 }
             },
+
             canvasdesignerJs: {
                 src: ['src/canvasdesigner/canvasdesigner.global.js', 'src/canvasdesigner/canvasdesigner.controller.js', 'src/canvasdesigner/editors/*.js', 'src/canvasdesigner/lib/*.js'],
                 dest: '<%= distdir %>/js/canvasdesigner.panel.js'
             },
+
             controllers: {
                 src: ['src/controllers/**/*.controller.js', 'src/views/**/*.controller.js'],
                 dest: '<%= distdir %>/js/umbraco.controllers.js',
@@ -203,6 +215,7 @@ module.exports = function (grunt) {
                     footer: "\n\n})();"
                 }
             },
+
             services: {
                 src: ['src/common/services/*.js'],
                 dest: '<%= distdir %>/js/umbraco.services.js',
@@ -211,6 +224,7 @@ module.exports = function (grunt) {
                     footer: "\n\n})();"
                 }
             },
+
             security: {
                 src: ['src/common/security/*.js'],
                 dest: '<%= distdir %>/js/umbraco.security.js',
@@ -219,6 +233,7 @@ module.exports = function (grunt) {
                     footer: "\n\n})();"
                 }
             },
+
             resources: {
                 src: ['src/common/resources/*.js'],
                 dest: '<%= distdir %>/js/umbraco.resources.js',
@@ -227,6 +242,7 @@ module.exports = function (grunt) {
                     footer: "\n\n})();"
                 }
             },
+
             testing: {
                 src: ['src/common/mocks/*/*.js'],
                 dest: '<%= distdir %>/js/umbraco.testing.js',
@@ -235,6 +251,7 @@ module.exports = function (grunt) {
                     footer: "\n\n})();"
                 }
             },
+
             directives: {
                 src: ['src/common/directives/**/*.js'],
                 dest: '<%= distdir %>/js/umbraco.directives.js',
@@ -243,6 +260,7 @@ module.exports = function (grunt) {
                     footer: "\n\n})();"
                 }
             },
+
             filters: {
                 src: ['src/common/filters/*.js'],
                 dest: '<%= distdir %>/js/umbraco.filters.js',
@@ -271,7 +289,8 @@ module.exports = function (grunt) {
                     ['<%= src.less %>']
                 },
                 options: {
-                    compile: true
+                    compile: true,
+                    compress: true
                 }
             },
             installer: {
@@ -280,21 +299,14 @@ module.exports = function (grunt) {
                     ['src/less/installer.less']
                 },
                 options: {
-                    compile: true
+                    compile: true,
+                    compress: true
                 }
             },
             canvasdesigner: {
                 files: {
                     '<%= distdir %>/assets/css/canvasdesigner.css':
-                    ['src/less/canvasdesigner.less', 'src/less/helveticons.less']
-                },
-                options: {
-                    compile: true
-                }
-            },
-            min: {
-                files: {
-                    '<%= distdir %>/assets/css/<%= pkg.name %>.css': ['<%= src.less %>']
+                    ['src/less/canvas-designer.less', 'src/less/helveticons.less']
                 },
                 options: {
                     compile: true,
@@ -303,8 +315,37 @@ module.exports = function (grunt) {
             }
         },
 
+        postcss: {
+           options: {
+              processors: [
+                 // add vendor prefixes
+                 require('autoprefixer-core')({
+                    browsers: 'last 2 versions'
+                 })
+              ]
+           },
+           dist: {
+              src: '<%= distdir %>/assets/css/<%= pkg.name %>.css'
+           }
+        },
+
+        ngTemplateCache: {
+            views: {
+                files: {
+                    '<%= distdir %>/js/umbraco.views.js': 'src/views/**/*.html'
+                },
+                options: {
+                    trim: 'src/',
+                    module: 'umbraco.views'
+                }
+            }
+        },
 
         watch: {
+            docs: {
+                files: ['docs/src/**/*.md'],
+                tasks: ['watch-docs', 'timestamp']
+            },
             css: {
                 files: 'src/**/*.less',
                 tasks: ['watch-less', 'timestamp'],
@@ -347,21 +388,26 @@ module.exports = function (grunt) {
                 title: 'API Documentation'
             },
             tutorials: {
-                src: ['docs/src/tutorials/**/*.ngdoc'],
-                title: 'Tutorials'
+                src: [],
+                title: ''
             }
+        },
+
+        eslint:{
+            src: ['<%= src.common %>','<%= src.controllers %>'],
+            options: {quiet: true}
         },
 
         jshint: {
             dev: {
                 files: {
-                    src: ['<%= src.common %>', '<%= src.specs %>', '<%= src.scenarios %>', '<%= src.samples %>']
+                    src: ['<%= src.common %>']
                 },
                 options: {
                     curly: true,
                     eqeqeq: true,
                     immed: true,
-                    latedef: true,
+                    latedef: "nofunc",
                     newcap: true,
                     noarg: true,
                     sub: true,
@@ -386,7 +432,7 @@ module.exports = function (grunt) {
                     curly: true,
                     eqeqeq: true,
                     immed: true,
-                    latedef: true,
+                    latedef: "nofunc",
                     newcap: true,
                     noarg: true,
                     sub: true,
@@ -407,21 +453,74 @@ module.exports = function (grunt) {
         },
 
         bower: {
-            install: {
+            dev: {
+                dest: '<%= distdir %>/lib',
                 options: {
-                    targetDir: "<%= distdir %>/lib",
-                    cleanTargetDir: false,
-                    layout: function (type, component, source) {
+                    expand: true,
+                    ignorePackages: ['bootstrap'],
+                    packageSpecific: {
+                        'typeahead.js': {
+                            keepExpandedHierarchy: false,
+                            files: ['dist/typeahead.bundle.min.js']
+                        },
+                        'underscore': {
+                            files: ['underscore-min.js', 'underscore-min.map']
+                        },
+                        'rgrove-lazyload': {
+                            files: ['lazyload.js']
+                        },
+                        'bootstrap-social': {
+                            files: ['bootstrap-social.css']
+                        },
+                        'font-awesome': {
+                            files: ['css/font-awesome.min.css', 'fonts/*']
+                        },
+                        "jquery": {
+                            files: ['jquery.min.js', 'jquery.min.map']
+                        },
+                        'jquery-ui': {
+                            keepExpandedHierarchy: false,
+                            files: ['jquery-ui.min.js']
+                        },
+                        'tinymce': {
+                            files: ['plugins/**', 'themes/**', 'tinymce.min.js']
+                        },
+                        'angular-dynamic-locale': {
+                            files: ['tmhDynamicLocale.min.js', 'tmhDynamicLocale.min.js.map']
+                        },
+                        'ng-file-upload': {
+                            keepExpandedHierarchy: false,
+                            files: ['ng-file-upload.min.js']
+                        },
+                        'codemirror': {
+                            files: [
+                                'lib/codemirror.js',
+                                'lib/codemirror.css',
 
-                        var path = require('path');
+                                'mode/css/*',
+                                'mode/javascript/*',
+                                'mode/xml/*',
+                                'mode/htmlmixed/*',
 
-                        //this is the same as 'byComponent', however we will not allow
-                        // folders with '.' in them since the grunt copy task does not like that
-                        var componentWithoutPeriod = component.replace(".", "-");
-                        return path.join(componentWithoutPeriod, type);
+                                'addon/search/*',
+                                'addon/edit/*',
+                                'addon/selection/*',
+                                'addon/dialog/*'
+                            ]
+                        }
                     }
                 }
+            },
+            options: {
+                expand: true
             }
+        },
+
+        "bower-install-simple": {
+            options: {
+                color: true
+            },
+            "dev": {}
         }
     });
 
@@ -434,12 +533,16 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-recess');
+    grunt.loadNpmTasks('grunt-postcss');
 
     grunt.loadNpmTasks('grunt-karma');
 
     grunt.loadNpmTasks('grunt-open');
     grunt.loadNpmTasks('grunt-contrib-connect');
-    grunt.loadNpmTasks('grunt-bower-task');
+    grunt.loadNpmTasks("grunt-bower-install-simple");
+    grunt.loadNpmTasks('grunt-bower');
     grunt.loadNpmTasks('grunt-ngdocs');
 
+    grunt.loadNpmTasks('grunt-eslint');
+    grunt.loadNpmTasks('grunt-hustler');
 };

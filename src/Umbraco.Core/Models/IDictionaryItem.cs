@@ -12,7 +12,7 @@ namespace Umbraco.Core.Models
         /// Gets or Sets the Parent Id of the Dictionary Item
         /// </summary>
         [DataMember]
-        Guid ParentId { get; set; }
+        Guid? ParentId { get; set; }
 
         /// <summary>
         /// Gets or sets the Key for the Dictionary Item

@@ -1,21 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<createUI>
-  <nodeType alias="nodeTypes">
-    <header>Nodetype</header>
-    <usercontrol>/create/nodeType.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="nodetypeTasks" />
-      <delete assembly="umbraco" type="nodetypeTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="initnodeTypes">
-    <header>Nodetype</header>
-    <usercontrol>/create/nodeType.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="nodetypeTasks" />
-      <delete assembly="umbraco" type="nodetypeTasks" />
-    </tasks>
-  </nodeType>
+<createUI>  
   <nodeType alias="templates">
     <header>Template</header>
     <usercontrol>/create/simple.ascx</usercontrol>
@@ -73,28 +57,7 @@
     <tasks>
       <delete assembly="umbraco" type="userTasks" />
     </tasks>
-  </nodeType>
-  <nodeType alias="initdatatype">
-    <header>Datatype</header>
-    <usercontrol>/create/simple.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="DataTypeTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="datatype">
-    <header>Datatype</header>
-    <usercontrol>/create/simple.ascx</usercontrol>
-    <tasks>
-      <delete assembly="umbraco" type="DataTypeTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="initmemberType">
-    <header>membertype</header>
-    <usercontrol>/create/simple.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="MemberTypeTasks" />
-    </tasks>
-  </nodeType>
+  </nodeType> 
   <nodeType alias="initmemberGroup">
     <header>membergroup</header>
     <usercontrol>/create/simple.ascx</usercontrol>
@@ -115,78 +78,28 @@
     <tasks>
       <create assembly="umbraco" type="XsltTasks" />
     </tasks>
-  </nodeType>
-  <nodeType alias="initmediaTypes">
-    <header>mediatype</header>
-    <usercontrol>/create/simple.ascx</usercontrol>
+  </nodeType>    
+  <nodeType alias="initmember">
+    <header>member</header>
+    <usercontrol>/create/member.ascx</usercontrol>
     <tasks>
-      <create assembly="umbraco" type="MediaTypeTasks" />
+      <create assembly="umbraco" type="memberTasks" />
     </tasks>
   </nodeType>
-  <nodeType alias="mediaTypes">
-    <header>Medie type</header>
-    <usercontrol>/create/simple.ascx</usercontrol>
+  <nodeType alias="initmember">
+    <header>member</header>
+    <usercontrol>/create/member.ascx</usercontrol>
     <tasks>
-      <create assembly="umbraco" type="MediaTypeTasks" />
-      <delete assembly="umbraco" type="MediaTypeTasks" />
+      <create assembly="umbraco" type="memberTasks" />
     </tasks>
   </nodeType>  
-  <nodeType alias="initmember">
-    <header>member</header>
-    <usercontrol>/create/member.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="memberTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="initmember">
-    <header>member</header>
-    <usercontrol>/create/member.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="memberTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="member">
-    <header>member</header>
-    <usercontrol>/create/member.ascx</usercontrol>
-    <tasks>
-      <delete assembly="umbraco" type="memberTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="memberType">
-    <header>membertype</header>
-    <usercontrol>/create/member.ascx</usercontrol>
-    <tasks>
-      <delete assembly="umbraco" type="MemberTypeTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="memberGroup">
+  <nodeType alias="memberGroups">
     <header>membergroup</header>
     <usercontrol>/create/simple.ascx</usercontrol>
     <tasks>
       <delete assembly="umbraco" type="MemberGroupTasks" />
     </tasks>
-  </nodeType>
-  <!--<nodeType alias="initcontentItemType">
-    <header>Indholdselemtent type</header>
-    <usercontrol>/create/simple.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="contentItemTypeTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="contentItemType">
-    <header>Indholdselemtent type</header>
-    <usercontrol>/create/simple.ascx</usercontrol>
-    <tasks>
-      <delete assembly="umbraco" type="contentItemTypeTasks" />
-    </tasks>
-  </nodeType>-->
-  <!--<nodeType alias="contentItem">
-    <header>Indholdselemtent type</header>
-    <usercontrol>/create/simple.ascx</usercontrol>
-    <tasks>
-      <delete assembly="umbraco" type="contentItemTasks" />
-    </tasks>
-  </nodeType>-->
+  </nodeType> 
   <nodeType alias="stylesheet">
     <header>Stylesheet editor egenskab</header>
     <usercontrol>/create/simple.ascx</usercontrol>

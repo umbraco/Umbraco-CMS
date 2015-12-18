@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Events;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -12,6 +14,7 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Relators;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -26,10 +29,8 @@ namespace Umbraco.Core.Persistence.Repositories
             : base(work, cache, logger, sqlSyntax, mappingResolver)
         {
             _templateRepository = templateRepository;
-        }
+        }        
 
-        #region Overrides of RepositoryBase<int,IContentType>
-        
         protected override IContentType PerformGet(int id)
         {
             var contentTypes = ContentTypeQueryMapper.GetContentTypes(
@@ -47,8 +48,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                var sql = new Sql().Select("id").From<NodeDto>(SqlSyntax)
-                    .Where<NodeDto>(SqlSyntax, dto => dto.NodeObjectType == NodeObjectTypeId);
+                var sql = new Sql().Select("id").From<NodeDto>(SqlSyntax).Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId);
                 var allIds = Database.Fetch<int>(sql).ToArray();
                 return ContentTypeQueryMapper.GetContentTypes(allIds, Database, SqlSyntax, this, _templateRepository);
             }
@@ -59,16 +59,14 @@ namespace Umbraco.Core.Persistence.Repositories
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IContentType>(sqlClause, query);
             var sql = translator.Translate()
-                .OrderBy<NodeDto>(SqlSyntax, x => x.Text);
+                .OrderBy<NodeDto>(x => x.Text, SqlSyntax);
 
-            var dtos = Database.Fetch<DocumentTypeDto, ContentTypeDto, NodeDto>(sql);
+            var dtos = Database.Fetch<ContentTypeTemplateDto, ContentTypeDto, NodeDto>(sql);
             return dtos.Any()
                 ? GetAll(dtos.DistinctBy(x => x.ContentTypeDto.NodeId).Select(x => x.ContentTypeDto.NodeId).ToArray())
                 : Enumerable.Empty<IContentType>();
         }
-
-        #endregion
-
+        
         /// <summary>
         /// Gets all entities of the specified <see cref="PropertyType"/> query
         /// </summary>
@@ -90,9 +88,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             return Database.Fetch<string>("SELECT DISTINCT Alias FROM cmsPropertyType ORDER BY Alias");
         }
-
-        #region Overrides of PetaPocoRepositoryBase<int,IContentType>
-
+        
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sql = new Sql();
@@ -101,8 +97,8 @@ namespace Umbraco.Core.Persistence.Repositories
                .From<ContentTypeDto>(SqlSyntax)
                .InnerJoin<NodeDto>(SqlSyntax)
                .On<ContentTypeDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-               .LeftJoin<DocumentTypeDto>(SqlSyntax)
-               .On<DocumentTypeDto, ContentTypeDto>(SqlSyntax, left => left.ContentTypeNodeId, right => right.NodeId)
+               .LeftJoin<ContentTypeTemplateDto>(SqlSyntax)
+               .On<ContentTypeTemplateDto, ContentTypeDto>(SqlSyntax, left => left.ContentTypeNodeId, right => right.NodeId)
                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
 
             return sql;
@@ -137,11 +133,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             get { return new Guid(Constants.ObjectTypes.DocumentType); }
         }
-
-        #endregion
-
-        #region Unit of Work Implementation
-
+        
         /// <summary>
         /// Deletes a content type
         /// </summary>
@@ -180,24 +172,37 @@ namespace Umbraco.Core.Persistence.Repositories
 
             ((ContentType)entity).AddingEntity();
 
-            var factory = new ContentTypeFactory(NodeObjectTypeId);
-            var dto = factory.BuildDto(entity);
-
-            PersistNewBaseContentType(dto.ContentTypeDto, entity);
-            //Inserts data into the cmsDocumentType table if a template exists
-            if (dto.TemplateNodeId > 0)
-            {
-                dto.ContentTypeNodeId = entity.Id;
-                Database.Insert(dto);
-            }
-
-            //Insert allowed Templates not including the default one, as that has already been inserted
-            foreach (var template in entity.AllowedTemplates.Where(x => x != null && x.Id != dto.TemplateNodeId))
-            {
-                Database.Insert(new DocumentTypeDto { ContentTypeNodeId = entity.Id, TemplateNodeId = template.Id, IsDefault = false });
-            }
+            PersistNewBaseContentType(entity);
+            PersistTemplates(entity, false);
 
             entity.ResetDirtyProperties();
+        }
+
+        protected void PersistTemplates(IContentType entity, bool clearAll)
+        {
+            // remove and insert, if required
+            Database.Delete<ContentTypeTemplateDto>("WHERE contentTypeNodeId = @Id", new { Id = entity.Id });
+
+            // we could do it all in foreach if we assume that the default template is an allowed template??
+            var defaultTemplateId = ((ContentType) entity).DefaultTemplateId;
+            if (defaultTemplateId > 0)
+            {
+                Database.Insert(new ContentTypeTemplateDto
+                {
+                    ContentTypeNodeId = entity.Id,
+                    TemplateNodeId = defaultTemplateId,
+                    IsDefault = true
+                });
+            }
+            foreach (var template in entity.AllowedTemplates.Where(x => x != null && x.Id != defaultTemplateId))
+            {
+                Database.Insert(new ContentTypeTemplateDto
+                {
+                    ContentTypeNodeId = entity.Id,
+                    TemplateNodeId = template.Id,
+                    IsDefault = false
+                });
+            }
         }
 
         protected override void PersistUpdatedItem(IContentType entity)
@@ -220,30 +225,33 @@ namespace Umbraco.Core.Persistence.Repositories
                 entity.SortOrder = maxSortOrder + 1;
             }
 
-            var factory = new ContentTypeFactory(NodeObjectTypeId);
-            var dto = factory.BuildDto(entity);
-
-            PersistUpdatedBaseContentType(dto.ContentTypeDto, entity);
-
-            //Look up DocumentType entries for updating - this could possibly be a "remove all, insert all"-approach
-            Database.Delete<DocumentTypeDto>("WHERE contentTypeNodeId = @Id", new { Id = entity.Id });
-            //Insert the updated DocumentTypeDto if a template exists
-            if (dto.TemplateNodeId > 0)
-            {
-                Database.Insert(dto);
-            }
-
-            //Insert allowed Templates not including the default one, as that has already been inserted
-            foreach (var template in entity.AllowedTemplates.Where(x => x != null && x.Id != dto.TemplateNodeId))
-            {
-                Database.Insert(new DocumentTypeDto { ContentTypeNodeId = entity.Id, TemplateNodeId = template.Id, IsDefault = false });
-            }
+            PersistUpdatedBaseContentType(entity);
+            PersistTemplates(entity, true);
 
             entity.ResetDirtyProperties();
         }
-
-        #endregion
-
         
+        protected override IContentType PerformGet(Guid id)
+        {
+            var contentTypes = ContentTypeQueryMapper.GetContentTypes(
+                new[] { id }, Database, SqlSyntax, this, _templateRepository);
+
+            var contentType = contentTypes.SingleOrDefault();
+            return contentType;
+        }
+
+        protected override IEnumerable<IContentType> PerformGetAll(params Guid[] ids)
+        {
+            if (ids.Any())
+            {
+                return ContentTypeQueryMapper.GetContentTypes(ids, Database, SqlSyntax, this, _templateRepository);
+            }
+            else
+            {
+                var sql = new Sql().Select("id").From<NodeDto>(SqlSyntax).Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId);
+                var allIds = Database.Fetch<int>(sql).ToArray();
+                return ContentTypeQueryMapper.GetContentTypes(allIds, Database, SqlSyntax, this, _templateRepository);
+            }
+        }
     }
 }

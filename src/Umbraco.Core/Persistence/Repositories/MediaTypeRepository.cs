@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Events;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 
 using Umbraco.Core.Persistence.Factories;
-using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -20,40 +22,17 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class MediaTypeRepository : ContentTypeBaseRepository<IMediaType>, IMediaTypeRepository
     {
 
-        public MediaTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
-            : base(work, cache, logger, sqlSyntax, mappingResolver)
+        public MediaTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+            : base(work, cache, logger, sqlSyntax)
         {
         }
-
-        #region Overrides of RepositoryBase<int,IMedia>
-
+        
         protected override IMediaType PerformGet(int id)
         {
-            var contentTypeSql = GetBaseQuery(false);
-            contentTypeSql.Where(GetBaseWhereClause(), new { Id = id});
+            var contentTypes = ContentTypeQueryMapper.GetMediaTypes(
+                new[] { id }, Database, SqlSyntax, this);
 
-            var dto = Database.Fetch<ContentTypeDto, NodeDto>(contentTypeSql).FirstOrDefault();
-
-            if (dto == null)
-                return null;
-
-            var factory = new MediaTypeFactory(NodeObjectTypeId);
-            var contentType = factory.BuildEntity(dto);
-            
-            contentType.AllowedContentTypes = GetAllowedContentTypeIds(id);
-            contentType.PropertyGroups = GetPropertyGroupCollection(id, contentType.CreateDate, contentType.UpdateDate);
-            ((MediaType)contentType).PropertyTypes = GetPropertyTypeCollection(id, contentType.CreateDate, contentType.UpdateDate);
-
-            var list = Database.Fetch<ContentType2ContentTypeDto>("WHERE childContentTypeId = @Id", new{ Id = id});
-            foreach (var contentTypeDto in list)
-            {
-                bool result = contentType.AddContentType(Get(contentTypeDto.ParentId));
-                //Do something if adding fails? (Should hopefully not be possible unless someone create a circular reference)
-            }
-
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            ((Entity)contentType).ResetDirtyProperties(false);
+            var contentType = contentTypes.SingleOrDefault();
             return contentType;
         }
 
@@ -65,7 +44,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                var sql = new Sql().Select("id").From<NodeDto>(SqlSyntax).Where<NodeDto>(SqlSyntax, dto => dto.NodeObjectType == NodeObjectTypeId);
+                var sql = new Sql().Select("id").From<NodeDto>(SqlSyntax).Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId);
                 var allIds = Database.Fetch<int>(sql).ToArray();
                 return ContentTypeQueryMapper.GetMediaTypes(allIds, Database, SqlSyntax, this);
             }
@@ -76,27 +55,27 @@ namespace Umbraco.Core.Persistence.Repositories
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<IMediaType>(sqlClause, query);
             var sql = translator.Translate()
-                .OrderBy<NodeDto>(SqlSyntax, x => x.Text);
+                .OrderBy<NodeDto>(x => x.Text, SqlSyntax);
 
             var dtos = Database.Fetch<ContentTypeDto, NodeDto>(sql);
             return dtos.Any()
                 ? GetAll(dtos.DistinctBy(x => x.NodeId).Select(x => x.NodeId).ToArray())
                 : Enumerable.Empty<IMediaType>();
         }
-
-        #endregion
-
+        
+        /// <summary>
+        /// Gets all entities of the specified <see cref="PropertyType"/> query
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns>An enumerable list of <see cref="IContentType"/> objects</returns>
         public IEnumerable<IMediaType> GetByQuery(IQuery<PropertyType> query)
         {
-            var ints = PerformGetByQuery(query);
-            foreach (var i in ints)
-            {
-                yield return Get(i);
-            }
-        }
-
-        #region Overrides of PetaPocoRepositoryBase<int,IMedia>
-
+            var ints = PerformGetByQuery(query).ToArray();
+            return ints.Any()
+                ? GetAll(ints)
+                : Enumerable.Empty<IMediaType>();
+        }       
+        
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sql = new Sql();
@@ -104,7 +83,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .From<ContentTypeDto>(SqlSyntax)
                 .InnerJoin<NodeDto>(SqlSyntax)
                 .On<ContentTypeDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
         }
 
@@ -136,19 +115,12 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             get { return new Guid(Constants.ObjectTypes.MediaType); }
         }
-
-        #endregion
-
-        #region Unit of Work Implementation
-
+        
         protected override void PersistNewItem(IMediaType entity)
         {
             ((MediaType)entity).AddingEntity();
 
-            var factory = new MediaTypeFactory(NodeObjectTypeId);
-            var dto = factory.BuildDto(entity);
-
-            PersistNewBaseContentType(dto, entity);
+            PersistNewBaseContentType(entity);
 
             entity.ResetDirtyProperties();
         }
@@ -173,14 +145,32 @@ namespace Umbraco.Core.Persistence.Repositories
                 entity.SortOrder = maxSortOrder + 1;
             }
 
-            var factory = new MediaTypeFactory(NodeObjectTypeId);
-            var dto = factory.BuildDto(entity);
-            
-            PersistUpdatedBaseContentType(dto, entity);
+            PersistUpdatedBaseContentType(entity);
 
             entity.ResetDirtyProperties();
         }
+        
+        protected override IMediaType PerformGet(Guid id)
+        {
+            var contentTypes = ContentTypeQueryMapper.GetMediaTypes(
+                new[] { id }, Database, SqlSyntax, this);
 
-        #endregion
+            var contentType = contentTypes.SingleOrDefault();
+            return contentType;
+        }
+
+        protected override IEnumerable<IMediaType> PerformGetAll(params Guid[] ids)
+        {
+            if (ids.Any())
+            {
+                return ContentTypeQueryMapper.GetMediaTypes(ids, Database, SqlSyntax, this);
+            }
+            else
+            {
+                var sql = new Sql().Select("id").From<NodeDto>(SqlSyntax).Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId);
+                var allIds = Database.Fetch<int>(sql).ToArray();
+                return ContentTypeQueryMapper.GetMediaTypes(allIds, Database, SqlSyntax, this);
+            }
+        }
     }
 }

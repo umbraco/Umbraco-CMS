@@ -23,7 +23,7 @@ namespace umbraco.BusinessLogic
     [Obsolete("Use the UserService instead")]
     public class User
     {
-        private IUser _user;
+        internal IUser UserEntity;
         private int? _lazyId;
         private bool? _defaultToLiveEditing;
         
@@ -38,7 +38,7 @@ namespace umbraco.BusinessLogic
 
         internal User(IUser user)
         {
-            _user = user;
+            UserEntity = user;
         }
 
         /// <summary>
@@ -81,8 +81,8 @@ namespace umbraco.BusinessLogic
 
         private void SetupUser(int ID)
         {
-            _user = ApplicationContext.Current.Services.UserService.GetUserById(ID);
-            if (_user == null)
+            UserEntity = ApplicationContext.Current.Services.UserService.GetUserById(ID);
+            if (UserEntity == null)
             {
                 throw new ArgumentException("No User exists with ID " + ID);
             }
@@ -95,7 +95,7 @@ namespace umbraco.BusinessLogic
         {
             if (_lazyId.HasValue) SetupUser(_lazyId.Value);
 
-            ApplicationContext.Current.Services.UserService.Save(_user);
+            ApplicationContext.Current.Services.UserService.Save(UserEntity);
 
             OnSaving(EventArgs.Empty);
         }
@@ -109,11 +109,11 @@ namespace umbraco.BusinessLogic
             get
             {
                 if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-                return _user.Name;
+                return UserEntity.Name;
             }
             set
             {
-                _user.Name = value;
+                UserEntity.Name = value;
                 
             }
         }
@@ -127,11 +127,11 @@ namespace umbraco.BusinessLogic
             get
             {
                 if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-                return _user.Email;
+                return UserEntity.Email;
             }
             set
             {
-                _user.Email = value;
+                UserEntity.Email = value;
             }
         }
 
@@ -144,11 +144,11 @@ namespace umbraco.BusinessLogic
             get
             {
                 if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-                return _user.Language;
+                return UserEntity.Language;
             }
             set
             {
-                _user.Language = value;
+                UserEntity.Language = value;
             }
         }
 
@@ -164,7 +164,7 @@ namespace umbraco.BusinessLogic
             }
             set
             {
-                _user.RawPasswordValue = value;
+                UserEntity.RawPasswordValue = value;
             }
         }
 
@@ -175,7 +175,7 @@ namespace umbraco.BusinessLogic
         public string GetPassword()
         {
             if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-            return _user.RawPasswordValue;
+            return UserEntity.RawPasswordValue;
         }
 
         /// <summary>
@@ -233,7 +233,7 @@ namespace umbraco.BusinessLogic
             var allApps = Application.getAll();
             var apps = new List<Application>();
 
-            var sections = _user.AllowedSections;
+            var sections = UserEntity.AllowedSections;
 
             foreach (var s in sections)
             {
@@ -254,14 +254,14 @@ namespace umbraco.BusinessLogic
             get
             {
                 if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-                return _user.Username;
+                return UserEntity.Username;
             }
             set
             {
                 if (EnsureUniqueLoginName(value, this) == false)
                     throw new Exception(String.Format("A user with the login '{0}' already exists", value));
 
-                _user.Username = value;
+                UserEntity.Username = value;
             }
         }
 
@@ -327,11 +327,11 @@ namespace umbraco.BusinessLogic
             get
             {
                 if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-                return new UserType(_user.UserType);
+                return new UserType(UserEntity.UserType);
             }
             set
             {
-                _user.UserType = value.UserTypeItem;
+                UserEntity.UserType = value.UserTypeItem;
             }
         }
 
@@ -576,7 +576,7 @@ namespace umbraco.BusinessLogic
 
             OnDeleting(EventArgs.Empty);
 
-            ApplicationContext.Current.Services.UserService.Delete(_user, true);
+            ApplicationContext.Current.Services.UserService.Delete(UserEntity, true);
 
             FlushFromCache();
         }
@@ -589,7 +589,7 @@ namespace umbraco.BusinessLogic
             OnDisabling(EventArgs.Empty);
 
             //delete without the true overload will perform the disable operation
-            ApplicationContext.Current.Services.UserService.Delete(_user);
+            ApplicationContext.Current.Services.UserService.Delete(UserEntity);
         }
 
         /// <summary>
@@ -603,7 +603,7 @@ namespace umbraco.BusinessLogic
 
             var defaultPermissions = UserType.DefaultPermissions;
 
-            var cachedPermissions = ApplicationContext.Current.Services.UserService.GetPermissions(_user)
+            var cachedPermissions = ApplicationContext.Current.Services.UserService.GetPermissions(UserEntity)
                 .ToArray();
 
             // NH 4.7.1 changing default permission behavior to default to User Type permissions IF no specific permissions has been
@@ -668,7 +668,7 @@ namespace umbraco.BusinessLogic
         {
             if (_lazyId.HasValue) SetupUser(_lazyId.Value);
 
-            var notifications = ApplicationContext.Current.Services.NotificationService.GetUserNotifications(_user);
+            var notifications = ApplicationContext.Current.Services.NotificationService.GetUserNotifications(UserEntity);
             foreach (var n in notifications.OrderBy(x => x.EntityId))
             {
                 int nodeId = n.EntityId;
@@ -688,7 +688,7 @@ namespace umbraco.BusinessLogic
         /// <value>The id.</value>
         public int Id
         {
-            get { return _user.Id; }
+            get { return UserEntity.Id; }
         }
 
         /// <summary>
@@ -697,9 +697,9 @@ namespace umbraco.BusinessLogic
         public void ClearApplications()
         {
             if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-            foreach (var s in _user.AllowedSections.ToArray())
+            foreach (var s in UserEntity.AllowedSections.ToArray())
             {
-                _user.RemoveAllowedSection(s);
+                UserEntity.RemoveAllowedSection(s);
             }
         }
 
@@ -711,13 +711,13 @@ namespace umbraco.BusinessLogic
         {
             if (_lazyId.HasValue) SetupUser(_lazyId.Value);
 
-            foreach (var s in _user.AllowedSections.ToArray())
+            foreach (var s in UserEntity.AllowedSections.ToArray())
             {
-                _user.RemoveAllowedSection(s);
+                UserEntity.RemoveAllowedSection(s);
             }
 
             //For backwards compatibility this requires an implicit save
-            ApplicationContext.Current.Services.UserService.Save(_user);
+            ApplicationContext.Current.Services.UserService.Save(UserEntity);
         }
 
         /// <summary>
@@ -727,7 +727,7 @@ namespace umbraco.BusinessLogic
         public void AddApplication(string appAlias)
         {
             if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-            _user.AddAllowedSection(appAlias);
+            UserEntity.AddAllowedSection(appAlias);
         }
 
         /// <summary>
@@ -739,10 +739,10 @@ namespace umbraco.BusinessLogic
         {
             if (_lazyId.HasValue) SetupUser(_lazyId.Value);
 
-            _user.AddAllowedSection(AppAlias);
+            UserEntity.AddAllowedSection(AppAlias);
 
             //For backwards compatibility this requires an implicit save
-            ApplicationContext.Current.Services.UserService.Save(_user);
+            ApplicationContext.Current.Services.UserService.Save(UserEntity);
         }
 
         /// <summary>
@@ -754,11 +754,11 @@ namespace umbraco.BusinessLogic
             get
             {
                 if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-                return _user.IsLockedOut;
+                return UserEntity.IsLockedOut;
             }
             set
             {
-                _user.IsLockedOut = value;
+                UserEntity.IsLockedOut = value;
             }
         }
 
@@ -771,11 +771,11 @@ namespace umbraco.BusinessLogic
             get
             {
                 if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-                return _user.IsApproved == false;
+                return UserEntity.IsApproved == false;
             }
             set
             {
-                _user.IsApproved = value == false;
+                UserEntity.IsApproved = value == false;
             }
         }
 
@@ -789,11 +789,11 @@ namespace umbraco.BusinessLogic
             get
             {
                 if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-                return _user.StartContentId;
+                return UserEntity.StartContentId;
             }
             set
             {
-                _user.StartContentId = value;
+                UserEntity.StartContentId = value;
             }
         }
 
@@ -806,11 +806,11 @@ namespace umbraco.BusinessLogic
             get
             {
                 if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-                return _user.StartMediaId;
+                return UserEntity.StartMediaId;
             }
             set
             {
-                _user.StartMediaId = value;
+                UserEntity.StartMediaId = value;
             }
         }
 

@@ -18,6 +18,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Security;
 using umbraco.BusinessLogic;
 using Umbraco.Core;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Tests.PublishedContent;
@@ -377,6 +378,7 @@ namespace Umbraco.Tests.Mvc
         ServiceContext GetServiceContext()
         {
             return MockHelper.GetMockedServiceContext();
+                    new TransientMessagesFactory(),
         }
 
         ViewContext GetViewContext()
@@ -398,7 +400,12 @@ namespace Umbraco.Tests.Mvc
                 urlProvider);
             umbracoContext.RoutingContext = routingContext;
 
-            var request = new PublishedContentRequest(new Uri("http://localhost/dang"), routingContext);
+            var request = new PublishedContentRequest(
+                new Uri("http://localhost/dang"), 
+                routingContext,
+               settings.WebRouting,
+                s => Enumerable.Empty<string>());
+
             request.Culture = CultureInfo.InvariantCulture;
             umbracoContext.PublishedContentRequest = request;
 

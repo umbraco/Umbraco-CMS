@@ -27,7 +27,7 @@ namespace Umbraco.Web.Cache
             var serializer = new JavaScriptSerializer();
             var jsonObject = serializer.Deserialize<JsonPayload[]>(json);
             return jsonObject;
-        }
+        }   
 
         /// <summary>
         /// Creates the custom Json payload used to refresh cache amongst the servers
@@ -41,8 +41,7 @@ namespace Umbraco.Web.Cache
             var json = serializer.Serialize(items);
             return json;
         }
-
-
+   
         /// <summary>
         /// Converts a macro to a jsonPayload object
         /// </summary>

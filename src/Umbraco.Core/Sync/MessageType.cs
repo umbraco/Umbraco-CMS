@@ -10,6 +10,7 @@
         RefreshByJson,
         RemoveById,
         RefreshByInstance,
-        RemoveByInstance
+        RemoveByInstance,
+        RefreshByPayload
     }
 }

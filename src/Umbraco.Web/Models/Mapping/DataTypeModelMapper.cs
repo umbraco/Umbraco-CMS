@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using AutoMapper;
-using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -34,10 +33,32 @@ namespace Umbraco.Web.Models.Mapping
                 Constants.System.DefaultMembersListViewDataTypeId
             };
 
-            config.CreateMap<IDataTypeDefinition, DataTypeBasic>()                
+            config.CreateMap<PropertyEditor, DataTypeBasic>()
+                .ForMember(x => x.HasPrevalues, expression => expression.Ignore())
+                .ForMember(x => x.IsSystemDataType, expression => expression.Ignore())
+                .ForMember(x => x.Id, expression => expression.Ignore())
+                .ForMember(x => x.Trashed, expression => expression.Ignore())
+                .ForMember(x => x.Key, expression => expression.Ignore())
+                .ForMember(x => x.ParentId, expression => expression.Ignore())
+                .ForMember(x => x.Path, expression => expression.Ignore())
+                .ForMember(x => x.AdditionalData, expression => expression.Ignore());
+
+            config.CreateMap<IDataTypeDefinition, DataTypeBasic>()
+                .ForMember(x => x.HasPrevalues, expression => expression.Ignore())
                 .ForMember(x => x.Icon, expression => expression.Ignore())
                 .ForMember(x => x.Alias, expression => expression.Ignore())
-                .ForMember(x => x.IsSystemDataType, expression => expression.MapFrom(definition => systemIds.Contains(definition.Id)));
+                .ForMember(x => x.Group, expression => expression.Ignore())
+                .ForMember(x => x.IsSystemDataType, expression => expression.MapFrom(definition => systemIds.Contains(definition.Id)))
+                .AfterMap((def, basic) =>
+                {
+                    var editor = PropertyEditorResolver.Current.GetByAlias(def.PropertyEditorAlias);
+                    if (editor != null)
+                    {
+                        basic.Alias = editor.Alias;
+                        basic.Group = editor.Group;
+                        basic.Icon = editor.Icon;
+                    }
+                });
 
             config.CreateMap<IDataTypeDefinition, DataTypeDisplay>()
                 .ForMember(display => display.AvailableEditors, expression => expression.ResolveUsing<AvailablePropertyEditorsResolver>())
@@ -45,10 +66,21 @@ namespace Umbraco.Web.Models.Mapping
                     new PreValueDisplayResolver(lazyDataTypeService)))
                 .ForMember(display => display.SelectedEditor, expression => expression.MapFrom(
                     definition => definition.PropertyEditorAlias.IsNullOrWhiteSpace() ? null : definition.PropertyEditorAlias))
+                .ForMember(x => x.HasPrevalues, expression => expression.Ignore())
                 .ForMember(x => x.Notifications, expression => expression.Ignore())
                 .ForMember(x => x.Icon, expression => expression.Ignore())
                 .ForMember(x => x.Alias, expression => expression.Ignore())
-                .ForMember(x => x.IsSystemDataType, expression => expression.MapFrom(definition => systemIds.Contains(definition.Id)));
+                .ForMember(x => x.Group, expression => expression.Ignore())                
+                .ForMember(x => x.IsSystemDataType, expression => expression.MapFrom(definition => systemIds.Contains(definition.Id)))
+                .AfterMap((def, basic) =>
+                {
+                    var editor = PropertyEditorResolver.Current.GetByAlias(def.PropertyEditorAlias);
+                    if (editor != null)
+                    {
+                        basic.Group = editor.Group;
+                        basic.Icon = editor.Icon;
+                    }
+                });
 
             //gets a list of PreValueFieldDisplay objects from the data type definition
             config.CreateMap<IDataTypeDefinition, IEnumerable<PreValueFieldDisplay>>()
@@ -59,14 +91,13 @@ namespace Umbraco.Web.Models.Mapping
                       });
 
             config.CreateMap<DataTypeSave, IDataTypeDefinition>()
-                .ConstructUsing(save => new DataTypeDefinition(-1, save.SelectedEditor) {CreateDate = DateTime.Now})
+                .ConstructUsing(save => new DataTypeDefinition(save.SelectedEditor) {CreateDate = DateTime.Now})
                 .ForMember(definition => definition.Id, expression => expression.MapFrom(save => Convert.ToInt32(save.Id)))
                 //we have to ignore the Key otherwise this will reset the UniqueId field which should never change!
                 // http://issues.umbraco.org/issue/U4-3911                
                 .ForMember(definition => definition.Key, expression => expression.Ignore())
                 .ForMember(definition => definition.Path, expression => expression.Ignore())
                 .ForMember(definition => definition.PropertyEditorAlias, expression => expression.MapFrom(save => save.SelectedEditor))
-                .ForMember(definition => definition.ParentId, expression => expression.MapFrom(save => -1))
                 .ForMember(definition => definition.DatabaseType, expression => expression.ResolveUsing<DatabaseTypeResolver>())
                 .ForMember(x => x.CreatorId, expression => expression.Ignore())
                 .ForMember(x => x.Level, expression => expression.Ignore())

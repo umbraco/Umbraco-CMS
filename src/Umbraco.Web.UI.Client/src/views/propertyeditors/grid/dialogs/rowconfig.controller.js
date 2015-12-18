@@ -1,8 +1,8 @@
 function RowConfigController($scope) {
-    
-    $scope.currentRow = angular.copy($scope.dialogOptions.currentRow);
-    $scope.editors = $scope.dialogOptions.editors;
-    $scope.columns = $scope.dialogOptions.columns;
+
+    $scope.currentRow = $scope.model.currentRow;
+    $scope.editors = $scope.model.editors;
+    $scope.columns = $scope.model.columns;
 
     $scope.scaleUp = function(section, max, overflow) {
         var add = 1;
@@ -19,7 +19,7 @@ function RowConfigController($scope) {
     };
 
     $scope.percentage = function(spans) {
-        return ((spans / $scope.columns) * 100).toFixed(1);
+        return ((spans / $scope.columns) * 100).toFixed(8);
     };
 
     $scope.toggleCollection = function(collection, toggle) {
@@ -88,10 +88,6 @@ function RowConfigController($scope) {
         }
     }, true);
 
-    $scope.complete = function () {
-        angular.extend($scope.dialogOptions.currentRow, $scope.currentRow);
-        $scope.close();
-    }
 }
 
 angular.module("umbraco").controller("Umbraco.PropertyEditors.GridPrevalueEditor.RowConfigController", RowConfigController);

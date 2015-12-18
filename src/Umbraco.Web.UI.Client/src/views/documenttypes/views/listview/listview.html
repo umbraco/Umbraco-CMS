@@ -1,0 +1,21 @@
+<div class="sub-view-columns">
+
+    <div class="sub-view-column-left">
+
+        <h5>Enable list view</h5>
+        <small>Configures the content item to show a sortable & searchable list of its children, the children will not be shown in the tree</small>
+
+    </div>
+
+    <div class="sub-view-column-right">
+
+      <umb-list-view-settings
+        enable-list-view="model.isContainer"
+        model-alias="model.alias"
+        list-view-name="model.listViewEditorName"
+        content-type="documentType">
+      </umb-list-view-settings>
+
+    </div>
+
+</div>

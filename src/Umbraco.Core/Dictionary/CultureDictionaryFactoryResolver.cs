@@ -1,5 +1,6 @@
 using System;
 using System.Linq.Expressions;
+using System.ComponentModel;
 using Umbraco.Core.LightInject;
 using Umbraco.Core.ObjectResolution;
 
@@ -36,13 +37,13 @@ namespace Umbraco.Core.Dictionary
 	    }
 
 	    /// <summary>
-		/// Can be used by developers at runtime to set their ICultureDictionaryFactory at app startup
-		/// </summary>
-		/// <param name="factory"></param>
-		public void SetContentStore(ICultureDictionaryFactory factory)
-		{
-			Value = factory;
-		}
+        /// Can be used by developers at runtime to set their ICultureDictionaryFactory at app startup
+        /// </summary>
+        /// <param name="factory"></param>
+        public void SetDictionaryFactory(ICultureDictionaryFactory factory)
+        {
+            Value = factory;
+        }
 
 		/// <summary>
 		/// Returns the ICultureDictionaryFactory

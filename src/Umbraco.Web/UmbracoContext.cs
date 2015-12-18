@@ -353,7 +353,7 @@ namespace Umbraco.Web
 		/// <summary>
 		/// Gets/sets the RoutingContext object
 		/// </summary>
-		internal RoutingContext RoutingContext { get; set; }	
+		public RoutingContext RoutingContext { get; internal set; }	
 
 		/// <summary>
 		/// Gets/sets the PublishedContentRequest object
@@ -462,8 +462,6 @@ namespace Umbraco.Web
             Security.DisposeIfDisposable();
             Security = null;
             _umbracoContext = null;
-            //ensure not to dispose this!
-            Application = null;
 
             //Before we set these to null but in fact these are application lifespan singletons so 
             //there's no reason we need to set them to null and this also caused a problem with packages
@@ -471,7 +469,8 @@ namespace Umbraco.Web
             //http://issues.umbraco.org/issue/U4-2734
             //http://our.umbraco.org/projects/developer-tools/301-url-tracker/version-2/44327-Issues-with-URL-Tracker-in-614
             //ContentCache = null;
-            //MediaCache = null;     
+            //MediaCache = null;                 
+            //Application = null;
         }
     }
 }

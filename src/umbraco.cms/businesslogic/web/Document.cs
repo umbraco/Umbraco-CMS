@@ -17,6 +17,7 @@ using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.helpers;
 using umbraco.DataLayer;
+using Umbraco.Core.Events;
 using Umbraco.Core.Strings;
 
 namespace umbraco.cms.businesslogic.web
@@ -917,6 +918,7 @@ namespace umbraco.cms.businesslogic.web
             return descendants.Select(x => new Document(x.Id, true));
         }
 
+            x.Attributes.Append(addAttribute(xd, "key", UniqueId.ToString()));
 
         public override List<CMSPreviewNode> GetNodesForPreview(bool childrenOnly)
         {

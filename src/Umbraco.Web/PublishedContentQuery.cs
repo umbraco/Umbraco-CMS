@@ -211,7 +211,7 @@ namespace Umbraco.Web
 
         private IEnumerable<IPublishedContent> TypedDocumentsByIds(ContextualPublishedCache cache, IEnumerable<int> ids)
         {
-            return ids.Select(eachId => TypedDocumentById(eachId, cache));
+            return ids.Select(eachId => TypedDocumentById(eachId, cache)).WhereNotNull();
         }
 
         private IEnumerable<IPublishedContent> TypedDocumentsByXPath(string xpath, XPathVariable[] vars, ContextualPublishedContentCache cache)

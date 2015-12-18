@@ -32,7 +32,9 @@ namespace Umbraco.Tests.Mvc
         [Test]
         public void Can_Construct_And_Get_Result()
         {
-            var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper());
+            var appCtx = new ApplicationContext(
+                CacheHelper.CreateDisabledCacheHelper(),
+                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
             var umbCtx = UmbracoContext.EnsureContext(
                 new Mock<HttpContextBase>().Object,
@@ -52,7 +54,10 @@ namespace Umbraco.Tests.Mvc
         [Test]
         public void Umbraco_Context_Not_Null()
         {
-            var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper());
+            var appCtx = new ApplicationContext(
+                CacheHelper.CreateDisabledCacheHelper(),
+                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+
             ApplicationContext.EnsureContext(appCtx, true);
 
             var umbCtx = UmbracoContext.EnsureContext(
@@ -93,7 +98,9 @@ namespace Umbraco.Tests.Mvc
         [Test]
         public void Can_Lookup_Content()
         {
-            var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper());
+            var appCtx = new ApplicationContext(
+                CacheHelper.CreateDisabledCacheHelper(),
+                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
             var umbCtx = UmbracoContext.EnsureContext(
                 new Mock<HttpContextBase>().Object,
@@ -127,7 +134,9 @@ namespace Umbraco.Tests.Mvc
         [Test]
         public void Mock_Current_Page()
         {
-            var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper());
+            var appCtx = new ApplicationContext(
+                CacheHelper.CreateDisabledCacheHelper(),
+                new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
 
             var webRoutingSettings = Mock.Of<IWebRoutingSection>(section => section.UrlProviderMode == "AutoLegacy");
 

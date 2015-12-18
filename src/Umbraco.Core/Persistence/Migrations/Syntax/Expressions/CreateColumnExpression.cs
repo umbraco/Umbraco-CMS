@@ -5,15 +5,16 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Expressions
 {
     public class CreateColumnExpression : MigrationExpressionBase
     {
-        public CreateColumnExpression(ISqlSyntaxProvider sqlSyntax, DatabaseProviders currentDatabaseProvider, DatabaseProviders[] supportedDatabaseProviders = null)
-            : base(sqlSyntax, currentDatabaseProvider, supportedDatabaseProviders)
+
+        public CreateColumnExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax)
+            : base(current, databaseProviders, sqlSyntax)
         {
             Column = new ColumnDefinition { ModificationType = ModificationType.Create };
         }
 
-        public virtual string SchemaName { get; set; }
-        public virtual string TableName { get; set; }
-        public virtual ColumnDefinition Column { get; set; }
+        public string SchemaName { get; set; }
+        public string TableName { get; set; }
+        public ColumnDefinition Column { get; set; }
 
         public override string ToString()
         {

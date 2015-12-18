@@ -2,21 +2,32 @@
  * @ngdoc controller
  * @name Umbraco.Editors.Member.ListController
  * @function
- * 
+ *
  * @description
  * The controller for the member list view
  */
-function MemberListController($scope, $routeParams, $location, $q, $window, appState, memberResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, formHelper, umbModelMapper, editorState) {
-    
+function MemberListController($scope, $routeParams, $location, $q, $window, appState, memberResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, formHelper, umbModelMapper, editorState, localizationService) {
+
     //setup scope vars
     $scope.currentSection = appState.getSectionState("currentSection");
     $scope.currentNode = null; //the editors affiliated node
-    
+
+    $scope.page = {};
+    $scope.page.lockedName = true;
+    $scope.page.loading = true;
+
     //we are editing so get the content item from the server
     memberResource.getListNode($routeParams.id)
         .then(function (data) {
-            $scope.loaded = true;
+
             $scope.content = data;
+
+            //translate "All Members"
+            if ($scope.content != null && $scope.content.name != null && $scope.content.name.replace(" ", "").toLowerCase() == "allmembers") {
+                localizationService.localize("member_allMembers").then(function (value) {
+                    $scope.content.name = value;
+                });
+            }
 
             editorState.set($scope.content);
 
@@ -29,6 +40,9 @@ function MemberListController($scope, $routeParams, $location, $q, $window, appS
             // after the redirect, so we will bind all subscriptions which will show the server validation errors
             // if there are any and then clear them so the collection no longer persists them.
             serverValidationManager.executeAndClearAllSubscriptions();
+
+            $scope.page.loading = false;
+
         });
 }
 

@@ -15,14 +15,13 @@ using Umbraco.Tests.TestHelpers;
 namespace Umbraco.Tests.Strings
 {
     [TestFixture]
-    public class DefaultShortStringHelperTests : BaseUmbracoConfigurationTest
+    public class DefaultShortStringHelperTests 
     {
         private DefaultShortStringHelper _helper;
 
         [SetUp]
-        public override void Initialize()
+        public void Initialize()
         {
-            base.Initialize();
 
             // NOTE: it is not possible to configure the helper once it has been assigned
             // to the resolver and resolution has frozen. but, obviously, it is possible
@@ -80,9 +79,8 @@ namespace Umbraco.Tests.Strings
         }
 
         [TearDown]
-        public override void TearDown()
+        public void TearDown()
         {
-            base.TearDown();
             ShortStringHelperResolver.Reset();
         }
 
@@ -537,7 +535,7 @@ namespace Umbraco.Tests.Strings
         //#endregion
         //public void CleanStringWithUnderscore(string input, string expected, bool allowUnderscoreInTerm)
         //{
-        //    var helper = new DefaultShortStringHelper()
+        //    var helper = new DefaultShortStringHelper(SettingsForTests.GetDefault())
         //        .WithConfig(allowUnderscoreInTerm: allowUnderscoreInTerm);
         //    var output = helper.CleanString(input, CleanStringType.Alias | CleanStringType.Ascii | CleanStringType.CamelCase);
         //    Assert.AreEqual(expected, output);

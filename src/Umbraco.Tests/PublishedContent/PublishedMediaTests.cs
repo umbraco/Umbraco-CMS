@@ -457,7 +457,8 @@ namespace Umbraco.Tests.PublishedContent
 
             var nav = node.CreateNavigator();
 
-            var converted = publishedMedia.ConvertFromXPathNodeIterator(nav.Select("/Image"), nodeId);
+            var converted = publishedMedia.CreateFromCacheValues(
+                publishedMedia.ConvertFromXPathNodeIterator(nav.Select("/Image"), nodeId));
 
             Assert.AreEqual(nodeId, converted.Id);
             Assert.AreEqual(3, converted.Level);

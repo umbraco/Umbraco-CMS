@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Web.UI;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
@@ -21,6 +22,83 @@ namespace Umbraco.Tests.Cache
         public virtual void TearDown()
         {
             Provider.ClearAllCache();
+        } 
+
+        [Test]
+        public void Throws_On_Reentry()
+        {
+            // don't run for StaticCacheProvider - not making sense
+            if (GetType() == typeof (StaticCacheProviderTests))
+                Assert.Ignore("Do not run for StaticCacheProvider.");
+
+            Exception exception = null;
+            var result = Provider.GetCacheItem("blah", () =>
+            {
+                try
+                {
+                    var result2 = Provider.GetCacheItem("blah");
+                }
+                catch (Exception e)
+                {
+                    exception = e;
+                }
+                return "value";
+            });
+            Assert.IsNotNull(exception);
+            Assert.IsAssignableFrom<InvalidOperationException>(exception);
+        }
+
+        [Test]
+        public void Does_Not_Cache_Exceptions()
+        {
+            var counter = 0;
+
+            object result;
+            try
+            {
+                result = Provider.GetCacheItem("Blah", () =>
+                    {
+                        counter++;
+                        throw new Exception("Do not cache this");
+                    });
+            }
+            catch (Exception){}
+
+            try
+            {
+                result = Provider.GetCacheItem("Blah", () =>
+                {
+                    counter++;
+                    throw new Exception("Do not cache this");
+                });
+            }
+            catch (Exception){}
+
+            Assert.Greater(counter, 1);
+
+        }
+
+        [Test]
+        public void Ensures_Delegate_Result_Is_Cached_Once()
+        {
+            var counter = 0;
+
+            object result;
+            
+            result = Provider.GetCacheItem("Blah", () =>
+            {
+                counter++;
+                return "";
+            });
+
+            result = Provider.GetCacheItem("Blah", () =>
+            {
+                counter++;
+                return "";
+            });
+
+            Assert.AreEqual(counter, 1);
+
         }
 
         [Test]

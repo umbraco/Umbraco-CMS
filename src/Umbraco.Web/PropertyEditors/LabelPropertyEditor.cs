@@ -9,7 +9,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.NoEditAlias, "Label", "readonlyvalue")]
+    [PropertyEditor(Constants.PropertyEditors.NoEditAlias, "Label", "readonlyvalue", Icon="icon-readonly")]
     public class LabelPropertyEditor : PropertyEditor
     {
         /// <summary>

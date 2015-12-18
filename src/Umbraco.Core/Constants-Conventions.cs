@@ -27,6 +27,7 @@ namespace Umbraco.Core
                 /// <summary>
                 /// The root id for all top level dictionary items
                 /// </summary>
+                [Obsolete("There is no dictionary root item id anymore, it is simply null")]
                 public const string DictionaryItemRootId = "41c7638d-f529-4bff-853e-59a0c2fb1bde";
 		    }
 
@@ -205,7 +206,7 @@ namespace Umbraco.Core
                 /// </summary>
                 internal const string StandardPropertiesGroupName = "Membership";
 
-		        internal static Dictionary<string, PropertyType> GetStandardPropertyTypeStubs()
+		        public static Dictionary<string, PropertyType> GetStandardPropertyTypeStubs()
 		        {
 		            return new Dictionary<string, PropertyType>
 		                {

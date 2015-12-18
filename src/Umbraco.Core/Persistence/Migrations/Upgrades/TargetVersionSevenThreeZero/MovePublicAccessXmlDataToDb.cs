@@ -30,6 +30,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
             }
 
             var xmlFile = IOHelper.MapPath(SystemFiles.AccessXml);
+            
+            if (File.Exists(xmlFile) == false) return;
+
             using (var fileStream = File.OpenRead(xmlFile))
             {
                 var xml = XDocument.Load(fileStream);

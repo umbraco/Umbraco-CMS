@@ -20,7 +20,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.UploadFieldAlias, "File upload", "fileupload")]
+    [PropertyEditor(Constants.PropertyEditors.UploadFieldAlias, "File upload", "fileupload", Icon = "icon-download-alt", Group = "media")]
     public class FileUploadPropertyEditor : PropertyEditor, IApplicationEventHandler
     {
         private readonly MediaFileSystem _mediaFileSystem;
@@ -33,6 +33,8 @@ namespace Umbraco.Web.PropertyEditors
             if (contentSettings == null) throw new ArgumentNullException("contentSettings");
             _mediaFileSystem = mediaFileSystem;
             _contentSettings = contentSettings;
+            MemberService.Deleted += (sender, args) =>
+                args.MediaFilesToDelete.AddRange(ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
         }
 
         /// <summary>

@@ -20,7 +20,7 @@ namespace Umbraco.Web
         public static MvcHtmlString GetGridHtml(this HtmlHelper html, IPublishedProperty property, string framework = "bootstrap3")
         {
             var asString = property.Value as string;
-            if (asString.IsNullOrWhiteSpace()) return new MvcHtmlString(string.Empty);
+            if (asString != null && string.IsNullOrEmpty(asString)) return new MvcHtmlString(string.Empty);
 
             var view = "Grid/" + framework;
             return html.Partial(view, property.Value);
@@ -56,7 +56,7 @@ namespace Umbraco.Web
         public static MvcHtmlString GetGridHtml(this IPublishedProperty property, HtmlHelper html, string framework = "bootstrap3")
         {
             var asString = property.Value as string;
-            if (asString.IsNullOrWhiteSpace()) return new MvcHtmlString(string.Empty);
+            if (asString != null && string.IsNullOrEmpty(asString)) return new MvcHtmlString(string.Empty);
 
             var view = "Grid/" + framework;
             return html.Partial(view, property.Value);
@@ -87,23 +87,23 @@ namespace Umbraco.Web
         }
 
 
-        //[Obsolete("This should not be used, GetGridHtml methods accepting HtmlHelper as a parameter or GetGridHtml extensions on HtmlHelper should be used instead")]
+        [Obsolete("This should not be used, GetGridHtml methods accepting HtmlHelper as a parameter or GetGridHtml extensions on HtmlHelper should be used instead")]
         public static MvcHtmlString GetGridHtml(this IPublishedProperty property, string framework = "bootstrap3")
         {
             var asString = property.Value as string;
-            if (asString.IsNullOrWhiteSpace()) return new MvcHtmlString(string.Empty);
+            if (asString != null && string.IsNullOrEmpty(asString)) return new MvcHtmlString(string.Empty);
 
             var htmlHelper = CreateHtmlHelper(property.Value);
             return htmlHelper.GetGridHtml(property, framework);
         }
 
-        //[Obsolete("This should not be used, GetGridHtml methods accepting HtmlHelper as a parameter or GetGridHtml extensions on HtmlHelper should be used instead")]
+        [Obsolete("This should not be used, GetGridHtml methods accepting HtmlHelper as a parameter or GetGridHtml extensions on HtmlHelper should be used instead")]
         public static MvcHtmlString GetGridHtml(this IPublishedContent contentItem)
         {
             return GetGridHtml(contentItem, "bodyText", "bootstrap3");
         }
 
-        //[Obsolete("This should not be used, GetGridHtml methods accepting HtmlHelper as a parameter or GetGridHtml extensions on HtmlHelper should be used instead")]
+        [Obsolete("This should not be used, GetGridHtml methods accepting HtmlHelper as a parameter or GetGridHtml extensions on HtmlHelper should be used instead")]
         public static MvcHtmlString GetGridHtml(this IPublishedContent contentItem, string propertyAlias)
         {
             Mandate.ParameterNotNullOrEmpty(propertyAlias, "propertyAlias");
@@ -111,7 +111,7 @@ namespace Umbraco.Web
             return GetGridHtml(contentItem, propertyAlias, "bootstrap3");    
         }
 
-        //[Obsolete("This should not be used, GetGridHtml methods accepting HtmlHelper as a parameter or GetGridHtml extensions on HtmlHelper should be used instead")]
+        [Obsolete("This should not be used, GetGridHtml methods accepting HtmlHelper as a parameter or GetGridHtml extensions on HtmlHelper should be used instead")]
         public static MvcHtmlString GetGridHtml(this IPublishedContent contentItem, string propertyAlias, string framework)
         {
             Mandate.ParameterNotNullOrEmpty(propertyAlias, "propertyAlias");
@@ -127,7 +127,7 @@ namespace Umbraco.Web
             return htmlHelper.GetGridHtml(contentItem, propertyAlias, framework);
         }
 
-        //[Obsolete("This shouldn't need to be used but because the obsolete extension methods above don't have access to the current HtmlHelper, we need to create a fake one, unfortunately however this will not pertain the current views viewdata, tempdata or model state so should not be used")]
+        [Obsolete("This shouldn't need to be used but because the obsolete extension methods above don't have access to the current HtmlHelper, we need to create a fake one, unfortunately however this will not pertain the current views viewdata, tempdata or model state so should not be used")]
         private static HtmlHelper CreateHtmlHelper(object model)
         {
             var cc = new ControllerContext

@@ -7,10 +7,10 @@ namespace Umbraco.Tests.Migrations.Stubs
     [Migration("6.0.0", 2, "Test")]
     public class SixZeroMigration2 : MigrationBase
     {
-        public SixZeroMigration2(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
+        public SixZeroMigration2(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
         {
         }
+
 
         public override void Up()
         {
@@ -21,5 +21,7 @@ namespace Umbraco.Tests.Migrations.Stubs
         {
             Alter.Table("umbracoUser").AlterColumn("sendEmail").AsBoolean();
         }
+
+        
     }
 }

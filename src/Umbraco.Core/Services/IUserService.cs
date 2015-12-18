@@ -73,12 +73,23 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Replaces the same permission set for a single user to any number of entities
-        /// </summary>
-        /// <remarks>If no 'entityIds' are specified all permissions will be removed for the specified user.</remarks>
+        /// </summary>        
         /// <param name="userId">Id of the user</param>
-        /// <param name="permissions">Permissions as enumerable list of <see cref="char"/></param>
+        /// <param name="permissions">
+        /// Permissions as enumerable list of <see cref="char"/>, 
+        /// if no permissions are specified then all permissions for this node are removed for this user
+        /// </param>
         /// <param name="entityIds">Specify the nodes to replace permissions for. If nothing is specified all permissions are removed.</param>
+        /// <remarks>If no 'entityIds' are specified all permissions will be removed for the specified user.</remarks>
         void ReplaceUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds);
+
+        /// <summary>
+        /// Assigns the same permission set for a single user to any number of entities
+        /// </summary>
+        /// <param name="userId">Id of the user</param>
+        /// <param name="permission"></param>
+        /// <param name="entityIds">Specify the nodes to replace permissions for</param>
+        void AssignUserPermission(int userId, char permission, params int[] entityIds);
 
         #region User types
 

@@ -7,8 +7,10 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Expressions
 {
     public class CreateTableExpression : MigrationExpressionBase
     {
-        public CreateTableExpression(ISqlSyntaxProvider sqlSyntax, DatabaseProviders currentDatabaseProvider, DatabaseProviders[] supportedDatabaseProviders = null)
-            : base(sqlSyntax, currentDatabaseProvider, supportedDatabaseProviders)
+
+
+        public CreateTableExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax)
+            : base(current, databaseProviders, sqlSyntax)
         {
             Columns = new List<ColumnDefinition>();
         }

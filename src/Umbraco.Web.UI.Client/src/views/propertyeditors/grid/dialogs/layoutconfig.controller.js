@@ -2,9 +2,9 @@ angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.GridPrevalueEditor.LayoutConfigController",
     function ($scope) {
 
-    		$scope.currentLayout = $scope.dialogOptions.currentLayout;
-    		$scope.columns = $scope.dialogOptions.columns;
-    		$scope.rows = $scope.dialogOptions.rows;
+    		$scope.currentLayout = $scope.model.currentLayout;
+    		$scope.columns = $scope.model.columns;
+    		$scope.rows = $scope.model.rows;
 
     		$scope.scaleUp = function(section, max, overflow){
     		   var add = 1;
@@ -21,7 +21,7 @@ angular.module("umbraco")
     		};
 
     		$scope.percentage = function(spans){
-    		    return ((spans / $scope.columns) * 100).toFixed(1);
+    		    return ((spans / $scope.columns) * 100).toFixed(8);
     		};
 
     		$scope.toggleCollection = function(collection, toggle){

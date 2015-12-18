@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using umbraco.interfaces;
@@ -54,6 +55,15 @@ namespace Umbraco.Core.Sync
         }
 
         #region IServerMessenger
+
+        public void PerformRefresh(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, object payload)
+        {
+            if (servers == null) throw new ArgumentNullException("servers");
+            if (refresher == null) throw new ArgumentNullException("refresher");
+            if (payload == null) throw new ArgumentNullException("payload");
+
+            Deliver(servers, refresher, payload);
+        }
 
         public void PerformRefresh(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, string jsonPayload)
         {
@@ -143,6 +153,19 @@ namespace Umbraco.Core.Sync
         #endregion
 
         #region Deliver
+
+        protected void DeliverLocal(ICacheRefresher refresher, object payload)
+        {
+            if (refresher == null) throw new ArgumentNullException("refresher");
+
+            LogHelper.Debug<ServerMessengerBase>("Invoking refresher {0} on local server for message type RefreshByPayload",
+                refresher.GetType);
+
+            var payloadRefresher = refresher as IPayloadCacheRefresher;
+            if (payloadRefresher == null)
+                throw new InvalidOperationException("The cache refresher " + refresher.GetType() + " is not of type " + typeof(IPayloadCacheRefresher));
+            payloadRefresher.Refresh(payload);
+        }
 
         /// <summary>
         /// Executes the non strongly typed <see cref="ICacheRefresher"/> on the local/current server
@@ -268,6 +291,25 @@ namespace Umbraco.Core.Sync
         protected abstract void DeliverRemote(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null);
 
         //protected abstract void DeliverRemote(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, object payload);
+
+        protected virtual void Deliver(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, object payload)
+        {
+            if (servers == null) throw new ArgumentNullException("servers");
+            if (refresher == null) throw new ArgumentNullException("refresher");
+
+            var serversA = servers.ToArray();
+
+            // deliver local
+            DeliverLocal(refresher, payload);
+
+            // distribute?
+            if (RequiresDistributed(serversA, refresher, MessageType.RefreshByJson) == false)
+                return;
+
+            // deliver remote
+            var json = JsonConvert.SerializeObject(payload);
+            DeliverRemote(serversA, refresher, MessageType.RefreshByJson, null, json);
+        }
 
         protected virtual void Deliver(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null)
         {

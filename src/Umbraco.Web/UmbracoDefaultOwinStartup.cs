@@ -21,6 +21,8 @@ namespace Umbraco.Web
     {
         public virtual void Configuration(IAppBuilder app)
         {
+            app.SanitizeThreadCulture();
+
             app.SetUmbracoLoggerFactory();
 
             //Configure the Identity user manager for use with Umbraco Back office 
@@ -32,8 +34,8 @@ namespace Umbraco.Web
             //Ensure owin is configured for Umbraco back office authentication. If you have any front-end OWIN
             // cookie configuration, this must be declared after it.
             app
-                .UseUmbracoBackOfficeCookieAuthentication()
-                .UseUmbracoBackOfficeExternalCookieAuthentication();
+                .UseUmbracoBackOfficeCookieAuthentication(ApplicationContext.Current)
+                .UseUmbracoBackOfficeExternalCookieAuthentication(ApplicationContext.Current);
         }
     }
 }

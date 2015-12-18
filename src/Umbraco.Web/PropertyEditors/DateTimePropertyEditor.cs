@@ -6,7 +6,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.DateTimeAlias, "Date/Time", "datepicker", ValueType = "DATETIME")]
+    [PropertyEditor(Constants.PropertyEditors.DateTimeAlias, "Date/Time", "datepicker", ValueType = "DATETIME", Icon="icon-time")]
     public class DateTimePropertyEditor : PropertyEditor
     {
         public DateTimePropertyEditor(ILogger logger): base(logger)
@@ -22,7 +22,7 @@ namespace Umbraco.Web.PropertyEditors
         private IDictionary<string, object> _defaultPreVals;
 
         /// <summary>
-        /// Overridden because we ONLY support Date + Time format and we don't have pre-values in the db.
+        /// Overridden because we ONLY support Date + Time format
         /// </summary>
         public override IDictionary<string, object> DefaultPreValues
         {
@@ -37,6 +37,11 @@ namespace Umbraco.Web.PropertyEditors
             editor.Validators.Add(new DateTimeValidator());
 
             return editor;
+        }
+
+        protected override PreValueEditor CreatePreValueEditor()
+        {
+            return new DatePreValueEditor();
         }
     }
 }

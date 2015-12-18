@@ -4,8 +4,8 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Alter.Expressions
 {
     public class AlterDefaultConstraintExpression : MigrationExpressionBase
     {
-        public AlterDefaultConstraintExpression(ISqlSyntaxProvider sqlSyntax, DatabaseProviders currentDatabaseProvider, DatabaseProviders[] supportedDatabaseProviders = null)
-            : base(sqlSyntax, currentDatabaseProvider, supportedDatabaseProviders)
+        public AlterDefaultConstraintExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax) 
+            : base(current, databaseProviders, sqlSyntax)
         {
         }
 

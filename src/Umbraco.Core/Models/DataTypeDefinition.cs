@@ -32,9 +32,18 @@ namespace Umbraco.Core.Models
         private string _propertyEditorAlias;
         private DataTypeDatabaseType _databaseType;
 
+
         public DataTypeDefinition(int parentId, string propertyEditorAlias)
         {
             _parentId = parentId;
+            _propertyEditorAlias = propertyEditorAlias;
+
+            _additionalData = new Dictionary<string, object>();
+        }
+
+        public DataTypeDefinition(string propertyEditorAlias)
+        {
+            _parentId = -1;
             _propertyEditorAlias = propertyEditorAlias;
 
             _additionalData = new Dictionary<string, object>();
@@ -219,11 +228,6 @@ namespace Umbraco.Core.Models
         {
             get { return _additionalData; }
         }
-
-        /// <summary>
-        /// Some entities may expose additional data that other's might not, this custom data will be available in this collection
-        /// </summary>
-        public IDictionary<string, object> AdditionalData { get; private set; }
 
         internal override void AddingEntity()
         {

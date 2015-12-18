@@ -18,10 +18,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         public MySqlSyntaxProvider(ILogger logger)
         {
             _logger = logger;
-            DefaultStringLength = 255;
-            StringLengthColumnDefinitionFormat = StringLengthUnicodeColumnDefinitionFormat;
-            StringColumnDefinition = string.Format(StringLengthColumnDefinitionFormat, DefaultStringLength);
-
+            
             AutoIncrementDefinition = "AUTO_INCREMENT";
             IntColumnDefinition = "int(11)";
             BoolColumnDefinition = "tinyint(1)";
@@ -29,10 +26,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             TimeColumnDefinition = "time";
             DecimalColumnDefinition = "decimal(38,6)";
             GuidColumnDefinition = "char(36)";
-
-            InitColumnTypeMap();
-
-            DefaultValueFormat = "DEFAULT '{0}'";
+            
+            DefaultValueFormat = "DEFAULT {0}";
         }
 
         public override IEnumerable<string> GetTablesInSchema(Database db)
@@ -191,6 +186,21 @@ ORDER BY TABLE_NAME, INDEX_NAME",
             return false;
         }
 
+        /// <summary>
+        /// This is used ONLY if we need to format datetime without using SQL parameters (i.e. during migrations)
+        /// </summary>
+        /// <param name="date"></param>
+        /// <param name="includeTime"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// MySQL has a DateTime standard that is unambiguous and works on all servers:
+        /// YYYYMMDDHHMMSS
+        /// </remarks>
+        public override string FormatDateTime(DateTime date, bool includeTime = true)
+        {
+            return includeTime ? date.ToString("yyyyMMddHHmmss") : date.ToString("yyyyMMdd");
+        }
+
         public override string GetQuotedTableName(string tableName)
         {
             return string.Format("`{0}`", tableName);
@@ -285,6 +295,10 @@ ORDER BY TABLE_NAME, INDEX_NAME",
             if (column.DefaultValue == null)
                 return string.Empty;
 
+            //hack - probably not needed with latest changes
+            if (column.DefaultValue.ToString().ToLower().Equals("getdate()".ToLower()))
+                column.DefaultValue = SystemMethods.CurrentDateTime;
+
             // see if this is for a system method
             if (column.DefaultValue is SystemMethods)
             {
@@ -295,10 +309,8 @@ ORDER BY TABLE_NAME, INDEX_NAME",
                 return string.Format(DefaultValueFormat, method);
             }
 
-            if (column.DefaultValue.ToString().ToLower().Equals("getdate()".ToLower()))
-                return "DEFAULT CURRENT_TIMESTAMP";
-
-            return string.Format(DefaultValueFormat, column.DefaultValue);
+            //needs quote
+            return string.Format(DefaultValueFormat, string.Format("'{0}'", column.DefaultValue));
         }
 
         protected override string FormatPrimaryKey(ColumnDefinition column)
@@ -311,13 +323,14 @@ ORDER BY TABLE_NAME, INDEX_NAME",
             switch (systemMethod)
             {
                 case SystemMethods.NewGuid:
-                    return "NEWID()";
-                case SystemMethods.NewSequentialId:
-                    return "NEWSEQUENTIALID()";
+                    return null; // NOT SUPPORTED!
+                    //return "NEWID()";                
                 case SystemMethods.CurrentDateTime:
-                    return "GETDATE()";
-                case SystemMethods.CurrentUTCDateTime:
-                    return "GETUTCDATE()";
+                    return "CURRENT_TIMESTAMP";
+                //case SystemMethods.NewSequentialId:
+                //    return "NEWSEQUENTIALID()";
+                //case SystemMethods.CurrentUTCDateTime:
+                //    return "GETUTCDATE()";
             }
 
             return null;

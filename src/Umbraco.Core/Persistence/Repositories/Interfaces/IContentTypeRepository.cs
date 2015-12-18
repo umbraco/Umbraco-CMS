@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface IContentTypeRepository : IRepositoryQueryable<int, IContentType>
+    public interface IContentTypeRepository : IRepositoryQueryable<int, IContentType>, IReadRepository<Guid, IContentType>
     {
         /// <summary>
         /// Gets all entities of the specified <see cref="PropertyType"/> query
@@ -18,5 +20,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <returns></returns>
         IEnumerable<string> GetAllPropertyTypeAliases();
+
+        IEnumerable<MoveEventInfo<IContentType>> Move(IContentType toMove, EntityContainer container);
     }
 }

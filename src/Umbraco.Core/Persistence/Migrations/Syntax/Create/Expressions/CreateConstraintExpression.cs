@@ -6,11 +6,12 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Create.Expressions
 {
     public class CreateConstraintExpression : MigrationExpressionBase
     {
-        public CreateConstraintExpression(ISqlSyntaxProvider sqlSyntax, DatabaseProviders currentDatabaseProvider, ConstraintType constraintType, DatabaseProviders[] supportedDatabaseProviders = null)
-            : base(sqlSyntax, currentDatabaseProvider, supportedDatabaseProviders)
+        public CreateConstraintExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax, ConstraintType constraint) 
+            : base(current, databaseProviders, sqlSyntax)
         {
-            Constraint = new ConstraintDefinition(constraintType);
+            Constraint = new ConstraintDefinition(constraint);
         }
+        
 
         public ConstraintDefinition Constraint { get; private set; }
 

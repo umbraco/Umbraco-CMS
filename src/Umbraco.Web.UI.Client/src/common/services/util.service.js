@@ -348,7 +348,7 @@ function umbModelMapper() {
          * @param {String} source.name The node name
          * @param {String} source.icon The models icon as a css class (.icon-doc)
          * @param {Number} source.parentId The parentID, if no parent, set to -1
-         * @param {path} source.path comma-seperated string of ancestor IDs (-1,1234,1782,1234)
+         * @param {path} source.path comma-separated string of ancestor IDs (-1,1234,1782,1234)
          */
 
         /** This converts the source model to a basic entity model, it will throw an exception if there isn't enough data to create the model */
@@ -487,10 +487,57 @@ angular.module('umbraco.services').factory('umbPropEditorHelper', umbPropEditorH
 function umbDataFormatter() {
     return {
         
+        formatContentTypePostData: function (displayModel, action) {
+
+            //create the save model from the display model
+            var saveModel = _.pick(displayModel,
+                'compositeContentTypes', 'isContainer', 'allowAsRoot', 'allowedTemplates', 'allowedContentTypes',
+                'alias', 'description', 'thumbnail', 'name', 'id', 'icon', 'trashed',
+                'key', 'parentId', 'alias', 'path');
+
+            //TODO: Map these
+            saveModel.allowedTemplates = _.map(displayModel.allowedTemplates, function (t) { return t.alias; });
+            saveModel.defaultTemplate = displayModel.defaultTemplate ? displayModel.defaultTemplate.alias : null;
+            var realGroups = _.reject(displayModel.groups, function(g) {
+                //do not include these tabs
+                return g.tabState === "init";
+            });
+            saveModel.groups = _.map(realGroups, function (g) {
+
+                var saveGroup = _.pick(g, 'inherited', 'id', 'sortOrder', 'name');
+
+                var realProperties = _.reject(g.properties, function (p) {
+                    //do not include these properties
+                    return p.propertyState === "init" || p.inherited === true;
+                });
+
+                var saveProperties = _.map(realProperties, function (p) {
+                    var saveProperty = _.pick(p, 'id', 'alias', 'description', 'validation', 'label', 'sortOrder', 'dataTypeId', 'groupId');
+                    return saveProperty;
+                });
+
+                saveGroup.properties = saveProperties;
+
+                //if this is an inherited group and there are not non-inherited properties on it, then don't send up the data
+                if (saveGroup.inherited === true && saveProperties.length === 0) {
+                    return null;
+                }
+
+                return saveGroup;
+            });
+            
+            //we don't want any null groups
+            saveModel.groups = _.reject(saveModel.groups, function(g) {
+                return !g;
+            });
+
+            return saveModel;
+        },
+
         /** formats the display model used to display the data type to the model used to save the data type */
         formatDataTypePostData: function(displayModel, preValues, action) {
             var saveModel = {
-                parentId: -1,
+                parentId: displayModel.parentId,
                 id: displayModel.id,
                 name: displayModel.name,
                 selectedEditor: displayModel.selectedEditor,

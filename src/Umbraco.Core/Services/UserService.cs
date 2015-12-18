@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data.Common;
+using System.Data.SqlClient;
 using System.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
@@ -17,9 +19,16 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class UserService : RepositoryService, IUserService
     {
-        public UserService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger)
-            : base(provider, repositoryFactory, logger)
+
+        //TODO: We need to change the isUpgrading flag to use an app state enum as described here: http://issues.umbraco.org/issue/U4-6816
+        // in the meantime, we will use a boolean which we are currently using during upgrades to ensure that a user object is not persisted during this phase, otherwise
+        // exceptions can occur if the db is not in it's correct state.
+        internal bool IsUpgrading { get; set; }
+
+        public UserService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+            : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
+            IsUpgrading = false;
         }
 
         #region Implementation of IMembershipUserService
@@ -137,6 +146,9 @@ namespace Umbraco.Core.Services
                     IsLockedOut = false,
                     IsApproved = true
                 };
+                //adding default sections content and media
+                user.AddAllowedSection("content");
+                user.AddAllowedSection("media");
 
                 if (SavingUser.IsRaisedEventCancelled(new SaveEventArgs<IUser>(user), this))
                     return user;
@@ -190,7 +202,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateUserRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = repository.Query.Where(x => x.Email.Equals(email));
+                var query = Query<IUser>.Builder.Where(x => x.Email.Equals(email));
                 var user = repository.GetByQuery(query).FirstOrDefault();
 
                 return user;
@@ -206,7 +218,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateUserRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = repository.Query.Where(x => x.Username.Equals(username));
+                var query = Query<IUser>.Builder.Where(x => x.Username.Equals(username));
                 var user = repository.GetByQuery(query).FirstOrDefault();
                 return user;
             }
@@ -226,10 +238,6 @@ namespace Umbraco.Core.Services
                 membershipUser.Username = DateTime.Now.ToString("yyyyMMdd") + "_" + membershipUser.Username;
             }
             Save(membershipUser);
-
-            //clear out the user logins!
-            var uow = UowProvider.GetUnitOfWork();
-            uow.Database.Execute("delete from umbracoUserLogins where userID = @id", new {id = membershipUser.Id});
         }
 
         /// <summary>
@@ -307,7 +315,18 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateUserRepository(uow))
             {
                 repository.AddOrUpdate(entity);
-                uow.Commit();
+                try
+                {
+                    uow.Commit();
+                }
+                catch (DbException ex)
+                {
+                    //Special case, if we are upgrading and an exception occurs, just continue
+                    if (IsUpgrading == false) throw;
+
+                    Logger.WarnWithException<UserService>("An error occurred attempting to save a user instance during upgrade, normally this warning can be ignored", ex);
+                    return;
+                }
             }
 
             if (raiseEvents)
@@ -357,7 +376,7 @@ namespace Umbraco.Core.Services
             var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateUserRepository(uow))
             {
-                var query = repository.Query;
+                var query = new Query<IUser>();
 
                 switch (matchType)
                 {
@@ -398,7 +417,7 @@ namespace Umbraco.Core.Services
             var uow = UowProvider.GetUnitOfWork();
             using (var repository = RepositoryFactory.CreateUserRepository(uow))
             {
-                var query = repository.Query;
+                var query = new Query<IUser>();
 
                 switch (matchType)
                 {
@@ -444,7 +463,7 @@ namespace Umbraco.Core.Services
                 switch (countType)
                 {
                     case MemberCountType.All:
-                        query = repository.Query;
+                        query = new Query<IUser>();
                         return repository.Count(query);
                     case MemberCountType.Online:
                         throw new NotImplementedException();
@@ -457,12 +476,12 @@ namespace Umbraco.Core.Services
                         //return repository.GetCountByQuery(query);
                     case MemberCountType.LockedOut:
                         query =
-                            repository.Query.Where(
+                            Query<IUser>.Builder.Where(
                                 x => x.IsLockedOut);
                         return repository.GetCountByQuery(query);
                     case MemberCountType.Approved:
                         query =
-                            repository.Query.Where(
+                            Query<IUser>.Builder.Where(
                                 x => x.IsApproved);
                         return repository.GetCountByQuery(query);
                     default:
@@ -543,6 +562,21 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Assigns the same permission set for a single user to any number of entities
+        /// </summary>
+        /// <param name="userId">Id of the user</param>
+        /// <param name="permission"></param>
+        /// <param name="entityIds">Specify the nodes to replace permissions for</param>
+        public void AssignUserPermission(int userId, char permission, params int[] entityIds)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateUserRepository(uow))
+            {
+                repository.AssignUserPermission(userId, permission, entityIds);
+            }
+        }
+
+        /// <summary>
         /// Gets all UserTypes or thosed specified as parameters
         /// </summary>
         /// <param name="ids">Optional Ids of UserTypes to retrieve</param>
@@ -565,7 +599,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateUserTypeRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = repository.Query.Where(x => x.Alias == alias);
+                var query = Query<IUserType>.Builder.Where(x => x.Alias == alias);
                 var contents = repository.GetByQuery(query);
                 return contents.SingleOrDefault();
             }
@@ -593,7 +627,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateUserTypeRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = repository.Query.Where(x => x.Name == name);
+                var query = Query<IUserType>.Builder.Where(x => x.Name == name);
                 var contents = repository.GetByQuery(query);
                 return contents.SingleOrDefault();
             }

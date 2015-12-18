@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
@@ -17,17 +21,19 @@ using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Dynamics;
-using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
     internal abstract class VersionableRepositoryBase<TId, TEntity> : PetaPocoRepositoryBase<TId, TEntity>
         where TEntity : class, IAggregateRoot
     {
+        private readonly IContentSection _contentSection;
 
-        protected VersionableRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
-            : base(work, cache, logger, sqlSyntax, mappingResolver)
+        protected VersionableRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IContentSection contentSection)
+            : base(work, cache, logger, sqlSyntax)
         {
+            _contentSection = contentSection;
         }
 
         #region IRepositoryVersionable Implementation
@@ -41,9 +47,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 .On<ContentVersionDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
                 .InnerJoin<NodeDto>(SqlSyntax)
                 .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId)
-                .Where<NodeDto>(SqlSyntax, x => x.NodeId == id)
-                .OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate);
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
+                .Where<NodeDto>(x => x.NodeId == id)
+                .OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
 
             var dtos = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sql);
             foreach (var dto in dtos)
@@ -111,21 +117,21 @@ namespace Umbraco.Core.Persistence.Repositories
             if (contentTypeAlias.IsNullOrWhiteSpace())
             {
                 sql.Select("COUNT(*)")
-                    .From<NodeDto>(SqlSyntax)
-                    .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId)
-                    .Where<NodeDto>(SqlSyntax, x => x.Path.Contains(pathMatch));
+                    .From<NodeDto>()
+                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
+                    .Where<NodeDto>(x => x.Path.Contains(pathMatch));
             }
             else
             {
                 sql.Select("COUNT(*)")
-                    .From<NodeDto>(SqlSyntax)
-                    .InnerJoin<ContentDto>(SqlSyntax)
-                    .On<NodeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                    .InnerJoin<ContentTypeDto>(SqlSyntax)
-                    .On<ContentTypeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.ContentTypeId)
-                    .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId)
-                    .Where<NodeDto>(SqlSyntax, x => x.Path.Contains(pathMatch))
-                    .Where<ContentTypeDto>(SqlSyntax, x => x.Alias == contentTypeAlias);
+                    .From<NodeDto>()
+                    .InnerJoin<ContentDto>()
+                    .On<NodeDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+                    .InnerJoin<ContentTypeDto>()
+                    .On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
+                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
+                    .Where<NodeDto>(x => x.Path.Contains(pathMatch))
+                    .Where<ContentTypeDto>(x => x.Alias == contentTypeAlias);
             }
 
             return Database.ExecuteScalar<int>(sql);
@@ -137,21 +143,21 @@ namespace Umbraco.Core.Persistence.Repositories
             if (contentTypeAlias.IsNullOrWhiteSpace())
             {
                 sql.Select("COUNT(*)")
-                    .From<NodeDto>(SqlSyntax)
-                    .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId)
-                    .Where<NodeDto>(SqlSyntax, x => x.ParentId == parentId);
+                    .From<NodeDto>()
+                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
+                    .Where<NodeDto>(x => x.ParentId == parentId);
             }
             else
             {
                 sql.Select("COUNT(*)")
-                    .From<NodeDto>(SqlSyntax)
-                    .InnerJoin<ContentDto>(SqlSyntax)
-                    .On<NodeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                    .InnerJoin<ContentTypeDto>(SqlSyntax)
-                    .On<ContentTypeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.ContentTypeId)
-                    .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId)
-                    .Where<NodeDto>(SqlSyntax, x => x.ParentId == parentId)
-                    .Where<ContentTypeDto>(SqlSyntax, x => x.Alias == contentTypeAlias);
+                    .From<NodeDto>()
+                    .InnerJoin<ContentDto>()
+                    .On<NodeDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+                    .InnerJoin<ContentTypeDto>()
+                    .On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
+                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
+                    .Where<NodeDto>(x => x.ParentId == parentId)
+                    .Where<ContentTypeDto>(x => x.Alias == contentTypeAlias);
             }
 
             return Database.ExecuteScalar<int>(sql);
@@ -168,19 +174,19 @@ namespace Umbraco.Core.Persistence.Repositories
             if (contentTypeAlias.IsNullOrWhiteSpace())
             {
                 sql.Select("COUNT(*)")
-                    .From<NodeDto>(SqlSyntax)
-                    .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
+                    .From<NodeDto>()
+                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             }
             else
             {
                 sql.Select("COUNT(*)")
-                    .From<NodeDto>(SqlSyntax)
-                    .InnerJoin<ContentDto>(SqlSyntax)
-                    .On<NodeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                    .InnerJoin<ContentTypeDto>(SqlSyntax)
-                    .On<ContentTypeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.ContentTypeId)
-                    .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId)
-                    .Where<ContentTypeDto>(SqlSyntax, x => x.Alias == contentTypeAlias);
+                    .From<NodeDto>()
+                    .InnerJoin<ContentDto>()
+                    .On<NodeDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+                    .InnerJoin<ContentTypeDto>()
+                    .On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
+                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
+                    .Where<ContentTypeDto>(x => x.Alias == contentTypeAlias);
             }
 
             return Database.ExecuteScalar<int>(sql);
@@ -288,7 +294,7 @@ namespace Umbraco.Core.Persistence.Repositories
             // Get base query
             var sqlBase = GetBaseQuery(false);
 
-            if (query == null) query = Query;
+            if (query == null) query = new Query<TEntity>();
             var translator = new SqlTranslator<TEntity>(sqlBase, query);
             var sqlQuery = translator.Translate();
             
@@ -396,7 +402,7 @@ ON cmsPropertyType.dataTypeId = cmsDataTypePreValues.datatypeNodeId", docSql.Arg
             // below if any property requires tag support
             var allPreValues = new Lazy<IEnumerable<DataTypePreValueDto>>(() =>
             {
-                var preValsSql = new Sql(@"SELECT a.id as preValId, a.value, a.sortorder, a.alias, a.datatypeNodeId
+                var preValsSql = new Sql(@"SELECT a.id, a.value, a.sortorder, a.alias, a.datatypeNodeId
 FROM cmsDataTypePreValues a
 WHERE EXISTS(
     SELECT DISTINCT b.id as preValIdInner
@@ -508,13 +514,16 @@ WHERE EXISTS(
             // of ContentItemBasic instances) to the database field names.
             switch (orderBy.ToUpperInvariant())
             {
+                case "UPDATEDATE":
+                    return "cmsContentVersion.VersionDate";
                 case "NAME":
                     return "umbracoNode.text";
                 case "OWNER":
                     //TODO: This isn't going to work very nicely because it's going to order by ID, not by letter
                     return "umbracoNode.nodeUser";
                 default:
-                    return orderBy;
+                    //ensure invalid SQL cannot be submitted
+                    return Regex.Replace(orderBy, @"[^\w\.,`\[\]@-]", "");
             }
         }
 
@@ -533,8 +542,54 @@ WHERE EXISTS(
                 case "VERSIONDATE":
                     return "UpdateDate";
                 default:
-                    return orderBy;
+                    //ensure invalid SQL cannot be submitted
+                    return Regex.Replace(orderBy, @"[^\w\.,`\[\]@-]", "");
             }
+        }
+
+        /// <summary>
+        /// Deletes all media files passed in.
+        /// </summary>
+        /// <param name="files"></param>
+        /// <returns></returns>
+        public virtual bool DeleteMediaFiles(IEnumerable<string> files)
+        {
+            //ensure duplicates are removed
+            files = files.Distinct();
+
+            var allsuccess = true;
+
+            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
+            Parallel.ForEach(files, file =>
+            {
+                try
+                {
+                    if (file.IsNullOrWhiteSpace()) return;
+
+                    var relativeFilePath = fs.GetRelativePath(file);
+                    if (fs.FileExists(relativeFilePath) == false) return;
+
+                    var parentDirectory = System.IO.Path.GetDirectoryName(relativeFilePath);
+
+                    // don't want to delete the media folder if not using directories.
+                    if (_contentSection.UploadAllowDirectories && parentDirectory != fs.GetRelativePath("/"))
+                    {
+                        //issue U4-771: if there is a parent directory the recursive parameter should be true
+                        fs.DeleteDirectory(parentDirectory, String.IsNullOrEmpty(parentDirectory) == false);
+                    }
+                    else
+                    {
+                        fs.DeleteFile(file, true);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.Error<VersionableRepositoryBase<TId, TEntity>>("An error occurred while deleting file attached to nodes: " + file, e);
+                    allsuccess = false;
+                }
+            });
+
+            return allsuccess;
         }
     }
 }

@@ -14,6 +14,7 @@ namespace Umbraco.Core.Models.Rdbms
         public int PrimaryKey { get; set; }
 
         [Column("languageId")]
+        [ForeignKey(typeof(LanguageDto), Column = "id")]
         public int LanguageId { get; set; }
 
         [Column("UniqueId")]

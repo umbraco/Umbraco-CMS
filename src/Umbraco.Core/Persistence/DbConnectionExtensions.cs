@@ -7,6 +7,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Umbraco.Core.Logging; 
 
 namespace Umbraco.Core.Persistence
 {
@@ -75,8 +76,10 @@ namespace Umbraco.Core.Persistence
                 connection.Open();
                 connection.Close();
             }
-            catch (DbException)
+            catch (DbException exc)
             {
+                // Don't swallow this error, the exception is super handy for knowing "why" its not available
+                LogHelper.WarnWithException<IDbConnection>("Configured database is reporting as not being available!", exc);
                 return false;
             }
 

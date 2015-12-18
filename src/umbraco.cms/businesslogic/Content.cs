@@ -268,6 +268,7 @@ namespace umbraco.cms.businesslogic
 
 
        
+            x.Attributes.Append(XmlHelper.AddAttribute(xd, "key", this.UniqueId.ToString()));
 
         /// <summary>
         /// Deletes the current Content object, must be overridden in the child class.

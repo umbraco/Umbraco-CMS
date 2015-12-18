@@ -14,7 +14,7 @@ namespace Umbraco.Tests.UmbracoExamine
 		public void Events_Ignoring_Node()
 		{
 			//change the parent id so that they are all ignored
-			var existingCriteria = ((IndexCriteria)_indexer.IndexerData);
+			var existingCriteria = _indexer.IndexerData;
 			_indexer.IndexerData = new IndexCriteria(existingCriteria.StandardFields, existingCriteria.UserFields, existingCriteria.IncludeNodeTypes, existingCriteria.ExcludeNodeTypes,
 				999); //change to 999
 

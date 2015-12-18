@@ -27,5 +27,9 @@ namespace Umbraco.Core.Persistence.Migrations
             get { return Values; }
         }
 
+	                {
+	                    ApplicationContext.Current.DatabaseContext.SqlSyntax, 
+                        ApplicationContext.Current.ProfilingLogger.Logger
+	                });
     }
 }

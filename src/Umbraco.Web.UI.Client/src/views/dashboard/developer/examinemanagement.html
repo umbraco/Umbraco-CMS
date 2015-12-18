@@ -29,9 +29,11 @@
                                 <button class="btn btn-warning" ng-click="rebuildIndex(indexer)">Rebuild index</button>
                                 <button class="btn btn-warning" ng-click="optimizeIndex(indexer)" ng-show="indexer.documentCount > 0">Optimize index</button>
                             </div>
-                            <div ng-show="indexer.isProcessing" class="progress progress-striped active">
-                                <div class="bar" style="width: 100%;"></div>
+                            
+                            <div ng-show="indexer.isProcessing" class="umb-loader-wrapper" ng-show="actionInProgress">
+                                <div class="umb-loader"></div>
                             </div>
+
                             <div class="error" ng-show="indexer.processingAttempts >= 100">
                                 The process is taking longer than expected, check the umbraco log to see if there have been any errors during this operation
                             </div>
@@ -169,12 +171,12 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <label for="textSearch" class="radio inline">
-                                    <input type="radio" name="searchType" id="textSearch" value="text" ng-model="searcher.searchType" />
+                                <label for="{{searcher.name}}-textSearch" class="radio inline">
+                                    <input type="radio" name="searchType" id="{{searcher.name}}-textSearch" value="text" ng-model="searcher.searchType" />
                                     Text Search
                                 </label>
-                                <label for="luceneSearch" class="radio inline">
-                                    <input type="radio" name="searchType" id="luceneSearch" value="lucene" ng-model="searcher.searchType" />
+                                <label for="{{searcher.name}}-luceneSearch" class="radio inline">
+                                    <input type="radio" name="searchType" id="{{searcher.name}}-luceneSearch" value="lucene" ng-model="searcher.searchType" />
                                     Lucene Search
                                 </label>
                             </div>
@@ -183,10 +185,11 @@
                         </form>
 
                         <div class="search-results" ng-show="searcher.isSearching">
-
-                            <div ng-show="indexer.isProcessing" class="progress progress-striped active">
-                                <div class="bar" style="width: 100%;"></div>
+                            
+                            <div ng-show="indexer.isProcessing" class="umb-loader-wrapper" ng-show="indexer.isProcessing">
+                                <div class="umb-loader"></div>
                             </div>
+
                             <table ng-hide="searcher.isProcessing" class="table table-bordered table-condensed">
                                 <thead>
                                     <tr>

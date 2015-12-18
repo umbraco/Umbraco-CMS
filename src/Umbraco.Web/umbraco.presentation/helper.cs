@@ -112,14 +112,17 @@ namespace umbraco
                 foreach (var attributeValueItem in attributeValueSplit)
                 {
                     attributeValue = attributeValueItem;
+                    var trimmedValue = attributeValue.Trim();
 
                     // Check for special variables (always in square-brackets like [name])
-                    if (attributeValueItem.StartsWith("[") &&
-                        attributeValueItem.EndsWith("]"))
+                    if (trimmedValue.StartsWith("[") &&
+                        trimmedValue.EndsWith("]"))
                     {
+                        attributeValue = trimmedValue;
+
                         // find key name
-                        var keyName = attributeValueItem.Substring(2, attributeValueItem.Length - 3);
-                        var keyType = attributeValueItem.Substring(1, 1);
+                        var keyName = attributeValue.Substring(2, attributeValue.Length - 3);
+                        var keyType = attributeValue.Substring(1, 1);
 
                         switch (keyType)
                         {

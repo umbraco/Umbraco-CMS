@@ -32,7 +32,7 @@
                            ng-click="deleteTemplate($index)"><localize key="general_delete" /></a>
                     </div>
 
-                    <br style="clear: both"
+                    <br style="clear: both" />
                 </li>
             </ul>
 
@@ -160,4 +160,33 @@
             </ul>
         </umb-control-group>
     </div>
+
+    <umb-overlay
+      ng-if="layoutConfigOverlay.show"
+      model="layoutConfigOverlay"
+      view="layoutConfigOverlay.view"
+      position="right">
+    </umb-overlay>
+
+    <umb-overlay
+      ng-if="rowConfigOverlay.show"
+      model="rowConfigOverlay"
+      view="rowConfigOverlay.view"
+      position="right">
+    </umb-overlay>
+
+    <umb-overlay
+      ng-if="editConfigCollectionOverlay.show"
+      model="editConfigCollectionOverlay"
+      view="editConfigCollectionOverlay.view"
+      position="right">
+    </umb-overlay>
+
+    <umb-overlay
+      ng-if="rowDeleteOverlay.show"
+      model="rowDeleteOverlay"
+      view="rowDeleteOverlay.view"
+      position="right">
+    </umb-overlay>
+
 </div>

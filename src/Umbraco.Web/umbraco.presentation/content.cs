@@ -1,29 +1,30 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
-using System.Web.Hosting;
 using System.Xml;
+using umbraco.BusinessLogic;
+using umbraco.cms.businesslogic;
+using umbraco.cms.businesslogic.web;
+using umbraco.DataLayer;
+using umbraco.presentation.nodeFactory;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.web;
 using Umbraco.Core.Models;
 using Umbraco.Core.Profiling;
-using umbraco.DataLayer;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Scheduling;
 using File = System.IO.File;
+using Node = umbraco.NodeFactory.Node;
+using Task = System.Threading.Tasks.Task;
 
 namespace umbraco
 {
@@ -34,35 +35,61 @@ namespace umbraco
     {
         private XmlCacheFilePersister _persisterTask;
 
+        private volatile bool _released;
+
         #region Constructors
 
         private content()
         {
-            if (SyncToXmlFile == false) return;
-
-            var logger = LoggerResolver.HasCurrent ? LoggerResolver.Current.Logger : new DebugDiagnosticsLogger();
-            var profingLogger = new ProfilingLogger(
-                logger,
-                ProfilerResolver.HasCurrent ? ProfilerResolver.Current.Profiler : new LogProfiler(logger));
-
-            // there's always be one task keeping a ref to the runner
-            // so it's safe to just create it as a local var here
-            var runner = new BackgroundTaskRunner<XmlCacheFilePersister>(new BackgroundTaskRunnerOptions
+            if (SyncToXmlFile)
             {
-                LongRunning = true,
-                KeepAlive = true
-            }, logger);
+                var logger = LoggerResolver.HasCurrent ? LoggerResolver.Current.Logger : new DebugDiagnosticsLogger();
+                var profingLogger = new ProfilingLogger(
+                    logger,
+                    ProfilerResolver.HasCurrent ? ProfilerResolver.Current.Profiler : new LogProfiler(logger));
+ 
+                // prepare the persister task
+                // there's always be one task keeping a ref to the runner
+                // so it's safe to just create it as a local var here
+                var runner = new BackgroundTaskRunner<XmlCacheFilePersister>("XmlCacheFilePersister", new BackgroundTaskRunnerOptions
+                {
+                    LongRunning = true,
+                    KeepAlive = true,
+                    Hosted = false // main domain will take care of stopping the runner (see below)
+                }, logger);
 
-            // create (and add to runner)
-            _persisterTask = new XmlCacheFilePersister(runner, this, profingLogger);
+                // create (and add to runner)
+                _persisterTask = new XmlCacheFilePersister(runner, this, profingLogger);
 
-            InitializeFileLock();
+                var registered = ApplicationContext.Current.MainDom.Register(
+                    null,
+                    () =>
+                    {
+                        // once released, the cache still works but does not write to file anymore,
+                        // which is OK with database server messenger but will cause data loss with
+                        // another messenger...
+                        
+                        runner.Shutdown(false, true); // wait until flushed
+                        _released = true;
+                    });
+
+                // failed to become the main domain, we will never use the file
+                if (registered == false)
+                    runner.Shutdown(false, true);
+
+                _released = (registered == false);
+            }
 
             // initialize content - populate the cache
             using (var safeXml = GetSafeXmlWriter(false))
             {
                 bool registerXmlChange;
+
+                // if we don't use the file then LoadXmlLocked will not even
+                // read from the file and will go straight to database
                 LoadXmlLocked(safeXml, out registerXmlChange);
+                // if we use the file and registerXmlChange is true this will
+                // write to file, else it will not
                 safeXml.Commit(registerXmlChange);
             }
         }
@@ -90,23 +117,26 @@ namespace umbraco
         private static readonly object DbReadSyncLock = new object();
 
         private const string XmlContextContentItemKey = "UmbracoXmlContextContent";
-        private string _umbracoXmlDiskCacheFileName = string.Empty;
+        private static string _umbracoXmlDiskCacheFileName = string.Empty;
         private volatile XmlDocument _xmlContent;
 
         /// <summary>
         /// Gets the path of the umbraco XML disk cache file.
         /// </summary>
         /// <value>The name of the umbraco XML disk cache file.</value>
+        public static string GetUmbracoXmlDiskFileName()
+        {
+            if (string.IsNullOrEmpty(_umbracoXmlDiskCacheFileName))
+            {
+                _umbracoXmlDiskCacheFileName = IOHelper.MapPath(SystemFiles.ContentCacheXml);
+            }
+            return _umbracoXmlDiskCacheFileName;
+        }
+
+        [Obsolete("Use the safer static GetUmbracoXmlDiskFileName() method instead to retrieve this value")]
         public string UmbracoXmlDiskCacheFileName
         {
-            get
-            {
-                if (string.IsNullOrEmpty(_umbracoXmlDiskCacheFileName))
-                {
-                    _umbracoXmlDiskCacheFileName = IOHelper.MapPath(SystemFiles.ContentCacheXml);
-                }
-                return _umbracoXmlDiskCacheFileName;
-            }
+            get { return GetUmbracoXmlDiskFileName(); }
             set { _umbracoXmlDiskCacheFileName = value; }
         }
 
@@ -126,7 +156,13 @@ namespace umbraco
         #endregion
 
         #region Public Methods
-        
+
+        [Obsolete("This is no longer used and will be removed in future versions, if you use this method it will not refresh 'async' it will perform the refresh on the current thread which is how it should be doing it")]
+        public virtual void RefreshContentFromDatabaseAsync()
+        {
+            RefreshContentFromDatabase();
+        }
+
         /// <summary>
         /// Load content from database and replaces active content when done.
         /// </summary>
@@ -161,8 +197,29 @@ namespace umbraco
                 var node = GetPreviewOrPublishedNode(d, xmlContentCopy, false);
                 var attr = ((XmlElement)node).GetAttributeNode("sortOrder");
                 attr.Value = d.sortOrder.ToString();
-                AddOrUpdateXmlNode(xmlContentCopy, d.Id, d.Level, parentId, node);
+                xmlContentCopy = GetAddOrUpdateXmlNode(xmlContentCopy, d.Id, d.Level, parentId, node);
 
+                // update sitemapprovider
+                if (updateSitemapProvider && SiteMap.Provider is UmbracoSiteMapProvider)
+                {
+                    try
+                    {
+                        var prov = (UmbracoSiteMapProvider)SiteMap.Provider;
+                        var n = new Node(d.Id, true);
+                        if (string.IsNullOrEmpty(n.Url) == false && n.Url != "/#")
+                        {
+                            prov.UpdateNode(n);
+                        }
+                        else
+                        {
+                            LogHelper.Debug<content>(string.Format("Can't update Sitemap Provider due to empty Url in node id: {0}", d.Id));
+                        }
+                    }
+                    catch (Exception ee)
+                    {
+                        LogHelper.Error<content>(string.Format("Error adding node to Sitemap Provider in PublishNodeDo(): {0}", d.Id), ee);
+                    }
+                }
             }
 
             return xmlContentCopy;
@@ -186,7 +243,9 @@ namespace umbraco
         /// <param name="parentId">The parent node identifier.</param>
         public void SortNodes(int parentId)
         {
-            var childNodesXPath = "./* [@id]";
+            var childNodesXPath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema
+                ? "./node"
+                : "./* [@id]";
 
             using (var safeXml = GetSafeXmlWriter(false))
             {
@@ -286,10 +345,56 @@ namespace umbraco
             }
         }
 
+        /// <summary>
+        /// Updates the document cache for multiple documents
+        /// </summary>
+        /// <param name="Documents">The documents.</param>
+        [Obsolete("This is not used and will be removed from the codebase in future versions")]
+        public virtual void UpdateDocumentCache(List<Document> Documents)
+        {
+            // We need to lock content cache here, because we cannot allow other threads
+            // making changes at the same time, they need to be queued
+            int parentid = Documents[0].Id;
+
+
+            using (var safeXml = GetSafeXmlWriter())
+            {
+                foreach (Document d in Documents)
+                {
+                    safeXml.Xml = PublishNodeDo(d, safeXml.Xml, true);
+                }
+            }
+
+            ClearContextCache();
+        }
+
+        [Obsolete("Method obsolete in version 4.1 and later, please use UpdateDocumentCache", true)]
+        public virtual void UpdateDocumentCacheAsync(int documentId)
+        {
+            UpdateDocumentCache(documentId);
+        }
+
+        [Obsolete("Method obsolete in version 4.1 and later, please use ClearDocumentCache", true)]
+        public virtual void ClearDocumentCacheAsync(int documentId)
+        {
+            ClearDocumentCache(documentId);
+        }
+
         public virtual void ClearDocumentCache(int documentId)
         {
             // Get the document
-            var d = new Document(documentId);
+            Document d;
+            try
+            {
+                d = new Document(documentId);
+            }
+            catch
+            {
+                // if we need the document to remove it... this cannot be LB?!
+                // shortcut everything here
+                ClearDocumentXmlCache(documentId);
+                return;
+            }
             ClearDocumentCache(d);
         }
 
@@ -310,34 +415,56 @@ namespace umbraco
                 // remove from xml db cache 
                 doc.XmlRemoveFromDB();
 
-                // We need to lock content cache here, because we cannot allow other threads
-                // making changes at the same time, they need to be queued
-                using (var safeXml = GetSafeXmlReader())
-                {
-                    // Check if node present, before cloning
-                    x = safeXml.Xml.GetElementById(doc.Id.ToString());
-                    if (x == null)
-                        return;
-
-                    safeXml.UpgradeToWriter(false);
-
-                    // Find the document in the xml cache
-                    x = safeXml.Xml.GetElementById(doc.Id.ToString());
-                    if (x != null)
-                    {
-                        // The document already exists in cache, so repopulate it
-                        x.ParentNode.RemoveChild(x);
-                        safeXml.Commit();
-                    }
-                }
+                // clear xml cache
+                ClearDocumentXmlCache(doc.Id);
 
                 ClearContextCache();
 
                 //SD: changed to fire event BEFORE running the sitemap!! argh.
                 FireAfterClearDocumentCache(doc, e);
-                
+
+                // update sitemapprovider
+                if (SiteMap.Provider is UmbracoSiteMapProvider)
+                {
+                    var prov = (UmbracoSiteMapProvider)SiteMap.Provider;
+                    prov.RemoveNode(doc.Id);
+                }                
             }
-        }   
+        }
+
+        internal void ClearDocumentXmlCache(int id)
+        {
+            // We need to lock content cache here, because we cannot allow other threads
+            // making changes at the same time, they need to be queued
+            using (var safeXml = GetSafeXmlReader())
+            {
+                // Check if node present, before cloning
+                var x = safeXml.Xml.GetElementById(id.ToString());
+                if (x == null)
+                    return;
+
+                safeXml.UpgradeToWriter(false);
+
+                // Find the document in the xml cache
+                x = safeXml.Xml.GetElementById(id.ToString());
+                if (x != null)
+                {
+                    // The document already exists in cache, so repopulate it
+                    x.ParentNode.RemoveChild(x);
+                    safeXml.Commit();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Unpublishes the  node.
+        /// </summary>
+        /// <param name="documentId">The document id.</param>
+        [Obsolete("Please use: umbraco.content.ClearDocumentCache", true)]
+        public virtual void UnPublishNode(int documentId)
+        {
+            ClearDocumentCache(documentId);
+        }
 
         #endregion
 
@@ -497,17 +624,47 @@ order by umbracoNode.level, umbracoNode.sortOrder";
 
             if (hierarchy.TryGetValue(parentId, out children))
             {
-                XmlNode childContainer = parentNode;
+                XmlNode childContainer = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ||
+                                         String.IsNullOrEmpty(UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME)
+                                             ? parentNode
+                                             : parentNode.SelectSingleNode(
+                                                 UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME);
+
+                if (!UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema &&
+                    !String.IsNullOrEmpty(UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME))
+                {
+                    if (childContainer == null)
+                    {
+                        childContainer = xmlHelper.addTextNode(parentNode.OwnerDocument,
+                                                               UmbracoSettings.
+                                                                   TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME, "");
+                        parentNode.AppendChild(childContainer);
+                    }
+                }
 
                 foreach (int childId in children)
                 {
                     XmlNode childNode = nodeIndex[childId];
-                    parentNode.AppendChild(childNode);
-                    
+
+                    if (UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ||
+                        String.IsNullOrEmpty(UmbracoSettings.TEMP_FRIENDLY_XML_CHILD_CONTAINER_NODENAME))
+                    {
+                        parentNode.AppendChild(childNode);
+                    }
+                    else
+                    {
+                        childContainer.AppendChild(childNode);
+                    }
+
                     // Recursively build the content tree under the current child
                     GenerateXmlDocument(hierarchy, nodeIndex, childId, childNode);
                 }
             }
+        }
+
+        [Obsolete("This method should not be used and does nothing, xml file persistence is done in a queue using a BackgroundTaskRunner")]
+        public void PersistXmlToFile()
+        {
         }
 
         /// <summary>
@@ -522,9 +679,9 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         {
             //TODO: Should there be a try/catch here in case the file is being written to while this is trying to be executed?
 
-            if (File.Exists(UmbracoXmlDiskCacheFileName))
+            if (File.Exists(GetUmbracoXmlDiskFileName()))
             {
-                return new FileInfo(UmbracoXmlDiskCacheFileName).LastWriteTimeUtc;
+                return new FileInfo(GetUmbracoXmlDiskFileName()).LastWriteTimeUtc;
             }
 
             return DateTime.MinValue;
@@ -562,6 +719,36 @@ order by umbracoNode.level, umbracoNode.sortOrder";
             get { return UmbracoConfig.For.UmbracoSettings().Content.CloneXmlContent; }
         }
 
+        // whether to use the legacy schema
+        private static bool UseLegacySchema
+        {
+            get { return UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema; }
+        }
+
+        // whether to keep version of everything (incl. medias & members) in cmsPreviewXml
+        // for audit purposes - false by default, not in umbracoSettings.config
+        // whether to... no idea what that one does
+        // it is false by default and not in UmbracoSettings.config anymore - ignoring
+        /*
+        private static bool GlobalPreviewStorageEnabled
+        {
+            get { return UmbracoConfig.For.UmbracoSettings().Content.GlobalPreviewStorageEnabled; }
+        }
+        */
+
+        // ensures config is valid
+        private void EnsureConfigurationIsValid()
+        {
+            if (SyncToXmlFile && SyncFromXmlFile)
+                throw new Exception("Cannot run with both ContinouslyUpdateXmlDiskCache and XmlContentCheckForDiskChanges being true.");
+
+            if (XmlIsImmutable == false)
+                //LogHelper.Warn<XmlStore>("Running with CloneXmlContent being false is a bad idea.");
+                LogHelper.Warn<content>("CloneXmlContent is false - ignored, we always clone.");
+
+            // note: if SyncFromXmlFile then we should also disable / warn that local edits are going to cause issues...
+        }
+
         #endregion
 
         #region Xml
@@ -590,7 +777,11 @@ order by umbracoNode.level, umbracoNode.sortOrder";
             }
         }
 
-    
+        [Obsolete("Please use: content.Instance.XmlContent")]
+        public static XmlDocument xmlContent
+        {
+            get { return Instance.XmlContent; }
+        }
 
         // to be used by content.Instance
         protected internal virtual XmlDocument XmlContentInternal
@@ -620,7 +811,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
             return xmlDoc == null ? null : (XmlDocument)xmlDoc.CloneNode(true);
         }
 
-        private static void EnsureSchema(string contentTypeAlias, XmlDocument xml)
+        private static XmlDocument EnsureSchema(string contentTypeAlias, XmlDocument xml)
         {
             string subset = null;
 
@@ -633,15 +824,22 @@ order by umbracoNode.level, umbracoNode.sortOrder";
 
             // ensure it contains the content type
             if (subset != null && subset.Contains(string.Format("<!ATTLIST {0} id ID #REQUIRED>", contentTypeAlias)))
-                return;
+                return xml;
 
-            // remove current doctype
-            xml.RemoveChild(n);
+            // alas, that does not work, replacing a doctype is ignored and GetElementById fails
+            //
+            //// remove current doctype, set new doctype
+            //xml.RemoveChild(n);
+            //subset = string.Format("<!ELEMENT {1} ANY>{0}<!ATTLIST {1} id ID #REQUIRED>{0}{2}", Environment.NewLine, contentTypeAlias, subset);
+            //var doctype = xml.CreateDocumentType("root", null, null, subset);
+            //xml.InsertAfter(doctype, xml.FirstChild);
 
-            // set new doctype
+            var xml2 = new XmlDocument();
             subset = string.Format("<!ELEMENT {1} ANY>{0}<!ATTLIST {1} id ID #REQUIRED>{0}{2}", Environment.NewLine, contentTypeAlias, subset);
-            var doctype = xml.CreateDocumentType("root", null, null, subset);
-            xml.InsertAfter(doctype, xml.FirstChild);
+            var doctype = xml2.CreateDocumentType("root", null, null, subset);
+            xml2.AppendChild(doctype);
+            xml2.AppendChild(xml2.ImportNode(xml.DocumentElement, true));
+            return xml2;
         }
 
         private static void InitializeXml(XmlDocument xml, string dtd)
@@ -771,12 +969,22 @@ order by umbracoNode.level, umbracoNode.sortOrder";
 
         private static string ChildNodesXPath
         {
-            get { return "./* [@id]"; }
+            get
+            {
+                return UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema
+                    ? "./node"
+                    : "./* [@id]";
+            }
         }
 
         private static string DataNodesXPath
         {
-            get { return "./* [not(@id)]"; }
+            get
+            {
+                return UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema
+                    ? "./data"
+                    : "./* [not(@id)]";
+            }
         }
 
         #endregion
@@ -786,100 +994,17 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         private readonly string _xmlFileName = IOHelper.MapPath(SystemFiles.ContentCacheXml);
         private DateTime _lastFileRead; // last time the file was read
         private DateTime _nextFileCheck; // last time we checked whether the file was changed
-        private AsyncLock _fileLock; // protects the file
-        private IDisposable _fileLocked; // protects the file
 
-        private const int FileLockTimeoutMilliseconds = 4 * 60 * 1000; // 4'
-
-        private void InitializeFileLock()
-        {
-            // initialize file lock
-            // ApplicationId will look like "/LM/W3SVC/1/Root/AppName"
-            // name is system-wide and must be less than 260 chars
-            //
-            // From MSDN C++ CreateSemaphore doc:
-            // "The name can have a "Global\" or "Local\" prefix to explicitly create the object in
-            // the global or session namespace. The remainder of the name can contain any character 
-            // except the backslash character (\). For more information, see Kernel Object Namespaces."
-            //
-            // From MSDN "Kernel object namespaces" doc:
-            // "The separate client session namespaces enable multiple clients to run the same 
-            // applications without interfering with each other. For processes started under 
-            // a client session, the system uses the session namespace by default. However, these 
-            // processes can use the global namespace by prepending the "Global\" prefix to the object name."
-            //
-            // just use "default" (whatever it is) for now - ie, no prefix
-            //
-            var name = HostingEnvironment.ApplicationID + "/XmlStore/XmlFile";
-            _fileLock = new AsyncLock(name);
-
-            // the file lock works with a shared, system-wide, semaphore - and we don't want
-            // to leak a count on that semaphore else the whole process will hang - so we have
-            // to ensure we dispose of the locker when the domain goes down - in theory the
-            // async lock should do it via its finalizer, but then there are some weird cases
-            // where the semaphore has been disposed of before it's been released, and then
-            // we'd need to GC-pin the semaphore... better dispose the locker explicitely
-            // when the app domain unloads.
-
-            if (AppDomain.CurrentDomain.IsDefaultAppDomain())
-            {
-                LogHelper.Debug<content>("Registering Unload handler for default app domain.");
-                AppDomain.CurrentDomain.ProcessExit += OnDomainUnloadReleaseFileLock;
-            }
-            else
-            {
-                LogHelper.Debug<content>("Registering Unload handler for non-default app domain.");
-                AppDomain.CurrentDomain.DomainUnload += OnDomainUnloadReleaseFileLock;
-            }
-        }
-
-        private void EnsureFileLock()
-        {
-            if (_fileLock == null) return; // not locking (testing?)
-            if (_fileLocked != null) return; // locked already
-
-            // thread-safety, acquire lock only once!
-            // lock something that's readonly and not null..
-            lock (_xmlFileName)
-            {
-                // double-check
-                if (_fileLock == null) return;
-                if (_fileLocked != null) return;
-
-                // don't hang forever, throws if it cannot lock within the timeout
-                LogHelper.Debug<content>("Acquiring exclusive access to file for this AppDomain...");
-                _fileLocked = _fileLock.Lock(FileLockTimeoutMilliseconds);
-                LogHelper.Debug<content>("Acquired exclusive access to file for this AppDomain.");
-            }
-        }
-
-        private void OnDomainUnloadReleaseFileLock(object sender, EventArgs args)
-        {
-            // the unload event triggers AFTER all hosted objects (eg the file persister
-            // background task runner) have been stopped, so we should NOT be accessing
-            // the file from now one - release the lock
-
-            // NOTE
-            // trying to write to the log via LogHelper at that point is a BAD idea
-            // it can lead to ugly deadlocks with the named semaphore - DONT do it
-
-            if (_fileLock == null) return; // not locking (testing?)
-            if (_fileLocked == null) return; // not locked
-
-            // thread-safety
-            // lock something that's readonly and not null..
-            lock (_xmlFileName)
-            {
-                // double-check
-                if (_fileLocked == null) return;
-
-                // in case you really need to debug... that should be safe...
-                //System.IO.File.AppendAllText(HostingEnvironment.MapPath("~/App_Data/log.txt"), string.Format("{0} {1} unlock", DateTime.Now, AppDomain.CurrentDomain.Id));
-                _fileLocked.Dispose();
-
-                _fileLock = null; // ensure we don't lock again
-            }
-        }     
+        // not used - just try to read the file
+        //private bool XmlFileExists
+        //{
+        //    get
+        //    {
+        //        // check that the file exists and has content (is not empty)
+        //        var fileInfo = new FileInfo(_xmlFileName);
+        //        return fileInfo.Exists && fileInfo.Length > 0;
+        //    }
+        //}
 
         private DateTime XmlFileLastWriteTime
         {
@@ -890,16 +1015,18 @@ order by umbracoNode.level, umbracoNode.sortOrder";
             }
         }
 
-        // assumes file lock
+        // invoked by XmlCacheFilePersister ONLY and that one manages the MainDom, ie it
+        // will NOT try to save once the current app domain is not the main domain anymore
+        // (no need to test _released)
         internal void SaveXmlToFile()
         {
             LogHelper.Info<content>("Save Xml to file...");
-            EnsureFileLock();
-
-            var xml = _xmlContent; // capture (atomic + volatile), immutable anyway
 
             try
             {
+                var xml = _xmlContent; // capture (atomic + volatile), immutable anyway
+                if (xml == null) return;
+
                 // delete existing file, if any
                 DeleteXmlFile();
 
@@ -907,7 +1034,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                 var directoryName = Path.GetDirectoryName(_xmlFileName);
                 if (directoryName == null)
                     throw new Exception(string.Format("Invalid XmlFileName \"{0}\".", _xmlFileName));
-                if (System.IO.File.Exists(_xmlFileName) == false && Directory.Exists(directoryName) == false)
+                if (File.Exists(_xmlFileName) == false && Directory.Exists(directoryName) == false)
                     Directory.CreateDirectory(directoryName);
 
                 // save
@@ -917,7 +1044,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                     fs.Write(bytes, 0, bytes.Length);
                 }
 
-                LogHelper.Debug<content>("Saved Xml to file.");
+                LogHelper.Info<content>("Saved Xml to file.");
             }
             catch (Exception e)
             {
@@ -928,16 +1055,18 @@ order by umbracoNode.level, umbracoNode.sortOrder";
             }
         }
 
-        // assumes file lock
-        internal async System.Threading.Tasks.Task SaveXmlToFileAsync()
+        // invoked by XmlCacheFilePersister ONLY and that one manages the MainDom, ie it
+        // will NOT try to save once the current app domain is not the main domain anymore
+        // (no need to test _released)
+        internal async Task SaveXmlToFileAsync()
         {
             LogHelper.Info<content>("Save Xml to file...");
-            EnsureFileLock();
-
-            var xml = _xmlContent; // capture (atomic + volatile), immutable anyway
 
             try
             {
+                var xml = _xmlContent; // capture (atomic + volatile), immutable anyway
+                if (xml == null) return;
+
                 // delete existing file, if any
                 DeleteXmlFile();
 
@@ -945,7 +1074,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                 var directoryName = Path.GetDirectoryName(_xmlFileName);
                 if (directoryName == null)
                     throw new Exception(string.Format("Invalid XmlFileName \"{0}\".", _xmlFileName));
-                if (System.IO.File.Exists(_xmlFileName) == false && Directory.Exists(directoryName) == false)
+                if (File.Exists(_xmlFileName) == false && Directory.Exists(directoryName) == false)
                     Directory.CreateDirectory(directoryName);
 
                 // save
@@ -955,7 +1084,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                     await fs.WriteAsync(bytes, 0, bytes.Length);
                 }
 
-                LogHelper.Debug<content>("Saved Xml to file.");
+                LogHelper.Info<content>("Saved Xml to file.");
             }
             catch (Exception e)
             {
@@ -994,11 +1123,12 @@ order by umbracoNode.level, umbracoNode.sortOrder";
             return sb.ToString();
         }
 
-        // assumes file lock
         private XmlDocument LoadXmlFromFile()
         {
+            // do NOT try to load if we are not the main domain anymore
+            if (_released) return null;
+
             LogHelper.Info<content>("Load Xml from file...");
-            EnsureFileLock();
 
             try
             {
@@ -1008,8 +1138,13 @@ order by umbracoNode.level, umbracoNode.sortOrder";
                     xml.Load(fs);
                 }
                 _lastFileRead = DateTime.UtcNow;
-                LogHelper.Info<content>("Successfully loaded Xml from file.");
+                LogHelper.Info<content>("Loaded Xml from file.");
                 return xml;
+            }
+            catch (FileNotFoundException)
+            {
+                LogHelper.Warn<content>("Failed to load Xml, file does not exist.");
+                return null;
             }
             catch (Exception e)
             {
@@ -1019,12 +1154,11 @@ order by umbracoNode.level, umbracoNode.sortOrder";
             }
         }
 
-        // (files is always locked)
         private void DeleteXmlFile()
         {
-            if (System.IO.File.Exists(_xmlFileName) == false) return;
-            System.IO.File.SetAttributes(_xmlFileName, FileAttributes.Normal);
-            System.IO.File.Delete(_xmlFileName);
+            if (File.Exists(_xmlFileName) == false) return;
+            File.SetAttributes(_xmlFileName, FileAttributes.Normal);
+            File.Delete(_xmlFileName);
         }
 
         private void ReloadXmlFromFileIfChanged()
@@ -1054,8 +1188,15 @@ order by umbracoNode.level, umbracoNode.sortOrder";
 
         #region Manage change
 
-        // adds or updates a node (docNode) into a cache (xml)
+        //TODO remove as soon as we can break backward compatibility
+        [Obsolete("Use GetAddOrUpdateXmlNode which returns an updated Xml document.", false)]
         public static void AddOrUpdateXmlNode(XmlDocument xml, int id, int level, int parentId, XmlNode docNode)
+        {
+            GetAddOrUpdateXmlNode(xml, id, level, parentId, docNode);
+        }
+
+        // adds or updates a node (docNode) into a cache (xml)
+        public static XmlDocument GetAddOrUpdateXmlNode(XmlDocument xml, int id, int level, int parentId, XmlNode docNode)
         {
             // sanity checks
             if (id != docNode.AttributeValue<int>("id"))
@@ -1068,8 +1209,13 @@ order by umbracoNode.level, umbracoNode.sortOrder";
 
             // if the document is not there already then it's a new document
             // we must make sure that its document type exists in the schema
-            if (currentNode == null)
-                EnsureSchema(docNode.Name, xml);
+            if (currentNode == null && UseLegacySchema == false)
+            {
+                var xml2 = EnsureSchema(docNode.Name, xml);
+                if (ReferenceEquals(xml, xml2) == false)
+                    docNode = xml2.ImportNode(docNode, true);
+                xml = xml2;
+            }
 
             // find the parent
             XmlNode parentNode = level == 1
@@ -1078,7 +1224,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
 
             // no parent = cannot do anything
             if (parentNode == null)
-                return;
+                return xml;
 
             // insert/move the node under the parent
             if (currentNode == null)
@@ -1146,6 +1292,7 @@ order by umbracoNode.level, umbracoNode.sortOrder";
             // then we just need to ensure that currentNode is at the right position.
             // should be faster that moving all the nodes around.
             XmlHelper.SortNode(parentNode, ChildNodesXPath, currentNode, x => x.AttributeValue<int>("sortOrder"));
+            return xml;
         }
 
         private static void TransferValuesFromDocumentXmlToPublishedXml(XmlNode documentNode, XmlNode publishedNode)

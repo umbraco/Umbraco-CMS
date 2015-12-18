@@ -56,7 +56,7 @@ namespace Umbraco.Tests.Publishing
                 ServiceContext.ContentTypeService.GetContentType("umbTextpage"), "Sub Sub Sub", mandatorContent.Id);
             ServiceContext.ContentService.Save(subContent, 0);
             
-            var strategy = new PublishingStrategy();
+            var strategy = new PublishingStrategy(new TransientMessagesFactory(), Logger);
 
             //publish root and nodes at it's children level
             var listToPublish = ServiceContext.ContentService.GetDescendants(_homePage.Id).Concat(new[] { _homePage });
@@ -83,8 +83,8 @@ namespace Umbraco.Tests.Publishing
         {
             CreateTestData();
 
-            var strategy = new PublishingStrategy();
-            
+            var strategy = new PublishingStrategy(new TransientMessagesFactory(), Logger);
+
 
             PublishingStrategy.Publishing +=PublishingStrategyPublishing;
 
@@ -110,8 +110,8 @@ namespace Umbraco.Tests.Publishing
         {
             CreateTestData();
 
-            var strategy = new PublishingStrategy();
-            
+            var strategy = new PublishingStrategy(new TransientMessagesFactory(), Logger);
+
             //publish root and nodes at it's children level
             var result1 = strategy.Publish(_homePage, 0);
             Assert.IsTrue(result1);
@@ -137,7 +137,7 @@ namespace Umbraco.Tests.Publishing
         {
             CreateTestData();
 
-            var strategy = new PublishingStrategy();
+            var strategy = new PublishingStrategy(new TransientMessagesFactory(), Logger);
 
             //publish root and nodes at it's children level
             var result1 = strategy.Publish(_homePage, 0);

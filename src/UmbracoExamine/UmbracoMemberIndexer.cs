@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Linq;
 using System.Xml.Linq;
 using Examine.LuceneEngine.Config;
@@ -19,8 +20,9 @@ using IMediaService = Umbraco.Core.Services.IMediaService;
 
 namespace UmbracoExamine
 {
+   
     /// <summary>
-    /// 
+    /// Custom indexer for members
     /// </summary>
     public class UmbracoMemberIndexer : UmbracoContentIndexer
     {
@@ -75,20 +77,33 @@ namespace UmbracoExamine
         /// <returns></returns>
         protected override IIndexCriteria GetIndexerData(IndexSet indexSet)
         {
+            var indexerData = base.GetIndexerData(indexSet);
+
             if (CanInitialize())
             {
-                var searchableEmail = indexSet.IndexUserFields["_searchEmail"];
-                if (searchableEmail == null)
+                //If the fields are missing a custom _searchEmail, then add it
+
+                if (indexerData.UserFields.Any(x => x.Name == "_searchEmail") == false)
                 {
-                    indexSet.IndexUserFields.Add(new IndexField
+                    var field = new IndexField {Name = "_searchEmail"};
+                    var policy = IndexFieldPolicies.FirstOrDefault(x => x.Name == "_searchEmail");
+                    if (policy != null)
                     {
-                        Name = "_searchEmail"
-                    });
+                        field.Type = policy.Type;
+                        field.EnableSorting = policy.EnableSorting;
+                    }
+
+                    return new IndexCriteria(
+                        indexerData.StandardFields,
+                        indexerData.UserFields.Concat(new[] {field}),
+                        indexerData.IncludeNodeTypes,
+                        indexerData.ExcludeNodeTypes,
+                        indexerData.ParentNodeId
+                        );
                 }
-                return indexSet.ToIndexCriteria(DataService, IndexFieldPolicies);
             }
 
-            return base.GetIndexerData(indexSet);
+	        return indexerData;
         }
 
         /// <summary>
@@ -111,12 +126,11 @@ namespace UmbracoExamine
             //This only supports members
             if (SupportedTypes.Contains(type) == false)
                 return;
-
-            //Re-index all members in batches of 5000
-	        int memberCount = 0;
+            
             const int pageSize = 1000;
             var pageIndex = 0;
-            var serializer = new EntityXmlSerializer();
+
+            IMember[] members;
 
             if (IndexerData.IncludeNodeTypes.Any())
             {
@@ -125,16 +139,13 @@ namespace UmbracoExamine
                 {
                     do
                     {
-                        int total;
-                        var members = _memberService.GetAll(pageIndex, pageSize, out total, "LoginName", Direction.Ascending, nodeType);
-                        memberCount = 0;
-                        foreach (var member in members)
-                        {
-                            AddNodesToIndex(new[] { serializer.Serialize(DataTypeService, member) }, type);
-                            memberCount++;
-                        }
+                        long total;
+                        members = _memberService.GetAll(pageIndex, pageSize, out total, "LoginName", Direction.Ascending, nodeType).ToArray();
+
+                        AddNodesToIndex(GetSerializedMembers(members), type);
+
                         pageIndex++;
-                    } while (memberCount == pageSize);
+                    } while (members.Length == pageSize);
                 }
             }
             else
@@ -143,17 +154,20 @@ namespace UmbracoExamine
                 do
                 {
                     int total;
-                    var members = _memberService.GetAll(pageIndex, pageSize, out total);
-                    memberCount = 0;
-                    foreach (var member in members)
-                    {
-                        AddNodesToIndex(new[] { serializer.Serialize(DataTypeService, member) }, type);
-                        memberCount++;
-                    }
+                    members = _memberService.GetAll(pageIndex, pageSize, out total).ToArray();
+
+                    AddNodesToIndex(GetSerializedMembers(members), type);
+
                     pageIndex++;
-                } while (memberCount == pageSize);
+                } while (members.Length == pageSize);
 	        }
 	    }
+
+        private IEnumerable<XElement> GetSerializedMembers(IEnumerable<IMember> members)
+        {
+            var serializer = new EntityXmlSerializer();
+            return members.Select(member => serializer.Serialize(_dataTypeService, member));
+        }
 
         protected override XDocument GetXDocument(string xPath, string type)
         {
@@ -191,6 +205,9 @@ namespace UmbracoExamine
                 if (e.Fields.ContainsKey("_searchEmail") == false)
                     e.Fields.Add("_searchEmail", e.Node.Attribute("email").Value.Replace(".", " ").Replace("@", " "));
             }
+            
+            if (e.Fields.ContainsKey(IconFieldName) == false)
+                e.Fields.Add(IconFieldName, (string)e.Node.Attribute("icon"));
         }
     }
 }

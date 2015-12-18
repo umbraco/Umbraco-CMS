@@ -1,10 +1,12 @@
 using System;
 using System.Linq;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Migrations.Initial;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence
 {
@@ -37,13 +39,41 @@ namespace Umbraco.Core.Persistence
 
         /// <summary>
         /// Creates the Umbraco db schema in the Database of the current Database.
+        /// Safe method that is only able to create the schema in non-configured
+        /// umbraco instances.
         /// </summary>
-        public void CreateDatabaseSchema()
+        public void CreateDatabaseSchema(ApplicationContext applicationContext)
         {
-            CreateDatabaseSchemaDo();
+            if (applicationContext == null) throw new ArgumentNullException("applicationContext");
+            CreateDatabaseSchema(true, applicationContext);
         }
 
-        private void CreateDatabaseSchemaDo()
+        /// <summary>
+        /// Creates the Umbraco db schema in the Database of the current Database
+        /// with the option to guard the db from having the schema created
+        /// multiple times.
+        /// </summary>
+        /// <param name="guardConfiguration"></param>
+        /// <param name="applicationContext"></param>
+        public void CreateDatabaseSchema(bool guardConfiguration, ApplicationContext applicationContext)
+        {
+            if (applicationContext == null) throw new ArgumentNullException("applicationContext");
+
+            if (guardConfiguration && applicationContext.IsConfigured)
+                throw new Exception("Umbraco is already configured!");
+
+            CreateDatabaseSchemaDo(applicationContext.Services.MigrationEntryService);
+        }
+
+        internal void CreateDatabaseSchemaDo(bool guardConfiguration, ApplicationContext applicationContext)
+        {
+            if (guardConfiguration && applicationContext.IsConfigured)
+                throw new Exception("Umbraco is already configured!");
+
+            CreateDatabaseSchemaDo(applicationContext.Services.MigrationEntryService);
+        }
+
+        internal void CreateDatabaseSchemaDo(IMigrationEntryService migrationEntryService)
         {
             _logger.Info<Database>("Initializing database schema creation");
 
@@ -118,6 +148,13 @@ namespace Umbraco.Core.Persistence
                         _db.Update<UserDto>("SET id = @IdAfter WHERE id = @IdBefore AND userLogin = @Login", new { IdAfter = 0, IdBefore = 1, Login = "admin" });
                     }
 
+                    //Loop through index statements and execute sql
+                    foreach (var sql in indexSql)
+                    {
+                        int createdIndex = _db.Execute(new Sql(sql));
+                        _logger.Info<Database>(string.Format("Create Index sql {0}:\n {1}", createdIndex, sql));
+                    }
+
                     //Loop through foreignkey statements and execute sql
                     foreach (var sql in foreignSql)
                     {
@@ -125,12 +162,7 @@ namespace Umbraco.Core.Persistence
                         _logger.Info<Database>(string.Format("Create Foreign Key sql {0}:\n {1}", createdFk, sql));
                     }
 
-                    //Loop through index statements and execute sql
-                    foreach (var sql in indexSql)
-                    {
-                        int createdIndex = _db.Execute(new Sql(sql));
-                        _logger.Info<Database>(string.Format("Create Index sql {0}:\n {1}", createdIndex, sql));
-                    }
+                    
 
                     transaction.Complete();
                 }

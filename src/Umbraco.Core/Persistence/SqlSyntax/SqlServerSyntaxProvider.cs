@@ -13,19 +13,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     {
         public SqlServerSyntaxProvider()
         {
-            StringLengthColumnDefinitionFormat = StringLengthUnicodeColumnDefinitionFormat;
-            StringColumnDefinition = string.Format(StringLengthColumnDefinitionFormat, DefaultStringLength);
-
-            AutoIncrementDefinition = "IDENTITY(1,1)";
-            StringColumnDefinition = "VARCHAR(8000)";
-            GuidColumnDefinition = "UniqueIdentifier";
-            RealColumnDefinition = "FLOAT";
-            BoolColumnDefinition = "BIT";
-            DecimalColumnDefinition = "DECIMAL(38,6)";
-            TimeColumnDefinition = "TIME"; //SQLSERVER 2008+
-            BlobColumnDefinition = "VARBINARY(MAX)";
-
-            InitColumnTypeMap();
+            
         }
 
         /// <summary>
@@ -126,13 +114,13 @@ order by T.name, I.name");
             switch (systemMethod)
             {
                 case SystemMethods.NewGuid:
-                    return "NEWID()";
-                case SystemMethods.NewSequentialId:
-                    return "NEWSEQUENTIALID()";
+                    return "NEWID()";                
                 case SystemMethods.CurrentDateTime:
                     return "GETDATE()";
-                case SystemMethods.CurrentUTCDateTime:
-                    return "GETUTCDATE()";
+                //case SystemMethods.NewSequentialId:
+                //    return "NEWSEQUENTIALID()";
+                //case SystemMethods.CurrentUTCDateTime:
+                //    return "GETUTCDATE()";
             }
 
             return null;

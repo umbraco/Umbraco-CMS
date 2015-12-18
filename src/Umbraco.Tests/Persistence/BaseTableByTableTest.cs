@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.ObjectResolution;
@@ -57,6 +58,7 @@ namespace Umbraco.Tests.Persistence
 
             var repositoryFactory = new RepositoryFactory(cacheHelper, _logger, SqlSyntaxProvider, SettingsForTests.GenerateMockSettings(), Mock.Of<IMappingResolver>());
 
+            var evtMsgs = new TransientMessagesFactory();
             ApplicationContext.Current = new ApplicationContext(
                 //assign the db context
                 dbContext,
@@ -237,6 +239,7 @@ namespace Umbraco.Tests.Persistence
             using (Transaction transaction = Database.GetTransaction())
             {
                 DatabaseSchemaHelper.CreateTable<DictionaryDto>();
+                DatabaseSchemaHelper.CreateTable<LanguageDto>();
                 DatabaseSchemaHelper.CreateTable<LanguageTextDto>();
 
                 //transaction.Complete();
@@ -281,7 +284,7 @@ namespace Umbraco.Tests.Persistence
                 DatabaseSchemaHelper.CreateTable<NodeDto>();
                 DatabaseSchemaHelper.CreateTable<ContentTypeDto>();
                 DatabaseSchemaHelper.CreateTable<TemplateDto>();
-                DatabaseSchemaHelper.CreateTable<DocumentTypeDto>();
+                DatabaseSchemaHelper.CreateTable<ContentTypeTemplateDto>();
 
                 //transaction.Complete();
             }
@@ -557,12 +560,25 @@ namespace Umbraco.Tests.Persistence
         }
 
         [Test]
-        public void Can_Create_umbracoUserLogins_Table()
+        public void Can_Create_umbracoDeployDependency_Table()
         {
-            
+
             using (Transaction transaction = Database.GetTransaction())
             {
-                DatabaseSchemaHelper.CreateTable<UserLoginDto>();
+                DatabaseSchemaHelper.CreateTable<UmbracoDeployChecksumDto>();
+                DatabaseSchemaHelper.CreateTable<UmbracoDeployDependencyDto>();
+
+                //transaction.Complete();
+            }
+        }
+
+        [Test]
+        public void Can_Create_umbracoDeployChecksum_Table()
+        {
+
+            using (Transaction transaction = Database.GetTransaction())
+            {
+                DatabaseSchemaHelper.CreateTable<UmbracoDeployChecksumDto>();
 
                 //transaction.Complete();
             }

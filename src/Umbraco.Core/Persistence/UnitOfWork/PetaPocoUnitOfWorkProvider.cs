@@ -46,7 +46,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
         /// Constructor accepting an IDatabaseFactory instance
         /// </summary>
         /// <param name="dbFactory"></param>
-        internal PetaPocoUnitOfWorkProvider(IDatabaseFactory dbFactory)
+        public PetaPocoUnitOfWorkProvider(IDatabaseFactory dbFactory)
         {
             Mandate.ParameterNotNull(dbFactory, "dbFactory");
             _dbFactory = dbFactory;

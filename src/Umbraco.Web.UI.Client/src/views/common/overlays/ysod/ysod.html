@@ -1,0 +1,15 @@
+﻿<div ng-controller="Umbraco.Overlays.YsodController">
+
+    <h4 class="heading red">{{model.error.errorMsg}}</h4>
+    <p>{{model.error.data.ExceptionMessage || model.error.data.Message}}</p>
+
+    <div class="umb-control-group">
+        <h5>Exception Details: </h5>
+        {{model.error.data.ExceptionType}}: {{model.error.data.ExceptionMessage}}
+    </div>
+
+    <div class="umb-control-group">
+        <h5>Stacktrace: </h5>
+        <pre style="white-space: pre-wrap; overflow-x: auto;">{{model.error.data.StackTrace}}</pre>
+    </div>
+</div>

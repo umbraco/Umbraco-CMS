@@ -54,12 +54,12 @@ namespace umbraco.dialogs
                 sb.AppendFormat("{0}{{ \"Id\": {1}, \"Code\": \"{2}\" }}", (i++ == 0 ? "" : ","), language.Id, language.IsoCode);
             sb.Append("]\r\n");
 
-            sb.AppendFormat(",language: {0}", wildcard == null ? "undefined" : wildcard.Language.Id.ToString());
+            sb.AppendFormat(",language: {0}", wildcard == null ? "undefined" : wildcard.LanguageId.ToString());
 
             sb.Append(",domains: [");
             i = 0;
             foreach (var domain in nodeDomains.Where(d => d.IsWildcard == false))
-                sb.AppendFormat("{0}{{ \"Name\": \"{1}\", \"Lang\": \"{2}\" }}", (i++ == 0 ? "" :","), domain.DomainName, domain.Language.Id);
+                sb.AppendFormat("{0}{{ \"Name\": \"{1}\", \"Lang\": \"{2}\" }}", (i++ == 0 ? "" :","), domain.DomainName, domain.LanguageId);
             sb.Append("]\r\n");
 
             data.Text = sb.ToString();

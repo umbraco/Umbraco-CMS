@@ -1,4 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Web.Http.Filters;
 using Umbraco.Core;
@@ -37,6 +40,8 @@ namespace Umbraco.Web.WebApi.Filters
         {
             base.OnActionExecuted(actionExecutedContext);
 
+            var tempFolders = new List<string>();
+
             if (_incomingModel)
             {
                 if (actionExecutedContext.ActionContext.ActionArguments.Any())
@@ -47,7 +52,21 @@ namespace Umbraco.Web.WebApi.Filters
                         //cleanup any files associated
                         foreach (var f in contentItem.UploadedFiles)
                         {
-                            File.Delete(f.TempFilePath);
+                            //track all temp folders so we can remove old files afterwords
+                            var dir = Path.GetDirectoryName(f.TempFilePath);
+                            if (tempFolders.Contains(dir) == false)
+                            {
+                                tempFolders.Add(dir);
+                            }
+
+                            try
+                            {
+                                File.Delete(f.TempFilePath);
+                            }
+                            catch (System.Exception ex)
+                            {
+                                LogHelper.Error<FileUploadCleanupFilterAttribute>("Could not delete temp file " + f.TempFilePath, ex);
+                            }
                         }
                     }
                 }
@@ -94,8 +113,24 @@ namespace Umbraco.Web.WebApi.Filters
                             {
                                 if (f.TempFilePath.IsNullOrWhiteSpace() == false)
                                 {
+                                    //track all temp folders so we can remove old files afterwords
+                                    var dir = Path.GetDirectoryName(f.TempFilePath);
+                                    if (tempFolders.Contains(dir) == false)
+                                    {
+                                        tempFolders.Add(dir);
+                                    }
+
                                     LogHelper.Debug<FileUploadCleanupFilterAttribute>("Removing temp file " + f.TempFilePath);
-                                    File.Delete(f.TempFilePath);
+
+                                    try
+                                    {
+                                        File.Delete(f.TempFilePath);
+                                    }
+                                    catch (System.Exception ex)
+                                    {
+                                        LogHelper.Error<FileUploadCleanupFilterAttribute>("Could not delete temp file " + f.TempFilePath, ex);
+                                    }
+
                                     //clear out the temp path so it's not returned in the response
                                     f.TempFilePath = "";
                                 }
@@ -119,6 +154,27 @@ namespace Umbraco.Web.WebApi.Filters
                 {
                     LogHelper.Warn<FileUploadCleanupFilterAttribute>("The actionExecutedContext.Request.Content is not ObjectContent, it is " + actionExecutedContext.Request.Content.GetType());
                 }
+            }
+
+            //Now remove all old files so that the temp folder(s) never grow
+            foreach (var tempFolder in tempFolders.Distinct())
+            {
+                var files = Directory.GetFiles(tempFolder);
+                foreach (var file in files)
+                {
+                    if (DateTime.UtcNow - File.GetLastWriteTimeUtc(file) > TimeSpan.FromDays(1))
+                    {
+                        try
+                        {
+                            File.Delete(file);
+                        }
+                        catch (System.Exception ex)
+                        {
+                            LogHelper.Error<FileUploadCleanupFilterAttribute>("Could not delete temp file " + file, ex);
+                        }
+                    }
+                }
+
             }
             
         }

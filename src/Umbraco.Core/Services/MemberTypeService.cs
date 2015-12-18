@@ -17,9 +17,9 @@ namespace Umbraco.Core.Services
         private readonly IMemberService _memberService;
 
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
-
-        public MemberTypeService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IMemberService memberService)
-            : base(provider, repositoryFactory, logger)
+        
+        public MemberTypeService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory, IMemberService memberService)
+            : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
             if (memberService == null) throw new ArgumentNullException("memberService");
             _memberService = memberService;
@@ -43,6 +43,19 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateMemberTypeRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.Get(id);
+            }
+        }
+
+        /// <summary>
+        /// Gets an <see cref="IMemberType"/> object by its Key
+        /// </summary>
+        /// <param name="key">Key of the <see cref="IMemberType"/> to retrieve</param>
+        /// <returns><see cref="IMemberType"/></returns>
+        public IMemberType Get(Guid key)
+        {
+            using (var repository = RepositoryFactory.CreateMemberTypeRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.Get(key);
             }
         }
 

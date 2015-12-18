@@ -6,6 +6,8 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Umbraco.Core.Events;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -17,6 +19,7 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Relators;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -25,13 +28,55 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     /// <remarks>Exposes shared functionality</remarks>
     /// <typeparam name="TEntity"></typeparam>
-    internal abstract class ContentTypeBaseRepository<TEntity> : PetaPocoRepositoryBase<int, TEntity>
+    internal abstract class ContentTypeBaseRepository<TEntity> : PetaPocoRepositoryBase<int, TEntity>, IReadRepository<Guid, TEntity>
         where TEntity : class, IContentTypeComposition
     {
-
         protected ContentTypeBaseRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
             : base(work, cache, logger, sqlSyntax, mappingResolver)
         {
+            _guidRepo = new GuidReadOnlyContentTypeBaseRepository(this, work, cache, logger, sqlSyntax);
+        }
+
+        private readonly GuidReadOnlyContentTypeBaseRepository _guidRepo;
+
+        public IEnumerable<MoveEventInfo<TEntity>> Move(TEntity toMove, EntityContainer container)
+        {
+            var parentId = -1;
+            if (container != null)
+            {
+                // Check on paths
+                if ((string.Format(",{0},", container.Path)).IndexOf(string.Format(",{0},", toMove.Id), StringComparison.Ordinal) > -1)
+                {
+                    throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedNotAllowedByPath);
+                }
+                parentId = container.Id;
+            }
+
+            //used to track all the moved entities to be given to the event
+            var moveInfo = new List<MoveEventInfo<TEntity>>
+            {
+                new MoveEventInfo<TEntity>(toMove, toMove.Path, parentId)
+            };
+
+            //do the move to a new parent
+            toMove.ParentId = parentId;
+            //schedule it for updating in the transaction
+            AddOrUpdate(toMove);
+
+            //update all descendants
+            var descendants = this.GetByQuery(
+                new Query<TEntity>().Where(type => type.Path.StartsWith(toMove.Path + ",")));
+            foreach (var descendant in descendants)
+            {
+                moveInfo.Add(new MoveEventInfo<TEntity>(descendant, descendant.Path, descendant.ParentId));
+
+                //all we're doing here is setting the parent Id to be dirty so that it resets the path/level/etc...
+                descendant.ParentId = descendant.ParentId;
+                //schedule it for updating in the transaction
+                AddOrUpdate(descendant);
+            }
+
+            return moveInfo;
         }
 
         /// <summary>
@@ -51,7 +96,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var translator = new SqlTranslator<PropertyType>(sqlClause, query);
             var sql = translator.Translate()
-                                .OrderBy<PropertyTypeDto>(SqlSyntax, x => x.PropertyTypeGroupId);
+                                .OrderBy<PropertyTypeDto>(x => x.PropertyTypeGroupId, SqlSyntax);
 
             var dtos = Database.Fetch<PropertyTypeGroupDto, PropertyTypeDto, DataTypeDto, PropertyTypeGroupDto>(new GroupPropertyTypeRelator().Map, sql);
 
@@ -60,14 +105,17 @@ namespace Umbraco.Core.Persistence.Repositories
                 yield return dto.ContentTypeNodeId;
             }
         }
-        
+
         protected virtual PropertyType CreatePropertyType(string propertyEditorAlias, DataTypeDatabaseType dbType, string propertyTypeAlias)
         {
             return new PropertyType(propertyEditorAlias, dbType, propertyTypeAlias);
         }
 
-        protected void PersistNewBaseContentType(ContentTypeDto dto, IContentTypeComposition entity)
+        protected void PersistNewBaseContentType(IContentTypeComposition entity)
         {
+            var factory = new ContentTypeFactory();
+            var dto = factory.BuildContentTypeDto(entity);
+
             //Cannot add a duplicate content type type
             var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsContentType
 INNER JOIN umbracoNode ON cmsContentType.nodeId = umbracoNode.id
@@ -119,7 +167,7 @@ AND umbracoNode.nodeObjectType = @objectType",
                 else
                 {
                     //Fallback for ContentTypes with no identity
-                    var contentTypeDto = Database.FirstOrDefault<ContentTypeDto>("WHERE alias = @Alias", new {Alias = composition.Alias});
+                    var contentTypeDto = Database.FirstOrDefault<ContentTypeDto>("WHERE alias = @Alias", new { Alias = composition.Alias });
                     if (contentTypeDto != null)
                     {
                         Database.Insert(new ContentType2ContentTypeDto { ParentId = contentTypeDto.NodeId, ChildId = entity.Id });
@@ -139,7 +187,7 @@ AND umbracoNode.nodeObjectType = @objectType",
             }
 
             var propertyFactory = new PropertyGroupFactory(nodeDto.NodeId);
-            
+
             //Insert Tabs
             foreach (var propertyGroup in entity.PropertyGroups)
             {
@@ -179,38 +227,35 @@ AND umbracoNode.nodeObjectType = @objectType",
             }
         }
 
-        protected void PersistUpdatedBaseContentType(ContentTypeDto dto, IContentTypeComposition entity)
+        protected void PersistUpdatedBaseContentType(IContentTypeComposition entity)
         {
+            var factory = new ContentTypeFactory();
+            var dto = factory.BuildContentTypeDto(entity);
 
-            //Cannot update to a duplicate alias
+            // ensure the alias is not used already
             var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsContentType
 INNER JOIN umbracoNode ON cmsContentType.nodeId = umbracoNode.id
 WHERE cmsContentType." + SqlSyntax.GetQuotedColumnName("alias") + @"= @alias
 AND umbracoNode.nodeObjectType = @objectType
 AND umbracoNode.id <> @id",
-                new { id = dto.NodeId, alias = entity.Alias, objectType = NodeObjectTypeId });
+                new { id = dto.NodeId, alias = dto.Alias, objectType = NodeObjectTypeId });
             if (exists > 0)
-            {
-                throw new DuplicateNameException("An item with the alias " + entity.Alias + " already exists");
-            }
+                throw new DuplicateNameException("An item with the alias " + dto.Alias + " already exists");
 
-            var propertyGroupFactory = new PropertyGroupFactory(entity.Id);
-
+            // handle (update) the node
             var nodeDto = dto.NodeDto;
-            var o = Database.Update(nodeDto);
+            Database.Update(nodeDto);
 
+            // fixme - why? we are UPDATING so we should ALREADY have a PK!
             //Look up ContentType entry to get PrimaryKey for updating the DTO
-            var dtoPk = Database.First<ContentTypeDto>("WHERE nodeId = @Id", new {Id = entity.Id});
+            var dtoPk = Database.First<ContentTypeDto>("WHERE nodeId = @Id", new { Id = entity.Id });
             dto.PrimaryKey = dtoPk.PrimaryKey;
             Database.Update(dto);
 
-            //Delete the ContentType composition entries before adding the updated collection
-            Database.Delete<ContentType2ContentTypeDto>("WHERE childContentTypeId = @Id", new {Id = entity.Id});
-            //Update ContentType composition in new table
+            // handle (delete then recreate) compositions
+            Database.Delete<ContentType2ContentTypeDto>("WHERE childContentTypeId = @Id", new { Id = entity.Id });
             foreach (var composition in entity.ContentTypeComposition)
-            {
-                Database.Insert(new ContentType2ContentTypeDto {ParentId = composition.Id, ChildId = entity.Id});
-            }
+                Database.Insert(new ContentType2ContentTypeDto { ParentId = composition.Id, ChildId = entity.Id });
 
             //Removing a ContentType from a composition (U4-1690)
             //1. Find content based on the current ContentType: entity.Id
@@ -234,7 +279,7 @@ AND umbracoNode.id <> @id",
                 foreach (var key in compositionBase.RemovedContentTypeKeyTracker)
                 {
                     //Find PropertyTypes for the removed ContentType
-                    var propertyTypes = Database.Fetch<PropertyTypeDto>("WHERE contentTypeId = @Id", new {Id = key});
+                    var propertyTypes = Database.Fetch<PropertyTypeDto>("WHERE contentTypeId = @Id", new { Id = key });
                     //Loop through the Content that is based on the current ContentType in order to remove the Properties that are 
                     //based on the PropertyTypes that belong to the removed ContentType.
                     foreach (var contentDto in contentDtos)
@@ -259,7 +304,7 @@ AND umbracoNode.id <> @id",
             }
 
             //Delete the allowed content type entries before adding the updated collection
-            Database.Delete<ContentTypeAllowedContentTypeDto>("WHERE Id = @Id", new {Id = entity.Id});
+            Database.Delete<ContentTypeAllowedContentTypeDto>("WHERE Id = @Id", new { Id = entity.Id });
             //Insert collection of allowed content types
             foreach (var allowedContentType in entity.AllowedContentTypes)
             {
@@ -272,10 +317,10 @@ AND umbracoNode.id <> @id",
             }
 
 
-            if (((ICanBeDirty) entity).IsPropertyDirty("PropertyTypes") || entity.PropertyTypes.Any(x => x.IsDirty()))
+            if (((ICanBeDirty)entity).IsPropertyDirty("PropertyTypes") || entity.PropertyTypes.Any(x => x.IsDirty()))
             {
                 //Delete PropertyTypes by excepting entries from db with entries from collections
-                var dbPropertyTypes = Database.Fetch<PropertyTypeDto>("WHERE contentTypeId = @Id", new {Id = entity.Id});
+                var dbPropertyTypes = Database.Fetch<PropertyTypeDto>("WHERE contentTypeId = @Id", new { Id = entity.Id });
                 var dbPropertyTypeAlias = dbPropertyTypes.Select(x => x.Id);
                 var entityPropertyTypes = entity.PropertyTypes.Where(x => x.HasIdentity).Select(x => x.Id);
                 var items = dbPropertyTypeAlias.Except(entityPropertyTypes);
@@ -283,60 +328,49 @@ AND umbracoNode.id <> @id",
                 {
                     //Before a PropertyType can be deleted, all Properties based on that PropertyType should be deleted.
                     Database.Delete<TagRelationshipDto>("WHERE propertyTypeId = @Id", new { Id = item });
-                    Database.Delete<PropertyDataDto>("WHERE propertytypeid = @Id", new {Id = item});
+                    Database.Delete<PropertyDataDto>("WHERE propertytypeid = @Id", new { Id = item });
                     Database.Delete<PropertyTypeDto>("WHERE contentTypeId = @Id AND id = @PropertyTypeId",
-                                                     new {Id = entity.Id, PropertyTypeId = item});
+                                                     new { Id = entity.Id, PropertyTypeId = item });
                 }
             }
 
-            if (entity.IsPropertyDirty("PropertyGroups") || 
-                entity.PropertyGroups.Any(x => x.IsDirty()))
+            if (entity.IsPropertyDirty("PropertyGroups") || entity.PropertyGroups.Any(x => x.IsDirty()))
             {
-                //Delete Tabs/Groups by excepting entries from db with entries from collections
-                var dbPropertyGroups =
-                    Database.Fetch<PropertyTypeGroupDto>("WHERE contenttypeNodeId = @Id", new {Id = entity.Id})
-                            .Select(x => new Tuple<int, string>(x.Id, x.Text))
-                            .ToList();
-                var entityPropertyGroups = entity.PropertyGroups.Select(x => new Tuple<int, string>(x.Id, x.Name)).ToList();
-                var tabsToDelete = dbPropertyGroups.Select(x => x.Item1).Except(entityPropertyGroups.Select(x => x.Item1));
-                var tabs = dbPropertyGroups.Where(x => tabsToDelete.Any(y => y == x.Item1));
-                //Update Tab name downstream to ensure renaming is done properly
-                foreach (var propertyGroup in entityPropertyGroups)
+                // todo
+                // we used to try to propagate tabs renaming downstream, relying on ParentId, but
+                // 1) ParentId makes no sense (if a tab can be inherited from multiple composition
+                //    types) so we would need to figure things out differently, visiting downstream
+                //    content types and looking for tabs with the same name...
+                // 2) It was not deployable as changing a content type changes other content types
+                //    that was not deterministic, because it would depend on the order of the changes.
+                // That last point could be fixed if (1) is fixed, but then it still is an issue with
+                // deploy because changing a content type changes other content types that are not
+                // dependencies but dependents, and then what?
+                //
+                // So... for the time being, all renaming propagation is disabled. We just don't do it.
+
+                // (all gone)
+
+                // delete tabs that do not exist anymore
+                // get the tabs that are currently existing (in the db)
+                // get the tabs that we want, now
+                // and derive the tabs that we want to delete
+                var existingPropertyGroups = Database.Fetch<PropertyTypeGroupDto>("WHERE contentTypeNodeId = @id", new { id = entity.Id })
+                    .Select(x => x.Id)
+                    .ToList();
+                var newPropertyGroups = entity.PropertyGroups.Select(x => x.Id).ToList();
+                var tabsToDelete = existingPropertyGroups
+                    .Except(newPropertyGroups)
+                    .ToArray();
+
+                // move properties to generic properties, and delete the tabs
+                if (tabsToDelete.Length > 0)
                 {
-                    Database.Update<PropertyTypeGroupDto>("SET Text = @TabName WHERE parentGroupId = @TabId",
-                                                          new { TabName = propertyGroup.Item2, TabId = propertyGroup.Item1 });
-
-                    var childGroups = Database.Fetch<PropertyTypeGroupDto>("WHERE parentGroupId = @TabId", new { TabId = propertyGroup.Item1 });
-                    foreach (var childGroup in childGroups)
-                    {
-                        var sibling = Database.Fetch<PropertyTypeGroupDto>("WHERE contenttypeNodeId = @Id AND text = @Name",
-                            new { Id = childGroup.ContentTypeNodeId, Name = propertyGroup.Item2 })
-                            .FirstOrDefault(x => x.ParentGroupId.HasValue == false || x.ParentGroupId.Value.Equals(propertyGroup.Item1) == false);
-                        //If the child group doesn't have a sibling there is no chance of duplicates and we continue
-                        if (sibling == null || (sibling.ParentGroupId.HasValue && sibling.ParentGroupId.Value.Equals(propertyGroup.Item1))) continue;
-
-                        //Since the child group has a sibling with the same name we need to point any PropertyTypes to the sibling
-                        //as this child group is about to leave the party.
-                        Database.Update<PropertyTypeDto>(
-                            "SET propertyTypeGroupId = @PropertyTypeGroupId WHERE propertyTypeGroupId = @PropertyGroupId AND ContentTypeId = @ContentTypeId",
-                            new { PropertyTypeGroupId = sibling.Id, PropertyGroupId = childGroup.Id, ContentTypeId = childGroup.ContentTypeNodeId });
-
-                        //Since the parent group has been renamed and we have duplicates we remove this group
-                        //and leave our sibling in charge of the part.
-                        Database.Delete(childGroup);
-                    }
-                }
-                //Do Tab updates
-                foreach (var tab in tabs)
-                {
-                    Database.Update<PropertyTypeDto>("SET propertyTypeGroupId = NULL WHERE propertyTypeGroupId = @PropertyGroupId",
-                                                    new {PropertyGroupId = tab.Item1});
-                    Database.Update<PropertyTypeGroupDto>("SET parentGroupId = NULL WHERE parentGroupId = @TabId",
-                                                          new {TabId = tab.Item1});
-                    Database.Delete<PropertyTypeGroupDto>("WHERE contenttypeNodeId = @Id AND text = @Name",
-                                                          new {Id = entity.Id, Name = tab.Item2});
+                    Database.Update<PropertyTypeDto>("SET propertyTypeGroupId=NULL WHERE propertyTypeGroupId IN (@ids)", new { ids = tabsToDelete });
+                    Database.Delete<PropertyTypeGroupDto>("WHERE id IN (@ids)", new { ids = tabsToDelete });
                 }
             }
+            var propertyGroupFactory = new PropertyGroupFactory(entity.Id);
 
             //Run through all groups to insert or update entries
             foreach (var propertyGroup in entity.PropertyGroups)
@@ -379,25 +413,6 @@ AND umbracoNode.id <> @id",
                                          : Convert.ToInt32(Database.Insert(propertyTypeDto));
                 if (propertyType.HasIdentity == false)
                     propertyType.Id = typePrimaryKey; //Set Id on new PropertyType
-            }
-
-            //If a Composition is removed we need to update/reset references to the PropertyGroups on that ContentType
-            if (entity.IsPropertyDirty("ContentTypeComposition") &&
-                compositionBase != null &&
-                compositionBase.RemovedContentTypeKeyTracker != null &&
-                compositionBase.RemovedContentTypeKeyTracker.Any())
-            {
-                foreach (var compositionId in compositionBase.RemovedContentTypeKeyTracker)
-                {
-                    var dbPropertyGroups =
-                        Database.Fetch<PropertyTypeGroupDto>("WHERE contenttypeNodeId = @Id", new { Id = compositionId })
-                            .Select(x => x.Id);
-                    foreach (var propertyGroup in dbPropertyGroups)
-                    {
-                        Database.Update<PropertyTypeGroupDto>("SET parentGroupId = NULL WHERE parentGroupId = @TabId AND contenttypeNodeId = @ContentTypeNodeId",
-                                                              new { TabId = propertyGroup, ContentTypeNodeId = entity.Id });
-                    }
-                }
             }
         }
 
@@ -448,7 +463,7 @@ AND umbracoNode.id <> @id",
             var list = new List<PropertyType>();
             foreach (var dto in dtos.Where(x => (x.PropertyTypeGroupId > 0) == false))
             {
-                var propType = CreatePropertyType(dto.DataTypeDto.PropertyEditorAlias, dto.DataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true), dto.Alias);      
+                var propType = CreatePropertyType(dto.DataTypeDto.PropertyEditorAlias, dto.DataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true), dto.Alias);
                 propType.DataTypeDefinitionId = dto.DataTypeId;
                 propType.Description = dto.Description;
                 propType.Id = dto.Id;
@@ -499,7 +514,7 @@ AND umbracoNode.id <> @id",
                                         throw exception;
                                     });
         }
-        
+
         /// <summary>
         /// Try to set the data type id based on its ControlId
         /// </summary>
@@ -562,28 +577,30 @@ AND umbracoNode.id <> @id",
                 }
             }
 
-            public static IEnumerable<IMediaType> GetMediaTypes<TRepo>(
-                int[] mediaTypeIds, Database db, ISqlSyntaxProvider sqlSyntax,
+            public static IEnumerable<IMediaType> GetMediaTypes<TRepo, TId>(
+                TId[] mediaTypeIds, Database db, ISqlSyntaxProvider sqlSyntax,
                 TRepo contentTypeRepository)
-                where TRepo : IRepositoryQueryable<int, TEntity>
+                where TRepo : IReadRepository<TId, TEntity>
+                where TId: struct
             {
-                IDictionary<int, IEnumerable<int>> allParentMediaTypeIds;
+                IDictionary<TId, IEnumerable<TId>> allParentMediaTypeIds;
                 var mediaTypes = MapMediaTypes(mediaTypeIds, db, sqlSyntax, out allParentMediaTypeIds)
                     .ToArray();
 
                 MapContentTypeChildren(mediaTypes, db, sqlSyntax, contentTypeRepository, allParentMediaTypeIds);
-                
+
                 return mediaTypes;
             }
 
-            public static IEnumerable<IContentType> GetContentTypes<TRepo>(
-                int[] contentTypeIds, Database db, ISqlSyntaxProvider sqlSyntax,
+            public static IEnumerable<IContentType> GetContentTypes<TRepo, TId>(
+                TId[] contentTypeIds, Database db, ISqlSyntaxProvider sqlSyntax,
                 TRepo contentTypeRepository,
                 ITemplateRepository templateRepository)
-                where TRepo : IRepositoryQueryable<int, TEntity>
+                where TRepo : IReadRepository<TId, TEntity>
+                where TId : struct
             {
-                IDictionary<int, IEnumerable<AssociatedTemplate>> allAssociatedTemplates;
-                IDictionary<int, IEnumerable<int>> allParentContentTypeIds;
+                IDictionary<TId, IEnumerable<AssociatedTemplate>> allAssociatedTemplates;
+                IDictionary<TId, IEnumerable<TId>> allParentContentTypeIds;
                 var contentTypes = MapContentTypes(contentTypeIds, db, sqlSyntax, out allAssociatedTemplates, out allParentContentTypeIds)
                     .ToArray();
 
@@ -593,17 +610,18 @@ AND umbracoNode.id <> @id",
                             contentTypes, db, contentTypeRepository, templateRepository, allAssociatedTemplates);
 
                     MapContentTypeChildren(
-                            contentTypes, db, sqlSyntax, contentTypeRepository, allParentContentTypeIds);         
+                            contentTypes, db, sqlSyntax, contentTypeRepository, allParentContentTypeIds);
                 }
 
                 return contentTypes;
             }
 
-            internal static void MapContentTypeChildren<TRepo>(IContentTypeComposition[] contentTypes,
+            internal static void MapContentTypeChildren<TRepo, TId>(IContentTypeComposition[] contentTypes,
                 Database db, ISqlSyntaxProvider sqlSyntax,
                 TRepo contentTypeRepository,
-                IDictionary<int, IEnumerable<int>> allParentContentTypeIds)
-                where TRepo : IRepositoryQueryable<int, TEntity>
+                IDictionary<TId, IEnumerable<TId>> allParentContentTypeIds)
+                where TRepo : IReadRepository<TId, TEntity>
+                where TId : struct
             {
                 //NOTE: SQL call #2
 
@@ -615,9 +633,9 @@ AND umbracoNode.id <> @id",
                 foreach (var contentType in contentTypes)
                 {
                     contentType.PropertyGroups = allPropGroups[contentType.Id];
-                    ((ContentTypeBase) contentType).PropertyTypes = allPropTypes[contentType.Id];
+                    contentType.NoGroupPropertyTypes = allPropTypes[contentType.Id];
                 }
-                
+
                 //NOTE: SQL call #3++
 
                 if (allParentContentTypeIds != null)
@@ -628,7 +646,18 @@ AND umbracoNode.id <> @id",
                         var allParentContentTypes = contentTypeRepository.GetAll(allParentIdsAsArray).ToArray();
                         foreach (var contentType in contentTypes)
                         {
-                            var parentContentTypes = allParentContentTypes.Where(x => allParentContentTypeIds[contentType.Id].Contains(x.Id));
+                            //TODO: this is pretty hacky right now but i don't have time to refactor/fix running queries based on ints and Guids
+                            // (i.e. for v8) but we need queries by GUIDs now so this is how it's gonna have to be
+                            var entityId = typeof(TId) == typeof(int) ? contentType.Id : (object)contentType.Key;
+
+                            var parentContentTypes = allParentContentTypes.Where(x =>
+                            {
+                                //TODO: this is pretty hacky right now but i don't have time to refactor/fix running queries based on ints and Guids
+                                // (i.e. for v8) but we need queries by GUIDs now so this is how it's gonna have to be
+                                var parentEntityId = typeof(TId) == typeof(int) ? x.Id : (object)x.Key;
+
+                                return allParentContentTypeIds[(TId)entityId].Contains((TId)parentEntityId);
+                            });
                             foreach (var parentContentType in parentContentTypes)
                             {
                                 var result = contentType.AddContentType(parentContentType);
@@ -642,15 +671,16 @@ AND umbracoNode.id <> @id",
                     }
                 }
 
-                
+
             }
 
-            internal static void MapContentTypeTemplates<TRepo>(IContentType[] contentTypes,
+            internal static void MapContentTypeTemplates<TRepo, TId>(IContentType[] contentTypes,
                 Database db,
                 TRepo contentTypeRepository,
                 ITemplateRepository templateRepository,
-                IDictionary<int, IEnumerable<AssociatedTemplate>> associatedTemplates)
-                where TRepo : IRepositoryQueryable<int, TEntity>
+                IDictionary<TId, IEnumerable<AssociatedTemplate>> associatedTemplates)
+                where TRepo : IReadRepository<TId, TEntity>
+                where TId: struct
             {
                 if (associatedTemplates == null || associatedTemplates.Any() == false) return;
 
@@ -667,7 +697,11 @@ AND umbracoNode.id <> @id",
 
                 foreach (var contentType in contentTypes)
                 {
-                    var associatedTemplateIds = associatedTemplates[contentType.Id].Select(x => x.TemplateId)
+                    //TODO: this is pretty hacky right now but i don't have time to refactor/fix running queries based on ints and Guids
+                    // (i.e. for v8) but we need queries by GUIDs now so this is how it's gonna have to be
+                    var entityId = typeof(TId) == typeof(int) ? contentType.Id : (object)contentType.Key;
+                    
+                    var associatedTemplateIds = associatedTemplates[(TId)entityId].Select(x => x.TemplateId)
                         .Distinct()
                         .ToArray();
 
@@ -676,11 +710,12 @@ AND umbracoNode.id <> @id",
                         : Enumerable.Empty<ITemplate>()).ToArray();
                 }
 
-                
+
             }
 
-            internal static IEnumerable<IMediaType> MapMediaTypes(int[] mediaTypeIds, Database db, ISqlSyntaxProvider sqlSyntax,
-                out IDictionary<int, IEnumerable<int>> parentMediaTypeIds)
+            internal static IEnumerable<IMediaType> MapMediaTypes<TId>(TId[] mediaTypeIds, Database db, ISqlSyntaxProvider sqlSyntax,
+                out IDictionary<TId, IEnumerable<TId>> parentMediaTypeIds)
+                where TId : struct
             {
                 Mandate.That(mediaTypeIds.Any(), () => new InvalidOperationException("must be at least one content type id specified"));
                 Mandate.ParameterNotNull(db, "db");
@@ -691,7 +726,7 @@ AND umbracoNode.id <> @id",
                 var sql = @"SELECT cmsContentType.pk as ctPk, cmsContentType.alias as ctAlias, cmsContentType.allowAtRoot as ctAllowAtRoot, cmsContentType.description as ctDesc,
                                 cmsContentType.icon as ctIcon, cmsContentType.isContainer as ctIsContainer, cmsContentType.nodeId as ctId, cmsContentType.thumbnail as ctThumb,
                                 AllowedTypes.allowedId as ctaAllowedId, AllowedTypes.SortOrder as ctaSortOrder, AllowedTypes.alias as ctaAlias,		                        
-                                ParentTypes.parentContentTypeId as chtParentId,
+                                ParentTypes.parentContentTypeId as chtParentId, ParentTypes.parentContentTypeKey as chtParentKey,
                                 umbracoNode.createDate as nCreateDate, umbracoNode." + sqlSyntax.GetQuotedColumnName("level") + @" as nLevel, umbracoNode.nodeObjectType as nObjectType, umbracoNode.nodeUser as nUser,
 		                        umbracoNode.parentID as nParentId, umbracoNode." + sqlSyntax.GetQuotedColumnName("path") + @" as nPath, umbracoNode.sortOrder as nSortOrder, umbracoNode." + sqlSyntax.GetQuotedColumnName("text") + @" as nName, umbracoNode.trashed as nTrashed,
                                 umbracoNode.uniqueID as nUniqueId
@@ -705,10 +740,28 @@ AND umbracoNode.id <> @id",
                             ON cmsContentTypeAllowedContentType.AllowedId = cmsContentType.nodeId
                         ) AllowedTypes
                         ON AllowedTypes.Id = cmsContentType.nodeId
-                        LEFT JOIN cmsContentType2ContentType as ParentTypes
+                        LEFT JOIN (
+                            SELECT cmsContentType2ContentType.parentContentTypeId, umbracoNode.uniqueID AS parentContentTypeKey, cmsContentType2ContentType.childContentTypeId
+                            FROM cmsContentType2ContentType	
+                            INNER JOIN umbracoNode
+                            ON cmsContentType2ContentType.parentContentTypeId = umbracoNode." + sqlSyntax.GetQuotedColumnName("id") + @"
+                        ) ParentTypes                        
                         ON ParentTypes.childContentTypeId = cmsContentType.nodeId	
-                        WHERE (umbracoNode.nodeObjectType = @nodeObjectType)
-                        AND (umbracoNode.id IN (@contentTypeIds))";
+                        WHERE (umbracoNode.nodeObjectType = @nodeObjectType)";
+
+                if (mediaTypeIds.Any())
+                {
+                    //TODO: This is all sorts of hacky but i don't have time to refactor a lot to get both ints and guids working nicely... this will 
+                    // work for the time being.
+                    if (typeof(TId) == typeof(int))
+                    {
+                        sql = sql + " AND (umbracoNode.id IN (@contentTypeIds))";    
+                    }
+                    else if (typeof(TId) == typeof(Guid))
+                    {
+                        sql = sql + " AND (umbracoNode.uniqueID IN (@contentTypeIds))";    
+                    }
+                }
 
                 //NOTE: we are going to assume there's not going to be more than 2100 content type ids since that is the max SQL param count!
                 if ((mediaTypeIds.Length - 1) > 2000)
@@ -722,7 +775,7 @@ AND umbracoNode.id <> @id",
                     return Enumerable.Empty<IMediaType>();
                 }
 
-                parentMediaTypeIds = new Dictionary<int, IEnumerable<int>>();
+                parentMediaTypeIds = new Dictionary<TId, IEnumerable<TId>>();
                 var mappedMediaTypes = new List<IMediaType>();
 
                 foreach (var contentTypeId in mediaTypeIds)
@@ -734,7 +787,14 @@ AND umbracoNode.id <> @id",
                     //first we want to get the main content type data this is 1 : 1 with umbraco node data
 
                     var ct = result
-                        .Where(x => x.ctId == currentCtId)
+                        .Where(x =>
+                        {
+                            //TODO: This is a bit hacky right now but don't have time to do a nice refactor to support both GUID and Int queries, so this is
+                            // how it is for now.
+                            return (typeof (TId) == typeof (int))
+                                ? x.ctId == currentCtId
+                                : x.nUniqueId == currentCtId;
+                        })
                         .Select(x => new { x.ctPk, x.ctId, x.ctAlias, x.ctAllowAtRoot, x.ctDesc, x.ctIcon, x.ctIsContainer, x.ctThumb, x.nName, x.nCreateDate, x.nLevel, x.nObjectType, x.nUser, x.nParentId, x.nPath, x.nSortOrder, x.nTrashed, x.nUniqueId })
                         .DistinctBy(x => (int)x.ctId)
                         .FirstOrDefault();
@@ -758,7 +818,7 @@ AND umbracoNode.id <> @id",
                         NodeDto = new NodeDto
                         {
                             CreateDate = ct.nCreateDate,
-                            Level = (short) ct.nLevel,
+                            Level = (short)ct.nLevel,
                             NodeId = ct.ctId,
                             NodeObjectType = ct.nObjectType,
                             ParentId = ct.nParentId,
@@ -770,11 +830,11 @@ AND umbracoNode.id <> @id",
                             UserId = ct.nUser
                         }
                     };
-                 
+
                     //now create the media type object
 
-                    var factory = new MediaTypeFactory(new Guid(Constants.ObjectTypes.MediaType));
-                    var mediaType = factory.BuildEntity(contentTypeDto);
+                    var factory = new ContentTypeFactory();
+                    var mediaType = factory.BuildMediaTypeEntity(contentTypeDto);
 
                     //map the allowed content types
                     //map the child content type ids
@@ -786,9 +846,10 @@ AND umbracoNode.id <> @id",
                 return mappedMediaTypes;
             }
 
-            internal static IEnumerable<IContentType> MapContentTypes(int[] contentTypeIds, Database db, ISqlSyntaxProvider sqlSyntax,
-                out IDictionary<int, IEnumerable<AssociatedTemplate>> associatedTemplates,
-                out IDictionary<int, IEnumerable<int>> parentContentTypeIds)
+            internal static IEnumerable<IContentType> MapContentTypes<TId>(TId[] contentTypeIds, Database db, ISqlSyntaxProvider sqlSyntax,                
+                out IDictionary<TId, IEnumerable<AssociatedTemplate>> associatedTemplates,
+                out IDictionary<TId, IEnumerable<TId>> parentContentTypeIds)
+                where TId : struct
             {
                 Mandate.ParameterNotNull(db, "db");
 
@@ -799,7 +860,7 @@ AND umbracoNode.id <> @id",
                                 cmsContentType.pk as ctPk, cmsContentType.alias as ctAlias, cmsContentType.allowAtRoot as ctAllowAtRoot, cmsContentType.description as ctDesc,
                                 cmsContentType.icon as ctIcon, cmsContentType.isContainer as ctIsContainer, cmsContentType.nodeId as ctId, cmsContentType.thumbnail as ctThumb,
                                 AllowedTypes.allowedId as ctaAllowedId, AllowedTypes.SortOrder as ctaSortOrder, AllowedTypes.alias as ctaAlias,		                        
-                                ParentTypes.parentContentTypeId as chtParentId,
+                                ParentTypes.parentContentTypeId as chtParentId,ParentTypes.parentContentTypeKey as chtParentKey,
                                 umbracoNode.createDate as nCreateDate, umbracoNode." + sqlSyntax.GetQuotedColumnName("level") + @" as nLevel, umbracoNode.nodeObjectType as nObjectType, umbracoNode.nodeUser as nUser,
 		                        umbracoNode.parentID as nParentId, umbracoNode." + sqlSyntax.GetQuotedColumnName("path") + @" as nPath, umbracoNode.sortOrder as nSortOrder, umbracoNode." + sqlSyntax.GetQuotedColumnName("text") + @" as nName, umbracoNode.trashed as nTrashed,
                                 umbracoNode.uniqueID as nUniqueId,                                
@@ -822,11 +883,29 @@ AND umbracoNode.id <> @id",
                             ON cmsTemplate.nodeId = umbracoNode.id
                         ) as Template
                         ON Template.nodeId = cmsDocumentType.templateNodeId
-                        LEFT JOIN cmsContentType2ContentType as ParentTypes
+                        LEFT JOIN (
+                            SELECT cmsContentType2ContentType.parentContentTypeId, umbracoNode.uniqueID AS parentContentTypeKey, cmsContentType2ContentType.childContentTypeId
+                            FROM cmsContentType2ContentType	
+                            INNER JOIN umbracoNode
+                            ON cmsContentType2ContentType.parentContentTypeId = umbracoNode." + sqlSyntax.GetQuotedColumnName("id") + @"
+                        ) ParentTypes 
                         ON ParentTypes.childContentTypeId = cmsContentType.nodeId	
                         WHERE (umbracoNode.nodeObjectType = @nodeObjectType)";
-                if(contentTypeIds.Any())                        
-                    sql = sql + " AND (umbracoNode.id IN (@contentTypeIds))";
+
+                if (contentTypeIds.Any())
+                {
+                    //TODO: This is all sorts of hacky but i don't have time to refactor a lot to get both ints and guids working nicely... this will 
+                    // work for the time being.
+                    if (typeof(TId) == typeof(int))
+                    {
+                        sql = sql + " AND (umbracoNode.id IN (@contentTypeIds))";    
+                    }
+                    else if (typeof(TId) == typeof(Guid))
+                    {
+                        sql = sql + " AND (umbracoNode.uniqueID IN (@contentTypeIds))";    
+                    }
+                }
+                    
 
                 //NOTE: we are going to assume there's not going to be more than 2100 content type ids since that is the max SQL param count!
                 if ((contentTypeIds.Length - 1) > 2000)
@@ -841,8 +920,8 @@ AND umbracoNode.id <> @id",
                     return Enumerable.Empty<IContentType>();
                 }
 
-                parentContentTypeIds = new Dictionary<int, IEnumerable<int>>();
-                associatedTemplates = new Dictionary<int, IEnumerable<AssociatedTemplate>>();
+                parentContentTypeIds = new Dictionary<TId, IEnumerable<TId>>();
+                associatedTemplates = new Dictionary<TId, IEnumerable<AssociatedTemplate>>();
                 var mappedContentTypes = new List<IContentType>();
 
                 foreach (var contentTypeId in contentTypeIds)
@@ -854,7 +933,14 @@ AND umbracoNode.id <> @id",
                     //first we want to get the main content type data this is 1 : 1 with umbraco node data
 
                     var ct = result
-                        .Where(x => x.ctId == currentCtId)
+                        .Where(x =>
+                        {
+                            //TODO: This is a bit hacky right now but don't have time to do a nice refactor to support both GUID and Int queries, so this is
+                            // how it is for now.
+                            return (typeof(TId) == typeof(int))
+                                ? x.ctId == currentCtId
+                                : x.nUniqueId == currentCtId;
+                        })
                         .Select(x => new { x.ctPk, x.ctId, x.ctAlias, x.ctAllowAtRoot, x.ctDesc, x.ctIcon, x.ctIsContainer, x.ctThumb, x.nName, x.nCreateDate, x.nLevel, x.nObjectType, x.nUser, x.nParentId, x.nPath, x.nSortOrder, x.nTrashed, x.nUniqueId })
                         .DistinctBy(x => (int)x.ctId)
                         .FirstOrDefault();
@@ -866,7 +952,14 @@ AND umbracoNode.id <> @id",
 
                     //get the unique list of associated templates
                     var defaultTemplates = result
-                        .Where(x => x.ctId == currentCtId)
+                        .Where(x =>
+                        {
+                            //TODO: This is a bit hacky right now but don't have time to do a nice refactor to support both GUID and Int queries, so this is
+                            // how it is for now.
+                            return (typeof(TId) == typeof(int))
+                                ? x.ctId == currentCtId
+                                : x.nUniqueId == currentCtId;
+                        })
                         //use a tuple so that distinct checks both values (in some rare cases the dtIsDefault will not compute as bool?, so we force it with Convert.ToBoolean)
                         .Select(x => new Tuple<bool?, int?>(Convert.ToBoolean(x.dtIsDefault), x.dtTemplateId))
                         .Where(x => x.Item1.HasValue && x.Item2.HasValue)
@@ -877,7 +970,7 @@ AND umbracoNode.id <> @id",
                     var defaultTemplate = defaultTemplates.FirstOrDefault(x => x.Item1.Value)
                         ?? defaultTemplates.FirstOrDefault();
 
-                    var dtDto = new DocumentTypeDto
+                    var dtDto = new ContentTypeTemplateDto
                     {
                         //create the content type dto
                         ContentTypeDto = new ContentTypeDto
@@ -914,7 +1007,14 @@ AND umbracoNode.id <> @id",
                     // We will map a subset of the associated template - alias, id, name
 
                     associatedTemplates.Add(currentCtId, result
-                        .Where(x => x.ctId == currentCtId)
+                        .Where(x =>
+                        {
+                            //TODO: This is a bit hacky right now but don't have time to do a nice refactor to support both GUID and Int queries, so this is
+                            // how it is for now.
+                            return (typeof(TId) == typeof(int))
+                                ? x.ctId == currentCtId
+                                : x.nUniqueId == currentCtId;
+                        })
                         .Where(x => x.tId != null)
                         .Select(x => new AssociatedTemplate(x.tId, x.tAlias, x.tText))
                         .Distinct()
@@ -922,25 +1022,40 @@ AND umbracoNode.id <> @id",
 
                     //now create the content type object
 
-                    var factory = new ContentTypeFactory(new Guid(Constants.ObjectTypes.DocumentType));
-                    var contentType = factory.BuildEntity(dtDto);
+                    var factory = new ContentTypeFactory();
+                    var contentType = factory.BuildContentTypeEntity(dtDto.ContentTypeDto);
+                    
+                    // NOTE
+                    // that was done by the factory but makes little sense, moved here, so
+                    // now we have to reset dirty props again (as the factory does it) and yet,
+                    // we are not managing allowed templates... the whole thing is weird.
+                    ((ContentType) contentType).DefaultTemplateId = dtDto.TemplateNodeId;
+                    contentType.ResetDirtyProperties(false);
 
                     //map the allowed content types
                     //map the child content type ids
                     MapCommonContentTypeObjects(contentType, currentCtId, result, parentContentTypeIds);
-                    
+
                     mappedContentTypes.Add(contentType);
                 }
 
                 return mappedContentTypes;
             }
 
-            private static void MapCommonContentTypeObjects<T>(T contentType, int currentCtId, List<dynamic> result, IDictionary<int, IEnumerable<int>> parentContentTypeIds)
-                where T: IContentTypeBase
+            private static void MapCommonContentTypeObjects<T, TId>(T contentType, TId currentCtId, List<dynamic> result, IDictionary<TId, IEnumerable<TId>> parentContentTypeIds)
+                where T : IContentTypeBase
+                where TId : struct
             {
                 //map the allowed content types
                 contentType.AllowedContentTypes = result
-                    .Where(x => x.ctId == currentCtId)
+                    .Where(x =>
+                    {
+                        //TODO: This is a bit hacky right now but don't have time to do a nice refactor to support both GUID and Int queries, so this is
+                        // how it is for now.
+                        return (typeof(TId) == typeof(int))
+                            ? x.ctId == currentCtId
+                            : x.nUniqueId == currentCtId;
+                    })
                     //use tuple so we can use distinct on all vals
                     .Select(x => new Tuple<int?, int?, string>(x.ctaAllowedId, x.ctaSortOrder, x.ctaAlias))
                     .Where(x => x.Item1.HasValue && x.Item2.HasValue && x.Item3 != null)
@@ -950,8 +1065,22 @@ AND umbracoNode.id <> @id",
 
                 //map the child content type ids
                 parentContentTypeIds.Add(currentCtId, result
-                    .Where(x => x.ctId == currentCtId)
-                    .Select(x => (int?)x.chtParentId)
+                    .Where(x =>
+                    {
+                        //TODO: This is a bit hacky right now but don't have time to do a nice refactor to support both GUID and Int queries, so this is
+                        // how it is for now.
+                        return (typeof(TId) == typeof(int))
+                            ? x.ctId == currentCtId
+                            : x.nUniqueId == currentCtId;
+                    })
+                    .Select(x =>
+                    {
+                        //TODO: This is a bit hacky right now but don't have time to do a nice refactor to support both GUID and Int queries, so this is
+                        // how it is for now.
+                        return (typeof(TId) == typeof(int))
+                            ? (TId?)x.chtParentId
+                            : (TId?)x.chtParentKey;                        
+                    })
                     .Where(x => x.HasValue)
                     .Distinct()
                     .Select(x => x.Value).ToList());
@@ -960,21 +1089,26 @@ AND umbracoNode.id <> @id",
             internal static void MapGroupsAndProperties(int[] contentTypeIds, Database db, ISqlSyntaxProvider sqlSyntax,
                 out IDictionary<int, PropertyTypeCollection> allPropertyTypeCollection,
                 out IDictionary<int, PropertyGroupCollection> allPropertyGroupCollection)
-            {   
+            {
+                allPropertyGroupCollection = new Dictionary<int, PropertyGroupCollection>();
+                allPropertyTypeCollection = new Dictionary<int, PropertyTypeCollection>();
+
+                // query below is not safe + pointless if array is empty
+                if (contentTypeIds.Length == 0) return;
 
                 // first part Gets all property groups including property type data even when no property type exists on the group
                 // second part Gets all property types including ones that are not on a group
                 // therefore the union of the two contains all of the property type and property group information we need
                 // NOTE: MySQL requires a SELECT * FROM the inner union in order to be able to sort . lame.
 
-                var sqlBuilder = new StringBuilder(@"SELECT PG.contenttypeNodeId as contentTypeId,
-                            PT.ptId, PT.ptAlias, PT.ptDesc,PT.ptMandatory,PT.ptName,PT.ptSortOrder,PT.ptRegExp, 
+                var sqlBuilder = new StringBuilder(@"SELECT PG.contenttypeNodeId as contentTypeId,                            
+                            PT.ptUniqueId as ptUniqueID, PT.ptId, PT.ptAlias, PT.ptDesc,PT.ptMandatory,PT.ptName,PT.ptSortOrder,PT.ptRegExp, 
                             PT.dtId,PT.dtDbType,PT.dtPropEdAlias,
-                            PG.id as pgId, PG.parentGroupId as pgParentGroupId, PG.sortorder as pgSortOrder, PG." + sqlSyntax.GetQuotedColumnName("text") + @" as pgText
+                            PG.id as pgId, PG.uniqueID as pgKey, PG.sortorder as pgSortOrder, PG." + sqlSyntax.GetQuotedColumnName("text") + @" as pgText
                         FROM cmsPropertyTypeGroup as PG
                         LEFT JOIN
                         (
-                            SELECT PT.id as ptId, PT.Alias as ptAlias, PT." + sqlSyntax.GetQuotedColumnName("Description") + @" as ptDesc, 
+                            SELECT PT.uniqueID as ptUniqueId, PT.id as ptId, PT.Alias as ptAlias, PT." + sqlSyntax.GetQuotedColumnName("Description") + @" as ptDesc, 
                                     PT.mandatory as ptMandatory, PT.Name as ptName, PT.sortOrder as ptSortOrder, PT.validationRegExp as ptRegExp,
                                     PT.propertyTypeGroupId as ptGroupId,
                                     DT.dbType as dtDbType, DT.nodeId as dtId, DT.propertyEditorAlias as dtPropEdAlias
@@ -988,18 +1122,16 @@ AND umbracoNode.id <> @id",
                         UNION
 
                         SELECT  PT.contentTypeId as contentTypeId,
-                                PT.id as ptId, PT.Alias as ptAlias, PT." + sqlSyntax.GetQuotedColumnName("Description") + @" as ptDesc, 
+                                PT.uniqueID as ptUniqueID, PT.id as ptId, PT.Alias as ptAlias, PT." + sqlSyntax.GetQuotedColumnName("Description") + @" as ptDesc, 
                                 PT.mandatory as ptMandatory, PT.Name as ptName, PT.sortOrder as ptSortOrder, PT.validationRegExp as ptRegExp,
                                 DT.nodeId as dtId, DT.dbType as dtDbType, DT.propertyEditorAlias as dtPropEdAlias,
-                                PG.id as pgId, PG.parentGroupId as pgParentGroupId, PG.sortorder as pgSortOrder, PG." + sqlSyntax.GetQuotedColumnName("text") + @" as pgText
+                                PG.id as pgId, PG.uniqueID as pgKey, PG.sortorder as pgSortOrder, PG." + sqlSyntax.GetQuotedColumnName("text") + @" as pgText
                         FROM cmsPropertyType as PT
                         INNER JOIN cmsDataType as DT
                         ON PT.dataTypeId = DT.nodeId
                         LEFT JOIN cmsPropertyTypeGroup as PG
-                        ON PG.id = PT.propertyTypeGroupId");
-
-                if(contentTypeIds.Any())                        
-                    sqlBuilder.AppendLine(" WHERE (PT.contentTypeId in (@contentTypeIds))");
+                        ON PG.id = PT.propertyTypeGroupId
+                        WHERE (PT.contentTypeId in (@contentTypeIds))");
 
                 sqlBuilder.AppendLine(" ORDER BY (pgId)");
 
@@ -1009,9 +1141,6 @@ AND umbracoNode.id <> @id",
                     throw new InvalidOperationException("Cannot perform this lookup, too many sql parameters");
 
                 var result = db.Fetch<dynamic>(sqlBuilder.ToString(), new { contentTypeIds = contentTypeIds });
-
-                allPropertyGroupCollection = new Dictionary<int, PropertyGroupCollection>();
-                allPropertyTypeCollection = new Dictionary<int, PropertyTypeCollection>();
 
                 foreach (var contentTypeId in contentTypeIds)
                 {
@@ -1023,13 +1152,13 @@ AND umbracoNode.id <> @id",
 
                     int currId = contentTypeId;
 
-                    var propertyGroupCollection = new PropertyGroupCollection(result                        
+                    var propertyGroupCollection = new PropertyGroupCollection(result
                         //get all rows that have a group id
                         .Where(x => x.pgId != null)
                         //filter based on the current content type
                         .Where(x => x.contentTypeId == currId)
                         //turn that into a custom object containing only the group info
-                        .Select(x => new { GroupId = x.pgId, ParentGroupId = x.pgParentGroupId, SortOrder = x.pgSortOrder, Text = x.pgText })
+                        .Select(x => new { GroupId = x.pgId, SortOrder = x.pgSortOrder, Text = x.pgText, Key = x.pgKey })
                         //get distinct data by id
                         .DistinctBy(x => (int)x.GroupId)
                         //for each of these groups, create a group object with it's associated properties
@@ -1042,6 +1171,7 @@ AND umbracoNode.id <> @id",
                                     Description = row.ptDesc,
                                     DataTypeDefinitionId = row.dtId,
                                     Id = row.ptId,
+                                    Key = row.ptUniqueID,
                                     Mandatory = Convert.ToBoolean(row.ptMandatory),
                                     Name = row.ptName,
                                     PropertyGroupId = new Lazy<int>(() => group.GroupId, false),
@@ -1052,15 +1182,15 @@ AND umbracoNode.id <> @id",
                             //fill in the rest of the group properties
                             Id = group.GroupId,
                             Name = group.Text,
-                            ParentId = group.ParentGroupId,
-                            SortOrder = group.SortOrder
+                            SortOrder = group.SortOrder,
+                            Key = group.Key
                         }).ToArray());
 
                     allPropertyGroupCollection[currId] = propertyGroupCollection;
 
                     //Create the property type collection now (that don't have groups)
 
-                    var propertyTypeCollection = new PropertyTypeCollection(result                        
+                    var propertyTypeCollection = new PropertyTypeCollection(result
                         .Where(x => x.pgId == null)
                         //filter based on the current content type
                         .Where(x => x.contentTypeId == currId)
@@ -1070,6 +1200,7 @@ AND umbracoNode.id <> @id",
                             Description = row.ptDesc,
                             DataTypeDefinitionId = row.dtId,
                             Id = row.ptId,
+                            Key = row.ptUniqueID,
                             Mandatory = Convert.ToBoolean(row.ptMandatory),
                             Name = row.ptName,
                             PropertyGroupId = null,
@@ -1080,9 +1211,105 @@ AND umbracoNode.id <> @id",
                     allPropertyTypeCollection[currId] = propertyTypeCollection;
                 }
 
-                
+
             }
 
+        }
+
+        /// <summary>
+        /// Inner repository to support the GUID lookups and keep the caching consistent
+        /// </summary>
+        internal class GuidReadOnlyContentTypeBaseRepository : PetaPocoRepositoryBase<Guid, TEntity>
+        {
+            private readonly ContentTypeBaseRepository<TEntity> _parentRepo;
+
+            public GuidReadOnlyContentTypeBaseRepository(
+                ContentTypeBaseRepository<TEntity> parentRepo,
+                IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+                : base(work, cache, logger, sqlSyntax)
+            {
+                _parentRepo = parentRepo;
+            }
+
+            protected override TEntity PerformGet(Guid id)
+            {
+                return _parentRepo.PerformGet(id);
+            }
+
+            protected override IEnumerable<TEntity> PerformGetAll(params Guid[] ids)
+            {
+                return _parentRepo.PerformGetAll(ids);
+            }
+
+            protected override Sql GetBaseQuery(bool isCount)
+            {
+                return _parentRepo.GetBaseQuery(isCount);
+            }
+
+            protected override string GetBaseWhereClause()
+            {
+                return "umbracoNode.uniqueID = @Id";
+            }
+
+            #region No implementation required
+            protected override IEnumerable<TEntity> PerformGetByQuery(IQuery<TEntity> query)
+            {
+                throw new NotImplementedException();
+            }
+
+            protected override IEnumerable<string> GetDeleteClauses()
+            {
+                throw new NotImplementedException();
+            }
+
+            protected override Guid NodeObjectTypeId
+            {
+                get { throw new NotImplementedException(); }
+            }
+
+            protected override void PersistNewItem(TEntity entity)
+            {
+                throw new NotImplementedException();
+            }
+
+            protected override void PersistUpdatedItem(TEntity entity)
+            {
+                throw new NotImplementedException();
+            } 
+            #endregion
+        }
+
+        protected abstract TEntity PerformGet(Guid id);
+        protected abstract IEnumerable<TEntity> PerformGetAll(params Guid[] ids);
+
+        /// <summary>
+        /// Gets an Entity by Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public TEntity Get(Guid id)
+        {
+            return _guidRepo.Get(id);
+        }
+
+        /// <summary>
+        /// Gets all entities of the spefified type
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public IEnumerable<TEntity> GetAll(params Guid[] ids)
+        {
+            return _guidRepo.GetAll(ids);
+        }
+
+        /// <summary>
+        /// Boolean indicating whether an Entity with the specified Id exists
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public bool Exists(Guid id)
+        {
+            return _guidRepo.Exists(id);
         }
     }
 }

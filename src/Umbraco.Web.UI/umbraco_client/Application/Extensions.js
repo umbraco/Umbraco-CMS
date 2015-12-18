@@ -357,4 +357,20 @@
 
     });
 
+    //This sets the default jquery ajax headers to include our csrf token, we
+    // need to user the beforeSend method because our token changes per user/login so
+    // it cannot be static
+    $.ajaxSetup({
+        beforeSend: function (xhr) {
+
+            function getCookie(name) {
+                var value = "; " + document.cookie;
+                var parts = value.split("; " + name + "=");
+                if (parts.length === 2) return parts.pop().split(";").shift();
+            }
+
+            xhr.setRequestHeader("X-XSRF-TOKEN", getCookie("XSRF-TOKEN"));
+        }
+    });
+
 })(jQuery);

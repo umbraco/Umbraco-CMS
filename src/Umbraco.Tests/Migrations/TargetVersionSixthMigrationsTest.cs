@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Moq;
 using NUnit.Framework;
+using Semver;
 using SQLCE4Umbraco;
 using Umbraco.Core;
 using Umbraco.Core.LightInject;
@@ -14,29 +15,26 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 
 namespace Umbraco.Tests.Migrations
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NoDatabasePerFixture)]
+    [DatabaseTestBehavior(DatabaseBehavior.EmptyDbFilePerTest)]
     [TestFixture]
     public class TargetVersionSixthMigrationsTest : BaseDatabaseFactoryTest
     {
         /// <summary>Regular expression that finds multiline block comments.</summary>
         private static readonly Regex FindComments = new Regex(@"\/\*.*?\*\/", RegexOptions.Singleline | RegexOptions.Compiled);
 
-        private MigrationResolver _migrationResolver;
-
-        [SetUp]
-        public override void Initialize()
+        /// <summary>
+        /// sets up resolvers before resolution is frozen
+        /// </summary>
+        protected override void FreezeResolution()
         {
             base.Initialize();
 
-            TestHelper.InitializeContentDirectories();
-
-            Path = TestHelper.CurrentAssemblyDirectory;
-            AppDomain.CurrentDomain.SetData("DataDirectory", Path);
 
             _migrationResolver = new MigrationResolver(
                 Container, 
@@ -78,18 +76,20 @@ namespace Umbraco.Tests.Migrations
                     db.Execute(new Sql(rawStatement));
             }
 
-            var configuredVersion = new Version("4.8.0");
-            var targetVersion = new Version("6.0.0");
+            var configuredVersion = new SemVersion(4, 8, 0);
+            var targetVersion = new SemVersion(6, 0, 0);
             var foundMigrations = _migrationResolver.Migrations;
 
             var migrationRunner = new MigrationRunner(
-                _migrationResolver,
+                Mock.Of<IMigrationEntryService>(),
                 Logger, configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
+
             var migrations = migrationRunner.OrderedUpgradeMigrations(foundMigrations).ToList();
 
             var context = new MigrationContext(DatabaseProviders.SqlServerCE, db, Logger, SqlSyntax);
-            foreach (MigrationBase migration in migrations)
+            foreach (var migration1 in migrations)
             {
+                var migration = (MigrationBase) migration1;
                 migration.GetUpExpressions(context);
             }
 
@@ -101,21 +101,6 @@ namespace Umbraco.Tests.Migrations
             Assert.That(migrations.Count(), Is.EqualTo(12));
         }
 
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-
-            PluginManager.Current = null;
-
-            TestHelper.CleanContentDirectories();
-
-            Path = TestHelper.CurrentAssemblyDirectory;
-            AppDomain.CurrentDomain.SetData("DataDirectory", null);
-
-            SqlCeContextGuardian.CloseBackgroundConnection();
-        }
-
         public string Path { get; set; }
 
         public UmbracoDatabase GetConfiguredDatabase()
@@ -123,10 +108,6 @@ namespace Umbraco.Tests.Migrations
             return new UmbracoDatabase("Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;", "System.Data.SqlServerCe.4.0", Mock.Of<ILogger>());
         }
 
-        public DatabaseProviders GetDatabaseProvider()
-        {
-            return DatabaseProviders.SqlServerCE;
-        }
 
         public string GetDatabaseSpecificSqlScript()
         {

@@ -2,13 +2,32 @@
 /**
 * @ngdoc service
 * @name umbraco.services.contentEditingHelper
-* @description A helper service for most editors, some methods are specific to content/media/member model types but most are used by 
+* @description A helper service for most editors, some methods are specific to content/media/member model types but most are used by
 * all editors to share logic and reduce the amount of replicated code among editors.
 **/
 function contentEditingHelper(fileManager, $q, $location, $routeParams, notificationsService, serverValidationManager, dialogService, formHelper, appState, keyboardService) {
 
+    function isValidIdentifier(id){
+        //empty id <= 0
+        if(angular.isNumber(id) && id > 0){
+            return true;
+        }
+
+        //empty guid
+        if(id === "00000000-0000-0000-0000-000000000000"){
+            return false;
+        }
+
+        //empty string / alias
+        if(id === ""){
+            return false;
+        }
+
+        return true;
+    }
+
     return {
-        
+
         /** Used by the content editor and mini content editor to perform saving operations */
         contentEditorPerformSave: function (args) {
             if (!angular.isObject(args)) {
@@ -29,8 +48,11 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
 
             var self = this;
 
+            //we will use the default one for content if not specified
+            var rebindCallback = args.rebindCallback === undefined ? self.reBindChangedProperties : args.rebindCallback;
+
             var deferred = $q.defer();
-            
+
             if (!args.scope.busy && formHelper.submitForm({ scope: args.scope, statusMessage: args.statusMessage })) {
 
                 args.scope.busy = true;
@@ -43,7 +65,9 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                         self.handleSuccessfulSave({
                             scope: args.scope,
                             savedContent: data,
-                            rebindCallback: self.reBindChangedProperties(args.content, data)
+                            rebindCallback: function() {
+                                rebindCallback.apply(self, [args.content, data]);
+                            }
                         });
 
                         args.scope.busy = false;
@@ -53,8 +77,16 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                         self.handleSaveError({
                             redirectOnFailure: true,
                             err: err,
-                            rebindCallback: self.reBindChangedProperties(args.content, err.data)
+                            rebindCallback: function() {
+                                rebindCallback.apply(self, [args.content, err.data]);
+                            }
                         });
+                        //show any notifications
+                        if (angular.isArray(err.data.notifications)) {
+                            for (var i = 0; i < err.data.notifications.length; i++) {
+                                notificationsService.showNotification(err.data.notifications[i]);
+                            }
+                        }
                         args.scope.busy = false;
                         deferred.reject(err);
                     });
@@ -65,9 +97,10 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
 
             return deferred.promise;
         },
-        
+
+
         /** Returns the action button definitions based on what permissions the user has.
-        The content.allowedActions parameter contains a list of chars, each represents a button by permission so 
+        The content.allowedActions parameter contains a list of chars, each represents a button by permission so
         here we'll build the buttons according to the chars of the user. */
         configureContentEditorButtons: function (args) {
 
@@ -130,7 +163,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             handler: args.methods.unPublish
                         };
                     default:
-                        return null; 
+                        return null;
                 }
             }
 
@@ -154,8 +187,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
 
             //Now we need to make the drop down button list, this is also slightly tricky because:
             //We cannot have any buttons if there's no default button above.
-            //We cannot have the unpublish button (Z) when there's no publish permission.    
-            //We cannot have the unpublish button (Z) when the item is not published.           
+            //We cannot have the unpublish button (Z) when there's no publish permission.
+            //We cannot have the unpublish button (Z) when the item is not published.
             if (buttons.defaultButton) {
 
                 //get the last index of the button order
@@ -168,7 +201,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 }
 
 
-                //if we are not creating, then we should add unpublish too, 
+                //if we are not creating, then we should add unpublish too,
                 // so long as it's already published and if the user has access to publish
                 if (!args.create) {
                     if (args.content.publishDate && _.contains(args.content.allowedActions, "U")) {
@@ -229,13 +262,13 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                         }
                     }
                 }
-                
+
                 actions.push(defaultAction);
 
                 //Now we need to make the drop down button list, this is also slightly tricky because:
                 //We cannot have any buttons if there's no default button above.
-                //We cannot have the unpublish button (Z) when there's no publish permission.    
-                //We cannot have the unpublish button (Z) when the item is not published.           
+                //We cannot have the unpublish button (Z) when there's no publish permission.
+                //We cannot have the unpublish button (Z) when the item is not published.
                 if (defaultAction) {
                     //get the last index of the button order
                     var lastIndex = _.indexOf(actionOrder, defaultAction);
@@ -247,7 +280,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                         }
                     }
 
-                    //if we are not creating, then we should add unpublish too, 
+                    //if we are not creating, then we should add unpublish too,
                     // so long as it's already published and if the user has access to publish
                     if (!creating) {
                         if (content.publishDate && _.contains(content.allowedActions,"U")) {
@@ -323,7 +356,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             var allOrigProps = this.getAllProps(origContent);
             var allNewProps = this.getAllProps(savedContent);
 
-            function getNewProp(alias) {                
+            function getNewProp(alias) {
                 return _.find(allNewProps, function (item) {
                     return item.alias === alias;
                 });
@@ -337,12 +370,12 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             };
             //check for changed built-in properties of the content
             for (var o in origContent) {
-                
+
                 //ignore the ones listed in the array
                 if (shouldIgnore(o)) {
                     continue;
                 }
-                
+
                 if (!_.isEqual(origContent[o], savedContent[o])) {
                     origContent[o] = savedContent[o];
                 }
@@ -356,8 +389,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                     //they have changed so set the origContent prop to the new one
                     var origVal = allOrigProps[p].value;
                     allOrigProps[p].value = newProp.value;
-                    
-                    //instead of having a property editor $watch their expression to check if it has 
+
+                    //instead of having a property editor $watch their expression to check if it has
                     // been updated, instead we'll check for the existence of a special method on their model
                     // and just call it.
                     if (angular.isFunction(allOrigProps[p].onValueChanged)) {
@@ -382,7 +415,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
          * A function to handle what happens when we have validation issues from the server side
          */
         handleSaveError: function (args) {
-             
+
             if (!args.err) {
                 throw "args.err cannot be null";
             }
@@ -396,7 +429,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             if (args.err.status === 400) {
                 //now we need to look through all the validation errors
                 if (args.err.data && (args.err.data.ModelState)) {
-                    
+
                     //wire up the server validation errs
                     formHelper.handleServerValidation(args.err.data.ModelState);
 
@@ -408,7 +441,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                         if (args.rebindCallback && angular.isFunction(args.rebindCallback)) {
                             args.rebindCallback();
                         }
-                        
+
                         serverValidationManager.executeAndClearAllSubscriptions();
                     }
 
@@ -447,7 +480,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             }
 
             if (!this.redirectToCreatedContent(args.redirectId ? args.redirectId : args.savedContent.id)) {
-                
+
                 //we are not redirecting because this is not new content, it is existing content. In this case
                 // we need to detect what properties have changed and re-bind them with the server data.
                 //call the callback
@@ -465,14 +498,14 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
          *
          * @description
          * Changes the location to be editing the newly created content after create was successful.
-         * We need to decide if we need to redirect to edito mode or if we will remain in create mode. 
-         * We will only need to maintain create mode if we have not fulfilled the basic requirements for creating an entity which is at least having a name.
+         * We need to decide if we need to redirect to edito mode or if we will remain in create mode.
+         * We will only need to maintain create mode if we have not fulfilled the basic requirements for creating an entity which is at least having a name and ID
          */
         redirectToCreatedContent: function (id, modelState) {
 
             //only continue if we are currently in create mode and if there is no 'Name' modelstate errors
             // since we need at least a name to create content.
-            if ($routeParams.create && (!modelState || !modelState["Name"])) {
+            if ($routeParams.create && (isValidIdentifier(id) && (!modelState || !modelState["Name"]))) {
 
                 //need to change the location to not be in 'create' mode. Currently the route will be something like:
                 // /belle/#/content/edit/1234?doctype=newsArticle&create=true
@@ -481,7 +514,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
 
                 //clear the query strings
                 $location.search("");
-                
+
                 //change to new path
                 $location.path("/" + $routeParams.section + "/" + $routeParams.tree  + "/" + $routeParams.method + "/" + id);
                 //don't add a browser history for this

@@ -8,10 +8,9 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
     public class DeleteDataExpression : MigrationExpressionBase
     {
         private readonly List<DeletionDataDefinition> _rows = new List<DeletionDataDefinition>();
-
-
-        public DeleteDataExpression(ISqlSyntaxProvider sqlSyntax, DatabaseProviders currentDatabaseProvider, DatabaseProviders[] supportedDatabaseProviders = null)
-            : base(sqlSyntax, currentDatabaseProvider, supportedDatabaseProviders)
+        
+        public DeleteDataExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax) 
+            : base(current, databaseProviders, sqlSyntax)
         {
         }
 
@@ -30,9 +29,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 
             if (IsAllRows)
             {
-                deleteItems.Add(string.Format(
-                    SqlSyntax.DeleteData,
-                    SqlSyntax.GetQuotedTableName(TableName), "1 = 1"));
+                deleteItems.Add(string.Format(SqlSyntax.DeleteData, SqlSyntax.GetQuotedTableName(TableName), "1 = 1"));
             }
             else
             {
@@ -44,7 +41,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
                         whereClauses.Add(string.Format("{0} {1} {2}",
                                                        SqlSyntax.GetQuotedColumnName(item.Key),
                                                        item.Value == null ? "IS" : "=",
-                                                       SqlSyntax.GetQuotedValue(item.Value.ToString())));
+                                                       GetQuotedValue(item.Value)));
                     }
 
                     deleteItems.Add(string.Format(SqlSyntax.DeleteData,

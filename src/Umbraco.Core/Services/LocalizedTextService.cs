@@ -14,7 +14,7 @@ namespace Umbraco.Core.Services
     public class LocalizedTextService : ILocalizedTextService
     {
         private readonly ILogger _logger;
-        private readonly LocalizedTextServiceFileSources _fileSources;
+        private readonly Lazy<LocalizedTextServiceFileSources> _fileSources;
         private readonly IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>> _dictionarySource;
         private readonly IDictionary<CultureInfo, Lazy<XDocument>> _xmlSource;
 
@@ -23,7 +23,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="fileSources"></param>
         /// <param name="logger"></param>
-        public LocalizedTextService(LocalizedTextServiceFileSources fileSources, ILogger logger)
+        public LocalizedTextService(Lazy<LocalizedTextServiceFileSources> fileSources, ILogger logger)
         {
             if (logger == null) throw new ArgumentNullException("logger");
             _logger = logger;
@@ -73,7 +73,7 @@ namespace Umbraco.Core.Services
             var alias = keyParts.Length > 1 ? keyParts[1] : keyParts[0];
 
             var xmlSource = _xmlSource ?? (_fileSources != null
-                ? _fileSources.GetXmlSources()
+                ? _fileSources.Value.GetXmlSources()
                 : null);
 
             if (xmlSource != null)
@@ -100,7 +100,7 @@ namespace Umbraco.Core.Services
             var result = new Dictionary<string, string>();
 
             var xmlSource = _xmlSource ?? (_fileSources != null
-                ? _fileSources.GetXmlSources()
+                ? _fileSources.Value.GetXmlSources()
                 : null);
 
             if (xmlSource != null)
@@ -160,7 +160,7 @@ namespace Umbraco.Core.Services
         public IEnumerable<CultureInfo> GetSupportedCultures()
         {
             var xmlSource = _xmlSource ?? (_fileSources != null
-                ? _fileSources.GetXmlSources()
+                ? _fileSources.Value.GetXmlSources()
                 : null);
 
             return xmlSource != null ? xmlSource.Keys : _dictionarySource.Keys;
@@ -187,8 +187,25 @@ namespace Umbraco.Core.Services
             if (_fileSources == null) return currentCulture;
             if (currentCulture.Name.Length > 2) return currentCulture;
 
-            var attempt = _fileSources.TryConvert2LetterCultureTo4Letter(currentCulture.TwoLetterISOLanguageName);
+            var attempt = _fileSources.Value.TryConvert2LetterCultureTo4Letter(currentCulture.TwoLetterISOLanguageName);
             return attempt ? attempt.Result : currentCulture;
+        }
+
+        /// <summary>
+        /// HAAAAAAAAAAACK! Used for backwards compat to convert a user's real culture code to a region code - normally this would be two letters
+        /// </summary>
+        /// <param name="currentCulture"></param>
+        /// <returns></returns>
+        public string ConvertToRegionCodeFromSupportedCulture(CultureInfo currentCulture)
+        {
+            if (currentCulture == null) throw new ArgumentNullException("currentCulture");
+
+            if (_fileSources == null) return currentCulture.Name;
+            
+            var attempt = _fileSources.Value.TryConvert4LetterCultureTo2Letter(currentCulture);
+            return attempt 
+                ? attempt.Result 
+                : currentCulture.Name;
         }
 
         private string GetFromDictionarySource(CultureInfo culture, string area, string key, IDictionary<string, string> tokens)
@@ -237,21 +254,33 @@ namespace Umbraco.Core.Services
                 return "[" + key + "]";                
             }
 
-            var cultureSource = xmlSource[culture].Value;
-            
-            var xpath = area.IsNullOrWhiteSpace()
-                    ? string.Format("//key [@alias = '{0}']", key)
-                    : string.Format("//area [@alias = '{0}']/key [@alias = '{1}']", area, key);
-
-            var found = cultureSource.XPathSelectElement(xpath);
+            var found = FindTranslation(xmlSource, culture, area, key);
 
             if (found != null)
             {
                 return ParseTokens(found.Value, tokens);
             }
+            
+            // Fall back to English by default if we can't find the key
+            found = FindTranslation(xmlSource, new CultureInfo("en-US"), area, key);
+            if (found != null)
+                return ParseTokens(found.Value, tokens);
 
-            //NOTE: Based on how legacy works, the default text does not contain the area, just the key
+            // If it can't be found in either file, fall back  to the default, showing just the key in square brackets
+            // NOTE: Based on how legacy works, the default text does not contain the area, just the key
             return "[" + key + "]";
+        }
+
+        private XElement FindTranslation(IDictionary<CultureInfo, Lazy<XDocument>> xmlSource, CultureInfo culture, string area, string key)
+        {
+            var cultureSource = xmlSource[culture].Value;
+
+            var xpath = area.IsNullOrWhiteSpace()
+                ? string.Format("//key [@alias = '{0}']", key)
+                : string.Format("//area [@alias = '{0}']/key [@alias = '{1}']", area, key);
+
+            var found = cultureSource.XPathSelectElement(xpath);
+            return found;
         }
 
         /// <summary>

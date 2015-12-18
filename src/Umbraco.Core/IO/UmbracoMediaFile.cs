@@ -199,8 +199,8 @@ namespace Umbraco.Core.IO
                 using (var image = Image.FromStream(fs))
                 {
                     var fileNameThumb = string.IsNullOrWhiteSpace(fileNameAddition)
-                        ? string.Format("{0}_UMBRACOSYSTHUMBNAIL.jpg", Path.Substring(0, Path.LastIndexOf(".", StringComparison.Ordinal)))
-                        : string.Format("{0}_{1}.jpg", Path.Substring(0, Path.LastIndexOf(".", StringComparison.Ordinal)), fileNameAddition);
+                        ? string.Format("{0}_UMBRACOSYSTHUMBNAIL." + Extension, Path.Substring(0, Path.LastIndexOf(".", StringComparison.Ordinal)))
+                        : string.Format("{0}_{1}." + Extension, Path.Substring(0, Path.LastIndexOf(".", StringComparison.Ordinal)), fileNameAddition);
 
                     var thumbnail = maxWidthHeight == -1
                         ? ImageHelper.GenerateThumbnail(image, width, height, fileNameThumb, Extension, _fs)

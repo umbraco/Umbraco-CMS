@@ -5,8 +5,8 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Update.Expressions
 {
     public class UpdateDataExpression : MigrationExpressionBase
     {
-        public UpdateDataExpression(ISqlSyntaxProvider sqlSyntax, DatabaseProviders currentDatabaseProvider, DatabaseProviders[] supportedDatabaseProviders = null)
-            : base(sqlSyntax, currentDatabaseProvider, supportedDatabaseProviders)
+        public UpdateDataExpression(DatabaseProviders current, DatabaseProviders[] databaseProviders, ISqlSyntaxProvider sqlSyntax) 
+            : base(current, databaseProviders, sqlSyntax)
         {
         }
 
@@ -29,7 +29,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Update.Expressions
             {
                 updateItems.Add(string.Format("{0} = {1}",
                                               SqlSyntax.GetQuotedColumnName(item.Key),
-                                              SqlSyntax.GetQuotedValue(item.Value.ToString())));
+                                              GetQuotedValue(item.Value)));
             }
 
             if (IsAllRows)
@@ -43,12 +43,12 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Update.Expressions
                     whereClauses.Add(string.Format("{0} {1} {2}",
                                                    SqlSyntax.GetQuotedColumnName(item.Key),
                                                    item.Value == null ? "IS" : "=",
-                                                   SqlSyntax.GetQuotedValue(item.Value.ToString())));
+                                                   GetQuotedValue(item.Value)));
                 }
             }
             return string.Format(SqlSyntax.UpdateData,
                                  SqlSyntax.GetQuotedTableName(TableName),
-                                 string.Join(", ", updateItems.ToArray()),
+                                 string.Join(", ", updateItems.ToArray()), 
                                  string.Join(" AND ", whereClauses.ToArray()));
         }
     }

@@ -11,6 +11,8 @@
         bool DisableFindContentByIdPath { get; }
 
         string UrlProviderMode { get; }
+
+        string UmbracoApplicationUrl { get; }
     }
 
 }

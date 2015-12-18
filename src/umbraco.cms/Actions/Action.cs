@@ -13,6 +13,7 @@ using umbraco.cms.businesslogic.workflow;
 using umbraco.interfaces;
 using System.Text.RegularExpressions;
 using System.Linq;
+using Umbraco.Core.IO;
 using TypeFinder = Umbraco.Core.TypeFinder;
 
 namespace umbraco.BusinessLogic.Actions

@@ -4,7 +4,6 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.LightInject;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
@@ -19,9 +18,6 @@ namespace Umbraco.Tests.Migrations
     [TestFixture]
     public class FindingMigrationsTest
     {
-
-        private MigrationResolver _migrationResolver;
-
         [SetUp]
         public void Initialize()
         {
@@ -42,12 +38,14 @@ namespace Umbraco.Tests.Migrations
                     typeof (FiveZeroMigration)                   
 				});
 
+           
+            
         }
 
         [Test]
         public void Can_Find_Migrations_With_Target_Version_Six()
         {
-            var foundMigrations = _migrationResolver.Migrations;
+	        var foundMigrations = MigrationResolver.Current.Migrations;
             var targetVersion = new Version("6.0.0");
             var list = new List<IMigration>();
 
@@ -65,11 +63,7 @@ namespace Umbraco.Tests.Migrations
 
             Assert.That(list.Count, Is.EqualTo(3));
 
-            var context = new MigrationContext(
-                DatabaseProviders.SqlServerCE,
-                new Database("test", "System.Data.SqlClient"), 
-                Mock.Of<ILogger>(), 
-                new SqlCeSyntaxProvider());
+            var context = new MigrationContext(DatabaseProviders.SqlServerCE, null, Mock.Of<ILogger>());
             foreach (var migration1 in list)
             {
                 var migration = (MigrationBase) migration1;
@@ -85,5 +79,11 @@ namespace Umbraco.Tests.Migrations
             }
         }
 
+        [TearDown]
+        public void TearDown()
+        {	        
+            LoggerResolver.Reset();
+            MigrationResolver.Reset();
+        }
     }
 }

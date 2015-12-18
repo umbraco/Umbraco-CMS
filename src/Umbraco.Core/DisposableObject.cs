@@ -4,69 +4,58 @@ using System.Threading;
 namespace Umbraco.Core
 {
 	/// <summary>
-	/// Abstract implementation of logic commonly required to safely handle disposable unmanaged resources.
+	/// Abstract implementation of IDisposable.
 	/// </summary>
+	/// <remarks>
+	/// Can also be used as a pattern for when inheriting is not possible.
+	/// 
+    /// See also: https://msdn.microsoft.com/en-us/library/b1yfkh5e%28v=vs.110%29.aspx
+    /// See also: https://lostechies.com/chrispatterson/2012/11/29/idisposable-done-right/
+    /// 
+    /// Note: if an object's ctor throws, it will never be disposed, and so if that ctor
+    /// has allocated disposable objects, it should take care of disposing them.
+	/// </remarks>
 	public abstract class DisposableObject : IDisposable
 	{
 		private bool _disposed;
-		private readonly ReaderWriterLockSlim _disposalLocker = new ReaderWriterLockSlim();
+	    private readonly object _locko = new object();
 
-		/// <summary>
-		/// Gets a value indicating whether this instance is disposed.
-		/// </summary>
-		/// <value>
-		/// 	<c>true</c> if this instance is disposed; otherwise, <c>false</c>.
-		/// </value>
-		public bool IsDisposed
-		{
-			get { return _disposed; }
-		}
+		// gets a value indicating whether this instance is disposed.
+        // for internal tests only (not thread safe)
+        //TODO make this internal + rename "Disposed" when we can break compatibility
+		public bool IsDisposed { get { return _disposed; } }
 
-		/// <summary>
-		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-		/// </summary>
-		/// <filterpriority>2</filterpriority>
+		// implements IDisposable
 		public void Dispose()
 		{
 			Dispose(true);
-
-			// Use SupressFinalize in case a subclass of this type implements a finalizer.
 			GC.SuppressFinalize(this);
 		}
 
+        // finalizer
 		~DisposableObject()
 		{
-			// Run dispose but let the class know it was due to the finalizer running.
 			Dispose(false);
 		}
 
-		protected virtual void Dispose(bool disposing)
+        //TODO make this private, non-virtual when we can break compatibility
+        protected virtual void Dispose(bool disposing)
 		{
-			// Only operate if we haven't already disposed
-			if (IsDisposed || !disposing) return;
+		    lock (_locko)
+		    {
+		        if (_disposed) return;
+		        _disposed = true;
+		    }
 
-			using (new WriteLock(_disposalLocker))
-			{
-				// Check again now we're inside the lock
-				if (IsDisposed) return;
+            DisposeUnmanagedResources();
 
-				// Call to actually release resources. This method is only
-				// kept separate so that the entire disposal logic can be used as a VS snippet
-				DisposeResources();
-
-				// Indicate that the instance has been disposed.
-				_disposed = true;
-			}
+            if (disposing)
+                DisposeResources();
 		}
 
-		/// <summary>
-		/// Handles the disposal of resources. Derived from abstract class <see cref="DisposableObject"/> which handles common required locking logic.
-		/// </summary>
 		protected abstract void DisposeResources();
 
 		protected virtual void DisposeUnmanagedResources()
-		{
-
-		}
+		{ }
 	}
 }

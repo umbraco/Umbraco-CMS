@@ -1,5 +1,5 @@
 angular.module('umbraco.services')
-    .factory('userService', function ($rootScope, eventsService, $q, $location, $log, securityRetryQueue, authResource, dialogService, $timeout, angularHelper) {
+    .factory('userService', function ($rootScope, eventsService, $q, $location, $log, securityRetryQueue, authResource, dialogService, $timeout, angularHelper, $http) {
 
         var currentUser = null;
         var lastUserId = null;
@@ -102,7 +102,14 @@ angular.module('umbraco.services')
                         if (Umbraco.Sys.ServerVariables.umbracoSettings.keepUserLoggedIn !== true) {
                             //NOTE: the safeApply because our timeout is set to not run digests (performance reasons)
                             angularHelper.safeApply($rootScope, function () {
-                                userAuthExpired();
+                                try {
+                                    //NOTE: We are calling this again so that the server can create a log that the timeout has expired, we
+                                    // don't actually care about this result.
+                                    authResource.getRemainingTimeoutSeconds();
+                                }
+                                finally {
+                                    userAuthExpired();
+                                } 
                             });
                         }
                         else {
@@ -243,7 +250,7 @@ angular.module('umbraco.services')
                             }
 
                             setCurrentUser(data);
-                            currentUser.avatar = '//www.gravatar.com/avatar/' + data.emailHash + '?s=40&d=404';
+
                             deferred.resolve(currentUser);
                         });
 

@@ -9,7 +9,7 @@ using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface IMemberRepository : IRepositoryVersionable<int, IMember>
+    public interface IMemberRepository : IRepositoryVersionable<int, IMember>, IDeleteMediaFilesRepository
     {
         /// <summary>
         /// Finds members in a given role

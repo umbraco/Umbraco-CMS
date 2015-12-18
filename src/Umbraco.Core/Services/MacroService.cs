@@ -20,8 +20,8 @@ namespace Umbraco.Core.Services
     public class MacroService : RepositoryService, IMacroService
     {
 
-        public MacroService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger)
-            : base(provider, repositoryFactory, logger)
+        public MacroService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+            : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
         }
 
@@ -35,12 +35,21 @@ namespace Umbraco.Core.Services
                 return MacroTypes.Xslt;
 
             if (string.IsNullOrEmpty(macro.ScriptPath) == false)
-            {                
-                return MacroTypes.PartialView;
+            {
+                //we need to check if the file path saved is a virtual path starting with ~/Views/MacroPartials, if so then this is 
+                //a partial view macro, not a script macro
+                //we also check if the file exists in ~/App_Plugins/[Packagename]/Views/MacroPartials, if so then it is also a partial view.
+                return (macro.ScriptPath.InvariantStartsWith(SystemDirectories.MvcViews + "/MacroPartials/")
+                        || (Regex.IsMatch(macro.ScriptPath, "~/App_Plugins/.+?/Views/MacroPartials", RegexOptions.Compiled | RegexOptions.IgnoreCase)))
+                           ? MacroTypes.PartialView
+                           : MacroTypes.Script;
             }
 
             if (string.IsNullOrEmpty(macro.ControlType) == false && macro.ControlType.InvariantContains(".ascx"))
                 return MacroTypes.UserControl;
+
+            if (string.IsNullOrEmpty(macro.ControlType) == false && string.IsNullOrEmpty(macro.ControlAssembly) == false)
+                return MacroTypes.CustomControl;
 
             return MacroTypes.Unknown;
         }
@@ -54,7 +63,8 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateMacroRepository(UowProvider.GetUnitOfWork()))
             {
-                var q = repository.Query.Where(macro => macro.Alias == alias);
+                var q = new Query<IMacro>();
+                q.Where(macro => macro.Alias == alias);
                 return repository.GetByQuery(q).FirstOrDefault();
             }
         }

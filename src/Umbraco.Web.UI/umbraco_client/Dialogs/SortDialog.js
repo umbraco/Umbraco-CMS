@@ -59,7 +59,7 @@
             $.ajax({
                 type: "POST",
                 url: self._opts.serviceUrl,
-                data: '{ "ParentId": ' + parseInt(self._opts.currentId) + ', "SortOrder": "' + sortOrder + '"}',
+                data: '{ "ParentId": "' + self._opts.currentId + '", "SortOrder": "' + sortOrder + '"}',
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function(msg) {

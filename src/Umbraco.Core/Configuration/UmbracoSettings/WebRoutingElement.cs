@@ -30,8 +30,13 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("urlProviderMode", DefaultValue = "AutoLegacy")]
         public string UrlProviderMode
         {
-            get { return (string)base["urlProviderMode"]; }
+            get { return (string) base["urlProviderMode"]; }
         }
 
+        [ConfigurationProperty("umbracoApplicationUrl", DefaultValue = null)]
+        public string UmbracoApplicationUrl
+        {
+            get { return (string)base["umbracoApplicationUrl"]; }
+        }
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -63,7 +64,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(0, found.First().AssigneeUserId);
                 Assert.AreEqual(false, found.First().Closed);
                 Assert.AreEqual("hello world", found.First().Comment);
-                Assert.GreaterOrEqual(found.First().CreateDate, created);
+                Assert.GreaterOrEqual(found.First().CreateDate.TruncateTo(DateTimeExtensions.DateTruncate.Second), created.TruncateTo(DateTimeExtensions.DateTruncate.Second));
                 Assert.AreEqual(-1, found.First().EntityId);
                 Assert.AreEqual(0, found.First().OwnerUserId);
                 Assert.AreEqual(true, found.First().HasIdentity);

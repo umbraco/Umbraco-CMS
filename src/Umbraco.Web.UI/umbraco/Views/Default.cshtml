@@ -52,8 +52,9 @@
 
 
 </head>
+<noscript><h5><strong>&nbsp; JavaScript is disabled. Please enable to continue!</strong></h5></noscript>
 <body ng-class="{touch:touchDevice,emptySection:emptySection}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
-    <div ng-hide="!authenticated" ng-cloak id="mainwrapper" id="mainwrapper" class="clearfix" ng-click="closeDialogs($event)">
+    <div ng-hide="!authenticated" ng-cloak id="mainwrapper" class="clearfix" ng-click="closeDialogs($event)">
 
         <umb-navigation></umb-navigation>
 
@@ -62,14 +63,21 @@
             </div>
         </section>
 
+        <umb-notifications></umb-notifications>
+
     </div>
 
-    <umb-notifications></umb-notifications>
+    @Html.BareMinimumServerVariablesScript(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewBag.UmbracoPath }))
 
-    @Html.BareMinimumServerVariables(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewBag.UmbracoPath }))
+    <script type="text/javascript">
+        document.angularReady = function(app) {
 
-    @Html.AngularExternalLoginInfoValues((IEnumerable<string>)ViewBag.ExternalSignInError)
-    
+            @Html.AngularExternalLoginInfoValuesScript((IEnumerable<string>)ViewBag.ExternalSignInError)
+
+        }
+    </script>
+
+
     @*And finally we can load in our angular app*@
     <script type="text/javascript" src="lib/rgrove-lazyload/lazyload.js"></script>
     <script type="text/javascript" src="@Url.GetUrlWithCacheBust("Application", "BackOffice")"></script>
@@ -78,6 +86,13 @@
     {
         @Html.RenderProfiler()
     }
+
+    <umb-overlay
+        ng-if="ysodOverlay.show"
+        model="ysodOverlay"
+        position="right"
+        view="ysodOverlay.view">
+    </umb-overlay>
 
 </body>
 </html>

@@ -8,23 +8,6 @@ function resizeTextArea(textEditor, offsetX, offsetY) {
     }
 }
 
-var currentHandle = null, currentLine;
-function updateLineInfo(cm) {
-
-    var line = cm.getCursor().line, handle = cm.getLineHandle(line);
-    if (handle == currentHandle && line == currentLine) return;
-
-    if (currentHandle) {
-        cm.setLineClass(currentHandle, null, null);
-    //    cm.clearMarker(currentHandle);
-    }
-
-    currentHandle = handle; currentLine = line;
-    cm.setLineClass(currentHandle, null, "activeline");
-    //cm.setMarker(currentHandle, String(line + 1));
-} 
-
-
 function UmbracoCodeSnippet() {
     this.BeginTag = "";
     this.EndTag = "";
@@ -36,7 +19,7 @@ function UmbracoCodeSnippet() {
 // Ctrl + S support
 var ctrlDown = false;
 var shiftDown = false;
-var keycode = 0
+var keycode = 0;
 
 function shortcutCheckKeysDown(e) {
 

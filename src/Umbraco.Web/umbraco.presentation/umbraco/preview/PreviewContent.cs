@@ -104,7 +104,7 @@ namespace umbraco.presentation.preview
                 if (document.ContentEntity.Published == false 
                     && ApplicationContext.Current.Services.ContentService.HasPublishedVersion(document.Id))
                     previewXml.Attributes.Append(XmlContent.CreateAttribute("isDraft"));
-                content.AddOrUpdateXmlNode(XmlContent, document.Id, document.Level, parentId, previewXml);
+                XmlContent = content.GetAddOrUpdateXmlNode(XmlContent, document.Id, document.Level, parentId, previewXml);
             }
 
             if (includeSubs)
@@ -114,7 +114,7 @@ namespace umbraco.presentation.preview
                     var previewXml = XmlContent.ReadNode(XmlReader.Create(new StringReader(prevNode.Xml)));
                     if (prevNode.IsDraft)
                         previewXml.Attributes.Append(XmlContent.CreateAttribute("isDraft"));
-                    content.AddOrUpdateXmlNode(XmlContent, prevNode.NodeId, prevNode.Level, prevNode.ParentId, previewXml);
+                    XmlContent = content.GetAddOrUpdateXmlNode(XmlContent, prevNode.NodeId, prevNode.Level, prevNode.ParentId, previewXml);
                 }
             }
 
@@ -193,10 +193,11 @@ namespace umbraco.presentation.preview
             {
                 DeletePreviewFile(userId, file);
             }
-            // also delete any files accessed more than one hour ago
+            // also delete any files accessed more than 10 minutes ago
+            var now = DateTime.Now;
             foreach (FileInfo file in dir.GetFiles("*.config"))
             {
-                if ((DateTime.Now - file.LastAccessTime).TotalMinutes > 1)
+                if ((now - file.LastAccessTime).TotalMinutes > 10)
                     DeletePreviewFile(userId, file);
             }
         }

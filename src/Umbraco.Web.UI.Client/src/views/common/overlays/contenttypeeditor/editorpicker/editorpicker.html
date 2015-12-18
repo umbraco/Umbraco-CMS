@@ -1,0 +1,79 @@
+<div class="umb-overlay-body" ng-controller="Umbraco.Overlays.EditorPickerOverlay as vm">
+
+	<div class="umb-control-group -no-border">
+		<div class="form-search">
+			<i class="icon-search"></i>
+			<input type="text"
+				style="width: 100%"
+				ng-change="vm.filterItems()"
+				ng-model="vm.searchTerm"
+				class="umb-search-field search-query input-block-level"
+				placeholder="Filter..."
+				umb-auto-focus>
+		</div>
+	</div>
+
+	<div ng-if="vm.showTabs">
+
+		<umb-tabs-nav model="vm.tabs"></umb-tabs-nav>
+
+		<umb-tabs-content>
+
+			<umb-tab id="tab{{tab.id}}" ng-repeat="tab in vm.tabs" rel="{{tab.id}}">
+				<div ng-if="tab.alias==='Default'">
+
+					<div ng-repeat="(key,value) in tab.typesAndEditors">
+
+						<div ng-if="(value | filter:vm.searchTerm).length > 0">
+							<h5>{{key}}</h5>
+
+							<ul class="umb-card-grid" ng-mouseleave="vm.hideDetailsOverlay()">
+								<li ng-repeat="systemDataType in value | orderBy:'name' | filter: vm.searchTerm" ng-mouseover="vm.showDetailsOverlay(systemDataType)">
+									<a href="" ng-click="vm.pickEditor(systemDataType)">
+										<i class="{{ systemDataType.icon }}" ng-class="{'icon-autofill': systemDataType.icon == null}"></i>
+										{{ systemDataType.name }}
+									</a>
+								</li>
+							</ul>
+
+						</div>
+
+					</div>
+				</div>
+
+				<div ng-if="tab.alias==='Reuse'">
+
+					<div ng-repeat="(key,value) in tab.userConfigured">
+
+						<div ng-if="(value | filter:vm.searchTerm).length > 0">
+							<h5>{{key}}</h5>
+
+							<ul class="umb-card-grid" ng-mouseleave="vm.hideDetailsOverlay()">
+								<li ng-repeat="dataType in value | orderBy:'name' | filter: vm.searchTerm" ng-mouseover="vm.showDetailsOverlay(dataType)">
+									<a href="" ng-click="vm.pickDataType(dataType)">
+										<i class="{{ dataType.icon }}" ng-class="{'icon-autofill': dataType.icon == null}"></i>
+										{{ dataType.name }}
+									</a>
+								</li>
+							</ul>
+
+						</div>
+
+					</div>
+
+				</div>
+
+			</umb-tab>
+
+		</umb-tabs-content>
+
+	</div>
+
+	<umb-overlay
+		ng-if="vm.editorSettingsOverlay.show"
+		model="vm.editorSettingsOverlay"
+		position="right"
+		view="vm.editorSettingsOverlay.view">
+	</umb-overlay>
+
+</div>

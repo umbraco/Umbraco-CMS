@@ -1,22 +1,17 @@
 using System;
-using System.IO;
 using System.Web.Mvc;
-using Umbraco.Core;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Mvc
 {
 
     /// <summary>
-    /// A controller to render front-end requests
+    /// The default controller to render front-end requests
     /// </summary>
-    [PreRenderViewActionFilter]
+    [PreRenderViewActionFilter]    
     public class RenderMvcController : UmbracoController, IRenderMvcController
     {
 
@@ -64,7 +59,7 @@ namespace Umbraco.Web.Mvc
             {
                 if (_publishedContentRequest != null)
                     return _publishedContentRequest;
-                if (!RouteData.DataTokens.ContainsKey("umbraco-doc-request"))
+                if (RouteData.DataTokens.ContainsKey("umbraco-doc-request") == false)
                 {
                     throw new InvalidOperationException("DataTokens must contain an 'umbraco-doc-request' key with a PublishedContentRequest object");
                 }
@@ -101,10 +96,8 @@ namespace Umbraco.Web.Mvc
         protected ActionResult CurrentTemplate<T>(T model)
         {
             var template = ControllerContext.RouteData.Values["action"].ToString();
-            if (!EnsurePhsyicalViewExists(template))
-            {
-                return Content("");
-            }
+            if (EnsurePhsyicalViewExists(template) == false)
+                throw new Exception("No physical template file was found for template " + template);
             return View(template, model);
         }
 
@@ -113,10 +106,10 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
+        [RenderIndexActionSelector]
         public virtual ActionResult Index(RenderModel model)
         {
             return CurrentTemplate(model);
         }
-
     }
 }

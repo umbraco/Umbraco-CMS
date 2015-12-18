@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Events;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -146,6 +149,10 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             ((DataTypeDefinition)entity).AddingEntity();
 
+            //ensure a datatype has a unique name before creating it
+            entity.Name = EnsureUniqueNodeName(entity.Name);
+
+            //TODO: should the below be removed?
             //Cannot add a duplicate data type
             var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsDataType
 INNER JOIN umbracoNode ON cmsDataType.nodeId = umbracoNode.id
@@ -190,6 +197,8 @@ WHERE umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + "= @name", new { n
 
         protected override void PersistUpdatedItem(IDataTypeDefinition entity)
         {
+
+            entity.Name = EnsureUniqueNodeName(entity.Name, entity.Id);
 
             //Cannot change to a duplicate alias
             var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsDataType
@@ -280,19 +289,22 @@ AND umbracoNode.id <> @id",
             return GetAndCachePreValueCollection(dataTypeId);
         }
 
+        internal static string GetCacheKeyRegex(int preValueId)
+        {
+            return CacheKeys.DataTypePreValuesCacheKey + @"[-\d]+-([\d]*,)*" + preValueId + @"(?!\d)[,\d$]*";
+        }
+
         public string GetPreValueAsString(int preValueId)
         {
             //We need to see if we can find the cached PreValueCollection based on the cache key above
 
-            var regex = CacheKeys.DataTypePreValuesCacheKey + @"[\d]+-[,\d]*" + preValueId + @"[,\d$]*";
-
-            var cached = _cacheHelper.RuntimeCache.GetCacheItemsByKeyExpression<PreValueCollection>(regex);
+            var cached = _cacheHelper.RuntimeCache.GetCacheItemsByKeyExpression<PreValueCollection>(GetCacheKeyRegex(preValueId));
             if (cached != null && cached.Any())
             {
                 //return from the cache
                 var collection = cached.First();
-                var preVal = collection.FormatAsDictionary().Single(x => x.Value.Id == preValueId);
-                return preVal.Value.Value;
+				var preVal = collection.FormatAsDictionary().Single(x => x.Value.Id == preValueId);
+				return preVal.Value.Value;
             }
 
             //go and find the data type id for the pre val id passed in
@@ -320,6 +332,47 @@ AND umbracoNode.id <> @id",
             AddOrUpdatePreValues(dtd, values);
         }
 
+        public IEnumerable<MoveEventInfo<IDataTypeDefinition>> Move(IDataTypeDefinition toMove, EntityContainer container)
+        {
+            var parentId = -1;
+            if (container != null)
+            {
+                // Check on paths
+                if ((string.Format(",{0},", container.Path)).IndexOf(string.Format(",{0},", toMove.Id), StringComparison.Ordinal) > -1)
+                {
+                    throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedNotAllowedByPath);
+                }
+                parentId = container.Id;
+            }
+
+            //used to track all the moved entities to be given to the event
+            var moveInfo = new List<MoveEventInfo<IDataTypeDefinition>>
+            {
+                new MoveEventInfo<IDataTypeDefinition>(toMove, toMove.Path, parentId)
+            };
+
+            //do the move to a new parent
+            toMove.ParentId = parentId;
+            //schedule it for updating in the transaction
+            AddOrUpdate(toMove);
+
+            //update all descendants
+            var descendants = this.GetByQuery(
+                new Query<IDataTypeDefinition>().Where(type => type.Path.StartsWith(toMove.Path + ",")));
+            foreach (var descendant in descendants)
+            {
+                moveInfo.Add(new MoveEventInfo<IDataTypeDefinition>(descendant, descendant.Path, descendant.ParentId));
+
+                //all we're doing here is setting the parent Id to be dirty so that it resets the path/level/etc...
+                descendant.ParentId = descendant.ParentId + 1;
+                descendant.ParentId = descendant.ParentId - 1;
+                //schedule it for updating in the transaction
+                AddOrUpdate(descendant);
+            }
+
+            return moveInfo;
+        }
+
         public void AddOrUpdatePreValues(IDataTypeDefinition dataType, IDictionary<string, PreValue> values)
         {
             var currentVals = new DataTypePreValueDto[] { };
@@ -329,7 +382,7 @@ AND umbracoNode.id <> @id",
                 var sql = new Sql().Select("*")
                                    .From<DataTypePreValueDto>(SqlSyntax)
                                    .Where<DataTypePreValueDto>(SqlSyntax, dto => dto.DataTypeNodeId == dataType.Id)
-                                   .OrderBy<DataTypePreValueDto>(SqlSyntax, dto => dto.SortOrder);
+                                   .OrderBy<DataTypePreValueDto>(dto => dto.SortOrder, SqlSyntax);
                 currentVals = Database.Fetch<DataTypePreValueDto>(sql).ToArray();
             }
 
@@ -414,6 +467,37 @@ AND umbracoNode.id <> @id",
             return collection;
         }
 
+        private string EnsureUniqueNodeName(string nodeName, int id = 0)
+        {
+         
+
+            var sql = new Sql();
+            sql.Select("*")
+               .From<NodeDto>(SqlSyntax)
+               .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId && x.Text.StartsWith(nodeName));
+
+            int uniqueNumber = 1;
+            var currentName = nodeName;
+
+            var dtos = Database.Fetch<NodeDto>(sql);
+            if (dtos.Any())
+            {
+                var results = dtos.OrderBy(x => x.Text, new SimilarNodeNameComparer());
+                foreach (var dto in results)
+                {
+                    if (id != 0 && id == dto.NodeId) continue;
+
+                    if (dto.Text.ToLowerInvariant().Equals(currentName.ToLowerInvariant()))
+                    {
+                        currentName = nodeName + string.Format(" ({0})", uniqueNumber);
+                        uniqueNumber++;
+                    }
+                }
+            }
+
+            return currentName;
+        }
+
         /// <summary>
         /// Private class to handle pre-value crud based on units of work with transactions
         /// </summary>
@@ -486,15 +570,10 @@ AND umbracoNode.id <> @id",
                     throw new InvalidOperationException("Cannot insert a pre value for a data type that has no identity");
                 }
 
-                //Cannot add a duplicate alias
-                var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsDataTypePreValues
-WHERE alias = @alias
-AND datatypeNodeId = @dtdid",
-                        new { alias = entity.Alias, dtdid = entity.DataType.Id });
-                if (exists > 0)
-                {
-                    throw new DuplicateNameException("A pre value with the alias " + entity.Alias + " already exists for this data type");
-                }
+                //NOTE: We used to check that the Alias was unique for the given DataTypeNodeId prevalues list, BUT
+                // in reality there is no need to check the uniqueness of this alias because the only way that this code executes is 
+                // based on an IDictionary<string, PreValue> dictionary being passed to this repository and a dictionary
+                // must have unique aliases by definition, so there is no need for this additional check
 
                 var dto = new DataTypePreValueDto
                 {
@@ -512,17 +591,12 @@ AND datatypeNodeId = @dtdid",
                 {
                     throw new InvalidOperationException("Cannot update a pre value for a data type that has no identity");
                 }
-
-                //Cannot change to a duplicate alias
-                var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsDataTypePreValues
-WHERE alias = @alias
-AND datatypeNodeId = @dtdid
-AND id <> @id",
-                        new { id = entity.Id, alias = entity.Alias, dtdid = entity.DataType.Id });
-                if (exists > 0)
-                {
-                    throw new DuplicateNameException("A pre value with the alias " + entity.Alias + " already exists for this data type");
-                }
+                
+                //NOTE: We used to check that the Alias was unique for the given DataTypeNodeId prevalues list, BUT
+                // this causes issues when sorting the pre-values (http://issues.umbraco.org/issue/U4-5670) but in reality
+                // there is no need to check the uniqueness of this alias because the only way that this code executes is 
+                // based on an IDictionary<string, PreValue> dictionary being passed to this repository and a dictionary
+                // must have unique aliases by definition, so there is no need for this additional check
 
                 var dto = new DataTypePreValueDto
                 {
@@ -534,6 +608,8 @@ AND id <> @id",
                 };
                 Database.Update(dto);
             }
+
+            
         }
 
         internal static class PreValueConverter

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models;
 
@@ -11,6 +12,7 @@ namespace Umbraco.Web.Models.ContentEditing
         protected ContentItemDisplayBase()
         {
             Notifications = new List<Notification>();
+            Errors = new Dictionary<string, object>();
         }
 
         /// <summary>
@@ -29,6 +31,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// This is used to add custom localized messages/strings to the response for the app to use for localized UI purposes.
         /// </summary>
         [DataMember(Name = "notifications")]
+        [ReadOnly(true)]
         public List<Notification> Notifications { get; private set; }
 
         /// <summary>
@@ -42,6 +45,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// NOTE: The ProperCase is important because when we return ModeState normally it will always be proper case.
         /// </remarks>
         [DataMember(Name = "ModelState")]
+        [ReadOnly(true)]
         public IDictionary<string, object> Errors { get; set; }
     }
 }

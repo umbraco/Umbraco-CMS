@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.LightInject;
+using Semver;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.Migrations.Syntax.Alter.Expressions;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Tests.Migrations
 {
@@ -18,18 +19,17 @@ namespace Umbraco.Tests.Migrations
         [Test]
         public void Executes_Only_One_Migration_For_Spanning_Multiple_Targets()
         {
-            var sqlSyntax = new SqlCeSyntaxProvider();
             var runner = new MigrationRunner(
-                Mock.Of<IMigrationResolver>(), 
-                Mock.Of<ILogger>(), new Version(4, 0, 0), new Version(6, 0, 0), "Test");
+                Mock.Of<IMigrationEntryService>(),
+                Mock.Of<ILogger>(), new SemVersion(4, 0, 0), new SemVersion(6, 0, 0), "Test");
 
-            var migrations = runner.OrderedUpgradeMigrations(new List<IMigration> { new MultiMigration(sqlSyntax, Mock.Of<ILogger>()) });
+            var migrations = runner.OrderedUpgradeMigrations(new List<IMigration> { new MultiMigration(new SqlCeSyntaxProvider(), Mock.Of<ILogger>()) });
 
             var ctx = runner.InitializeMigrations(
                 //new List<IMigration> {new DoRunMigration(), new DoNotRunMigration()},
                 migrations.ToList(),
                 new Database("umbracoDbDSN")
-                , DatabaseProviders.SqlServerCE, sqlSyntax, true);
+                , DatabaseProviders.SqlServerCE, true);
 
             Assert.AreEqual(1, ctx.Expressions.Count());
         }
@@ -37,18 +37,17 @@ namespace Umbraco.Tests.Migrations
         [Test]
         public void Executes_Migration_For_Spanning_One_Target_1()
         {
-            var sqlSyntax = new SqlCeSyntaxProvider();
             var runner = new MigrationRunner(
-                Mock.Of<IMigrationResolver>(),
-                Mock.Of<ILogger>(), new Version(4, 0, 0), new Version(5, 0, 0), "Test");
+                Mock.Of<IMigrationEntryService>(),
+                Mock.Of<ILogger>(), new SemVersion(4, 0, 0), new SemVersion(5, 0, 0), "Test");
 
-            var migrations = runner.OrderedUpgradeMigrations(new List<IMigration> { new MultiMigration(sqlSyntax, Mock.Of<ILogger>()) });
+            var migrations = runner.OrderedUpgradeMigrations(new List<IMigration> { new MultiMigration(new SqlCeSyntaxProvider(), Mock.Of<ILogger>()) });
 
             var ctx = runner.InitializeMigrations(
                 //new List<IMigration> {new DoRunMigration(), new DoNotRunMigration()},
                 migrations.ToList(),
                 new Database("umbracoDbDSN")
-                , DatabaseProviders.SqlServerCE, sqlSyntax, true);
+                , DatabaseProviders.SqlServerCE, true);
 
             Assert.AreEqual(1, ctx.Expressions.Count());
         }
@@ -56,18 +55,17 @@ namespace Umbraco.Tests.Migrations
         [Test]
         public void Executes_Migration_For_Spanning_One_Target_2()
         {
-            var sqlSyntax = new SqlCeSyntaxProvider();
             var runner = new MigrationRunner(
-                Mock.Of<IMigrationResolver>(),
-                Mock.Of<ILogger>(), new Version(5, 0, 1), new Version(6, 0, 0), "Test");
+                Mock.Of<IMigrationEntryService>(),
+                Mock.Of<ILogger>(), new SemVersion(5, 0, 1), new SemVersion(6, 0, 0), "Test");
 
-            var migrations = runner.OrderedUpgradeMigrations(new List<IMigration> { new MultiMigration(sqlSyntax, Mock.Of<ILogger>()) });
+            var migrations = runner.OrderedUpgradeMigrations(new List<IMigration> { new MultiMigration(new SqlCeSyntaxProvider(), Mock.Of<ILogger>()) });
 
             var ctx = runner.InitializeMigrations(
                 //new List<IMigration> {new DoRunMigration(), new DoNotRunMigration()},
                 migrations.ToList(),
                 new Database("umbracoDbDSN")
-                , DatabaseProviders.SqlServerCE, sqlSyntax, true);
+                , DatabaseProviders.SqlServerCE, true);
 
             Assert.AreEqual(1, ctx.Expressions.Count());
         }
@@ -82,12 +80,12 @@ namespace Umbraco.Tests.Migrations
 
             public override void Up()
             {
-                Context.Expressions.Add(new AlterColumnExpression(SqlSyntax, DatabaseProviders.SqlServerCE));
+                Context.Expressions.Add(new AlterColumnExpression(DatabaseProviders.SqlServerCE, new []{DatabaseProviders.SqlServerCE}, SqlSyntax));
             }
 
             public override void Down()
             {
-                Context.Expressions.Add(new AlterColumnExpression(SqlSyntax, DatabaseProviders.SqlServerCE));
+                Context.Expressions.Add(new AlterColumnExpression(DatabaseProviders.SqlServerCE, new[] { DatabaseProviders.SqlServerCE }, SqlSyntax));
             }
         }
     }

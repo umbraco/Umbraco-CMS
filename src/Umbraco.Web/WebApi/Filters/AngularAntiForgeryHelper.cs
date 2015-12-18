@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -27,6 +29,8 @@ namespace Umbraco.Web.WebApi.Filters
         /// The header name that angular uses to pass in the token to validate the cookie
         /// </summary>
         public const string AngularHeadername = "X-XSRF-TOKEN";
+
+        
 
         /// <summary>
         /// Returns 2 tokens - one for the cookie value and one that angular should set as the header value
@@ -64,13 +68,10 @@ namespace Umbraco.Web.WebApi.Filters
             return true;
         }
 
-        /// <summary>
-        /// Validates the headers/cookies passed in for the request
-        /// </summary>
-        /// <param name="requestHeaders"></param>
-        /// <param name="failedReason"></param>
-        /// <returns></returns>
-        public static bool ValidateHeaders(HttpRequestHeaders requestHeaders, out string failedReason)
+        internal static bool ValidateHeaders(            
+            KeyValuePair<string, IEnumerable<string>>[] requestHeaders, 
+            string cookieToken,
+            out string failedReason)
         {
             failedReason = "";
 
@@ -85,12 +86,7 @@ namespace Umbraco.Web.WebApi.Filters
                 .Select(z => z.Value)
                 .SelectMany(z => z)
                 .FirstOrDefault();
-
-            var cookieToken = requestHeaders
-                .GetCookies()
-                .Select(c => c[CsrfValidationCookieName])
-                .FirstOrDefault();
-
+            
             // both header and cookie must be there
             if (cookieToken == null || headerToken == null)
             {
@@ -98,13 +94,32 @@ namespace Umbraco.Web.WebApi.Filters
                 return false;
             }
 
-            if (ValidateTokens(cookieToken.Value, headerToken) == false)
+            if (ValidateTokens(cookieToken, headerToken) == false)
             {
                 failedReason = "Invalid token";
                 return false;
             }
-            
+
             return true;
+        }
+
+        /// <summary>
+        /// Validates the headers/cookies passed in for the request
+        /// </summary>
+        /// <param name="requestHeaders"></param>
+        /// <param name="failedReason"></param>
+        /// <returns></returns>
+        public static bool ValidateHeaders(HttpRequestHeaders requestHeaders, out string failedReason)
+        {
+            var cookieToken = requestHeaders
+                .GetCookies()
+                .Select(c => c[CsrfValidationCookieName])
+                .FirstOrDefault();
+
+            return ValidateHeaders(
+                requestHeaders.ToDictionary(x => x.Key, x => x.Value).ToArray(),
+                cookieToken == null ? null : cookieToken.Value,
+                out failedReason);
         }
     }
 }

@@ -12,6 +12,7 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.PropertyEditors;
 using umbraco.interfaces;
+using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.Services
 {
@@ -21,10 +22,93 @@ namespace Umbraco.Core.Services
     public class DataTypeService : RepositoryService, IDataTypeService
     {
 
-        public DataTypeService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger)
-            : base(provider, repositoryFactory, logger)
+        public DataTypeService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+            : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
         }
+
+        #region Containers
+
+        public Attempt<int> CreateContainer(int parentId, string name, int userId = 0)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow))
+            {
+                try
+                {
+                    var container = new EntityContainer(Constants.ObjectTypes.DataTypeGuid)
+                    {
+                        Name = name,
+                        ParentId = parentId,
+                        CreatorId = userId
+                    };
+                    repo.AddOrUpdate(container);
+                    uow.Commit();
+                    return Attempt.Succeed(container.Id);
+                }
+                catch (Exception ex)
+                {
+                    return Attempt<int>.Fail(ex);
+                }
+                //TODO: Audit trail ?
+            }
+        }
+
+        public EntityContainer GetContainer(int containerId)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow))
+            {
+                var container = repo.Get(containerId);
+                return container != null && container.ContainedObjectType == Constants.ObjectTypes.DataTypeGuid
+                    ? container
+                    : null;
+            }
+        }
+
+        public EntityContainer GetContainer(Guid containerId)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow))
+            {
+                var container = repo.Get(containerId);
+                return container != null && container.ContainedObjectType == Constants.ObjectTypes.DataTypeGuid
+                    ? container
+                    : null;
+            }
+        }
+
+        public void SaveContainer(EntityContainer container, int userId = 0)
+        {
+            if (container.ContainedObjectType != Constants.ObjectTypes.DataTypeGuid) 
+                throw new InvalidOperationException("Not a data type container.");
+            if (container.HasIdentity && container.IsPropertyDirty("ParentId"))
+                throw new InvalidOperationException("Cannot save a container with a modified parent, move the container instead.");
+
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow))
+            {
+                repo.AddOrUpdate(container);
+                uow.Commit();
+                //TODO: Audit trail ?
+            }
+        }
+
+        public void DeleteContainer(int containerId, int userId = 0)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow))
+            {
+                var container = repo.Get(containerId);
+                if (container == null) return;
+                if (container.ContainedObjectType != Constants.ObjectTypes.DataTypeGuid) return;
+                repo.Delete(container);
+                uow.Commit();
+                //TODO: Audit trail ?
+            }
+        }
+
+        #endregion
 
         /// <summary>
         /// Gets a <see cref="IDataTypeDefinition"/> by its Name
@@ -35,7 +119,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(UowProvider.GetUnitOfWork()))
             {
-                return repository.GetByQuery(repository.Query.Where(x => x.Name == name)).FirstOrDefault();
+                return repository.GetByQuery(new Query<IDataTypeDefinition>().Where(x => x.Name == name)).FirstOrDefault();
             }
         }
 
@@ -61,7 +145,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = repository.Query.Where(x => x.Key == id);
+                var query = Query<IDataTypeDefinition>.Builder.Where(x => x.Key == id);
                 var definitions = repository.GetByQuery(query);
 
                 return definitions.FirstOrDefault();
@@ -89,7 +173,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = repository.Query.Where(x => x.PropertyEditorAlias == propertyEditorAlias);
+                var query = Query<IDataTypeDefinition>.Builder.Where(x => x.PropertyEditorAlias == propertyEditorAlias);
                 var definitions = repository.GetByQuery(query);
 
                 return definitions;
@@ -151,6 +235,49 @@ namespace Umbraco.Core.Services
             {
                 return repository.GetPreValueAsString(id);
             }
+        }
+
+        public Attempt<OperationStatus<MoveOperationStatusType>> Move(IDataTypeDefinition toMove, int parentId)
+        {
+            var evtMsgs = EventMessagesFactory.Get();
+
+            if (Moving.IsRaisedEventCancelled(
+                  new MoveEventArgs<IDataTypeDefinition>(evtMsgs, new MoveEventInfo<IDataTypeDefinition>(toMove, toMove.Path, parentId)),
+                  this))
+            {
+                return Attempt.Fail(
+                    new OperationStatus<MoveOperationStatusType>(
+                        MoveOperationStatusType.FailedCancelledByEvent, evtMsgs));
+            }
+
+            var moveInfo = new List<MoveEventInfo<IDataTypeDefinition>>();
+            var uow = UowProvider.GetUnitOfWork();
+            using (var containerRepository = RepositoryFactory.CreateEntityContainerRepository(uow))
+            using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(uow))
+            {
+                try
+                {
+                    EntityContainer container = null;
+                    if (parentId > 0)
+                    {
+                        container = containerRepository.Get(parentId);
+                        if (container == null || container.ContainedObjectType != Constants.ObjectTypes.DataTypeGuid)
+                            throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound);
+                    }
+                    moveInfo.AddRange(repository.Move(toMove, container));
+                }
+                catch (DataOperationException<MoveOperationStatusType> ex)
+                {
+                    return Attempt.Fail(
+                        new OperationStatus<MoveOperationStatusType>(ex.Operation, evtMsgs));
+                }
+                uow.Commit();
+            }
+
+            Moved.RaiseEvent(new MoveEventArgs<IDataTypeDefinition>(false, evtMsgs, moveInfo.ToArray()), this);
+
+            return Attempt.Succeed(
+                new OperationStatus<MoveOperationStatusType>(MoveOperationStatusType.Success, evtMsgs));
         }
 
         /// <summary>
@@ -350,6 +477,26 @@ namespace Umbraco.Core.Services
 	        Audit(AuditType.Delete, string.Format("Delete DataTypeDefinition performed by user"), userId, dataTypeDefinition.Id);
         }
 
+        /// <summary>
+        /// Gets the <see cref="IDataType"/> specified by it's unique ID
+        /// </summary>
+        /// <param name="id">Id of the DataType, which corresponds to the Guid Id of the control</param>
+        /// <returns><see cref="IDataType"/> object</returns>
+        [Obsolete("IDataType is obsolete and is no longer used, it will be removed from the codebase in future versions")]
+        public IDataType GetDataTypeById(Guid id)
+        {
+            return DataTypesResolver.Current.GetById(id);
+        }
+
+        /// <summary>
+        /// Gets a complete list of all registered <see cref="IDataType"/>'s
+        /// </summary>
+        /// <returns>An enumerable list of <see cref="IDataType"/> objects</returns>
+        [Obsolete("IDataType is obsolete and is no longer used, it will be removed from the codebase in future versions")]
+        public IEnumerable<IDataType> GetAllDataTypes()
+        {
+            return DataTypesResolver.Current.DataTypes;
+        }
 
         private void Audit(AuditType type, string message, int userId, int objectId)
         {
@@ -381,8 +528,18 @@ namespace Umbraco.Core.Services
         /// Occurs after Save
         /// </summary>
 		public static event TypedEventHandler<IDataTypeService, SaveEventArgs<IDataTypeDefinition>> Saved;
+
+        /// <summary>
+        /// Occurs before Move
+        /// </summary>
+        public static event TypedEventHandler<IDataTypeService, MoveEventArgs<IDataTypeDefinition>> Moving;
+
+        /// <summary>
+        /// Occurs after Move
+        /// </summary>
+        public static event TypedEventHandler<IDataTypeService, MoveEventArgs<IDataTypeDefinition>> Moved;
         #endregion
 
-        
+
     }
 }

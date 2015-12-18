@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using umbraco.businesslogic;
 using umbraco.cms.businesslogic;
@@ -53,7 +54,7 @@ namespace umbraco
             else
                 tmp = new Dictionary.DictionaryItem(this.id).Children;
 
-            foreach (Dictionary.DictionaryItem di in tmp)
+            foreach (Dictionary.DictionaryItem di in tmp.OrderBy(a => a.key))
             {
                 XmlTreeNode xNode = XmlTreeNode.Create(this);
                 xNode.NodeID = di.id.ToString(); //dictionary_ + id.. 

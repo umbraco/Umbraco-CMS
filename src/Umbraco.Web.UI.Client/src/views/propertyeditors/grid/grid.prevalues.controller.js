@@ -74,25 +74,40 @@ angular.module("umbraco")
             template
         *****************/
 
-        $scope.configureTemplate = function(template){
-           if(template === undefined){
-                template = {
-                    name: "",
-                    sections:[
+        $scope.configureTemplate = function(template) {
 
-                    ]
-                };
-                $scope.model.value.templates.push(template);
-           }    
-           
-           dialogService.open(
-               {
-                   template: "views/propertyEditors/grid/dialogs/layoutconfig.html",
-                   currentLayout: template,
-                   rows: $scope.model.value.layouts,
-                   columns: $scope.model.value.columns
-               }
-           );
+           var templatesCopy = angular.copy($scope.model.value.templates);
+
+           if (template === undefined) {
+              template = {
+                 name: "",
+                 sections: [
+
+                 ]
+              };
+              $scope.model.value.templates.push(template);
+           }
+
+           $scope.layoutConfigOverlay = {};
+           $scope.layoutConfigOverlay.view = "views/propertyEditors/grid/dialogs/layoutconfig.html";
+           $scope.layoutConfigOverlay.currentLayout = template;
+           $scope.layoutConfigOverlay.rows = $scope.model.value.layouts;
+           $scope.layoutConfigOverlay.columns = $scope.model.value.columns;
+           $scope.layoutConfigOverlay.show = true;
+
+           $scope.layoutConfigOverlay.submit = function(model) {
+              $scope.layoutConfigOverlay.show = false;
+              $scope.layoutConfigOverlay = null;
+           };
+
+           $scope.layoutConfigOverlay.close = function(oldModel) {
+
+              //reset templates
+              $scope.model.value.templates = templatesCopy;
+
+              $scope.layoutConfigOverlay.show = false;
+              $scope.layoutConfigOverlay = null;
+           }
 
         };
 
@@ -105,48 +120,64 @@ angular.module("umbraco")
             Row
         *****************/
 
-        $scope.configureLayout = function(layout){
+        $scope.configureLayout = function(layout) {
 
-            if(layout === undefined){
-                 layout = {
-                     name: "",
-                     areas:[
+           var layoutsCopy = angular.copy($scope.model.value.layouts);
 
-                     ]
-                 };
-                 $scope.model.value.layouts.push(layout);
-            }
+           if(layout === undefined){
+                layout = {
+                    name: "",
+                    areas:[
 
-            dialogService.open(
-                {
-                    template: "views/propertyEditors/grid/dialogs/rowconfig.html",
-                    currentRow: layout,
-                    editors: $scope.editors,
-                    columns: $scope.model.value.columns
-                }
-            );
+                    ]
+                };
+                $scope.model.value.layouts.push(layout);
+           }
+
+           $scope.rowConfigOverlay = {};
+           $scope.rowConfigOverlay.view = "views/propertyEditors/grid/dialogs/rowconfig.html";
+           $scope.rowConfigOverlay.currentRow = layout;
+           $scope.rowConfigOverlay.editors = $scope.editors;
+           $scope.rowConfigOverlay.columns = $scope.model.value.columns;
+           $scope.rowConfigOverlay.show = true;
+
+           $scope.rowConfigOverlay.submit = function(model) {
+             $scope.rowConfigOverlay.show = false;
+             $scope.rowConfigOverlay = null;
+           };
+
+           $scope.rowConfigOverlay.close = function(oldModel) {
+             $scope.model.value.layouts = layoutsCopy;
+             $scope.rowConfigOverlay.show = false;
+             $scope.rowConfigOverlay = null;
+           };
+
         };
 
         //var rowDeletesPending = false;
-        $scope.deleteLayout = function (index) {
-            //rowDeletesPending = true;
+        $scope.deleteLayout = function(index) {
 
-            //show ok/cancel dialog
-            var confirmDialog = dialogService.open(
-               {
-                   template: "views/propertyEditors/grid/dialogs/rowdeleteconfirm.html",
-                   show: true,
-                   callback: function() {
-                       $scope.model.value.layouts.splice(index, 1);
-                   },
-                   dialogData: {
-                       rowName: $scope.model.value.layouts[index].name
-                   }
-               }
-           );
-            
+           $scope.rowDeleteOverlay = {};
+           $scope.rowDeleteOverlay.view = "views/propertyEditors/grid/dialogs/rowdeleteconfirm.html";
+           $scope.rowDeleteOverlay.dialogData = {
+             rowName: $scope.model.value.layouts[index].name
+           };
+           $scope.rowDeleteOverlay.show = true;
+
+           $scope.rowDeleteOverlay.submit = function(model) {
+
+             $scope.model.value.layouts.splice(index, 1);
+
+             $scope.rowDeleteOverlay.show = false;
+             $scope.rowDeleteOverlay = null;
+           };
+
+           $scope.rowDeleteOverlay.close = function(oldModel) {
+             $scope.rowDeleteOverlay.show = false;
+             $scope.rowDeleteOverlay = null;
+           };
+
         };
-        
 
 
         /****************
@@ -161,7 +192,7 @@ angular.module("umbraco")
         };
 
         $scope.percentage = function(spans){
-            return ((spans / $scope.model.value.columns) * 100).toFixed(1);
+            return ((spans / $scope.model.value.columns) * 100).toFixed(8);
         };
 
         $scope.zeroWidthFilter = function (cell) {
@@ -176,30 +207,40 @@ angular.module("umbraco")
             collection.splice(index, 1);
         };
 
-        var editConfigCollection = function(configValues, title, callbackOnSave){
-            dialogService.open(
-                {
-                    template: "views/propertyeditors/grid/dialogs/editconfig.html",
-                    config: configValues,
-                    name: title,
-                    callback: function(data){
-                        callbackOnSave(data);
-                    }
-                });
+        var editConfigCollection = function(configValues, title, callback) {
+
+           $scope.editConfigCollectionOverlay = {};
+           $scope.editConfigCollectionOverlay.view = "views/propertyeditors/grid/dialogs/editconfig.html";
+           $scope.editConfigCollectionOverlay.config = configValues;
+           $scope.editConfigCollectionOverlay.title = title;
+           $scope.editConfigCollectionOverlay.show = true;
+
+           $scope.editConfigCollectionOverlay.submit = function(model) {
+
+              callback(model.config)
+
+              $scope.editConfigCollectionOverlay.show = false;
+              $scope.editConfigCollectionOverlay = null;
+           };
+
+           $scope.editConfigCollectionOverlay.close = function(oldModel) {
+              $scope.editConfigCollectionOverlay.show = false;
+              $scope.editConfigCollectionOverlay = null;
+           };
+
         };
 
-        $scope.editConfig = function(){
-            editConfigCollection($scope.model.value.config, "Settings", function(data){
-                $scope.model.value.config = data;
-            });
-	    };
-
-        $scope.editStyles = function(){
-            editConfigCollection($scope.model.value.styles, "Styling", function(data){
-                $scope.model.value.styles = data;
-            });
+        $scope.editConfig = function() {
+           editConfigCollection($scope.model.value.config, "Settings", function(data) {
+              $scope.model.value.config = data;
+           });
         };
 
+        $scope.editStyles = function() {
+           editConfigCollection($scope.model.value.styles, "Styling", function(data){
+               $scope.model.value.styles = data;
+           });
+        };
 
         /****************
             editors

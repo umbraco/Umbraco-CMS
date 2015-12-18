@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Web;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -17,7 +18,7 @@ namespace Umbraco.Web.Models.Mapping
     /// Creates the tabs collection with properties assigned for display models
     /// </summary>
     internal class TabsAndPropertiesResolver : ValueResolver<IContentBase, IEnumerable<Tab<ContentPropertyDisplay>>>
-    {
+    {        
         private ICultureDictionary _cultureDictionary;
         protected IEnumerable<string> IgnoreProperties { get; set; }
 
@@ -27,7 +28,7 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         public TabsAndPropertiesResolver(IEnumerable<string> ignoreProperties)
-        {
+        {         
             if (ignoreProperties == null) throw new ArgumentNullException("ignoreProperties");
             IgnoreProperties = ignoreProperties;
         }
@@ -40,6 +41,7 @@ namespace Umbraco.Web.Models.Mapping
         /// <param name="customProperties">
         /// Any additional custom properties to assign to the generic properties tab. 
         /// </param>
+        /// <param name="onGenericPropertiesMapped"></param>
         /// <remarks>
         /// The generic properties tab is mapped during AfterMap and is responsible for 
         /// setting up the properties such as Created date, updated date, template selected, etc...
@@ -47,11 +49,10 @@ namespace Umbraco.Web.Models.Mapping
         public static void MapGenericProperties<TPersisted>(
             TPersisted content,
             ContentItemDisplayBase<ContentPropertyDisplay, TPersisted> display,
-            params ContentPropertyDisplay[] customProperties)
+            IEnumerable<ContentPropertyDisplay> customProperties = null,
+            Action<List<ContentPropertyDisplay>> onGenericPropertiesMapped = null)
             where TPersisted : IContentBase
         {
-            
-
             var genericProps = display.Tabs.Single(x => x.Id == 0);
 
             //store the current props to append to the newly inserted ones
@@ -60,55 +61,66 @@ namespace Umbraco.Web.Models.Mapping
             var labelEditor = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View;
 
             var contentProps = new List<ContentPropertyDisplay>
+            {
+                new ContentPropertyDisplay
                 {
-                    new ContentPropertyDisplay
-                        {
-                            Alias = string.Format("{0}id", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                            Label = "Id",
-                            Value = Convert.ToInt32(display.Id).ToInvariantString() + "<br/><small class='muted'>" + display.Key + "</small>",
-                            View = labelEditor
-                        },
-                    new ContentPropertyDisplay
-                        {
-                            Alias = string.Format("{0}creator", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                            Label = ui.Text("content", "createBy"),
-                            Description = ui.Text("content", "createByDesc"), //TODO: Localize this
-                            Value = display.Owner.Name,
-                            View = labelEditor
-                        },
-                    new ContentPropertyDisplay
-                        {
-                            Alias = string.Format("{0}createdate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                            Label = ui.Text("content", "createDate"),
-                            Description = ui.Text("content", "createDateDesc"), 
-                            Value = display.CreateDate.ToIsoString(),
-                            View = labelEditor
-                        },
-                     new ContentPropertyDisplay
-                        {
-                            Alias = string.Format("{0}updatedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                            Label = ui.Text("content", "updateDate"),
-                            Description = ui.Text("content", "updateDateDesc"), 
-                            Value = display.UpdateDate.ToIsoString(),
-                            View = labelEditor
-                        },                    
-                    new ContentPropertyDisplay
-                        {
-                            Alias = string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                            Label = ui.Text("content", "documentType"),
-                            Value = TranslateItem(display.ContentTypeName, CreateDictionary()),
-                            View = labelEditor
-                        }
-                };
+                    Alias = string.Format("{0}id", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Label = "Id",
+                    Value = Convert.ToInt32(display.Id).ToInvariantString() + "<br/><small class='muted'>" + display.Key + "</small>",
+                    View = labelEditor
+                },
+                new ContentPropertyDisplay
+                {
+                    Alias = string.Format("{0}creator", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Label = ui.Text("content", "createBy"),
+                    Description = ui.Text("content", "createByDesc"), //TODO: Localize this
+                    Value = display.Owner.Name,
+                    View = labelEditor
+                },
+                new ContentPropertyDisplay
+                {
+                    Alias = string.Format("{0}createdate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Label = ui.Text("content", "createDate"),
+                    Description = ui.Text("content", "createDateDesc"),
+                    Value = display.CreateDate.ToIsoString(),
+                    View = labelEditor
+                },
+                new ContentPropertyDisplay
+                {
+                    Alias = string.Format("{0}updatedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Label = ui.Text("content", "updateDate"),
+                    Description = ui.Text("content", "updateDateDesc"),
+                    Value = display.UpdateDate.ToIsoString(),
+                    View = labelEditor
+                },
+                new ContentPropertyDisplay
+                {
+                    Alias = string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Label = ui.Text("content", "documentType"),
+                    Value = TranslateItem(display.ContentTypeName, CreateDictionary()),
+                    View = labelEditor
+                }
+            };
 
-            //add the custom ones
-            contentProps.AddRange(customProperties);
+            if (customProperties != null)
+            {
+                //add the custom ones
+                contentProps.AddRange(customProperties);
+            }
 
             //now add the user props
             contentProps.AddRange(currProps);
 
+            //callback
+            if (onGenericPropertiesMapped != null)
+            {
+                onGenericPropertiesMapped(contentProps);
+            }
+
             //re-assign
             genericProps.Properties = contentProps;
+
+           
 
         }
 
@@ -189,62 +201,66 @@ namespace Umbraco.Web.Models.Mapping
 
         protected override IEnumerable<Tab<ContentPropertyDisplay>> ResolveCore(IContentBase content)
         {
-            var aggregateTabs = new List<Tab<ContentPropertyDisplay>>();
+            var tabs = new List<Tab<ContentPropertyDisplay>>();
 
-            //now we need to aggregate the tabs and properties since we might have duplicate tabs (based on aliases) because
-            // of how content composition works. 
-            foreach (var propertyGroups in content.PropertyGroups.OrderBy(x => x.SortOrder).GroupBy(x => x.Name))
+            // add the tabs, for properties that belong to a tab
+            // need to aggregate the tabs, as content.PropertyGroups contains all the composition tabs,
+            // and there might be duplicates (content does not work like contentType and there is no 
+            // content.CompositionPropertyGroups).
+            var groupsGroupsByName = content.PropertyGroups.OrderBy(x => x.SortOrder).GroupBy(x => x.Name);
+            foreach (var groupsByName in groupsGroupsByName)
             {
-                var aggregateProperties = new List<ContentPropertyDisplay>();
+                var properties = new List<ContentPropertyDisplay>();
                 
-                //add the properties from each composite property group
-                foreach (var current in propertyGroups)
+                // merge properties for groups with the same name
+                foreach (var group in groupsByName)
                 {
-                    var propsForGroup = content.GetPropertiesForGroup(current)
-                        .Where(x => IgnoreProperties.Contains(x.Alias) == false); //don't include ignored props
+                    var groupProperties = content.GetPropertiesForGroup(group)
+                        .Where(x => IgnoreProperties.Contains(x.Alias) == false); // skip ignored
 
-                    aggregateProperties.AddRange(
-                        Mapper.Map<IEnumerable<Property>, IEnumerable<ContentPropertyDisplay>>(
-                            propsForGroup));
+                    properties.AddRange(Mapper.Map<IEnumerable<Property>, IEnumerable<ContentPropertyDisplay>>(groupProperties));
                 }
-                
-                if (aggregateProperties.Count == 0)
+
+                if (properties.Count == 0)
                     continue;
 
-                    TranslateProperties(aggregateProperties);
+                TranslateProperties(properties);
 
-                //then we'll just use the root group's data to make the composite tab
-                var rootGroup = propertyGroups.First(x => x.ParentId == null);
-                aggregateTabs.Add(new Tab<ContentPropertyDisplay>
-                    {
-                        Id = rootGroup.Id,
-                        Alias = rootGroup.Name,
-                        Label = TranslateItem(rootGroup.Name),
-                        Properties = aggregateProperties,
-                        IsActive = false
-                    });
+                // add the tab
+                // we need to pick an identifier... there is no "right" way...
+                var g = groupsByName.FirstOrDefault(x => x.Id == content.ContentTypeId) // try local
+                    ?? groupsByName.First(); // else pick one randomly
+                var groupId = g.Id;
+                var groupName = groupsByName.Key;
+                tabs.Add(new Tab<ContentPropertyDisplay>
+                {
+                    Id = groupId,
+                    Alias = groupName,
+                    Label = TranslateItem(groupName),
+                    Properties = properties,
+                    IsActive = false
+                });
             }
 
-            //now add the generic properties tab for any properties that don't belong to a tab
-            var orphanProperties = content.GetNonGroupedProperties()
-                .Where(x => IgnoreProperties.Contains(x.Alias) == false); //don't include ignored props
-
-            //now add the generic properties tab
-            var genericproperties = Mapper.Map<IEnumerable<Property>, IEnumerable<ContentPropertyDisplay>>(orphanProperties).ToList();
+            // add the generic properties tab, for properties that don't belong to a tab
+            // get the properties, map and translate them, then add the tab
+            var noGroupProperties = content.GetNonGroupedProperties()
+                .Where(x => IgnoreProperties.Contains(x.Alias) == false); // skip ignored
+            var genericproperties = Mapper.Map<IEnumerable<Property>, IEnumerable<ContentPropertyDisplay>>(noGroupProperties).ToList();
             TranslateProperties(genericproperties);
 
-            aggregateTabs.Add(new Tab<ContentPropertyDisplay>
-                {
-                    Id = 0,
-                    Label = ui.Text("general", "properties"),
-                    Alias = "Generic properties",
-                    Properties = genericproperties
-                });
+            tabs.Add(new Tab<ContentPropertyDisplay>
+            {
+                Id = 0,
+                Label = ui.Text("general", "properties"),
+                Alias = "Generic properties",
+                Properties = genericproperties
+            });
 
-            //set the first tab to active
-            aggregateTabs.First().IsActive = true;
+            // activate the first tab
+            tabs.First().IsActive = true;
 
-            return aggregateTabs;
+            return tabs;
         }
 
         private void TranslateProperties(IEnumerable<ContentPropertyDisplay> properties)

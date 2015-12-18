@@ -14,15 +14,9 @@ namespace Umbraco.Core.Services
     public class RelationService : RepositoryService, IRelationService
     {
         private readonly IEntityService _entityService;
-
-        [Obsolete("Use the constructors that specify all dependencies instead")]
-        public RelationService(IDatabaseUnitOfWorkProvider uowProvider, RepositoryFactory repositoryFactory, IEntityService entityService)
-            : this(uowProvider, repositoryFactory, LoggerResolver.Current.Logger, entityService)
-        {
-        }
-
-        public RelationService(IDatabaseUnitOfWorkProvider uowProvider, RepositoryFactory repositoryFactory, ILogger logger, IEntityService entityService)
-            : base(uowProvider, repositoryFactory, logger)
+        
+        public RelationService(IDatabaseUnitOfWorkProvider uowProvider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory, IEntityService entityService)
+            : base(uowProvider, repositoryFactory, logger, eventMessagesFactory)
         {
             if (entityService == null) throw new ArgumentNullException("entityService");
             _entityService = entityService;

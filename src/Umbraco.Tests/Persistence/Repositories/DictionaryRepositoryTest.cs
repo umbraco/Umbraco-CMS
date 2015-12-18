@@ -161,37 +161,6 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         }
 
-        [Test]
-        public void Get_Ignores_Item_WhenLanguageMissing()
-        {
-            // Arrange
-            var language = ServiceContext.LocalizationService.GetLanguageByCultureCode("en-US");
-            var itemMissingLanguage = new DictionaryItem("I have invalid language");
-            var translations = new List<IDictionaryTranslation>
-                                   {
-                                       new DictionaryTranslation(new Language("") { Id = 0 }, ""),
-                                       new DictionaryTranslation(language, "I have language")
-                                   };
-            itemMissingLanguage.Translations = translations;
-            ServiceContext.LocalizationService.Save(itemMissingLanguage);//Id 3?
-
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            LanguageRepository languageRepository;
-            using (var repository = CreateRepository(unitOfWork, out languageRepository))
-            {
-                // Act
-                var dictionaryItem = repository.Get(3);
-
-                // Assert
-                Assert.That(dictionaryItem, Is.Not.Null);
-                Assert.That(dictionaryItem.ItemKey, Is.EqualTo("I have invalid language"));
-                Assert.That(dictionaryItem.Translations.Any(), Is.True);
-                Assert.That(dictionaryItem.Translations.Any(x => x == null), Is.False);
-                Assert.That(dictionaryItem.Translations.First().Value, Is.EqualTo("I have language"));
-                Assert.That(dictionaryItem.Translations.Count(), Is.EqualTo(1));
-            }
-        }
 
         [Test]
         public void Can_Perform_GetAll_On_DictionaryRepository()

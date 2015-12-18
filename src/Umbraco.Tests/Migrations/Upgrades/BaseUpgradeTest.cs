@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Moq;
 using NUnit.Framework;
+using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.LightInject;
@@ -12,6 +13,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 
@@ -31,7 +33,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
             TestHelper.InitializeContentDirectories();
 
             Path = TestHelper.CurrentAssemblyDirectory;
-            AppDomain.CurrentDomain.SetData("DataDirectory", Path);         
+            AppDomain.CurrentDomain.SetData("DataDirectory", Path);
 
             DatabaseSpecificSetUp();
         }
@@ -39,10 +41,8 @@ namespace Umbraco.Tests.Migrations.Upgrades
         [Test]
         public virtual void Can_Upgrade_From_470_To_600()
         {
-            var sqlHelper = new SqlCeSyntaxProvider();
-
-            var configuredVersion = new Version("4.7.0");
-            var targetVersion = new Version("6.0.0");
+            var configuredVersion = new SemVersion(4, 7, 0);
+            var targetVersion = new SemVersion(6, 0, 0);
             var provider = GetDatabaseProvider();
             var db = GetConfiguredDatabase();
 
@@ -63,6 +63,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
 
             //Setup the MigrationRunner
             var migrationRunner = new MigrationRunner(
+                Mock.Of<IMigrationEntryService>(),
                 logger,
                 configuredVersion,
                 targetVersion,

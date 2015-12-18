@@ -33,7 +33,7 @@ namespace umbraco.uicontrols {
             base.CreateChildControls();
 
             _tabList.TagName = "ul";
-            _tabList.Attributes.Add("class", "nav nav-tabs umb-nav-tabs span12");
+            _tabList.Attributes.Add("class", "nav nav-tabs umb-nav-tabs span12 -padding-left");
             base.row.Controls.Add(_tabList);
 
             _body.TagName = "div";
@@ -41,7 +41,7 @@ namespace umbraco.uicontrols {
             base.Controls.Add(_body);
 
             _tabsHolder.TagName = "div";
-            _tabsHolder.Attributes.Add("class", "tab-content form-horizontal umb-tab-content");
+            _tabsHolder.Attributes.Add("class", "tab-content form-horizontal");
             _tabsHolder.ID = this.ID + "_content";
             _body.Controls.Add(_tabsHolder);
             

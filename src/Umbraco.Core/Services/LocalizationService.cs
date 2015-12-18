@@ -18,10 +18,10 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class LocalizationService : RepositoryService, ILocalizationService
     {
-        private static readonly Guid RootParentId = new Guid(Constants.Conventions.Localization.DictionaryItemRootId);
+        
 
-        public LocalizationService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger)
-            : base(provider, repositoryFactory, logger)
+        public LocalizationService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+            : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
         }
 
@@ -76,7 +76,7 @@ namespace Umbraco.Core.Services
                     }
                 }
 
-                var item = new DictionaryItem(parentId.HasValue ? parentId.Value : RootParentId, key);
+                var item = new DictionaryItem(parentId, key);
 
                 if (defaultValue.IsNullOrWhiteSpace() == false)
                 {
@@ -123,10 +123,6 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateDictionaryRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.Get(id);
-                //var query = Query<IDictionaryItem>.Builder.Where(x => x.Key == id);
-                //var items = repository.GetByQuery(query);
-
-                //return items.FirstOrDefault();
             }
         }
 
@@ -140,10 +136,6 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateDictionaryRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.Get(key);
-                //var query = Query<IDictionaryItem>.Builder.Where(x => x.ItemKey == key);
-                //var items = repository.GetByQuery(query);
-
-                //return items.FirstOrDefault();
             }
         }
 
@@ -156,10 +148,23 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateDictionaryRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = repository.Query.Where(x => x.ParentId == parentId);
+                var query = Query<IDictionaryItem>.Builder.Where(x => x.ParentId == parentId);
                 var items = repository.GetByQuery(query);
 
                 return items;
+            }
+        }
+
+        /// <summary>
+        /// Gets a list of descendants for a <see cref="IDictionaryItem"/>
+        /// </summary>
+        /// <param name="parentId">Id of the parent, null will return all dictionary items</param>
+        /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
+        public IEnumerable<IDictionaryItem> GetDictionaryItemDescendants(Guid? parentId)
+        {
+            using (var repository = RepositoryFactory.CreateDictionaryRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.GetDictionaryItemDescendants(parentId);
             }
         }
 
@@ -171,7 +176,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateDictionaryRepository(UowProvider.GetUnitOfWork()))
             {
-                var query = repository.Query.Where(x => x.ParentId == RootParentId);
+                var query = Query<IDictionaryItem>.Builder.Where(x => x.ParentId == null);
                 var items = repository.GetByQuery(query);
 
                 return items;
@@ -188,10 +193,6 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateDictionaryRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.Get(key) != null;
-                //var query = Query<IDictionaryItem>.Builder.Where(x => x.ItemKey == key);
-                //var items = repository.GetByQuery(query);
-
-                //return items.Any();
             }
         }
 

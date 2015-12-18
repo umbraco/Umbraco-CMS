@@ -7,7 +7,6 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 
 using Umbraco.Core.Persistence.Factories;
-using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -19,32 +18,33 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class LanguageRepository : PetaPocoRepositoryBase<int, ILanguage>, ILanguageRepository
     {
-        private readonly IMappingResolver _mappingResolver;
-
-        public LanguageRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
-            : base(work, cache, logger, sqlSyntax, mappingResolver)
+        public LanguageRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+            : base(work, cache, logger, sqlSyntax)
         {
-            _mappingResolver = mappingResolver;
+            //Custom cache options for better performance
+            _cacheOptions = new RepositoryCacheOptions
+            {
+                GetAllCacheAllowZeroCount = true,
+                GetAllCacheValidateCount = false
+            };
+        }
+
+        private readonly RepositoryCacheOptions _cacheOptions;
+
+        /// <summary>
+        /// Returns the repository cache options
+        /// </summary>
+        protected override RepositoryCacheOptions RepositoryCacheOptions
+        {
+            get { return _cacheOptions; }
         }
 
         #region Overrides of RepositoryBase<int,Language>
 
         protected override ILanguage PerformGet(int id)
         {
-            var sql = GetBaseQuery(false);
-            sql.Where(GetBaseWhereClause(), new { Id = id });
-
-            var languageDto = Database.FirstOrDefault<LanguageDto>(sql);
-            if (languageDto == null)
-                return null;
-
-            var entity = ConvertFromDto(languageDto);
-
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            ((Entity)entity).ResetDirtyProperties(false);
-
-            return entity;
+            //use the underlying GetAll which will force cache all domains
+            return GetAll().FirstOrDefault(x => x.Id == id);
         }
 
         protected override IEnumerable<ILanguage> PerformGetAll(params int[] ids)
@@ -57,7 +57,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //this needs to be sorted since that is the way legacy worked - default language is the first one!!
             //even though legacy didn't sort, it should be by id
-            sql.OrderBy<LanguageDto>(SqlSyntax, dto => dto.Id);
+            sql.OrderBy<LanguageDto>(dto => dto.Id, SqlSyntax);
 
             
             return Database.Fetch<LanguageDto>(sql).Select(ConvertFromDto);
@@ -135,8 +135,8 @@ namespace Umbraco.Core.Persistence.Repositories
             entity.ResetDirtyProperties();
 
             //Clear the cache entries that exist by key/iso
-            RepositoryCache.RuntimeCache.ClearCacheItem(GetCacheIdKey<ILanguage>(entity.IsoCode));
-            RepositoryCache.RuntimeCache.ClearCacheItem(GetCacheIdKey<ILanguage>(entity.CultureName));
+            RuntimeCache.ClearCacheItem(GetCacheIdKey<ILanguage>(entity.IsoCode));
+            RuntimeCache.ClearCacheItem(GetCacheIdKey<ILanguage>(entity.CultureName));
         }
 
         protected override void PersistDeletedItem(ILanguage entity)
@@ -144,8 +144,8 @@ namespace Umbraco.Core.Persistence.Repositories
             base.PersistDeletedItem(entity);
 
             //Clear the cache entries that exist by key/iso
-            RepositoryCache.RuntimeCache.ClearCacheItem(GetCacheIdKey<ILanguage>(entity.IsoCode));
-            RepositoryCache.RuntimeCache.ClearCacheItem(GetCacheIdKey<ILanguage>(entity.CultureName));
+            RuntimeCache.ClearCacheItem(GetCacheIdKey<ILanguage>(entity.IsoCode));
+            RuntimeCache.ClearCacheItem(GetCacheIdKey<ILanguage>(entity.CultureName));
         }
 
         #endregion
@@ -159,94 +159,16 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public ILanguage GetByCultureName(string cultureName)
         {
-            var cultureNameRepo = new LanguageByCultureNameRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax, _mappingResolver);
-            return cultureNameRepo.Get(cultureName);
+            //use the underlying GetAll which will force cache all domains
+            return GetAll().FirstOrDefault(x => x.CultureName.InvariantEquals(cultureName));
         }
 
         public ILanguage GetByIsoCode(string isoCode)
         {
-            var isoRepo = new LanguageByIsoCodeRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax, _mappingResolver);
-            return isoRepo.Get(isoCode);
+            //use the underlying GetAll which will force cache all domains
+            return GetAll().FirstOrDefault(x => x.IsoCode.InvariantEquals(isoCode));
         }
 
-        /// <summary>
-        /// Inner repository for looking up languages by ISO code, this deals with caching by a string key
-        /// </summary>
-        private class LanguageByIsoCodeRepository : SimpleGetRepository<string, ILanguage, LanguageDto>
-        {
-            private readonly LanguageRepository _languageRepository;
-
-            public LanguageByIsoCodeRepository(LanguageRepository languageRepository, IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
-                : base(work, cache, logger, sqlSyntax, mappingResolver)
-            {
-                _languageRepository = languageRepository;
-            }
-
-            protected override Sql GetBaseQuery(bool isCount)
-            {
-                return _languageRepository.GetBaseQuery(isCount);
-            }
-
-            protected override string GetBaseWhereClause()
-            {
-                return "umbracoLanguage.languageISOCode = @Id";
-            }
-
-            protected override ILanguage ConvertToEntity(LanguageDto dto)
-            {
-                var factory = new LanguageFactory();
-                return factory.BuildEntity(dto);
-            }
-
-            protected override object GetBaseWhereClauseArguments(string id)
-            {
-                return new {Id = id};
-            }
-
-            protected override string GetWhereInClauseForGetAll()
-            {
-                return "umbracoLanguage.languageISOCode in (@ids)";
-            }
-        }
-
-        /// <summary>
-        /// Inner repository for looking up languages by culture name, this deals with caching by a string key
-        /// </summary>
-        private class LanguageByCultureNameRepository : SimpleGetRepository<string, ILanguage, LanguageDto>
-        {
-            private readonly LanguageRepository _languageRepository;
-
-            public LanguageByCultureNameRepository(LanguageRepository languageRepository, IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
-                : base(work, cache, logger, sqlSyntax, mappingResolver)
-            {
-                _languageRepository = languageRepository;
-            }
-
-            protected override Sql GetBaseQuery(bool isCount)
-            {
-                return _languageRepository.GetBaseQuery(isCount);
-            }
-
-            protected override string GetBaseWhereClause()
-            {
-                return "umbracoLanguage.languageCultureName = @Id";
-            }
-
-            protected override ILanguage ConvertToEntity(LanguageDto dto)
-            {
-                var factory = new LanguageFactory();
-                return factory.BuildEntity(dto);
-            }
-
-            protected override object GetBaseWhereClauseArguments(string id)
-            {
-                return new {Id = id};
-            }
-
-            protected override string GetWhereInClauseForGetAll()
-            {
-                return "umbracoLanguage.languageCultureName in (@ids)";
-            }
-        }
+   
     }
 }

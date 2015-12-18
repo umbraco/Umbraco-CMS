@@ -36,6 +36,16 @@ function entityResource($q, $http, umbRequestHelper) {
     //the factory object returned
     return {
         
+        getSafeAlias: function (value, camelCase) {
+
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "entityApiBaseUrl",
+                       "GetSafeAlias", { value: value, camelCase: camelCase })),
+               'Failed to retrieve content type scaffold');
+        },
+
         /**
          * @ngdoc method
          * @name umbraco.resources.entityResource#getPath
@@ -139,6 +149,12 @@ function entityResource($q, $http, umbRequestHelper) {
             _.each(ids, function(item) {
                 query += "ids=" + item + "&";
             });
+
+            // if ids array is empty we need a empty variable in the querystring otherwise the service returns a error
+            if (ids.length === 0) {
+                query += "ids=&";
+            }
+
             query += "type=" + type;
 
             return umbRequestHelper.resourcePromise(

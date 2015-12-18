@@ -68,7 +68,7 @@ namespace umbraco.presentation.webservices
 
             //check which parameters to pass depending on the types passed in
             int intNodeId;
-            if (nodeType == "memberGroup")
+            if (nodeType == "memberGroups")
             {
                  LegacyDialogHandler.Delete(
                     new HttpContextWrapper(HttpContext.Current),
@@ -270,7 +270,9 @@ namespace umbraco.presentation.webservices
         }
 
         private string SaveXslt(string fileName, string fileContents, bool ignoreDebugging)
-        {	        
+        {
+            IOHelper.EnsurePathExists(SystemDirectories.Xslt);
+
 			var tempFileName = IOHelper.MapPath(SystemDirectories.Xslt + "/" + System.DateTime.Now.Ticks + "_temp.xslt");
             using (var sw = File.CreateText(tempFileName))
             {
@@ -406,6 +408,9 @@ namespace umbraco.presentation.webservices
                 //Directory check.. only allow files in script dir and below to be edited
                 if (savePath.StartsWith(IOHelper.MapPath(SystemDirectories.Scripts + "/")))
                 {
+                    //ensure the folder exists before saving
+                    Directory.CreateDirectory(Path.GetDirectoryName(savePath));
+
                     using (var sw = File.CreateText(IOHelper.MapPath(SystemDirectories.Scripts + "/" + filename)))
                     {
                         sw.Write(val);

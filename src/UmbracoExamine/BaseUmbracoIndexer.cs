@@ -19,6 +19,7 @@ using UmbracoExamine.DataServices;
 using Examine;
 using System.IO;
 using System.Xml.Linq;
+using Lucene.Net.Store;
 using UmbracoExamine.LocalStorage;
 
 namespace UmbracoExamine
@@ -65,14 +66,14 @@ namespace UmbracoExamine
         /// Used for unit tests
         /// </summary>
         internal static bool? DisableInitializationCheck = null;
-        private readonly LocalTempStorageIndexer _localTempStorageHelper = new LocalTempStorageIndexer();
+        private readonly LocalTempStorageIndexer _localTempStorageIndexer = new LocalTempStorageIndexer();
         private BaseLuceneSearcher _internalTempStorageSearcher = null;
 
         #region Properties
 
         public bool UseTempStorage
         {
-            get { return _localTempStorageHelper.LuceneDirectory != null; }
+            get { return _localTempStorageIndexer.LuceneDirectory != null; }
         }
 
         public string TempStorageLocation
@@ -80,7 +81,7 @@ namespace UmbracoExamine
             get
             {
                 if (UseTempStorage == false) return string.Empty;
-                return _localTempStorageHelper.TempPath;
+                return _localTempStorageIndexer.TempPath;
             }
         }
 
@@ -162,21 +163,31 @@ namespace UmbracoExamine
 
             if (config["useTempStorage"] != null)
             {
-                //Use the temp storage directory which will store the index in the local/codegen folder, this is useful
-                // for websites that are running from a remove file server and file IO latency becomes an issue
-                var attemptUseTempStorage = config["useTempStorage"].TryConvertTo<LocalStorageType>();
-                if (attemptUseTempStorage)
+                var fsDir = base.GetLuceneDirectory() as FSDirectory;
+                if (fsDir != null)
                 {
-                    
-                    var indexSet = IndexSets.Instance.Sets[IndexSetName];
-                    var configuredPath = indexSet.IndexPath;
+                    //Use the temp storage directory which will store the index in the local/codegen folder, this is useful
+                    // for websites that are running from a remove file server and file IO latency becomes an issue
+                    var attemptUseTempStorage = config["useTempStorage"].TryConvertTo<LocalStorageType>();
+                    if (attemptUseTempStorage)
+                    {
 
-                    _localTempStorageHelper.Initialize(config, configuredPath, base.GetLuceneDirectory(), IndexingAnalyzer, attemptUseTempStorage.Result);
+                        var indexSet = IndexSets.Instance.Sets[IndexSetName];
+                        var configuredPath = indexSet.IndexPath;
+
+                        _localTempStorageIndexer.Initialize(config, configuredPath, fsDir, IndexingAnalyzer, attemptUseTempStorage.Result);
+                    }
                 }
+               
             }
         }
 
         #endregion
+
+        /// <summary>
+        /// Used to aquire the internal searcher
+        /// </summary>
+        private readonly object _internalSearcherLocker = new object();
 
         protected override BaseSearchProvider InternalSearcher
         {
@@ -185,21 +196,29 @@ namespace UmbracoExamine
                 //if temp local storage is configured use that, otherwise return the default
                 if (UseTempStorage)
                 {
-                    //create one if one has not been created already
-                    return _internalTempStorageSearcher 
-                        ?? (_internalTempStorageSearcher = new LuceneSearcher(_localTempStorageHelper.LuceneDirectory, IndexingAnalyzer));
+                    if (_internalTempStorageSearcher == null)
+                    {
+                        lock (_internalSearcherLocker)
+                        {
+                            if (_internalTempStorageSearcher == null)
+                            {
+                                _internalTempStorageSearcher = new LuceneSearcher(GetIndexWriter(), IndexingAnalyzer);
+                            }
+                        }
+                    }
+                    return _internalTempStorageSearcher;
                 }
 
                 return base.InternalSearcher;
             }
         }
-
+        
         public override Lucene.Net.Store.Directory GetLuceneDirectory()
         {
             //if temp local storage is configured use that, otherwise return the default
             if (UseTempStorage)
             {
-                return _localTempStorageHelper.LuceneDirectory;
+                return _localTempStorageIndexer.LuceneDirectory;
             }
 
             return base.GetLuceneDirectory();
@@ -441,8 +460,19 @@ namespace UmbracoExamine
             if (xDoc != null)
             {
                 var rootNode = xDoc.Root;
-
-                AddNodesToIndex(rootNode.Elements(), type);
+                if (rootNode != null)
+                {
+                    //the result will either be a single doc with an id as the root, or it will
+                    // be multiple docs with a <nodes> wrapper, we need to check for this
+                    if (rootNode.HasAttributes)
+                    {
+                        AddNodesToIndex(new[] {rootNode}, type);
+                    }
+                    else
+                    {
+                        AddNodesToIndex(rootNode.Elements(), type);
+                    }
+                }
             }
 
         }

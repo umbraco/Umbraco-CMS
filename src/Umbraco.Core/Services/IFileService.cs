@@ -21,6 +21,7 @@ namespace Umbraco.Core.Services
         Attempt<IPartialView> SavePartialView(IPartialView partialView, int userId = 0);
         Attempt<IPartialView> SavePartialViewMacro(IPartialView partialView, int userId = 0);
         bool ValidatePartialView(PartialView partialView);
+        bool ValidatePartialViewMacro(PartialView partialView);
 
         /// <summary>
         /// Gets a list of all <see cref="Stylesheet"/> objects
@@ -116,24 +117,59 @@ namespace Umbraco.Core.Services
         IEnumerable<ITemplate> GetTemplates(int masterTemplateId);
 
         /// <summary>
-        /// Gets a <see cref="ITemplate"/> object by its alias
+        /// Gets a <see cref="ITemplate"/> object by its alias.
         /// </summary>
-        /// <param name="alias">Alias of the template</param>
-        /// <returns>A <see cref="ITemplate"/> object</returns>
+        /// <param name="alias">The alias of the template.</param>
+        /// <returns>The <see cref="ITemplate"/> object matching the alias, or null.</returns>
         ITemplate GetTemplate(string alias);
 
         /// <summary>
-        /// Gets a <see cref="ITemplate"/> object by its alias
+        /// Gets a <see cref="ITemplate"/> object by its identifier.
         /// </summary>
-        /// <param name="id">Id of the template</param>
-        /// <returns>A <see cref="ITemplate"/> object</returns>
+        /// <param name="id">The identifer of the template.</param>
+        /// <returns>The <see cref="ITemplate"/> object matching the identifier, or null.</returns>
         ITemplate GetTemplate(int id);
+
+        /// <summary>
+        /// Gets a <see cref="ITemplate"/> object by its guid identifier.
+        /// </summary>
+        /// <param name="id">The guid identifier of the template.</param>
+        /// <returns>The <see cref="ITemplate"/> object matching the identifier, or null.</returns>
+        ITemplate GetTemplate(Guid id);
+
+        /// <summary>
+        /// Gets the template descendants
+        /// </summary>
+        /// <param name="alias"></param>
+        /// <returns></returns>
+        IEnumerable<ITemplate> GetTemplateDescendants(string alias);
+
+        /// <summary>
+        /// Gets the template descendants
+        /// </summary>
+        /// <param name="masterTemplateId"></param>
+        /// <returns></returns>
+        IEnumerable<ITemplate> GetTemplateDescendants(int masterTemplateId);
+
+        /// <summary>
+        /// Gets the template children
+        /// </summary>
+        /// <param name="alias"></param>
+        /// <returns></returns>
+        IEnumerable<ITemplate> GetTemplateChildren(string alias);
+
+        /// <summary>
+        /// Gets the template children
+        /// </summary>
+        /// <param name="masterTemplateId"></param>
+        /// <returns></returns>
+        IEnumerable<ITemplate> GetTemplateChildren(int masterTemplateId);
 
         /// <summary>
         /// Returns a template as a template node which can be traversed (parent, children)
         /// </summary>
         /// <param name="alias"></param>
-        /// <returns></returns>
+        /// <returns></returns>        
         TemplateNode GetTemplateNode(string alias);
 
         /// <summary>

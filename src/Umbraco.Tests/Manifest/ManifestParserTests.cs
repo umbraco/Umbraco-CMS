@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using Moq;
+using System.Text;
 using NUnit.Framework;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -138,7 +139,8 @@ namespace Umbraco.Tests.Manifest
             var a = JsonConvert.DeserializeObject<JArray>(@"[
     {
         alias: 'Test.Test1',
-        name: 'Test 1',        
+        name: 'Test 1',
+        icon: 'icon-war',        
         editor: {
             view: '~/App_Plugins/MyPackage/PropertyEditors/MyEditor.html',
             valueType: 'int',
@@ -150,7 +152,8 @@ namespace Umbraco.Tests.Manifest
     },
     {
         alias: 'Test.Test2',
-        name: 'Test 2',        
+        name: 'Test 2',
+        group: 'customgroup',        
         defaultConfig: { key1: 'some default pre val' },
         editor: {
             view: '~/App_Plugins/MyPackage/PropertyEditors/CsvEditor.html',
@@ -174,6 +177,14 @@ namespace Umbraco.Tests.Manifest
             var manifestValidator2 = parser.ElementAt(0).ValueEditor.Validators.ElementAt(1) as ManifestPropertyValidator;
             Assert.IsNotNull(manifestValidator2);
             Assert.AreEqual("regex", manifestValidator2.Type);
+
+            //groups and icons
+            Assert.AreEqual("common", parser.ElementAt(0).Group);
+            Assert.AreEqual("customgroup", parser.ElementAt(1).Group);
+
+            Assert.AreEqual("icon-war", parser.ElementAt(0).Icon);
+            Assert.AreEqual("icon-autofill", parser.ElementAt(1).Icon);
+
 
             Assert.AreEqual(true, parser.ElementAt(1).ValueEditor.HideLabel);
             Assert.AreEqual("Test.Test2", parser.ElementAt(1).Alias);
@@ -473,13 +484,15 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
             var content2 = "{javascript: []}";
             var content3 = "{javascript: ['~/test.js', '~/test2.js']}";
             var content4 = "{propertyEditors: [], javascript: ['~/test.js', '~/test2.js']}";
+            var content5 = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble()) + "{propertyEditors: [], javascript: ['~/test.js', '~/test2.js']}";
 
             var result = _parser.CreateManifests(null, content1, content2, content3, content4);
 
-            Assert.AreEqual(4, result.Count());
+            Assert.AreEqual(5, result.Count());
             Assert.AreEqual(0, result.ElementAt(1).JavaScriptInitialize.Count);
             Assert.AreEqual(2, result.ElementAt(2).JavaScriptInitialize.Count);
             Assert.AreEqual(2, result.ElementAt(3).JavaScriptInitialize.Count);
+            Assert.AreEqual(2, result.ElementAt(4).JavaScriptInitialize.Count);
         }
 
         [Test]

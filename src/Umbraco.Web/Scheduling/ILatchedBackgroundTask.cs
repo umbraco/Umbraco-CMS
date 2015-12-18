@@ -21,6 +21,7 @@ namespace Umbraco.Web.Scheduling
         /// <summary>
         /// Gets a value indicating whether the task is latched.
         /// </summary>
+        /// <remarks>Should return false as soon as the condition is met.</remarks>
         bool IsLatched { get; }
 
         /// <summary>

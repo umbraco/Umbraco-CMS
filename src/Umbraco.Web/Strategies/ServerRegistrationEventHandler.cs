@@ -3,6 +3,7 @@ using System.Web;
 using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Routing;
 
@@ -21,18 +22,23 @@ namespace Umbraco.Web.Strategies
     /// </remarks>
     public sealed class ServerRegistrationEventHandler : ApplicationEventHandler
     {
-        private static DateTime _lastUpdated = DateTime.MinValue;
+        private readonly object _locko = new object();
+        private DatabaseServerRegistrar _registrar;
+        private DateTime _lastUpdated = DateTime.MinValue;
 
         // bind to events
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
+            _registrar = ServerRegistrarResolver.Current.Registrar as DatabaseServerRegistrar;
+
             // only for the DatabaseServerRegistrar
-            if (ServerRegistrarResolver.Current.Registrar is DatabaseServerRegistrar)
-                UmbracoModule.RouteAttempt += UmbracoModuleRouteAttempt;
+            if (_registrar == null) return;
+
+            UmbracoModule.RouteAttempt += UmbracoModuleRouteAttempt;
         }
 
         // handles route attempts.
-        private static void UmbracoModuleRouteAttempt(object sender, RoutableAttemptEventArgs e)
+        private void UmbracoModuleRouteAttempt(object sender, RoutableAttemptEventArgs e)
         {
             if (e.HttpContext.Request == null || e.HttpContext.Request.Url == null) return;
 
@@ -60,31 +66,26 @@ namespace Umbraco.Web.Strategies
         }
 
         // register current server (throttled).
-        private static void RegisterServer(UmbracoRequestEventArgs e)
+        private void RegisterServer(UmbracoRequestEventArgs e)
         {
-            var reg = (DatabaseServerRegistrar) ServerRegistrarResolver.Current.Registrar;
-            var options = reg.Options;
-            var secondsSinceLastUpdate = DateTime.Now.Subtract(_lastUpdated).TotalSeconds;
-            if (secondsSinceLastUpdate < options.ThrottleSeconds) return;
+            lock (_locko) // ensure we trigger only once
+            {
+                var secondsSinceLastUpdate = DateTime.Now.Subtract(_lastUpdated).TotalSeconds;
+                if (secondsSinceLastUpdate < _registrar.Options.ThrottleSeconds) return;
+                _lastUpdated = DateTime.Now;
+            }
 
-            _lastUpdated = DateTime.Now;
-
-            var url = e.HttpContext.Request.Url;
             var svc = e.UmbracoContext.Application.Services.ServerRegistrationService;
+
+            // because
+            // - ApplicationContext.UmbracoApplicationUrl is initialized by UmbracoModule in BeginRequest
+            // - RegisterServer is called on UmbracoModule.RouteAttempt which is triggered in ProcessRequest
+            // we are safe, UmbracoApplicationUrl has been initialized
+            var serverAddress = e.UmbracoContext.Application.UmbracoApplicationUrl;
 
             try
             {
-                if (url == null)
-                    throw new Exception("Request.Url is null.");
-
-                var serverAddress = url.GetLeftPart(UriPartial.Authority);
-                var serverIdentity = JsonConvert.SerializeObject(new
-                {
-                    machineName = NetworkHelper.MachineName, 
-                    appDomainAppId = HttpRuntime.AppDomainAppId
-                });
-
-                svc.TouchServer(serverAddress, serverIdentity, options.StaleServerTimeout);
+                svc.TouchServer(serverAddress, svc.CurrentServerIdentity, _registrar.Options.StaleServerTimeout);
             }
             catch (Exception ex)
             {

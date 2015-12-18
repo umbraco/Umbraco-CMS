@@ -6,7 +6,8 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
-    [MapperFor(typeof(DomainRepository.CacheableDomain))]
+    [MapperFor(typeof(IDomain))]
+    [MapperFor(typeof(UmbracoDomain))]
     public sealed class DomainMapper : BaseMapper
     {
         private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
@@ -23,10 +24,10 @@ namespace Umbraco.Core.Persistence.Mappers
 
         protected override void BuildMap()
         {
-            CacheMap<DomainRepository.CacheableDomain, DomainDto>(src => src.Id, dto => dto.Id);
-            CacheMap<DomainRepository.CacheableDomain, DomainDto>(src => src.RootContentId, dto => dto.RootStructureId);
-            CacheMap<DomainRepository.CacheableDomain, DomainDto>(src => src.DefaultLanguageId, dto => dto.DefaultLanguage);
-            CacheMap<DomainRepository.CacheableDomain, DomainDto>(src => src.DomainName, dto => dto.DomainName);
+            CacheMap<UmbracoDomain, DomainDto>(src => src.Id, dto => dto.Id);
+            CacheMap<UmbracoDomain, DomainDto>(src => src.RootContentId, dto => dto.RootStructureId);
+            CacheMap<UmbracoDomain, DomainDto>(src => src.LanguageId, dto => dto.DefaultLanguage);
+            CacheMap<UmbracoDomain, DomainDto>(src => src.DomainName, dto => dto.DomainName);
         }
     }
 }

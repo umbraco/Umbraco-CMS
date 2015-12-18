@@ -16,7 +16,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.ImageCropperAlias, "Image Cropper", "imagecropper", ValueType = "JSON", HideLabel = false)]
+    [PropertyEditor(Constants.PropertyEditors.ImageCropperAlias, "Image Cropper", "imagecropper", ValueType = "JSON", HideLabel = false, Group="media", Icon="icon-crop")]
     public class ImageCropperPropertyEditor : PropertyEditor, IApplicationEventHandler
     {
         private readonly MediaFileSystem _mediaFileSystem;
@@ -35,6 +35,8 @@ namespace Umbraco.Web.PropertyEditors
                     {"focalPoint", "{left: 0.5, top: 0.5}"},
                     {"src", ""}
                 };
+            MemberService.Deleted += (sender, args) =>
+                args.MediaFilesToDelete.AddRange(ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
         }
 
         /// <summary>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -100,11 +101,15 @@ namespace Umbraco.Core.Manifest
             
             if (depth < 1)
             {
-                var dirs = currDir.GetDirectories();
                 var result = new List<string>();
-                foreach (var d in dirs)
+                if (currDir.Exists)
                 {
-                    result.AddRange(GetAllManifestFileContents(d));
+                    var dirs = currDir.GetDirectories();
+
+                    foreach (var d in dirs)
+                    {
+                        result.AddRange(GetAllManifestFileContents(d));
+                    }    
                 }
                 return result;
             }
@@ -140,11 +145,22 @@ namespace Umbraco.Core.Manifest
         {
             var result = new List<PackageManifest>();
             foreach (var m in manifestFileContents)
-            {
-                if (m.IsNullOrWhiteSpace()) continue;
+            { 
+                var manifestContent = m;
+
+                if (manifestContent.IsNullOrWhiteSpace()) continue;
+
+                // Strip byte object marker, JSON.NET does not like it
+                var preamble = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
+
+                // Strangely StartsWith(preamble) would always return true
+                if (manifestContent.Substring(0, 1) == preamble)
+                    manifestContent = manifestContent.Remove(0, preamble.Length);
+
+                if (manifestContent.IsNullOrWhiteSpace()) continue;
 
                 //remove any comments first
-                var replaced = CommentsSurround.Replace(m, match => " ");
+                var replaced = CommentsSurround.Replace(manifestContent, match => " ");
                 replaced = CommentsLine.Replace(replaced, match => "");
 
                 JObject deserialized;

@@ -44,12 +44,12 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                               {4, typeof (ContentVersionDto)},
                                                                               {5, typeof (DocumentDto)},
                                                                               
-                                                                              {6, typeof (DocumentTypeDto)},
+                                                                              {6, typeof (ContentTypeTemplateDto)},
                                                                               {7, typeof (DataTypeDto)},
                                                                               {8, typeof (DataTypePreValueDto)},
                                                                               {9, typeof (DictionaryDto)},
-                                                                              {10, typeof (LanguageTextDto)},
-                                                                              {11, typeof (LanguageDto)},
+                                                                              {10, typeof (LanguageDto)},
+                                                                              {11, typeof (LanguageTextDto)},
                                                                               {12, typeof (DomainDto)},
                                                                               {13, typeof (LogDto)},
                                                                               {14, typeof (MacroDto)},
@@ -68,7 +68,6 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                               {27, typeof (StylesheetPropertyDto)},
                                                                               {28, typeof (TagDto)},
                                                                               {29, typeof (TagRelationshipDto)},
-                                                                              {30, typeof (UserLoginDto)},
                                                                               {31, typeof (UserTypeDto)},
                                                                               {32, typeof (UserDto)},
                                                                               {33, typeof (TaskTypeDto)},
@@ -82,7 +81,10 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                                                                               {41, typeof (AccessDto)},
                                                                               {42, typeof (AccessRuleDto)},
                                                                               {43, typeof(CacheInstructionDto)},
-                                                                              {44, typeof (ExternalLoginDto)}
+                                                                              {44, typeof (ExternalLoginDto)},
+                                                                              {45, typeof (MigrationDto)},
+                                                                              {46, typeof (UmbracoDeployChecksumDto)},
+                                                                              {47, typeof (UmbracoDeployDependencyDto)}
                                                                           };
         #endregion
         

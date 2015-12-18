@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
 
@@ -15,15 +16,22 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets an <see cref="IMemberType"/> object by its Id
         /// </summary>
-        /// <param name="id">Id of the <see cref="IMediaType"/> to retrieve</param>
-        /// <returns><see cref="IMediaType"/></returns>
+        /// <param name="id">Id of the <see cref="IMemberType"/> to retrieve</param>
+        /// <returns><see cref="IMemberType"/></returns>
         IMemberType Get(int id);
+
+        /// <summary>
+        /// Gets an <see cref="IMemberType"/> object by its Key
+        /// </summary>
+        /// <param name="key">Key of the <see cref="IMemberType"/> to retrieve</param>
+        /// <returns><see cref="IMemberType"/></returns>
+        IMemberType Get(Guid key);
 
         /// <summary>
         /// Gets an <see cref="IMemberType"/> object by its Alias
         /// </summary>
-        /// <param name="alias">Alias of the <see cref="IMediaType"/> to retrieve</param>
-        /// <returns><see cref="IMediaType"/></returns>
+        /// <param name="alias">Alias of the <see cref="IMemberType"/> to retrieve</param>
+        /// <returns><see cref="IMemberType"/></returns>
         IMemberType Get(string alias);
 
         /// <summary>

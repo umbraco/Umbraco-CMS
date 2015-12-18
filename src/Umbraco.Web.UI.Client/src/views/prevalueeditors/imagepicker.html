@@ -11,4 +11,12 @@
                 <a href class="picked-image" ng-click="model.value = null" ng-show="model.value"><i class="icon icon-delete"></i></a>
         </li>
     </ul>
+
+    <umb-overlay
+      ng-if="mediaPickerDialog.show"
+      model="mediaPickerDialog"
+      view="mediaPickerDialog.view"
+      position="right">
+    </umb-overlay>
+
 </div>

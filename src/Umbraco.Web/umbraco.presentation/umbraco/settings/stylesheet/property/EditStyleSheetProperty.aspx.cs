@@ -45,7 +45,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
 
             var propName = IsPostBack ? OriginalName.Value : Request.QueryString["prop"];
 
-            _stylesheetproperty = _sheet.Properties.FirstOrDefault(x => x.Name == propName);
+            _stylesheetproperty = _sheet.Properties.FirstOrDefault(x => x.Name.InvariantEquals(propName));
             if (_stylesheetproperty == null) throw new InvalidOperationException("No stylesheet property found with name: " + Request.QueryString["prop"]);
 
             Panel1.Text = ui.Text("stylesheet", "editstylesheetproperty", UmbracoUser);

@@ -59,7 +59,7 @@ namespace Umbraco.Core.Media
                 var fileHeight = image.Height;
                 return new Size(fileWidth, fileHeight);
             }
-           
+
         }
 
         public static string GetMimeType(this Image image)
@@ -79,22 +79,22 @@ namespace Umbraco.Core.Media
         /// <param name="additionalThumbSizes"></param>
         /// <returns></returns>
         internal static IEnumerable<ResizedImage> GenerateMediaThumbnails(
-            IFileSystem fs, 
-            string fileName, 
-            string extension, 
+            IFileSystem fs,
+            string fileName,
+            string extension,
             Image originalImage,
             IEnumerable<int> additionalThumbSizes)
         {
 
             var result = new List<ResizedImage>();
 
-            var allSizesDictionary = new Dictionary<int,string> {{100,"thumb"}, {500,"big-thumb"}};
-            
+            var allSizesDictionary = new Dictionary<int, string> { { 100, "thumb" }, { 500, "big-thumb" } };
+
             //combine the static dictionary with the additional sizes with only unique values
             var allSizes = allSizesDictionary.Select(kv => kv.Key)
                 .Union(additionalThumbSizes.Where(x => x > 0).Distinct());
 
-            var sizesDictionary = allSizes.ToDictionary(s => s, s => allSizesDictionary.ContainsKey(s) ? allSizesDictionary[s]: "");
+            var sizesDictionary = allSizes.ToDictionary(s => s, s => allSizesDictionary.ContainsKey(s) ? allSizesDictionary[s] : "");
 
             foreach (var s in sizesDictionary)
             {
@@ -121,9 +121,9 @@ namespace Umbraco.Core.Media
         /// <returns></returns>
         private static ResizedImage Resize(IFileSystem fileSystem, string path, string extension, int maxWidthHeight, string fileNameAddition, Image originalImage)
         {
-            var fileNameThumb = String.IsNullOrEmpty(fileNameAddition)
-                                            ? string.Format("{0}_UMBRACOSYSTHUMBNAIL.jpg", path.Substring(0, path.LastIndexOf(".")))
-                                            : string.Format("{0}_{1}.jpg", path.Substring(0, path.LastIndexOf(".")), fileNameAddition);
+            var fileNameThumb = string.IsNullOrWhiteSpace(fileNameAddition)
+                                            ? string.Format("{0}_UMBRACOSYSTHUMBNAIL." + extension, path.Substring(0, path.LastIndexOf(".", StringComparison.Ordinal)))
+                                            : string.Format("{0}_{1}." + extension, path.Substring(0, path.LastIndexOf(".", StringComparison.Ordinal)), fileNameAddition);
 
             var thumb = GenerateThumbnail(
                 originalImage,
@@ -190,9 +190,9 @@ namespace Umbraco.Core.Media
                         //use best quality
                         g.InterpolationMode = InterpolationMode.HighQualityBicubic;
                     }
-                    
 
-                    g.SmoothingMode = SmoothingMode.HighQuality;                    
+
+                    g.SmoothingMode = SmoothingMode.HighQuality;
                     g.PixelOffsetMode = PixelOffsetMode.HighQuality;
                     g.CompositingQuality = CompositingQuality.HighQuality;
 
@@ -202,10 +202,29 @@ namespace Umbraco.Core.Media
 
                     // Copy metadata
                     var imageEncoders = ImageCodecInfo.GetImageEncoders();
-
-                    var codec = extension.ToLower() == "png" || extension.ToLower() == "gif"
-                        ? imageEncoders.Single(t => t.MimeType.Equals("image/png"))
-                        : imageEncoders.Single(t => t.MimeType.Equals("image/jpeg"));
+                    ImageCodecInfo codec;
+                    switch (extension.ToLower())
+                    {
+                        case "png":
+                            codec = imageEncoders.Single(t => t.MimeType.Equals("image/png"));
+                            break;
+                        case "gif":
+                            codec = imageEncoders.Single(t => t.MimeType.Equals("image/gif"));
+                            break;
+                        case "tif":
+                        case "tiff":
+                            codec = imageEncoders.Single(t => t.MimeType.Equals("image/tiff"));
+                            break;
+                        case "bmp":
+                            codec = imageEncoders.Single(t => t.MimeType.Equals("image/bmp"));
+                            break;
+                        // TODO: this is dirty, defaulting to jpg but the return value of this thing is used all over the
+                        // place so left it here, but it needs to not set a codec if it doesn't know which one to pick 
+                        // Note: when fixing this: both .jpg and .jpeg should be handled as extensions
+                        default:
+                            codec = imageEncoders.Single(t => t.MimeType.Equals("image/jpeg"));
+                            break;
+                    }
 
                     // Set compresion ratio to 90%
                     var ep = new EncoderParameters();
@@ -213,12 +232,14 @@ namespace Umbraco.Core.Media
 
                     // Save the new image using the dimensions of the image
                     var predictableThumbnailName = thumbnailFileName.Replace("UMBRACOSYSTHUMBNAIL", maxWidthHeight.ToString(CultureInfo.InvariantCulture));
+                    var predictableThumbnailNameJpg = predictableThumbnailName.Substring(0, predictableThumbnailName.LastIndexOf(".", StringComparison.Ordinal)) + ".jpg";
                     using (var ms = new MemoryStream())
                     {
                         bp.Save(ms, codec, ep);
                         ms.Seek(0, 0);
 
                         fs.AddFile(predictableThumbnailName, ms);
+                        fs.AddFile(predictableThumbnailNameJpg, ms);
                     }
 
                     // TODO: Remove this, this is ONLY here for backwards compatibility but it is essentially completely unusable see U4-5385

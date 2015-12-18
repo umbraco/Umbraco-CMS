@@ -53,7 +53,7 @@ namespace Umbraco.Tests.UmbracoExamine
 		public void Index_Move_Media_From_Non_Indexable_To_Indexable_ParentID()
 		{
 			//change parent id to 1116
-			var existingCriteria = ((IndexCriteria)_indexer.IndexerData);
+			var existingCriteria = _indexer.IndexerData;
 			_indexer.IndexerData = new IndexCriteria(existingCriteria.StandardFields, existingCriteria.UserFields, existingCriteria.IncludeNodeTypes, existingCriteria.ExcludeNodeTypes,
 				1116);
 			
@@ -110,7 +110,7 @@ namespace Umbraco.Tests.UmbracoExamine
 			_indexer.ReIndexNode(node, IndexTypes.Media);
 
 			//change the parent node id to be the one it used to exist under
-			var existingCriteria = ((IndexCriteria)_indexer.IndexerData);
+			var existingCriteria = _indexer.IndexerData;
 			_indexer.IndexerData = new IndexCriteria(existingCriteria.StandardFields, existingCriteria.UserFields, existingCriteria.IncludeNodeTypes, existingCriteria.ExcludeNodeTypes,
 				2222);
 

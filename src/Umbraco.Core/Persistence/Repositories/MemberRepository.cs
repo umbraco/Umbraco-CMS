@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
@@ -19,7 +20,6 @@ using Umbraco.Core.Persistence.Relators;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Dynamics;
-using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -34,16 +34,16 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ContentXmlRepository<IMember> _contentXmlRepository;
         private readonly ContentPreviewRepository<IMember> _contentPreviewRepository;
 
-        public MemberRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository, IMappingResolver mappingResolver)
-            : base(work, cache, logger, sqlSyntax, mappingResolver)
+        public MemberRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository, IContentSection contentSection)
+            : base(work, cache, logger, sqlSyntax, contentSection)
         {
             if (memberTypeRepository == null) throw new ArgumentNullException("memberTypeRepository");
             if (tagRepository == null) throw new ArgumentNullException("tagRepository");
             _memberTypeRepository = memberTypeRepository;
             _tagRepository = tagRepository;
             _memberGroupRepository = memberGroupRepository;
-            _contentXmlRepository = new ContentXmlRepository<IMember>(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax, mappingResolver);
-            _contentPreviewRepository = new ContentPreviewRepository<IMember>(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax, mappingResolver);
+            _contentXmlRepository = new ContentXmlRepository<IMember>(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax);
+            _contentPreviewRepository = new ContentPreviewRepository<IMember>(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax);
         }
 
         #region Overrides of RepositoryBase<int, IMembershipUser>
@@ -52,7 +52,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
-            sql.OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate);
+            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
 
             var dto = Database.Fetch<MemberDto, ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
 
@@ -93,7 +93,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 var sql = translator.Translate();
 
                 baseQuery.Append(new Sql("WHERE umbracoNode.id IN (" + sql.SQL + ")", sql.Arguments))
-                    .OrderBy<NodeDto>(SqlSyntax, x => x.SortOrder);
+                    .OrderBy<NodeDto>(x => x.SortOrder);
 
                 return ProcessQuery(baseQuery);    
             }
@@ -101,7 +101,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 var translator = new SqlTranslator<IMember>(baseQuery, query);
                 var sql = translator.Translate()
-                    .OrderBy<NodeDto>(SqlSyntax, x => x.SortOrder);
+                    .OrderBy<NodeDto>(x => x.SortOrder);
 
                 return ProcessQuery(sql);    
             }
@@ -116,19 +116,18 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*")
-                .From<MemberDto>(SqlSyntax)
-                .InnerJoin<ContentVersionDto>(SqlSyntax)
-                .On<ContentVersionDto, MemberDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)                
-                .InnerJoin<ContentDto>(SqlSyntax)
-                .On<ContentVersionDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .From<MemberDto>()
+                .InnerJoin<ContentVersionDto>()
+                .On<ContentVersionDto, MemberDto>(left => left.NodeId, right => right.NodeId)                
+                .InnerJoin<ContentDto>()
+                .On<ContentVersionDto, ContentDto>(left => left.NodeId, right => right.NodeId)
                 //We're joining the type so we can do a query against the member type - not sure if this adds much overhead or not?
                 // the execution plan says it doesn't so we'll go with that and in that case, it might be worth joining the content
                 // types by default on the document and media repo's so we can query by content type there too.
-                .InnerJoin<ContentTypeDto>(SqlSyntax)
-                .On<ContentTypeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.ContentTypeId)
-                .InnerJoin<NodeDto>(SqlSyntax)
-                .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
+                .InnerJoin<ContentTypeDto>().On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
+                .InnerJoin<NodeDto>()
+                .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
 
         }
@@ -142,16 +141,16 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = new Sql();
             sql.Select("DISTINCT(umbracoNode.id)")
-                .From<NodeDto>(SqlSyntax)
-                .InnerJoin<ContentDto>(SqlSyntax).On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .InnerJoin<ContentTypeDto>(SqlSyntax).On<ContentTypeDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.ContentTypeId)
-                .InnerJoin<ContentVersionDto>(SqlSyntax).On<ContentVersionDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .InnerJoin<MemberDto>(SqlSyntax).On<MemberDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .LeftJoin<PropertyTypeDto>(SqlSyntax).On<PropertyTypeDto, ContentDto>(SqlSyntax, left => left.ContentTypeId, right => right.ContentTypeId)
-                .LeftJoin<DataTypeDto>(SqlSyntax).On<DataTypeDto, PropertyTypeDto>(SqlSyntax, left => left.DataTypeId, right => right.DataTypeId)
-                .LeftJoin<PropertyDataDto>(SqlSyntax).On<PropertyDataDto, PropertyTypeDto>(SqlSyntax, left => left.PropertyTypeId, right => right.Id)
+                .From<NodeDto>()
+                .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .InnerJoin<ContentTypeDto>().On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
+                .InnerJoin<ContentVersionDto>().On<ContentVersionDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                .InnerJoin<MemberDto>().On<MemberDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+                .LeftJoin<PropertyTypeDto>().On<PropertyTypeDto, ContentDto>(left => left.ContentTypeId, right => right.ContentTypeId)
+                .LeftJoin<DataTypeDto>().On<DataTypeDto, PropertyTypeDto>(left => left.DataTypeId, right => right.DataTypeId)
+                .LeftJoin<PropertyDataDto>().On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
                 .Append("AND cmsPropertyData.versionId = cmsContentVersion.VersionId")
-                .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
         }
 
@@ -375,36 +374,6 @@ namespace Umbraco.Core.Persistence.Repositories
             dirtyEntity.ResetDirtyProperties();
         }
 
-        protected override void PersistDeletedItem(IMember entity)
-        {
-            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
-            var uploadFieldAlias = Constants.PropertyEditors.UploadFieldAlias;
-            //Loop through properties to check if the media item contains images/file that should be deleted
-            foreach (var property in ((Member)entity).Properties)
-            {
-                if (property.PropertyType.PropertyEditorAlias == uploadFieldAlias &&
-                    string.IsNullOrEmpty(property.Value.ToString()) == false
-                    && fs.FileExists(fs.GetRelativePath(property.Value.ToString())))
-                {
-                    var relativeFilePath = fs.GetRelativePath(property.Value.ToString());
-                    var parentDirectory = System.IO.Path.GetDirectoryName(relativeFilePath);
-
-                    // don't want to delete the media folder if not using directories.
-                    if (UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories && parentDirectory != fs.GetRelativePath("/"))
-                    {
-                        //issue U4-771: if there is a parent directory the recursive parameter should be true
-                        fs.DeleteDirectory(parentDirectory, String.IsNullOrEmpty(parentDirectory) == false);
-                    }
-                    else
-                    {
-                        fs.DeleteFile(relativeFilePath, true);
-                    }
-                }
-            }
-
-            base.PersistDeletedItem(entity);
-        }
-
         #endregion
 
         #region Overrides of VersionableRepositoryBase<IMembershipUser>
@@ -421,10 +390,10 @@ namespace Umbraco.Core.Persistence.Repositories
                     var memberObjectType = Guid.Parse(Constants.ObjectTypes.Member);
                     var subQuery = new Sql()
                         .Select("DISTINCT cmsContentXml.nodeId")
-                        .From<ContentXmlDto>(SqlSyntax)
-                        .InnerJoin<NodeDto>(SqlSyntax)
-                        .On<ContentXmlDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                        .Where<NodeDto>(SqlSyntax, dto => dto.NodeObjectType == memberObjectType);
+                        .From<ContentXmlDto>()
+                        .InnerJoin<NodeDto>()
+                        .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                        .Where<NodeDto>(dto => dto.NodeObjectType == memberObjectType);
 
                     var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
                     Database.Execute(deleteSql);
@@ -437,13 +406,13 @@ namespace Umbraco.Core.Persistence.Repositories
                         var memberObjectType = Guid.Parse(Constants.ObjectTypes.Member);
                         var subQuery = new Sql()
                             .Select("DISTINCT cmsContentXml.nodeId")
-                            .From<ContentXmlDto>(SqlSyntax)
-                            .InnerJoin<NodeDto>(SqlSyntax)
-                            .On<ContentXmlDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                            .InnerJoin<ContentDto>(SqlSyntax)
-                            .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                            .Where<NodeDto>(SqlSyntax, dto => dto.NodeObjectType == memberObjectType)
-                            .Where<ContentDto>(SqlSyntax, dto => dto.ContentTypeId == id1);
+                            .From<ContentXmlDto>()
+                            .InnerJoin<NodeDto>()
+                            .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                            .InnerJoin<ContentDto>()
+                            .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                            .Where<NodeDto>(dto => dto.NodeObjectType == memberObjectType)
+                            .Where<ContentDto>(dto => dto.ContentTypeId == id1);
 
                         var deleteSql = SqlSyntax.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
                         Database.Execute(deleteSql);
@@ -453,7 +422,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 //now insert the data, again if something fails here, the whole transaction is reversed
                 if (contentTypeIds == null)
                 {
-                    var query = Query;
+                    var query = Query<IMember>.Builder;
                     RebuildXmlStructuresProcessQuery(serializer, query, tr, groupSize);
                 }
                 else
@@ -462,7 +431,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     {
                         //copy local
                         var id = contentTypeId;
-                        var query = Query.Where(x => x.ContentTypeId == id && x.Trashed == false);
+                        var query = Query<IMember>.Builder.Where(x => x.ContentTypeId == id && x.Trashed == false);
                         RebuildXmlStructuresProcessQuery(serializer, query, tr, groupSize);
                     }
                 }
@@ -482,10 +451,10 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 var xmlItems = (from descendant in descendants
                                 let xml = serializer(descendant)
-                                select new ContentXmlDto { NodeId = descendant.Id, Xml = xml.ToString(SaveOptions.None) }).ToArray();
+                                select new ContentXmlDto { NodeId = descendant.Id, Xml = xml.ToDataString() }).ToArray();
 
                 //bulk insert it into the database
-                Database.BulkInsertRecords(SqlSyntax, xmlItems, tr);
+                Database.BulkInsertRecords(xmlItems, tr);
 
                 processed += xmlItems.Length;
 
@@ -497,7 +466,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = GetBaseQuery(false);
             sql.Where("cmsContentVersion.VersionId = @VersionId", new { VersionId = versionId });
-            sql.OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate);
+            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
 
             var dto = Database.Fetch<MemberDto, ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
 
@@ -532,12 +501,12 @@ namespace Umbraco.Core.Persistence.Repositories
         public IEnumerable<IMember> FindMembersInRole(string roleName, string usernameToMatch, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
             //get the group id
-            var grpQry = QueryFactory.Create<IMemberGroup>().Where(group => group.Name.Equals(roleName));
+            var grpQry = new Query<IMemberGroup>().Where(group => group.Name.Equals(roleName));
             var memberGroup = _memberGroupRepository.GetByQuery(grpQry).FirstOrDefault();
             if (memberGroup == null) return Enumerable.Empty<IMember>();
 
             // get the members by username
-            var query = QueryFactory.Create<IMember>();
+            var query = new Query<IMember>();
             switch (matchType)
             {
                 case StringPropertyMatchType.Exact:
@@ -567,8 +536,8 @@ namespace Umbraco.Core.Persistence.Repositories
             foreach (var batch in inGroups)
             {
                 var memberIdBatch = batch.Select(x => x.Id);
-                var sql = new Sql().Select("*").From<Member2MemberGroupDto>(SqlSyntax)
-                    .Where<Member2MemberGroupDto>(SqlSyntax, dto => dto.MemberGroup == memberGroup.Id)
+                var sql = new Sql().Select("*").From<Member2MemberGroupDto>()
+                    .Where<Member2MemberGroupDto>(dto => dto.MemberGroup == memberGroup.Id)
                     .Where("Member IN (@memberIds)", new { memberIds = memberIdBatch });
                 var memberIdsInGroup = Database.Fetch<Member2MemberGroupDto>(sql)
                     .Select(x => x.Member).ToArray();
@@ -587,19 +556,18 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public IEnumerable<IMember> GetByMemberGroup(string groupName)
         {
-            var grpQry = QueryFactory.Create<IMemberGroup>().Where(group => group.Name.Equals(groupName));
+            var grpQry = new Query<IMemberGroup>().Where(group => group.Name.Equals(groupName));
             var memberGroup = _memberGroupRepository.GetByQuery(grpQry).FirstOrDefault();
             if (memberGroup == null) return Enumerable.Empty<IMember>();
             
-            var subQuery = new Sql().Select("Member").From<Member2MemberGroupDto>(SqlSyntax)
-                .Where<Member2MemberGroupDto>(SqlSyntax, dto => dto.MemberGroup == memberGroup.Id);
+            var subQuery = new Sql().Select("Member").From<Member2MemberGroupDto>().Where<Member2MemberGroupDto>(dto => dto.MemberGroup == memberGroup.Id);
 
             var sql = GetBaseQuery(false)
                 //TODO: An inner join would be better, though I've read that the query optimizer will always turn a
                 // subquery with an IN clause into an inner join anyways.
                 .Append(new Sql("WHERE umbracoNode.id IN (" + subQuery.SQL + ")", subQuery.Arguments))
-                .OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate)
-                .OrderBy<NodeDto>(SqlSyntax, x => x.SortOrder);
+                .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
+                .OrderBy<NodeDto>(x => x.SortOrder);
             
             return ProcessQuery(sql);
 
@@ -610,8 +578,8 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = new Sql();
 
             sql.Select("COUNT(*)")
-                .From<MemberDto>(SqlSyntax)
-                .Where<MemberDto>(SqlSyntax, x => x.LoginName == username);
+                .From<MemberDto>()
+                .Where<MemberDto>(x => x.LoginName == username);
 
             return Database.ExecuteScalar<int>(sql) > 0;
         }
@@ -706,8 +674,10 @@ namespace Umbraco.Core.Persistence.Repositories
             //NOTE: This doesn't allow properties to be part of the query
             var dtos = Database.Fetch<MemberDto, ContentVersionDto, ContentDto, NodeDto>(sql);
 
+            var ids = dtos.Select(x => x.ContentVersionDto.ContentDto.ContentTypeId).ToArray();
+
             //content types
-            var contentTypes = _memberTypeRepository.GetAll(dtos.Select(x => x.ContentVersionDto.ContentDto.ContentTypeId).ToArray()).ToArray();
+            var contentTypes = ids.Length == 0 ? Enumerable.Empty<IMemberType>() : _memberTypeRepository.GetAll(ids).ToArray();
 
             var dtosWithContentTypes = dtos
                 //This select into and null check are required because we don't have a foreign damn key on the contentType column
@@ -794,5 +764,6 @@ namespace Umbraco.Core.Persistence.Repositories
             _contentXmlRepository.Dispose();
             _contentPreviewRepository.Dispose();
         }
+
     }
 }

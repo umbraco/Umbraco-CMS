@@ -15,19 +15,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     {
         public SqlCeSyntaxProvider()
         {
-            StringLengthColumnDefinitionFormat = StringLengthUnicodeColumnDefinitionFormat;
-            StringColumnDefinition = string.Format(StringLengthColumnDefinitionFormat, DefaultStringLength);
-
-            AutoIncrementDefinition = "IDENTITY(1,1)";
-            StringColumnDefinition = "NVARCHAR(255)";
-            GuidColumnDefinition = "UniqueIdentifier";
-            RealColumnDefinition = "FLOAT";
-            BoolColumnDefinition = "BIT";
-            DecimalColumnDefinition = "DECIMAL(38,6)";
-            TimeColumnDefinition = "TIME"; //SQLSERVER 2008+
-            BlobColumnDefinition = "VARBINARY(MAX)";
-
-            InitColumnTypeMap();
+            
         }
 
         public override bool SupportsClustered()
@@ -197,13 +185,13 @@ ORDER BY TABLE_NAME, INDEX_NAME");
             switch (systemMethod)
             {
                 case SystemMethods.NewGuid:
-                    return "NEWID()";
-                case SystemMethods.NewSequentialId:
-                    return "NEWSEQUENTIALID()";
+                    return "NEWID()";                
                 case SystemMethods.CurrentDateTime:
                     return "GETDATE()";
-                case SystemMethods.CurrentUTCDateTime:
-                    return "GETUTCDATE()";
+                //case SystemMethods.NewSequentialId:
+                //    return "NEWSEQUENTIALID()";
+                //case SystemMethods.CurrentUTCDateTime:
+                //    return "GETUTCDATE()";
             }
 
             return null;

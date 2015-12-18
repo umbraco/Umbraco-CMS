@@ -4,10 +4,11 @@ using Umbraco.Core;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Web.WebApi;
+using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.WebServices
 {
-
+    [ValidateAngularAntiForgeryToken]
     public class XmlDataIntegrityController : UmbracoAuthorizedApiController
     {
         [HttpPost]

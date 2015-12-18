@@ -152,10 +152,26 @@ namespace Umbraco.Web.WebApi.Filters
 
                 if (p.ValidationRegExp.IsNullOrWhiteSpace() == false)
                 {
-                    foreach (var result in p.PropertyEditor.ValueEditor.RegexValidator.Validate(postedValue, p.ValidationRegExp, preValues, editor))
+
+                    //We only want to execute the regex statement if:
+                    // * the value is null or empty AND it is required OR
+                    // * the value is not null or empty
+                    //See: http://issues.umbraco.org/issue/U4-4669
+
+                    var asString = postedValue as string;
+
+                    if (
+                        //Value is not null or empty
+                        (postedValue != null && asString.IsNullOrWhiteSpace() == false)
+                        //It's required
+                        || (p.IsRequired))
                     {
-                        actionContext.ModelState.AddPropertyError(result, p.Alias);
+                        foreach (var result in p.PropertyEditor.ValueEditor.RegexValidator.Validate(postedValue, p.ValidationRegExp, preValues, editor))
+                        {
+                            actionContext.ModelState.AddPropertyError(result, p.Alias);
+                        }
                     }
+                    
                 }
             }
 
