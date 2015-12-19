@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<language alias="de" intName="German" localName="Deutsch" lcid="7" culture="de-DE">
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<language alias="de" intName="German (DE)" localName="Deutsch (DE)" lcid="7" culture="de-DE">
   <creator>
     <name>The Umbraco community</name>
     <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
@@ -8,7 +8,7 @@
     <key alias="assignDomain">Hostnamen verwalten</key>
     <key alias="auditTrail">Protokoll</key>
     <key alias="browse">Durchsuchen</key>
-		<key alias="changeDocType">Dokumententyp ändern</key>
+    <key alias="changeDocType">Dokumenttyp ändern</key>
     <key alias="copy">Kopieren</key>
     <key alias="create">Erstellen</key>
     <key alias="createPackage">Paket erstellen</key>
@@ -24,9 +24,10 @@
     <key alias="notify">Benachrichtigungen</key>
     <key alias="protect">Öffentlicher Zugriff</key>
     <key alias="publish">Veröffentlichen</key>
-		<key alias="unpublish">Veröffentlichung zurück nehmen</key>
+    <key alias="unpublish">Veröffentlichung zurücknehmen</key>
     <key alias="refreshNode">Aktualisieren</key>
     <key alias="republish">Erneut veröffentlichen</key>
+    <key alias="restore" version="7.3.0">Wiederherstellen</key>
     <key alias="rights">Berechtigungen</key>
     <key alias="rollback">Zurücksetzen</key>
     <key alias="sendtopublish">Zur Veröffentlichung einreichen</key>
@@ -35,15 +36,15 @@
     <key alias="toPublish">Zur Veröffentlichung einreichen</key>
     <key alias="translate">Übersetzen</key>
     <key alias="update">Aktualisieren</key>
-    <key alias="defaultValue">Standard Wert</key>
+    <key alias="defaultValue">Standardwert</key>
   </area>
   <area alias="assignDomain">
-  	<key alias="permissionDenied">Zugriff verweigert</key>
+    <key alias="permissionDenied">Erlaubnis verweigert.</key>
     <key alias="addNew">Neue Domain hinzufügen</key>
-    <key alias="remove">Entfernen</key>
-    <key alias="invalidNode">Ungültiges Element</key>
-    <key alias="invalidDomain">Format der Domain ungültig</key>
-    <key alias="duplicateDomain">Die Domain ist bereits zugeordnet</key>
+    <key alias="remove">entfernen</key>
+    <key alias="invalidNode">Ungültiges Element.</key>
+    <key alias="invalidDomain">Format der Domain ungültig.</key>
+    <key alias="duplicateDomain">Domain wurde bereits zugewiesen.</key>
     <key alias="language">Sprache</key>
     <key alias="domain">Domain</key>
     <key alias="domainCreated">Domain '%0%' hinzugefügt</key>
@@ -51,23 +52,20 @@
     <key alias="domainExists">Die Domain '%0%' ist bereits zugeordnet</key>
     <key alias="domainUpdated">Domain '%0%' aktualisiert</key>
     <key alias="orEdit">Domains bearbeiten</key>
-		<key alias="domainHelp"><![CDATA[Gültige Domainnamen sind: "example.com", "www.example.com", "example.com:8080" oder
-        "https://www.example.com/".<br /><br />1-Level Pfade in Domains werden unterstützt, z.B. "example.com/en". Diese sollten aber nach Möglichkeit vermieden werden. Besser sollten 
-		die Sprachkultur-Einstellungen verwendet werden.]]></key>
+    <key alias="domainHelp">Beispiel: example.com, www.example.com</key>
     <key alias="inherit">Vererben</key>
-    <key alias="setLanguage">Sprachkultur</key>
-    <key alias="setLanguageHelp">Definiert die Sprachkultureinstellung für untergeordnete Elemente dieses Elements oder vererbt vom übergeordneten Element. Wird auch auf das aktuelle Element angewendet, sofern auf tieferer Ebene keine Domain zugeordnet ist.</key>
-	
-		<key alias="setDomains">Domains</key>
-</area>
+    <key alias="setLanguage">Kultur</key>
+    <key alias="setLanguageHelp">Definiert die Kultureinstellung für untergeordnete Elemente dieses Elements oder vererbt vom übergeordneten Element. Wird auch auf das aktuelle Element angewendet, sofern auf tieferer Ebene keine Domain zugeordnet ist.</key>
+    <key alias="setDomains">Domains</key>
+  </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Ansicht für</key>
   </area>
   <area alias="buttons">
     <key alias="select">Auswählen</key>
-		<key alias="selectCurrentFolder">Verzeichnis wählen</key>
-		<key alias="somethingElse">Etwas anders machen</key>
-		<key alias="bold">Fett</key>
+    <key alias="selectCurrentFolder">Aktuellen Ordner auswählen</key>
+    <key alias="somethingElse">Etwas anderes machen</key>
+    <key alias="bold">Fett</key>
     <key alias="deindent">Ausrücken</key>
     <key alias="formFieldInsert">Formularelement einfügen</key>
     <key alias="graphicHeadline">Graphische Überschrift einfügen</key>
@@ -82,37 +80,37 @@
     <key alias="listBullet">Aufzählung</key>
     <key alias="listNumeric">Nummerierung</key>
     <key alias="macroInsert">Makro einfügen</key>
-    <key alias="pictureInsert">Bild einfügen</key>
+    <key alias="pictureInsert">Abbildung einfügen</key>
     <key alias="relations">Datenbeziehungen bearbeiten</key>
-		<key alias="returnToList">Zürück zur Übersicht</key>
+    <key alias="returnToList">Zurück zur Liste</key>
     <key alias="save">Speichern</key>
     <key alias="saveAndPublish">Speichern und veröffentlichen</key>
     <key alias="saveToPublish">Speichern und zur Abnahme übergeben</key>
     <key alias="showPage">Vorschau</key>
-		<key alias="showPageDisabled">Die Vorschaufunktion ist deaktiviert, da keine Vorlage zugewiesen ist</key>
+    <key alias="showPageDisabled">Die Vorschaufunktion ist deaktiviert, da keine Vorlage zugewiesen ist</key>
     <key alias="styleChoose">Stil auswählen</key>
     <key alias="styleShow">Stil anzeigen</key>
     <key alias="tableInsert">Tabelle einfügen</key>
   </area>
   <area alias="changeDocType">
-    <key alias="changeDocTypeInstruction">Um einen Dokumententyp zu ändern muss zunächst ein gültiger Dokumententyp in der Liste für diesen Inhalt ausgewählt werden.</key>
-    <key alias="changeDocTypeInstruction2">Danach muss die Zuweisung der Eigenschaften vom aktuellen zum neuen Dokumententyp bestätigt und/oder geändert werden und auf Speichern geklickt werden.</key>
+    <key alias="changeDocTypeInstruction">Um den Typ des ausgewählten Dokuments zu ändern, wählen Sie bitte zunächst aus der Liste der an dieser Stelle erlaubten Dokumenttypen.</key>
+    <key alias="changeDocTypeInstruction2">Im Anschluss bestätigen oder korrigieren Sie die Zuordnung der Eigenschaften und klicken Sie auf 'Speichern'.</key>
     <key alias="contentRepublished">Der Inhalt wurde neu veröffentlicht.</key>
-    <key alias="currentProperty">Aktuelle Eigenschaft</key>
-    <key alias="currentType">Aktueller Doumententyp</key>
-    <key alias="docTypeCannotBeChanged">Der Dokumententyp kann nicht geändert werden, da es keine alternativen gültigen Eigenschaften für dieses Dokument gibt.  Eine Alternative wird gültig sein, wenn es unter dem übergeordenten Knoten des ausgewählten Dokuments erlaubt ist und alle bestehenden untergeordneten Dokumente unter diesem erstellt werden dürfen.</key>
-    <key alias="docTypeChanged">Dokumententyp ändern</key>
-    <key alias="mapProperties">Eigenschaften zuweisen</key>
-    <key alias="mapToProperty">Zu Eigenschaft zuweisen</key>
+    <key alias="currentProperty">Derzeitige Eigenschaft</key>
+    <key alias="currentType">Derzeitiger Datentyp</key>
+    <key alias="docTypeCannotBeChanged">Der Typ dieses Dokuments kann nicht geändert werden, da an dieser Stelle keine Alternativen zugelassen sind. Ein alternativer Dokumenttyp kann nur dann verwendet werden, wenn er unterhalb des diesem Dokument übergeordneten Elements angelegt werden darf.</key>
+    <key alias="docTypeChanged">Dokumenttyp geändert</key>
+    <key alias="mapProperties">Eigenschaften zuordnen</key>
+    <key alias="mapToProperty">Dieser Eigenschaft zuordnen</key>
     <key alias="newTemplate">Neue Vorlage</key>
-    <key alias="newType">Neue Eigenschaft</key>
-    <key alias="none">keine</key>
+    <key alias="newType">Neuer Typ</key>
+    <key alias="none">keiner</key>
     <key alias="selectedContent">Inhalt</key>
-    <key alias="selectNewDocType">Neuen Dokumententyp auswählen</key>
-    <key alias="successMessage">Der Dokumententyp des ausgewählten Dokuments wurde erfolgreich geändert zu [new type] und zu folgenden Eigenschaften zugewiesen:</key>
-    <key alias="to">zu</key>
-    <key alias="validationErrorPropertyWithMoreThanOneMapping">Zuweisung der Eigenschaft konnte nicht abgeschlossen werden, weil es eine oder mehr Eigenschaften mehr gibt als für eine Zuweisung definiert wurden.</key>
-    <key alias="validDocTypesNote">Nur wecheselnde Eigenschaften sind gültig für das aktuell angezeigte Dokument.</key>
+    <key alias="selectNewDocType">Neuen Dokumenttyp auswählen</key>
+    <key alias="successMessage">Der Typ des ausgewählten Dokuments wurde erfolgreich zu [new type] geändert und die Eigenschaften wie folgend zugeordnet:</key>
+    <key alias="to">nach</key>
+    <key alias="validationErrorPropertyWithMoreThanOneMapping">Die Zuordnung der Eigenschaften kann nicht abgeschlossen werden, da mindestens eine Eigenschaft mehrfach zugeordnet werden soll.</key>
+    <key alias="validDocTypesNote">Nur an dieser Stelle erlaubte Dokumenttypen werden angezeigt.</key>
   </area>
   <area alias="content">
     <key alias="isPublished" version="7.2">Ist veröffentlicht</key>
@@ -122,19 +120,19 @@
     <key alias="alternativeUrls">Alternative Links</key>
     <key alias="clickToEdit">Klicken, um das Dokument zu bearbeiten</key>
     <key alias="createBy">Erstellt von</key>
-	<key alias="createByDesc" version="7.0">Ursprünglicher Author</key>
-    <key alias="updatedBy" version="7.0">Geändert von</key>
+    <key alias="createByDesc" version="7.0">Ursprünglicher Autor</key>
+    <key alias="updatedBy" version="7.0">Aktualisiert von</key>
     <key alias="createDate">Erstellt am</key>
-	<key alias="createDateDesc" version="7.0">Erstellungszeitpunkt des Dokuments</key>
+    <key alias="createDateDesc" version="7.0">Erstellungszeitpunkt des Dokuments</key>
     <key alias="documentType">Dokumenttyp</key>
     <key alias="editing">In Bearbeitung</key>
     <key alias="expireDate">Veröffentlichung aufheben am</key>
     <key alias="itemChanged">Dieses Dokument wurde nach dem Veröffentlichen bearbeitet.</key>
     <key alias="itemNotPublished">Dieses Dokument ist nicht veröffentlicht.</key>
     <key alias="lastPublished">Zuletzt veröffentlicht</key>
-	<key alias="listViewNoItems" version="7.1.5">Es gibt keine anzeigbaren Elemente in dieser Liste.</key>
+    <key alias="listViewNoItems" version="7.1.5">Diese Liste enthält keine Einträge.</key>
     <key alias="mediatype">Medientyp</key>
-    <key alias="mediaLinks">Link zu Medienobjekt(en)</key>
+    <key alias="mediaLinks">Verweis auf Medienobjekt(e)</key>
     <key alias="membergroup">Mitgliedergruppe</key>
     <key alias="memberrole">Mitgliederrolle</key>
     <key alias="membertype">Mitglieder-Typ</key>
@@ -142,38 +140,42 @@
     <key alias="nodeName">Name des Dokument</key>
     <key alias="otherElements">Eigenschaften</key>
     <key alias="parentNotPublished">Dieses Dokument ist veröffentlicht aber nicht sichtbar, da das übergeordnete Dokument '%0%' nicht publiziert ist</key>
-	<key alias="parentNotPublishedAnomaly">Ups! Dieses Dokument ist veröffentlicht, aber befindet sich nicht im internen Cache (Systemfehler)</key>
+    <key alias="parentNotPublishedAnomaly">Ups! Dieses Dokument ist veröffentlicht aber nicht im internen Cache aufzufinden: Systemfehler.</key>
     <key alias="publish">Veröffentlichen</key>
     <key alias="publishStatus">Publikationsstatus</key>
     <key alias="releaseDate">Veröffentlichen am</key>
-   	<key alias="unpublishDate">Veröffentlichung aufheben am</key>
+    <key alias="unpublishDate">Veröffentlichung widerrufen am</key>
     <key alias="removeDate">Datum entfernen</key>
     <key alias="sortDone">Sortierung abgeschlossen</key>
     <key alias="sortHelp">Um die Dokumente zu sortieren, ziehen Sie sie einfach an die gewünschte Position. Sie können mehrere Zeilen markieren indem Sie die Umschalttaste ("Shift") oder die Steuerungstaste ("Strg") gedrückt halten</key>
     <key alias="statistics">Statistiken</key>
     <key alias="titleOptional">Titel (optional)</key>
-    <key alias="altTextOptional">Alternativer Text (optional)</key>
+    <key alias="altTextOptional">Alternativtext (optional)</key>
     <key alias="type">Typ</key>
-    <key alias="unPublish">Veröffentlichung zurück nehmen</key>
+    <key alias="unPublish">Veröffentlichung widerrufen</key>
     <key alias="updateDate">Zuletzt bearbeitet am</key>
     <key alias="updateDateDesc" version="7.0">Letzter Änderungszeitpunkt des Dokuments</key>
     <key alias="uploadClear">Datei entfernen</key>
     <key alias="urls">Link zum Dokument</key>
     <key alias="memberof">Mitglied der Gruppe(n)</key>
     <key alias="notmemberof">Kein Mitglied der Gruppe(n)</key>
-    <key alias="childItems">Untergeordnete Elemente</key>
-	 <key alias="target" version="7.0">Ziel</key>
+    <key alias="childItems" version="7.0">Untergeordnete Elemente</key>
+    <key alias="target" version="7.0">Ziel</key>
   </area>
- <area alias="media">
-    <key alias="clickToUpload">Klicken zum Hochladen</key>
-    <key alias="dropFilesHere">Dateien hierher ziehen...</key>
+  <area alias="media">
+    <key alias="clickToUpload">Für Upload klicken</key>
+    <key alias="dropFilesHere">Dateien hier fallen lassen ...</key>
+  </area>
+  <area alias="member">
+    <key alias="createNewMember">Neues Mitglied anlegen</key>
+    <key alias="allMembers">Alle Mitglieder</key>
   </area>
   <area alias="create">
     <key alias="chooseNode">An welcher Stellen wollen Sie das Element erstellen</key>
     <key alias="createUnder">Erstellen unter</key>
     <key alias="updateData">Wählen Sie einen Namen und einen Typ</key>
-    <key alias="noDocumentTypes">Es stehen keine erlaubten Dokumenttypen zur Verfügung. Sie müssen diese in den Einstellungen (unter "Dokumenttypen") aktivieren.</key>
-    <key alias="noMediaTypes">Es stehen keine erlaubten Medientypen zur Verfügung. Sie müssen diese in den Einstellungen (unter "Medientypen") aktivieren.</key>
+    <key alias="noDocumentTypes" version="7.0">Es stehen keine erlaubten Dokumenttypen zur Verfügung. Sie müssen diese in den Einstellungen (unter "Dokumenttypen") aktivieren.</key>
+    <key alias="noMediaTypes" version="7.0">Es stehen keine erlaubten Medientypen zur Verfügung. Sie müssen diese in den Einstellungen (unter "Medientypen") aktivieren.</key>
   </area>
   <area alias="dashboard">
     <key alias="browser">Website anzeigen</key>
@@ -232,24 +234,22 @@
   </area>
   <area alias="dictionaryItem">
     <key alias="description">Bearbeiten Sie nachfolgend die verschiedenen Sprachversionen für den Wörterbucheintrag '&lt;em&gt;%0%&lt;/em&gt;'. &lt;br/&gt;Unter dem links angezeigten Menüpunkt 'Sprachen' können Sie weitere hinzufügen.</key>
-    <key alias="displayName">Name der Sprachkultur</key>
-</area>
-
-
-<area alias="placeholders">
-<key alias="username">Benutzername eingeben</key>
-    <key alias="password">Passwort eingeben</key>
-    <key alias="nameentity">Benenne %0%...</key>
-    <key alias="entername">Name eingeben...</key>
-    <key alias="search">Suchbegriff eingeben...</key>
-    <key alias="filter">Tippen zum Filtern...</key>
-    <key alias="enterTags">Tippen für Schlagworte hinzuzufügen (drücke Enter nach jedem Schlagwort)...</key>
+    <key alias="displayName">Name der Kultur</key>
+  </area>
+  <area alias="placeholders">
+    <key alias="username">Benutzername eingeben</key>
+    <key alias="password">Kennwort eingeben</key>
+    <key alias="nameentity">%0% benennen ...</key>
+    <key alias="entername">Name angeben ...</key>
+    <key alias="search">Durchsuchen ...</key>
+    <key alias="filter">Filtern ...</key>
+    <key alias="enterTags">Tippen, um Tags hinzuzufügen (nach jedem Tag die Eingabetaste drücken) ...</key>
   </area>
   <area alias="editcontenttype">
-   	<key alias="allowAtRoot" version="7.2">Als Wurzel-Knoten erlauben</key>
-	<key alias="allowAtRootDesc" version="7.2">Nur Dokumententype mit dieser Markierung können auf Ebene 1 im Inhalts- und Medienverzeichnisbaum erstellt werden</key>
+    <key alias="allowAtRoot" version="7.2">Auf oberster Ebene erlauben</key>
+    <key alias="allowAtRootDesc" version="7.2">Nur diese Dokumenttypen können auf oberster Ebene in Inhalte und Medien angelegt werden</key>
     <key alias="allowedchildnodetypes">Dokumenttypen, die unterhalb dieses Typs erlaubt sind</key>
- 	<key alias="contenttypecompositions">Dokumententyp-Kompositionen</key>
+    <key alias="contenttypecompositions">Zusammengesetzte Dokumenttypen</key>
     <key alias="create">Erstellen</key>
     <key alias="deletetab">Registerkarte löschen</key>
     <key alias="description">Beschreibung</key>
@@ -257,11 +257,11 @@
     <key alias="tab">Registerkarte</key>
     <key alias="thumbnail">Illustration</key>
     <key alias="hasListView">Listenansicht aktivieren</key>
-	<key alias="hasListViewDesc" version="7.2">Konfiguriert das Dokument zur Darstellung einer sortierbaren und durchsuchbaren Liste mit untergeordneten Dokumenten. Die untergeordneten Elemente werden im Verzeichnisbaum nicht mehr angezeigt.</key>
+    <key alias="hasListViewDesc" version="7.2">Aktiviert eine durchsuch- und sortierbare Listendarstellung der untergeordneten Elemente anstelle diese in der Baumstruktur anzuzeigen</key>
     <key alias="currentListView" version="7.2">Aktuelle Listenansicht</key>
-    <key alias="currentListViewDesc" version="7.2">Datentyp der aktiven Listenansicht</key>
-    <key alias="createListView" version="7.2">Erstelle benutzerdefinierte Listenansicht</key>
-    <key alias="removeListView" version="7.2">Entferne benutzerdefinierte Listenansicht</key>
+    <key alias="currentListViewDesc" version="7.2">Der Datentyp für die aktuelle Ansicht der Liste</key>
+    <key alias="createListView" version="7.2">Angepasste Listenansicht erstellen</key>
+    <key alias="removeListView" version="7.2">Angepasste Listenansicht entfernen</key>
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue">Vorgabewert hinzufügen</key>
@@ -290,6 +290,7 @@
     <key alias="errorRegExpWithoutTab">'%0%' hat ein falsches Format</key>
   </area>
   <area alias="errors">
+    <key alias="dissallowedMediaType">Dieser Dateityp wird durch die Systemeinstellungen blockiert</key>
     <key alias="codemirroriewarning">ACHTUNG! Obwohl CodeMirror in den Einstellungen aktiviert ist, bleibt das Modul wegen mangelnder Stabilität in Internet Explorer deaktiviert.</key>
     <key alias="contentTypeAliasAndNameNotNull">Bitte geben Sie die Bezeichnung und den Alias des neuen Dokumenttyps ein.</key>
     <key alias="filePermissionsError">Es besteht ein Problem mit den Lese-/Schreibrechten auf eine Datei oder einen Ordner</key>
@@ -305,7 +306,7 @@
     <key alias="tableSplitNotSplittable">Sie können keine Zelle trennen, die nicht zuvor aus mehreren zusammengeführt wurde.</key>
     <key alias="xsltErrorHeader">Fehler im XSLT</key>
     <key alias="xsltErrorText">Das XSLT ist fehlerhaft und wurde daher nicht gespeichert.</key>
-    <key alias="dissallowedMediaType">Dieser Dateityp wird durch die Systemeinstellungen blockiert</key>
+    <key alias="missingPropertyEditorErrorMessage">Es liegt ein Konfigurationsfehler beim Datentyp dieser Eigenschaft vor. Bitte prüfen Sie den Datentyp bzw. die Eigenschaft.</key>
   </area>
   <area alias="general">
     <key alias="about">Info</key>
@@ -380,7 +381,7 @@
     <key alias="remaining">Verbleibend</key>
     <key alias="rename">Umbenennen</key>
     <key alias="renew">Erneuern</key>
-    <key alias="required" version="7.0">Pflichtangaben</key>
+    <key alias="required" version="7.0">Pflichtangabe</key>
     <key alias="retry">Wiederholen</key>
     <key alias="rights">Berechtigungen</key>
     <key alias="search">Suchen</key>
@@ -390,7 +391,7 @@
     <key alias="size">Größe</key>
     <key alias="sort">Sortieren</key>
     <key alias="type">Typ</key>
-    <key alias="typeToSearch">nach Inhalten suchen ...</key>
+    <key alias="typeToSearch">Durchsuchen ...</key>
     <key alias="up">nach oben</key>
     <key alias="update">Aktualisieren</key>
     <key alias="upgrade">Update</key>
@@ -406,9 +407,6 @@
     <key alias="folder">Ordner</key>
     <key alias="searchResults">Suchergebnisse</key>
   </area>
-
-
-
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Hintergrundfarbe</key>
     <key alias="bold">Fett</key>
@@ -438,7 +436,7 @@
   Keine Sorge - Dabei werden keine Inhalte gelöscht und alles wird weiterhin funktionieren!
   &lt;/p&gt;
 </key>
-<key alias="databaseUpgradeDone">Die Datenbank wurde auf die Version %0% aktualisiert. Klicken Sie auf &lt;strong&gt;weiter&lt;/strong&gt;, um fortzufahren.</key>
+    <key alias="databaseUpgradeDone">Die Datenbank wurde auf die Version %0% aktualisiert. Klicken Sie auf &lt;strong&gt;weiter&lt;/strong&gt;, um fortzufahren.</key>
     <key alias="databaseUpToDate">Die Datenbank ist fertig eingerichtet. Klicken Sie auf &lt;strong&gt;"weiter"&lt;/strong&gt;, um mit der Einrichtung fortzufahren.</key>
     <key alias="defaultUserChangePass">&lt;strong&gt;Das Kennwort des Standard-Benutzers muss geändert werden!&lt;/strong&gt;</key>
     <key alias="defaultUserDisabled">&lt;strong&gt;Der Standard-Benutzer wurde deaktiviert oder hat keinen Zugriff auf Umbraco.&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Es sind keine weiteren Aktionen notwendig. Klicken Sie auf &lt;b&gt;Weiter&lt;/b&gt; um fortzufahren.</key>
@@ -514,8 +512,8 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="welcomeIntro">Dieser Assistent führt Sie durch die Einrichtung einer neuen Installation von &lt;strong&gt;Umbraco %0%&lt;/strong&gt; oder einem Upgrade von Version 3.0.&lt;br /&gt;&lt;br /&gt;Klicken Sie auf &lt;strong&gt;weiter&lt;/strong&gt;, um zu beginnen.</key>
   </area>
   <area alias="language">
-    <key alias="cultureCode">Code der Sprachkultur</key>
-    <key alias="displayName">Name der Sprachkultur</key>
+    <key alias="cultureCode">Code der Kultur</key>
+    <key alias="displayName">Name der Kultur</key>
   </area>
   <area alias="lockout">
     <key alias="lockoutWillOccur">Sie haben keine Tätigkeiten mehr durchgeführt und werden automatisch abgemeldet in</key>
@@ -523,18 +521,18 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
   </area>
   <area alias="login">
     <key alias="greeting0">Einen wunderbaren Sonntag</key>
-    <key alias="greeting5">Frohen freundlichen Freitag</key>
-    <key alias="greeting4">Donnerwetter Donnerstag</key>
     <key alias="greeting1">Schönen Montag</key>
     <key alias="greeting2">Einen großartigen Dienstag</key>
     <key alias="greeting3">Wunderbaren Mittwoch</key>
+    <key alias="greeting4">Donnerwetter Donnerstag</key>
+    <key alias="greeting5">Frohen freundlichen Freitag</key>
     <key alias="greeting6">Wunderbaren sonnigen Samstag</key>
     <key alias="instruction">Hier anmelden:</key>
-    <key alias="timeout">Die Sitzung ist abgelaufen</key>
-	<key alias="bottomText">&lt;p style="text-align:right;"&gt;&amp;copy; 2001 - %0% &lt;br /&gt;&lt;a href="http://umbraco.com" style="text-decoration: none" target="_blank"&gt;umbraco.org&lt;/a&gt;&lt;/p&gt; </key>
+    <key alias="timeout">Sitzung abgelaufen</key>
+    <key alias="bottomText">&lt;p style="text-align:right;"&gt;&amp;copy; 2001 - %0% &lt;br /&gt;&lt;a href="http://umbraco.com" style="text-decoration: none" target="_blank"&gt;umbraco.org&lt;/a&gt;&lt;/p&gt; </key>
   </area>
   <area alias="main">
-    <key alias="dashboard">Armaturenbrett</key>
+    <key alias="dashboard">Dashboard</key>
     <key alias="sections">Bereiche</key>
     <key alias="tree">Inhalt</key>
   </area>
@@ -548,9 +546,9 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="noNodeSelected">Es ist noch kein Element ausgewählt. Bitte wählen Sie ein Element aus der Liste aus, bevor Sie fortfahren.</key>
     <key alias="notAllowedByContentType">Das aktuelle Element kann aufgrund seines Dokumenttyps nicht an diese Stelle verschoben werden.</key>
     <key alias="notAllowedByPath">Das ausgewählte Element kann nicht zu einem seiner eigenen Unterelemente verschoben werden.</key>
+    <key alias="notAllowedAtRoot">Dieses Element kann nicht auf der obersten Ebene platziert werden.</key>
     <key alias="notValid">Diese Aktion ist nicht erlaubt, da Sie unzureichende Berechtigungen für mindestens ein untergeordnetes Element haben.</key>
     <key alias="relateToOriginal">Kopierte Elemente mit dem Original verknüpfen</key>
-    <key alias="notAllowedAtRoot">Dieses Element kann nicht auf der obersten Ebene platziert werden.</key>
   </area>
   <area alias="notifications">
     <key alias="editNotifications">Bearbeiten Sie Ihre Benachrichtigungseinstellungen für '%0%'</key>
@@ -565,8 +563,7 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
       Ihr freundlicher Umbraco-Robot
     </key>
     <key alias="mailBodyHtml">
-<![CDATA[<p>Hi %0%</p>
-
+<![CDATA[<p>Hallo %0%</p>
 		  <p>Dies ist eine automatisch E-Mail, welche Sie informiert, dass die Aufgabe <strong>'%1%'</strong> 
 		  an der Seite <a href="http://%4%/#/content/content/edit/%5%"><strong>'%2%'</strong></a>
 		  vom Benutzer <strong>'%3%'</strong> ausgeführt wurde.
@@ -591,7 +588,8 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
 
 		  <p>Einen schönen Tag wünscht<br /><br />
 			  Ihr freundlicher Umbraco-Robot
-		  </p>]]>
+		  </p>
+]]>
 </key>
     <key alias="mailSubject">[%0%] Benachrichtigung: %1% ausgeführt an Seite '%2%' </key>
     <key alias="notifications">Benachrichtigungen</key>
@@ -619,8 +617,8 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="packageUpgradeInstructions">Hinweise für die Durchführung des Updates</key>
     <key alias="packageUpgradeText"> Es ist ein Update für dieses Paket verfügbar. Sie können es direkt vom Umbraco-Paket-Repository herunterladen.</key>
     <key alias="packageVersion">Version des Pakets</key>
-    <key alias="viewPackageWebsite">Paket-Webseite aufrufen</key>
     <key alias="packageVersionHistory">Versionsverlauf des Pakets</key>
+    <key alias="viewPackageWebsite">Paket-Webseite aufrufen</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Einfügen mit Formatierung (Nicht empfohlen)</key>
@@ -647,7 +645,10 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="paSimpleHelp">Wenn Sie einen einfachen Zugriffsschutz unter Verwendung eines einzelnen Logins mit Kennwort aktivieren wollen</key>
   </area>
   <area alias="publish">
+    <key alias="contentPublishedFailedAwaitingRelease">%0% kann nicht veröffentlicht werden, da die Veröffentlichung zeitlich geplant ist.</key>
+    <key alias="contentPublishedFailedInvalid">%0% konnte nicht veröffentlicht werden, da einige Daten die Gültigkeitsprüfung nicht bestanden haben.</key>
     <key alias="contentPublishedFailedByEvent">%0% konnte nicht veröffentlicht werden, da ein Plug-In die Aktion abgebrochen hat.</key>
+    <key alias="contentPublishedFailedByParent">%0% kann nicht veröffentlicht werden, da das übergeordnete Dokument nicht veröffentlicht ist.</key>
     <key alias="includeUnpublished">Unveröffentlichte Unterelemente einschließen</key>
     <key alias="inProgress">Bitte warten, Veröffentlichung läuft...</key>
     <key alias="inProgressCounter">%0% Elemente veröffentlicht, %1% Elemente ausstehend ...</key>
@@ -655,22 +656,22 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="nodePublishAll">%0% und die untergeordneten Elemente wurden veröffentlicht</key>
     <key alias="publishAll">%0% und alle untergeordneten Elemente veröffentlichen</key>
     <key alias="publishHelp">Mit &lt;em&gt;Ok&lt;/em&gt; wird &lt;strong&gt;%0%&lt;/strong&gt; veröffentlicht und auf der Website sichtbar.&lt;br/&gt;&lt;br /&gt;Sie können dieses Element mitsamt seinen untergeordneten Elementen veröffentlichen, indem Sie &lt;em&gt;Unveröffentlichte Unterelemente einschließen&lt;/em&gt; aktivieren.</key>
-    <key alias="contentPublishedFailedInvalid">%0% konnte nicht veröffentlicht werden, da einige Daten die Gültigkeitsprüfung nicht bestanden haben.</key>
-    <key alias="contentPublishedFailedByParent">%0% kann nicht veröffentlicht werden, da das übergeordnete Dokument nicht veröffentlicht ist.</key>
-    <key alias="contentPublishedFailedAwaitingRelease">%0% kann nicht veröffentlicht werden, da die Veröffentlichung zeitlich geplant ist.</key>
+  </area>
+  <area alias="colorpicker">
+    <key alias="noColors">Sie haben keine freigegeben Farben konfiguriert</key>
   </area>
   <area alias="relatedlinks">
-    <key alias="enterExternal">Externer Link eingeben</key>
-    <key alias="chooseInternal">Interne Seite auswählen</key>
-    <key alias="link">Link hinzufügen</key>
+    <key alias="enterExternal">Externen Link eingeben</key>
+    <key alias="chooseInternal">Internen Link auswählen</key>
     <key alias="caption">Beschriftung</key>
-	<key alias="newWindow">In neuem Fenster öffnen</key>
-    <key alias="captionPlaceholder">Neue Beschriftung eingeben</key>
-    <key alias="externalLinkPlaceholder">Link eingeben</key>    
- </area>
-<area alias="imagecropper">
-	<key alias="reset">Zurücksetzen</key>
-</area>
+    <key alias="link">Link</key>
+    <key alias="newWindow">In neuem Fenster öffnen</key>
+    <key alias="captionPlaceholder">Bezeichnung eingeben</key>
+    <key alias="externalLinkPlaceholder">Link eingeben</key>
+  </area>
+  <area alias="imagecropper">
+    <key alias="reset">Zurücksetzen</key>
+  </area>
   <area alias="rollback">
     <key alias="currentVersion">Aktuelle Version</key>
     <key alias="diffHelp">Zeigt die Unterschiede zwischen der aktuellen und der ausgewählten Version an.&lt;br /&gt;Text in &lt;del&gt;rot&lt;/del&gt; fehlen in der ausgewählten Version, &lt;ins&gt;grün&lt;/ins&gt; markierter Text wurde hinzugefügt.</key>
@@ -696,9 +697,15 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="statistics">Statistiken</key>
     <key alias="translation">Übersetzung</key>
     <key alias="users">Benutzer</key>
-	<key alias="forms">Umbraco Forms</key>
-    <key alias="help">Hilfe</key>
-	<key alias="analytics">Analytics</key>
+    <key alias="help" version="7.0">Hilfe</key>
+    <key alias="forms">Formulare</key>
+    <key alias="analytics">Auswertungen</key>
+  </area>
+  <area alias="help">
+    <key alias="goTo">go to</key>
+    <key alias="helpTopicsFor">Hilfethemen zu</key>
+    <key alias="videoChaptersFor">Video-Tutorials für</key>
+    <key alias="theBestUmbracoVideoTutorials">Die besten Umbraco-Video-Tutorials</key>
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Standardvorlage</key>
@@ -708,17 +715,17 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="nodetype">Elementtyp</key>
     <key alias="objecttype">Typ</key>
     <key alias="stylesheet">Stylesheet</key>
+    <key alias="script">Skript</key>
     <key alias="stylesheet editor egenskab">Stylesheet-Eigenschaft</key>
-	<key alias="script">Skript</key>
     <key alias="tab">Registerkarte</key>
     <key alias="tabname">Registerkartenbeschriftung</key>
     <key alias="tabs">Registerkarten</key>
-    <key alias="contentTypeUses">Dieser Dokumenttyp verwendet</key>
     <key alias="contentTypeEnabled">Masterdokumenttyp aktiviert</key>
+    <key alias="contentTypeUses">Dieser Dokumenttyp verwendet</key>
     <key alias="asAContentMasterType">als Masterdokumenttyp. Register vom Masterdokumenttyp werden nicht angezeigt und können nur im Masterdokumenttyp selbst bearbeitet werden</key>
     <key alias="noPropertiesDefinedOnTab">Für dieses Register sind keine Eigenschaften definiert. Klicken Sie oben auf "neue Eigenschaft hinzufügen", um eine neue Eigenschaft hinzuzufügen.</key>
-	<key alias="masterDocumentType">Master Dokumententyp</key>
-    <key alias="createMatchingTemplate">Erstelle zugehörige Vorlage</key>
+    <key alias="masterDocumentType">Masterdokumenttyp</key>
+    <key alias="createMatchingTemplate">Zugehörige Vorlage anlegen</key>
   </area>
   <area alias="sort">
     <key alias="sortDone">Sortierung abgeschlossen.</key>
@@ -726,6 +733,10 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="sortPleaseWait">Bitte warten, die Seiten werden sortiert. Das kann einen Moment dauern. Bitte schließen Sie dieses Fenster nicht, bis der Sortiervorgang abgeschlossen ist.</key>
   </area>
   <area alias="speechBubbles">
+    <key alias="operationFailedHeader">Fehlgeschlagen</key>
+    <key alias="invalidUserPermissionsText">Unzureichende Benutzerberechtigungen. Vorgang kann nicht abgeschlossen werden.</key>
+    <key alias="operationCancelledHeader">Abgebrochen</key>
+    <key alias="operationCancelledText">Vorgang wurde durch eine benutzerdefinierte Erweiterung abgebrochen</key>
     <key alias="contentPublishedFailedByEvent">Das Veröffentlichen wurde von einem individuellen Ereignishandler abgebrochen</key>
     <key alias="contentTypeDublicatePropertyType">Eigenschaft existiert bereits</key>
     <key alias="contentTypePropertyTypeCreated">Eigenschaft erstellt</key>
@@ -742,17 +753,20 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="dictionaryItemSaved">Wörterbucheintrag gespeichert</key>
     <key alias="editContentPublishedFailedByParent">Veröffentlichung nicht möglich, da das übergeordnete Dokument nicht veröffentlicht ist.</key>
     <key alias="editContentPublishedHeader">Inhalte veröffentlicht</key>
-    <key alias="editContentPublishedText">und sichtbar auf der Webseite</key>
+    <key alias="editContentPublishedText">Sichtbar auf der Webseite</key>
     <key alias="editContentSavedHeader">Inhalte gespeichert</key>
-    <key alias="editContentSavedText">Denken Sie daran die Inhalte zu veröffentlichen, um die Änderungen sichtbar zu machen</key>
+    <key alias="editContentSavedText">Denken Sie daran, die Inhalte zu veröffentlichen, um die Änderungen sichtbar zu machen</key>
     <key alias="editContentSendToPublish">Zur Abnahme eingereicht</key>
     <key alias="editContentSendToPublishText">Die Änderungen wurden zur Abnahme eingereicht</key>
+    <key alias="editMediaSaved">Medium gespeichert</key>
+    <key alias="editMediaSavedText">Medium fehlerfrei gespeichert</key>
     <key alias="editMemberSaved">Mitglied gespeichert</key>
     <key alias="editStylesheetPropertySaved">Stylesheet-Regel gespeichert</key>
     <key alias="editStylesheetSaved">Stylesheet gespeichert</key>
     <key alias="editTemplateSaved">Vorlage gespeichert</key>
     <key alias="editUserError">Fehler beim Speichern des Benutzers.</key>
     <key alias="editUserSaved">Benutzer gespeichert</key>
+    <key alias="editUserTypeSaved">Benutzertyp gepsichert</key>
     <key alias="fileErrorHeader">Datei wurde nicht gespeichert</key>
     <key alias="fileErrorText">Datei konnte nicht gespeichert werden. Bitte überprüfen Sie die Schreibrechte auf Dateiebene.</key>
     <key alias="fileSavedHeader">Datei gespeichert</key>
@@ -771,14 +785,16 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="xsltPermissionErrorText">XSLT kann nicht gespeichert werden. Bitte überprüfen Sie die Schreibrechte auf Dateiebene.</key>
     <key alias="xsltSavedHeader">XSLT gespeichert</key>
     <key alias="xsltSavedText">Keine Fehler im XSLT</key>
-    <key alias="editMediaSaved">Medium gespeichert</key>
     <key alias="contentUnpublished">Veröffentlichung des Inhalts aufgehoben</key>
     <key alias="partialViewSavedHeader">Partielle Ansicht gespeichert</key>
     <key alias="partialViewSavedText">Partielle Ansicht ohne Fehler gespeichert.</key>
     <key alias="partialViewErrorHeader">Partielle Ansicht nicht gespeichert</key>
     <key alias="partialViewErrorText">Fehler beim Speichern der Datei.</key>
-    <key alias="editUserTypeSaved">Benutzertyp gepsichert</key>
-    <key alias="editMediaSavedText">Medium fehlerfrei gespeichert</key>
+    <key alias="scriptSavedHeader">Skript gespeichert</key>
+    <key alias="scriptSavedText">Skript fehlerfrei gespeichert!</key>
+    <key alias="scriptErrorHeader">Skript nicht gespeichert</key>
+    <key alias="scriptErrorText">Fehler beim Speichern der Datei.</key>
+    <key alias="cssErrorText">Fehler beim Speichern der Datei.</key>
   </area>
   <area alias="stylesheet">
     <key alias="aliasHelp">Gewünschter CSS-Selektor, zum Beispiel 'h1', '.bigHeader' oder 'p.infoText'</key>
@@ -800,68 +816,40 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="template">Vorlage</key>
   </area>
   <area alias="grid">
-    <key alias="insertControl">Typ auswählen</key>
-    <key alias="addRows">Wählen Sie ein Layout für diese Seite</key>
-    <key alias="addElement"><![CDATA[Zum starten klicken Sie bitte unterhalb auf <i class="icon icon-add blue"></i> und fügen Sie ihr erstes Element hinzu.]]></key>
-
-    <key alias="clickToEmbed">Klicken zum Einfügen</key>
-    <key alias="clickToInsertImage">Klicken zum Bild Einfügen</key>
-    <key alias="placeholderImageCaption">Bildbeschriftung...</key>
-    <key alias="placeholderWriteHere">Schreibe hier...</key>
-
-    <key alias="gridLayouts">Grid Layouts</key>
-    <key alias="gridLayoutsDetail">Layouts sind der gesamte Arbeitsbereich des Grid Editors. Sie brauchen aber meistens nur ein oder zwei unterschiedliche Layouts.</key>
-    <key alias="addGridLayout">Grid Layout hinzufügen</key>
-    <key alias="addGridLayoutDetail">Layout einstellen (Spaltenbreite festlegen und zusätzliche Bereiche hinzufügen)</key>
-
-    <key alias="rowConfigurations">Zeilenkonfiguration</key>
-    <key alias="rowConfigurationsDetail">Zeilen sind vordefinierte und horizontal angeordnete Zellen</key>
-    <key alias="addRowConfiguration">Zeilenkonfiguration hinzufügen</key>
-    <key alias="addRowConfigurationDetail">Zeilen einstellen (Zellenbreite festlegen und zusätzliche Zellen hinzufügen)</key>
-
+    <key alias="insertControl">Element hinzufügen</key>
+    <key alias="addRows">Zeilenlayout auswählen</key>
+    <key alias="addElement">Einfach auf &lt;i class="icon icon-add blue"&gt;&lt;/i&gt; klicken, um das erste Element anzulegen</key>
+    <key alias="clickToEmbed">Klicken, um Inhalt einzubetten</key>
+    <key alias="clickToInsertImage">Klicken, um Abbildung einzufügen</key>
+    <key alias="placeholderImageCaption">Beschriftung ...</key>
+    <key alias="placeholderWriteHere">Hier schreiben ...</key>
+    <key alias="gridLayouts">Layouts</key>
+    <key alias="gridLayoutsDetail">Layouts sind die grundlegenden Arbeitsflächen für das Gestaltungsraster. Üblicherweise sind nicht mehr als ein oder zwei Layouts nötig.</key>
+    <key alias="addGridLayout">Layout hinzufügen</key>
+    <key alias="addGridLayoutDetail">Passen Sie das Layout an, indem Sie die Spaltenbreiten einstellen und Abschnitte hinzufügen.</key>
+    <key alias="rowConfigurations">Einstellungen für das Zeilenlayout</key>
+    <key alias="rowConfigurationsDetail">Zeilen sind vordefinierte horizontale Zellenanordnungen</key>
+    <key alias="addRowConfiguration">Zeilenlayout hinzufügen</key>
+    <key alias="addRowConfigurationDetail">Pasen Sie das Zeilenlayout an, indem Sie die Zellenbreite einstellen und Zellen hinzufügen.</key>
     <key alias="columns">Spalten</key>
-    <key alias="columnsDetails">Gesamtanzahl von allen kombinierten Spalten im Grid Layout</key>
-
+    <key alias="columnsDetails">Insgesamte Spaltenanzahl im Layout</key>
     <key alias="settings">Einstellungen</key>
-    <key alias="settingsDetails">Konfiguriere, welche Einstellungen der Editor ändern kann</key>
-
-
-    <key alias="styles">Stilangaben</key>
-    <key alias="stylesDetails">Konfiguriere, welche Stilangaben Editoren ändern können</key>
-
-    <key alias="settingDialogDetails">Einstellungen werden nur mit eingetragener und gültiger JSON Konfiguration gespeichert</key>
-
-    <key alias="allowAllEditors">Allen Editoren erlauben</key>
-    <key alias="allowAllRowConfigurations">Alle Zeilenkonfigurationen erlauben</key>
+    <key alias="settingsDetails">Legen Sie fest, welche Einstellungen die Autoren anpassen können.</key>
+    <key alias="styles">CSS-Stile</key>
+    <key alias="stylesDetails">Legen Sie fest, welche Stile die Autoren anpassen können.</key>
+    <key alias="settingDialogDetails">Die Einstellungen werden nur gespeichert, wenn die angegebene JSON-Konfiguration gültig ist.</key>
+    <key alias="allowAllEditors">Alle Elemente erlauben</key>
+    <key alias="allowAllRowConfigurations">Alle Zeilenlayouts erlauben</key>
   </area>
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<area alias="templateEditor">
+  <area alias="templateEditor">
     <key alias="alternativeField">Alternatives Feld</key>
     <key alias="alternativeText">Alternativer Text</key>
     <key alias="casing">Groß- und Kleinschreibung</key>
+    <key alias="encoding">Kodierung</key>
     <key alias="chooseField">Feld auswählen</key>
     <key alias="convertLineBreaks">Zeilenumbrüche ersetzen</key>
     <key alias="convertLineBreaksHelp">Ersetzt Zeilenumbrüche durch das HTML-Tag &lt;br /&gt;</key>
+    <key alias="customFields">Benutzerdefinierte Felder</key>
     <key alias="dateOnly">nur Datum</key>
     <key alias="formatAsDate">Als Datum formatieren</key>
     <key alias="htmlEncode">HTML kodieren</key>
@@ -875,15 +863,13 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="recursive">Rekursiv</key>
     <key alias="removeParagraph">Textabsatz entfernen</key>
     <key alias="removeParagraphHelp">Alle &lt;p&gt; am Anfang und am Ende des Feldinhalts werden entfernt</key>
+    <key alias="standardFields">Standardfelder</key>
     <key alias="uppercase">Großbuchstaben</key>
     <key alias="urlEncode">URL kodieren</key>
     <key alias="urlEncodeHelp">Wandelt Sonderzeichen zur Verwendung in URLs um</key>
     <key alias="usedIfAllEmpty">Wird nur verwendet, wenn beide vorgenannten Felder leer sind</key>
     <key alias="usedIfEmpty">Dieses Feld wird nur verwendet, wenn das primäre Feld leer ist</key>
     <key alias="withTime">Datum und Zeit mit Trennzeichen: </key>
-    <key alias="customFields">Benutzerdefinierte Felder</key>
-    <key alias="standardFields">Standardfelder</key>
-    <key alias="encoding">Kodierung</key>
   </area>
   <area alias="translation">
     <key alias="assignedTasks">Ihre Aufgaben</key>
@@ -941,7 +927,7 @@ Ihr freundlicher Umbraco-Robot
     <key alias="memberGroup">Mitgliedergruppen</key>
     <key alias="memberRoles">Mitgliederrollen</key>
     <key alias="memberType">Mitglieder-Typen</key>
-    <key alias="nodeTypes">Dokumententypen</key>
+    <key alias="nodeTypes">Dokumenttypen</key>
     <key alias="packager">Pakete</key>
     <key alias="packages">Pakete</key>
     <key alias="python">Python-Dateien</key>
@@ -953,7 +939,7 @@ Ihr freundlicher Umbraco-Robot
     <key alias="stylesheets">Stylesheets</key>
     <key alias="templates">Vorlagen</key>
     <key alias="xslt">XSLT-Dateien</key>
-	<key alias="analytics">Analysen</key>
+    <key alias="analytics">Auswertungen</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Neues Update verfügbar</key>
@@ -964,10 +950,10 @@ Ihr freundlicher Umbraco-Robot
   <area alias="user">
     <key alias="administrators">Administrator</key>
     <key alias="categoryField">Feld für Kategorie</key>
-    <key alias="changePassword">Passwort ändern</key>
-	<key alias="newPassword">Neues Passwort</key>     
-	<key alias="confirmNewPassword">Neues Kennwort (Bestätigung)</key>
-    <key alias="changePasswordDescription">Sie können Ihr Kennwort für den Zugriff auf den Umbraco-Verwaltungsbereich ändern, indem Sie das nachfolgende Formular ausfüllen und auf die 'Kennwort ändern'-Schaltfläche klicken</key>
+    <key alias="changePassword">Kennwort ändern</key>
+    <key alias="newPassword">Neues Kennwort</key>
+    <key alias="confirmNewPassword">Neues Kennwort (Bestätigung)</key>
+    <key alias="changePasswordDescription">Sie können Ihr Kennwort für den Zugriff auf den Umbraco-Verwaltungsbereich ändern, indem Sie das nachfolgende Formular ausfüllen und auf 'Kennwort ändern' klicken</key>
     <key alias="contentChannel">Schnittstelle für externe Editoren</key>
     <key alias="descriptionField">Feld für Beschreibung</key>
     <key alias="disabled">Benutzer endgültig deaktivieren</key>
@@ -983,12 +969,12 @@ Ihr freundlicher Umbraco-Robot
     <key alias="resetPassword">Kennwort zurücksetzen</key>
     <key alias="passwordChanged">Ihr Kennwort wurde geändert!</key>
     <key alias="passwordConfirm">Bitte bestätigen Sie das neue Kennwort</key>
-    <key alias="passwordCurrent">Aktuelle Kennwort</key>
-    <key alias="passwordInvalid">Ungültig aktuelle Kennwort</key>
     <key alias="passwordEnterNew">Geben Sie Ihr neues Kennwort ein</key>
     <key alias="passwordIsBlank">Ihr neues Kennwort darf nicht leer sein!</key>
+    <key alias="passwordCurrent">Aktuelles Kennwort</key>
+    <key alias="passwordInvalid">Aktuelles Kennwort falsch</key>
     <key alias="passwordIsDifferent">Ihr neues Kennwort und die Wiederholung Ihres neuen Kennworts stimmen nicht überein. Bitte versuchen Sie es erneut!</key>
-    <key alias="passwordMismatch">Die Wiederholung Ihres Kennworts stimmt nicht mit dem neuen Kennwort überein!</key>
+    <key alias="passwordMismatch">Die Bestätigung Ihres Kennworts stimmt nicht mit dem angegebenen neuen Kennwort überein!</key>
     <key alias="permissionReplaceChildren">Die Berechtigungen der untergeordneten Elemente ersetzen</key>
     <key alias="permissionSelectedPages">Die Berechtigungen für folgende Seiten werden angepasst:</key>
     <key alias="permissionSelectPages">Dokumente auswählen, um deren Berechtigungen zu ändern</key>
@@ -999,9 +985,9 @@ Ihr freundlicher Umbraco-Robot
     <key alias="usertype">Rolle</key>
     <key alias="userTypes">Rollen</key>
     <key alias="writer">Autor</key>
-	<key alias="translator">Übersetzer</key>
-    <key alias="yourProfile">Ihr Profil</key>
-    <key alias="yourHistory">Ihr Verlauf</key>
-    <key alias="sessionExpires">Sitzung läuft ab in</key>
+    <key alias="translator">Übersetzer</key>
+    <key alias="yourProfile" version="7.0">Ihr Profil</key>
+    <key alias="yourHistory" version="7.0">Ihr Verlauf</key>
+    <key alias="sessionExpires" version="7.0">Sitzung läuft ab in</key>
   </area>
 </language>

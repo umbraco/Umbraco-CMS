@@ -490,6 +490,8 @@ namespace Umbraco.Web
                     httpContext.Response.Headers.Remove("Server");
                     //this doesn't normally work since IIS sets it but we'll keep it here anyways.
                     httpContext.Response.Headers.Remove("X-Powered-By");
+                    httpContext.Response.Headers.Remove("X-AspNet-Version");
+                    httpContext.Response.Headers.Remove("X-AspNetMvc-Version");
                 }
                 catch (PlatformNotSupportedException ex)
                 {
