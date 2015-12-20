@@ -85,16 +85,6 @@ namespace Umbraco.Tests.TestHelpers
             get { return _disabledCacheHelper ?? (_disabledCacheHelper = CacheHelper.CreateDisabledCacheHelper()); }
         }
 
-        private MappingResolver _mappingResolver;
-        protected IMappingResolver MappingResolver
-        {
-            get
-            {
-                return _mappingResolver ??
-                       (_mappingResolver = new MappingResolver(Container, Mock.Of<ILogger>(), () => PluginManager.Current.ResolveAssignedMapperTypes()));
-            }
-        }
-
         protected virtual ISqlSyntaxProvider SqlSyntax
         {
             get { return new SqlCeSyntaxProvider(); }
@@ -118,12 +108,12 @@ namespace Umbraco.Tests.TestHelpers
                 new DatabaseContext(dbFactory, Logger, SqlSyntax, "System.Data.SqlServerCe.4.0"),
                 //assign the service context
                 new ServiceContext(
-                        repositoryFactory, 
-                        new PetaPocoUnitOfWorkProvider(dbFactory), 
-                        new FileUnitOfWorkProvider(), 
-                        new PublishingStrategy(evtMsgs, Logger), 
-                        cacheHelper, 
-                        Logger, 
+                        repositoryFactory,
+                        new PetaPocoUnitOfWorkProvider(dbFactory),
+                        new FileUnitOfWorkProvider(),
+                        new PublishingStrategy(evtMsgs, Logger),
+                        cacheHelper,
+                        Logger,
                         evtMsgs,
                         Enumerable.Empty<IUrlSegmentProvider>()),
                 cacheHelper,
@@ -132,7 +122,7 @@ namespace Umbraco.Tests.TestHelpers
                 IsReady = true
             };
 
-            base.Initialize();
+            ApplicationContext.Current = _appContext;
 
             using (ProfilingLogger.TraceDuration<BaseDatabaseFactoryTest>("init"))
             {
@@ -143,8 +133,8 @@ namespace Umbraco.Tests.TestHelpers
                 InitializeDatabase();
 
                 //ensure the configuration matches the current version for tests
-                SettingsForTests.ConfigurationStatus = UmbracoVersion.GetSemanticVersion().ToSemanticString();
-            }            
+                SettingsForTests.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
+            }
         }
 
         /// <summary>

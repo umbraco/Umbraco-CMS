@@ -308,16 +308,24 @@ namespace Umbraco.Web
         }
 
         /// <summary>
-        /// Called to customize the IoC container
+        /// Build the core container which contains all core things requird to build an app context
         /// </summary>
-        /// <param name="container"></param>
-        internal override void ConfigureServices(ServiceContainer container)
+        internal override void ConfigureCoreServices(ServiceContainer container)
         {
-            base.ConfigureServices(container);
+            base.ConfigureCoreServices(container);
 
             //Replace services:
             container.Register<IEventMessagesFactory, RequestLifespanMessagesFactory>();
+        }
 
+        /// <summary>
+        /// Called to customize the IoC container
+        /// </summary>
+        /// <param name="container"></param>
+        internal override void ConfigureApplicationServices(ServiceContainer container)
+        {
+            base.ConfigureApplicationServices(container);
+            
             //IoC setup for LightInject for mvc/webapi
             Container.EnableMvc();
             Container.RegisterMvcControllers(PluginManager);

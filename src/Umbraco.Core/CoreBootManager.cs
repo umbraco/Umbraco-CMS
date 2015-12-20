@@ -48,7 +48,7 @@ namespace Umbraco.Core
         protected ProfilingLogger ProfilingLogger { get; private set; }
         private DisposableTimer _timer;
         protected PluginManager PluginManager { get; private set; }
-        private CacheHelper _cacheHelper;
+        
 
         private bool _isInitialized = false;
         private bool _isStarted = false;
@@ -88,16 +88,28 @@ namespace Umbraco.Core
             if (_isInitialized)
                 throw new InvalidOperationException("The boot manager has already been initialized");
             
+            //Create logger/profiler, and their resolvers, these are special resolvers that can be resolved before frozen so we can start logging
+            LoggerResolver.Current = new LoggerResolver(_umbracoApplication.Logger) { CanResolveBeforeFrozen = true };
+            var profiler = CreateProfiler();
+            ProfilerResolver.Current = new ProfilerResolver(profiler) { CanResolveBeforeFrozen = true };
+            ProfilingLogger = new ProfilingLogger(_umbracoApplication.Logger, profiler);
+
             ProfilingLogger = ProfilingLogger?? new ProfilingLogger(LoggerResolver.Current.Logger, ProfilerResolver.Current.Profiler);
+            
+            ApplicationCache = CreateApplicationCache();
 
             _timer = ProfilingLogger.TraceDuration<CoreBootManager>(
                 string.Format("Umbraco {0} application starting on {1}", UmbracoVersion.GetSemanticVersion().ToSemanticString(), NetworkHelper.MachineName),
                 "Umbraco application startup complete");
-            _cacheHelper = CreateApplicationCache();
-            ServiceProvider = new ActivatorServiceProvider();
-            PluginManager.Current = PluginManager = new PluginManager(ServiceProvider, _cacheHelper.RuntimeCache, ProfilingLogger, true);
 
-            ApplicationCache = CreateApplicationCache();
+            ServiceProvider = new ActivatorServiceProvider();
+
+            //create the plugin manager
+            //TODO: this is currently a singleton but it would be better if it weren't. Unfortunately the only way to get
+            // rid of this singleton would be to put it into IoC and then use the ServiceLocator pattern.
+            PluginManager.Current = PluginManager = new PluginManager(ServiceProvider, ApplicationCache.RuntimeCache, ProfilingLogger, true);
+            
+            //build up core IoC servoces
             ConfigureCoreServices(Container);
 
             //set the singleton resolved from the core container
@@ -117,14 +129,24 @@ namespace Umbraco.Core
             _appStartupEvtContainer.RegisterCollection<IApplicationEventHandler, PerScopeLifetime>(PluginManager.ResolveApplicationStartupHandlers());
             
             //build up standard IoC services
-            ConfigureServices(Container);
+            ConfigureApplicationServices(Container);
 
             InitializeResolvers();
             InitializeModelMappers();
 
             //now we need to call the initialize methods
-            //TODO: Make sure to try/catch the OnApplicationInitialized!!
-            Parallel.ForEach(_appStartupEvtContainer.GetAllInstances<IApplicationEventHandler>(), x => x.OnApplicationInitialized(UmbracoApplication, ApplicationContext));
+            Parallel.ForEach(_appStartupEvtContainer.GetAllInstances<IApplicationEventHandler>(), x =>
+            {
+                try
+                {
+                    x.OnApplicationInitialized(UmbracoApplication, ApplicationContext);
+                }
+                catch (Exception ex)
+                {
+                    ProfilingLogger.Logger.Error<CoreBootManager>("An error occurred running OnApplicationInitialized for handler " + x.GetType(), ex);
+                    throw;
+                }
+            });
 
             _isInitialized = true;
 
@@ -134,20 +156,19 @@ namespace Umbraco.Core
         /// <summary>
         /// Build the core container which contains all core things requird to build an app context
         /// </summary>
-        private void ConfigureCoreServices(ServiceContainer container)
+        internal virtual void ConfigureCoreServices(ServiceContainer container)
         {
             container.Register<IServiceContainer>(factory => container);
             container.Register<ILogger>(factory => _umbracoApplication.Logger, new PerContainerLifetime());
             container.Register<IProfiler>(factory => ProfilingLogger.Profiler, new PerContainerLifetime());
             container.Register<ProfilingLogger>(factory => ProfilingLogger, new PerContainerLifetime());
-            var settings = UmbracoConfig.For.UmbracoSettings();
-            container.Register<IUmbracoSettingsSection>(factory => settings);
-            container.Register<IContentSection>(factory => settings.Content);
-            container.Register<IRequestHandlerSection>(factory => settings.RequestHandler);
+            container.Register<IUmbracoSettingsSection>(factory => UmbracoConfig.For.UmbracoSettings());
+            container.Register<IContentSection>(factory => factory.GetInstance<IUmbracoSettingsSection>().Content);
+            container.Register<IRequestHandlerSection>(factory => factory.GetInstance<IUmbracoSettingsSection>().RequestHandler);
             //TODO: Add the other config areas...
 
-            container.Register<CacheHelper>(factory => _cacheHelper, new PerContainerLifetime());
-            container.Register<IRuntimeCacheProvider>(factory => _cacheHelper.RuntimeCache, new PerContainerLifetime());
+            container.Register<CacheHelper>(factory => ApplicationCache, new PerContainerLifetime());
+            container.Register<IRuntimeCacheProvider>(factory => ApplicationCache.RuntimeCache, new PerContainerLifetime());
             container.Register<IServiceProvider, ActivatorServiceProvider>();
             container.Register<PluginManager>(factory => PluginManager, new PerContainerLifetime());
             container.Register<IDatabaseFactory>(factory => new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, factory.GetInstance<ILogger>()));
@@ -185,7 +206,7 @@ namespace Umbraco.Core
         /// Called to customize the IoC container
         /// </summary>
         /// <param name="container"></param>
-        internal virtual void ConfigureServices(ServiceContainer container)
+        internal virtual void ConfigureApplicationServices(ServiceContainer container)
         {
             
         }
@@ -270,9 +291,19 @@ namespace Umbraco.Core
             if (_isStarted)
                 throw new InvalidOperationException("The boot manager has already been initialized");
 
-            //TODO: Make sure to try/catch the OnApplicationInitialized!!    
             //call OnApplicationStarting of each application events handler
-            Parallel.ForEach(_appStartupEvtContainer.GetAllInstances<IApplicationEventHandler>(), x => x.OnApplicationStarting(UmbracoApplication, ApplicationContext));
+            Parallel.ForEach(_appStartupEvtContainer.GetAllInstances<IApplicationEventHandler>(), x =>
+            {
+                try
+                {
+                    x.OnApplicationStarting(UmbracoApplication, ApplicationContext);
+                }
+                catch (Exception ex)
+                {
+                    ProfilingLogger.Logger.Error<CoreBootManager>("An error occurred running OnApplicationStarting for handler " + x.GetType(), ex);
+                    throw;
+                }
+            });
 
             if (afterStartup != null)
             {
@@ -307,9 +338,18 @@ namespace Umbraco.Core
 
             
             //call OnApplicationStarting of each application events handler
-            //TODO: Make sure to try/catch the OnApplicationInitialized!!
-            Parallel.ForEach(_appStartupEvtContainer.GetAllInstances<IApplicationEventHandler>(), x => x.OnApplicationStarted(UmbracoApplication, ApplicationContext));
-
+            Parallel.ForEach(_appStartupEvtContainer.GetAllInstances<IApplicationEventHandler>(), x =>
+            {
+                try
+                {
+                    x.OnApplicationStarted(UmbracoApplication, ApplicationContext);
+                }
+                catch (Exception ex)
+                {
+                    ProfilingLogger.Logger.Error<CoreBootManager>("An error occurred running OnApplicationStarted for handler " + x.GetType(), ex);
+                    throw;
+                }
+            });
 
             //end the current scope which was created to intantiate all of the startup handlers
             _appStartupEvtContainer.EndCurrentScope();
@@ -372,8 +412,9 @@ namespace Umbraco.Core
         /// </summary>
         protected virtual void InitializeResolvers()
         {
-            var manifestParser = new ManifestParser(ProfilingLogger.Logger, new DirectoryInfo(IOHelper.MapPath("~/App_Plugins")), _cacheHelper.RuntimeCache);
-            var manifestBuilder = new ManifestBuilder(_cacheHelper.RuntimeCache, manifestParser);
+
+            var manifestParser = new ManifestParser(ProfilingLogger.Logger, new DirectoryInfo(IOHelper.MapPath("~/App_Plugins")), ApplicationCache.RuntimeCache);
+            var manifestBuilder = new ManifestBuilder(ApplicationCache.RuntimeCache, manifestParser);
 
             PropertyEditorResolver.Current = new PropertyEditorResolver(
                 Container, ProfilingLogger.Logger, () => PluginManager.ResolvePropertyEditors(),

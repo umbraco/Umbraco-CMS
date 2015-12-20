@@ -45,32 +45,6 @@ namespace Umbraco.Core
 	    }
 
 	    /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="dbContext"></param>
-        /// <param name="serviceContext"></param>
-        /// <param name="cache"></param>
-        [Obsolete("Use the other constructor specifying a ProfilingLogger instead")]
-        public ApplicationContext(DatabaseContext dbContext, ServiceContext serviceContext, CacheHelper cache)
-            : this(dbContext, serviceContext, cache, 
-                new ProfilingLogger(LoggerResolver.Current.Logger, ProfilerResolver.Current.Profiler))
-        {
-        }
-
-        /// <summary>
-        /// Creates a basic app context
-        /// </summary>
-        /// <param name="cache"></param>
-        [Obsolete("Use the other constructor specifying a ProfilingLogger instead")]
-        public ApplicationContext(CacheHelper cache)
-        {
-            if (cache == null) throw new ArgumentNullException("cache");
-            ApplicationCache = cache;
-            ProfilingLogger = new ProfilingLogger(LoggerResolver.Current.Logger, ProfilerResolver.Current.Profiler);
-            Init();
-        }
-
-	    /// <summary>
 	    /// Creates a basic app context
 	    /// </summary>
 	    /// <param name="cache"></param>
@@ -105,33 +79,6 @@ namespace Umbraco.Core
             Current = appContext;
             return Current;
 	    }
-
-	    /// <summary>
-	    /// A method used to create and ensure that a global ApplicationContext singleton is created.
-	    /// </summary>
-	    /// <param name="cache"></param>
-	    /// <param name="replaceContext">
-	    /// If set to true will replace the current singleton instance - This should only be used for unit tests or on app 
-	    /// startup if for some reason the boot manager is not the umbraco boot manager.
-	    /// </param>
-	    /// <param name="dbContext"></param>
-	    /// <param name="serviceContext"></param>
-	    /// <returns></returns>
-	    /// <remarks>
-	    /// This is NOT thread safe 
-	    /// </remarks>
-        [Obsolete("Use the other method specifying an ProfilingLogger instead")]
-	    public static ApplicationContext EnsureContext(DatabaseContext dbContext, ServiceContext serviceContext, CacheHelper cache, bool replaceContext)
-        {
-            if (Current != null)
-            {
-                if (!replaceContext)
-                    return Current;
-            }
-            var ctx = new ApplicationContext(dbContext, serviceContext, cache);
-            Current = ctx;
-            return Current;
-        }
 
 	    /// <summary>
 	    /// A method used to create and ensure that a global ApplicationContext singleton is created.

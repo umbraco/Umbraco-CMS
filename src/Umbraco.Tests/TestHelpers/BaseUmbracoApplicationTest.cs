@@ -109,6 +109,16 @@ namespace Umbraco.Tests.TestHelpers
 
         private static readonly object Locker = new object();
 
+        private MappingResolver _mappingResolver;
+        protected IMappingResolver MappingResolver
+        {
+            get
+            {
+                return _mappingResolver ??
+                       (_mappingResolver = new MappingResolver(Container, Mock.Of<ILogger>(), () => PluginManager.Current.ResolveAssignedMapperTypes()));
+            }
+        }
+
         private static void InitializeLegacyMappingsForCoreEditors()
         {
             lock (Locker)
@@ -181,7 +191,7 @@ namespace Umbraco.Tests.TestHelpers
         {
 
             var sqlSyntax = new SqlCeSyntaxProvider();
-            var repoFactory = new RepositoryFactory(CacheHelper.CreateDisabledCacheHelper(), Logger, sqlSyntax, SettingsForTests.GenerateMockSettings(), Mock.Of<IMappingResolver>());
+            var repoFactory = new RepositoryFactory(CacheHelper.CreateDisabledCacheHelper(), Logger, sqlSyntax, SettingsForTests.GenerateMockSettings(), MappingResolver);
 
             var evtMsgs = new TransientMessagesFactory();
             ApplicationContext.Current = new ApplicationContext(
