@@ -10,6 +10,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -31,7 +32,7 @@ namespace Umbraco.Tests.Templates
         {
             var loggerMock = new Mock<ILogger>();
             var sqlSyntaxMock = new Mock<ISqlSyntaxProvider>();
-            _templateRepository = new TemplateRepository(_unitOfWorkMock.Object, _cacheMock.Object, loggerMock.Object, sqlSyntaxMock.Object, _masterpageFileSystemMock.Object, _viewFileSystemMock.Object, _templateConfigMock.Object);
+            _templateRepository = new TemplateRepository(_unitOfWorkMock.Object, _cacheMock.Object, loggerMock.Object, sqlSyntaxMock.Object, _masterpageFileSystemMock.Object, _viewFileSystemMock.Object, _templateConfigMock.Object, Mock.Of<IMappingResolver>());
 
         }
 

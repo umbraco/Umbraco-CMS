@@ -62,59 +62,46 @@ namespace Umbraco.Tests.BootManagers
             {
             }
 
-            /// <summary>
-            /// Creates and returns the application context singleton
-            /// </summary>
-            /// <param name="dbContext"></param>
-            /// <param name="serviceContext"></param>
-            protected override ApplicationContext CreateApplicationContext(DatabaseContext dbContext, ServiceContext serviceContext)
-            {
-                var appContext = base.CreateApplicationContext(dbContext, serviceContext);
+            ///// <summary>
+            ///// Creates and returns the application context singleton
+            ///// </summary>
+            ///// <param name="dbContext"></param>
+            ///// <param name="serviceContext"></param>
+            //protected override ApplicationContext CreateApplicationContext(DatabaseContext dbContext, ServiceContext serviceContext)
+            //{
+            //    var appContext = base.CreateApplicationContext(dbContext, serviceContext);
 
-                var dbContextMock = new Mock<DatabaseContext>(Mock.Of<IDatabaseFactory>(), ProfilingLogger.Logger, Mock.Of<ISqlSyntaxProvider>(), "test");
-                dbContextMock.Setup(x => x.CanConnect).Returns(true);
-                appContext.DatabaseContext = dbContextMock.Object;
+            //    var dbContextMock = new Mock<DatabaseContext>(Mock.Of<IDatabaseFactory>(), ProfilingLogger.Logger, Mock.Of<ISqlSyntaxProvider>(), "test");
+            //    dbContextMock.Setup(x => x.CanConnect).Returns(true);
+            //    appContext.DatabaseContext = dbContextMock.Object;
 
-                return appContext;
-            }
+            //    return appContext;
+            //}
 
-            protected override void InitializeApplicationEventsResolver()
-            {
-                //create an empty resolver so we can add our own custom ones (don't type find)
-                ApplicationEventsResolver.Current = new ApplicationEventsResolver(
-                    new ActivatorServiceProvider(), ProfilingLogger.Logger,
-                    new Type[]
-                    {
-                        typeof(LegacyStartupHandler),
-                        typeof(TestApplicationEventHandler)
-                    })
-                    {
-                        CanResolveBeforeFrozen = true
-                    };
-            }
+            //protected override void InitializeApplicationEventsResolver()
+            //{
+            //    //create an empty resolver so we can add our own custom ones (don't type find)
+            //    ApplicationEventsResolver.Current = new ApplicationEventsResolver(
+            //        new ActivatorServiceProvider(), ProfilingLogger.Logger,
+            //        new Type[]
+            //        {
+            //            typeof(LegacyStartupHandler),
+            //            typeof(TestApplicationEventHandler)
+            //        })
+            //        {
+            //            CanResolveBeforeFrozen = true
+            //        };
+            //}
             
-            protected override void InitializeLoggerResolver()
-            {                
-            }
+            //protected override void InitializeLoggerResolver()
+            //{                
+            //}
             
-            protected override void InitializeProfilerResolver()
-            {
-            }
+            //protected override void InitializeProfilerResolver()
+            //{
+            //}
         }
-
-        /// <summary>
-        /// Test legacy startup handler
-        /// </summary>
-        public class LegacyStartupHandler : IApplicationStartupHandler
-        {
-            public static bool Initialized = false;
-
-            public LegacyStartupHandler()
-            {
-                Initialized = true;
-            }
-        }
-
+        
         /// <summary>
         /// test event handler
         /// </summary>
@@ -153,24 +140,27 @@ namespace Umbraco.Tests.BootManagers
         [Test]
         public void Ensure_Legacy_Startup_Handlers_Not_Started_Until_Complete()
         {
-            EventHandler starting = (sender, args) =>
+            using (var app = new TestApp())
+            {
+                EventHandler starting = (sender, args) =>
                 {
                     Assert.IsTrue(TestApplicationEventHandler.Initialized);
                     Assert.IsTrue(TestApplicationEventHandler.Starting);
-                    Assert.IsFalse(LegacyStartupHandler.Initialized);
                 };
-            EventHandler started = (sender, args) =>
+                EventHandler started = (sender, args) =>
                 {
                     Assert.IsTrue(TestApplicationEventHandler.Started);
-                    Assert.IsTrue(LegacyStartupHandler.Initialized);
                 };
-            TestApp.ApplicationStarting += starting;
-            TestApp.ApplicationStarted += started;
 
-            _testApp.StartApplication(_testApp, new EventArgs());
+                app.ApplicationStarting += starting;
+                app.ApplicationStarted += started;
 
-            TestApp.ApplicationStarting -= starting;
-            TestApp.ApplicationStarting -= started;
+                _testApp.StartApplication(_testApp, new EventArgs());
+
+                app.ApplicationStarting -= starting;
+                app.ApplicationStarting -= started;
+            }
+           
 
         }
 

@@ -20,6 +20,7 @@ namespace Umbraco.Tests.Migrations
         public void Executes_Only_One_Migration_For_Spanning_Multiple_Targets()
         {
             var runner = new MigrationRunner(
+                Mock.Of<IMigrationResolver>(),
                 Mock.Of<IMigrationEntryService>(),
                 Mock.Of<ILogger>(), new SemVersion(4, 0, 0), new SemVersion(6, 0, 0), "Test");
 
@@ -29,7 +30,7 @@ namespace Umbraco.Tests.Migrations
                 //new List<IMigration> {new DoRunMigration(), new DoNotRunMigration()},
                 migrations.ToList(),
                 new Database("umbracoDbDSN")
-                , DatabaseProviders.SqlServerCE, true);
+                , DatabaseProviders.SqlServerCE, Mock.Of<ISqlSyntaxProvider>(), true);
 
             Assert.AreEqual(1, ctx.Expressions.Count());
         }
@@ -38,6 +39,7 @@ namespace Umbraco.Tests.Migrations
         public void Executes_Migration_For_Spanning_One_Target_1()
         {
             var runner = new MigrationRunner(
+                Mock.Of<IMigrationResolver>(),
                 Mock.Of<IMigrationEntryService>(),
                 Mock.Of<ILogger>(), new SemVersion(4, 0, 0), new SemVersion(5, 0, 0), "Test");
 
@@ -47,7 +49,7 @@ namespace Umbraco.Tests.Migrations
                 //new List<IMigration> {new DoRunMigration(), new DoNotRunMigration()},
                 migrations.ToList(),
                 new Database("umbracoDbDSN")
-                , DatabaseProviders.SqlServerCE, true);
+                , DatabaseProviders.SqlServerCE, Mock.Of<ISqlSyntaxProvider>(), true);
 
             Assert.AreEqual(1, ctx.Expressions.Count());
         }
@@ -56,6 +58,7 @@ namespace Umbraco.Tests.Migrations
         public void Executes_Migration_For_Spanning_One_Target_2()
         {
             var runner = new MigrationRunner(
+                Mock.Of<IMigrationResolver>(),
                 Mock.Of<IMigrationEntryService>(),
                 Mock.Of<ILogger>(), new SemVersion(5, 0, 1), new SemVersion(6, 0, 0), "Test");
 
@@ -65,7 +68,7 @@ namespace Umbraco.Tests.Migrations
                 //new List<IMigration> {new DoRunMigration(), new DoNotRunMigration()},
                 migrations.ToList(),
                 new Database("umbracoDbDSN")
-                , DatabaseProviders.SqlServerCE, true);
+                , DatabaseProviders.SqlServerCE, Mock.Of<ISqlSyntaxProvider>(), true);
 
             Assert.AreEqual(1, ctx.Expressions.Count());
         }

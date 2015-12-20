@@ -36,10 +36,10 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private MemberRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out MemberTypeRepository memberTypeRepository, out MemberGroupRepository memberGroupRepository)
         {
-            memberTypeRepository = new MemberTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, MappingResolver);
-            memberGroupRepository = new MemberGroupRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, CacheHelper.CreateDisabledCacheHelper(), MappingResolver);
-            var tagRepo = new TagRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, MappingResolver);
-            var repository = new MemberRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, memberTypeRepository, memberGroupRepository, tagRepo, Mock.Of<IContentSection>());
+            memberTypeRepository = new MemberTypeRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, MappingResolver);
+            memberGroupRepository = new MemberGroupRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, DisabledCache, MappingResolver);
+            var tagRepo = new TagRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, MappingResolver);
+            var repository = new MemberRepository(unitOfWork, DisabledCache, Logger, SqlSyntax, memberTypeRepository, memberGroupRepository, tagRepo, Mock.Of<IContentSection>(), MappingResolver);
             return repository;
         }
 

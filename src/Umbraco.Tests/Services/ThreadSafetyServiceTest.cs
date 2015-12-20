@@ -56,7 +56,8 @@ namespace Umbraco.Tests.Services
                 new PublishingStrategy(evtMsgs, Logger), 
                 cacheHelper, 
                 Logger,
-                evtMsgs);
+                evtMsgs,
+                Enumerable.Empty<IUrlSegmentProvider>());
 
 			CreateTestData();
 		}

@@ -55,7 +55,7 @@ namespace Umbraco.Tests.TestHelpers
         //Used to flag if its the first test in the current fixture
         private bool _isFirstTestInFixture = false;
 
-        //private ApplicationContext _appContext;
+        private ApplicationContext _appContext;
 
         private string _dbPath;
         //used to store (globally) the pre-built db with schema and initial data
@@ -70,16 +70,6 @@ namespace Umbraco.Tests.TestHelpers
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
             base.Initialize();
-
-            
-
-            
-
-            
-
-            
-
-            
         }
 
         protected override void ConfigureContainer()
@@ -87,6 +77,12 @@ namespace Umbraco.Tests.TestHelpers
             base.ConfigureContainer();
 
             Container.Register<ISqlSyntaxProvider, SqlCeSyntaxProvider>();
+        }
+
+        private CacheHelper _disabledCacheHelper;
+        protected CacheHelper DisabledCache
+        {
+            get { return _disabledCacheHelper ?? (_disabledCacheHelper = CacheHelper.CreateDisabledCacheHelper()); }
         }
 
         private MappingResolver _mappingResolver;
@@ -121,7 +117,15 @@ namespace Umbraco.Tests.TestHelpers
                 //assign the db context
                 new DatabaseContext(dbFactory, Logger, SqlSyntax, "System.Data.SqlServerCe.4.0"),
                 //assign the service context
-                new ServiceContext(repositoryFactory, new PetaPocoUnitOfWorkProvider(dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy(evtMsgs, Logger), cacheHelper, Logger, evtMsgs),
+                new ServiceContext(
+                        repositoryFactory, 
+                        new PetaPocoUnitOfWorkProvider(dbFactory), 
+                        new FileUnitOfWorkProvider(), 
+                        new PublishingStrategy(evtMsgs, Logger), 
+                        cacheHelper, 
+                        Logger, 
+                        evtMsgs,
+                        Enumerable.Empty<IUrlSegmentProvider>()),
                 cacheHelper,
                 ProfilingLogger)
             {
@@ -134,7 +138,7 @@ namespace Umbraco.Tests.TestHelpers
             {
                 //TODO: Somehow make this faster - takes 5s +
 
-                appContext.DatabaseContext.Initialize(dbFactory.ProviderName, dbFactory.ConnectionString);
+                _appContext.DatabaseContext.Initialize(dbFactory.ProviderName, dbFactory.ConnectionString);
                 CreateSqlCeDatabase();
                 InitializeDatabase();
 
@@ -270,7 +274,7 @@ namespace Umbraco.Tests.TestHelpers
 
                 var schemaHelper = new DatabaseSchemaHelper(DatabaseContext.Database, Logger, SqlSyntax);
                 //Create the umbraco database and its base data
-                schemaHelper.CreateDatabaseSchema();
+                schemaHelper.CreateDatabaseSchema(_appContext);
 
                 //close the connections, we're gonna read this baby in as a byte array so we don't have to re-initialize the 
                 // damn db for each test

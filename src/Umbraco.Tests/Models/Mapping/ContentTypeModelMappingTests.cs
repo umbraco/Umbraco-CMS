@@ -185,10 +185,10 @@ namespace Umbraco.Tests.Models.Mapping
 
             //return a textbox property editor for any requested editor by alias
             _propertyEditorResolver.Setup(resolver => resolver.GetByAlias(It.IsAny<string>()))
-                .Returns(new TextboxPropertyEditor());
+                .Returns(new TextboxPropertyEditor(Mock.Of<ILogger>()));
             //for testing, just return a list of whatever property editors we want
             _propertyEditorResolver.Setup(resolver => resolver.PropertyEditors)
-                .Returns(new[] { new TextboxPropertyEditor() });
+                .Returns(new[] { new TextboxPropertyEditor(Mock.Of<ILogger>()) });
             
             var contentType = MockedContentTypes.CreateTextpageContentType();
             MockedContentTypes.EnsureAllIds(contentType, 8888);
@@ -360,10 +360,10 @@ namespace Umbraco.Tests.Models.Mapping
 
             //return a textbox property editor for any requested editor by alias
             _propertyEditorResolver.Setup(resolver => resolver.GetByAlias(It.IsAny<string>()))
-                .Returns(new TextboxPropertyEditor());
+                .Returns(new TextboxPropertyEditor(Mock.Of<ILogger>()));
             //for testing, just return a list of whatever property editors we want
             _propertyEditorResolver.Setup(resolver => resolver.PropertyEditors)
-                .Returns(new[] { new TextboxPropertyEditor() });
+                .Returns(new[] { new TextboxPropertyEditor(Mock.Of<ILogger>()) });
 
             var ctMain = MockedContentTypes.CreateSimpleContentType();
             //not assigned to tab

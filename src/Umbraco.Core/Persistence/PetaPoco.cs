@@ -27,7 +27,7 @@ using System.Linq.Expressions;
 
 namespace Umbraco.Core.Persistence
 {
-	// Poco's marked [Explicit] require all column properties to be marked
+    // Poco's marked [Explicit] require all column properties to be marked
 	[AttributeUsage(AttributeTargets.Class)]
 	public class ExplicitColumnsAttribute : Attribute
 	{

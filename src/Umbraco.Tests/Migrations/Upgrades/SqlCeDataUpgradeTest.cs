@@ -20,6 +20,7 @@ namespace Umbraco.Tests.Migrations.Upgrades
         [Test, NUnit.Framework.Ignore]
         public override void Can_Upgrade_From_470_To_600()
         {
+            var sqlSyntax = Mock.Of<ISqlSyntaxProvider>();
             var configuredVersion = new SemVersion(4, 11, 0);
             var targetVersion = new SemVersion(6, 0, 0);
             var provider = GetDatabaseProvider();
@@ -29,10 +30,11 @@ namespace Umbraco.Tests.Migrations.Upgrades
 
             //Setup the MigrationRunner
             var migrationRunner = new MigrationRunner(
+                Mock.Of<IMigrationResolver>(),
                 Mock.Of<IMigrationEntryService>(),
                 Mock.Of<ILogger>(), configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
 
-            bool upgraded = migrationRunner.Execute(db, provider, true);
+            bool upgraded = migrationRunner.Execute(db, provider, sqlSyntax, true);
 
             Assert.That(upgraded, Is.True);
 

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using AutoMapper;
 using Moq;
@@ -188,7 +189,15 @@ namespace Umbraco.Tests.TestHelpers
                 new DatabaseContext(new DefaultDatabaseFactory(Core.Configuration.GlobalSettings.UmbracoConnectionName, Logger),
                     Logger, sqlSyntax, "System.Data.SqlServerCe.4.0"),
                 //assign the service context
-                new ServiceContext(repoFactory, new PetaPocoUnitOfWorkProvider(Logger), new FileUnitOfWorkProvider(), new PublishingStrategy(evtMsgs, Logger), CacheHelper, Logger, evtMsgs),
+                new ServiceContext(
+                    repoFactory, 
+                    new PetaPocoUnitOfWorkProvider(Logger), 
+                    new FileUnitOfWorkProvider(),
+                    new PublishingStrategy(evtMsgs, Logger), 
+                    CacheHelper, 
+                    Logger, 
+                    evtMsgs, 
+                    Enumerable.Empty<IUrlSegmentProvider>()),
                 CacheHelper,
                 ProfilingLogger)
             {

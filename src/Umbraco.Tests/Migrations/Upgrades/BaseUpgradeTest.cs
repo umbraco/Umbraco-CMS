@@ -59,10 +59,12 @@ namespace Umbraco.Tests.Migrations.Upgrades
             }
 
             var logger = Mock.Of<ILogger>();
+            var sqlHelper = Mock.Of<ISqlSyntaxProvider>();
             var sql = GetSyntaxProvider();
 
             //Setup the MigrationRunner
             var migrationRunner = new MigrationRunner(
+                Mock.Of<IMigrationResolver>(),
                 Mock.Of<IMigrationEntryService>(),
                 logger,
                 configuredVersion,
