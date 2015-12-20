@@ -89,9 +89,7 @@ namespace umbraco.cms.businesslogic.datatype
                             // additional thumbnails configured as prevalues on the DataType
                             if (_thumbnailSizes != "")
                             {
-                                char sep = (_thumbnailSizes.Contains("") == false && _thumbnailSizes.Contains(",")) ? ',' : ';';
-
-                                foreach (string thumb in _thumbnailSizes.Split(sep))
+								foreach (var thumb in _thumbnailSizes.Split(new[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries))
                                 {
                                     int thumbSize;
                                     if (thumb != "" && int.TryParse(thumb, out thumbSize))
