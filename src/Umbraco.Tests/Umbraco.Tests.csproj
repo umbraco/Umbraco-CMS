@@ -347,7 +347,6 @@
     <Compile Include="Migrations\Stubs\AlterUserTableMigrationStub.cs" />
     <Compile Include="Migrations\Stubs\Dummy.cs" />
     <Compile Include="Migrations\Stubs\SixZeroMigration1.cs" />
-    <Compile Include="Migrations\TargetVersionSixthMigrationsTest.cs" />
     <Compile Include="Migrations\Upgrades\MySqlUpgradeTest.cs" />
     <Compile Include="Migrations\Upgrades\SqlCeDataUpgradeTest.cs" />
     <Compile Include="Migrations\Upgrades\SqlCeUpgradeTest.cs" />
