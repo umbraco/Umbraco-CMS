@@ -16,10 +16,7 @@ namespace umbraco.cms.businesslogic.macro
         public string Alias { get; set; }
         public string MacroControlIdentifier { get; set; }
         public MacroTypes MacroType { get; set; }
-
-        [Obsolete("This is no longer used, we should remove it in v8, CustomControl macros are gone")]
-        public string TypeAssembly { get; set; }
-
+        
         public string TypeName { get; set; }
         public string Xslt { get; set; }
         public string ScriptName { get; set; }
@@ -49,7 +46,6 @@ namespace umbraco.cms.businesslogic.macro
                 Id = m.Id;
                 Name = m.Name;
                 Alias = m.Alias;
-                TypeAssembly = m.Assembly;
                 TypeName = m.Type;
                 Xslt = m.Xslt;
                 ScriptName = m.ScriptingFile;

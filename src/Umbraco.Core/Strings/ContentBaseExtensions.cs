@@ -23,7 +23,7 @@ namespace Umbraco.Core.Strings
             if (content == null) throw new ArgumentNullException("content");
             if (urlSegmentProviders == null) throw new ArgumentNullException("urlSegmentProviders");
 
-            var url = urlSegmentProviders.Select(p => p.GetUrlSegment(content)).First(u => u != null);
+            var url = urlSegmentProviders.Select(p => p.GetUrlSegment(content)).FirstOrDefault(u => u != null);
             url = url ?? new DefaultUrlSegmentProvider().GetUrlSegment(content); // be safe
             return url;
         }
@@ -41,7 +41,7 @@ namespace Umbraco.Core.Strings
             if (culture == null) throw new ArgumentNullException("culture");
             if (urlSegmentProviders == null) throw new ArgumentNullException("urlSegmentProviders");
 
-            var url = urlSegmentProviders.Select(p => p.GetUrlSegment(content, culture)).First(u => u != null);
+            var url = urlSegmentProviders.Select(p => p.GetUrlSegment(content, culture)).FirstOrDefault(u => u != null);
             url = url ?? new DefaultUrlSegmentProvider().GetUrlSegment(content, culture); // be safe
             return url;
         }

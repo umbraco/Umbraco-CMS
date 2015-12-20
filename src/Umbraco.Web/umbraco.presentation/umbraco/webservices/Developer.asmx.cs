@@ -50,7 +50,6 @@ namespace umbraco.webservices
                 macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "useInEditor", m.UseInEditor.ToString()));
                 macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "alias", m.Alias));
                 macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "name", m.Name));
-                macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "assembly", m.Assembly));
                 macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "type", m.Type));
                 macro.Attributes.Append(XmlHelper.AddAttribute(xmlDoc, "xslt", m.Xslt));
 				var properties = xmlDoc.CreateElement("properties");

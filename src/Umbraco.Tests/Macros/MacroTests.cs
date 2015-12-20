@@ -78,38 +78,33 @@ namespace Umbraco.Tests.Macros
             Assert.AreEqual(converted.Result, prop.GetValue(ctrl));
         }
 
-        [TestCase("text.xslt", "", "", "", "XSLT")]
-        [TestCase("", "razor-script.cshtml", "", "", "Script")]
-        [TestCase("", "~/Views/MacroPartials/test.cshtml", "", "", "PartialView")]
-        [TestCase("", "~/App_Plugins/MyPackage/Views/MacroPartials/test.cshtml", "", "", "PartialView")]
-        [TestCase("", "", "~/usercontrols/menu.ascx", "", "UserControl")]
-        [TestCase("", "", "~/usercontrols/Header.ASCX", "", "UserControl")]
-        [TestCase("", "", "MyNamespace.MyCustomControl", "MyAssembly", "CustomControl")]
-        [TestCase("", "", "", "", "Unknown")]
-        public void Determine_Macro_Type(string xslt, string scriptFile, string scriptType, string scriptAssembly, string expectedType)
+        [TestCase("text.xslt", "", "", "Xslt")]
+        [TestCase("", "~/Views/MacroPartials/test.cshtml", "", "PartialView")]
+        [TestCase("", "~/App_Plugins/MyPackage/Views/MacroPartials/test.cshtml", "", "PartialView")]
+        [TestCase("", "", "~/usercontrols/menu.ascx", "UserControl")]
+        [TestCase("", "", "~/usercontrols/Header.ASCX", "UserControl")]
+        [TestCase("", "", "", "Unknown")]
+        public void Determine_Macro_Type(string xslt, string scriptFile, string scriptType, string expectedType)
         {
             var expected = Enum<MacroTypes>.Parse(expectedType);
             Assert.AreEqual(expected, Macro.FindMacroType(xslt, scriptFile, scriptType));
         }
 
-        [TestCase("text.xslt", "", "", "", "~/xslt/text.xslt")]
-        [TestCase("", "razor-script.cshtml", "", "", "~/macroScripts/razor-script.cshtml")]
-        [TestCase("", "~/Views/MacroPartials/test.cshtml", "", "", "~/Views/MacroPartials/test.cshtml")]
-        [TestCase("", "~/App_Plugins/MyPackage/Views/MacroPartials/test.cshtml", "", "", "~/App_Plugins/MyPackage/Views/MacroPartials/test.cshtml")]
-        [TestCase("", "", "~/usercontrols/menu.ascx", "", "~/usercontrols/menu.ascx")]
-        public void Get_Macro_File(string xslt, string scriptFile, string scriptType, string scriptAssembly, string expectedResult)
+        [TestCase("text.xslt", "", "", "~/xslt/text.xslt")]
+        [TestCase("", "razor-script.cshtml", "", "~/macroScripts/razor-script.cshtml")]
+        [TestCase("", "~/Views/MacroPartials/test.cshtml", "", "~/Views/MacroPartials/test.cshtml")]
+        [TestCase("", "~/App_Plugins/MyPackage/Views/MacroPartials/test.cshtml", "", "~/App_Plugins/MyPackage/Views/MacroPartials/test.cshtml")]
+        [TestCase("", "", "~/usercontrols/menu.ascx", "~/usercontrols/menu.ascx")]
+        public void Get_Macro_File(string xslt, string scriptFile, string scriptType, string expectedResult)
         {
-            var model = new MacroModel("Test", "test", scriptAssembly, scriptType, xslt, 0, false, false);
+            var model = new MacroModel("Test", "test", "", scriptType, xslt, 0, false, false);
             var file = macro.GetMacroFile(model);
             Assert.AreEqual(expectedResult, file);
         }
 
-        [TestCase("XSLT", true)]
-        [TestCase("Script", true)]
+        [TestCase("Xslt", true)]
         [TestCase("PartialView", true)]
         [TestCase("UserControl", true)]
-        [TestCase("CustomControl", false)]
-        [TestCase("Python", true)]
         [TestCase("Unknown", false)]
         public void Macro_Is_File_Based(string macroType, bool expectedResult)
         {
@@ -119,12 +114,9 @@ namespace Umbraco.Tests.Macros
             Assert.AreEqual(expectedResult, macro.MacroIsFileBased(model));
         }
 
-        [TestCase("XSLT", true)]
-        [TestCase("Script", true)]
+        [TestCase("Xslt", true)]
         [TestCase("PartialView", true)]
         [TestCase("UserControl", false)]
-        [TestCase("CustomControl", false)]
-        [TestCase("Python", true)]
         [TestCase("Unknown", false)]
         public void Can_Cache_As_String(string macroType, bool expectedResult)
         {

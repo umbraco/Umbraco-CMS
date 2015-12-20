@@ -90,17 +90,6 @@ namespace umbraco.cms.businesslogic.macro
 		}
 
 		/// <summary>
-		/// If the macro is a wrapper for a custom control, this is the assemly name from which to load the macro
-		/// 
-		/// specified like: /bin/mydll (without the .dll extension)
-		/// </summary>
-		public string Assembly
-		{
-            get { return MacroEntity.ControlAssembly; }
-            set { MacroEntity.ControlAssembly = value; }
-		}
-
-		/// <summary>
 		/// The relative path to the usercontrol or the assembly type of the macro when using .Net custom controls
 		/// </summary>
 		/// <remarks>
@@ -268,13 +257,12 @@ namespace umbraco.cms.businesslogic.macro
             try
             {
                 m.Alias = alias;
-                m.Assembly = XmlHelper.GetNodeValue(n.SelectSingleNode("scriptAssembly"));
                 m.Type = XmlHelper.GetNodeValue(n.SelectSingleNode("scriptType"));
                 m.Xslt = XmlHelper.GetNodeValue(n.SelectSingleNode("xslt"));
                 m.RefreshRate = int.Parse(XmlHelper.GetNodeValue(n.SelectSingleNode("refreshRate")));
 
                 // we need to validate if the usercontrol is missing the tilde prefix requirement introduced in v6
-                if (string.IsNullOrEmpty(m.Assembly) && string.IsNullOrEmpty(m.Type) == false && m.Type.StartsWith("~") == false)
+                if (string.IsNullOrEmpty(m.Type) == false && m.Type.StartsWith("~") == false)
                 {
                     m.Type = "~/" + m.Type;
                 }
