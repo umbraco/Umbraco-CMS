@@ -42,6 +42,7 @@ using Umbraco.Web.Scheduling;
 using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic;
+using Umbraco.Core.Events;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
@@ -154,6 +155,7 @@ namespace Umbraco.Web
             return new WebProfiler();
         }
 
+        /// <summary>
         /// Ensure that the OnApplicationStarted methods of the IApplicationEvents are called
         /// </summary>
         /// <param name="afterComplete"></param>
@@ -257,7 +259,7 @@ namespace Umbraco.Web
             }
 
             //need to get the plugin controllers that are unique to each area (group by)
-            var pluginSurfaceControlleres = pluginControllers.Where(x => !PluginController.GetMetadata(x).AreaName.IsNullOrWhiteSpace());
+            var pluginSurfaceControlleres = pluginControllers.Where(x => PluginController.GetMetadata(x).AreaName.IsNullOrWhiteSpace() == false);
             var groupedAreas = pluginSurfaceControlleres.GroupBy(controller => PluginController.GetMetadata(controller).AreaName);
             //loop through each area defined amongst the controllers
             foreach (var g in groupedAreas)
@@ -313,16 +315,21 @@ namespace Umbraco.Web
         {
             base.ConfigureServices(container);
 
+            //Replace services:
+            container.Register<IEventMessagesFactory, RequestLifespanMessagesFactory>();
+
             //IoC setup for LightInject for mvc/webapi
-            MvcContainerExtensions.EnableMvc(Container);
+            Container.EnableMvc();
             Container.RegisterMvcControllers(PluginManager);
             container.EnablePerWebRequestScope();
             container.EnableWebApi(GlobalConfiguration.Configuration);
             container.RegisterApiControllers(PluginManager);
 
             //register other services
-            container.Register<IPublishedContentCache, PublishedContentCache>();
-            container.Register<IPublishedMediaCache, PublishedMediaCache>();
+            container.Register<IUmbracoContextAccessor, DefaultUmbracoContextAccessor>(new PerRequestLifeTime());
+            //TODO: Is this lifespan correct? Need to ask Stephen because we have contextual ones too
+            container.Register<IPublishedContentCache, PublishedContentCache>(new PerContainerLifetime());
+            container.Register<IPublishedMediaCache, PublishedMediaCache>(new PerContainerLifetime());
             //no need to declare as per request, currently we manage it's lifetime as the singleton
             container.Register<UmbracoContext>(factory => UmbracoContext.Current);
         }

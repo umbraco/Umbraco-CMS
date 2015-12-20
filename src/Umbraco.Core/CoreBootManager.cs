@@ -176,6 +176,9 @@ namespace Umbraco.Core
             container.Register<MediaFileSystem>(factory => FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>());
 
             container.Register<ISqlSyntaxProvider>(factory => factory.GetInstance<DatabaseContext>().SqlSyntax);
+
+            //These will be replaced by the web boot manager when running in a web context
+            container.Register<IEventMessagesFactory, TransientMessagesFactory>();
         }
 
         /// <summary>

@@ -260,7 +260,6 @@ namespace Umbraco.Core
         /// Returns the logger instance for the application - this will be used throughout the entire app
         /// </summary>
         public virtual ILogger Logger
-                // LoggerResolver can resolve before resolution is frozen
         {
             get { return _logger ?? (_logger = Logging.Logger.CreateWithDefaultLog4NetConfiguration()); }
         }

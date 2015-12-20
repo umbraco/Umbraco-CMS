@@ -310,6 +310,7 @@
     <Compile Include="ApplicationContextExtensions.cs" />
     <Compile Include="AreaRegistrationContextExtensions.cs" />
     <Compile Include="BatchedDatabaseServerMessengerStartup.cs" />
+    <Compile Include="DefaultUmbracoContextAccessor.cs" />
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
     <Compile Include="LightInjectExtensions.cs" />
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />

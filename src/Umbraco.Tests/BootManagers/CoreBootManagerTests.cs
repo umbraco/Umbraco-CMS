@@ -61,45 +61,6 @@ namespace Umbraco.Tests.BootManagers
                 : base(umbracoApplication, logger)
             {
             }
-
-            ///// <summary>
-            ///// Creates and returns the application context singleton
-            ///// </summary>
-            ///// <param name="dbContext"></param>
-            ///// <param name="serviceContext"></param>
-            //protected override ApplicationContext CreateApplicationContext(DatabaseContext dbContext, ServiceContext serviceContext)
-            //{
-            //    var appContext = base.CreateApplicationContext(dbContext, serviceContext);
-
-            //    var dbContextMock = new Mock<DatabaseContext>(Mock.Of<IDatabaseFactory>(), ProfilingLogger.Logger, Mock.Of<ISqlSyntaxProvider>(), "test");
-            //    dbContextMock.Setup(x => x.CanConnect).Returns(true);
-            //    appContext.DatabaseContext = dbContextMock.Object;
-
-            //    return appContext;
-            //}
-
-            //protected override void InitializeApplicationEventsResolver()
-            //{
-            //    //create an empty resolver so we can add our own custom ones (don't type find)
-            //    ApplicationEventsResolver.Current = new ApplicationEventsResolver(
-            //        new ActivatorServiceProvider(), ProfilingLogger.Logger,
-            //        new Type[]
-            //        {
-            //            typeof(LegacyStartupHandler),
-            //            typeof(TestApplicationEventHandler)
-            //        })
-            //        {
-            //            CanResolveBeforeFrozen = true
-            //        };
-            //}
-            
-            //protected override void InitializeLoggerResolver()
-            //{                
-            //}
-            
-            //protected override void InitializeProfilerResolver()
-            //{
-            //}
         }
         
         /// <summary>
@@ -138,7 +99,7 @@ namespace Umbraco.Tests.BootManagers
         }
 
         [Test]
-        public void Ensure_Legacy_Startup_Handlers_Not_Started_Until_Complete()
+        public void Raises_Events()
         {
             using (var app = new TestApp())
             {
@@ -146,9 +107,12 @@ namespace Umbraco.Tests.BootManagers
                 {
                     Assert.IsTrue(TestApplicationEventHandler.Initialized);
                     Assert.IsTrue(TestApplicationEventHandler.Starting);
+                    Assert.IsFalse(TestApplicationEventHandler.Started);
                 };
                 EventHandler started = (sender, args) =>
                 {
+                    Assert.IsTrue(TestApplicationEventHandler.Initialized);
+                    Assert.IsTrue(TestApplicationEventHandler.Starting);
                     Assert.IsTrue(TestApplicationEventHandler.Started);
                 };
 
