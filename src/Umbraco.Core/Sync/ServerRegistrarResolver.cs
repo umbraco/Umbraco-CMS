@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
-using Umbraco.Core.LightInject;
+using LightInject;
 using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Core.Sync
@@ -23,7 +23,7 @@ namespace Umbraco.Core.Sync
         {
         }
 
-        internal ServerRegistrarResolver(IServiceContainer container, Expression<Func<IServiceFactory, IServerRegistrar>> implementationType)
+        internal ServerRegistrarResolver(IServiceContainer container, Func<IServiceFactory, IServerRegistrar> implementationType)
             : base(container, implementationType)
         {
         }

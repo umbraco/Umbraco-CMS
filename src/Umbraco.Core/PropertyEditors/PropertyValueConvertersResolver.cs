@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Umbraco.Core.LightInject;
+using LightInject;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 

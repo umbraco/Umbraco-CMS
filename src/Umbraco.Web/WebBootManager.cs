@@ -13,11 +13,11 @@ using System.Web.Routing;
 using ClientDependency.Core.Config;
 using Examine;
 using Examine.Config;
+using LightInject;
 using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
-using Umbraco.Core.LightInject;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Macros;
 using Umbraco.Core.ObjectResolution;
@@ -27,7 +27,6 @@ using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Dictionary;
 using Umbraco.Web.Install;
-using Umbraco.Web.LightInject;
 using Umbraco.Web.Macros;
 using Umbraco.Web.Media;
 using Umbraco.Web.Media.ThumbnailProviders;
@@ -50,7 +49,6 @@ using Umbraco.Core.Services;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using ProfilingViewEngine = Umbraco.Core.Profiling.ProfilingViewEngine;
 using TypeHelper = Umbraco.Core.TypeHelper;
-using Umbraco.Core.LightInject;
 
 
 namespace Umbraco.Web
@@ -316,7 +314,7 @@ namespace Umbraco.Web
             base.ConfigureServices(container);
 
             //IoC setup for LightInject for mvc/webapi
-            Container.EnableMvc();
+            MvcContainerExtensions.EnableMvc(Container);
             Container.RegisterMvcControllers(PluginManager);
             container.EnablePerWebRequestScope();
             container.EnableWebApi(GlobalConfiguration.Configuration);

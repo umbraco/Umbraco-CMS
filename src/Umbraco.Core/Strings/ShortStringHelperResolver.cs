@@ -1,6 +1,6 @@
 using System;
 using System.Linq.Expressions;
-using Umbraco.Core.LightInject;
+using LightInject;
 using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Core.Strings
@@ -26,7 +26,7 @@ namespace Umbraco.Core.Strings
         /// </summary>
         /// <param name="container"></param>
         /// <param name="implementationType"></param>
-        internal ShortStringHelperResolver(IServiceContainer container, Expression<Func<IServiceFactory, IShortStringHelper>> implementationType)
+        internal ShortStringHelperResolver(IServiceContainer container, Func<IServiceFactory, IShortStringHelper> implementationType)
             : base(container, implementationType)
         {
             Resolution.Frozen += (sender, args) => Value.Freeze();

@@ -1,6 +1,6 @@
 using System;
 using System.Linq.Expressions;
-using Umbraco.Core.LightInject;
+using LightInject;
 using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Web.PublishedCache
@@ -35,7 +35,7 @@ namespace Umbraco.Web.PublishedCache
 	    /// </summary>
 	    /// <param name="container"></param>
 	    /// <param name="implementationType"></param>
-	    public PublishedCachesResolver(IServiceContainer container, Expression<Func<IServiceFactory, IPublishedCaches>> implementationType) : base(container, implementationType)
+	    public PublishedCachesResolver(IServiceContainer container, Func<IServiceFactory, IPublishedCaches> implementationType) : base(container, implementationType)
 	    {
 	    }
 

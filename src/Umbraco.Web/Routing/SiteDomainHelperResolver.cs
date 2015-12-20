@@ -1,6 +1,6 @@
 using System;
 using System.Linq.Expressions;
-using Umbraco.Core.LightInject;
+using LightInject;
 using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Web.Routing
@@ -34,7 +34,7 @@ namespace Umbraco.Web.Routing
         /// </summary>
         /// <param name="container"></param>
         /// <param name="implementationType"></param>
-        internal SiteDomainHelperResolver(IServiceContainer container, Expression<Func<IServiceFactory, ISiteDomainHelper>> implementationType)
+        internal SiteDomainHelperResolver(IServiceContainer container, Func<IServiceFactory, ISiteDomainHelper> implementationType)
             : base(container, implementationType)
         {
         }

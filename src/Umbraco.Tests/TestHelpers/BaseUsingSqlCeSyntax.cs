@@ -1,8 +1,8 @@
-﻿using Moq;
+﻿using LightInject;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.LightInject;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence.Mappers;

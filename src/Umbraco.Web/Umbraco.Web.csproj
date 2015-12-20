@@ -128,6 +128,22 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
+    <Reference Include="LightInject, Version=4.0.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\LightInject.4.0.2\lib\net45\LightInject.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="LightInject.Mvc, Version=1.0.0.4, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\LightInject.Mvc.1.0.0.4\lib\net45\LightInject.Mvc.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="LightInject.Web, Version=1.0.0.4, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\LightInject.Web.1.0.0.4\lib\net45\LightInject.Web.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="LightInject.WebApi, Version=1.0.0.4, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\LightInject.WebApi.1.0.0.4\lib\net45\LightInject.WebApi.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Lucene.Net, Version=2.9.4.1, Culture=neutral, PublicKeyToken=85089178b9ac3181, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Lucene.Net.2.9.4.1\lib\net40\Lucene.Net.dll</HintPath>
@@ -295,9 +311,7 @@
     <Compile Include="AreaRegistrationContextExtensions.cs" />
     <Compile Include="BatchedDatabaseServerMessengerStartup.cs" />
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
-    <Compile Include="LightInject\LightInjectExtensions.cs" />
-    <Compile Include="LightInject\Mvc\LightInject.Mvc.cs" />
-    <Compile Include="LightInject\WebApi\LightInject.WebApi.cs" />
+    <Compile Include="LightInjectExtensions.cs" />
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
     <Compile Include="Routing\NotFoundHandlerHelper.cs" />
     <Compile Include="Install\InstallSteps\Version73FileCleanup.cs" />
@@ -336,7 +350,6 @@
     <Compile Include="Security\WebAuthExtensions.cs" />
     <Compile Include="UmbracoDefaultOwinStartup.cs" />
     <Compile Include="IUmbracoContextAccessor.cs" />
-    <Compile Include="LightInject\Web\LightInject.Web.cs" />
     <Compile Include="Models\ContentEditing\Relation.cs" />
     <Compile Include="HtmlStringUtilities.cs" />
     <Compile Include="Models\ContentEditing\RelationType.cs" />

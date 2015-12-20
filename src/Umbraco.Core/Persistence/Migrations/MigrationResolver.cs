@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.LightInject;
 using System.Linq;
+using LightInject;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence.SqlSyntax;

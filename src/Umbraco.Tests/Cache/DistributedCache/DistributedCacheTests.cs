@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using LightInject;
 using Moq;
 using NUnit.Framework;
 using umbraco.interfaces;
 using Umbraco.Core;
-using Umbraco.Core.LightInject;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Sync;

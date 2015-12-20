@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
-using Umbraco.Core.LightInject;
+using LightInject;
 
 namespace Umbraco.Core.ObjectResolution
 {
@@ -71,7 +71,7 @@ namespace Umbraco.Core.ObjectResolution
         /// </summary>
         /// <param name="container"></param>
         /// <param name="implementationType"></param>
-        internal ContainerSingleObjectResolver(IServiceContainer container, Expression<Func<IServiceFactory, TResolved>> implementationType)
+        internal ContainerSingleObjectResolver(IServiceContainer container, Func<IServiceFactory, TResolved> implementationType)
         {
             _container = container;
             _container.Register<TResolved>(implementationType, new PerContainerLifetime());

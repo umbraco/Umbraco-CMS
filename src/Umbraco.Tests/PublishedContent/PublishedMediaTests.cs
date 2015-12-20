@@ -27,7 +27,7 @@ using UmbracoExamine;
 using UmbracoExamine.DataServices;
 using umbraco.BusinessLogic;
 using System.Linq;
-using Umbraco.Core.LightInject;
+using LightInject;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Strings;
 

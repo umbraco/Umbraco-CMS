@@ -16,7 +16,6 @@ using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using umbraco;
-using Umbraco.Core.LightInject;
 
 namespace Umbraco.Tests
 {

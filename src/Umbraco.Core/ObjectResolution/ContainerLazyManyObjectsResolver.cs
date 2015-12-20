@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using Umbraco.Core.LightInject;
+using LightInject;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.ObjectResolution

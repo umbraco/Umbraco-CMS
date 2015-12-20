@@ -6,7 +6,6 @@ using NUnit.Framework;
 using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.LightInject;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;

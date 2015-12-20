@@ -1,5 +1,5 @@
 ﻿using System;
-using Umbraco.Core.LightInject;
+using LightInject;
 using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Core.Models.PublishedContent

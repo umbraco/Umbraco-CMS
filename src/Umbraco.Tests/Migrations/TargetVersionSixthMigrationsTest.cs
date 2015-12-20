@@ -8,7 +8,6 @@ using NUnit.Framework;
 using Semver;
 using SQLCE4Umbraco;
 using Umbraco.Core;
-using Umbraco.Core.LightInject;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
-using Umbraco.Core.LightInject;
+using LightInject;
 using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Core.Sync
@@ -15,7 +15,7 @@ namespace Umbraco.Core.Sync
         {
         }
 
-        internal ServerMessengerResolver(IServiceContainer container, Expression<Func<IServiceFactory, IServerMessenger>> implementationType)
+        internal ServerMessengerResolver(IServiceContainer container, Func<IServiceFactory, IServerMessenger> implementationType)
             : base(container, implementationType)
         {
         }
