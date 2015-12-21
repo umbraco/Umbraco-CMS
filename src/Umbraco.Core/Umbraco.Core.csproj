@@ -292,6 +292,7 @@
     <Compile Include="DelegateExtensions.cs" />
     <Compile Include="DependencyInjection\ConfigurationCompositionRoot.cs" />
     <Compile Include="DependencyInjection\RepositoryCompositionRoot.cs" />
+    <Compile Include="DependencyInjection\ServicesCompositionRoot.cs" />
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="Dictionary\CultureDictionaryFactoryResolver.cs" />
     <Compile Include="Dictionary\ICultureDictionaryFactory.cs" />
@@ -510,6 +511,7 @@
     <Compile Include="Services\RepositoryService.cs" />
     <Compile Include="Services\OperationStatus.cs" />
     <Compile Include="Services\OperationStatusType.cs" />
+    <Compile Include="Services\ServiceWithResultExtensions.cs" />
     <Compile Include="Services\TaskService.cs" />
     <Compile Include="Strategies\ManifestWatcherHandler.cs" />
     <Compile Include="Strings\Css\StylesheetHelper.cs" />

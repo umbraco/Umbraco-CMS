@@ -9,12 +9,12 @@ namespace Umbraco.Core.DependencyInjection
     /// </summary>
     public sealed class ConfigurationCompositionRoot : ICompositionRoot
     {
-        public void Compose(IServiceRegistry serviceRegistry)
+        public void Compose(IServiceRegistry container)
         {
-            serviceRegistry.Register<IUmbracoSettingsSection>(factory => UmbracoConfig.For.UmbracoSettings());
-            serviceRegistry.Register<IContentSection>(factory => factory.GetInstance<IUmbracoSettingsSection>().Content);
-            serviceRegistry.Register<ITemplatesSection>(factory => factory.GetInstance<IUmbracoSettingsSection>().Templates);
-            serviceRegistry.Register<IRequestHandlerSection>(factory => factory.GetInstance<IUmbracoSettingsSection>().RequestHandler);
+            container.Register<IUmbracoSettingsSection>(factory => UmbracoConfig.For.UmbracoSettings());
+            container.Register<IContentSection>(factory => factory.GetInstance<IUmbracoSettingsSection>().Content);
+            container.Register<ITemplatesSection>(factory => factory.GetInstance<IUmbracoSettingsSection>().Templates);
+            container.Register<IRequestHandlerSection>(factory => factory.GetInstance<IUmbracoSettingsSection>().RequestHandler);
 
             //TODO: Add the other config areas...
         }

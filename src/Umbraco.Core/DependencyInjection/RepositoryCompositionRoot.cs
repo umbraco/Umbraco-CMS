@@ -19,15 +19,16 @@ namespace Umbraco.Core.DependencyInjection
     {
         public void Compose(IServiceRegistry container)
         {
-            container.Register<IDatabaseFactory>(factory => new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, factory.GetInstance<ILogger>()));
+            container.Register<IDatabaseFactory>(factory => new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, factory.GetInstance<ILogger>()), new PerContainerLifetime());
             container.Register<DatabaseContext>(factory => GetDbContext(factory), new PerContainerLifetime());
-            container.Register<SqlSyntaxProviders>(factory => SqlSyntaxProviders.CreateDefault(factory.GetInstance<ILogger>()));
-            container.Register<IUnitOfWorkProvider, FileUnitOfWorkProvider>();
-            container.Register<IDatabaseUnitOfWorkProvider, PetaPocoUnitOfWorkProvider>();
+            container.Register<SqlSyntaxProviders>(factory => SqlSyntaxProviders.CreateDefault(factory.GetInstance<ILogger>()), new PerContainerLifetime());
+            container.Register<IUnitOfWorkProvider, FileUnitOfWorkProvider>(new PerContainerLifetime());
+            container.Register<IDatabaseUnitOfWorkProvider>(factory => new PetaPocoUnitOfWorkProvider(factory.GetInstance<ILogger>()), new PerContainerLifetime());
             container.Register<IMappingResolver>(factory => new MappingResolver(
                 factory.GetInstance<IServiceContainer>(),
                 factory.GetInstance<ILogger>(),
-                () => factory.GetInstance<PluginManager>().ResolveAssignedMapperTypes()));
+                () => factory.GetInstance<PluginManager>().ResolveAssignedMapperTypes()),
+                new PerContainerLifetime());
             container.Register<RepositoryFactory>();
             container.Register<ISqlSyntaxProvider>(factory => factory.GetInstance<DatabaseContext>().SqlSyntax);
             container.Register<CacheHelper>(factory => CacheHelper.CreateDisabledCacheHelper(), "DisabledCache", new PerContainerLifetime());

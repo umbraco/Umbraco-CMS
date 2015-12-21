@@ -175,27 +175,16 @@ namespace Umbraco.Core
 
             //Datalayer/Repositories/SQL/Database/etc...
             container.RegisterFrom<RepositoryCompositionRoot>();
-            
+
+            //Data Services/ServiceContext/etc...
+            container.RegisterFrom<ServicesCompositionRoot>();
+
             container.Register<IServiceProvider, ActivatorServiceProvider>();
-            container.Register<PluginManager>(factory => PluginManager, new PerContainerLifetime());
-            
-            container.Register<BasePublishingStrategy, PublishingStrategy>();
-                        
-            container.Register<ServiceContext>(factory => new ServiceContext(
-                factory.GetInstance<RepositoryFactory>(),
-                factory.GetInstance<IDatabaseUnitOfWorkProvider>(),
-                factory.GetInstance<IUnitOfWorkProvider>(),
-                factory.GetInstance<BasePublishingStrategy>(),
-                factory.GetInstance<CacheHelper>(),
-                factory.GetInstance<ILogger>(),
-                factory.GetInstance<IEventMessagesFactory>(),
-                factory.GetAllInstances<IUrlSegmentProvider>()));
+            container.Register<PluginManager>(factory => PluginManager, new PerContainerLifetime());                                    
 
             container.Register<ApplicationContext>(new PerContainerLifetime());
             container.Register<MediaFileSystem>(factory => FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>());
             
-            //These will be replaced by the web boot manager when running in a web context
-            container.Register<IEventMessagesFactory, TransientMessagesFactory>();
         }
 
         /// <summary>
