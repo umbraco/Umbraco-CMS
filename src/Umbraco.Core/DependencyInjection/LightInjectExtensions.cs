@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using LightInject;
 
-namespace Umbraco.Core
+namespace Umbraco.Core.DependencyInjection
 {
     internal static class LightInjectExtensions
     {

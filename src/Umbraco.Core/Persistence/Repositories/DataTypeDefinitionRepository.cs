@@ -31,11 +31,11 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly DataTypePreValueRepository _preValRepository;
 
-        public DataTypeDefinitionRepository(IDatabaseUnitOfWork work, CacheHelper cache, CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider sqlSyntax,
+        public DataTypeDefinitionRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax,
             IContentTypeRepository contentTypeRepository, IMappingResolver mappingResolver)
             : base(work, cache, logger, sqlSyntax, mappingResolver)
         {
-            _cacheHelper = cacheHelper;
+            _cacheHelper = cache;
             _contentTypeRepository = contentTypeRepository;
             _preValRepository = new DataTypePreValueRepository(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax, mappingResolver);
         }

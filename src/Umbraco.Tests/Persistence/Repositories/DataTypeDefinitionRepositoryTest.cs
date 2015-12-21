@@ -32,18 +32,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.Initialize();
         }
 
-        private DataTypeDefinitionRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
+        private IDataTypeDefinitionRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            var dataTypeDefinitionRepository = new DataTypeDefinitionRepository(
-                unitOfWork, CacheHelper.CreateDisabledCacheHelper(),
-                CacheHelper.CreateDisabledCacheHelper(),
-                Mock.Of<ILogger>(), SqlSyntax,
-                new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax,
-                    new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver),
-                    MappingResolver),
-                MappingResolver);
-
-            return dataTypeDefinitionRepository;
+            return Container.GetInstance<IDatabaseUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork);
         }
 
         private EntityContainerRepository CreateContainerRepository(IDatabaseUnitOfWork unitOfWork)
@@ -508,18 +499,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
 
             var cache = new CacheHelper(new ObjectCacheRuntimeCacheProvider(), new StaticCacheProvider(), new StaticCacheProvider());
-
-            Func<DataTypeDefinitionRepository> creator = () => new DataTypeDefinitionRepository(
-                unitOfWork, CacheHelper.CreateDisabledCacheHelper(),
-                cache,
-                Mock.Of<ILogger>(), SqlSyntax,
-                new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax,
-                    new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver),
-                    MappingResolver),
-                MappingResolver);
-
+            
             DataTypeDefinition dtd;
-            using (var repository = creator())
+            using (var repository = Container.GetInstance<IDatabaseUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork))
             {
                 dtd = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.AddOrUpdate(dtd);
@@ -530,7 +512,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             DatabaseContext.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 1, Value = "test2" });
 
             //this will cache the result
-            using (var repository = creator())
+            using (var repository = Container.GetInstance<IDatabaseUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork))
             {
                 var collection = repository.GetPreValuesCollectionByDataTypeId(dtd.Id);
             }
@@ -549,18 +531,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
 
             var cache = new CacheHelper(new ObjectCacheRuntimeCacheProvider(), new StaticCacheProvider(), new StaticCacheProvider());
-
-            Func<DataTypeDefinitionRepository> creator = () => new DataTypeDefinitionRepository(
-                unitOfWork, CacheHelper.CreateDisabledCacheHelper(),
-                cache,
-                Mock.Of<ILogger>(), SqlSyntax,
-                new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax,
-                    new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>(), MappingResolver),
-                    MappingResolver),
-                MappingResolver);
-
+            
             DataTypeDefinition dtd;
-            using (var repository = creator())
+            using (var repository = Container.GetInstance<IDatabaseUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork))
             {
                 dtd = new DataTypeDefinition(-1, Constants.PropertyEditors.RadioButtonListAlias) { Name = "test" };
                 repository.AddOrUpdate(dtd);
@@ -571,7 +544,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             DatabaseContext.Database.Insert(new DataTypePreValueDto() { DataTypeNodeId = dtd.Id, SortOrder = 1, Value = "test2" });
 
             //this will cache the result
-            using (var repository = creator())
+            using (var repository = Container.GetInstance<IDatabaseUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork))
             {
                 var val = repository.GetPreValueAsString(Convert.ToInt32(id));
             }
@@ -582,7 +555,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.AreEqual(1, cached.Count());
             Assert.AreEqual(2, cached.Single().FormatAsDictionary().Count);
 
-            using (var repository = creator())
+            using (var repository = Container.GetInstance<IDatabaseUnitOfWork, IDataTypeDefinitionRepository>(unitOfWork))
             {
                 //ensure it still gets resolved!
                 var val = repository.GetPreValueAsString(Convert.ToInt32(id));

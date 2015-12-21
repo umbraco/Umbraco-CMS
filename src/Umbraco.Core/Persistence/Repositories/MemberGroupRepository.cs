@@ -23,11 +23,10 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly CacheHelper _cacheHelper;
 
-        public MemberGroupRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, CacheHelper cacheHelper, IMappingResolver mappingResolver)
+        public MemberGroupRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
             : base(work, cache, logger, sqlSyntax, mappingResolver)
         {
-            if (cacheHelper == null) throw new ArgumentNullException("cacheHelper");
-            _cacheHelper = cacheHelper;
+            _cacheHelper = cache;
         }
 
         private readonly MemberGroupFactory _modelFactory = new MemberGroupFactory();

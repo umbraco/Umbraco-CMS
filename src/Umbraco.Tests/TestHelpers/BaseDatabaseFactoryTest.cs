@@ -85,38 +85,28 @@ namespace Umbraco.Tests.TestHelpers
             get { return _disabledCacheHelper ?? (_disabledCacheHelper = CacheHelper.CreateDisabledCacheHelper()); }
         }
 
-        protected virtual ISqlSyntaxProvider SqlSyntax
-        {
-            get { return new SqlCeSyntaxProvider(); }
-        }
-
         protected override void SetupApplicationContext()
-        {
-            //disable cache
-            var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
-
+        {           
             var dbFactory = new DefaultDatabaseFactory(
                 GetDbConnectionString(),
                 GetDbProviderName(),
                 Logger);
-
-            var repositoryFactory = new RepositoryFactory(cacheHelper, Logger, SqlSyntax, SettingsForTests.GenerateMockSettings(), MappingResolver);
-
+            
             var evtMsgs = new TransientMessagesFactory();
             _appContext = new ApplicationContext(
                 //assign the db context
                 new DatabaseContext(dbFactory, Logger, SqlSyntax, "System.Data.SqlServerCe.4.0"),
                 //assign the service context
                 new ServiceContext(
-                        repositoryFactory,
+                        Container.GetInstance<RepositoryFactory>(),
                         new PetaPocoUnitOfWorkProvider(dbFactory),
                         new FileUnitOfWorkProvider(),
                         new PublishingStrategy(evtMsgs, Logger),
-                        cacheHelper,
+                        CacheHelper,
                         Logger,
                         evtMsgs,
                         Enumerable.Empty<IUrlSegmentProvider>()),
-                cacheHelper,
+                CacheHelper,
                 ProfilingLogger)
             {
                 IsReady = true

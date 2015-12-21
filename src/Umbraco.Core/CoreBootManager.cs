@@ -9,6 +9,7 @@ using LightInject;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
@@ -159,31 +160,28 @@ namespace Umbraco.Core
         internal virtual void ConfigureCoreServices(ServiceContainer container)
         {
             container.Register<IServiceContainer>(factory => container);
+            
+            //Logging
             container.Register<ILogger>(factory => _umbracoApplication.Logger, new PerContainerLifetime());
             container.Register<IProfiler>(factory => ProfilingLogger.Profiler, new PerContainerLifetime());
             container.Register<ProfilingLogger>(factory => ProfilingLogger, new PerContainerLifetime());
-            container.Register<IUmbracoSettingsSection>(factory => UmbracoConfig.For.UmbracoSettings());
-            container.Register<IContentSection>(factory => factory.GetInstance<IUmbracoSettingsSection>().Content);
-            container.Register<IRequestHandlerSection>(factory => factory.GetInstance<IUmbracoSettingsSection>().RequestHandler);
-            //TODO: Add the other config areas...
+            
+            //Config
+            container.RegisterFrom<ConfigurationCompositionRoot>();
 
+            //Cache
             container.Register<CacheHelper>(factory => ApplicationCache, new PerContainerLifetime());
             container.Register<IRuntimeCacheProvider>(factory => ApplicationCache.RuntimeCache, new PerContainerLifetime());
+
+            //Datalayer/Repositories/SQL/Database/etc...
+            container.RegisterFrom<RepositoryCompositionRoot>();
+            
             container.Register<IServiceProvider, ActivatorServiceProvider>();
             container.Register<PluginManager>(factory => PluginManager, new PerContainerLifetime());
-            container.Register<IDatabaseFactory>(factory => new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, factory.GetInstance<ILogger>()));
-            container.Register<DatabaseContext>(factory => GetDbContext(factory), new PerContainerLifetime());
-            container.Register<SqlSyntaxProviders>(factory => SqlSyntaxProviders.CreateDefault(factory.GetInstance<ILogger>()));
-            container.Register<IDatabaseUnitOfWorkProvider, PetaPocoUnitOfWorkProvider>();
-            container.Register<IUnitOfWorkProvider, FileUnitOfWorkProvider>();
+            
             container.Register<BasePublishingStrategy, PublishingStrategy>();
-            container.Register<IMappingResolver>(factory => new MappingResolver(
-                factory.GetInstance<IServiceContainer>(), 
-                factory.GetInstance<ILogger>(),
-                () => PluginManager.ResolveAssignedMapperTypes()));
-            container.Register<RepositoryFactory>();
+                        
             container.Register<ServiceContext>(factory => new ServiceContext(
-
                 factory.GetInstance<RepositoryFactory>(),
                 factory.GetInstance<IDatabaseUnitOfWorkProvider>(),
                 factory.GetInstance<IUnitOfWorkProvider>(),
@@ -195,9 +193,7 @@ namespace Umbraco.Core
 
             container.Register<ApplicationContext>(new PerContainerLifetime());
             container.Register<MediaFileSystem>(factory => FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>());
-
-            container.Register<ISqlSyntaxProvider>(factory => factory.GetInstance<DatabaseContext>().SqlSyntax);
-
+            
             //These will be replaced by the web boot manager when running in a web context
             container.Register<IEventMessagesFactory, TransientMessagesFactory>();
         }
@@ -210,24 +206,7 @@ namespace Umbraco.Core
         {
             
         }
-
-        /// <summary>
-        /// Creates and initializes the db context when IoC requests it
-        /// </summary>
-        /// <param name="container"></param>
-        /// <returns></returns>
-        private DatabaseContext GetDbContext(IServiceFactory container)
-        {
-            var dbCtx = new DatabaseContext(
-                container.GetInstance<IDatabaseFactory>(),
-                container.GetInstance<ILogger>(),
-                container.GetInstance<SqlSyntaxProviders>());
-
-            //when it's first created we need to initialize it
-            dbCtx.Initialize();
-            return dbCtx;
-        }
-
+        
         /// <summary>
         /// Creates the ApplicationCache based on a new instance of System.Web.Caching.Cache
         /// </summary>

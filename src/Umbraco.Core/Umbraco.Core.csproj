@@ -290,6 +290,8 @@
     <Compile Include="DataTableExtensions.cs" />
     <Compile Include="DateTimeExtensions.cs" />
     <Compile Include="DelegateExtensions.cs" />
+    <Compile Include="DependencyInjection\ConfigurationCompositionRoot.cs" />
+    <Compile Include="DependencyInjection\RepositoryCompositionRoot.cs" />
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="Dictionary\CultureDictionaryFactoryResolver.cs" />
     <Compile Include="Dictionary\ICultureDictionaryFactory.cs" />
@@ -334,7 +336,7 @@
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="IApplicationEventHandler.cs" />
     <Compile Include="IDisposeOnRequestEnd.cs" />
-    <Compile Include="LightInjectExtensions.cs" />
+    <Compile Include="DependencyInjection\LightInjectExtensions.cs" />
     <Compile Include="Logging\AsyncForwardingAppenderBase.cs" />
     <Compile Include="Logging\LoggingEventContext.cs" />
     <Compile Include="Logging\LoggingEventHelper.cs" />
@@ -450,6 +452,7 @@
     <Compile Include="Persistence\Repositories\DeepCloneRuntimeCacheProvider.cs" />
     <Compile Include="Persistence\Repositories\DomainRepository.cs" />
     <Compile Include="Persistence\Repositories\ExternalLoginRepository.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\INotificationsRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IAuditRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IDomainRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IExternalLoginRepository.cs" />

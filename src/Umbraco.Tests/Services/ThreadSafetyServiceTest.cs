@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Services
 			//here we are going to override the ServiceContext because normally with our test cases we use a 
 			//global Database object but this is NOT how it should work in the web world or in any multi threaded scenario.
 			//we need a new Database object for each thread.
-            var repositoryFactory = new RepositoryFactory(cacheHelper, Logger, SqlSyntax, SettingsForTests.GenerateMockSettings(), MappingResolver);
+            var repositoryFactory = new RepositoryFactory(SqlSyntax, Container);
 			_uowProvider = new PerThreadPetaPocoUnitOfWorkProvider(_dbFactory);
 		    var evtMsgs = new TransientMessagesFactory();
 		    ApplicationContext.Services = new ServiceContext(
@@ -62,7 +62,15 @@ namespace Umbraco.Tests.Services
 			CreateTestData();
 		}
 
-		[TearDown]
+        protected override void ConfigureContainer()
+        {
+            base.ConfigureContainer();
+
+            //replace some services
+            Container.Register<IDatabaseFactory>(factory => _dbFactory);
+        }
+
+        [TearDown]
 		public override void TearDown()
 		{
 			_error = null;

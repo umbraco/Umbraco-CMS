@@ -27,6 +27,7 @@ using Umbraco.Core.Strings;
 using Umbraco.Web;
 using Umbraco.Web.Models.Mapping;
 using umbraco.BusinessLogic;
+using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Events;
 using ObjectExtensions = Umbraco.Core.ObjectExtensions;
@@ -63,11 +64,11 @@ namespace Umbraco.Tests.TestHelpers
 
             SetupPluginManager();
 
+            ConfigureContainer();
+
             SetupApplicationContext();
 
-            InitializeMappers();
-
-            ConfigureContainer();
+            InitializeMappers();            
 
             FreezeResolution();
 
@@ -94,29 +95,38 @@ namespace Umbraco.Tests.TestHelpers
 
         protected virtual void ConfigureContainer()
         {
+            var settings = SettingsForTests.GetDefault();
+            
+            //Default Datalayer/Repositories/SQL/Database/etc...
+            Container.RegisterFrom<RepositoryCompositionRoot>();
+
             //register basic stuff that might need to be there for some container resolvers to work,  we can 
             // add more to this in base classes in resolution freezing
             Container.Register<ILogger>(factory => Logger);
             Container.Register<CacheHelper>(factory => CacheHelper);
             Container.Register<ProfilingLogger>(factory => ProfilingLogger);
-            var settings = SettingsForTests.GetDefault();
             Container.Register<IUmbracoSettingsSection>(factory => SettingsForTests.GetDefault(), new PerContainerLifetime());
             Container.Register<IContentSection>(factory => settings.Content, new PerContainerLifetime());
+            Container.Register<ITemplatesSection>(factory => settings.Templates, new PerContainerLifetime());
             Container.Register<IRuntimeCacheProvider>(factory => CacheHelper.RuntimeCache);
             Container.Register<IServiceProvider, ActivatorServiceProvider>();
             Container.Register<MediaFileSystem>(factory => new MediaFileSystem(Mock.Of<IFileSystem>()));
+
+            //replace some stuff
+            Container.Register<ISqlSyntaxProvider>(factory => SqlSyntax);
+            Container.Register<IFileSystem>(factory => Mock.Of<IFileSystem>(), "ScriptFileSystem", new PerContainerLifetime());
+            Container.Register<IFileSystem>(factory => Mock.Of<IFileSystem>(), "PartialViewFileSystem", new PerContainerLifetime());
+            Container.Register<IFileSystem>(factory => Mock.Of<IFileSystem>(), "PartialViewMacroFileSystem", new PerContainerLifetime());
+            Container.Register<IFileSystem>(factory => Mock.Of<IFileSystem>(), "StylesheetFileSystem", new PerContainerLifetime());
+            Container.Register<IFileSystem>(factory => Mock.Of<IFileSystem>(), "MasterpageFileSystem", new PerContainerLifetime());
+            Container.Register<IFileSystem>(factory => Mock.Of<IFileSystem>(), "ViewFileSystem", new PerContainerLifetime());
         }
 
         private static readonly object Locker = new object();
 
-        private MappingResolver _mappingResolver;
         protected IMappingResolver MappingResolver
         {
-            get
-            {
-                return _mappingResolver ??
-                       (_mappingResolver = new MappingResolver(Container, Mock.Of<ILogger>(), () => PluginManager.Current.ResolveAssignedMapperTypes()));
-            }
+            get { return Container.GetInstance<IMappingResolver>(); }
         }
 
         private static void InitializeLegacyMappingsForCoreEditors()
@@ -188,19 +198,15 @@ namespace Umbraco.Tests.TestHelpers
         /// Inheritors can override this if they wish to create a custom application context
         /// </summary>
         protected virtual void SetupApplicationContext()
-        {
-
-            var sqlSyntax = new SqlCeSyntaxProvider();
-            var repoFactory = new RepositoryFactory(CacheHelper.CreateDisabledCacheHelper(), Logger, sqlSyntax, SettingsForTests.GenerateMockSettings(), MappingResolver);
-
+        {            
             var evtMsgs = new TransientMessagesFactory();
             ApplicationContext.Current = new ApplicationContext(
                 //assign the db context
                 new DatabaseContext(new DefaultDatabaseFactory(Core.Configuration.GlobalSettings.UmbracoConnectionName, Logger),
-                    Logger, sqlSyntax, "System.Data.SqlServerCe.4.0"),
+                    Logger, SqlSyntax, "System.Data.SqlServerCe.4.0"),
                 //assign the service context
                 new ServiceContext(
-                    repoFactory, 
+                    Container.GetInstance<RepositoryFactory>(), 
                     new PetaPocoUnitOfWorkProvider(Logger), 
                     new FileUnitOfWorkProvider(),
                     new PublishingStrategy(evtMsgs, Logger), 
@@ -262,5 +268,10 @@ namespace Umbraco.Tests.TestHelpers
         //I know tests shouldn't use IoC, but for all these tests inheriting from this class are integration tests 
         // and the number of these will hopefully start getting greatly reduced now that most things are mockable.
         internal IServiceContainer Container { get; private set; }
+
+        protected virtual ISqlSyntaxProvider SqlSyntax
+        {
+            get { return new SqlCeSyntaxProvider(); }
+        }
     }
 }

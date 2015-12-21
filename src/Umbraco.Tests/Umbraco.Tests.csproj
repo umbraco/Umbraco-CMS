@@ -379,7 +379,7 @@
     <Compile Include="Models\ContentTests.cs" />
     <Compile Include="Models\ContentXmlTest.cs" />
     <Compile Include="Models\StylesheetTests.cs" />
-    <Compile Include="Persistence\BaseTableByTableTest.cs" />
+    <Compile Include="Persistence\SqlCeTableByTableTest.cs" />
     <Compile Include="Persistence\DatabaseContextTests.cs" />
     <Compile Include="Persistence\Mappers\ContentMapperTest.cs" />
     <Compile Include="Persistence\Mappers\ContentTypeMapperTest.cs" />
@@ -392,7 +392,6 @@
     <Compile Include="Persistence\Mappers\PropertyTypeMapperTest.cs" />
     <Compile Include="Persistence\Mappers\RelationMapperTest.cs" />
     <Compile Include="Persistence\Mappers\RelationTypeMapperTest.cs" />
-    <Compile Include="Persistence\MySqlTableByTableTest.cs" />
     <Compile Include="Persistence\Querying\PetaPocoSqlTests.cs" />
     <Compile Include="Persistence\Querying\QueryBuilderTests.cs" />
     <Compile Include="Persistence\Repositories\ContentRepositoryTest.cs" />
@@ -406,8 +405,6 @@
     <Compile Include="Persistence\Repositories\RelationTypeRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\ScriptRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\StylesheetRepositoryTest.cs" />
-    <Compile Include="Persistence\SqlCeTableByTableTest.cs" />
-    <Compile Include="Persistence\SqlTableByTableTest.cs" />
     <Compile Include="PublishedContent\PublishedContentMoreTests.cs" />
     <Compile Include="Publishing\PublishingStrategyTests.cs" />
     <Compile Include="Resolvers\ActionsResolverTests.cs" />

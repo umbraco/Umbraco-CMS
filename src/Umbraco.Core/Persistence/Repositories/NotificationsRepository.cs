@@ -10,7 +10,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal class NotificationsRepository
+    public class NotificationsRepository : INotificationsRepository
     {
         private readonly IDatabaseUnitOfWork _unitOfWork;
         private readonly ISqlSyntaxProvider _sqlSyntax;
