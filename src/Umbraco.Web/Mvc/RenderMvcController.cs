@@ -24,12 +24,13 @@ namespace Umbraco.Web.Mvc
         public RenderMvcController(UmbracoContext umbracoContext, UmbracoHelper umbracoHelper)
             : base(umbracoContext, umbracoHelper)
         {
+            ActionInvoker = new RenderActionInvoker();
         }
 
         public RenderMvcController(UmbracoContext umbracoContext)
             : base(umbracoContext)
         {
-
+            ActionInvoker = new RenderActionInvoker();
         }
 
         private PublishedContentRequest _publishedContentRequest;

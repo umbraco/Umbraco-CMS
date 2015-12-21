@@ -35,8 +35,6 @@ namespace Umbraco.Web.Mvc
         }
 
         /// <summary>
-        [Obsolete("This method will be removed in future versions and should not be used to resolve a controller instance, the IControllerFactory is used for that purpose")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
         /// Sets the default RenderMvcController type
         /// </summary>
         /// <param name="controllerType"></param>

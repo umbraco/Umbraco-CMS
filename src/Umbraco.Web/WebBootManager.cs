@@ -322,6 +322,7 @@ namespace Umbraco.Web
 
             //no need to declare as per request, currently we manage it's lifetime as the singleton
             container.Register<UmbracoContext>(factory => UmbracoContext.Current);
+            container.Register<UmbracoHelper>(new PerRequestLifeTime());
 
             //Replace services:
             container.Register<IEventMessagesFactory, RequestLifespanMessagesFactory>();

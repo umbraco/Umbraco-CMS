@@ -177,17 +177,6 @@ namespace Umbraco.Web
             _dynamicQuery = dynamicQuery;
         }
 
-        [Obsolete("Use the constructor specifying all dependencies")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public UmbracoHelper(UmbracoContext umbracoContext, IPublishedContent content, PublishedContentQuery query)
-            : this(umbracoContext)
-        {
-            if (content == null) throw new ArgumentNullException("content");
-            if (query == null) throw new ArgumentNullException("query");
-            _currentPage = content;
-            _query = query;
-        }
-
         /// <summary>
         /// Custom constructor setting the current page to the parameter passed in
         /// </summary>
@@ -216,14 +205,6 @@ namespace Umbraco.Web
             }
         }
 
-        [Obsolete("Use the constructor specifying all dependencies")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public UmbracoHelper(UmbracoContext umbracoContext, PublishedContentQuery query)
-            : this(umbracoContext)
-        {
-            if (query == null) throw new ArgumentNullException("query");
-            _query = query;
-        } 
         #endregion
 
         /// <summary>
