@@ -64,7 +64,7 @@ namespace Umbraco.Tests.Macros
         public void SetUserControlProperty(string val, string macroPropName, Type convertTo)
         {
             var ctrl = new UserControlTest();
-            var macroModel = new MacroModel("test", "test", "", "~/usercontrols/menu.ascx", "", 0, false, false);
+            var macroModel = new MacroModel("test", "test", "", "", "~/usercontrols/menu.ascx", 0, false, false);
             macroModel.Properties.Add(new MacroPropertyModel(macroPropName, val));
 
             macro.UpdateControlProperties(ctrl, macroModel);
@@ -97,7 +97,7 @@ namespace Umbraco.Tests.Macros
         [TestCase("", "", "~/usercontrols/menu.ascx", "~/usercontrols/menu.ascx")]
         public void Get_Macro_File(string xslt, string scriptFile, string scriptType, string expectedResult)
         {
-            var model = new MacroModel("Test", "test", "", scriptType, xslt, 0, false, false);
+            var model = new MacroModel("Test", "test", scriptType, xslt, scriptFile, 0, false, false);
             var file = macro.GetMacroFile(model);
             Assert.AreEqual(expectedResult, file);
         }
@@ -142,7 +142,7 @@ namespace Umbraco.Tests.Macros
             File.CreateText(path).Close();
 
             //needs to be file based (i.e. xslt)
-            var model = new MacroModel("Test", "test", "", "", "test.xslt", 0, false, false);
+            var model = new MacroModel("Test", "test", "", "test.xslt", "", 0, false, false);
 
             Assert.AreEqual(expectedResult, macro.MacroNeedsToBeClearedFromCache(model, "TestDate", new FileInfo(path)));
         }

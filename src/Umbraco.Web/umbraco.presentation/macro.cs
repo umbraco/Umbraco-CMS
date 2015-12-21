@@ -637,7 +637,9 @@ namespace umbraco
             switch (model.MacroType)
             {
                 case MacroTypes.Xslt:
-                    return string.Concat("~/xslt/", model.Xslt);                                
+                    return string.Concat("~/xslt/", model.Xslt);
+                case MacroTypes.Script:
+                    return string.Concat("~/macroScripts/", model.ScriptName);
                 case MacroTypes.PartialView:
                     return model.ScriptName; //partial views are saved with the full virtual path
                 case MacroTypes.UserControl:
