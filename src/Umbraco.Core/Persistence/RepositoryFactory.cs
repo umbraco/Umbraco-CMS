@@ -123,7 +123,7 @@ namespace Umbraco.Core.Persistence
 
         public virtual ITemplateRepository CreateTemplateRepository(IDatabaseUnitOfWork uow)
         {
-            return _container.GetInstance<IUnitOfWork, ITemplateRepository>(uow);
+            return _container.GetInstance<IDatabaseUnitOfWork, ITemplateRepository>(uow);
         }
 
         public virtual IMigrationEntryRepository CreateMigrationEntryRepository(IDatabaseUnitOfWork uow)

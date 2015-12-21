@@ -471,48 +471,5 @@ namespace Umbraco.Core
             PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver(Container);
         }
 
-        ///// <summary>
-        ///// An IoC lifetime that will dispose instances at the end of the bootup sequence
-        ///// </summary>
-        //private class BootManagerLifetime : ILifetime
-        //{
-        //    public BootManagerLifetime(UmbracoApplicationBase appBase)
-        //    {
-        //        appBase.ApplicationStarted += appBase_ApplicationStarted;
-        //    }
-
-        //    void appBase_ApplicationStarted(object sender, EventArgs e)
-        //    {
-        //        throw new NotImplementedException();
-        //    }
-
-        //    private object _instance;
-
-        //    /// <summary>
-        //    /// Returns a service instance according to the specific lifetime characteristics.
-        //    /// </summary>
-        //    /// <param name="createInstance">The function delegate used to create a new service instance.</param>
-        //    /// <param name="scope">The <see cref="Scope"/> of the current service request.</param>
-        //    /// <returns>The requested services instance.</returns>
-        //    public object GetInstance(Func<object> createInstance, Scope scope)
-        //    {
-        //        if (_instance == null)
-        //        {
-        //            _instance = createInstance();
-
-        //            var disposable = _instance as IDisposable;
-        //            if (disposable != null)
-        //            {
-        //                if (scope == null)
-        //                {
-        //                    throw new InvalidOperationException("Attempt to create an disposable object without a current scope.");
-        //                }
-        //                scope.TrackInstance(disposable);
-        //            }
-
-        //        }
-        //        return createInstance;
-        //    }
-        //}
     }
 }

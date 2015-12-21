@@ -138,19 +138,19 @@ namespace Umbraco.Core.DependencyInjection
                 factory.GetInstance<ILogger>(),
                 factory.GetInstance<ISqlSyntaxProvider>(),
                 factory.GetInstance<IMappingResolver>()));
-            container.Register<IDatabaseUnitOfWork, IScriptRepository>((factory, work) => new ScriptRepository(                
+            container.Register<IUnitOfWork, IScriptRepository>((factory, work) => new ScriptRepository(                
                 work,
                 factory.GetInstance<IFileSystem>("ScriptFileSystem"),
                 factory.GetInstance<IContentSection>()));
-            container.Register<IDatabaseUnitOfWork, IPartialViewRepository>((factory, work) => new PartialViewRepository(
+            container.Register<IUnitOfWork, IPartialViewRepository>((factory, work) => new PartialViewRepository(
                 work,
                 factory.GetInstance<IFileSystem>("ScriptFileSystem")),
                 serviceName: "PartialViewFileSystem");
-            container.Register<IDatabaseUnitOfWork, IPartialViewRepository>((factory, work) => new PartialViewMacroRepository(
+            container.Register<IUnitOfWork, IPartialViewRepository>((factory, work) => new PartialViewMacroRepository(
                 work,
                 factory.GetInstance<IFileSystem>("PartialViewMacroFileSystem")),
                 serviceName: "PartialViewMacroRepository");
-            container.Register<IDatabaseUnitOfWork, IStylesheetRepository>((factory, work) => new StylesheetRepository(
+            container.Register<IUnitOfWork, IStylesheetRepository>((factory, work) => new StylesheetRepository(
                 work,
                 factory.GetInstance<IFileSystem>("StylesheetFileSystem")));
             container.Register<IDatabaseUnitOfWork, ITemplateRepository>((factory, work) => new TemplateRepository(
