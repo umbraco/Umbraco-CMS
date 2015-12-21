@@ -117,18 +117,25 @@ namespace Umbraco.Core.Services
         IEnumerable<ITemplate> GetTemplates(int masterTemplateId);
 
         /// <summary>
-        /// Gets a <see cref="ITemplate"/> object by its alias
+        /// Gets a <see cref="ITemplate"/> object by its alias.
         /// </summary>
-        /// <param name="alias">Alias of the template</param>
-        /// <returns>A <see cref="ITemplate"/> object</returns>
+        /// <param name="alias">The alias of the template.</param>
+        /// <returns>The <see cref="ITemplate"/> object matching the alias, or null.</returns>
         ITemplate GetTemplate(string alias);
 
         /// <summary>
-        /// Gets a <see cref="ITemplate"/> object by its alias
+        /// Gets a <see cref="ITemplate"/> object by its identifier.
         /// </summary>
-        /// <param name="id">Id of the template</param>
-        /// <returns>A <see cref="ITemplate"/> object</returns>
+        /// <param name="id">The identifer of the template.</param>
+        /// <returns>The <see cref="ITemplate"/> object matching the identifier, or null.</returns>
         ITemplate GetTemplate(int id);
+
+        /// <summary>
+        /// Gets a <see cref="ITemplate"/> object by its guid identifier.
+        /// </summary>
+        /// <param name="id">The guid identifier of the template.</param>
+        /// <returns>The <see cref="ITemplate"/> object matching the identifier, or null.</returns>
+        ITemplate GetTemplate(Guid id);
 
         /// <summary>
         /// Gets the template descendants

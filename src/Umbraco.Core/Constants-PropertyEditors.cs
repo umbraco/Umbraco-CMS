@@ -159,6 +159,11 @@ namespace Umbraco.Core
             public const string IntegerAlias = "Umbraco.Integer";
 
             /// <summary>
+            /// Alias for the Decimal datatype.
+            /// </summary>
+            public const string DecimalAlias = "Umbraco.Decimal";
+
+            /// <summary>
             /// Alias for the listview datatype.
             /// </summary>
             public const string ListViewAlias = "Umbraco.ListView";

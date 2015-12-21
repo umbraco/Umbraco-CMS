@@ -294,10 +294,10 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets a <see cref="ITemplate"/> object by its alias
+        /// Gets a <see cref="ITemplate"/> object by its alias.
         /// </summary>
-        /// <param name="alias">Alias of the template</param>
-        /// <returns>A <see cref="Template"/> object</returns>
+        /// <param name="alias">The alias of the template.</param>
+        /// <returns>The <see cref="ITemplate"/> object matching the alias, or null.</returns>
         public ITemplate GetTemplate(string alias)
         {
             using (var repository = _repositoryFactory.CreateTemplateRepository(_dataUowProvider.GetUnitOfWork()))
@@ -307,15 +307,29 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets a <see cref="ITemplate"/> object by its alias
+        /// Gets a <see cref="ITemplate"/> object by its identifier.
         /// </summary>
-        /// <param name="id">Id of the template</param>
-        /// <returns>A <see cref="ITemplate"/> object</returns>
+        /// <param name="id">The identifer of the template.</param>
+        /// <returns>The <see cref="ITemplate"/> object matching the identifier, or null.</returns>
         public ITemplate GetTemplate(int id)
         {
             using (var repository = _repositoryFactory.CreateTemplateRepository(_dataUowProvider.GetUnitOfWork()))
             {
                 return repository.Get(id);
+            }
+        }
+
+        /// <summary>
+        /// Gets a <see cref="ITemplate"/> object by its guid identifier.
+        /// </summary>
+        /// <param name="id">The guid identifier of the template.</param>
+        /// <returns>The <see cref="ITemplate"/> object matching the identifier, or null.</returns>
+        public ITemplate GetTemplate(Guid id)
+        {
+            using (var repository = _repositoryFactory.CreateTemplateRepository(_dataUowProvider.GetUnitOfWork()))
+            {
+                var query = Query<ITemplate>.Builder.Where(x => x.Key == id);
+                return repository.GetByQuery(query).SingleOrDefault();
             }
         }
 

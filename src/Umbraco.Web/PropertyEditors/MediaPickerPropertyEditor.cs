@@ -9,7 +9,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.MediaPickerAlias, "Legacy Media Picker", "INT", "mediapicker")]
+    [PropertyEditor(Constants.PropertyEditors.MediaPickerAlias, "Legacy Media Picker", "INT", "mediapicker", Group="media", Icon="icon-picture")]
     public class MediaPickerPropertyEditor : PropertyEditor
     {
         public MediaPickerPropertyEditor()

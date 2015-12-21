@@ -1,0 +1,39 @@
+<div class="umb-list-view">
+
+  <div class="umb-list-view__trigger">
+    <label class="checkbox no-indent">
+        <input type="checkbox" ng-model="enableListView" hotkey="alt+shift+l" /> Yes - enable list view
+    </label>
+  </div>
+
+  <!-- list view enabled -->
+  <div ng-if="enableListView">
+    <div class="umb-list-view__box" ng-class="{'-open': editDataTypeSettings}">
+
+        <div class="umb-list-view__content">
+            <i class="umb-list-view__list-view-icon icon-list"></i>
+            <div>
+                <div>
+                    <div class="umb-list-view__name">{{ dataType.name }} <em ng-if="!customListViewCreated">(default)</em></div>
+                    <a href="" ng-click="toggleEditListViewDataTypeSettings()"><i class="umb-list-view__settings-icon icon-settings"></i></a>
+                </div>
+                <a href="" class="umb-list-view__create-new" ng-if="!customListViewCreated" ng-click="createCustomListViewDataType()">Create custom list view</a>
+                <a href="" class="umb-list-view__remove-new" ng-if="customListViewCreated" ng-click="removeCustomListDataType()">Remove custom list view</a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- list view settings -->
+    <div class="umb-list-view__settings form-horizontal" ng-if="editDataTypeSettings" ng-class="{'-open': editDataTypeSettings}">
+
+        <umb-property property="preValue" ng-repeat="preValue in dataType.preValues">
+            <umb-editor model="preValue" is-pre-value="true"></umb-editor>
+        </umb-property>
+
+        <button type="button" class="btn" ng-click="toggleEditListViewDataTypeSettings()">Close</button>
+        <button type="button" class="btn btn-success" ng-click="saveListViewDataType()">Save list view</button>
+
+    </div>
+  </div>
+</div>

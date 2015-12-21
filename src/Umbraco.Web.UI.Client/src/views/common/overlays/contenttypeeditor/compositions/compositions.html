@@ -1,0 +1,37 @@
+<div class="umb-control-group">
+   <div class="form-search">
+      <i class="icon-search"></i>
+      <input type="text"
+         style="width: 100%"
+         ng-model="searchTerm"
+         class="umb-search-field search-query input-block-level"
+         placeholder="Filter..."
+         umb-auto-focus>
+   </div>
+</div>
+
+<div class="umb-control-group">
+   <small>Inherit tabs and properties from an existing document type. New tabs will be added to the current document type or merged if a tab with an identical name exists.</small>
+</div>
+
+<div class="umb-empty-state-text -center" ng-if="model.availableCompositeContentTypes.length === 0">
+   This content type is used in a composition, and therefore cannot be composed itself.
+</div>
+
+<ul class="umb-checkbox-list">
+   <li class="umb-checkbox-list__item" ng-repeat="compositeContentType in model.availableCompositeContentTypes | filter:searchTerm" ng-class="{ '-selected': model.compositeContentTypes.indexOf(compositeContentType.alias)+1 }">
+
+      <div class="umb-checkbox-list__item-checkbox" ng-class="{ '-selected': model.compositeContentTypes.indexOf(compositeContentType.alias)+1 }">
+         <input type="checkbox"
+            checklist-model="model.compositeContentTypes"
+            checklist-value="compositeContentType.alias"
+            ng-change="model.selectCompositeContentType(compositeContentType)" />
+      </div>
+
+      <div class="umb-checkbox-list__item-text">
+         <i class="{{ compositeContentType.icon }} umb-checkbox-list__item-icon"></i>
+         {{ compositeContentType.name }}
+      </div>
+
+   </li>
+</ul>

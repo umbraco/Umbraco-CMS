@@ -1,7 +1,7 @@
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
 angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerController",
-    function ($rootScope, $scope, dialogService, entityResource, mediaResource, mediaHelper, $timeout, userService, angularHelper) {
+    function ($rootScope, $scope, dialogService, entityResource, mediaResource, mediaHelper, $timeout, userService) {
 
         //check the pre-values for multi-picker
         var multiPicker = $scope.model.config.multiPicker && $scope.model.config.multiPicker !== '0' ? true : false;
@@ -54,36 +54,42 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         $scope.remove = function(index) {
             $scope.images.splice(index, 1);
             $scope.ids.splice(index, 1);
-            angularHelper.getCurrentForm($scope).$setDirty();
             $scope.sync();
         };
 
-        $scope.add = function() {
-            dialogService.mediaPicker({
-                startNodeId: $scope.model.config.startNodeId,
-                multiPicker: multiPicker,
-                callback: function(data) {
-                    
-                    //it's only a single selector, so make it into an array
-                    if (!multiPicker) {
-                        data = [data];
-                    }
-                    
-                    _.each(data, function(media, i) {
+       $scope.add = function() {
 
-                        if (!media.thumbnail) {
-                            media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
-                        }
+          $scope.mediaPickerOverlay = {};
+          $scope.mediaPickerOverlay.startNodeId = $scope.model.config.startNodeId;
+          $scope.mediaPickerOverlay.multiPicker = multiPicker;
+          $scope.mediaPickerOverlay.view = "mediaPicker";
+          $scope.mediaPickerOverlay.title = "Select media";
+          $scope.mediaPickerOverlay.show = true;
 
-                        $scope.images.push(media);
-                        $scope.ids.push(media.id);
-                        angularHelper.getCurrentForm($scope).$setDirty();
-                    });
+          $scope.mediaPickerOverlay.submit = function(model) {
 
-                    $scope.sync();
-                }
-            });
-        };
+             _.each(model.selectedImages, function(media, i) {
+
+                 if (!media.thumbnail) {
+                     media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
+                 }
+
+                 $scope.images.push(media);
+                 $scope.ids.push(media.id);
+             });
+
+             $scope.sync();
+
+             $scope.mediaPickerOverlay.show = false;
+             $scope.mediaPickerOverlay = null;
+          };
+
+          $scope.mediaPickerOverlay.close = function(oldModel) {
+             $scope.mediaPickerOverlay.show = false;
+             $scope.mediaPickerOverlay = null;
+          };
+
+       };
 
        $scope.sortableOptions = {
            update: function(e, ui) {

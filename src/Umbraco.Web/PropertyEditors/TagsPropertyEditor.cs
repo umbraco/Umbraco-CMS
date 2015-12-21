@@ -11,7 +11,7 @@ using Umbraco.Core.PropertyEditors;
 namespace Umbraco.Web.PropertyEditors
 {
     [SupportTags(typeof(TagPropertyEditorTagDefinition), ValueType = TagValueType.CustomTagList)]
-    [PropertyEditor(Constants.PropertyEditors.TagsAlias, "Tags", "tags")]
+    [PropertyEditor(Constants.PropertyEditors.TagsAlias, "Tags", "tags", Icon="icon-tags")]
     public class TagsPropertyEditor : PropertyEditor
     {
         public TagsPropertyEditor()

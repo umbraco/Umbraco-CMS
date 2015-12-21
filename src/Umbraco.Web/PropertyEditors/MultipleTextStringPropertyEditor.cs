@@ -14,7 +14,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.MultipleTextstringAlias, "Multiple Textbox", "multipletextbox", ValueType = "TEXT")]
+    [PropertyEditor(Constants.PropertyEditors.MultipleTextstringAlias, "Repeatable textstrings", "multipletextbox", ValueType = "TEXT", Icon="icon-ordered-list", Group="lists")]
     public class MultipleTextStringPropertyEditor : PropertyEditor
     {
         protected override PropertyValueEditor CreateValueEditor()

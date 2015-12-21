@@ -126,7 +126,8 @@ namespace Umbraco.Tests.Manifest
             var a = JsonConvert.DeserializeObject<JArray>(@"[
     {
         alias: 'Test.Test1',
-        name: 'Test 1',        
+        name: 'Test 1',
+        icon: 'icon-war',        
         editor: {
             view: '~/App_Plugins/MyPackage/PropertyEditors/MyEditor.html',
             valueType: 'int',
@@ -138,7 +139,8 @@ namespace Umbraco.Tests.Manifest
     },
     {
         alias: 'Test.Test2',
-        name: 'Test 2',        
+        name: 'Test 2',
+        group: 'customgroup',        
         defaultConfig: { key1: 'some default pre val' },
         editor: {
             view: '~/App_Plugins/MyPackage/PropertyEditors/CsvEditor.html',
@@ -162,6 +164,14 @@ namespace Umbraco.Tests.Manifest
             var manifestValidator2 = parser.ElementAt(0).ValueEditor.Validators.ElementAt(1) as ManifestPropertyValidator;
             Assert.IsNotNull(manifestValidator2);
             Assert.AreEqual("regex", manifestValidator2.Type);
+
+            //groups and icons
+            Assert.AreEqual("common", parser.ElementAt(0).Group);
+            Assert.AreEqual("customgroup", parser.ElementAt(1).Group);
+
+            Assert.AreEqual("icon-war", parser.ElementAt(0).Icon);
+            Assert.AreEqual("icon-autofill", parser.ElementAt(1).Icon);
+
 
             Assert.AreEqual(true, parser.ElementAt(1).ValueEditor.HideLabel);
             Assert.AreEqual("Test.Test2", parser.ElementAt(1).Alias);

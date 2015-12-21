@@ -1,0 +1,58 @@
+<div ng-controller="Umbraco.PropertyEditors.ListView.GridLayoutController as vm">
+
+   <div
+      ng-if="entityType !== 'media'">
+
+      <umb-content-grid
+         content="items"
+         content-properties="options.includeProperties"
+         on-click="vm.clickItem"
+         on-select="vm.selectItem">
+      </umb-content-grid>
+
+   </div>
+
+   <div
+   ng-if="entityType === 'media'"
+   on-drag-leave="vm.dragLeave()"
+   on-drag-end="vm.dragLeave()"
+   on-drag-enter="vm.dragEnter()">
+
+      <umb-file-dropzone
+         parent-id="{{vm.nodeId}}"
+         files-uploaded="vm.onUploadComplete"
+         accept="{{vm.acceptedFileTypes}}"
+         max-file-size="{{vm.maxFileSize}}"
+         hide-dropzone="{{!vm.activeDrag && items.length > 0 }}"
+         compact="{{ items.length > 0 }}"
+         files-queued="vm.onFilesQueue">
+      </umb-file-dropzone>
+
+      <umb-folder-grid
+         ng-if="folders.length > 0"
+         folders="folders"
+         on-select="vm.selectFolder"
+         on-click="vm.clickItem">
+      </umb-folder-grid>
+
+      <umb-media-grid
+         items="vm.itemsWithoutFolders"
+         on-details-hover="vm.hoverMediaItemDetails"
+         on-select="vm.selectItem"
+         on-click="vm.clickItem">
+      </umb-media-grid>
+
+      <umb-tooltip
+         ng-if="vm.mediaDetailsTooltip.show"
+         event="vm.mediaDetailsTooltip.event">
+         <ul class="umb-tooltip-list">
+            <li class="umb-tooltip-list__item" ng-repeat="property in options.includeProperties">
+               <div class="umb-tooltip-list__item-label">{{ property.header }}</div>
+               <div class="umb-tooltip-list__item-value">{{ vm.mediaDetailsTooltip.item[property.alias] }}</div>
+            </li>
+         </ul>
+      </umb-tooltip>
+
+   <div>
+
+</div>

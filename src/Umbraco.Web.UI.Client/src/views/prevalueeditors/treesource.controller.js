@@ -28,11 +28,19 @@ angular.module('umbraco')
 
 
 		$scope.openContentPicker =function(){
-			var d = dialogService.treePicker({
-								section: $scope.model.value.type,
-								treeAlias: $scope.model.value.type,
-								multiPicker: false,
-								callback: populate});
+			$scope.treePickerOverlay = {
+				view: "treepicker",
+				section: $scope.model.value.type,
+				treeAlias: $scope.model.value.type,
+				multiPicker: false,
+				show: true,
+				submit: function(model) {
+					var item = model.selection[0];
+					populate(item);
+					$scope.treePickerOverlay.show = false;
+					$scope.treePickerOverlay = null;
+				}
+			};
 		};
 
 		$scope.clear = function() {

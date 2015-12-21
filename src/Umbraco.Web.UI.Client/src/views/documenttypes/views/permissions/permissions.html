@@ -1,0 +1,46 @@
+<div ng-controller="Umbraco.Editors.DocumentType.PermissionsController as vm">
+
+    <div class="sub-view-columns">
+
+        <div class="sub-view-column-left">
+            <h5>Allow as root</h5>
+            <small>Allow editors to create content if this type in the root of the content tree</small>
+        </div>
+        <div class="sub-view-column-right">
+            <label class="checkbox no-indent" >
+                <input type="checkbox" ng-model="model.allowAsRoot" hotkey="alt+shift+r" /> Yes - allow content of this type in the root
+            </label>
+        </div>
+
+    </div>
+
+    <div class="sub-view-columns">
+
+        <div class="sub-view-column-left">
+            <h5>Allowed child node types</h5>
+            <small>Allow content of these types to be created underneath content this type</small>
+        </div>
+
+        <div class="sub-view-column-right">
+            <umb-child-selector
+                    selected-children="vm.selectedChildren"
+                    available-children="vm.contentTypes"
+                    parent-name="model.name"
+                    parent-icon="model.icon"
+                    parent-id="model.id"
+                    on-add="vm.addChild"
+                    on-remove="vm.removeChild">
+            </umb-child-selector>
+
+            <umb-overlay
+               ng-if="vm.childNodeSelectorOverlay.show"
+               model="vm.childNodeSelectorOverlay"
+               position="target"
+               view="vm.childNodeSelectorOverlay.view">
+            </umb-overlay>
+
+        </div>
+
+    </div>
+
+</div>

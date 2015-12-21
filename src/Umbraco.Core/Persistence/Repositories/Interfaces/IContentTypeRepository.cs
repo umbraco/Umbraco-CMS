@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Querying;
 
@@ -19,5 +20,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <returns></returns>
         IEnumerable<string> GetAllPropertyTypeAliases();
+
+        IEnumerable<MoveEventInfo<IContentType>> Move(IContentType toMove, EntityContainer container);
     }
 }
