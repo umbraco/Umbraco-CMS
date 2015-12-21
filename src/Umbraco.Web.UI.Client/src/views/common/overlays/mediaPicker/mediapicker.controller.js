@@ -142,39 +142,32 @@ angular.module("umbraco")
 
             };
 
+            $scope.selectFolder = function(folder, event, index) {
+                eventsService.emit("dialogs.mediaPicker.select", folder);
+                selectImage(folder);
+            };
+
             function selectImage(image) {
 
-                if ($scope.model.selectedImages.length > 0) {
+                if(image.selected) {
 
-                    var selectImage = false;
+                    for(var i = 0; $scope.model.selectedImages.length > i; i++) {
 
-                    for (var i = 0; i < $scope.model.selectedImages.length; i++) {
-
-                        var selectedImage = $scope.model.selectedImages[i];
-
-                        if (image.key === selectedImage.key) {
+                        var imageInSelection = $scope.model.selectedImages[i];
+                        if(image.key === imageInSelection.key) {
                             image.selected = false;
                             $scope.model.selectedImages.splice(i, 1);
-                            selectImage = false;
-                        } else {
-                            selectImage = true;
                         }
-
-                    }
-
-                    if (selectImage) {
-
-                        if(!$scope.multiPicker) {
-                            deselectAllImages($scope.model.selectedImages);
-                        }
-
-                        image.selected = true;
-                        $scope.model.selectedImages.push(image);
                     }
 
                 } else {
-                    $scope.model.selectedImages.push(image);
+
+                    if(!$scope.multiPicker) {
+                        deselectAllImages($scope.model.selectedImages);
+                    }
+
                     image.selected = true;
+                    $scope.model.selectedImages.push(image);
                 }
 
             }

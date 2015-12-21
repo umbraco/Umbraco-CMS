@@ -128,6 +128,13 @@
             }
          };
 
+         scope.clickFolderSelect = function(item, $event, $index) {
+             if(scope.onFolderSelect) {
+                 scope.onFolderSelect(item, $event, $index);
+                 $event.stopPropagation();
+             }
+         };
+
          var unbindItemsWatcher = scope.$watch('items', function(newValue, oldValue){
             if(angular.isArray(newValue)) {
                activate();
@@ -149,6 +156,7 @@
             onDetailsHover: "=",
             onSelect: '=',
             onClick: '=',
+            onFolderSelect: "=",
             filterBy: "="
          },
          link: link

@@ -1,6 +1,6 @@
 <div class="umb-media-grid">
 
-   <a href="" ng-click="clickItem(item)" ng-repeat="item in items | filter:filterBy" ng-style="item.flexStyle" class="umb-media-grid__item">
+   <div ng-click="clickItem(item)" ng-repeat="item in items | filter:filterBy" ng-style="item.flexStyle" class="umb-media-grid__item">
 
       <div class="umb-media-grid__actions">
          <i ng-if="onDetailsHover" class="icon-info umb-media-grid__action -not-clickable" ng-mouseover="hoverItemDetails(item, $event, true)" ng-mouseleave="hoverItemDetails(item, $event, false)"></i>
@@ -13,12 +13,13 @@
       </div>
 
       <div class="umb-media-grid__item-non-image-name" ng-if="!item.thumbnail">{{ item.name }}</div>
+      <div class="umb-media-grid__item-folder-select" ng-if="item.isFolder && onFolderSelect" ng-click="clickFolderSelect(item, $event, $index)">Select folder</div>
 
       <img class="umb-media-grid__item-image" ng-if="item.thumbnail" ng-src="{{item.thumbnail}}" alt="{{item.name}}" ng-class="{'-faded': item.selected}" />
       <img class="umb-media-grid__item-image" ng-if="!item.thumbnail" src="assets/img/transparent.png" alt="{{item.name}}" />
 
       <i class="umb-media-grid__item-icon {{ item.icon }}" ng-if="!item.thumbnail"></i>
 
-   </a>
+   </div>
 
 </div>
