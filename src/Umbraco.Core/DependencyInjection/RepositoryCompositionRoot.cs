@@ -1,5 +1,7 @@
 using System;
+using System.Linq;
 using LightInject;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
@@ -43,102 +45,77 @@ namespace Umbraco.Core.DependencyInjection
             //NOTE: Wondering if we can pass in parameters at resolution time with LightInject 
             // without having to manually specify the ctor for each one, have asked here: https://github.com/seesharper/LightInject/issues/237
             container.Register<IDatabaseUnitOfWork, INotificationsRepository>((factory, work) => new NotificationsRepository(work, factory.GetInstance<ISqlSyntaxProvider>()));
+            
             container.Register<IDatabaseUnitOfWork, IExternalLoginRepository>((factory, work) => new ExternalLoginRepository(
                 work,   
                 factory.GetInstance<CacheHelper>(),
                 factory.GetInstance<ILogger>(),
                 factory.GetInstance<ISqlSyntaxProvider>(),
                 factory.GetInstance<IMappingResolver>()));
-            container.Register<IDatabaseUnitOfWork, IPublicAccessRepository>((factory, work) => new PublicAccessRepository(
+
+            //here we are using some nice IoC magic:
+            //https://github.com/seesharper/LightInject/issues/237
+            //This tells the container that anytime there is a ctor dependency for IDatabaseUnitOfWork and it's available as the first
+            //arg in the runtimeArgs, to use that. This means we donn't have to explicitly define all ctor's for all repositories which
+            //saves us a lot of code.
+            container.RegisterConstructorDependency<IDatabaseUnitOfWork>((factory, info, runtimeArguments) =>
+            {
+                var uow = runtimeArguments.Length > 0 ? runtimeArguments[0] as IDatabaseUnitOfWork : null;
+                return uow;
+            });
+            //This ensures that the correct CacheHelper is returned for the right repos
+            container.RegisterConstructorDependency<CacheHelper>((factory, info, runtimeArguments) =>
+            {
+                var declaringType = info.Member.DeclaringType;
+                var disabledCacheRepos = new[]
+                {
+                    typeof (ITaskRepository),
+                    typeof (ITaskTypeRepository),
+                    typeof (IAuditRepository),
+                    typeof (IRelationRepository),
+                    typeof(IRelationTypeRepository),
+                    typeof (IMigrationEntryRepository)
+                };
+                return disabledCacheRepos.Any(x => TypeHelper.IsTypeAssignableFrom(x, declaringType))
+                    ? factory.GetInstance<CacheHelper>("DisabledCache")
+                    : factory.GetInstance<CacheHelper>();
+            });
+
+            container.Register<IPublicAccessRepository, PublicAccessRepository>();
+            container.Register<ITagRepository, TagRepository>();
+            container.Register<IContentRepository, ContentRepository>();
+            container.Register<IContentTypeRepository, ContentTypeRepository>();
+            container.Register<IDataTypeDefinitionRepository, DataTypeDefinitionRepository>();
+            container.Register<IDictionaryRepository, DictionaryRepository>();
+            container.Register<ILanguageRepository, LanguageRepository>();
+            container.Register<IMediaRepository, MediaRepository>();
+            container.Register<IMediaTypeRepository, MediaTypeRepository>();
+            container.Register<ITemplateRepository, TemplateRepository>();
+            container.Register<IUserTypeRepository, UserTypeRepository>();
+            container.Register<IUserRepository, UserRepository>();
+            container.Register<IMacroRepository, MacroRepository>();
+            container.Register<IMemberRepository, MemberRepository>();
+            container.Register<IMemberTypeRepository, MemberTypeRepository>();
+            container.Register<IMemberGroupRepository, MemberGroupRepository>();
+            container.Register<IEntityRepository, EntityRepository>();
+            container.Register<IDomainRepository, DomainRepository>();
+            container.Register<EntityContainerRepository, EntityContainerRepository>();
+            container.Register<ITaskRepository, TaskRepository>();
+            container.Register<ITaskTypeRepository,TaskTypeRepository>();
+            container.Register<IAuditRepository, AuditRepository>();
+            container.Register<IRelationRepository, RelationRepository>();
+            container.Register<IRelationTypeRepository, RelationTypeRepository>();
+            container.Register<IMigrationEntryRepository, MigrationEntryRepository>();
+
+            //These repo registrations require custom injections so we need to define them:
+
+            container.Register<IDatabaseUnitOfWork, IServerRegistrationRepository>((factory, work) => new ServerRegistrationRepository(
                 work,
-                factory.GetInstance<CacheHelper>(),
+                factory.GetInstance<CacheHelper>().StaticCache, //special static cache scenario
                 factory.GetInstance<ILogger>(),
                 factory.GetInstance<ISqlSyntaxProvider>(),
                 factory.GetInstance<IMappingResolver>()));
-            container.Register<IDatabaseUnitOfWork, ITaskRepository>((factory, work) => new TaskRepository(
-                work,
-                factory.GetInstance<CacheHelper>("DisabledCache"), //never cache
-                factory.GetInstance<ILogger>(),
-                factory.GetInstance<ISqlSyntaxProvider>(),
-                factory.GetInstance<IMappingResolver>()));
-            container.Register<IDatabaseUnitOfWork, IAuditRepository>((factory, work) => new AuditRepository(
-                work,
-                factory.GetInstance<CacheHelper>("DisabledCache"), //never cache
-                factory.GetInstance<ILogger>(),
-                factory.GetInstance<ISqlSyntaxProvider>(),
-                factory.GetInstance<IMappingResolver>()));
-            container.Register<IDatabaseUnitOfWork, ITagRepository>((factory, work) => new TagRepository(
-                work,
-                factory.GetInstance<CacheHelper>(),
-                factory.GetInstance<ILogger>(),
-                factory.GetInstance<ISqlSyntaxProvider>(),
-                factory.GetInstance<IMappingResolver>()));
-            container.Register<IDatabaseUnitOfWork, IContentRepository>((factory, work) => new ContentRepository(
-                work,
-                factory.GetInstance<CacheHelper>(),
-                factory.GetInstance<ILogger>(),
-                factory.GetInstance<ISqlSyntaxProvider>(),
-                factory.GetInstance<Func<IDatabaseUnitOfWork, IContentTypeRepository>>()(work),
-                factory.GetInstance<Func<IDatabaseUnitOfWork, ITemplateRepository>>()(work),
-                factory.GetInstance<Func<IDatabaseUnitOfWork, ITagRepository>>()(work),
-                factory.GetInstance<IContentSection>(),
-                factory.GetInstance<IMappingResolver>()));
-            container.Register<IDatabaseUnitOfWork, IContentTypeRepository>((factory, work) => new ContentTypeRepository(
-                work,
-                factory.GetInstance<CacheHelper>(),
-                factory.GetInstance<ILogger>(),
-                factory.GetInstance<ISqlSyntaxProvider>(),
-                factory.GetInstance<Func<IDatabaseUnitOfWork, ITemplateRepository>>()(work),
-                factory.GetInstance<IMappingResolver>()));
-            container.Register<IDatabaseUnitOfWork, IDataTypeDefinitionRepository>((factory, work) => new DataTypeDefinitionRepository(
-                work,
-                factory.GetInstance<CacheHelper>(),
-                factory.GetInstance<ILogger>(),
-                factory.GetInstance<ISqlSyntaxProvider>(),
-                factory.GetInstance<Func<IDatabaseUnitOfWork, IContentTypeRepository>>()(work),
-                factory.GetInstance<IMappingResolver>()));
-            container.Register<IDatabaseUnitOfWork, IDictionaryRepository>((factory, work) => new DictionaryRepository(
-                work,
-                factory.GetInstance<CacheHelper>(),
-                factory.GetInstance<ILogger>(),
-                factory.GetInstance<ISqlSyntaxProvider>(),
-                factory.GetInstance<Func<IDatabaseUnitOfWork, ILanguageRepository>>()(work),
-                factory.GetInstance<IMappingResolver>()));
-            container.Register<IDatabaseUnitOfWork, ILanguageRepository>((factory, work) => new LanguageRepository(
-                work,
-                factory.GetInstance<CacheHelper>(),
-                factory.GetInstance<ILogger>(),
-                factory.GetInstance<ISqlSyntaxProvider>(),
-                factory.GetInstance<IMappingResolver>()));
-            container.Register<IDatabaseUnitOfWork, IMediaRepository>((factory, work) => new MediaRepository(
-                work,
-                factory.GetInstance<CacheHelper>(),
-                factory.GetInstance<ILogger>(),
-                factory.GetInstance<ISqlSyntaxProvider>(),
-                factory.GetInstance<Func<IDatabaseUnitOfWork, IMediaTypeRepository>>()(work),
-                factory.GetInstance<Func<IDatabaseUnitOfWork, ITagRepository>>()(work),
-                factory.GetInstance<IContentSection>(),
-                factory.GetInstance<IMappingResolver>()));
-            container.Register<IDatabaseUnitOfWork, IMediaTypeRepository>((factory, work) => new MediaTypeRepository(
-                work,
-                factory.GetInstance<CacheHelper>(),
-                factory.GetInstance<ILogger>(),
-                factory.GetInstance<ISqlSyntaxProvider>(),
-                factory.GetInstance<IMappingResolver>()));
-            container.Register<IDatabaseUnitOfWork, IRelationRepository>((factory, work) => new RelationRepository(
-                work,
-                factory.GetInstance<CacheHelper>("DisabledCache"), //never cache
-                factory.GetInstance<ILogger>(),
-                factory.GetInstance<ISqlSyntaxProvider>(),
-                factory.GetInstance<Func<IDatabaseUnitOfWork, IRelationTypeRepository>>()(work),
-                factory.GetInstance<IMappingResolver>()));
-            container.Register<IDatabaseUnitOfWork, IRelationTypeRepository>((factory, work) => new RelationTypeRepository(
-                work,
-                factory.GetInstance<CacheHelper>("DisabledCache"), //never cache
-                factory.GetInstance<ILogger>(),
-                factory.GetInstance<ISqlSyntaxProvider>(),
-                factory.GetInstance<IMappingResolver>()));
-            container.Register<IUnitOfWork, IScriptRepository>((factory, work) => new ScriptRepository(                
+            container.Register<IUnitOfWork, IScriptRepository>((factory, work) => new ScriptRepository(
                 work,
                 factory.GetInstance<IFileSystem>("ScriptFileSystem"),
                 factory.GetInstance<IContentSection>()));
@@ -152,91 +129,7 @@ namespace Umbraco.Core.DependencyInjection
                 serviceName: "PartialViewMacroRepository");
             container.Register<IUnitOfWork, IStylesheetRepository>((factory, work) => new StylesheetRepository(
                 work,
-                factory.GetInstance<IFileSystem>("StylesheetFileSystem")));
-            container.Register<IDatabaseUnitOfWork, ITemplateRepository>((factory, work) => new TemplateRepository(
-                work,
-                factory.GetInstance<CacheHelper>(),
-                factory.GetInstance<ILogger>(),
-                factory.GetInstance<ISqlSyntaxProvider>(),
-                factory.GetInstance<IFileSystem>("MasterpageFileSystem"),
-                factory.GetInstance<IFileSystem>("ViewFileSystem"),
-                factory.GetInstance<ITemplatesSection>(),
-                factory.GetInstance<IMappingResolver>()));
-            container.Register<IDatabaseUnitOfWork, IMigrationEntryRepository>((factory, work) => new MigrationEntryRepository(
-                work,
-                factory.GetInstance<CacheHelper>("DisabledCache"), //never cache
-                factory.GetInstance<ILogger>(),
-                factory.GetInstance<ISqlSyntaxProvider>(),
-                factory.GetInstance<IMappingResolver>()));
-            container.Register<IDatabaseUnitOfWork, IServerRegistrationRepository>((factory, work) => new ServerRegistrationRepository(
-                work,
-                factory.GetInstance<CacheHelper>().StaticCache, //special static cache scenario
-                factory.GetInstance<ILogger>(),
-                factory.GetInstance<ISqlSyntaxProvider>(),
-                factory.GetInstance<IMappingResolver>()));
-            container.Register<IDatabaseUnitOfWork, IUserTypeRepository>((factory, work) => new UserTypeRepository(
-                work,
-                factory.GetInstance<CacheHelper>(),
-                factory.GetInstance<ILogger>(),
-                factory.GetInstance<ISqlSyntaxProvider>(),
-                factory.GetInstance<IMappingResolver>()));
-            container.Register<IDatabaseUnitOfWork, IUserRepository>((factory, work) => new UserRepository(
-                work,
-                factory.GetInstance<CacheHelper>(),
-                factory.GetInstance<ILogger>(),
-                factory.GetInstance<ISqlSyntaxProvider>(),
-                factory.GetInstance<Func<IDatabaseUnitOfWork, IUserTypeRepository>>()(work),
-                factory.GetInstance<IMappingResolver>()));
-            container.Register<IDatabaseUnitOfWork, IMacroRepository>((factory, work) => new MacroRepository(
-                work,
-                factory.GetInstance<CacheHelper>(),
-                factory.GetInstance<ILogger>(),
-                factory.GetInstance<ISqlSyntaxProvider>(),
-                factory.GetInstance<IMappingResolver>()));
-            container.Register<IDatabaseUnitOfWork, IMemberRepository>((factory, work) => new MemberRepository(
-                work,
-                factory.GetInstance<CacheHelper>(),
-                factory.GetInstance<ILogger>(),
-                factory.GetInstance<ISqlSyntaxProvider>(),
-                factory.GetInstance<Func<IDatabaseUnitOfWork, IMemberTypeRepository>>()(work),
-                factory.GetInstance<Func<IDatabaseUnitOfWork, IMemberGroupRepository>>()(work),
-                factory.GetInstance<Func<IDatabaseUnitOfWork, ITagRepository>>()(work),
-                factory.GetInstance<IContentSection>(),
-                factory.GetInstance<IMappingResolver>()));
-            container.Register<IDatabaseUnitOfWork, IMemberTypeRepository>((factory, work) => new MemberTypeRepository(
-               work,
-               factory.GetInstance<CacheHelper>(),
-               factory.GetInstance<ILogger>(),
-               factory.GetInstance<ISqlSyntaxProvider>(),
-               factory.GetInstance<IMappingResolver>()));
-            container.Register<IDatabaseUnitOfWork, IMemberGroupRepository>((factory, work) => new MemberGroupRepository(
-               work,
-               factory.GetInstance<CacheHelper>(),
-               factory.GetInstance<ILogger>(),
-               factory.GetInstance<ISqlSyntaxProvider>(),
-               factory.GetInstance<IMappingResolver>()));
-            container.Register<IDatabaseUnitOfWork, IEntityRepository>((factory, work) => new EntityRepository(
-               work,               
-               factory.GetInstance<ISqlSyntaxProvider>(),
-               factory.GetInstance<IMappingResolver>()));
-            container.Register<IDatabaseUnitOfWork, IDomainRepository>((factory, work) => new DomainRepository(
-               work,
-               factory.GetInstance<CacheHelper>(),
-               factory.GetInstance<ILogger>(),
-               factory.GetInstance<ISqlSyntaxProvider>(),
-               factory.GetInstance<IMappingResolver>()));
-            container.Register<IDatabaseUnitOfWork, ITaskTypeRepository>((factory, work) => new TaskTypeRepository(
-               work,
-               factory.GetInstance<CacheHelper>("DisabledCache"), //never cache
-               factory.GetInstance<ILogger>(),
-               factory.GetInstance<ISqlSyntaxProvider>(),
-               factory.GetInstance<IMappingResolver>()));
-            container.Register<IDatabaseUnitOfWork, EntityContainerRepository>((factory, work) => new EntityContainerRepository(
-               work,
-               factory.GetInstance<CacheHelper>(),
-               factory.GetInstance<ILogger>(),
-               factory.GetInstance<ISqlSyntaxProvider>(),
-               factory.GetInstance<IMappingResolver>()));
+                factory.GetInstance<IFileSystem>("StylesheetFileSystem")));            
         }
 
         /// <summary>
