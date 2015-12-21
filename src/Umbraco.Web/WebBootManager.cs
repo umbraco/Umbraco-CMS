@@ -317,9 +317,9 @@ namespace Umbraco.Web
             container.EnablePerWebRequestScope();
 
             container.Register<IUmbracoContextAccessor, DefaultUmbracoContextAccessor>(new PerContainerLifetime());
-            //TODO: Is this lifespan correct? Need to ask Stephen because we have contextual ones too
-            container.Register<IPublishedContentCache, PublishedContentCache>(new PerContainerLifetime());
+            container.Register<IPublishedContentCache>(factory => new PublishedContentCache(), new PerContainerLifetime());
             container.Register<IPublishedMediaCache, PublishedMediaCache>(new PerContainerLifetime());
+
             //no need to declare as per request, currently we manage it's lifetime as the singleton
             container.Register<UmbracoContext>(factory => UmbracoContext.Current);
 

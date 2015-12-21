@@ -362,15 +362,13 @@ namespace Umbraco.Tests.TestHelpers
 
         protected UmbracoContext GetUmbracoContext(string url, int templateId, RouteData routeData = null, bool setSingleton = false)
         {
-            var cache = new PublishedContentCache();
-
-            cache.GetXmlDelegate = (context, preview) =>
-                {
-                    var doc = new XmlDocument();
-                    doc.LoadXml(GetXmlContent(templateId));
-                    return doc;
-                };
-
+            var cache = new PublishedContentCache((context, preview) =>
+            {
+                var doc = new XmlDocument();
+                doc.LoadXml(GetXmlContent(templateId));
+                return doc;
+            });
+            
             PublishedContentCache.UnitTesting = true;
 
             var httpContext = GetHttpContextFactory(url, routeData).HttpContext;

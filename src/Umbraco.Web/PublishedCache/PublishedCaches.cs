@@ -4,7 +4,7 @@
     /// Provides caches (content and media).
     /// </summary>
     /// <remarks>Default implementation for unrelated caches.</remarks>
-    class PublishedCaches : IPublishedCaches
+    internal class PublishedCaches : IPublishedCaches
     {
         private readonly IPublishedContentCache _contentCache;
         private readonly IPublishedMediaCache _mediaCache;
