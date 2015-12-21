@@ -21,7 +21,6 @@
   color: @black;
   border: 1px solid @btnBorder;
   *border: 0; // Remove the border to prevent IE7's black border on input:focus
-  .border-radius(@baseBorderRadius);
   .ie7-restore-left-whitespace(); // Give IE7 some love
   -webkit-box-shadow: none;
   box-shadow: none;
@@ -69,6 +68,12 @@
     -webkit-box-shadow:none;
 }
 
+.btn-group >.btn:first-child,
+.btn-group > .btn:last-child,
+.btn-group > .dropdown-toggle {
+    border-radius: 0;
+}
+
 
 
 // Button Sizes
@@ -78,7 +83,6 @@
 .btn-large {
   padding: @paddingLarge;
   font-size: @fontSizeLarge;
-  .border-radius(@borderRadiusLarge);
 }
 .btn-large [class^="icon-"],
 .btn-large [class*=" icon-"] {
@@ -89,7 +93,6 @@
 .btn-small {
   padding: @paddingSmall;
   font-size: @fontSizeSmall;
-  .border-radius(@borderRadiusSmall);
 }
 .btn-small [class^="icon-"],
 .btn-small [class*=" icon-"] {
@@ -104,7 +107,6 @@
 .btn-mini {
   padding: @paddingMini;
   font-size: @fontSizeMini;
-  .border-radius(@borderRadiusSmall);
 }
 
 

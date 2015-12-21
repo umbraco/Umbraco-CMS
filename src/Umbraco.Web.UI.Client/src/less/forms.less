@@ -167,7 +167,6 @@ input[type="color"],
   font-size: @baseFontSize;
   line-height: @baseLineHeight;
   color: @gray;
-  .border-radius(@inputBorderRadius);
   vertical-align: middle;
 }
 
@@ -447,7 +446,7 @@ input[type="checkbox"][readonly] {
 // --------------------------
 
 // Error
-.show-validation.ng-invalid .control-group.error, 
+.show-validation.ng-invalid .control-group.error,
 .show-validation.ng-invalid .umb-panel-header-content-wrapper {
     .formFieldState(@formErrorText, @formErrorText, @formErrorBackground);
 }
@@ -581,23 +580,10 @@ input[type="checkbox"][readonly] {
 }
 
 .input-append {
-  input,
-  select,
-  .uneditable-input {
-    .border-radius(@inputBorderRadius 0 0 @inputBorderRadius);
-    + .btn-group .btn:last-child {
-      .border-radius(0 @inputBorderRadius @inputBorderRadius 0);
-    }
-  }
   .add-on,
   .btn,
   .btn-group {
     margin-left: -1px;
-  }
-  .add-on:last-child,
-  .btn:last-child,
-  .btn-group:last-child > .dropdown-toggle {
-    .border-radius(0 @inputBorderRadius @inputBorderRadius 0);
   }
 }
 
