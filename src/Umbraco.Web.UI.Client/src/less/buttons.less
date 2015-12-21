@@ -68,7 +68,7 @@
     -webkit-box-shadow:none;
 }
 
-.btn-group >.btn:first-child,
+.btn-group > .btn:first-child,
 .btn-group > .btn:last-child,
 .btn-group > .dropdown-toggle {
     border-radius: 0;
@@ -87,13 +87,16 @@
 .btn-large [class^="icon-"],
 .btn-large [class*=" icon-"] {
   margin-top: 4px;
+  .border-radius(@borderRadiusLarge);
 }
 
 // Small
 .btn-small {
   padding: @paddingSmall;
   font-size: @fontSizeSmall;
+  .border-radius(@borderRadiusSmall);
 }
+
 .btn-small [class^="icon-"],
 .btn-small [class*=" icon-"] {
   margin-top: 0;
@@ -107,6 +110,7 @@
 .btn-mini {
   padding: @paddingMini;
   font-size: @fontSizeMini;
+  .border-radius(@borderRadiusSmall);
 }
 
 
