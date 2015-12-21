@@ -96,7 +96,10 @@ namespace Umbraco.Tests.TestHelpers
         protected virtual void ConfigureContainer()
         {
             var settings = SettingsForTests.GetDefault();
-            
+
+            Container.Register<IServiceContainer>(factory => Container);
+            Container.Register<PluginManager>(factory => PluginManager.Current);
+
             //Default Datalayer/Repositories/SQL/Database/etc...
             Container.RegisterFrom<RepositoryCompositionRoot>();
 
