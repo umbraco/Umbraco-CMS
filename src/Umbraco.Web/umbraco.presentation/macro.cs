@@ -892,7 +892,7 @@ namespace umbraco
 
                     // extract the tag and parse it
                     string tag = text.Substring(tagStartPos, (tagEndPos + tagEnd.Length) - tagStartPos);
-                    Hashtable attributes = helper.ReturnAttributes(tag);
+                    Hashtable attributes = new Hashtable(XmlHelper.GetAttributesFromElement(tag));
 
                     // create item with the parameters specified in the tag
                     var item = new Item();

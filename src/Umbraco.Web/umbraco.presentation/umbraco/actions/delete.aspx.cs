@@ -10,6 +10,7 @@ using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using umbraco.cms.businesslogic.web;
 using Umbraco.Core;
+using Umbraco.Web;
 
 namespace umbraco.presentation.actions
 {
@@ -19,7 +20,7 @@ namespace umbraco.presentation.actions
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            d = new Document(int.Parse(helper.Request("id")));
+            d = new Document(int.Parse(Request.GetItemAsString("id")));
 
             if (!base.ValidateUserApp(Constants.Applications.Content))
                 throw new ArgumentException("The current user doesn't have access to this application. Please contact the system administrator.");

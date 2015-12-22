@@ -29,29 +29,18 @@ namespace umbraco
             return umbraco.BasePages.UmbracoEnsuredPage.CurrentUser;
         }
 
-		[Obsolete("This method has been superceded. Use the extension method for HttpRequest or HttpRequestBase method: GetItemAsString instead.")]
-        public static string Request(string text)
-		{
-			if (HttpContext.Current == null)
-				return string.Empty;
+		//[Obsolete("This method has been superceded. Use the extension method for HttpRequest or HttpRequestBase method: GetItemAsString instead.")]
+  //      public static string Request(string text)
+		//{
+		//	if (HttpContext.Current == null)
+		//		return string.Empty;
 
-            if (HttpContext.Current.Request[text.ToLower()] != null)
-				if (HttpContext.Current.Request[text] != string.Empty)
-					return HttpContext.Current.Request[text];
+  //          if (HttpContext.Current.Request[text.ToLower()] != null)
+		//		if (HttpContext.Current.Request[text] != string.Empty)
+		//			return HttpContext.Current.Request[text];
             
-            return String.Empty;
-        }
-
-		[Obsolete("Has been superceded by Umbraco.Core.XmlHelper.GetAttributesFromElement")]
-        public static Hashtable ReturnAttributes(String tag)
-		{
-			var h = new Hashtable();
-            foreach(var i in Umbraco.Core.XmlHelper.GetAttributesFromElement(tag))
-            {
-            	h.Add(i.Key, i.Value);
-            }
-			return h;
-		}
+  //          return String.Empty;
+  //      }
 
         public static String FindAttribute(IDictionary attributes, String key)
         {
@@ -188,16 +177,5 @@ namespace umbraco
             return attributeValue;
         }
 
-        [UmbracoWillObsolete("We should really obsolete that one.")]
-        public static string SpaceCamelCasing(string text)
-        {
-            return text.SplitPascalCasing().ToFirstUpperInvariant();
-        }
-
-        [Obsolete("Use umbraco.presentation.UmbracContext.Current.GetBaseUrl()")]
-        public static string GetBaseUrl(HttpContext Context)
-        {
-            return Context.Request.Url.GetLeftPart(UriPartial.Authority);
-        }
     }
 }

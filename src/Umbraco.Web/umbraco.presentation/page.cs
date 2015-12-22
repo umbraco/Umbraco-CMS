@@ -14,6 +14,7 @@ using Umbraco.Web.Editors;
 using Umbraco.Web.Routing;
 using umbraco.cms.businesslogic.web;
 using Umbraco.Core.Configuration;
+using Umbraco.Web;
 
 namespace umbraco
 {
@@ -161,11 +162,11 @@ namespace umbraco
 		                    HttpContext.Current.Items[Constants.Conventions.Url.AltTemplate].ToString());
 		            _elements.Add("template", _template.ToString());
 		        }
-		        else if (helper.Request(Constants.Conventions.Url.AltTemplate) != String.Empty)
+		        else if (HttpContext.Current.Request.GetItemAsString(Constants.Conventions.Url.AltTemplate) != String.Empty)
 		        {
 		            _template =
 		                umbraco.cms.businesslogic.template.Template.GetTemplateIdFromAlias(
-		                    helper.Request(Constants.Conventions.Url.AltTemplate).ToLower());
+		                    HttpContext.Current.Request.GetItemAsString(Constants.Conventions.Url.AltTemplate).ToLower());
 		            _elements.Add("template", _template.ToString());
 		        }
 		    }

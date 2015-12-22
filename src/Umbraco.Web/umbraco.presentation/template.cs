@@ -238,7 +238,7 @@ namespace umbraco
                     tempOutput.Remove(0, tagIndex);
 
                     String tag = tempOutput.ToString().Substring(0, tempOutput.ToString().IndexOf(">") + 1);
-                    Hashtable attributes = helper.ReturnAttributes(tag);
+                    Hashtable attributes = new Hashtable(XmlHelper.GetAttributesFromElement(tag));
 
                     // Check whether it's a single tag (<?.../>) or a tag with children (<?..>...</?...>)
                     if (tag.Substring(tag.Length - 2, 1) != "/" && tag.IndexOf(" ") > -1)
@@ -398,7 +398,7 @@ namespace umbraco
 
             foreach (Match tag in tags)
             {
-                Hashtable attributes = helper.ReturnAttributes(tag.Value.ToString());
+                Hashtable attributes = new Hashtable(XmlHelper.GetAttributesFromElement(tag.Value));
 
 
                 if (tag.ToString().ToLower().IndexOf("umbraco_macro") > -1)
@@ -420,7 +420,7 @@ namespace umbraco
                             MatchCollection tempMacros = Regex.Matches(tempElementContent, "<\\?UMBRACO_MACRO(?<attributes>[^>]*)><img[^>]*><\\/\\?UMBRACO_MACRO>", RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
                             foreach (Match tempMacro in tempMacros)
                             {
-                                Hashtable tempAttributes = helper.ReturnAttributes(tempMacro.Groups["attributes"].Value.ToString());
+                                Hashtable tempAttributes = new Hashtable(XmlHelper.GetAttributesFromElement(tempMacro.Groups["attributes"].Value));
                                 String macroID = helper.FindAttribute(tempAttributes, "macroid");
                                 if (Convert.ToInt32(macroID) > 0)
                                 {

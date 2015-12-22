@@ -11,6 +11,7 @@ using umbraco.presentation.create;
 using Content=umbraco.cms.businesslogic.Content;
 using umbraco.cms.helpers;
 using umbraco.BasePages;
+using Umbraco.Web;
 
 namespace umbraco.cms.presentation.create.controls
 {
@@ -110,7 +111,7 @@ namespace umbraco.cms.presentation.create.controls
                 var returnUrl = LegacyDialogHandler.Create(
                     new HttpContextWrapper(Context),
                     BasePage.Current.getUser(),
-                    helper.Request("nodeType"),
+                    Request.GetItemAsString("nodeType"),
                     int.Parse(Request["nodeID"]),
                     rename.Text,
                     int.Parse(nodeType.SelectedValue));

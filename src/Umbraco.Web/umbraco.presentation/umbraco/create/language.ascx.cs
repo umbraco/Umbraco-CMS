@@ -6,6 +6,8 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using Umbraco.Web.UI;
 using umbraco.BasePages;
+using Umbraco.Web;
+
 namespace umbraco.cms.presentation.create.controls
 {
     /// <summary>
@@ -40,7 +42,7 @@ namespace umbraco.cms.presentation.create.controls
             LegacyDialogHandler.Create(
                 new HttpContextWrapper(Context),
                 BasePage.Current.getUser(),
-                helper.Request("nodeType"),
+                Request.GetItemAsString("nodeType"),
                 -1,
                 Cultures.SelectedValue);
 

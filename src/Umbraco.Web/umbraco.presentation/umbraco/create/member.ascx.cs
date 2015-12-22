@@ -1,20 +1,22 @@
 using Umbraco.Web.UI;
 using System.Globalization;
 using Umbraco.Core.Security;
+using System;
+using System.Data;
+using System.Drawing;
+using System.Web;
+using System.Web.UI.WebControls;
+using System.Web.UI.HtmlControls;
+using Umbraco.Web;
+using System.Web.Security;
+using umbraco.cms.helpers;
+using umbraco.BasePages;
+using umbraco.cms.businesslogic.member;
+using MembershipProviderExtensions = Umbraco.Core.Security.MembershipProviderExtensions;
 
 namespace umbraco.cms.presentation.create.controls
 {
-    using System;
-    using System.Data;
-    using System.Drawing;
-    using System.Web;
-    using System.Web.UI.WebControls;
-    using System.Web.UI.HtmlControls;
-
-    using System.Web.Security;
-	using umbraco.cms.helpers;
-	using umbraco.BasePages;
-    using umbraco.cms.businesslogic.member;
+    
 
     /// <summary>
     ///		Summary description for member.
@@ -81,7 +83,7 @@ namespace umbraco.cms.presentation.create.controls
                 var returnUrl = LegacyDialogHandler.Create(
                     new HttpContextWrapper(Context),
                     BasePage.Current.getUser(),
-                    helper.Request("nodeType"),
+                    Request.GetItemAsString("nodeType"),
                     -1,                    
                     rename.Text + emailAppend,
                     memberType);
