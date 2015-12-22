@@ -11,8 +11,11 @@
     </div>
 
     <ul class="umb-card-grid">
-      <li ng-repeat="availableItem in model.availableItems | compareArrays:model.selectedItems:'alias' | orderBy:'name' | filter:searchTerm" class="-three-in-row">
-        <a href="" ng-click="selectItem(availableItem)" title="{{ availableItem.name }}">
+      <li
+        ng-repeat="availableItem in model.availableItems | compareArrays:model.selectedItems:'alias' | orderBy:'name' | filter:searchTerm"
+        ng-click="selectItem(availableItem)"
+        class="-three-in-row">
+        <a href="" title="{{ availableItem.name }}">
             <i class="{{ availableItem.icon }}"></i>
             {{ availableItem.name }}
         </a>
