@@ -35,7 +35,6 @@ namespace Umbraco.Tests.UI
         [TestCase(typeof(stylesheetPropertyTasks), DefaultApps.settings)]
         [TestCase(typeof(ScriptTasks), DefaultApps.settings)]
         [TestCase(typeof(MemberGroupTasks), DefaultApps.member)]
-        [TestCase(typeof(MediaTypeTasks), DefaultApps.settings)]
         [TestCase(typeof(dictionaryTasks), DefaultApps.settings)]
         [TestCase(typeof(macroTasks), DefaultApps.developer)]
         [TestCase(typeof(languageTasks), DefaultApps.settings)]
