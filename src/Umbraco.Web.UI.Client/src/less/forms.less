@@ -449,7 +449,7 @@ input[type="checkbox"][readonly] {
 // --------------------------
 
 // Error
-.show-validation.ng-invalid .control-group.error, 
+.show-validation.ng-invalid .control-group.error,
 .show-validation.ng-invalid .umb-panel-header-content-wrapper {
     .formFieldState(@formErrorText, @formErrorText, @formErrorBackground);
 }
@@ -539,7 +539,6 @@ input[type="checkbox"][readonly] {
     margin-bottom: 0; // prevent bottom margin from screwing up alignment in stacked forms
     *margin-left: 0;
     vertical-align: top;
-    .border-radius(0 @inputBorderRadius @inputBorderRadius 0);
     // Make input on top when focused so blue border and shadow always show
     &:focus {
       z-index: 2;
@@ -576,30 +575,13 @@ input[type="checkbox"][readonly] {
   .btn {
     margin-right: -1px;
   }
-  .add-on:first-child,
-  .btn:first-child {
-    .border-radius(@inputBorderRadius 0 0 @inputBorderRadius);
-  }
 }
 
 .input-append {
-  input,
-  select,
-  .uneditable-input {
-    .border-radius(@inputBorderRadius 0 0 @inputBorderRadius);
-    + .btn-group .btn:last-child {
-      .border-radius(0 @inputBorderRadius @inputBorderRadius 0);
-    }
-  }
   .add-on,
   .btn,
   .btn-group {
     margin-left: -1px;
-  }
-  .add-on:last-child,
-  .btn:last-child,
-  .btn-group:last-child > .dropdown-toggle {
-    .border-radius(0 @inputBorderRadius @inputBorderRadius 0);
   }
 }
 
