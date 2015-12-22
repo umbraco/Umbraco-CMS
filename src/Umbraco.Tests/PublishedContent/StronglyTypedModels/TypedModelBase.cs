@@ -155,7 +155,7 @@ namespace Umbraco.Tests.PublishedContent.StronglyTypedModels
 
         public static string ToUmbracoAlias(this MethodBase methodBase)
         {
-            return methodBase.CleanCallingMethodName().ToUmbracoAlias();
+            return methodBase.CleanCallingMethodName().ToSafeAlias();
         }
 
         public static string ToSingular(this string pluralWord)

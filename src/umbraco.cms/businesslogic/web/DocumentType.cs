@@ -68,58 +68,6 @@ namespace umbraco.cms.businesslogic.web
 
         #region Static Methods
 
-        /// <summary>
-        /// Generates the complete (simplified) XML DTD 
-        /// </summary>
-        /// <returns>The DTD as a string</returns>
-        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentTypeService.GetDtd()", false)]
-        public static string GenerateDtd()
-        {
-            StringBuilder dtd = new StringBuilder();
-            // Renamed 'umbraco' to 'root' since the top level of the DOCTYPE should specify the name of the root node for it to be valid;
-            // there's no mention of 'umbraco' anywhere in the schema that this DOCTYPE governs
-            // (Alex N 20100212)
-            dtd.AppendLine("<!DOCTYPE root [ ");
-
-            dtd.AppendLine(GenerateXmlDocumentType());
-            dtd.AppendLine("]>");
-
-            return dtd.ToString();
-        }
-
-        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentTypeService.GetContentTypesDtd()", false)]
-        public static string GenerateXmlDocumentType()
-        {
-            StringBuilder dtd = new StringBuilder();
-            // TEMPORARY: Added Try-Catch to this call since trying to generate a DTD against a corrupt db
-            // or a broken connection string is not handled yet
-            // (Alex N 20100212)
-            try
-            {
-                StringBuilder strictSchemaBuilder = new StringBuilder();
-
-                List<DocumentType> dts = GetAllAsList();
-                foreach (DocumentType dt in dts)
-                {
-                    string safeAlias = helpers.Casing.SafeAlias(dt.Alias);
-                    if (safeAlias != null)
-                    {
-                        strictSchemaBuilder.AppendLine(String.Format("<!ELEMENT {0} ANY>", safeAlias));
-                        strictSchemaBuilder.AppendLine(String.Format("<!ATTLIST {0} id ID #REQUIRED>", safeAlias));
-                    }
-                }
-
-                // Only commit the strong schema to the container if we didn't generate an error building it
-                dtd.Append(strictSchemaBuilder);
-            }
-            catch (Exception exception)
-            {
-                LogHelper.Error<DocumentType>("Exception while trying to build DTD for Xml schema; is Umbraco installed correctly and the connection string configured?", exception);
-            }
-            return dtd.ToString();
-
-        }
-
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentTypeService.GetContentType()", false)]
         public new static DocumentType GetByAlias(string Alias)
         {

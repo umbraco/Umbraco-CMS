@@ -6,6 +6,7 @@ using System.Reflection;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Persistence.Factories
 {
@@ -17,7 +18,7 @@ namespace Umbraco.Core.Persistence.Factories
             
             //figure out what extra properties we have that are not on the IUmbracoEntity and add them to additional data
             foreach (var k in originalEntityProperties.Keys
-                .Select(x => new { orig = x, title = x.ConvertCase(StringAliasCaseType.PascalCase) })
+                .Select(x => new { orig = x, title = x.ToCleanString(CleanStringType.PascalCase) })
                 .Where(x => entityProps.InvariantContains(x.title) == false))
             {
                 entity.AdditionalData[k.title] = originalEntityProperties[k.orig];

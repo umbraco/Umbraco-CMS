@@ -14,6 +14,7 @@ using umbraco.cms.presentation.Trees;
 using umbraco.BasePages;
 using System.Web.Services;
 using umbraco.BusinessLogic;
+using Umbraco.Core;
 
 namespace umbraco.controls.Tree
 {
@@ -42,7 +43,7 @@ namespace umbraco.controls.Tree
                         {
                             // Make new Iaction
                             PlaceboAction pa = new PlaceboAction(a);
-                            pa.JsFunctionName = "IActionProxy_" + umbraco.cms.helpers.Casing.SafeAlias(pa.Alias) + "()";
+                            pa.JsFunctionName = "IActionProxy_" + pa.Alias.ToSafeAlias() + "()";
                             allActions.Add(pa);
 
                         }

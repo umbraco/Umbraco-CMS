@@ -470,7 +470,7 @@ namespace umbraco
                     {
 
                         // Lets cache the DTD to save on the DB hit on the subsequent use
-                        string dtd = DocumentType.GenerateDtd();
+                        string dtd = ApplicationContext.Current.Services.ContentTypeService.GetDtd();
 
                         // Prepare an XmlDocument with an appropriate inline DTD to match
                         // the expected content

@@ -1050,7 +1050,7 @@ namespace Umbraco.Core.Services
                 var contentTypes = GetAllContentTypes();
                 foreach (ContentType contentType in contentTypes)
                 {
-                    string safeAlias = contentType.Alias.ToUmbracoAlias();
+                    string safeAlias = contentType.Alias.ToSafeAlias();
                     if (safeAlias != null)
                     {
                         strictSchemaBuilder.AppendLine(String.Format("<!ELEMENT {0} ANY>", safeAlias));

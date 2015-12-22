@@ -689,7 +689,6 @@
     <Content Include="Umbraco_Client\Editors\EditStyleSheet.js" />
     <Content Include="Umbraco_Client\Editors\EditTemplate.js" />
     <Content Include="Umbraco_Client\Editors\EditView.js" />
-    <Content Include="Umbraco_Client\PunyCode\punycode.min.js" />
     <Content Include="Umbraco_Client\Splitbutton\InsertMacroSplitButton.js" />
     <Content Include="Umbraco_Client\Tablesorting\img\asc.gif" />
     <Content Include="Umbraco_Client\Tablesorting\img\desc.gif" />

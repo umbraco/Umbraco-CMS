@@ -25,10 +25,6 @@ namespace Umbraco.Core
     ///</summary>
     public static class StringExtensions
     {
-        [UmbracoWillObsolete("Do not use this constants. See IShortStringHelper.CleanStringForSafeAliasJavaScriptCode.")]
-        public const string UmbracoValidAliasCharacters = "_-abcdefghijklmnopqrstuvwxyz1234567890";
-        [UmbracoWillObsolete("Do not use this constants. See IShortStringHelper.CleanStringForSafeAliasJavaScriptCode.")]
-        public const string UmbracoInvalidFirstCharacters = "01234567890";
 
         private static readonly char[] ToCSharpHexDigitLower = "0123456789abcdef".ToCharArray();
         private static readonly char[] ToCSharpEscapeChars;
@@ -1027,62 +1023,7 @@ namespace Umbraco.Core
         }
 
         // FORMAT STRINGS
-
-        // note: LegacyShortStringHelper will produce a 100% backward-compatible output for ToUrlAlias.
-        // this is the only reason why we keep the method, otherwise it should be removed, and with any other
-        // helper we fallback to ToUrlSegment anyway.
-
-        /// <summary>
-        /// Converts string to a URL alias.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        /// <param name="charReplacements">The char replacements.</param>
-        /// <param name="replaceDoubleDashes">if set to <c>true</c> replace double dashes.</param>
-        /// <param name="stripNonAscii">if set to <c>true</c> strip non ASCII.</param>
-        /// <param name="urlEncode">if set to <c>true</c> URL encode.</param>
-        /// <returns></returns>
-        /// <remarks>
-        /// This ensures that ONLY ascii chars are allowed and of those ascii chars, only digits and lowercase chars, all
-        /// punctuation, etc... are stripped out, however this method allows you to pass in string's to replace with the
-        /// specified replacement character before the string is converted to ascii and it has invalid characters stripped out.
-        /// This allows you to replace strings like &amp; , etc.. with your replacement character before the automatic
-        /// reduction.
-        /// </remarks>
-        [Obsolete("This method should be removed. Use ToUrlSegment instead.")]
-        public static string ToUrlAlias(this string value, IDictionary<string, string> charReplacements, bool replaceDoubleDashes, bool stripNonAscii, bool urlEncode)
-        {
-            var helper = ShortStringHelper;
-            var legacy = helper as LegacyShortStringHelper;
-            return legacy != null
-                ? legacy.LegacyToUrlAlias(value, charReplacements, replaceDoubleDashes, stripNonAscii, urlEncode)
-                : helper.CleanStringForUrlSegment(value);
-        }
-
-        // note: LegacyShortStringHelper will produce a 100% backward-compatible output for FormatUrl.
-        // this is the only reason why we keep the method, otherwise it should be removed, and with any other
-        // helper we fallback to ToUrlSegment anyway.
-
-        /// <summary>
-        /// Cleans a string to produce a string that can safely be used in an url segment.
-        /// </summary>
-        /// <param name="url">The text to filter.</param>
-        /// <returns>The safe url segment.</returns>
-        /// <remarks>
-        /// <para>When using the legacy ShortStringHelper, uses <c>UmbracoSettings.UrlReplaceCharacters</c>
-        ///  and <c>UmbracoSettings.RemoveDoubleDashesFromUrlReplacing</c>.</para>
-        /// <para>Other helpers may use different parameters.</para>
-        /// </remarks>
-        [Obsolete("This method should be removed. Use ToUrlSegment instead.")]
-        public static string FormatUrl(this string url)
-        {
-            var helper = ShortStringHelper;
-            var legacy = helper as LegacyShortStringHelper;
-            return legacy != null ? legacy.LegacyFormatUrl(url) : helper.CleanStringForUrlSegment(url);
-        }
-
-        // note: LegacyShortStringHelper will produce a 100% backward-compatible output for ToSafeAlias
-        // other helpers may not. DefaultShortStringHelper produces better, but non-compatible, results.
-
+        
         /// <summary>
         /// Cleans a string to produce a string that can safely be used in an alias.
         /// </summary>
@@ -1140,26 +1081,6 @@ namespace Umbraco.Core
             return UmbracoConfig.For.UmbracoSettings().Content.ForceSafeAliases ? alias.ToSafeAlias(culture) : alias;
         }
 
-        // note: LegacyShortStringHelper will produce a 100% backward-compatible output for ToUmbracoAlias.
-        // this is the only reason why we keep the method, otherwise it should be removed, and with any other
-        // helper we fallback to ToSafeAlias anyway.
-
-        /// <summary>
-        /// Cleans a string to produce a string that can safely be used in an alias.
-        /// </summary>
-        /// <param name="phrase">The text to filter.</param>
-        /// <param name="caseType">The case type. THIS PARAMETER IS IGNORED.</param>
-        /// <param name="removeSpaces">Indicates whether spaces should be removed. THIS PARAMETER IS IGNORED.</param>
-        /// <returns>The safe alias.</returns>
-        /// <remarks>CamelCase, and remove spaces, whatever the parameters.</remarks>
-        [Obsolete("This method should be removed. Use ToSafeAlias instead.")]
-        public static string ToUmbracoAlias(this string phrase, StringAliasCaseType caseType = StringAliasCaseType.CamelCase, bool removeSpaces = false)
-        {
-            var helper = ShortStringHelper;
-            var legacy = helper as LegacyShortStringHelper;
-            return legacy != null ? legacy.LegacyCleanStringForUmbracoAlias(phrase) : helper.CleanStringForSafeAlias(phrase);
-        }
-
         // the new methods to get a url segment
 
         /// <summary>
@@ -1181,31 +1102,6 @@ namespace Umbraco.Core
         public static string ToUrlSegment(this string text, CultureInfo culture)
         {
             return ShortStringHelper.CleanStringForUrlSegment(text, culture);
-        }
-
-        // note: LegacyShortStringHelper will produce 100% backward-compatible output for ConvertCase.
-        // this is the only reason why we keep the method, otherwise it should be removed, and with any other
-        // helper we fallback to CleanString(ascii, alias) anyway.
-
-        /// <summary>
-        /// Filters a string to convert case, and more.
-        /// </summary>
-        /// <param name="phrase">the text to filter.</param>
-        /// <param name="cases">The string case type.</param>
-        /// <returns>The filtered text.</returns>
-        /// <remarks>
-        /// <para>This is the legacy method, so we can't really change it, although it has issues (see unit tests).</para>
-        /// <para>It does more than "converting the case", and also remove spaces, etc.</para>
-        /// </remarks>
-        [Obsolete("This method should be removed. Use ToCleanString instead.")]
-        public static string ConvertCase(this string phrase, StringAliasCaseType cases)
-        {
-            var helper = ShortStringHelper;
-            var legacy = helper as LegacyShortStringHelper;
-            var cases2 = cases.ToCleanStringType() & CleanStringType.CaseMask;
-            return legacy != null
-                       ? legacy.LegacyConvertStringCase(phrase, cases2)
-                       : helper.CleanString(phrase, CleanStringType.Ascii | CleanStringType.ConvertCase | cases2);
         }
 
         // the new methods to clean a string (to alias, url segment...)
@@ -1275,6 +1171,16 @@ namespace Umbraco.Core
         public static string SplitPascalCasing(this string phrase)
         {
             return ShortStringHelper.SplitPascalCasing(phrase, ' ');
+        }
+
+        //NOTE: Not sure what this actually does but is used a few places, need to figure it out and then move to StringExtensions and obsolete.
+        // it basically is yet another version of SplitPascalCasing
+        // plugging string extensions here to be 99% compatible
+        // the only diff. is with numbers, Number6Is was "Number6 Is", and the new string helper does it too,
+        // but the legacy one does "Number6Is"... assuming it is not a big deal.
+        internal static string SpaceCamelCasing(this string phrase)
+        {
+            return phrase.Length < 2 ? phrase : phrase.SplitPascalCasing().ToFirstUpperInvariant();
         }
 
         /// <summary>

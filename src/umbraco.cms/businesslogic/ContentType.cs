@@ -188,7 +188,7 @@ namespace umbraco.cms.businesslogic
             SqlHelper.ExecuteNonQuery(
                                       "Insert into cmsContentType (nodeId,alias,icon) values (" + 
                                       nodeId + ",'" +
-                                      (formatAlias ? helpers.Casing.SafeAliasWithForcingCheck(alias) : alias) +
+                                      (formatAlias ? alias.ToSafeAliasWithForcingCheck() : alias) +
                                       "','" + iconUrl + "')");
         }
 
@@ -299,7 +299,7 @@ namespace umbraco.cms.businesslogic
             get { return _alias; }
             set
             {
-                _alias = helpers.Casing.SafeAliasWithForcingCheck(value);
+                _alias = value.ToSafeAliasWithForcingCheck();
 
                 // validate if alias is empty
                 if (String.IsNullOrEmpty(_alias))

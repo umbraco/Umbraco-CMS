@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Strings
         [TestCase("WhoIsNumber6InTheVillage", "Who Is Number6 In The Village")] // now fixed since DefaultShortStringHelper is the default
         public void SpaceCamelCasing(string input, string expected)
         {
-            var output = umbraco.cms.helpers.Casing.SpaceCamelCasing(input);
+            var output = input.SpaceCamelCasing();
             Assert.AreEqual(expected, output);
         }
 

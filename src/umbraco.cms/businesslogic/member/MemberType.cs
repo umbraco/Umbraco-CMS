@@ -156,7 +156,7 @@ namespace umbraco.cms.businesslogic.member
         /// <param name="u">Creator of the MemberType</param>
         public static MemberType MakeNew(User u, string Text)
         {
-            var alias = helpers.Casing.SafeAliasWithForcingCheck(Text);
+            var alias = Text.ToSafeAliasWithForcingCheck();
             //special case, if it stars with an underscore, we have to re-add it for member types
             if (Text.StartsWith("_")) alias = "_" + alias;
             var mt = new Umbraco.Core.Models.MemberType(-1)

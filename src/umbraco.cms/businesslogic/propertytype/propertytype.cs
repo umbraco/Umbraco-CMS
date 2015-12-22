@@ -204,7 +204,7 @@ namespace umbraco.cms.businesslogic.propertytype
                 _alias = value;
                 InvalidateCache();
                 SqlHelper.ExecuteNonQuery("Update cmsPropertyType set alias = @alias where id= @id",
-                                          SqlHelper.CreateParameter("@alias", Casing.SafeAliasWithForcingCheck(_alias)),
+                                          SqlHelper.CreateParameter("@alias", _alias.ToSafeAliasWithForcingCheck()),
                                           SqlHelper.CreateParameter("@id", Id));
             }
         }
