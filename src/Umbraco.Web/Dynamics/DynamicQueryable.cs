@@ -236,7 +236,7 @@ namespace Umbraco.Web.Dynamics
         }
         private static object GetObjectAsTypeOrDefault(object value, Type type)
         {
-            if (type.IsAssignableFrom(value.GetType()))
+            if (type.IsInstanceOfType(value))
             {
                 return (object)Convert.ChangeType(value, type);
             }

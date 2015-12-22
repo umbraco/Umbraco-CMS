@@ -333,7 +333,7 @@ namespace umbraco.presentation.developer.packages
                         .Where(x => x.Data.Id != _pack.Data.Id &&  string.Equals(x.Data.Name, _pack.Data.Name, StringComparison.OrdinalIgnoreCase))
                         .OrderBy(x => Version.TryParse(x.Data.Version, out v) ? v : new Version());
 
-                    if (packageVersionHistory != null && packageVersionHistory.Count() > 0)
+                    if (packageVersionHistory != null && packageVersionHistory.Any())
                     {
                         rptr_versions.DataSource = packageVersionHistory;
                         rptr_versions.DataBind();

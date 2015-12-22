@@ -60,7 +60,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var found = repo.GetAll().ToArray();
 
-                Assert.AreEqual(1, found.Count());
+                Assert.AreEqual(1, found.Length);
                 Assert.AreEqual(0, found.First().AssigneeUserId);
                 Assert.AreEqual(false, found.First().Closed);
                 Assert.AreEqual("hello world", found.First().Comment);

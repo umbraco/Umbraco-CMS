@@ -32,7 +32,7 @@ namespace Umbraco.Web.Routing
             ITypedPublishedContentQuery publishedContentQuery,
             IDomainService domainService)
         {
-            if (error404Collection.Count() > 1)
+            if (error404Collection.Length > 1)
             {
                 // try to get the 404 based on current culture (via domain)
                 IContentErrorPage cultureErr;

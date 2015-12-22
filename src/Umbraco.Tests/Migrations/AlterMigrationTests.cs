@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Migrations
             stub.GetUpExpressions(context);
 
             // Assert
-            Assert.That(context.Expressions.Count(), Is.EqualTo(1));
+            Assert.That(context.Expressions.Count, Is.EqualTo(1));
             Assert.That(context.Expressions.Single().ToString(), Is.EqualTo("ALTER TABLE [umbracoUser2app] DROP CONSTRAINT [FK_umbracoUser2app_umbracoUser_id]"));
 
         }

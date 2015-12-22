@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Resolvers
             Resolution.Freeze();
             
             var types = MacroFieldEditorsResolver.Current.MacroControlTypes;
-			Assert.AreEqual(2, types.Count());
+			Assert.AreEqual(2, types.Count);
 
             // order is unspecified, but both must be there
             bool hasType1 = types.ElementAt(0) == typeof(ControlMacroRendering) || types.ElementAt(1) == typeof(ControlMacroRendering);

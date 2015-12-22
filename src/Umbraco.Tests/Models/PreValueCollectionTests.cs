@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Models
                 Assert.AreNotSame(orig, clone);
                 var oDic = orig.FormatAsDictionary();
                 var cDic = clone.FormatAsDictionary();
-                Assert.AreEqual(oDic.Keys.Count(), cDic.Keys.Count());
+                Assert.AreEqual(oDic.Keys.Count, cDic.Keys.Count);
                 foreach (var k in oDic.Keys)
                 {
                     Assert.AreNotSame(oDic[k], cDic[k]);

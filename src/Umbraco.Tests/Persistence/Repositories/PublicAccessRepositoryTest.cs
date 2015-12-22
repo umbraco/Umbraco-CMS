@@ -71,7 +71,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var found = repo.GetAll().ToArray();
 
-                Assert.AreEqual(1, found.Count());
+                Assert.AreEqual(1, found.Length);
                 Assert.AreEqual(content[0].Id, found[0].ProtectedNodeId);
                 Assert.AreEqual(content[1].Id, found[0].LoginNodeId);
                 Assert.AreEqual(content[2].Id, found[0].NoAccessNodeId);

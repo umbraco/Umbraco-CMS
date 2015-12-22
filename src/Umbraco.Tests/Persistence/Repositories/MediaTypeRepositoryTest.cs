@@ -69,7 +69,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var result = repository.Move(contentType, container1).ToArray();
                 unitOfWork.Commit();
 
-                Assert.AreEqual(2, result.Count());
+                Assert.AreEqual(2, result.Length);
 
                 //re-get
                 contentType = repository.Get(contentType.Id);

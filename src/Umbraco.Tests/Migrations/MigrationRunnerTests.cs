@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Migrations
                 new Database("umbracoDbDSN")
                 , DatabaseProviders.SqlServerCE, Mock.Of<ISqlSyntaxProvider>(), true);
 
-            Assert.AreEqual(1, ctx.Expressions.Count());
+            Assert.AreEqual(1, ctx.Expressions.Count);
         }
 
         [Test]
@@ -51,7 +51,7 @@ namespace Umbraco.Tests.Migrations
                 new Database("umbracoDbDSN")
                 , DatabaseProviders.SqlServerCE, Mock.Of<ISqlSyntaxProvider>(), true);
 
-            Assert.AreEqual(1, ctx.Expressions.Count());
+            Assert.AreEqual(1, ctx.Expressions.Count);
         }
 
         [Test]

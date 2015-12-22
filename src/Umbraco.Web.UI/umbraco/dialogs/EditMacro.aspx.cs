@@ -26,7 +26,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
 		{
 			base.OnPreRender(e);
 			CountOfMacroProperties = MacroObject != null 
-				? MacroObject.Properties.Count() 
+				? MacroObject.Properties.Length 
 				: 0;
 		}
 	}

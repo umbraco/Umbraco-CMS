@@ -322,7 +322,7 @@ namespace Umbraco.Core.Dynamics
             {
                 var firstElement = elements.FirstOrDefault();
                 //we have a single element, does it have any children?
-                if (firstElement != null && firstElement.Elements().Count() == 0 && !firstElement.HasAttributes)
+                if (firstElement != null && firstElement.Elements().Any() == false && firstElement.HasAttributes == false)
                 {
                     //no, return the text
                     result = firstElement.Value;

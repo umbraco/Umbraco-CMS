@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public override void DisabledLogTypes()
         {
-            Assert.IsTrue(SettingsSection.Logging.DisabledLogTypes.Count() == 0);
+            Assert.IsTrue(SettingsSection.Logging.DisabledLogTypes.Any() == false);
         }
         [Test]
         public override void CleaningMiliseconds()

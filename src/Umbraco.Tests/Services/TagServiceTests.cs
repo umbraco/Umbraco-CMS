@@ -60,7 +60,7 @@ namespace Umbraco.Tests.Services
                 .ToList();
 
             // Assert
-            Assert.AreEqual(3, tags.Count());
+            Assert.AreEqual(3, tags.Count);
             Assert.AreEqual("cow", tags[0].Text);
             Assert.AreEqual(3, tags[0].NodeCount);
             Assert.AreEqual("pig", tags[1].Text);

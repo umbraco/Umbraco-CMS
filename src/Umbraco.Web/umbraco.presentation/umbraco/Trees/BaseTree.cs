@@ -427,7 +427,7 @@ namespace umbraco.cms.presentation.Trees
         /// <returns></returns>
         public static bool IsBaseTree(ITree tree)
         {
-            return typeof(BaseTree).IsAssignableFrom(tree.GetType());
+            return tree is BaseTree;
         }
 
         /// <summary>

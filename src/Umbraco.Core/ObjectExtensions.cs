@@ -478,7 +478,7 @@ namespace Umbraco.Core
 
 					var items = (from object enumItem in enumerable let value = GetEnumPropertyDebugString(enumItem, levels) where value != null select value).Take(10).ToList();
 
-					return items.Count() > 0
+					return items.Any()
 							? "{{ {0} }}".InvariantFormat(String.Join(", ", items))
 							: null;
 				}
@@ -505,7 +505,7 @@ namespace Umbraco.Core
 						where value != null
 						select "{0}={1}".InvariantFormat(propertyInfo.Name, value);
 
-					return items.Count() > 0
+					return items.Any()
 							? "[{0}]:{{ {1} }}".InvariantFormat(obj.GetType().Name, String.Join(", ", items))
 							: null;
 				}

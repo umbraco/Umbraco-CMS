@@ -34,13 +34,13 @@ namespace Umbraco.Tests.Routing
             Assert.Contains("site2", sites.Keys);
             
             var domains = sites["site1"];
-            Assert.AreEqual(3, domains.Count());
+            Assert.AreEqual(3, domains.Length);
             Assert.Contains("domain1.com", domains);
             Assert.Contains("domain1.net", domains);
             Assert.Contains("domain1.org", domains);
 
             domains = sites["site2"];
-            Assert.AreEqual(3, domains.Count());
+            Assert.AreEqual(3, domains.Length);
             Assert.Contains("domain2.com", domains);
             Assert.Contains("domain2.net", domains);
             Assert.Contains("domain2.org", domains);

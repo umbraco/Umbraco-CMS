@@ -14,7 +14,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public override void Links()
         {
-            Assert.IsTrue(SettingsSection.Help.Links.Count() == 0);
+            Assert.IsTrue(SettingsSection.Help.Links.Any() == false);
         }
     }
 }

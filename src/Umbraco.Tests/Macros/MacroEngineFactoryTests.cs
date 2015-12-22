@@ -44,7 +44,7 @@ namespace Umbraco.Tests.Macros
 		public void Get_All()
 		{			
 			var engines = MacroEngineFactory.GetAll();
-			Assert.AreEqual(2, engines.Count());
+			Assert.AreEqual(2, engines.Count);
 		}
 
 		[Test]
