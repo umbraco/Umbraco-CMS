@@ -23,15 +23,9 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
     $scope.model.config = angular.extend(config, $scope.model.config);
 
     //Umbraco persists boolean for prevalues as "0" or "1" so we need to convert that!
-    $scope.model.config.showToday = ($scope.model.config.showToday == 0 ? false : true);
+    $scope.model.config.showToday = $scope.model.config.showToday == 0 ? false : true;
 
-    //if ($scope.model.config.showToday !== undefined || $scope.model.config.showToday !== null) {
-    //    $scope.model.config.showToday = $scope.model.config.showToday == 0 ? false : true;
-    //}
-
-    if ($scope.model.config.calendarWeeks !== undefined || $scope.model.config.calendarWeeks !== null) {
-        $scope.model.config.calendarWeeks = $scope.model.config.calendarWeeks == 0 ? false : true;
-    }
+    $scope.model.config.calendarWeeks = $scope.model.config.calendarWeeks == 0 ? false : true;
 
     if ($scope.model.config.daysOfWeekDisabled !== undefined || $scope.model.config.daysOfWeekDisabled !== null) {
         $scope.model.config.daysOfWeekDisabled = angular.isArray($scope.model.config.daysOfWeekDisabled) ? $scope.model.config.daysOfWeekDisabled : [];
@@ -122,7 +116,11 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 
 		assetsService.load(filesToLoad, $scope).then(
             function () {
-				//The Datepicker js and css files are available and all components are ready to use.
+                //The Datepicker js and css files are available and all components are ready to use.
+
+                // Set min and max date and parse date from dateformat and locale http://momentjs.com/docs/#/parsing/
+                $scope.model.config.minDate = moment($scope.model.config.minDate, ["DD/MM/YYYY HH:mm:ss"], $scope.model.config.language);
+                $scope.model.config.maxDate = moment($scope.model.config.maxDate, ["DD/MM/YYYY HH:mm:ss"], $scope.model.config.language);
 
 				// Get the id of the datepicker button that was clicked
 				var pickerId = $scope.model.alias;
@@ -131,7 +129,11 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 
 				// Open the datepicker and add a changeDate eventlistener
 			    element
-			        .datetimepicker(angular.extend({ useCurrent: true }, $scope.model.config))
+			        .datetimepicker(angular.extend({
+			            useCurrent: true,
+			            minDate: moment($scope.model.config.minDate).isValid() ? $scope.model.config.minDate : moment({ y: 1900 }),
+			            maxDate: moment($scope.model.config.maxDate).isValid() ? $scope.model.config.maxDate : moment().add(100, 'y')
+			        }, $scope.model.config))
 			        .on("dp.change", applyDate)
 			        .on("dp.error", function(a, b, c) {
 			            $scope.hasDatetimePickerValue = false;
