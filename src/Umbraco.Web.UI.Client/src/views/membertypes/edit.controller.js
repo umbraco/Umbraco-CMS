@@ -136,11 +136,6 @@
             // convert legacy icons
             convertLegacyIcons(contentType);
 
-            // sort properties after sort order
-            angular.forEach(contentType.groups, function (group) {
-                group.properties = $filter('orderBy')(group.properties, 'sortOrder');
-            });
-
             //set a shared state
             editorState.set(contentType);
 

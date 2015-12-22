@@ -231,11 +231,6 @@
                 });
             }
 
-            // sort properties after sort order
-            angular.forEach(contentType.groups, function (group) {
-                group.properties = $filter('orderBy')(group.properties, 'sortOrder');
-            });
-
             // insert template on new doc types
             if (!$routeParams.notemplate && contentType.id === 0) {
                 contentType.defaultTemplate = contentTypeHelper.insertDefaultTemplatePlaceholder(contentType.defaultTemplate);
