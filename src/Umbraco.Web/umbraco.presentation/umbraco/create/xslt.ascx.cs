@@ -9,7 +9,6 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.UI;
 using Umbraco.Core.IO;
-using umbraco.cms.helpers;
 using umbraco.BasePages;
 using Umbraco.Web;
 

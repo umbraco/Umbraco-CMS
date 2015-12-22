@@ -9,7 +9,6 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using umbraco.DataLayer;
 using System.Runtime.CompilerServices;
-using umbraco.cms.helpers;
 using File = System.IO.File;
 
 using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;

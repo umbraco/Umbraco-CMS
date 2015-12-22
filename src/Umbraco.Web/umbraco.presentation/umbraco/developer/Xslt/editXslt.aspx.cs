@@ -13,7 +13,6 @@ using umbraco.BasePages;
 using umbraco.uicontrols;
 using System.Net;
 using umbraco.cms.presentation.Trees;
-using umbraco.cms.helpers;
 
 namespace umbraco.cms.presentation.developer
 {
@@ -33,7 +32,7 @@ namespace umbraco.cms.presentation.developer
 			if (!IsPostBack)
 			{
 				string file = Request.QueryString["file"];
-				string path = DeepLink.GetTreePathFromFilePath(file);
+				string path = BaseTree.GetTreePathFromFilePath(file);
 				ClientTools
 					.SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadXslt>().Tree.Alias)
 					.SyncTree(path, false);

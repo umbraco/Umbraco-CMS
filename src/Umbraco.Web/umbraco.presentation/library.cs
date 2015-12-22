@@ -26,7 +26,6 @@ using Umbraco.Web.Templates;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.web;
-using umbraco.cms.helpers;
 using umbraco.DataLayer;
 using Umbraco.Core.IO;
 using Language = umbraco.cms.businesslogic.language.Language;

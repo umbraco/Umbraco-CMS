@@ -246,8 +246,6 @@
     <Compile Include="businesslogic\task\Tasks.cs" />
     <Compile Include="businesslogic\Tuple.cs" />
     <Compile Include="businesslogic\web\DocumentVersionList.cs" />
-    <Compile Include="helpers\DeepLink.cs" />
-    <Compile Include="helpers\DeepLinkType.cs" />
     <Compile Include="PluginManagerExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

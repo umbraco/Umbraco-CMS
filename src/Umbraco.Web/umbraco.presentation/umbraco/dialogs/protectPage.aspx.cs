@@ -10,7 +10,6 @@ using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.member;
 using umbraco.cms.businesslogic.web;
 using umbraco.controls;
-using umbraco.cms.helpers;
 using umbraco.BasePages;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Security;

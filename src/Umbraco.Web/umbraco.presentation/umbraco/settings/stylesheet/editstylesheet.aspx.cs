@@ -7,7 +7,6 @@ using Umbraco.Web;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.web;
-using umbraco.cms.helpers;
 using umbraco.cms.presentation.Trees;
 using umbraco.uicontrols;
 using Umbraco.Core;
@@ -60,7 +59,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
 
             lttPath.Text = "<a id=\"" + lttPath.ClientID + "\" target=\"_blank\" href=\"" + stylesheet.VirtualPath + "\">" + stylesheet.VirtualPath + "</a>";
             editorSource.Text = stylesheet.Content;
-            TreeSyncPath = DeepLink.GetTreePathFromFilePath(filename);
+            TreeSyncPath = BaseTree.GetTreePathFromFilePath(filename);
 
             // name derives from path, without the .css extension, clean for xss
             NameTxt.Text = stylesheet.Path.TrimEnd(".css").CleanForXss('\\', '/');

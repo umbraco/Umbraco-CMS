@@ -9,7 +9,6 @@ using Umbraco.Core.Models;
 
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.web;
-using umbraco.cms.helpers;
 using umbraco.DataLayer;
 
 using Language = umbraco.cms.businesslogic.language.Language;

@@ -13,7 +13,6 @@ using Umbraco.Web.UI.Controls;
 using umbraco;
 using umbraco.BasePages;
 using umbraco.cms.businesslogic.template;
-using umbraco.cms.helpers;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
 using umbraco.uicontrols;
@@ -157,7 +156,7 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 
                 //TemplateTreeSyncPath = "-1,init," + Path.GetFileName(OriginalFileName);
 
-                TemplateTreeSyncPath = DeepLink.GetTreePathFromFilePath(OriginalFileName.TrimStart("MacroPartials/").TrimStart("Partials/"));
+                TemplateTreeSyncPath = BaseTree.GetTreePathFromFilePath(OriginalFileName.TrimStart("MacroPartials/").TrimStart("Partials/"));
 			}
 			else
 			{

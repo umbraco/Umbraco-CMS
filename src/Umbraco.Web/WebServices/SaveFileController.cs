@@ -12,7 +12,7 @@ using Umbraco.Web.Mvc;
 using umbraco;
 using umbraco.cms.businesslogic.macro;
 using System.Collections.Generic;
-using umbraco.cms.helpers;
+using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Template = umbraco.cms.businesslogic.template.Template;
@@ -233,7 +233,7 @@ namespace Umbraco.Web.WebServices
             return Success(ui.Text("speechBubbles", "scriptSavedText"), ui.Text("speechBubbles", "scriptSavedHeader"),
                 new
                 {
-                    path = DeepLink.GetTreePathFromFilePath(script.Path),
+                    path = BaseTree.GetTreePathFromFilePath(script.Path),
                     name = script.Path,
                     url = script.VirtualPath,
                     contents = script.Content
@@ -273,7 +273,7 @@ namespace Umbraco.Web.WebServices
             return Success(ui.Text("speechBubbles", "cssSavedText"), ui.Text("speechBubbles", "cssSavedHeader"),
                 new
                 {
-                    path = DeepLink.GetTreePathFromFilePath(stylesheet.Path),
+                    path = BaseTree.GetTreePathFromFilePath(stylesheet.Path),
                     name = stylesheet.Path,
                     url = stylesheet.VirtualPath,
                     contents = stylesheet.Content

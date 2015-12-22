@@ -15,7 +15,6 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using umbraco.cms.presentation.Trees;
 using System.Linq;
-using umbraco.cms.helpers;
 using umbraco.uicontrols;
 
 namespace umbraco.cms.presentation.settings.scripts
@@ -63,7 +62,7 @@ namespace umbraco.cms.presentation.settings.scripts
 
             lttPath.Text = "<a id=\"" + lttPath.ClientID + "\" target=\"_blank\" href=\"" + script.VirtualPath + "\">" + script.VirtualPath + "</a>";
             editorSource.Text = script.Content;
-            ScriptTreeSyncPath = DeepLink.GetTreePathFromFilePath(filename);
+            ScriptTreeSyncPath = BaseTree.GetTreePathFromFilePath(filename);
 
             // name derives from filename, clean for xss
             NameTxt.Text = filename.CleanForXss('\\', '/');

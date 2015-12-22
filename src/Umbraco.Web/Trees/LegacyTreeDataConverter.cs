@@ -13,7 +13,6 @@ using Umbraco.Web.Models.Trees;
 using umbraco;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
-using umbraco.cms.helpers;
 using umbraco.cms.presentation.Trees;
 using umbraco.controls.Tree;
 using umbraco.interfaces;

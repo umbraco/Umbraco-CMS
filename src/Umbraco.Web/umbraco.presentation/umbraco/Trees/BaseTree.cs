@@ -28,7 +28,23 @@ namespace umbraco.cms.presentation.Trees
         }
 
         protected const string FolderIcon = "icon-folder";
-        protected const string FolderIconOpen = "icon-folder";        
+        protected const string FolderIconOpen = "icon-folder";
+
+
+        internal static string GetTreePathFromFilePath(string filePath)
+        {
+            List<string> treePath = new List<string>();
+            treePath.Add("-1");
+            treePath.Add("init");
+            string[] pathPaths = filePath.Split('/');
+            pathPaths.Reverse();
+            for (int p = 0; p < pathPaths.Length; p++)
+            {
+                treePath.Add(string.Join("/", pathPaths.Take(p + 1).ToArray()));
+            }
+            string sPath = string.Join(",", treePath.ToArray());
+            return sPath;
+        }
 
         /// <summary>
         /// Returns the node definition of the root node for this tree

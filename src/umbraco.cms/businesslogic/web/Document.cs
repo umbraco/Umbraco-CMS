@@ -15,7 +15,6 @@ using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
-using umbraco.cms.helpers;
 using umbraco.DataLayer;
 using Umbraco.Core.Events;
 using Umbraco.Core.Strings;
