@@ -12,11 +12,11 @@
             $.tablesorter.addParser({
                 // use a unique id
                 id: 'cultureDateParser',
-                is: function(s, table, cell) {
+                is: function() {
                     //don't auto-detect this parser
                     return false;
                 },
-                format: function(s, table, cell, cellIndex) {
+                format: function(s, table) {
                     var c = table.config;
 
                     s = s.replace(/\-/g, "/");

@@ -13,7 +13,7 @@ using File = Umbraco.Core.Models.File;
 namespace Umbraco.Tests.PublishedContent
 {
     [TestFixture]
-	public class DynamicPublishedContentTests : DynamicDocumentTestsBase<DynamicPublishedContent, DynamicPublishedContentList>
+	public class DynamicPublishedContentTests : DynamicDocumentTestsBase<DynamicPublishedContent>
 	{
 		internal DynamicPublishedContent GetNode(int id)
 		{

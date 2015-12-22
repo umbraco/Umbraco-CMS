@@ -15,7 +15,7 @@ using Umbraco.Tests.TestHelpers;
 namespace Umbraco.Tests.PublishedContent
 {
 	[TestFixture]
-    public abstract class DynamicDocumentTestsBase<TDocument, TDocumentList> : PublishedContentTestBase
+    public abstract class DynamicDocumentTestsBase<TDocument> : PublishedContentTestBase
 	{
         private IUmbracoSettingsSection _umbracoSettings;
 

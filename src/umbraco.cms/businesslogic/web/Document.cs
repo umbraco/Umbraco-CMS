@@ -69,42 +69,7 @@ namespace umbraco.cms.businesslogic.web
         /// Initialize the document
         /// </summary>
         /// <param name="id">The id of the document</param>
-        public Document(Guid id) : base(id) { }
-
-        /// <summary>
-        /// Initializes a Document object with one SQL query instead of many
-        /// </summary>
-        /// <param name="optimizedMode"></param>
-        /// <param name="id"></param>
-        public Document(bool optimizedMode, int id)
-            : base(id, optimizedMode)
-        {
-            this._optimizedMode = optimizedMode;
-            if (optimizedMode)
-            {
-                ContentEntity = ApplicationContext.Current.Services.ContentService.GetById(id);
-                bool hasChildren = ApplicationContext.Current.Services.ContentService.HasChildren(id);
-                int templateId = ContentEntity.Template == null ? 0 : ContentEntity.Template.Id;
-
-                SetupDocumentForTree(ContentEntity.Key, ContentEntity.Level, ContentEntity.ParentId, ContentEntity.CreatorId,
-                                     ContentEntity.WriterId,
-                                     ContentEntity.Published, ContentEntity.Path, ContentEntity.Name, ContentEntity.CreateDate,
-                                     ContentEntity.UpdateDate, ContentEntity.UpdateDate, ContentEntity.ContentType.Icon, hasChildren,
-                                     ContentEntity.ContentType.Alias, ContentEntity.ContentType.Thumbnail,
-                                     ContentEntity.ContentType.Description, null, ContentEntity.ContentType.Id,
-                                     templateId, ContentEntity.ContentType.IsContainer);
-
-                var tmpReleaseDate = ContentEntity.ReleaseDate.HasValue ? ContentEntity.ReleaseDate.Value : new DateTime();
-                var tmpExpireDate = ContentEntity.ExpireDate.HasValue ? ContentEntity.ExpireDate.Value : new DateTime();
-                var creator = new User(ContentEntity.CreatorId, true);
-                var writer = new User(ContentEntity.WriterId, true);
-
-                InitializeContent(ContentEntity.ContentType.Id, ContentEntity.Version, ContentEntity.UpdateDate,
-                                  ContentEntity.ContentType.Icon);
-                InitializeDocument(creator, writer, ContentEntity.Name, templateId, tmpReleaseDate, tmpExpireDate,
-                                   ContentEntity.UpdateDate, ContentEntity.Published);
-            }
-        }
+        public Document(Guid id) : base(id) { }      
 
         /// <summary>
         /// Internal initialization of a legacy Document object using the new IUmbracoEntity object
@@ -169,54 +134,7 @@ namespace umbraco.cms.businesslogic.web
         #endregion
 
         #region Static Methods
-
-
-        /// <summary>
-        /// Creates a new document
-        /// </summary>
-        /// <param name="Name">The name (.Text property) of the document</param>
-        /// <param name="dct">The documenttype</param>
-        /// <param name="u">The usercontext under which the action are performed</param>
-        /// <param name="ParentId">The id of the parent to the document</param>
-        /// <returns>The newly created document</returns>
-        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.CreateContent()", false)]
-        public static Document MakeNew(string Name, DocumentType dct, User u, int ParentId)
-        {
-            //allows you to cancel a document before anything goes to the DB
-            var newingArgs = new DocumentNewingEventArgs()
-                                 {
-                                     Text = Name,
-                                     DocumentType = dct,
-                                     User = u,
-                                     ParentId = ParentId
-                                 };
-            Document.OnNewing(newingArgs);
-            if (newingArgs.Cancel)
-            {
-                return null;
-            }
-
-            //Create a new IContent object based on the passed in DocumentType's alias, set the name and save it
-            IContent content = ApplicationContext.Current.Services.ContentService.CreateContentWithIdentity(Name, ParentId, dct.Alias, u.Id);
-            //The content object will only have the 'WasCancelled' flag set to 'True' if the 'Creating' event has been cancelled, so we return null.
-            if (((Entity)content).WasCancelled)
-                return null;
-
-            //read the whole object from the db
-            Document d = new Document(content);
-
-            //event
-            NewEventArgs e = new NewEventArgs();
-            d.OnNew(e);
-
-            // Log
-            LogHelper.Info<Document>(string.Format("New document {0}", d.Id));
-
-            // Save doc
-            d.Save();
-
-            return d;
-        }
+        
 
         /// <summary>
         /// Check if a node is a document
@@ -245,37 +163,7 @@ namespace umbraco.cms.businesslogic.web
             var content = ApplicationContext.Current.Services.ContentService.GetRootContent().OrderBy(x => x.SortOrder);
             return content.Select(c => new Document(c)).ToArray();
         }
-
-        public static int CountSubs(int parentId, bool publishedOnly)
-        {
-            if (!publishedOnly)
-            {
-                return CountSubs(parentId);
-            }
-
-            return ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<int>(
-                "SELECT COUNT(*) FROM (select distinct umbracoNode.id from umbracoNode INNER JOIN cmsDocument ON cmsDocument.published = 1 and cmsDocument.nodeId = umbracoNode.id WHERE ','+path+',' LIKE '%," +
-                parentId.ToString() + ",%') t");
-        }
-
-        /// <summary>
-        /// Deletes all documents of a type, will be invoked if a documenttype is deleted.
-        /// 
-        /// Note: use with care: this method can result in wast amount of data being deleted.
-        /// </summary>
-        /// <param name="dt">The type of which documents should be deleted</param>
-        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.DeleteContentOfType()", false)]
-        public static void DeleteFromType(DocumentType dt)
-        {
-            ApplicationContext.Current.Services.ContentService.DeleteContentOfType(dt.Id);
-        }
-
-        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetContentOfContentType()", false)]
-        public static IEnumerable<Document> GetDocumentsOfDocumentType(int docTypeId)
-        {
-            var contents = ApplicationContext.Current.Services.ContentService.GetContentOfContentType(docTypeId);
-            return contents.Select(x => new Document(x)).ToArray();
-        }
+        
 
         public static void RemoveTemplateFromDocument(int templateId)
         {
@@ -297,49 +185,7 @@ namespace umbraco.cms.businesslogic.web
             var list = children.Select(x => new Document(x));
             return list.ToArray();
         }
-
-        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetChildrenByName()", false)]
-        public static List<Document> GetChildrenBySearch(int NodeId, string searchString)
-        {
-            var children = ApplicationContext.Current.Services.ContentService.GetChildrenByName(NodeId, searchString);
-            return children.Select(x => new Document(x)).ToList();
-        }
-                
-        /// <summary>
-        /// This will clear out the cmsContentXml table for all Documents (not media or members) and then
-        /// rebuild the xml for each Docuemtn item and store it in this table.
-        /// </summary>
-        /// <remarks>
-        /// This method is thread safe
-        /// </remarks>
-        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.RePublishAll()", false)]
-        public static void RePublishAll()
-        {
-            ApplicationContext.Current.Services.ContentService.RePublishAll();
-        }
-
-
-        /// <summary>
-        /// Retrieve a list of documents with an expirationdate greater than today
-        /// </summary>
-        /// <returns>A list of documents with expirationdates than today</returns>
-        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetContentForExpiration()", false)]
-        public static Document[] GetDocumentsForExpiration()
-        {
-            var contents = ApplicationContext.Current.Services.ContentService.GetContentForExpiration();
-            return contents.Select(x => new Document(x)).ToArray();
-        }
-
-        /// <summary>
-        /// Retrieve a list of documents with with releasedate greater than today
-        /// </summary>
-        /// <returns>Retrieve a list of documents with with releasedate greater than today</returns>
-        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetContentForRelease()", false)]
-        public static Document[] GetDocumentsForRelease()
-        {
-            var contents = ApplicationContext.Current.Services.ContentService.GetContentForRelease();
-            return contents.Select(x => new Document(x)).ToArray();
-        }
+        
 
         #endregion
 
@@ -617,69 +463,7 @@ namespace umbraco.cms.businesslogic.web
         #endregion
 
         #region Public Methods
-
-        /// <summary>
-        /// Saves and executes handlers and events for the Send To Publication action.
-        /// </summary>
-        /// <param name="u">The User</param>
-        public bool SendToPublication(User u)
-        {
-            var e = new SendToPublishEventArgs();
-            FireBeforeSendToPublish(e);
-            if (e.Cancel == false)
-            {
-                var sent = ApplicationContext.Current.Services.ContentService.SendToPublication(ContentEntity, u.Id);
-                if (sent)
-                {
-                    FireAfterSendToPublish(e);
-                    return true;    
-                }
-            }
-
-            return false;
-
-        }
-
-
-        /// <summary>
-        /// Publishing a document
-        /// A xmlrepresentation of the document and its data are exposed to the runtime data
-        /// (an xmlrepresentation is added -or updated if the document previously are published) ,
-        /// this will lead to a new version of the document being created, for continuing editing of
-        /// the data.
-        /// </summary>
-        /// <param name="u">The usercontext under which the action are performed</param>
-        /// <returns>True if the publishing succeed. Possible causes for not publishing is if an event aborts the publishing</returns>
-        /// <remarks>        
-        /// This method needs to be marked with [MethodImpl(MethodImplOptions.Synchronized)]
-        /// because we execute multiple queries affecting the same data, if two thread are to do this at the same time for the same node we may have problems
-        /// </remarks>
-        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Publish()", false)]
-        public bool PublishWithResult(User u)
-        {
-            return PublishWithResult(u, true);
-        }
-
-        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Publish()", false)]
-        internal bool PublishWithResult(User u, bool omitCacheRefresh)
-        {
-            var e = new PublishEventArgs();
-            FireBeforePublish(e);
-
-            if (!e.Cancel)
-            {
-                var result = ApplicationContext.Current.Services.ContentService.PublishWithStatus(ContentEntity, u.Id);
-                _published = result.Success;
-                
-                FireAfterPublish(e);
-
-                return result.Success;
-            }
-            else
-            {
-                return false;
-            }
-        }
+        
 
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.PublishWithChildren()", false)]
         public bool PublishWithChildrenWithResult(User u)
@@ -689,68 +473,7 @@ namespace umbraco.cms.businesslogic.web
             // do the same thing for the moment
             return result.Single(x => x.Result.ContentItem.Id == Id).Success;
         }
-
-        /// <summary>
-        /// Rollbacks a document to a previous version, this will create a new version of the document and copy
-        /// all of the old documents data.
-        /// </summary>
-        /// <param name="u">The usercontext under which the action are performed</param>
-        /// <param name="VersionId">The unique Id of the version to roll back to</param>
-        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Rollback()", false)]
-        public void RollBack(Guid VersionId, User u)
-        {
-            var e = new RollBackEventArgs();
-            FireBeforeRollBack(e);
-
-            if (!e.Cancel)
-            {
-                ContentEntity = ApplicationContext.Current.Services.ContentService.Rollback(Id, VersionId, u.Id);
-
-                FireAfterRollBack(e);
-            }
-        }
-
-        /// <summary>
-        /// Recursive publishing.
-        /// 
-        /// Envoking this method will publish the documents and all children recursive.
-        /// </summary>
-        /// <param name="u">The usercontext under which the action are performed</param>
-        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.PublishWithChildren()", false)]
-        public void PublishWithSubs(User u)
-        {
-            PublishEventArgs e = new PublishEventArgs();
-            FireBeforePublish(e);
-
-            if (!e.Cancel)
-            {
-                IEnumerable<Attempt<PublishStatus>> publishedResults = ApplicationContext.Current.Services.ContentService
-                    .PublishWithChildrenWithStatus(ContentEntity, u.Id);
-
-                FireAfterPublish(e);
-            }
-        }
-
-        [Obsolete("Don't use! Only used internally to support the legacy events", false)]
-        internal IEnumerable<Attempt<PublishStatus>> PublishWithSubs(int userId, bool includeUnpublished)
-        {
-            PublishEventArgs e = new PublishEventArgs();
-            FireBeforePublish(e);
-
-            IEnumerable<Attempt<PublishStatus>> publishedResults = Enumerable.Empty<Attempt<PublishStatus>>();
-
-            if (!e.Cancel)
-            {
-                publishedResults = ApplicationContext.Current.Services.ContentService
-                    .PublishWithChildrenWithStatus(ContentEntity, userId, includeUnpublished);
-
-                FireAfterPublish(e);
-            }
-
-            return publishedResults;
-        }
-
-    
+        
 
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.UnPublish()", false)]
         public void UnPublish()
@@ -765,118 +488,9 @@ namespace umbraco.cms.businesslogic.web
                 
                 FireAfterUnPublish(e);
             }
-        }
+        }      
 
-      
-
-
-        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.HasPublishedVersion()", false)]
-        public bool HasPublishedVersion()
-        {
-            return ContentEntity.HasPublishedVersion;
-        }
-
-        /// <summary>
-        /// Pending changes means that there have been property/data changes since the last published version.
-        /// This is determined by the comparing the version date to the updated date. if they are different by more than 2 seconds, 
-        /// then this is considered a change.
-        /// </summary>
-        /// <returns></returns>
-        [Obsolete("Obsolete, Instead of calling this just check if the latest version of the content is published", false)]
-        public bool HasPendingChanges()
-        {
-            return ContentEntity.Published == false && ((Umbraco.Core.Models.Content)ContentEntity).PublishedState != PublishedState.Unpublished;
-        }
-
-        /// <summary>
-        /// Used for rolling back documents to a previous version
-        /// </summary>
-        /// <returns> Previous published versions of the document</returns>
-        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetVersions()", false)]
-        public DocumentVersionList[] GetVersions()
-        {
-            var versions = ApplicationContext.Current.Services.ContentService.GetVersions(Id);
-            return
-                versions.Select(x => new DocumentVersionList(x.Version, x.UpdateDate, x.Name, User.GetUser(x.CreatorId)))
-                        .ToArray();
-        }
-
-        /// <summary>
-        /// Returns the published version of this document
-        /// </summary>
-        /// <returns>The published version of this document</returns>
-        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetPublishedVersion()", false)]
-        public DocumentVersionList GetPublishedVersion()
-        {
-            var version = ApplicationContext.Current.Services.ContentService.GetPublishedVersion(Id);
-            if (version == null)
-                return null;
-
-            return new DocumentVersionList(version.Version, version.UpdateDate, version.Name, User.GetUser(version.CreatorId));
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns>Returns a breadcrumlike path for the document like: /ancestorname/ancestorname</returns>
-        [Obsolete("Method is not used anywhere, so its marked for deletion")]
-        public string GetTextPath()
-        {
-            string tempPath = "";
-            string[] splitPath = Path.Split(".".ToCharArray());
-            for (int i = 1; i < Level; i++)
-            {
-                tempPath += new Document(int.Parse(splitPath[i])).Text + "/";
-            }
-            if (tempPath.Length > 0)
-                tempPath = tempPath.Substring(0, tempPath.Length - 1);
-            return tempPath;
-        }
-
-
-        /// <summary>
-        /// Creates a new document of the same type and copies all data from the current onto it. Due to backwards compatibility we can't return
-        /// the new Document, but it's included in the CopyEventArgs.Document if you subscribe to the AfterCopy event
-        /// </summary>
-        /// <param name="CopyTo">The parentid where the document should be copied to</param>
-        /// <param name="u">The usercontext under which the action are performed</param>
-        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Copy()", false)]
-        public Document Copy(int CopyTo, User u)
-        {
-            return Copy(CopyTo, u, false);
-        }
-
-        /// <summary>
-        /// Creates a new document of the same type and copies all data from the current onto it. Due to backwards compatibility we can't return
-        /// the new Document, but it's included in the CopyEventArgs.Document if you subscribe to the AfterCopy event
-        /// </summary>
-        /// <param name="CopyTo"></param>
-        /// <param name="u"></param>
-        /// <param name="RelateToOrignal"></param>
-        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.Copy()", false)]
-        public Document Copy(int CopyTo, User u, bool RelateToOrignal)
-        {
-            var e = new CopyEventArgs();
-            e.CopyTo = CopyTo;
-            FireBeforeCopy(e);
-            Document newDoc = null;
-
-            if (!e.Cancel)
-            {
-                // Make the new document
-                var content = ApplicationContext.Current.Services.ContentService.Copy(ContentEntity, CopyTo, RelateToOrignal, u.Id);
-                newDoc = new Document(content);
-                
-                // Then save to preserve any changes made by action handlers
-                newDoc.Save();
-
-                e.NewDocument = newDoc;
-                FireAfterCopy(e);
-            }
-
-            return newDoc;
-        }
-
+        
         /// <summary>
         /// Puts the current document in the trash
         /// </summary>
@@ -903,20 +517,6 @@ namespace umbraco.cms.businesslogic.web
             }
         }
 
-        /// <summary>
-        /// Returns all decendants of the current document
-        /// </summary>
-        /// <returns></returns>
-        [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.GetDescendants()", false)]
-        public override IEnumerable GetDescendants()
-        {
-            var descendants = ContentEntity == null
-                                  ? ApplicationContext.Current.Services.ContentService.GetDescendants(Id)
-                                  : ApplicationContext.Current.Services.ContentService.GetDescendants(ContentEntity);
-
-            return descendants.Select(x => new Document(x.Id, true));
-        }        
-
         public override List<CMSPreviewNode> GetNodesForPreview(bool childrenOnly)
         {
             var nodes = new List<CMSPreviewNode>();
@@ -930,16 +530,7 @@ namespace umbraco.cms.businesslogic.web
 
             return nodes;
         }
-
-
-        /// <summary>
-        /// Method to remove an assigned template from a document
-        /// </summary>
-        public void RemoveTemplate()
-        {
-            Template = 0;
-        }
-
+        
         #endregion
 
         #region Protected Methods
@@ -1015,91 +606,9 @@ namespace umbraco.cms.businesslogic.web
             _published = InitPublished;
         }
 
-        [Obsolete("Obsolete", false)]
-        protected void PopulateDocumentFromReader(IRecordsReader dr)
-        {
-            var hc = dr.GetInt("children") > 0;
-
-            SetupDocumentForTree(dr.GetGuid("uniqueId")
-                , dr.GetShort("level")
-                , dr.GetInt("parentId")
-                , dr.GetInt("nodeUser")
-                , dr.GetInt("documentUser")
-                , !dr.GetBoolean("trashed") && (dr.GetInt("isPublished") == 1) //set published... double check trashed property
-                , dr.GetString("path")
-                , dr.GetString("text")
-                , dr.GetDateTime("createDate")
-                , dr.GetDateTime("updateDate")
-                , dr.GetDateTime("versionDate")
-                , dr.GetString("icon")
-                , hc
-                , dr.GetString("alias")
-                , dr.GetString("thumbnail")
-                , dr.GetString("description")
-                     , null
-                , dr.GetInt("contentTypeId")
-                     , dr.GetInt("templateId")
-                     , dr.GetBoolean("isContainer"));
-
-            if (!dr.IsNull("releaseDate"))
-                _release = dr.GetDateTime("releaseDate");
-            if (!dr.IsNull("expireDate"))
-                _expire = dr.GetDateTime("expireDate");
-        }
-
-
         #endregion
 
-        #region Private Methods
-        [Obsolete("Obsolete", false)]
-        private void SetupDocumentForTree(Guid uniqueId, int level, int parentId, int creator, int writer, bool publish, string path,
-                                         string text, DateTime createDate, DateTime updateDate,
-                                         DateTime versionDate, string icon, bool hasChildren, string contentTypeAlias, string contentTypeThumb,
-                                           string contentTypeDesc, int? masterContentType, int contentTypeId, int templateId, bool isContainer)
-        {
-            SetupNodeForTree(uniqueId, _objectType, level, parentId, creator, path, text, createDate, hasChildren);
-
-            _writerId = writer;
-            _published = publish;
-            _updated = updateDate;
-            _template = templateId;
-            ContentType = new ContentType(contentTypeId, contentTypeAlias, icon, contentTypeThumb, null, isContainer);
-            ContentTypeIcon = icon;
-            VersionDate = versionDate;
-        }
-
-        private XmlAttribute addAttribute(XmlDocument Xd, string Name, string Value)
-        {
-            XmlAttribute temp = Xd.CreateAttribute(Name);
-            temp.Value = Value;
-            return temp;
-        }
-
-        /// <summary>
-        /// This needs to be synchronized since we're doing multiple sql operations in the single method
-        /// </summary>
-        /// <param name="x"></param>
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        private void saveXml(XmlNode x)
-        {
-            bool exists = (SqlHelper.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId=@nodeId",
-                                            SqlHelper.CreateParameter("@nodeId", Id)) != 0);
-            string sql = exists ? "UPDATE cmsContentXml SET xml = @xml WHERE nodeId=@nodeId"
-                                : "INSERT INTO cmsContentXml(nodeId, xml) VALUES (@nodeId, @xml)";
-            SqlHelper.ExecuteNonQuery(sql,
-                                      SqlHelper.CreateParameter("@nodeId", Id),
-                                      SqlHelper.CreateParameter("@xml", x.OuterXml));
-        }
-
-        private XmlNode importXml()
-        {
-            XmlDocument xmlDoc = new XmlDocument();
-            XmlReader xmlRdr = SqlHelper.ExecuteXmlReader(string.Format(
-                                                       "select xml from cmsContentXml where nodeID = {0}", Id));
-            xmlDoc.Load(xmlRdr);
-
-            return xmlDoc.FirstChild;
-        }
+        #region Private Methods       
 
         /// <summary>
         /// Used internally to permanently delete the data from the database
@@ -1164,99 +673,21 @@ namespace umbraco.cms.businesslogic.web
         #region Events
 
         /// <summary>
-        /// The save event handler
-        /// </summary>
-        public delegate void SaveEventHandler(Document sender, SaveEventArgs e);
-        /// <summary>
-        /// The New event handler
-        /// </summary>
-        public delegate void NewEventHandler(Document sender, NewEventArgs e);
-        /// <summary>
         /// The delete  event handler
         /// </summary>
         public delegate void DeleteEventHandler(Document sender, DeleteEventArgs e);
         /// <summary>
-        /// The publish event handler
-        /// </summary>
-        public delegate void PublishEventHandler(Document sender, PublishEventArgs e);
-        /// <summary>
-        /// The Send To Publish event handler
-        /// </summary>
-        public delegate void SendToPublishEventHandler(Document sender, SendToPublishEventArgs e);
-        /// <summary>
         /// The unpublish event handler
         /// </summary>
         public delegate void UnPublishEventHandler(Document sender, UnPublishEventArgs e);
-        /// <summary>
-        /// The copy event handler
-        /// </summary>
-        public delegate void CopyEventHandler(Document sender, CopyEventArgs e);
-        /// <summary>
-        /// The rollback event handler
-        /// </summary>
-        public delegate void RollBackEventHandler(Document sender, RollBackEventArgs e);
-
+        
+        
         /// <summary>
         /// The Move to trash event handler
         /// </summary>
         public delegate void MoveToTrashEventHandler(Document sender, MoveToTrashEventArgs e);
-
-        /// <summary>
-        /// Occurs when [before save].
-        /// </summary>
-        public new static event SaveEventHandler BeforeSave;
-        /// <summary>
-        /// Raises the <see cref="E:BeforeSave"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected internal new virtual void FireBeforeSave(SaveEventArgs e)
-        {
-            if (BeforeSave != null)
-            {
-                BeforeSave(this, e);
-            }
-        }
-
-        /// <summary>
-        /// Occurs when [after save].
-        /// </summary>
-        public new static event SaveEventHandler AfterSave;
-        /// <summary>
-        /// Raises the <see cref="E:AfterSave"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected new virtual void FireAfterSave(SaveEventArgs e)
-        {
-            if (AfterSave != null)
-            {
-                AfterSave(new Document(this.Id), e);
-            }
-        }
-
-        /// <summary>
-        /// Occurs when [new].
-        /// </summary>
-        public static event NewEventHandler New;
-        /// <summary>
-        /// Raises the <see cref="E:New"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void OnNew(NewEventArgs e)
-        {
-            if (New != null)
-                New(this, e);
-        }
-
-        //TODO: Slace - Document this
-        public static event EventHandler<DocumentNewingEventArgs> Newing;
-        protected static void OnNewing(DocumentNewingEventArgs e)
-        {
-            if (Newing != null)
-            {
-                Newing(null, e);
-            }
-        }
-
+        
+        
         /// <summary>
         /// Occurs when [before delete].
         /// </summary>
@@ -1316,63 +747,8 @@ namespace umbraco.cms.businesslogic.web
             if (AfterMoveToTrash != null)
                 AfterMoveToTrash(this, e);
         }
-
-        /// <summary>
-        /// Occurs when [before publish].
-        /// </summary>
-        public static event PublishEventHandler BeforePublish;
-        /// <summary>
-        /// Raises the <see cref="E:BeforePublish"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireBeforePublish(PublishEventArgs e)
-        {
-            if (BeforePublish != null)
-                BeforePublish(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [after publish].
-        /// </summary>
-        public static event PublishEventHandler AfterPublish;
-        /// <summary>
-        /// Raises the <see cref="E:AfterPublish"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterPublish(PublishEventArgs e)
-        {
-            if (AfterPublish != null)
-                AfterPublish(this, e);
-        }
-        /// <summary>
-        /// Occurs when [before publish].
-        /// </summary>
-        public static event SendToPublishEventHandler BeforeSendToPublish;
-        /// <summary>
-        /// Raises the <see cref="E:BeforePublish"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireBeforeSendToPublish(SendToPublishEventArgs e)
-        {
-            if (BeforeSendToPublish != null)
-                BeforeSendToPublish(this, e);
-        }
-
-
-        /// <summary>
-        /// Occurs when [after publish].
-        /// </summary>
-        public static event SendToPublishEventHandler AfterSendToPublish;
-        /// <summary>
-        /// Raises the <see cref="E:AfterPublish"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterSendToPublish(SendToPublishEventArgs e)
-        {
-            if (AfterSendToPublish != null)
-                AfterSendToPublish(this, e);
-        }
-
+        
+        
         /// <summary>
         /// Occurs when [before un publish].
         /// </summary>
@@ -1400,62 +776,8 @@ namespace umbraco.cms.businesslogic.web
             if (AfterUnPublish != null)
                 AfterUnPublish(this, e);
         }
-
-        /// <summary>
-        /// Occurs when [before copy].
-        /// </summary>
-        public static event CopyEventHandler BeforeCopy;
-        /// <summary>
-        /// Raises the <see cref="E:BeforeCopy"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireBeforeCopy(CopyEventArgs e)
-        {
-            if (BeforeCopy != null)
-                BeforeCopy(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [after copy].
-        /// </summary>
-        public static event CopyEventHandler AfterCopy;
-        /// <summary>
-        /// Raises the <see cref="E:AfterCopy"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterCopy(CopyEventArgs e)
-        {
-            if (AfterCopy != null)
-                AfterCopy(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [before roll back].
-        /// </summary>
-        public static event RollBackEventHandler BeforeRollBack;
-        /// <summary>
-        /// Raises the <see cref="E:BeforeRollBack"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireBeforeRollBack(RollBackEventArgs e)
-        {
-            if (BeforeRollBack != null)
-                BeforeRollBack(this, e);
-        }
-
-        /// <summary>
-        /// Occurs when [after roll back].
-        /// </summary>
-        public static event RollBackEventHandler AfterRollBack;
-        /// <summary>
-        /// Raises the <see cref="E:AfterRollBack"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void FireAfterRollBack(RollBackEventArgs e)
-        {
-            if (AfterRollBack != null)
-                AfterRollBack(this, e);
-        }
+        
+        
         #endregion
 
 

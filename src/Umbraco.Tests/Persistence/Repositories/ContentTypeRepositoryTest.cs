@@ -81,9 +81,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var templates = new[]
                 {
-                    new Template("test1.cshtml", "test1", "test1"),
-                    new Template("test2.cshtml", "test2", "test2"),
-                    new Template("test3.cshtml", "test3", "test3")
+                    new Template("test1", "test1"),
+                    new Template("test2", "test2"),
+                    new Template("test3", "test3")
                 };
                 foreach (var template in templates)
                 {

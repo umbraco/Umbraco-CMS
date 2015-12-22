@@ -30,7 +30,6 @@ namespace Umbraco.Core
         private readonly ILogger _logger;
         private readonly SqlSyntaxProviders _syntaxProviders;
         private bool _configured;
-        private readonly object _locker = new object();
         private string _connectionString;
         private string _providerName;
         private DatabaseSchemaResult _result;

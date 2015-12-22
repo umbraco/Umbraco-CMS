@@ -608,11 +608,6 @@ order by umbracoNode.level, umbracoNode.sortOrder";
             }
         }
 
-        [Obsolete("This method should not be used and does nothing, xml file persistence is done in a queue using a BackgroundTaskRunner")]
-        public void PersistXmlToFile()
-        {
-        }
-
         /// <summary>
         /// Adds a task to the xml cache file persister
         /// </summary>
@@ -677,17 +672,6 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         */
 
         // ensures config is valid
-        private void EnsureConfigurationIsValid()
-        {
-            if (SyncToXmlFile && SyncFromXmlFile)
-                throw new Exception("Cannot run with both ContinouslyUpdateXmlDiskCache and XmlContentCheckForDiskChanges being true.");
-
-            if (XmlIsImmutable == false)
-                //LogHelper.Warn<XmlStore>("Running with CloneXmlContent being false is a bad idea.");
-                LogHelper.Warn<content>("CloneXmlContent is false - ignored, we always clone.");
-
-            // note: if SyncFromXmlFile then we should also disable / warn that local edits are going to cause issues...
-        }
 
         #endregion
 
@@ -815,13 +799,6 @@ order by umbracoNode.level, umbracoNode.sortOrder";
         private SafeXmlReaderWriter GetSafeXmlReader()
         {
             var releaser = _xmlLock.Lock();
-            return SafeXmlReaderWriter.GetReader(this, releaser);
-        }
-
-        // gets a locked safe read accses to the main xml
-        private async Task<SafeXmlReaderWriter> GetSafeXmlReaderAsync()
-        {
-            var releaser = await _xmlLock.LockAsync();
             return SafeXmlReaderWriter.GetReader(this, releaser);
         }
 

@@ -19,7 +19,6 @@ namespace Umbraco.Web.Trees
     [Tree(Constants.Applications.Settings, Constants.Trees.MediaTypes, null, sortOrder:5)]
     [Mvc.PluginController("UmbracoTrees")]
     [CoreTree]
-    [LegacyBaseTree(typeof(loadMediaTypes))]
     public class MediaTypeTreeController : TreeController
     {
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)

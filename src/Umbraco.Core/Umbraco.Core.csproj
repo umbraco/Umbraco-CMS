@@ -683,7 +683,6 @@
     <Compile Include="Models\Member.cs" />
     <Compile Include="Models\Membership\MembershipUserExtensions.cs" />
     <Compile Include="Models\Membership\UmbracoMembershipMember.cs" />
-    <Compile Include="Models\Membership\UmbracoMembershipUser.cs" />
     <Compile Include="Models\PagedResult.cs" />
     <Compile Include="Models\PreValue.cs" />
     <Compile Include="Models\MemberType.cs" />

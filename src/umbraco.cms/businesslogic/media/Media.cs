@@ -270,13 +270,6 @@ namespace umbraco.cms.businesslogic.media
             }
         }
 
-        [Obsolete("Obsolete, Use Umbraco.Core.Services.MediaService.GetDescendants()", false)]
-        public override IEnumerable GetDescendants()
-        {
-            var descendants = ApplicationContext.Current.Services.MediaService.GetDescendants(Id);
-            return descendants.Select(x => new Media(x));
-        }
-
         #endregion
 
         #region Protected methods
@@ -297,28 +290,7 @@ namespace umbraco.cms.businesslogic.media
 
             SetupNode(media);
         }
-        
-        [Obsolete("Obsolete, This method is no longer used")]
-        protected void PopulateMediaFromReader(IRecordsReader dr)
-        {
-            var hc = dr.GetInt("children") > 0;
-
-            SetupMediaForTree(dr.GetGuid("uniqueId")
-                , dr.GetShort("level")
-                , dr.GetInt("parentId")
-                , dr.GetInt("nodeUser")
-                , dr.GetString("path")
-                , dr.GetString("text")
-                , dr.GetDateTime("createDate")
-                , dr.GetString("icon")
-                , hc
-                , dr.GetString("alias")
-                , dr.GetString("thumbnail")
-                , dr.GetString("description")
-                , null
-                , dr.GetInt("contentTypeId")
-                , dr.GetBoolean("isContainer"));
-        } 
+      
         #endregion
 
         #region Private methods
@@ -334,16 +306,6 @@ namespace umbraco.cms.businesslogic.media
             //If the version is empty we update with the latest version from the current IContent.
             if (Version == Guid.Empty)
                 Version = MediaItem.Version;
-        }
-
-        [Obsolete("Obsolete, This method is no longer needed", false)]
-        private void SetupMediaForTree(Guid uniqueId, int level, int parentId, int user, string path,
-                                          string text, DateTime createDate, string icon, bool hasChildren, string contentTypeAlias, string contentTypeThumb,
-                                            string contentTypeDesc, int? masterContentType, int contentTypeId, bool isContainer)
-        {
-            SetupNodeForTree(uniqueId, _objectType, level, parentId, user, path, text, createDate, hasChildren);
-            ContentType = new ContentType(contentTypeId, contentTypeAlias, icon, contentTypeThumb, masterContentType, isContainer);
-            ContentTypeIcon = icon;
         }
 
         /// <summary>

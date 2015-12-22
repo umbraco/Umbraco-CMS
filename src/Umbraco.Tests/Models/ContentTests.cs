@@ -210,7 +210,7 @@ namespace Umbraco.Tests.Models
             content.ReleaseDate = DateTime.Now;
             content.ChangePublishedState(PublishedState.Published);
             content.SortOrder = 5;
-            content.Template = new Template("-1,2,3,4", "Test Template", "testTemplate")
+            content.Template = new Template((string) "Test Template", (string) "testTemplate")
             {
                 Id = 88
             };
@@ -265,7 +265,7 @@ namespace Umbraco.Tests.Models
             content.ReleaseDate = DateTime.Now;
             content.ChangePublishedState(PublishedState.Published);
             content.SortOrder = 5;
-            content.Template = new Template("-1,2,3,4", "Test Template", "testTemplate")
+            content.Template = new Template((string) "Test Template", (string) "testTemplate")
             {
                 Id = 88
             };
@@ -368,7 +368,7 @@ namespace Umbraco.Tests.Models
             content.ReleaseDate = DateTime.Now;
             content.ChangePublishedState(PublishedState.Published);
             content.SortOrder = 5;
-            content.Template = new Template("-1,2,3,4", "Test Template", "testTemplate")
+            content.Template = new Template((string) "Test Template", (string) "testTemplate")
             {
                 Id = 88
             };

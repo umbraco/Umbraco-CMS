@@ -69,12 +69,6 @@ namespace umbraco.cms.businesslogic.web
         {
         }
 
-        [Obsolete("This constructors parameters: setupStyleProperties, loadContentFromFile don't do anything")]
-        public StyleSheet(int id, bool setupStyleProperties, bool loadContentFromFile)
-            : base(id)
-        {
-        }
-
         /// <summary>
         /// Sort order does nothing for Stylesheets
         /// </summary>

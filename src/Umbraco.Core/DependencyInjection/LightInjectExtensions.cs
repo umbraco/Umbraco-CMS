@@ -9,11 +9,10 @@ namespace Umbraco.Core.DependencyInjection
         /// <summary>
         /// In order for LightInject to deal with enumerables of the same type, each one needs to be named individually
         /// </summary>
-        /// <typeparam name="TService"></typeparam>
         /// <typeparam name="TLifetime"></typeparam>
         /// <param name="container"></param>
         /// <param name="implementationTypes"></param>
-        public static void RegisterCollection<TService, TLifetime>(this IServiceContainer container, IEnumerable<Type> implementationTypes)
+        public static void RegisterCollection<TLifetime>(this IServiceContainer container, IEnumerable<Type> implementationTypes)
             where TLifetime : ILifetime
         {
             var i = 0;
@@ -39,10 +38,9 @@ namespace Umbraco.Core.DependencyInjection
         /// <summary>
         /// In order for LightInject to deal with enumerables of the same type, each one needs to be named individually
         /// </summary>
-        /// <typeparam name="TService"></typeparam>
         /// <param name="container"></param>
         /// <param name="implementationTypes"></param>
-        public static void RegisterCollection<TService>(this IServiceContainer container, IEnumerable<Type> implementationTypes)
+        public static void RegisterCollection(this IServiceContainer container, IEnumerable<Type> implementationTypes)
         {
             var i = 0;
             foreach (var type in implementationTypes)

@@ -31,7 +31,6 @@ namespace Umbraco.Web.Trees
         Constants.Applications.Settings,
         Constants.Applications.Developer,
         Constants.Applications.Members)]
-    [LegacyBaseTree(typeof(loadContent))]
     [Tree(Constants.Applications.Content, Constants.Trees.Content)]
     [PluginController("UmbracoTrees")]
     [CoreTree]

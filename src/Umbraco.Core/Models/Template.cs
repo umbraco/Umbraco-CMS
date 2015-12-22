@@ -43,12 +43,6 @@ namespace Umbraco.Core.Models
             _masterTemplateId = new Lazy<int>(() => -1);
         }
 
-        [Obsolete("This constructor should not be used, file path is determined by alias, setting the path here will have no affect")]
-        public Template(string path, string name, string alias)
-            : this(name, alias)
-        {            
-        }
-
         [DataMember]
         public Lazy<int> MasterTemplateId
         {

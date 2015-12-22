@@ -19,7 +19,6 @@ namespace Umbraco.Web.Trees
     [Tree(Constants.Applications.Settings, Constants.Trees.DocumentTypes, null, sortOrder: 6)]
     [Mvc.PluginController("UmbracoTrees")]
     [CoreTree]
-    [LegacyBaseTree(typeof(loadNodeTypes))]
     public class ContentTypeTreeController : TreeController
     {
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)

@@ -39,7 +39,7 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions
             if (UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages)
 				value = tmp.EnsureMasterPageSyntax(value);
 
-			_addStringToHtmlElement(tmp, value, templateAlias, htmlElementId, position);
+			_addStringToHtmlElement(tmp, value, htmlElementId, position);
 
 			return true;
 		}
@@ -61,7 +61,7 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions
 			if (UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages)
 				value = tmp.EnsureMasterPageSyntax(value);
 
-			_removeStringFromHtmlElement(tmp, value, templateAlias, htmlElementId);
+			_removeStringFromHtmlElement(tmp, value, htmlElementId);
 			return true;
 		}
 
@@ -74,7 +74,7 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions
 			return "addStringToHtmlElement";
 		}
 
-		private void _addStringToHtmlElement(template.Template tmp, string value, string templateAlias, string htmlElementId, string position)
+		private void _addStringToHtmlElement(template.Template tmp, string value, string htmlElementId, string position)
 		{
 			bool hasAspNetContentBeginning = false;
 			string design = "";
@@ -128,7 +128,7 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions
 			}
 		}
 
-		private void _removeStringFromHtmlElement(template.Template tmp, string value, string templateAlias, string htmlElementId)
+		private void _removeStringFromHtmlElement(template.Template tmp, string value, string htmlElementId)
 		{
 			bool hasAspNetContentBeginning = false;
 			string design = "";

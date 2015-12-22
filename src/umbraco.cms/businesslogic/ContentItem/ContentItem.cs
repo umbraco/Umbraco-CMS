@@ -1,5 +1,4 @@
 using System;
-using Umbraco.Core;
 
 namespace umbraco.cms.businesslogic.contentitem
 {
@@ -8,32 +7,12 @@ namespace umbraco.cms.businesslogic.contentitem
 	/// </summary>
 	public class ContentItem : Content
 	{
-		private static Guid _objectType = new Guid(Constants.ObjectTypes.ContentItem);
-
-		public ContentItem(int id) : base(id)
+	    public ContentItem(int id) : base(id)
 		{
-			//
-			// TODO: Add constructor logic here
-			//
 		}
 		public ContentItem(Guid id) : base(id)
 		{
-			//
-			// TODO: Add constructor logic here
-			//
 		}
-
-
-        /// <summary>
-        /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
-        /// </summary>
-
-        public override void Save()
-        {
-            base.Save();
-        }
-
-
 
 		public static void DeleteFromType(ContentItemType cit) 
 		{

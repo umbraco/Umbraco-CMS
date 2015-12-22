@@ -27,7 +27,6 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Xml.XPath;
 using Umbraco.Core.Profiling;
-using umbraco.interfaces;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Macros;
@@ -1637,27 +1636,6 @@ namespace umbraco
             xslt = xslt.Replace("{1}", namespaceList.ToString());
             return xslt;
         }
-
-        private static INode GetCurrentNode()
-        {
-            //Get the current content request
-
-            IPublishedContent content;
-            if (UmbracoContext.Current.IsFrontEndUmbracoRequest)
-            {
-                content = UmbracoContext.Current.PublishedContentRequest != null
-                    ? UmbracoContext.Current.PublishedContentRequest.PublishedContent
-                    : null;
-            }
-            else
-            {
-                var pageId = UmbracoContext.Current.PageId;
-                content = pageId.HasValue ? UmbracoContext.Current.ContentCache.GetById(pageId.Value) : null;
-            }
-
-            return content == null ? null : LegacyNodeHelper.ConvertToNode(content);
-        }
-
 
         #region Events
 

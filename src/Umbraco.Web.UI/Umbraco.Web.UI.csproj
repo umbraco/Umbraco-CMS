@@ -1286,7 +1286,6 @@
     <Content Include="Umbraco_Client\Panel\Images\panel_boxfooter_statusBar_h2_bg.gif" />
     <Content Include="Umbraco_Client\Panel\Images\panel_boxhead_bg.gif" />
     <Content Include="Umbraco_Client\Panel\Images\panel_boxhead_h2_bg.gif" />
-    <Content Include="Umbraco_Client\Panel\javascript.js" />
     <Content Include="Umbraco_Client\Panel\style.css" />
     <Content Include="Umbraco_Client\ProgressBar\Images\container_left.gif" />
     <Content Include="Umbraco_Client\ProgressBar\Images\container_right.gif" />

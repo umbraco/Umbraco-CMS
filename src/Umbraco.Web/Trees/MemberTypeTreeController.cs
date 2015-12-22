@@ -16,7 +16,6 @@ namespace Umbraco.Web.Trees
     [Tree(Constants.Applications.Members, Constants.Trees.MemberTypes, null, sortOrder:2  )]
     [Mvc.PluginController("UmbracoTrees")]
     [CoreTree]
-    [LegacyBaseTree(typeof(loadMemberTypes))]
     public class MemberTypeTreeController : TreeController
     {
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)

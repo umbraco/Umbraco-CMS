@@ -2,7 +2,7 @@
 <%@ Register TagPrefix="cc2" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <asp:Content ContentPlaceHolderID="head" runat="server">
     <script type="text/javascript">
-        function toggleDiv(id, gotoDiv) {
+        function toggleDiv(id) {
             var div = document.getElementById(id);
 
             if (div.style.display == "none")

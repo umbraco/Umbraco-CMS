@@ -49,12 +49,6 @@ namespace Umbraco.Core.ObjectResolution
 
 	    }
 
-        internal ResolverBase(IServiceContainer container)
-            : base(() => Reset())
-	    {
-	        
-	    }
-
 	    /// <summary>
 		/// Gets or sets the resolver singleton instance.
 		/// </summary>

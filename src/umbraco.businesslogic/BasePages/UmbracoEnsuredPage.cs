@@ -63,12 +63,6 @@ namespace umbraco.BasePages
             }
         }
 
-        [Obsolete("This constructor is not used and will be removed from the codebase in the future")]
-        public UmbracoEnsuredPage(string hest) : this()
-        {
-            
-        }
-
         /// <summary>
         /// If true then umbraco will force any window/frame to reload umbraco in the main window
         /// </summary>

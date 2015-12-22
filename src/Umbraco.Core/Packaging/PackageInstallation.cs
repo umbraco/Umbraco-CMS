@@ -97,7 +97,7 @@ namespace Umbraco.Core.Packaging
             try
             {
                 XElement rootElement = GetConfigXmlElement(packageFilePath);
-                return GetPreInstallWarnings(packageFilePath, rootElement);
+                return GetPreInstallWarnings(rootElement);
             }
             catch (Exception e)
             {
@@ -169,7 +169,7 @@ namespace Umbraco.Core.Packaging
                 var documentTypesInstalled = EmptyEnumerableIfNull<IContentType>(documentTypes) ?? InstallDocumentTypes(documentTypes, userId);
                 installationSummary.ContentTypesInstalled =documentTypesInstalled;
 
-                var stylesheetsInstalled = EmptyEnumerableIfNull<IFile>(styleSheets) ?? InstallStylesheets(styleSheets, userId);
+                var stylesheetsInstalled = EmptyEnumerableIfNull<IFile>(styleSheets) ?? InstallStylesheets(styleSheets);
                 installationSummary.StylesheetsInstalled = stylesheetsInstalled;
 
                 var documentsInstalled = documents != null ? InstallDocuments(documents, userId) 
@@ -328,7 +328,7 @@ namespace Umbraco.Core.Packaging
                     .ToArray();
         }
 
-        private IEnumerable<IFile> InstallStylesheets(XElement styleSheetsElement, int userId = 0)
+        private IEnumerable<IFile> InstallStylesheets(XElement styleSheetsElement)
         {
             if (string.Equals(Constants.Packaging.StylesheetsNodeName, styleSheetsElement.Name.LocalName) == false)
             {
@@ -425,7 +425,7 @@ namespace Umbraco.Core.Packaging
             return _packagingService.ImportDataTypeDefinitions(dataTypeElements, userId);
         }
 
-        private PreInstallWarnings GetPreInstallWarnings(string packagePath, XElement rootElement)
+        private PreInstallWarnings GetPreInstallWarnings(XElement rootElement)
         {
             XElement files = rootElement.Element(Constants.Packaging.FilesNodeName);
             XElement styleSheets = rootElement.Element(Constants.Packaging.StylesheetsNodeName);

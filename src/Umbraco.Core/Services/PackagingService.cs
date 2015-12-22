@@ -1379,7 +1379,7 @@ namespace Umbraco.Core.Services
                 var path = isMasterPage ? MasterpagePath(alias) : ViewPath(alias);
 
                 var existingTemplate = _fileService.GetTemplate(alias) as Template;
-                var template = existingTemplate ?? new Template(path, templateName, alias);
+                var template = existingTemplate ?? new Template(templateName, alias);
                 template.Content = design;
                 if (masterElement != null && string.IsNullOrEmpty(masterElement.Value) == false)
                 {

@@ -18,12 +18,7 @@ namespace Umbraco.Core.Models
 
         internal Script(string path, Func<File, string> getFileContent)
             : base(path, getFileContent)
-        { }
-
-        [Obsolete("This is no longer used and will be removed from the codebase in future versions")]
-        public Script(string path, IContentSection contentConfig)
-            : base(path)
-        { }
+        { }      
 
         /// <summary>
         /// Indicates whether the current entity has an identity, which in this case is a path/name.

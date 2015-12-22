@@ -16,15 +16,7 @@ namespace umbraco.uicontrols
     public class UmbracoPanel : Panel
     {
         private ScrollingMenu _menu = new ScrollingMenu();
-        public UmbracoPanel()
-        {
-
-        }
-        public UmbracoPanel(object input)
-        {
-
-        }
-
+        
         private bool _hasMenu = false;
         private string _StatusBarText = "";
         private string _text;
