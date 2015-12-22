@@ -181,11 +181,6 @@
 
                 });
             }
-            
-            // sort properties after sort order
-            angular.forEach(contentType.groups, function (group) {
-                group.properties = $filter('orderBy')(group.properties, 'sortOrder');
-            });
 
             // convert icons for content type
             convertLegacyIcons(contentType);
