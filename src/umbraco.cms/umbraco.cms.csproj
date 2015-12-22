@@ -365,9 +365,6 @@
     <Compile Include="businesslogic\workflow\Notification.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="helpers\url.cs">
-      <SubType>Code</SubType>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="businesslogic\Packager\FileResources\Packages.config" />

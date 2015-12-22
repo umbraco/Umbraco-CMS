@@ -43,39 +43,7 @@ namespace umbraco.cms.businesslogic.macro
 				
 				_isInitialized = true;
 			}
-		}
-
-		[Obsolete("Use EnsureInitialize method instead")]
-        protected static void Initialize()
-        {
-        	EnsureInitialize();
-        }
-
-		/// <summary>
-		/// Returns a collectino of MacroEngineLanguage objects, each of which describes a file extension and an associated macro engine
-		/// </summary>
-		/// <returns></returns>
-		/// <remarks>
-		/// Until the macro engines are rewritten, this method explicitly ignores the PartialViewMacroEngine because this method 
-		/// is essentially just used for any macro engine that stores it's files in the ~/macroScripts folder where file extensions
-		/// cannot overlap.
-		/// </remarks>
-		[Obsolete("This method is not used and will be removed from the codebase in the future")]
-        public static IEnumerable<MacroEngineLanguage> GetSupportedLanguages() 
-		{
-            var languages = new List<MacroEngineLanguage>();
-            foreach(var engine in GetAll()) 
-			{
-                foreach (string lang in engine.SupportedExtensions)
-                {
-					if (languages.Find(t => t.Extension == lang) == null)
-					{
-						languages.Add(new MacroEngineLanguage(lang, engine.Name));
-					}
-                }
-            }
-            return languages;
-        }
+		}	
 
 		/// <summary>
 		/// Returns a collectino of MacroEngineLanguage objects, each of which describes a file extension and an associated macro engine that
