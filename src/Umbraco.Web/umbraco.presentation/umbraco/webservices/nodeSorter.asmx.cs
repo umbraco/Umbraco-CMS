@@ -108,8 +108,8 @@ namespace umbraco.presentation.webservices
             var isMedia = Context.Request.GetItemAsString("app") == "media";
 
             //ensure user is authorized for the app requested
-            if (isContent && AuthorizeRequest(DefaultApps.content.ToString()) == false) return;
-            if (isMedia && AuthorizeRequest(DefaultApps.media.ToString()) == false) return;
+            if (isContent && AuthorizeRequest(Constants.Applications.Content.ToString()) == false) return;
+            if (isMedia && AuthorizeRequest(Constants.Applications.Media.ToString()) == false) return;
 
             var ids = SortOrder.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
             if (isContent)

@@ -6,6 +6,7 @@ using System.Web.UI.WebControls;
 using System.Text.RegularExpressions;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
+using Umbraco.Core;
 
 namespace umbraco.presentation.umbraco.dialogs
 {
@@ -13,7 +14,7 @@ namespace umbraco.presentation.umbraco.dialogs
     {
         public insertMasterpageContent()
         {
-            CurrentApp = DefaultApps.settings.ToString();
+            CurrentApp = Constants.Applications.Settings.ToString();
         }
 
         protected void Page_Load(object sender, EventArgs e)

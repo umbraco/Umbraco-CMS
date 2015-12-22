@@ -3,18 +3,12 @@ using System.Linq;
 using System.Collections;
 using System.Xml;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
-using umbraco.DataLayer;
 using System.Text.RegularExpressions;
-using System.IO;
 using System.Collections.Generic;
-using umbraco.cms.businesslogic.cache;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.web;
 

@@ -24,7 +24,7 @@ namespace umbraco.settings
 	{
 	    public editLanguage()
 	    {
-            CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
+            CurrentApp = Constants.Applications.Settings.ToString();
 
 	    }
 		protected System.Web.UI.WebControls.TextBox NameTxt;

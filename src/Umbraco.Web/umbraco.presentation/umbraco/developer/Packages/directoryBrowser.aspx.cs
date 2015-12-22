@@ -9,6 +9,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using umbraco.BusinessLogic;
+using Umbraco.Core;
 
 namespace umbraco.presentation.developer.packages
 {
@@ -17,7 +18,7 @@ namespace umbraco.presentation.developer.packages
     {
         public directoryBrowser()
         {
-            CurrentApp = DefaultApps.developer.ToString();
+            CurrentApp = Constants.Applications.Developer.ToString();
         }
 
         /// <summary>

@@ -30,7 +30,7 @@ namespace umbraco.presentation.developer.packages
     {
         public Installer()
         {
-            CurrentApp = DefaultApps.developer.ToString();
+            CurrentApp = Constants.Applications.Developer.ToString();
             _installer = new cms.businesslogic.packager.Installer(UmbracoUser.Id);
         }
 

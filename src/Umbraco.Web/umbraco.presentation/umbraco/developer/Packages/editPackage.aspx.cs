@@ -12,6 +12,7 @@ using umbraco.cms.businesslogic.template;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.presentation.Trees;
 using umbraco.controls;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 
 namespace umbraco.presentation.developer.packages
@@ -21,7 +22,7 @@ namespace umbraco.presentation.developer.packages
 
         public _Default()
         {
-            CurrentApp = BusinessLogic.DefaultApps.developer.ToString();
+            CurrentApp = Constants.Applications.Developer.ToString();
 
         }
         public uicontrols.TabPage packageInfo;

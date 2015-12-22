@@ -151,7 +151,7 @@ namespace umbraco.cms.businesslogic
         #endregion
 
         #region Public properties
-        public override umbraco.BusinessLogic.console.IconI[] Children
+        public override CMSNode[] Children
         {
             get
             {

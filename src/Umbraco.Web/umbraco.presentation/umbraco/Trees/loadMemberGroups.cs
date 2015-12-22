@@ -6,6 +6,7 @@ using umbraco.cms.businesslogic.member;
 using umbraco.cms.presentation.Trees;
 using System.Web.Security;
 using Umbraco.Core;
+using Umbraco.Web.Trees;
 
 namespace umbraco
 {

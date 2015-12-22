@@ -20,7 +20,7 @@ namespace umbraco.webservices
 		[WebMethod]
 		public XmlNode GetTabs(string ContextID, int ContentTypeId)
 		{
-            if (!AuthorizeRequest(DefaultApps.settings.ToString()))
+            if (!AuthorizeRequest(Constants.Applications.Settings.ToString()))
 			{
 				var xmlDoc = new XmlDocument();
 				var tabs = xmlDoc.CreateElement("tabs");

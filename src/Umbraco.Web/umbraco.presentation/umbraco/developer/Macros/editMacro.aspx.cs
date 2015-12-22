@@ -24,7 +24,7 @@ namespace umbraco.cms.presentation.developer
 	{
 		public editMacro()
 		{
-			CurrentApp = BusinessLogic.DefaultApps.developer.ToString();
+			CurrentApp = Constants.Applications.Developer.ToString();
 		}
 
 		protected PlaceHolder Buttons;

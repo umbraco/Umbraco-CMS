@@ -102,48 +102,48 @@ namespace umbraco.cms.businesslogic.packager
                 }
 
                 XmlElement instance = Source.CreateElement("package");
-                instance.Attributes.Append(xmlHelper.addAttribute(Source, "id", _maxId.ToString()));
-                instance.Attributes.Append(xmlHelper.addAttribute(Source, "version", ""));
-                instance.Attributes.Append(xmlHelper.addAttribute(Source, "url", ""));
-                instance.Attributes.Append(xmlHelper.addAttribute(Source, "name", Name));
-                instance.Attributes.Append(xmlHelper.addAttribute(Source, "folder", System.Guid.NewGuid().ToString()));
-                instance.Attributes.Append(xmlHelper.addAttribute(Source, "packagepath", ""));
-                instance.Attributes.Append(xmlHelper.addAttribute(Source, "repositoryGuid", ""));
-                instance.Attributes.Append(xmlHelper.addAttribute(Source, "packageGuid", System.Guid.NewGuid().ToString()));
-                instance.Attributes.Append(xmlHelper.addAttribute(Source, "hasUpdate", "false"));
+                instance.Attributes.Append(XmlHelper.AddAttribute(Source, "id", _maxId.ToString()));
+                instance.Attributes.Append(XmlHelper.AddAttribute(Source, "version", ""));
+                instance.Attributes.Append(XmlHelper.AddAttribute(Source, "url", ""));
+                instance.Attributes.Append(XmlHelper.AddAttribute(Source, "name", Name));
+                instance.Attributes.Append(XmlHelper.AddAttribute(Source, "folder", System.Guid.NewGuid().ToString()));
+                instance.Attributes.Append(XmlHelper.AddAttribute(Source, "packagepath", ""));
+                instance.Attributes.Append(XmlHelper.AddAttribute(Source, "repositoryGuid", ""));
+                instance.Attributes.Append(XmlHelper.AddAttribute(Source, "packageGuid", System.Guid.NewGuid().ToString()));
+                instance.Attributes.Append(XmlHelper.AddAttribute(Source, "hasUpdate", "false"));
 
-                instance.Attributes.Append(xmlHelper.addAttribute(Source, "enableSkins", "false"));
-                instance.Attributes.Append(xmlHelper.addAttribute(Source, "skinRepoGuid", ""));
+                instance.Attributes.Append(XmlHelper.AddAttribute(Source, "enableSkins", "false"));
+                instance.Attributes.Append(XmlHelper.AddAttribute(Source, "skinRepoGuid", ""));
 
                 XmlElement license = Source.CreateElement("license");
                 license.InnerText = "MIT License";
-                license.Attributes.Append(xmlHelper.addAttribute(Source, "url", "http://opensource.org/licenses/MIT"));
+                license.Attributes.Append(XmlHelper.AddAttribute(Source, "url", "http://opensource.org/licenses/MIT"));
                 instance.AppendChild(license);
 
                 XmlElement author = Source.CreateElement("author");
                 author.InnerText = "";
-                author.Attributes.Append(xmlHelper.addAttribute(Source, "url", ""));
+                author.Attributes.Append(XmlHelper.AddAttribute(Source, "url", ""));
                 instance.AppendChild(author);
                 
-                instance.AppendChild(xmlHelper.addTextNode(Source, "readme", ""));
-                instance.AppendChild(xmlHelper.addTextNode(Source, "actions", ""));
+                instance.AppendChild(XmlHelper.AddTextNode(Source, "readme", ""));
+                instance.AppendChild(XmlHelper.AddTextNode(Source, "actions", ""));
 
-                instance.AppendChild(xmlHelper.addTextNode(Source, "datatypes", ""));
+                instance.AppendChild(XmlHelper.AddTextNode(Source, "datatypes", ""));
 
                 XmlElement content = Source.CreateElement("content");
                 content.InnerText = "";
-                content.Attributes.Append(xmlHelper.addAttribute(Source, "nodeId", ""));
-                content.Attributes.Append(xmlHelper.addAttribute(Source, "loadChildNodes", "false"));
+                content.Attributes.Append(XmlHelper.AddAttribute(Source, "nodeId", ""));
+                content.Attributes.Append(XmlHelper.AddAttribute(Source, "loadChildNodes", "false"));
                 instance.AppendChild(content);
 
-                instance.AppendChild(xmlHelper.addTextNode(Source, "templates", ""));
-                instance.AppendChild(xmlHelper.addTextNode(Source, "stylesheets", ""));
-                instance.AppendChild(xmlHelper.addTextNode(Source, "documenttypes", ""));
-                instance.AppendChild(xmlHelper.addTextNode(Source, "macros", ""));
-                instance.AppendChild(xmlHelper.addTextNode(Source, "files", ""));
-                instance.AppendChild(xmlHelper.addTextNode(Source, "languages", ""));
-                instance.AppendChild(xmlHelper.addTextNode(Source, "dictionaryitems", ""));
-                instance.AppendChild(xmlHelper.addTextNode(Source, "loadcontrol", ""));
+                instance.AppendChild(XmlHelper.AddTextNode(Source, "templates", ""));
+                instance.AppendChild(XmlHelper.AddTextNode(Source, "stylesheets", ""));
+                instance.AppendChild(XmlHelper.AddTextNode(Source, "documenttypes", ""));
+                instance.AppendChild(XmlHelper.AddTextNode(Source, "macros", ""));
+                instance.AppendChild(XmlHelper.AddTextNode(Source, "files", ""));
+                instance.AppendChild(XmlHelper.AddTextNode(Source, "languages", ""));
+                instance.AppendChild(XmlHelper.AddTextNode(Source, "dictionaryitems", ""));
+                instance.AppendChild(XmlHelper.AddTextNode(Source, "loadcontrol", ""));
 
                 Source.SelectSingleNode("packages").AppendChild(instance);
                 Source.Save(dataSource);
@@ -309,7 +309,7 @@ namespace umbraco.cms.businesslogic.packager
                 _xmlDef.SelectSingleNode("readme").InnerXml = "<![CDATA[" + package.Readme + "]]>";
 
                 if(_xmlDef.SelectSingleNode("actions") == null)
-                    _xmlDef.AppendChild(xmlHelper.addTextNode(Source, "actions", ""));
+                    _xmlDef.AppendChild(XmlHelper.AddTextNode(Source, "actions", ""));
 
                 _xmlDef.SelectSingleNode("actions").InnerXml = package.Actions;
 
@@ -329,7 +329,7 @@ namespace umbraco.cms.businesslogic.packager
 
                 foreach (string fileStr in package.Files) {
                     if(!string.IsNullOrEmpty(fileStr.Trim()))
-                        _xmlDef.SelectSingleNode("files").AppendChild(xmlHelper.addTextNode(data.Source, "file", fileStr));
+                        _xmlDef.SelectSingleNode("files").AppendChild(XmlHelper.AddTextNode(data.Source, "file", fileStr));
                 }
 
                 _xmlDef.SelectSingleNode("loadcontrol").InnerText = package.LoadControl;
@@ -355,7 +355,7 @@ namespace umbraco.cms.businesslogic.packager
 
         private static string safeNodeValue(XmlNode n) {
             try {
-                return xmlHelper.GetNodeValue(n);
+                return XmlHelper.GetNodeValue(n);
             } catch {
                 return "";
             }

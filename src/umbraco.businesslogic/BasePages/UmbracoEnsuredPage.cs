@@ -1,12 +1,11 @@
 using System;
 using Umbraco.Core.Logging;
 using System.Linq;
+using System.Security;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
-using umbraco.businesslogic.Exceptions;
 using Umbraco.Core.Security;
 
 namespace umbraco.BasePages
@@ -121,10 +120,10 @@ namespace umbraco.BasePages
                 if (!string.IsNullOrEmpty(CurrentApp))
                 {
                     if (!ValidateUserApp(CurrentApp))
-                        throw new UserAuthorizationException(String.Format("The current user doesn't have access to the section/app '{0}'", CurrentApp));
+                        throw new SecurityException(string.Format("The current user doesn't have access to the section/app '{0}'", CurrentApp));
                 }
             }
-            catch (UserAuthorizationException ex)
+            catch (SecurityException ex)
             {
                 LogHelper.Warn<UmbracoEnsuredPage>(string.Format("{0} tried to access '{1}'", CurrentUser.Id, CurrentApp));
                 throw;

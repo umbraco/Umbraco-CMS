@@ -10,6 +10,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
+using Umbraco.Core;
 using Umbraco.Web;
 
 namespace umbraco.presentation.developer.packages {
@@ -17,7 +18,7 @@ namespace umbraco.presentation.developer.packages {
 
         public SubmitPackage()
         {
-            CurrentApp = BusinessLogic.DefaultApps.developer.ToString();
+            CurrentApp = Constants.Applications.Developer.ToString();
 
         }
         private cms.businesslogic.packager.PackageInstance pack;

@@ -573,9 +573,19 @@ namespace umbraco
         {
             XmlDocument xd = new XmlDocument();
             xd.LoadXml("<roles/>");
-            foreach (string role in Access.GetAccessingMembershipRoles(documentId, path))
-                xd.DocumentElement.AppendChild(xmlHelper.addTextNode(xd, "role", role));
+            foreach (string role in GetAccessingMembershipRoles(documentId, path))
+                xd.DocumentElement.AppendChild(XmlHelper.AddTextNode(xd, "role", role));
             return xd.CreateNavigator().Select(".");
+        }
+
+        private static string[] GetAccessingMembershipRoles(int documentId, string path)
+        {
+            var entry = ApplicationContext.Current.Services.PublicAccessService.GetEntryForContent(path.EnsureEndsWith("," + documentId));
+            if (entry == null) return new string[] { };
+
+            var memberGroupRoleRules = entry.Rules.Where(x => x.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType);
+            return memberGroupRoleRules.Select(x => x.RuleValue).ToArray();
+
         }
 
         /// <summary>
@@ -1160,7 +1170,7 @@ namespace umbraco
             xd.LoadXml("<values/>");
             foreach (string id in values)
             {
-                XmlNode node = xmlHelper.addTextNode(xd, "value", id);
+                XmlNode node = XmlHelper.AddTextNode(xd, "value", id);
                 xd.DocumentElement.AppendChild(node);
             }
             XPathNavigator xp = xd.CreateNavigator();
@@ -1229,8 +1239,8 @@ namespace umbraco
             {
                 while (dr.Read())
                 {
-                    XmlNode n = xmlHelper.addTextNode(xd, "preValue", dr.GetString("value"));
-                    n.Attributes.Append(xmlHelper.addAttribute(xd, "id", dr.GetInt("id").ToString()));
+                    XmlNode n = XmlHelper.AddTextNode(xd, "preValue", dr.GetString("value"));
+                    n.Attributes.Append(XmlHelper.AddAttribute(xd, "id", dr.GetInt("id").ToString()));
                     xd.DocumentElement.AppendChild(n);
                 }
             }
@@ -1284,22 +1294,22 @@ namespace umbraco
                     try
                     {
                         if (languageId != 0)
-                            xe = xmlHelper.addTextNode(xd, "DictionaryItem", item.Value(languageId));
+                            xe = XmlHelper.AddTextNode(xd, "DictionaryItem", item.Value(languageId));
                         else
-                            xe = xmlHelper.addTextNode(xd, "DictionaryItem", item.Value());
+                            xe = XmlHelper.AddTextNode(xd, "DictionaryItem", item.Value());
                     }
                     catch
                     {
-                        xe = xmlHelper.addTextNode(xd, "DictionaryItem", string.Empty);
+                        xe = XmlHelper.AddTextNode(xd, "DictionaryItem", string.Empty);
                     }
-                    xe.Attributes.Append(xmlHelper.addAttribute(xd, "key", item.key));
+                    xe.Attributes.Append(XmlHelper.AddAttribute(xd, "key", item.key));
                     xd.DocumentElement.AppendChild(xe);
                 }
             }
             catch (Exception ee)
             {
                 xd.DocumentElement.AppendChild(
-                    xmlHelper.addTextNode(xd, "Error", ee.ToString()));
+                    XmlHelper.AddTextNode(xd, "Error", ee.ToString()));
             }
 
             XPathNavigator xp = xd.CreateNavigator();
@@ -1783,12 +1793,12 @@ namespace umbraco
             foreach (Relation r in rels)
             {
                 XmlElement n = xd.CreateElement("relation");
-                n.AppendChild(xmlHelper.addCDataNode(xd, "comment", r.Comment));
-                n.Attributes.Append(xmlHelper.addAttribute(xd, "typeId", r.RelType.Id.ToString()));
-                n.Attributes.Append(xmlHelper.addAttribute(xd, "typeName", r.RelType.Name));
-                n.Attributes.Append(xmlHelper.addAttribute(xd, "createDate", r.CreateDate.ToString()));
-                n.Attributes.Append(xmlHelper.addAttribute(xd, "parentId", r.Parent.Id.ToString()));
-                n.Attributes.Append(xmlHelper.addAttribute(xd, "childId", r.Child.Id.ToString()));
+                n.AppendChild(XmlHelper.AddCDataNode(xd, "comment", r.Comment));
+                n.Attributes.Append(XmlHelper.AddAttribute(xd, "typeId", r.RelType.Id.ToString()));
+                n.Attributes.Append(XmlHelper.AddAttribute(xd, "typeName", r.RelType.Name));
+                n.Attributes.Append(XmlHelper.AddAttribute(xd, "createDate", r.CreateDate.ToString()));
+                n.Attributes.Append(XmlHelper.AddAttribute(xd, "parentId", r.Parent.Id.ToString()));
+                n.Attributes.Append(XmlHelper.AddAttribute(xd, "childId", r.Child.Id.ToString()));
 
                 // Append the node that isn't the one we're getting the related nodes from
                 if (NodeId == r.Child.Id)

@@ -157,8 +157,8 @@ namespace umbraco.presentation.webservices
 			xd.LoadXml("<cacheRefreshers/>");
 			foreach (var cr in CacheRefreshersResolver.Current.CacheRefreshers) 
 			{
-				var n = xmlHelper.addTextNode(xd, "cacheRefresher", cr.Name);
-				n.Attributes.Append(xmlHelper.addAttribute(xd, "uniqueIdentifier", cr.UniqueIdentifier.ToString()));
+				var n = XmlHelper.AddTextNode(xd, "cacheRefresher", cr.Name);
+				n.Attributes.Append(XmlHelper.AddAttribute(xd, "uniqueIdentifier", cr.UniqueIdentifier.ToString()));
 				xd.DocumentElement.AppendChild(n);
 			}
 			return xd;

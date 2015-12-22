@@ -26,7 +26,7 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 
 		public EditView()
 		{
-			CurrentApp = global::umbraco.BusinessLogic.DefaultApps.settings.ToString();
+			CurrentApp = Constants.Applications.Settings;
 		}
 
 		/// <summary>

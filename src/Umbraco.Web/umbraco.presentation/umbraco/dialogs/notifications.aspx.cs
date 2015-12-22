@@ -6,6 +6,7 @@ using System.Web.UI.WebControls;
 using umbraco.BasePages;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.workflow;
+using Umbraco.Core;
 using Umbraco.Web;
 
 namespace umbraco.dialogs
@@ -20,7 +21,7 @@ namespace umbraco.dialogs
 
         public notifications()
         {
-            CurrentApp = BusinessLogic.DefaultApps.content.ToString();
+            CurrentApp = Constants.Applications.Content.ToString();
 
         }
 

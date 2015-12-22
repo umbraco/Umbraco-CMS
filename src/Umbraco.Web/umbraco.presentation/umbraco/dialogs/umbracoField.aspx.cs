@@ -27,7 +27,7 @@ namespace umbraco.dialogs
 
 		public umbracoField()
 		{
-			CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
+			CurrentApp = Constants.Applications.Settings.ToString();
 		}
 
 		protected void Page_Load(object sender, System.EventArgs e)

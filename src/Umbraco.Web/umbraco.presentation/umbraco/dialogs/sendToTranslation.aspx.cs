@@ -13,6 +13,7 @@ using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic;
 using umbraco.BusinessLogic;
 using umbraco.BasePages;
+using Umbraco.Core;
 using Umbraco.Web;
 
 namespace umbraco.presentation.dialogs
@@ -23,7 +24,7 @@ namespace umbraco.presentation.dialogs
 
         public sendToTranslation()
         {
-            CurrentApp = DefaultApps.content.ToString();
+            CurrentApp = Constants.Applications.Content.ToString();
         }
 
         protected void Page_Load(object sender, EventArgs e)

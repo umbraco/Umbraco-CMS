@@ -21,16 +21,5 @@ namespace umbraco.businesslogic
 			return resolver.ResolveTypesWithAttribute<IApplication, ApplicationAttribute>(cacheResult:false);
 		}
 
-		/// <summary>
-		/// Returns all available ITrees in application that are attribute with TreeAttribute
-		/// </summary>
-		/// <param name="resolver"></param>
-		/// <returns></returns>
-		internal static IEnumerable<Type> ResolveAttributedTrees(this PluginManager resolver)
-		{
-			//don't cache the result of this because it is only used once during app startup, caching will just add a bit more mem overhead for no reason
-			return resolver.ResolveTypesWithAttribute<ITree, TreeAttribute>(cacheResult:false);
-		}
-		
 	}
 }

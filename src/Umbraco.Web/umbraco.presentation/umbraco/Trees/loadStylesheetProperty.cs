@@ -6,6 +6,7 @@ using umbraco.businesslogic;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
+using Umbraco.Web.Trees;
 
 
 namespace umbraco

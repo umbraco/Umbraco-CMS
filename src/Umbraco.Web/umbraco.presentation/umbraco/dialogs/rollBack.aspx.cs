@@ -23,7 +23,7 @@
 //    {
 //        public rollBack()
 //        {
-//            CurrentApp = BusinessLogic.DefaultApps.content.ToString();
+//            CurrentApp = Constants.Applications.Content.ToString();
 
 //        }
 //        private Document currentDoc = new Document(int.Parse(helper.Request("nodeId")));

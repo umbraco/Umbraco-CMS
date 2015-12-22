@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Web;
 using umbraco.BusinessLogic.Actions;
 using System.Web.Services;
+using Umbraco.Web.UI.JavaScript;
 
 namespace umbraco.cms.presentation
 {
@@ -45,7 +46,7 @@ namespace umbraco.cms.presentation
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.UmbracoClientDependencyLoader ClientLoader;
+		protected UmbracoClientDependencyLoader ClientLoader;
 
 		/// <summary>
 		/// CssInclude1 control.

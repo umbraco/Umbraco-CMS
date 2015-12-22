@@ -10,6 +10,7 @@ using umbraco.cms.presentation.Trees;
 using umbraco.BusinessLogic.Actions;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Web.Trees;
 
 
 namespace umbraco

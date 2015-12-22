@@ -15,6 +15,7 @@ using Umbraco.Web;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.preview;
 using umbraco.BusinessLogic;
+using Umbraco.Core;
 
 namespace umbraco.presentation.dialogs
 {
@@ -22,7 +23,7 @@ namespace umbraco.presentation.dialogs
     {
         public Preview()
         {
-            CurrentApp = DefaultApps.content.ToString();
+            CurrentApp = Constants.Applications.Content.ToString();
         }
 
         protected void Page_Load(object sender, EventArgs e)

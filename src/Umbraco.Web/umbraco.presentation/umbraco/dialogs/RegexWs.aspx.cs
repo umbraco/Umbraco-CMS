@@ -8,6 +8,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
+using Umbraco.Core;
 
 namespace umbraco.presentation.dialogs {
     public partial class RegexWs : BasePages.UmbracoEnsuredPage {
@@ -15,7 +16,7 @@ namespace umbraco.presentation.dialogs {
 
         public RegexWs()
         {
-            CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
+            CurrentApp = Constants.Applications.Settings.ToString();
 
         }
 

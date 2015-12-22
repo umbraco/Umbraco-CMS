@@ -8,6 +8,7 @@ using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
+using Umbraco.Core;
 
 namespace umbraco.cms.presentation
 {
@@ -19,7 +20,7 @@ namespace umbraco.cms.presentation
     {
         public publishStatus()
         {
-            CurrentApp = BusinessLogic.DefaultApps.content.ToString();
+            CurrentApp = Constants.Applications.Content.ToString();
 
         }
 

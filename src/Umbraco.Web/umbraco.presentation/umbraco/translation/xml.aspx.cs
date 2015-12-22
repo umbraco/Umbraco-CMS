@@ -26,7 +26,7 @@ namespace umbraco.presentation.translation
 
         public xml()
         {
-            CurrentApp = DefaultApps.translation.ToString();
+            CurrentApp = Constants.Applications.Translation.ToString();
         }
 
         protected void Page_Load(object sender, EventArgs e)

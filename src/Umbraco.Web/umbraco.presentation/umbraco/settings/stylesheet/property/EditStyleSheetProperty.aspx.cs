@@ -25,7 +25,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
     {
         public EditStyleSheetProperty()
         {
-            CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
+            CurrentApp = Constants.Applications.Settings.ToString();
 
         }
 

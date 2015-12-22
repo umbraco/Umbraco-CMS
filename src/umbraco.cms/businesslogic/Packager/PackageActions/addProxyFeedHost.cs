@@ -1,4 +1,5 @@
 using System.Xml;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 
 namespace umbraco.cms.businesslogic.packager.standardPackageActions
@@ -13,7 +14,7 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions
 			if (string.IsNullOrEmpty(hostname))
 				return false;
 
-			var xdoc = xmlHelper.OpenAsXmlDocument(SystemFiles.FeedProxyConfig);
+			var xdoc = XmlHelper.OpenAsXmlDocument(SystemFiles.FeedProxyConfig);
 
 			xdoc.PreserveWhitespace = true;
 
@@ -33,8 +34,8 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions
 
 				if (insert)
 				{
-					var newHostname = xmlHelper.addTextNode(xdoc, "allow", string.Empty);
-					newHostname.Attributes.Append(xmlHelper.addAttribute(xdoc, "host", hostname));
+					var newHostname = XmlHelper.AddTextNode(xdoc, "allow", string.Empty);
+					newHostname.Attributes.Append(XmlHelper.AddAttribute(xdoc, "host", hostname));
 					xn.AppendChild(newHostname);
 
 					xdoc.Save(IOHelper.MapPath(SystemFiles.FeedProxyConfig));
@@ -57,7 +58,7 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions
 			if (string.IsNullOrEmpty(hostname))
 				return false;
 
-			var xdoc = xmlHelper.OpenAsXmlDocument(SystemFiles.FeedProxyConfig);
+			var xdoc = XmlHelper.OpenAsXmlDocument(SystemFiles.FeedProxyConfig);
 			xdoc.PreserveWhitespace = true;
 
 			var xn = xdoc.SelectSingleNode("//feedProxy");
@@ -91,7 +92,7 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions
 		public XmlNode SampleXml()
 		{
 			string sample = "<Action runat=\"install\" undo=\"true\" alias=\"addProxyFeedHost\" host=\"umbraco.com\"/>";
-			return helper.parseStringToXmlNode(sample);
+			return PackageHelper.ParseStringToXmlNode(sample);
 		}
 	}
 }

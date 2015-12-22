@@ -52,7 +52,7 @@ namespace umbraco
 
         public override string AssignedApp
         {
-            get { return DefaultApps.settings.ToString(); }
+            get { return Constants.Applications.Settings.ToString(); }
         }
     }
 }

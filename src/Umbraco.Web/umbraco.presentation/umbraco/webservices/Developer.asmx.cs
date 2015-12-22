@@ -19,7 +19,7 @@ namespace umbraco.webservices
 		public XmlNode GetMacros(string Login, string Password)
 		{
 		    if (ValidateCredentials(Login, Password) 
-                && UserHasAppAccess(DefaultApps.developer.ToString(), Login))  
+                && UserHasAppAccess(Constants.Applications.Developer.ToString(), Login))  
 			{
 				var xmlDoc = new XmlDocument();
 				var macros = xmlDoc.CreateElement("macros");
@@ -40,7 +40,7 @@ namespace umbraco.webservices
 		public XmlNode GetMacro(int Id, string Login, string Password)
 		{
 		    if (ValidateCredentials(Login, Password)
-                && UserHasAppAccess(DefaultApps.developer.ToString(), Login)) 
+                && UserHasAppAccess(Constants.Applications.Developer.ToString(), Login)) 
 			{
 				var xmlDoc = new XmlDocument();
 				var macro = xmlDoc.CreateElement("macro");

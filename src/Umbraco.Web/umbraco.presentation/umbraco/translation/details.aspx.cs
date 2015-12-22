@@ -19,13 +19,14 @@ using ICSharpCode.SharpZipLib.Zip;
 using ICSharpCode.SharpZipLib.Zip.Compression;
 using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 using ICSharpCode.SharpZipLib.GZip;
+using Umbraco.Core;
 
 namespace umbraco.presentation.umbraco.translation {
     public partial class details : BasePages.UmbracoEnsuredPage {
 
         public details()
         {
-            CurrentApp = BusinessLogic.DefaultApps.translation.ToString();
+            CurrentApp = Constants.Applications.Translation.ToString();
 
         }
         protected void closeTask(object sender, EventArgs e) {

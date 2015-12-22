@@ -10,6 +10,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Linq;
 using umbraco.BusinessLogic;
+using Umbraco.Core;
 
 namespace umbraco.developer
 {
@@ -20,7 +21,7 @@ namespace umbraco.developer
 	{
 	    public autoDoc()
 	    {
-	        CurrentApp = DefaultApps.developer.ToString();
+	        CurrentApp = Constants.Applications.Developer.ToString();
 	    }
 
 		protected void Page_Load(object sender, EventArgs e)

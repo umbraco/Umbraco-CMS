@@ -1,18 +1,11 @@
 using System;
-using System.Configuration;
 using System.IO;
-using System.Threading;
-using System.Xml;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
-using Umbraco.Web.Routing;
-using umbraco.BusinessLogic;
 using Umbraco.Core.IO;
-using umbraco.cms.businesslogic.cache;
-using umbraco.cms.businesslogic.template;
 
 namespace Umbraco.Tests.Routing
 {

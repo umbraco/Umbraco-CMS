@@ -292,7 +292,7 @@ namespace umbraco.cms.businesslogic
                         foreach (XmlNode xn in values)
                         {
                             string cA = xn.Attributes["LanguageCultureAlias"].Value;
-                            string keyValue = xmlHelper.GetNodeValue(xn);
+                            string keyValue = XmlHelper.GetNodeValue(xn);
 
                             Language valueLang = Language.GetByCultureCode(cA);
 

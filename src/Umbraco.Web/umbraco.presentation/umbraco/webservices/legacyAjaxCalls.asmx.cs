@@ -1,6 +1,5 @@
 using System;
 using System.Web;
-using System.Web.Security;
 using System.Web.Services;
 using System.ComponentModel;
 using System.Web.Script.Services;
@@ -9,16 +8,15 @@ using System.Xml.Xsl;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Net;
+using System.Security;
 using System.Web.UI;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Web.UI;
 using Umbraco.Web;
-using Umbraco.Web.Cache;
 using Umbraco.Web.WebServices;
 
 using umbraco.BusinessLogic;
-using umbraco.businesslogic.Exceptions;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.media;
 using umbraco.BasePages;
@@ -109,7 +107,7 @@ namespace umbraco.presentation.webservices
                     case "media":
                     case "mediaRecycleBin":
                         //ensure user has access to media
-                        AuthorizeRequest(DefaultApps.media.ToString(), true);
+                        AuthorizeRequest(Constants.Applications.Media.ToString(), true);
 
                         new Media(intNodeId).delete(true);
                         break;
@@ -117,7 +115,7 @@ namespace umbraco.presentation.webservices
                     case "contentRecycleBin":
                     default:
                         //ensure user has access to content
-                        AuthorizeRequest(DefaultApps.content.ToString(), true);
+                        AuthorizeRequest(Constants.Applications.Content.ToString(), true);
 
                         new Document(intNodeId).delete(true);
                         break;
@@ -133,7 +131,7 @@ namespace umbraco.presentation.webservices
         [ScriptMethod]
         public void DisableUser(int userId)
         {
-            AuthorizeRequest(DefaultApps.users.ToString(), true);
+            AuthorizeRequest(Constants.Applications.Users.ToString(), true);
 
             BusinessLogic.User.GetUser(userId).disable();
         }
@@ -216,7 +214,7 @@ namespace umbraco.presentation.webservices
         [ScriptMethod]
         public string TemplateMasterPageContentContainer(int templateId, int masterTemplateId)
         {
-            AuthorizeRequest(DefaultApps.settings.ToString(), true);
+            AuthorizeRequest(Constants.Applications.Settings.ToString(), true);
             return new cms.businesslogic.template.Template(templateId).GetMasterContentElement(masterTemplateId);
         }
 
@@ -227,19 +225,19 @@ namespace umbraco.presentation.webservices
             switch (fileType)
             {
                 case "xslt":
-                    AuthorizeRequest(DefaultApps.developer.ToString(), true);
+                    AuthorizeRequest(Constants.Applications.Developer.ToString(), true);
                     return SaveXslt(fileName, fileContents, ignoreDebug);
                 case "python":
-                    AuthorizeRequest(DefaultApps.developer.ToString(), true);
+                    AuthorizeRequest(Constants.Applications.Developer.ToString(), true);
                     return "true";
                 case "css":
-                    AuthorizeRequest(DefaultApps.settings.ToString(), true);
+                    AuthorizeRequest(Constants.Applications.Settings.ToString(), true);
                     return SaveCss(fileName, fileContents, fileID);
                 case "script":
-                    AuthorizeRequest(DefaultApps.settings.ToString(), true);
+                    AuthorizeRequest(Constants.Applications.Settings.ToString(), true);
                     return SaveScript(fileName, fileContents);
                 case "template":
-                    AuthorizeRequest(DefaultApps.settings.ToString(), true);
+                    AuthorizeRequest(Constants.Applications.Settings.ToString(), true);
                     return SaveTemplate(fileName, fileAlias, fileContents, fileID, masterID);
                 default:
                     throw new ArgumentException(String.Format("Invalid fileType passed: '{0}'", fileType));
@@ -455,7 +453,7 @@ namespace umbraco.presentation.webservices
         {
             // check for secure connection
             if (GlobalSettings.UseSSL && !HttpContext.Current.Request.IsSecureConnection)
-                throw new UserAuthorizationException("This installation requires a secure connection (via SSL). Please update the URL to include https://");
+                throw new SecurityException("This installation requires a secure connection (via SSL). Please update the URL to include https://");
 
             if (!BasePage.ValidateUserContextID(BasePages.BasePage.umbracoUserContextID))
                 throw new Exception("Client authorization failed. User is not logged in");

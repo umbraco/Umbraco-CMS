@@ -211,15 +211,6 @@
     <Compile Include="Actions\ActionRestore.cs" />
     <Compile Include="Actions\LegacyActionMenuItemAttribute.cs" />
     <Compile Include="businesslogic\CMSPreviewNode.cs" />
-    <Compile Include="businesslogic\Files\IFile.cs" />
-    <Compile Include="businesslogic\Files\NotAnImageException.cs" />
-    <Compile Include="businesslogic\Files\UmbracoFile.cs" />
-    <Compile Include="businesslogic\installer\IInstallerStep.cs" />
-    <Compile Include="businesslogic\installer\InstallerStep.cs" />
-    <Compile Include="businesslogic\installer\InstallStepCollection.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="businesslogic\ISaveHandlerContents.cs" />
     <Compile Include="businesslogic\macro\IMacroEngine.cs" />
     <Compile Include="businesslogic\macro\MacroEngineFactory.cs" />
     <Compile Include="businesslogic\macro\MacroModel.cs" />
@@ -237,20 +228,15 @@
     <Compile Include="businesslogic\Packager\PackageActions\addProxyFeedHost.cs" />
     <Compile Include="businesslogic\Packager\PackageActions\addStringToHtmlElement.cs" />
     <Compile Include="businesslogic\Packager\PackageActions\allowDoctype.cs" />
-    <Compile Include="businesslogic\Packager\PackageActions\helper.cs" />
+    <Compile Include="businesslogic\Packager\PackageActions\PackageHelper.cs" />
     <Compile Include="businesslogic\Packager\PackageActions\moveRootDocument.cs" />
     <Compile Include="businesslogic\Packager\PackageActions\publishRootDocument.cs" />
     <Compile Include="businesslogic\Packager\PackageActions\removeStringFromTemplate.cs" />
     <Compile Include="businesslogic\propertytype\PropertyTypeGroup.cs" />
-    <Compile Include="businesslogic\ProviderBase.cs" />
     <Compile Include="businesslogic\task\Tasks.cs" />
-    <Compile Include="businesslogic\Tuple.cs" />
     <Compile Include="businesslogic\web\DocumentVersionList.cs" />
     <Compile Include="PluginManagerExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="businesslogic\cache\Cache.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="businesslogic\CMSModuleI.cs">
@@ -260,12 +246,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="businesslogic\Content.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="businesslogic\ContentItem\ContentItem.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="businesslogic\ContentItem\ContentItemType.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="businesslogic\ContentType.cs">
@@ -338,12 +318,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="businesslogic\translation\Translation.cs" />
-    <Compile Include="businesslogic\utilities\Diff.cs" />
-    <Compile Include="businesslogic\utilities\File.cs" />
-    <Compile Include="businesslogic\utilities\Zip.cs" />
-    <Compile Include="businesslogic\web\Access.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="businesslogic\web\Document.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -359,7 +333,6 @@
     <Compile Include="businesslogic\web\StylesheetProperty.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="businesslogic\workflow\Diff.cs" />
     <Compile Include="businesslogic\workflow\Notification.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -6,6 +6,7 @@ using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.language;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Core;
 
 namespace umbraco.dialogs
 {
@@ -19,7 +20,7 @@ namespace umbraco.dialogs
 
         public AssignDomain()
         {
-            CurrentApp = DefaultApps.content.ToString();
+            CurrentApp = Constants.Applications.Content.ToString();
         }
 
         protected void Page_Load(object sender, EventArgs e)

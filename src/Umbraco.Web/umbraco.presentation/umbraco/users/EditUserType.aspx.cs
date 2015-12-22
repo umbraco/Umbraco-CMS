@@ -15,6 +15,7 @@ using umbraco.BusinessLogic.Actions;
 using umbraco.BusinessLogic;
 using umbraco.uicontrols;
 using umbraco.cms.presentation.Trees;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 
 namespace umbraco.cms.presentation.user
@@ -23,7 +24,7 @@ namespace umbraco.cms.presentation.user
     {
         public EditUserType()
         {
-            CurrentApp = BusinessLogic.DefaultApps.users.ToString();
+            CurrentApp = Constants.Applications.Users.ToString();
         }
         protected void Page_Load(object sender, EventArgs e)
         {

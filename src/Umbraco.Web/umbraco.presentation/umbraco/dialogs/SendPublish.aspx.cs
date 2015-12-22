@@ -12,6 +12,7 @@ using Umbraco.Web;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Core;
 
 namespace umbraco.dialogs
 {
@@ -23,7 +24,7 @@ namespace umbraco.dialogs
 	{
 	    public SendPublish()
 	    {
-	        CurrentApp = DefaultApps.content.ToString();
+	        CurrentApp = Constants.Applications.Content.ToString();
 	    }
 
 		protected void Page_Load(object sender, EventArgs e)

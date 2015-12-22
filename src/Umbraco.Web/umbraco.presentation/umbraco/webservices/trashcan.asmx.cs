@@ -6,6 +6,7 @@ using Umbraco.Web.WebServices;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
+using Umbraco.Core;
 
 namespace umbraco.presentation.webservices
 {
@@ -25,10 +26,10 @@ namespace umbraco.presentation.webservices
             switch (type)
             {
                 case RecycleBin.RecycleBinType.Content:
-                    if (!AuthorizeRequest(DefaultApps.content.ToString())) return;
+                    if (!AuthorizeRequest(Constants.Applications.Content.ToString())) return;
                     break;
                 case RecycleBin.RecycleBinType.Media:
-                    if (!AuthorizeRequest(DefaultApps.media.ToString())) return;
+                    if (!AuthorizeRequest(Constants.Applications.Media.ToString())) return;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException("type");

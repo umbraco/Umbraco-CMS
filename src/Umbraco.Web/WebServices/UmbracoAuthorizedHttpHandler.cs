@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Linq;
-using System.Web;
-using System.Web.Security;
+using System.Security;
 using Umbraco.Core;
 using Umbraco.Web.Security;
-using umbraco;
-using umbraco.BasePages;
 using umbraco.BusinessLogic;
-using umbraco.businesslogic.Exceptions;
 
 namespace Umbraco.Web.WebServices
 {
@@ -64,7 +59,7 @@ namespace Umbraco.Web.WebServices
             }
             var hasAccess = UserHasAppAccess(app, UmbracoUser);
             if (!hasAccess && throwExceptions)
-                throw new UserAuthorizationException("The user does not have access to the required application");
+                throw new SecurityException("The user does not have access to the required application");
             return hasAccess;
         }
 

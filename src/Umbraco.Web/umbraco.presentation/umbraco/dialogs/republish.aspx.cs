@@ -21,7 +21,7 @@
 //    {
 //        public republish()
 //        {
-//            CurrentApp = BusinessLogic.DefaultApps.content.ToString();
+//            CurrentApp = Constants.Applications.Content.ToString();
 
 //        }
 //        protected void go(object sender, EventArgs e) {

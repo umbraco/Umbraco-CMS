@@ -8,6 +8,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Web;
 
@@ -18,7 +19,7 @@ namespace umbraco.presentation.actions
 
         public preview()
         {
-            CurrentApp = BusinessLogic.DefaultApps.content.ToString();
+            CurrentApp = Constants.Applications.Content;
 
         }
         /// <summary>

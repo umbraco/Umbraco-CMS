@@ -24,7 +24,7 @@ namespace umbraco.dialogs
 
         public cruds()
         {
-            CurrentApp = BusinessLogic.DefaultApps.content.ToString();
+            CurrentApp = Constants.Applications.Content.ToString();
 
         }
 

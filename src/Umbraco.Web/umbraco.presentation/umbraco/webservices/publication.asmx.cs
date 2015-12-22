@@ -5,6 +5,7 @@ using System.Web.Script.Services;
 using Umbraco.Web.WebServices;
 using umbraco.BusinessLogic;
 using umbraco.presentation.webservices;
+using Umbraco.Core;
 
 namespace umbraco.webservices
 {
@@ -20,7 +21,7 @@ namespace umbraco.webservices
         [ScriptMethod]
 		public int GetPublicationStatus(string key)
 		{
-		    if (!AuthorizeRequest(DefaultApps.content.ToString()))
+		    if (!AuthorizeRequest(Constants.Applications.Content.ToString()))
 		        return 0;
 
 			try 
@@ -37,7 +38,7 @@ namespace umbraco.webservices
         [ScriptMethod]
         public int GetPublicationStatusMax(string key)
         {
-            if (!AuthorizeRequest(DefaultApps.content.ToString()))
+            if (!AuthorizeRequest(Constants.Applications.Content.ToString()))
                 return 0;
 
             try
@@ -54,7 +55,7 @@ namespace umbraco.webservices
         [ScriptMethod]
         public int GetPublicationStatusMaxAll(string key)
         {
-            if (!AuthorizeRequest(DefaultApps.content.ToString()))
+            if (!AuthorizeRequest(Constants.Applications.Content.ToString()))
 		        return 0;
 
             try
@@ -77,7 +78,7 @@ namespace umbraco.webservices
         [WebMethod]
         public void SaveXmlCacheToDisk()
         {
-            if (!AuthorizeRequest(DefaultApps.content.ToString()))
+            if (!AuthorizeRequest(Constants.Applications.Content.ToString()))
                 return;
         }
 

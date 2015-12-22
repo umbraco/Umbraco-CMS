@@ -8,6 +8,7 @@ using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
+using Umbraco.Core;
 
 namespace umbraco.presentation.umbraco.dialogs
 {
@@ -18,7 +19,7 @@ namespace umbraco.presentation.umbraco.dialogs
 	{
 	    public viewAuditTrail()
 	    {
-            CurrentApp = BusinessLogic.DefaultApps.content.ToString();
+            CurrentApp = Constants.Applications.Content.ToString();
 
 	    }
 	

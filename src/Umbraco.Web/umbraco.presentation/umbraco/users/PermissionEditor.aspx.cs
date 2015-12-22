@@ -28,7 +28,7 @@ namespace umbraco.cms.presentation.user
     {
 	    public PermissionEditor()
 	    {
-            CurrentApp = BusinessLogic.DefaultApps.users.ToString();
+            CurrentApp = Constants.Applications.Users.ToString();
 
 	    }
 

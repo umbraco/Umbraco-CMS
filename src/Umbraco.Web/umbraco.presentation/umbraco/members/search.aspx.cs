@@ -9,6 +9,7 @@ using umbraco.cms.businesslogic.member;
 using umbraco.DataLayer.SqlHelpers;
 using umbraco.BusinessLogic;
 using Examine;
+using Umbraco.Core;
 
 namespace umbraco.presentation.members
 {
@@ -18,7 +19,7 @@ namespace umbraco.presentation.members
     {
         public search()
         {
-            CurrentApp = DefaultApps.member.ToString();
+            CurrentApp = Constants.Applications.Members.ToString();
         }
     }
 }

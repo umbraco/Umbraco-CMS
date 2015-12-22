@@ -13,6 +13,7 @@ using System.Web.Security;
 using umbraco.cms.businesslogic.member;
 using umbraco.cms.presentation.Trees;
 using umbraco.uicontrols;
+using Umbraco.Core;
 
 namespace umbraco.presentation.members
 {
@@ -23,7 +24,7 @@ namespace umbraco.presentation.members
 	{
 	    public EditMemberGroup()
 	    {
-            CurrentApp = BusinessLogic.DefaultApps.member.ToString();
+            CurrentApp = Constants.Applications.Members.ToString();
 
 	    }
 

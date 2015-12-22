@@ -31,7 +31,7 @@ namespace umbraco.presentation.translation
     {
         public _default()
         {
-            CurrentApp = DefaultApps.translation.ToString();
+            CurrentApp = Constants.Applications.Translation.ToString();
 
         }
         protected void Page_Load(object sender, EventArgs e)
@@ -112,7 +112,7 @@ namespace umbraco.presentation.translation
 
                     // Unpack the zip file
 
-                    cms.businesslogic.utilities.Zip.UnPack(tempFileName, tempPath, true);
+                    IOHelper.UnZip(tempFileName, tempPath, true);
 
                     // Test the number of xml files
                     try

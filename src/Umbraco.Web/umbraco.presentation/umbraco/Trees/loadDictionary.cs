@@ -8,11 +8,13 @@ using umbraco.interfaces;
 using umbraco.cms.presentation.Trees;
 using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
+using Umbraco.Web.Trees;
 
 
 namespace umbraco
 {
-    [Tree(Constants.Applications.Settings, Constants.Trees.Dictionary, "Dictionary", action: "openDictionary()", sortOrder: 3)]
+
+    [Tree(Constants.Applications.Settings, Constants.Trees.Dictionary, "Dictionary", sortOrder: 3)]
     public class loadDictionary : BaseTree
 	{
         public loadDictionary(string application) : base(application) { }

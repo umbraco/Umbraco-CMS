@@ -27,7 +27,7 @@ namespace umbraco.cms.presentation.settings
 
 		public editTemplate()
 		{
-			CurrentApp = DefaultApps.settings.ToString();
+			CurrentApp = Constants.Applications.Settings.ToString();
 		}
 
 		protected override void OnPreRender(EventArgs e)

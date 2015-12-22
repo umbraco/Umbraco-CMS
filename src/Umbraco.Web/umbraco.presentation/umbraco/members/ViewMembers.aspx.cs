@@ -4,6 +4,7 @@ using System.Web;
 using System.Web.Security;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Umbraco.Core;
 using Umbraco.Core.Security;
 
 namespace umbraco.presentation.members
@@ -13,7 +14,7 @@ namespace umbraco.presentation.members
 
         public ViewMembers()
         {
-            CurrentApp = BusinessLogic.DefaultApps.member.ToString();
+            CurrentApp = Constants.Applications.Members.ToString();
         }
 
         protected void Page_Load(object sender, EventArgs e)

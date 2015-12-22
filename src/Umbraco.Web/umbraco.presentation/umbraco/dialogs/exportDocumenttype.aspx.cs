@@ -11,6 +11,7 @@ using System.Web.UI.HtmlControls;
 
 using umbraco.cms.businesslogic.web;
 using System.Xml;
+using Umbraco.Core;
 using Umbraco.Web;
 
 namespace umbraco.presentation.dialogs
@@ -22,7 +23,7 @@ namespace umbraco.presentation.dialogs
 	{
 	    public exportDocumenttype()
 	    {
-            CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
+            CurrentApp = Constants.Applications.Settings.ToString();
 
 	    }
 		private void Page_Load(object sender, System.EventArgs e)

@@ -17,7 +17,7 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Packages
     {
         public DirectoryBrowser()
         {
-            CurrentApp = DefaultApps.developer.ToString();
+            CurrentApp = Constants.Applications.Developer;
         }
 
         string _lsScriptName;

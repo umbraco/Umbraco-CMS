@@ -26,7 +26,7 @@ namespace umbraco.webservices
 		[WebMethod]
 		public XmlNode GetTemplates(string Login, string Password)
 		{
-		    if (ValidateCredentials(Login, Password) && UserHasAppAccess(DefaultApps.settings.ToString(), Login)) 
+		    if (ValidateCredentials(Login, Password) && UserHasAppAccess(Constants.Applications.Settings.ToString(), Login)) 
 			{
 				var xmlDoc = new XmlDocument();
 				xmlDoc.LoadXml("<templates/>");
@@ -45,7 +45,7 @@ namespace umbraco.webservices
 	    [WebMethod]
 		public XmlNode GetTemplate(int Id, string Login, string Password)
 		{
-            if (ValidateCredentials(Login, Password) && UserHasAppAccess(DefaultApps.settings.ToString(), Login)) 
+            if (ValidateCredentials(Login, Password) && UserHasAppAccess(Constants.Applications.Settings.ToString(), Login)) 
 			{
 				var t = new cms.businesslogic.template.Template(Id);
 				var xmlDoc = new XmlDocument();
@@ -62,7 +62,7 @@ namespace umbraco.webservices
 	    [WebMethod]
 		public bool UpdateTemplate(int Id, int Master, string Design, string Login, string Password)
 		{
-            if (ValidateCredentials(Login, Password) && UserHasAppAccess(DefaultApps.settings.ToString(), Login)) 
+            if (ValidateCredentials(Login, Password) && UserHasAppAccess(Constants.Applications.Settings.ToString(), Login)) 
 			{
                 try
                 {
@@ -88,7 +88,7 @@ namespace umbraco.webservices
         public string GetCodeSnippet(object templateId)
 	    {
             //NOTE: The legacy code threw an exception so will continue to do that.
-	        AuthorizeRequest(DefaultApps.settings.ToString(), true);
+	        AuthorizeRequest(Constants.Applications.Settings.ToString(), true);
 
 	        var snippetPath = SystemDirectories.Umbraco + "/scripting/templates/cshtml/";
 	        var filePath = IOHelper.MapPath(snippetPath + templateId);

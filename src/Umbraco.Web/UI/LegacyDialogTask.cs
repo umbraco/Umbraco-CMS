@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Authentication;
-using System.Text;
 using Umbraco.Core;
 using umbraco.BusinessLogic;
-using umbraco.businesslogic.Exceptions;
 using umbraco.interfaces;
 
 namespace Umbraco.Web.UI

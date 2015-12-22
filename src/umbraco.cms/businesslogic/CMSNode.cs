@@ -34,7 +34,7 @@ namespace umbraco.cms.businesslogic
     /// distinguishing the different types of CMSNodes (ex. Documents/Medias/Stylesheets/documenttypes and so forth).
     /// </summary>
     [Obsolete("Obsolete, This class will eventually be phased out", false)]
-    public class CMSNode : BusinessLogic.console.IconI
+    public class CMSNode 
     {
         #region Private Members
 
@@ -809,7 +809,7 @@ order by level,sortOrder";
         /// The basic recursive tree pattern
         /// </summary>
         /// <value>The children.</value>
-        public virtual BusinessLogic.console.IconI[] Children
+        public virtual CMSNode[] Children
         {
             get
             {
@@ -839,7 +839,7 @@ order by level,sortOrder";
         /// Use with care.
         /// </summary>
         /// <value>The children of all object types.</value>
-        public BusinessLogic.console.IconI[] ChildrenOfAllObjectTypes
+        public CMSNode[] ChildrenOfAllObjectTypes
         {
             get
             {
@@ -1086,18 +1086,18 @@ order by level,sortOrder";
         private void XmlPopulate(XmlDocument xd, XmlNode x, bool Deep)
         {
             // attributes
-            x.Attributes.Append(xmlHelper.addAttribute(xd, "id", this.Id.ToString()));
-            x.Attributes.Append(xmlHelper.addAttribute(xd, "key", this.UniqueId.ToString()));
+            x.Attributes.Append(XmlHelper.AddAttribute(xd, "id", this.Id.ToString()));
+            x.Attributes.Append(XmlHelper.AddAttribute(xd, "key", this.UniqueId.ToString()));
             if (this.Level > 1)
-                x.Attributes.Append(xmlHelper.addAttribute(xd, "parentID", this.Parent.Id.ToString()));
+                x.Attributes.Append(XmlHelper.AddAttribute(xd, "parentID", this.Parent.Id.ToString()));
             else
-                x.Attributes.Append(xmlHelper.addAttribute(xd, "parentID", "-1"));
-            x.Attributes.Append(xmlHelper.addAttribute(xd, "level", this.Level.ToString()));
-            x.Attributes.Append(xmlHelper.addAttribute(xd, "writerID", this.User.Id.ToString()));
-            x.Attributes.Append(xmlHelper.addAttribute(xd, "sortOrder", this.sortOrder.ToString()));
-            x.Attributes.Append(xmlHelper.addAttribute(xd, "createDate", this.CreateDateTime.ToString("s")));
-            x.Attributes.Append(xmlHelper.addAttribute(xd, "nodeName", this.Text));
-            x.Attributes.Append(xmlHelper.addAttribute(xd, "path", this.Path));
+                x.Attributes.Append(XmlHelper.AddAttribute(xd, "parentID", "-1"));
+            x.Attributes.Append(XmlHelper.AddAttribute(xd, "level", this.Level.ToString()));
+            x.Attributes.Append(XmlHelper.AddAttribute(xd, "writerID", this.User.Id.ToString()));
+            x.Attributes.Append(XmlHelper.AddAttribute(xd, "sortOrder", this.sortOrder.ToString()));
+            x.Attributes.Append(XmlHelper.AddAttribute(xd, "createDate", this.CreateDateTime.ToString("s")));
+            x.Attributes.Append(XmlHelper.AddAttribute(xd, "nodeName", this.Text));
+            x.Attributes.Append(XmlHelper.AddAttribute(xd, "path", this.Path));
 
             if (Deep)
             {

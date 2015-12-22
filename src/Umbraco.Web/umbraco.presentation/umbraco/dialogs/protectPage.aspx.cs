@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Web.Security;
@@ -7,13 +8,15 @@ using System.Web.UI.WebControls;
 using System.Windows.Forms.VisualStyles;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
-using umbraco.cms.businesslogic.member;
 using umbraco.cms.businesslogic.web;
 using umbraco.controls;
 using umbraco.BasePages;
+using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Security;
 using Umbraco.Web;
+using MembershipProviderExtensions = Umbraco.Core.Security.MembershipProviderExtensions;
+using MemberType = umbraco.cms.businesslogic.member.MemberType;
 
 namespace umbraco.presentation.umbraco.dialogs
 {
@@ -24,7 +27,7 @@ namespace umbraco.presentation.umbraco.dialogs
     {
         public protectPage()
         {
-            CurrentApp = BusinessLogic.DefaultApps.content.ToString();
+            CurrentApp = Constants.Applications.Content.ToString();
 
         }
 
@@ -57,6 +60,150 @@ namespace umbraco.presentation.umbraco.dialogs
             }
         }
 
+        private ProtectionType GetProtectionType(int documentId)
+        {
+            var content = Services.ContentService.GetById(documentId);
+            if (content == null) return ProtectionType.NotProtected;
+
+            var entry = Services.PublicAccessService.GetEntryForContent(content);
+            if (entry == null) return ProtectionType.NotProtected;
+
+            //legacy states that if it is protected by a member id then it is 'simple'
+            return entry.Rules.Any(x => x.RuleType == Constants.Conventions.PublicAccess.MemberIdRuleType)
+                ? ProtectionType.Simple
+                : ProtectionType.Advanced;
+        }
+
+        private enum ProtectionType
+        {
+            NotProtected,
+            Simple,
+            Advanced
+        }
+
+        private int GetErrorPage(string path)
+        {
+            var entry = Services.PublicAccessService.GetEntryForContent(path);
+            if (entry == null) return -1;
+            var entity = Services.EntityService.Get(entry.NoAccessNodeId, UmbracoObjectTypes.Document, false);
+            return entity.Id;
+        }
+
+        private int GetLoginPage(string path)
+        {
+            var entry = Services.PublicAccessService.GetEntryForContent(path);
+            if (entry == null) return -1;
+            var entity = Services.EntityService.Get(entry.LoginNodeId, UmbracoObjectTypes.Document, false);
+            return entity.Id;
+        }
+
+        private MembershipUser GetAccessingMembershipUser(int documentId)
+        {
+            var content = Services.ContentService.GetById(documentId);
+            if (content == null) return null;
+            var entry = Services.PublicAccessService.GetEntryForContent(content);
+            if (entry == null) return null;
+            //legacy would throw an exception here if it was not 'simple' and simple means based on a username
+            if (entry.Rules.All(x => x.RuleType != Constants.Conventions.PublicAccess.MemberUsernameRuleType))
+            {
+                throw new Exception("Document isn't protected using Simple mechanism. Use GetAccessingMemberGroups instead");
+            }
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+            var usernameRule = entry.Rules.First(x => x.RuleType == Constants.Conventions.PublicAccess.MemberUsernameRuleType);
+            return provider.GetUser(usernameRule.RuleValue, false);
+        }
+
+        private bool IsProtectedByMembershipRole(int documentId, string role)
+        {
+            var content = Services.ContentService.GetById(documentId);
+            var entry = Services.PublicAccessService.GetEntryForContent(content);
+            if (entry == null) return false;
+            return entry.Rules
+                .Any(x => x.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType
+                    && x.RuleValue == role);
+        }
+
+        private void ProtectPage(bool Simple, int DocumentId, int LoginDocumentId, int ErrorDocumentId)
+        {
+            var doc = new Document(DocumentId);
+            var loginContent = Services.ContentService.GetById(LoginDocumentId);
+            if (loginContent == null) throw new NullReferenceException("No content item found with id " + LoginDocumentId);
+            var noAccessContent = Services.ContentService.GetById(ErrorDocumentId);
+            if (noAccessContent == null) throw new NullReferenceException("No content item found with id " + ErrorDocumentId);
+
+            var entry = Services.PublicAccessService.GetEntryForContent(doc.ContentEntity.Id.ToString());
+            if (entry != null)
+            {
+                if (Simple)
+                {
+                    // if using simple mode, make sure that all existing groups are removed
+                    entry.ClearRules();
+                }
+
+                //ensure the correct ids are applied
+                entry.LoginNodeId = loginContent.Id;
+                entry.NoAccessNodeId = noAccessContent.Id;
+            }
+            else
+            {
+                entry = new PublicAccessEntry(doc.ContentEntity,
+                    Services.ContentService.GetById(LoginDocumentId),
+                    Services.ContentService.GetById(ErrorDocumentId),
+                    new List<PublicAccessRule>());
+            }
+            Services.PublicAccessService.Save(entry);
+        }
+
+        private void AddMembershipRoleToDocument(int documentId, string role)
+        {
+            //event
+            var doc = new Document(documentId);
+
+            var entry = Services.PublicAccessService.AddRule(
+                doc.ContentEntity,
+                Constants.Conventions.PublicAccess.MemberRoleRuleType,
+                role);
+
+            if (entry.Success == false && entry.Result.Entity == null)
+            {
+                throw new Exception("Document is not protected!");
+            }            
+        }
+
+        private void AddMembershipUserToDocument(int documentId, string membershipUserName)
+        {
+            //event
+            var doc = new Document(documentId);
+            var entry = Services.PublicAccessService.AddRule(
+                doc.ContentEntity,
+                Constants.Conventions.PublicAccess.MemberUsernameRuleType,
+                membershipUserName);
+
+            if (entry.Success == false && entry.Result.Entity == null)
+            {
+                throw new Exception("Document is not protected!");
+            }
+        }
+
+        private void RemoveMembershipRoleFromDocument(int documentId, string role)
+        {
+            var doc = new Document(documentId);
+            Services.PublicAccessService.RemoveRule(
+                doc.ContentEntity,
+                Constants.Conventions.PublicAccess.MemberRoleRuleType,
+                role);
+        }
+
+        private void RemoveProtection(int documentId)
+        {
+            var doc = new Document(documentId);
+            var entry = Services.PublicAccessService.GetEntryForContent(doc.ContentEntity);
+            if (entry != null)
+            {
+                Services.PublicAccessService.Delete(entry);
+            }            
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
             // Check for editing
@@ -79,14 +226,15 @@ namespace umbraco.presentation.umbraco.dialogs
 
             if (IsPostBack == false)
             {
-                if (Access.IsProtected(documentId) && Access.GetProtectionType(documentId) != ProtectionType.NotProtected)
+                if (Services.PublicAccessService.IsProtected(documentId.ToString()) 
+                    && GetProtectionType(documentId) != ProtectionType.NotProtected)
                 {
                     bt_buttonRemoveProtection.Visible = true;
                     bt_buttonRemoveProtection.Attributes.Add("onClick", "return confirm('" + ui.Text("areyousure") + "')");
 
                     // Get login and error pages
-                    int errorPage = Access.GetErrorPage(documentObject.Path);
-                    int loginPage = Access.GetLoginPage(documentObject.Path);
+                    int errorPage = GetErrorPage(documentObject.Path);
+                    int loginPage = GetLoginPage(documentObject.Path);
                     try
                     {
                         var loginPageObj = new Document(loginPage);
@@ -102,9 +250,9 @@ namespace umbraco.presentation.umbraco.dialogs
                         LogHelper.Error<protectPage>("An error occurred initializing the protect page editor", ex);
                     }
 
-                    if (Access.GetProtectionType(documentId) == ProtectionType.Simple)
+                    if (GetProtectionType(documentId) == ProtectionType.Simple)
                     {
-                        MembershipUser m = Access.GetAccessingMembershipUser(documentId);
+                        MembershipUser m = GetAccessingMembershipUser(documentId);
                         if (m != null)
                         {
                             pane_simple.Visible = true;
@@ -117,7 +265,7 @@ namespace umbraco.presentation.umbraco.dialogs
                         }
 
                     }
-                    else if (Access.GetProtectionType(documentId) == ProtectionType.Advanced)
+                    else if (GetProtectionType(documentId) == ProtectionType.Advanced)
                     {
                         pane_simple.Visible = false;
                         pane_advanced.Visible = true;
@@ -142,7 +290,7 @@ namespace umbraco.presentation.umbraco.dialogs
                     ListItem li = new ListItem(role, role);
                     if (IsPostBack == false)
                     {
-                        if (Access.IsProtectedByMembershipRole(int.Parse(Request.GetItemAsString("nodeid")), role))
+                        if (IsProtectedByMembershipRole(int.Parse(Request.GetItemAsString("nodeid")), role))
                             selectedGroups += role + ",";
                     }
                     _memberGroups.Items.Add(li);
@@ -243,19 +391,19 @@ namespace umbraco.presentation.umbraco.dialogs
                         Roles.AddUserToRole(member.UserName, simpleRoleName);
                     }
 
-                    Access.ProtectPage(true, pageId, int.Parse(loginPagePicker.Value), int.Parse(errorPagePicker.Value));
-                    Access.AddMembershipRoleToDocument(pageId, simpleRoleName);
-                    Access.AddMembershipUserToDocument(pageId, member.UserName);
+                    ProtectPage(true, pageId, int.Parse(loginPagePicker.Value), int.Parse(errorPagePicker.Value));
+                    AddMembershipRoleToDocument(pageId, simpleRoleName);
+                    AddMembershipUserToDocument(pageId, member.UserName);
                 }
                 else if (e.CommandName == "advanced")
                 {
-                    Access.ProtectPage(false, pageId, int.Parse(loginPagePicker.Value), int.Parse(errorPagePicker.Value));
+                    ProtectPage(false, pageId, int.Parse(loginPagePicker.Value), int.Parse(errorPagePicker.Value));
 
                     foreach (ListItem li in _memberGroups.Items)
                         if (("," + _memberGroups.Value + ",").IndexOf("," + li.Value + ",", StringComparison.Ordinal) > -1)
-                            Access.AddMembershipRoleToDocument(pageId, li.Value);
+                            AddMembershipRoleToDocument(pageId, li.Value);
                         else
-                            Access.RemoveMembershipRoleFromDocument(pageId, li.Value);
+                            RemoveMembershipRoleFromDocument(pageId, li.Value);
                 }
 
                 feedback.Text = ui.Text("publicAccess", "paIsProtected", new cms.businesslogic.CMSNode(pageId).Text) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
@@ -263,7 +411,7 @@ namespace umbraco.presentation.umbraco.dialogs
                 p_buttons.Visible = false;
                 pane_advanced.Visible = false;
                 pane_simple.Visible = false;
-                var content = ApplicationContext.Current.Services.ContentService.GetById(pageId);
+                var content = Services.ContentService.GetById(pageId);
                 //reloads the current node in the tree
                 ClientTools.SyncTree(content.Path, true);
                 //reloads the current node's children in the tree
@@ -280,11 +428,11 @@ namespace umbraco.presentation.umbraco.dialogs
             pane_advanced.Visible = false;
             pane_simple.Visible = false;
 
-            Access.RemoveProtection(pageId);
+            RemoveProtection(pageId);
 
             feedback.Text = ui.Text("publicAccess", "paIsRemoved", new cms.businesslogic.CMSNode(pageId).Text) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
 
-            var content = ApplicationContext.Current.Services.ContentService.GetById(pageId);
+            var content = Services.ContentService.GetById(pageId);
             //reloads the current node in the tree
             ClientTools.SyncTree(content.Path, true);
             //reloads the current node's children in the tree

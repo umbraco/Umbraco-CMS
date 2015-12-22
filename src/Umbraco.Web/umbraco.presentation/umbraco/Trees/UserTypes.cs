@@ -11,6 +11,7 @@ using umbraco.BusinessLogic;
 using System.Collections.Generic;
 using umbraco.businesslogic;
 using Umbraco.Core;
+using Umbraco.Web.Trees;
 
 namespace umbraco.cms.presentation.Trees
 {

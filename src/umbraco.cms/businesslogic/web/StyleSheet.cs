@@ -1,18 +1,10 @@
 using System;
 using System.Collections;
-using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Xml;
-using umbraco.BusinessLogic.console;
-using Umbraco.Core.Cache;
-using Umbraco.Core.IO;
-using umbraco.cms.businesslogic.cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
-using umbraco.DataLayer;
 using Umbraco.Core;
-using File = System.IO.File;
 
 namespace umbraco.cms.businesslogic.web
 {
@@ -226,22 +218,22 @@ namespace umbraco.cms.businesslogic.web
 
         public static StyleSheet Import(XmlNode n, umbraco.BusinessLogic.User u)
         {
-            string stylesheetName = xmlHelper.GetNodeValue(n.SelectSingleNode("Name"));
+            string stylesheetName = XmlHelper.GetNodeValue(n.SelectSingleNode("Name"));
             StyleSheet s = GetByName(stylesheetName);
             if (s == null)
             {
                 s = StyleSheet.MakeNew(
                     u,
                     stylesheetName,
-                    xmlHelper.GetNodeValue(n.SelectSingleNode("FileName")),
-                    xmlHelper.GetNodeValue(n.SelectSingleNode("Content")));
+                    XmlHelper.GetNodeValue(n.SelectSingleNode("FileName")),
+                    XmlHelper.GetNodeValue(n.SelectSingleNode("Content")));
             }
 
             foreach (XmlNode prop in n.SelectNodes("Properties/Property"))
             {
-                string alias = xmlHelper.GetNodeValue(prop.SelectSingleNode("Alias"));
+                string alias = XmlHelper.GetNodeValue(prop.SelectSingleNode("Alias"));
                 var sp = s.Properties.SingleOrDefault(p => p != null && p.Alias == alias);
-                string name = xmlHelper.GetNodeValue(prop.SelectSingleNode("Name"));
+                string name = XmlHelper.GetNodeValue(prop.SelectSingleNode("Name"));
                 if (sp == null)
                 {
                     sp = StylesheetProperty.MakeNew(
@@ -254,7 +246,7 @@ namespace umbraco.cms.businesslogic.web
                     sp.Text = name;
                 }
                 sp.Alias = alias;
-                sp.value = xmlHelper.GetNodeValue(prop.SelectSingleNode("Value"));
+                sp.value = XmlHelper.GetNodeValue(prop.SelectSingleNode("Value"));
             }
             s.saveCssToFile();
 

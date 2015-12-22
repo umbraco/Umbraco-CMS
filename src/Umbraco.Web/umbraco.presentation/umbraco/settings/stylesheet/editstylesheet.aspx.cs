@@ -25,7 +25,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
 
         public editstylesheet()
         {
-            CurrentApp = DefaultApps.settings.ToString();
+            CurrentApp = Constants.Applications.Settings.ToString();
         }
 
         protected override void OnInit(EventArgs e)

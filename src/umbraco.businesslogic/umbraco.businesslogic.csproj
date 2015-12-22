@@ -190,10 +190,8 @@
     <Compile Include="ApplicationRegistrar.cs" />
     <Compile Include="ApplicationTree.cs" />
     <Compile Include="ApplicationTreeRegistrar.cs" />
-    <Compile Include="DefaultApps.cs" />
     <Compile Include="LogTypes.cs" />
     <Compile Include="PluginManagerExtensions.cs" />
-    <Compile Include="TreeAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -204,13 +202,7 @@
     <Compile Include="BasePages\UmbracoEnsuredPage.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="CacheHelper.cs" />
-    <Compile Include="Exceptions\FileSecurityException.cs" />
-    <Compile Include="Exceptions\UserAuthorizationException.cs" />
     <Compile Include="GlobalSettings.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="IconI.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Interfaces\ILog.cs" />
@@ -230,13 +222,9 @@
     <Compile Include="Utils\EncodedStringWriter.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Utils\fileHelper.cs" />
     <Compile Include="Utils\JSONSerializer.cs" />
     <Compile Include="Utils\SerializableData.cs" />
     <Compile Include="Utils\Singleton.cs" />
-    <Compile Include="xmlHelper.cs">
-      <SubType>Code</SubType>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

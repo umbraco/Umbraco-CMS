@@ -4,6 +4,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using Umbraco.Core.IO;
+using Umbraco.Web.UI.JavaScript;
 
 namespace umbraco.presentation.masterpages
 {
@@ -56,7 +57,7 @@ namespace umbraco.presentation.masterpages
 		/// Auto-generated field.
 		/// To modify move field declaration from designer file to code-behind file.
 		/// </remarks>
-		protected global::umbraco.uicontrols.UmbracoClientDependencyLoader ClientLoader;
+		protected UmbracoClientDependencyLoader ClientLoader;
 
 		/// <summary>
 		/// CssInclude1 control.

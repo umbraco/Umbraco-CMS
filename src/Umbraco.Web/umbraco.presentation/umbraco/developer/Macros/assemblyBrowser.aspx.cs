@@ -29,7 +29,7 @@ namespace umbraco.developer
     {
         public assemblyBrowser()
         {
-            CurrentApp = DefaultApps.developer.ToString();
+            CurrentApp = Constants.Applications.Developer.ToString();
         }
         protected void Page_Load(object sender, EventArgs e)
         {

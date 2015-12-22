@@ -3,12 +3,11 @@ using umbraco.uicontrols;
 
 namespace umbraco.cms.presentation.Trees
 {
-
-	/// <summary>
-	/// A utility class to aid in creating the URL for returning XML for a tree structure and
-	/// for reading the parameters from the URL when a request is made.
-	/// </summary>
-	public class TreeService : TreeUrlGenerator, ITreeService
+    /// <summary>
+    /// A utility class to aid in creating the URL for returning XML for a tree structure and
+    /// for reading the parameters from the URL when a request is made.
+    /// </summary>
+    public class TreeService : TreeUrlGenerator, ITreeService
 	{
 
 		/// <summary>

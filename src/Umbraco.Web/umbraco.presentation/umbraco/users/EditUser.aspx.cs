@@ -34,7 +34,7 @@ namespace umbraco.cms.presentation.user
     {
         public EditUser()
         {
-            CurrentApp = DefaultApps.users.ToString();
+            CurrentApp = Constants.Applications.Users.ToString();
         }
         protected HtmlTable macroProperties;
         protected TextBox uname = new TextBox();

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
+using System.Security;
 using System.Web;
 using System.Web.Security;
 using AutoMapper;
@@ -11,8 +11,6 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
-using umbraco.businesslogic.Exceptions;
-using Umbraco.Web.Models.ContentEditing;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using User = umbraco.BusinessLogic.User;
 
@@ -398,7 +396,7 @@ namespace Umbraco.Web.Security
             // check for secure connection
             if (GlobalSettings.UseSSL && _httpContext.Request.IsSecureConnection == false)
             {
-                if (throwExceptions) throw new UserAuthorizationException("This installation requires a secure connection (via SSL). Please update the URL to include https://");
+                if (throwExceptions) throw new SecurityException("This installation requires a secure connection (via SSL). Please update the URL to include https://");
                 return ValidateRequestAttempt.FailedNoSsl;
             }
             return ValidateCurrentUser(throwExceptions);

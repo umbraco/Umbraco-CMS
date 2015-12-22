@@ -12,6 +12,7 @@ using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.task;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.relation;
+using Umbraco.Core;
 using Umbraco.Web;
 
 namespace umbraco.presentation.translation
@@ -23,7 +24,7 @@ namespace umbraco.presentation.translation
 
         public preview()
         {
-            CurrentApp = DefaultApps.translation.ToString();
+            CurrentApp = Constants.Applications.Translation.ToString();
         }
 
         protected void Page_Load(object sender, EventArgs e)

@@ -7,6 +7,7 @@ using umbraco.DataLayer;
 using umbraco.BasePages;
 using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.member;
+using Umbraco.Core;
 
 namespace umbraco
 {
@@ -39,7 +40,7 @@ namespace umbraco
 
         public override string AssignedApp
         {
-            get { return DefaultApps.member.ToString(); }
+            get { return Constants.Applications.Members.ToString(); }
         }
     }
 }

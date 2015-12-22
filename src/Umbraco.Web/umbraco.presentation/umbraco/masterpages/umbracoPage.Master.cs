@@ -11,6 +11,7 @@ using System.Web.UI.WebControls;
 using StackExchange.Profiling;
 using Umbraco.Core.Profiling;
 using Umbraco.Web;
+using Umbraco.Web.UI.JavaScript;
 using mp = umbraco.presentation.masterpages;
 namespace umbraco.presentation.umbraco.masterpages
 {
@@ -79,7 +80,7 @@ namespace umbraco.presentation.masterpages
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.UmbracoClientDependencyLoader ClientLoader;
+        protected UmbracoClientDependencyLoader ClientLoader;
 
         /// <summary>
         /// CssInclude1 control.

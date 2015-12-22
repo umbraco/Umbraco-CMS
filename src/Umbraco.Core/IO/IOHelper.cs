@@ -7,6 +7,7 @@ using System.Configuration;
 using System.Web;
 using System.Text.RegularExpressions;
 using System.Web.Hosting;
+using ICSharpCode.SharpZipLib.Zip;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 
@@ -27,7 +28,52 @@ namespace Umbraco.Core.IO
             }
         }
 
-        //helper to try and match the old path to a new virtual one
+	    internal static void UnZip(string zipFilePath, string unPackDirectory, bool deleteZipFile)
+	    {
+	        // Unzip
+	        string tempDir = unPackDirectory;
+	        Directory.CreateDirectory(tempDir);
+
+	        using (ZipInputStream s = new ZipInputStream(File.OpenRead(zipFilePath)))
+	        {
+                ZipEntry theEntry;
+                while ((theEntry = s.GetNextEntry()) != null)
+                {
+                    string directoryName = Path.GetDirectoryName(theEntry.Name);
+                    string fileName = Path.GetFileName(theEntry.Name);
+
+                    if (fileName != String.Empty)
+                    {
+                        FileStream streamWriter = File.Create(tempDir + Path.DirectorySeparatorChar + fileName);
+
+                        int size = 2048;
+                        byte[] data = new byte[2048];
+                        while (true)
+                        {
+                            size = s.Read(data, 0, data.Length);
+                            if (size > 0)
+                            {
+                                streamWriter.Write(data, 0, size);
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+
+                        streamWriter.Close();
+
+                    }
+                }
+
+                // Clean up
+                s.Close();
+                if (deleteZipFile)
+                    File.Delete(zipFilePath);
+            }
+	    }
+
+	    //helper to try and match the old path to a new virtual one
         public static string FindFile(string virtualPath)
         {
             string retval = virtualPath;

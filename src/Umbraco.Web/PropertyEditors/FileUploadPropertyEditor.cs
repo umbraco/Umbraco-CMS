@@ -8,7 +8,6 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using umbraco.cms.businesslogic.Files;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;

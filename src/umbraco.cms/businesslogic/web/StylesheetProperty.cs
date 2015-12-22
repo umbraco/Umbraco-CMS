@@ -1,10 +1,6 @@
 using System;
 using System.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
-using umbraco.cms.businesslogic.cache;
-using Umbraco.Core.Models.Rdbms;
-using umbraco.DataLayer;
 
 namespace umbraco.cms.businesslogic.web
 {

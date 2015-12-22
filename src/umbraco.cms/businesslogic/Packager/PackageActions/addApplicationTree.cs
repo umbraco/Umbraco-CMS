@@ -77,7 +77,7 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions
         {
 
             string sample = "<Action runat=\"install\" undo=\"true/false\" alias=\"addApplicationTree\" silent=\"true/false\"  initialize=\"true/false\" sortOrder=\"1\" applicationAlias=\"appAlias\" treeAlias=\"myTree\" treeTitle=\"My Tree\" iconOpened=\"folder_o.gif\" iconClosed=\"folder.gif\" assemblyName=\"umbraco\" treeHandlerType=\"treeClass\" action=\"alert('you clicked my tree')\"/>";
-            return helper.parseStringToXmlNode(sample);
+            return PackageHelper.ParseStringToXmlNode(sample);
         }
     }
 }

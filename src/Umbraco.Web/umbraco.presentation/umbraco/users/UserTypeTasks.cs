@@ -10,6 +10,7 @@ using System.Web.UI.HtmlControls;
 using Umbraco.Web.UI;
 using umbraco.interfaces;
 using umbraco.BusinessLogic;
+using Umbraco.Core;
 
 namespace umbraco.cms.presentation.user
 {
@@ -46,7 +47,7 @@ namespace umbraco.cms.presentation.user
 
         public override string AssignedApp
         {
-            get { return DefaultApps.users.ToString(); }
+            get { return Constants.Applications.Users.ToString(); }
         }
     }
 }

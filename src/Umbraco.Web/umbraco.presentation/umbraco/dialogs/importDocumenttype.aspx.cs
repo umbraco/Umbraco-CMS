@@ -17,7 +17,7 @@ namespace umbraco.presentation.umbraco.dialogs
 	    public importDocumentType()
 	    {
 
-            CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
+            CurrentApp = Constants.Applications.Settings.ToString();
 
 	    }
 		protected Literal FeedBackMessage;

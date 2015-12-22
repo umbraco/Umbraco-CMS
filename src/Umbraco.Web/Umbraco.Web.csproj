@@ -349,6 +349,8 @@
     <Compile Include="Trees\MemberTypeTreeController.cs" />
     <Compile Include="Security\OwinExtensions.cs" />
     <Compile Include="Security\WebAuthExtensions.cs" />
+    <Compile Include="UI\JavaScript\UmbracoClientDependencyLoader.cs" />
+    <Compile Include="umbraco.presentation\umbraco\Trees\TreeUrlGenerator.cs" />
     <Compile Include="UmbracoDefaultOwinStartup.cs" />
     <Compile Include="IUmbracoContextAccessor.cs" />
     <Compile Include="Models\ContentEditing\Relation.cs" />

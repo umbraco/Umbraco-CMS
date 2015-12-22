@@ -30,7 +30,7 @@ namespace umbraco.presentation.developer.packages
     {
         public installedPackage()
         {
-            CurrentApp = DefaultApps.developer.ToString();
+            CurrentApp = Constants.Applications.Developer.ToString();
         }
 
         private cms.businesslogic.packager.InstalledPackage _pack;

@@ -102,11 +102,8 @@
     </Compile>
     <Compile Include="TreePicker\SimpleContentPicker.cs" />
     <Compile Include="TreePicker\SimpleMediaPicker.cs" />
-    <Compile Include="TreeUrlGenerator.cs" />
-    <Compile Include="UmbracoClientDependencyLoader.cs" />
     <Compile Include="CodeArea.cs" />
     <Compile Include="feedback.cs" />
-    <Compile Include="helper.cs" />
     <Compile Include="MenuButtonI.cs" />
     <Compile Include="MenuIcon.cs" />
     <Compile Include="MenuIconClass.cs" />

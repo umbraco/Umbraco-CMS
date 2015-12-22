@@ -11,6 +11,7 @@ using umbraco.interfaces;
 using umbraco.cms.presentation.developer.RelationTypes.TreeMenu;
 using umbraco.businesslogic;
 using Umbraco.Core;
+using Umbraco.Web.Trees;
 
 namespace umbraco
 {

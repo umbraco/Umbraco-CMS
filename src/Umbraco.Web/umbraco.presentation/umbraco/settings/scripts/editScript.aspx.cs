@@ -23,7 +23,7 @@ namespace umbraco.cms.presentation.settings.scripts
     {
         public editScript()
         {
-            CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
+            CurrentApp = Constants.Applications.Settings.ToString();
 
         }
         protected System.Web.UI.HtmlControls.HtmlForm Form1;

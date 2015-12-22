@@ -1,12 +1,9 @@
 using System;
-using System.Linq;
+using System.Security;
 using System.Web;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using Umbraco.Web.Security;
-using umbraco;
 using umbraco.BusinessLogic;
-using umbraco.businesslogic.Exceptions;
 using Umbraco.Core;
 using Umbraco.Core.Security;
 
@@ -63,7 +60,7 @@ namespace Umbraco.Web.UI.Pages
 
                 if (!Security.ValidateUserApp(CurrentApp))
                 {
-                    var ex = new UserAuthorizationException(String.Format("The current user doesn't have access to the section/app '{0}'", CurrentApp));
+                    var ex = new SecurityException(String.Format("The current user doesn't have access to the section/app '{0}'", CurrentApp));
                     LogHelper.Error<UmbracoEnsuredPage>(String.Format("Tried to access '{0}'", CurrentApp), ex);
                     throw ex;
                 }

@@ -1,19 +1,11 @@
 using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Web;
-using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
-
 using System.Reflection;
+using System.Security;
 using Umbraco.Core.IO;
-using umbraco.BusinessLogic;
 using umbraco.DataLayer;
-using umbraco.businesslogic.Exceptions;
+using Umbraco.Core;
 using Umbraco.Web;
 
 namespace umbraco.dialogs
@@ -30,8 +22,8 @@ namespace umbraco.dialogs
             base.OnInit(e);
 
             //this could be used for media or content so we need to at least validate that the user has access to one or the other
-            if (!ValidateUserApp(DefaultApps.content.ToString()) && !ValidateUserApp(DefaultApps.media.ToString()))
-                throw new UserAuthorizationException("The current user doesn't have access to the section/app");
+            if (!ValidateUserApp(Constants.Applications.Content.ToString()) && !ValidateUserApp(Constants.Applications.Media.ToString()))
+                throw new SecurityException("The current user doesn't have access to the section/app");
         }
 
 		protected void Page_Load(object sender, EventArgs e)
