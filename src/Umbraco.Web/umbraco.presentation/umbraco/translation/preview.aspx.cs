@@ -12,6 +12,7 @@ using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.task;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.relation;
+using Umbraco.Web;
 
 namespace umbraco.presentation.translation
 {
@@ -28,7 +29,7 @@ namespace umbraco.presentation.translation
         protected void Page_Load(object sender, EventArgs e)
         {
             
-            var taskId = int.Parse(helper.Request("id"));
+            var taskId = int.Parse(Request.GetItemAsString("id"));
 
             var t = new Task(taskId);
             var translated = new Document(t.Node.Id);

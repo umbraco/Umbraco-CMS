@@ -104,8 +104,8 @@ namespace umbraco.presentation.webservices
             if (AuthorizeRequest() == false) return;
             if (SortOrder.Trim().Length <= 0) return;
 
-            var isContent = helper.Request("app") == "content" | helper.Request("app") == "";
-            var isMedia = helper.Request("app") == "media";
+            var isContent = Context.Request.GetItemAsString("app") == "content" | Context.Request.GetItemAsString("app") == "";
+            var isMedia = Context.Request.GetItemAsString("app") == "media";
 
             //ensure user is authorized for the app requested
             if (isContent && AuthorizeRequest(DefaultApps.content.ToString()) == false) return;

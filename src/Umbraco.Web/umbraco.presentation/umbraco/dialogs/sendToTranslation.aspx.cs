@@ -13,6 +13,7 @@ using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic;
 using umbraco.BusinessLogic;
 using umbraco.BasePages;
+using Umbraco.Web;
 
 namespace umbraco.presentation.dialogs
 {
@@ -27,7 +28,7 @@ namespace umbraco.presentation.dialogs
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            _currentPage = new CMSNode(int.Parse(helper.Request("id")));
+            _currentPage = new CMSNode(int.Parse(Request.GetItemAsString("id")));
 
             pp_translator.Text = ui.Text("translation","translator", this.getUser());
             pp_language.Text = ui.Text("translation", "translateTo", this.getUser());

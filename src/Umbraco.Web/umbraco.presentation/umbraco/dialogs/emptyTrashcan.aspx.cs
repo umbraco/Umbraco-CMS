@@ -26,7 +26,7 @@ namespace umbraco.presentation.dialogs
         {
             base.OnInit(e);
 
-            var recycleBinType = helper.Request("type");
+            var recycleBinType = Request.GetItemAsString("type");
             if (ValidateUserApp(recycleBinType) == false)
             {
                 throw new InvalidOperationException("The user does not have access to the requested app");

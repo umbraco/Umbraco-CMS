@@ -11,6 +11,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
+using Umbraco.Web;
 using Umbraco.Web.Trees;
 
 namespace umbraco.settings
@@ -32,7 +33,7 @@ namespace umbraco.settings
 	
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
-			currentLanguage = new cms.businesslogic.language.Language(int.Parse(helper.Request("id")));
+			currentLanguage = new cms.businesslogic.language.Language(int.Parse(Request.GetItemAsString("id")));
            
 
 			// Put user code to initialize the page here
@@ -44,7 +45,7 @@ namespace umbraco.settings
 
 				ClientTools
 					.SetActiveTreeType(Constants.Trees.Languages)
-					.SyncTree(helper.Request("id"), false);
+					.SyncTree(Request.GetItemAsString("id"), false);
 			}
 			
 		}

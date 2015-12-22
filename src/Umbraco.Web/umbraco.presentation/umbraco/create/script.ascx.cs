@@ -15,6 +15,7 @@ using Umbraco.Web.UI;
 using umbraco.cms.helpers;
 using umbraco.BasePages;
 using Umbraco.Core.IO;
+using Umbraco.Web;
 
 namespace umbraco.presentation.umbraco.create
 {
@@ -45,7 +46,7 @@ namespace umbraco.presentation.umbraco.create
                 string returnUrl = LegacyDialogHandler.Create(
                     new HttpContextWrapper(Context),
                     BasePage.Current.getUser(),
-					helper.Request("nodeType"),
+                    Request.GetItemAsString("nodeType"),
 					createFolder,
                     rename.Text + '\u00A4' + scriptType.SelectedValue);
 

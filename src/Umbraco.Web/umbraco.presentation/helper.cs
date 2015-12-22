@@ -16,6 +16,7 @@ namespace umbraco
     /// <summary>
     /// Summary description for helper.
     /// </summary>
+    [Obsolete("This needs to be removed, do not use")]
     public class helper
     {
         public static bool IsNumeric(string Number)
@@ -28,19 +29,6 @@ namespace umbraco
         {
             return umbraco.BasePages.UmbracoEnsuredPage.CurrentUser;
         }
-
-		//[Obsolete("This method has been superceded. Use the extension method for HttpRequest or HttpRequestBase method: GetItemAsString instead.")]
-  //      public static string Request(string text)
-		//{
-		//	if (HttpContext.Current == null)
-		//		return string.Empty;
-
-  //          if (HttpContext.Current.Request[text.ToLower()] != null)
-		//		if (HttpContext.Current.Request[text] != string.Empty)
-		//			return HttpContext.Current.Request[text];
-            
-  //          return String.Empty;
-  //      }
 
         public static String FindAttribute(IDictionary attributes, String key)
         {

@@ -11,6 +11,7 @@ using System.Web.UI.HtmlControls;
 
 using umbraco.cms.businesslogic.web;
 using System.Xml;
+using Umbraco.Web;
 
 namespace umbraco.presentation.dialogs
 {
@@ -26,7 +27,7 @@ namespace umbraco.presentation.dialogs
 	    }
 		private void Page_Load(object sender, System.EventArgs e)
 		{
-			int documentTypeId = int.Parse(helper.Request("nodeID"));
+			int documentTypeId = int.Parse(Request.GetItemAsString("nodeID"));
 			if (documentTypeId > 0) 
 			{
 				cms.businesslogic.web.DocumentType dt = new cms.businesslogic.web.DocumentType(documentTypeId);

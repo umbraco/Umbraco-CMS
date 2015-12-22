@@ -1221,9 +1221,6 @@
     <Content Include="Umbraco\Js\guiFunctions.js" />
     <Content Include="Umbraco\Js\language.aspx" />
     <Content Include="Umbraco\Js\umbracoCheckKeys.js" />
-    <Content Include="Umbraco\macroResultWrapper.aspx">
-      <SubType>Form</SubType>
-    </Content>
     <Content Include="Umbraco\Members\EditMemberGroup.aspx">
       <SubType>Form</SubType>
     </Content>

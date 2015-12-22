@@ -138,7 +138,7 @@ namespace umbraco.presentation.developer.packages
             //if we auth correctly and get a valid key back, we will fetch the file from the repo webservice.
             if (string.IsNullOrEmpty(memberGuid) == false)
             {
-                tempFile.Value = _installer.Import(_repo.fetch(helper.Request("guid"), memberGuid));
+                tempFile.Value = _installer.Import(_repo.fetch(Request.GetItemAsString("guid"), memberGuid));
                 UpdateSettings();
             }
         }
@@ -371,7 +371,7 @@ namespace umbraco.presentation.developer.packages
 
             _installer.LoadConfig(tempFile.Value);
 
-            int pId = _installer.CreateManifest(tempFile.Value, helper.Request("guid"), helper.Request("repoGuid"));
+            int pId = _installer.CreateManifest(tempFile.Value, Request.GetItemAsString("guid"), Request.GetItemAsString("repoGuid"));
 
             //and then copy over the files. This will take some time if it contains .dlls that will reboot the system..
             _installer.InstallFiles(pId, tempFile.Value);

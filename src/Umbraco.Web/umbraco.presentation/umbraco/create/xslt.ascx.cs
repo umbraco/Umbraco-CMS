@@ -11,6 +11,7 @@ using Umbraco.Web.UI;
 using Umbraco.Core.IO;
 using umbraco.cms.helpers;
 using umbraco.BasePages;
+using Umbraco.Web;
 
 namespace umbraco.presentation.create
 {
@@ -57,7 +58,7 @@ namespace umbraco.presentation.create
                 var returnUrl = LegacyDialogHandler.Create(
                     new HttpContextWrapper(Context),
                     BasePage.Current.getUser(),
-                    helper.Request("nodeType"),
+                    Request.GetItemAsString("nodeType"),
                     createMacroVal,
                     xsltName + "|||" + rename.Text);
 

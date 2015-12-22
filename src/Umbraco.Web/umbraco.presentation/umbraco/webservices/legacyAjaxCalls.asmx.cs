@@ -182,7 +182,7 @@ namespace umbraco.presentation.webservices
         {
             AuthorizeRequest(true);
 
-            return Application[helper.Request("key")].ToString();
+            return Application[Context.Request.GetItemAsString("key")].ToString();
         }
 
         [Obsolete("This is no longer used and will be removed in future versions")]

@@ -14,6 +14,7 @@ using umbraco.cms.helpers;
 using umbraco.BasePages;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Security;
+using Umbraco.Web;
 
 namespace umbraco.presentation.umbraco.dialogs
 {
@@ -60,7 +61,7 @@ namespace umbraco.presentation.umbraco.dialogs
         protected void Page_Load(object sender, EventArgs e)
         {
             // Check for editing
-            int documentId = int.Parse(helper.Request("nodeId"));
+            int documentId = int.Parse(Request.GetItemAsString("nodeId"));
             var documentObject = new Document(documentId);
             jsShowWindow.Text = "";
 
@@ -142,7 +143,7 @@ namespace umbraco.presentation.umbraco.dialogs
                     ListItem li = new ListItem(role, role);
                     if (IsPostBack == false)
                     {
-                        if (Access.IsProtectedByMembershipRole(int.Parse(helper.Request("nodeid")), role))
+                        if (Access.IsProtectedByMembershipRole(int.Parse(Request.GetItemAsString("nodeid")), role))
                             selectedGroups += role + ",";
                     }
                     _memberGroups.Items.Add(li);
@@ -182,11 +183,11 @@ namespace umbraco.presentation.umbraco.dialogs
             //reset
             SimpleLoginNameValidator.IsValid = true;
 
-            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+            var provider = Umbraco.Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
 
             if (Page.IsValid)
             {
-                int pageId = int.Parse(helper.Request("nodeId"));
+                int pageId = int.Parse(Request.GetItemAsString("nodeId"));
 
                 if (e.CommandName == "simple")
                 {
@@ -275,7 +276,7 @@ namespace umbraco.presentation.umbraco.dialogs
 
         protected void buttonRemoveProtection_Click(object sender, System.EventArgs e)
         {
-            int pageId = int.Parse(helper.Request("nodeId"));
+            int pageId = int.Parse(Request.GetItemAsString("nodeId"));
             p_buttons.Visible = false;
             pane_advanced.Visible = false;
             pane_simple.Visible = false;

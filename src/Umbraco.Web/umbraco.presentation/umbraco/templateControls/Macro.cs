@@ -7,6 +7,7 @@ using System.Collections;
 using umbraco.cms.businesslogic.macro;
 using System.Web;
 using Umbraco.Core.Models;
+using Umbraco.Web;
 
 namespace umbraco.presentation.templateControls
 {
@@ -163,7 +164,7 @@ namespace umbraco.presentation.templateControls
                     if (int.TryParse(Attributes["Cache"], out cacheDuration))
                         tempMacro.Model.CacheDuration = cacheDuration;
                     else
-                        System.Web.HttpContext.Current.Trace.Warn("Template", "Cache attribute is in incorect format (should be an integer).");
+                        Context.Trace.Warn("Template", "Cache attribute is in incorect format (should be an integer).");
                 }
                 var c = tempMacro.RenderMacro((Hashtable)Context.Items["pageElements"], pageId);
                 if (c != null)
@@ -173,7 +174,7 @@ namespace umbraco.presentation.templateControls
                     Controls.Add(c);
                 }
                 else
-                    System.Web.HttpContext.Current.Trace.Warn("Template", "Result of inline macro scripting is null");
+                    Context.Trace.Warn("Template", "Result of inline macro scripting is null");
             
             } else {
                 var tempMacro = macro.GetMacro(Alias);
@@ -183,9 +184,9 @@ namespace umbraco.presentation.templateControls
                         if (c != null)
                             Controls.Add(c);
                         else
-                            System.Web.HttpContext.Current.Trace.Warn("Template", "Result of macro " + tempMacro.Name + " is null");
+                            Context.Trace.Warn("Template", "Result of macro " + tempMacro.Name + " is null");
                     } catch (Exception ee) {
-                        System.Web.HttpContext.Current.Trace.Warn("Template", "Error adding macro " + tempMacro.Name, ee);
+                        Context.Trace.Warn("Template", "Error adding macro " + tempMacro.Name, ee);
                         throw;
                     }
                 }
@@ -201,7 +202,7 @@ namespace umbraco.presentation.templateControls
 			// Create child controls when told to - do it here anyway as it has to be done
             EnsureChildControls();
 
-            bool isDebug = GlobalSettings.DebugMode && (helper.Request("umbdebugshowtrace") != "" || helper.Request("umbdebug") != "");
+            bool isDebug = GlobalSettings.DebugMode && (Context.Request.GetItemAsString("umbdebugshowtrace") != "" || Context.Request.GetItemAsString("umbdebug") != "");
             if (isDebug)
             {
                 writer.Write("<div title=\"Macro Tag: '{0}'\" style=\"border: 1px solid #009;\">", Alias);

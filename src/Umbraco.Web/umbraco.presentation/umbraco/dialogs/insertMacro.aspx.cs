@@ -14,6 +14,7 @@ using Umbraco.Core.IO;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.businesslogic.Exceptions;
+using Umbraco.Web;
 
 namespace umbraco.dialogs
 {
@@ -42,10 +43,10 @@ namespace umbraco.dialogs
 			{
 				// Put user code to initialize the page here
 				cms.businesslogic.macro.Macro m;
-				if (helper.Request("macroID") != "")
-					m = new cms.businesslogic.macro.Macro(int.Parse(helper.Request("macroID")));
+				if (Request.GetItemAsString("macroID") != "")
+					m = new cms.businesslogic.macro.Macro(int.Parse(Request.GetItemAsString("macroID")));
 				else
-					m = cms.businesslogic.macro.Macro.GetByAlias(helper.Request("macroAlias"));
+					m = cms.businesslogic.macro.Macro.GetByAlias(Request.GetItemAsString("macroAlias"));
 
 			    foreach (var mp in m.Properties) {
 		
@@ -99,7 +100,7 @@ namespace umbraco.dialogs
 			else 
 			{
 				IRecordsReader macroRenderings;
-				if (helper.Request("editor") != "")
+				if (Request.GetItemAsString("editor") != "")
 					macroRenderings = SqlHelper.ExecuteReader("select macroAlias, macroName from cmsMacro where macroUseInEditor = 1 order by macroName");
 				else
 					macroRenderings = SqlHelper.ExecuteReader("select macroAlias, macroName from cmsMacro order by macroName");

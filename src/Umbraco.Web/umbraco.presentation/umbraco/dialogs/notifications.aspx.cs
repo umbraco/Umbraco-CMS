@@ -6,6 +6,7 @@ using System.Web.UI.WebControls;
 using umbraco.BasePages;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.workflow;
+using Umbraco.Web;
 
 namespace umbraco.dialogs
 {
@@ -39,7 +40,7 @@ namespace umbraco.dialogs
             InitializeComponent();
             base.OnInit(e);
 
-            node = new cms.businesslogic.CMSNode(int.Parse(helper.Request("id")));
+            node = new cms.businesslogic.CMSNode(int.Parse(Request.GetItemAsString("id")));
 
             ArrayList actionList = BusinessLogic.Actions.Action.GetAll();
             

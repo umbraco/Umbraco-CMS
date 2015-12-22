@@ -13,6 +13,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Persistence.SqlSyntax;
 using umbraco.DataLayer;
+using Umbraco.Web;
 
 namespace umbraco.dialogs
 {
@@ -51,7 +52,7 @@ namespace umbraco.dialogs
 
 			// either get page fields or dictionary items
 			string fieldSql = "";
-			if (helper.Request("tagName") == "UMBRACOGETDICTIONARY")
+			if (Request.GetItemAsString("tagName") == "UMBRACOGETDICTIONARY")
 			{
 				fieldSql = "select '#'+[key] as alias from cmsDictionary order by alias";
 				m_IsDictionaryMode = true;

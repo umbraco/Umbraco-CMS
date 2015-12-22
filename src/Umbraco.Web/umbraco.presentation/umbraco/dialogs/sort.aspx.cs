@@ -31,7 +31,7 @@ namespace umbraco.cms.presentation
 
         protected override void OnInit(EventArgs e)
         {
-            CurrentApp = helper.Request("app");
+            CurrentApp = Request.GetItemAsString("app");
 
             base.OnInit(e);
         }
