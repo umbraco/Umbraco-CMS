@@ -4,11 +4,18 @@
       ng-if="entityType !== 'media'">
 
       <umb-content-grid
+         ng-if="items || !items && !options.filter"
          content="items"
          content-properties="options.includeProperties"
          on-click="vm.clickItem"
          on-select="vm.selectItem">
       </umb-content-grid>
+
+      <umb-empty-state
+          ng-if="!items && options.filter"
+          position="center">
+          Sorry, we can not find what you are looking for
+      </umb-empty-state>
 
    </div>
 
@@ -23,7 +30,7 @@
          files-uploaded="vm.onUploadComplete"
          accept="{{vm.acceptedFileTypes}}"
          max-file-size="{{vm.maxFileSize}}"
-         hide-dropzone="{{!vm.activeDrag && items.length > 0 }}"
+         hide-dropzone="{{!vm.activeDrag && items.length > 0 || !items && options.filter }}"
          compact="{{ items.length > 0 }}"
          files-queued="vm.onFilesQueue">
       </umb-file-dropzone>
@@ -53,6 +60,12 @@
          </ul>
       </umb-tooltip>
 
-   <div>
+      <umb-empty-state
+          ng-if="vm.itemsWithoutFolders.length === 0 && options.filter"
+          position="center">
+          Sorry, we can not find what you are looking for
+      </umb-empty-state>
+
+    </div>
 
 </div>

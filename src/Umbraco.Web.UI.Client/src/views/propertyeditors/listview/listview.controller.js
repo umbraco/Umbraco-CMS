@@ -155,22 +155,13 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
     /*Pagination is done by an array of objects, due angularJS's funky way of monitoring state
     with simple values */
 
-    $scope.reloadView = function (id) {
+    $scope.reloadView = function(id) {
 
-      $scope.viewLoaded = false;
+        $scope.viewLoaded = false;
 
-      listViewHelper.clearSelection($scope.listViewResultSet.items, $scope.folders, $scope.selection);
+        listViewHelper.clearSelection($scope.listViewResultSet.items, $scope.folders, $scope.selection);
 
-         if($scope.entityType === 'media') {
-
-             mediaResource.getChildFolders($scope.contentId)
-                .then(function(folders) {
-                   $scope.folders = folders;
-                });
-
-         }
-
-        getListResultsCallback(id, $scope.options).then(function (data) {
+        getListResultsCallback(id, $scope.options).then(function(data) {
 
             $scope.actionInProgress = false;
 
@@ -178,9 +169,21 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
 
             //update all values for display
             if ($scope.listViewResultSet.items) {
-                _.each($scope.listViewResultSet.items, function (e, index) {
+                _.each($scope.listViewResultSet.items, function(e, index) {
                     setPropertyValues(e);
                 });
+            }
+
+            if ($scope.entityType === 'media') {
+
+                mediaResource.getChildFolders($scope.contentId)
+                    .then(function(folders) {
+                        $scope.folders = folders;
+                        $scope.viewLoaded = true;
+                    });
+
+            } else {
+                $scope.viewLoaded = true;
             }
 
             //NOTE: This might occur if we are requesting a higher page number than what is actually available, for example
@@ -193,38 +196,36 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
                 $scope.reloadView(id);
             }
 
-            $scope.viewLoaded = true;
-
         });
     };
 
-    $scope.$watch(function() {
-        return $scope.options.filter;
-    }, _.debounce(function(newVal, oldVal) {
+    var searchListView = _.debounce(function(){
         $scope.$apply(function() {
-            if (newVal !== null && newVal !== undefined && newVal !== oldVal) {
-                $scope.options.pageNumber = 1;
-                $scope.actionInProgress = true;
-                $scope.reloadView($scope.contentId);
-            }
+            makeSearch();
         });
-    }, 1000));
+    }, 500);
 
-    $scope.filterResults = function (ev) {
+    $scope.forceSearch = function (ev) {
         //13: enter
-
         switch (ev.keyCode) {
             case 13:
-                $scope.options.pageNumber = 1;
-                $scope.actionInProgress = true;
-                $scope.reloadView($scope.contentId);
+                makeSearch();
                 break;
         }
     };
 
-    $scope.enterSearch = function ($event) {
-        $($event.target).next().focus();
+    $scope.enterSearch = function() {
+        $scope.viewLoaded = false;
+        searchListView();
     };
+
+    function makeSearch() {
+        if ($scope.options.filter !== null && $scope.options.filter !== undefined) {
+            $scope.options.pageNumber = 1;
+            //$scope.actionInProgress = true;
+            $scope.reloadView($scope.contentId);
+        }
+    }
 
     $scope.isAnythingSelected = function() {
        if ($scope.selection.length === 0) {
