@@ -1,5 +1,5 @@
 //inject umbracos assetsServce and dialog service
-function MarkdownEditorController($scope, assetsService, dialogService, angularHelper, $timeout) {
+function MarkdownEditorController($scope, $element, assetsService, dialogService, angularHelper, $timeout) {
 
     //tell the assets service to load the markdown.editor libs from the markdown editors
     //plugin folder
@@ -40,6 +40,10 @@ function MarkdownEditorController($scope, assetsService, dialogService, angularH
 
                 editor2.hooks.set("onPreviewRefresh", function () {
                     angularHelper.getCurrentForm($scope).$setDirty();
+                    // We must manually update the model as there is no way to hook into the markdown editor events without editing that code.
+                    $scope.$apply(function () {
+                        $scope.model.value = $("textarea", $element).val();
+                    });
                 });
             }, 200);
 
