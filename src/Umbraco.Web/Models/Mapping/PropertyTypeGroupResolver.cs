@@ -155,7 +155,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             var mappedProperties = new List<PropertyTypeDisplay>();
 
-            foreach (var p in properties.Where(x => x.DataTypeDefinitionId != 0) )
+            foreach (var p in properties.Where(x => x.DataTypeDefinitionId != 0).OrderBy(x => x.SortOrder))
             {
                 var propertyEditor = _propertyEditorResolver.Value.GetByAlias(p.PropertyEditorAlias);
                 var preValues = _applicationContext.Services.DataTypeService.GetPreValuesCollectionByDataTypeId(p.DataTypeDefinitionId);
