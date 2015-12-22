@@ -28,16 +28,12 @@ namespace Umbraco.Tests.UI
         }
 
         [TestCase(typeof(UserTypeTasks), DefaultApps.users)]
-        [TestCase(typeof(contentItemTypeTasks), DefaultApps.member)]
         [TestCase(typeof(XsltTasks), DefaultApps.developer)]
         [TestCase(typeof(userTasks), DefaultApps.users)]
         [TestCase(typeof(templateTasks), DefaultApps.settings)]
         [TestCase(typeof(StylesheetTasks), DefaultApps.settings)]
         [TestCase(typeof(stylesheetPropertyTasks), DefaultApps.settings)]
         [TestCase(typeof(ScriptTasks), DefaultApps.settings)]
-        [TestCase(typeof(nodetypeTasks), DefaultApps.settings)]
-        [TestCase(typeof(MemberTypeTasks), DefaultApps.member)]
-        [TestCase(typeof(memberTasks), DefaultApps.member)]
         [TestCase(typeof(MemberGroupTasks), DefaultApps.member)]
         [TestCase(typeof(MediaTypeTasks), DefaultApps.settings)]
         [TestCase(typeof(dictionaryTasks), DefaultApps.settings)]
