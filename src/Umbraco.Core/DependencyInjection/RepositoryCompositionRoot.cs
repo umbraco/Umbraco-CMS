@@ -73,7 +73,8 @@ namespace Umbraco.Core.DependencyInjection
                     typeof (ITaskTypeRepository),
                     typeof (IAuditRepository),
                     typeof (IRelationRepository),
-                    typeof(IRelationTypeRepository),
+                    typeof (IRelationTypeRepository),
+                    typeof (IAuditRepository),
                     typeof (IMigrationEntryRepository)
                 };
                 return disabledCacheRepos.Any(x => TypeHelper.IsTypeAssignableFrom(x, declaringType))

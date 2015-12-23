@@ -190,13 +190,8 @@
     <Compile Include="ApplicationRegistrar.cs" />
     <Compile Include="ApplicationTree.cs" />
     <Compile Include="ApplicationTreeRegistrar.cs" />
-    <Compile Include="LogTypes.cs" />
     <Compile Include="PluginManagerExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Interfaces\ILog.cs" />
-    <Compile Include="Log.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="StateHelper.cs" />

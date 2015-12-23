@@ -16,7 +16,7 @@ namespace Umbraco.Web.Models.ContentEditing
         public DateTime Timestamp { get; set; }
 
         [DataMember(Name = "logType", IsRequired = true)]
-        public AuditLogType LogType { get; set; }
+        public string LogType { get; set; }
 
         [DataMember(Name = "comment", IsRequired = true)]
         public string Comment { get; set; }

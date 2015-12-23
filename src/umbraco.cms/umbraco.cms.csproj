@@ -279,7 +279,6 @@
     <Compile Include="businesslogic\template\Template.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="businesslogic\translation\Translation.cs" />
     <Compile Include="businesslogic\web\Document.cs">
       <SubType>Code</SubType>
     </Compile>

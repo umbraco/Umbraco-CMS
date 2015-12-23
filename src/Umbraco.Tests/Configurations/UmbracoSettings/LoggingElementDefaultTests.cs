@@ -10,27 +10,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         {
             get { return true; }
         }
-
-        [Test]
-        public override void ExternalLoggerConfigured()
-        {
-            Assert.IsTrue(SettingsSection.Logging.ExternalLoggerIsConfigured == false);
-        }
-        [Test]
-        public override void ExternalLogger_Assembly()
-        {
-            Assert.IsTrue(SettingsSection.Logging.ExternalLoggerIsConfigured == false);
-        }
-        [Test]
-        public override void ExternalLogger_LogAuditTrail()
-        {
-            Assert.IsTrue(SettingsSection.Logging.ExternalLoggerIsConfigured == false);
-        }
-        [Test]
-        public override void ExternalLogger_Type()
-        {
-            Assert.IsTrue(SettingsSection.Logging.ExternalLoggerIsConfigured == false);
-        }
+        
         [Test]
         public override void DisabledLogTypes()
         {

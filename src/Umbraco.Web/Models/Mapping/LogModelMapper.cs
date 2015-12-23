@@ -3,6 +3,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Web.Models.ContentEditing;
 using umbraco.BusinessLogic;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -10,8 +11,8 @@ namespace Umbraco.Web.Models.Mapping
     {
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
-            config.CreateMap<LogItem, AuditLog>()
-                  .ForMember(log => log.LogType, expression => expression.MapFrom(item => Enum<AuditLogType>.Parse(item.LogType.ToString())));
+            config.CreateMap<AuditItem, AuditLog>()
+                  .ForMember(log => log.LogType, expression => expression.MapFrom(item => item.AuditType.ToString()));
         }
     }
 }
