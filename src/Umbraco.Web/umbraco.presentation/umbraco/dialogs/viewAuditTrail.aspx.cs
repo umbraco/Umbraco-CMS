@@ -9,13 +9,14 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using Umbraco.Core;
+using Action = Umbraco.Web.LegacyActions.Action;
 
 namespace umbraco.presentation.umbraco.dialogs
 {
 	/// <summary>
 	/// Summary description for viewAuditTrail.
 	/// </summary>
-	public partial class viewAuditTrail : BasePages.UmbracoEnsuredPage
+	public partial class viewAuditTrail : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
 	{
 	    public viewAuditTrail()
 	    {
@@ -38,7 +39,7 @@ namespace umbraco.presentation.umbraco.dialogs
 			action = action.ToLower();
 			if (action == "new")
 				action = "create";
-			ArrayList actions = BusinessLogic.Actions.Action.GetAll();
+			ArrayList actions = Action.GetAll();
 			foreach (interfaces.IAction a in actions)
 			{
 			    return ui.Text(action);

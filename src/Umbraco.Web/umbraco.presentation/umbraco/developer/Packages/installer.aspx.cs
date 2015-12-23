@@ -15,11 +15,11 @@ using System.Xml.XPath;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Web;
-using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
-using BizLogicAction = umbraco.BusinessLogic.Actions.Action;
+using Umbraco.Web.UI.Pages;
+using BizLogicAction = Umbraco.Web.LegacyActions.Action;
 
 namespace umbraco.presentation.developer.packages
 {

@@ -54,10 +54,10 @@ namespace Umbraco.Web.Trees
                     if (string.IsNullOrEmpty(a.Alias) == false && (string.IsNullOrEmpty(a.JsFunctionName) == false || string.IsNullOrEmpty(a.JsSource) == false))
                     {
                         // if the action is using invalid javascript we need to do something about this
-                        if (global::umbraco.BusinessLogic.Actions.Action.ValidateActionJs(a) == false)
+                        if (global::Umbraco.Web.LegacyActions.Action.ValidateActionJs(a) == false)
                         {
                             js.AppendLine("function IActionProxy_" + a.Alias.ToSafeAlias() + "() {");
-                            js.AppendLine(global::umbraco.BusinessLogic.Actions.Action.ConvertLegacyJs(a.JsFunctionName));
+                            js.AppendLine(global::Umbraco.Web.LegacyActions.Action.ConvertLegacyJs(a.JsFunctionName));
                             js.AppendLine("}");
                         }
                     }

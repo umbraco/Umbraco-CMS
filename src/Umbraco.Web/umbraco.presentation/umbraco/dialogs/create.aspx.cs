@@ -1,26 +1,15 @@
 ﻿using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Globalization;
 using System.Linq;
-using System.Web;
-using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
 using System.Xml;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Web;
 using umbraco.cms.businesslogic;
-using umbraco.cms.presentation;
-using umbraco.presentation;
-using umbraco.BusinessLogic.Actions;
-using umbraco.BasePages;
-using umbraco.cms.businesslogic.web;
 using Umbraco.Core;
+using Umbraco.Web.LegacyActions;
+using Umbraco.Web.UI.Pages;
 
 namespace umbraco.dialogs
 {
@@ -99,7 +88,7 @@ namespace umbraco.dialogs
 
         private bool CheckCreatePermissions(int nodeId)
         {
-            return CurrentUser.GetPermissions(new CMSNode(nodeId).Path)
+            return UmbracoContext.UmbracoUser.GetPermissions(new CMSNode(nodeId).Path)
                 .Contains(ActionNew.Instance.Letter.ToString(CultureInfo.InvariantCulture));
         }
 

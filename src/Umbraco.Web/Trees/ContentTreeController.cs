@@ -14,10 +14,10 @@ using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
 using umbraco;
-using umbraco.BusinessLogic.Actions;
 using umbraco.businesslogic;
 using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
+using Umbraco.Web.LegacyActions;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
@@ -131,7 +131,7 @@ namespace Umbraco.Web.Trees
 
                 // we need to get the default permissions as you can't set permissions on the very root node
                 //TODO: Use the new services to get permissions
-                var nodeActions = global::umbraco.BusinessLogic.Actions.Action.FromString(
+                var nodeActions = global::Umbraco.Web.LegacyActions.Action.FromString(
                     UmbracoUser.GetPermissions(Constants.System.Root.ToInvariantString()))
                                         .Select(x => new MenuItem(x));
 

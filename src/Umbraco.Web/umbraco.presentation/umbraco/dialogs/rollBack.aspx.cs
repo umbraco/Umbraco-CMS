@@ -10,7 +10,7 @@
 //using System.Web.UI;
 //using System.Web.UI.WebControls;
 //using System.Web.UI.HtmlControls;
-//using umbraco.BasePages;
+//
 //using umbraco.cms.businesslogic.web;
 //using umbraco.cms.businesslogic.property;
 
@@ -150,9 +150,9 @@
 //        {
 //            if (allVersions.SelectedValue.Trim() != "") {
 //                Document d = new Document(int.Parse(helper.Request("nodeId")));
-//                d.RollBack(new Guid(allVersions.SelectedValue), base.getUser());
+//                d.RollBack(new Guid(allVersions.SelectedValue), Security.CurrentUser);
                 
-//                BusinessLogic.Log.Add(BusinessLogic.LogTypes.RollBack, base.getUser(), d.Id, "Version rolled back to revision '" + allVersions.SelectedValue + "'");
+//                BusinessLogic.Log.Add(BusinessLogic.LogTypes.RollBack, Security.CurrentUser, d.Id, "Version rolled back to revision '" + allVersions.SelectedValue + "'");
                 
 //                Document rollback = new Document(d.Id, new Guid(allVersions.SelectedValue));
 //                feedBackMsg.type = global::umbraco.uicontrols.Feedback.feedbacktype.success;

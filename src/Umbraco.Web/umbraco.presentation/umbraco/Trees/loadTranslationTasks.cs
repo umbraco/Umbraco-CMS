@@ -5,8 +5,8 @@ using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.task;
 
 using umbraco.interfaces;
-using umbraco.BusinessLogic.Actions;
 using umbraco.cms.presentation.Trees;
+using Umbraco.Web.LegacyActions;
 
 namespace umbraco {
     public class loadOpenTasks : BaseTree {

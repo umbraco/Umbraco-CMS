@@ -1,21 +1,14 @@
 ﻿using System;
+using Umbraco.Core.Security;
 using System.Collections.Generic;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.Script.Serialization;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Web.Trees;
 using Umbraco.Web.UI.Controls;
-using umbraco.interfaces;
-using System.Text.RegularExpressions;
-using umbraco.BusinessLogic.Actions;
-using umbraco.businesslogic.Utils;
 using System.Text;
 using umbraco.cms.presentation.Trees;
-using umbraco.BasePages;
-using System.Web.Services;
 using System.Drawing;
 using System.Linq;
 using Umbraco.Core;
@@ -226,10 +219,10 @@ namespace umbraco.controls.Tree
             m_TreeService.App = GetCurrentApp();
 
             // Validate permissions
-            if (!BasePages.BasePage.ValidateUserContextID(BasePages.BasePage.umbracoUserContextID))
+            if (ValidateCurrentUser() == false)
                 return;
-            UmbracoEnsuredPage page = new UmbracoEnsuredPage();
-            if (!page.ValidateUserApp(GetCurrentApp()))
+            
+            if (!Security.ValidateUserApp(GetCurrentApp()))
                 throw new ArgumentException("The current user doesn't have access to this application. Please contact the system administrator.");
 
             //find all tree definitions that have the current application alias that are ACTIVE.
@@ -264,6 +257,28 @@ namespace umbraco.controls.Tree
 
             m_IsInit = true;
         }
+
+        /// <summary>
+        /// Validates the currently logged in user and ensures they are not timed out
+        /// </summary>
+        /// <returns></returns>
+        private bool ValidateCurrentUser()
+        {
+            var identity = Context.GetCurrentIdentity(
+                //DO NOT AUTO-AUTH UNLESS THE CURRENT HANDLER IS WEBFORMS!
+                // Without this check, anything that is using this legacy API, like ui.Text will
+                // automatically log the back office user in even if it is a front-end request (if there is 
+                // a back office user logged in. This can cause problems becaues the identity is changing mid
+                // request. For example: http://issues.umbraco.org/issue/U4-4010
+                HttpContext.Current.CurrentHandler is Page);
+
+            if (identity != null)
+            {
+                return true;
+            }
+            return false;
+        }
+
 
         /// <summary>
         /// This calls the databind method to bind the data binding syntax on the front-end.
@@ -391,9 +406,9 @@ namespace umbraco.controls.Tree
                 //container node labelled with the current application.
                 XmlTree xTree = new XmlTree();
                 XmlTreeNode xNode = XmlTreeNode.CreateRoot(new NullTree(GetCurrentApp()));
-                xNode.Text = ui.Text("sections", GetCurrentApp(), UmbracoEnsuredPage.CurrentUser);
+                xNode.Text = ui.Text("sections", GetCurrentApp(), Security.CurrentUser);
                 xNode.Source = m_TreeService.GetServiceUrl();
-                xNode.Action = "javascript:" + ClientTools.Scripts.OpenDashboard(GetCurrentApp());
+                xNode.Action = "javascript:" + global::Umbraco.Web.UI.Pages.ClientTools.Scripts.OpenDashboard(GetCurrentApp());
                 xNode.NodeType = m_TreeService.App.ToLower();
                 xNode.NodeID = "-1";
                 xNode.Icon = ".sprTreeFolder";

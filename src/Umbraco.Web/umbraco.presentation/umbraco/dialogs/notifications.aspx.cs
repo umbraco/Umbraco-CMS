@@ -3,11 +3,12 @@ using System.Collections;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
-using umbraco.BasePages;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.workflow;
 using Umbraco.Core;
 using Umbraco.Web;
+using Umbraco.Web.UI.Pages;
+using Action = Umbraco.Web.LegacyActions.Action;
 
 namespace umbraco.dialogs
 {
@@ -28,7 +29,7 @@ namespace umbraco.dialogs
         protected void Page_Load(object sender, EventArgs e)
         {
             Button1.Text = ui.Text("update");
-            pane_form.Text = ui.Text("notifications", "editNotifications", node.Text, base.getUser());
+            pane_form.Text = ui.Text("notifications", "editNotifications", node.Text, Security.CurrentUser);
         }
 
         #region Web Form Designer generated code
@@ -43,7 +44,7 @@ namespace umbraco.dialogs
 
             node = new cms.businesslogic.CMSNode(int.Parse(Request.GetItemAsString("id")));
 
-            ArrayList actionList = BusinessLogic.Actions.Action.GetAll();
+            ArrayList actionList = Action.GetAll();
             
             foreach (interfaces.IAction a in actionList)
             {
@@ -53,7 +54,7 @@ namespace umbraco.dialogs
                     CheckBox c = new CheckBox();
                     c.ID = a.Letter.ToString();
                     
-                    if (base.getUser().GetNotifications(node.Path).IndexOf(a.Letter) > -1)
+                    if (UmbracoContext.UmbracoUser.GetNotifications(node.Path).IndexOf(a.Letter) > -1)
                         c.Checked = true;
 
                     uicontrols.PropertyPanel pp = new umbraco.uicontrols.PropertyPanel();
@@ -91,9 +92,9 @@ namespace umbraco.dialogs
                 if (c.Checked)
                     notifications += c.ID;
             }
-            Notification.UpdateNotifications(base.getUser(), node, notifications);
-            getUser().resetNotificationCache();
-            base.getUser().initNotifications();
+            Notification.UpdateNotifications(UmbracoContext.UmbracoUser, node, notifications);
+            UmbracoContext.UmbracoUser.resetNotificationCache();
+            UmbracoContext.UmbracoUser.initNotifications();
 
             var feedback = new umbraco.uicontrols.Feedback();
             feedback.Text = ui.Text("notifications") + " " + ui.Text("ok") + "</p><p><a href='#' class='btn btn-primary' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";

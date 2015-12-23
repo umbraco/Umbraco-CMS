@@ -1,29 +1,24 @@
 ﻿using System;
-using System.Collections;
 using System.Configuration.Provider;
 using System.Globalization;
-using System.IO;
 using System.Web;
 using System.Web.Security;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
-using System.Xml;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Web;
 using Umbraco.Web.Security;
-using umbraco.BasePages;
 using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic.web;
 using umbraco.controls;
 using umbraco.uicontrols;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core.IO;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Services;
-using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;
+using Umbraco.Web.UI;
+using Umbraco.Web.UI.Pages;
 
 namespace umbraco.cms.presentation.user
 {
@@ -78,13 +73,13 @@ namespace umbraco.cms.presentation.user
             u = BusinessLogic.User.GetUser(UID);
 
             //the true admin can only edit the true admin
-            if (u.Id == 0 && CurrentUser.Id != 0)
+            if (u.Id == 0 && Security.CurrentUser.Id != 0)
             {
                 throw new Exception("Only the root user can edit the 'root' user (id:0)");
             }
 
             //only another admin can edit another admin (who is not the true admin)
-            if (u.IsAdmin() && CurrentUser.IsAdmin() == false)
+            if (u.IsAdmin() && UmbracoContext.UmbracoUser.IsAdmin() == false)
             {
                 throw new Exception("Admin users can only be edited by admins");
             }
@@ -92,7 +87,7 @@ namespace umbraco.cms.presentation.user
             // Populate usertype list
             foreach (UserType ut in UserType.getAll)
             {
-                if (CurrentUser.IsAdmin() || ut.Alias != "admin")
+                if (UmbracoContext.UmbracoUser.IsAdmin() || ut.Alias != "admin")
                 {
                     ListItem li = new ListItem(ui.Text("user", ut.Name.ToLower(), UmbracoUser), ut.Id.ToString());
                     if (ut.Id == u.UserType.Id)
@@ -245,13 +240,13 @@ namespace umbraco.cms.presentation.user
 
                 // get the current users applications
                 string currentUserApps = ";";
-                foreach (Application a in CurrentUser.Applications)
-                    currentUserApps += a.alias + ";";
+                foreach (var a in Security.CurrentUser.AllowedSections)
+                    currentUserApps += a + ";";
 
                 Application[] uapps = u.Applications;
                 foreach (Application app in BusinessLogic.Application.getAll())
                 {
-                    if (CurrentUser.IsAdmin() || currentUserApps.Contains(";" + app.alias + ";"))
+                    if (UmbracoContext.UmbracoUser.IsAdmin() || currentUserApps.Contains(";" + app.alias + ";"))
                     {
                         ListItem li = new ListItem(ui.Text("sections", app.alias), app.alias);
                         if (!IsPostBack) foreach (Application tmp in uapps) if (app.alias == tmp.alias) li.Selected = true;
@@ -386,17 +381,17 @@ namespace umbraco.cms.presentation.user
                     u.Save();
 
 
-                    ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editUserSaved", UmbracoUser), "");
+                    ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, ui.Text("speechBubbles", "editUserSaved", UmbracoUser), "");
                 }
                 catch (Exception ex)
                 {
-                    ClientTools.ShowSpeechBubble(speechBubbleIcon.error, ui.Text("speechBubbles", "editUserError", UmbracoUser), "");
+                    ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Error, ui.Text("speechBubbles", "editUserError", UmbracoUser), "");
                     LogHelper.Error<EditUser>("Exception", ex);
                 }
             }
             else
             {
-                ClientTools.ShowSpeechBubble(speechBubbleIcon.error, ui.Text("speechBubbles", "editUserError", UmbracoUser), "");
+                ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Error, ui.Text("speechBubbles", "editUserError", UmbracoUser), "");
             }
         }
 

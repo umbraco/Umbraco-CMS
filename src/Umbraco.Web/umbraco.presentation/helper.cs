@@ -10,6 +10,7 @@ using Umbraco.Core.Profiling;
 using umbraco.BusinessLogic;
 using System.Xml;
 using umbraco.presentation;
+using Umbraco.Web.UI.Pages;
 
 namespace umbraco
 {
@@ -23,12 +24,7 @@ namespace umbraco
         {
             int result;
             return int.TryParse(Number, out result);
-        }
-
-        public static User GetCurrentUmbracoUser()
-        {
-            return umbraco.BasePages.UmbracoEnsuredPage.CurrentUser;
-        }
+        }        
 
         public static String FindAttribute(IDictionary attributes, String key)
         {

@@ -9,10 +9,10 @@ using System.Xml;
 using System.Xml.Xsl;
 using Umbraco.Core;
 using Umbraco.Core.IO;
-using umbraco.BasePages;
 using umbraco.uicontrols;
 using System.Net;
 using umbraco.cms.presentation.Trees;
+using Umbraco.Web.UI.Pages;
 
 namespace umbraco.cms.presentation.developer
 {

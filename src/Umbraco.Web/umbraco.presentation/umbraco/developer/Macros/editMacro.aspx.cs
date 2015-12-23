@@ -9,11 +9,12 @@ using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
-using umbraco.BasePages;
 using umbraco.uicontrols;
 using umbraco.DataLayer;
 using umbraco.cms.presentation.Trees;
 using System.Linq;
+using Umbraco.Web.UI;
+using Umbraco.Web.UI.Pages;
 
 namespace umbraco.cms.presentation.developer
 {
@@ -326,7 +327,7 @@ namespace umbraco.cms.presentation.developer
 
             Services.MacroService.Save(_macro);
 
-            ClientTools.ShowSpeechBubble(speechBubbleIcon.save, "Macro saved", "");
+            ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, "Macro saved", "");
 
             // Check for assemblyBrowser
             if (tempMacroType.IndexOf(".ascx", StringComparison.Ordinal) > 0)

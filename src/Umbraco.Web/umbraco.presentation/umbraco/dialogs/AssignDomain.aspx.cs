@@ -2,11 +2,10 @@
 using System.Globalization;
 using System.Web.UI.WebControls;
 using Umbraco.Web;
-using umbraco.BasePages;
-using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.language;
 using umbraco.cms.businesslogic.web;
 using Umbraco.Core;
+using Umbraco.Web.UI.Pages;
 
 namespace umbraco.dialogs
 {

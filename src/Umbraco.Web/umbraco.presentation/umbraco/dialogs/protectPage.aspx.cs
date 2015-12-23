@@ -10,11 +10,11 @@ using Umbraco.Core;
 using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.web;
 using umbraco.controls;
-using umbraco.BasePages;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Security;
 using Umbraco.Web;
+using Umbraco.Web.UI.Pages;
 using MembershipProviderExtensions = Umbraco.Core.Security.MembershipProviderExtensions;
 using MemberType = umbraco.cms.businesslogic.member.MemberType;
 

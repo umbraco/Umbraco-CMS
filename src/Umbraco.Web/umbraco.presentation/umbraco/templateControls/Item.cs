@@ -5,7 +5,8 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using Umbraco.Core.Models;
-using umbraco.BusinessLogic.Actions;
+using Umbraco.Web;
+using Umbraco.Web.LegacyActions;
 
 namespace umbraco.presentation.templateControls
 {
@@ -302,8 +303,8 @@ namespace umbraco.presentation.templateControls
         /// </summary>
         /// <value><c>true</c> if the current item is editable by the current user; otherwise, <c>false</c>.</value>
         protected virtual bool FieldEditableWithUserPermissions()
-        {
-            BusinessLogic.User u = helper.GetCurrentUmbracoUser();
+        {   
+            BusinessLogic.User u = UmbracoContext.Current.UmbracoUser;
             return u != null && u.GetPermissions(PageElements["path"].ToString()).Contains(ActionUpdate.Instance.Letter.ToString());
         } 
 

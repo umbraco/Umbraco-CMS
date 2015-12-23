@@ -7,11 +7,11 @@ using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using umbraco.BusinessLogic.Actions;
 using umbraco.businesslogic;
 using umbraco.cms.businesslogic.template;
 using umbraco.cms.presentation.Trees;
 using umbraco.interfaces;
+using Umbraco.Web.LegacyActions;
 
 namespace Umbraco.Web.Trees
 {

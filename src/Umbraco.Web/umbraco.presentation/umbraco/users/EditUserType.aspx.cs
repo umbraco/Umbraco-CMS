@@ -1,22 +1,13 @@
 using System;
-using System.Data;
-using System.Configuration;
-using System.Collections;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
-using umbraco.BasePages;
 using System.Collections.Generic;
 using umbraco.interfaces;
-using umbraco.BusinessLogic.Actions;
 using umbraco.BusinessLogic;
-using umbraco.uicontrols;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
-using Umbraco.Core.IO;
+using Umbraco.Web.UI;
+using Umbraco.Web.UI.Pages;
+using Action = Umbraco.Web.LegacyActions.Action;
 
 namespace umbraco.cms.presentation.user
 {
@@ -28,7 +19,7 @@ namespace umbraco.cms.presentation.user
         }
         protected void Page_Load(object sender, EventArgs e)
         {
-            pnlUmbraco.Text = umbraco.ui.Text("usertype", base.getUser());
+            pnlUmbraco.Text = umbraco.ui.Text("usertype", Security.CurrentUser);
 
             var save = pnlUmbraco.Menu.NewButton();
             save.Click += save_Click;
@@ -36,10 +27,10 @@ namespace umbraco.cms.presentation.user
             save.ToolTip = ui.Text("save");
             save.Text = ui.Text("save");
 
-            pp_alias.Text = umbraco.ui.Text("usertype", base.getUser()) + " " + umbraco.ui.Text("alias", base.getUser());
-            pp_name.Text = umbraco.ui.Text("usertype", base.getUser()) + " " + umbraco.ui.Text("name", base.getUser());
+            pp_alias.Text = umbraco.ui.Text("usertype", Security.CurrentUser) + " " + umbraco.ui.Text("alias", Security.CurrentUser);
+            pp_name.Text = umbraco.ui.Text("usertype", Security.CurrentUser) + " " + umbraco.ui.Text("name", Security.CurrentUser);
 
-            pp_rights.Text = umbraco.ui.Text("default", base.getUser()) + " " + umbraco.ui.Text("rights", base.getUser());
+            pp_rights.Text = umbraco.ui.Text("default", Security.CurrentUser) + " " + umbraco.ui.Text("rights", Security.CurrentUser);
             
             //ensure we have a query string
             if (string.IsNullOrEmpty(Request.QueryString["id"]))
@@ -73,7 +64,7 @@ namespace umbraco.cms.presentation.user
             userType.DefaultPermissions = actions;
             userType.Save();
 
-            ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editUserTypeSaved", base.getUser()), "");
+            ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, ui.Text("speechBubbles", "editUserTypeSaved", Security.CurrentUser), "");
         }
 
         protected List<IAction> CurrentUserTypeActions
@@ -81,7 +72,7 @@ namespace umbraco.cms.presentation.user
             get
             {
                 if (m_userTypeActions == null)
-                    m_userTypeActions = umbraco.BusinessLogic.Actions.Action.FromString(CurrentUserType.DefaultPermissions);
+                    m_userTypeActions = Action.FromString(CurrentUserType.DefaultPermissions);
                 return m_userTypeActions;
             }
         }
@@ -105,9 +96,9 @@ namespace umbraco.cms.presentation.user
             txtUserTypeName.Text = CurrentUserType.Name;
             hidUserTypeID.Value = CurrentUserType.Id.ToString();
 
-            foreach (IAction ai in global::umbraco.BusinessLogic.Actions.Action.GetPermissionAssignable()) {
+            foreach (IAction ai in Action.GetPermissionAssignable()) {
 
-                ListItem li = new ListItem(umbraco.ui.Text(ai.Alias, base.getUser()), ai.Letter.ToString());
+                ListItem li = new ListItem(umbraco.ui.Text(ai.Alias, Security.CurrentUser), ai.Letter.ToString());
 
                 if(CurrentUserTypeActions.Contains(ai))
                     li.Selected = true;

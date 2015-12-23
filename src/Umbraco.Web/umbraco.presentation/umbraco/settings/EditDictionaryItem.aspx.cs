@@ -11,6 +11,7 @@ using System.Web.UI.HtmlControls;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Web.UI;
 
 namespace umbraco.settings
 {
@@ -18,7 +19,7 @@ namespace umbraco.settings
 	/// Summary description for EditDictionaryItem.
 	/// </summary>
     [WebformsPageTreeAuthorize(Constants.Trees.Dictionary)]
-	public partial class EditDictionaryItem : BasePages.UmbracoEnsuredPage
+	public partial class EditDictionaryItem : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
 	{
 	    
 		protected LiteralControl keyTxt = new LiteralControl();
@@ -44,7 +45,7 @@ namespace umbraco.settings
             save.ButtonType = uicontrols.MenuButtonType.Primary;
 
             Literal txt = new Literal();
-            txt.Text = "<p>" + ui.Text("dictionaryItem", "description", currentItem.key, base.getUser()) + "</p><br/>";
+            txt.Text = "<p>" + ui.Text("dictionaryItem", "description", currentItem.key, Security.CurrentUser) + "</p><br/>";
             p.addProperty(txt);
 			
 			foreach (cms.businesslogic.language.Language l in cms.businesslogic.language.Language.getAll)
@@ -92,7 +93,7 @@ namespace umbraco.settings
 					currentItem.setValue(int.Parse(t.ID),t.Text);
 				}
 			}
-            ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "dictionaryItemSaved"), "");	
+            ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, ui.Text("speechBubbles", "dictionaryItemSaved"), "");	
 		}
 		#region Web Form Designer generated code
 		override protected void OnInit(EventArgs e)

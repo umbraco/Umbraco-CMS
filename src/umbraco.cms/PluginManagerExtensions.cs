@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Umbraco.Core;
-using umbraco.BusinessLogic.Actions;
-using umbraco.businesslogic;
 using umbraco.cms.businesslogic.macro;
 using umbraco.cms.businesslogic.media;
 using umbraco.interfaces;

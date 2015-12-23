@@ -68,7 +68,7 @@ namespace umbraco
 
         static macro()
         {
-            _xsltSettings = GlobalSettings.ApplicationTrustLevel > AspNetHostingPermissionLevel.Medium
+            _xsltSettings = SystemUtilities.GetCurrentTrustLevel() > AspNetHostingPermissionLevel.Medium
                 ? XsltSettings.TrustedXslt
                 : XsltSettings.Default;
         }

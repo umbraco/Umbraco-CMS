@@ -17,7 +17,7 @@
 
 //namespace umbraco.presentation.actions
 //{
-//    public partial class publish : BasePages.UmbracoEnsuredPage
+//    public partial class publish : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
 //    {
 //        private Document d;
 

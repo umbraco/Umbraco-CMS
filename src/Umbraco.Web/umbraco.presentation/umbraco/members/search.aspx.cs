@@ -15,7 +15,7 @@ namespace umbraco.presentation.members
 {
 
 
-    public partial class search : BasePages.UmbracoEnsuredPage
+    public partial class search : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
     {
         public search()
         {

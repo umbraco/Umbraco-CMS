@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -15,6 +16,7 @@ using System.IO;
 using Umbraco.Core.IO;
 using Umbraco.Web;
 using umbraco.DataLayer;
+using Umbraco.Web.UI.Pages;
 
 
 namespace umbraco.dialogs
@@ -22,7 +24,7 @@ namespace umbraco.dialogs
 	/// <summary>
 	/// Summary description for insertMacro.
 	/// </summary>
-	public partial class editMacro : BasePages.UmbracoEnsuredPage
+	public partial class editMacro : UmbracoEnsuredPage
 	{
 		protected Button Button1;
 
@@ -125,17 +127,16 @@ namespace umbraco.dialogs
 				}
 				else
 				{
-					IRecordsReader macroRenderings;
+					List<dynamic> macroRenderings;
 					if (Request.GetItemAsString("editor") != "")
-						macroRenderings = SqlHelper.ExecuteReader("select macroAlias, macroName from cmsMacro where macroUseInEditor = 1 order by macroName");
+						macroRenderings = DatabaseContext.Database.Fetch<dynamic>("select macroAlias, macroName from cmsMacro where macroUseInEditor = 1 order by macroName");
 					else
-						macroRenderings = SqlHelper.ExecuteReader("select macroAlias, macroName from cmsMacro order by macroName");
+						macroRenderings = DatabaseContext.Database.Fetch<dynamic>("select macroAlias, macroName from cmsMacro order by macroName");
 
 					umb_macroAlias.DataSource = macroRenderings;
 					umb_macroAlias.DataValueField = "macroAlias";
 					umb_macroAlias.DataTextField = "macroName";
 					umb_macroAlias.DataBind();
-					macroRenderings.Close();
 				}
 			}
 

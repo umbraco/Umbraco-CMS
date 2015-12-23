@@ -15,13 +15,14 @@ using Umbraco.Core;
 using Umbraco.Web;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
+using Umbraco.Web.UI;
 
 namespace umbraco.cms.presentation.settings.stylesheet
 {
     /// <summary>
     /// Summary description for EditStyleSheetProperty.
     /// </summary>
-    public partial class EditStyleSheetProperty : BasePages.UmbracoEnsuredPage
+    public partial class EditStyleSheetProperty : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
     {
         public EditStyleSheetProperty()
         {
@@ -97,7 +98,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
 
             Services.FileService.SaveStylesheet(_sheet);
 
-            ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editStylesheetPropertySaved", UmbracoUser), "");
+            ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, ui.Text("speechBubbles", "editStylesheetPropertySaved", UmbracoUser), "");
         }
 
 

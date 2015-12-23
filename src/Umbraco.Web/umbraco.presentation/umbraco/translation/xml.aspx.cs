@@ -20,7 +20,7 @@ using Umbraco.Core.IO;
 
 namespace umbraco.presentation.translation
 {
-    public partial class xml : BasePages.UmbracoEnsuredPage
+    public partial class xml : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
     {
         private readonly XmlDocument _xd = new XmlDocument();
 
@@ -39,7 +39,7 @@ namespace umbraco.presentation.translation
             if (int.TryParse(Request["id"], out pageId))
             {
                 var t = new Task(pageId);
-                if (t.User.Id == base.getUser().Id || t.ParentUser.Id == base.getUser().Id)
+                if (t.User.Id == Security.CurrentUser.Id || t.ParentUser.Id == Security.CurrentUser.Id)
                 {
                     XmlNode x = CreateTaskNode(t, _xd);
                     root.AppendChild(x);
@@ -54,7 +54,7 @@ namespace umbraco.presentation.translation
                 var nodes = new SortedList();
                 int totalWords = 0;
 
-                foreach (Task t in Task.GetTasks(base.getUser(), false))
+                foreach (Task t in Task.GetTasks(UmbracoContext.UmbracoUser, false))
                 {
                     if (!nodes.ContainsKey(t.Node.Path))
                     {

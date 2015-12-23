@@ -14,10 +14,12 @@ using umbraco.cms.presentation.Trees;
 using umbraco.controls;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Web.UI;
+using Umbraco.Web.UI.Pages;
 
 namespace umbraco.presentation.developer.packages
 {
-    public partial class _Default : BasePages.UmbracoEnsuredPage
+    public partial class _Default : UmbracoEnsuredPage
     {
 
         public _Default()
@@ -212,7 +214,7 @@ namespace umbraco.presentation.developer.packages
         protected void saveOrPublish(object sender, CommandEventArgs e) {
 
             if (!Page.IsValid) {
-                this.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.error, "Saved failed.", "Some fields have not been filled-out correctly");
+                this.ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Error, "Saved failed.", "Some fields have not been filled-out correctly");
             }
             else
             {
@@ -231,9 +233,9 @@ namespace umbraco.presentation.developer.packages
 
                         packageUmbFile.Text = " &nbsp; <a href='" + IOHelper.ResolveUrl(pack.PackagePath) + "'>Download</a>";
 
-                        this.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.success, "Package saved and published", "");
+                        this.ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Success, "Package saved and published", "");
                     } else {
-                        this.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.error, "Save failed", "check your umbraco log.");
+                        this.ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Error, "Save failed", "check your umbraco log.");
                     }
                 }
             }
@@ -323,7 +325,7 @@ namespace umbraco.presentation.developer.packages
             createdPackage.Save();
 
             if(showNotification)
-                this.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.save, "Package Saved", "");
+                this.ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, "Package Saved", "");
         }
 
         protected void addFileToPackage(object sender, EventArgs e)

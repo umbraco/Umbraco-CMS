@@ -8,7 +8,6 @@ using System.Xml.Xsl;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Net;
-using System.Security;
 using System.Web.UI;
 using Umbraco.Core;
 using Umbraco.Core.IO;
@@ -19,7 +18,6 @@ using Umbraco.Web.WebServices;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.media;
-using umbraco.BasePages;
 
 
 namespace umbraco.presentation.webservices
@@ -34,19 +32,7 @@ namespace umbraco.presentation.webservices
     public class legacyAjaxCalls : UmbracoAuthorizedWebService
     {
         private User _currentUser;
-
-        [WebMethod]
-        public bool ValidateUser(string username, string password)
-        {
-            if (ValidateCredentials(username, password))
-            {
-                var u = new BusinessLogic.User(username);
-                BasePage.doLogin(u);
-                return true;
-            }
-            return false;
-        }
-
+        
         /// <summary>
         /// method to accept a string value for the node id. Used for tree's such as python
         /// and xslt since the file names are the node IDs
@@ -182,34 +168,7 @@ namespace umbraco.presentation.webservices
 
             return Application[Context.Request.GetItemAsString("key")].ToString();
         }
-
-        [Obsolete("This is no longer used and will be removed in future versions")]
-        [WebMethod]
-        [ScriptMethod]
-        public void RenewUmbracoSession()
-        {
-            AuthorizeRequest(true);
-
-            BasePage.RenewLoginTimeout();
-
-        }
-
-        [Obsolete("This is no longer used and will be removed in future versions")]
-        [WebMethod]
-        [ScriptMethod]
-        public int GetSecondsBeforeUserLogout()
-        {
-            //TODO: Change this to not throw an exception otherwise we end up with JS errors all the time when recompiling!!
-
-            AuthorizeRequest(true);
-            var timeout = BasePage.GetTimeout(true);
-            var timeoutDate = new DateTime(timeout);
-            var currentDate = DateTime.Now;
-            
-            return (int) timeoutDate.Subtract(currentDate).TotalSeconds;
-
-        }
-
+        
         [WebMethod]
         [ScriptMethod]
         public string TemplateMasterPageContentContainer(int templateId, int masterTemplateId)
@@ -448,16 +407,5 @@ namespace umbraco.presentation.webservices
 	        return retVal;
         }
 
-        [Obsolete("You should use the AuthorizeRequest methods on the base class of UmbracoAuthorizedWebService and ensure you inherit from that class for umbraco asmx web services")]
-        public static void Authorize()
-        {
-            // check for secure connection
-            if (GlobalSettings.UseSSL && !HttpContext.Current.Request.IsSecureConnection)
-                throw new SecurityException("This installation requires a secure connection (via SSL). Please update the URL to include https://");
-
-            if (!BasePage.ValidateUserContextID(BasePages.BasePage.umbracoUserContextID))
-                throw new Exception("Client authorization failed. User is not logged in");
-
-        }
     }
 }

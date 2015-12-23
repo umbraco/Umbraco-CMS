@@ -6,7 +6,6 @@ using System.Web.UI.WebControls;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using umbraco.BasePages;
 using umbraco.BusinessLogic;
 
 using umbraco.cms.businesslogic.template;
@@ -14,6 +13,7 @@ using umbraco.cms.presentation.Trees;
 using umbraco.DataLayer;
 using umbraco.uicontrols;
 using System.Linq;
+using Umbraco.Web.UI.Pages;
 
 namespace umbraco.cms.presentation.settings
 {
@@ -112,7 +112,7 @@ namespace umbraco.cms.presentation.settings
 
 			// Editing buttons
             MenuIconI umbField = editorSource.Menu.NewIcon();
-			umbField.ImageURL = UmbracoPath + "/images/editor/insField.gif";
+			umbField.ImageURL = SystemDirectories.Umbraco + "/images/editor/insField.gif";
 			umbField.OnClickCommand =
 				ClientTools.Scripts.OpenModalWindow(
 					IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/umbracoField.aspx?objectId=" +
@@ -135,7 +135,7 @@ namespace umbraco.cms.presentation.settings
 			if (UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages)
 			{
 			    MenuIconI umbContainer = editorSource.Menu.NewIcon();
-				umbContainer.ImageURL = UmbracoPath + "/images/editor/masterpagePlaceHolder.gif";
+				umbContainer.ImageURL = SystemDirectories.Umbraco + "/images/editor/masterpagePlaceHolder.gif";
 				umbContainer.AltText = ui.Text("template", "insertContentAreaPlaceHolder");
 				umbContainer.OnClickCommand =
 					ClientTools.Scripts.OpenModalWindow(
@@ -144,7 +144,7 @@ namespace umbraco.cms.presentation.settings
 						ui.Text("template", "insertContentAreaPlaceHolder"), 470, 320);
 
                 MenuIconI umbContent = editorSource.Menu.NewIcon();
-				umbContent.ImageURL = UmbracoPath + "/images/editor/masterpageContent.gif";
+				umbContent.ImageURL = SystemDirectories.Umbraco + "/images/editor/masterpageContent.gif";
 				umbContent.AltText = ui.Text("template", "insertContentArea");
 				umbContent.OnClickCommand =
 					ClientTools.Scripts.OpenModalWindow(
@@ -165,7 +165,7 @@ namespace umbraco.cms.presentation.settings
 				ClientTools.Scripts.OpenModalWindow(
 					IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/settings/modals/showumbracotags.aspx?alias=" +
 					_template.Alias, ui.Text("template", "quickGuide"), 600, 580);
-			helpIcon.ImageURL = UmbracoPath + "/images/editor/help.png";
+			helpIcon.ImageURL = SystemDirectories.Umbraco + "/images/editor/help.png";
 			helpIcon.AltText = ui.Text("template", "quickGuide");
 		}
 
@@ -198,19 +198,17 @@ namespace umbraco.cms.presentation.settings
 
 		private void LoadMacros()
 		{
-			IRecordsReader macroRenderings =
-				SqlHelper.ExecuteReader("select id, macroAlias, macroName from cmsMacro order by macroName");
+			var macroRenderings =
+				DatabaseContext.Database.Fetch<dynamic>("select id, macroAlias, macroName from cmsMacro order by macroName");
 
 			rpt_macros.DataSource = macroRenderings;
 			rpt_macros.DataBind();
-
-			macroRenderings.Close();
 		}
 
 		public string DoesMacroHaveSettings(string macroId)
 		{
 			if (
-				SqlHelper.ExecuteScalar<int>(string.Format("select 1 from cmsMacroProperty where macro = {0}", macroId)) ==
+				DatabaseContext.Database.ExecuteScalar<int>(string.Format("select 1 from cmsMacroProperty where macro = {0}", macroId)) ==
 				1)
 				return "1";
 			else

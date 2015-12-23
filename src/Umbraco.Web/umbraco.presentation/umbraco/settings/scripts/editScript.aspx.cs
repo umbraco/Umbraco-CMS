@@ -19,7 +19,7 @@ using umbraco.uicontrols;
 
 namespace umbraco.cms.presentation.settings.scripts
 {
-    public partial class editScript : BasePages.UmbracoEnsuredPage
+    public partial class editScript : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
     {
         public editScript()
         {
@@ -67,9 +67,9 @@ namespace umbraco.cms.presentation.settings.scripts
             // name derives from filename, clean for xss
             NameTxt.Text = filename.CleanForXss('\\', '/');
 
-            Panel1.Text = ui.Text("editscript", base.getUser());
-            pp_name.Text = ui.Text("name", base.getUser());
-            pp_path.Text = ui.Text("path", base.getUser());
+            Panel1.Text = ui.Text("editscript", Security.CurrentUser);
+            pp_name.Text = ui.Text("name", Security.CurrentUser);
+            pp_path.Text = ui.Text("path", Security.CurrentUser);
 
             if (IsPostBack == false)
             {
@@ -110,27 +110,27 @@ namespace umbraco.cms.presentation.settings.scripts
                 // Editing buttons
                 Panel1.Menu.InsertSplitter();
                 uicontrols.MenuIconI umbField = Panel1.Menu.NewIcon();
-                umbField.ImageURL = UmbracoPath + "/images/editor/insField.gif";
-                umbField.OnClickCommand = BasePages.ClientTools.Scripts.OpenModalWindow(IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/umbracoField.aspx?objectId=" + editorSource.ClientID + "&tagName=UMBRACOGETDATA", ui.Text("template", "insertPageField"), 640, 550);
+                umbField.ImageURL = SystemDirectories.Umbraco + "/images/editor/insField.gif";
+                umbField.OnClickCommand = Umbraco.Web.UI.Pages.ClientTools.Scripts.OpenModalWindow(IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/umbracoField.aspx?objectId=" + editorSource.ClientID + "&tagName=UMBRACOGETDATA", ui.Text("template", "insertPageField"), 640, 550);
                 umbField.AltText = ui.Text("template", "insertPageField");
 
                 // TODO: Update icon
                 uicontrols.MenuIconI umbDictionary = Panel1.Menu.NewIcon();
                 umbDictionary.ImageURL = GlobalSettings.Path + "/images/editor/dictionaryItem.gif";
-                umbDictionary.OnClickCommand = BasePages.ClientTools.Scripts.OpenModalWindow(IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/umbracoField.aspx?objectId=" + editorSource.ClientID + "&tagName=UMBRACOGETDICTIONARY", ui.Text("template", "insertDictionaryItem"), 640, 550);
+                umbDictionary.OnClickCommand = Umbraco.Web.UI.Pages.ClientTools.Scripts.OpenModalWindow(IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/umbracoField.aspx?objectId=" + editorSource.ClientID + "&tagName=UMBRACOGETDICTIONARY", ui.Text("template", "insertDictionaryItem"), 640, 550);
                 umbDictionary.AltText = "Insert umbraco dictionary item";
 
                 uicontrols.MenuIconI umbMacro = Panel1.Menu.NewIcon();
-                umbMacro.ImageURL = UmbracoPath + "/images/editor/insMacro.gif";
+                umbMacro.ImageURL = SystemDirectories.Umbraco + "/images/editor/insMacro.gif";
                 umbMacro.AltText = ui.Text("template", "insertMacro");
-                umbMacro.OnClickCommand = BasePages.ClientTools.Scripts.OpenModalWindow(IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/editMacro.aspx?objectId=" + editorSource.ClientID, ui.Text("template", "insertMacro"), 470, 530);
+                umbMacro.OnClickCommand = Umbraco.Web.UI.Pages.ClientTools.Scripts.OpenModalWindow(IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/editMacro.aspx?objectId=" + editorSource.ClientID, ui.Text("template", "insertMacro"), 470, 530);
 
                 // Help
                 Panel1.Menu.InsertSplitter();
 
                 uicontrols.MenuIconI helpIcon = Panel1.Menu.NewIcon();
-                helpIcon.OnClickCommand = umbraco.BasePages.ClientTools.Scripts.OpenModalWindow(Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Umbraco) + "/settings/modals/showumbracotags.aspx?alias=", ui.Text("template", "quickGuide"), 600, 580);
-                helpIcon.ImageURL = UmbracoPath + "/images/editor/help.png";
+                helpIcon.OnClickCommand = Umbraco.Web.UI.Pages.ClientTools.Scripts.OpenModalWindow(Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Umbraco) + "/settings/modals/showumbracotags.aspx?alias=", ui.Text("template", "quickGuide"), 600, 580);
+                helpIcon.ImageURL = SystemDirectories.Umbraco + "/images/editor/help.png";
                 helpIcon.AltText = ui.Text("template", "quickGuide");
 
             }

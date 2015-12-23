@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Web;
-using Umbraco.Core.IO;
-using umbraco.BasePages;
+﻿using Umbraco.Core.IO;
 using System.Web.UI;
-using umbraco.BusinessLogic;
 
 namespace Umbraco.Web.UI.Pages
 {
@@ -229,17 +223,22 @@ namespace Umbraco.Web.UI.Pages
 			return this;
 		}
 
-		/// <summary>
-		/// Reloads only the last node that the user interacted with via the context menu. To reload a specify node, use SyncTree.
-		/// </summary>
-		/// <param name="reselect"></param>
-		/// <param name="reloadChildren"></param>
-		/// <remarks>
-		/// If for whatever reason the client side system cannot just refresh the one node, the system will use jsTree's built in 
-		/// refresh tool, this however won't allow for reselect or reloadChildren. Most trees will work with the single node
-		/// refresh but 3rd party tools may have poorly built tree data models.
-		/// </remarks>
-		public ClientTools ReloadActionNode(bool reselect, bool reloadChildren)
+        public string ReloadContentFrameUrlIfPathLoaded(string url)
+        {
+            return string.Format(ClientTools.Scripts.ClientMgrScript + ".reloadContentFrameUrlIfPathLoaded('{0}');", url);
+        }
+
+        /// <summary>
+        /// Reloads only the last node that the user interacted with via the context menu. To reload a specify node, use SyncTree.
+        /// </summary>
+        /// <param name="reselect"></param>
+        /// <param name="reloadChildren"></param>
+        /// <remarks>
+        /// If for whatever reason the client side system cannot just refresh the one node, the system will use jsTree's built in 
+        /// refresh tool, this however won't allow for reselect or reloadChildren. Most trees will work with the single node
+        /// refresh but 3rd party tools may have poorly built tree data models.
+        /// </remarks>
+        public ClientTools ReloadActionNode(bool reselect, bool reloadChildren)
 		{
 			RegisterClientScript(string.Format(Scripts.ReloadActionNode, (!reselect).ToString().ToLower(), (!reloadChildren).ToString().ToLower()));
 			return this;

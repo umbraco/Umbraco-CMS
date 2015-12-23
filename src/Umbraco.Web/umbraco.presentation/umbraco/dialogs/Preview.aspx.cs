@@ -19,7 +19,7 @@ using Umbraco.Core;
 
 namespace umbraco.presentation.dialogs
 {
-    public partial class Preview : BasePages.UmbracoEnsuredPage
+    public partial class Preview : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
     {
         public Preview()
         {

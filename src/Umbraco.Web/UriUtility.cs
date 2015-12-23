@@ -3,7 +3,6 @@ using System.Text;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using GlobalSettings = umbraco.GlobalSettings;
 
 namespace Umbraco.Web
 {

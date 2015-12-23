@@ -8,6 +8,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
 using umbraco.DataLayer;
+using Umbraco.Web.UI.Pages;
 
 namespace Umbraco.Web.UI.Controls
 {
@@ -35,6 +36,19 @@ namespace Umbraco.Web.UI.Controls
         protected UmbracoUserControl()
             : this(UmbracoContext.Current)
         {
+        }
+
+        private ClientTools _clientTools;
+        /// <summary>
+        /// Returns a refernce of an instance of ClientTools for access to the pages client API
+        /// </summary>
+        public ClientTools ClientTools
+        {
+            get
+            {
+                var page = Page as BasePage;
+                return _clientTools ?? (_clientTools = (page != null) ? page.ClientTools : new ClientTools(Page));
+            }
         }
 
         private readonly MembershipHelper _membershipHelper;

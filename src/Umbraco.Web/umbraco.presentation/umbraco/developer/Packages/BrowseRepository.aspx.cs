@@ -14,9 +14,10 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Web;
+using Umbraco.Web.UI.Pages;
 
 namespace umbraco.presentation.developer.packages {
-    public partial class BrowseRepository : BasePages.UmbracoEnsuredPage {
+    public partial class BrowseRepository : UmbracoEnsuredPage {
 
         public BrowseRepository()
         {

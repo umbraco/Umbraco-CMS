@@ -15,7 +15,7 @@ using Umbraco.Core;
 
 namespace umbraco.presentation.dialogs
 {
-    public partial class search : BasePages.UmbracoEnsuredPage
+    public partial class search : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
     {
 
         protected override void OnInit(EventArgs e)

@@ -358,17 +358,7 @@ namespace umbraco.BusinessLogic
         /// <returns>A user or null</returns>
         public static User GetCurrent()
         {
-            try
-            {
-                if (BasePages.BasePage.umbracoUserContextID != "")
-                    return GetUser(BasePages.BasePage.GetUserId(BasePages.BasePage.umbracoUserContextID));
-                else
-                    return null;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
+            throw new NotImplementedException("NOTHING USING THIS WILL WORK UNTIL THIS USER CLASS IS REMOVED AND ALL CODE REFERENCING IT IS MIGRATED");
         }
 
 		/// <summary>

@@ -1,10 +1,6 @@
-using Umbraco.Core.IO;
 using Umbraco.Web.UI;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using umbraco.BusinessLogic;
-using umbraco.BasePages;
 
 namespace umbraco
 {

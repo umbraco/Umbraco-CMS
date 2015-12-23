@@ -17,7 +17,7 @@
 //    /// <summary>
 //    /// Summary description for republish.
 //    /// </summary>
-//    public partial class republish : BasePages.UmbracoEnsuredPage
+//    public partial class republish : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
 //    {
 //        public republish()
 //        {

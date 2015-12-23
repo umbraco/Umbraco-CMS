@@ -12,7 +12,7 @@ namespace umbraco.presentation.umbraco.dialogs
 	/// <summary>
 	/// Summary description for importDocumentType.
 	/// </summary>
-	public class importDocumentType : BasePages.UmbracoEnsuredPage
+	public class importDocumentType : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
 	{
 	    public importDocumentType()
 	    {
@@ -72,7 +72,7 @@ namespace umbraco.presentation.umbraco.dialogs
             var xd = new XmlDocument();
             xd.Load(tempFile.Value);
 
-		    var userId = base.getUser().Id;
+		    var userId = Security.GetUserId();
 
             var element = XElement.Parse(xd.InnerXml);
 		    var importContentTypes = ApplicationContext.Current.Services.PackagingService.ImportContentTypes(element, userId);

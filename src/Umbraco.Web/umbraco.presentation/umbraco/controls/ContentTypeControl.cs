@@ -163,7 +163,7 @@
 //            SaveAllowedChildTypes();
 
 //            NodeTypeEditorCtrl.Save();
-//            prnt.ClientTools.ShowSpeechBubble( BasePages.BasePage.speechBubbleIcon.save, ui.Text("speechBubbles", "contentTypeSavedHeader"),"" + xtra);
+//            prnt.ClientTools.ShowSpeechBubble( BasePages.BasePage.SpeechBubbleIcon.Save, ui.Text("speechBubbles", "contentTypeSavedHeader"),"" + xtra);
 //        }
 
 //        private void SaveAllowedChildTypes() {

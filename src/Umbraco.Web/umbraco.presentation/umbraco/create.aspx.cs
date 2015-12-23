@@ -3,10 +3,11 @@ using System.Web.UI.WebControls;
 
 using System.Xml;
 using Umbraco.Core.IO;
+using Umbraco.Web.UI.Pages;
 
 namespace umbraco.cms.presentation
 {
-    public class Create : BasePages.UmbracoEnsuredPage
+    public class Create : UmbracoEnsuredPage
     {
         protected Label helpText;
         protected TextBox rename;

@@ -299,13 +299,16 @@ namespace umbraco.cms.businesslogic.packager
 
                 // Get current user, with a fallback
                 var currentUser = new User(0);
-                if (string.IsNullOrEmpty(BasePages.UmbracoEnsuredPage.umbracoUserContextID) == false)
-                {
-                    if (BasePages.UmbracoEnsuredPage.ValidateUserContextID(BasePages.UmbracoEnsuredPage.umbracoUserContextID))
-                    {
-                        currentUser = User.GetCurrent();
-                    }
-                }
+
+                //TODO: Need to migrate this class/code/logic so that we can replicate this functionality, until then everything will be installed by ADMIN
+
+                //if (string.IsNullOrEmpty(Umbraco.Web.UI.Pages.UmbracoEnsuredPage.umbracoUserContextID) == false)
+                //{
+                //    if (Umbraco.Web.UI.Pages.UmbracoEnsuredPage.ValidateUserContextID(Umbraco.Web.UI.Pages.UmbracoEnsuredPage.umbracoUserContextID))
+                //    {
+                //        currentUser = User.GetCurrent();
+                //    }
+                //}
 
                 //Xml as XElement which is used with the new PackagingService
                 var rootElement = Config.DocumentElement.GetXElement();

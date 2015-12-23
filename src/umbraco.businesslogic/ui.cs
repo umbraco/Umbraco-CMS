@@ -1,12 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading;
-using System.Web;
 using System.Web.Caching;
 using System.Xml;
 using Umbraco.Core;
@@ -14,8 +11,6 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
-using umbraco.BasePages;
-using Umbraco.Core.Services;
 using File = System.IO.File;
 using User = umbraco.BusinessLogic.User;
 
@@ -31,7 +26,7 @@ namespace umbraco
     [Obsolete("Use the ILocalizedTextService instead which is on the ApplicationContext.Services.TextService")]
     public class ui
     {
-        private static readonly string UmbracoDefaultUiLanguage = GlobalSettings.DefaultUILanguage;
+        private static readonly string UmbracoDefaultUiLanguage = Umbraco.Core.Configuration.GlobalSettings.DefaultUILanguage;
         private static readonly string UmbracoPath = SystemDirectories.Umbraco;
 
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -54,10 +49,10 @@ namespace umbraco
             return found == null ? string.Empty : found.Name;
         }
         
+        
         private static string GetLanguage()
         {
-            var user = UmbracoEnsuredPage.CurrentUser;
-            return GetLanguage(user);
+            throw new NotImplementedException("NOTHING WILL WORK UNTIL WE REPLACE ALL USAGES OF THE ui CLASS");
         }
 
         private static string GetLanguage(User u)

@@ -12,9 +12,9 @@ using System.Web.UI.HtmlControls;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic;
 using umbraco.BusinessLogic;
-using umbraco.BasePages;
 using Umbraco.Core;
 using Umbraco.Web;
+using Umbraco.Web.UI.Pages;
 
 namespace umbraco.presentation.dialogs
 {
@@ -31,11 +31,11 @@ namespace umbraco.presentation.dialogs
         {
             _currentPage = new CMSNode(int.Parse(Request.GetItemAsString("id")));
 
-            pp_translator.Text = ui.Text("translation","translator", this.getUser());
-            pp_language.Text = ui.Text("translation", "translateTo", this.getUser());
-            pp_includeSubs.Text = ui.Text("translation","includeSubpages", this.getUser());
-            pp_comment.Text = ui.Text("comment", this.getUser());
-            pane_form.Text = ui.Text("translation", "sendToTranslate", _currentPage.Text, base.getUser());
+            pp_translator.Text = ui.Text("translation","translator", Security.CurrentUser);
+            pp_language.Text = ui.Text("translation", "translateTo", Security.CurrentUser);
+            pp_includeSubs.Text = ui.Text("translation","includeSubpages", Security.CurrentUser);
+            pp_comment.Text = ui.Text("comment", Security.CurrentUser);
+            pane_form.Text = ui.Text("translation", "sendToTranslate", _currentPage.Text, Security.CurrentUser);
             
 
             if (!IsPostBack)
@@ -47,15 +47,15 @@ namespace umbraco.presentation.dialogs
                 if (domains != null)
                 {
                     selectedLanguage = domains[0].Language.id;
-                    defaultLanguage.Text = ui.Text("defaultLanguageIs", base.getUser()) + " " + domains[0].Language.FriendlyName;
+                    defaultLanguage.Text = ui.Text("defaultLanguageIs", Security.CurrentUser) + " " + domains[0].Language.FriendlyName;
                 }
                 else
                 {
-                    defaultLanguage.Text = ui.Text("defaultLanguageIsNotAssigned", base.getUser());
+                    defaultLanguage.Text = ui.Text("defaultLanguageIsNotAssigned", Security.CurrentUser);
                 }
                 
                 // languages
-                language.Items.Add(new ListItem(ui.Text("general", "choose", base.getUser()), ""));
+                language.Items.Add(new ListItem(ui.Text("general", "choose", Security.CurrentUser), ""));
                 foreach (var l in cms.businesslogic.language.Language.getAll)
                 {
                     var li = new ListItem();
@@ -82,7 +82,7 @@ namespace umbraco.presentation.dialogs
                 }
 
                 // send button
-                doTranslation.Text = ui.Text("general", "ok", base.getUser());
+                doTranslation.Text = ui.Text("general", "ok", Security.CurrentUser);
             }
         }
 
@@ -97,7 +97,7 @@ namespace umbraco.presentation.dialogs
             // testing translate
             cms.businesslogic.translation.Translation.MakeNew(
                 _currentPage,
-                getUser(),
+                UmbracoContext.UmbracoUser,
                 BusinessLogic.User.GetUser(int.Parse(translator.SelectedValue)),
                 new cms.businesslogic.language.Language(int.Parse(language.SelectedValue)),
                 comment.Text, includeSubpages.Checked,
@@ -106,7 +106,7 @@ namespace umbraco.presentation.dialogs
             pane_form.Visible = false;
             pl_buttons.Visible = false;
 
-            feedback.Text = ui.Text("translation","pageHasBeenSendToTranslation", _currentPage.Text, base.getUser()) + "</p><p><a href=\"#\" onclick=\"" + ClientTools.Scripts.CloseModalWindow() + "\">" + ui.Text("defaultdialogs", "closeThisWindow") + "</a></p>";
+            feedback.Text = ui.Text("translation","pageHasBeenSendToTranslation", _currentPage.Text, Security.CurrentUser) + "</p><p><a href=\"#\" onclick=\"" + ClientTools.Scripts.CloseModalWindow() + "\">" + ui.Text("defaultdialogs", "closeThisWindow") + "</a></p>";
             feedback.type = uicontrols.Feedback.feedbacktype.success;
         }
     }

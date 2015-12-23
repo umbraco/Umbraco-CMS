@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using umbraco.BasePages;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Web.UI.Pages;
 
 namespace Umbraco.Web.UI.Umbraco.Dialogs
 {

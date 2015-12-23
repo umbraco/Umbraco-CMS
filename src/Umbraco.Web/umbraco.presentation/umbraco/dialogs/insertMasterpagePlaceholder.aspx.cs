@@ -6,7 +6,7 @@ using System.Web.UI.WebControls;
 using Umbraco.Core;
 
 namespace umbraco.presentation.umbraco.dialogs {
-    public partial class insertMasterpagePlaceholder : BasePages.UmbracoEnsuredPage {
+    public partial class insertMasterpagePlaceholder : Umbraco.Web.UI.Pages.UmbracoEnsuredPage {
 
         public insertMasterpagePlaceholder()
         {

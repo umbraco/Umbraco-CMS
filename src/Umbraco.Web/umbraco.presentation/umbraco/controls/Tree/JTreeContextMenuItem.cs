@@ -1,17 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
 using System.Web.Script.Serialization;
 using umbraco.interfaces;
-using System.Text.RegularExpressions;
-using umbraco.BusinessLogic.Actions;
 using umbraco.businesslogic.Utils;
 using System.Text;
-using umbraco.cms.presentation.Trees;
-using umbraco.BasePages;
-using System.Web.Services;
 
 namespace umbraco.controls.Tree
 {
@@ -80,7 +72,7 @@ namespace umbraco.controls.Tree
 			get
 			{
 				List<Type> types = new List<Type>();
-				foreach (IAction a in global::umbraco.BusinessLogic.Actions.Action.GetAll())
+				foreach (IAction a in global::Umbraco.Web.LegacyActions.Action.GetAll())
 				{
 					types.Add(a.GetType());
 				}

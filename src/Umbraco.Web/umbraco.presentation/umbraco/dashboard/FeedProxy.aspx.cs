@@ -1,17 +1,16 @@
 ﻿using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Web;
+using Umbraco.Web.UI.Pages;
+using System;
+using System.Linq;
+using System.Net;
+using System.Net.Mime;
+using Umbraco.Core.IO;
 
 namespace dashboardUtilities
 {
-    using System;
-    using System.Linq;
-    using System.Net;
-    using System.Net.Mime;
-    using umbraco;
-    using umbraco.BasePages;
-    using umbraco.BusinessLogic;
-    using Umbraco.Core.IO;
+    
 
     public partial class FeedProxy : UmbracoEnsuredPage
     {

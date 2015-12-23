@@ -8,8 +8,8 @@ using umbraco.businesslogic;
 using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
 using umbraco.cms.presentation.Trees;
-using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
+using Umbraco.Web.LegacyActions;
 using Umbraco.Web.Trees;
 
 

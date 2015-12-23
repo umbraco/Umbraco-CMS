@@ -33,7 +33,7 @@ using Umbraco.Web.Trees;
 using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Web.WebServices;
-using Action = umbraco.BusinessLogic.Actions.Action;
+using Action = Umbraco.Web.LegacyActions.Action;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors

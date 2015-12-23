@@ -11,7 +11,7 @@ using System.Web.UI.HtmlControls;
 using Umbraco.Core;
 
 namespace umbraco.presentation.dialogs {
-    public partial class RegexWs : BasePages.UmbracoEnsuredPage {
+    public partial class RegexWs : Umbraco.Web.UI.Pages.UmbracoEnsuredPage {
         private DataSet ds = new DataSet();
 
         public RegexWs()

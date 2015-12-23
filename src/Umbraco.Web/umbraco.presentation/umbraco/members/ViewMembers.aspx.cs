@@ -9,7 +9,7 @@ using Umbraco.Core.Security;
 
 namespace umbraco.presentation.members
 {
-    public partial class ViewMembers : BasePages.UmbracoEnsuredPage
+    public partial class ViewMembers : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
     {
 
         public ViewMembers()

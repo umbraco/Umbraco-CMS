@@ -8,7 +8,6 @@ using SqlCE4Umbraco;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using umbraco.DataLayer;
-using GlobalSettings = umbraco.GlobalSettings;
 
 namespace Umbraco.Tests.TestHelpers
 {

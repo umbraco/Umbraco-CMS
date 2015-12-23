@@ -1,33 +1,20 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.IO;
 using System.Linq;
-using System.Security;
-using System.Text;
-using System.Web;
 using System.Xml.Linq;
 using Examine;
-using Examine.Config;
-using Examine.Providers;
 using Lucene.Net.Documents;
-using Lucene.Net.Index;
 using Umbraco.Core;
-using umbraco.cms.businesslogic;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using UmbracoExamine.DataServices;
 using Examine.LuceneEngine;
 using Examine.LuceneEngine.Config;
 using UmbracoExamine.Config;
-using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
-using umbraco.BasePages;
 using IContentService = Umbraco.Core.Services.IContentService;
-using UmbracoExamine.LocalStorage;
 using IMediaService = Umbraco.Core.Services.IMediaService;
 
 

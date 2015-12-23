@@ -11,9 +11,9 @@ using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
 using umbraco;
-using umbraco.BusinessLogic.Actions;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Services;
+using Umbraco.Web.LegacyActions;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees

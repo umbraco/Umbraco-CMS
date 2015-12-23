@@ -1,28 +1,12 @@
 ﻿using System;
 using System.Data;
-using System.IO;
-using System.Text;
-using System.Xml;
-using System.Web;
-using System.Web.UI;
 using System.Web.UI.WebControls;
-
-using umbraco.BasePages;
-using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.task;
-using umbraco.cms.businesslogic.translation;
 using umbraco.cms.businesslogic.web;
-
-using ICSharpCode.SharpZipLib.BZip2;
-using ICSharpCode.SharpZipLib.Zip;
-using ICSharpCode.SharpZipLib.Zip.Compression;
-using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
-using ICSharpCode.SharpZipLib.GZip;
 using Umbraco.Core;
 
 namespace umbraco.presentation.umbraco.translation {
-    public partial class details : BasePages.UmbracoEnsuredPage {
+    public partial class details : Umbraco.Web.UI.Pages.UmbracoEnsuredPage {
 
         public details()
         {
@@ -33,7 +17,7 @@ namespace umbraco.presentation.umbraco.translation {
             int translationId = int.Parse(Request["id"]);
             Task t = new Task(translationId);
 
-            if (t != null && (t.ParentUser.Id == base.getUser().Id || t.User.Id == base.getUser().Id)) {
+            if (t != null && (t.ParentUser.Id == Security.CurrentUser.Id || t.User.Id == Security.CurrentUser.Id)) {
                 t.Closed = true;
                 t.Save();
                 Response.Redirect("default.aspx");

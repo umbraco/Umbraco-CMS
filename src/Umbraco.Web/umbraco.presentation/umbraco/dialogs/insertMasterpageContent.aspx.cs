@@ -10,7 +10,7 @@ using Umbraco.Core;
 
 namespace umbraco.presentation.umbraco.dialogs
 {
-    public partial class insertMasterpageContent : BasePages.UmbracoEnsuredPage
+    public partial class insertMasterpageContent : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
     {
         public insertMasterpageContent()
         {

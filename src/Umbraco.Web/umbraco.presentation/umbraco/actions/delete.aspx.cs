@@ -11,10 +11,11 @@ using System.Web.UI.HtmlControls;
 using umbraco.cms.businesslogic.web;
 using Umbraco.Core;
 using Umbraco.Web;
+using Umbraco.Web.UI.Pages;
 
 namespace umbraco.presentation.actions
 {
-    public partial class delete : BasePages.UmbracoEnsuredPage
+    public partial class delete : UmbracoEnsuredPage
     {
         private Document d;
 
@@ -22,9 +23,9 @@ namespace umbraco.presentation.actions
         {
             d = new Document(int.Parse(Request.GetItemAsString("id")));
 
-            if (!base.ValidateUserApp(Constants.Applications.Content))
+            if (Security.ValidateUserApp(Constants.Applications.Content) == false)
                 throw new ArgumentException("The current user doesn't have access to this application. Please contact the system administrator.");
-            if (!base.ValidateUserNodeTreePermissions(d.Path, "D"))
+            if (Security.ValidateUserNodeTreePermissions(UmbracoUser, d.Path, "D") == false)
                 throw new ArgumentException("The current user doesn't have permissions to delete this document. Please contact the system administrator.");
             
             pane_delete.Text = ui.Text("delete") + " '" + d.Text + "'";

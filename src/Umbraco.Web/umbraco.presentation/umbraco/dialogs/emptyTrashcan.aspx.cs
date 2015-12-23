@@ -2,8 +2,8 @@
 using System.Web.UI;
 using Umbraco.Core;
 using Umbraco.Web;
-using umbraco.BasePages;
 using umbraco.cms.businesslogic;
+using Umbraco.Web.UI.Pages;
 
 namespace umbraco.presentation.dialogs
 {
@@ -27,7 +27,7 @@ namespace umbraco.presentation.dialogs
             base.OnInit(e);
 
             var recycleBinType = Request.GetItemAsString("type");
-            if (ValidateUserApp(recycleBinType) == false)
+            if (Security.ValidateUserApp(recycleBinType) == false)
             {
                 throw new InvalidOperationException("The user does not have access to the requested app");
             }

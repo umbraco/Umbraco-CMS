@@ -5,13 +5,13 @@ using System.Net.Http.Formatting;
 using System.Text;
 using System.Threading.Tasks;
 using umbraco;
-using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Services;
+using Umbraco.Web.LegacyActions;
 
 namespace Umbraco.Web.Trees
 {

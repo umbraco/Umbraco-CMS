@@ -4,7 +4,7 @@
 //using System.Collections.Generic;
 //using System.Web.UI;
 //using System.Web.UI.WebControls;
-//using umbraco.BasePages;
+//
 //using umbraco.BusinessLogic;
 //using Umbraco.Core;
 //using Umbraco.Core.Models;
@@ -276,7 +276,7 @@
 //                    var relationService = Services.RelationService;
 //                    relationService.Save(this._relationType);
                     
-//                    ClientTools.ShowSpeechBubble(speechBubbleIcon.save, "Relation Type Updated", bubbleBody);
+//                    ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, "Relation Type Updated", bubbleBody);
 //                }
 //            }
 //        }

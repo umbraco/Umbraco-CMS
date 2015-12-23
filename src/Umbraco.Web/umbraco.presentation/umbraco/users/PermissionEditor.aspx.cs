@@ -1,25 +1,10 @@
 using System;
-using System.Data;
-using System.Configuration;
-using System.Collections;
-using System.Web;
-using System.Web.Security;
 using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
-using System.Xml;
-using System.IO;
 using Umbraco.Core;
-using umbraco;
 using umbraco.BusinessLogic;
-using System.Collections.Generic;
-using umbraco.BasePages;
-using umbraco.BusinessLogic.Actions;
-using umbraco.interfaces;
 using umbraco.cms.presentation.Trees;
-using System.Xml.XPath;
 using Umbraco.Core.IO;
+using Umbraco.Web.UI.Pages;
 
 namespace umbraco.cms.presentation.user
 {
@@ -74,7 +59,7 @@ namespace umbraco.cms.presentation.user
         /// <summary>
         /// Since Umbraco stores users in cache, we'll use this method to retrieve our user object by the selected id
         /// </summary>
-        public override User UmbracoUser
+        public User UmbracoUser
         {
             get
             {

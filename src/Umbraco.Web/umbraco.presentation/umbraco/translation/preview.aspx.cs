@@ -17,7 +17,7 @@ using Umbraco.Web;
 
 namespace umbraco.presentation.translation
 {
-    public partial class preview : BasePages.UmbracoEnsuredPage
+    public partial class preview : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
     {
         public string originalUrl = "";
         public string translatedUrl = "";

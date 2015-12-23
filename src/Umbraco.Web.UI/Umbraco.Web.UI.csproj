@@ -1219,7 +1219,6 @@
     <Content Include="Umbraco\Images\Umbraco\userType.gif" />
     <Content Include="Umbraco\Js\dualSelectBox.js" />
     <Content Include="Umbraco\Js\guiFunctions.js" />
-    <Content Include="Umbraco\Js\language.aspx" />
     <Content Include="Umbraco\Js\umbracoCheckKeys.js" />
     <Content Include="Umbraco\Members\EditMemberGroup.aspx">
       <SubType>Form</SubType>
@@ -1232,7 +1231,6 @@
     <Content Include="Umbraco\Settings\Stylesheet\editstylesheet.aspx" />
     <Content Include="Umbraco\Settings\Stylesheet\Property\EditStyleSheetProperty.aspx" />
     <Content Include="Umbraco\Dialogs\sort.aspx" />
-    <Content Include="Umbraco\tree.aspx" />
     <Content Include="Umbraco\treeInit.aspx" />
     <Content Include="Umbraco\Users\EditUser.aspx" />
     <Content Include="Umbraco\Users\EditUserType.aspx" />

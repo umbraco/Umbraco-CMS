@@ -12,9 +12,10 @@ using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using Umbraco.Core;
 using Umbraco.Web;
+using Umbraco.Web.UI.Pages;
 
 namespace umbraco.presentation.developer.packages {
-    public partial class SubmitPackage : BasePages.UmbracoEnsuredPage {
+    public partial class SubmitPackage : UmbracoEnsuredPage {
 
         public SubmitPackage()
         {

@@ -14,13 +14,14 @@ using umbraco.cms.businesslogic.member;
 using umbraco.cms.presentation.Trees;
 using umbraco.uicontrols;
 using Umbraco.Core;
+using Umbraco.Web.UI;
 
 namespace umbraco.presentation.members
 {
 	/// <summary>
 	/// Summary description for EditMemberGroup.
 	/// </summary>
-	public partial class EditMemberGroup : BasePages.UmbracoEnsuredPage
+	public partial class EditMemberGroup : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
 	{
 	    public EditMemberGroup()
 	    {
@@ -68,7 +69,7 @@ namespace umbraco.presentation.members
 			_memberGroup.Text = NameTxt.Text;
             memberGroupName.Value = NameTxt.Text;
             _memberGroup.Save();
-            this.ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editMemberGroupSaved", base.getUser()),"");
+            this.ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, ui.Text("speechBubbles", "editMemberGroupSaved", Security.CurrentUser),"");
 
             ClientTools
                 .RefreshTree(TreeDefinitionCollection.Instance.FindTree<loadMemberGroups>().Tree.Alias);

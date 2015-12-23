@@ -13,6 +13,7 @@ using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
 using Umbraco.Web;
 using Umbraco.Web.Trees;
+using Umbraco.Web.UI;
 
 namespace umbraco.settings
 {
@@ -20,7 +21,7 @@ namespace umbraco.settings
 	/// Summary description for editLanguage.
 	/// </summary>
     [WebformsPageTreeAuthorize(Constants.Trees.Languages)]
-	public partial class editLanguage : BasePages.UmbracoEnsuredPage
+	public partial class editLanguage : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
 	{
 	    public editLanguage()
 	    {
@@ -38,7 +39,7 @@ namespace umbraco.settings
 
 			// Put user code to initialize the page here
             Panel1.Text = ui.Text("editlanguage");
-            pp_language.Text = ui.Text("language", "displayName", base.getUser());
+            pp_language.Text = ui.Text("language", "displayName", Security.CurrentUser);
             if (!IsPostBack) 
 			{
 				updateCultureList();
@@ -75,7 +76,7 @@ namespace umbraco.settings
 		    currentLanguage.Save();
 			updateCultureList();
 
-            ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "languageSaved"), "");	
+            ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, ui.Text("speechBubbles", "languageSaved"), "");	
 		}
 
 		#region Web Form Designer generated code

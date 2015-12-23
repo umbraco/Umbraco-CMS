@@ -20,13 +20,14 @@ using umbraco.cms.businesslogic.web;
 using runtimeMacro = umbraco.macro;
 using System.Xml;
 using umbraco.cms.presentation.Trees;
-using BizLogicAction = umbraco.BusinessLogic.Actions.Action;
+using Umbraco.Web.UI.Pages;
+using BizLogicAction = Umbraco.Web.LegacyActions.Action;
 using Macro = umbraco.cms.businesslogic.macro.Macro;
 using Template = umbraco.cms.businesslogic.template.Template;
 
 namespace umbraco.presentation.developer.packages
 {
-    public partial class installedPackage : BasePages.UmbracoEnsuredPage
+    public partial class installedPackage : UmbracoEnsuredPage
     {
         public installedPackage()
         {

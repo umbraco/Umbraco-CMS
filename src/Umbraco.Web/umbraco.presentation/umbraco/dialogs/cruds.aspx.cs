@@ -13,13 +13,14 @@ using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Web;
 using umbraco.cms.businesslogic;
+using Umbraco.Web.UI.Pages;
 
 namespace umbraco.dialogs
 {
     /// <summary>
     /// Summary description for cruds.
     /// </summary>
-    public partial class cruds : BasePages.UmbracoEnsuredPage
+    public partial class cruds : UmbracoEnsuredPage
     {
 
         public cruds()

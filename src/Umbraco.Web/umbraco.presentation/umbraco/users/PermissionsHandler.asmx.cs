@@ -1,20 +1,14 @@
-using System;
-using System.Data;
 using System.Web;
-using System.Collections;
 using System.Web.Services;
-using System.Web.Services.Protocols;
 using System.ComponentModel;
 using System.Web.Script.Services;
 using System.Web.UI;
 using System.IO;
-using System.Reflection;
-using System.Web.UI.HtmlControls;
-using umbraco.BasePages;
 using System.Collections.Generic;
 using umbraco.interfaces;
-using umbraco.BusinessLogic.Actions;
 using Umbraco.Core.IO;
+using Umbraco.Web.LegacyActions;
+using Umbraco.Web.WebServices;
 
 namespace umbraco.cms.presentation.user
 {
@@ -25,7 +19,7 @@ namespace umbraco.cms.presentation.user
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
     [ToolboxItem(false)]
     [ScriptService]
-    public class PermissionsHandler : System.Web.Services.WebService
+    public class PermissionsHandler : UmbracoAuthorizedWebService
     {
 
         /// <summary>
@@ -37,7 +31,7 @@ namespace umbraco.cms.presentation.user
         [WebMethod]        
         public string GetNodePermissions(int userID, string nodes)
         {
-            Authorize();
+            AuthorizeRequest(true);
 
             Page page = new Page();
 
@@ -60,21 +54,15 @@ namespace umbraco.cms.presentation.user
         [WebMethod]
         public string SaveNodePermissions(int userID, string nodes, string permissions, bool replaceChild)
         {
-			Authorize();
+            AuthorizeRequest(true);
 
             UserPermissions uPermissions = new UserPermissions(BusinessLogic.User.GetUser(userID));
-            List<IAction> actions = umbraco.BusinessLogic.Actions.Action.FromString(permissions);
+            List<IAction> actions = Action.FromString(permissions);
             uPermissions.SaveNewPermissions(toIntArray(nodes), actions, replaceChild);
 
             return GetNodePermissions(userID, nodes);
         }
-
-        private void Authorize()
-        {
-            if (!BasePage.ValidateUserContextID(BasePage.umbracoUserContextID))
-                throw new Exception("Client authorization failed. User is not logged in");
-
-        }
+        
 
         private int[] toIntArray(string nodeIds) {
 

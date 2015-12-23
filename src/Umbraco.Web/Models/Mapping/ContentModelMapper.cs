@@ -10,10 +10,10 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.Services;
+using Umbraco.Web.LegacyActions;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Trees;
 using Umbraco.Web.Routing;
-using umbraco.BusinessLogic.Actions;
 
 namespace Umbraco.Web.Models.Mapping
 {

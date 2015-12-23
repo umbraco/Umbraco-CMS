@@ -5,6 +5,7 @@ using umbraco.businesslogic;
 using umbraco.interfaces;
 using Umbraco.Core;
 using umbraco.cms.presentation.Trees;
+using Umbraco.Web.LegacyActions;
 using Umbraco.Web.Trees;
 
 namespace umbraco
@@ -46,7 +47,7 @@ namespace umbraco
         protected override void CreateAllowedActions(ref List<IAction> actions)
         {
             actions.Clear();
-            actions.Add(umbraco.BusinessLogic.Actions.ActionRefresh.Instance);
+            actions.Add(ActionRefresh.Instance);
         }
 
         protected override void CreateRootNodeActions(ref List<IAction> actions)
@@ -144,8 +145,8 @@ namespace umbraco
                         xNode.Source = "tree.aspx?app=" + this._app + "&id=" + this._id + "&treeType=packagerPackages&packageType=created" + "&rnd=" + Guid.NewGuid();
                         xNode.NodeType = "createdPackages";
                         xNode.Menu.Clear();                        
-                        xNode.Menu.Add(umbraco.BusinessLogic.Actions.ActionNew.Instance);
-                        xNode.Menu.Add(umbraco.BusinessLogic.Actions.ActionRefresh.Instance);
+                        xNode.Menu.Add(ActionNew.Instance);
+                        xNode.Menu.Add(ActionRefresh.Instance);
                         xNode.Text = ui.Text("treeHeaders", "createdPackages");
                         xNode.HasChildren = true;
                         xNode.Action = "javascript:void(0);";

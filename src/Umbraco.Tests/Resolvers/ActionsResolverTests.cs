@@ -1,14 +1,9 @@
 using System.Linq;
-using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
-using Umbraco.Core.Profiling;
-using Umbraco.Tests.TestHelpers;
-using umbraco.BasePages;
 using umbraco.interfaces;
+using Umbraco.Web.UI.Pages;
 
 namespace Umbraco.Tests.Resolvers
 {

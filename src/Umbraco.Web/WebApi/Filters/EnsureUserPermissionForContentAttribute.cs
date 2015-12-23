@@ -11,8 +11,8 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Web.Editors;
+using Umbraco.Web.LegacyActions;
 using Umbraco.Web.Models.ContentEditing;
-using umbraco.BusinessLogic.Actions;
 
 namespace Umbraco.Web.WebApi.Filters
 {

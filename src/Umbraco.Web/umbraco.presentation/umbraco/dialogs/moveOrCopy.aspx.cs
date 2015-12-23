@@ -7,12 +7,13 @@ using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-using umbraco.BasePages;
 using System.Linq;
 using umbraco.cms.presentation.user;
 using umbraco.interfaces;
 using Umbraco.Web;
 using Umbraco.Core;
+using Umbraco.Web.UI.Pages;
+using Action = Umbraco.Web.LegacyActions.Action;
 
 namespace umbraco.dialogs
 {
@@ -121,7 +122,7 @@ namespace umbraco.dialogs
 
         private bool ValidAction(IContentBase cmsNode, char actionLetter)
         {
-            var currentAction = BusinessLogic.Actions.Action.GetPermissionAssignable().First(a => a.Letter == actionLetter);
+            var currentAction = Action.GetPermissionAssignable().First(a => a.Letter == actionLetter);
             return CheckPermissions(cmsNode, currentAction);
         }
 
@@ -137,7 +138,7 @@ namespace umbraco.dialogs
         /// </remarks>
         private bool CheckPermissions(IContentBase node, IAction currentAction)
         {
-            var currUserPermissions = new UserPermissions(CurrentUser);
+            var currUserPermissions = new UserPermissions(UmbracoContext.UmbracoUser);
             var lstCurrUserActions = currUserPermissions.GetExistingNodePermission(node.Id);
 
             return lstCurrUserActions.Contains(currentAction);

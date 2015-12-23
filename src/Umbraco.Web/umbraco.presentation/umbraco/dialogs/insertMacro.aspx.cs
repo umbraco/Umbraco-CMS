@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Reflection;
@@ -13,7 +14,7 @@ namespace umbraco.dialogs
 	/// <summary>
 	/// Summary description for insertMacro.
 	/// </summary>
-	public partial class insertMacro : BasePages.UmbracoEnsuredPage
+	public partial class insertMacro : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
 	{
 		protected Button Button1;
 
@@ -22,14 +23,14 @@ namespace umbraco.dialogs
             base.OnInit(e);
 
             //this could be used for media or content so we need to at least validate that the user has access to one or the other
-            if (!ValidateUserApp(Constants.Applications.Content.ToString()) && !ValidateUserApp(Constants.Applications.Media.ToString()))
+            if (Security.ValidateUserApp(Constants.Applications.Content) == false && Security.ValidateUserApp(Constants.Applications.Media) == false)
                 throw new SecurityException("The current user doesn't have access to the section/app");
         }
 
 		protected void Page_Load(object sender, EventArgs e)
 		{
-            pane_edit.Text = ui.Text("general", "edit",this.getUser()) + " " + ui.Text("general", "macro",this.getUser());
-            pane_insert.Text = ui.Text("general", "insert",this.getUser()) + " " + ui.Text("general", "macro",this.getUser());
+            pane_edit.Text = ui.Text("general", "edit",Security.CurrentUser) + " " + ui.Text("general", "macro",Security.CurrentUser);
+            pane_insert.Text = ui.Text("general", "insert",Security.CurrentUser) + " " + ui.Text("general", "macro",Security.CurrentUser);
 
 			if (Request["macroID"] != null || Request["macroAlias"] != null) 
 			{
@@ -91,17 +92,16 @@ namespace umbraco.dialogs
 			} 
 			else 
 			{
-				IRecordsReader macroRenderings;
-				if (Request.GetItemAsString("editor") != "")
-					macroRenderings = SqlHelper.ExecuteReader("select macroAlias, macroName from cmsMacro where macroUseInEditor = 1 order by macroName");
+                List<dynamic> macroRenderings;
+                if (Request.GetItemAsString("editor") != "")
+					macroRenderings = DatabaseContext.Database.Fetch<dynamic>("select macroAlias, macroName from cmsMacro where macroUseInEditor = 1 order by macroName");
 				else
-					macroRenderings = SqlHelper.ExecuteReader("select macroAlias, macroName from cmsMacro order by macroName");
+					macroRenderings = DatabaseContext.Database.Fetch<dynamic>("select macroAlias, macroName from cmsMacro order by macroName");
 				
 				macroAlias.DataSource = macroRenderings;
 				macroAlias.DataValueField = "macroAlias";
 				macroAlias.DataTextField = "macroName";
 				macroAlias.DataBind();
-				macroRenderings.Close();
 
 			}
 

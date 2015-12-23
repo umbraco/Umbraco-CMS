@@ -12,10 +12,10 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using umbraco;
 using umbraco.BusinessLogic;
-using umbraco.BusinessLogic.Actions;
 using umbraco.cms.presentation.Trees;
 using umbraco.controls.Tree;
 using umbraco.interfaces;
+using Umbraco.Web.LegacyActions;
 
 namespace Umbraco.Web.Trees
 {

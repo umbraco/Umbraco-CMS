@@ -1,23 +1,12 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Xml;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
-
-using Umbraco.Core.Publishing;
-using Umbraco.Core.Services;
 using umbraco.BusinessLogic;
-using umbraco.BusinessLogic.Actions;
 using umbraco.DataLayer;
-using Umbraco.Core.Events;
-using Umbraco.Core.Strings;
 
 namespace umbraco.cms.businesslogic.web
 {

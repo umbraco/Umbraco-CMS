@@ -11,10 +11,11 @@ using umbraco.cms.businesslogic.web;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Web;
+using Umbraco.Web.UI.Pages;
 
 namespace umbraco.presentation.actions
 {
-    public partial class preview : BasePages.UmbracoEnsuredPage
+    public partial class preview : UmbracoEnsuredPage
     {
 
         public preview()

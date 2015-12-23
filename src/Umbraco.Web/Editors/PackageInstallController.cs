@@ -93,7 +93,7 @@ namespace Umbraco.Web.Editors
             //clear the tree cache - we'll do this here even though the browser will reload, but just in case it doesn't can't hurt.
             //these bits are super old, but cant find another way to do this currently
             global::umbraco.cms.presentation.Trees.TreeDefinitionCollection.Instance.ReRegisterTrees();
-            global::umbraco.BusinessLogic.Actions.Action.ReRegisterActionsAndHandlers();
+            global::Umbraco.Web.LegacyActions.Action.ReRegisterActionsAndHandlers();
 
 
             return model;

@@ -1,24 +1,16 @@
 ﻿using System;
-using System.Data;
-using System.Configuration;
-using System.Collections;
 using System.Linq;
 using System.Web;
-using System.Web.Security;
-using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.UI;
-using umbraco.BasePages;
-using Umbraco.Core.IO;
 using Umbraco.Web;
+using Umbraco.Web.UI.Controls;
 
 namespace umbraco.presentation.umbraco.create
 {
-	public partial class script : System.Web.UI.UserControl
+	public partial class script : UmbracoUserControl
 	{
         protected override void OnLoad(EventArgs e)
         {
@@ -44,12 +36,12 @@ namespace umbraco.presentation.umbraco.create
 			{
                 string returnUrl = LegacyDialogHandler.Create(
                     new HttpContextWrapper(Context),
-                    BasePage.Current.getUser(),
+                    UmbracoContext.UmbracoUser,
                     Request.GetItemAsString("nodeType"),
 					createFolder,
                     rename.Text + '\u00A4' + scriptType.SelectedValue);
 
-				BasePage.Current.ClientTools
+				ClientTools
                     .ChangeContentFrameUrl(returnUrl)
                     .ReloadActionNode(false, true)
 					.CloseModalWindow();

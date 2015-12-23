@@ -6,12 +6,11 @@ using NUnit.Framework;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers.Entities;
-using umbraco.BusinessLogic.Actions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
-using umbraco.BusinessLogic.Actions;
+using Umbraco.Web.LegacyActions;
 
 namespace Umbraco.Tests.Services
 {

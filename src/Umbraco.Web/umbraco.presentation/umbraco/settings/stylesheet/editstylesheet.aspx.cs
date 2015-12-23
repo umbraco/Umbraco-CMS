@@ -4,12 +4,12 @@ using System.Linq;
 using System.Web.UI;
 using Umbraco.Core.IO;
 using Umbraco.Web;
-using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.presentation.Trees;
 using umbraco.uicontrols;
 using Umbraco.Core;
+using Umbraco.Web.UI.Pages;
 
 namespace umbraco.cms.presentation.settings.stylesheet
 {

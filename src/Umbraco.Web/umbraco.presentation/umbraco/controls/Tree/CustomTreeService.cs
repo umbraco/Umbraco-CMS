@@ -1,8 +1,11 @@
 ﻿using System;
+using Umbraco.Core.Security;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web;
 using System.Web.Script.Services;
 using System.Web.Services;
+using System.Web.UI;
 using umbraco;
 using umbraco.cms.businesslogic;
 using umbraco.cms.presentation.Trees;
@@ -114,10 +117,32 @@ namespace umbraco.controls.Tree
             return returnVal;
         }
 
-        internal static void Authorize()
+        internal void Authorize()
         {
-            if (!umbraco.BasePages.BasePage.ValidateUserContextID(umbraco.BasePages.BasePage.umbracoUserContextID))
+            if (ValidateCurrentUser() == false)
                 throw new Exception("Client authorization failed. User is not logged in");
+        }
+
+
+        /// <summary>
+        /// Validates the currently logged in user and ensures they are not timed out
+        /// </summary>
+        /// <returns></returns>
+        private bool ValidateCurrentUser()
+        {
+            var identity = Context.GetCurrentIdentity(
+                //DO NOT AUTO-AUTH UNLESS THE CURRENT HANDLER IS WEBFORMS!
+                // Without this check, anything that is using this legacy API, like ui.Text will
+                // automatically log the back office user in even if it is a front-end request (if there is 
+                // a back office user logged in. This can cause problems becaues the identity is changing mid
+                // request. For example: http://issues.umbraco.org/issue/U4-4010
+                HttpContext.Current.CurrentHandler is Page);
+
+            if (identity != null)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

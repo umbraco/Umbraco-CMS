@@ -12,8 +12,8 @@ using umbraco.interfaces;
 using System.Xml;
 using System.Collections.Generic;
 using System.Text;
-using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
+using Umbraco.Web.LegacyActions;
 using Umbraco.Web.Trees;
 
 namespace umbraco.cms.presentation.Trees

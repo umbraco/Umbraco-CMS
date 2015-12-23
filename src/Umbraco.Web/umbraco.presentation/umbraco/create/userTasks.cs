@@ -1,15 +1,9 @@
 using System;
-using System.Data;
 using System.Web.Security;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
 using Umbraco.Core.Security;
-using umbraco.DataLayer;
-using umbraco.BasePages;
-using Umbraco.Core.IO;
-using umbraco.cms.businesslogic.member;
 using Umbraco.Core;
 
 namespace umbraco

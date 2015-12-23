@@ -6,6 +6,7 @@ using System.Web.UI.WebControls;
 using System.Collections;
 using umbraco.cms.businesslogic.macro;
 using System.Web;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Web;
 

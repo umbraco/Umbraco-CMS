@@ -16,7 +16,6 @@ using umbraco;
 using System.Linq;
 using umbraco.BusinessLogic;
 using umbraco.presentation.preview;
-using GlobalSettings = umbraco.GlobalSettings;
 
 namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 {
@@ -179,7 +178,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             }
 
             // no domain, respect HideTopLevelNodeFromPath for legacy purposes
-            if (hasDomains == false && global::umbraco.GlobalSettings.HideTopLevelNodeFromPath)
+            if (hasDomains == false && GlobalSettings.HideTopLevelNodeFromPath)
                 ApplyHideTopLevelNodeFromPath(umbracoContext, node, pathParts);
 
             // assemble the route

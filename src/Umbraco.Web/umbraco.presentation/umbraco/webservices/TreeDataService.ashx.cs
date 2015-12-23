@@ -40,15 +40,7 @@ namespace umbraco.presentation.webservices
                 return false;
             }
         }
-
-        [Obsolete("Use the base class AuthorizeRequest methods in UmbracoAuthorizedHttpHandler")]
-        public static void Authorize()
-        {
-            if (!BasePages.BasePage.ValidateUserContextID(BasePages.BasePage.umbracoUserContextID))
-                throw new Exception("Client authorization failed. User is not logged in");
-
-        }
-
+        
         /// <summary>
         /// Returns the an XmlTree based on the current http request
         /// </summary>

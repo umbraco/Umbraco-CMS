@@ -1,16 +1,11 @@
-﻿using System;
-using System.Data;
-using System.Drawing;
-using System.Web;
+﻿using System.Web;
 using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
 using System.IO;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Web.UI;
 using Umbraco.Core.IO;
-using umbraco.BasePages;
 using Umbraco.Web;
+using Umbraco.Web.UI.Controls;
 
 namespace umbraco.presentation.create
 {
@@ -19,7 +14,7 @@ namespace umbraco.presentation.create
     /// <summary>
     ///		Summary description for xslt.
     /// </summary>
-    public partial class xslt : System.Web.UI.UserControl
+    public partial class xslt : UmbracoUserControl
     {
         protected System.Web.UI.WebControls.ListBox nodeType;
 
@@ -56,12 +51,12 @@ namespace umbraco.presentation.create
 
                 var returnUrl = LegacyDialogHandler.Create(
                     new HttpContextWrapper(Context),
-                    BasePage.Current.getUser(),
+                    UmbracoContext.UmbracoUser,
                     Request.GetItemAsString("nodeType"),
                     createMacroVal,
                     xsltName + "|||" + rename.Text);
 
-                BasePage.Current.ClientTools
+                ClientTools
                     .ChangeContentFrameUrl(returnUrl)
                     .ChildNodeCreated()
                     .CloseModalWindow();

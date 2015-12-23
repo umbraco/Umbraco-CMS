@@ -3,8 +3,6 @@ using System.Web.Script.Services;
 using System.Web.Services;
 using System.ComponentModel;
 using Umbraco.Web.WebServices;
-using umbraco.BasePages;
-using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
 using Umbraco.Core;
 

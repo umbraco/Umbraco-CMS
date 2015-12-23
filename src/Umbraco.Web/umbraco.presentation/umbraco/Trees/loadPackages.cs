@@ -9,6 +9,7 @@ using umbraco.cms.businesslogic.packager;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
 using umbraco.interfaces;
+using Umbraco.Web.LegacyActions;
 using Umbraco.Web.Trees;
 
 namespace umbraco
@@ -87,7 +88,7 @@ namespace umbraco
                         xNode.Icon = "icon-box";
                         xNode.OpenIcon = "icon-box";
                         xNode.NodeType = "createdPackageInstance";
-                        xNode.Menu.Add(umbraco.BusinessLogic.Actions.ActionDelete.Instance);
+                        xNode.Menu.Add(ActionDelete.Instance);
                         tree.Add(xNode);
                     }
                     break;
@@ -103,7 +104,7 @@ namespace umbraco
                         xNode.Icon = "icon-server-alt";
                         xNode.OpenIcon = "icon-server-alt";
                         xNode.NodeType = "packagesRepo" + repo.Guid;
-                        xNode.Menu.Add( umbraco.BusinessLogic.Actions.ActionRefresh.Instance );
+                        xNode.Menu.Add( ActionRefresh.Instance );
                         xNode.Source = "tree.aspx?app=" + this._app + "&id=" + this._id + "&treeType=packagerPackages&packageType=repository&repoGuid=" + repo.Guid + "&rnd=" + Guid.NewGuid();
                         tree.Add(xNode);
                         

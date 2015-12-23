@@ -9,10 +9,10 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Services;
 using Umbraco.Web.Trees;
 using umbraco.BusinessLogic;
-using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.media;
 using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
+using Umbraco.Web.LegacyActions;
 
 namespace umbraco.cms.presentation.Trees
 {

@@ -19,7 +19,7 @@ namespace umbraco.presentation.dialogs
 	/// <summary>
 	/// Summary description for exportDocumenttype.
 	/// </summary>
-	public class exportDocumenttype : BasePages.UmbracoEnsuredPage
+	public class exportDocumenttype : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
 	{
 	    public exportDocumenttype()
 	    {

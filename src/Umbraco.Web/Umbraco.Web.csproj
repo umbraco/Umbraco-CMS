@@ -314,6 +314,40 @@
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
     <Compile Include="LightInjectExtensions.cs" />
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
+    <Compile Include="LegacyActions\Action.cs" />
+    <Compile Include="LegacyActions\ActionAssignDomain.cs" />
+    <Compile Include="LegacyActions\ActionAudit.cs" />
+    <Compile Include="LegacyActions\ActionBrowse.cs" />
+    <Compile Include="LegacyActions\ActionChangeDocType.cs" />
+    <Compile Include="LegacyActions\ActionCopy.cs" />
+    <Compile Include="LegacyActions\ActionDelete.cs" />
+    <Compile Include="LegacyActions\ActionDisable.cs" />
+    <Compile Include="LegacyActions\ActionEmptyTranscan.cs" />
+    <Compile Include="LegacyActions\ActionExport.cs" />
+    <Compile Include="LegacyActions\ActionImport.cs" />
+    <Compile Include="LegacyActions\ActionMove.cs" />
+    <Compile Include="LegacyActions\ActionNew.cs" />
+    <Compile Include="LegacyActions\ActionNewFolder.cs" />
+    <Compile Include="LegacyActions\ActionNotify.cs" />
+    <Compile Include="LegacyActions\ActionNull.cs" />
+    <Compile Include="LegacyActions\ActionPackage.cs" />
+    <Compile Include="LegacyActions\ActionPackageCreate.cs" />
+    <Compile Include="LegacyActions\ActionProtect.cs" />
+    <Compile Include="LegacyActions\ActionPublish.cs" />
+    <Compile Include="LegacyActions\ActionQuit.cs" />
+    <Compile Include="LegacyActions\ActionRefresh.cs" />
+    <Compile Include="LegacyActions\ActionRePublish.cs" />
+    <Compile Include="LegacyActions\ActionRestore.cs" />
+    <Compile Include="LegacyActions\ActionRights.cs" />
+    <Compile Include="LegacyActions\ActionRollback.cs" />
+    <Compile Include="LegacyActions\ActionSendToTranslate.cs" />
+    <Compile Include="LegacyActions\ActionSort.cs" />
+    <Compile Include="LegacyActions\ActionToPublish.cs" />
+    <Compile Include="LegacyActions\ActionTranslate.cs" />
+    <Compile Include="LegacyActions\ActionUnPublish.cs" />
+    <Compile Include="LegacyActions\ActionUpdate.cs" />
+    <Compile Include="LegacyActions\ContextMenuSeperator.cs" />
+    <Compile Include="LegacyActions\LegacyActionMenuItemAttribute.cs" />
     <Compile Include="Routing\NotFoundHandlerHelper.cs" />
     <Compile Include="Install\InstallSteps\Version73FileCleanup.cs" />
     <Compile Include="Models\ContentEditing\ContentTypeDisplay.cs" />
@@ -857,9 +891,6 @@
     <Compile Include="umbraco.presentation\umbraco\create\simple.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Packages\directoryBrowser.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\ProtectPage.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -1031,9 +1062,6 @@
     <Compile Include="umbraco.presentation\umbraco\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\tree.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\PartialViewMacrosTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\PartialViewTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\developer\Macros\editMacro.aspx.cs">
@@ -1087,9 +1115,6 @@
     <Compile Include="Mvc\RouteDefinition.cs" />
     <Compile Include="Mvc\RouteValueDictionaryExtensions.cs" />
     <Compile Include="Routing\UmbracoRequestEventArgs.cs" />
-    <Compile Include="UmbracoUserControl.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="WebApi\UmbracoAuthorizeAttribute.cs" />
     <Compile Include="WebApi\UmbracoAuthorizedApiController.cs" />
     <Compile Include="WebApi\Filters\ValidationFilterAttribute.cs" />
@@ -1119,7 +1144,6 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\BasePageExtensions.cs" />
     <Compile Include="umbraco.presentation\content.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -1429,13 +1453,6 @@
     <Compile Include="umbraco.presentation\umbraco\dialogs\viewAuditTrail.aspx.designer.cs">
       <DependentUpon>viewAuditTrail.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\js\language.aspx.cs">
-      <DependentUpon>language.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\js\language.aspx.designer.cs">
-      <DependentUpon>language.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\members\EditMemberGroup.aspx.cs">
       <DependentUpon>EditMemberGroup.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1534,9 +1551,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\translation\xml.aspx.designer.cs">
       <DependentUpon>xml.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\treeInit.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\Trees\BaseTree.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\FileSystemTree.cs" />
@@ -1795,9 +1809,6 @@
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\getXsltStatus.asmx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltChooseExtension.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltInsertValueOf.aspx" />
-    <Content Include="umbraco.presentation\umbraco\js\language.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\members\EditMemberGroup.aspx">
       <SubType>Form</SubType>
     </Content>
@@ -1852,10 +1863,6 @@
     <EmbeddedResource Include="Mvc\Strings.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="umbraco.presentation\umbraco\js\language.aspx.resx">
-      <DependentUpon>language.aspx.cs</DependentUpon>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="umbraco.presentation\umbraco\templateControls\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

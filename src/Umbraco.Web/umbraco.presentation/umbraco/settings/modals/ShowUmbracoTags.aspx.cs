@@ -16,7 +16,7 @@ namespace umbraco.cms.presentation.settings.modal
     /// <summary>
     /// Summary description for ShowUmbracoTags.
     /// </summary>
-    public partial class ShowUmbracoTags : BasePages.UmbracoEnsuredPage
+    public partial class ShowUmbracoTags : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
     {
 
         public ShowUmbracoTags()

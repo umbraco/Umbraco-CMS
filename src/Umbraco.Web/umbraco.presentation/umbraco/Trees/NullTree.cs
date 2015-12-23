@@ -9,7 +9,7 @@ using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using System.Collections.Generic;
 using umbraco.interfaces;
-using umbraco.BusinessLogic.Actions;
+using Umbraco.Web.LegacyActions;
 
 namespace umbraco.cms.presentation.Trees
 {

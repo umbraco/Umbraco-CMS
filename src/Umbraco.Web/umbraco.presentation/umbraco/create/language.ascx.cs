@@ -2,10 +2,8 @@
 using System.Collections;
 using System.Globalization;
 using System.Web;
-using System.Web.UI;
 using System.Web.UI.WebControls;
 using Umbraco.Web.UI;
-using umbraco.BasePages;
 using Umbraco.Web;
 
 namespace umbraco.cms.presentation.create.controls
@@ -13,7 +11,7 @@ namespace umbraco.cms.presentation.create.controls
     /// <summary>
     ///		Summary description for language.
     /// </summary>
-    public partial class language : UserControl
+    public partial class language : global::Umbraco.Web.UI.Controls.UmbracoUserControl
     {
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -41,12 +39,12 @@ namespace umbraco.cms.presentation.create.controls
         {
             LegacyDialogHandler.Create(
                 new HttpContextWrapper(Context),
-                BasePage.Current.getUser(),
+                UmbracoContext.UmbracoUser,
                 Request.GetItemAsString("nodeType"),
                 -1,
                 Cultures.SelectedValue);
 
-            BasePage.Current.ClientTools
+            ClientTools
                 .ChildNodeCreated()
                 .CloseModalWindow();
         }

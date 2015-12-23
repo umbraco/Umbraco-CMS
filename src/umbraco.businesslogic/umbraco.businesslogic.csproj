@@ -195,16 +195,6 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="BasePages\BasePage.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="BasePages\ClientTools.cs" />
-    <Compile Include="BasePages\UmbracoEnsuredPage.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="GlobalSettings.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Interfaces\ILog.cs" />
     <Compile Include="Log.cs">
       <SubType>Code</SubType>

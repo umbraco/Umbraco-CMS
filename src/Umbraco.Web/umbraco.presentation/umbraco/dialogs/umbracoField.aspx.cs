@@ -20,7 +20,7 @@ namespace umbraco.dialogs
 	/// <summary>
 	/// Summary description for umbracoField.
 	/// </summary>
-	public partial class umbracoField : BasePages.UmbracoEnsuredPage
+	public partial class umbracoField : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
 	{
 		string[] preValuesSource = { "@createDate", "@creatorName", "@level", "@nodeType", "@nodeTypeAlias", "@pageID", "@pageName", "@parentID", "@path", "@template", "@updateDate", "@writerID", "@writerName" };
 		bool m_IsDictionaryMode = false;
@@ -74,25 +74,23 @@ namespace umbraco.dialogs
 			fieldPicker.StandardPropertiesLabel = ui.Text("templateEditor", "standardFields");
 			fieldPicker.CustomPropertiesLabel = ui.Text("templateEditor", "customFields");
 
-			IRecordsReader dataTypes = SqlHelper.ExecuteReader(fieldSql);
+			var dataTypes = DatabaseContext.Database.Fetch<dynamic>(fieldSql);
 			fieldPicker.DataTextField = "alias";
 			fieldPicker.DataValueField = "alias";
 			fieldPicker.DataSource = dataTypes;
 			fieldPicker.DataBind();
 			fieldPicker.Attributes.Add("onChange", "document.forms[0].field.value = document.forms[0]." + fieldPicker.ClientID + "[document.forms[0]." + fieldPicker.ClientID + ".selectedIndex].value;");
-			dataTypes.Close();
 
 			altFieldPicker.ChooseText = ui.Text("templateEditor", "chooseField");
 			altFieldPicker.StandardPropertiesLabel = ui.Text("templateEditor", "standardFields");
 			altFieldPicker.CustomPropertiesLabel = ui.Text("templateEditor", "customFields");
 
-			IRecordsReader dataTypes2 = SqlHelper.ExecuteReader(fieldSql);
+			var dataTypes2 = DatabaseContext.Database.Fetch<dynamic>(fieldSql);
 			altFieldPicker.DataTextField = "alias";
 			altFieldPicker.DataValueField = "alias";
 			altFieldPicker.DataSource = dataTypes2;
 			altFieldPicker.DataBind();
 			altFieldPicker.Attributes.Add("onChange", "document.forms[0].useIfEmpty.value = document.forms[0]." + altFieldPicker.ClientID + "[document.forms[0]." + altFieldPicker.ClientID + ".selectedIndex].value;");
-			dataTypes2.Close();
 
 			// Pre values
 			if (!m_IsDictionaryMode)

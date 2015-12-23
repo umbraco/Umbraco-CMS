@@ -11,7 +11,7 @@ using Umbraco.Core.Services;
 using umbraco.interfaces;
 using umbraco.cms.businesslogic.template;
 using umbraco.cms.presentation.Trees;
-using umbraco.BusinessLogic.Actions;
+using Umbraco.Web.LegacyActions;
 
 
 namespace umbraco

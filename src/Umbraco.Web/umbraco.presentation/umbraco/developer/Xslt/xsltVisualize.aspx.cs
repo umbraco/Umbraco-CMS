@@ -9,11 +9,12 @@ using System.Xml;
 using System.IO;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Web.UI.Pages;
 
 namespace umbraco.presentation.umbraco.developer.Xslt
 {
     [WebformsPageTreeAuthorize(Constants.Trees.Xslt)]
-    public partial class xsltVisualize : BasePages.UmbracoEnsuredPage
+    public partial class xsltVisualize : UmbracoEnsuredPage
     {
         
 		// zb-00004 #29956 : refactor cookies names & handling

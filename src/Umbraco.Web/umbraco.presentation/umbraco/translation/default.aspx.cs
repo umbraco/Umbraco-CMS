@@ -1,29 +1,14 @@
 using System;
 using System.Data;
-using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Xml;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Models.EntityBase;
-using Umbraco.Web;
-using umbraco.BasePages;
-using umbraco.BusinessLogic;
-using umbraco.BusinessLogic.Actions;
-using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.task;
-using umbraco.cms.businesslogic.translation;
 //using umbraco.cms.businesslogic.utilities;
-using umbraco.cms.businesslogic.web;
-
-using ICSharpCode.SharpZipLib.BZip2;
-using ICSharpCode.SharpZipLib.Zip;
-using ICSharpCode.SharpZipLib.Zip.Compression;
-using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
-using ICSharpCode.SharpZipLib.GZip;
 using Umbraco.Core.IO;
 using System.Collections.Generic;
+using Umbraco.Web.UI.Pages;
 
 namespace umbraco.presentation.translation
 {
@@ -54,13 +39,13 @@ namespace umbraco.presentation.translation
             Tasks ts = new Tasks();
             if (Request["mode"] == "owned")
             {
-                ts = Task.GetOwnedTasks(base.getUser(), false);
+                ts = Task.GetOwnedTasks(UmbracoContext.UmbracoUser, false);
                 pane_tasks.Text = ui.Text("translation", "ownedTasks");
                 Panel2.Text = ui.Text("translation", "ownedTasks");
             }
             else
             {
-                ts = Task.GetTasks(base.getUser(), false);
+                ts = Task.GetTasks(UmbracoContext.UmbracoUser, false);
                 pane_tasks.Text = ui.Text("translation", "assignedTasks");
                 Panel2.Text = ui.Text("translation", "assignedTasks");
             }

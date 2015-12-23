@@ -16,7 +16,7 @@ namespace umbraco.cms.presentation
     /// Summary description for publishStatus.
     /// </summary>
     [Obsolete("This class is no longer used and will be removed from the codebase in future versions")]
-    public partial class publishStatus : BasePages.UmbracoEnsuredPage
+    public partial class publishStatus : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
     {
         public publishStatus()
         {
@@ -31,7 +31,7 @@ namespace umbraco.cms.presentation
             if (library.IsPublishing)
             {
                 Panel1.Controls.Add(new LiteralControl("Der er nu publiseret " + library.NodesPublished.ToString() + " ud af " + totalNodes.ToString() + " noder..."));
-                base.RefreshPage(2);
+                ClientTools.RefreshAdmin(2);
             }
             else
                 Panel1.Controls.Add(new LiteralControl("Færdig. Der er ialt publiseret " + library.NodesPublished.ToString() + " noder og det tog " + ((long)((System.DateTime.Now.Ticks - library.PublishStart.Ticks) / 10000000)).ToString() + " sekunder..."));

@@ -11,15 +11,16 @@ using Umbraco.Core.Logging;
 using Umbraco.Web.Trees;
 using Umbraco.Web.UI.Controls;
 using umbraco;
-using umbraco.BasePages;
 using umbraco.cms.businesslogic.template;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
 using umbraco.uicontrols;
+using Umbraco.Core.Configuration;
+using Umbraco.Web.UI.Pages;
 
 namespace Umbraco.Web.UI.Umbraco.Settings.Views
 {
-	public partial class EditView : global::umbraco.BasePages.UmbracoEnsuredPage
+	public partial class EditView : UmbracoEnsuredPage
 	{
 		private Template _template;
 		public MenuButton SaveButton;
@@ -178,13 +179,13 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
             SaveButton.CssClass = "client-side";
 
 			Panel1.Text = ui.Text("edittemplate");
-			pp_name.Text = ui.Text("name", base.getUser());
-			pp_alias.Text = ui.Text("alias", base.getUser());
-			pp_masterTemplate.Text = ui.Text("mastertemplate", base.getUser());
+			pp_name.Text = ui.Text("name", UmbracoContext.UmbracoUser);
+			pp_alias.Text = ui.Text("alias", UmbracoContext.UmbracoUser);
+			pp_masterTemplate.Text = ui.Text("mastertemplate", UmbracoContext.UmbracoUser);
 
 			// Editing buttons
             MenuIconI umbField = editorSource.Menu.NewIcon();
-			umbField.ImageURL = UmbracoPath + "/images/editor/insField.gif";
+			umbField.ImageURL = SystemDirectories.Umbraco + "/images/editor/insField.gif";
 			umbField.OnClickCommand =
 				ClientTools.Scripts.OpenModalWindow(
 					IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/umbracoField.aspx?objectId=" +
@@ -210,7 +211,7 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
             editorSource.Menu.InsertNewControl(macroSplitButton, 40);
 
             MenuIconI umbTemplateQueryBuilder = editorSource.Menu.NewIcon();
-            umbTemplateQueryBuilder.ImageURL = UmbracoPath + "/images/editor/inshtml.gif";
+            umbTemplateQueryBuilder.ImageURL = SystemDirectories.Umbraco + "/images/editor/inshtml.gif";
             umbTemplateQueryBuilder.OnClickCommand = "editViewEditor.openQueryModal()";
             umbTemplateQueryBuilder.AltText = "Open query builder";
 
@@ -253,21 +254,21 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
             editorSource.Menu.InsertSplitter();
 
             MenuIconI umbRenderBody = editorSource.Menu.NewIcon();
-            umbRenderBody.ImageURL = UmbracoPath + "/images/editor/renderbody.gif";
+            umbRenderBody.ImageURL = SystemDirectories.Umbraco + "/images/editor/renderbody.gif";
             //umbContainer.AltText = ui.Text("template", "insertContentAreaPlaceHolder");
             umbRenderBody.AltText = "Insert @RenderBody()";
 
             umbRenderBody.OnClickCommand = "editViewEditor.insertRenderBody()";
 
             MenuIconI umbSection = editorSource.Menu.NewIcon();
-            umbSection.ImageURL = UmbracoPath + "/images/editor/masterpagePlaceHolder.gif";
+            umbSection.ImageURL = SystemDirectories.Umbraco + "/images/editor/masterpagePlaceHolder.gif";
             //umbContainer.AltText = ui.Text("template", "insertContentAreaPlaceHolder");
             umbSection.AltText = "Insert Section";
 
             umbSection.OnClickCommand = "editViewEditor.openSnippetModal('section')";
 
             MenuIconI umbRenderSection = editorSource.Menu.NewIcon();
-            umbRenderSection.ImageURL = UmbracoPath + "/images/editor/masterpageContent.gif";
+            umbRenderSection.ImageURL = SystemDirectories.Umbraco + "/images/editor/masterpageContent.gif";
             //umbContainer.AltText = ui.Text("template", "insertContentAreaPlaceHolder");
             umbRenderSection.AltText = "Insert @RenderSection";
 

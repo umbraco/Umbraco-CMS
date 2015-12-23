@@ -40,12 +40,12 @@ namespace umbraco.presentation.webservices
         {
             bool isUpgrade = false;
             // if it's an upgrade, you'll need to be logged in before we allow this call
-            if (!String.IsNullOrEmpty(global::Umbraco.Core.Configuration.GlobalSettings.ConfigurationStatus))
+            if (string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus) == false)
             {
                 isUpgrade = true;
                 try
                 {
-                    legacyAjaxCalls.Authorize();
+                    AuthorizeRequest(true);
                 }
                 catch (Exception)
                 {

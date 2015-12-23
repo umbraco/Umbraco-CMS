@@ -1,13 +1,9 @@
 ﻿using System;
-using System.IO;
 using Umbraco.Core.CodeAnnotations;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
-using Umbraco.Web;
 using Umbraco.Web.UI;
-using umbraco.BasePages;
 using Umbraco.Core;
 
 namespace umbraco

@@ -1,19 +1,10 @@
 using System;
-using System.Data;
-using System.Configuration;
-using System.Collections;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
-using umbraco.BusinessLogic.Actions;
 using System.Collections.Generic;
 using umbraco.interfaces;
-using System.Drawing;
 using umbraco.BusinessLogic;
-using umbraco.BasePages;
+using Umbraco.Web;
+using Umbraco.Web.LegacyActions;
+using Action = Umbraco.Web.LegacyActions.Action;
 
 namespace umbraco.cms.presentation.user
 {
@@ -78,7 +69,7 @@ namespace umbraco.cms.presentation.user
                 throw new ArgumentNullException("No User specified");
 
             //get the logged in user's permissions
-            UserPermissions currUserPermissions = new UserPermissions(UmbracoEnsuredPage.CurrentUser);
+            UserPermissions currUserPermissions = new UserPermissions(UmbracoContext.Current.UmbracoUser);
             
             //lookup permissions for last node selected
             int selectedNodeId = m_nodeID[m_nodeID.Length - 1];
@@ -86,7 +77,7 @@ namespace umbraco.cms.presentation.user
             List<IAction> lstCurrUserActions = currUserPermissions.GetExistingNodePermission(selectedNodeId);
             List<IAction> lstLookupUserActions = m_userPermissions.GetExistingNodePermission(selectedNodeId);
             
-            List<IAction> lstAllActions = umbraco.BusinessLogic.Actions.Action.GetPermissionAssignable();
+            List<IAction> lstAllActions = Action.GetPermissionAssignable();
 
             //no node is selected, disable the check boxes
             if (m_nodeID[0] == -1)

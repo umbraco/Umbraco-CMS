@@ -10,7 +10,6 @@ using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using umbraco.BusinessLogic;
 using umbraco.presentation.preview;
-using GlobalSettings = umbraco.GlobalSettings;
 using IOHelper = Umbraco.Core.IO.IOHelper;
 using SystemDirectories = Umbraco.Core.IO.SystemDirectories;
 

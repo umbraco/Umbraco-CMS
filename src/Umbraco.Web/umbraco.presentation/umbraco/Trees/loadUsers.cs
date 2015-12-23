@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 using Umbraco.Core.Configuration;
-using umbraco.BasePages;
 using umbraco.BusinessLogic;
-using umbraco.businesslogic;
 using umbraco.interfaces;
 using umbraco.cms.presentation.Trees;
-using umbraco.BusinessLogic.Actions;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Web;
+using Umbraco.Web.LegacyActions;
 using Umbraco.Web.Trees;
 
 
@@ -51,7 +50,7 @@ function openUser(id) {
         {
             var users = new List<User>(User.getAll());
 
-            User currUser = UmbracoEnsuredPage.CurrentUser;
+            User currUser = UmbracoContext.Current.UmbracoUser;
 
             bool currUserIsAdmin = currUser.IsAdmin();
             foreach (User u in users.OrderBy(x => x.Disabled))

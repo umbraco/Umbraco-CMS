@@ -2,8 +2,6 @@
 using System.Web;
 using System.Web.Mvc;
 using Umbraco.Core;
-using Umbraco.Web.Security;
-using umbraco.BasePages;
 
 namespace Umbraco.Web.Mvc
 {
