@@ -122,18 +122,25 @@ ul.color-picker li a  {
 //
 // Media picker
 // --------------------------------------------------
-.umb-mediapicker .add-link{
+.umb-mediapicker .add-link {
   display: inline-block;
   height: 120px;
   width: 120px;
   text-align: center;
   color: @grayLight;
-  border: 2px @grayLight dashed !important;
+  border: 2px @grayLight dashed;
   line-height: 120px;
   text-decoration: none;
+
+  transition: all 150ms ease-in-out;
+
+  &:hover {
+      color: @blue;
+      border-color: @blue;
+  }
 }
 
-.umb-mediapicker .picked-image{
+.umb-mediapicker .picked-image {
   position: absolute;
   bottom: 10px;
   right: 10px;
@@ -178,12 +185,8 @@ ul.color-picker li a  {
 }
 
 
-.umb-sortable-thumbnails li{
+.umb-sortable-thumbnails li {
     display: inline-block;
-    border: 1px solid @grayLighter;
-    padding: 2px;
-    background: white;
-    margin: 5px;
     position: relative;
     text-align: center;
     vertical-align: top;
@@ -205,16 +208,6 @@ ul.color-picker li a  {
 .umb-sortable-thumbnails li img.noScale{
   max-width: none !important;
   max-height: none !important;
-}
-
-.umb-sortable-thumbnails .icon-holder .icon{
-  font-size: 60px;
-  line-height: 70px;
-}
-.umb-sortable-thumbnails .icon-holder *
-{
-  color: @grayLight;
-  display: block
 }
 
 

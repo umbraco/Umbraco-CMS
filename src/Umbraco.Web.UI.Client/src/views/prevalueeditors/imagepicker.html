@@ -1,10 +1,9 @@
 <div ng-controller="Umbraco.PrevalueEditors.ImageFilePickerController" class="umb-editor umb-mediapicker">
     <ul class="umb-sortable-thumbnails">
-        <li style="width: 120px; height: 100px; overflow: hidden;">
+        <li>
 
-                <a href ng-click="pick()" class="icon-holder" ng-hide="model.value">
-                    <i class="icon icon-add large" ></i>
-                    <small>Choose...</small>
+                <a href ng-click="pick()" class="icon-holder umb-mediapicker add-link" ng-hide="model.value">
+                    <i class="icon icon-add large"></i>
                 </a>
 
                 <img ng-src="{{model.value}}" alt="" ng-show="model.value">
