@@ -68,8 +68,10 @@
     </div>
 
     <!-- If list is empty, then display -->
-    <div ng-if="!items" class="umb-empty-state-text -center">
+    <umb-empty-state
+        ng-if="!items"
+        position="center">
         <localize key="content_listViewNoItems">There are no items show in the list.</localize>
-    </div>
+    </umb-empty-state>
 
 </div>

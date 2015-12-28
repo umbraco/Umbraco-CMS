@@ -14,9 +14,11 @@
    <small>Inherit tabs and properties from an existing document type. New tabs will be added to the current document type or merged if a tab with an identical name exists.</small>
 </div>
 
-<div class="umb-empty-state-text -center" ng-if="model.availableCompositeContentTypes.length === 0">
-   This content type is used in a composition, and therefore cannot be composed itself.
-</div>
+<umb-empty-state
+    ng-if="model.availableCompositeContentTypes.length === 0"
+    position="center">
+    This content type is used in a composition, and therefore cannot be composed itself.
+</umb-empty-state>
 
 <ul class="umb-checkbox-list">
    <li class="umb-checkbox-list__item" ng-repeat="compositeContentType in model.availableCompositeContentTypes | filter:searchTerm" ng-class="{ '-selected': model.compositeContentTypes.indexOf(compositeContentType.alias)+1 }">
