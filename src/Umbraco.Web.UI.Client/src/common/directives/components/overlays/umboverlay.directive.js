@@ -1,6 +1,6 @@
 /**
  * @ngdoc directive
- * @name umbraco.directives.directive:umbProperty
+ * @name umbraco.directives.directive:umbOverlay
  * @restrict E
  **/
 

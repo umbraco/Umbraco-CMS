@@ -1,10 +1,9 @@
 /**
 * @ngdoc directive
-* @name umbraco.directives.directive:umbCropsy
+* @name umbraco.directives.directive:umbImageGravity
 * @restrict E
 * @function
 * @description
-* Used by editors that require naming an entity. Shows a textbox/headline with a required validator within it's own form.
 **/
 angular.module("umbraco.directives")
 	.directive('umbImageGravity', function ($timeout, localizationService, $log) {
