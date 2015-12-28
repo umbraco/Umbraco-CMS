@@ -28,7 +28,7 @@ namespace Umbraco.Core.Services
         /// <param name="iconClosed">The icon closed.</param>
         /// <param name="iconOpened">The icon opened.</param>
         /// <param name="type">The type.</param>
-        void MakeNew(bool initialize, byte sortOrder, string applicationAlias, string alias, string title, string iconClosed, string iconOpened, string type);
+        void MakeNew(bool initialize, int sortOrder, string applicationAlias, string alias, string title, string iconClosed, string iconOpened, string type);
 
         /// <summary>
         /// Saves this instance.

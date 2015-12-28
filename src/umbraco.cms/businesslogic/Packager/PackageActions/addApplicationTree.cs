@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
+using Umbraco.Core;
 
 namespace umbraco.cms.businesslogic.packager.standardPackageActions
 {
@@ -28,7 +29,6 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions
         /// </code></example>
         public bool Execute(string packageName, XmlNode xmlData)
         {
-            bool silent = bool.Parse(xmlData.Attributes["silent"].Value);
             bool initialize = bool.Parse(xmlData.Attributes["initialize"].Value);
             byte sortOrder = byte.Parse(xmlData.Attributes["sortOrder"].Value);
 
@@ -37,13 +37,9 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions
             string treeTitle = xmlData.Attributes["treeTitle"].Value;
             string iconOpened = xmlData.Attributes["iconOpened"].Value;
             string iconClosed = xmlData.Attributes["iconClosed"].Value;
-
-            string assemblyName = xmlData.Attributes["assemblyName"].Value;
             string type = xmlData.Attributes["treeHandlerType"].Value;
-            string action = xmlData.Attributes["action"].Value;
-
-
-            BusinessLogic.ApplicationTree.MakeNew(silent, initialize, sortOrder, applicationAlias, treeAlias, treeTitle, iconClosed, iconOpened, assemblyName, type, action);
+            
+            ApplicationContext.Current.Services.ApplicationTreeService.MakeNew(initialize, sortOrder, applicationAlias, treeAlias, treeTitle, iconClosed, iconOpened, type);
 
             return true;
         }
@@ -57,7 +53,11 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions
         public bool Undo(string packageName, XmlNode xmlData)
         {
             string treeAlias = xmlData.Attributes["treeAlias"].Value;
-            BusinessLogic.ApplicationTree.getByAlias(treeAlias).Delete();
+            var found = ApplicationContext.Current.Services.ApplicationTreeService.GetByAlias(treeAlias);
+            if (found != null)
+            {
+                ApplicationContext.Current.Services.ApplicationTreeService.DeleteTree(found);
+            }
             return true;
         }
 

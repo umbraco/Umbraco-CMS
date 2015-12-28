@@ -1017,7 +1017,6 @@
     <Compile Include="Search\ExamineEvents.cs" />
     <Compile Include="Strategies\Migrations\PublishAfterUpgradeToVersionSixth.cs" />
     <Compile Include="Strategies\LegacyClasses.cs" />
-    <Compile Include="Strategies\Migrations\EnsureAppsTreesUpdatedOnUpgrade.cs" />
     <Compile Include="Strategies\ServerRegistrationEventHandler.cs" />
     <Compile Include="Templates\TemplateRenderer.cs" />
     <Compile Include="Templates\TemplateUtilities.cs" />
@@ -1502,10 +1501,6 @@
       <DependentUpon>MacroContainerService.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\webservices\TreeClientService.asmx.cs">
-      <DependentUpon>TreeClientService.asmx</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\templateControls\DisableEventValidation.cs" />
     <Compile Include="umbraco.presentation\umbraco\templateControls\Item.cs" />
     <Compile Include="umbraco.presentation\umbraco\templateControls\ItemRenderer.cs" />
@@ -1560,9 +1555,6 @@
     <Compile Include="umbraco.presentation\umbraco\Trees\loadXslt.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\NullTree.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\LegacyTree.cs" />
-    <Compile Include="umbraco.presentation\umbraco\webservices\TreeDataService.ashx.cs">
-      <DependentUpon>TreeDataService.ashx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\Trees\TreeDefinitionCollection.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\TreeDefinition.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\TreeDialogModes.cs" />
@@ -1730,7 +1722,6 @@
     </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\search.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\SendPublish.aspx" />
-    <Content Include="umbraco.presentation\umbraco\webservices\TreeClientService.asmx" />
     <Content Include="umbraco.presentation\umbraco\members\search.aspx" />
     <Content Include="umbraco.presentation\umbraco\translation\details.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Packages\BrowseRepository.aspx" />
@@ -1829,7 +1820,6 @@
     </Content>
     <Content Include="umbraco.presentation\umbraco\webservices\templates.asmx" />
     <Content Include="umbraco.presentation\umbraco\webservices\trashcan.asmx" />
-    <Content Include="umbraco.presentation\umbraco\webservices\TreeDataService.ashx" />
     <None Include="umbraco.presentation\umbraco\Trees\Trees.cd" />
     <None Include="umbraco.presentation\umbraco\Trees\XmlTree.xsd">
       <SubType>

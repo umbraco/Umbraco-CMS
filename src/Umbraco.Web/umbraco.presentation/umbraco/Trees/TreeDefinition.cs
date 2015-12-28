@@ -7,8 +7,8 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
-using umbraco.BusinessLogic;
 using umbraco.interfaces;
+using Umbraco.Core.Models;
 
 namespace umbraco.cms.presentation.Trees
 {
@@ -27,7 +27,7 @@ namespace umbraco.cms.presentation.Trees
         /// <param name="type">The type.</param>
         /// <param name="tree">The tree.</param>
         /// <param name="app">The app.</param>
-        public TreeDefinition(Type type, ApplicationTree tree, Application app)
+        public TreeDefinition(Type type, ApplicationTree tree, Section app)
         {
             m_treeType = type;
             m_tree = tree;
@@ -36,7 +36,7 @@ namespace umbraco.cms.presentation.Trees
 
         private Type m_treeType;
         private ApplicationTree m_tree;
-        private Application m_app;
+        private Section m_app;
 
         /// <summary>
         /// Returns a new instance of a BaseTree based on this Tree Definition
@@ -44,12 +44,12 @@ namespace umbraco.cms.presentation.Trees
         public BaseTree CreateInstance()
         {       
             //create the tree instance
-            ITree typeInstance = CreateTreeInstance(m_treeType, m_app.alias);
+            var typeInstance = CreateTreeInstance(m_treeType, m_app.Alias);
 
             if (typeInstance != null)
             {
                 //convert to BaseTree
-                return (BaseTree.IsBaseTree(typeInstance) ? typeInstance as BaseTree : BaseTree.FromITree(typeInstance, m_tree.Alias, m_app.alias, m_tree.IconClosed, m_tree.IconOpened, m_tree.Action));                    
+                return (BaseTree.IsBaseTree(typeInstance) ? typeInstance as BaseTree : BaseTree.FromITree(typeInstance, m_tree.Alias, m_app.Alias, m_tree.IconClosed, m_tree.IconOpened, null));                    
             }
             return null;
         }
@@ -78,7 +78,7 @@ namespace umbraco.cms.presentation.Trees
         /// Gets or sets the application.
         /// </summary>
         /// <value>The app.</value>
-        public Application App
+        public Section App
         {
             get { return m_app; }
             set { m_app = value; }

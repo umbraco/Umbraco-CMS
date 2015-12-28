@@ -7,6 +7,7 @@ using umbraco.interfaces;
 using System.Collections.Generic;
 using System.Web.Script.Serialization;
 using umbraco.businesslogic.Utils;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Web.UI.Pages;
 using Action = Umbraco.Web.LegacyActions.Action;
@@ -200,9 +201,8 @@ namespace umbraco.cms.presentation.Trees
 			xNode.NodeType = bTree.TreeAlias;
 			xNode.Text = BaseTree.GetTreeHeader(bTree.TreeAlias);
 			
-            // By default the action from the trees.config will be used, if none is specified then the apps dashboard will be used.
-            var appTreeItem = umbraco.BusinessLogic.ApplicationTree.getByAlias(bTree.TreeAlias);
-            xNode.Action = appTreeItem == null || String.IsNullOrEmpty(appTreeItem.Action) ? "javascript:" + ClientTools.Scripts.OpenDashboard(bTree.app) : "javascript:" + appTreeItem.Action;
+            // The apps dashboard action will be used
+            xNode.Action = "javascript:" + ClientTools.Scripts.OpenDashboard(bTree.app);
 			
             xNode.IsRoot = true;
 			//generally the tree type and node type are the same but in some cased they are not.

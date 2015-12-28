@@ -435,7 +435,7 @@ namespace umbraco.controls.Tree
             {
                 TreeDefinition treeDef = TreeDefinitionCollection.Instance.FindTree(m_TreeService.TreeType);
                 if (treeDef != null)
-                    return treeDef.App.alias;
+                    return treeDef.App.Alias;
             }
             else if (!string.IsNullOrEmpty(m_TreeService.App))
                 return m_TreeService.App;

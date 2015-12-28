@@ -185,8 +185,6 @@
     <Compile Include="Application.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ApplicationTree.cs" />
-    <Compile Include="ApplicationTreeRegistrar.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

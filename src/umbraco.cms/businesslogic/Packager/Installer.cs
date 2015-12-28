@@ -436,11 +436,7 @@ namespace umbraco.cms.businesslogic.packager
                     }
                 }
                 #endregion
-
-                // Trigger update of Apps / Trees config.
-                // (These are ApplicationStartupHandlers so just instantiating them will trigger them)
-                new ApplicationTreeRegistrar();
-
+                
                 insPack.Save();
 
                 OnPackageBusinessLogicInstalled(insPack);

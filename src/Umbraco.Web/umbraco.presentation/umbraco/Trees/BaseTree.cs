@@ -488,7 +488,7 @@ namespace umbraco.cms.presentation.Trees
             //going to make it equal to what is specified in the db.
             if (treeCaption.Length > 0 && treeCaption.Substring(0, 1) == "[")
             {
-                ApplicationTree tree = ApplicationTree.getByAlias(alias);
+                var tree = ApplicationContext.Current.Services.ApplicationTreeService.GetByAlias(alias);
                 if (tree != null)
                     return tree.Title.SplitPascalCasing().ToFirstUpperInvariant();
             }

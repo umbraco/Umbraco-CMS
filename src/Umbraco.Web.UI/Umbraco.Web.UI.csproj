@@ -789,7 +789,6 @@
     <Content Include="Umbraco_Client\Application\UmbracoUtils.js" />
     <Content Include="Umbraco_Client\Application\UmbracoApplicationActions.js" />
     <Content Include="Umbraco_Client\Application\UmbracoClientManager.js" />
-    <Content Include="Umbraco\Webservices\TreeClientService.asmx" />
     <Content Include="Umbraco_Client\Application\NamespaceManager.js" />
     <Content Include="Umbraco\Members\search.aspx" />
     <Content Include="Umbraco\Translation\details.aspx" />
@@ -1320,7 +1319,6 @@
     <Content Include="App_Browsers\w3cvalidator.browser" />
     <Content Include="App_Browsers\Form.browser" />
     <Content Include="Umbraco\Masterpages\default.Master" />
-    <Content Include="Umbraco\Webservices\TreeDataService.ashx" />
     <Content Include="Umbraco\Webservices\MediaUploader.ashx" />
     <None Include="web.Template.config">
       <SubType>Designer</SubType>

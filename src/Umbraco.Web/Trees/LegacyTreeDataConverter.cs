@@ -11,10 +11,11 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using umbraco;
-using umbraco.BusinessLogic;
+
 using umbraco.cms.presentation.Trees;
 using umbraco.controls.Tree;
 using umbraco.interfaces;
+using Umbraco.Core.Models;
 using Umbraco.Web.LegacyActions;
 
 namespace Umbraco.Web.Trees
@@ -42,8 +43,8 @@ namespace Umbraco.Web.Trees
 
                 var treeDef = new TreeDefinition(
                     legacyAtt.BaseTreeType,
-                    new ApplicationTree(false, true, (byte)appTree.SortOrder, appTree.ApplicationAlias, appTree.Alias, appTree.Title, appTree.IconClosed, appTree.IconOpened, "", legacyAtt.BaseTreeType.GetFullNameWithAssembly(), ""),
-                    new Application(appTree.Alias, appTree.Alias, "", 0));
+                    new ApplicationTree(true, appTree.SortOrder, appTree.ApplicationAlias, appTree.Alias, appTree.Title, appTree.IconClosed, appTree.IconOpened, legacyAtt.BaseTreeType.GetFullNameWithAssembly()),
+                    new Section(appTree.Alias, appTree.Alias, "", 0));
 
                 tree = treeDef.CreateInstance();
                 tree.TreeAlias = appTree.Alias;
