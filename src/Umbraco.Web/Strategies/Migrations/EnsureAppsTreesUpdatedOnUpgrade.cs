@@ -36,7 +36,6 @@ namespace Umbraco.Web.Strategies.Migrations
         void EnsureAppsTreesUpdated_Upgrading(object sender, EnsureAppsTreesUpdated.UpgradingEventArgs e)
         {
             var treeRegistrar = new ApplicationTreeRegistrar();
-            var appRegistrar = new ApplicationRegistrar();
         }
     }
 }

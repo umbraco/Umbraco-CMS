@@ -160,8 +160,7 @@ namespace Umbraco.Tests.TestHelpers
                     var mappers = PluginManager.Current.FindAndCreateInstances<IMapperConfiguration>(
                         specificAssemblies: new[]
                         {
-                            typeof(ContentModelMapper).Assembly,
-                            typeof(ApplicationRegistrar).Assembly
+                            typeof(ContentModelMapper).Assembly
                         });
                     foreach (var mapper in mappers)
                     {
