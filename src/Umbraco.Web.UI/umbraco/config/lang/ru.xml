@@ -421,7 +421,7 @@
     <key alias="addRows">Добавить новые строки</key>
     <key alias="allowAllEditors">Доступны все редакторы</key>
     <key alias="allowAllRowConfigurations">Доступны все конфигурации строк</key>
-    <key alias="chooseLayout">Choose a layout</key>
+    <key alias="chooseLayout">Выберите раскладку</key>
     <key alias="clickToEmbed">Кликните для встраивания</key>
     <key alias="clickToInsertImage">Кликните для вставки изображения</key>
     <key alias="columns">Колонки</key>
