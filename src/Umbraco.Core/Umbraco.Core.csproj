@@ -343,9 +343,12 @@
     <Compile Include="Logging\OwinLoggerFactory.cs" />
     <Compile Include="Logging\ParallelForwardingAppender.cs" />
     <Compile Include="Manifest\GridEditorConverter.cs" />
+    <Compile Include="Models\ApplicationAttribute.cs" />
+    <Compile Include="Models\ApplicationDefinitions.cs" />
     <Compile Include="Models\AuditItem.cs" />
     <Compile Include="Models\AuditType.cs" />
     <Compile Include="Models\EntityContainer.cs" />
+    <Compile Include="Models\IApplication.cs" />
     <Compile Include="ObjectResolution\ContainerLazyManyObjectsResolver.cs" />
     <Compile Include="ObjectResolution\ContainerManyObjectsResolver.cs" />
     <Compile Include="Models\Identity\IdentityModelMappings.cs" />

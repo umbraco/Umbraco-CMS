@@ -185,12 +185,8 @@
     <Compile Include="Application.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ApplicationAttribute.cs" />
-    <Compile Include="ApplicationDefinitions.cs" />
-    <Compile Include="ApplicationRegistrar.cs" />
     <Compile Include="ApplicationTree.cs" />
     <Compile Include="ApplicationTreeRegistrar.cs" />
-    <Compile Include="PluginManagerExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -209,7 +205,6 @@
     </Compile>
     <Compile Include="Utils\JSONSerializer.cs" />
     <Compile Include="Utils\SerializableData.cs" />
-    <Compile Include="Utils\Singleton.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

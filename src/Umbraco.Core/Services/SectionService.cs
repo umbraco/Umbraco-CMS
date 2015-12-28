@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,13 +18,12 @@ namespace Umbraco.Core.Services
     internal class SectionService : ISectionService
     {
         private readonly IUserService _userService;
-        private IEnumerable<Section> _allAvailableSections;
+        private readonly Lazy<IEnumerable<Section>> _allAvailableSections;
         private readonly IApplicationTreeService _applicationTreeService;
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         private readonly CacheHelper _cache;
         internal const string AppConfigFileName = "applications.config";
         private static string _appConfig;
-        private volatile bool _isInitialized = false;
         private static readonly object Locker = new object();
 
         public SectionService(
@@ -39,8 +39,8 @@ namespace Umbraco.Core.Services
             _applicationTreeService = applicationTreeService;
             _uowProvider = uowProvider;
             _cache = cache;
+            _allAvailableSections = new Lazy<IEnumerable<Section>>(() => new LazyEnumerableSections());
         }
-
         
 
         /// <summary>
@@ -61,21 +61,7 @@ namespace Umbraco.Core.Services
             }
             set { _appConfig = value; }
         }
-
-        /// <summary>
-        /// Initializes the service with all available application plugins
-        /// </summary>
-        /// <param name="allAvailableSections">
-        /// All application plugins found in assemblies
-        /// </param>
-        /// <remarks>
-        /// This is used to populate the app.config file with any applications declared in plugins that don't exist in the file
-        /// </remarks>
-        public void Initialize(IEnumerable<Section> allAvailableSections)
-        {
-            _allAvailableSections = allAvailableSections;            
-        }
-
+        
         /// <summary>
         /// The cache storage for all applications
         /// </summary>
@@ -85,64 +71,41 @@ namespace Umbraco.Core.Services
                 CacheKeys.ApplicationsCacheKey,
                 () =>
                     {
-                        ////used for unit tests
-                        //if (_testApps != null)
-                        //    return _testApps;
-
                         var list = ReadFromXmlAndSort();
+                        var hasChanges = false;                    
+                        var localCopyList = list;
 
-                        //On first access we need to do some initialization
-                        if (_isInitialized == false)
+                        LoadXml(doc =>
                         {
-                            lock (Locker)
+                            //Now, load in the xml structure and update it with anything that is not declared there and save the file.
+                            //NOTE: On the first iteration here, it will lazily scan all apps, etc... this is because this ienumerable is lazy                      
+                            //Get all the trees not registered in the config
+                            
+                            var unregistered = _allAvailableSections.Value
+                                .Where(x => localCopyList.Any(l => l.Alias == x.Alias) == false)
+                                .ToArray();
+
+                            hasChanges = unregistered.Any();
+
+                            var count = 0;
+                            foreach (var attr in unregistered)
                             {
-                                if (_isInitialized == false)
-                                {
-                                    //now we can check the non-volatile flag
-                                    if (_allAvailableSections != null)
-                                    {
-                                        var hasChanges = false;
-
-                                        LoadXml(doc =>
-                                        {
-                                            //Now, load in the xml structure and update it with anything that is not declared there and save the file.
-
-                                            //NOTE: On the first iteration here, it will lazily scan all apps, etc... this is because this ienumerable is lazy
-                                            // based on the ApplicationRegistrar - and as noted there this is not an ideal way to do things but were stuck like this
-                                            // currently because of the legacy assemblies and types not in the Core.
-
-                                            //Get all the trees not registered in the config
-                                            var unregistered = _allAvailableSections
-                                                .Where(x => list.Any(l => l.Alias == x.Alias) == false)
-                                                .ToArray();
-
-                                            hasChanges = unregistered.Any();
-
-                                            var count = 0;
-                                            foreach (var attr in unregistered)
-                                            {
-                                                doc.Root.Add(new XElement("add",
-                                                    new XAttribute("alias", attr.Alias),
-                                                    new XAttribute("name", attr.Name),
-                                                    new XAttribute("icon", attr.Icon),
-                                                    new XAttribute("sortOrder", attr.SortOrder)));
-                                                count++;
-                                            }
-
-                                            //don't save if there's no changes
-                                            return count > 0;
-                                        }, true);
-
-                                        if (hasChanges)
-                                        {
-                                            //If there were changes, we need to re-read the structures from the XML
-                                            list = ReadFromXmlAndSort();
-                                        }
-                                    }
-                                }
-
-                                _isInitialized = true;
+                                doc.Root.Add(new XElement("add",
+                                    new XAttribute("alias", attr.Alias),
+                                    new XAttribute("name", attr.Name),
+                                    new XAttribute("icon", attr.Icon),
+                                    new XAttribute("sortOrder", attr.SortOrder)));
+                                count++;
                             }
+
+                            //don't save if there's no changes
+                            return count > 0;
+                        }, true);
+
+                        if (hasChanges)
+                        {
+                            //If there were changes, we need to re-read the structures from the XML
+                            list = ReadFromXmlAndSort();
                         }
 
                         return list;
@@ -312,6 +275,53 @@ namespace Umbraco.Core.Services
             if (New != null)
             {
                 New(app, args);
+            }
+        }
+
+        /// <summary>
+        /// This class is here so that we can provide lazy access to tree scanning for when it is needed
+        /// </summary>
+        private class LazyEnumerableSections : IEnumerable<Section>
+        {
+            public LazyEnumerableSections()
+            {
+                _lazySections = new Lazy<IEnumerable<Section>>(() =>
+                {
+                    // Load all Applications by attribute and add them to the XML config
+
+                    //don't cache the result of this because it is only used once during app startup, caching will just add a bit more mem overhead for no reason
+                    var types = PluginManager.Current.ResolveTypesWithAttribute<IApplication, ApplicationAttribute>(cacheResult: false);
+
+                    //since applications don't populate their metadata from the attribute and because it is an interface, 
+                    //we need to interrogate the attributes for the data. Would be better to have a base class that contains 
+                    //metadata populated by the attribute. Oh well i guess.
+                    var attrs = types.Select(x => x.GetCustomAttributes<ApplicationAttribute>(false).Single());
+                    return attrs.Select(x => new Section(x.Name, x.Alias, x.Icon, x.SortOrder)).ToArray();
+                });
+            }
+
+            private readonly Lazy<IEnumerable<Section>> _lazySections;
+
+            /// <summary>
+            /// Returns an enumerator that iterates through the collection.
+            /// </summary>
+            /// <returns>
+            /// A <see cref="T:System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the collection.
+            /// </returns>
+            public IEnumerator<Section> GetEnumerator()
+            {
+                return _lazySections.Value.GetEnumerator();
+            }
+
+            /// <summary>
+            /// Returns an enumerator that iterates through a collection.
+            /// </summary>
+            /// <returns>
+            /// An <see cref="T:System.Collections.IEnumerator"/> object that can be used to iterate through the collection.
+            /// </returns>
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
             }
         }
 

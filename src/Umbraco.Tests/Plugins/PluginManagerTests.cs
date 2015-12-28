@@ -40,7 +40,6 @@ namespace Umbraco.Tests.Plugins
             _manager.AssembliesToScan = new[]
 			    {
 			        this.GetType().Assembly, 
-                    typeof(ApplicationAttribute).Assembly,
 			        typeof(SqlCEHelper).Assembly,
 			        typeof(CMSNode).Assembly,
 			        typeof(System.Guid).Assembly,
@@ -287,15 +286,7 @@ namespace Umbraco.Tests.Plugins
             var trees = _manager.ResolveTrees();
             Assert.AreEqual(39, trees.Count());
         }
-
-        [Test]
-        public void Resolves_Applications()
-        {
-            var apps = _manager.ResolveApplications();
-            Assert.AreEqual(7, apps.Count());
-        }
-
-   
+        
         [Test]
         public void Resolves_XsltExtensions()
         {

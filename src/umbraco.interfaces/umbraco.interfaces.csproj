@@ -124,7 +124,6 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="IApplication.cs" />
     <Compile Include="INode.cs" />
     <Compile Include="IProperty.cs" />
     <Compile Include="ITag.cs" />
