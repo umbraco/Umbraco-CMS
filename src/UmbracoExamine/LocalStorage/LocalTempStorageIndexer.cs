@@ -43,6 +43,7 @@ namespace UmbracoExamine.LocalStorage
 
         public void Initialize(NameValueCollection config, string configuredPath, FSDirectory baseLuceneDirectory, Analyzer analyzer, LocalStorageType localStorageType)
         {
+            //this is the default
             ILocalStorageDirectory localStorateDir = new CodeGenLocalStorageDirectory();
             if (config["tempStorageDirectory"] != null)
             {
