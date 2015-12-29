@@ -1,3 +1,86 @@
+/**
+@ngdoc directive
+@name umbraco.directives.directive:umbButtonGroup
+@restrict E
+@scope
+
+@description
+Use this directive to render a button with a dropdown of alternative actions.
+
+<h3>Markup example</h3>
+<pre>
+    <div ng-controller="Umbraco.Controller as vm">
+
+        <umb-button-group
+           ng-if="vm.buttonGroup"
+           default-button="vm.buttonGroup.defaultButton"
+           sub-buttons="vm.buttonGroup.subButtons"
+           direction="up"
+           float="right">
+        </umb-button-group>
+
+    </div>
+</pre>
+
+<h3>Controller example</h3>
+<pre>
+    (function () {
+        "use strict";
+
+        function Controller() {
+
+            var vm = this;
+            vm.buttonGroup = {
+                defaultButton: {
+                    labelKey: "general_defaultButton",
+                    hotKey: "ctrl+d",
+                    handler: function() {
+                        // do magic here
+                    }
+                },
+                subButtons: [
+                    {
+                        labelKey: "general_subButton",
+                        hotKey: "ctrl+b",
+                        handler: function() {
+                            // do magic here
+                        }
+                    }
+                ]
+            }
+        }
+
+        angular.module("umbraco").controller("Umbraco.Controller", Controller);
+
+    })();
+</pre>
+
+<h3>Button model description</h3>
+<ul>
+    <li>
+        <strong>labekKey</strong>
+        <small>(string)</small> -
+        Set a localization key to make a multi lingual button ("general_buttonText").
+    </li>
+    <li>
+        <strong>hotKey</strong>
+        <small>(array)</small> -
+        Set a keyboard shortcut for the button ("ctrl+c").
+    </li>
+    <li>
+        <strong>handler</strong>
+        <small>(callback)</small> -
+        Set a callback to handle button click events.
+    </li>
+</ul>
+
+@param {object} defaultButton The model of the default button.
+@param {array} subButtons Array of sub buttons.
+@param {string=} state Set a progress state on the button (init, busy, success, error).
+@param {string=} direction Set the direction of the drop down (up, down).
+@param {string=} float Set the float of the drop down. (left, right).
+**/
+
 (function() {
    'use strict';
 
