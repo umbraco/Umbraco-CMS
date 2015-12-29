@@ -172,7 +172,7 @@ namespace Umbraco.Web.Editors
     Layout = null;
 }";
 
-                        template.Content = design.Replace("IPublishedContent", contentType.Name.ToSafeAlias(false));
+                        template.Content = design.Replace("IPublishedContent", contentTypeSave.Name.ToSafeAlias(false));
                             Services.FileService.SaveTemplate(template);
                         }
 
