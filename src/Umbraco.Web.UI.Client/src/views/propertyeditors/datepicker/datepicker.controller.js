@@ -1,4 +1,4 @@
-function dateTimePickerController($scope, notificationsService, assetsService, angularHelper, userService, $element) {
+function dateTimePickerController($scope, notificationsService, localizationService, assetsService, angularHelper, userService, $element) {
 
     //setup the default config
     var config = {
@@ -59,6 +59,25 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 
     $scope.onlyTimePicker = $scope.model.config.pickTime && !$scope.model.config.pickDate;
     $scope.datetimePickerIcon = $scope.onlyTimePicker ? "time" : "calendar";
+    $scope.errorMsg = {
+        required: "Required",
+        invalid: "Invalid " + ($scope.onlyTimePicker ? "time" : "date")
+    };
+
+    localizationService.localize("general_required").then(function (value) {
+        $scope.errorMsg.required = value;
+    });
+
+    if ($scope.onlyTimePicker) {
+        localizationService.localize("content_invalidTime").then(function (value) {
+            $scope.errorMsg.invalid = value;
+        });
+    }
+    else {
+        localizationService.localize("content_invalidDate").then(function (value) {
+            $scope.errorMsg.invalid = value;
+        });
+    }
 
     //hide picker if clicking on the document 
     $scope.hidePicker = function () {
@@ -128,17 +147,25 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
 			    var element = $element.find("div:first");
 
 				// Open the datepicker and add a changeDate eventlistener
-			    element
-			        .datetimepicker(angular.extend({
-			            useCurrent: true,
-			            minDate: moment($scope.model.config.minDate).isValid() ? $scope.model.config.minDate : moment({ y: 1900 }),
-			            maxDate: moment($scope.model.config.maxDate).isValid() ? $scope.model.config.maxDate : moment().add(100, 'y')
-			        }, $scope.model.config))
-			        .on("dp.change", applyDate)
-			        .on("dp.error", function(a, b, c) {
-			            $scope.hasDatetimePickerValue = false;
-			            $scope.datePickerForm.datepicker.$setValidity("pickerError", false);
-			        });
+			    element.datetimepicker(angular.extend({
+                    useCurrent: true,
+                    minDate: moment($scope.model.config.minDate).isValid() ? $scope.model.config.minDate : moment({ y: 1900 }),
+                    maxDate: moment($scope.model.config.maxDate).isValid() ? $scope.model.config.maxDate : moment().add(100, 'y')
+			    }, $scope.model.config))
+			    .on("dp.change", applyDate)
+			    .on("dp.error", function (a, b, c) {
+			        $scope.hasDatetimePickerValue = false;
+			        $scope.datePickerForm.datepicker.$setValidity("pickerError", false);
+			    });
+
+                // Ensure table table cell with class "picker-switch" fill 5 cols, when not using calendarWeeks.
+			    if ($scope.model.config.calendarWeeks == false) {
+			        var currentDateInput = element.find(".datepickerinput"),
+                        dateInputs = $("input[name=datepicker].datepickerinput"),
+                        datePickerIndex = dateInputs.index(currentDateInput);
+
+			        $(".bootstrap-datetimepicker-widget").eq(datePickerIndex).find("table > thead .picker-switch").attr("colspan", 5);
+			    }
 
 			    if ($scope.hasDatetimePickerValue) {
 

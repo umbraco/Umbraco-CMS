@@ -145,6 +145,8 @@
     <key alias="unpublishDate">Dato for Fortryd udgivelse</key>
     <key alias="removeDate">Fjern dato</key>
     <key alias="removeTime">Fjern tid</key>
+    <key alias="invalidDate">Ugyldig dato</key>
+    <key alias="invalidTime">Ugyldig tid</key>
     <key alias="sortDone">Sorteringrækkefølgen er opdateret</key>
     <key alias="sortHelp">For at sortere, træk siderne eller klik på en af kolonnehovederne. Du kan vælge flere sider ved at holde "shift" eller "control" nede mens du vælger.</key>
     <key alias="statistics">Statistik</key>
@@ -381,6 +383,7 @@
     <key alias="rename">Omdøb</key>
     <key alias="renew">Forny</key>
     <key alias="required" version="7.0">Påkrævet</key>
+    <key alias="invalid">Ugyldig</key>
     <key alias="retry">Prøv igen</key>
     <key alias="rights">Rettigheder</key>
     <key alias="search">Søg</key>

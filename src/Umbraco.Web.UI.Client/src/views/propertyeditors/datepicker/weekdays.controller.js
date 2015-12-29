@@ -18,14 +18,9 @@
             var items = [];
             for (var i in $scope.model.value) {
                 items.push($scope.model.value[i]);
-                //items.push({
-                //    value: $scope.model.value[i],
-                //    id: i
-                //});
             }
             //now make the editor model the array
             $scope.model.value = items;
         }
-
 
     });
