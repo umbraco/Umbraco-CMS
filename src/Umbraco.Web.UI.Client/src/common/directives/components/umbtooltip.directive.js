@@ -1,3 +1,71 @@
+/**
+@ngdoc directive
+@name umbraco.directives.directive:umbTooltip
+@restrict E
+@scope
+
+@description
+Use this directive to render a tooltip.
+
+<h3>Markup example</h3>
+<pre>
+    <div ng-controller="Umbraco.Controller as vm">
+
+        <div
+            ng-mouseover="vm.mouseOver($event)"
+            ng-mouseleave="vm.mouseLeave()">
+            Hover me
+        </div>
+
+        <umb-tooltip
+           ng-if="vm.tooltip.show"
+           event="vm.tooltip.event">
+           // tooltip content here
+        </umb-tooltip>
+
+    </div>
+</pre>
+
+<h3>Controller example</h3>
+<pre>
+    (function () {
+        "use strict";
+
+        function Controller() {
+
+            var vm = this;
+            vm.tooltip = {
+                show: false;
+                event: null;
+            };
+
+            vm.mouseOver = mouseOver;
+            vm.mouseLeave = mouseLeave;
+
+            function mouseOver($event) {
+                vm.tooltip = {
+                    show: true;
+                    event: $event;
+                };
+            }
+
+            function mouseLeave() {
+                vm.tooltip = {
+                    show: false;
+                    event: null;
+                };
+            }
+
+        }
+
+        angular.module("umbraco").controller("Umbraco.Controller", Controller);
+
+    })();
+</pre>
+
+@param {string} event Set the $event from the target element to position the tooltip relative to the mouse cursor.
+**/
+
 (function() {
    'use strict';
 
