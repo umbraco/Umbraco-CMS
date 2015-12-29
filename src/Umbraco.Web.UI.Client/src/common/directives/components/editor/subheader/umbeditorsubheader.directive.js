@@ -1,3 +1,63 @@
+/**
+@ngdoc directive
+@name umbraco.directives.directive:umbEditorSubHeader
+@restrict E
+
+@description
+Use this directive to construct a sub header in the main editor window.
+The sub header is sticky and will follow along down the page when scrolling.
+
+<h3>Markup example</h3>
+<pre>
+    <div ng-controller="Umbraco.Controller as vm">
+
+        <umb-editor-view>
+
+            <umb-editor-container>
+
+                <umb-editor-sub-header>
+
+                    <umb-editor-sub-header-content-left>
+
+                        <umb-editor-sub-header-section>
+                            // content goes here
+                        </umb-editor-sub-header-section>
+
+                        <umb-editor-sub-header-section>
+                            // content goes here
+                        </umb-editor-sub-header-section>
+
+                    </umb-editor-sub-header-content-left>
+
+                    <umb-editor-sub-header-content-right>
+
+                        <umb-editor-sub-header-section>
+                            // content goes here
+                        </umb-editor-sub-header-section>
+
+                        <umb-editor-sub-header-section>
+                            // content goes here
+                        </umb-editor-sub-header-section>
+
+                    </umb-editor-sub-header-content-right>
+
+                </umb-editor-sub-header>
+
+            </umb-editor-container>
+
+        </umb-editor-view>
+
+    </div>
+</pre>
+
+<h3>Use in combination with</h3>
+<ul>
+    <li>{@link umbraco.directives.directive:umbEditorSubHeaderContentLeft umbEditorSubHeaderContentLeft}</li>
+    <li>{@link umbraco.directives.directive:umbEditorSubHeaderContentRight umbEditorSubHeaderContentRight}</li>
+    <li>{@link umbraco.directives.directive:umbEditorSubHeaderSection umbEditorSubHeaderSection}</li>
+</ul>
+**/
+
 (function() {
    'use strict';
 

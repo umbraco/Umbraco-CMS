@@ -1,3 +1,22 @@
+/**
+@ngdoc directive
+@name umbraco.directives.directive:umbEditorSubHeaderContentRight
+@restrict E
+
+@description
+Use this directive to rigt align content in a sub header in the main editor window.
+
+<h3>Markup example</h3>
+For examples see: {@link umbraco.directives.directive:umbEditorSubHeader umbEditorSubHeader}
+
+<h3>Use in combination with</h3>
+<ul>
+    <li>{@link umbraco.directives.directive:umbEditorSubHeader umbEditorSubHeader}</li>
+    <li>{@link umbraco.directives.directive:umbEditorSubHeaderContentLeft umbEditorSubHeaderContentLeft}</li>
+    <li>{@link umbraco.directives.directive:umbEditorSubHeaderSection umbEditorSubHeaderSection}</li>
+</ul>
+**/
+
 (function() {
    'use strict';
 
