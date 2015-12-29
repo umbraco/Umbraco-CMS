@@ -14,7 +14,10 @@ using System.Net;
 using Umbraco.Core.PropertyEditors;
 using System;
 using System.Net.Http;
+using System.Text;
+using Umbraco.Web.WebApi;
 using ContentType = System.Net.Mime.ContentType;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Editors
 {
@@ -80,9 +83,14 @@ namespace Umbraco.Web.Editors
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
-        public ContentTypeCompositionDisplay GetEmpty()
+        public IEnumerable<EntityBasic> GetAvailableCompositeMediaTypes(int contentTypeId)
         {
-            var ct = new MediaType(-1);
+            return PerformGetAvailableCompositeContentTypes(contentTypeId, UmbracoObjectTypes.MediaType);
+        }
+
+        public ContentTypeCompositionDisplay GetEmpty(int parentId)
+        {
+            var ct = new MediaType(parentId);
             ct.Icon = "icon-picture";
 
             var dto = Mapper.Map<IMediaType, ContentTypeCompositionDisplay>(ct);
@@ -100,58 +108,43 @@ namespace Umbraco.Web.Editors
                                .Select(Mapper.Map<IMediaType, ContentTypeBasic>);
         }
 
-        public ContentTypeCompositionDisplay PostSave(ContentTypeCompositionDisplay contentType)
+        /// <summary>
+        /// Deletes a document type container wth a given ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [HttpPost]
+        public HttpResponseMessage DeleteContainer(int id)
         {
+            Services.ContentTypeService.DeleteMediaTypeContainer(id, Security.CurrentUser.Id);
 
-            var ctService = ApplicationContext.Services.ContentTypeService;
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
 
-            //TODO: warn on content type alias conflicts
-            //TODO: warn on property alias conflicts
+        public HttpResponseMessage PostCreateContainer(int parentId, string name)
+        {
+            var result = Services.ContentTypeService.CreateMediaTypeContainer(parentId, name, Security.CurrentUser.Id);
 
-            //TODO: Validate the submitted model
+            return result
+                ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id 
+                : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
+        }
 
-            //filter out empty properties
-            contentType.Groups = contentType.Groups.Where(x => x.Name.IsNullOrWhiteSpace() == false).ToList();
-            foreach (var group in contentType.Groups)
-            {
-                group.Properties = group.Properties.Where(x => x.Alias.IsNullOrWhiteSpace() == false).ToList();
-            }
+        public ContentTypeCompositionDisplay PostSave(ContentTypeSave contentTypeSave)
+        {
+            var savedCt = PerformPostSave<IMediaType, ContentTypeCompositionDisplay>(
+                contentTypeSave:    contentTypeSave,
+                getContentType:     i => Services.ContentTypeService.GetMediaType(i),
+                saveContentType:    type => Services.ContentTypeService.Save(type));
 
-            var ctId = Convert.ToInt32(contentType.Id);
+            var display = Mapper.Map<ContentTypeCompositionDisplay>(savedCt);
 
-            if (ctId > 0)
-            {
-                //its an update to an existing
-                IMediaType found = ctService.GetMediaType(ctId);
-                if (found == null)
-                    throw new HttpResponseException(HttpStatusCode.NotFound);
+            display.AddSuccessNotification(
+                            Services.TextService.Localize("speechBubbles/contentTypeSavedHeader"),
+                            string.Empty);
 
-                Mapper.Map(contentType, found);
-                ctService.Save(found);
-
-                //map the saved item back to the content type (it should now get id etc set)
-                Mapper.Map(found, contentType);
-                return contentType;
-            }
-            else
-            {
-                //ensure alias is set
-                if (string.IsNullOrEmpty(contentType.Alias))
-                    contentType.Alias = contentType.Name.ToSafeAlias();
-
-                contentType.Id = null;
-
-                //save as new
-                IMediaType newCt = new MediaType(-1);
-                Mapper.Map(contentType, newCt);
-
-                ctService.Save(newCt);
-
-                //map the saved item back to the content type (it should now get id etc set)
-                Mapper.Map(newCt, contentType);
-                return contentType;
-            }
-
+            return display;
         }
 
 
@@ -199,5 +192,19 @@ namespace Umbraco.Web.Editors
 
             return basics;
         }
+
+        /// <summary>
+        /// Move the media type
+        /// </summary>
+        /// <param name="move"></param>
+        /// <returns></returns>
+        public HttpResponseMessage PostMove(MoveOrCopy move)
+        {
+            return PerformMove(
+                move, 
+                getContentType: i => Services.ContentTypeService.GetMediaType(i), 
+                doMove:         (type, i) => Services.ContentTypeService.MoveMediaType(type, i));            
+        }
+        
     }
 }

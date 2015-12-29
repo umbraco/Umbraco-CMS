@@ -12,7 +12,10 @@
          <umb-editor-header
             name="content.name"
             tabs="content.tabs"
-            menu="page.menu">
+            menu="page.menu"
+            hide-icon="true"
+            hide-description="true"
+            hide-alias="true">
          </umb-editor-header>
 
          <umb-editor-container>
@@ -32,7 +35,13 @@
          <umb-editor-footer>
 
             <umb-editor-footer-content-left>
-               <umb-breadcrumbs ng-if="ancestors && ancestors.length > 0" ancestors="ancestors"></umb-breadcrumbs>
+
+               <umb-breadcrumbs
+                  ng-if="ancestors && ancestors.length > 0"
+                  ancestors="ancestors"
+                  entity-type="media">
+               </umb-breadcrumbs>
+
             </umb-editor-footer-content-left>
 
 

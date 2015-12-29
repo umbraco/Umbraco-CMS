@@ -8,7 +8,8 @@
       replace: true,
       templateUrl: 'views/components/editor/umb-breadcrumbs.html',
       scope: {
-        ancestors: "="
+        ancestors: "=",
+        entityType: "@"
       }
     };
 

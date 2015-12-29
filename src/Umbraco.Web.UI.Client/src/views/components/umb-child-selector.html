@@ -22,27 +22,14 @@
                 <span class="umb-child-selector__child-name"> {{ selectedChild.name }}</span>
             </div>
             <div class="umb-child-selector__child-actions">
-                <i class="umb-child-selector__child-remove icon-trash" ng-click="removeSelectedChild(selectedChild)"></i>
+                <i class="umb-child-selector__child-remove icon-trash" ng-click="removeChild(selectedChild, $index)"></i>
             </div>
         </div>
 
-        <a href="" class="umb-child-selector__child -placeholder" ng-if="(availableChildren | compareArrays:selectedChildren:'alias').length > 0" ng-click="openItemPicker($event)" hotkey="alt+shift+c">
+        <a href="" class="umb-child-selector__child -placeholder" ng-click="addChild($event)" hotkey="alt+shift+c">
             <div class="umb-child-selector__child-name -blue"><strong>Add child</strong></div>
         </a>
 
-        <div class="text-center" ng-if="(availableChildren | compareArrays:selectedChildren:'alias').length === 0">
-            <small>All children are added</small>
-        </div>
-
     </div>
-
-    <umb-overlay
-            ng-style=""
-            ng-if="showDialog"
-            model="dialogModel"
-            animation="slide-in-right"
-            position="target"
-            view="dialogModel.view">
-    </umb-overlay>
 
 </div>

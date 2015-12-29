@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using AutoMapper;
@@ -20,7 +19,7 @@ namespace Umbraco.Web.Models.Mapping
     internal class ContentTypeModelMapper : MapperConfiguration
     {
         private readonly Lazy<PropertyEditorResolver> _propertyEditorResolver;
-        
+
         //default ctor
         public ContentTypeModelMapper()
         {
@@ -35,207 +34,69 @@ namespace Umbraco.Web.Models.Mapping
 
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
-            config.CreateMap<ContentTypeCompositionDisplay, IContentTypeComposition>()
-                .Include<ContentTypeDisplay, IContentType>()
-                .Include<ContentTypeCompositionDisplay, IMemberType>()
-                .Include<ContentTypeCompositionDisplay, IMediaType>()
+            
+            config.CreateMap<PropertyTypeBasic, PropertyType>()
+                .ConstructUsing(basic => new PropertyType(applicationContext.Services.DataTypeService.GetDataTypeDefinitionById(basic.DataTypeId)))
+                .ForMember(type => type.ValidationRegExp, expression => expression.ResolveUsing(basic => basic.Validation.Pattern))
+                .ForMember(type => type.Mandatory, expression => expression.ResolveUsing(basic => basic.Validation.Mandatory))
+                .ForMember(type => type.Name, expression => expression.ResolveUsing(basic => basic.Label))
+                .ForMember(type => type.DataTypeDefinitionId, expression => expression.ResolveUsing(basic => basic.DataTypeId))
+                .ForMember(type => type.DataTypeId, expression => expression.Ignore())
+                .ForMember(type => type.PropertyEditorAlias, expression => expression.Ignore())
+                .ForMember(type => type.HelpText, expression => expression.Ignore())
+                .ForMember(type => type.Key, expression => expression.Ignore())
+                .ForMember(type => type.CreateDate, expression => expression.Ignore())
+                .ForMember(type => type.UpdateDate, expression => expression.Ignore())
+                .ForMember(type => type.HasIdentity, expression => expression.Ignore());
 
-                //only map id if set to something higher then zero
-                .ForMember(dto => dto.Id, expression => expression.Condition(display => (Convert.ToInt32(display.Id) > 0)))
-                .ForMember(dto => dto.Id, expression => expression.MapFrom(display => Convert.ToInt32(display.Id)))
-                
-                .ForMember(dto => dto.AllowedAsRoot, expression => expression.MapFrom(display => display.AllowAsRoot))
-                .ForMember(dto => dto.CreatorId, expression => expression.Ignore())
-                .ForMember(dto => dto.Level, expression => expression.Ignore())
-                .ForMember(dto => dto.SortOrder, expression => expression.Ignore())
-
-                .ForMember(
-                    dto => dto.AllowedContentTypes,
-                    expression => expression.MapFrom(dto => dto.AllowedContentTypes.Select( (t, i) => new ContentTypeSort(t, i) )))
-
-                //ignore, we'll do this in after map
-                .ForMember(dto => dto.PropertyGroups, expression => expression.Ignore())
-
-                .AfterMap((source, dest) =>
-                {
-
-                    var addedProperties = new List<string>();
-
-                    //get all properties from groups that are not generic properties or inhertied (-666 id)
-                    var selfNonGenericGroups = source.Groups.Where(x => x.Inherited == false && x.Id != -666).ToArray();
-
-                    foreach (var groupDisplay in selfNonGenericGroups)
-                    {
-                        //use underlying logic to add the property group which should wire most things up for us
-                        dest.AddPropertyGroup(groupDisplay.Name);
-                        
-                        //now update that group with the values from the display object
-                        Mapper.Map(groupDisplay, dest.PropertyGroups[groupDisplay.Name]);
-                        
-                        foreach (var propertyTypeDisplay in groupDisplay.Properties.Where(x => x.Inherited == false))
-                        {
-                            //update existing
-                            if(propertyTypeDisplay.Id > 0)
-                            {
-                                var currentPropertyType = dest.PropertyTypes.FirstOrDefault(x => x.Id == propertyTypeDisplay.Id);
-                                Mapper.Map(propertyTypeDisplay, currentPropertyType);
-                            }else
-                            {//add new
-                                var mapped = Mapper.Map<PropertyType>(propertyTypeDisplay);
-                                dest.AddPropertyType(mapped, groupDisplay.Name);
-                            }
-                            
-                            addedProperties.Add(propertyTypeDisplay.Alias);
-                        }   
-                    }
-
-                    //Groups to remove
-                    var groupsToRemove = dest.PropertyGroups.Select(x => x.Name).Except(selfNonGenericGroups.Select(x => x.Name)).ToArray();
-                    foreach (var toRemove in groupsToRemove)
-                    {
-                        dest.RemovePropertyGroup(toRemove);
-                    }
-
-                    //add generic properties
-                    var genericProperties = source.Groups.FirstOrDefault(x => x.Id == -666);
-                    if(genericProperties != null)
-                    {
-                        foreach (var propertyTypeDisplay in genericProperties.Properties.Where(x => x.Inherited == false))
-                        {
-                            dest.AddPropertyType(Mapper.Map<PropertyType>(propertyTypeDisplay));
-                            addedProperties.Add(propertyTypeDisplay.Alias);
-                        }
-                    }
-
-                    //remove deleted types
-                    foreach(var removedType in dest.PropertyTypes
-                            .Where(x => addedProperties.Contains(x.Alias) == false).ToList())
-                    {
-                        dest.RemovePropertyType(removedType.Alias);
-                    }
-                    
-
-                });
-
-            config.CreateMap<ContentTypeDisplay, IContentType>()
+            config.CreateMap<ContentTypeSave, IContentType>()
+                //do the base mapping
+                .MapBaseContentTypeSaveToEntity(applicationContext)
                 .ConstructUsing((source) => new ContentType(source.ParentId))
-                .ForMember(dto => dto.Id, expression => expression.Ignore())
-                .ForMember(dto => dto.AllowedTemplates, expression => expression.Ignore())
+                .ForMember(source => source.AllowedTemplates, expression => expression.Ignore())
                 .ForMember(dto => dto.DefaultTemplate, expression => expression.Ignore())
-
                 .AfterMap((source, dest) =>
                 {
-                    //sync templates
-                    dest.AllowedTemplates = source.AllowedTemplates.Where(x => x != null).Select(x => Mapper.Map<ITemplate>(x));
+                    dest.AllowedTemplates = source.AllowedTemplates
+                        .Where(x => x != null)
+                        .Select(s => applicationContext.Services.FileService.GetTemplate(s))
+                        .ToArray();
 
                     if (source.DefaultTemplate != null)
-                        dest.SetDefaultTemplate(Mapper.Map<ITemplate>(source.DefaultTemplate));
+                        dest.SetDefaultTemplate(applicationContext.Services.FileService.GetTemplate(source.DefaultTemplate));
 
-
-                    //sync compositions
-                    var current = dest.CompositionAliases().ToArray();
-                    var proposed = source.CompositeContentTypes;
-
-                    var remove = current.Where(x => proposed.Contains(x) == false);
-                    var add = proposed.Where(x => current.Contains(x) == false);
-
-                    foreach (var rem in remove)
-                    {
-                        dest.RemoveContentType(rem);
-                    }
-
-                    foreach (var a in add)
-                    {
-
-                        //TODO: Remove N+1 lookup
-                        var addCt = applicationContext.Services.ContentTypeService.GetContentType(a);
-                        if (addCt != null)
-                            dest.AddContentType(addCt);
-                    }
+                    ContentTypeModelMapperExtensions.AfterMapContentTypeSaveToEntity(source, dest, applicationContext);
                 });
 
-            config.CreateMap<ContentTypeCompositionDisplay, IMemberType>()
+            config.CreateMap<ContentTypeSave, IMediaType>()
+                //do the base mapping
+                .MapBaseContentTypeSaveToEntity(applicationContext)
+                .ConstructUsing((source) => new MediaType(source.ParentId))                
                 .AfterMap((source, dest) =>
-                 {
-                   
-                     //sync compositions
-                     var current = dest.CompositionAliases().ToArray();
-                     var proposed = source.CompositeContentTypes;
+                {
+                    ContentTypeModelMapperExtensions.AfterMapContentTypeSaveToEntity(source, dest, applicationContext);
+                });
 
-                     var remove = current.Where(x => proposed.Contains(x) == false);
-                     var add = proposed.Where(x => current.Contains(x) == false);
-
-                     foreach (var rem in remove)
-                         dest.RemoveContentType(rem);
-                     
-                     foreach (var a in add)
-                     {
-                         //TODO: Remove N+1 lookup
-                         var addCt = applicationContext.Services.MemberTypeService.Get(a);
-                         if (addCt != null)
-                             dest.AddContentType(addCt);
-                     }
-                 });
-
-
-            config.CreateMap<ContentTypeCompositionDisplay, IMediaType>()
+            config.CreateMap<ContentTypeSave, IMemberType>()
+                //do the base mapping
+                .MapBaseContentTypeSaveToEntity(applicationContext)
+                .ConstructUsing((source) => new MemberType(source.ParentId))
                 .AfterMap((source, dest) =>
-                 {
-                     //sync compositions
-                     var current = dest.CompositionAliases().ToArray();
-                     var proposed = source.CompositeContentTypes;
+                {
+                    ContentTypeModelMapperExtensions.AfterMapContentTypeSaveToEntity(source, dest, applicationContext);
+                });
 
-                     var remove = current.Where(x => proposed.Contains(x) == false);
-                     var add = proposed.Where(x => current.Contains(x) == false);
-
-                     foreach (var rem in remove)
-                         dest.RemoveContentType(rem);
-                     
-                     foreach (var a in add)
-                     {
-                         //TODO: Remove N+1 lookup
-                         var addCt = applicationContext.Services.ContentTypeService.GetMediaType(a);
-                         if (addCt != null)
-                             dest.AddContentType(addCt);
-                     }
-                 });
-
-            
             config.CreateMap<IContentTypeComposition, string>().ConvertUsing(x => x.Alias);
 
+            config.CreateMap<IMemberType, ContentTypeCompositionDisplay>()
+                //map base logic
+                .MapBaseContentTypeEntityToDisplay(applicationContext, _propertyEditorResolver);
 
-            config.CreateMap<IContentTypeComposition, ContentTypeCompositionDisplay>()
-                .Include<IContentType, ContentTypeDisplay>()
-                .Include<IMemberType, ContentTypeCompositionDisplay>()
-                .Include<IMediaType, ContentTypeCompositionDisplay>()
-
-                .ForMember(display => display.AllowAsRoot, expression => expression.MapFrom(type => type.AllowedAsRoot))
-                .ForMember(display => display.ListViewEditorName, expression => expression.Ignore())
-                //Ignore because this is not actually used for content types
-                .ForMember(display => display.Trashed, expression => expression.Ignore())
-
-                .ForMember(
-                    dto => dto.AllowedContentTypes,
-                    expression => expression.MapFrom(dto => dto.AllowedContentTypes.Select(x => x.Id.Value)))
-
-                .ForMember(
-                    dto => dto.AvailableCompositeContentTypes,
-                    expression => expression.ResolveUsing(new AvailableCompositeContentTypesResolver(applicationContext)))
-
-                .ForMember(
-                    dto => dto.CompositeContentTypes,
-                    expression => expression.MapFrom(dto => dto.ContentTypeComposition))
-
-                .ForMember(
-                    dto => dto.Groups,
-                    expression => expression.ResolveUsing(new PropertyTypeGroupResolver(applicationContext, _propertyEditorResolver)));
-
-
-            config.CreateMap<IMemberType, ContentTypeCompositionDisplay>();
             config.CreateMap<IMediaType, ContentTypeCompositionDisplay>()
+                //map base logic
+                .MapBaseContentTypeEntityToDisplay(applicationContext, _propertyEditorResolver)
                 .AfterMap((source, dest) =>
                  {
-                  
                      //default listview
                      dest.ListViewEditorName = Constants.Conventions.DataTypes.ListViewPrefix + "Media";
 
@@ -248,20 +109,22 @@ namespace Umbraco.Web.Models.Mapping
                  });
 
             config.CreateMap<IContentType, ContentTypeDisplay>()
+                //map base logic
+                .MapBaseContentTypeEntityToDisplay(applicationContext, _propertyEditorResolver)
                 .ForMember(dto => dto.AllowedTemplates, expression => expression.Ignore())
                 .ForMember(dto => dto.DefaultTemplate, expression => expression.Ignore())
-
+                .ForMember(display => display.Notifications, expression => expression.Ignore())
                 .AfterMap((source, dest) =>
                 {
                     //sync templates
-                    dest.AllowedTemplates = source.AllowedTemplates.Select(Mapper.Map<EntityBasic>);
+                    dest.AllowedTemplates = source.AllowedTemplates.Select(Mapper.Map<EntityBasic>).ToArray();
 
                     if (source.DefaultTemplate != null)
                         dest.DefaultTemplate = Mapper.Map<EntityBasic>(source.DefaultTemplate);
 
                     //default listview
                     dest.ListViewEditorName = Constants.Conventions.DataTypes.ListViewPrefix + "Content";
-                    
+
                     if (string.IsNullOrEmpty(source.Name) == false)
                     {
                         var name = Constants.Conventions.DataTypes.ListViewPrefix + source.Name;
@@ -275,26 +138,13 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IMediaType, ContentTypeBasic>();
             config.CreateMap<IContentType, ContentTypeBasic>();
 
+            config.CreateMap<PropertyTypeBasic, PropertyType>()
 
-            config.CreateMap<PropertyGroupDisplay, PropertyGroup>()
-                .ForMember(dest => dest.Id, expression => expression.Condition(source => source.Id > 0))
-                .ForMember(g => g.Key, expression => expression.Ignore())
-                .ForMember(g => g.HasIdentity, expression => expression.Ignore())
-                .ForMember(dto => dto.CreateDate, expression => expression.Ignore())
-                .ForMember(dto => dto.UpdateDate, expression => expression.Ignore())
-                //only map if a parent is actually set
-                .ForMember(g => g.ParentId, expression => expression.Condition(display => display.ParentGroupId > 0))
-                .ForMember(g => g.ParentId, expression => expression.MapFrom(display => display.ParentGroupId))
-                //ignore these, this is handled with IContentType.AddPropertyType
-                .ForMember(g => g.PropertyTypes, expression => expression.Ignore());
-
-            config.CreateMap<PropertyTypeDisplay, PropertyType>()
-                
-                .ConstructUsing((PropertyTypeDisplay propertyTypeDisplay) =>
+                .ConstructUsing((PropertyTypeBasic propertyTypeBasic) =>
                 {
-                    var dataType = applicationContext.Services.DataTypeService.GetDataTypeDefinitionById(propertyTypeDisplay.DataTypeId);
-                    if (dataType == null) throw new NullReferenceException("No data type found with id " + propertyTypeDisplay.DataTypeId);
-                    return new PropertyType(dataType, propertyTypeDisplay.Alias);
+                    var dataType = applicationContext.Services.DataTypeService.GetDataTypeDefinitionById(propertyTypeBasic.DataTypeId);
+                    if (dataType == null) throw new NullReferenceException("No data type found with id " + propertyTypeBasic.DataTypeId);
+                    return new PropertyType(dataType, propertyTypeBasic.Alias);
                 })
 
                 //only map if it is actually set
@@ -308,17 +158,86 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(type => type.Key, expression => expression.Ignore())
                 .ForMember(type => type.HelpText, expression => expression.Ignore())
                 .ForMember(type => type.HasIdentity, expression => expression.Ignore())
-                //ignore because this is set in the ctor
-                .ForMember(type => type.Alias, expression => expression.Ignore())
+                //ignore because this is set in the ctor NOT ON UPDATE, STUPID!
+                //.ForMember(type => type.Alias, expression => expression.Ignore())
                 //ignore because this is obsolete and shouldn't be used
                 .ForMember(type => type.DataTypeId, expression => expression.Ignore())
                 .ForMember(type => type.Mandatory, expression => expression.MapFrom(display => display.Validation.Mandatory))
                 .ForMember(type => type.ValidationRegExp, expression => expression.MapFrom(display => display.Validation.Pattern))
-                .ForMember(type => type.PropertyEditorAlias, expression => expression.MapFrom(display => display.Editor))
                 .ForMember(type => type.DataTypeDefinitionId, expression => expression.MapFrom(display => display.DataTypeId))
                 .ForMember(type => type.Name, expression => expression.MapFrom(display => display.Label));
+
+            #region *** Used for mapping on top of an existing display object from a save object ***
+
+            config.CreateMap<ContentTypeSave, ContentTypeCompositionDisplay>()
+                .MapBaseContentTypeSaveToDisplay();
+            
+            config.CreateMap<ContentTypeSave, ContentTypeDisplay>()
+                .MapBaseContentTypeSaveToDisplay()
+                .ForMember(dto => dto.AllowedTemplates, expression => expression.Ignore())
+                .ForMember(dto => dto.DefaultTemplate, expression => expression.Ignore())
+                .AfterMap((source, dest) =>
+                {
+                    //sync templates
+                    var destAllowedTemplateAliases = dest.AllowedTemplates.Select(x => x.Alias);
+                    //if the dest is set and it's the same as the source, then don't change
+                    if (destAllowedTemplateAliases.SequenceEqual(source.AllowedTemplates) == false)
+                    {
+                        var templates = applicationContext.Services.FileService.GetTemplates(source.AllowedTemplates.ToArray());
+                        dest.AllowedTemplates = source.AllowedTemplates.Select(x => Mapper.Map<EntityBasic>(templates.Single(t => t.Alias == x))).ToArray();
+                    }
+
+                    if (source.DefaultTemplate.IsNullOrWhiteSpace() == false)
+                    {
+                        //if the dest is set and it's the same as the source, then don't change
+                        if (dest.DefaultTemplate == null || source.DefaultTemplate != dest.DefaultTemplate.Alias)
+                        {
+                            var template = applicationContext.Services.FileService.GetTemplate(source.DefaultTemplate);
+                            dest.DefaultTemplate = template == null ? null : Mapper.Map<EntityBasic>(template);
+                        }
+                    }
+                    else
+                    {
+                        dest.DefaultTemplate = null;
+                    }
+                });
+
+            config.CreateMap<PropertyGroupBasic<PropertyTypeBasic>, PropertyGroup>()
+                    .ForMember(dest => dest.Id, map => map.Condition(source => source.Id > 0))
+                    .ForMember(dest => dest.Key, map => map.Ignore())
+                    .ForMember(dest => dest.HasIdentity, map => map.Ignore())
+                    .ForMember(dest => dest.CreateDate, map => map.Ignore())
+                    .ForMember(dest => dest.UpdateDate, map => map.Ignore())
+                    // fixme
+                    // this is basically *replacing* dest properties by a mapped version of
+                    // *every* source properties (including, I guess, inherited properties?)
+                    // also, ContentTypeModelMapperExtensions will map properties *again* so
+                    // this makes little sense - ignore for now
+                    .ForMember(dest => dest.PropertyTypes, map => map.Ignore());
+                    //.ForMember(dest => dest.PropertyTypes, map => map.MapFrom(source =>
+                    //    source.Properties.Select(Mapper.Map<PropertyType>)));
+
+            config.CreateMap<PropertyGroupBasic<PropertyTypeBasic>, PropertyGroupDisplay>()
+                .ForMember(dest => dest.Id, expression => expression.Condition(source => source.Id > 0))
+                .ForMember(g => g.ContentTypeId, expression => expression.Ignore())
+                .ForMember(g => g.ParentTabContentTypes, expression => expression.Ignore())
+                .ForMember(g => g.ParentTabContentTypeNames, expression => expression.Ignore())
+                .ForMember(g => g.Properties, expression => expression.MapFrom(display => display.Properties.Select(Mapper.Map<PropertyTypeDisplay>)));
+
+            config.CreateMap<PropertyTypeBasic, PropertyTypeDisplay>()
+                .ForMember(g => g.Editor, expression => expression.Ignore())
+                .ForMember(g => g.View, expression => expression.Ignore())
+                .ForMember(g => g.Config, expression => expression.Ignore())
+                .ForMember(g => g.ContentTypeId, expression => expression.Ignore())
+                .ForMember(g => g.ContentTypeName, expression => expression.Ignore());
+
+            #endregion
+
+            
+
+            
         }
 
-        
+
     }
 }

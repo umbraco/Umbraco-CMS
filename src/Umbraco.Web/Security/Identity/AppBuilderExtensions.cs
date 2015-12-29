@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Threading;
 using System.Web;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
@@ -45,9 +47,6 @@ namespace Umbraco.Web.Security.Identity
             if (appContext == null) throw new ArgumentNullException("appContext");
             if (userMembershipProvider == null) throw new ArgumentNullException("userMembershipProvider");
 
-            //Don't proceed if the app is not ready
-            if (appContext.IsUpgrading == false && appContext.IsConfigured == false) return;
-
             //Configure Umbraco user manager to be created per request
             app.CreatePerOwinContext<BackOfficeUserManager>(
                 (options, owinContext) => BackOfficeUserManager.Create(
@@ -76,9 +75,6 @@ namespace Umbraco.Web.Security.Identity
             if (userMembershipProvider == null) throw new ArgumentNullException("userMembershipProvider");
             if (customUserStore == null) throw new ArgumentNullException("customUserStore");
 
-            //Don't proceed if the app is not ready
-            if (appContext.IsUpgrading == false && appContext.IsConfigured == false) return;
-
             //Configure Umbraco user manager to be created per request
             app.CreatePerOwinContext<BackOfficeUserManager>(
                 (options, owinContext) => BackOfficeUserManager.Create(
@@ -105,9 +101,6 @@ namespace Umbraco.Web.Security.Identity
             if (appContext == null) throw new ArgumentNullException("appContext");
             if (userManager == null) throw new ArgumentNullException("userManager");
 
-            //Don't proceed if the app is not ready
-            if (appContext.IsUpgrading == false && appContext.IsConfigured == false) return;
-
             //Configure Umbraco user manager to be created per request
             app.CreatePerOwinContext<TManager>(userManager);
 
@@ -126,34 +119,72 @@ namespace Umbraco.Web.Security.Identity
             if (app == null) throw new ArgumentNullException("app");
             if (appContext == null) throw new ArgumentNullException("appContext");
 
-            //Don't proceed if the app is not ready
-            if (appContext.IsUpgrading == false && appContext.IsConfigured == false) return app;
+            var cookieAuthProvider = new BackOfficeCookieAuthenticationProvider
+            {
+                // Enables the application to validate the security stamp when the user 
+                // logs in. This is a security feature which is used when you 
+                // change a password or add an external login to your account.  
+                OnValidateIdentity = SecurityStampValidator
+                    .OnValidateIdentity<BackOfficeUserManager, BackOfficeIdentityUser, int>(
+                        TimeSpan.FromMinutes(30),
+                        (manager, user) => user.GenerateUserIdentityAsync(manager),
+                        identity => identity.GetUserId<int>()),
+            };
 
             var authOptions = new UmbracoBackOfficeCookieAuthOptions(
                 UmbracoConfig.For.UmbracoSettings().Security,
                 GlobalSettings.TimeOutInMinutes,
                 GlobalSettings.UseSSL)
             {
-                Provider = new BackOfficeCookieAuthenticationProvider
-                {
-                    // Enables the application to validate the security stamp when the user 
-                    // logs in. This is a security feature which is used when you 
-                    // change a password or add an external login to your account.  
-                    OnValidateIdentity = SecurityStampValidator
-                        .OnValidateIdentity<BackOfficeUserManager, BackOfficeIdentityUser, int>(
-                            TimeSpan.FromMinutes(30),
-                            (manager, user) => user.GenerateUserIdentityAsync(manager),
-                            identity => identity.GetUserId<int>()),                    
-                }
+                Provider = cookieAuthProvider
             };
 
-            //This is a custom middleware, we need to return the user's remaining logged in seconds
-            app.Use<GetUserSecondsMiddleWare>(
-                authOptions,
-                UmbracoConfig.For.UmbracoSettings().Security,
-                app.CreateLogger<GetUserSecondsMiddleWare>());
+            app.UseUmbracoBackOfficeCookieAuthentication(authOptions, appContext);
 
-            app.UseCookieAuthentication(authOptions);
+            //don't apply if app isnot ready
+            if (appContext.IsUpgrading || appContext.IsConfigured)
+            {
+                var getSecondsOptions = new UmbracoBackOfficeCookieAuthOptions(
+                    //This defines the explicit path read cookies from for this middleware
+                    new[]{string.Format("{0}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds", GlobalSettings.Path)},
+                    UmbracoConfig.For.UmbracoSettings().Security,
+                    GlobalSettings.TimeOutInMinutes,
+                    GlobalSettings.UseSSL)
+                {
+                    Provider = cookieAuthProvider
+                };
+
+                //This is a custom middleware, we need to return the user's remaining logged in seconds
+                app.Use<GetUserSecondsMiddleWare>(
+                    getSecondsOptions,
+                    UmbracoConfig.For.UmbracoSettings().Security,
+                    app.CreateLogger<GetUserSecondsMiddleWare>());
+            }
+
+            return app;
+        }
+
+        internal static IAppBuilder UseUmbracoBackOfficeCookieAuthentication(this IAppBuilder app, CookieAuthenticationOptions options, ApplicationContext appContext)
+        {
+            if (app == null)
+            {
+                throw new ArgumentNullException("app");
+            }
+
+            //First the normal cookie middleware
+            app.Use(typeof(CookieAuthenticationMiddleware), app, options);
+            app.UseStageMarker(PipelineStage.Authenticate);
+
+            //don't apply if app isnot ready
+            if (appContext.IsUpgrading || appContext.IsConfigured)
+            {
+                //Then our custom middlewares
+                app.Use(typeof(ForceRenewalCookieAuthenticationMiddleware), app, options, new SingletonUmbracoContextAccessor());
+                app.UseStageMarker(PipelineStage.Authenticate);
+                app.Use(typeof(FixWindowsAuthMiddlware));
+                app.UseStageMarker(PipelineStage.Authenticate);
+            }
+            
 
             return app;
         }
@@ -169,9 +200,6 @@ namespace Umbraco.Web.Security.Identity
         {
             if (app == null) throw new ArgumentNullException("app");
             if (appContext == null) throw new ArgumentNullException("appContext");
-
-            //Don't proceed if the app is not ready
-            if (appContext.IsUpgrading == false && appContext.IsConfigured == false) return app;
 
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
@@ -191,5 +219,9 @@ namespace Umbraco.Web.Security.Identity
         }
         #endregion
 
+        public static void SanitizeThreadCulture(this IAppBuilder app)
+        {
+            Thread.CurrentThread.SanitizeThreadCulture();
+        }
     }
 }

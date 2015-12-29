@@ -24,6 +24,28 @@ function dataTypeHelper() {
 
             return preValues;
 
+        },
+
+        rebindChangedProperties: function (origContent, savedContent) {
+
+            //a method to ignore built-in prop changes
+            var shouldIgnore = function (propName) {
+                return _.some(["notifications", "ModelState"], function (i) {
+                    return i === propName;
+                });
+            };
+            //check for changed built-in properties of the content
+            for (var o in origContent) {
+
+                //ignore the ones listed in the array
+                if (shouldIgnore(o)) {
+                    continue;
+                }
+
+                if (!_.isEqual(origContent[o], savedContent[o])) {
+                    origContent[o] = savedContent[o];
+                }
+            }
         }
 
     };

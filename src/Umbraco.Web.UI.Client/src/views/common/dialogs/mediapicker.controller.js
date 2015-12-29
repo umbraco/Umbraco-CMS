@@ -33,11 +33,12 @@ angular.module("umbraco")
             $scope.submitFolder = function(e) {
                 if (e.keyCode === 13) {
                     e.preventDefault();
-                    $scope.showFolderInput = false;
-
+                    
                     mediaResource
                         .addFolder($scope.newFolderName, $scope.currentFolder.id)
                         .then(function(data) {
+                            $scope.showFolderInput = false;
+                            $scope.newFolderName = "";
 
                             //we've added a new folder so lets clear the tree cache for that specific item
                             treeService.clearCache({
@@ -78,7 +79,7 @@ angular.module("umbraco")
 
                 $scope.currentFolder = folder;      
             };
-
+            
           
             $scope.clickHandler = function(image, ev, select) {
                 ev.preventDefault();

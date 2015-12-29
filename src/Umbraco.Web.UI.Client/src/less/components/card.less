@@ -5,10 +5,10 @@
 .umb-card{
 	position: relative;
 	padding: 5px 10px 5px 10px;
-    background: white;    
+    background: white;
 
     .title{padding: 12px; color: @gray; border-bottom: 1px solid @grayLight; font-weight: 400; font-size: 16px; text-transform: none; margin: 0 -10px 10px -10px;}
-    
+
 }
 
 .umb-card-thumb{
@@ -24,13 +24,13 @@
     }
 }
 
-.umb-card-content{ 
+.umb-card-content{
     .item-title{color: @blackLight; font-weight: 400; border: none; font-size: 16px; text-transform: none; margin-bottom: 3px;}
-    p{color: @gray; margin-bottom: 1px;}   
+    p{color: @gray; margin-bottom: 1px;}
 }
 
 .umb-card-actions{
-    padding-top: 10px; 
+    padding-top: 10px;
     border-top: @grayLighter 1px solid;
     clear: both;
 }
@@ -41,8 +41,8 @@
 	display: block;
 	list-style: none;
 	margin: 0;
-	padding: 0;	
-}	
+	padding: 0;
+}
 
 .umb-card-icons.vertical{
 	position: absolute;
@@ -70,7 +70,7 @@
      margin: 0;
  }
 
-.umb-card-list li{ 
+.umb-card-list li{
     border-bottom: @grayLighter 1px solid;
     padding-bottom: 3px;
     display: block;
@@ -81,36 +81,43 @@
 
 //Card icon grid for picking items off a card
 .umb-card-grid{
-     display: block;
-     padding: 0;
-     margin: 0;
-	  list-style: none;
+	padding: 0;
+	margin: 0 auto;
+	list-style: none;
+
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: flex-start;
  }
 
-// clearfix floats
- .umb-card-grid:after {
-  content:"";
-  display:table;
-  clear:both;
-}
 
-.umb-card-grid li{
-	  float: left;
-     width: 90px;
-     height: 80px;
-     margin: 5px;
-     padding: 5px;
-     overflow: hidden;
-     font-size: 11px;
-     text-align: center;
+.umb-card-grid li {
+	padding: 5px;
+	overflow: hidden;
+	font-size: 11px;
+	text-align: center;
+
+	width: 100px;
+	height: 100px;
+
+	box-sizing: border-box;
  }
 
-.umb-card-grid li:hover, .umb-card-grid li:hover *{
+ .umb-card-grid li.-four-in-row {
+	 flex: 0 0 25%;
+ }
+
+ .umb-card-grid li.-three-in-row {
+	 flex: 0 0 33.33%;
+ }
+
+.umb-card-grid li:hover, .umb-card-grid li:hover * {
      background: @blue;
      color: white;
+	 cursor: pointer;
  }
 
-.umb-card-grid a{
+.umb-card-grid a {
      color: #222;
      text-decoration: none;
  }
@@ -152,7 +159,7 @@
  .umb-btn-round i {
      font-size:16px !important;
      color: #grayLight;
-     display:block;	
+     display:block;
  }
 
  .umb-btn-round.alert:hover, .umb-btn-round.alert:hover *{

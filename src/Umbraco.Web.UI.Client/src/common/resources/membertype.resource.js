@@ -3,9 +3,19 @@
     * @name umbraco.resources.memberTypeResource
     * @description Loads in data for member types
     **/
-function memberTypeResource($q, $http, umbRequestHelper) {
+function memberTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
 
     return {
+
+        getAvailableCompositeContentTypes: function (contentTypeId) {
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "memberTypeApiBaseUrl",
+                       "GetAvailableCompositeMemberTypes",
+                       [{ contentTypeId: contentTypeId }])),
+               'Failed to retrieve data for content type id ' + contentTypeId);
+        },
 
         //return all member types
         getTypes: function () {
@@ -16,17 +26,7 @@ function memberTypeResource($q, $http, umbRequestHelper) {
                        "memberTypeApiBaseUrl",
                        "GetAllTypes")),
                'Failed to retrieve data for member types id');
-        },
-
-        getPropertyTypeScaffold : function (id) {
-              return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "memberTypeApiBaseUrl",
-                       "GetPropertyTypeScaffold",
-                       [{ id: id }])),
-               'Failed to retrieve property type scaffold');
-        },
+        },       
 
         getById: function (id) {
 
@@ -74,8 +74,10 @@ function memberTypeResource($q, $http, umbRequestHelper) {
          */
         save: function (contentType) {
 
+            var saveModel = umbDataFormatter.formatContentTypePostData(contentType);
+
             return umbRequestHelper.resourcePromise(
-                 $http.post(umbRequestHelper.getApiUrl("memberTypeApiBaseUrl", "PostSave"), contentType),
+                 $http.post(umbRequestHelper.getApiUrl("memberTypeApiBaseUrl", "PostSave"), saveModel),
                 'Failed to save data for member type id ' + contentType.id);
         }
 

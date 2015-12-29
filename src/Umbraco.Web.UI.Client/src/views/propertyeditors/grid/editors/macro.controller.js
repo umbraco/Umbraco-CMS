@@ -5,23 +5,40 @@ angular.module("umbraco")
         $scope.title = "Click to insert macro";
 
         $scope.setMacro = function(){
-            dialogService.macroPicker({
-                dialogData: {
-                    richTextEditor: true,  
-                    macroData: $scope.control.value || {
-                        macroAlias: $scope.control.editor.config && $scope.control.editor.config.macroAlias
-                          ? $scope.control.editor.config.macroAlias : ""
-                    }
-                },
-                callback: function (data) {
-                    $scope.control.value = {
-                            macroAlias: data.macroAlias,
-                            macroParamsDictionary: data.macroParamsDictionary
-                    };
 
-                    $scope.setPreview($scope.control.value );
+            var dialogData = {
+                richTextEditor: true,
+                macroData: $scope.control.value || {
+                    macroAlias: $scope.control.editor.config && $scope.control.editor.config.macroAlias
+                      ? $scope.control.editor.config.macroAlias : ""
                 }
-            });
+            };
+
+            $scope.macroPickerOverlay = {};
+            $scope.macroPickerOverlay.view = "macropicker";
+            $scope.macroPickerOverlay.dialogData = dialogData;
+            $scope.macroPickerOverlay.show = true;
+
+            $scope.macroPickerOverlay.submit = function(model) {
+
+                var macroObject = macroService.collectValueData(model.selectedMacro, model.macroParams, dialogData.renderingEngine);
+
+                $scope.control.value = {
+                        macroAlias: macroObject.macroAlias,
+                        macroParamsDictionary: macroObject.macroParamsDictionary
+                };
+
+                $scope.setPreview($scope.control.value );
+
+                $scope.macroPickerOverlay.show = false;
+                $scope.macroPickerOverlay = null;
+            };
+
+            $scope.macroPickerOverlay.close = function(oldModel) {
+                $scope.macroPickerOverlay.show = false;
+                $scope.macroPickerOverlay = null;
+            };
+
     	};
 
         $scope.setPreview = function(macro){
@@ -45,4 +62,3 @@ angular.module("umbraco")
             }
     	}, 200);
 });
-

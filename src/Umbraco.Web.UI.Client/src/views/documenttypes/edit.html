@@ -19,7 +19,7 @@
 
             <umb-editor-container>
 
-               <umb-editor-sub-views sub-views="vm.page.navigation" model="vm.contentType"></umb-editor-sub-views>
+               <umb-editor-sub-views ng-if="!vm.page.loading" sub-views="vm.page.navigation" model="vm.contentType"></umb-editor-sub-views>
 
             </umb-editor-container>
 

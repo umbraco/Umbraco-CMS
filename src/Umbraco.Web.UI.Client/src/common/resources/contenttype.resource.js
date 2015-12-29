@@ -3,19 +3,18 @@
     * @name umbraco.resources.contentTypeResource
     * @description Loads in data for content types
     **/
-function contentTypeResource($q, $http, umbRequestHelper) {
+function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
 
     return {
 
-        getAssignedListViewDataType: function (contentTypeId) {
-
+        getAvailableCompositeContentTypes: function (contentTypeId) {
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "contentTypeApiBaseUrl",
-                       "GetAssignedListViewDataType",
+                       "GetAvailableCompositeContentTypes",
                        [{ contentTypeId: contentTypeId }])),
-               'Failed to retrieve data for content id ' + contentTypeId);
+               'Failed to retrieve data for content type id ' + contentTypeId);
         },
 
 
@@ -34,19 +33,19 @@ function contentTypeResource($q, $http, umbRequestHelper) {
          *        $scope.type = type;
          *    });
          * </pre>
-         * @param {Int} contentId id of the content item to retrive allowed child types for
+         * @param {Int} contentTypeId id of the content item to retrive allowed child types for
          * @returns {Promise} resourcePromise object.
          *
          */
-        getAllowedTypes: function (contentId) {
+        getAllowedTypes: function (contentTypeId) {
 
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "contentTypeApiBaseUrl",
                        "GetAllowedChildren",
-                       [{ contentId: contentId }])),
-               'Failed to retrieve data for content id ' + contentId);
+                       [{ contentId: contentTypeId }])),
+               'Failed to retrieve data for content id ' + contentTypeId);
         },
 
 
@@ -109,7 +108,7 @@ function contentTypeResource($q, $http, umbRequestHelper) {
                $http.post(
                    umbRequestHelper.getApiUrl(
                        "contentTypeApiBaseUrl",
-                       "DeleteContainerById",
+                       "DeleteContainer",
                        [{ id: id }])),
                'Failed to delete content type contaier');
         },
@@ -145,16 +144,6 @@ function contentTypeResource($q, $http, umbRequestHelper) {
                'Failed to retrieve content type scaffold');
         },
 
-        getSafeAlias: function (value, camelCase) {
-
-            return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "contentTypeApiBaseUrl",
-                       "GetSafeAlias", { value: value, camelCase: camelCase })),
-               'Failed to retrieve content type scaffold');
-        },
-
         /**
          * @ngdoc method
          * @name umbraco.resources.contentTypeResource#save
@@ -169,19 +158,64 @@ function contentTypeResource($q, $http, umbRequestHelper) {
          */
         save: function (contentType) {
 
+            var saveModel = umbDataFormatter.formatContentTypePostData(contentType);
+
             return umbRequestHelper.resourcePromise(
-                 $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostSave"), contentType),
+                 $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostSave"), saveModel),
                 'Failed to save data for content type id ' + contentType.id);
         },
 
-        createFolder: function(parentId, name) {
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.contentTypeResource#move
+         * @methodOf umbraco.resources.contentTypeResource
+         *
+         * @description
+         * Moves a node underneath a new parentId
+         *
+         * ##usage
+         * <pre>
+         * contentTypeResource.move({ parentId: 1244, id: 123 })
+         *    .then(function() {
+         *        alert("node was moved");
+         *    }, function(err){
+         *      alert("node didnt move:" + err.data.Message); 
+         *    });
+         * </pre> 
+         * @param {Object} args arguments object
+         * @param {Int} args.idd the ID of the node to move
+         * @param {Int} args.parentId the ID of the parent node to move to
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        move: function (args) {
+            if (!args) {
+                throw "args cannot be null";
+            }
+            if (!args.parentId) {
+                throw "args.parentId cannot be null";
+            }
+            if (!args.id) {
+                throw "args.id cannot be null";
+            }
 
             return umbRequestHelper.resourcePromise(
-                 $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostCreateFolder", { parentId: parentId, name: name })),
+                $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostMove"),
+                    {
+                        parentId: args.parentId,
+                        id: args.id
+                    }),
+                'Failed to move content');
+        },
+
+        createContainer: function(parentId, name) {
+
+            return umbRequestHelper.resourcePromise(
+                 $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostCreateContainer", { parentId: parentId, name: name })),
                 'Failed to create a folder under parent id ' + parentId);
 
         }
-
+        
     };
 }
 angular.module('umbraco.resources').factory('contentTypeResource', contentTypeResource);

@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
     [DataContract(Name = "propertyGroup", Namespace = "")]
-    public class PropertyGroupDisplay
+    public class PropertyGroupDisplay : PropertyGroupBasic<PropertyTypeDisplay>
     {
         public PropertyGroupDisplay()
         {
@@ -17,32 +14,25 @@ namespace Umbraco.Web.Models.ContentEditing
             ParentTabContentTypes = new List<int>();
         }
 
-        [DataMember(Name = "id")]
-        public int Id { get; set; }
-
-        [DataMember(Name = "parentGroupId")]
-        public int ParentGroupId { get; set; }
-
-        [DataMember(Name = "sortOrder")]
-        public int SortOrder { get; set; }
-
-        [DataMember(Name = "name")]
-        public string Name { get; set; }
-
-        [DataMember(Name = "properties")]
-        public IEnumerable<PropertyTypeDisplay> Properties { get; set; }
-
-        //Indicate if this tab was inherited
-        [DataMember(Name = "inherited")]
-        public bool Inherited { get; set; }
-
+        /// <summary>
+        /// Gets the context content type.
+        /// </summary>
         [DataMember(Name = "contentTypeId")]
+        [ReadOnly(true)]
         public int ContentTypeId { get; set; }
 
+        /// <summary>
+        /// Gets the identifiers of the content types that define this group.
+        /// </summary>
         [DataMember(Name = "parentTabContentTypes")]
+        [ReadOnly(true)]
         public IEnumerable<int> ParentTabContentTypes { get; set; }
 
+        /// <summary>
+        /// Gets the name of the content types that define this group.
+        /// </summary>
         [DataMember(Name = "parentTabContentTypeNames")]
+        [ReadOnly(true)]
         public IEnumerable<string> ParentTabContentTypeNames { get; set; }
     }
 }

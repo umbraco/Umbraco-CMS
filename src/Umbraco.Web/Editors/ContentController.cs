@@ -603,7 +603,8 @@ namespace Umbraco.Web.Editors
                 if (toMove.ContentType.AllowedAsRoot == false)
                 {
                     throw new HttpResponseException(
-                        Request.CreateValidationErrorResponse(Services.TextService.Localize("moveOrCopy/notAllowedAtRoot")));
+                        Request.CreateNotificationValidationErrorResponse(
+                            Services.TextService.Localize("moveOrCopy/notAllowedAtRoot")));
                 }
             }
             else
@@ -619,14 +620,16 @@ namespace Umbraco.Web.Editors
                     .Any(x => x.Value == toMove.ContentType.Id) == false)
                 {
                     throw new HttpResponseException(
-                        Request.CreateValidationErrorResponse(Services.TextService.Localize("moveOrCopy/notAllowedByContentType")));
+                        Request.CreateNotificationValidationErrorResponse(
+                            Services.TextService.Localize("moveOrCopy/notAllowedByContentType")));
                 }
 
                 // Check on paths
                 if ((string.Format(",{0},", parent.Path)).IndexOf(string.Format(",{0},", toMove.Id), StringComparison.Ordinal) > -1)
-                {
+                {                    
                     throw new HttpResponseException(
-                        Request.CreateValidationErrorResponse(Services.TextService.Localize("moveOrCopy/notAllowedByPath")));
+                        Request.CreateNotificationValidationErrorResponse(
+                            Services.TextService.Localize("moveOrCopy/notAllowedByPath")));
                 }
             }
 

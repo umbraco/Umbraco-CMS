@@ -117,7 +117,7 @@ namespace Umbraco.Core.Persistence
 
         public override void OnException(Exception x)
         {
-            _logger.Info<UmbracoDatabase>(x.StackTrace);
+            _logger.Error<UmbracoDatabase>("Database exception occurred", x);
             base.OnException(x);
         }
 

@@ -19,6 +19,7 @@ using Umbraco.Web.WebApi.Filters;
 using umbraco;
 using Constants = Umbraco.Core.Constants;
 using System.Net.Http;
+using System.Text;
 
 namespace Umbraco.Web.Editors
 {
@@ -26,11 +27,11 @@ namespace Umbraco.Web.Editors
     /// The API controller used for editing data types
     /// </summary>
     /// <remarks>
-    /// This controller is decorated with the UmbracoApplicationAuthorizeAttribute which means that any user requesting
-    /// access to ALL of the methods on this controller will need access to the developer application.
+    /// The security for this controller is defined to allow full CRUD access to data types if the user has access to either:
+    /// Content Types, Member Types or Media Types ... and of course to Data Types
     /// </remarks>
     [PluginController("UmbracoApi")]
-    [UmbracoTreeAuthorize(Constants.Trees.DataTypes)]
+    [UmbracoTreeAuthorize(Constants.Trees.DataTypes, Constants.Trees.DocumentTypes, Constants.Trees.MediaTypes, Constants.Trees.MemberTypes)]
     [EnableOverrideAuthorization]
     public class DataTypeController : UmbracoAuthorizedJsonController
     {
@@ -46,7 +47,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Gets the content json for the content id
+        /// Gets the datatype json for the datatype id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -75,14 +76,14 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
             
-            Services.DataTypeService.Delete(foundType, UmbracoUser.Id);
+            Services.DataTypeService.Delete(foundType, Security.CurrentUser.Id);
 
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
-        public DataTypeDisplay GetEmpty()
+        public DataTypeDisplay GetEmpty(int parentId)
         {
-            var dt = new DataTypeDefinition("");
+            var dt = new DataTypeDefinition(parentId, "");
             return Mapper.Map<IDataTypeDefinition, DataTypeDisplay>(dt);
         }
 
@@ -162,7 +163,28 @@ namespace Umbraco.Web.Editors
             return Mapper.Map<PropertyEditor, IEnumerable<PreValueFieldDisplay>>(propEd);            
         }
 
-        //TODO: Generally there probably won't be file uploads for pre-values but we should allow them just like we do for the content editor
+        /// <summary>
+        /// Deletes a data type container wth a given ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [HttpPost]
+        public HttpResponseMessage DeleteContainer(int id)
+        {
+            Services.DataTypeService.DeleteContainer(id, Security.CurrentUser.Id);
+
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
+        public HttpResponseMessage PostCreateContainer(int parentId, string name)
+        {
+            var result = Services.DataTypeService.CreateContainer(parentId, name, Security.CurrentUser.Id);
+
+            return result
+                ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id 
+                : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
+        }
 
         /// <summary>
         /// Saves the data type
@@ -207,6 +229,44 @@ namespace Umbraco.Web.Editors
             return display;
         }
 
+        /// <summary>
+        /// Move the media type
+        /// </summary>
+        /// <param name="move"></param>
+        /// <returns></returns>
+        public HttpResponseMessage PostMove(MoveOrCopy move)
+        {
+            var toMove = Services.DataTypeService.GetDataTypeDefinitionById(move.Id);
+            if (toMove == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+
+            var result = Services.DataTypeService.Move(toMove, move.ParentId);
+            if (result.Success)
+            {
+                var response = Request.CreateResponse(HttpStatusCode.OK);
+                response.Content = new StringContent(toMove.Path, Encoding.UTF8, "application/json");
+                return response;
+            }
+
+            switch (result.Result.StatusType)
+            {
+                case MoveOperationStatusType.FailedParentNotFound:
+                    return Request.CreateResponse(HttpStatusCode.NotFound);
+                case MoveOperationStatusType.FailedCancelledByEvent:
+                    //returning an object of INotificationModel will ensure that any pending 
+                    // notification messages are added to the response.
+                    return Request.CreateValidationErrorResponse(new SimpleNotificationModel());
+                case MoveOperationStatusType.FailedNotAllowedByPath:
+                    var notificationModel = new SimpleNotificationModel();
+                    notificationModel.AddErrorNotification(Services.TextService.Localize("moveOrCopy/notAllowedByPath"), "");
+                    return Request.CreateValidationErrorResponse(notificationModel);
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
         #region ReadOnly actions to return basic data - allow access for: content ,media, members, settings, developer
         /// <summary>
         /// Gets the content json for all data types
@@ -226,31 +286,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Gets the content json for all data types added by the user
-        /// </summary>
-        /// <returns></returns>
-        /// <remarks>
-        /// Permission is granted to this method if the user has access to any of these sections: Content, media, settings, developer, members
-        /// </remarks>        
-        [UmbracoApplicationAuthorize(
-            Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
-            Constants.Applications.Settings, Constants.Applications.Developer)]
-        public IEnumerable<DataTypeBasic> GetAllUserConfigured()
-        {
-            //find all user configured for re-reference
-            return Services.DataTypeService
-                .GetAllDataTypeDefinitions()
-                //TODO: This is pretty nasty :(
-                .Where(x => x.Id > 1045)
-                .Select(Mapper.Map<IDataTypeDefinition, DataTypeBasic>).Where(x => x.IsSystemDataType == false);
-
-            //find all custom editors added by non-core manifests
-
-            //find the rest
-        }
-
-        /// <summary>
-        /// Gets the content json for all user added property editors
+        /// Returns all data types grouped by their property editor group
         /// </summary>
         /// <returns></returns>
         /// <remarks>
@@ -259,17 +295,29 @@ namespace Umbraco.Web.Editors
         [UmbracoTreeAuthorize(
             Constants.Applications.Content, Constants.Applications.Media, Constants.Applications.Members,
             Constants.Applications.Settings, Constants.Applications.Developer)]
-        public IEnumerable<PropertyEditorBasic> GetAllUserPropertyEditors()
+        public IDictionary<string, IEnumerable<DataTypeBasic>> GetGroupedDataTypes()
         {
-            return PropertyEditorResolver.Current.PropertyEditors
-                .OrderBy(x => x.Name)
-                .Where(x => x.ValueEditor.View.IndexOf("app_plugins", StringComparison.InvariantCultureIgnoreCase) >= 0)
-                .Select(Mapper.Map<PropertyEditorBasic>);
+            var dataTypes = Services.DataTypeService
+                     .GetAllDataTypeDefinitions()
+                     .Select(Mapper.Map<IDataTypeDefinition, DataTypeBasic>);
+
+            var propertyEditors = PropertyEditorResolver.Current.PropertyEditors.ToArray();
+
+            foreach (var dataType in dataTypes)
+            {
+                var propertyEditor = propertyEditors.Single(x => x.Alias == dataType.Alias);
+                dataType.HasPrevalues = propertyEditor.PreValueEditor.Fields.Any(); ;
+            }
+
+            var grouped = dataTypes
+                .GroupBy(x => x.Group.IsNullOrWhiteSpace() ? "" : x.Group.ToLower())
+                .ToDictionary(group => group.Key, group => group.OrderBy(d => d.Name).AsEnumerable());
+
+            return grouped;
         }
 
         /// <summary>
-        /// Returns all configured data types and all potential data types that could exist based on unused property editors grouped
-        /// by their property editor defined group.
+        /// Returns all property editors grouped
         /// </summary>
         /// <returns></returns>
         /// <remarks>
@@ -280,44 +328,20 @@ namespace Umbraco.Web.Editors
             Constants.Applications.Settings, Constants.Applications.Developer)]
         public IDictionary<string, IEnumerable<DataTypeBasic>> GetGroupedPropertyEditors()
         {
-            var datadefs = Services.DataTypeService
-                                    .GetAllDataTypeDefinitions()
-                                    .ToArray();
-
             var datatypes = new List<DataTypeBasic>();
-
-            //this is a very specific map - if a property editor does not have prevalue - and there is a datatype already using this type, return that.
-            //also, we exclude all the system listviews from the list
+            
             var propertyEditors = PropertyEditorResolver.Current.PropertyEditors;
             foreach (var propertyEditor in propertyEditors)
             {
                 var hasPrevalues = propertyEditor.PreValueEditor.Fields.Any();
-
-                //check if a data type exists for this property editor
-                var dataDef = datadefs.FirstOrDefault(x => x.PropertyEditorAlias == propertyEditor.Alias);
-
-                //if no prevalues and a datatype exists with this property editor
-                if (hasPrevalues == false && dataDef != null)
-                {
-                    //exclude system list views
-                    if (dataDef.Name.InvariantStartsWith(Constants.Conventions.DataTypes.ListViewPrefix) == false)
-                    {
-                        datatypes.Add(Mapper.Map<DataTypeBasic>(dataDef));
-                    }   
-                }
-                else
-                {
-                    //else, just add a clean property editor
-                    var basic = Mapper.Map<DataTypeBasic>(propertyEditor);
-                    basic.HasPrevalues = hasPrevalues;
-                    datatypes.Add(basic);
-                }
+                var basic = Mapper.Map<DataTypeBasic>(propertyEditor);
+                basic.HasPrevalues = hasPrevalues;
+                datatypes.Add(basic);
             }
-
 
             var grouped = datatypes
                 .GroupBy(x => x.Group.IsNullOrWhiteSpace() ? "" : x.Group.ToLower())
-                .ToDictionary(group => group.Key, group => group.AsEnumerable());
+                .ToDictionary(group => group.Key, group => group.OrderBy(d => d.Name).AsEnumerable());
 
             return grouped;
         }

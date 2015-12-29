@@ -1,5 +1,5 @@
 angular.module("umbraco.directives")
-    .directive('umbGenerateAlias', function ($timeout, contentTypeResource) {
+    .directive('umbGenerateAlias', function ($timeout, entityResource) {
         return {
             restrict: 'E',
             templateUrl: 'views/components/umb-generate-alias.html',
@@ -11,9 +11,10 @@ angular.module("umbraco.directives")
             },
             link: function (scope, element, attrs, ctrl) {
 
-                var unbindWatcher = function(){};
+                var eventBindings = [];
                 var bindWatcher = true;
                 var generateAliasTimeout = "";
+                var updateAlias = false;
 
                 scope.locked = true;
                 scope.placeholderText = "Enter alias...";
@@ -24,17 +25,21 @@ angular.module("umbraco.directives")
                     $timeout.cancel(generateAliasTimeout);
                   }
 
-                  if( value !== undefined && value !== "") {
+                  if( value !== undefined && value !== "" && value !== null) {
 
                     scope.alias = "Generating Alias...";
 
                     generateAliasTimeout = $timeout(function () {
-                      contentTypeResource.getSafeAlias(value, true).then(function(safeAlias){
-                        scope.alias = safeAlias.alias;
+                       updateAlias = true;
+                        entityResource.getSafeAlias(value, true).then(function (safeAlias) {
+                           if(updateAlias) {
+                              scope.alias = safeAlias.alias;
+                           }
                       });
                     }, 500);
 
                   } else {
+                    updateAlias = true;
                     scope.alias = "";
                     scope.placeholderText = "Enter alias...";
                   }
@@ -42,26 +47,33 @@ angular.module("umbraco.directives")
                 }
 
                 // if alias gets unlocked - stop watching alias
-                scope.$watch('locked', function(newValue, oldValue){
+                eventBindings.push(scope.$watch('locked', function(newValue, oldValue){
                     if(newValue === false) {
-                        unbindWatcher();
-                        bindWatcher = false;
+                       bindWatcher = false;
                     }
-                });
+                }));
 
                 // validate custom entered alias
-                scope.$watch('alias', function(newValue, oldValue){
+                eventBindings.push(scope.$watch('alias', function(newValue, oldValue){
 
                   if(scope.alias === "" && bindWatcher === true || scope.alias === null && bindWatcher === true) {
                     // add watcher
-                    unbindWatcher = scope.$watch('aliasFrom', function(newValue, oldValue) {
-                      if (newValue !== undefined && newValue !== null) {
-                        generateAlias(newValue);
-                      }
-                    });
+                    eventBindings.push(scope.$watch('aliasFrom', function(newValue, oldValue) {
+                       if(bindWatcher) {
+                          generateAlias(newValue);
+                       }
+                    }));
                   }
 
-                });
+               }));
+
+               // clean up
+               scope.$on('$destroy', function(){
+                 // unbind watchers
+                 for(var e in eventBindings) {
+                   eventBindings[e]();
+                  }
+               });
 
             }
         };

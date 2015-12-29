@@ -7,12 +7,17 @@
       class="umb-dashboard"
       val-form-manager>
 
-      <umb-editor-view umb-tabs>
+      <umb-editor-view
+        footer="false"
+        umb-tabs>
 
          <umb-editor-header
             name="dashboard.name"
             name-locked="page.nameLocked"
-            tabs="dashboard.tabs">
+            tabs="dashboard.tabs"
+            hide-icon="true"
+            hide-description="true"
+            hide-alias="true">
          </umb-editor-header>
 
          <umb-editor-container>
@@ -22,7 +27,7 @@
 
                   <div ng-repeat="property in tab.properties" ng-switch on="property.serverSide">
 
-                     <div class="span12 umb-dashboard-control clearfix" ng-switch-when="false">
+                     <div class="span12 clearfix" ng-switch-when="false">
                         <h3 ng-show="property.caption">{{property.caption}}</h3>
                         <div ng-include="property.path"></div>
                      </div>

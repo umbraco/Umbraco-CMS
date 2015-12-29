@@ -1,16 +1,3 @@
 <div ng-controller="Umbraco.PropertyEditors.FolderBrowserController">
-
-	<umb-file-dropzone
-		ng-if="creating == null"
-		parent-id="{{nodeId}}"
-		compact="{{images.length > 0}}"
-		files-uploaded="onUploadComplete"
-		accept="{{acceptedFileTypes}}">
-	</umb-file-dropzone>
-
-	<umb-photo-folder ng-show="!creating && images.length > 0"
-                      min-height="105"
-                      min-width="220"
-                      on-click="clickHandler"
-                      ng-model="images" />
+	<umb-editor ng-if="fakeProperty" model="fakeProperty"></umb-editor>
 </div>

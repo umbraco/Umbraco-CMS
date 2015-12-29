@@ -19,7 +19,7 @@ angular.module("umbraco.directives")
                var ua = window.navigator.userAgent;
                var msie = ua.indexOf("MSIE ");
 
-               if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
+               if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./) || navigator.userAgent.match(/Edge\/\d+/)) {
                   return true;
                } else {
                   return false;
@@ -69,18 +69,14 @@ angular.module("umbraco.directives")
             function resizeInput() {
 
                if (domEl.scrollWidth !== domEl.clientWidth) {
-
-                  if (ngModelController.$modelValue === undefined || ngModelController.$modelValue === "" || ngModelController.$modelValue === null) {
-
-                     if (attr.placeholder) {
-                        attr.$set('size', attr.placeholder.length);
-                        element.width('auto');
-                     }
-
-                  } else {
+                  if (ngModelController.$modelValue) {
                      element.width(domEl.scrollWidth);
                   }
+               }
 
+               if(!ngModelController.$modelValue && attr.placeholder) {
+                  attr.$set('size', attr.placeholder.length);
+                  element.width('auto');
                }
 
             }

@@ -6,240 +6,224 @@
  * @description
  * The controller for the media type editor
  */
-(function() {
-	"use strict";
+(function () {
+    "use strict";
 
-	function MediaTypesEditController($scope, $routeParams, mediaTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter) {
+    function MediaTypesEditController($scope, $routeParams, mediaTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter, $q, localizationService) {
+        var vm = this;
 
-		var vm = this;
+        vm.save = save;
 
-		vm.save = save;
-
-		vm.currentNode = null;
-		vm.contentType = {};
-		vm.page = {};
-		vm.page.loading = false;
-		vm.page.saveButtonState = "init";
-		vm.page.navigation = [
+        vm.currentNode = null;
+        vm.contentType = {};
+        vm.page = {};
+        vm.page.loading = false;
+        vm.page.saveButtonState = "init";
+        vm.page.navigation = [
 			{
-				"name": "Design",
-				"icon": "icon-document-dashed-line",
-				"view": "views/mediatypes/views/design/design.html",
-				"active": true
+			    "name": "Design",
+			    "icon": "icon-document-dashed-line",
+			    "view": "views/mediatypes/views/design/design.html",
+			    "active": true
 			},
 			{
-				"name": "List view",
-				"icon": "icon-list",
-				"view": "views/mediatypes/views/listview/listview.html"
+			    "name": "List view",
+			    "icon": "icon-list",
+			    "view": "views/mediatypes/views/listview/listview.html"
 			},
 			{
-				"name": "Permissions",
-				"icon": "icon-keychain",
-				"view": "views/mediatypes/views/permissions/permissions.html"
+			    "name": "Permissions",
+			    "icon": "icon-keychain",
+			    "view": "views/mediatypes/views/permissions/permissions.html"
 			}
-		];
+        ];
 
-		vm.page.keyboardShortcutsOverview = [
+        vm.page.keyboardShortcutsOverview = [
 			{
-				"name": "Sections",
-				"shortcuts": [
+			    "name": "Sections",
+			    "shortcuts": [
 					{
-						"description": "Navigate sections",
-						"keys": [{"key": "1"}, {"key": "3"}],
-						"keyRange": true
+					    "description": "Navigate sections",
+					    "keys": [{ "key": "1" }, { "key": "3" }],
+					    "keyRange": true
 					}
-				]
+			    ]
 			},
 			{
-				"name": "Design",
-				"shortcuts": [
+			    "name": "Design",
+			    "shortcuts": [
 				{
-					"description": "Add tab",
-					"keys": [{"key": "alt"},{"key": "shift"},{"key": "t"}]
+				    "description": "Add tab",
+				    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "t" }]
 				},
 				{
-					"description": "Add property",
-					"keys": [{"key": "alt"},{"key": "shift"},{"key": "p"}]
+				    "description": "Add property",
+				    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "p" }]
 				},
 				{
-					"description": "Add editor",
-					"keys": [{"key": "alt"},{"key": "shift"},{"key": "e"}]
+				    "description": "Add editor",
+				    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "e" }]
 				},
 				{
-					"description": "Edit data type",
-					"keys": [{"key": "alt"},{"key": "shift"},{"key": "d"}]
+				    "description": "Edit data type",
+				    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "d" }]
 				}
-			]
+			    ]
+			},
+		{
+		    "name": "List view",
+		    "shortcuts": [
+				{
+				    "description": "Toggle list view",
+				    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "l" }]
+				}
+		    ]
 		},
 		{
-			"name": "List view",
-			"shortcuts": [
+		    "name": "Permissions",
+		    "shortcuts": [
 				{
-					"description": "Toggle list view",
-					"keys": [{"key": "alt"},{"key": "shift"},{"key": "l"}]
-				}
-			]
-		},
-		{
-			"name": "Permissions",
-			"shortcuts": [
-				{
-					"description": "Toggle allow as root",
-					"keys": [{"key": "alt"},{"key": "shift"},{"key": "r"}]
+				    "description": "Toggle allow as root",
+				    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "r" }]
 				},
 				{
-					"description": "Add child node",
-					"keys": [{"key": "alt"},{"key": "shift"},{"key": "c"}]
+				    "description": "Add child node",
+				    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "c" }]
 				}
-			]
+		    ]
 		}
-	];
+        ];
 
-		if ($routeParams.create) {
+        if ($routeParams.create) {
+            vm.page.loading = true;
 
-			vm.page.loading = true;
+            //we are creating so get an empty data type item
+            mediaTypeResource.getScaffold($routeParams.id)
+                .then(function(dt) {
+                    init(dt);
 
-			//we are creating so get an empty data type item
-			mediaTypeResource.getScaffold($routeParams.id)
-				.then(function(dt) {
-					init(dt);
+                    vm.page.loading = false;
+                });
+        }
+        else {
+            vm.page.loading = true;
 
-					vm.page.loading = false;
-				});
-		}
-		else {
+            mediaTypeResource.getById($routeParams.id).then(function(dt) {
+                init(dt);
 
-			vm.page.loading = true;
+                syncTreeNode(vm.contentType, dt.path, true);
 
-			mediaTypeResource.getById($routeParams.id).then(function(dt){
-				init(dt);
+                vm.page.loading = false;
+            });
+        }
 
-				syncTreeNode(vm.contentType, dt.path, true);
+        /* ---------- SAVE ---------- */
 
-				vm.page.loading = false;
-			});
-		}
+        function save() {
+            var deferred = $q.defer();
 
+            vm.page.saveButtonState = "busy";
 
-		/* ---------- SAVE ---------- */
+            // reformat allowed content types to array if id's
+            vm.contentType.allowedContentTypes = contentTypeHelper.createIdArray(vm.contentType.allowedContentTypes);
 
-		function save() {
+            contentEditingHelper.contentEditorPerformSave({
+                statusMessage: "Saving...",
+                saveMethod: mediaTypeResource.save,
+                scope: $scope,
+                content: vm.contentType,
+                //no-op for rebind callback... we don't really need to rebind for content types
+                rebindCallback: angular.noop
+            }).then(function (data) {
+                //success            
+                syncTreeNode(vm.contentType, data.path);
 
-			// validate form
-			if (formHelper.submitForm({ scope: $scope })) {
+                vm.page.saveButtonState = "success";
 
-				formHelper.resetForm({ scope: $scope });
+                deferred.resolve(data);
+            }, function (err) {
+                //error
+                if (err) {
+                    editorState.set($scope.content);
+                }
+                else {
+                    localizationService.localize("speechBubbles_validationFailedHeader").then(function (headerValue) {
+                        localizationService.localize("speechBubbles_validationFailedMessage").then(function (msgValue) {
+                            notificationsService.error(headerValue, msgValue);
+                        });
+                    });
+                }
 
-				// if form validates - perform save
-				performSave();
+                vm.page.saveButtonState = "error";
 
-			}
+                deferred.reject(err);
+            });
 
-		}
+            return deferred.promise;
+        }
 
-		function performSave() {
+        function init(contentType) {
+            //get available composite types
+            mediaTypeResource.getAvailableCompositeContentTypes(contentType.id).then(function (result) {
+                contentType.availableCompositeContentTypes = result;
+                // convert legacy icons
+                iconHelper.formatContentTypeIcons(contentType.availableCompositeContentTypes);
+            });
 
-			vm.page.saveButtonState = "busy";
+            // set all tab to inactive
+            if (contentType.groups.length !== 0) {
+                angular.forEach(contentType.groups, function (group) {
 
-			// reformat allowed content types to array if id's
-			vm.contentType.allowedContentTypes = contentTypeHelper.createIdArray(vm.contentType.allowedContentTypes);
+                    angular.forEach(group.properties, function (property) {
+                        // get data type details for each property
+                        getDataTypeDetails(property);
+                    });
 
-			mediaTypeResource.save(vm.contentType).then(function(dt){
+                });
+            }
 
-				formHelper.resetForm({ scope: $scope, notifications: dt.notifications });
-				contentEditingHelper.handleSuccessfulSave({
-					scope: $scope,
-					savedContent: dt,
-					rebindCallback: function() {
+            // convert icons for content type
+            convertLegacyIcons(contentType);
 
-					}
-				});
+            //set a shared state
+            editorState.set(contentType);
 
-				notificationsService.success("Media type saved");
-				//post save logic here -the saved doctype returns as a new object
-				init(dt);
+            vm.contentType = contentType;
+        }
 
-				syncTreeNode(vm.contentType, dt.path);
+        function convertLegacyIcons(contentType) {
+            // make array to store contentType icon
+            var contentTypeArray = [];
 
-				vm.page.saveButtonState = "success";
+            // push icon to array
+            contentTypeArray.push({ "icon": contentType.icon });
 
-			});
+            // run through icon method
+            iconHelper.formatContentTypeIcons(contentTypeArray);
 
-		}
+            // set icon back on contentType
+            contentType.icon = contentTypeArray[0].icon;
+        }
 
+        function getDataTypeDetails(property) {
+            if (property.propertyState !== "init") {
 
-		function init(contentType){
-
-			// set all tab to inactive
-			if( contentType.groups.length !== 0 ) {
-				angular.forEach(contentType.groups, function(group){
-
-					angular.forEach(group.properties, function(property){
-						// get data type details for each property
-						getDataTypeDetails(property);
-					});
-
-				});
-			}
-
-			// convert legacy icons
-			convertLegacyIcons(contentType);
-
-			// sort properties after sort order
-			angular.forEach(contentType.groups, function(group){
-				group.properties = $filter('orderBy')(group.properties, 'sortOrder');
-			});
-
-			//set a shared state
-			editorState.set(contentType);
-
-			vm.contentType = contentType;
-
-		}
-
-		function convertLegacyIcons(contentType) {
-
-			// convert icons for composite content types
-			iconHelper.formatContentTypeIcons(contentType.availableCompositeContentTypes);
-
-			// make array to store contentType icon
-			var contentTypeArray = [];
-
-			// push icon to array
-			contentTypeArray.push({"icon":contentType.icon});
-
-			// run through icon method
-			iconHelper.formatContentTypeIcons(contentTypeArray);
-
-			// set icon back on contentType
-			contentType.icon = contentTypeArray[0].icon;
-
-		}
-
-		function getDataTypeDetails(property) {
-
-			if( property.propertyState !== "init" ) {
-
-				dataTypeResource.getById(property.dataTypeId)
-					.then(function(dataType) {
-						property.dataTypeIcon = dataType.icon;
-						property.dataTypeName = dataType.name;
-					});
-			}
-		}
+                dataTypeResource.getById(property.dataTypeId)
+                    .then(function(dataType) {
+                        property.dataTypeIcon = dataType.icon;
+                        property.dataTypeName = dataType.name;
+                    });
+            }
+        }
 
 
-		/** Syncs the content type  to it's tree node - this occurs on first load and after saving */
-		function syncTreeNode(dt, path, initialLoad) {
+        /** Syncs the content type  to it's tree node - this occurs on first load and after saving */
+        function syncTreeNode(dt, path, initialLoad) {
+            navigationService.syncTree({ tree: "mediatypes", path: path.split(","), forceReload: initialLoad !== true }).then(function(syncArgs) {
+                vm.currentNode = syncArgs.node;
+            });
+        }
+    }
 
-			navigationService.syncTree({ tree: "mediatypes", path: path.split(","), forceReload: initialLoad !== true }).then(function (syncArgs) {
-				vm.currentNode = syncArgs.node;
-			});
-
-		}
-
-	}
-
-	angular.module("umbraco").controller("Umbraco.Editors.MediaTypes.EditController", MediaTypesEditController);
-
+    angular.module("umbraco").controller("Umbraco.Editors.MediaTypes.EditController", MediaTypesEditController);
 })();

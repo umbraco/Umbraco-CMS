@@ -53,28 +53,20 @@
       }
 
       function openIconPicker(layout) {
-
-         vm.iconPickerDialog = {};
-         vm.iconPickerDialog.view = "iconpicker";
-         vm.iconPickerDialog.show = true;
-
-         vm.iconPickerDialog.pickIcon = function(icon, color) {
-
-            layout.icon = icon;
-            vm.focusLayoutName = true;
-
-            vm.iconPickerDialog.show = false;
-            vm.iconPickerDialog = null;
-         };
-
-
-         vm.iconPickerDialog.close = function(oldModel) {
-
-            vm.iconPickerDialog.show = false;
-            vm.iconPickerDialog = null;
-         };
-
-
+          vm.iconPickerDialog = {
+              view: "iconpicker",
+              show: true,
+              submit: function(model) {
+                  if (model.color) {
+                     layout.icon = model.icon + " " + model.color;
+                  } else {
+                     layout.icon = model.icon;
+                  }
+                  vm.focusLayoutName = true;
+                  vm.iconPickerDialog.show = false;
+                  vm.iconPickerDialog = null;
+              }
+          };
       }
 
       activate();

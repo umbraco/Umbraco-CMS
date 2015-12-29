@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using AutoMapper;
-using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -35,6 +34,7 @@ namespace Umbraco.Web.Models.Mapping
             };
 
             config.CreateMap<PropertyEditor, DataTypeBasic>()
+                .ForMember(x => x.HasPrevalues, expression => expression.Ignore())
                 .ForMember(x => x.IsSystemDataType, expression => expression.Ignore())
                 .ForMember(x => x.Id, expression => expression.Ignore())
                 .ForMember(x => x.Trashed, expression => expression.Ignore())
@@ -44,6 +44,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.AdditionalData, expression => expression.Ignore());
 
             config.CreateMap<IDataTypeDefinition, DataTypeBasic>()
+                .ForMember(x => x.HasPrevalues, expression => expression.Ignore())
                 .ForMember(x => x.Icon, expression => expression.Ignore())
                 .ForMember(x => x.Alias, expression => expression.Ignore())
                 .ForMember(x => x.Group, expression => expression.Ignore())
@@ -65,10 +66,11 @@ namespace Umbraco.Web.Models.Mapping
                     new PreValueDisplayResolver(lazyDataTypeService)))
                 .ForMember(display => display.SelectedEditor, expression => expression.MapFrom(
                     definition => definition.PropertyEditorAlias.IsNullOrWhiteSpace() ? null : definition.PropertyEditorAlias))
+                .ForMember(x => x.HasPrevalues, expression => expression.Ignore())
                 .ForMember(x => x.Notifications, expression => expression.Ignore())
                 .ForMember(x => x.Icon, expression => expression.Ignore())
                 .ForMember(x => x.Alias, expression => expression.Ignore())
-                .ForMember(x => x.Group, expression => expression.Ignore())
+                .ForMember(x => x.Group, expression => expression.Ignore())                
                 .ForMember(x => x.IsSystemDataType, expression => expression.MapFrom(definition => systemIds.Contains(definition.Id)))
                 .AfterMap((def, basic) =>
                 {
@@ -96,7 +98,6 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(definition => definition.Key, expression => expression.Ignore())
                 .ForMember(definition => definition.Path, expression => expression.Ignore())
                 .ForMember(definition => definition.PropertyEditorAlias, expression => expression.MapFrom(save => save.SelectedEditor))
-                .ForMember(definition => definition.ParentId, expression => expression.MapFrom(save => -1))
                 .ForMember(definition => definition.DatabaseType, expression => expression.ResolveUsing<DatabaseTypeResolver>())
                 .ForMember(x => x.ControlId, expression => expression.Ignore())
                 .ForMember(x => x.CreatorId, expression => expression.Ignore())

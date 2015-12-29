@@ -4,11 +4,12 @@
     'lib/underscore/underscore-min.js',
 
     'lib/jquery-ui/jquery-ui.min.js',
+    'lib/jquery-ui-touch-punch/jquery.ui.touch-punch.js',
 
     'lib/angular/1.1.5/angular-cookies.min.js',
     'lib/angular/1.1.5/angular-mobile.js',
     'lib/angular/1.1.5/angular-sanitize.min.js',
-
+    
     'lib/angular/angular-ui-sortable.js',
 
     'lib/angular-dynamic-locale/tmhDynamicLocale.min.js',

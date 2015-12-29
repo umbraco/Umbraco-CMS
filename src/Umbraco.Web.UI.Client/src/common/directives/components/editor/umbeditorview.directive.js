@@ -7,7 +7,10 @@
          transclude: true,
          restrict: 'E',
          replace: true,
-         templateUrl: 'views/components/editor/umb-editor-view.html'
+         templateUrl: 'views/components/editor/umb-editor-view.html',
+         scope: {
+             footer: "@"
+         }
       };
 
       return directive;

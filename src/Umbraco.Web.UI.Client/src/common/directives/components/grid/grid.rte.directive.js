@@ -7,7 +7,11 @@ angular.module("umbraco.directives")
                 onClick: '&',
                 onFocus: '&',
                 onBlur: '&',
-                configuration:"="
+                configuration:"=",
+                onMediaPickerClick: "=",
+                onEmbedClick: "=",
+                onMacroPickerClick: "=",
+                onLinkPickerClick: "="
             },
             template: "<textarea ng-model=\"value\" rows=\"10\" class=\"mceNoEditor\" style=\"overflow:hidden\" id=\"{{uniqueId}}\"></textarea>",
             replace: true,
@@ -56,7 +60,7 @@ angular.module("umbraco.directives")
                         if(scope.configuration && scope.configuration.stylesheets){
                             angular.forEach(scope.configuration.stylesheets, function(stylesheet, key){
 
-                                    stylesheets.push("/css/" + stylesheet + ".css");
+                                    stylesheets.push(Umbraco.Sys.ServerVariables.umbracoSettings.cssPath + "/" + stylesheet + ".css");
                                     await.push(stylesheetResource.getRulesByName(stylesheet).then(function (rules) {
                                         angular.forEach(rules, function (rule) {
                                           var r = {};
@@ -101,7 +105,8 @@ angular.module("umbraco.directives")
                                 relative_urls: false,
                                 toolbar: toolbar,
                                 content_css: stylesheets.join(','),
-                                style_formats: styleFormats
+                                style_formats: styleFormats,
+                                autoresize_bottom_margin: 0
                             };
 
 
@@ -122,11 +127,6 @@ angular.module("umbraco.directives")
 
                                     editor.getBody().setAttribute('spellcheck', true);
 
-                                    //hide toolbar by default
-                                    $(editor.editorContainer)
-                                        .find(".mce-toolbar")
-                                        .css("visibility", "hidden");
-
                                     //force overflow to hidden to prevent no needed scroll
                                     editor.getBody().style.overflow = "hidden";
 
@@ -137,32 +137,6 @@ angular.module("umbraco.directives")
                                     }, 400);
 
                                 });
-                                
-                                // pin toolbar to top of screen if we have focus and it scrolls off the screen
-                                var pinToolbar = function () {
-
-                                    var _toolbar = $(editor.editorContainer).find(".mce-toolbar");
-                                    var toolbarHeight = _toolbar.height();
-
-                                    var _tinyMce = $(editor.editorContainer);
-                                    var tinyMceRect = _tinyMce[0].getBoundingClientRect();
-                                    var tinyMceTop = tinyMceRect.top;
-                                    var tinyMceBottom = tinyMceRect.bottom;
-
-                                    if (tinyMceTop < 100 && (tinyMceBottom > (100 + toolbarHeight))) {
-                                        _toolbar
-                                            .css("visibility", "visible")
-                                            .css("position", "fixed")
-                                            .css("top", "100px")
-                                            .css("margin-top", "0");
-                                    } else {
-                                        _toolbar
-                                            .css("visibility", "visible")
-                                            .css("position", "absolute")
-                                            .css("top", "auto")
-                                            .css("margin-top", (-toolbarHeight - 2) + "px");
-                                    }
-                                };
 
                                 //when we leave the editor (maybe)
                                 editor.on('blur', function (e) {
@@ -177,8 +151,6 @@ angular.module("umbraco.directives")
                                             scope.onBlur();
                                         }
 
-                                        _toolbar.css("visibility", "hidden");
-                                        $('.umb-panel-body').off('scroll', pinToolbar);
                                     });
                                 });
 
@@ -190,8 +162,6 @@ angular.module("umbraco.directives")
                                             scope.onFocus();
                                         }
 
-                                        pinToolbar();
-                                        $('.umb-panel-body').on('scroll', pinToolbar);
                                     });
                                 });
 
@@ -203,8 +173,6 @@ angular.module("umbraco.directives")
                                             scope.onClick();
                                         }
 
-                                        pinToolbar();
-                                        $('.umb-panel-body').on('scroll', pinToolbar);
                                     });
                                 });
 
@@ -241,18 +209,33 @@ angular.module("umbraco.directives")
                                     $(e.target).attr("data-mce-src", path + qs);
                                 });
 
+                                //Create the insert link plugin
+                                tinyMceService.createLinkPicker(editor, scope, function(currentTarget, anchorElement){
+                                    if(scope.onLinkPickerClick) {
+                                        scope.onLinkPickerClick(editor, currentTarget, anchorElement);
+                                    }
+                                });
 
                                 //Create the insert media plugin
-                                tinyMceService.createMediaPicker(editor, scope);
+                                tinyMceService.createMediaPicker(editor, scope, function(currentTarget, userData){
+                                    if(scope.onMediaPickerClick) {
+                                        scope.onMediaPickerClick(editor, currentTarget, userData);
+                                    }
+                                });
 
                                 //Create the embedded plugin
-                                tinyMceService.createInsertEmbeddedMedia(editor, scope);
-
-                                //Create the insert link plugin
-                                //tinyMceService.createLinkPicker(editor, scope);
+                                tinyMceService.createInsertEmbeddedMedia(editor, scope, function(){
+                                    if(scope.onEmbedClick) {
+                                        scope.onEmbedClick(editor);
+                                    }
+                                });
 
                                 //Create the insert macro plugin
-                                tinyMceService.createInsertMacro(editor, scope);
+                                tinyMceService.createInsertMacro(editor, scope, function(dialogData){
+                                    if(scope.onMacroPickerClick) {
+                                        scope.onMacroPickerClick(editor, dialogData);
+                                    }
+                                });
 
                             };
 

@@ -43,8 +43,8 @@ namespace Umbraco.Tests.Persistence.Querying
                 DatabaseContext.Database.Insert("cmsContentType", "pk", false, new ContentTypeDto { PrimaryKey = 88889, NodeId = 99999, Alias = "TestContentType3", Icon = "icon-folder", Thumbnail = "folder.png", IsContainer = false, AllowAtRoot = true });
                 DatabaseContext.Database.Execute(new Sql(string.Format("SET IDENTITY_INSERT {0} OFF ", SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName("cmsContentType"))));
 
-                DatabaseContext.Database.Insert(new DocumentTypeDto { ContentTypeNodeId = 99997, IsDefault = true, TemplateNodeId = 55555 });
-                DatabaseContext.Database.Insert(new DocumentTypeDto { ContentTypeNodeId = 99997, IsDefault = false, TemplateNodeId = 55554 });
+                DatabaseContext.Database.Insert(new ContentTypeTemplateDto { ContentTypeNodeId = 99997, IsDefault = true, TemplateNodeId = 55555 });
+                DatabaseContext.Database.Insert(new ContentTypeTemplateDto { ContentTypeNodeId = 99997, IsDefault = false, TemplateNodeId = 55554 });
 
                 DatabaseContext.Database.Insert(new ContentTypeAllowedContentTypeDto { AllowedId = 99998, Id = 99997, SortOrder = 1 });
                 DatabaseContext.Database.Insert(new ContentTypeAllowedContentTypeDto { AllowedId = 99999, Id = 99997, SortOrder = 2});

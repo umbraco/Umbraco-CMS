@@ -11,15 +11,25 @@
 
 	function LockedFieldDirective($timeout, localizationService) {
 
-		function link(scope, el, attr, ngModel) {
+	    function link(scope, el, attr, ngModel) {
 
-			var input = el.children('.umb-locked-field__input');
+			var input = el.find('.umb-locked-field__input');
 
 			function activate() {
 
 				// if locked state is not defined as an attr set default state
 				if (scope.locked === undefined || scope.locked === null) {
 					scope.locked = true;
+				}
+
+			    // if regex validation is not defined as an attr set default state
+                // if this is set to an empty string then regex validation can be ignored.
+				if (scope.regexValidation === undefined || scope.regexValidation === null) {
+				    scope.regexValidation = "^[a-zA-Z]\\w.*$";
+				}
+
+				if (scope.serverValidationField === undefined || scope.serverValidationField === null) {
+				    scope.serverValidationField = "";
 				}
 
 				// if locked state is not defined as an attr set default state
@@ -71,7 +81,9 @@
 			scope: {
 				model: '=ngModel',
 				locked: "=?",
-				placeholderText: "=?"
+				placeholderText: "=?",
+				regexValidation: "=?",
+				serverValidationField: "@"
 			},
 			link: link
 		};

@@ -25,6 +25,24 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter) {
 
         },
 
+        makeObjectArrayFromId: function (idArray, objectArray) {
+           var newArray = [];
+
+           for (var idIndex = 0; idArray.length > idIndex; idIndex++) {
+             var id = idArray[idIndex];
+
+             for (var objectIndex = 0; objectArray.length > objectIndex; objectIndex++) {
+                 var object = objectArray[objectIndex];
+                 if (id === object.id) {
+                    newArray.push(object);
+                 }
+             }
+
+           }
+
+           return newArray;
+        },
+
         mergeCompositeContentType: function(contentType, compositeContentType) {
 
            angular.forEach(compositeContentType.groups, function(compositionGroup) {
@@ -240,27 +258,19 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter) {
 
           return array;
 
-        },
+       },
 
-        updateTemplatePlaceholder: function(contentType) {
+       insertChildNodePlaceholder: function (array, name, icon, id) {
 
-          // update default template
-          if(contentType.defaultTemplate !== null && contentType.defaultTemplate.placeholder) {
-            contentType.defaultTemplate.name = contentType.name;
-            contentType.defaultTemplate.alias = contentType.alias;
-          }
+         var placeholder = {
+           "name": name,
+           "icon": icon,
+           "id": id
+         };
 
-          // update allowed template
-          angular.forEach(contentType.allowedTemplates, function(allowedTemplate){
-            if(allowedTemplate.placeholder) {
-              allowedTemplate.name = contentType.name;
-              allowedTemplate.alias = contentType.alias;
-            }
-          });
+         array.push(placeholder);
 
-          return contentType;
-
-        }
+       }
 
     };
 

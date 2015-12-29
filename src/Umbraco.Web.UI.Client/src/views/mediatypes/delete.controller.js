@@ -6,7 +6,7 @@
  * @description
  * The controller for the media type delete dialog
  */
-function MediaTypesDeleteController($scope, dataTypeResource, mediaTypeResource, contentTypeResource, treeService, navigationService) {
+function MediaTypesDeleteController($scope, dataTypeResource, mediaTypeResource, treeService, navigationService) {
 
     $scope.performDelete = function() {
 
@@ -29,7 +29,7 @@ function MediaTypesDeleteController($scope, dataTypeResource, mediaTypeResource,
 
         //mark it for deletion (used in the UI)
         $scope.currentNode.loading = true;
-        contentTypeResource.deleteContainerById($scope.currentNode.id).then(function () {
+        mediaTypeResource.deleteContainerById($scope.currentNode.id).then(function () {
             $scope.currentNode.loading = false;
 
             //get the root node before we remove it

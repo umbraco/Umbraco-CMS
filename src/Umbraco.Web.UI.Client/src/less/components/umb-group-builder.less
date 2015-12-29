@@ -59,10 +59,12 @@
   position: absolute;
   top: -30px;
   right: 20px;
+  font-size: 18px;
 }
 
 .umb-group-builder__group-remove:hover {
   cursor: pointer;
+  color: @blueDark;
 }
 
 .umb-group-builder__group-title-wrapper {
@@ -123,7 +125,7 @@ input.umb-group-builder__group-title-input {
 }
 
 .umb-group-builder__group-title-input.-placeholder {
-  border: 1px dashed #979797 !important;
+  border: 1px dashed #979797;
 }
 
 .umb-group-builder__group-inherited-label {
@@ -229,32 +231,29 @@ input.umb-group-builder__group-sort-value {
   font-weight: bold;
   margin-bottom: 0;
   color: @grayDarker;
-  min-width: 100%;
+  width: 100%;
+  padding: 0;
   min-height: 25px;
   box-sizing: border-box;
   resize: none;
-  position: relative;
-  top: -3px;
-  left: -7px;
   overflow: hidden;
   border-color: transparent;
   background: transparent;
 }
 
-.umb-group-builder__property-meta-description {
-   margin-top: -16px;
+.umb-group-builder__property-meta-label textarea.ng-invalid {
+   border: none;
 }
 
 .umb-group-builder__property-meta-description textarea {
   font-size: 12px;
   color: @grayDark;
   margin-bottom: 0;
-  min-width: 100%;
+  padding: 0;
+  width: 100%;
   min-height: 25px;
   box-sizing: border-box;
   resize: none;
-  position: relative;
-  left: -7px;
   overflow: hidden;
   border-color: transparent;
   background: transparent;
@@ -315,6 +314,12 @@ input.umb-group-builder__group-sort-value {
   margin: 0 0 10px 0;
   display: block;
   font-size: 18px;
+  position: relative;
+  cursor: pointer;
+}
+
+.umb-group-builder__property-action:hover {
+    color: @blueDark;
 }
 
 .umb-group-builder__property-inherited-label {
@@ -391,9 +396,9 @@ input.umb-group-builder__group-sort-value {
 
 /* ---------- DIALOGS ---------- */
 
-.show-validation .editor-wrapper.ng-invalid-val-required-component .editor-placeholder {
-  border-color: @red;
-  color: @red;
+.umb-overlay .show-validation .ng-invalid-val-required-component .editor-placeholder {
+   border-color: @red;
+   color: @red;
 }
 
 .content-type-editor-dialog.edit-property-settings {
@@ -412,16 +417,17 @@ input.umb-group-builder__group-sort-value {
   }
 
   textarea.editor-label {
-    border: none;
+    border-color:transparent;
     box-shadow: none;
     width: 100%;
     box-sizing: border-box;
-    padding: 10px 0 0 0;
-    margin-bottom: 10px;
+    margin-bottom: 0;
     font-size: 16px;
     font-weight: bold;
     resize: none;
     line-height: 1.5em;
+    padding-left: 0;
+    border: none;
     &:focus {
       outline: none;
       box-shadow: none !important;

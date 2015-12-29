@@ -12,6 +12,7 @@ angular.module("umbraco")
             $scope.cropSize = dialogOptions.cropSize;
             $scope.lastOpenedNode = $cookieStore.get("umbLastOpenedMediaNodeId");
             $scope.acceptedFileTypes = mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
+            $scope.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB";
 
             $scope.model.selectedImages = [];
 
@@ -20,6 +21,10 @@ angular.module("umbraco")
             if(dialogOptions.currentTarget){
                 $scope.target = dialogOptions.currentTarget;
             }
+
+            $scope.upload = function(v){
+               angular.element(".umb-file-dropzone-directive .file-select").click();
+            };
 
             $scope.dragLeave = function(el, event){
                 $scope.activeDrag = false;
@@ -55,6 +60,13 @@ angular.module("umbraco")
                   $scope.showFolderInput = false;
                }
 
+            };
+
+            $scope.enterSubmitFolder = function(event) {
+                if (event.keyCode === 13) {
+                    $scope.submitFolder();
+                    event.stopPropagation();
+                }
             };
 
             $scope.gotoFolder = function(folder) {
@@ -97,7 +109,7 @@ angular.module("umbraco")
                          }
 
                          if(imageIsSelected) {
-                            folderImage.cssclass = "selected";
+                            folderImage.selected = true;
                          }
                       }
 
@@ -110,61 +122,69 @@ angular.module("umbraco")
 
             };
 
-            $scope.clickHandler = function(image, ev, select) {
-                ev.preventDefault();
+            $scope.clickHandler = function(image, event, index) {
 
-                if (image.isFolder && !select) {
+                if (image.isFolder) {
                     $scope.gotoFolder(image);
-                }else{
+                } else {
+
                     eventsService.emit("dialogs.mediaPicker.select", image);
 
-                    //we have 3 options add to collection (if multi) show details, or submit it right back to the callback
-                    if ($scope.multiPicker) {
-                        selectImage(image);
-                    }else if($scope.showDetails) {
-
+                    if($scope.showDetails) {
                         $scope.target = image;
                         $scope.target.url = mediaHelper.resolveFile(image);
-
                         $scope.openDetailsDialog();
-
-                    }else{
-                       $scope.model.selectedImages.push(image);
-                       $scope.model.submit($scope.model);
+                    } else {
+                        selectImage(image);
                     }
+
                 }
+
             };
 
             function selectImage(image) {
 
-               if($scope.model.selectedImages.length > 0) {
+                if ($scope.model.selectedImages.length > 0) {
 
-                  var selectImage = false;
+                    var selectImage = false;
 
-                  for (var i = 0; i < $scope.model.selectedImages.length; i++) {
+                    for (var i = 0; i < $scope.model.selectedImages.length; i++) {
 
-                     var selectedImage = $scope.model.selectedImages[i];
+                        var selectedImage = $scope.model.selectedImages[i];
 
-                     if(image.key === selectedImage.key) {
-                        image.cssclass = "";
-                        $scope.model.selectedImages.splice(i, 1);
-                        selectImage = false;
-                     } else {
-                        selectImage = true;
-                     }
+                        if (image.key === selectedImage.key) {
+                            image.selected = false;
+                            $scope.model.selectedImages.splice(i, 1);
+                            selectImage = false;
+                        } else {
+                            selectImage = true;
+                        }
 
-                  }
+                    }
 
-                  if(selectImage) {
-                     image.cssclass = "selected";
-                     $scope.model.selectedImages.push(image);
-                  }
+                    if (selectImage) {
 
-               } else {
-                  $scope.model.selectedImages.push(image);
-                  image.cssclass = "selected";
-               }
+                        if(!$scope.multiPicker) {
+                            deselectAllImages($scope.model.selectedImages);
+                        }
 
+                        image.selected = true;
+                        $scope.model.selectedImages.push(image);
+                    }
+
+                } else {
+                    $scope.model.selectedImages.push(image);
+                    image.selected = true;
+                }
+
+            }
+
+            function deselectAllImages(images) {
+                for (var i = 0; i < images.length; i++) {
+                    var image = images[i];
+                    image.selected = false;
+                }
+                images.length = 0;
             }
 
             $scope.onUploadComplete = function () {
@@ -178,7 +198,7 @@ angular.module("umbraco")
             //default root item
             if (!$scope.target) {
 
-               if($scope.lastOpenedNode) {
+               if($scope.lastOpenedNode && $scope.lastOpenedNode !== -1) {
 
                   entityResource.getById($scope.lastOpenedNode, "media")
                      .then(function(node){
@@ -186,13 +206,15 @@ angular.module("umbraco")
                         // make sure that las opened node is on the same path as start node
                         var nodePath = node.path.split(",");
 
-                        if(nodePath.indexOf($scope.startNodeId) !== -1) {
+                        if(nodePath.indexOf($scope.startNodeId.toString()) !== -1) {
                            $scope.gotoFolder({id: $scope.lastOpenedNode, name: "Media", icon: "icon-folder"});
                         } else {
                            $scope.gotoFolder({id: $scope.startNodeId, name: "Media", icon: "icon-folder"});
                         }
 
-                     });
+                    }, function (err) {
+                        $scope.gotoFolder({id: $scope.startNodeId, name: "Media", icon: "icon-folder"});
+                    });
 
                } else {
 

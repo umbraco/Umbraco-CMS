@@ -394,6 +394,7 @@
     <key alias="showPageOnSend">送信後にページを表示</key>
     <key alias="size">サイズ</key>
     <key alias="sort">並べ替え</key>
+    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
     <key alias="type">型</key>
     <key alias="typeToSearch">検索...</key>
     <key alias="up">上</key>
@@ -410,6 +411,8 @@
     <key alias="yes">はい</key>
     <key alias="folder">フォルダー</key>
     <key alias="searchResults">検索結果</key>
+    <key alias="reorder">Reorder</key>
+    <key alias="reorderDone">I am done reordering</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">背景色</key>
@@ -867,8 +870,14 @@ Runwayをインストールして作られた新しいウェブサイトがど�
 
   <area alias="grid">
     <key alias="insertControl">挿入するアイテムを選択する</key>
+    <key alias="addLayout">Choose a layout</key>
     <key alias="addRows">ここからレイアウトを選択します</key>
     <key alias="addElement"><![CDATA[<i class="icon icon-add blue"></i> 最初の要素を追加します]]></key>
+    <key alias="dropElement">Drop content</key>
+    <key alias="settingsApplied">Settings applied</key>
+
+    <key alias="contentNotAllowed">This content is not allowed here</key>
+    <key alias="contentAllowed">This content is allowed here</key>
 
     <key alias="clickToEmbed">クリックして埋め込む</key>
     <key alias="clickToInsertImage">クリックして画像を挿入する</key>

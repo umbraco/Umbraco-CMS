@@ -40,7 +40,8 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile />
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort />
+    <IISExpressSSLPort>
+    </IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
@@ -198,7 +199,7 @@
     </Reference>
     <Reference Include="MySql.Data">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\MySql.Data.6.9.7\lib\net45\MySql.Data.dll</HintPath>
+      <HintPath>..\packages\MySql.Data.6.9.8\lib\net45\MySql.Data.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -386,13 +387,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\Controls\ContentTypeControlNew.ascx.cs">
-      <DependentUpon>ContentTypeControlNew.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Controls\ContentTypeControlNew.ascx.designer.cs">
-      <DependentUpon>ContentTypeControlNew.ascx</DependentUpon>
-    </Compile>
     <Compile Include="Umbraco\Controls\Images\ImageViewer.ascx.cs">
       <DependentUpon>ImageViewer.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -553,13 +547,6 @@
     <Compile Include="Umbraco\Search\QuickSearch.ascx.designer.cs">
       <DependentUpon>QuickSearch.ascx</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\Settings\EditNodeTypeNew.aspx.cs">
-      <DependentUpon>EditNodeTypeNew.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Settings\EditNodeTypeNew.aspx.designer.cs">
-      <DependentUpon>EditNodeTypeNew.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Umbraco\Settings\EditTemplate.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -619,7 +606,6 @@
     <Content Include="Umbraco\create.aspx" />
     <Content Include="Umbraco\Logout.aspx" />
     <Content Include="Umbraco\umbraco.aspx" />
-    <Content Include="Umbraco_Client\Editors\EditContentType.js" />
     <Content Include="Umbraco_Client\IconPicker\iconpicker.js" />
     <Compile Include="Umbraco\umbraco.aspx.cs">
       <DependentUpon>umbraco.aspx</DependentUpon>
@@ -1675,8 +1661,6 @@
     <Content Include="Umbraco\Controls\ProgressBar.ascx" />
     <Content Include="Umbraco_Client\DateTimePicker\datetimepicker.css" />
     <Content Include="Umbraco_Client\DateTimePicker\timepicker.js" />
-    <Content Include="Umbraco\Controls\ContentTypeControlNew.ascx" />
-    <Content Include="Umbraco\Controls\GenericProperties\GenericProperty.ascx" />
     <Content Include="Umbraco\Create\DlrScripting.ascx" />
     <Content Include="Umbraco\Images\Umbraco\developerRuby.gif" />
     <Content Include="Umbraco\Images\Umbraco\developerScript.gif" />
@@ -1880,6 +1864,7 @@
     <Content Include="Umbraco\Images\Editor\newdocument.gif" />
     <Content Include="Umbraco\Images\Editor\opacity.png" />
     <Content Include="Umbraco\Images\Editor\outdent.gif" />
+    <Content Include="Umbraco\Images\Editor\renderbody.gif" />
     <Content Include="Umbraco\Images\Editor\removeformat.gif" />
     <Content Include="Umbraco\Images\Editor\separator.gif" />
     <Content Include="Umbraco\Images\Editor\showStyles.png" />
@@ -1978,7 +1963,9 @@
     <Content Include="Umbraco\Translation\translationTasks.dtd" />
     <Content Include="UserControls\Zbu\ModelsBuilder\BuildModels.ascx" />
     <Content Include="UserControls\Zbu\ModelsBuilder\logo32x32.png" />
-    <Content Include="Views\Web.config" />
+    <Content Include="Views\Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -2044,7 +2031,6 @@
       <SubType>UserControl</SubType>
     </Content>
     <Content Include="Umbraco\Css\background.gif" />
-    <Content Include="Umbraco_Client\GenericProperty\genericproperty.css" />
     <Content Include="Umbraco\Css\splitter.gif" />
     <Content Include="Umbraco\Css\umbracoGui.css" />
     <Content Include="Umbraco\Dashboard\LatestEdits.ascx" />
@@ -2253,7 +2239,6 @@
     <Content Include="Umbraco\Images\Umbraco\userGroup.gif" />
     <Content Include="Umbraco\Images\Umbraco\userType.gif" />
     <Content Include="Umbraco\Js\dualSelectBox.js" />
-    <Content Include="Umbraco_Client\GenericProperty\genericProperty.js" />
     <Content Include="Umbraco\Js\guiFunctions.js" />
     <Content Include="Umbraco\Js\language.aspx" />
     <Content Include="Umbraco\Js\umbracoCheckKeys.js" />
@@ -2265,15 +2250,9 @@
     <Content Include="Umbraco\Members\EditMemberGroup.aspx">
       <SubType>Form</SubType>
     </Content>
-    <Content Include="Umbraco\Members\EditMemberType.aspx" />
-    <Content Include="Umbraco\ping.aspx">
-      <SubType>Form</SubType>
-    </Content>
     <Content Include="Umbraco\publishStatus.aspx" />
     <Content Include="Umbraco\Settings\EditDictionaryItem.aspx" />
     <Content Include="Umbraco\Settings\editLanguage.aspx" />
-    <Content Include="Umbraco\Settings\EditMediaType.aspx" />
-    <Content Include="Umbraco\Settings\EditNodeTypeNew.aspx" />
     <Content Include="Umbraco\Settings\editTemplate.aspx" />
     <Content Include="Umbraco\Settings\Modals\ShowUmbracoTags.aspx" />
     <Content Include="Umbraco\Settings\Stylesheet\editstylesheet.aspx" />
@@ -2441,7 +2420,7 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.0\x86\*.* "$(TargetDir)x86\" 
         <WebProjectProperties>
           <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>7300</DevelopmentServerPort>
+          <DevelopmentServerPort>7400</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:7400</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>

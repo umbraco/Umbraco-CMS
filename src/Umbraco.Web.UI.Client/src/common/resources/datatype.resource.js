@@ -17,7 +17,7 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
          *
          * ##usage
          * <pre>
-         * dataTypeResource.getPrevalyes("Umbraco.MediaPicker", 1234)
+         * dataTypeResource.getPreValues("Umbraco.MediaPicker", 1234)
          *    .then(function(prevalues) {
          *        alert('its gone!');
          *    });
@@ -114,28 +114,17 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
                        "GetAll")),
                "Failed to retrieve data");
         },
-
-        getAllUserConfigured: function () {
-
+     
+        getGroupedDataTypes: function () {
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "dataTypeApiBaseUrl",
-                        "GetAllUserConfigured")),
+                        "GetGroupedDataTypes")),
                 "Failed to retrieve data");
         },
 
-        getAllUserPropertyEditors: function () {
-
-            return umbRequestHelper.resourcePromise(
-                $http.get(
-                    umbRequestHelper.getApiUrl(
-                        "dataTypeApiBaseUrl",
-                        "GetAllUserPropertyEditors")),
-                "Failed to retrieve data");
-        },
-
-        getAllTypesAndEditors : function(){
+        getGroupedPropertyEditors : function(){
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
@@ -181,13 +170,13 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
          * @returns {Promise} resourcePromise object containing the data type scaffold.
          *
          */
-        getScaffold: function () {
+        getScaffold: function (parentId) {
 
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "dataTypeApiBaseUrl",
-                       "GetEmpty")),
+                       "GetEmpty", { parentId: parentId })),
                "Failed to retrieve data for empty datatype");
         },
         /**
@@ -218,6 +207,17 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
                         "DeleteById",
                         [{ id: id }])),
                 "Failed to delete item " + id);
+        },
+
+        deleteContainerById: function (id) {
+
+            return umbRequestHelper.resourcePromise(
+               $http.post(
+                   umbRequestHelper.getApiUrl(
+                       "dataTypeApiBaseUrl",
+                       "DeleteContainer",
+                       [{ id: id }])),
+               'Failed to delete content type contaier');
         },
 
 
@@ -303,6 +303,60 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
             return umbRequestHelper.resourcePromise(
                  $http.post(umbRequestHelper.getApiUrl("dataTypeApiBaseUrl", "PostSave"), saveModel),
                 "Failed to save data for data type id " + dataType.id);
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.dataTypeResource#move
+         * @methodOf umbraco.resources.dataTypeResource
+         *
+         * @description
+         * Moves a node underneath a new parentId
+         *
+         * ##usage
+         * <pre>
+         * dataTypeResource.move({ parentId: 1244, id: 123 })
+         *    .then(function() {
+         *        alert("node was moved");
+         *    }, function(err){
+         *      alert("node didnt move:" + err.data.Message); 
+         *    });
+         * </pre> 
+         * @param {Object} args arguments object
+         * @param {Int} args.idd the ID of the node to move
+         * @param {Int} args.parentId the ID of the parent node to move to
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        move: function (args) {
+            if (!args) {
+                throw "args cannot be null";
+            }
+            if (!args.parentId) {
+                throw "args.parentId cannot be null";
+            }
+            if (!args.id) {
+                throw "args.id cannot be null";
+            }
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(umbRequestHelper.getApiUrl("dataTypeApiBaseUrl", "PostMove"),
+                    {
+                        parentId: args.parentId,
+                        id: args.id
+                    }),
+                'Failed to move content');
+        },
+
+        createContainer: function (parentId, name) {
+
+            return umbRequestHelper.resourcePromise(
+                 $http.post(
+                    umbRequestHelper.getApiUrl(
+                       "dataTypeApiBaseUrl",
+                       "PostCreateContainer",
+                       { parentId: parentId, name: name })),
+                'Failed to create a folder under parent id ' + parentId);
         }
     };
 }

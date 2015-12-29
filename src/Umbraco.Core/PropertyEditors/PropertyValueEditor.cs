@@ -291,8 +291,12 @@ namespace Umbraco.Core.PropertyEditors
                     return property.Value.ToString();
                 case DataTypeDatabaseType.Integer:
                 case DataTypeDatabaseType.Decimal:
-                    //we can just ToString() any of these types
-                    return property.Value.ToString();
+                    //Decimals need to be formatted with invariant culture (dots, not commas)
+                    //Anything else falls back to ToString()
+                    var decim = property.Value.TryConvertTo<decimal>();
+                    return decim.Success 
+                        ? decim.Result.ToString(NumberFormatInfo.InvariantInfo) 
+                        : property.Value.ToString();
                 case DataTypeDatabaseType.Date:
                     var date = property.Value.TryConvertTo<DateTime?>();
                     if (date.Success == false || date.Result == null)

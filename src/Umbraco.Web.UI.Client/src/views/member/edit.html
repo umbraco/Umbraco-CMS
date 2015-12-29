@@ -1,0 +1,71 @@
+<div ng-controller="Umbraco.Editors.Member.EditController">
+
+   <umb-load-indicator ng-if="page.loading"></umb-load-indicator>
+
+   <form novalidate name="contentForm"
+      ng-show="!page.loading"
+      ng-submit="save()"
+      val-form-manager>
+
+      <umb-editor-view umb-tabs>
+
+         <umb-editor-header
+            name="content.name"
+            tabs="content.tabs"
+            menu="page.menu"
+            hide-icon="true"
+            hide-description="true"
+            hide-alias="true">
+         </umb-editor-header>
+
+         <umb-editor-container>
+
+            <umb-tabs-content view="true" class="form-horizontal">
+               <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" ng-repeat="tab in content.tabs">
+
+                  <umb-property property="property" ng-repeat="property in tab.properties">
+                     <umb-editor model="property"></umb-editor>
+                  </umb-property>
+
+               </umb-tab>
+            </umb-tabs-content>
+
+         </umb-editor-container>
+
+         <umb-editor-footer>
+
+            <umb-editor-footer-content-left>
+               <umb-breadcrumbs ng-if="ancestors && ancestors.length > 0" ancestors="ancestors"></umb-breadcrumbs>
+            </umb-editor-footer-content-left>
+
+
+            <umb-editor-footer-content-right>
+
+               <umb-button
+                  ng-if="page.listViewPath"
+                  type="link"
+                  href="#{{page.listViewPath}}"
+                  label="Return to list"
+                  label-key="buttons_returnToList">
+               </umb-button>
+
+               <umb-button
+                  type="submit"
+                  label="Save"
+                  label-key="buttons_save"
+                  button-style="success"
+                  shortcut="ctrl+s"
+                  state="page.saveButtonState">
+               </umb-button>
+
+            </umb-editor-footer-content-right>
+
+
+         </umb-editor-footer>
+
+
+      </umb-editor-view>
+
+   </form>
+
+</div>

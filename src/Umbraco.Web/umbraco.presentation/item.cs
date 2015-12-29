@@ -62,60 +62,51 @@ namespace umbraco
             else
             {
                 // Loop through XML children we need to find the fields recursive
-                if (helper.FindAttribute(attributes, "recursive") == "true")
+                var recursive = helper.FindAttribute(attributes, "recursive") == "true";
+
+                if (publishedContent == null)
                 {
-                    if (publishedContent == null)
-                    {
-                        var recursiveVal = GetRecursiveValueLegacy(elements);
-                        _fieldContent = recursiveVal.IsNullOrWhiteSpace() ? _fieldContent : recursiveVal;
-                    }
-                    else
-                    {
-					    var pval = publishedContent.GetPropertyValue(_fieldName, true);
-					    var rval = pval == null ? string.Empty : pval.ToString();
-					    _fieldContent = rval.IsNullOrWhiteSpace() ? _fieldContent : rval;
-                    }
+                    var recursiveVal = GetRecursiveValueLegacy(elements);
+                    _fieldContent = recursiveVal.IsNullOrWhiteSpace() ? _fieldContent : recursiveVal;
+                }
+
+                //check for published content and get its value using that
+                if (publishedContent != null && (publishedContent.HasProperty(_fieldName) || recursive))
+                {
+                    var pval = publishedContent.GetPropertyValue(_fieldName, recursive);
+                    var rval = pval == null ? string.Empty : pval.ToString();
+                    _fieldContent = rval.IsNullOrWhiteSpace() ? _fieldContent : rval;
                 }
                 else
                 {
-                    //check for published content and get its value using that
-                    if (publishedContent != null && publishedContent.HasProperty(_fieldName))
-                    {
-                        var pval = publishedContent.GetPropertyValue(_fieldName);
-                        var rval = pval == null ? string.Empty : pval.ToString();
-                        _fieldContent = rval.IsNullOrWhiteSpace() ? _fieldContent : rval;
-                    }
-                    else
-                    {
-                        //get the vaue the legacy way (this will not parse locallinks, etc... since that is handled with ipublishedcontent)
-                        var elt = elements[_fieldName];
-                        if (elt != null && string.IsNullOrEmpty(elt.ToString()) == false)
-                            _fieldContent = elt.ToString().Trim();
-                    }
-
-                    //now we check if the value is still empty and if so we'll check useIfEmpty
-                    if (string.IsNullOrEmpty(_fieldContent))
-                    {
-                        var altFieldName = helper.FindAttribute(attributes, "useIfEmpty");
-                        if (string.IsNullOrEmpty(altFieldName) == false)
-                        {
-                            if (publishedContent != null && publishedContent.HasProperty(altFieldName))
-                            {
-                                var pval = publishedContent.GetPropertyValue(altFieldName);
-                                var rval = pval == null ? string.Empty : pval.ToString();
-                                _fieldContent = rval.IsNullOrWhiteSpace() ? _fieldContent : rval;
-                            }
-                            else
-                            {
-                                //get the vaue the legacy way (this will not parse locallinks, etc... since that is handled with ipublishedcontent)
-                                var elt = elements[altFieldName];
-                                if (elt != null && string.IsNullOrEmpty(elt.ToString()) == false)
-                                    _fieldContent = elt.ToString().Trim();
-                            }
-                        }
-                    }                    
-
+                    //get the vaue the legacy way (this will not parse locallinks, etc... since that is handled with ipublishedcontent)
+                    var elt = elements[_fieldName];
+                    if (elt != null && string.IsNullOrEmpty(elt.ToString()) == false)
+                        _fieldContent = elt.ToString().Trim();
                 }
+
+                //now we check if the value is still empty and if so we'll check useIfEmpty
+                if (string.IsNullOrEmpty(_fieldContent))
+                {
+                    var altFieldName = helper.FindAttribute(attributes, "useIfEmpty");
+                    if (string.IsNullOrEmpty(altFieldName) == false)
+                    {
+                        if (publishedContent != null && (publishedContent.HasProperty(altFieldName) || recursive))
+                        {
+                            var pval = publishedContent.GetPropertyValue(altFieldName, recursive);
+                            var rval = pval == null ? string.Empty : pval.ToString();
+                            _fieldContent = rval.IsNullOrWhiteSpace() ? _fieldContent : rval;
+                        }
+                        else
+                        {
+                            //get the vaue the legacy way (this will not parse locallinks, etc... since that is handled with ipublishedcontent)
+                            var elt = elements[altFieldName];
+                            if (elt != null && string.IsNullOrEmpty(elt.ToString()) == false)
+                                _fieldContent = elt.ToString().Trim();
+                        }
+                    }
+                }
+
             }
 
             ParseItem(attributes);

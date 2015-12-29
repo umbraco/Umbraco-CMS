@@ -389,6 +389,7 @@
     <key alias="showPageOnSend">Hvilken side skal vises efter at formularen er sendt</key>
     <key alias="size">Størrelse</key>
     <key alias="sort">Sortér</key>
+    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
     <key alias="type">Type</key>
     <key alias="typeToSearch">Skriv for at søge...</key>
     <key alias="up">Op</key>
@@ -405,6 +406,8 @@
     <key alias="yes">Ja</key>
     <key alias="folder">Mappe</key>
     <key alias="searchResults">Søgeresultater</key>
+    <key alias="reorder">Reorder</key>
+    <key alias="reorderDone">I am done reordering</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Baggrundsfarve</key>
@@ -626,9 +629,15 @@ Mange hilsner fra Umbraco robotten
     <key alias="reset">Nulstil</key>
   </area>
   <area alias="grid">
-    <key alias="insertControl">Indsæt element</key>
-    <key alias="addRows">Tilføj rækker til dit layout</key>
-    <key alias="addElement"><![CDATA[Kom i gang ved at trykke på <i class=" icon icon-add blue"></i> nedenfor og tilføje det første element]]></key>
+    <key alias="insertControl">Vælg indholdstype</key>
+    <key alias="chooseLayout">Vælg layout</key>
+    <key alias="addRows">Tilføj række</key>
+    <key alias="addElement">Tilføj indhold</key>
+    <key alias="dropElement">Slip indhold</key>
+    <key alias="settingsApplied">Instillinger tilføjet</key>
+
+    <key alias="contentNotAllowed">Indholdet er ikke tilladt her</key>
+    <key alias="contentAllowed">Indholdet er tilladt her</key>
 
     <key alias="clickToEmbed">Klik for at indlejre</key>
     <key alias="clickToInsertImage">Klik for at indsætte et billede</key>
@@ -867,7 +876,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="memberTypes">Medlemstype</key>
     <key alias="documentTypes">Dokumenttyper</key>
     <key alias="relationTypes">Dokumenttyper</key>
-    
+
     <key alias="packager">Pakker</key>
     <key alias="packages">Pakker</key>
     <key alias="python">Python</key>
@@ -926,6 +935,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="userTypes">Brugertyper</key>
     <key alias="writer">Forfatter</key>
     <key alias="translator">Oversætter</key>
+    <key alias="change">Skift</key>
     <key alias="yourProfile">Din profil</key>
     <key alias="yourHistory">Din historik</key>
     <key alias="sessionExpires">Session udløber</key>
