@@ -17,6 +17,7 @@ using Umbraco.Core.PropertyEditors;
 using System;
 using System.Net.Http;
 using Umbraco.Core.Services;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Editors
 {
@@ -164,15 +165,7 @@ namespace Umbraco.Web.Editors
                         if (template == null)
                         {
                             template = new Template(ctSave.Name, ctSave.Alias);
-
-                        //POC: temporary models template support, this should really not be handled here but by
-                        //the models builder
-                        var design = @"@inherits Umbraco.Web.Mvc.UmbracoTemplatePage<IPublishedContent>
-@{
-    Layout = null;
-}";
-
-                        template.Content = design.Replace("IPublishedContent", contentTypeSave.Name.ToSafeAlias(false));
+                            template.Content = ViewHelper.GetDefaultFileContent(modelClassName: ctSave.Name.ToSafeAlias(false));
                             Services.FileService.SaveTemplate(template);
                         }
 
