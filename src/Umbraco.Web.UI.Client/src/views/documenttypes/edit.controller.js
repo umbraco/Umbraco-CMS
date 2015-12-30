@@ -45,7 +45,6 @@
 			}
         ];
 
-
         
         //disable by default, turn on if detected correctly.
 		vm.page.modelsBuilder = false;
@@ -70,19 +69,19 @@
 
 				vm.page.saveButtonState = "busy";
 				notificationsService.info("Building models", "this can take abit of time, don't worry");
-				
-				modelsResource.buildModels().then(function(){
-					vm.page.saveButtonState = "init";
 
-					//clear and add success
-					notificationsService.success("Models Generated");
+				modelsResource.buildModels().then(function () {
+				    vm.page.saveButtonState = "init";
 
-					//just calling this to get the servar back to life
-					modelsResource.getModelsOutOfDateStatus();
+				    //clear and add success
+				    notificationsService.success("Models Generated");
 
-				}, function(){
-                    notificationsService.error("Models could not be generated");
-                    vm.page.saveButtonState = "error";
+				    //just calling this to get the servar back to life
+				    modelsResource.getModelsOutOfDateStatus();
+
+				}, function () {
+				    notificationsService.error("Models could not be generated");
+				    vm.page.saveButtonState = "error";
 				});
 			}
 		}];
