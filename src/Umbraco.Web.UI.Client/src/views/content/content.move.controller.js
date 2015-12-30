@@ -1,5 +1,5 @@
 angular.module("umbraco").controller("Umbraco.Editors.Content.MoveController",
-	function ($scope, eventsService, contentResource, navigationService, appState, treeService, localizationService) {
+	function ($scope, eventsService, contentResource, navigationService, appState, treeService, localizationService, notificationsService) {
 
 	    var dialogOptions = $scope.dialogOptions;
 	    var searchText = "Search...";
@@ -120,6 +120,12 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.MoveController",
                     $scope.success = false;
                     $scope.error = err;
                     $scope.busy = false;
+                    //show any notifications
+                    if (angular.isArray(err.data.notifications)) {
+                        for (var i = 0; i < err.data.notifications.length; i++) {
+                            notificationsService.showNotification(err.data.notifications[i]);
+                        }
+                    }
                 });
 	    };
 

@@ -148,10 +148,37 @@
                 </cc2:PropertyPanel>
             </cc2:Pane>
 
-            <cc2:Pane id="pane_uninstalled" runat="server" Visible="false">
-                <div style="margin: 10px;">
-                    <p><%= umbraco.ui.Text("packager", "packageUninstalledText") %></p>
+           <cc2:Pane id="pane_uninstalled" runat="server" Visible="false">
+
+                <div class="alert alert-block">
+                    Package uninstall in progress, please wait while the browser is reloaded...
                 </div>
+
+                <script type="text/javascript">
+                    
+                    //This is all a bit zany with double encoding because we have a URL in a hash (#) url part
+                    // but it works and maintains query strings
+
+                    var umbPath = "<%=umbraco.GlobalSettings.Path%>";
+                    setTimeout(function () {
+                        var mainWindow = UmbClientMgr.mainWindow();
+
+                        //kill the tree and template cache
+                        if (mainWindow.UmbClientMgr) {
+                            mainWindow.UmbClientMgr._packageInstalled();
+                        }
+
+                        var baseUrl = mainWindow.location.href.substr(0, mainWindow.location.href.indexOf("#/developer/framed/"));
+                        var framedUrl = baseUrl + "#/developer/framed/";
+                        var refreshUrl = framedUrl + encodeURIComponent(encodeURIComponent(umbPath + "/developer/packages/installer.aspx?installing=uninstalled"));
+
+                        var redirectUrl = umbPath + "/ClientRedirect.aspx?redirectUrl=" + refreshUrl;
+
+                        mainWindow.location.href = redirectUrl;
+                    }, 2000);
+                </script>
+
+
              </cc2:Pane>
     </cc2:Tabview>
 </asp:Content>

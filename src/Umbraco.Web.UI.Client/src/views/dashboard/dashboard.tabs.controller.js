@@ -43,7 +43,7 @@ function FormsController($scope, $route, $cookieStore, packageResource) {
 
     $scope.complete = function(result){
         var url = window.location.href + "?init=true";
-        $cookieStore.put("umbPackageInstallId", result.packageGuid); 
+        $cookieStore.put("umbPackageInstallId", result.packageGuid);
         window.location.reload(true);
     };
 
@@ -186,60 +186,29 @@ function startupLatestEditsController($scope) {
 }
 angular.module("umbraco").controller("Umbraco.Dashboard.StartupLatestEditsController", startupLatestEditsController);
 
-function MediaFolderBrowserDashboardController($rootScope, $scope, assetsService, $routeParams, $timeout, $element, $location, umbRequestHelper,navigationService, mediaResource, $cookies) {
-        var dialogOptions = $scope.dialogOptions;
+function MediaFolderBrowserDashboardController($rootScope, $scope, contentTypeResource) {
 
-        $scope.filesUploading = [];
-        $scope.nodeId = -1;
+    //get the system media listview
+    contentTypeResource.getPropertyTypeScaffold(-96)
+        .then(function(dt) {
 
-        $scope.onUploadComplete = function () {
-            navigationService.reloadSection("media");
-        }
+            $scope.fakeProperty = {
+                alias: "contents",
+                config: dt.config,
+                description: "",
+                editor: dt.editor,
+                hideLabel: true,
+                id: 1,
+                label: "Contents:",
+                validation: {
+                    mandatory: false,
+                    pattern: null
+                },
+                value: "",
+                view: dt.view
+            };
+
+    });
 
 }
 angular.module("umbraco").controller("Umbraco.Dashboard.MediaFolderBrowserDashboardController", MediaFolderBrowserDashboardController);
-
-
-function ChangePasswordDashboardController($scope, xmlhelper, $log, currentUserResource, formHelper) {
-
-    //create the initial model for change password property editor
-    $scope.changePasswordModel = {
-        alias: "_umb_password",
-        view: "changepassword",
-        config: {},
-        value: {}
-    };
-
-    //go get the config for the membership provider and add it to the model
-    currentUserResource.getMembershipProviderConfig().then(function(data) {
-        $scope.changePasswordModel.config = data;
-        //ensure the hasPassword config option is set to true (the user of course has a password already assigned)
-        //this will ensure the oldPassword is shown so they can change it
-        $scope.changePasswordModel.config.hasPassword = true;
-        $scope.changePasswordModel.config.disableToggle = true;
-    });
-
-    ////this is the model we will pass to the service
-    //$scope.profile = {};
-
-    $scope.changePassword = function() {
-
-        if (formHelper.submitForm({ scope: $scope })) {
-            currentUserResource.changePassword($scope.changePasswordModel.value).then(function(data) {
-
-                //if the password has been reset, then update our model
-                if (data.value) {
-                    $scope.changePasswordModel.value.generatedPassword = data.value;
-                }
-
-                formHelper.resetForm({ scope: $scope, notifications: data.notifications });
-
-            }, function (err) {
-
-                formHelper.handleError(err);
-
-            });
-        }
-    };
-}
-angular.module("umbraco").controller("Umbraco.Dashboard.StartupChangePasswordController", ChangePasswordDashboardController);

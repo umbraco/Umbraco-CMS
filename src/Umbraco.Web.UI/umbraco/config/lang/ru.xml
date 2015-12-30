@@ -386,6 +386,7 @@
     <key alias="showPageOnSend">Показать страницу при отправке</key>
     <key alias="size">Размер</key>
     <key alias="sort">Сортировать</key>
+    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
     <key alias="type">Тип</key>
     <key alias="typeToSearch">Что искать?</key>
     <key alias="up">Вверх</key>
@@ -400,6 +401,8 @@
     <key alias="welcome">Добро пожаловать...</key>
     <key alias="width">Ширина</key>
     <key alias="yes">Да</key>
+    <key alias="reorder">Reorder</key>
+    <key alias="reorderDone">I am done reordering</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Цвет фона</key>
@@ -409,7 +412,8 @@
     <key alias="text">Текст</key>
   </area>
   <area alias="grid">
-    <key alias="addElement"><![CDATA[Чтобы начать, кликните иконку <i class="icon icon-add blue"></i> снизу и добавьте Ваш первый элемент]]></key>
+    <key alias="addElement">Add content</key>
+    <key alias="dropElement">Drop content</key>
     <key alias="addGridLayout">Добавить шаблон сетки</key>
     <key alias="addGridLayoutDetail">Настройте шаблон, задавая ширину колонок или добавляя дополнительные секции</key>
     <key alias="addRowConfiguration">Добавить конфигурацию строки</key>
@@ -417,9 +421,12 @@
     <key alias="addRows">Добавить новые строки</key>
     <key alias="allowAllEditors">Доступны все редакторы</key>
     <key alias="allowAllRowConfigurations">Доступны все конфигурации строк</key>
+    <key alias="chooseLayout">Choose a layout</key>
     <key alias="clickToEmbed">Кликните для встраивания</key>
     <key alias="clickToInsertImage">Кликните для вставки изображения</key>
     <key alias="columns">Колонки</key>
+    <key alias="contentNotAllowed">This content is not allowed here</key>
+    <key alias="contentAllowed">This content is allowed here</key>
     <key alias="columnsDetails">Суммарное число колонок в шаблоне сетки</key>
     <key alias="gridLayouts">Шаблоны сетки</key>
     <key alias="gridLayoutsDetail">Шаблоны являются рабочим пространством для редактора сетки, обычно Вам понадобится не более одного или двух шаблонов</key>
@@ -430,6 +437,7 @@
     <key alias="rowConfigurationsDetail">Строки - это последовательности ячеек с горизонтальным расположением</key>
     <key alias="settingDialogDetails">Установки будут сохранены только если они указаны в корректном формате json</key>
     <key alias="settings">Установки</key>
+    <key alias="settingsApplied">Settings applied</key>
     <key alias="settingsDetails">Задайте установки, доступные редакторам для изменения</key>
     <key alias="styles">Стили</key>
     <key alias="stylesDetails">Задайте стили, доступные редакторам для изменения</key>
@@ -965,7 +973,7 @@
     <key alias="cacheBrowser">Обзор кэша</key>
     <key alias="contentRecycleBin">Корзина</key>
     <key alias="createdPackages">Созданные пакеты</key>
-    <key alias="datatype">Типы данных</key>
+    <key alias="dataTypes">Типы данных</key>
     <key alias="dictionary">Словарь</key>
     <key alias="installedPackages">Установленные пакеты</key>
     <key alias="installSkin">Установить тему</key>
@@ -975,10 +983,10 @@
     <key alias="macros">Макросы</key>
     <key alias="mediaTypes">Типы медиа-материалов</key>
     <key alias="member">Участники</key>
-    <key alias="memberGroup">Группы участников</key>
+    <key alias="memberGroups">Группы участников</key>
     <key alias="memberRoles">Роли участников</key>
-    <key alias="memberType">Типы участников</key>
-    <key alias="nodeTypes">Типы документов</key>
+    <key alias="memberTypes">Типы участников</key>
+    <key alias="documentTypes">Типы документов</key>
     <key alias="packager">Пакеты дополнений</key>
     <key alias="packages">Пакеты дополнений</key>
     <key alias="python">Скрипты Python</key>

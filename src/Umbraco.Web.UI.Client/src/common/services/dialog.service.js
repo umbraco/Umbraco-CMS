@@ -2,13 +2,13 @@
  * @ngdoc service
  * @name umbraco.services.dialogService
  *
- * @requires $rootScope 
+ * @requires $rootScope
  * @requires $compile
  * @requires $http
  * @requires $log
  * @requires $q
  * @requires $templateCache
- *  
+ *
  * @description
  * Application-wide service for handling modals, overlays and dialogs
  * By default it injects the passed template url into a div to body of the document
@@ -22,10 +22,10 @@
  * <pre>
  *    var dialog = dialogService.open({template: 'path/to/page.html', show: true, callback: done});
  *    functon done(data){
- *      //The dialog has been submitted 
+ *      //The dialog has been submitted
  *      //data contains whatever the dialog has selected / attached
- *    }     
- * </pre> 
+ *    }
+ * </pre>
  */
 
 angular.module('umbraco.services')
@@ -38,12 +38,12 @@ angular.module('umbraco.services')
         for (var i = 0; i < dialogs.length; i++) {
             var dialog = dialogs[i];
 
-            //very special flag which means that global events cannot close this dialog - currently only used on the login 
+            //very special flag which means that global events cannot close this dialog - currently only used on the login
             // dialog since it's special and cannot be closed without logging in.
             if (!dialog.manualClose) {
                 dialog.close(args);
             }
-            
+
         }
     }
 
@@ -56,28 +56,18 @@ angular.module('umbraco.services')
             //this is not entirely enough since the damn webforms scriploader still complains
             if (dialog.iframe) {
                 dialog.element.find("iframe").attr("src", "about:blank");
-                $timeout(function () {
-                    //we need to do more than just remove the element, this will not destroy the 
-                    // scope in angular 1.1x, in angular 1.2x this is taken care of but if we dont
-                    // take care of this ourselves we have memory leaks.
-                    dialog.element.remove();
-                    //SD: No idea why this is required but was there before - pretty sure it's not required
-                    $("#" + dialog.element.attr("id")).remove();
-                    dialog.scope.$destroy();
-                }, 1000);
-            } else {
-                //we need to do more than just remove the element, this will not destroy the 
-                // scope in angular 1.1x, in angular 1.2x this is taken care of but if we dont
-                // take care of this ourselves we have memory leaks.
-                dialog.element.remove();
-                //SD: No idea why this is required but was there before - pretty sure it's not required
-                $("#" + dialog.element.attr("id")).remove();
-                dialog.scope.$destroy();
             }
-        }
 
-        //remove 'this' dialog from the dialogs array
-        dialogs = _.reject(dialogs, function (i) { return i === dialog; });
+            dialog.scope.$destroy();
+
+            //we need to do more than just remove the element, this will not destroy the
+            // scope in angular 1.1x, in angular 1.2x this is taken care of but if we dont
+            // take care of this ourselves we have memory leaks.
+            dialog.element.remove();
+
+            //remove 'this' dialog from the dialogs array
+            dialogs = _.reject(dialogs, function (i) { return i === dialog; });
+        }
     }
 
     /** Internal method that handles opening all dialogs */
@@ -93,24 +83,24 @@ angular.module('umbraco.services')
             template: "views/common/notfound.html",
             callback: undefined,
             closeCallback: undefined,
-            element: undefined,          
+            element: undefined,
             // It will set this value as a property on the dialog controller's scope as dialogData,
-            // used to pass in custom data to the dialog controller's $scope. Though this is near identical to 
-            // the dialogOptions property that is also set the the dialog controller's $scope object. 
+            // used to pass in custom data to the dialog controller's $scope. Though this is near identical to
+            // the dialogOptions property that is also set the the dialog controller's $scope object.
             // So there's basically 2 ways of doing the same thing which we're now stuck with and in fact
             // dialogData has another specially attached property called .selection which gets used.
             dialogData: undefined
         };
 
         var dialog = angular.extend(defaults, options);
-        
+
         //NOTE: People should NOT pass in a scope object that is legacy functoinality and causes problems. We will ALWAYS
         // destroy the scope when the dialog is closed regardless if it is in use elsewhere which is why it shouldn't be done.
         var scope = options.scope || $rootScope.$new();
 
-        //Modal dom obj and unique id
+        //Modal dom obj and set id to old-dialog-service - used until we get all dialogs moved the the new overlay directive
         dialog.element = $('<div ng-swipe-right="swipeHide($event)"  data-backdrop="false"></div>');
-        var id = dialog.template.replace('.html', '').replace('.aspx', '').replace(/[\/|\.|:\&\?\=]/g, "-") + '-' + scope.$id;
+        var id = "old-dialog-service";
 
         if (options.inline) {
             dialog.animation = "";
@@ -156,7 +146,7 @@ angular.module('umbraco.services')
 
             dialog.element.css("width", dialog.width);
 
-            //Autoshow 
+            //Autoshow
             if (dialog.show) {
                 dialog.element.modal('show');
             }
@@ -167,7 +157,7 @@ angular.module('umbraco.services')
         else {
 
             //We need to load the template with an httpget and once it's loaded we'll compile and assign the result to the container
-            // object. However since the result could be a promise or just data we need to use a $q.when. We still need to return the 
+            // object. However since the result could be a promise or just data we need to use a $q.when. We still need to return the
             // $modal object so we'll actually return the modal object synchronously without waiting for the promise. Otherwise this openDialog
             // method will always need to return a promise which gets nasty because of promises in promises plus the result just needs a reference
             // to the $modal object which will not change (only it's contents will change).
@@ -177,7 +167,7 @@ angular.module('umbraco.services')
                     // Build modal object
                     dialog.element.html(template);
 
-                    //append to body or other container element  
+                    //append to body or other container element
                     dialog.container.append(dialog.element);
 
                     // Compile modal content
@@ -224,8 +214,8 @@ angular.module('umbraco.services')
                     scope.close = function (data) {
                         dialog.close(data);
                     };
-                    
-                    //NOTE: This can ONLY ever be used to show the dialog if dialog.show is false (autoshow). 
+
+                    //NOTE: This can ONLY ever be used to show the dialog if dialog.show is false (autoshow).
                     // You CANNOT call show() after you call hide(). hide = close, they are the same thing and once
                     // a dialog is closed it's resources are disposed of.
                     scope.show = function () {
@@ -237,7 +227,7 @@ angular.module('umbraco.services')
                             //just show normally
                             dialog.element.modal('show');
                         }
-                        
+
                     };
 
                     scope.select = function (item) {
@@ -266,11 +256,11 @@ angular.module('umbraco.services')
 
                     dialog.scope = scope;
 
-                    //Autoshow 
+                    //Autoshow
                     if (dialog.show) {
                         scope.show();
                     }
-                    
+
                 });
 
             //Return the modal object outside of the promise!
@@ -368,7 +358,7 @@ angular.module('umbraco.services')
          * @param {Function} options.callback callback function
          * @returns {Object} modal object
          */
-        contentPicker: function (options) {           
+        contentPicker: function (options) {
 
             options.treeAlias = "content";
             options.section = "content";
@@ -424,7 +414,7 @@ angular.module('umbraco.services')
          * @returns {Object} modal object
          */
         memberPicker: function (options) {
-            
+
             options.treeAlias = "member";
             options.section = "member";
 
@@ -511,7 +501,7 @@ angular.module('umbraco.services')
         * @name umbraco.services.dialogService#embedDialog
         * @methodOf umbraco.services.dialogService
         * @description
-        * Opens a dialog to an embed dialog 
+        * Opens a dialog to an embed dialog
         */
         embedDialog: function (options) {
             options.template = 'views/common/dialogs/rteembed.html';

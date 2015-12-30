@@ -390,6 +390,7 @@
     <key alias="showPageOnSend">Hvilken side skal vises etter at skjemaet er sendt</key>
     <key alias="size">Størrelse</key>
     <key alias="sort">Sorter</key>
+    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
     <key alias="type">Type</key>
     <key alias="typeToSearch">Søk...</key>
     <key alias="up">Opp</key>

@@ -1,0 +1,25 @@
+<div class="umb-dialog umb-pane" ng-controller="Umbraco.Editors.MemberTypes.DeleteController">
+    <div class="umb-dialog-body">
+
+        <p class="umb-abstract">
+        	Are you sure you want to delete <strong>{{currentNode.name}}</strong> ?
+        </p>
+
+        <p>
+            <i class="icon-alert red"></i> <strong class="red">All members</strong>
+            using this member type will be deleted permanently, please confirm you want to delete these as well.
+        </p>
+
+        <hr />
+
+        <label class="checkbox">
+            <input type="checkbox" ng-model="confirmed" />
+            Yes, delete {{currentNode.name}} and all members using this type
+        </label>
+
+        <umb-confirm ng-if="confirmed" on-confirm="performDelete" on-cancel="cancel">
+        </umb-confirm>
+
+
+    </div>
+</div>

@@ -1,0 +1,32 @@
+<ng-form class="umb-locked-field">
+
+   <div class="umb-locked-field__wrapper">
+
+      <a ng-if="locked" href="" ng-click="unlock()" class="umb-locked-field__toggle">
+         <i class="umb-locked-field__lock-icon icon-lock"></i>
+      </a>
+
+      <a ng-if="!locked" href="" ng-click="lock()" class="umb-locked-field__toggle">
+         <i class="umb-locked-field__lock-icon icon-unlocked -unlocked"></i>
+      </a>
+
+      <input type="text"
+         class="umb-locked-field__input"
+         name="lockedField"
+         ng-model="model"
+         ng-disabled="locked"
+         ng-class="{'-unlocked': !locked}"
+         placeholder="{{placeholderText}}"
+         val-regex="{{regexValidation}}"
+         umb-auto-resize
+         required
+         val-server-field="{{serverValidationField}}"
+         title="{{model}}" />
+
+   </div>
+
+   <div class="umb-validation-label" val-msg-for="lockedField" val-toggle-msg="required">Required alias</div>
+   <div ng-if="regexValidation.length > 0" class="umb-validation-label" val-msg-for="lockedField" val-toggle-msg="valRegex">Invalid alias</div>
+   <div ng-if="serverValidationField.length > 0" class="umb-validation-label" val-msg-for="lockedField" val-toggle-msg="valServerField"></div>
+
+</ng-form>

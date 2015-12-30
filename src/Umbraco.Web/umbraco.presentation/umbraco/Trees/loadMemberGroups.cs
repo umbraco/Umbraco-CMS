@@ -31,7 +31,7 @@ namespace umbraco
 	/// <summary>
 	/// Handles loading of the member groups into the application tree
 	/// </summary>
-    [Tree(Constants.Applications.Members, "memberGroup", "Member Groups", sortOrder: 1)]
+    [Tree(Constants.Applications.Members, "memberGroups", "Member Groups", sortOrder: 1)]
     public class loadMemberGroups : BaseTree
 	{
         public loadMemberGroups(string application) : base(application) { }
@@ -43,7 +43,7 @@ namespace umbraco
             {
                 rootNode.Text = ui.Text("memberRoles");
             }
-            rootNode.NodeType = "init" + TreeAlias;
+            rootNode.NodeType = "initmemberGroup";
             rootNode.NodeID = "init";
         }
 

@@ -1,14 +1,22 @@
-function imageFilePickerController($scope, dialogService, mediaHelper) {
+function imageFilePickerController($scope) {
 
     $scope.pick = function() {
-        dialogService.mediaPicker({
-            multiPicker: false,
-            callback: function(data) {
-                 $scope.model.value = mediaHelper.resolveFile(data, false);
-            }
-        });
+        $scope.mediaPickerDialog = {};
+        $scope.mediaPickerDialog.view = "mediapicker";
+        $scope.mediaPickerDialog.show = true;
+
+        $scope.mediaPickerDialog.submit = function(model) {
+            $scope.model.value = model.selectedImages[0].image;
+            $scope.mediaPickerDialog.show = false;
+            $scope.mediaPickerDialog = null;
+        };
+
+        $scope.mediaPickerDialog.close = function(oldModel) {
+            $scope.mediaPickerDialog.show = false;
+            $scope.mediaPickerDialog = null;
+        };
     };
 
 }
 
-angular.module('umbraco').controller("Umbraco.PrevalueEditors.ImageFilePickerController",imageFilePickerController);
+angular.module('umbraco').controller("Umbraco.PrevalueEditors.ImageFilePickerController", imageFilePickerController);

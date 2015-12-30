@@ -1,5 +1,5 @@
 ﻿angular.module("umbraco").controller("Umbraco.Dialogs.LoginController",
-    function ($scope, localizationService, userService, externalLoginInfo) {
+    function ($scope, $cookies, localizationService, userService, externalLoginInfo) {
 
         /**
          * @ngdoc function
@@ -10,17 +10,38 @@
          * @description
          * signs the user in
          */
-        var d = new Date();
-        //var weekday = new Array("Super Sunday", "Manic Monday", "Tremendous Tuesday", "Wonderful Wednesday", "Thunder Thursday", "Friendly Friday", "Shiny Saturday");
-        localizationService.localize("login_greeting" + d.getDay()).then(function (label) {
-            $scope.greeting = label;
-        }); // weekday[d.getDay()];
 
+
+
+        var d = new Date();
+        var konamiGreetings = new Array("Suze Sunday", "Malibu Monday", "Tequila Tuesday", "Whiskey Wednesday", "Negroni Day", "Fernet Friday", "Sancerre Saturday");
+        var konamiMode = $cookies.konamiLogin;
+        //var weekday = new Array("Super Sunday", "Manic Monday", "Tremendous Tuesday", "Wonderful Wednesday", "Thunder Thursday", "Friendly Friday", "Shiny Saturday");
+        if (konamiMode == "1") {
+            $scope.greeting = "Happy " + konamiGreetings[d.getDay()];
+        } else {
+            localizationService.localize("login_greeting" + d.getDay()).then(function (label) {
+                $scope.greeting = label;
+            }); // weekday[d.getDay()];
+        }
         $scope.errorMsg = "";
 
         $scope.externalLoginFormAction = Umbraco.Sys.ServerVariables.umbracoUrls.externalLoginsUrl;
         $scope.externalLoginProviders = externalLoginInfo.providers;
         $scope.externalLoginInfo = externalLoginInfo;
+
+        $scope.activateKonamiMode = function () {
+            if ($cookies.konamiLogin == "1") {
+                // somehow I can't update the cookie value using $cookies, so going native
+                document.cookie = "konamiLogin=; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+                document.location.reload();
+            } else {
+                document.cookie = "konamiLogin=1; expires=Tue, 01 Jan 2030 00:00:01 GMT;";
+                $scope.$apply(function () {
+                    $scope.greeting = "Happy " + konamiGreetings[d.getDay()];
+                });
+            }
+        }
 
         $scope.loginSubmit = function (login, password) {
 
