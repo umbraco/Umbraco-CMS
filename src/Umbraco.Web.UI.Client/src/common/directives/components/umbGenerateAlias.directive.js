@@ -1,3 +1,52 @@
+/**
+@ngdoc directive
+@name umbraco.directives.directive:umbGenerateAlias
+@restrict E
+@scope
+
+@description
+Use this directive to generate a camelCased umbraco alias.
+When the aliasFrom value is changed the directive will get a formatted alias from the server and update the alias model. If "enableLock" is set to <code>true</code>
+the directive will use {@link umbraco.directives.directive:umbLockedField umbLockedField} to lock and unlock the alias.
+
+<h3>Markup example</h3>
+<pre>
+    <div ng-controller="Umbraco.Controller as vm">
+
+        <input type="text" ng-model="vm.name" />
+
+        <umb-generate-alias
+            enable-lock="true"
+            alias-from="vm.name"
+            alias="vm.alias">
+        </umb-generate-alias>
+
+    </div>
+</pre>
+
+<h3>Controller example</h3>
+<pre>
+    (function () {
+        "use strict";
+
+        function Controller() {
+
+            var vm = this;
+
+            vm.name = "";
+            vm.alias = "";
+
+        }
+
+        angular.module("umbraco").controller("Umbraco.Controller", Controller);
+    })();
+</pre>
+
+@param {string} alias (<code>binding</code>): The model where the alias is bound.
+@param {string} aliasFrom (<code>binding</code>): The model to generate the alias from.
+@param {boolean=} enableLock (<code>binding</code>): Set to <code>true</code> to add a lock next to the alias from where it can be unlocked and changed.
+**/
+
 angular.module("umbraco.directives")
     .directive('umbGenerateAlias', function ($timeout, entityResource) {
         return {
