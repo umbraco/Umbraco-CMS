@@ -23,8 +23,6 @@
 
             setButtonText();
 
-            registerOverlay();
-
             modelCopy = makeModelCopy(scope.model);
 
             $timeout(function() {
@@ -32,6 +30,10 @@
                if (scope.position === "target") {
                   setTargetPosition();
                }
+
+               // this has to be done inside a timeout to ensure the destroy
+               // event on other overlays is run before registering a new one
+               registerOverlay();
 
                setOverlayIndent();
 
