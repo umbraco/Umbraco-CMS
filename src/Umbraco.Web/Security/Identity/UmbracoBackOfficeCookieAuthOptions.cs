@@ -21,35 +21,13 @@ namespace Umbraco.Web.Security.Identity
             : this(UmbracoConfig.For.UmbracoSettings().Security, GlobalSettings.TimeOutInMinutes, GlobalSettings.UseSSL)
         {            
         }
-
-        public CookieOptions CreateRequestCookieOptions(IOwinContext ctx, AuthenticationTicket ticket)
-        {
-            if (ctx == null) throw new ArgumentNullException("ctx");
-            if (ticket == null) throw new ArgumentNullException("ticket");
-
-            var cookieOptions = new CookieOptions
-            {
-                Path = "/",
-                Domain = this.CookieDomain ?? null,
-                Expires = DateTime.Now.AddMinutes(30),
-                HttpOnly = true,
-                Secure = this.CookieSecure == CookieSecureOption.Always
-                                         || (this.CookieSecure == CookieSecureOption.SameAsRequest && ctx.Request.IsSecure),
-            };
-
-            if (ticket.Properties.IsPersistent && ticket.Properties.ExpiresUtc.HasValue)
-            {
-                cookieOptions.Expires = ticket.Properties.ExpiresUtc.Value.ToUniversalTime().DateTime;
-            }
-
-            return cookieOptions;
-        }
-
-        public UmbracoBackOfficeCookieAuthOptions(            
-            ISecuritySection securitySection, 
-            int loginTimeoutMinutes, 
-            bool forceSsl, 
-            bool useLegacyFormsAuthDataFormat = true)
+        
+        public UmbracoBackOfficeCookieAuthOptions(
+            string[] explicitPaths,
+            ISecuritySection securitySection,
+            int loginTimeoutMinutes,
+            bool forceSsl,
+            bool useLegacyFormsAuthDataFormat = true)            
         {
             LoginTimeoutMinutes = loginTimeoutMinutes;
             AuthenticationType = Constants.Security.BackOfficeAuthenticationType;
@@ -57,9 +35,9 @@ namespace Umbraco.Web.Security.Identity
             if (useLegacyFormsAuthDataFormat)
             {
                 //If this is not explicitly set it will fall back to the default automatically
-                TicketDataFormat = new FormsAuthenticationSecureDataFormat(loginTimeoutMinutes);    
+                TicketDataFormat = new FormsAuthenticationSecureDataFormat(loginTimeoutMinutes);
             }
-            
+
             SlidingExpiration = true;
             ExpireTimeSpan = TimeSpan.FromMinutes(LoginTimeoutMinutes);
             CookieDomain = securitySection.AuthCookieDomain;
@@ -69,7 +47,49 @@ namespace Umbraco.Web.Security.Identity
             CookiePath = "/";
 
             //Custom cookie manager so we can filter requests
-            CookieManager = new BackOfficeCookieManager(new SingletonUmbracoContextAccessor());
-        }       
+            CookieManager = new BackOfficeCookieManager(new SingletonUmbracoContextAccessor(), explicitPaths);
+        }
+
+        public UmbracoBackOfficeCookieAuthOptions(
+            ISecuritySection securitySection,
+            int loginTimeoutMinutes,
+            bool forceSsl,
+            bool useLegacyFormsAuthDataFormat = true)
+            : this(null, securitySection, loginTimeoutMinutes, forceSsl, useLegacyFormsAuthDataFormat)
+        {
+        }
+
+        /// <summary>
+        /// Creates the cookie options for saving the auth cookie
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="ticket"></param>
+        /// <returns></returns>
+        public CookieOptions CreateRequestCookieOptions(IOwinContext ctx, AuthenticationTicket ticket)
+        {
+            if (ctx == null) throw new ArgumentNullException("ctx");
+            if (ticket == null) throw new ArgumentNullException("ticket");
+
+            var issuedUtc = ticket.Properties.IssuedUtc ?? SystemClock.UtcNow;
+            var expiresUtc = ticket.Properties.ExpiresUtc ?? issuedUtc.Add(ExpireTimeSpan);
+
+            var cookieOptions = new CookieOptions
+            {
+                Path = "/",
+                Domain = this.CookieDomain ?? null,
+                HttpOnly = true,
+                Secure = this.CookieSecure == CookieSecureOption.Always
+                                         || (this.CookieSecure == CookieSecureOption.SameAsRequest && ctx.Request.IsSecure),
+            };
+
+            if (ticket.Properties.IsPersistent)
+            {
+                cookieOptions.Expires = expiresUtc.ToUniversalTime().DateTime;
+            }
+
+            return cookieOptions;
+        }
+
+          
     }
 }

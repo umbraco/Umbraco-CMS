@@ -118,33 +118,45 @@ namespace Umbraco.Web.Security.Identity
         {
             if (app == null) throw new ArgumentNullException("app");
             if (appContext == null) throw new ArgumentNullException("appContext");
-            
+
+            var cookieAuthProvider = new BackOfficeCookieAuthenticationProvider
+            {
+                // Enables the application to validate the security stamp when the user 
+                // logs in. This is a security feature which is used when you 
+                // change a password or add an external login to your account.  
+                OnValidateIdentity = SecurityStampValidator
+                    .OnValidateIdentity<BackOfficeUserManager, BackOfficeIdentityUser, int>(
+                        TimeSpan.FromMinutes(30),
+                        (manager, user) => user.GenerateUserIdentityAsync(manager),
+                        identity => identity.GetUserId<int>()),
+            };
+
             var authOptions = new UmbracoBackOfficeCookieAuthOptions(
                 UmbracoConfig.For.UmbracoSettings().Security,
                 GlobalSettings.TimeOutInMinutes,
                 GlobalSettings.UseSSL)
             {
-                Provider = new BackOfficeCookieAuthenticationProvider
-                {
-                    // Enables the application to validate the security stamp when the user 
-                    // logs in. This is a security feature which is used when you 
-                    // change a password or add an external login to your account.  
-                    OnValidateIdentity = SecurityStampValidator
-                        .OnValidateIdentity<BackOfficeUserManager, BackOfficeIdentityUser, int>(
-                            TimeSpan.FromMinutes(30),
-                            (manager, user) => user.GenerateUserIdentityAsync(manager),
-                            identity => identity.GetUserId<int>()),                    
-                }
+                Provider = cookieAuthProvider
             };
-            
+
             app.UseUmbracoBackOfficeCookieAuthentication(authOptions, appContext);
 
             //don't apply if app isnot ready
             if (appContext.IsUpgrading || appContext.IsConfigured)
             {
+                var getSecondsOptions = new UmbracoBackOfficeCookieAuthOptions(
+                    //This defines the explicit path read cookies from for this middleware
+                    new[]{string.Format("{0}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds", GlobalSettings.Path)},
+                    UmbracoConfig.For.UmbracoSettings().Security,
+                    GlobalSettings.TimeOutInMinutes,
+                    GlobalSettings.UseSSL)
+                {
+                    Provider = cookieAuthProvider
+                };
+
                 //This is a custom middleware, we need to return the user's remaining logged in seconds
                 app.Use<GetUserSecondsMiddleWare>(
-                    authOptions,
+                    getSecondsOptions,
                     UmbracoConfig.For.UmbracoSettings().Security,
                     app.CreateLogger<GetUserSecondsMiddleWare>());
             }
