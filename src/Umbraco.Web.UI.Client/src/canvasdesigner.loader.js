@@ -11,12 +11,10 @@ LazyLoad.js([
       '../js/umbraco.security.js',
       '../ServerVariables',
       '../lib/spectrum/spectrum.js',
-      
+
       '../js/canvasdesigner.panel.js',
 ], function () {
     jQuery(document).ready(function () {
         angular.bootstrap(document, ['Umbraco.canvasdesigner']);
     });
 });
-
-LazyLoad.js(['https://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js']);
