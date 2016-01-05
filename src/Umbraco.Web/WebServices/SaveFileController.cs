@@ -152,8 +152,8 @@ namespace Umbraco.Web.WebServices
             {
                 t = new Template(templateId)
                 {
-                    Text = templateName.CleanForXss(),
-                    Alias = templateAlias.CleanForXss(),
+                    Text = templateName.CleanForXss('[', ']', '(', ')'),
+                    Alias = templateAlias.CleanForXss('[', ']', '(', ')'),
                     Design = templateContents
                 };
 
