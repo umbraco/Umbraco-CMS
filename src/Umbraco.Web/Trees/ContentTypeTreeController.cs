@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Formatting;
-using System.Text;
-using System.Threading.Tasks;
 using umbraco;
 using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Services;
@@ -101,7 +97,7 @@ namespace Umbraco.Web.Trees
                     Level = 1,
                     ParentId = -1,
                     Name = ""
-                }, "documenttypes", "settings"); ;
+                }, "documenttypes", "settings");
                 menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)), hasSeparator: true);
             }
 
