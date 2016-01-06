@@ -34,7 +34,6 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var dataTypeDefinitionRepository = new DataTypeDefinitionRepository(
                 unitOfWork, CacheHelper.CreateDisabledCacheHelper(),
-                CacheHelper.CreateDisabledCacheHelper(),
                 Mock.Of<ILogger>(), SqlSyntax,
                 new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax,
                     new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>())));
@@ -376,10 +375,14 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
 
-            var cache = new CacheHelper(new ObjectCacheRuntimeCacheProvider(), new StaticCacheProvider(), new StaticCacheProvider());
+            var cache = new CacheHelper(
+                new ObjectCacheRuntimeCacheProvider(), 
+                new StaticCacheProvider(), 
+                new StaticCacheProvider(),
+                new IsolatedRuntimeCache(type => new ObjectCacheRuntimeCacheProvider()));
 
             Func<DataTypeDefinitionRepository> creator = () => new DataTypeDefinitionRepository(
-                unitOfWork, CacheHelper.CreateDisabledCacheHelper(),
+                unitOfWork, 
                 cache,
                 Mock.Of<ILogger>(), SqlSyntax,
                 new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax,
@@ -402,7 +405,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var collection = repository.GetPreValuesCollectionByDataTypeId(dtd.Id);
             }
 
-            var cached = cache.RuntimeCache.GetCacheItemsByKeySearch<PreValueCollection>(CacheKeys.DataTypePreValuesCacheKey + dtd.Id + "-");
+            var cached = cache.IsolatedRuntimeCache.GetCache<IDataTypeDefinition>().Result
+                .GetCacheItemsByKeySearch<PreValueCollection>(CacheKeys.DataTypePreValuesCacheKey + dtd.Id + "-");
 
             Assert.IsNotNull(cached);
             Assert.AreEqual(1, cached.Count());
@@ -415,10 +419,14 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
 
-            var cache = new CacheHelper(new ObjectCacheRuntimeCacheProvider(), new StaticCacheProvider(), new StaticCacheProvider());
+            var cache = new CacheHelper(
+                new ObjectCacheRuntimeCacheProvider(), 
+                new StaticCacheProvider(), 
+                new StaticCacheProvider(),
+                new IsolatedRuntimeCache(type => new ObjectCacheRuntimeCacheProvider()));
 
             Func<DataTypeDefinitionRepository> creator = () => new DataTypeDefinitionRepository(
-                unitOfWork, CacheHelper.CreateDisabledCacheHelper(),
+                unitOfWork,
                 cache,
                 Mock.Of<ILogger>(), SqlSyntax,
                 new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax,
@@ -441,7 +449,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var val = repository.GetPreValueAsString(Convert.ToInt32(id));
             }
 
-            var cached = cache.RuntimeCache.GetCacheItemsByKeySearch<PreValueCollection>(CacheKeys.DataTypePreValuesCacheKey + dtd.Id + "-");
+            var cached = cache.IsolatedRuntimeCache.GetCache<IDataTypeDefinition>().Result
+                .GetCacheItemsByKeySearch<PreValueCollection>(CacheKeys.DataTypePreValuesCacheKey + dtd.Id + "-");
 
             Assert.IsNotNull(cached);
             Assert.AreEqual(1, cached.Count());

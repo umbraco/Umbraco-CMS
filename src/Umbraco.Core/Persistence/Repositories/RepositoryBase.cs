@@ -89,7 +89,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         protected override IRuntimeCacheProvider RuntimeCache
         {
-            get { return RepositoryCache.GetIsolatedRuntimeCache<TEntity>(); }
+            get { return RepositoryCache.IsolatedRuntimeCache.GetOrCreateCache<TEntity>(); }
         }
 
         /// <summary>

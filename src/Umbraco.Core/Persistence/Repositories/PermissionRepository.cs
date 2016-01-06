@@ -26,13 +26,14 @@ namespace Umbraco.Core.Persistence.Repositories
         where TEntity : class, IAggregateRoot
     {
         private readonly IDatabaseUnitOfWork _unitOfWork;
-        private readonly CacheHelper _cache;
+        private readonly IRuntimeCacheProvider _runtimeCache;
         private readonly ISqlSyntaxProvider _sqlSyntax;
 
         internal PermissionRepository(IDatabaseUnitOfWork unitOfWork, CacheHelper cache, ISqlSyntaxProvider sqlSyntax)
         {
             _unitOfWork = unitOfWork;
-            _cache = cache;
+            //Make this repository use an isolated cache
+            _runtimeCache = cache.IsolatedRuntimeCache.GetOrCreateCache<EntityPermission>();
             _sqlSyntax = sqlSyntax;
         }
 
@@ -45,7 +46,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public IEnumerable<EntityPermission> GetUserPermissionsForEntities(int userId, params int[] entityIds)
         {
             var entityIdKey = string.Join(",", entityIds.Select(x => x.ToString(CultureInfo.InvariantCulture)));
-            return _cache.RuntimeCache.GetCacheItem<IEnumerable<EntityPermission>>(
+            return _runtimeCache.GetCacheItem<IEnumerable<EntityPermission>>(
                 string.Format("{0}{1}{2}", CacheKeys.UserPermissionsCacheKey, userId, entityIdKey),
                 () =>
         {            

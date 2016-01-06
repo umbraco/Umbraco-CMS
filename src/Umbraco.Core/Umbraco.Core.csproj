@@ -162,6 +162,7 @@
     <Compile Include="Cache\DictionaryCacheProviderBase.cs" />
     <Compile Include="Cache\HttpRequestCacheProvider.cs" />
     <Compile Include="Cache\IPayloadCacheRefresher.cs" />
+    <Compile Include="Cache\IsolatedRuntimeCache.cs" />
     <Compile Include="Cache\ObjectCacheRuntimeCacheProvider.cs" />
     <Compile Include="Cache\IRuntimeCacheProvider.cs" />
     <Compile Include="Cache\HttpRuntimeCacheProvider.cs" />

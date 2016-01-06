@@ -32,12 +32,26 @@ namespace Umbraco.Core.Persistence
             if (settings == null) throw new ArgumentNullException("settings");
 
             _cacheHelper = cacheHelper;
+
             //IMPORTANT: We will force the DeepCloneRuntimeCacheProvider to be used here which is a wrapper for the underlying
             // runtime cache to ensure that anything that can be deep cloned in/out is done so, this also ensures that our tracks
             // changes entities are reset.
             if ((_cacheHelper.RuntimeCache is DeepCloneRuntimeCacheProvider) == false)
             {
-                _cacheHelper = new CacheHelper(new DeepCloneRuntimeCacheProvider(_cacheHelper.RuntimeCache), _cacheHelper.StaticCache, _cacheHelper.RequestCache);
+                var originalHelper = cacheHelper;
+
+                _cacheHelper = new CacheHelper(
+                    new DeepCloneRuntimeCacheProvider(originalHelper.RuntimeCache),
+                    originalHelper.StaticCache,
+                    originalHelper.RequestCache,
+                    new IsolatedRuntimeCache(type =>
+                    {
+                        var cache = originalHelper.IsolatedRuntimeCache.GetOrCreateCache(type);
+                        return (cache is DeepCloneRuntimeCacheProvider) == false
+                            //wrap the original if it's not DeepCloneRuntimeCacheProvider
+                            ? new DeepCloneRuntimeCacheProvider(cache) 
+                            : cache;
+                    }));
             }
             
             _noCache = CacheHelper.CreateDisabledCacheHelper();
@@ -140,7 +154,6 @@ namespace Umbraco.Core.Persistence
         {
             return new DataTypeDefinitionRepository(
                 uow,
-                _cacheHelper,                
                 _cacheHelper,
                 _logger, _sqlSyntax,
                 CreateContentTypeRepository(uow));
@@ -295,8 +308,7 @@ namespace Umbraco.Core.Persistence
         {
             return new MemberGroupRepository(uow,
                 _cacheHelper,
-                _logger, _sqlSyntax,
-                _cacheHelper);
+                _logger, _sqlSyntax);
         }
 
         public virtual IEntityRepository CreateEntityRepository(IDatabaseUnitOfWork uow)

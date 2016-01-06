@@ -188,10 +188,16 @@ namespace Umbraco.Core
         protected virtual CacheHelper CreateApplicationCache()
         {
             var cacheHelper = new CacheHelper(
-                new ObjectCacheRuntimeCacheProvider(),
+                //we need to have the dep clone runtime cache provider to ensure 
+                //all entities are cached properly (cloned in and cloned out)
+                new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()),
                 new StaticCacheProvider(),
                 //we have no request based cache when not running in web-based context
-                new NullCacheProvider());
+                new NullCacheProvider(),
+                new IsolatedRuntimeCache(type =>
+                    //we need to have the dep clone runtime cache provider to ensure 
+                    //all entities are cached properly (cloned in and cloned out)
+                    new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider())));
 
             return cacheHelper;
         }

@@ -28,13 +28,13 @@ namespace Umbraco.Web.Cache
 
         public override void Refresh(int id)
         {
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<ILanguage>();
+            ClearAllCacheByRepositoryEntityType<ILanguage>();
             base.Refresh(id);
         }
 
         public override void Remove(int id)
         {
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<ILanguage>();
+            ClearAllCacheByRepositoryEntityType<ILanguage>();
             base.Remove(id);
         }
     }
