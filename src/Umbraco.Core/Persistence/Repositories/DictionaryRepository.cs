@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -23,16 +24,40 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public DictionaryRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider syntax, ILanguageRepository languageRepository)
             : base(work, cache, logger, syntax)
-		{
-		    _languageRepository = languageRepository;
-		}
+        {
+            _languageRepository = languageRepository;
+        }
+
+        /// <summary>
+        /// Returns the repository cache options
+        /// </summary>
+        /// <remarks>
+        /// The dictionary repository is also backed by two sub repositories, the main one that will be used is the DictionaryByKeyRepository
+        /// since the queries from DefaultCultureDictionary will use this. That repositories will manage it's own caches by keys.
+        /// </remarks>
+        protected override RepositoryCacheOptions RepositoryCacheOptions
+        {
+            get
+            {
+                return new RepositoryCacheOptions
+                {
+                    //If there is zero, we can cache it
+                    GetAllCacheAllowZeroCount = true,
+                    GetAllCacheAsCollection = false,
+                    GetAllCacheValidateCount = false,
+                    //dont' cache any result with GetAll - since there could be a ton
+                    // of dictionary items.
+                    GetAllCacheThresholdLimit = 0
+                };
+            }
+        }
 
         #region Overrides of RepositoryBase<int,DictionaryItem>
 
         protected override IDictionaryItem PerformGet(int id)
         {
             var sql = GetBaseQuery(false)
-                .Where(GetBaseWhereClause(), new {Id = id})
+                .Where(GetBaseWhereClause(), new { Id = id })
                 .OrderBy<DictionaryDto>(x => x.UniqueId, SqlSyntax);
 
             var dto = Database.Fetch<DictionaryDto, LanguageTextDto, DictionaryDto>(new DictionaryLanguageTextRelator().Map, sql).FirstOrDefault();
@@ -56,7 +81,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false).Where("cmsDictionary.pk > 0");
             if (ids.Any())
             {
-                sql.Where("cmsDictionary.pk in (@ids)", new { ids = ids });                
+                sql.Where("cmsDictionary.pk in (@ids)", new { ids = ids });
             }
 
             //This will be cached
@@ -87,7 +112,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sql = new Sql();
-            if(isCount)
+            if (isCount)
             {
                 sql.Select("COUNT(*)")
                     .From<DictionaryDto>(SqlSyntax);
@@ -161,7 +186,7 @@ namespace Umbraco.Core.Persistence.Repositories
             foreach (var translation in entity.Translations)
             {
                 var textDto = translationFactory.BuildDto(translation);
-                if(translation.HasIdentity)
+                if (translation.HasIdentity)
                 {
                     Database.Update(textDto);
                 }
@@ -183,7 +208,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             RecursiveDelete(entity.Key);
 
-            Database.Delete<LanguageTextDto>("WHERE UniqueId = @Id", new { Id = entity.Key});
+            Database.Delete<LanguageTextDto>("WHERE UniqueId = @Id", new { Id = entity.Key });
             Database.Delete<DictionaryDto>("WHERE id = @Id", new { Id = entity.Key });
 
             //Clear the cache entries that exist by uniqueid/item key
@@ -193,7 +218,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private void RecursiveDelete(Guid parentId)
         {
-            var list = Database.Fetch<DictionaryDto>("WHERE parent = @ParentId", new {ParentId = parentId});
+            var list = Database.Fetch<DictionaryDto>("WHERE parent = @ParentId", new { ParentId = parentId });
             foreach (var dto in list)
             {
                 RecursiveDelete(dto.UniqueId);
@@ -234,7 +259,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             using (var uniqueIdRepo = new DictionaryByUniqueIdRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax))
             {
-                return uniqueIdRepo.Get(uniqueId);    
+                return uniqueIdRepo.Get(uniqueId);
             }
         }
 
@@ -242,7 +267,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             using (var keyRepo = new DictionaryByKeyRepository(this, UnitOfWork, RepositoryCache, Logger, SqlSyntax))
             {
-                return keyRepo.Get(key);    
+                return keyRepo.Get(key);
             }
         }
 
@@ -284,7 +309,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 : getItemsFromParents(new[] { parentId.Value });
 
             return childItems.SelectRecursive(items => getItemsFromParents(items.Select(x => x.Key).ToArray())).SelectMany(items => items);
-            
+
         }
 
         private class DictionaryByUniqueIdRepository : SimpleGetRepository<Guid, IDictionaryItem, DictionaryDto>
@@ -321,12 +346,32 @@ namespace Umbraco.Core.Persistence.Repositories
 
             protected override object GetBaseWhereClauseArguments(Guid id)
             {
-                return new {Id = id};
+                return new { Id = id };
             }
 
             protected override string GetWhereInClauseForGetAll()
             {
                 return "cmsDictionary." + SqlSyntax.GetQuotedColumnName("id") + " in (@ids)";
+            }
+
+            /// <summary>
+            /// Returns the repository cache options
+            /// </summary>
+            protected override RepositoryCacheOptions RepositoryCacheOptions
+            {
+                get
+                {
+                    return new RepositoryCacheOptions
+                    {
+                        //If there is zero, we can cache it
+                        GetAllCacheAllowZeroCount = true,
+                        GetAllCacheAsCollection = false,
+                        GetAllCacheValidateCount = false,
+                        //dont' cache any result with GetAll - since there could be a ton
+                        // of dictionary items.
+                        GetAllCacheThresholdLimit = 0
+                    };
+                }
             }
         }
 
@@ -370,6 +415,26 @@ namespace Umbraco.Core.Persistence.Repositories
             protected override string GetWhereInClauseForGetAll()
             {
                 return "cmsDictionary." + SqlSyntax.GetQuotedColumnName("key") + " in (@ids)";
+            }
+
+            /// <summary>
+            /// Returns the repository cache options
+            /// </summary>
+            protected override RepositoryCacheOptions RepositoryCacheOptions
+            {
+                get
+                {
+                    return new RepositoryCacheOptions
+                    {
+                        //If there is zero, we can cache it
+                        GetAllCacheAllowZeroCount = true,
+                        GetAllCacheAsCollection = false,
+                        GetAllCacheValidateCount = false,
+                        //dont' cache any result with GetAll - since there could be a ton
+                        // of dictionary items.
+                        GetAllCacheThresholdLimit = 0
+                    };
+                }
             }
         }
 

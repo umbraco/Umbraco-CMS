@@ -160,13 +160,13 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public ILanguage GetByCultureName(string cultureName)
         {
-            //use the underlying GetAll which will force cache all domains
+            //use the underlying GetAll which will force cache all languages
             return GetAll().FirstOrDefault(x => x.CultureName.InvariantEquals(cultureName));
         }
 
         public ILanguage GetByIsoCode(string isoCode)
         {
-            //use the underlying GetAll which will force cache all domains
+            //use the underlying GetAll which will force cache all languages
             return GetAll().FirstOrDefault(x => x.IsoCode.InvariantEquals(isoCode));
         }
 

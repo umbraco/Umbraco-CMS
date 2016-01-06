@@ -265,10 +265,6 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateLanguageRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.GetByCultureName(cultureName);
-                //var query = Query<ILanguage>.Builder.Where(x => x.CultureName == cultureName);
-                //var items = repository.GetByQuery(query);
-
-                //return items.FirstOrDefault();
             }
         }
 
@@ -282,10 +278,6 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateLanguageRepository(UowProvider.GetUnitOfWork()))
             {
                 return repository.GetByIsoCode(isoCode);
-                //var query = Query<ILanguage>.Builder.Where(x => x.IsoCode == isoCode);
-                //var items = repository.GetByQuery(query);
-
-                //return items.FirstOrDefault();
             }
         }
 
