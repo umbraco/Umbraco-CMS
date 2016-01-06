@@ -658,6 +658,7 @@ namespace Umbraco.Core.Services
                                            Description = property.Element("Description") != null ? property.Element("Description").Value : null,
                                            Mandatory = property.Element("Mandatory") != null ? property.Element("Mandatory").Value.ToLowerInvariant().Equals("true") : false,
                                            ValidationRegExp = property.Element("Validation") != null ? property.Element("Validation").Value : null,
+                                           SortOrder = property.Element("SortOrder") != null ? int.Parse(property.Element("SortOrder").Value) : 0
                                        };
 
                 var tab = property.Element("Tab").Value;
