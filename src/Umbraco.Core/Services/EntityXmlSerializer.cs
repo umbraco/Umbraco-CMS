@@ -374,14 +374,15 @@ namespace Umbraco.Core.Services
                                                 : contentType.PropertyGroups.FirstOrDefault(x => x.Id == propertyType.PropertyGroupId.Value);
 
                 var genericProperty = new XElement("GenericProperty",
-                                                   new XElement("Name", propertyType.Name),
-                                                   new XElement("Alias", propertyType.Alias),
-                                                   new XElement("Type", propertyType.PropertyEditorAlias),
+                                                   propertyType.Name != null ? new XElement("Name", propertyType.Name) : null,
+                                                   propertyType.Alias != null ? new XElement("Alias", propertyType.Alias) : null,
+                                                   propertyType.PropertyEditorAlias != null ? new XElement("Type", propertyType.PropertyEditorAlias) : null,
                                                    new XElement("Definition", definition.Key),
                                                    new XElement("Tab", propertyGroup == null ? "" : propertyGroup.Name),
                                                    new XElement("Mandatory", propertyType.Mandatory.ToString()),
-                                                   new XElement("Validation", propertyType.ValidationRegExp),
-                                                   new XElement("Description", new XCData(propertyType.Description)));
+                                                   propertyType.ValidationRegExp != null ? new XElement("Validation", propertyType.ValidationRegExp) : null,
+                                                   propertyType.Description != null ? new XElement("Description", new XCData(propertyType.Description)) : null);
+
                 genericProperties.Add(genericProperty);
             }
 
