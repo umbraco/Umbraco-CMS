@@ -247,14 +247,16 @@ namespace Umbraco.Core
 			    else if (destinationType == typeof(Double))
 			    {
 			        Double value;
-			        var input2 = NormalizeNumberDecimalSeparator(input);
-			        return Double.TryParse(input2, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+                    var currentUiCulture = System.Threading.Thread.CurrentThread.CurrentUICulture;
+                    var input2 = NormalizeNumberDecimalSeparator(input);
+			        return Double.TryParse(input2, NumberStyles.Float | NumberStyles.AllowThousands, currentUiCulture, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
 			    }
 			    else if (destinationType == typeof(Single))
 			    {
 			        Single value;
+                    var currentUiCulture = System.Threading.Thread.CurrentThread.CurrentUICulture;
                     var input2 = NormalizeNumberDecimalSeparator(input);
-                    return Single.TryParse(input2, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+                    return Single.TryParse(input2, NumberStyles.Float | NumberStyles.AllowThousands, currentUiCulture, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
 			    }
 			    else if (destinationType == typeof(Char))
 			    {
