@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Cache;
@@ -22,11 +23,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (logger == null) throw new ArgumentNullException("logger");
             Logger = logger;
             _work = work;
-
-            //IMPORTANT: We will force the DeepCloneRuntimeCacheProvider to be used here which is a wrapper for the underlying
-            // runtime cache to ensure that anything that can be deep cloned in/out is done so, this also ensures that our tracks
-            // changes entities are reset.
-            _cache = new CacheHelper(new DeepCloneRuntimeCacheProvider(cache.RuntimeCache), cache.StaticCache, cache.RequestCache);            
+            _cache = cache;
         }
 
         /// <summary>
@@ -86,7 +83,13 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private readonly RepositoryCacheOptions _cacheOptions = new RepositoryCacheOptions();
 
-        #region IRepository<TEntity> Members
+        /// <summary>
+        /// The runtime cache used for this repo by default is the isolated cache for this type
+        /// </summary>
+        protected override IRuntimeCacheProvider RuntimeCache
+        {
+            get { return RepositoryCache.GetIsolatedRuntimeCache<TEntity>(); }
+        }
 
         /// <summary>
         /// Adds or Updates an entity of type TEntity
@@ -167,9 +170,18 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                var allEntities = RuntimeCache.GetCacheItemsByKeySearch<TEntity>(GetCacheTypeKey<TEntity>())
-                    .WhereNotNull()
-                    .ToArray();
+                TEntity[] allEntities;
+                if (RepositoryCacheOptions.GetAllCacheAsCollection)
+                {
+                    var found = RuntimeCache.GetCacheItem<List<TEntity>>(GetCacheTypeKey<TEntity>());
+                    allEntities = found == null ? new TEntity[] {} : found.WhereNotNull().ToArray();
+                }
+                else
+                {
+                    allEntities = RuntimeCache.GetCacheItemsByKeySearch<TEntity>(GetCacheTypeKey<TEntity>())
+                        .WhereNotNull()
+                        .ToArray();
+                }
 
                 if (allEntities.Any())
                 {
@@ -205,21 +217,32 @@ namespace Umbraco.Core.Persistence.Repositories
                 //ensure we don't include any null refs in the returned collection!
                 .WhereNotNull()
                 .ToArray();
-
-            //We need to put a threshold here! IF there's an insane amount of items
-            // coming back here we don't want to chuck it all into memory, this added cache here
-            // is more for convenience when paging stuff temporarily
-
-            if (entityCollection.Length > RepositoryCacheOptions.GetAllCacheThresholdLimit) 
-                return entityCollection;
-
+            
             if (entityCollection.Length == 0 && RepositoryCacheOptions.GetAllCacheAllowZeroCount)
             {
                 //there was nothing returned but we want to cache a zero count result so add an TEntity[] to the cache
                 // to signify that there is a zero count cache
                 RuntimeCache.InsertCacheItem(GetCacheTypeKey<TEntity>(), () => new TEntity[] {});
+                return entityCollection;
             }
 
+            if (RepositoryCacheOptions.GetAllCacheAsCollection)
+            {
+                //when this is true, we don't want to cache each item individually, we want to cache the result as a single collection
+                RuntimeCache.InsertCacheItem(GetCacheTypeKey<TEntity>(), () => entityCollection.ToList());
+                return entityCollection;
+            }
+            
+            if (entityCollection.Length > RepositoryCacheOptions.GetAllCacheThresholdLimit)
+            {
+                //We need to put a threshold here! IF there's an insane amount of items
+                // coming back here we don't want to chuck it all into memory, this added cache here
+                // is more for convenience when paging stuff temporarily
+                return entityCollection;
+            }
+
+            //This is the default behavior, we'll individually cache each item so that if/when these items are resolved 
+            // by id, they are returned from the already existing cache.
             foreach (var entity in entityCollection)
             {
                 if (entity != null)
@@ -279,11 +302,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             return PerformCount(query);
         }
-
-        #endregion
-
-        #region IUnitOfWorkRepository Members
-
+        
         /// <summary>
         /// Unit of work method that tells the repository to persist the new entity
         /// </summary>
@@ -345,16 +364,12 @@ namespace Umbraco.Core.Persistence.Repositories
             //If there's a GetAll zero count cache, ensure it is cleared
             RuntimeCache.ClearCacheItem(GetCacheTypeKey<TEntity>());
         }
-
-        #endregion
-
-        #region Abstract IUnitOfWorkRepository Methods
+        
 
         protected abstract void PersistNewItem(TEntity item);
         protected abstract void PersistUpdatedItem(TEntity item);
         protected abstract void PersistDeletedItem(TEntity item);
 
-        #endregion
 
         /// <summary>
         /// Dispose disposable properties
