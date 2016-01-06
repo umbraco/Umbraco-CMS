@@ -55,7 +55,7 @@ namespace Umbraco.Web.Models
 
         public bool HasFocalPoint()
         {
-            return FocalPoint != null && FocalPoint.Top != 0.5m && FocalPoint.Top != 0.5m;
+            return FocalPoint != null && FocalPoint.Left != 0.5m && FocalPoint.Top != 0.5m;
         }
 
         public bool HasCrop(string alias)

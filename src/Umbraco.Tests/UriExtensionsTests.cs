@@ -141,7 +141,7 @@ namespace Umbraco.Tests
         public void GetAbsolutePathDecoded(string input, string expected)
         {
             var source = new Uri(input, UriKind.RelativeOrAbsolute);
-            var output = source.GetSafeAbsolutePathDecoded();
+            var output = source.GetAbsolutePathDecoded();
             Assert.AreEqual(expected, output);
         }
 

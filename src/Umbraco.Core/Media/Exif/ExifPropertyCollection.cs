@@ -75,7 +75,7 @@ namespace Umbraco.Core.Media.Exif
 		{
 			if (items.ContainsKey (key))
 				items.Remove (key);
-			if (key == ExifTag.WindowsTitle || key == ExifTag.WindowsTitle || key == ExifTag.WindowsComment || key == ExifTag.WindowsAuthor || key == ExifTag.WindowsKeywords || key == ExifTag.WindowsSubject) {
+			if (key == ExifTag.WindowsTitle || key == ExifTag.WindowsComment || key == ExifTag.WindowsAuthor || key == ExifTag.WindowsKeywords || key == ExifTag.WindowsSubject) {
 				items.Add (key, new WindowsByteString (key, value));
 			} else {
 				items.Add (key, new ExifAscii (key, value, parent.Encoding));
