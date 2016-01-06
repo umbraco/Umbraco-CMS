@@ -219,7 +219,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 .WhereNotNull()
                 .ToArray();
             
-            if (entityCollection.Length == 0 && RepositoryCacheOptions.GetAllCacheAllowZeroCount)
+            //This option cannot execute if we are looking up specific Ids
+            if (ids.Any() == false && entityCollection.Length == 0 && RepositoryCacheOptions.GetAllCacheAllowZeroCount)
             {
                 //there was nothing returned but we want to cache a zero count result so add an TEntity[] to the cache
                 // to signify that there is a zero count cache
@@ -227,7 +228,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 return entityCollection;
             }
 
-            if (RepositoryCacheOptions.GetAllCacheAsCollection)
+            //This option cannot execute if we are looking up specific Ids
+            if (ids.Any() == false && RepositoryCacheOptions.GetAllCacheAsCollection)
             {
                 //when this is true, we don't want to cache each item individually, we want to cache the result as a single collection
                 RuntimeCache.InsertCacheItem(GetCacheTypeKey<TEntity>(), () => new DeepCloneableList<TEntity>(entityCollection));
