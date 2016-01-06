@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,7 +12,6 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Core
 {
-
 	/// <summary>
 	/// Class that is exposed by the ApplicationContext for application wide caching purposes
 	/// </summary>
@@ -22,9 +22,10 @@ namespace Umbraco.Core
         private readonly ICacheProvider _nullRequestCache = new NullCacheProvider();
         private readonly ICacheProvider _staticCache;
         private readonly ICacheProvider _nullStaticCache = new NullCacheProvider();
-        private readonly IRuntimeCacheProvider _httpCache;
-        private readonly IRuntimeCacheProvider _nullHttpCache = new NullCacheProvider();
-
+        private readonly IRuntimeCacheProvider _runtimeCache;
+        private readonly IRuntimeCacheProvider _nullRuntimeCache = new NullCacheProvider();
+        private readonly ConcurrentDictionary<Type, IRuntimeCacheProvider> _isolatedCache = new ConcurrentDictionary<Type, IRuntimeCacheProvider>(); 
+        
         /// <summary>
         /// Creates a cache helper with disabled caches
         /// </summary>
@@ -89,13 +90,13 @@ namespace Umbraco.Core
         {
             if (enableCache)
             {
-                _httpCache = httpCacheProvider;
+                _runtimeCache = httpCacheProvider;
                 _staticCache = staticCacheProvider;
                 _requestCache = requestCacheProvider;
             }
             else
             {
-                _httpCache = null;
+                _runtimeCache = null;
                 _staticCache = null;
                 _requestCache = null;
             }
@@ -104,6 +105,22 @@ namespace Umbraco.Core
         }
 
         /// <summary>
+        /// Returns an isolated runtime cache for a given type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        /// <remarks>
+        /// This is useful for repository level caches to ensure that cache lookups by key are fast so 
+        /// that the repository doesn't need to search through all keys on a global scale.
+        /// </remarks>
+	    public IRuntimeCacheProvider GetIsolatedRuntimeCache<T>()
+        {
+            return _enableCache == false 
+                ? _nullRuntimeCache 
+                : _isolatedCache.GetOrAdd(typeof (T), type => new ObjectCacheRuntimeCacheProvider());
+        }
+
+	    /// <summary>
         /// Returns the current Request cache
         /// </summary>
         public ICacheProvider RequestCache
@@ -124,7 +141,7 @@ namespace Umbraco.Core
         /// </summary>
 	    public IRuntimeCacheProvider RuntimeCache
 	    {
-	        get { return _enableCache ? _httpCache : _nullHttpCache; }
+	        get { return _enableCache ? _runtimeCache : _nullRuntimeCache; }
 	    }
         
 	    #region Legacy Runtime/Http Cache accessors
@@ -137,11 +154,11 @@ namespace Umbraco.Core
         {
             if (_enableCache == false)
             {
-                _nullHttpCache.ClearAllCache();
+                _nullRuntimeCache.ClearAllCache();
             }
             else
             {
-                _httpCache.ClearAllCache();
+                _runtimeCache.ClearAllCache();
             }
         }
 
@@ -154,11 +171,11 @@ namespace Umbraco.Core
         {
             if (_enableCache == false)
             {
-                _nullHttpCache.ClearCacheItem(key);
+                _nullRuntimeCache.ClearCacheItem(key);
             }
             else
             {
-                _httpCache.ClearCacheItem(key);
+                _runtimeCache.ClearCacheItem(key);
             }
         }
 
@@ -173,11 +190,11 @@ namespace Umbraco.Core
         {
             if (_enableCache == false)
             {
-                _nullHttpCache.ClearCacheObjectTypes(typeName);
+                _nullRuntimeCache.ClearCacheObjectTypes(typeName);
             }
             else
             {
-                _httpCache.ClearCacheObjectTypes(typeName);
+                _runtimeCache.ClearCacheObjectTypes(typeName);
             }
         }
 
@@ -189,11 +206,11 @@ namespace Umbraco.Core
         {
             if (_enableCache == false)
             {
-                _nullHttpCache.ClearCacheObjectTypes<T>();
+                _nullRuntimeCache.ClearCacheObjectTypes<T>();
             }
             else
             {
-                _httpCache.ClearCacheObjectTypes<T>();
+                _runtimeCache.ClearCacheObjectTypes<T>();
             }
         }
 
@@ -206,11 +223,11 @@ namespace Umbraco.Core
         {
             if (_enableCache == false)
             {
-                _nullHttpCache.ClearCacheByKeySearch(keyStartsWith);
+                _nullRuntimeCache.ClearCacheByKeySearch(keyStartsWith);
             }
             else
             {
-                _httpCache.ClearCacheByKeySearch(keyStartsWith);
+                _runtimeCache.ClearCacheByKeySearch(keyStartsWith);
             }
         }
 
@@ -223,11 +240,11 @@ namespace Umbraco.Core
         {
             if (_enableCache == false)
             {
-                _nullHttpCache.ClearCacheByKeyExpression(regexString);
+                _nullRuntimeCache.ClearCacheByKeyExpression(regexString);
             }
             else
             {
-                _httpCache.ClearCacheByKeyExpression(regexString);
+                _runtimeCache.ClearCacheByKeyExpression(regexString);
             }
         }
 
@@ -236,11 +253,11 @@ namespace Umbraco.Core
         {
             if (_enableCache == false)
             {
-                return _nullHttpCache.GetCacheItemsByKeySearch<T>(keyStartsWith);
+                return _nullRuntimeCache.GetCacheItemsByKeySearch<T>(keyStartsWith);
             }
             else
             {
-                return _httpCache.GetCacheItemsByKeySearch<T>(keyStartsWith);
+                return _runtimeCache.GetCacheItemsByKeySearch<T>(keyStartsWith);
             }
         }
 
@@ -255,11 +272,11 @@ namespace Umbraco.Core
         {
             if (_enableCache == false)
             {
-                return _nullHttpCache.GetCacheItem<TT>(cacheKey);
+                return _nullRuntimeCache.GetCacheItem<TT>(cacheKey);
             }
             else
             {
-                return _httpCache.GetCacheItem<TT>(cacheKey);
+                return _runtimeCache.GetCacheItem<TT>(cacheKey);
             }
         }
 
@@ -275,11 +292,11 @@ namespace Umbraco.Core
         {
             if (_enableCache == false)
             {
-                return _nullHttpCache.GetCacheItem<TT>(cacheKey, getCacheItem);
+                return _nullRuntimeCache.GetCacheItem<TT>(cacheKey, getCacheItem);
             }
             else
             {
-                return _httpCache.GetCacheItem<TT>(cacheKey, getCacheItem);
+                return _runtimeCache.GetCacheItem<TT>(cacheKey, getCacheItem);
             }
         }
 
@@ -297,11 +314,11 @@ namespace Umbraco.Core
         {
             if (_enableCache == false)
             {
-                return _nullHttpCache.GetCacheItem<TT>(cacheKey, getCacheItem, timeout);
+                return _nullRuntimeCache.GetCacheItem<TT>(cacheKey, getCacheItem, timeout);
             }
             else
             {
-                return _httpCache.GetCacheItem<TT>(cacheKey, getCacheItem, timeout);
+                return _runtimeCache.GetCacheItem<TT>(cacheKey, getCacheItem, timeout);
             }
         }
 
@@ -321,11 +338,11 @@ namespace Umbraco.Core
         {
             if (!_enableCache)
             {
-                return _nullHttpCache.GetCacheItem<TT>(cacheKey, getCacheItem, timeout, removedCallback: refreshAction);
+                return _nullRuntimeCache.GetCacheItem<TT>(cacheKey, getCacheItem, timeout, removedCallback: refreshAction);
             }
             else
             {
-                return _httpCache.GetCacheItem<TT>(cacheKey, getCacheItem, timeout, removedCallback: refreshAction);
+                return _runtimeCache.GetCacheItem<TT>(cacheKey, getCacheItem, timeout, removedCallback: refreshAction);
             }
         }
 
@@ -346,11 +363,11 @@ namespace Umbraco.Core
         {
             if (_enableCache == false)
             {
-                return _nullHttpCache.GetCacheItem<TT>(cacheKey, getCacheItem, timeout, false, priority, refreshAction);
+                return _nullRuntimeCache.GetCacheItem<TT>(cacheKey, getCacheItem, timeout, false, priority, refreshAction);
             }
             else
             {
-                return _httpCache.GetCacheItem<TT>(cacheKey, getCacheItem, timeout, false, priority, refreshAction);
+                return _runtimeCache.GetCacheItem<TT>(cacheKey, getCacheItem, timeout, false, priority, refreshAction);
             }
         }
 
@@ -375,11 +392,11 @@ namespace Umbraco.Core
         {
             if (_enableCache == false)
             {
-                return _nullHttpCache.GetCacheItem<TT>(cacheKey, getCacheItem, timeout, false, priority, refreshAction, null);
+                return _nullRuntimeCache.GetCacheItem<TT>(cacheKey, getCacheItem, timeout, false, priority, refreshAction, null);
             }
             else
             {
-                var cache = _httpCache as HttpRuntimeCacheProvider;
+                var cache = _runtimeCache as HttpRuntimeCacheProvider;
                 if (cache != null)
                 {
                     var result = cache.GetCacheItem(cacheKey, () => getCacheItem(), timeout, false, priority, refreshAction, cacheDependency);
@@ -406,11 +423,11 @@ namespace Umbraco.Core
         {
             if (!_enableCache)
             {
-                return _nullHttpCache.GetCacheItem<TT>(cacheKey, getCacheItem, null, false, priority, null, null);
+                return _nullRuntimeCache.GetCacheItem<TT>(cacheKey, getCacheItem, null, false, priority, null, null);
             }
             else
             {
-                var cache = _httpCache as HttpRuntimeCacheProvider;
+                var cache = _runtimeCache as HttpRuntimeCacheProvider;
                 if (cache != null)
                 {
                     var result = cache.GetCacheItem(cacheKey, () => getCacheItem(), null, false, priority, null, cacheDependency);
@@ -433,11 +450,11 @@ namespace Umbraco.Core
         {
             if (_enableCache == false)
             {
-                _nullHttpCache.InsertCacheItem<T>(cacheKey, getCacheItem, priority: priority);
+                _nullRuntimeCache.InsertCacheItem<T>(cacheKey, getCacheItem, priority: priority);
             }
             else
             {
-                _httpCache.InsertCacheItem<T>(cacheKey, getCacheItem, priority: priority);
+                _runtimeCache.InsertCacheItem<T>(cacheKey, getCacheItem, priority: priority);
             }
         }
 
@@ -456,11 +473,11 @@ namespace Umbraco.Core
         {
             if (_enableCache == false)
             {
-                _nullHttpCache.InsertCacheItem<T>(cacheKey, getCacheItem, timeout, priority: priority);
+                _nullRuntimeCache.InsertCacheItem<T>(cacheKey, getCacheItem, timeout, priority: priority);
             }
             else
             {
-                _httpCache.InsertCacheItem<T>(cacheKey, getCacheItem, timeout, priority: priority);
+                _runtimeCache.InsertCacheItem<T>(cacheKey, getCacheItem, timeout, priority: priority);
             }
         }
 
@@ -482,11 +499,11 @@ namespace Umbraco.Core
         {
             if (_enableCache == false)
             {
-                _nullHttpCache.InsertCacheItem<T>(cacheKey, getCacheItem, timeout, priority: priority, dependentFiles:null);
+                _nullRuntimeCache.InsertCacheItem<T>(cacheKey, getCacheItem, timeout, priority: priority, dependentFiles:null);
             }
             else
             {
-                var cache = _httpCache as HttpRuntimeCacheProvider;
+                var cache = _runtimeCache as HttpRuntimeCacheProvider;
                 if (cache != null)
                 {
                     cache.InsertCacheItem(cacheKey, () => getCacheItem(), timeout, false, priority, null, cacheDependency);
@@ -515,11 +532,11 @@ namespace Umbraco.Core
         {
             if (_enableCache == false)
             {
-                _nullHttpCache.InsertCacheItem<T>(cacheKey, getCacheItem, timeout, false, priority, refreshAction, null);
+                _nullRuntimeCache.InsertCacheItem<T>(cacheKey, getCacheItem, timeout, false, priority, refreshAction, null);
             }
             else
             {
-                var cache = _httpCache as HttpRuntimeCacheProvider;
+                var cache = _runtimeCache as HttpRuntimeCacheProvider;
                 if (cache != null)
                 {
                     cache.InsertCacheItem(cacheKey, () => getCacheItem(), timeout, false, priority, refreshAction, cacheDependency);

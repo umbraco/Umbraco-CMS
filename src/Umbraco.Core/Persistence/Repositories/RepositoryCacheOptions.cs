@@ -10,6 +10,7 @@ namespace Umbraco.Core.Persistence.Repositories
             GetAllCacheValidateCount = true;
             GetAllCacheAllowZeroCount = false;
             GetAllCacheThresholdLimit = 100;
+            GetAllCacheAsCollection = false;
         }
 
         /// <summary>
@@ -32,5 +33,15 @@ namespace Umbraco.Core.Persistence.Repositories
         /// The threshold entity count for which the GetAll method will cache entities
         /// </summary>
         public int GetAllCacheThresholdLimit { get; set; }
+
+        /// <summary>
+        /// When set to true, the cache for the result of GetAll will be cached as a List/Collection rather than
+        /// individual entities in the dictionary
+        /// </summary>
+        /// <remarks>
+        /// The default is false which means that if the result of GetAll is less than the GetAllCacheThresholdLimit, each entity
+        /// returned will be cached individually
+        /// </remarks>
+        public bool GetAllCacheAsCollection { get; set; }
     }
 }

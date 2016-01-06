@@ -25,7 +25,8 @@ namespace Umbraco.Core.Persistence.Repositories
             _cacheOptions = new RepositoryCacheOptions
             {
                 GetAllCacheAllowZeroCount = true,
-                GetAllCacheValidateCount = false
+                GetAllCacheValidateCount = false,
+                GetAllCacheAsCollection = true
             };
         }
 
