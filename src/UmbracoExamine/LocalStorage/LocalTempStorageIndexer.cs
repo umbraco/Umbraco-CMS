@@ -44,7 +44,7 @@ namespace UmbracoExamine.LocalStorage
         public void Initialize(NameValueCollection config, string configuredPath, FSDirectory baseLuceneDirectory, Analyzer analyzer, LocalStorageType localStorageType)
         {
             //this is the default
-            ILocalStorageDirectory localStorateDir = new CodeGenLocalStorageDirectory();
+            ILocalStorageDirectory localStorageDir = new CodeGenLocalStorageDirectory();
             if (config["tempStorageDirectory"] != null)
             {
                 //try to get the type
@@ -53,7 +53,7 @@ namespace UmbracoExamine.LocalStorage
                 {
                     try
                     {
-                        localStorateDir = (ILocalStorageDirectory)Activator.CreateInstance(dirType);
+                        localStorageDir = (ILocalStorageDirectory)Activator.CreateInstance(dirType);
                     }
                     catch (Exception ex)
                     {
@@ -64,8 +64,8 @@ namespace UmbracoExamine.LocalStorage
                 }
             }
 
-            var tempPath = localStorateDir.GetLocalStorageDirectory(config, configuredPath);
-            if (tempPath == null) throw new InvalidOperationException("Could not resolve a temp location from the " + localStorateDir.GetType() + " specified");
+            var tempPath = localStorageDir.GetLocalStorageDirectory(config, configuredPath);
+            if (tempPath == null) throw new InvalidOperationException("Could not resolve a temp location from the " + localStorageDir.GetType() + " specified");
             TempPath = tempPath.FullName;
 
             switch (localStorageType)
