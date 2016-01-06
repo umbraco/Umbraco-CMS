@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -322,8 +323,9 @@ namespace Umbraco.Core
 			else if (destinationType == typeof(Decimal))
 			{
 				Decimal value;
+			    var currentUiCulture = System.Threading.Thread.CurrentThread.CurrentUICulture;
                 var input2 = NormalizeNumberDecimalSeparator(input);
-                return Decimal.TryParse(input2, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+                return Decimal.TryParse(input2, NumberStyles.Number, currentUiCulture, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
 			}
 			else if (destinationType == typeof(Version))
 			{
