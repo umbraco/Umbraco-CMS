@@ -339,7 +339,7 @@ namespace Umbraco.Core
 
 	    private static string NormalizeNumberDecimalSeparator(string s)
 	    {
-	        var normalized = System.Threading.Thread.CurrentThread.CurrentUICulture.NumberFormat.NumberDecimalSeparator[0];
+	        var normalized = System.Threading.Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator[0];
             return s.ReplaceMany(NumberDecimalSeparatorsToNormalize, normalized);
 	    }
 
