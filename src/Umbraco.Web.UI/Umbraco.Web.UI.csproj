@@ -1995,7 +1995,6 @@
     <Content Include="Umbraco\Create\language.ascx">
       <SubType>UserControl</SubType>
     </Content>
-    <Content Include="Umbraco\Create\media.ascx" />
     <Content Include="Umbraco\Create\member.ascx" />
     <Content Include="Umbraco\Create\nodeType.ascx">
       <SubType>UserControl</SubType>
