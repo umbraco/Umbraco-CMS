@@ -7,11 +7,20 @@
     box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
 }
 
+.umb-overlay__form {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    height: 100%;
+}
+
 .umb-overlay .umb-overlay-header {
     background: @grayLighter;
     border-bottom: 1px solid @grayLight;
     padding: 10px;
     margin-top: 0;
+    flex-grow: 0;
+    flex-shrink: 0;
 }
 
 
@@ -29,29 +38,31 @@
 }
 
 .umb-overlay .umb-overlay-container {
-    top: 50px;
-    left: 7px;
-    right: 7px;
-    bottom: 7px;
-    position: absolute;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: auto;
     overflow-y: auto;
     overflow-x: hidden;
+    position: relative;
+    height: auto;
 }
 
 .umb-overlay .umb-overlay-drawer {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    height: 31px;
-    padding: 10px;
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 31px;
+    padding: 10px 20px;
     margin: 0;
 
     background: @grayLighter;
     border-top: 1px solid @grayLight;
 }
 
-.umb-overlay .umb-overlay-drawer .umb-overlay-drawer-content {
+.umb-overlay .umb-overlay-drawer.-auto-height {
+    flex-basis: auto;
+}
+
+.umb-overlay .umb-overlay-drawer .umb-overlay-drawer__align-right {
     display: flex;
     justify-content: flex-end;
 }
@@ -76,7 +87,6 @@
 }
 
 .umb-overlay.umb-overlay-center .umb-overlay-container {
-    top: 68px;
     padding: 20px;
 }
 
@@ -92,8 +102,7 @@
 }
 
 .umb-overlay.umb-overlay-target .umb-overlay-container {
-    top: 68px;
-    bottom: 58px;
+    padding: 10px;
 }
 
 /* ---------- OVERLAY RIGHT ---------- */
@@ -107,16 +116,12 @@
 }
 
 .umb-overlay.umb-overlay-right .umb-overlay-header {
-    height: 100px;
+    flex-basis: 100px;
     padding: 20px;
     box-sizing: border-box;
 }
 
 .umb-overlay.umb-overlay-right .umb-overlay-container {
-    top: 100px;
-    left: 0;
-    right: 0;
-    bottom: 52px;
     padding: 20px;
 }
 
@@ -132,16 +137,12 @@
 }
 
 .umb-overlay.umb-overlay-left .umb-overlay-header {
-    height: 100px;
+    flex-basis: 100px;
     padding: 20px;
     box-sizing: border-box;
 }
 
 .umb-overlay.umb-overlay-left .umb-overlay-container {
-    top: 100px;
-    left: 0;
-    right: 0;
-    bottom: 51px;
     padding: 20px;
 }
 

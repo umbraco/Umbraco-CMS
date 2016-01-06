@@ -1,5 +1,5 @@
 <div class="umb-overlay umb-overlay-{{position}}" on-outside-click="closeOverLay()">
-    <form name="overlayForm" ng-submit="submitForm(model)" novalidate val-form-manager>
+    <form class="umb-overlay__form" name="overlayForm" ng-submit="submitForm(model)" novalidate val-form-manager>
 
         <div class="umb-overlay-header">
             <h4 class="umb-overlay__title">{{model.title}}</h4>
@@ -21,11 +21,53 @@
 
         </div>
 
-        <div class="umb-overlay-drawer">
-            <div class="umb-overlay-drawer-content">
-                <umb-button action="closeOverLay()" button-style="link" label-key="{{model.closeButtonLabelKey}}" label="{{model.closeButtonLabel}}" type="button"></umb-button>
-                <umb-button button-style="success" label-key="{{model.submitButtonLabelKey}}" label="{{model.submitButtonLabel}}" ng-if="model.submit && model.hideSubmitButton !== true" type="submit"></umb-button>
+        <div class="umb-overlay-drawer" ng-class="{'-auto-height': model.confirmSubmit.show}">
+
+            <div ng-if="model.confirmSubmit.show">
+
+                <h5 class="red" ng-if="model.confirmSubmit.title"><i class="icon-alert"></i> {{ model.confirmSubmit.title }}</h5>
+                <p ng-if="model.confirmSubmit.description">{{ model.confirmSubmit.description }}</p>
+
+                <label class="checkbox no-indent">
+                    <input type="checkbox" ng-model="directive.enableConfirmButton" />
+                    <strong>{{model.confirmSubmit.checkboxLabel}}</strong>
+                </label>
+
+                <div class="umb-overlay-drawer__align-right">
+                    <umb-button
+                        action="cancelConfirmSubmit()"
+                        button-style="link"
+                        label="Cancel"
+                        type="button">
+                    </umb-button>
+
+                    <umb-button
+                        button-style="success"
+                        label="Confirm"
+                        type="submit"
+                        disabled="!directive.enableConfirmButton">
+                    </umb-button>
+                </div>
             </div>
+
+            <div class="umb-overlay-drawer__align-right" ng-if="!model.confirmSubmit.show">
+                <umb-button
+                    action="closeOverLay()"
+                    button-style="link"
+                    label-key="{{model.closeButtonLabelKey}}"
+                    label="{{model.closeButtonLabel}}"
+                    type="button">
+                </umb-button>
+
+                <umb-button
+                    button-style="success"
+                    label-key="{{model.submitButtonLabelKey}}"
+                    label="{{model.submitButtonLabel}}"
+                    ng-if="model.submit && model.hideSubmitButton !== true"
+                    type="submit">
+                </umb-button>
+            </div>
+
         </div>
     </form>
 </div>

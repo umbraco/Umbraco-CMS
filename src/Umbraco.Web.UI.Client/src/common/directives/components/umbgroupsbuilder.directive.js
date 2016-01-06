@@ -182,64 +182,95 @@
       };
 
       scope.openCompositionsDialog = function() {
-        scope.compositionsDialogModel = {};
-        scope.compositionsDialogModel.title = "Compositions";
-        scope.compositionsDialogModel.contentType = scope.model;
-        scope.compositionsDialogModel.availableCompositeContentTypes = scope.model.availableCompositeContentTypes;
-        scope.compositionsDialogModel.compositeContentTypes = scope.model.compositeContentTypes;
-        scope.compositionsDialogModel.view = "views/common/overlays/contenttypeeditor/compositions/compositions.html";
-        scope.compositionsDialogModel.show = true;
 
-        scope.compositionsDialogModel.submit = function(model) {
+        scope.compositionsDialogModel = {
+            title: "Compositions",
+            contentType: scope.model,
+            availableCompositeContentTypes: scope.model.availableCompositeContentTypes,
+            compositeContentTypes: scope.model.compositeContentTypes,
+            view: "views/common/overlays/contenttypeeditor/compositions/compositions.html",
+            confirmSubmit: {
+                title: "Warning",
+                description: "Removing a composition will delete all the associated property data. Once you save the document type there's no way back, are you sure?",
+                checkboxLabel: "I know what I'm doing",
+                enable: true
+            },
+            show: true,
+            submit: function(model, oldModel, confirmed) {
 
-          // make sure that all tabs has an init property
-          if (scope.model.groups.length !== 0) {
-            angular.forEach(scope.model.groups, function(group) {
-              addInitProperty(group);
-            });
-          }
+                var compositionRemoved = false;
 
-          // remove overlay
-          scope.compositionsDialogModel.show = false;
-          scope.compositionsDialogModel = null;
-        };
+                // check if any compositions has been removed
+                for(var i = 0; oldModel.compositeContentTypes.length > i; i++) {
 
-        scope.compositionsDialogModel.close = function(oldModel) {
-          // reset composition changes
-          scope.model.groups = oldModel.contentType.groups;
-          scope.model.compositeContentTypes = oldModel.contentType.compositeContentTypes;
+                    var oldComposition = oldModel.compositeContentTypes[i];
 
-          // remove overlay
-          scope.compositionsDialogModel.show = false;
-          scope.compositionsDialogModel = null;
-        };
+                    if(_.contains(model.compositeContentTypes, oldComposition) === false) {
+                        compositionRemoved = true;
+                    }
 
-        scope.compositionsDialogModel.selectCompositeContentType = function(compositeContentType) {
+                }
 
-          if (scope.model.compositeContentTypes.indexOf(compositeContentType.alias) === -1) {
-            //merge composition with content type
+                // show overlay confirm box if compositions has been removed.
+                if(compositionRemoved && confirmed === false) {
 
-            if(scope.contentType === "documentType") {
+                    scope.compositionsDialogModel.confirmSubmit.show = true;
 
-               contentTypeResource.getById(compositeContentType.id).then(function(composition){
-                  contentTypeHelper.mergeCompositeContentType(scope.model, composition);
-               });
+                // submit overlay if no compositions has been removed
+                // or the action has been confirmed
+                } else {
+
+                    // make sure that all tabs has an init property
+                    if (scope.model.groups.length !== 0) {
+                      angular.forEach(scope.model.groups, function(group) {
+                        addInitProperty(group);
+                      });
+                    }
+
+                    // remove overlay
+                    scope.compositionsDialogModel.show = false;
+                    scope.compositionsDialogModel = null;
+                }
+
+            },
+            close: function(oldModel) {
+
+                // reset composition changes
+                scope.model.groups = oldModel.contentType.groups;
+                scope.model.compositeContentTypes = oldModel.contentType.compositeContentTypes;
+
+                // remove overlay
+                scope.compositionsDialogModel.show = false;
+                scope.compositionsDialogModel = null;
+
+            },
+            selectCompositeContentType: function(compositeContentType) {
+
+                if (scope.model.compositeContentTypes.indexOf(compositeContentType.alias) === -1) {
+                  //merge composition with content type
+
+                  if(scope.contentType === "documentType") {
+
+                     contentTypeResource.getById(compositeContentType.id).then(function(composition){
+                        contentTypeHelper.mergeCompositeContentType(scope.model, composition);
+                     });
 
 
-            } else if(scope.contentType === "mediaType") {
+                  } else if(scope.contentType === "mediaType") {
 
-               mediaTypeResource.getById(compositeContentType.id).then(function(composition){
-                  contentTypeHelper.mergeCompositeContentType(scope.model, composition);
-               });
+                     mediaTypeResource.getById(compositeContentType.id).then(function(composition){
+                        contentTypeHelper.mergeCompositeContentType(scope.model, composition);
+                     });
+
+                  }
+
+
+                } else {
+                  // split composition from content type
+                  contentTypeHelper.splitCompositeContentType(scope.model, compositeContentType);
+                }
 
             }
-
-
-          } else {
-            // split composition from content type
-            contentTypeHelper.splitCompositeContentType(scope.model, compositeContentType);
-          }
-
         };
 
       };
