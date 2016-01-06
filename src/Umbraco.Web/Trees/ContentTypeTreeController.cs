@@ -69,7 +69,14 @@ namespace Umbraco.Web.Trees
 
                 // root actions              
                 menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
-                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)));
+                menu.Items.Add<ActionImport>(Services.TextService.Localize(string.Format("actions/{0}", ActionImport.Instance.Alias)), true).ConvertLegacyMenuItem(new UmbracoEntity
+                {
+                    Id = int.Parse(id),
+                    Level = 1,
+                    ParentId = -1,
+                    Name = ""
+                }, "documenttypes", "settings");
+                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
                 return menu;
             }
 
@@ -86,19 +93,19 @@ namespace Umbraco.Web.Trees
                     //can delete doc type
                     menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
                 }
-                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), hasSeparator: true);    
+                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);    
             }
             else
             {
                 menu.Items.Add<ActionMove>(Services.TextService.Localize(string.Format("actions/{0}", ActionMove.Instance.Alias)));
-                menu.Items.Add<ActionExport>(Services.TextService.Localize(string.Format("actions/{0}", ActionExport.Instance.Alias)), hasSeparator: true).ConvertLegacyMenuItem(new UmbracoEntity
+                menu.Items.Add<ActionExport>(Services.TextService.Localize(string.Format("actions/{0}", ActionExport.Instance.Alias)), true).ConvertLegacyMenuItem(new UmbracoEntity
                 {
                     Id = int.Parse(id),
                     Level = 1,
                     ParentId = -1,
                     Name = ""
                 }, "documenttypes", "settings");
-                menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)), hasSeparator: true);
+                menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)), true);
             }
 
             return menu;
