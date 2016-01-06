@@ -1,15 +1,11 @@
 using System;
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Security;
 using System.Xml;
 
 namespace Umbraco.Core
@@ -51,7 +47,7 @@ namespace Umbraco.Core
 		public static Attempt<T> TryConvertTo<T>(this object input)
 		{
 			var result = TryConvertTo(input, typeof(T));
-            if (!result.Success)
+            if (result.Success == false)
             {
                 //just try a straight up conversion
                 try
@@ -64,7 +60,7 @@ namespace Umbraco.Core
                     return Attempt<T>.Fail(e);
                 }
             }
-			return !result.Success ? Attempt<T>.Fail() : Attempt<T>.Succeed((T)result.Result);
+			return result.Success == false ? Attempt<T>.Fail() : Attempt<T>.Succeed((T)result.Result);
 		}
 
 		/// <summary>
@@ -117,7 +113,7 @@ namespace Umbraco.Core
 			}
 
 			// we've already dealed with nullables, so any other generic types need to fall through
-			if (!destinationType.IsGenericType)
+			if (destinationType.IsGenericType == false)
 			{
 				if (input is string)
 				{
@@ -246,14 +242,16 @@ namespace Umbraco.Core
 			    else if (destinationType == typeof(Double))
 			    {
 			        Double value;
-			        var input2 = NormalizeNumberDecimalSeparator(input);
-			        return Double.TryParse(input2, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+                    var currentUiCulture = System.Threading.Thread.CurrentThread.CurrentUICulture;
+                    var input2 = NormalizeNumberDecimalSeparator(input);
+			        return Double.TryParse(input2, NumberStyles.Float | NumberStyles.AllowThousands, currentUiCulture, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
 			    }
 			    else if (destinationType == typeof(Single))
 			    {
 			        Single value;
+                    var currentUiCulture = System.Threading.Thread.CurrentThread.CurrentUICulture;
                     var input2 = NormalizeNumberDecimalSeparator(input);
-                    return Single.TryParse(input2, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+                    return Single.TryParse(input2, NumberStyles.Float | NumberStyles.AllowThousands, currentUiCulture, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
 			    }
 			    else if (destinationType == typeof(Char))
 			    {
@@ -322,8 +320,9 @@ namespace Umbraco.Core
 			else if (destinationType == typeof(Decimal))
 			{
 				Decimal value;
+			    var currentUiCulture = System.Threading.Thread.CurrentThread.CurrentUICulture;
                 var input2 = NormalizeNumberDecimalSeparator(input);
-                return Decimal.TryParse(input2, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+                return Decimal.TryParse(input2, NumberStyles.Number, currentUiCulture, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
 			}
 			else if (destinationType == typeof(Version))
 			{
@@ -335,7 +334,7 @@ namespace Umbraco.Core
 			return null; // we can't decide...
 		}
 
-        private readonly static char[] NumberDecimalSeparatorsToNormalize = new[] {'.', ','};
+        private static readonly char[] NumberDecimalSeparatorsToNormalize = new[] {'.', ','};
 
 	    private static string NormalizeNumberDecimalSeparator(string s)
 	    {
@@ -442,7 +441,7 @@ namespace Umbraco.Core
 			{
 				var props = TypeDescriptor.GetProperties(o);
 				var d = new Dictionary<string, TVal>();
-				foreach (var prop in props.Cast<PropertyDescriptor>().Where(x => !ignoreProperties.Contains(x.Name)))
+				foreach (var prop in props.Cast<PropertyDescriptor>().Where(x => ignoreProperties.Contains(x.Name) == false))
 				{
 					var val = prop.GetValue(o);
 					if (val != null)
@@ -478,13 +477,13 @@ namespace Umbraco.Core
 
 					var items = (from object enumItem in enumerable let value = GetEnumPropertyDebugString(enumItem, levels) where value != null select value).Take(10).ToList();
 
-					return items.Count() > 0
+					return items.Any()
 							? "{{ {0} }}".InvariantFormat(String.Join(", ", items))
 							: null;
 				}
 
 				var props = obj.GetType().GetProperties();
-				if ((props.Count() == 2) && props[0].Name == "Key" && props[1].Name == "Value" && levels > -2)
+				if ((props.Length == 2) && props[0].Name == "Key" && props[1].Name == "Value" && levels > -2)
 				{
 					try
 					{
@@ -500,12 +499,12 @@ namespace Umbraco.Core
 				if (levels > -1)
 				{
 					var items =
-						from propertyInfo in props
+						(from propertyInfo in props
 						let value = GetPropertyDebugString(propertyInfo, obj, levels)
 						where value != null
-						select "{0}={1}".InvariantFormat(propertyInfo.Name, value);
+						select "{0}={1}".InvariantFormat(propertyInfo.Name, value)).ToArray();
 
-					return items.Count() > 0
+					return items.Any()
 							? "[{0}]:{{ {1} }}".InvariantFormat(obj.GetType().Name, String.Join(", ", items))
 							: null;
 				}
