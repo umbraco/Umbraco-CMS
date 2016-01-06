@@ -549,6 +549,9 @@ namespace Umbraco.Web.Editors
                             else
                             {
 
+                                if (loginInfo.Email.IsNullOrWhiteSpace()) throw new InvalidOperationException("The Email value cannot be null");
+                                if (loginInfo.ExternalIdentity.Name.IsNullOrWhiteSpace()) throw new InvalidOperationException("The Name value cannot be null");
+
                                 var autoLinkUser = new BackOfficeIdentityUser()
                                 {
                                     Email = loginInfo.Email,

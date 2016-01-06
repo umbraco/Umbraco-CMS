@@ -652,12 +652,17 @@ namespace Umbraco.Core.Services
                     if (dataTypeDefinition == null) continue;
                 }
 
+                var sortOrder = 0;
+                var sortOrderElement = property.Element("SortOrder");
+                if (sortOrderElement != null)
+                    int.TryParse(sortOrderElement.Value, out sortOrder);
                 var propertyType = new PropertyType(dataTypeDefinition, property.Element("Alias").Value)
                                        {
                                            Name = property.Element("Name").Value,
                                            Description = property.Element("Description").Value,
                                            Mandatory = property.Element("Mandatory").Value.ToLowerInvariant().Equals("true"),
                                            ValidationRegExp = property.Element("Validation").Value,
+                                           SortOrder = sortOrder
                                        };
 
                 var tab = property.Element("Tab").Value;

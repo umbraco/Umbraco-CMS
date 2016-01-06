@@ -43,14 +43,10 @@ namespace Umbraco.Web.Security.Identity
         {
             var request = context.Request;
             var response = context.Response;
-
-            var rootPath = context.Request.PathBase.HasValue
-                ? context.Request.PathBase.Value.EnsureStartsWith("/").EnsureEndsWith("/")
-                : "/";
-
+            
             if (request.Uri.Scheme.InvariantStartsWith("http")
                 && request.Uri.AbsolutePath.InvariantEquals(
-                    string.Format("{0}{1}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds", rootPath, GlobalSettings.UmbracoMvcArea)))
+                    string.Format("{0}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds", GlobalSettings.Path)))
             {
                 var cookie = _authOptions.CookieManager.GetRequestCookie(context, _security.AuthCookieName);
                 if (cookie.IsNullOrWhiteSpace() == false)
@@ -59,7 +55,7 @@ namespace Umbraco.Web.Security.Identity
                     if (ticket != null)
                     {
                         var remainingSeconds = ticket.Properties.ExpiresUtc.HasValue
-                            ? (ticket.Properties.ExpiresUtc.Value - DateTime.Now.ToUniversalTime()).TotalSeconds
+                            ? (ticket.Properties.ExpiresUtc.Value - _authOptions.SystemClock.UtcNow).TotalSeconds
                             : 0;
 
                         response.ContentType = "application/json; charset=utf-8";
@@ -67,36 +63,42 @@ namespace Umbraco.Web.Security.Identity
                         response.Headers.Add("Cache-Control", new[] { "no-cache" });
                         response.Headers.Add("Pragma", new[] { "no-cache" });
                         response.Headers.Add("Expires", new[] { "-1" });
-                        response.Headers.Add("Date", new[] { DateTime.Now.ToUniversalTime().ToString("R") });
+                        response.Headers.Add("Date", new[] { _authOptions.SystemClock.UtcNow.ToString("R") });
 
                         //Ok, so here we need to check if we want to process/renew the auth ticket for each 
                         // of these requests. If that is the case, the user will really never be logged out until they
                         // close their browser (there will be edge cases of that, especially when debugging)
                         if (_security.KeepUserLoggedIn)
                         {
-                            var utcNow = DateTime.Now.ToUniversalTime();
-                            ticket.Properties.IssuedUtc = utcNow;
-                            ticket.Properties.ExpiresUtc = utcNow.AddMinutes(30);
+                            var currentUtc = _authOptions.SystemClock.UtcNow;
+                            var issuedUtc = ticket.Properties.IssuedUtc;
+                            var expiresUtc = ticket.Properties.ExpiresUtc;
 
-                            var cookieValue = _authOptions.TicketDataFormat.Protect(ticket);
-
-                            var cookieOptions = new CookieOptions
+                            if (expiresUtc.HasValue && issuedUtc.HasValue)
                             {
-                                Path = "/",
-                                Domain = _authOptions.CookieDomain ?? null,
-                                Expires = DateTime.Now.AddMinutes(30),
-                                HttpOnly = true,
-                                Secure = _authOptions.CookieSecure == CookieSecureOption.Always
-                                         || (_authOptions.CookieSecure == CookieSecureOption.SameAsRequest && request.Uri.Scheme.InvariantEquals("https")),
-                            };
+                                var timeElapsed = currentUtc.Subtract(issuedUtc.Value);
+                                var timeRemaining = expiresUtc.Value.Subtract(currentUtc);
 
-                            _authOptions.CookieManager.AppendResponseCookie(
-                                context,
-                                _authOptions.CookieName,
-                                cookieValue,
-                                cookieOptions);
+                                //if it's time to renew, then do it
+                                if (timeRemaining < timeElapsed)
+                                {
+                                    ticket.Properties.IssuedUtc = currentUtc;
+                                    var timeSpan = expiresUtc.Value.Subtract(issuedUtc.Value);
+                                    ticket.Properties.ExpiresUtc = currentUtc.Add(timeSpan);
 
-                            remainingSeconds = (ticket.Properties.ExpiresUtc.Value - DateTime.Now.ToUniversalTime()).TotalSeconds;
+                                    var cookieValue = _authOptions.TicketDataFormat.Protect(ticket);
+
+                                    var cookieOptions = _authOptions.CreateRequestCookieOptions(context, ticket);
+
+                                    _authOptions.CookieManager.AppendResponseCookie(
+                                        context,
+                                        _authOptions.CookieName,
+                                        cookieValue,
+                                        cookieOptions);
+
+                                    remainingSeconds = (ticket.Properties.ExpiresUtc.Value - currentUtc).TotalSeconds;
+                                }
+                            }                            
                         }
                         else if (remainingSeconds <= 30)
                         {

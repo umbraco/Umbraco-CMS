@@ -18,6 +18,11 @@ namespace Umbraco.Web.Dictionary
     /// <summary>
     /// A culture dictionary that uses the Umbraco ILocalizationService
     /// </summary>
+    /// <remarks>
+    /// TODO: The ICultureDictionary needs to represent the 'fast' way to do dictionary item retrieval - for front-end and back office.
+    /// The ILocalizationService is the service used for interacting with this data from the database which isn't all that fast 
+    /// (even though there is caching involved, if there's lots of dictionary items the caching is not great)
+    /// </remarks>
 	public class DefaultCultureDictionary : Umbraco.Core.Dictionary.ICultureDictionary
 	{
 	    private readonly ILocalizationService _localizationService;

@@ -10,6 +10,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Microsoft.AspNet.Identity.Owin;
+using Microsoft.Owin;
 using umbraco.businesslogic.Exceptions;
 using Umbraco.Web.Models.ContentEditing;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
@@ -79,6 +80,42 @@ namespace Umbraco.Web.Security
             }
         }
 
+        private BackOfficeSignInManager _signInManager;
+        private BackOfficeSignInManager SignInManager
+        {
+            get
+            {
+                if (_signInManager == null)
+                {
+                    var mgr = _httpContext.GetOwinContext().Get<BackOfficeSignInManager>();
+                    if (mgr == null)
+                    {
+                        throw new NullReferenceException("Could not resolve an instance of " + typeof(BackOfficeSignInManager) + " from the " + typeof(IOwinContext));
+                    }
+                    _signInManager = mgr;
+                }
+                return _signInManager;
+            }
+        }
+
+        private BackOfficeUserManager _userManager;
+        protected BackOfficeUserManager UserManager
+        {
+            get
+            {
+                if (_userManager == null)
+                {
+                    var mgr = _httpContext.GetOwinContext().GetUserManager<BackOfficeUserManager>();
+                    if (mgr == null)
+                    {
+                        throw new NullReferenceException("Could not resolve an instance of " + typeof(BackOfficeUserManager) + " from the " + typeof(IOwinContext) + " GetUserManager method");
+                    }
+                    _userManager = mgr;
+                }
+                return _userManager;
+            }
+        }
+
         /// <summary>
         /// Logs a user in.
         /// </summary>
@@ -87,25 +124,34 @@ namespace Umbraco.Web.Security
         public virtual double PerformLogin(int userId)
         {
             var owinCtx = _httpContext.GetOwinContext();
+            //ensure it's done for owin too
+            owinCtx.Authentication.SignOut(Constants.Security.BackOfficeExternalAuthenticationType);
             
-            var user = _applicationContext.Services.UserService.GetUserById(userId);
-            var userDetail = Mapper.Map<UserDetail>(user);
-            //update the userDetail and set their remaining seconds
-            userDetail.SecondsUntilTimeout = TimeSpan.FromMinutes(GlobalSettings.TimeOutInMinutes).TotalSeconds;            
-            var principal = _httpContext.SetPrincipalForRequest(user);
-            owinCtx.Authentication.SignIn((UmbracoBackOfficeIdentity)principal.Identity);
+            var user = UserManager.FindByIdAsync(userId).Result;
+            var userData = Mapper.Map<UserData>(user);
+            _httpContext.SetPrincipalForRequest(userData);
+
+            SignInManager.SignInAsync(user, isPersistent: true, rememberBrowser: false).Wait();
             return TimeSpan.FromMinutes(GlobalSettings.TimeOutInMinutes).TotalSeconds;
         }
 
         [Obsolete("This method should not be used, login is performed by the OWIN pipeline, use the overload that returns double and accepts a UserId instead")]
         public virtual FormsAuthenticationTicket PerformLogin(IUser user)
         {
+            //clear the external cookie - we do this first without owin context because we're writing cookies directly to httpcontext 
+            // and cookie handling is different with httpcontext vs webapi and owin, normally we'd just do:
+            //_httpContext.GetOwinContext().Authentication.SignOut(Constants.Security.BackOfficeExternalAuthenticationType);
+
             var externalLoginCookie = _httpContext.Request.Cookies.Get(Constants.Security.BackOfficeExternalCookieName);
             if (externalLoginCookie != null)
             {
                 externalLoginCookie.Expires = DateTime.Now.AddYears(-1);
                 _httpContext.Response.Cookies.Set(externalLoginCookie);
             }
+
+            //ensure it's done for owin too
+            _httpContext.GetOwinContext().Authentication.SignOut(Constants.Security.BackOfficeExternalAuthenticationType);
+
             var ticket = _httpContext.CreateUmbracoAuthTicket(Mapper.Map<UserData>(user));
             return ticket;
         }
@@ -116,7 +162,9 @@ namespace Umbraco.Web.Security
         public virtual void ClearCurrentLogin()
         {
             _httpContext.UmbracoLogout();
-            _httpContext.GetOwinContext().Authentication.SignOut();
+            _httpContext.GetOwinContext().Authentication.SignOut(
+                Core.Constants.Security.BackOfficeAuthenticationType,
+                Core.Constants.Security.BackOfficeExternalAuthenticationType);
         }
 
         /// <summary>

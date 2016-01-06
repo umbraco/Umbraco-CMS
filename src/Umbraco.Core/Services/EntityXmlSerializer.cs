@@ -379,6 +379,7 @@ namespace Umbraco.Core.Services
                                                    new XElement("Type", propertyType.PropertyEditorAlias),
                                                    new XElement("Definition", definition.Key),
                                                    new XElement("Tab", propertyGroup == null ? "" : propertyGroup.Name),
+                                                   new XElement("SortOrder", propertyType.SortOrder),
                                                    new XElement("Mandatory", propertyType.Mandatory.ToString()),
                                                    new XElement("Validation", propertyType.ValidationRegExp),
                                                    new XElement("Description", new XCData(propertyType.Description)));
