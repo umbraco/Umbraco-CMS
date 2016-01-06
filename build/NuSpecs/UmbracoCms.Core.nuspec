@@ -38,6 +38,7 @@
       <dependency id="semver" version="[1.1.2, 2.0.0)" />
       <dependency id="Microsoft.AspNet.WebHelpers" version="[3.2.3, 4.0.0)" />
       <dependency id="Microsoft.AspNet.WebPages.Data" version="[3.2.3, 4.0.0)" />
+      <dependency id="Microsoft.SqlServer.Compact" version="[4.0.8876, 5.0.0)" />
     </dependencies>
   </metadata>
   <files>
@@ -53,8 +54,6 @@
     <file src="..\_BuildOutput\WebApp\bin\Microsoft.ApplicationBlocks.Data.dll" target="lib\Microsoft.ApplicationBlocks.Data.dll" />
     <file src="..\_BuildOutput\WebApp\bin\SQLCE4Umbraco.dll" target="lib\SQLCE4Umbraco.dll" />
     <file src="..\_BuildOutput\WebApp\bin\SQLCE4Umbraco.xml" target="lib\SQLCE4Umbraco.xml" />
-    <file src="..\_BuildOutput\WebApp\bin\System.Data.SqlServerCe.dll" target="lib\System.Data.SqlServerCe.dll" />
-    <file src="..\_BuildOutput\WebApp\bin\System.Data.SqlServerCe.Entity.dll" target="lib\System.Data.SqlServerCe.Entity.dll" />
     <file src="..\_BuildOutput\WebApp\bin\TidyNet.dll" target="lib\TidyNet.dll" />
     <file src="..\_BuildOutput\WebApp\bin\Umbraco.Core.dll" target="lib\Umbraco.Core.dll" />
     <file src="..\_BuildOutput\WebApp\bin\Umbraco.Core.xml" target="lib\Umbraco.Core.xml" />
