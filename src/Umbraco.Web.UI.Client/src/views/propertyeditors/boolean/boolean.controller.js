@@ -2,7 +2,7 @@ function booleanEditorController($scope, $rootScope, assetsService) {
 
     function setupViewModel() {
         $scope.renderModel = {
-            value: false
+            value: $scope.model.config.default || false
         };
         if ($scope.model && $scope.model.value && ($scope.model.value.toString() === "1" || angular.lowercase($scope.model.value) === "true")) {
             $scope.renderModel.value = true;
