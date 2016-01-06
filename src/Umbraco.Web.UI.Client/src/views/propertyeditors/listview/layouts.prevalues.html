@@ -19,13 +19,13 @@
          </div>
 
          <div class="list-view-layout__name">
-            <input ng-if="layout.isSystem !== 1" ng-model="layout.name" placeholder="Name..." class="-full-width-input" focus-when="{{ vm.focusLayoutName }}" />
+            <input ng-if="layout.isSystem !== 1" type="text" ng-model="layout.name" placeholder="Name..." class="-full-width-input" focus-when="{{ vm.focusLayoutName }}" />
             <span ng-if="layout.isSystem === 1" class="list-view-layout__name-text">{{ layout.name }}</span>
             <span ng-if="layout.isSystem === 1" class="list-view-layout__system">(system layout)</span>
          </div>
 
          <div class="list-view-layout__path">
-            <input ng-if="layout.isSystem !== 1" ng-model="layout.path" placeholder="Layout path..." class="-full-width-input" />
+            <input ng-if="layout.isSystem !== 1" type="text" ng-model="layout.path" placeholder="Layout path..." class="-full-width-input" />
          </div>
 
          <div>
