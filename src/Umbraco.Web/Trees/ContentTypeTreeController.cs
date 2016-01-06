@@ -73,7 +73,7 @@ namespace Umbraco.Web.Trees
                 {
                     Id = int.Parse(id),
                     Level = 1,
-                    ParentId = -1,
+                    ParentId = Constants.System.Root,
                     Name = ""
                 }, "documenttypes", "settings");
                 menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
@@ -102,7 +102,7 @@ namespace Umbraco.Web.Trees
                 {
                     Id = int.Parse(id),
                     Level = 1,
-                    ParentId = -1,
+                    ParentId = Constants.System.Root,
                     Name = ""
                 }, "documenttypes", "settings");
                 menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)), true);
