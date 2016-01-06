@@ -64,6 +64,15 @@ namespace Umbraco.Core.Services
 
         private static ICultureDictionary _cultureDictionary;
 
+        /// <summary>
+        /// TODO: We need to refactor how we work with ICultureDictionary - this is supposed to be the 'fast' way to
+        /// do readonly access to the Dictionary without using the ILocalizationService. See TODO Notes in `DefaultCultureDictionary`
+        /// Also NOTE that the ICultureDictionary is based on the ILocalizationService not the ILocalizedTextService (which is used
+        /// only for the localization files - not the dictionary)
+        /// </summary>
+        /// <param name="manager"></param>
+        /// <param name="text"></param>
+        /// <returns></returns>
         internal static string UmbracoDictionaryTranslate(this ILocalizedTextService manager, string text)
         {
             var cultureDictionary = CultureDictionary;
