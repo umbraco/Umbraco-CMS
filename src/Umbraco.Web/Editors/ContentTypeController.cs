@@ -4,15 +4,15 @@ using System.Net;
 using System.Web.Http;
 using AutoMapper;
 using Umbraco.Core.Models;
-using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Services;
 using Umbraco.Core.PropertyEditors;
-using System;
 using System.Net.Http;
-using Umbraco.Core.Services;
+using Umbraco.Core;
+using Umbraco.Web.WebApi;
+using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Editors
 {

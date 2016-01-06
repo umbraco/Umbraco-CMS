@@ -231,7 +231,7 @@ namespace Umbraco.Web.Models.Mapping
                 {
                     Id = groupId,
                     Alias = groupName,
-                    Label = TranslateItem(groupName),
+                    Label = _localizedTextService.UmbracoDictionaryTranslate(groupName),
                     Properties = properties,
                     IsActive = false
                 });
