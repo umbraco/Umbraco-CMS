@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -11,6 +12,13 @@ namespace Umbraco.Tests.PropertyEditors
     [TestFixture]
     public class PropertyEditorValueEditorTests
     {
+        [SetUp]
+        public void Setup()
+        {
+            //normalize culture
+            Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture;
+        }
+
         [TestCase("{prop1: 'val1', prop2: 'val2'}", true)]
         [TestCase("{1,2,3,4}", false)]
         [TestCase("[1,2,3,4]", true)]
