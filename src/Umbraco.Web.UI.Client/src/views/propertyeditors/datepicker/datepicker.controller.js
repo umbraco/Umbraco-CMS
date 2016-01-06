@@ -44,6 +44,7 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
                 $scope.datePickerForm.datepicker.$setValidity("pickerError", true);
                 $scope.hasDatetimePickerValue = true;
                 $scope.datetimePickerValue = e.date.format($scope.model.config.format);
+                $scope.model.value = $scope.datetimePickerValue;
             }
             else {
                 $scope.hasDatetimePickerValue = false;

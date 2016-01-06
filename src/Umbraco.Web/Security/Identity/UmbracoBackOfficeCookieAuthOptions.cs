@@ -90,6 +90,37 @@ namespace Umbraco.Web.Security.Identity
             return cookieOptions;
         }
 
+        /// <summary>
+        /// Creates the cookie options for saving the auth cookie
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <param name="ticket"></param>
+        /// <returns></returns>
+        public CookieOptions CreateRequestCookieOptions(IOwinContext ctx, AuthenticationTicket ticket)
+        {
+            if (ctx == null) throw new ArgumentNullException("ctx");
+            if (ticket == null) throw new ArgumentNullException("ticket");
+
+            var issuedUtc = ticket.Properties.IssuedUtc ?? SystemClock.UtcNow;
+            var expiresUtc = ticket.Properties.ExpiresUtc ?? issuedUtc.Add(ExpireTimeSpan);
+
+            var cookieOptions = new CookieOptions
+            {
+                Path = "/",
+                Domain = this.CookieDomain ?? null,
+                HttpOnly = true,
+                Secure = this.CookieSecure == CookieSecureOption.Always
+                                         || (this.CookieSecure == CookieSecureOption.SameAsRequest && ctx.Request.IsSecure),
+            };
+
+            if (ticket.Properties.IsPersistent)
+            {
+                cookieOptions.Expires = expiresUtc.ToUniversalTime().DateTime;
+            }
+
+            return cookieOptions;
+        }
+
           
     }
 }
