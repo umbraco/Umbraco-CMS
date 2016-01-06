@@ -1,0 +1,101 @@
+.umb-button {
+   position: relative;
+   overflow: hidden;
+}
+
+ .umb-button__button:focus {
+   outline: none;
+}
+
+.umb-button__content {
+   opacity: 1;
+   transition: opacity 0.25s ease;
+
+   display: flex;
+   flex-wrap: wrap;
+}
+
+.umb-button__icon {
+    margin-right: 5px;
+}
+
+.umb-button__content.-hidden {
+   opacity: 0;
+}
+
+.umb-button__progress {
+   position: absolute;
+   left: 50%;
+   top: 50%;
+   width: 14px;
+   height: 14px;
+   margin-left: -9px;
+   margin-top: -9px;
+   z-index: 100;
+   border-radius: 40px;
+   border: 2px solid @btnBorder;
+   border-left-color: @green;
+   opacity: 1;
+   animation: rotating 0.4s linear infinite;
+   transition: opacity 0.25s ease;
+}
+
+.umb-button__progress.-hidden {
+   opacity: 0;
+   z-index: 0;
+}
+
+.umb-button__progress.-white {
+   border-color: rgba(255, 255, 255, 0.4);
+   border-left-color: #ffffff;
+}
+
+.umb-button__success,
+.umb-button__error {
+   position: absolute;
+   top: 50%;
+   left: 50%;
+   z-index: 10;
+   transform: translate(-50%, -50%);
+   opacity: 1;
+   font-size: 20px;
+   color: @green;
+   transition: opacity 0.25s ease;
+}
+
+.umb-button__success {
+   color: @green;
+}
+
+.umb-button__error {
+   color: @red;
+}
+
+.umb-button__success.-hidden,
+.umb-button__error.-hidden {
+   opacity: 0;
+   z-index: 0;
+}
+
+.umb-button__success.-white,
+.umb-button__error.-white {
+   color: #ffffff;
+}
+
+.umb-button__overlay {
+   position: absolute;
+   width: 100%;
+   height: 100%;
+   z-index: 10;
+   background: #ffffff;
+   opacity: 0;
+}
+
+@keyframes rotating {
+   from {
+      transform: rotate(0deg);
+   }
+   to {
+      transform: rotate(360deg);
+   }
+}

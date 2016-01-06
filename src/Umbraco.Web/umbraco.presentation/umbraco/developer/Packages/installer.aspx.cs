@@ -275,6 +275,9 @@ namespace umbraco.presentation.developer.packages
                 case "finished":
                     PerformFinishedAction(packageId, dir, Request.GetItemAsString("customUrl"));
                     break;
+                case "uninstalled":
+                    PerformUninstalledAction();
+                    break;
                 default:
                     break;
             }
@@ -301,6 +304,13 @@ namespace umbraco.presentation.developer.packages
             pane_success.Visible = true;
 
             PerformPostInstallCleanup(packageId, dir);
+        }
+
+        private void PerformUninstalledAction()
+        {
+            HideAllPanes();
+            Panel1.Text = "Package has been uninstalled";
+            pane_uninstalled.Visible = true;
         }
 
         /// <summary>
@@ -743,6 +753,9 @@ namespace umbraco.presentation.developer.packages
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::umbraco.uicontrols.Pane pane_installing;
+
+        protected global::umbraco.uicontrols.Pane pane_uninstalled;
+
 
         /// <summary>
         /// progBar2 control.

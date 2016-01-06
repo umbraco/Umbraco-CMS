@@ -89,6 +89,7 @@
     <key alias="styleChoose">Vælg formattering</key>
     <key alias="styleShow">Vis koder</key>
     <key alias="tableInsert">Indsæt tabel</key>
+    <key alias="generateModels">Generer modeller</key>
   </area>
   <area alias="changeDocType">
     <key alias="changeDocTypeInstruction">For at skifte det valgte indholds dokumenttype, skal du først vælge en ny dokumenttype, som er gyldig på denne placering.</key>
@@ -388,6 +389,7 @@
     <key alias="showPageOnSend">Hvilken side skal vises efter at formularen er sendt</key>
     <key alias="size">Størrelse</key>
     <key alias="sort">Sortér</key>
+    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
     <key alias="type">Type</key>
     <key alias="typeToSearch">Skriv for at søge...</key>
     <key alias="up">Op</key>
@@ -404,6 +406,8 @@
     <key alias="yes">Ja</key>
     <key alias="folder">Mappe</key>
     <key alias="searchResults">Søgeresultater</key>
+    <key alias="reorder">Reorder</key>
+    <key alias="reorderDone">I am done reordering</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Baggrundsfarve</key>
@@ -625,9 +629,15 @@ Mange hilsner fra Umbraco robotten
     <key alias="reset">Nulstil</key>
   </area>
   <area alias="grid">
-    <key alias="insertControl">Indsæt element</key>
-    <key alias="addRows">Tilføj rækker til dit layout</key>
-    <key alias="addElement"><![CDATA[Kom i gang ved at trykke på <i class=" icon icon-add blue"></i> nedenfor og tilføje det første element]]></key>
+    <key alias="insertControl">Vælg indholdstype</key>
+    <key alias="chooseLayout">Vælg layout</key>
+    <key alias="addRows">Tilføj række</key>
+    <key alias="addElement">Tilføj indhold</key>
+    <key alias="dropElement">Slip indhold</key>
+    <key alias="settingsApplied">Instillinger tilføjet</key>
+
+    <key alias="contentNotAllowed">Indholdet er ikke tilladt her</key>
+    <key alias="contentAllowed">Indholdet er tilladt her</key>
 
     <key alias="clickToEmbed">Klik for at indlejre</key>
     <key alias="clickToInsertImage">Klik for at indsætte et billede</key>
@@ -851,7 +861,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="cacheBrowser">Cacheviser</key>
     <key alias="contentRecycleBin">Papirkurv</key>
     <key alias="createdPackages">Oprettede pakker</key>
-    <key alias="datatype">Datatyper</key>
+    <key alias="dataTypes">Datatyper</key>
     <key alias="dictionary">Ordbog</key>
     <key alias="installedPackages">Installerede pakker</key>
     <key alias="installSkin">Installér et skin'</key>
@@ -861,10 +871,12 @@ Mange hilsner fra Umbraco robotten
     <key alias="macros">Makroer</key>
     <key alias="mediaTypes">Medietyper</key>
     <key alias="member">Medlemmer</key>
-    <key alias="memberGroup">Medlemsgruppe</key>
+    <key alias="memberGroups">Medlemsgruppe</key>
     <key alias="memberRoles">Roller</key>
-    <key alias="memberType">Medlemstype</key>
-    <key alias="nodeTypes">Dokumenttyper</key>
+    <key alias="memberTypes">Medlemstype</key>
+    <key alias="documentTypes">Dokumenttyper</key>
+    <key alias="relationTypes">Dokumenttyper</key>
+
     <key alias="packager">Pakker</key>
     <key alias="packages">Pakker</key>
     <key alias="python">Python</key>
@@ -872,7 +884,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="runway">Installer Runway</key>
     <key alias="runwayModules">Runway-moduler</key>
     <key alias="scripting">Scripting filer</key>
-    <key alias="scripts">Script</key>
+    <key alias="scripts">Scripts</key>
     <key alias="stylesheets">Stylesheets</key>
     <key alias="templates">Skabeloner</key>
     <key alias="xslt">XSLT-filer</key>

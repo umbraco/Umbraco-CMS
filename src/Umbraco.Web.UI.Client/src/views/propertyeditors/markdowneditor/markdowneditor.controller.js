@@ -8,6 +8,28 @@ function MarkdownEditorController($scope, assetsService, dialogService, $timeout
         $scope.model.value = $scope.model.config.defaultValue;
     }
 
+    function openMediaPicker(callback) {
+
+      $scope.mediaPickerOverlay = {};
+      $scope.mediaPickerOverlay.view = "mediaPicker";
+      $scope.mediaPickerOverlay.show = true;
+
+      $scope.mediaPickerOverlay.submit = function(model) {
+
+          var selectedImagePath = model.selectedImages[0].image;
+          callback(selectedImagePath);
+
+          $scope.mediaPickerOverlay.show = false;
+          $scope.mediaPickerOverlay = null;
+      };
+
+      $scope.mediaPickerOverlay.close = function(model) {
+          $scope.mediaPickerOverlay.show = false;
+          $scope.mediaPickerOverlay = null;
+      };
+
+    }
+
     assetsService
         .load([
             "lib/markdown/markdown.converter.js",
@@ -29,15 +51,10 @@ function MarkdownEditorController($scope, assetsService, dialogService, $timeout
 
                     //subscribe to the image dialog clicks
                     editor2.hooks.set("insertImageDialog", function (callback) {
-
-                        dialogService.mediaPicker({
-                            callback: function (data) {
-                                callback(data.image);
-                            }
-                        });
-
+                        openMediaPicker(callback);
                         return true; // tell the editor that we'll take care of getting the image url
                     });
+
                 }, 200);
             });
 

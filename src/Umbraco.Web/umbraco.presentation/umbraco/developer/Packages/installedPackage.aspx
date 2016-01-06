@@ -31,9 +31,6 @@
     <cc2:Tabview ID="Panel1" Text="Installed package" runat="server" Width="496px" Height="584px">
 
 
-       
-
-
             <cc2:Pane ID="pane_meta" runat="server" Text="Package meta data">
 
                 <cc2:PropertyPanel ID="pp_name" runat="server">
@@ -145,12 +142,39 @@
                     </p>
                 </cc2:PropertyPanel>
             </cc2:Pane>
-
+            
             <cc2:Pane id="pane_uninstalled" runat="server" Visible="false">
-                <div style="margin: 10px;">
-                    <p><%= umbraco.ui.Text("packager", "packageUninstalledText") %></p>
+
+                <div class="alert alert-block">
+                    Please wait while the browser is reloaded...
                 </div>
+
+                <script type="text/javascript">
+                    
+                    //This is all a bit zany with double encoding because we have a URL in a hash (#) url part
+                    // but it works and maintains query strings
+
+                    var umbPath = "<%=GlobalSettings.Path%>";
+                    setTimeout(function () {
+                        var mainWindow = UmbClientMgr.mainWindow();
+
+                        //kill the tree and template cache
+                        if (mainWindow.UmbClientMgr) {
+                            mainWindow.UmbClientMgr._packageInstalled();
+                        }
+
+                        var baseUrl = mainWindow.location.href.substr(0, mainWindow.location.href.indexOf("#/developer/framed/"));
+                        var framedUrl = baseUrl + "#/developer/framed/";
+                        var refreshUrl = framedUrl + encodeURIComponent(encodeURIComponent(umbPath + "/developer/packages/installer.aspx?installing=uninstalled"));
+
+                        var redirectUrl = umbPath + "/ClientRedirect.aspx?redirectUrl=" + refreshUrl;
+
+                        mainWindow.location.href = redirectUrl;
+                    }, 2000);
+                </script>
+
+               
              </cc2:Pane>
-            </cc2:Pane>
+        </cc2:Pane>
     </cc2:Tabview>
 </asp:Content>

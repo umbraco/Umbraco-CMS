@@ -1,0 +1,27 @@
+<form ng-controller="Umbraco.Overlays.EmbedOverlay as vm">
+
+   <umb-control-group label="Url">
+       <input id="url" class="umb-editor input-block-level" type="text" style="margin-bottom: 10px;" ng-model="model.embed.url" ng-keyup="$event.keyCode == 13 ? vm.showPreview() : null" required />
+       <input type="button" ng-click="vm.showPreview()" class="btn" value="Retrieve" />
+   </umb-control-group>
+
+   <umb-control-group>
+      <p ng-bind="model.embed.info"></p>
+      <div ng-bind-html-unsafe="model.embed.preview"></div>
+   </umb-control-group>
+
+   <div ng-show="model.embed.supportsDimensions">
+       <umb-control-group label="Width">
+           <input type="text" ng-model="model.embed.width" on-blur="vm.changeSize('width')" />
+       </umb-control-group>
+
+       <umb-control-group label="Height">
+          <input type="text" ng-model="model.embed.height" on-blur="vm.changeSize('height')" />
+       </umb-control-group>
+
+       <umb-control-group label="Constrain:">
+          <input id="constrain" type="checkbox" ng-model="model.embed.constrain" />
+       </umb-control-group>
+   </div>
+
+</form>

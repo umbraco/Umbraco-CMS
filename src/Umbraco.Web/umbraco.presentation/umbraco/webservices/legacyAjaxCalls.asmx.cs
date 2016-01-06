@@ -68,7 +68,7 @@ namespace umbraco.presentation.webservices
 
             //check which parameters to pass depending on the types passed in
             int intNodeId;
-            if (nodeType == "memberGroup")
+            if (nodeType == "memberGroups")
             {
                  LegacyDialogHandler.Delete(
                     new HttpContextWrapper(HttpContext.Current),

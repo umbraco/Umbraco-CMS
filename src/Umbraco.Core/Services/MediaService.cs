@@ -402,12 +402,8 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateMediaRepository(UowProvider.GetUnitOfWork()))
             {
                 var query = Query<IMedia>.Builder;
-                //if the id is -1, then just get all
-                if (id != -1)
-                {
-                    query.Where(x => x.ParentId == id);
-                }
-
+                query.Where(x => x.ParentId == id);
+                
                 long total;
                 var medias = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out total, orderBy, orderDirection, filter);
 
@@ -435,11 +431,8 @@ namespace Umbraco.Core.Services
             using (var repository = RepositoryFactory.CreateMediaRepository(UowProvider.GetUnitOfWork()))
             {
                 var query = Query<IMedia>.Builder;
-                //if the id is -1, then just get all
-                if (id != -1)
-                {
-                    query.Where(x => x.ParentId == id);
-                }
+                query.Where(x => x.ParentId == id);
+                
                 var medias = repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, filter);
 
                 return medias;

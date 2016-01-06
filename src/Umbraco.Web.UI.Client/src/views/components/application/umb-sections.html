@@ -1,0 +1,62 @@
+<div>
+    <div id="applications" ng-class="{faded:stickyNavigation}"> 
+        <ul class="sections">
+            <li class="avatar">
+                <a href="#" ng-click="avatarClick()" hotkey="ctrl+shift+u" title="{{user.name}}" prevent-default>
+                    <img id="avatar-img" ng-src="{{avatar[0].value}}" ng-srcset="{{avatar[1].value}} 2x, {{avatar[2].value}} 3x" />
+                </a>
+            </li>
+            <li ng-repeat="section in sections | limitTo: maxSections" ng-class="{current: section.alias == currentSection}">
+                <a href="#/{{section.alias}}"
+                   ng-dblclick="sectionDblClick(section)"
+                   ng-click="sectionClick($event, section)"
+                   prevent-default>
+                    <section-icon icon="{{section.cssclass}}"></section-icon>  
+                    <span>{{section.name}}</span>
+                </a>
+            </li>
+            
+            <li class="expand" ng-class="{ 'open': showTray === true }" ng-show="needTray">
+                <a href ng-click="trayClick()">
+                    <i class="icon icon-arrow-right"></i>
+                </a>
+            </li>
+
+            <li class="help">
+                <a href class="help" hotkey="ctrl+shift+h" ng-click="helpClick()" prevent-default>
+                    <i class="icon-help-alt"></i>
+                    <span><localize key="sections_help">Help</localize></span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div id="applications-tray" ng-show="showTray" ng-animate="trayAnimation()">
+        <ul class="sections sections-tray">
+            <li ng-repeat="section in sections | limitTo: overflowingSections" ng-class="{current: section.alias == currentSection}">
+                <a href="#/{{section.alias}}"
+                   ng-dblclick="sectionDblClick(section)"
+                   ng-click="sectionClick($event, section)"
+                   prevent-default>
+                    <section-icon icon="{{section.cssclass}}"></section-icon>
+                    <span>{{section.name}}</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <umb-overlay
+      ng-if="helpDialog.show"
+      model="helpDialog"
+      view="helpDialog.view"
+      position="left">
+    </umb-overlay>
+
+    <umb-overlay
+      ng-if="userDialog.show"
+      model="userDialog"
+      view="userDialog.view"
+      position="left">
+    </umb-overlay>
+
+</div>

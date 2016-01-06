@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AutoMapper;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -16,9 +17,11 @@ using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
+    [RequiresAutoMapperMappings]
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
     public class ContentTypeRepositoryTest : BaseDatabaseFactoryTest
@@ -51,6 +54,17 @@ namespace Umbraco.Tests.Persistence.Repositories
             var templateRepository = new TemplateRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
             var contentTypeRepository = new ContentTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, templateRepository);
             return contentTypeRepository;
+        }
+
+        private MediaTypeRepository CreateMediaTypeRepository(IDatabaseUnitOfWork unitOfWork)
+        {
+            var contentTypeRepository = new MediaTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
+            return contentTypeRepository;
+        }
+
+        private EntityContainerRepository CreateContainerRepository(IDatabaseUnitOfWork unitOfWork)
+        {
+            return new EntityContainerRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
         }
 
         //TODO Add test to verify SetDefaultTemplates updates both AllowedTemplates and DefaultTemplate(id).
@@ -93,6 +107,153 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Can_Move()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var containerRepository = CreateContainerRepository(unitOfWork))
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var container1 = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid) { Name = "blah1" };
+                containerRepository.AddOrUpdate(container1);
+                unitOfWork.Commit();
+
+                var container2 = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid) { Name = "blah2", ParentId = container1.Id };
+                containerRepository.AddOrUpdate(container2);
+                unitOfWork.Commit();
+
+                var contentType = (IContentType) MockedContentTypes.CreateBasicContentType("asdfasdf");
+                contentType.ParentId = container2.Id;
+                repository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
+
+                //create a 
+                var contentType2 = (IContentType)new ContentType(contentType, "hello")
+                {
+                    Name = "Blahasdfsadf"
+                };
+                contentType.ParentId = contentType.Id;
+                repository.AddOrUpdate(contentType2);
+                unitOfWork.Commit();
+
+                var result = repository.Move(contentType, container1).ToArray();
+                unitOfWork.Commit();
+
+                Assert.AreEqual(2, result.Count());
+
+                //re-get
+                contentType = repository.Get(contentType.Id);
+                contentType2 = repository.Get(contentType2.Id);
+
+                Assert.AreEqual(container1.Id, contentType.ParentId);
+                Assert.AreNotEqual(result.Single(x => x.Entity.Id == contentType.Id).OriginalPath, contentType.Path);
+                Assert.AreNotEqual(result.Single(x => x.Entity.Id == contentType2.Id).OriginalPath, contentType2.Path);
+            }
+
+        }
+
+        [Test]
+        public void Can_Create_Container()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            EntityContainer container;
+            using (var containerRepository = CreateContainerRepository(unitOfWork))
+            {
+                container = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid) { Name = "blah" };
+                containerRepository.AddOrUpdate(container);
+                unitOfWork.Commit();
+                Assert.That(container.Id, Is.GreaterThan(0));
+            }
+            using (var containerRepository = CreateContainerRepository(unitOfWork))
+            {
+                var found = containerRepository.Get(container.Id);
+                Assert.IsNotNull(found);
+            }
+        }
+
+        [Test]
+        public void Can_Delete_Container()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            EntityContainer container;
+            using (var containerRepository = CreateContainerRepository(unitOfWork))
+            {
+                container = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid) { Name = "blah" };
+                containerRepository.AddOrUpdate(container);
+                unitOfWork.Commit();
+            }
+            using (var containerRepository = CreateContainerRepository(unitOfWork))
+            {
+                // Act
+                containerRepository.Delete(container);
+                unitOfWork.Commit();
+            }
+            using (var containerRepository = CreateContainerRepository(unitOfWork))
+            {
+                var found = containerRepository.Get(container.Id);
+                Assert.IsNull(found);
+            }
+        }
+
+        [Test]
+        public void Can_Create_Container_Containing_Media_Types()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var containerRepository = CreateContainerRepository(unitOfWork))
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var container = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah" };
+                containerRepository.AddOrUpdate(container);
+                unitOfWork.Commit();
+
+                var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test", propertyGroupName: "testGroup");
+                contentType.ParentId = container.Id;
+                repository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
+
+                Assert.AreEqual(container.Id, contentType.ParentId);
+            }
+        }
+
+        [Test]
+        public void Can_Delete_Container_Containing_Media_Types()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            EntityContainer container;
+            IMediaType contentType;
+            using (var containerRepository = CreateContainerRepository(unitOfWork))
+            using (var repository = CreateMediaTypeRepository(unitOfWork))
+            {
+                container = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah" };
+                containerRepository.AddOrUpdate(container);
+                unitOfWork.Commit();
+
+                contentType = MockedContentTypes.CreateSimpleMediaType("test", "Test", propertyGroupName: "testGroup");
+                contentType.ParentId = container.Id;
+                repository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
+            }
+            using (var containerRepository = CreateContainerRepository(unitOfWork))
+            using (var repository = CreateMediaTypeRepository(unitOfWork))
+            {
+                // Act
+                containerRepository.Delete(container);
+                unitOfWork.Commit();
+
+                var found = containerRepository.Get(container.Id);
+                Assert.IsNull(found);
+
+                contentType = repository.Get(contentType.Id);
+                Assert.IsNotNull(contentType);
+                Assert.AreEqual(-1, contentType.ParentId);
+            }
+        }
+
+        [Test]
         public void Can_Perform_Add_On_ContentTypeRepository()
         {
             // Arrange
@@ -101,22 +262,63 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork))
             {
                 // Act
-                var contentType = MockedContentTypes.CreateSimpleContentType();
+                var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test", propertyGroupName: "testGroup");
                 repository.AddOrUpdate(contentType);
                 unitOfWork.Commit();
 
                 // Assert
                 Assert.That(contentType.HasIdentity, Is.True);
                 Assert.That(contentType.PropertyGroups.All(x => x.HasIdentity), Is.True);
+                Assert.That(contentType.PropertyTypes.All(x => x.HasIdentity), Is.True);
                 Assert.That(contentType.Path.Contains(","), Is.True);
                 Assert.That(contentType.SortOrder, Is.GreaterThan(0));
+
+                Assert.That(contentType.PropertyGroups.ElementAt(0).Name == "testGroup", Is.True);
+                var groupId = contentType.PropertyGroups.ElementAt(0).Id;
+                Assert.That(contentType.PropertyTypes.All(x => x.PropertyGroupId.Value == groupId), Is.True);
 
                 foreach (var propertyType in contentType.PropertyTypes)
                 {
                     Assert.AreNotEqual(propertyType.Key, Guid.Empty);
                 }
             }
-            
+        }
+
+        [Test]
+        public void Can_Perform_Add_On_ContentTypeRepository_After_Model_Mapping()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                // Act
+                var contentType = (IContentType)MockedContentTypes.CreateSimpleContentType("test", "Test", propertyGroupName: "testGroup");
+
+                // there is NO mapping from display to contentType, but only from save
+                // to contentType, so if we want to test, let's to it properly!
+                var display = Mapper.Map<ContentTypeDisplay>(contentType);
+                var save = MapToContentTypeSave(display);
+                var mapped = Mapper.Map<IContentType>(save);
+
+                repository.AddOrUpdate(mapped);
+                unitOfWork.Commit();
+
+                //re-get
+                contentType = repository.Get(mapped.Id);
+
+                // Assert
+                Assert.That(contentType.HasIdentity, Is.True);
+                Assert.That(contentType.PropertyGroups.All(x => x.HasIdentity), Is.True);
+                Assert.That(contentType.PropertyTypes.All(x => x.HasIdentity), Is.True);
+                Assert.That(contentType.Path.Contains(","), Is.True);
+                Assert.That(contentType.SortOrder, Is.GreaterThan(0));
+
+                Assert.That(contentType.PropertyGroups.ElementAt(0).Name == "testGroup", Is.True);
+                var groupId = contentType.PropertyGroups.ElementAt(0).Id;
+                Assert.That(contentType.PropertyTypes.All(x => x.PropertyGroupId.Value == groupId), Is.True);
+            }
+
         }
 
         [Test]
@@ -152,6 +354,110 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
 
             
+        }
+
+        // this is for tests only because it makes no sense at all to have such a
+        // mapping defined, we only need it for the weird tests that use it
+        private ContentTypeSave MapToContentTypeSave(ContentTypeDisplay display)
+        {
+            return new ContentTypeSave
+            {
+                // EntityBasic
+                Name = display.Name,
+                Icon = display.Icon,
+                Trashed = display.Trashed,
+                Key = display.Key,
+                ParentId = display.ParentId,
+                //Alias = display.Alias,
+                Path = display.Path,
+                //AdditionalData = display.AdditionalData,
+
+                // ContentTypeBasic
+                Alias = display.Alias,
+                UpdateDate = display.UpdateDate,
+                CreateDate = display.CreateDate,
+                Description = display.Description,
+                Thumbnail = display.Thumbnail,
+
+                // ContentTypeSave
+                CompositeContentTypes = display.CompositeContentTypes,
+                IsContainer = display.IsContainer,
+                AllowAsRoot = display.AllowAsRoot,
+                AllowedTemplates = display.AllowedTemplates.Select(x => x.Alias),
+                AllowedContentTypes = display.AllowedContentTypes,
+                DefaultTemplate = display.DefaultTemplate == null ? null : display.DefaultTemplate.Alias,
+                Groups = display.Groups.Select(x => new PropertyGroupBasic<PropertyTypeBasic>
+                {
+                    Inherited = x.Inherited,
+                    Id = x.Id,
+                    Properties = x.Properties,
+                    SortOrder = x.SortOrder,
+                    Name = x.Name
+                }).ToArray()
+            };
+        }
+
+        [Test]
+        public void Can_Perform_Update_On_ContentTypeRepository_After_Model_Mapping()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                // Act
+                var contentType = repository.Get(NodeDto.NodeIdSeed + 1);
+
+                // there is NO mapping from display to contentType, but only from save
+                // to contentType, so if we want to test, let's to it properly!
+                var display = Mapper.Map<ContentTypeDisplay>(contentType);
+                var save = MapToContentTypeSave(display);
+
+                // modify...
+                save.Thumbnail = "Doc2.png";
+                var contentGroup = save.Groups.Single(x => x.Name == "Content");
+                contentGroup.Properties = contentGroup.Properties.Concat(new[]
+                {
+                    new PropertyTypeBasic
+                    {
+                        Alias = "subtitle",
+                        Label = "Subtitle",
+                        Description = "Optional Subtitle",
+                        Validation = new PropertyTypeValidation
+                        {
+                            Mandatory = false,
+                            Pattern = ""
+                        },
+                        SortOrder = 1,
+                        DataTypeId = -88
+                    }
+                });
+
+                var mapped = Mapper.Map(save, contentType);
+
+                // just making sure
+                Assert.AreEqual(mapped.Thumbnail, "Doc2.png");
+                Assert.IsTrue(mapped.PropertyTypes.Any(x => x.Alias == "subtitle"));
+
+                repository.AddOrUpdate(mapped);
+                unitOfWork.Commit();
+
+                var dirty = mapped.IsDirty();
+
+                //re-get
+                contentType = repository.Get(NodeDto.NodeIdSeed + 1);
+
+                // Assert
+                Assert.That(contentType.HasIdentity, Is.True);
+                Assert.That(dirty, Is.False);
+                Assert.That(contentType.Thumbnail, Is.EqualTo("Doc2.png"));
+                Assert.That(contentType.PropertyTypes.Any(x => x.Alias == "subtitle"), Is.True);
+                foreach (var propertyType in contentType.PropertyTypes)
+                {
+                    Assert.IsTrue(propertyType.HasIdentity);
+                    Assert.Greater(propertyType.Id, 0);
+                }
+            }
         }
 
         [Test]

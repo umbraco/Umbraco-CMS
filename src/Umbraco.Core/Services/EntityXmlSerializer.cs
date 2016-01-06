@@ -381,8 +381,9 @@ namespace Umbraco.Core.Services
                                                    new XElement("Tab", propertyGroup == null ? "" : propertyGroup.Name),
                                                    new XElement("SortOrder", propertyType.SortOrder),
                                                    new XElement("Mandatory", propertyType.Mandatory.ToString()),
-                                                   new XElement("Validation", propertyType.ValidationRegExp),
-                                                   new XElement("Description", new XCData(propertyType.Description)));
+                                                   propertyType.ValidationRegExp != null ? new XElement("Validation", propertyType.ValidationRegExp) : null,
+                                                   propertyType.Description != null ? new XElement("Description", new XCData(propertyType.Description)) : null);
+                
                 genericProperties.Add(genericProperty);
             }
 

@@ -34,11 +34,6 @@ h5{
   margin-top: 15px;
 }
 
-
-
-
-
-
 /* MISC FORM ELEMENTS */
 .umb-form-actions {
     background: none;
@@ -106,6 +101,11 @@ h5{
   margin-bottom: 15px !important;
 }
 
+.umb-control-group.-no-border {
+  border: none;
+}
+
+
 /*COMPACT MODE */
 .compact .umb-pane{margin: 0px 0px 15px 0px;}
 .compact .umb-control-group {
@@ -157,7 +157,12 @@ h5{
   display: inline-block
 }
 
-.hidelabel > div > .controls-row, .hidelabel > .controls-row  {
+.block-form .controls-row {
+   margin-left: 0;
+   padding-top: 0;
+}
+
+.hidelabel > div > .controls-row, .hidelabel > .controls-row, .hidelabel .controls {
   padding: 0px;
   border: none;
   margin: 0px !important;
@@ -192,30 +197,9 @@ h5{
   left: 2px
 }
 
-.umb-dashboard-control a{text-decoration: underline;}
-
 .umb-dashboard-control
   iframe{ position: absolute; display: block; width: 99%; height: 99%; overflow: auto !important;}
 
-
-/* NOTIFICATIONS */
-.umb-notification ul {
-  list-style: none;
-  margin: 0;
-  padding-left: 100px;
-  padding-right: 20px;
-  position: relative;
-}
-.umb-notification li {
-  padding: 5px 30px 5px 20px;
-  text-shadow: none;
-  font-size: 12px;
-  margin: auto;
-  margin-top: 5px;
-  border: none;
-  border-radius: 5;
-  position: relative;
-}
 
 /* TABLE */
 .umb-table {
@@ -532,6 +516,9 @@ height:1px;
 
 }
 
+.umb-loader-wrapper.-bottom {
+	bottom: 0;
+}
 
 // Helpers
 
@@ -586,4 +573,13 @@ input[type=checkbox]:checked + .input-label--small {
 	font-size: @fontSizeLarge;
 	font-weight: bold;
 	line-height: 20px;
+}
+
+
+// Datepicker styles
+.bootstrap-datetimepicker-widget,
+.bootstrap-datetimepicker-widget td,
+.bootstrap-datetimepicker-widget th,
+.bootstrap-datetimepicker-widget td span {
+	border-radius: 0 !important;
 }

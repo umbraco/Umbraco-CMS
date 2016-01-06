@@ -35,7 +35,7 @@ namespace Umbraco.Web.Security.Identity
             if (useLegacyFormsAuthDataFormat)
             {
                 //If this is not explicitly set it will fall back to the default automatically
-                TicketDataFormat = new FormsAuthenticationSecureDataFormat(loginTimeoutMinutes);
+                TicketDataFormat = new FormsAuthenticationSecureDataFormat(LoginTimeoutMinutes);
             }
 
             SlidingExpiration = true;
@@ -89,7 +89,6 @@ namespace Umbraco.Web.Security.Identity
 
             return cookieOptions;
         }
-
           
     }
 }

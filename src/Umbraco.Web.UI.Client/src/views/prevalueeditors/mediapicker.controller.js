@@ -13,25 +13,38 @@ function mediaPickerController($scope, dialogService, entityResource, $log, icon
         multiPicker: false,
         entityType: "Media",
         section: "media",
-        treeAlias: "media",
-        callback: function(data) {
-            if (angular.isArray(data)) {
-                _.each(data, function (item, i) {
-                    $scope.add(item);
-                });
-            }
-            else {
-                $scope.clear();
-                $scope.add(data);
-            }
-        }
+        treeAlias: "media"
     };
 
-    $scope.openContentPicker = function(){
-        var d = dialogService.treePicker(dialogOptions);
-    };
+    $scope.openContentPicker = function() {
+      $scope.contentPickerOverlay = dialogOptions;
+      $scope.contentPickerOverlay.view = "treePicker";
+      $scope.contentPickerOverlay.show = true;
 
-    $scope.remove =function(index){
+      $scope.contentPickerOverlay.submit = function(model) {
+
+         if ($scope.contentPickerOverlay.multiPicker) {
+             _.each(model.selection, function (item, i) {
+                 $scope.add(item);
+             });
+         }
+         else {
+             $scope.clear();
+             $scope.add(model.selection[0]);
+         }
+
+         $scope.contentPickerOverlay.show = false;
+         $scope.contentPickerOverlay = null;
+      };
+
+      $scope.contentPickerOverlay.close = function(oldModel) {
+         $scope.contentPickerOverlay.show = false;
+         $scope.contentPickerOverlay = null;
+      };
+    }
+
+    $scope.remove =function(index, event){
+        event.preventDefault();
         $scope.renderModel.splice(index, 1);
     };
 
