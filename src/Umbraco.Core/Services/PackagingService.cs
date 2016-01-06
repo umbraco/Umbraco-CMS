@@ -653,7 +653,9 @@ namespace Umbraco.Core.Services
                 }
 
                 var sortOrder = 0;
-                int.TryParse(property.Element("SortOrder").Value, out sortOrder);
+                var sortOrderElement = property.Element("SortOrder");
+                if (sortOrderElement != null)
+                    int.TryParse(sortOrderElement.Value, out sortOrder);
                 var propertyType = new PropertyType(dataTypeDefinition, property.Element("Alias").Value)
                                        {
                                            Name = property.Element("Name").Value,
