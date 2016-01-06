@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Collections;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 
@@ -173,7 +174,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 TEntity[] allEntities;
                 if (RepositoryCacheOptions.GetAllCacheAsCollection)
                 {
-                    var found = RuntimeCache.GetCacheItem<List<TEntity>>(GetCacheTypeKey<TEntity>());
+                    var found = RuntimeCache.GetCacheItem<DeepCloneableList<TEntity>>(GetCacheTypeKey<TEntity>());
                     allEntities = found == null ? new TEntity[] {} : found.WhereNotNull().ToArray();
                 }
                 else
@@ -229,7 +230,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (RepositoryCacheOptions.GetAllCacheAsCollection)
             {
                 //when this is true, we don't want to cache each item individually, we want to cache the result as a single collection
-                RuntimeCache.InsertCacheItem(GetCacheTypeKey<TEntity>(), () => entityCollection.ToList());
+                RuntimeCache.InsertCacheItem(GetCacheTypeKey<TEntity>(), () => new DeepCloneableList<TEntity>(entityCollection));
                 return entityCollection;
             }
             

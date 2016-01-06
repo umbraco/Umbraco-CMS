@@ -1,5 +1,6 @@
 using Umbraco.Core.Configuration;
 using System;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
