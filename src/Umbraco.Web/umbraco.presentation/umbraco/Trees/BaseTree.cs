@@ -500,7 +500,7 @@ namespace umbraco.cms.presentation.Trees
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         protected virtual void OnBeforeNodeRender(ref XmlTree sender, ref XmlTreeNode node, EventArgs e)
         {
-            if (node != null && node != null)
+            if (sender != null && node != null)
             {
                 if (BeforeNodeRender != null)
                     BeforeNodeRender(ref sender, ref node, e);    
