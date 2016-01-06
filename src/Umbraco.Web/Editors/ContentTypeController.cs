@@ -1,18 +1,14 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Web.Http;
 using AutoMapper;
-using Umbraco.Core;
-using Umbraco.Core.Dictionary;
 using Umbraco.Core.Models;
+using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.WebApi;
-using System.Linq;
-using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
-using Newtonsoft.Json;
+using Umbraco.Core.Services;
 using Umbraco.Core.PropertyEditors;
 using System;
 using System.Net.Http;
@@ -248,10 +244,11 @@ namespace Umbraco.Web.Editors
 
             var basics = types.Select(Mapper.Map<IContentType, ContentTypeBasic>).ToList();
 
+            var localizedTextService = Services.TextService;
             foreach (var basic in basics)
             {
-                basic.Name = TranslateItem(basic.Name);
-                basic.Description = TranslateItem(basic.Description);
+                basic.Name = localizedTextService.UmbracoDictionaryTranslate(basic.Name);
+                basic.Description = localizedTextService.UmbracoDictionaryTranslate(basic.Description);
             }
 
             return basics;

@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -242,16 +241,14 @@ namespace Umbraco.Core
 			    else if (destinationType == typeof(Double))
 			    {
 			        Double value;
-                    var currentUiCulture = System.Threading.Thread.CurrentThread.CurrentUICulture;
-                    var input2 = NormalizeNumberDecimalSeparator(input);
-			        return Double.TryParse(input2, NumberStyles.Float | NumberStyles.AllowThousands, currentUiCulture, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+			        var input2 = NormalizeNumberDecimalSeparator(input);
+			        return Double.TryParse(input2, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
 			    }
 			    else if (destinationType == typeof(Single))
 			    {
 			        Single value;
-                    var currentUiCulture = System.Threading.Thread.CurrentThread.CurrentUICulture;
                     var input2 = NormalizeNumberDecimalSeparator(input);
-                    return Single.TryParse(input2, NumberStyles.Float | NumberStyles.AllowThousands, currentUiCulture, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+                    return Single.TryParse(input2, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
 			    }
 			    else if (destinationType == typeof(Char))
 			    {
@@ -320,9 +317,8 @@ namespace Umbraco.Core
 			else if (destinationType == typeof(Decimal))
 			{
 				Decimal value;
-			    var currentUiCulture = System.Threading.Thread.CurrentThread.CurrentUICulture;
                 var input2 = NormalizeNumberDecimalSeparator(input);
-                return Decimal.TryParse(input2, NumberStyles.Number, currentUiCulture, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+                return Decimal.TryParse(input2, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
 			}
 			else if (destinationType == typeof(Version))
 			{
@@ -338,7 +334,7 @@ namespace Umbraco.Core
 
 	    private static string NormalizeNumberDecimalSeparator(string s)
 	    {
-	        var normalized = System.Threading.Thread.CurrentThread.CurrentUICulture.NumberFormat.NumberDecimalSeparator[0];
+	        var normalized = System.Threading.Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator[0];
             return s.ReplaceMany(NumberDecimalSeparatorsToNormalize, normalized);
 	    }
 
