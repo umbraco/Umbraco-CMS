@@ -30,7 +30,7 @@ namespace Umbraco.Core.Persistence.Factories
         {
             var text = new LanguageTextDto
                            {
-                               LanguageId = entity.Language.Id,
+                               LanguageId = entity.LanguageId,
                                UniqueId = _uniqueId,
                                Value = entity.Value
                            };

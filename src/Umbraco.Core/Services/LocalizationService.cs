@@ -376,7 +376,6 @@ namespace Umbraco.Core.Services
         /// </summary>
         private void EnsureDictionaryItemLanguageCallback(IDictionaryItem d)
         {
-            if (d == null) throw new ArgumentNullException("d");
             var item = d as DictionaryItem;
             if (item == null) return;
 

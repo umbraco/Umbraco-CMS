@@ -223,7 +223,10 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var list = new List<IDictionaryTranslation>();
             foreach (var textDto in dto.LanguageTextDtos)
-            {
+            {                
+                if (textDto.LanguageId <= 0)
+                    continue;
+
                 var translationFactory = new DictionaryTranslationFactory(dto.UniqueId);
                 list.Add(translationFactory.BuildEntity(textDto));
             }

@@ -318,12 +318,12 @@ namespace Umbraco.Tests.Persistence.Repositories
             repository.AddOrUpdate(item);
             unitOfWork.Commit();
 
-            var dictionaryItem = repository.Get(1);
-
+            var dictionaryItem = (DictionaryItem)repository.Get(1);
+            
             // Assert
             Assert.That(dictionaryItem, Is.Not.Null);
             Assert.That(dictionaryItem.Translations.Count(), Is.EqualTo(3));
-            Assert.That(dictionaryItem.Translations.Single(t => t.Language.IsoCode == "nb-NO").Value, Is.EqualTo("Les mer"));
+            Assert.That(dictionaryItem.Translations.Single(t => t.LanguageId == languageNo.Id).Value, Is.EqualTo("Les mer"));
         }
 
         [Test]
