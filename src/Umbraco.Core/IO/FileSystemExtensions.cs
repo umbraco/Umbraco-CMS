@@ -39,13 +39,19 @@ namespace Umbraco.Core.IO
 
         public static long GetSize(this IFileSystem fs, string path)
         {
+            // no idea why GetSize is not part of IFileSystem, but
+            // for physical file system we have way better & faster ways
+            // to get the size, than to read the entire thing in memory!
+            var physical = fs as PhysicalFileSystem;
+            if (physical != null)
+                return physical.GetSize(path);
+
+            // other filesystems... bah...
             using (var file = fs.OpenFile(path))
+            using (var sr = new StreamReader(file))
             {
-                using (var sr = new StreamReader(file))
-                {
-                    var str = sr.ReadToEnd();
-                    return str.Length;
-                }
+                var str = sr.ReadToEnd();
+                return str.Length;
             }
         }
 

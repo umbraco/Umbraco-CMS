@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -54,5 +55,19 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="template"><see cref="ITemplate"/> to validate</param>
         /// <returns>True if Script is valid, otherwise false</returns>
         bool ValidateTemplate(ITemplate template);
+
+        /// <summary>
+        /// Gets the content of a template as a stream.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the template.</param>
+        /// <returns>The content of the template.</returns>
+        Stream GetFileStream(string filepath);
+
+        /// <summary>
+        /// Sets the content of a template.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the template.</param>
+        /// <param name="content">The content of the template.</param>
+        void SetFile(string filepath, Stream content);
     }
 }

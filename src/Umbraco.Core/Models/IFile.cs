@@ -40,6 +40,14 @@ namespace Umbraco.Core.Models
         string Content { get; set; }
 
         /// <summary>
+        /// Indicates that the file should use whatever content already
+        /// exists on the filesystem which manages the file, bypassing content
+        /// management entirely.
+        /// </summary>
+        /// <remarks>Only for the next save. Is resetted when the file is saved.</remarks>
+        void UseExistingContent();
+
+        /// <summary>
         /// Gets or sets the file's virtual path (i.e. the file path relative to the root of the website)
         /// </summary>
         string VirtualPath { get; set; }

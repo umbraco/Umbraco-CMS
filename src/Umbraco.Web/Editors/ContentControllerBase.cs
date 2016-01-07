@@ -100,6 +100,9 @@ namespace Umbraco.Web.Editors
                 if (files.Any())
                 {
                     d.Add("files", files);
+                    // add extra things needed to figure out where to put the files
+                    d.Add("cuid", contentItem.PersistedContent.Key);
+                    d.Add("puid", dboProperty.PropertyType.Key);
                 }
                 var data = new ContentPropertyData(p.Value, p.PreValues, d);
 

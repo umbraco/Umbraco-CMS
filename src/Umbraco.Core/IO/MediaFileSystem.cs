@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -25,23 +26,30 @@ namespace Umbraco.Core.IO
             _contentConfig = contentConfig;
         }
 
-	    public string GetRelativePath(int propertyId, string fileName)
+        [Obsolete("This low-level method should NOT exist.")]
+        public string GetRelativePath(int propertyId, string fileName)
 		{
-            var seperator = _contentConfig.UploadAllowDirectories
+            var sep = _contentConfig.UploadAllowDirectories
 				? Path.DirectorySeparatorChar
 				: '-';
 
-			return propertyId.ToString(CultureInfo.InvariantCulture) + seperator + fileName;
+			return propertyId.ToString(CultureInfo.InvariantCulture) + sep + fileName;
 		}
 
+        [Obsolete("This low-level method should NOT exist.")]
         public string GetRelativePath(string subfolder, string fileName)
         {
-            var seperator = _contentConfig.UploadAllowDirectories
+            var sep = _contentConfig.UploadAllowDirectories
                 ? Path.DirectorySeparatorChar
                 : '-';
 
-            return subfolder + seperator + fileName;
+            return subfolder + sep + fileName;
         }
+
+        // what's below is weird
+        // we are not deleting custom thumbnails
+        // MediaFileSystem is not just IFileSystem
+        // etc
 
 		public IEnumerable<string> GetThumbnails(string path)
 		{
@@ -68,5 +76,16 @@ namespace Umbraco.Core.IO
 			GetThumbnails(path)
 				.ForEach(DeleteFile);
 		}
+
+	    public void CopyThumbnails(string sourcePath, string targetPath)
+	    {
+            var targetPathBase = Path.GetDirectoryName(targetPath) ?? "";
+            foreach (var sourceThumbPath in GetThumbnails(sourcePath))
+            {
+                var sourceThumbFilename = Path.GetFileName(sourceThumbPath) ?? "";
+                var targetThumbPath = Path.Combine(targetPathBase, sourceThumbFilename);
+                this.CopyFile(sourceThumbPath, targetThumbPath);
+            }
+        }
 	}
 }
