@@ -51,7 +51,7 @@ namespace Umbraco.Web.Editors
         /// Returns the available composite content types for a given content type
         /// </summary>
         /// <returns></returns>
-        protected IEnumerable<EntityBasic> PerformGetAvailableCompositeContentTypes(int contentTypeId, UmbracoObjectTypes type)
+        protected IEnumerable<EntityBasic> PerformGetAvailableCompositeContentTypes(int contentTypeId, int parentId, UmbracoObjectTypes type)
         {
             IContentTypeComposition source = null;
 
@@ -124,22 +124,29 @@ namespace Umbraco.Web.Editors
 
             if (UmbracoConfig.For.UmbracoSettings().Content.EnableInheritedDocumentTypes)
             {
-                // directContentTypes are those we use directly
-                // they are already in indirectContentTypes, no need to add to the list
-                var directContentTypes = source.ContentTypeComposition.ToArray();
+                // get the ancestorIds via the parent
+                var ancestorIds = new int[0];
+                if (parentId > 0)
+                {
+                    var parent = allContentTypes.FirstOrDefault(x => x.Id == parentId);
+                    ancestorIds = parent.Path.Split(',').Select(int.Parse).ToArray();
+                }
+                
+                // add all ancestors as compositions (since they are implicitly compositions by inheritance)
+                foreach (var x in allContentTypes)
+                    if (ancestorIds.Contains(x.Id))
+                        list.Add(x);
 
-                var enabled = usableContentTypes.Select(x => x.Id) // those we can use
+                // get the ids of compositions that are inherited from ancestors and add metadata to those compositions
+                var inheritedFromAncestorsIds = usableContentTypes.Select(x => x.Id) // those we can use
                     .Except(indirectContentTypes.Select(x => x.Id)) // except those that are indirectly used
-                    .Union(directContentTypes.Select(x => x.Id)) // but those that are directly used
-                    .Where(x => x != source.ParentId) // but not the parent
+                    .Where(x => ancestorIds.Contains(x) == false) // but not the parents
                     .Distinct()
                     .ToArray();
-
                 foreach (var x in list)
-                    if (enabled.Contains(x.Id) == false)
-                        x.AdditionalData["compositionIsInheritedFromParent"] = true;
+                    if (inheritedFromAncestorsIds.Contains(x.Id) == false)
+                        x.AdditionalData["compositionIsInheritedFromAncestors"] = true;
             }
-            
             return list
                 .Where(x => x.Id != contentTypeId)
                 .OrderBy(x => x.Name)

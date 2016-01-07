@@ -102,6 +102,11 @@ namespace Umbraco.Core.Models
                     throw new InvalidCompositionException(Alias, contentType.Alias, conflictingPropertyTypeAliases.ToArray());
 
                 _contentTypeComposition.Add(contentType);
+                //Make sure to include the composition's compositions since this is possible with inheritance
+                foreach (var contentTypeComposition in contentType.ContentTypeComposition)
+                {
+                    _contentTypeComposition.Add(contentTypeComposition);
+                }
                 OnPropertyChanged(ContentTypeCompositionSelector);
                 return true;
             }

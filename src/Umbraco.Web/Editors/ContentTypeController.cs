@@ -93,9 +93,9 @@ namespace Umbraco.Web.Editors
             return ApplicationContext.Services.ContentTypeService.GetAllPropertyTypeAliases();
         }
 
-        public IEnumerable<EntityBasic> GetAvailableCompositeContentTypes(int contentTypeId)
+        public IEnumerable<EntityBasic> GetAvailableCompositeContentTypes(int contentTypeId, int parentId)
         {
-            return PerformGetAvailableCompositeContentTypes(contentTypeId, UmbracoObjectTypes.DocumentType);
+            return PerformGetAvailableCompositeContentTypes(contentTypeId, parentId, UmbracoObjectTypes.DocumentType);
         }
 
         [UmbracoTreeAuthorize(

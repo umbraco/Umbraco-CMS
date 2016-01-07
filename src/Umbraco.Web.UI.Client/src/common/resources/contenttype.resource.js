@@ -7,13 +7,13 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
 
     return {
 
-        getAvailableCompositeContentTypes: function (contentTypeId) {
+        getAvailableCompositeContentTypes: function (contentTypeId, parentId) {
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "contentTypeApiBaseUrl",
                        "GetAvailableCompositeContentTypes",
-                       [{ contentTypeId: contentTypeId }])),
+                       [{ contentTypeId: contentTypeId }, { parentId: parentId }])),
                'Failed to retrieve data for content type id ' + contentTypeId);
         },
 
