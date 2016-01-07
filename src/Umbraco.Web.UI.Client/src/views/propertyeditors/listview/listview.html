@@ -153,7 +153,7 @@
          on-get-content="reloadView">
       </umb-list-view-layout>
 
-      <umb-load-indicator ng-if="!viewLoaded"></umb-load-indicator>
+      <umb-load-indicator ng-show="!viewLoaded"></umb-load-indicator>
 
       <umb-pagination
          ng-if="listViewResultSet.totalPages"
