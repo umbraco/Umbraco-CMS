@@ -9,7 +9,7 @@
 (function () {
     "use strict";
 
-    function MediaTypesEditController($scope, $routeParams, mediaTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter, $q, localizationService) {
+    function MediaTypesEditController($scope, $routeParams, mediaTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter, $q, localizationService, overlayHelper) {
         var vm = this;
 
         vm.save = save;
@@ -120,46 +120,51 @@
         /* ---------- SAVE ---------- */
 
         function save() {
-            var deferred = $q.defer();
 
-            vm.page.saveButtonState = "busy";
+            // only save if there is no overlays open
+            if(overlayHelper.getNumberOfOverlays() === 0) {
 
-            // reformat allowed content types to array if id's
-            vm.contentType.allowedContentTypes = contentTypeHelper.createIdArray(vm.contentType.allowedContentTypes);
+                var deferred = $q.defer();
 
-            contentEditingHelper.contentEditorPerformSave({
-                statusMessage: "Saving...",
-                saveMethod: mediaTypeResource.save,
-                scope: $scope,
-                content: vm.contentType,
-                //no-op for rebind callback... we don't really need to rebind for content types
-                rebindCallback: angular.noop
-            }).then(function (data) {
-                //success            
-                syncTreeNode(vm.contentType, data.path);
+                vm.page.saveButtonState = "busy";
 
-                vm.page.saveButtonState = "success";
+                // reformat allowed content types to array if id's
+                vm.contentType.allowedContentTypes = contentTypeHelper.createIdArray(vm.contentType.allowedContentTypes);
 
-                deferred.resolve(data);
-            }, function (err) {
-                //error
-                if (err) {
-                    editorState.set($scope.content);
-                }
-                else {
-                    localizationService.localize("speechBubbles_validationFailedHeader").then(function (headerValue) {
-                        localizationService.localize("speechBubbles_validationFailedMessage").then(function (msgValue) {
-                            notificationsService.error(headerValue, msgValue);
+                contentEditingHelper.contentEditorPerformSave({
+                    statusMessage: "Saving...",
+                    saveMethod: mediaTypeResource.save,
+                    scope: $scope,
+                    content: vm.contentType,
+                    //no-op for rebind callback... we don't really need to rebind for content types
+                    rebindCallback: angular.noop
+                }).then(function (data) {
+                    //success
+                    syncTreeNode(vm.contentType, data.path);
+
+                    vm.page.saveButtonState = "success";
+
+                    deferred.resolve(data);
+                }, function (err) {
+                    //error
+                    if (err) {
+                        editorState.set($scope.content);
+                    }
+                    else {
+                        localizationService.localize("speechBubbles_validationFailedHeader").then(function (headerValue) {
+                            localizationService.localize("speechBubbles_validationFailedMessage").then(function (msgValue) {
+                                notificationsService.error(headerValue, msgValue);
+                            });
                         });
-                    });
-                }
+                    }
 
-                vm.page.saveButtonState = "error";
+                    vm.page.saveButtonState = "error";
 
-                deferred.reject(err);
-            });
+                    deferred.reject(err);
+                });
 
-            return deferred.promise;
+                return deferred.promise;
+            }
         }
 
         function init(contentType) {
