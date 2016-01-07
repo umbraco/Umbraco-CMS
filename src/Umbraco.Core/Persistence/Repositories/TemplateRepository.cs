@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
@@ -32,7 +33,6 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ITemplatesSection _templateConfig;
         private readonly ViewHelper _viewHelper;
         private readonly MasterPageHelper _masterPageHelper;
-        private readonly RepositoryCacheOptions _cacheOptions;
 
         internal TemplateRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IFileSystem masterpageFileSystem, IFileSystem viewFileSystem, ITemplatesSection templateConfig)
             : base(work, cache, logger, sqlSyntax)
@@ -41,25 +41,18 @@ namespace Umbraco.Core.Persistence.Repositories
             _viewsFileSystem = viewFileSystem;
             _templateConfig = templateConfig;
             _viewHelper = new ViewHelper(_viewsFileSystem);
-            _masterPageHelper = new MasterPageHelper(_masterpagesFileSystem);
-
-            _cacheOptions = new RepositoryCacheOptions
-            {
-                //Allow a zero count cache entry because GetAll() gets used quite a lot and we want to ensure
-                // if there are no templates, that it doesn't keep going to the db.
-                GetAllCacheAllowZeroCount = true,
-                //GetAll is used as the base call for getting all templates, so we'll cache it as a single entry
-                GetAllCacheAsCollection = true
-            };
+            _masterPageHelper = new MasterPageHelper(_masterpagesFileSystem);            
         }
 
 
-        /// <summary>
-        /// Returns the repository cache options
-        /// </summary>
-        protected override RepositoryCacheOptions RepositoryCacheOptions
+        private FullDataSetRepositoryCachePolicyFactory<ITemplate, int> _cachePolicyFactory;
+        protected override IRepositoryCachePolicyFactory<ITemplate, int> CachePolicyFactory
         {
-            get { return _cacheOptions; }
+            get
+            {
+                //Use a FullDataSet cache policy - this will cache the entire GetAll result in a single collection
+                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<ITemplate, int>(RuntimeCache));
+            }
         }
 
         #region Overrides of RepositoryBase<int,ITemplate>

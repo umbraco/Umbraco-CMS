@@ -156,12 +156,18 @@
     <Compile Include="CacheHelper.cs" />
     <Compile Include="Cache\CacheKeys.cs" />
     <Compile Include="Cache\CacheProviderExtensions.cs" />
+    <Compile Include="Cache\DefaultRepositoryCachePolicy.cs" />
+    <Compile Include="Cache\DefaultRepositoryCachePolicyFactory.cs" />
+    <Compile Include="Cache\FullDataSetRepositoryCachePolicy.cs" />
+    <Compile Include="Cache\FullDataSetRepositoryCachePolicyFactory.cs" />
     <Compile Include="Cache\ICacheProvider.cs" />
     <Compile Include="Cache\CacheRefresherBase.cs" />
     <Compile Include="Cache\CacheRefresherEventArgs.cs" />
     <Compile Include="Cache\DictionaryCacheProviderBase.cs" />
     <Compile Include="Cache\HttpRequestCacheProvider.cs" />
+    <Compile Include="Cache\IRepositoryCachePolicy.cs" />
     <Compile Include="Cache\IPayloadCacheRefresher.cs" />
+    <Compile Include="Cache\IRepositoryCachePolicyFactory.cs" />
     <Compile Include="Cache\IsolatedRuntimeCache.cs" />
     <Compile Include="Cache\ObjectCacheRuntimeCacheProvider.cs" />
     <Compile Include="Cache\IRuntimeCacheProvider.cs" />
@@ -169,7 +175,10 @@
     <Compile Include="Cache\IJsonCacheRefresher.cs" />
     <Compile Include="Cache\JsonCacheRefresherBase.cs" />
     <Compile Include="Cache\NullCacheProvider.cs" />
+    <Compile Include="Cache\OnlySingleItemsRepositoryCachePolicy.cs" />
+    <Compile Include="Cache\OnlySingleItemsRepositoryCachePolicyFactory.cs" />
     <Compile Include="Cache\PayloadCacheRefresherBase.cs" />
+    <Compile Include="Cache\RepositoryCachePolicyOptions.cs" />
     <Compile Include="Cache\StaticCacheProvider.cs" />
     <Compile Include="Cache\TypedCacheRefresherBase.cs" />
     <Compile Include="CodeAnnotations\FriendlyNameAttribute.cs" />
@@ -457,7 +466,6 @@
     <Compile Include="Persistence\Repositories\Interfaces\ITaskTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\MigrationEntryRepository.cs" />
     <Compile Include="Persistence\Repositories\PublicAccessRepository.cs" />
-    <Compile Include="Persistence\Repositories\RepositoryCacheOptions.cs" />
     <Compile Include="Persistence\Repositories\TaskRepository.cs" />
     <Compile Include="Persistence\Repositories\TaskTypeRepository.cs" />
     <Compile Include="PropertyEditors\ValueConverters\GridValueConverter.cs" />

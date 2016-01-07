@@ -28,27 +28,19 @@ namespace Umbraco.Core.Persistence.Repositories
             _languageRepository = languageRepository;
         }
 
-        /// <summary>
-        /// Returns the repository cache options
-        /// </summary>
-        /// <remarks>
-        /// The dictionary repository is also backed by two sub repositories, the main one that will be used is the DictionaryByKeyRepository
-        /// since the queries from DefaultCultureDictionary will use this. That repositories will manage it's own caches by keys.
-        /// </remarks>
-        protected override RepositoryCacheOptions RepositoryCacheOptions
+        private IRepositoryCachePolicyFactory<IDictionaryItem, int> _cachePolicyFactory;
+        protected override IRepositoryCachePolicyFactory<IDictionaryItem, int> CachePolicyFactory
         {
             get
             {
-                return new RepositoryCacheOptions
-                {
-                    //If there is zero, we can cache it
-                    GetAllCacheAllowZeroCount = true,
-                    GetAllCacheAsCollection = false,
-                    GetAllCacheValidateCount = false,
-                    //dont' cache any result with GetAll - since there could be a ton
-                    // of dictionary items.
-                    GetAllCacheThresholdLimit = 0
-                };
+                //custom cache policy which will not cache any results for GetAll
+                return _cachePolicyFactory ?? (_cachePolicyFactory = new OnlySingleItemsRepositoryCachePolicyFactory<IDictionaryItem, int>(
+                    RuntimeCache,
+                    new RepositoryCachePolicyOptions
+                    {
+                            //allow zero to be cached
+                            GetAllCacheAllowZeroCount = true
+                    }));
             }
         }
 
@@ -354,23 +346,19 @@ namespace Umbraco.Core.Persistence.Repositories
                 return "cmsDictionary." + SqlSyntax.GetQuotedColumnName("id") + " in (@ids)";
             }
 
-            /// <summary>
-            /// Returns the repository cache options
-            /// </summary>
-            protected override RepositoryCacheOptions RepositoryCacheOptions
+            private IRepositoryCachePolicyFactory<IDictionaryItem, Guid> _cachePolicyFactory;
+            protected override IRepositoryCachePolicyFactory<IDictionaryItem, Guid> CachePolicyFactory
             {
                 get
                 {
-                    return new RepositoryCacheOptions
-                    {
-                        //If there is zero, we can cache it
-                        GetAllCacheAllowZeroCount = true,
-                        GetAllCacheAsCollection = false,
-                        GetAllCacheValidateCount = false,
-                        //dont' cache any result with GetAll - since there could be a ton
-                        // of dictionary items.
-                        GetAllCacheThresholdLimit = 0
-                    };
+                    //custom cache policy which will not cache any results for GetAll
+                    return _cachePolicyFactory ?? (_cachePolicyFactory = new OnlySingleItemsRepositoryCachePolicyFactory<IDictionaryItem, Guid>(
+                        RuntimeCache,
+                        new RepositoryCachePolicyOptions
+                        {
+                            //allow zero to be cached
+                            GetAllCacheAllowZeroCount = true
+                        }));
                 }
             }
         }
@@ -417,23 +405,19 @@ namespace Umbraco.Core.Persistence.Repositories
                 return "cmsDictionary." + SqlSyntax.GetQuotedColumnName("key") + " in (@ids)";
             }
 
-            /// <summary>
-            /// Returns the repository cache options
-            /// </summary>
-            protected override RepositoryCacheOptions RepositoryCacheOptions
+            private IRepositoryCachePolicyFactory<IDictionaryItem, string> _cachePolicyFactory;
+            protected override IRepositoryCachePolicyFactory<IDictionaryItem, string> CachePolicyFactory
             {
                 get
                 {
-                    return new RepositoryCacheOptions
-                    {
-                        //If there is zero, we can cache it
-                        GetAllCacheAllowZeroCount = true,
-                        GetAllCacheAsCollection = false,
-                        GetAllCacheValidateCount = false,
-                        //dont' cache any result with GetAll - since there could be a ton
-                        // of dictionary items.
-                        GetAllCacheThresholdLimit = 0
-                    };
+                    //custom cache policy which will not cache any results for GetAll
+                    return _cachePolicyFactory ?? (_cachePolicyFactory = new OnlySingleItemsRepositoryCachePolicyFactory<IDictionaryItem, string>(
+                        RuntimeCache,
+                        new RepositoryCachePolicyOptions
+                        {
+                            //allow zero to be cached
+                            GetAllCacheAllowZeroCount = true
+                        }));
                 }
             }
         }

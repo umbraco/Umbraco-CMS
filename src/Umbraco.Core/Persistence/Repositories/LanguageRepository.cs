@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -20,24 +21,17 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         public LanguageRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
-        {
-            //Custom cache options for better performance
-            _cacheOptions = new RepositoryCacheOptions
-            {
-                GetAllCacheAllowZeroCount = true,
-                GetAllCacheValidateCount = false,
-                GetAllCacheAsCollection = true
-            };
+        {           
         }
 
-        private readonly RepositoryCacheOptions _cacheOptions;
-
-        /// <summary>
-        /// Returns the repository cache options
-        /// </summary>
-        protected override RepositoryCacheOptions RepositoryCacheOptions
+        private FullDataSetRepositoryCachePolicyFactory<ILanguage, int> _cachePolicyFactory;
+        protected override IRepositoryCachePolicyFactory<ILanguage, int> CachePolicyFactory
         {
-            get { return _cacheOptions; }
+            get
+            {
+                //Use a FullDataSet cache policy - this will cache the entire GetAll result in a single collection
+                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<ILanguage, int>(RuntimeCache));
+            }
         }
 
         #region Overrides of RepositoryBase<int,Language>

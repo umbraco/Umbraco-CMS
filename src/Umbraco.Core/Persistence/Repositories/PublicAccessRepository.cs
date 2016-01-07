@@ -17,20 +17,18 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         public PublicAccessRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
-        {
-            _options = new RepositoryCacheOptions
-            {
-                //We want to ensure that a zero count gets cached, even if there is nothing in the db we don't want it to lookup nothing each time
-                GetAllCacheAllowZeroCount = true,
-                //We'll use GetAll as the backing source for all queries and we'll cache the result as a single collection
-                GetAllCacheAsCollection = true,
-                //Override to false so that a Count check against the db is NOT performed when doing a GetAll without params, we just want to 
-                // return the raw cache without validation. The GetAll on this repository gets called *A lot*, we want max performance
-                GetAllCacheValidateCount = false
-            };
+        {            
         }
 
-        private readonly RepositoryCacheOptions _options;
+        private FullDataSetRepositoryCachePolicyFactory<PublicAccessEntry, Guid> _cachePolicyFactory;
+        protected override IRepositoryCachePolicyFactory<PublicAccessEntry, Guid> CachePolicyFactory
+        {
+            get
+            {
+                //Use a FullDataSet cache policy - this will cache the entire GetAll result in a single collection
+                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<PublicAccessEntry, Guid>(RuntimeCache));
+            }
+        }
 
         protected override PublicAccessEntry PerformGet(Guid id)
         {
@@ -93,15 +91,6 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             get { throw new NotImplementedException(); }
         }
-
-        /// <summary>
-        /// Returns the repository cache options
-        /// </summary>
-        protected override RepositoryCacheOptions RepositoryCacheOptions
-        {
-            get { return _options; }
-        }
-
 
         protected override void PersistNewItem(PublicAccessEntry entity)
         {
