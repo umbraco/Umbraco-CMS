@@ -9,6 +9,7 @@ using System.Web.Http;
 using AutoMapper;
 using Newtonsoft.Json;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -57,6 +58,7 @@ namespace Umbraco.Web.Editors
             //below is all ported from the old doc type editor and comes with the same weaknesses /insanity / magic
             
             IContentTypeComposition[] allContentTypes;
+
             switch (type)
             {
                 case UmbracoObjectTypes.DocumentType:
@@ -90,9 +92,57 @@ namespace Umbraco.Web.Editors
                     throw new ArgumentOutOfRangeException("The entity type was not a content type");
             }
 
-            var filtered = Services.ContentTypeService.GetAvailableCompositeContentTypes(source, allContentTypes);
+            // note: there are many sanity checks missing here and there ;-((
+            // make sure once and for all
+            //if (allContentTypes.Any(x => x.ParentId > 0 && x.ContentTypeComposition.Any(y => y.Id == x.ParentId) == false))
+            //    throw new Exception("A parent does not belong to a composition.");
 
-            return filtered                
+            // find out if any content type uses this content type
+            var isUsing = allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == contentTypeId)).ToArray();
+            if (isUsing.Length > 0)
+            {
+                //if already in use a composition, do not allow any composited types
+                return new List<EntityBasic>();
+            }
+
+            // if it is not used then composition is possible
+            // hashset guarantees unicity on Id
+            var list = new HashSet<IContentTypeComposition>(new DelegateEqualityComparer<IContentTypeComposition>(
+                (x, y) => x.Id == y.Id,
+                x => x.Id));
+
+            // usable types are those that are top-level
+            var usableContentTypes = allContentTypes
+                .Where(x => x.ContentTypeComposition.Any() == false).ToArray();
+            foreach (var x in usableContentTypes)
+                list.Add(x);
+
+            // indirect types are those that we use, directly or indirectly
+            var indirectContentTypes = GetIndirect(source).ToArray();
+            foreach (var x in indirectContentTypes)
+                list.Add(x);
+
+            if (UmbracoConfig.For.UmbracoSettings().Content.EnableInheritedDocumentTypes)
+            {
+                // directContentTypes are those we use directly
+                // they are already in indirectContentTypes, no need to add to the list
+                var directContentTypes = source.ContentTypeComposition.ToArray();
+
+                var enabled = usableContentTypes.Select(x => x.Id) // those we can use
+                    .Except(indirectContentTypes.Select(x => x.Id)) // except those that are indirectly used
+                    .Union(directContentTypes.Select(x => x.Id)) // but those that are directly used
+                    .Where(x => x != source.ParentId) // but not the parent
+                    .Distinct()
+                    .ToArray();
+
+                foreach (var x in list)
+                    if (enabled.Contains(x.Id) == false)
+                        x.AdditionalData["compositionIsInheritedFromParent"] = true;
+            }
+            
+            return list
+                .Where(x => x.Id != contentTypeId)
+                .OrderBy(x => x.Name)
                 .Select(Mapper.Map<IContentTypeComposition, EntityBasic>)
                 .Select(x =>
                 {
@@ -101,7 +151,32 @@ namespace Umbraco.Web.Editors
                 })
                 .ToList();
         }
-        
+
+        private static IEnumerable<IContentTypeComposition> GetIndirect(IContentTypeComposition ctype)
+        {
+            // hashset guarantees unicity on Id
+            var all = new HashSet<IContentTypeComposition>(new DelegateEqualityComparer<IContentTypeComposition>(
+                (x, y) => x.Id == y.Id,
+                x => x.Id));
+
+            var stack = new Stack<IContentTypeComposition>();
+
+            if (ctype != null)
+            {
+                foreach (var x in ctype.ContentTypeComposition)
+                    stack.Push(x);
+            }
+
+            while (stack.Count > 0)
+            {
+                var x = stack.Pop();
+                all.Add(x);
+                foreach (var y in x.ContentTypeComposition)
+                    stack.Push(y);
+            }
+
+            return all;
+        }
 
         /// <summary>
         /// Validates the composition and adds errors to the model state if any are found then throws an error response if there are errors
