@@ -9,10 +9,10 @@ namespace Umbraco.Core.Cache
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
     /// <typeparam name="TId"></typeparam>
-    internal class OnlySingleItemsRepositoryCachePolicy<TEntity, TId> : DefaultRepositoryCachePolicy<TEntity, TId>
+    internal class SingleItemsOnlyRepositoryCachePolicy<TEntity, TId> : DefaultRepositoryCachePolicy<TEntity, TId>
         where TEntity : class, IAggregateRoot
     {
-        public OnlySingleItemsRepositoryCachePolicy(IRuntimeCacheProvider cache, RepositoryCachePolicyOptions options) : base(cache, options)
+        public SingleItemsOnlyRepositoryCachePolicy(IRuntimeCacheProvider cache, RepositoryCachePolicyOptions options) : base(cache, options)
         {
         }
         

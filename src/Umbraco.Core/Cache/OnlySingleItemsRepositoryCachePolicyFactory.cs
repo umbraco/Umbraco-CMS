@@ -21,7 +21,7 @@ namespace Umbraco.Core.Cache
 
         public virtual IRepositoryCachePolicy<TEntity, TId> CreatePolicy()
         {
-            return new OnlySingleItemsRepositoryCachePolicy<TEntity, TId>(_runtimeCache, _options);
+            return new SingleItemsOnlyRepositoryCachePolicy<TEntity, TId>(_runtimeCache, _options);
         }
     }
 }

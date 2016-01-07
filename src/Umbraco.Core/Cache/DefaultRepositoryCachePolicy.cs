@@ -42,19 +42,27 @@ namespace Umbraco.Core.Cache
                 persistMethod(entity);
 
                 //set the disposal action                
-                SetCacheAction(() => Cache.InsertCacheItem(cacheKey, () => entity));
-
-                ////If there's a GetAll zero count cache, ensure it is cleared
-                //_cache.ClearCacheItem(GetCacheTypeKey());
+                SetCacheAction(() =>
+                {
+                    Cache.InsertCacheItem(cacheKey, () => entity);
+                    //If there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
+                    Cache.ClearCacheItem(GetCacheTypeKey());
+                });
+                
             }
             catch
             {
-                //if an exception is thrown we need to remove the entry from cache, this is ONLY a work around because of the way
-                // that we cache entities: http://issues.umbraco.org/issue/U4-4259
-                Cache.ClearCacheItem(cacheKey);
+                //set the disposal action                
+                SetCacheAction(() =>
+                {
+                    //if an exception is thrown we need to remove the entry from cache, this is ONLY a work around because of the way
+                    // that we cache entities: http://issues.umbraco.org/issue/U4-4259
+                    Cache.ClearCacheItem(cacheKey);
 
-                ////If there's a GetAll zero count cache, ensure it is cleared
-                //_cache.ClearCacheItem(GetCacheTypeKey());
+                    //If there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
+                    Cache.ClearCacheItem(GetCacheTypeKey());
+                });
+                
                 throw;
             }
         }
@@ -65,10 +73,12 @@ namespace Umbraco.Core.Cache
 
             //set the disposal action
             var cacheKey = GetCacheIdKey(entity.Id);
-            SetCacheAction(() => Cache.ClearCacheItem(cacheKey));
-
-            ////If there's a GetAll zero count cache, ensure it is cleared
-            //_cache.ClearCacheItem(GetCacheTypeKey());
+            SetCacheAction(() =>
+            {
+                Cache.ClearCacheItem(cacheKey);
+                //If there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
+                Cache.ClearCacheItem(GetCacheTypeKey());
+            });            
         }
 
         public TEntity Get(TId id, Func<TId, TEntity> getFromRepo)
