@@ -28,13 +28,15 @@ namespace Umbraco.Web.Cache
 
         public override void Refresh(int id)
         {
-            ClearAllCacheByRepositoryEntityType<ILanguage>();
+            ClearAllIsolatedCacheByRepositoryEntityType<ILanguage>();
             base.Refresh(id);
         }
 
         public override void Remove(int id)
         {
-            ClearAllCacheByRepositoryEntityType<ILanguage>();
+            ClearAllIsolatedCacheByRepositoryEntityType<ILanguage>();
+            //if a language is removed, then all dictionary cache needs to be removed
+            ClearAllIsolatedCacheByRepositoryEntityType<IDictionaryItem>();
             base.Remove(id);
         }
     }

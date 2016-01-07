@@ -126,8 +126,8 @@ namespace Umbraco.Web.Cache
 
         public override void RefreshAll()
         {
-            ClearAllCacheByRepositoryEntityType<IContent>();
-            ClearAllCacheByRepositoryEntityType<IContentType>();
+            ClearAllIsolatedCacheByRepositoryEntityType<IContent>();
+            ClearAllIsolatedCacheByRepositoryEntityType<IContentType>();
             
             //all property type cache
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.PropertyTypeCacheKey);
@@ -214,18 +214,18 @@ namespace Umbraco.Web.Cache
             {
                 if (payloads.Any(x => x.Type == typeof (IContentType).Name))
                 {
-                    ClearAllCacheByRepositoryEntityType<IContent>();
-                    ClearAllCacheByRepositoryEntityType<IContentType>();
+                    ClearAllIsolatedCacheByRepositoryEntityType<IContent>();
+                    ClearAllIsolatedCacheByRepositoryEntityType<IContentType>();
                 }
                 if (payloads.Any(x => x.Type == typeof(IMediaType).Name))
                 {
-                    ClearAllCacheByRepositoryEntityType<IMedia>();
-                    ClearAllCacheByRepositoryEntityType<IMediaType>();
+                    ClearAllIsolatedCacheByRepositoryEntityType<IMedia>();
+                    ClearAllIsolatedCacheByRepositoryEntityType<IMediaType>();
                 }
                 if (payloads.Any(x => x.Type == typeof(IMemberType).Name))
                 {
-                    ClearAllCacheByRepositoryEntityType<IMember>();
-                    ClearAllCacheByRepositoryEntityType<IMemberType>();
+                    ClearAllIsolatedCacheByRepositoryEntityType<IMember>();
+                    ClearAllIsolatedCacheByRepositoryEntityType<IMemberType>();
                 }
                 
 

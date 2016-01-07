@@ -176,7 +176,7 @@ namespace Umbraco.Web.Cache
                     prefix =>
                     ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(prefix));
 
-            ClearAllCacheByRepositoryEntityType<IMacro>();
+            ClearAllIsolatedCacheByRepositoryEntityType<IMacro>();
 
             base.RefreshAll();
         }

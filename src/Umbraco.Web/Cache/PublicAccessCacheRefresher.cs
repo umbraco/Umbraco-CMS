@@ -27,25 +27,25 @@ namespace Umbraco.Web.Cache
 
         public override void Refresh(Guid id)
         {
-            ClearAllCacheByRepositoryEntityType<PublicAccessEntry>();
+            ClearAllIsolatedCacheByRepositoryEntityType<PublicAccessEntry>();
             base.Refresh(id);
         }
 
         public override void Refresh(int id)
         {
-            ClearAllCacheByRepositoryEntityType<PublicAccessEntry>();
+            ClearAllIsolatedCacheByRepositoryEntityType<PublicAccessEntry>();
             base.Refresh(id);
         }
 
         public override void RefreshAll()
         {
-            ClearAllCacheByRepositoryEntityType<PublicAccessEntry>();
+            ClearAllIsolatedCacheByRepositoryEntityType<PublicAccessEntry>();
             base.RefreshAll();
         }
 
         public override void Remove(int id)
         {
-            ClearAllCacheByRepositoryEntityType<PublicAccessEntry>();
+            ClearAllIsolatedCacheByRepositoryEntityType<PublicAccessEntry>();
             base.Remove(id);
         }
     }

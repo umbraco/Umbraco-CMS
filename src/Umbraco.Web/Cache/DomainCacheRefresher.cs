@@ -42,7 +42,7 @@ namespace Umbraco.Web.Cache
 
         private void ClearCache()
         {            
-            ClearAllCacheByRepositoryEntityType<IDomain>();
+            ClearAllIsolatedCacheByRepositoryEntityType<IDomain>();
 
             // SD: we need to clear the routes cache here!             
             //

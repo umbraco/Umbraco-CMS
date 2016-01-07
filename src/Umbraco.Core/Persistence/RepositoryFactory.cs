@@ -165,8 +165,7 @@ namespace Umbraco.Core.Persistence
                 uow,
                 _cacheHelper,
                 _logger,
-                _sqlSyntax,
-                CreateLanguageRepository(uow));
+                _sqlSyntax);
         }
 
         public virtual ILanguageRepository CreateLanguageRepository(IDatabaseUnitOfWork uow)
