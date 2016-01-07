@@ -129,7 +129,8 @@ namespace Umbraco.Web.Editors
                 if (parentId > 0)
                 {
                     var parent = allContentTypes.FirstOrDefault(x => x.Id == parentId);
-                    ancestorIds = parent.Path.Split(',').Select(int.Parse).ToArray();
+                    if (parent != null)
+                        ancestorIds = parent.Path.Split(',').Select(int.Parse).ToArray();
                 }
                 
                 // add all ancestors as compositions (since they are implicitly compositions by inheritance)

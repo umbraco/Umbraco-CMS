@@ -191,12 +191,10 @@ namespace Umbraco.Web.Editors
                 parentId != Constants.System.Root)
             {
                 var parent = Services.ContentTypeService.GetContentType(parentId);
-                ct = new ContentType(parent, String.Empty);
+                ct = parent != null ? new ContentType(parent, String.Empty) : new ContentType(parentId);
             }
             else
-            {
                 ct = new ContentType(parentId);
-            }
             
             ct.Icon = "icon-document";
 
