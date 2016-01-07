@@ -286,9 +286,9 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get
             {
                 return new OptionalInnerTextConfigurationElement<bool>(
-                          (InnerTextConfigurationElement<bool>)this["EnableInheritedDocumentTypes"],
-                          //set the default
-                          true);
+                    (InnerTextConfigurationElement<bool>) this["EnableInheritedDocumentTypes"],
+                    //set the default
+                    false);
             }
         }
         
@@ -429,7 +429,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         bool IContentSection.EnableInheritedDocumentTypes
         {
-            get { return ContinouslyUpdateXmlDiskCache; }
+            get { return EnableInheritedDocumentTypes; }
         }
     }
 }
