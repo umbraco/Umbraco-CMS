@@ -22,8 +22,8 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 //We want to ensure that a zero count gets cached, even if there is nothing in the db we don't want it to lookup nothing each time
                 GetAllCacheAllowZeroCount = true,
-                //Set to 1000 just to ensure that all of them are cached, The GetAll on this repository gets called *A lot*, we want max performance
-                GetAllCacheThresholdLimit = 1000,
+                //We'll use GetAll as the backing source for all queries and we'll cache the result as a single collection
+                GetAllCacheAsCollection = true,
                 //Override to false so that a Count check against the db is NOT performed when doing a GetAll without params, we just want to 
                 // return the raw cache without validation. The GetAll on this repository gets called *A lot*, we want max performance
                 GetAllCacheValidateCount = false
@@ -34,16 +34,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override PublicAccessEntry PerformGet(Guid id)
         {
-            var sql = GetBaseQuery(false);
-            sql.Where(GetBaseWhereClause(), new { Id = id });
-
-            var taskDto = Database.Fetch<AccessDto, AccessRuleDto, AccessDto>(new AccessRulesRelator().Map, sql).FirstOrDefault();
-            if (taskDto == null)
-                return null;
-
-            var factory = new PublicAccessEntryFactory();
-            var entity = factory.BuildEntity(taskDto);
-            return entity;
+            //return from GetAll - this will be cached as a collection
+            return GetAll().FirstOrDefault(x => x.Key == id);
         }
 
         protected override IEnumerable<PublicAccessEntry> PerformGetAll(params Guid[] ids)
