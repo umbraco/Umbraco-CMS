@@ -29,7 +29,7 @@ namespace Umbraco.Web.Cache
 
         public override void RefreshAll()
         {
-            ClearAllIsolatedCacheByRepositoryEntityType<IUserType>();
+            ClearAllIsolatedCacheByEntityType<IUserType>();
             base.RefreshAll();
         }
 

@@ -69,7 +69,7 @@ namespace Umbraco.Core.Cache
         /// Clears the cache for all repository entities of this type
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
-        protected void ClearAllIsolatedCacheByRepositoryEntityType<TEntity>()
+        internal void ClearAllIsolatedCacheByEntityType<TEntity>()
             where TEntity : class, IAggregateRoot
         {
             ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.ClearCache<TEntity>();

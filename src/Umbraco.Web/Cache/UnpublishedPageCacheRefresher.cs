@@ -77,8 +77,8 @@ namespace Umbraco.Web.Cache
 
         public override void RefreshAll()
         {
-            ClearAllIsolatedCacheByRepositoryEntityType<IContent>();
-            ClearAllIsolatedCacheByRepositoryEntityType<PublicAccessEntry>();
+            ClearAllIsolatedCacheByEntityType<IContent>();
+            ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
             DistributedCache.Instance.ClearDomainCacheOnCurrentServer();
             base.RefreshAll();
         }
@@ -86,7 +86,7 @@ namespace Umbraco.Web.Cache
         public override void Refresh(int id)
         {
             ClearRepositoryCacheItemById(id);
-            ClearAllIsolatedCacheByRepositoryEntityType<PublicAccessEntry>();
+            ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
             content.Instance.UpdateSortOrder(id);
             DistributedCache.Instance.ClearDomainCacheOnCurrentServer();
             base.Refresh(id);
@@ -95,7 +95,7 @@ namespace Umbraco.Web.Cache
         public override void Remove(int id)
         {
             ClearRepositoryCacheItemById(id);
-            ClearAllIsolatedCacheByRepositoryEntityType<PublicAccessEntry>();
+            ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
             DistributedCache.Instance.ClearDomainCacheOnCurrentServer();
             base.Remove(id);
         }
@@ -104,7 +104,7 @@ namespace Umbraco.Web.Cache
         public override void Refresh(IContent instance)
         {
             ClearRepositoryCacheItemById(instance.Id);
-            ClearAllIsolatedCacheByRepositoryEntityType<PublicAccessEntry>();
+            ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
             content.Instance.UpdateSortOrder(instance);
             DistributedCache.Instance.ClearDomainCacheOnCurrentServer();
             base.Refresh(instance);
@@ -113,7 +113,7 @@ namespace Umbraco.Web.Cache
         public override void Remove(IContent instance)
         {
             ClearRepositoryCacheItemById(instance.Id);
-            ClearAllIsolatedCacheByRepositoryEntityType<PublicAccessEntry>();
+            ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
             DistributedCache.Instance.ClearDomainCacheOnCurrentServer();
             base.Remove(instance);
         }
@@ -124,7 +124,7 @@ namespace Umbraco.Web.Cache
         /// <param name="jsonPayload"></param>
         public void Refresh(string jsonPayload)
         {
-            ClearAllIsolatedCacheByRepositoryEntityType<PublicAccessEntry>();
+            ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
 
             foreach (var payload in DeserializeFromJsonPayload(jsonPayload))
             {
