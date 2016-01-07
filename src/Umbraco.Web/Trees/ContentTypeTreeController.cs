@@ -4,6 +4,7 @@ using System.Net.Http.Formatting;
 using umbraco;
 using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
@@ -62,6 +63,9 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
 
+            var enableInheritedDocumentTypes = UmbracoConfig.For.UmbracoSettings().Content.EnableInheritedDocumentTypes;
+
+
             if (id == Constants.System.Root.ToInvariantString())
             {
                 //set the default to create
@@ -97,6 +101,10 @@ namespace Umbraco.Web.Trees
             }
             else
             {
+                if (enableInheritedDocumentTypes)
+                {
+                    menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
+                }
                 menu.Items.Add<ActionMove>(Services.TextService.Localize(string.Format("actions/{0}", ActionMove.Instance.Alias)));
                 menu.Items.Add<ActionExport>(Services.TextService.Localize(string.Format("actions/{0}", ActionExport.Instance.Alias)), true).ConvertLegacyMenuItem(new UmbracoEntity
                 {
