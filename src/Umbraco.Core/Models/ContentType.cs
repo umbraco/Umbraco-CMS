@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.Models
 {
@@ -34,6 +35,10 @@ namespace Umbraco.Core.Models
         [Obsolete("This method is obsolete, use ContentType(IContentType parent, string alias) instead.", false)]
         public ContentType(IContentType parent) : this(parent, null)
         {
+            if (UmbracoConfig.For.UmbracoSettings().Content.EnableInheritedDocumentTypes)
+            {
+                AddContentType(parent);
+            }
         }
 
         /// <summary>
@@ -45,6 +50,10 @@ namespace Umbraco.Core.Models
         public ContentType(IContentType parent, string alias)
             : base(parent, alias)
         {
+            if (UmbracoConfig.For.UmbracoSettings().Content.EnableInheritedDocumentTypes)
+            {
+                AddContentType(parent);
+            }
             _allowedTemplates = new List<ITemplate>();
         }
 

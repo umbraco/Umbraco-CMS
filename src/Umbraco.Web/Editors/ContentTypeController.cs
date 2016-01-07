@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
@@ -11,6 +12,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.PropertyEditors;
 using System.Net.Http;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 
@@ -184,7 +186,18 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public ContentTypeDisplay GetEmpty(int parentId)
         {
-            var ct = new ContentType(parentId);
+            IContentType ct = null;
+            if (UmbracoConfig.For.UmbracoSettings().Content.EnableInheritedDocumentTypes &&
+                parentId != Constants.System.Root)
+            {
+                var parent = Services.ContentTypeService.GetContentType(parentId);
+                ct = new ContentType(parent, String.Empty);
+            }
+            else
+            {
+                ct = new ContentType(parentId);
+            }
+            
             ct.Icon = "icon-document";
 
             var dto = Mapper.Map<IContentType, ContentTypeDisplay>(ct);
