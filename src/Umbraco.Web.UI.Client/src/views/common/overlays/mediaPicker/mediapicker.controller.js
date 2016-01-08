@@ -71,6 +71,10 @@ angular.module("umbraco")
 
             $scope.gotoFolder = function(folder) {
 
+                if(!$scope.multiPicker) {
+                    deselectAllImages($scope.model.selectedImages);
+                }
+
                 if(!folder){
                     folder = {id: -1, name: "Media", icon: "icon-folder"};
                 }
@@ -125,7 +129,10 @@ angular.module("umbraco")
             $scope.clickHandler = function(image, event, index) {
 
                 if (image.isFolder) {
-                    $scope.gotoFolder(image);
+
+                    eventsService.emit("dialogs.mediaPicker.select", image);
+                    selectImage(image);
+
                 } else {
 
                     eventsService.emit("dialogs.mediaPicker.select", image);
@@ -142,9 +149,10 @@ angular.module("umbraco")
 
             };
 
-            $scope.selectFolder = function(folder, event, index) {
-                eventsService.emit("dialogs.mediaPicker.select", folder);
-                selectImage(folder);
+            $scope.clickItemName = function(item) {
+                if(item.isFolder) {
+                    $scope.gotoFolder(item);
+                }
             };
 
             function selectImage(image) {
