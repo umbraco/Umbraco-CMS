@@ -82,6 +82,10 @@ namespace Umbraco.Web.Models.Mapping
                     expression => expression.MapFrom(dto => dto.ContentTypeComposition))
 
                 .ForMember(
+                    dto => dto.LockedCompositeContentTypes,
+                    expression => expression.ResolveUsing(new LockedCompositionsResolver(applicationContext)))
+
+                .ForMember(
                     dto => dto.Groups,
                     expression => expression.ResolveUsing(new PropertyTypeGroupResolver(applicationContext, propertyEditorResolver)));
         }

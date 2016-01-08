@@ -65,7 +65,6 @@ namespace Umbraco.Web.Trees
 
             var enableInheritedDocumentTypes = UmbracoConfig.For.UmbracoSettings().Content.EnableInheritedDocumentTypes;
 
-
             if (id == Constants.System.Root.ToInvariantString())
             {
                 //set the default to create

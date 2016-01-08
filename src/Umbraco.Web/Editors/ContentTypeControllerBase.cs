@@ -132,21 +132,12 @@ namespace Umbraco.Web.Editors
                     if (parent != null)
                         ancestorIds = parent.Path.Split(',').Select(int.Parse).ToArray();
                 }
-                
-                // add all ancestors as compositions (since they are implicitly compositions by inheritance)
+
+                // add all ancestors as compositions (since they are implicitly "compositions" by inheritance and should
+                // be in the list even though they can't be deselected)
                 foreach (var x in allContentTypes)
                     if (ancestorIds.Contains(x.Id))
                         list.Add(x);
-
-                // get the ids of compositions that are inherited from ancestors and add metadata to those compositions
-                var inheritedFromAncestorsIds = usableContentTypes.Select(x => x.Id) // those we can use
-                    .Except(indirectContentTypes.Select(x => x.Id)) // except those that are indirectly used
-                    .Where(x => ancestorIds.Contains(x) == false) // but not the parents
-                    .Distinct()
-                    .ToArray();
-                foreach (var x in list)
-                    if (inheritedFromAncestorsIds.Contains(x.Id) == false)
-                        x.AdditionalData["compositionIsInheritedFromAncestors"] = true;
             }
             return list
                 .Where(x => x.Id != contentTypeId)
