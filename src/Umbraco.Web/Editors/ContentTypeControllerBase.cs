@@ -90,7 +90,7 @@ namespace Umbraco.Web.Editors
                     throw new ArgumentOutOfRangeException("The entity type was not a content type");
             }
 
-            var filtered = Services.ContentTypeService.GetAvailableCompositeContentTypes(contentTypeId, allContentTypes);
+            var filtered = Services.ContentTypeService.GetAvailableCompositeContentTypes(source, allContentTypes);
 
             return filtered                
                 .Select(Mapper.Map<IContentTypeComposition, EntityBasic>)
