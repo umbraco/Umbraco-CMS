@@ -191,7 +191,7 @@ namespace umbraco
             // check if document *is* published, it could be unpublished by an event
             if (d.Published)
             {
-                var parentId = d.Level == 1 ? -1 : d.Parent.Id;
+                var parentId = d.Level == 1 ? -1 : d.ParentId;
 
                 // fix sortOrder - see note in UpdateSortOrder
                 var node = GetPreviewOrPublishedNode(d, xmlContentCopy, false);
