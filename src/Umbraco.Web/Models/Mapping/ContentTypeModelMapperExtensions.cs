@@ -54,10 +54,11 @@ namespace Umbraco.Web.Models.Mapping
         {
             return mapping
                 .ForMember(dto => dto.CreateDate, expression => expression.Ignore())
-                .ForMember(dto => dto.UpdateDate, expression => expression.Ignore())                
+                .ForMember(dto => dto.UpdateDate, expression => expression.Ignore())
                 .ForMember(dto => dto.ListViewEditorName, expression => expression.Ignore())
                 .ForMember(dto => dto.Notifications, expression => expression.Ignore())
-                .ForMember(dto => dto.Errors, expression => expression.Ignore());
+                .ForMember(dto => dto.Errors, expression => expression.Ignore())
+                .ForMember(dto => dto.LockedCompositeContentTypes, exp => exp.Ignore());
         }
 
         public static IMappingExpression<TSource, TDestination> MapBaseContentTypeEntityToDisplay<TSource, TDestination>(

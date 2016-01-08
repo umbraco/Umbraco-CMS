@@ -17,17 +17,24 @@ namespace Umbraco.Web.Models.Mapping
 
         protected override IEnumerable<string> ResolveCore(IContentTypeComposition source)
         {
-            // get ancestor ids from path (exclude current node id)
-            var ancestorIds = source.Path.Substring(0, source.Path.LastIndexOf(',')).Split(',').Select(int.Parse);
             var aliases = new List<string>();
-            // loop through all content types and return ordered aliases of ancestors
-            var allContentTypes = _applicationContext.Services.ContentTypeService.GetAllContentTypes().ToArray();
-            foreach (var ancestorId in ancestorIds)
+            // get ancestor ids from path of parent if not root
+            if (source.ParentId != Constants.System.Root)
             {
-                var ancestor = allContentTypes.FirstOrDefault(x => x.Id == ancestorId);
-                if (ancestor != null)
+                var parent = _applicationContext.Services.ContentTypeService.GetContentType(source.ParentId);
+                if (parent != null)
                 {
-                    aliases.Add(ancestor.Alias);
+                    var ancestorIds = parent.Path.Split(',').Select(int.Parse);
+                    // loop through all content types and return ordered aliases of ancestors
+                    var allContentTypes = _applicationContext.Services.ContentTypeService.GetAllContentTypes().ToArray();
+                    foreach (var ancestorId in ancestorIds)
+                    {
+                        var ancestor = allContentTypes.FirstOrDefault(x => x.Id == ancestorId);
+                        if (ancestor != null)
+                        {
+                            aliases.Add(ancestor.Alias);
+                        }
+                    }
                 }
             }
             return aliases.OrderBy(x => x);
