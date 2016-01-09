@@ -1,39 +1,49 @@
-<div class="umb-control-group">
-   <div class="form-search">
-      <i class="icon-search"></i>
-      <input type="text"
-         style="width: 100%"
-         ng-model="searchTerm"
-         class="umb-search-field search-query input-block-level"
-         placeholder="Filter..."
-         umb-auto-focus>
-   </div>
+<div ng-controller="Umbraco.Overlays.CompositionsOverlay as vm">
+
+    <div class="umb-control-group">
+       <div class="form-search">
+          <i class="icon-search"></i>
+          <input type="text"
+             style="width: 100%"
+             ng-model="searchTerm"
+             class="umb-search-field search-query input-block-level"
+             placeholder="Filter..."
+             umb-auto-focus>
+       </div>
+    </div>
+
+    <div class="umb-control-group">
+       <small>Inherit tabs and properties from an existing document type. New tabs will be added to the current document type or merged if a tab with an identical name exists.</small>
+    </div>
+
+    <umb-empty-state
+        ng-if="model.contentType.availableCompositeContentTypes.length === 0"
+        position="center">
+        This content type is used in a composition, and therefore cannot be composed itself.
+    </umb-empty-state>
+
+    <ul class="umb-checkbox-list">
+       <li class="umb-checkbox-list__item"
+            ng-repeat="compositeContentType in model.contentType.availableCompositeContentTypes | filter:searchTerm"
+            ng-class="{'-disabled': vm.isDisabled(compositeContentType.alias), '-selected': vm.isSelected(compositeContentType.alias)}">
+
+          <div class="umb-checkbox-list__item-checkbox" ng-class="{ '-disabled': vm.isDisabled(compositeContentType.alias) }">
+             <input type="checkbox"
+                id="umb-overlay-comp-{{compositeContentType.key}}"
+                checklist-model="model.contentType.compositeContentTypes"
+                checklist-value="compositeContentType.alias"
+                ng-change="model.selectCompositeContentType(compositeContentType)"
+                ng-disabled="vm.isDisabled(compositeContentType.alias)" />
+          </div>
+
+          <label for="umb-overlay-comp-{{compositeContentType.key}}" class="umb-checkbox-list__item-text" ng-class="{'-faded': vm.isDisabled(compositeContentType.alias)}">
+              <i class="{{ compositeContentType.icon }} umb-checkbox-list__item-icon"></i>
+              {{ compositeContentType.name }}
+              <span class="umb-checkbox-list__item-caption" ng-if="vm.isDisabled(compositeContentType.alias)">(inherited)</span>
+          </label>
+
+
+       </li>
+    </ul>
+
 </div>
-
-<div class="umb-control-group">
-   <small>Inherit tabs and properties from an existing document type. New tabs will be added to the current document type or merged if a tab with an identical name exists.</small>
-</div>
-
-<umb-empty-state
-    ng-if="model.availableCompositeContentTypes.length === 0"
-    position="center">
-    This content type is used in a composition, and therefore cannot be composed itself.
-</umb-empty-state>
-
-<ul class="umb-checkbox-list">
-   <li class="umb-checkbox-list__item" ng-repeat="compositeContentType in model.availableCompositeContentTypes | filter:searchTerm" ng-class="{ '-selected': model.compositeContentTypes.indexOf(compositeContentType.alias)+1, '-disabled': model.lockedCompositeContentTypes.indexOf(compositeContentType.alias)+1 }">
-
-      <div class="umb-checkbox-list__item-checkbox" ng-class="{ '-selected': model.compositeContentTypes.indexOf(compositeContentType.alias)+1 }">
-         <input type="checkbox"
-            checklist-model="model.compositeContentTypes"
-            checklist-value="compositeContentType.alias"
-            ng-change="model.selectCompositeContentType(compositeContentType)" />
-      </div>
-
-      <div class="umb-checkbox-list__item-text">
-         <i class="{{ compositeContentType.icon }} umb-checkbox-list__item-icon"></i>
-         {{ compositeContentType.name }}
-      </div>
-
-   </li>
-</ul>
