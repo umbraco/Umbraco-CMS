@@ -1,6 +1,30 @@
-<div>
+<div class="clearfix">
 
-    <umb-editor-toolbar tools="toolbar"></umb-editor-toolbar>
+    <umb-editor-sub-header>
+
+        <umb-editor-sub-header-content-right>
+
+            <umb-button
+                ng-if="compositions !== false"
+                type="button"
+                button-style="link"
+                label="Compositions"
+                icon="icon-merge"
+                action="openCompositionsDialog()">
+            </umb-button>
+
+            <umb-button
+                ng-if="sorting !== false"
+                type="button"
+                button-style="link"
+                label="{{sortingButtonLabel}}"
+                icon="icon-navigation"
+                action="toggleSortingMode();">
+            </umb-button>
+
+        </umb-editor-sub-header-content-right>
+
+    </umb-editor-sub-header>
 
     <div ng-if="sortingMode && model.groups.length <= 1" class="umb-group-builder__no-data-text">You have not added any tabs to reorder</div>
 

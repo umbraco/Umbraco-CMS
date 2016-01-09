@@ -9,10 +9,9 @@
       scope.toolbar = [];
       scope.sortableOptionsGroup = {};
       scope.sortableOptionsProperty = {};
+      scope.sortingButtonLabel = "Reorder";
 
       function activate() {
-
-          setToolbar();
 
           setSortingOptions();
 
@@ -25,36 +24,6 @@
 
           // add init tab
           addInitGroup(scope.model.groups);
-
-      }
-
-      function setToolbar() {
-
-        scope.toolbar = [];
-
-        var compositionTool = {
-          "name": "Compositions",
-          "icon": "icon-merge",
-          "action": function(tool) {
-            scope.openCompositionsDialog(tool);
-          }
-        };
-
-        var sortingTool = {
-          "name": "Reorder",
-          "icon": "icon-navigation",
-          "action": function(tool) {
-            scope.toggleSortingMode(tool);
-          }
-        };
-
-        if(scope.compositions || scope.compositions === undefined) {
-          scope.toolbar.push(compositionTool);
-        }
-
-        if(scope.sorting || scope.sorting === undefined) {
-          scope.toolbar.push(sortingTool);
-        }
 
       }
 
@@ -174,9 +143,9 @@
          scope.sortingMode = !scope.sortingMode;
 
          if(scope.sortingMode === true) {
-            tool.name = "I'm done reordering";
+            scope.sortingButtonLabel = "I'm done reordering";
          } else {
-            tool.name = "Reorder";
+            scope.sortingButtonLabel = "Reorder";
          }
 
       };
