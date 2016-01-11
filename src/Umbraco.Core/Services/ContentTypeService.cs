@@ -141,16 +141,26 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public EntityContainer GetMediaTypeContainer(string name, int level)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow))
+            {
+                var container = repo.Get(name, level, Constants.ObjectTypes.MediaTypeContainerGuid);
+                return container;
+            }
+        }
+
         public EntityContainer GetContentTypeContainer(Guid containerId)
         {
             return GetContainer(containerId, Constants.ObjectTypes.DocumentTypeGuid);
         }
-
+        
         public EntityContainer GetMediaTypeContainer(Guid containerId)
         {
             return GetContainer(containerId, Constants.ObjectTypes.MediaTypeGuid);
         }
-
+        
         private EntityContainer GetContainer(Guid containerId, Guid containedObjectType)
         {
             var uow = UowProvider.GetUnitOfWork();
@@ -160,6 +170,16 @@ namespace Umbraco.Core.Services
                 return container != null && container.ContainedObjectType == containedObjectType
                     ? container
                     : null;
+            }
+        }
+
+        public EntityContainer GetContentTypeContainer(string name, int level)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow))
+            {
+                var container = repo.Get(name, level, Constants.ObjectTypes.DocumentTypeContainerGuid);
+                return container;
             }
         }
 

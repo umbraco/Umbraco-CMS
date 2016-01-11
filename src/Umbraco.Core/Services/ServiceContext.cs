@@ -279,14 +279,14 @@ namespace Umbraco.Core.Services
             if (_localizationService == null)
                 _localizationService = new Lazy<ILocalizationService>(() => new LocalizationService(provider, repositoryFactory, logger, eventMessagesFactory));
 
-            if (_packagingService == null)
-                _packagingService = new Lazy<IPackagingService>(() => new PackagingService(logger, _contentService.Value, _contentTypeService.Value, _mediaService.Value, _macroService.Value, _dataTypeService.Value, _fileService.Value, _localizationService.Value, _userService.Value, repositoryFactory, provider));
-
             if (_entityService == null)
                 _entityService = new Lazy<IEntityService>(() => new EntityService(
-                    provider, repositoryFactory, logger, eventMessagesFactory, 
+                    provider, repositoryFactory, logger, eventMessagesFactory,
                     _contentService.Value, _contentTypeService.Value, _mediaService.Value, _dataTypeService.Value, _memberService.Value, _memberTypeService.Value,
                     cache.RuntimeCache));
+            
+            if (_packagingService == null)
+                _packagingService = new Lazy<IPackagingService>(() => new PackagingService(logger, _contentService.Value, _contentTypeService.Value, _mediaService.Value, _macroService.Value, _dataTypeService.Value, _fileService.Value, _localizationService.Value, _entityService.Value, _userService.Value, repositoryFactory, provider));
 
             if (_relationService == null)
                 _relationService = new Lazy<IRelationService>(() => new RelationService(provider, repositoryFactory, logger, eventMessagesFactory, _entityService.Value));
