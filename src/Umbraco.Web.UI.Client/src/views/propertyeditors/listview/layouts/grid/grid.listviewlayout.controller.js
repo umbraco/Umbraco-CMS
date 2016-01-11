@@ -22,12 +22,15 @@
 
       vm.dragEnter = dragEnter;
       vm.dragLeave = dragLeave;
-		vm.onFilesQueue = onFilesQueue;
+	  vm.onFilesQueue = onFilesQueue;
       vm.onUploadComplete = onUploadComplete;
+
       vm.hoverMediaItemDetails = hoverMediaItemDetails;
       vm.selectItem = selectItem;
       vm.selectFolder = selectFolder;
       vm.clickItem = clickItem;
+      vm.clickFolder = clickFolder;
+      vm.clickFolderName = clickFolderName;
 
       function activate() {
           vm.itemsWithoutFolders = filterOutFolders($scope.items);
@@ -95,6 +98,14 @@
 
       function clickItem(item) {
          $location.path($scope.entityType + '/' + $scope.entityType + '/edit/' + item.id);
+      }
+
+      function clickFolder(folder, $event, $index) {
+          listViewHelper.selectHandler(folder, $index, $scope.folders, $scope.selection, $event);
+      }
+
+      function clickFolderName(folder, $event, $index) {
+          $location.path($scope.entityType + '/' + $scope.entityType + '/edit/' + folder.id);
       }
 
       activate();
