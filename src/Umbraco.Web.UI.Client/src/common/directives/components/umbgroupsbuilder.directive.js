@@ -225,9 +225,7 @@
                 // submit overlay if no compositions has been removed
                 // or the action has been confirmed
                 } else {
-
-                //TODO: RE-validate compositions
-
+                    
                     // make sure that all tabs has an init property
                     if (scope.model.groups.length !== 0) {
                       angular.forEach(scope.model.groups, function(group) {
@@ -252,32 +250,43 @@
                 scope.compositionsDialogModel = null;
 
             },
-            selectCompositeContentType: function(compositeContentType) {
+            selectCompositeContentType: function (selectedContentType) {
 
-                if (scope.model.compositeContentTypes.indexOf(compositeContentType.alias) === -1) {
-                  //merge composition with content type
+                //first check if this is a new selection - we need to store this value here before any further digests/async
+                // because after that the scope.model.compositeContentTypes will be populated with the selected value.
+                var newSelection = scope.model.compositeContentTypes.indexOf(selectedContentType.alias) === -1;
 
-                  if(scope.contentType === "documentType") {
+                //based on the selection, we need to filter the available composite types list
+                filterAvailableCompositions(selectedContentType, newSelection).then(function () {
 
-                     contentTypeResource.getById(compositeContentType.id).then(function(composition){
-                        contentTypeHelper.mergeCompositeContentType(scope.model, composition);
-                     });
+                    if (newSelection) {
+                        //merge composition with content type
 
+                        //use a different resource lookup depending on the content type type
+                        var resourceLookup = scope.contentType === "documentType" ? contentTypeResource.getById : mediaTypeResource.getById;
 
-                  } else if(scope.contentType === "mediaType") {
-
-                     mediaTypeResource.getById(compositeContentType.id).then(function(composition){
-                        contentTypeHelper.mergeCompositeContentType(scope.model, composition);
+                        resourceLookup(selectedContentType.id).then(function (composition) {
+                            //based on the above filtering we shouldn't be able to select an invalid one, but let's be safe and
+                            // double check here.
+                            var overlappingAliases = contentTypeHelper.validateAddingComposition(scope.model, composition);
+                            if (overlappingAliases.length > 0) {
+                                //this will create an invalid composition, need to uncheck it
+                                scope.compositionsDialogModel.compositeContentTypes.splice(
+                                    scope.compositionsDialogModel.compositeContentTypes.indexOf(composition.alias), 1);
+                                //dissallow this until something else is unchecked
+                                selectedContentType.disallow = true;
                             }
-                     });
+                            else {
+                                contentTypeHelper.mergeCompositeContentType(scope.model, composition);
+                            }
+                        });
+                    }
+                    else {
+                        // split composition from content type
+                        contentTypeHelper.splitCompositeContentType(scope.model, selectedContentType);
+                    }
 
-                  }
-
-
-                } else {
-                  // split composition from content type
-                  contentTypeHelper.splitCompositeContentType(scope.model, compositeContentType);
-                }
+                });
 
             }
         };
