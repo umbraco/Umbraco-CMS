@@ -2,11 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Caching;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 
-namespace Umbraco.Core.Persistence.Repositories
+namespace Umbraco.Core.Cache
 {
     /// <summary>
     /// A wrapper for any IRuntimeCacheProvider that ensures that all inserts and returns 

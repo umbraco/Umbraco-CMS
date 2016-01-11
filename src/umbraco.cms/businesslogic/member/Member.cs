@@ -819,10 +819,10 @@ namespace umbraco.cms.businesslogic.member
                     FormsAuthentication.SetAuthCookie(m.LoginName, true);
 
                     //cache the member
-                    var cachedMember = ApplicationContext.Current.ApplicationCache.GetCacheItem(
+                    var cachedMember = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<Member>(
                         GetCacheKey(m.Id),
-                        TimeSpan.FromMinutes(30),
-                        () =>
+                        timeout:        TimeSpan.FromMinutes(30),
+                        getCacheItem:   () =>
                         {
                             // Debug information
                             HttpContext.Current.Trace.Write("member",
@@ -868,10 +868,10 @@ namespace umbraco.cms.businesslogic.member
                     FormsAuthentication.SetAuthCookie(m.LoginName, !UseSession);
 
                     //cache the member
-                    var cachedMember = ApplicationContext.Current.ApplicationCache.GetCacheItem(
+                    var cachedMember = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<Member>(
                         GetCacheKey(m.Id),
-                        TimeSpan.FromMinutes(30),
-                        () =>
+                        timeout:        TimeSpan.FromMinutes(30),
+                        getCacheItem:   () =>
                         {
                             // Debug information
                             HttpContext.Current.Trace.Write("member",
@@ -908,7 +908,7 @@ namespace umbraco.cms.businesslogic.member
         [Obsolete("Member cache is automatically cleared when members are updated")]
         public static void RemoveMemberFromCache(int NodeId)
         {
-            ApplicationContext.Current.ApplicationCache.ClearCacheItem(GetCacheKey(NodeId));
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(GetCacheKey(NodeId));
         }
 
         /// <summary>
@@ -962,7 +962,7 @@ namespace umbraco.cms.businesslogic.member
         {
             var h = new Hashtable();
 
-            var items = ApplicationContext.Current.ApplicationCache.GetCacheItemsByKeySearch<Member>(
+            var items = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItemsByKeySearch<Member>(
                 CacheKeys.MemberBusinessLogicCacheKey);
             foreach (var i in items)
             {

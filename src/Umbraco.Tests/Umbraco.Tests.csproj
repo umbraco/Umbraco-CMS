@@ -175,6 +175,10 @@
     <Compile Include="AttemptTests.cs" />
     <Compile Include="Cache\CacheRefresherTests.cs" />
     <Compile Include="Cache\DeepCloneRuntimeCacheProviderTests.cs" />
+    <Compile Include="Cache\DefaultCachePolicyTests.cs" />
+    <Compile Include="Cache\FullDataSetCachePolicyTests.cs" />
+    <Compile Include="Cache\SingleItemsOnlyCachePolicyTests.cs" />
+    <Compile Include="Collections\DeepCloneableListTests.cs" />
     <Compile Include="Controllers\BackOfficeControllerUnitTests.cs" />
     <Compile Include="DelegateExtensionsTests.cs" />
     <Compile Include="Logging\AsyncRollingFileAppenderTest.cs" />
