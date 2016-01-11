@@ -51,7 +51,7 @@ namespace Umbraco.Web.Editors
         /// Returns the available composite content types for a given content type
         /// </summary>
         /// <returns></returns>
-        protected IEnumerable<EntityBasic> PerformGetAvailableCompositeContentTypes(int contentTypeId, int parentId, UmbracoObjectTypes type)
+        protected IEnumerable<EntityBasic> PerformGetAvailableCompositeContentTypes(int contentTypeId, UmbracoObjectTypes type)
         {
             IContentTypeComposition source = null;
 

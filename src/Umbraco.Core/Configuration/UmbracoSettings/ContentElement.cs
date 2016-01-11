@@ -288,7 +288,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                 return new OptionalInnerTextConfigurationElement<bool>(
                     (InnerTextConfigurationElement<bool>) this["EnableInheritedDocumentTypes"],
                     //set the default
-                    false);
+                    true);
             }
         }
         

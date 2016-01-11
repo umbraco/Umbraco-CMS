@@ -79,9 +79,9 @@ namespace Umbraco.Web.Editors
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
-        public IEnumerable<EntityBasic> GetAvailableCompositeMemberTypes(int contentTypeId, int parentId)
+        public IEnumerable<EntityBasic> GetAvailableCompositeMemberTypes(int contentTypeId)
         {
-            return PerformGetAvailableCompositeContentTypes(contentTypeId, parentId, UmbracoObjectTypes.MemberType);
+            return PerformGetAvailableCompositeContentTypes(contentTypeId, UmbracoObjectTypes.MemberType);
         }
 
         public ContentTypeCompositionDisplay GetEmpty()

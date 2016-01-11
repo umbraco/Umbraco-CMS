@@ -213,7 +213,7 @@
 
         function init(contentType) {
             //get available composite types
-            contentTypeResource.getAvailableCompositeContentTypes(contentType.id, contentType.parentId).then(function (result) {
+            contentTypeResource.getAvailableCompositeContentTypes(contentType.id).then(function (result) {
                 contentType.availableCompositeContentTypes = result;
                 // convert icons for composite content types
                 iconHelper.formatContentTypeIcons(contentType.availableCompositeContentTypes);

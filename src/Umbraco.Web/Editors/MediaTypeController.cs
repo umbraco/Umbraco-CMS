@@ -83,9 +83,9 @@ namespace Umbraco.Web.Editors
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
-        public IEnumerable<EntityBasic> GetAvailableCompositeMediaTypes(int contentTypeId, int parentId)
+        public IEnumerable<EntityBasic> GetAvailableCompositeMediaTypes(int contentTypeId)
         {
-            return PerformGetAvailableCompositeContentTypes(contentTypeId, parentId, UmbracoObjectTypes.MediaType);
+            return PerformGetAvailableCompositeContentTypes(contentTypeId, UmbracoObjectTypes.MediaType);
         }
 
         public ContentTypeCompositionDisplay GetEmpty(int parentId)
