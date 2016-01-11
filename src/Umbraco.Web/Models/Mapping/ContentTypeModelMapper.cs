@@ -9,6 +9,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
 using System.Collections.Generic;
 using AutoMapper.Internal;
+using Umbraco.Core.Services;
 using Property = umbraco.NodeFactory.Property;
 
 namespace Umbraco.Web.Models.Mapping
@@ -19,17 +20,20 @@ namespace Umbraco.Web.Models.Mapping
     internal class ContentTypeModelMapper : MapperConfiguration
     {
         private readonly Lazy<PropertyEditorResolver> _propertyEditorResolver;
+        private readonly Lazy<IContentTypeService> _contentTypeService;
 
         //default ctor
         public ContentTypeModelMapper()
         {
             _propertyEditorResolver = new Lazy<PropertyEditorResolver>(() => PropertyEditorResolver.Current);
+            _contentTypeService = new Lazy<IContentTypeService>(() => ApplicationContext.Current.Services.ContentTypeService);
         }
 
         //ctor can be used for testing
-        public ContentTypeModelMapper(Lazy<PropertyEditorResolver> propertyEditorResolver)
+        public ContentTypeModelMapper(Lazy<PropertyEditorResolver> propertyEditorResolver, Lazy<IContentTypeService> contentTypeService)
         {
             _propertyEditorResolver = propertyEditorResolver;
+            _contentTypeService = contentTypeService;
         }
 
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
@@ -114,6 +118,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.AllowedTemplates, expression => expression.Ignore())
                 .ForMember(dto => dto.DefaultTemplate, expression => expression.Ignore())
                 .ForMember(display => display.Notifications, expression => expression.Ignore())
+                .ForMember(x => x.FirstContentType, exp => exp.ResolveUsing(new FirstContentTypeResolver(_contentTypeService)))
                 .AfterMap((source, dest) =>
                 {
                     //sync templates
@@ -176,6 +181,7 @@ namespace Umbraco.Web.Models.Mapping
                 .MapBaseContentTypeSaveToDisplay()
                 .ForMember(dto => dto.AllowedTemplates, expression => expression.Ignore())
                 .ForMember(dto => dto.DefaultTemplate, expression => expression.Ignore())
+                .ForMember(dto => dto.FirstContentType, exp => exp.Ignore())
                 .AfterMap((source, dest) =>
                 {
                     //sync templates

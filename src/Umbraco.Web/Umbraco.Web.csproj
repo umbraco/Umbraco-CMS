@@ -309,6 +309,7 @@
     <Compile Include="Models\ContentEditing\PropertyTypeBasic.cs" />
     <Compile Include="Models\ContentEditing\SimpleNotificationModel.cs" />
     <Compile Include="Models\Mapping\ContentTypeModelMapperExtensions.cs" />
+    <Compile Include="Models\Mapping\FirstContentTypeResolver.cs" />
     <Compile Include="Models\PublishedContentWithKeyBase.cs" />
     <Compile Include="Mvc\IRenderController.cs" />
     <Compile Include="Mvc\RenderIndexActionSelectorAttribute.cs" />

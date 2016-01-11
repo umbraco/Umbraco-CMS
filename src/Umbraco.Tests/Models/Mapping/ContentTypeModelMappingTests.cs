@@ -63,7 +63,7 @@ namespace Umbraco.Tests.Models.Mapping
             Mapper.Initialize(configuration =>
             {
                 //initialize our content type mapper
-                var mapper = new ContentTypeModelMapper(new Lazy<PropertyEditorResolver>(() => _propertyEditorResolver.Object));
+                var mapper = new ContentTypeModelMapper(new Lazy<PropertyEditorResolver>(() => _propertyEditorResolver.Object), new Lazy<IContentTypeService>(() => appContext.Services.ContentTypeService));
                 mapper.ConfigureMappings(configuration, appContext);
                 var entityMapper = new EntityModelMapper();
                 entityMapper.ConfigureMappings(configuration, appContext);
