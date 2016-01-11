@@ -462,27 +462,25 @@ namespace Umbraco.Core.Services
                 var foldersAttribute = documentType.Attribute("Folders");
                 if (foldersAttribute != null)
                 {
-                    var containerId = 0;
                     var alias = documentType.Element("Info").Element("Alias").Value;
-
                     var folders = foldersAttribute.Value.Split('/');
                     var rootFolder = HttpUtility.UrlDecode(folders[0]);
                     var current = _contentTypeService.GetContentTypeContainer(rootFolder, 1);
 
-                    var rootFolderId = current != null
-                        ? current.Id
-                        : _contentTypeService.CreateContentTypeContainer(-1, rootFolder).Result;
+                    if (current == null)
+                    {
+                        var rootFolderId = _contentTypeService.CreateContentTypeContainer(-1, rootFolder).Result;
+                        current = _contentTypeService.GetContentTypeContainer(rootFolderId);
+                    }
 
-                    current = _contentTypeService.GetContentTypeContainer(rootFolderId);
+                    importedFolders.Add(alias, current.Id);
 
                     for (var i = 1; i < folders.Length; i++)
                     {
                         var folderName = HttpUtility.UrlDecode(folders[i]);
                         current = CreateContentTypeChildFolder(folderName, current);
-                        containerId = current.Id;
+                        importedFolders[alias] = current.Id;
                     }
-
-                    importedFolders.Add(alias, containerId);
                 }
             }
 
@@ -877,7 +875,7 @@ namespace Umbraco.Core.Services
 
                 var dataTypeDefinitionId = new Guid(dataTypeElement.Attribute("Definition").Value);
                 var databaseTypeAttribute = dataTypeElement.Attribute("DatabaseType");
-                
+
                 var parentId = -1;
                 if (importedFolders.ContainsKey(dataTypeDefinitionName))
                     parentId = importedFolders[dataTypeDefinitionName];
@@ -951,27 +949,25 @@ namespace Umbraco.Core.Services
                 var foldersAttribute = datatypeElement.Attribute("Folders");
                 if (foldersAttribute != null)
                 {
-                    var containerId = 0;
                     var name = datatypeElement.Attribute("Name").Value;
-
                     var folders = foldersAttribute.Value.Split('/');
                     var rootFolder = HttpUtility.UrlDecode(folders[0]);
                     var current = _dataTypeService.GetContainer(rootFolder, 1);
 
-                    var rootFolderId = current != null
-                        ? current.Id
-                        : _dataTypeService.CreateContainer(-1, rootFolder).Result;
+                    if (current == null)
+                    {
+                        var rootFolderId = _dataTypeService.CreateContainer(-1, rootFolder).Result;
+                        current = _dataTypeService.GetContainer(rootFolderId);
+                    }
 
-                    current = _dataTypeService.GetContainer(rootFolderId);
+                    importedFolders.Add(name, current.Id);
 
                     for (var i = 1; i < folders.Length; i++)
                     {
                         var folderName = HttpUtility.UrlDecode(folders[i]);
                         current = CreateDataTypeChildFolder(folderName, current);
-                        containerId = current.Id;
+                        importedFolders[name] = current.Id;
                     }
-
-                    importedFolders.Add(name, containerId);
                 }
             }
 

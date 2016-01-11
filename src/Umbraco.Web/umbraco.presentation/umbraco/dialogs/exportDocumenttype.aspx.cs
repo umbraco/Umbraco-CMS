@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Linq;
 using System.Web;
 using System.Web.SessionState;
 using System.Web.UI;
@@ -11,6 +13,7 @@ using System.Web.UI.HtmlControls;
 
 using umbraco.cms.businesslogic.web;
 using System.Xml;
+using Umbraco.Core;
 
 namespace umbraco.presentation.dialogs
 {
@@ -30,13 +33,32 @@ namespace umbraco.presentation.dialogs
 			if (documentTypeId > 0) 
 			{
 				cms.businesslogic.web.DocumentType dt = new cms.businesslogic.web.DocumentType(documentTypeId);
-				if (dt != null) 
+				if (dt != null)
 				{
-					Response.AddHeader("Content-Disposition", "attachment;filename=" + dt.Alias + ".udt");
+				    var folderNames = string.Empty;
+				    if (dt.Level != 1)
+				    {
+				        var folders = new List<string>();
+
+				        var current = dt.Parent;
+				        while (current.Level >= 1)
+				        {
+				            if (current.nodeObjectType == Constants.ObjectTypes.DocumentTypeContainerGuid)
+				                folders.Add(HttpUtility.UrlEncode(current.Text));
+
+				            if (current.Level == 1)
+				                break;
+				            current = current.Parent;
+				        }
+
+                        folderNames = string.Join("/", folders.ToArray().Reverse());
+                    }
+
+                    Response.AddHeader("Content-Disposition", "attachment;filename=" + dt.Alias + ".udt");
 					Response.ContentType = "application/octet-stream";
 
 					XmlDocument doc = new XmlDocument();
-					doc.AppendChild(dt.ToXml(doc));
+					doc.AppendChild(dt.ToXml(doc, folderNames));
 
 
 					XmlWriterSettings writerSettings = new XmlWriterSettings();
