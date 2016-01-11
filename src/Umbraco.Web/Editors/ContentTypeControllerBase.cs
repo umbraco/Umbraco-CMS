@@ -92,56 +92,9 @@ namespace Umbraco.Web.Editors
                     throw new ArgumentOutOfRangeException("The entity type was not a content type");
             }
 
-            // note: there are many sanity checks missing here and there ;-((
-            // make sure once and for all
-            //if (allContentTypes.Any(x => x.ParentId > 0 && x.ContentTypeComposition.Any(y => y.Id == x.ParentId) == false))
-            //    throw new Exception("A parent does not belong to a composition.");
+            var filtered = Services.ContentTypeService.GetAvailableCompositeContentTypes(source, allContentTypes);
 
-            // find out if any content type uses this content type
-            var isUsing = allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == contentTypeId)).ToArray();
-            if (isUsing.Length > 0)
-            {
-                //if already in use a composition, do not allow any composited types
-                return new List<EntityBasic>();
-            }
-
-            // if it is not used then composition is possible
-            // hashset guarantees unicity on Id
-            var list = new HashSet<IContentTypeComposition>(new DelegateEqualityComparer<IContentTypeComposition>(
-                (x, y) => x.Id == y.Id,
-                x => x.Id));
-
-            // usable types are those that are top-level
-            var usableContentTypes = allContentTypes
-                .Where(x => x.ContentTypeComposition.Any() == false).ToArray();
-            foreach (var x in usableContentTypes)
-                list.Add(x);
-
-            // indirect types are those that we use, directly or indirectly
-            var indirectContentTypes = GetIndirect(source).ToArray();
-            foreach (var x in indirectContentTypes)
-                list.Add(x);
-
-            if (UmbracoConfig.For.UmbracoSettings().Content.EnableInheritedDocumentTypes)
-            {
-                // get the ancestorIds via the parent
-                var ancestorIds = new int[0];
-                if (parentId > 0)
-                {
-                    var parent = allContentTypes.FirstOrDefault(x => x.Id == parentId);
-                    if (parent != null)
-                        ancestorIds = parent.Path.Split(',').Select(int.Parse).ToArray();
-                }
-
-                // add all ancestors as compositions (since they are implicitly "compositions" by inheritance and should
-                // be in the list even though they can't be deselected)
-                foreach (var x in allContentTypes)
-                    if (ancestorIds.Contains(x.Id))
-                        list.Add(x);
-            }
-            return list
-                .Where(x => x.Id != contentTypeId)
-                .OrderBy(x => x.Name)
+            return filtered
                 .Select(Mapper.Map<IContentTypeComposition, EntityBasic>)
                 .Select(x =>
                 {
@@ -149,32 +102,6 @@ namespace Umbraco.Web.Editors
                     return x;
                 })
                 .ToList();
-        }
-
-        private static IEnumerable<IContentTypeComposition> GetIndirect(IContentTypeComposition ctype)
-        {
-            // hashset guarantees unicity on Id
-            var all = new HashSet<IContentTypeComposition>(new DelegateEqualityComparer<IContentTypeComposition>(
-                (x, y) => x.Id == y.Id,
-                x => x.Id));
-
-            var stack = new Stack<IContentTypeComposition>();
-
-            if (ctype != null)
-            {
-                foreach (var x in ctype.ContentTypeComposition)
-                    stack.Push(x);
-            }
-
-            while (stack.Count > 0)
-            {
-                var x = stack.Pop();
-                all.Add(x);
-                foreach (var y in x.ContentTypeComposition)
-                    stack.Push(y);
-            }
-
-            return all;
         }
 
         /// <summary>
