@@ -29,7 +29,7 @@
 
 .umb-folder-grid__folder:hover {
    text-decoration: none;
-   border: 1px solid @blue;
+   background-color: darken(@grayLighter, 5%);
 }
 
 .umb-folder-grid__folder-description {
@@ -39,12 +39,18 @@
 
 .umb-folder-grid__folder-icon {
    font-size: 20px;
-   color: @gray;
-   margin-right: 20px;
+   margin-right: 15px;
+   color: @black;
 }
 
 .umb-folder-grid__folder-name {
    font-size: 13px;
+   color: @black;
+   font-weight: bold;
+}
+
+.umb-folder-grid__folder-name:hover {
+   text-decoration: underline;
 }
 
 .umb-folder-grid__action {
@@ -63,19 +69,7 @@
    cursor: pointer;
 }
 
-.umb-folder-grid__action:hover {
-   background: @blue;
-   transition: background 0.1s;
-}
-
 .umb-folder-grid__action.-selected {
    opacity: 1;
    background: @blue;
-}
-
-.umb-folder-grid__folder:hover .umb-folder-grid__action:not(.-selected) {
-   opacity: 1;
-   animation: fadeIn;
-   animation-duration: 0.2s;
-   animation-timing-function: ease-in-out;
 }
