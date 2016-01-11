@@ -186,12 +186,11 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public ContentTypeDisplay GetEmpty(int parentId)
         {
-            IContentType ct = null;
-            if (UmbracoConfig.For.UmbracoSettings().Content.EnableInheritedDocumentTypes &&
-                parentId != Constants.System.Root)
+            IContentType ct;
+            if (parentId != Constants.System.Root)
             {
                 var parent = Services.ContentTypeService.GetContentType(parentId);
-                ct = parent != null ? new ContentType(parent, String.Empty) : new ContentType(parentId);
+                ct = parent != null ? new ContentType(parent, string.Empty) : new ContentType(parentId);
             }
             else
                 ct = new ContentType(parentId);

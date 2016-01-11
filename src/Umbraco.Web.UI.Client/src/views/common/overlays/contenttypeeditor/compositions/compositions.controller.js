@@ -19,7 +19,6 @@
                 return true;
             }
         }
-
 	}
 
 	angular.module("umbraco").controller("Umbraco.Overlays.CompositionsOverlay", CompositionsOverlay);
