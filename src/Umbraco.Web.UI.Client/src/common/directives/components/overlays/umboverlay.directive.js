@@ -11,6 +11,10 @@
 
       function link(scope, el, attr, ctrl) {
 
+          scope.directive = {
+              enableConfirmButton: false
+          };
+
          var overlayNumber = 0;
          var numberOfOverlays = 0;
          var isRegistered = false;
@@ -222,21 +226,23 @@
          }
 
          scope.submitForm = function(model) {
-
             if(scope.model.submit) {
+                 if (formHelper.submitForm({scope: scope})) {
+                    formHelper.resetForm({ scope: scope });
 
-               if (formHelper.submitForm({scope: scope})) {
+                    if(scope.model.confirmSubmit && scope.model.confirmSubmit.enable && !scope.directive.enableConfirmButton) {
+                        scope.model.submit(model, modelCopy, scope.directive.enableConfirmButton);
+                    } else {
+                        unregisterOverlay();
+                        scope.model.submit(model, modelCopy, scope.directive.enableConfirmButton);
+                    }
 
-                  formHelper.resetForm({ scope: scope });
+                 }
+             }
+         };
 
-                  unregisterOverlay();
-
-                  scope.model.submit(model);
-
-               }
-
-            }
-
+         scope.cancelConfirmSubmit = function() {
+             scope.model.confirmSubmit.show = false;
          };
 
          scope.closeOverLay = function() {
