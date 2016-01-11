@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
@@ -12,7 +11,6 @@ using Umbraco.Core.Services;
 using Umbraco.Core.PropertyEditors;
 using System.Net.Http;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 
