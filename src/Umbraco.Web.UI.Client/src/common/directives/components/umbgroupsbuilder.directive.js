@@ -125,13 +125,22 @@
                 _.union(scope.compositionsDialogModel.compositeContentTypes, [selectedContentType.alias]) :
                 //the user has unselected the item so remove from the current list
                 _.reject(scope.compositionsDialogModel.compositeContentTypes, function(i) {
-                    return i === selectedContentType.alias;
-                });                
+                    return i === selectedContentType && selectedContentType.alias;
+                });
+
+            //get the currently assigned property type aliases - ensure we pass these to the server side filer
+            var propAliasesExisting = _.filter(_.flatten(_.map(scope.model.groups, function(g) {
+                return _.map(g.properties, function(p) {
+                    return p.alias;
+                });
+            })), function (f) {
+                return f !== null && f !== undefined;
+            });
 
             //use a different resource lookup depending on the content type type
             var resourceLookup = scope.contentType === "documentType" ? contentTypeResource.getAvailableCompositeContentTypes : mediaTypeResource.getAvailableCompositeContentTypes;
 
-            return resourceLookup(scope.model.id, selectedContentTypeAliases).then(function (filteredAvailableCompositeTypes) {
+            return resourceLookup(scope.model.id, selectedContentTypeAliases, propAliasesExisting).then(function (filteredAvailableCompositeTypes) {
                 _.each(scope.compositionsDialogModel.availableCompositeContentTypes, function (current) {
                     //reset first 
                     current.disallow = false;

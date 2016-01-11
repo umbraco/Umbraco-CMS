@@ -27,7 +27,7 @@
 
 <ul class="umb-checkbox-list">
    <li class="umb-checkbox-list__item" 
-       ng-show="compositeContentType.disallow !== true"
+       
        ng-repeat="compositeContentType in model.availableCompositeContentTypes | filter:searchTerm" 
        ng-class="{ '-selected': model.compositeContentTypes.indexOf(compositeContentType.alias)+1 }">
        

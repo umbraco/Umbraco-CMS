@@ -52,11 +52,14 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter) {
                     return p.alias;
                 });
             }));
-            var propAliasesExisting = _.flatten(_.map(contentType.groups, function(g) {
+            var propAliasesExisting = _.filter(_.flatten(_.map(contentType.groups, function(g) {
                 return _.map(g.properties, function(p) {
                     return p.alias;
                 });
-            }));
+            })), function(f) {
+                return f !== null && f !== undefined;
+            });
+
             var intersec = _.intersection(propertiesAdding, propAliasesExisting);
             if (intersec.length > 0) {
                 //return the overlapping property aliases

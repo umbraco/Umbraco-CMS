@@ -28,22 +28,22 @@ namespace Umbraco.Core.Services
             IContentTypeComposition[] allContentTypes,
             string[] filterContentTypes = null,
             string[] filterPropertyTypes = null)
-        {
-
-            if (filterContentTypes == null) filterContentTypes = new string[] { };
-            if (filterPropertyTypes == null) filterContentTypes = new string[] { };
-
-            //ensure the source alias is added
-            var filterContentTypesList = filterContentTypes.Where(x => x.IsNullOrWhiteSpace() == false).ToList();            
-            if (source != null && filterContentTypesList.Contains(source.Alias) == false)
-                filterContentTypesList.Add(source.Alias);
+        {            
+            filterContentTypes = filterContentTypes == null
+                ? new string[] { }
+                : filterContentTypes.Where(x => x.IsNullOrWhiteSpace() == false).ToArray();
 
             //create the full list of property types to use as the filter
-            var filteredPropertyTypes = allContentTypes
-                .Where(c => filterContentTypesList.Contains(c.Alias))
-                .SelectMany(c => c.PropertyTypes)
-                .Select(c => c.Alias)
-                .Union(filterPropertyTypes);
+            //this is the combination of all property type aliases found in the content types passed in for the filter
+            //as well as the specific property types passed in for the filter
+            filterPropertyTypes = filterPropertyTypes == null
+                ? new string[] {}
+                : allContentTypes
+                    .Where(c => filterContentTypes.Contains(c.Alias))
+                    .SelectMany(c => c.PropertyTypes)
+                    .Select(c => c.Alias)
+                    .Union(filterPropertyTypes)
+                    .ToArray();
 
             var sourceId = source != null ? source.Id : 0;
 
@@ -96,17 +96,13 @@ namespace Umbraco.Core.Services
                 .Where(x =>
                 {
                     //need to filter any content types that are included in this list
-                    if (filterContentTypesList.Any() == false) return true;
-
-                    return filterContentTypesList.Any(c => c.InvariantEquals(x.Alias)) == false;
+                    return filterContentTypes.Any(c => c.InvariantEquals(x.Alias)) == false;
                 })
                 .Where(x =>
                 {
-                    //need to filter any content types that have matching property aliases that are included in this list
-                    if (filterContentTypesList.Any() == false) return true;
-                    
+                    //need to filter any content types that have matching property aliases that are included in this list                    
                     //ensure that we don't return if there's any overlapping property aliases from the filtered ones specified
-                    return filteredPropertyTypes.Intersect(
+                    return filterPropertyTypes.Intersect(
                         x.PropertyTypes.Select(p => p.Alias), 
                         StringComparer.InvariantCultureIgnoreCase).Any() == false;
                 })
