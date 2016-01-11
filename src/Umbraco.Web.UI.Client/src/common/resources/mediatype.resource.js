@@ -7,6 +7,15 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
 
     return {
 
+        getCount: function () {
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "mediaTypeApiBaseUrl",
+                       "GetCount")),
+               'Failed to retrieve count');
+        },
+
         getAvailableCompositeContentTypes: function (contentTypeId) {
             return umbRequestHelper.resourcePromise(
                $http.get(

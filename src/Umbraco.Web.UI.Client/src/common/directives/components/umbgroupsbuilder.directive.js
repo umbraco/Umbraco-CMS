@@ -1,7 +1,7 @@
 (function() {
   'use strict';
 
-  function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource, dataTypeHelper, dataTypeResource, $filter) {
+  function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource, dataTypeHelper, dataTypeResource, $filter, iconHelper, $q) {
 
     function link(scope, el, attr, ctrl) {
 

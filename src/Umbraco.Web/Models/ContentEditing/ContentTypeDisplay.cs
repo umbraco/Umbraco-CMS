@@ -21,8 +21,6 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "defaultTemplate")]
         public EntityBasic DefaultTemplate { get; set; }
-
-        [DataMember(Name = "firstContentType")]
-        public bool FirstContentType { get; set; }
+        
     }
 }
