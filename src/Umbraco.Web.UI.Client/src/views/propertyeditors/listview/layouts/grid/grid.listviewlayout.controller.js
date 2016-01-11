@@ -27,10 +27,9 @@
 
       vm.hoverMediaItemDetails = hoverMediaItemDetails;
       vm.selectItem = selectItem;
-      vm.selectFolder = selectFolder;
       vm.clickItem = clickItem;
-      vm.clickFolder = clickFolder;
-      vm.clickFolderName = clickFolderName;
+      vm.selectFolder = selectFolder;
+      vm.openFolder = openFolder;
 
       function activate() {
           vm.itemsWithoutFolders = filterOutFolders($scope.items);
@@ -92,19 +91,15 @@
          listViewHelper.selectHandler(selectedItem, index, vm.itemsWithoutFolders, $scope.selection, $event);
       }
 
-      function selectFolder(selectedItem, $event, index) {
-         listViewHelper.selectHandler(selectedItem, index, $scope.folders, $scope.selection, $event);
-      }
-
       function clickItem(item) {
          $location.path($scope.entityType + '/' + $scope.entityType + '/edit/' + item.id);
       }
 
-      function clickFolder(folder, $event, $index) {
+      function selectFolder(folder, $event, $index) {
           listViewHelper.selectHandler(folder, $index, $scope.folders, $scope.selection, $event);
       }
 
-      function clickFolderName(folder, $event, $index) {
+      function openFolder(folder, $event, $index) {
           $location.path($scope.entityType + '/' + $scope.entityType + '/edit/' + folder.id);
       }
 
