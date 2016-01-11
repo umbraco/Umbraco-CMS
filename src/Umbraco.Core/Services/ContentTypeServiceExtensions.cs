@@ -10,11 +10,43 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Returns the available composite content types for a given content type
         /// </summary>
+        /// <param name="allContentTypes"></param>
+        /// <param name="filterContentTypes">
+        /// This is normally an empty list but if additional content type aliases are passed in, any content types containing those aliases will be filtered out
+        /// along with any content types that have matching property types that are included in the filtered content types
+        /// </param>
+        /// <param name="ctService"></param>
+        /// <param name="source"></param>
+        /// <param name="filterPropertyTypes">
+        /// This is normally an empty list but if additional property type aliases are passed in, any content types that have these aliases will be filtered out.
+        /// This is required because in the case of creating/modifying a content type because new property types being added to it are not yet persisted so cannot
+        /// be looked up via the db, they need to be passed in.
+        /// </param>
         /// <returns></returns>
         public static IEnumerable<IContentTypeComposition> GetAvailableCompositeContentTypes(this IContentTypeService ctService,
             IContentTypeComposition source,
-            IContentTypeComposition[] allContentTypes)
+            IContentTypeComposition[] allContentTypes,
+            string[] filterContentTypes = null,
+            string[] filterPropertyTypes = null)
         {
+
+            if (filterContentTypes == null) filterContentTypes = new string[] { };
+            if (filterPropertyTypes == null) filterContentTypes = new string[] { };
+
+            //ensure the source alias is added
+            var filterContentTypesList = filterContentTypes.Where(x => x.IsNullOrWhiteSpace() == false).ToList();            
+            if (source != null && filterContentTypesList.Contains(source.Alias) == false)
+                filterContentTypesList.Add(source.Alias);
+
+            //create the full list of property types to use as the filter
+            var filteredPropertyTypes = allContentTypes
+                .Where(c => filterContentTypesList.Contains(c.Alias))
+                .SelectMany(c => c.PropertyTypes)
+                .Select(c => c.Alias)
+                .Union(filterPropertyTypes);
+
+            var sourceId = source != null ? source.Id : 0;
+
             //below is all ported from the old doc type editor and comes with the same weaknesses /insanity / magic
 
             // note: there are many sanity checks missing here and there ;-((
@@ -22,15 +54,12 @@ namespace Umbraco.Core.Services
             //if (allContentTypes.Any(x => x.ParentId > 0 && x.ContentTypeComposition.Any(y => y.Id == x.ParentId) == false))
             //    throw new Exception("A parent does not belong to a composition.");
 
-            if (source != null)
+            // find out if any content type uses this content type
+            var isUsing = allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == sourceId)).ToArray();
+            if (isUsing.Length > 0)
             {
-                // find out if any content type uses this content type
-                var isUsing = allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == source.Id)).ToArray();
-                if (isUsing.Length > 0)
-                {
-                    //if already in use a composition, do not allow any composited types
-                    return new List<IContentTypeComposition>();
-                }
+                //if already in use a composition, do not allow any composited types
+                return new List<IContentTypeComposition>();
             }
 
             // if it is not used then composition is possible
@@ -62,7 +91,25 @@ namespace Umbraco.Core.Services
             //    .ToArray();
 
             return list
-                .Where(x => x.Id != (source != null ? source.Id : 0))
+                //not itself
+                .Where(x => x.Id != sourceId)
+                .Where(x =>
+                {
+                    //need to filter any content types that are included in this list
+                    if (filterContentTypesList.Any() == false) return true;
+
+                    return filterContentTypesList.Any(c => c.InvariantEquals(x.Alias)) == false;
+                })
+                .Where(x =>
+                {
+                    //need to filter any content types that have matching property aliases that are included in this list
+                    if (filterContentTypesList.Any() == false) return true;
+                    
+                    //ensure that we don't return if there's any overlapping property aliases from the filtered ones specified
+                    return filteredPropertyTypes.Intersect(
+                        x.PropertyTypes.Select(p => p.Alias), 
+                        StringComparer.InvariantCultureIgnoreCase).Any() == false;
+                })
                 .OrderBy(x => x.Name)                
                 .ToList();
         }
@@ -74,6 +121,8 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         private static IEnumerable<IContentTypeComposition> GetDirectOrIndirect(IContentTypeComposition ctype)
         {
+            if (ctype == null) return Enumerable.Empty<IContentTypeComposition>();
+
             // hashset guarantees unicity on Id
             var all = new HashSet<IContentTypeComposition>(new DelegateEqualityComparer<IContentTypeComposition>(
                 (x, y) => x.Id == y.Id,

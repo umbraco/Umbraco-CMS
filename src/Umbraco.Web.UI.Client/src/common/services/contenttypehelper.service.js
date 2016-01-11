@@ -43,7 +43,37 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter) {
            return newArray;
         },
 
+        validateAddingComposition: function(contentType, compositeContentType) {
+
+            //Validate that by adding this group that we are not adding duplicate property type aliases
+
+            var propertiesAdding = _.flatten(_.map(compositeContentType.groups, function(g) {
+                return _.map(g.properties, function(p) {
+                    return p.alias;
+                });
+            }));
+            var propAliasesExisting = _.flatten(_.map(contentType.groups, function(g) {
+                return _.map(g.properties, function(p) {
+                    return p.alias;
+                });
+            }));
+            var intersec = _.intersection(propertiesAdding, propAliasesExisting);
+            if (intersec.length > 0) {
+                //return the overlapping property aliases
+                return intersec;
+            }
+
+            //no overlapping property aliases
+            return [];
+        },
+
         mergeCompositeContentType: function(contentType, compositeContentType) {
+
+            //Validate that there are no overlapping aliases
+            var overlappingAliases = this.validateAddingComposition(contentType, compositeContentType);
+            if (overlappingAliases.length > 0) {
+                throw new Error("Cannot add this composition, these properties already exist on the content type: " + overlappingAliases.join());
+            }
 
            angular.forEach(compositeContentType.groups, function(compositionGroup) {
 
@@ -134,7 +164,7 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter) {
 
                  // push id to array of merged composite content types
                  compositionGroup.parentTabContentTypes.push(compositeContentType.id);
-
+                  
                  // push group before placeholder tab
                  contentType.groups.unshift(compositionGroup);
 

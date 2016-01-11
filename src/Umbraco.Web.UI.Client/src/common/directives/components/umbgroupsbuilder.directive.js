@@ -1,7 +1,7 @@
 (function() {
   'use strict';
 
-  function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource, dataTypeHelper, dataTypeResource, $filter, iconHelper, $q) {
+  function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource, dataTypeHelper, dataTypeResource, $filter, iconHelper, $q, $timeout) {
 
     function link(scope, el, attr, ctrl) {
 
@@ -116,6 +116,36 @@
 
       }
 
+        function filterAvailableCompositions(selectedContentType, selecting) {
+
+            //selecting = true if the user has check the item, false if the user has unchecked the item
+
+            var selectedContentTypeAliases = selecting ?
+                //the user has selected the item so add to the current list
+                _.union(scope.compositionsDialogModel.compositeContentTypes, [selectedContentType.alias]) :
+                //the user has unselected the item so remove from the current list
+                _.reject(scope.compositionsDialogModel.compositeContentTypes, function(i) {
+                    return i === selectedContentType.alias;
+                });                
+
+            //use a different resource lookup depending on the content type type
+            var resourceLookup = scope.contentType === "documentType" ? contentTypeResource.getAvailableCompositeContentTypes : mediaTypeResource.getAvailableCompositeContentTypes;
+
+            return resourceLookup(scope.model.id, selectedContentTypeAliases).then(function (filteredAvailableCompositeTypes) {
+                _.each(scope.compositionsDialogModel.availableCompositeContentTypes, function (current) {
+                    //reset first 
+                    current.disallow = false;
+                    //see if this list item is found in the response (allowed) list
+                    var found = _.find(filteredAvailableCompositeTypes, function (f) {
+                        return current.alias === f.alias;
+                    });
+                    //disallow if the item was not found in the response (allowed) list - 
+                    // BUT do not set to dissallowed if it is currently checked
+                    current.disallow = (selectedContentTypeAliases.indexOf(current.alias) === -1) && (found ? false : true);
+                });
+            });
+        }
+
       function updatePropertiesSortOrder() {
 
         angular.forEach(scope.model.groups, function(group){
@@ -187,6 +217,8 @@
                 // or the action has been confirmed
                 } else {
 
+                //TODO: RE-validate compositions
+
                     // make sure that all tabs has an init property
                     if (scope.model.groups.length !== 0) {
                       angular.forEach(scope.model.groups, function(group) {
@@ -227,6 +259,7 @@
 
                      mediaTypeResource.getById(compositeContentType.id).then(function(composition){
                         contentTypeHelper.mergeCompositeContentType(scope.model, composition);
+                            }
                      });
 
                   }

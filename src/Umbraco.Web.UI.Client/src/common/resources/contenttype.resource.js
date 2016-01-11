@@ -16,13 +16,26 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                'Failed to retrieve count');
         },
 
-        getAvailableCompositeContentTypes: function (contentTypeId) {
+        getAvailableCompositeContentTypes: function (contentTypeId, filterContentTypes) {
+            if (!filterContentTypes) {
+                filterContentTypes = [];
+            }
+            var query = "";
+            _.each(filterContentTypes, function (item) {
+                query += "filterContentTypes=" + item + "&";
+            });
+            // if filterContentTypes array is empty we need a empty variable in the querystring otherwise the service returns a error
+            if (filterContentTypes.length === 0) {
+                query += "filterContentTypes=&";
+            }
+            query += "contentTypeId=" + contentTypeId;
+            
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "contentTypeApiBaseUrl",
                        "GetAvailableCompositeContentTypes",
-                       [{ contentTypeId: contentTypeId }])),
+                       query)),
                'Failed to retrieve data for content type id ' + contentTypeId);
         },
 
