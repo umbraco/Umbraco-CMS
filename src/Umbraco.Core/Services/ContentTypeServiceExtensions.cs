@@ -33,13 +33,13 @@ namespace Umbraco.Core.Services
                 ? new string[] { }
                 : filterContentTypes.Where(x => x.IsNullOrWhiteSpace() == false).ToArray();
 
+            if (filterPropertyTypes == null) filterPropertyTypes = new string[] {};
+
             //create the full list of property types to use as the filter
             //this is the combination of all property type aliases found in the content types passed in for the filter
             //as well as the specific property types passed in for the filter
-            filterPropertyTypes = filterPropertyTypes == null
-                ? new string[] {}
-                : allContentTypes
-                    .Where(c => filterContentTypes.Contains(c.Alias))
+            filterPropertyTypes = allContentTypes
+                    .Where(c => filterContentTypes.InvariantContains(c.Alias))
                     .SelectMany(c => c.PropertyTypes)
                     .Select(c => c.Alias)
                     .Union(filterPropertyTypes)
