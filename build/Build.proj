@@ -175,9 +175,7 @@
     <!-- Copy SQL CE -->
     <ItemGroup>
       <SQLCE4Files
-     Include="..\src\packages\SqlServerCE.4.0.0.0\**\*.*"
-     Exclude="..\src\packages\SqlServerCE.4.0.0.0\lib\**\*;..\src\packages\SqlServerCE.4.0.0.0\**\*.nu*"
-		/>
+		Include="..\src\packages\Microsoft.SqlServer.Compact.4.0.8876.1\NativeBinaries\**\*.*"	/>
     </ItemGroup>
 
     <Copy SourceFiles="@(SQLCE4Files)"
