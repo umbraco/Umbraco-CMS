@@ -13,15 +13,14 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
         creatingFolder: false,
     };
 
-    var node = $scope.dialogOptions.currentNode;
+    var node = $scope.dialogOptions.currentNode,
+        localizeCreateFolder = localizationService.localize("defaultdialog_createFolder").then(function (value) {return value;});
 
     $scope.showCreateFolder = function() {
         $scope.model.creatingFolder = true;
     }
 
     $scope.createContainer = function () {
-        var localizeCreateFolder = localizationService.localize("defaultdialog_createFolder").then(function (value) {return value;})
-
         if (formHelper.submitForm({
             scope: $scope,
             formCtrl: this.createFolderForm,

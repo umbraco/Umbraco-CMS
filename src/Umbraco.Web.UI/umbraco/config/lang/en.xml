@@ -181,6 +181,7 @@
     <key alias="updateData">Choose a type and a title</key>
     <key alias="noDocumentTypes" version="7.0"><![CDATA[There are no allowed document types available. You must enable these in the settings section under <strong>"document types"</strong>.]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[There are no allowed media types available. You must enable these in the settings section under <strong>"media types"</strong>.]]></key>
+    <key alias="documentTypeWithoutTemplate">Document Type without a template</key>
   </area>
   <area alias="dashboard">
     <key alias="browser">Browse your website</key>
@@ -454,7 +455,8 @@
     <key alias="preview">Preview</key>
     <key alias="changePassword">Change password</key>
     <key alias="to">to</key>
-
+    <key alias="listView">List view</key>
+    <key alias="saving">Saving...</key>
   </area>
 
   <area alias="colors">
@@ -466,6 +468,23 @@
     <key alias="red">Red</key>
   </area>
 
+  <area alias="shortcuts">
+      <key alias="addTab">Add tab</key>
+      <key alias="addProperty">Add property</key>
+      <key alias="addEditor">Add editor</key>
+      <key alias="addTemplate">Add template</key>
+      <key alias="addChildNode">Add child node</key>
+
+      <key alias="editDataType">Edit data type</key>
+
+      <key alias="navigateSections">Navigate sections</key>
+
+      <key alias="shortcut">Shortcuts</key>
+
+      <key alias="toggleListView">Toggle list view</key>
+      <key alias="toggleAllowAsRoot">Toggle allow as root</key>
+  </area>
+
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Background colour</key>
     <key alias="bold">Bold</key>
@@ -473,6 +492,7 @@
     <key alias="font">Font</key>
     <key alias="text">Text</key>
   </area>
+
   <area alias="headers">
     <key alias="page">Page</key>
   </area>

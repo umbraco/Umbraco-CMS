@@ -12,6 +12,7 @@
     function MemberTypesEditController($scope, $rootScope, $routeParams, $log, $filter, memberTypeResource, dataTypeResource, editorState, iconHelper, formHelper, navigationService, contentEditingHelper, notificationsService, $q, localizationService, overlayHelper) {
 
         var vm = this;
+        var localizeSaving = localizationService.localize("general_saving").then(function (value) {return value;});
 
         vm.save = save;
 
@@ -22,7 +23,7 @@
         vm.page.saveButtonState = "init";
         vm.page.navigation = [
 			{
-			    "name": "Design",
+			    "name": localizationService.localize("general_design").then(function (value) {return value;}),
 			    "icon": "icon-document-dashed-line",
 			    "view": "views/membertypes/views/design/design.html",
 			    "active": true
@@ -31,21 +32,22 @@
 
         vm.page.keyboardShortcutsOverview = [
 			{
+                "name": localizationService.localize("shortcuts_shortcut").then(function (value) {return value;}),
 			    "shortcuts": [
 					{
-					    "description": "Add tab",
+					    "description": localizationService.localize("shortcuts_addTab").then(function (value) {return value;}),
 					    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "t" }]
 					},
 					{
-					    "description": "Add property",
+					    "description": localizationService.localize("shortcuts_addProperty").then(function (value) {return value;}),
 					    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "p" }]
 					},
 					{
-					    "description": "Add editor",
+					    "description": localizationService.localize("shortcuts_addEditor").then(function (value) {return value;}),
 					    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "e" }]
 					},
 					{
-					    "description": "Edit data type",
+					    "description": localizationService.localize("shortcuts_editDataType").then(function (value) {return value;}),
 					    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "d" }]
 					}
 			    ]
@@ -86,7 +88,7 @@
                 vm.page.saveButtonState = "busy";
 
                 contentEditingHelper.contentEditorPerformSave({
-                    statusMessage: "Saving...",
+                    statusMessage: localizeSaving,
                     saveMethod: memberTypeResource.save,
                     scope: $scope,
                     content: vm.contentType,

@@ -105,7 +105,7 @@ angular.module('umbraco.services')
 
             return deferred.promise;
         },
-        
+
     };
 
     // force the load of the resource file
