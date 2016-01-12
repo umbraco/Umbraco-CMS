@@ -51,6 +51,10 @@ namespace Umbraco.Web.Editors
            
         }
 
+        public int GetCount()
+        {
+            return Services.ContentTypeService.CountContentTypes();
+        }
 
         public ContentTypeCompositionDisplay GetById(int id)
         {
