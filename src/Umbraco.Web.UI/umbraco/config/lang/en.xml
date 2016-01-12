@@ -431,7 +431,7 @@
     <key alias="showPageOnSend">Show page on Send</key>
     <key alias="size">Size</key>
     <key alias="sort">Sort</key>
-    <key alias="submit">Submit</key> <!-- TODO: Add to other languasge files -->
+    <key alias="submit">Submit</key>
     <key alias="type">Type</key>
     <key alias="typeToSearch">Type to search...</key>
     <key alias="up">Up</key>
@@ -452,6 +452,7 @@
     <key alias="reorderDone">I am done reordering</key>
     <key alias="preview">Preview</key>
     <key alias="changePassword">Change password</key>
+    <key alias="to">to</key>
 
   </area>
 
@@ -995,9 +996,23 @@ To manage your website, simply open the Umbraco back office and start adding con
 
       <key alias="configuration">Configuration</key>
 
+      <key alias="yesDelete">Yes, delete</key>
+
+      <key alias="movedUnderneath">was moved underneath</key>
+      <key alias="folderToMove">Select the folder to move</key>
+      <key alias="structureBelow">to in the tree structure below</key>
+
       <key alias="allDocumentTypes">All Document types</key>
+      <key alias="allDocuments">All Documents</key>
+      <key alias="allMediaItems">All media items</key>
 
+      <key alias="usingThisDocument">using this document type will be deleted permanently, please confirm you want to delete these as well.</key>
+      <key alias="usingThisMedia">using this media type will be deleted permanently, please confirm you want to delete these as well.</key>
+      <key alias="usingThisMember">using this member type will be deleted permanently, please confirm you want to delete these as well</key>
 
+      <key alias="andAllDocuments">and all documents using this type</key>
+      <key alias="andAllMediaItems">and all media items using this type</key>
+      <key alias="andAllMembers">and all members using this type</key>
   </area>
 
   <area alias="templateEditor">
