@@ -2,7 +2,7 @@
  * @ngdoc service
  * @name umbraco.services.tinyMceService
  *
- *  
+ *
  * @description
  * A service containing all logic for all of the Umbraco TinyMCE plugins
  */
@@ -53,7 +53,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
         * @description
         * Creates the umbrco insert embedded media tinymce plugin
         *
-        * @param {Object} editor the TinyMCE editor instance        
+        * @param {Object} editor the TinyMCE editor instance
         * @param {Object} $scope the current controller scope
         */
         createInsertEmbeddedMedia: function (editor, $scope) {
@@ -78,10 +78,11 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
         * @description
         * Creates the umbrco insert media tinymce plugin
         *
-        * @param {Object} editor the TinyMCE editor instance        
+        * @param {Object} editor the TinyMCE editor instance
         * @param {Object} $scope the current controller scope
+        * @param {Object} $rootScope rootScope
         */
-        createMediaPicker: function (editor) {
+        createMediaPicker: function (editor, $scope, $rootScope) {
             editor.addButton('umbmediapicker', {
                 icon: 'custom icon-picture',
                 tooltip: 'Media Picker',
@@ -106,6 +107,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                             onlyImages: true,
                             showDetails: true,
                             startNodeId: userData.startMediaId,
+                            openAtNodeId: $rootScope.lastPickedMediaParentId ? $rootScope.lastPickedMediaParentId : userData.startMediaId,
                             callback: function (img) {
 
                                 if (img) {
@@ -117,6 +119,8 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                                         'data-id': img.id,
                                         id: '__mcenew'
                                     };
+
+                                    $rootScope.lastPickedMediaParentId = img.parentId;
 
                                     editor.insertContent(editor.dom.createHTML('img', data));
 
@@ -142,7 +146,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                         });
                     });
 
-                    
+
                 }
             });
         },
@@ -155,11 +159,11 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
         * @description
         * Creates the insert umbrco macro tinymce plugin
         *
-        * @param {Object} editor the TinyMCE editor instance      
+        * @param {Object} editor the TinyMCE editor instance
         * @param {Object} $scope the current controller scope
         */
         createInsertMacro: function (editor, $scope) {
-            
+
             /** Adds custom rules for the macro plugin and custom serialization */
             editor.on('preInit', function (args) {
                 //this is requires so that we tell the serializer that a 'div' is actually allowed in the root, otherwise the cleanup will strip it out
@@ -173,11 +177,11 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                         }
                     }
                 });
-            
+
             });
 
             /**
-            * Because the macro gets wrapped in a P tag because of the way 'enter' works, this 
+            * Because the macro gets wrapped in a P tag because of the way 'enter' works, this
             * method will return the macro element if not wrapped in a p, or the p if the macro
             * element is the only one inside of it even if we are deep inside an element inside the macro
             */
@@ -185,7 +189,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                 var e = $(element).closest(".umb-macro-holder");
                 if (e.length > 0) {
                     if (e.get(0).parentNode.nodeName === "P") {
-                        //now check if we're the only element                    
+                        //now check if we're the only element
                         if (element.parentNode.childNodes.length === 1) {
                             return e.get(0).parentNode;
                         }
@@ -197,9 +201,9 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
 
             /** loads in the macro content async from the server */
             function loadMacroContent($macroDiv, macroData) {
-                
+
                 //if we don't have the macroData, then we'll need to parse it from the macro div
-                if (!macroData) {                    
+                if (!macroData) {
                     var contents = $macroDiv.contents();
                     var comment = _.find(contents, function (item) {
                         return item.nodeType === 8;
@@ -231,9 +235,9 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                         }
                     });
                 });
-                
+
             }
-            
+
             /** Adds the button instance */
             editor.addButton('umbmacro', {
                 icon: 'custom icon-settings-alt',
@@ -254,15 +258,15 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                             var endSelection = tinymce.activeEditor.selection.getEnd();
                             var startSelection = tinymce.activeEditor.selection.getStart();
                             //don't proceed if it's an entire element selected
-                            if (endSelection !== startSelection) { 
-                                
+                            if (endSelection !== startSelection) {
+
                                 //if the end selection is a macro then move the cursor
                                 //NOTE: we don't have to handle when the selection comes from a previous parent because
-                                // that is automatically taken care of with the normal onNodeChanged logic since the 
+                                // that is automatically taken care of with the normal onNodeChanged logic since the
                                 // evt.element will be the macro once it becomes part of the selection.
                                 var $testForMacro = $(endSelection).closest(".umb-macro-holder");
                                 if ($testForMacro.length > 0) {
-                                    
+
                                     //it came from before so move after, if there is no after then select ourselves
                                     var next = $testForMacro.next();
                                     if (next.length > 0) {
@@ -305,7 +309,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
 
                         //set our macro button active when on a node of class umb-macro-holder
                         var $macroElement = $(evt.element).closest(".umb-macro-holder");
-                        
+
                         handleSelectionChange();
 
                         //set the button active
@@ -333,16 +337,16 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
 
                     /** when the contents load we need to find any macros declared and load in their content */
                     editor.on("LoadContent", function (o) {
-                        
+
                         //get all macro divs and load their content
                         $(editor.dom.select(".umb-macro-holder.mceNonEditable")).each(function() {
                             loadMacroContent($(this));
-                        });                        
+                        });
 
                     });
-                    
+
                     /** This prevents any other commands from executing when the current element is the macro so the content cannot be edited */
-                    editor.on('BeforeExecCommand', function (o) {                        
+                    editor.on('BeforeExecCommand', function (o) {
                         if (isOnMacroElement) {
                             if (o.preventDefault) {
                                 o.preventDefault();
@@ -353,9 +357,9 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                             return;
                         }
                     });
-                    
+
                     /** This double checks and ensures you can't paste content into the rendered macro */
-                    editor.on("Paste", function (o) {                        
+                    editor.on("Paste", function (o) {
                         if (isOnMacroElement) {
                             if (o.preventDefault) {
                                 o.preventDefault();
@@ -370,7 +374,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                     //set onNodeChanged event listener
                     editor.on('NodeChange', onNodeChanged);
 
-                    /** 
+                    /**
                     * Listen for the keydown in the editor, we'll check if we are currently on a macro element, if so
                     * we'll check if the key down is a supported key which requires an action, otherwise we ignore the request
                     * so the macro cannot be edited.
@@ -431,22 +435,22 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                     });
 
                 },
-                
+
                 /** The insert macro button click event handler */
                 onclick: function () {
 
                     var dialogData = {
                         //flag for use in rte so we only show macros flagged for the editor
-                        richTextEditor: true  
+                        richTextEditor: true
                     };
 
                     //when we click we could have a macro already selected and in that case we'll want to edit the current parameters
                     //so we'll need to extract them and submit them to the dialog.
-                    var macroElement = editor.selection.getNode();                    
+                    var macroElement = editor.selection.getNode();
                     macroElement = getRealMacroElem(macroElement);
                     if (macroElement) {
                         //we have a macro selected so we'll need to parse it's alias and parameters
-                        var contents = $(macroElement).contents();                        
+                        var contents = $(macroElement).contents();
                         var comment = _.find(contents, function(item) {
                             return item.nodeType === 8;
                         });
@@ -456,7 +460,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                         var syntax = comment.textContent.trim();
                         var parsed = macroService.parseMacroSyntax(syntax);
                         dialogData = {
-                            macroData: parsed  
+                            macroData: parsed
                         };
                     }
 
@@ -476,11 +480,11 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                                 macroSyntaxComment + '<ins>Macro alias: <strong>' + data.macroAlias + '</strong></ins>');
 
                             editor.selection.setNode(macroDiv);
-                            
+
                             var $macroDiv = $(editor.dom.select("div.umb-macro-holder." + uniqueId));
 
                             //async load the macro content
-                            loadMacroContent($macroDiv, data);                          
+                            loadMacroContent($macroDiv, data);
                         }
                     });
 
