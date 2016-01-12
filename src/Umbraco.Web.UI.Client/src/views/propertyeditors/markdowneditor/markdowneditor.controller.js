@@ -13,6 +13,7 @@ function MarkdownEditorController($scope, assetsService, dialogService, $timeout
       $scope.mediaPickerOverlay = {};
       $scope.mediaPickerOverlay.view = "mediaPicker";
       $scope.mediaPickerOverlay.show = true;
+      $scope.mediaPickerOverlay.disableFolderSelect = true;
 
       $scope.mediaPickerOverlay.submit = function(model) {
 
