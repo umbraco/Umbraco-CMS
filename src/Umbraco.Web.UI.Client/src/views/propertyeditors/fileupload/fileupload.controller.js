@@ -144,31 +144,28 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
 };
 angular.module("umbraco")
     .controller('Umbraco.PropertyEditors.FileUploadController', fileUploadController)
-    .run(function(mediaHelper, umbRequestHelper){
+    .run(function(mediaHelper, umbRequestHelper, assetsService){
         if (mediaHelper && mediaHelper.registerFileResolver) {
-
-            //NOTE: The 'entity' can be either a normal media entity or an "entity" returned from the entityResource
-            // they contain different data structures so if we need to query against it we need to be aware of this.
-            mediaHelper.registerFileResolver("Umbraco.UploadField", function(property, entity, thumbnail){
-                if (thumbnail) {
-
-                    if (mediaHelper.detectIfImageByExtension(property.value)) {
-
-                        var thumbnailUrl = umbRequestHelper.getApiUrl(
-                            "imagesApiBaseUrl",
-                            "GetBigThumbnail",
-                            [{ originalImagePath: property.value }]);
-                            
-                        return thumbnailUrl;
-                    }
-                    else {
-                        return null;
-                    }
-                    
+            assetsService.load(["lib/moment/moment-with-locales.js"]).then(
+                function () {
+                    //NOTE: The 'entity' can be either a normal media entity or an "entity" returned from the entityResource
+                    // they contain different data structures so if we need to query against it we need to be aware of this.
+                    mediaHelper.registerFileResolver("Umbraco.UploadField", function(property, entity, thumbnail){
+                        if (thumbnail) {
+                            if (mediaHelper.detectIfImageByExtension(property.value)) {
+                                //get default big thumbnail from image processor
+                                var thumbnailUrl = property.value + "?rnd=" + moment(entity.updateDate).format("YYYYMMDDHHmmss") + "&width=500";
+                                return thumbnailUrl;
+                            }
+                            else {
+                                return null;
+                            }
+                        }
+                        else {
+                            return property.value;
+                        }
+                    });
                 }
-                else {
-                    return property.value;
-                }
-            });
+            );
         }
     });
