@@ -238,29 +238,30 @@
     <key alias="thumbnailimageclickfororiginal">Click on the image to see full size</key>
     <key alias="treepicker">Pick item</key>
     <key alias="viewCacheItem">View Cache Item</key>
+    <key alias="createFolder">Create folder...</key>
 
-     <key alias="relateToOriginalLabel">Relate to original</key>
-     <key alias="theFriendliestCommunity">The friendliest community</key>
+    <key alias="relateToOriginalLabel">Relate to original</key>
+    <key alias="theFriendliestCommunity">The friendliest community</key>
 
-     <key alias="linkToPage">Link to page</key>
+    <key alias="linkToPage">Link to page</key>
 
-     <key alias="openInNewWindow">Opens the linked document in a new window or tab</key>
-     <key alias="openInFullBody">Opens the linked document in the full body of the window</key>
-     <key alias="openInParentFrame">Opens the linked document in the parent frame</key>
+    <key alias="openInNewWindow">Opens the linked document in a new window or tab</key>
+    <key alias="openInFullBody">Opens the linked document in the full body of the window</key>
+    <key alias="openInParentFrame">Opens the linked document in the parent frame</key>
 
-     <key alias="linkToMedia">Link to media</key>
-     <key alias="selectMedia">SelectMedia</key>
+    <key alias="linkToMedia">Link to media</key>
+    <key alias="selectMedia">SelectMedia</key>
 
-     <key alias="noMacroParams">There are no parameters for this macro</key>
+    <key alias="noMacroParams">There are no parameters for this macro</key>
 
-     <key alias="externalLoginProviders">External login providers</key>
-     <key alias="exceptionDetail">Exception Details</key>
-     <key alias="stracktrace">Stacktrace</key>
+    <key alias="externalLoginProviders">External login providers</key>
+    <key alias="exceptionDetail">Exception Details</key>
+    <key alias="stracktrace">Stacktrace</key>
 
-     <key alias="linkYour">Link your</key>
-     <key alias="unLinkYour">Un-Link your</key>
+    <key alias="linkYour">Link your</key>
+    <key alias="unLinkYour">Un-Link your</key>
 
-     <key alias="account">account</key>
+    <key alias="account">account</key>
 
   </area>
   <area alias="dictionaryItem">

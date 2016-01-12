@@ -6,7 +6,7 @@
  * @description
  * The controller for the media type creation dialog
  */
-function MediaTypesCreateController($scope, $location, navigationService, mediaTypeResource, formHelper, appState) {
+function MediaTypesCreateController($scope, $location, navigationService, mediaTypeResource, formHelper, appState, localizationService) {
 
     $scope.model = {
         folderName: "",
@@ -20,7 +20,13 @@ function MediaTypesCreateController($scope, $location, navigationService, mediaT
     }
 
     $scope.createContainer = function () {
-        if (formHelper.submitForm({ scope: $scope, formCtrl: this.createFolderForm, statusMessage: "Creating folder..." })) {
+        var localizeCreateFolder = localizationService.localize("defaultdialog_createFolder").then(function (value) {return value;})
+
+        if (formHelper.submitForm({
+            scope: $scope,
+            formCtrl: this.createFolderForm,
+            statusMessage: localizeCreateFolder
+        })) {
             mediaTypeResource.createContainer(node.id, $scope.model.folderName).then(function (folderId) {
 
                 navigationService.hideMenu();

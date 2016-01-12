@@ -6,7 +6,7 @@
  * @description
  * The controller for the member type creation dialog
  */
-function MemberTypesCreateController($scope, $location, navigationService, memberTypeResource, formHelper, appState) {
+function MemberTypesCreateController($scope, $location, navigationService, memberTypeResource, formHelper, appState, localizationService) {
 
     $scope.model = {
         folderName: "",
@@ -20,7 +20,13 @@ function MemberTypesCreateController($scope, $location, navigationService, membe
     }
 
     $scope.createContainer = function () {
-        if (formHelper.submitForm({ scope: $scope, formCtrl: this.createFolderForm, statusMessage: "Creating folder..." })) {
+        var localizeCreateFolder = localizationService.localize("defaultdialog_createFolder").then(function (value) {return value;})
+
+        if (formHelper.submitForm({
+            scope: $scope,
+            formCtrl: this.createFolderForm,
+            statusMessage: localizeCreateFolder
+        })) {
             memberTypeResource.createContainer(node.id, $scope.model.folderName).then(function (folderId) {
 
                 navigationService.hideMenu();
