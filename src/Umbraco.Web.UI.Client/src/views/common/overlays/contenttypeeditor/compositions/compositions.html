@@ -7,13 +7,14 @@
                    style="width: 100%"
                    ng-model="searchTerm"
                    class="umb-search-field search-query input-block-level"
-                   placeholder="Filter..."
+         localize="placeholder"
+         placeholder="@placeholders_filter"
                    umb-auto-focus>
         </div>
     </div>
 
     <div class="umb-control-group">
-        <small>Inherit tabs and properties from an existing document type. New tabs will be added to the current document type or merged if a tab with an identical name exists.</small>
+    <small><localize key="contentTypeEditor_compositionsDescription"></localize></small>
     </div>
 
     <umb-empty-state
@@ -24,7 +25,7 @@
     <umb-empty-state
         ng-if="model.availableCompositeContentTypes.length === 0 && model.totalContentTypes > 1"
         position="center">
-        This content type is used in a composition, and therefore cannot be composed itself.
+    <localize key="contentTypeEditor_compositionInUse"></localize>
     </umb-empty-state>
 
     <ul class="umb-checkbox-list">
