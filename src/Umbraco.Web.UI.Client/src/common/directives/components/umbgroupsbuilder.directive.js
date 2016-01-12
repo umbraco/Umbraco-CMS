@@ -293,21 +293,30 @@
 
         var availableContentTypeResource = scope.contentType === "documentType" ? contentTypeResource.getAvailableCompositeContentTypes : mediaTypeResource.getAvailableCompositeContentTypes;
         var countContentTypeResource = scope.contentType === "documentType" ? contentTypeResource.getCount : mediaTypeResource.getCount;
-        $q.all([
+
+          //get the currently assigned property type aliases - ensure we pass these to the server side filer
+          var propAliasesExisting = _.filter(_.flatten(_.map(scope.model.groups, function(g) {
+              return _.map(g.properties, function(p) {
+                  return p.alias;
+              });
+          })), function(f) {
+              return f !== null && f !== undefined;
+          });
+          $q.all([
               //get available composite types
-              availableContentTypeResource(scope.model.id).then(function (result) {
+              availableContentTypeResource(scope.model.id, [], propAliasesExisting).then(function (result) {
                   scope.compositionsDialogModel.availableCompositeContentTypes = result;
                   // convert icons for composite content types
                   iconHelper.formatContentTypeIcons(scope.compositionsDialogModel.availableCompositeContentTypes);
               }),
               //get content type count
-              countContentTypeResource().then(function (result) {
+              countContentTypeResource().then(function(result) {
                   scope.compositionsDialogModel.totalContentTypes = parseInt(result, 10);
               })
-        ]).then(function () {
-            //resolves when both other promises are done, now show it
-            scope.compositionsDialogModel.show = true;
-        });
+          ]).then(function() {
+              //resolves when both other promises are done, now show it
+              scope.compositionsDialogModel.show = true;
+          });
 
       };
 
