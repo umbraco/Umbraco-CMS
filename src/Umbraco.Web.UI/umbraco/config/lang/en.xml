@@ -181,7 +181,6 @@
     <key alias="updateData">Choose a type and a title</key>
     <key alias="noDocumentTypes" version="7.0"><![CDATA[There are no allowed document types available. You must enable these in the settings section under <strong>"document types"</strong>.]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[There are no allowed media types available. You must enable these in the settings section under <strong>"media types"</strong>.]]></key>
-    <key alias="documentTypeWithoutTemplate">Document Type Without Template</key>
   </area>
   <area alias="dashboard">
     <key alias="browser">Browse your website</key>
@@ -257,6 +256,11 @@
      <key alias="externalLoginProviders">External login providers</key>
      <key alias="exceptionDetail">Exception Details</key>
      <key alias="stracktrace">Stacktrace</key>
+
+     <key alias="linkYour">Link your</key>
+     <key alias="unLinkYour">Un-Link your</key>
+
+     <key alias="account">account</key>
 
   </area>
   <area alias="dictionaryItem">
