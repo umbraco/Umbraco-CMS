@@ -136,13 +136,13 @@ namespace Umbraco.Web.Models.Mapping
                 }
             };
 
-            if (media.Properties.FirstOrDefault(x => x.Alias == "umbracoFile") != null)
+            if (media.Properties.FirstOrDefault(x => x.Alias == Constants.Conventions.Media.File) != null)
             {
                 var helper = new UmbracoHelper(UmbracoContext.Current);
                 var mediaItem = helper.TypedMedia(media.Id);
                 if (mediaItem != null)
                 {
-                    var crop = mediaItem.GetCropUrl("umbracoFile", string.Empty);
+                    var crop = mediaItem.GetCropUrl(Constants.Conventions.Media.File, string.Empty);
                     if (string.IsNullOrWhiteSpace(crop) == false)
                     {
                         var link = new ContentPropertyDisplay
