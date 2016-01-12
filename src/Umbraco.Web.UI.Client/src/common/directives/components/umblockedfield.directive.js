@@ -17,12 +17,18 @@
 	        // this ensures that the normal flow (i.e. a user editing the text box) occurs so that
             // the parsers, validators and viewchangelisteners execute
 	        scope.$watch("ngModel", function (newValue, oldValue) {
-                if (newValue !== oldValue) {
+	            if (newValue !== oldValue) {
+	                //Hack: in order for the pipeline to execute for setViewValue, the underlying $modelValue cannot
+	                // match the value being set with the newValue, so we'll se it to undefined first.
+	                // We could avoid this hack by setting the ngModel of the lockedField input field to a custom
+	                // scope object, but that would mean we'd have to watch that value too in order to set the outer
+                    // ngModelCtrl.$modelValue. It's seems like less overhead to just do this and not have 2x watches.
+	                scope.lockedFieldForm.lockedField.$modelValue = undefined;
                     scope.lockedFieldForm.lockedField.$setViewValue(newValue);
                     scope.lockedFieldForm.lockedField.$render();
                 }
 	        });
-
+	        
 			var input = el.find('.umb-locked-field__input');
 
 			function activate() {
