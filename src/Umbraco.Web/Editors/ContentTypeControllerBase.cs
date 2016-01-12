@@ -61,7 +61,7 @@ namespace Umbraco.Web.Editors
         /// </param>
         /// <param name="contentTypeId"></param>        
         /// <returns></returns>
-        protected IEnumerable<EntityBasic> PerformGetAvailableCompositeContentTypes(int contentTypeId, 
+        protected IEnumerable<Tuple<EntityBasic, bool>> PerformGetAvailableCompositeContentTypes(int contentTypeId, 
             UmbracoObjectTypes type, 
             string[] filterContentTypes,
             string[] filterPropertyTypes)
@@ -107,10 +107,10 @@ namespace Umbraco.Web.Editors
             var filtered = Services.ContentTypeService.GetAvailableCompositeContentTypes(source, allContentTypes, filterContentTypes, filterPropertyTypes);
 
             return filtered                
-                .Select(Mapper.Map<IContentTypeComposition, EntityBasic>)
+                .Select(x => new Tuple<EntityBasic, bool>(Mapper.Map<IContentTypeComposition, EntityBasic>(x.Item1), x.Item2))
                 .Select(x =>
                 {
-                    x.Name = TranslateItem(x.Name);
+                    x.Item1.Name = TranslateItem(x.Item1.Name);
                     return x;
                 })
                 .ToList();

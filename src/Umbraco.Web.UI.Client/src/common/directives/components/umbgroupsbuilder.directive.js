@@ -125,7 +125,7 @@
                 _.union(scope.compositionsDialogModel.compositeContentTypes, [selectedContentType.alias]) :
                 //the user has unselected the item so remove from the current list
                 _.reject(scope.compositionsDialogModel.compositeContentTypes, function(i) {
-                    return i === selectedContentType && selectedContentType.alias;
+                    return i === selectedContentType.alias;
                 });
 
             //get the currently assigned property type aliases - ensure we pass these to the server side filer
@@ -143,14 +143,16 @@
             return resourceLookup(scope.model.id, selectedContentTypeAliases, propAliasesExisting).then(function (filteredAvailableCompositeTypes) {
                 _.each(scope.compositionsDialogModel.availableCompositeContentTypes, function (current) {
                     //reset first 
-                    current.disallow = false;
+                    current.allowed = true;
                     //see if this list item is found in the response (allowed) list
                     var found = _.find(filteredAvailableCompositeTypes, function (f) {
-                        return current.alias === f.alias;
+                        return current.contentType.alias === f.contentType.alias;
                     });
-                    //disallow if the item was not found in the response (allowed) list - 
-                    // BUT do not set to dissallowed if it is currently checked
-                    current.disallow = (selectedContentTypeAliases.indexOf(current.alias) === -1) && (found ? false : true);
+                    //allow if the item was  found in the response (allowed) list - 
+                    // and ensure its set to allowed if it is currently checked
+                    current.allowed = (selectedContentTypeAliases.indexOf(current.contentType.alias) !== -1) ||
+                                        ((found !== null && found !== undefined) ? found.allowed : false);
+
                 });
             });
         }
@@ -256,37 +258,42 @@
                 // because after that the scope.model.compositeContentTypes will be populated with the selected value.
                 var newSelection = scope.model.compositeContentTypes.indexOf(selectedContentType.alias) === -1;
 
-                //based on the selection, we need to filter the available composite types list
-                filterAvailableCompositions(selectedContentType, newSelection).then(function () {
+                if (newSelection) {
+                    //merge composition with content type
 
-                    if (newSelection) {
-                        //merge composition with content type
+                    //use a different resource lookup depending on the content type type
+                    var resourceLookup = scope.contentType === "documentType" ? contentTypeResource.getById : mediaTypeResource.getById;
 
-                        //use a different resource lookup depending on the content type type
-                        var resourceLookup = scope.contentType === "documentType" ? contentTypeResource.getById : mediaTypeResource.getById;
+                    resourceLookup(selectedContentType.id).then(function (composition) {
+                        //based on the above filtering we shouldn't be able to select an invalid one, but let's be safe and
+                        // double check here.
+                        var overlappingAliases = contentTypeHelper.validateAddingComposition(scope.model, composition);
+                        if (overlappingAliases.length > 0) {
+                            //this will create an invalid composition, need to uncheck it
+                            scope.compositionsDialogModel.compositeContentTypes.splice(
+                                scope.compositionsDialogModel.compositeContentTypes.indexOf(composition.alias), 1);
+                            //dissallow this until something else is unchecked
+                            selectedContentType.allowed = false;
+                        }
+                        else {
+                            contentTypeHelper.mergeCompositeContentType(scope.model, composition);
+                        }
 
-                        resourceLookup(selectedContentType.id).then(function (composition) {
-                            //based on the above filtering we shouldn't be able to select an invalid one, but let's be safe and
-                            // double check here.
-                            var overlappingAliases = contentTypeHelper.validateAddingComposition(scope.model, composition);
-                            if (overlappingAliases.length > 0) {
-                                //this will create an invalid composition, need to uncheck it
-                                scope.compositionsDialogModel.compositeContentTypes.splice(
-                                    scope.compositionsDialogModel.compositeContentTypes.indexOf(composition.alias), 1);
-                                //dissallow this until something else is unchecked
-                                selectedContentType.disallow = true;
-                            }
-                            else {
-                                contentTypeHelper.mergeCompositeContentType(scope.model, composition);
-                            }
+                        //based on the selection, we need to filter the available composite types list
+                        filterAvailableCompositions(selectedContentType, newSelection).then(function () {
+                            //TODO: Here we could probably re-enable selection if we previously showed a throbber or something
                         });
-                    }
-                    else {
-                        // split composition from content type
-                        contentTypeHelper.splitCompositeContentType(scope.model, selectedContentType);
-                    }
+                    });
+                }
+                else {
+                    // split composition from content type
+                    contentTypeHelper.splitCompositeContentType(scope.model, selectedContentType);
 
-                });
+                    //based on the selection, we need to filter the available composite types list
+                    filterAvailableCompositions(selectedContentType, newSelection).then(function () {
+                        //TODO: Here we could probably re-enable selection if we previously showed a throbber or something
+                    });
+                }
 
             }
         };
@@ -306,8 +313,11 @@
               //get available composite types
               availableContentTypeResource(scope.model.id, [], propAliasesExisting).then(function (result) {
                   scope.compositionsDialogModel.availableCompositeContentTypes = result;
+                  var contentTypes = _.map(scope.compositionsDialogModel.availableCompositeContentTypes, function(c) {
+                      return c.contentType;
+                  });
                   // convert icons for composite content types
-                  iconHelper.formatContentTypeIcons(scope.compositionsDialogModel.availableCompositeContentTypes);
+                  iconHelper.formatContentTypeIcons(contentTypes);
               }),
               //get content type count
               countContentTypeResource().then(function(result) {

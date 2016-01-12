@@ -23,7 +23,7 @@ namespace Umbraco.Core.Services
         /// be looked up via the db, they need to be passed in.
         /// </param>
         /// <returns></returns>
-        public static IEnumerable<IContentTypeComposition> GetAvailableCompositeContentTypes(this IContentTypeService ctService,
+        public static IEnumerable<Tuple<IContentTypeComposition, bool>> GetAvailableCompositeContentTypes(this IContentTypeService ctService,
             IContentTypeComposition source,
             IContentTypeComposition[] allContentTypes,
             string[] filterContentTypes = null,
@@ -48,20 +48,13 @@ namespace Umbraco.Core.Services
                     .ToArray();
 
             var sourceId = source != null ? source.Id : 0;
-
-            //below is all ported from the old doc type editor and comes with the same weaknesses /insanity / magic
-
-            // note: there are many sanity checks missing here and there ;-((
-            // make sure once and for all
-            //if (allContentTypes.Any(x => x.ParentId > 0 && x.ContentTypeComposition.Any(y => y.Id == x.ParentId) == false))
-            //    throw new Exception("A parent does not belong to a composition.");
-
+                        
             // find out if any content type uses this content type
             var isUsing = allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == sourceId)).ToArray();
             if (isUsing.Length > 0)
             {
                 //if already in use a composition, do not allow any composited types
-                return new List<IContentTypeComposition>();
+                return new List<Tuple<IContentTypeComposition, bool>>();
             }
 
             // if it is not used then composition is possible
@@ -81,18 +74,10 @@ namespace Umbraco.Core.Services
             foreach (var x in indirectContentTypes)
                 list.Add(x);
 
-            //// directContentTypes are those we use directly
-            //// they are already in indirectContentTypes, no need to add to the list
-            //var directContentTypes = source.ContentTypeComposition.ToArray();
-
-            //var enabled = usableContentTypes.Select(x => x.Id) // those we can use
-            //    .Except(indirectContentTypes.Select(x => x.Id)) // except those that are indirectly used
-            //    .Union(directContentTypes.Select(x => x.Id)) // but those that are directly used
-            //    .Where(x => x != source.ParentId) // but not the parent
-            //    .Distinct()
-            //    .ToArray();
-
-            return list
+            //At this point we have a list of content types that 'could' be compositions
+            
+            //now we'll filter this list based on the filters requested
+            var filtered = list
                 //not itself
                 .Where(x => x.Id != sourceId)
                 .Where(x =>
@@ -110,6 +95,15 @@ namespace Umbraco.Core.Services
                 })
                 .OrderBy(x => x.Name)                
                 .ToList();
+
+            //now we can create our result based on what is still available
+            var result = list
+                .OrderBy(x => x.Name)
+                .Select(composition => filtered.Contains(composition)
+                ? new Tuple<IContentTypeComposition, bool>(composition, true)
+                : new Tuple<IContentTypeComposition, bool>(composition, false)).ToList();
+
+            return result;
         }
 
         /// <summary>

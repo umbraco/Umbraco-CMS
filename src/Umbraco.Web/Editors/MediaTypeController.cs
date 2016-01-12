@@ -101,11 +101,17 @@ namespace Umbraco.Web.Editors
         /// be looked up via the db, they need to be passed in.
         /// </param>
         /// <returns></returns>
-        public IEnumerable<EntityBasic> GetAvailableCompositeMediaTypes(int contentTypeId,
+        public HttpResponseMessage GetAvailableCompositeMediaTypes(int contentTypeId,
             [FromUri]string[] filterContentTypes,
             [FromUri]string[] filterPropertyTypes)
         {
-            return PerformGetAvailableCompositeContentTypes(contentTypeId, UmbracoObjectTypes.MediaType, filterContentTypes, filterPropertyTypes);
+            var result = PerformGetAvailableCompositeContentTypes(contentTypeId, UmbracoObjectTypes.MediaType, filterContentTypes, filterPropertyTypes)
+                .Select(x => new
+                {
+                    contentType = x.Item1,
+                    allowed = x.Item2
+                });
+            return Request.CreateResponse(result);            
         }
 
         public ContentTypeCompositionDisplay GetEmpty(int parentId)
