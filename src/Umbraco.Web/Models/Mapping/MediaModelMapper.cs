@@ -9,6 +9,7 @@ using System.Web.Routing;
 using AutoMapper;
 using umbraco;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.PropertyEditors;
@@ -142,15 +143,23 @@ namespace Umbraco.Web.Models.Mapping
                 var mediaItem = helper.TypedMedia(media.Id);
                 if (mediaItem != null)
                 {
-                    var crop = mediaItem.GetCropUrl(Constants.Conventions.Media.File, string.Empty);
-                    if (string.IsNullOrWhiteSpace(crop) == false)
+                    var crops = new List<string>();
+                    var autoFillProperties = UmbracoConfig.For.UmbracoSettings().Content.ImageAutoFillProperties;
+                    foreach (var field in autoFillProperties)
+                    {
+                        var crop = mediaItem.GetCropUrl(field.Alias, string.Empty);
+                        if (string.IsNullOrWhiteSpace(crop) == false)
+                            crops.Add(crop.Split('?')[0]);
+                    }
+                    
+                    if (crops.Any())
                     {
                         var link = new ContentPropertyDisplay
                         {
                             Alias = string.Format("{0}urls", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                             Label = localizedText.Localize("media/urls"),
                             // don't add the querystring, split on the "?" will also work if there is no "?"
-                            Value = crop.Split('?')[0],
+                            Value = string.Join(",", crops),
                             View = "urllist"
                         };
 
