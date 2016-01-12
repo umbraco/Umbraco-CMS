@@ -181,6 +181,7 @@
     <Compile Include="Cache\RepositoryCachePolicyOptions.cs" />
     <Compile Include="Cache\StaticCacheProvider.cs" />
     <Compile Include="Cache\TypedCacheRefresherBase.cs" />
+	<Compile Include="Cache\DeepCloneRuntimeCacheProvider.cs" />
     <Compile Include="CodeAnnotations\FriendlyNameAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoObjectTypeAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoWillObsoleteAttribute.cs" />
@@ -465,7 +466,6 @@
     <Compile Include="Persistence\Relators\AccessRulesRelator.cs" />
     <Compile Include="Persistence\Repositories\AuditRepository.cs" />
     <Compile Include="Persistence\Repositories\EntityContainerRepository.cs" />
-    <Compile Include="Persistence\Repositories\DeepCloneRuntimeCacheProvider.cs" />
     <Compile Include="Persistence\Repositories\DomainRepository.cs" />
     <Compile Include="Persistence\Repositories\ExternalLoginRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IAuditRepository.cs" />
@@ -479,7 +479,6 @@
     <Compile Include="Persistence\Repositories\Interfaces\ITaskTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\MigrationEntryRepository.cs" />
     <Compile Include="Persistence\Repositories\PublicAccessRepository.cs" />
-    <Compile Include="Persistence\Repositories\RepositoryCacheOptions.cs" />
     <Compile Include="Persistence\Repositories\TaskRepository.cs" />
     <Compile Include="Persistence\Repositories\TaskTypeRepository.cs" />
     <Compile Include="PropertyEditors\DecimalValidator.cs" />
