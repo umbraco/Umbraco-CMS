@@ -251,7 +251,7 @@
               }),
               //get content type count
               countContentTypeResource().then(function (result) {
-                  scope.compositionsDialogModel.totalContentTypes = result;
+                  scope.compositionsDialogModel.totalContentTypes = parseInt(result, 10);
               })
         ]).then(function () {
             //resolves when both other promises are done, now show it

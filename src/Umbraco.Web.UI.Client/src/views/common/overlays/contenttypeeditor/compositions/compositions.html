@@ -15,13 +15,12 @@
 </div>
 
 <umb-empty-state
-    ng-if="model.totalContentTypes === 0"
+    ng-if="model.availableCompositeContentTypes.length === 0 && model.totalContentTypes <= 1"
     position="center">
     There are no content types available to use as a composition.
 </umb-empty-state>
-
 <umb-empty-state
-    ng-if="model.availableCompositeContentTypes.length === 0 && model.totalContentTypes !== 0"
+    ng-if="model.availableCompositeContentTypes.length === 0 && model.totalContentTypes > 1"
     position="center">
     This content type is used in a composition, and therefore cannot be composed itself.
 </umb-empty-state>
