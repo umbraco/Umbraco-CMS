@@ -12,6 +12,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         ILanguage Language { get; set; }
 
+        int LanguageId { get; }
+
         /// <summary>
         /// Gets or sets the translated text
         /// </summary>

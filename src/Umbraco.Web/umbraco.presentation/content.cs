@@ -297,7 +297,7 @@ namespace umbraco
                 ClearContextCache();
 
                 var cachedFieldKeyStart = string.Format("{0}{1}_", CacheKeys.ContentItemCacheKey, d.Id);
-                ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(cachedFieldKeyStart);
+                ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(cachedFieldKeyStart);
 
                 FireAfterUpdateDocumentCache(d, e);
             }

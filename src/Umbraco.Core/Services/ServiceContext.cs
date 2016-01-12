@@ -286,6 +286,7 @@ namespace Umbraco.Core.Services
                 _entityService = new Lazy<IEntityService>(() => new EntityService(
                     provider, repositoryFactory, logger, eventMessagesFactory, 
                     _contentService.Value, _contentTypeService.Value, _mediaService.Value, _dataTypeService.Value, _memberService.Value, _memberTypeService.Value,
+                    //TODO: Consider making this an isolated cache instead of using the global one
                     cache.RuntimeCache));
 
             if (_relationService == null)
