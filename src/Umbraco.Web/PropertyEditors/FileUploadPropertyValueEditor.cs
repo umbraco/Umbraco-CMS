@@ -63,10 +63,10 @@ namespace Umbraco.Web.PropertyEditors
                 clear = json["clearFiles"].Value<bool>();
             }
 
-            var currentPersistedValues = new string[] {};
+            var currentPersistedValues = new string[] { };
             if (string.IsNullOrEmpty(currentValue.ToString()) == false)
             {
-                currentPersistedValues = currentValue.ToString().Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
+                currentPersistedValues = currentValue.ToString().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             }
 
             var newValue = new List<string>();
@@ -82,7 +82,7 @@ namespace Umbraco.Web.PropertyEditors
                 }
                 return "";
             }
-            
+
             //check for any files
             if (editorValue.AdditionalData.ContainsKey("files"))
             {
@@ -128,20 +128,43 @@ namespace Umbraco.Web.PropertyEditors
                         {
                             var umbracoFile = UmbracoMediaFile.Save(fileStream, fileName);
 
+                            if (umbracoFile.SupportsResizing)
+                            {
+                                var additionalSizes = new List<int>();
+                                //get the pre-vals value		
+                                var thumbs = editorValue.PreValues.FormatAsDictionary();
+                                if (thumbs.Any())
+                                {
+                                    var thumbnailSizes = thumbs.First().Value.Value;
+                                    // additional thumbnails configured as prevalues on the DataType		
+                                    foreach (var thumb in thumbnailSizes.Split(new[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries))
+                                    {
+                                        int thumbSize;
+                                        if (thumb == "" || int.TryParse(thumb, out thumbSize) == false) continue;
+                                        additionalSizes.Add(thumbSize);
+                                    }
+                                }
+
+                                using (var image = Image.FromStream(fileStream))
+                                {
+                                    ImageHelper.GenerateMediaThumbnails(fs, fileName, umbracoFile.Extension, image, additionalSizes);
+                                }
+                            }
+
                             newValue.Add(umbracoFile.Url);
                             //add to the saved paths
                             savedFilePaths.Add(umbracoFile.Url);
                         }
                         //now remove the temp file
-                        File.Delete(file.TempFilePath);   
+                        File.Delete(file.TempFilePath);
                     }
-                    
+
                     //Remove any files that are no longer saved for this item
                     foreach (var toRemove in currentPersistedValues.Except(savedFilePaths))
                     {
                         fs.DeleteFile(fs.GetRelativePath(toRemove), true);
                     }
-                    
+
 
                     return string.Join(",", newValue);
                 }
