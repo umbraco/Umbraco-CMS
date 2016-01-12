@@ -1,7 +1,7 @@
 (function() {
   'use strict';
 
-  function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource, dataTypeHelper, dataTypeResource, $filter) {
+  function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource, dataTypeHelper, dataTypeResource, $filter, iconHelper, $q) {
 
     function link(scope, el, attr, ctrl) {
 
@@ -155,7 +155,6 @@
         scope.compositionsDialogModel = {
             title: "Compositions",
             contentType: scope.model,
-            availableCompositeContentTypes: scope.model.availableCompositeContentTypes,
             compositeContentTypes: scope.model.compositeContentTypes,
             view: "views/common/overlays/contenttypeeditor/compositions/compositions.html",
             confirmSubmit: {
@@ -164,7 +163,6 @@
                 checkboxLabel: "I know what I'm doing",
                 enable: true
             },
-            show: true,
             submit: function(model, oldModel, confirmed) {
 
                 var compositionRemoved = false;
@@ -241,6 +239,24 @@
 
             }
         };
+
+        var availableContentTypeResource = scope.contentType === "documentType" ? contentTypeResource.getAvailableCompositeContentTypes : mediaTypeResource.getAvailableCompositeContentTypes;
+        var countContentTypeResource = scope.contentType === "documentType" ? contentTypeResource.getCount : mediaTypeResource.getCount;
+        $q.all([
+              //get available composite types
+              availableContentTypeResource(scope.model.id).then(function (result) {
+                  scope.compositionsDialogModel.availableCompositeContentTypes = result;
+                  // convert icons for composite content types
+                  iconHelper.formatContentTypeIcons(scope.compositionsDialogModel.availableCompositeContentTypes);
+              }),
+              //get content type count
+              countContentTypeResource().then(function (result) {
+                  scope.compositionsDialogModel.totalContentTypes = parseInt(result, 10);
+              })
+        ]).then(function () {
+            //resolves when both other promises are done, now show it
+            scope.compositionsDialogModel.show = true;
+        });
 
       };
 

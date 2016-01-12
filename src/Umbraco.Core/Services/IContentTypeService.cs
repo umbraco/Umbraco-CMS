@@ -11,6 +11,9 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IContentTypeService : IService
     {
+        int CountContentTypes();
+        int CountMediaTypes();
+
         /// <summary>
         /// Validates the composition, if its invalid a list of property type aliases that were duplicated is returned
         /// </summary>

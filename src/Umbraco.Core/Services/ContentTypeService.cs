@@ -461,6 +461,22 @@ namespace Umbraco.Core.Services
             
         }
 
+        public int CountContentTypes()
+        {
+            using (var repository = RepositoryFactory.CreateContentTypeRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.Count(Query<IContentType>.Builder);
+            }
+        }
+
+        public int CountMediaTypes()
+        {
+            using (var repository = RepositoryFactory.CreateMediaTypeRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.Count(Query<IMediaType>.Builder);
+            }
+        }
+
         /// <summary>
         /// Validates the composition, if its invalid a list of property type aliases that were duplicated is returned
         /// </summary>

@@ -7,6 +7,15 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
 
     return {
 
+        getCount: function () {
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "contentTypeApiBaseUrl",
+                       "GetCount")),
+               'Failed to retrieve count');
+        },
+
         getAvailableCompositeContentTypes: function (contentTypeId) {
             return umbRequestHelper.resourcePromise(
                $http.get(

@@ -15,8 +15,6 @@ namespace Umbraco.Core.Services
             IContentTypeComposition source,
             IContentTypeComposition[] allContentTypes)
         {
-
-            if (source == null) throw new ArgumentNullException("source");
             //below is all ported from the old doc type editor and comes with the same weaknesses /insanity / magic
 
             // note: there are many sanity checks missing here and there ;-((
@@ -24,12 +22,15 @@ namespace Umbraco.Core.Services
             //if (allContentTypes.Any(x => x.ParentId > 0 && x.ContentTypeComposition.Any(y => y.Id == x.ParentId) == false))
             //    throw new Exception("A parent does not belong to a composition.");
 
-            // find out if any content type uses this content type
-            var isUsing = allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == source.Id)).ToArray();
-            if (isUsing.Length > 0)
+            if (source != null)
             {
-                //if already in use a composition, do not allow any composited types
-                return new List<IContentTypeComposition>();
+                // find out if any content type uses this content type
+                var isUsing = allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == source.Id)).ToArray();
+                if (isUsing.Length > 0)
+                {
+                    //if already in use a composition, do not allow any composited types
+                    return new List<IContentTypeComposition>();
+                }
             }
 
             // if it is not used then composition is possible
@@ -61,7 +62,7 @@ namespace Umbraco.Core.Services
             //    .ToArray();
 
             return list
-                .Where(x => x.Id != source.Id)
+                .Where(x => x.Id != (source != null ? source.Id : 0))
                 .OrderBy(x => x.Name)                
                 .ToList();
         }
