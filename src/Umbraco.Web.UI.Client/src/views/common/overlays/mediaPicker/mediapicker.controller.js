@@ -5,6 +5,7 @@ angular.module("umbraco")
 
             var dialogOptions = $scope.model;
 
+            $scope.disableFolderSelect = dialogOptions.disableFolderSelect;
             $scope.onlyImages = dialogOptions.onlyImages;
             $scope.showDetails = dialogOptions.showDetails;
             $scope.multiPicker = (dialogOptions.multiPicker && dialogOptions.multiPicker !== "0") ? true : false;
@@ -127,11 +128,13 @@ angular.module("umbraco")
             };
 
             $scope.clickHandler = function(image, event, index) {
-
                 if (image.isFolder) {
-
-                    eventsService.emit("dialogs.mediaPicker.select", image);
-                    selectImage(image);
+                    if ($scope.disableFolderSelect) {
+                        $scope.gotoFolder(image);
+                    } else {
+                        eventsService.emit("dialogs.mediaPicker.select", image);
+                        selectImage(image);
+                    }
 
                 } else {
 
