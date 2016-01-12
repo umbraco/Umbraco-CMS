@@ -249,6 +249,7 @@ angular.module("umbraco")
                             currentTarget: currentTarget,
                             onlyImages: true,
                             showDetails: true,
+                            disableFolderSelect: true,
                             startNodeId: userData.startMediaId,
                             view: "mediapicker",
                             show: true,
