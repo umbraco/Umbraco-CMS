@@ -141,13 +141,12 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public EntityContainer GetMediaTypeContainer(string name, int level)
+        public IEnumerable<EntityContainer> GetMediaTypeContainers(string name, int level)
         {
             var uow = UowProvider.GetUnitOfWork();
             using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow))
             {
-                var container = repo.Get(name, level, Constants.ObjectTypes.MediaTypeContainerGuid);
-                return container;
+                return repo.Get(name, level, Constants.ObjectTypes.MediaTypeContainerGuid);
             }
         }
 
@@ -173,13 +172,12 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public EntityContainer GetContentTypeContainer(string name, int level)
+        public IEnumerable<EntityContainer> GetContentTypeContainers(string name, int level)
         {
             var uow = UowProvider.GetUnitOfWork();
             using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow))
             {
-                var container = repo.Get(name, level, Constants.ObjectTypes.DocumentTypeContainerGuid);
-                return container;
+                return repo.Get(name, level, Constants.ObjectTypes.DocumentTypeContainerGuid);
             }
         }
 

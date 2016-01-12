@@ -24,10 +24,10 @@ namespace Umbraco.Core.Services
         void SaveMediaTypeContainer(EntityContainer container, int userId = 0);
         EntityContainer GetContentTypeContainer(int containerId);
         EntityContainer GetContentTypeContainer(Guid containerId);
-        EntityContainer GetContentTypeContainer(string folderName, int level);
+        IEnumerable<EntityContainer> GetContentTypeContainers(string folderName, int level);
         EntityContainer GetMediaTypeContainer(int containerId);
         EntityContainer GetMediaTypeContainer(Guid containerId);
-        EntityContainer GetMediaTypeContainer(string folderName, int level);
+        IEnumerable<EntityContainer> GetMediaTypeContainers(string folderName, int level);
         void DeleteMediaTypeContainer(int folderId, int userId = 0);
         void DeleteContentTypeContainer(int containerId, int userId = 0);
 

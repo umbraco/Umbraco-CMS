@@ -338,9 +338,20 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="dataTypeService"></param>
         /// <param name="contentType">Content type to export</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the IContentType object</returns>
+        public XElement Serialize(IDataTypeService dataTypeService, IContentType contentType)
+        {
+            return Serialize(dataTypeService, contentType, string.Empty);
+        }
+
+        /// <summary>
+        /// Exports an <see cref="IContentType"/> item to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="dataTypeService"></param>
+        /// <param name="contentType">Content type to export</param>
         /// <param name="folders">The path of folders for this content type separated by a backslash, for example: `SEO/Meta`</param>
         /// <returns><see cref="XElement"/> containing the xml representation of the IContentType object</returns>
-        public XElement Serialize(IDataTypeService dataTypeService, IContentType contentType, string folders = "")
+        public XElement Serialize(IDataTypeService dataTypeService, IContentType contentType, string folders)
         {
             var info = new XElement("Info",
                                     new XElement("Name", contentType.Name),

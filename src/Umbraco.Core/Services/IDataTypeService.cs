@@ -14,7 +14,7 @@ namespace Umbraco.Core.Services
         void SaveContainer(EntityContainer container, int userId = 0);
         EntityContainer GetContainer(int containerId);
         EntityContainer GetContainer(Guid containerId);
-        EntityContainer GetContainer(string folderName, int level);
+        IEnumerable<EntityContainer> GetContainers(string folderName, int level);
         void DeleteContainer(int containerId, int userId = 0);
 
         /// <summary>
