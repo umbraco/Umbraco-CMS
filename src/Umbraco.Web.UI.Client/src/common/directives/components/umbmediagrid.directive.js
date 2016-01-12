@@ -100,7 +100,8 @@
 
                var flexStyle = {
                   "flex": flex + " 1 " + imageMinWidth + "px",
-                  "max-width": mediaItem.width + "px"
+                  "max-width": mediaItem.width + "px",
+                  "min-width": "125px"
                };
 
                mediaItem.flexStyle = flexStyle;
@@ -109,16 +110,16 @@
 
          }
 
-         scope.selectItem = function(item, $event, $index) {
-            if(scope.onSelect) {
-               scope.onSelect(item, $event, $index);
-               $event.stopPropagation();
+         scope.clickItem = function(item, $event, $index) {
+            if(scope.onClick) {
+               scope.onClick(item, $event, $index);
             }
          };
 
-         scope.clickItem = function(item) {
-            if(scope.onClick) {
-               scope.onClick(item);
+         scope.clickItemName = function(item, $event, $index) {
+            if(scope.onClickName) {
+                scope.onClickName(item, $event, $index);
+                $event.stopPropagation();
             }
          };
 
@@ -147,8 +148,8 @@
          scope: {
             items: '=',
             onDetailsHover: "=",
-            onSelect: '=',
             onClick: '=',
+            onClickName: "=",
             filterBy: "="
          },
          link: link
