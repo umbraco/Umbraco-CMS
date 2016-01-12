@@ -7,7 +7,8 @@ angular.module("umbraco.directives")
             scope: {
                 alias: '=',
                 aliasFrom: '=',
-                enableLock: '=?'
+                enableLock: '=?',
+                serverValidationField: '@'
             },
             link: function (scope, element, attrs, ctrl) {
 
@@ -32,7 +33,7 @@ angular.module("umbraco.directives")
                     generateAliasTimeout = $timeout(function () {
                        updateAlias = true;
                         entityResource.getSafeAlias(value, true).then(function (safeAlias) {
-                           if(updateAlias) {
+                            if (updateAlias) {
                               scope.alias = safeAlias.alias;
                            }
                       });

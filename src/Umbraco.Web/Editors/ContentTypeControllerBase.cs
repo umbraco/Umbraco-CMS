@@ -155,6 +155,7 @@ namespace Umbraco.Web.Editors
         protected TContentType PerformPostSave<TContentType, TContentTypeDisplay>(
             ContentTypeSave contentTypeSave,
             Func<int, TContentType> getContentType,
+            Func<string, TContentType> getContentTypeByAlias,
             Action<TContentType> saveContentType,
             bool validateComposition = true,
             Action<ContentTypeSave> beforeCreateNew = null)
@@ -163,6 +164,13 @@ namespace Umbraco.Web.Editors
         {
             var ctId = Convert.ToInt32(contentTypeSave.Id);
             
+            //Validate that there's no other ct with the same name
+            var exists = getContentTypeByAlias(contentTypeSave.Alias);
+            if (exists != null)
+            {
+                ModelState.AddModelError("Alias", "A content type with this alias already exists");
+            }
+
             if (ModelState.IsValid == false)
             {
                 var ct = getContentType(ctId);

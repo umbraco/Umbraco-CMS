@@ -11,7 +11,17 @@
 
 	function LockedFieldDirective($timeout, localizationService) {
 
-	    function link(scope, el, attr, ngModel) {
+	    function link(scope, el, attr, ngModelCtrl) {
+            
+	        //watch the ngModel so we can manually update the textbox view value when it changes
+	        // this ensures that the normal flow (i.e. a user editing the text box) occurs so that
+            // the parsers, validators and viewchangelisteners execute
+	        scope.$watch("ngModel", function (newValue, oldValue) {
+                if (newValue !== oldValue) {
+                    scope.lockedFieldForm.lockedField.$setViewValue(newValue);
+                    scope.lockedFieldForm.lockedField.$render();
+                }
+	        });
 
 			var input = el.find('.umb-locked-field__input');
 
@@ -79,7 +89,7 @@
 			replace: true,
 			templateUrl: 'views/components/umb-locked-field.html',
 			scope: {
-				model: '=ngModel',
+			    ngModel: "=",
 				locked: "=?",
 				placeholderText: "=?",
 				regexValidation: "=?",

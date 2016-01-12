@@ -1,4 +1,4 @@
-<ng-form class="umb-locked-field">
+<ng-form name="lockedFieldForm" class="umb-locked-field">
 
    <div class="umb-locked-field__wrapper">
 
@@ -13,7 +13,7 @@
       <input type="text"
          class="umb-locked-field__input"
          name="lockedField"
-         ng-model="model"
+         ng-model="inputModel"
          ng-disabled="locked"
          ng-class="{'-unlocked': !locked}"
          placeholder="{{placeholderText}}"
@@ -21,7 +21,7 @@
          umb-auto-resize
          required
          val-server-field="{{serverValidationField}}"
-         title="{{model}}" />
+         title="{{inputModel}}" />
 
    </div>
 

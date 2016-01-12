@@ -25,7 +25,12 @@
 
                   <div class="umb-panel-header-name" ng-if="nameLocked">{{ name }}</div>
 
-                  <umb-generate-alias class="umb-panel-header-alias" ng-if="!hideAlias" alias="$parent.alias" alias-from="$parent.name" enable-lock="true"></umb-generate-alias>
+                  <umb-generate-alias class="umb-panel-header-alias" 
+                                      ng-if="!hideAlias" 
+                                      alias="$parent.alias" 
+                                      alias-from="$parent.name" 
+                                      enable-lock="true"
+                                      server-validation-field="Alias"></umb-generate-alias>
 
                   <input type="text" class="umb-panel-header-description" placeholder="Enter description..." ng-if="!hideDescription" ng-model="$parent.description" />
 
