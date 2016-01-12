@@ -137,21 +137,21 @@ namespace Umbraco.Web.Models.Mapping
                 }
             };
 
-            if (media.Properties.FirstOrDefault(x => x.Alias == Constants.Conventions.Media.File) != null)
+            var helper = new UmbracoHelper(UmbracoContext.Current);
+            var mediaItem = helper.TypedMedia(media.Id);
+            if (mediaItem != null)
             {
-                var helper = new UmbracoHelper(UmbracoContext.Current);
-                var mediaItem = helper.TypedMedia(media.Id);
-                if (mediaItem != null)
+                var crops = new List<string>();
+                var autoFillProperties = UmbracoConfig.For.UmbracoSettings().Content.ImageAutoFillProperties.ToArray();
+                if (autoFillProperties.Any())
                 {
-                    var crops = new List<string>();
-                    var autoFillProperties = UmbracoConfig.For.UmbracoSettings().Content.ImageAutoFillProperties;
                     foreach (var field in autoFillProperties)
                     {
                         var crop = mediaItem.GetCropUrl(field.Alias, string.Empty);
                         if (string.IsNullOrWhiteSpace(crop) == false)
                             crops.Add(crop.Split('?')[0]);
                     }
-                    
+
                     if (crops.Any())
                     {
                         var link = new ContentPropertyDisplay
