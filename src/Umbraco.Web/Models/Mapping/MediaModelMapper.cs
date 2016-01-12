@@ -136,6 +136,29 @@ namespace Umbraco.Web.Models.Mapping
                 }
             };
 
+            if (media.Properties.FirstOrDefault(x => x.Alias == "umbracoFile") != null)
+            {
+                var helper = new UmbracoHelper(UmbracoContext.Current);
+                var mediaItem = helper.TypedMedia(media.Id);
+                if (mediaItem != null)
+                {
+                    var crop = mediaItem.GetCropUrl("umbracoFile", string.Empty);
+                    if (string.IsNullOrWhiteSpace(crop) == false)
+                    {
+                        var link = new ContentPropertyDisplay
+                        {
+                            Alias = string.Format("{0}urls", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                            Label = localizedText.Localize("media/urls"),
+                            // don't add the querystring, split on the "?" will also work if there is no "?"
+                            Value = crop.Split('?')[0],
+                            View = "urllist"
+                        };
+
+                        genericProperties.Add(link);
+                    }
+                }
+            }
+
             TabsAndPropertiesResolver.MapGenericProperties(media, display, localizedText, genericProperties);
         }
 
