@@ -148,10 +148,12 @@
                     var found = _.find(filteredAvailableCompositeTypes, function (f) {
                         return current.contentType.alias === f.contentType.alias;
                     });
+
                     //allow if the item was  found in the response (allowed) list - 
-                    // and ensure its set to allowed if it is currently checked
-                    current.allowed = (selectedContentTypeAliases.indexOf(current.contentType.alias) !== -1) ||
-                                        ((found !== null && found !== undefined) ? found.allowed : false);
+                    // and ensure its set to allowed if it is currently checked,
+                    // DO not allow if it's a locked content type.
+                    current.allowed = scope.model.lockedCompositeContentTypes.indexOf(current.contentType.alias) === -1 &&
+                        (selectedContentTypeAliases.indexOf(current.contentType.alias) !== -1) || ((found !== null && found !== undefined) ? found.allowed : false);
 
                 });
             });
@@ -166,6 +168,20 @@
         });
 
       }
+
+        function setupAvailableContentTypesModel(result) {
+            scope.compositionsDialogModel.availableCompositeContentTypes = result;            
+            //iterate each one and set it up
+            _.each(scope.compositionsDialogModel.availableCompositeContentTypes, function (c) {
+                //set the inherited flags
+                c.inherited = false;
+                if (scope.model.lockedCompositeContentTypes.indexOf(c.contentType.alias) > -1) {
+                    c.inherited = true;
+                }
+                // convert icons for composite content types
+                iconHelper.formatContentTypeIcons([c.contentType]);
+            });
+        }
 
       /* ---------- DELETE PROMT ---------- */
 
@@ -312,12 +328,7 @@
           $q.all([
               //get available composite types
               availableContentTypeResource(scope.model.id, [], propAliasesExisting).then(function (result) {
-                  scope.compositionsDialogModel.availableCompositeContentTypes = result;
-                  var contentTypes = _.map(scope.compositionsDialogModel.availableCompositeContentTypes, function(c) {
-                      return c.contentType;
-                  });
-                  // convert icons for composite content types
-                  iconHelper.formatContentTypeIcons(contentTypes);                  
+                  setupAvailableContentTypesModel(result);
               }),
               //get content type count
               countContentTypeResource().then(function(result) {

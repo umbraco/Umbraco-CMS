@@ -4,6 +4,7 @@ using System.Net.Http.Formatting;
 using umbraco;
 using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
@@ -62,6 +63,8 @@ namespace Umbraco.Web.Trees
         {
             var menu = new MenuItemCollection();
 
+            var enableInheritedDocumentTypes = UmbracoConfig.For.UmbracoSettings().Content.EnableInheritedDocumentTypes;
+
             if (id == Constants.System.Root.ToInvariantString())
             {
                 //set the default to create
@@ -91,13 +94,35 @@ namespace Umbraco.Web.Trees
                 if (container.HasChildren() == false)
                 {
                     //can delete doc type
-                    menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
+                    menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)), true);
                 }
                 menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);    
             }
             else
             {
-                menu.Items.Add<ActionMove>(Services.TextService.Localize(string.Format("actions/{0}", ActionMove.Instance.Alias)));
+                var ct = Services.ContentTypeService.GetContentType(int.Parse(id));
+                IContentType parent = null;
+                parent = ct == null ? null : Services.ContentTypeService.GetContentType(ct.ParentId);
+
+                if (enableInheritedDocumentTypes)
+                {
+                    menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
+
+                    //no move action if this is a child doc type
+                    if (parent == null)
+                    {
+                        menu.Items.Add<ActionMove>(Services.TextService.Localize(string.Format("actions/{0}", ActionMove.Instance.Alias)), true);
+                    }
+                }
+                else
+                {
+                    menu.Items.Add<ActionMove>(Services.TextService.Localize(string.Format("actions/{0}", ActionMove.Instance.Alias)));
+                    //no move action if this is a child doc type
+                    if (parent == null)
+                    {
+                        menu.Items.Add<ActionMove>(Services.TextService.Localize(string.Format("actions/{0}", ActionMove.Instance.Alias)), true);
+                    }
+                }
                 menu.Items.Add<ActionExport>(Services.TextService.Localize(string.Format("actions/{0}", ActionExport.Instance.Alias)), true).ConvertLegacyMenuItem(new UmbracoEntity
                 {
                     Id = int.Parse(id),
@@ -106,6 +131,8 @@ namespace Umbraco.Web.Trees
                     Name = ""
                 }, "documenttypes", "settings");
                 menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)), true);
+                if (enableInheritedDocumentTypes)
+                    menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
             }
 
             return menu;
