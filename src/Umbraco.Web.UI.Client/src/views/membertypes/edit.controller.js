@@ -90,6 +90,10 @@
                     saveMethod: memberTypeResource.save,
                     scope: $scope,
                     content: vm.contentType,
+                    //We do not redirect on failure for doc types - this is because it is not possible to actually save the doc
+                    // type when server side validation fails - as opposed to content where we are capable of saving the content
+                    // item if server side validation fails
+                    redirectOnFailure: false,
                     //no-op for rebind callback... we don't really need to rebind for content types
                     rebindCallback: angular.noop
                 }).then(function (data) {

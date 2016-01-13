@@ -138,9 +138,10 @@ namespace Umbraco.Web.Editors
         public ContentTypeCompositionDisplay PostSave(ContentTypeSave contentTypeSave)
         {
             var savedCt = PerformPostSave<IMediaType, ContentTypeCompositionDisplay>(
-                contentTypeSave:    contentTypeSave,
-                getContentType:     i => Services.ContentTypeService.GetMediaType(i),
-                saveContentType:    type => Services.ContentTypeService.Save(type));
+                contentTypeSave:        contentTypeSave,
+                getContentType:         i => Services.ContentTypeService.GetMediaType(i),
+                getContentTypeByAlias:  alias => Services.ContentTypeService.GetMediaType(alias),
+                saveContentType:        type => Services.ContentTypeService.Save(type));
 
             var display = Mapper.Map<ContentTypeCompositionDisplay>(savedCt);
 
