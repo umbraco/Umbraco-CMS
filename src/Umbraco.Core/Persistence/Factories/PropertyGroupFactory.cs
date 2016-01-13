@@ -129,11 +129,7 @@ namespace Umbraco.Core.Persistence.Factories
                 Name = propertyType.Name,
                 SortOrder = propertyType.SortOrder,
                 ValidationRegExp = propertyType.ValidationRegExp,
-                UniqueId = propertyType.HasIdentity
-                    ? propertyType.Key == Guid.Empty
-                        ? Guid.NewGuid()
-                        : propertyType.Key
-                    : Guid.NewGuid()
+                UniqueId = propertyType.Key == Guid.Empty ? Guid.NewGuid() : propertyType.Key
             };
 
             if (tabId != default(int))

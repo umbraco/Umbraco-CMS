@@ -454,6 +454,7 @@ AND umbracoNode.id <> @id",
                 propType.DataTypeDefinitionId = dto.DataTypeId;
                 propType.Description = dto.Description;
                 propType.Id = dto.Id;
+                propType.Key = dto.UniqueId;
                 propType.Name = dto.Name;
                 propType.Mandatory = dto.Mandatory;
                 propType.SortOrder = dto.SortOrder;
