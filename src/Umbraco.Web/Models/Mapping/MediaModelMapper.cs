@@ -9,6 +9,7 @@ using System.Web.Routing;
 using AutoMapper;
 using umbraco;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.PropertyEditors;
@@ -135,6 +136,37 @@ namespace Umbraco.Web.Models.Mapping
                     View = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View
                 }
             };
+
+            var helper = new UmbracoHelper(UmbracoContext.Current);
+            var mediaItem = helper.TypedMedia(media.Id);
+            if (mediaItem != null)
+            {
+                var crops = new List<string>();
+                var autoFillProperties = UmbracoConfig.For.UmbracoSettings().Content.ImageAutoFillProperties.ToArray();
+                if (autoFillProperties.Any())
+                {
+                    foreach (var field in autoFillProperties)
+                    {
+                        var crop = mediaItem.GetCropUrl(field.Alias, string.Empty);
+                        if (string.IsNullOrWhiteSpace(crop) == false)
+                            crops.Add(crop.Split('?')[0]);
+                    }
+
+                    if (crops.Any())
+                    {
+                        var link = new ContentPropertyDisplay
+                        {
+                            Alias = string.Format("{0}urls", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                            Label = localizedText.Localize("media/urls"),
+                            // don't add the querystring, split on the "?" will also work if there is no "?"
+                            Value = string.Join(",", crops),
+                            View = "urllist"
+                        };
+
+                        genericProperties.Add(link);
+                    }
+                }
+            }
 
             TabsAndPropertiesResolver.MapGenericProperties(media, display, localizedText, genericProperties);
         }

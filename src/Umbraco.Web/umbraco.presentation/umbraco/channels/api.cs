@@ -93,7 +93,7 @@ namespace umbraco.presentation.channels
                     p.dateCreated = d.CreateDateTime;
                     p.page_title = d.Text;
                     p.page_id = d.Id;
-                    p.page_parent_id = d.Parent.Id;
+                    p.page_parent_id = d.ParentId;
 
                     blogPostsObjects.Add(p);
                 }
@@ -150,7 +150,7 @@ namespace umbraco.presentation.channels
                     p.dateCreated = d.CreateDateTime;
                     p.title = d.Text;
                     p.page_id = d.Id;
-                    p.wp_page_parent_id = d.Parent.Id;
+                    p.wp_page_parent_id = d.ParentId;
                     p.wp_page_parent_title = d.Parent.Text;
                     p.permalink = library.NiceUrl(d.Id);
                     p.description = d.getProperty(userChannel.FieldDescriptionAlias).Value.ToString();
