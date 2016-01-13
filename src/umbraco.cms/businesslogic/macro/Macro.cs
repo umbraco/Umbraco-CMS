@@ -416,10 +416,10 @@ namespace umbraco.cms.businesslogic.macro
 		/// <returns>If the macro with the given alias exists, it returns the macro, else null</returns>
         public static Macro GetByAlias(string alias)
 		{
-		    return ApplicationContext.Current.ApplicationCache.GetCacheItem(
+		    return ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<Macro>(
 		        GetCacheKey(alias),
-		        TimeSpan.FromMinutes(30),
-		        () =>
+		        timeout:        TimeSpan.FromMinutes(30),
+		        getCacheItem:   () =>
 		            {
                         var macro = ApplicationContext.Current.Services.MacroService.GetByAlias(alias);
 		                if (macro == null) return null;
@@ -429,10 +429,10 @@ namespace umbraco.cms.businesslogic.macro
 
         public static Macro GetById(int id)
         {
-            return ApplicationContext.Current.ApplicationCache.GetCacheItem(
+            return ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<Macro>(
                 GetCacheKey(string.Format("macro_via_id_{0}", id)),
-                TimeSpan.FromMinutes(30),
-                () =>
+                timeout:        TimeSpan.FromMinutes(30),
+                getCacheItem:   () =>
                     {
                         var macro = ApplicationContext.Current.Services.MacroService.GetById(id);
                         if (macro == null) return null;

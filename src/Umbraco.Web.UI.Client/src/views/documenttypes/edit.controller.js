@@ -8,8 +8,8 @@
  */
 (function () {
     "use strict";
-	
-        function DocumentTypesEditController($scope, $routeParams, modelsResource, contentTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter, $q, localizationService) {
+
+        function DocumentTypesEditController($scope, $routeParams, modelsResource, contentTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter, $q, localizationService, overlayHelper) {
 
         var vm = this;
 
@@ -183,86 +183,90 @@
         /* ---------- SAVE ---------- */
 
         function save() {
-            var deferred = $q.defer();
 
-            vm.page.saveButtonState = "busy";
+            // only save if there is no overlays open
+            if(overlayHelper.getNumberOfOverlays() === 0) {
 
-            // reformat allowed content types to array if id's
-            vm.contentType.allowedContentTypes = contentTypeHelper.createIdArray(vm.contentType.allowedContentTypes);
+                var deferred = $q.defer();
 
-            contentEditingHelper.contentEditorPerformSave({
-                statusMessage: "Saving...",
-                saveMethod: contentTypeResource.save,
-                scope: $scope,
-                content: vm.contentType,
-                // we need to rebind... the IDs that have been created!
-                rebindCallback: function (origContentType, savedContentType) {
-                    vm.contentType.id = savedContentType.id;
-                    vm.contentType.groups.forEach(function(group) {
-                        if (!group.name) return;
+                vm.page.saveButtonState = "busy";
 
-                        var k = 0;
-                        while (k < savedContentType.groups.length && savedContentType.groups[k].name != group.name)
-                            k++;
-                        if (k == savedContentType.groups.length) {
-                            group.id = 0;
-                            return;
-                        }
+                // reformat allowed content types to array if id's
+                vm.contentType.allowedContentTypes = contentTypeHelper.createIdArray(vm.contentType.allowedContentTypes);
 
-                        var savedGroup = savedContentType.groups[k];
-                        if (!group.id) group.id = savedGroup.id;
+                contentEditingHelper.contentEditorPerformSave({
+                    statusMessage: "Saving...",
+                    saveMethod: contentTypeResource.save,
+                    scope: $scope,
+                    content: vm.contentType,
+                    //We do not redirect on failure for doc types - this is because it is not possible to actually save the doc
+                    // type when server side validation fails - as opposed to content where we are capable of saving the content
+                    // item if server side validation fails
+                    redirectOnFailure: false,
+                    // we need to rebind... the IDs that have been created!
+                    rebindCallback: function (origContentType, savedContentType) {
+                        vm.contentType.id = savedContentType.id;
+                        vm.contentType.groups.forEach(function(group) {
+                            if (!group.name) return;
 
-                        group.properties.forEach(function (property) {
-                            if (property.id || !property.alias) return;
-
-                            k = 0;
-                            while (k < savedGroup.properties.length && savedGroup.properties[k].alias != property.alias)
+                            var k = 0;
+                            while (k < savedContentType.groups.length && savedContentType.groups[k].name != group.name)
                                 k++;
-                            if (k == savedGroup.properties.length) {
-                                property.id = 0;
+                            if (k == savedContentType.groups.length) {
+                                group.id = 0;
                                 return;
                             }
 
-                            var savedProperty = savedGroup.properties[k];
-                            property.id = savedProperty.id;
+                            var savedGroup = savedContentType.groups[k];
+                            if (!group.id) group.id = savedGroup.id;
+
+                            group.properties.forEach(function (property) {
+                                if (property.id || !property.alias) return;
+
+                                k = 0;
+                                while (k < savedGroup.properties.length && savedGroup.properties[k].alias != property.alias)
+                                    k++;
+                                if (k == savedGroup.properties.length) {
+                                    property.id = 0;
+                                    return;
+                                }
+
+                                var savedProperty = savedGroup.properties[k];
+                                property.id = savedProperty.id;
+                            });
                         });
-                    });
-                }
-            }).then(function (data) {
-                //success            
-                syncTreeNode(vm.contentType, data.path);
+                    }
+                }).then(function (data) {
+                    //success
+                    syncTreeNode(vm.contentType, data.path);
 
-                vm.page.saveButtonState = "success";
+                    vm.page.saveButtonState = "success";
 
-                deferred.resolve(data);
-            }, function (err) {
-                //error
-                if (err) {
-                    editorState.set($scope.content);
-                }
-                else {
-                    localizationService.localize("speechBubbles_validationFailedHeader").then(function (headerValue) {
-                        localizationService.localize("speechBubbles_validationFailedMessage").then(function(msgValue) {
-                            notificationsService.error(headerValue, msgValue);
+                    deferred.resolve(data);
+                }, function (err) {
+                    //error
+                    if (err) {
+                        editorState.set($scope.content);
+                    }
+                    else {
+                        localizationService.localize("speechBubbles_validationFailedHeader").then(function (headerValue) {
+                            localizationService.localize("speechBubbles_validationFailedMessage").then(function(msgValue) {
+                                notificationsService.error(headerValue, msgValue);
+                            });
                         });
-                    });
-                }
-                vm.page.saveButtonState = "error";
+                    }
+                    vm.page.saveButtonState = "error";
 
-                deferred.reject(err);
-            });
-            return deferred.promise;
+                    deferred.reject(err);
+                });
+                return deferred.promise;
+
+            }
 
         }
 
         function init(contentType) {
-            //get available composite types
-            contentTypeResource.getAvailableCompositeContentTypes(contentType.id).then(function (result) {
-                contentType.availableCompositeContentTypes = result;
-                // convert icons for composite content types
-                iconHelper.formatContentTypeIcons(contentType.availableCompositeContentTypes);
-            });
-
+            
             // set all tab to inactive
             if (contentType.groups.length !== 0) {
                 angular.forEach(contentType.groups, function (group) {

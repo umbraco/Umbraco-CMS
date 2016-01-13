@@ -3,14 +3,20 @@
 
    function EditorViewDirective() {
 
+       function link(scope, el, attr) {
+
+           if(attr.footer) {
+               scope.footer = attr.footer;
+           }
+
+       }
+
       var directive = {
          transclude: true,
          restrict: 'E',
          replace: true,
          templateUrl: 'views/components/editor/umb-editor-view.html',
-         scope: {
-             footer: "@"
-         }
+         link: link
       };
 
       return directive;

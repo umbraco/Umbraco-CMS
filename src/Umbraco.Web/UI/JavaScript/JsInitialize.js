@@ -9,16 +9,17 @@
     'lib/angular/1.1.5/angular-cookies.min.js',
     'lib/angular/1.1.5/angular-mobile.js',
     'lib/angular/1.1.5/angular-sanitize.min.js',
-    
+
     'lib/angular/angular-ui-sortable.js',
 
     'lib/angular-dynamic-locale/tmhDynamicLocale.min.js',
     'lib/ng-file-upload/ng-file-upload.min.js',
+    'lib/angular-local-storage/angular-local-storage.min.js',
 
     'lib/bootstrap/js/bootstrap.2.3.2.min.js',
     'lib/bootstrap-tabdrop/bootstrap-tabdrop.js',
     'lib/umbraco/Extensions.js',
-    
+
     'lib/umbraco/NamespaceManager.js',
     'lib/umbraco/LegacyUmbClientMgr.js',
     'lib/umbraco/LegacySpeechBubble.js',

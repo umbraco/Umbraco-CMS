@@ -26,7 +26,7 @@ namespace Umbraco.Web.Cache
 
         public override void RefreshAll()
         {
-            ApplicationContext.Current.ApplicationCache.ClearCacheItem(CacheKeys.ApplicationsCacheKey);
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(CacheKeys.ApplicationsCacheKey);
             base.RefreshAll();
         }
 
@@ -38,7 +38,7 @@ namespace Umbraco.Web.Cache
 
         public override void Remove(int id)
         {
-            ApplicationContext.Current.ApplicationCache.ClearCacheItem(CacheKeys.ApplicationsCacheKey);
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(CacheKeys.ApplicationsCacheKey);
             base.Remove(id);
         }
 

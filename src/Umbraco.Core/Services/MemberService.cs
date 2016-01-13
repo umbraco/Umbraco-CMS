@@ -111,7 +111,7 @@ namespace Umbraco.Core.Services
 
             member.RawPasswordValue = result.RawPasswordValue;
             member.LastPasswordChangeDate = result.LastPasswordChangeDate;
-            member.UpdateDate = member.UpdateDate;
+            member.UpdateDate = result.UpdateDate;
         }
 
         /// <summary>

@@ -45,12 +45,12 @@
             /// <summary>callback used to display the modal dialog to insert a macro with parameters</summary>
             
             var self = this;
-
+           
             UmbClientMgr.openAngularModalWindow({
                 template: "views/common/dialogs/insertmacro.html",
                 dialogData: {
                     renderingEngine: "Mvc",
-                    selectedAlias: alias
+                    macroData: {macroAlias: alias}
                 },
                 callback: function (data) {
                     UmbEditor.Insert(data.syntax, '', self._opts.codeEditorElementId);

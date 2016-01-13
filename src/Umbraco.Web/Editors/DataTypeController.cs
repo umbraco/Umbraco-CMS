@@ -299,14 +299,16 @@ namespace Umbraco.Web.Editors
         {
             var dataTypes = Services.DataTypeService
                      .GetAllDataTypeDefinitions()
-                     .Select(Mapper.Map<IDataTypeDefinition, DataTypeBasic>);
+                     .Select(Mapper.Map<IDataTypeDefinition, DataTypeBasic>)
+                     .ToArray();
 
             var propertyEditors = PropertyEditorResolver.Current.PropertyEditors.ToArray();
 
             foreach (var dataType in dataTypes)
             {
-                var propertyEditor = propertyEditors.Single(x => x.Alias == dataType.Alias);
-                dataType.HasPrevalues = propertyEditor.PreValueEditor.Fields.Any(); ;
+                var propertyEditor = propertyEditors.SingleOrDefault(x => x.Alias == dataType.Alias);
+                if(propertyEditor != null)
+                    dataType.HasPrevalues = propertyEditor.PreValueEditor.Fields.Any(); ;
             }
 
             var grouped = dataTypes

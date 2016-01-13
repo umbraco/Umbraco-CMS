@@ -7,6 +7,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using AutoMapper;
+using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
@@ -50,8 +51,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Updater, expression => expression.Ignore())
                 .ForMember(display => display.Alias, expression => expression.Ignore())
                 .ForMember(display => display.IsContainer, expression => expression.Ignore())
-                .ForMember(display => display.Tabs, expression => expression.ResolveUsing<TabsAndPropertiesResolver>())
-                .AfterMap((media, display) => AfterMap(media, display, applicationContext.Services.DataTypeService));
+                .ForMember(display => display.Tabs, expression => expression.ResolveUsing(new TabsAndPropertiesResolver(applicationContext.Services.TextService)))
+                .AfterMap((media, display) => AfterMap(media, display, applicationContext.Services.DataTypeService, applicationContext.Services.TextService));
 
             //FROM IMedia TO ContentItemBasic<ContentPropertyBasic, IMedia>
             config.CreateMap<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>()
@@ -82,7 +83,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.Alias, expression => expression.Ignore());
         }
 
-        private static void AfterMap(IMedia media, MediaItemDisplay display, IDataTypeService dataTypeService)
+        private static void AfterMap(IMedia media, MediaItemDisplay display, IDataTypeService dataTypeService, ILocalizedTextService localizedText)
         {
 			// Adapted from ContentModelMapper
 			//map the IsChildOfListView (this is actually if it is a descendant of a list view!)
@@ -121,10 +122,21 @@ namespace Umbraco.Web.Models.Mapping
             
             if (media.ContentType.IsContainer)
             {
-                TabsAndPropertiesResolver.AddListView(display, "media", dataTypeService);
+                TabsAndPropertiesResolver.AddListView(display, "media", dataTypeService, localizedText);
             }
+            
+            var genericProperties = new List<ContentPropertyDisplay>
+            {
+                new ContentPropertyDisplay
+                {
+                    Alias = string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Label = localizedText.Localize("content/mediatype"),
+                    Value = localizedText.UmbracoDictionaryTranslate(display.ContentTypeName),
+                    View = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View
+                }
+            };
 
-            TabsAndPropertiesResolver.MapGenericProperties(media, display);
+            TabsAndPropertiesResolver.MapGenericProperties(media, display, localizedText, genericProperties);
         }
 
     }

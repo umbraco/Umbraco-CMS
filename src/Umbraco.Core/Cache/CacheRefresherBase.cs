@@ -2,6 +2,7 @@
 using Umbraco.Core.Events;
 using Umbraco.Core.Sync;
 using umbraco.interfaces;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Cache
 {
@@ -62,6 +63,16 @@ namespace Umbraco.Core.Cache
         public virtual void Refresh(Guid id)
         {
             OnCacheUpdated(Instance, new CacheRefresherEventArgs(id, MessageType.RefreshById));
+        }
+
+        /// <summary>
+        /// Clears the cache for all repository entities of this type
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        internal void ClearAllIsolatedCacheByEntityType<TEntity>()
+            where TEntity : class, IAggregateRoot
+        {
+            ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.ClearCache<TEntity>();
         }
     }
 }

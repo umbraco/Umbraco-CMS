@@ -136,12 +136,12 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
-    <Reference Include="ImageProcessor, Version=2.3.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ImageProcessor.2.3.0.0\lib\net45\ImageProcessor.dll</HintPath>
+    <Reference Include="ImageProcessor, Version=2.3.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ImageProcessor.2.3.2.0\lib\net45\ImageProcessor.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ImageProcessor.Web, Version=4.4.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ImageProcessor.Web.4.4.0.0\lib\net45\ImageProcessor.Web.dll</HintPath>
+    <Reference Include="ImageProcessor.Web, Version=4.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ImageProcessor.Web.4.5.0.0\lib\net45\ImageProcessor.Web.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, processorArchitecture=MSIL">
@@ -350,8 +350,9 @@
       <Name>umbraco.providers</Name>
     </ProjectReference>
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="UrlRewritingNet.UrlRewriter">
-      <HintPath>..\packages\UrlRewritingNet.UrlRewriter.2.0.60829.1\lib\UrlRewritingNet.UrlRewriter.dll</HintPath>
+    <Reference Include="UrlRewritingNet.UrlRewriter, Version=2.0.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\UrlRewritingNet.UrlRewriter.2.0.7\lib\UrlRewritingNet.UrlRewriter.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Zbu.ModelsBuilder, Version=2.2.0.59, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Zbu.ModelsBuilder.2.2.0-beta001\lib\Zbu.ModelsBuilder.dll</HintPath>
@@ -1703,7 +1704,7 @@
     <Content Include="Umbraco\Config\Lang\fr.xml" />
     <Content Include="Umbraco\Config\Lang\it.xml" />
     <Content Include="Umbraco\Config\Lang\nl.xml" />
-    <Content Include="Umbraco\Config\Lang\no.xml" />
+    <Content Include="Umbraco\Config\Lang\nb.xml" />
     <Content Include="Umbraco\Config\Lang\sv.xml" />
     <Content Include="Umbraco\Css\permissionsEditor.css" />
     <Content Include="Umbraco\Dialogs\mediaPicker.aspx" />
@@ -2021,7 +2022,6 @@
     <Content Include="Umbraco\Create\language.ascx">
       <SubType>UserControl</SubType>
     </Content>
-    <Content Include="Umbraco\Create\media.ascx" />
     <Content Include="Umbraco\Create\member.ascx" />
     <Content Include="Umbraco\Create\nodeType.ascx">
       <SubType>UserControl</SubType>

@@ -11,6 +11,9 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IContentTypeService : IService
     {
+        int CountContentTypes();
+        int CountMediaTypes();
+
         /// <summary>
         /// Validates the composition, if its invalid a list of property type aliases that were duplicated is returned
         /// </summary>
@@ -24,8 +27,10 @@ namespace Umbraco.Core.Services
         void SaveMediaTypeContainer(EntityContainer container, int userId = 0);
         EntityContainer GetContentTypeContainer(int containerId);
         EntityContainer GetContentTypeContainer(Guid containerId);
+        IEnumerable<EntityContainer> GetContentTypeContainers(string folderName, int level);
         EntityContainer GetMediaTypeContainer(int containerId);
         EntityContainer GetMediaTypeContainer(Guid containerId);
+        IEnumerable<EntityContainer> GetMediaTypeContainers(string folderName, int level);
         void DeleteMediaTypeContainer(int folderId, int userId = 0);
         void DeleteContentTypeContainer(int containerId, int userId = 0);
 

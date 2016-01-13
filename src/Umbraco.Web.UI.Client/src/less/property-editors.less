@@ -181,23 +181,30 @@ ul.color-picker li a  {
     list-style-type: none;
     margin: 0;
     padding: 0;
-    display: block;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
 }
 
 
 .umb-sortable-thumbnails li {
-    display: inline-block;
     position: relative;
-    text-align: center;
-    vertical-align: top;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 2px;
+    margin: 5px;
+    background: white;
+    border: 1px solid #f8f8f8;
 }
 
-.umb-sortable-thumbnails li:hover a{
+.umb-sortable-thumbnails li:hover a {
   display: block;
 }
 
-.umb-sortable-thumbnails li img
-{
+.umb-sortable-thumbnails li img {
   max-width:100%;
   max-height:100%;
   margin:auto;
@@ -208,6 +215,17 @@ ul.color-picker li a  {
 .umb-sortable-thumbnails li img.noScale{
   max-width: none !important;
   max-height: none !important;
+}
+
+.umb-sortable-thumbnails .icon-holder {
+    text-align: center;
+}
+
+.umb-sortable-thumbnails .icon-holder .icon{
+    font-size: 40px;
+    line-height: 50px;
+    color: @gray;
+    display: block;
 }
 
 
@@ -224,6 +242,10 @@ ul.color-picker li a  {
    position: absolute;
    top: 0;
    left: 0;
+ }
+
+ .umb-cropper img {
+     max-width: initial;
  }
 
  .umb-cropper .overlay, .umb-cropper-gravity .overlay {

@@ -79,9 +79,31 @@ namespace Umbraco.Web.Editors
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
-        public IEnumerable<EntityBasic> GetAvailableCompositeMemberTypes(int contentTypeId)
+        /// <summary>
+        /// Returns the avilable compositions for this content type
+        /// </summary>
+        /// <param name="contentTypeId"></param>
+        /// <param name="filterContentTypes">
+        /// This is normally an empty list but if additional content type aliases are passed in, any content types containing those aliases will be filtered out
+        /// along with any content types that have matching property types that are included in the filtered content types
+        /// </param>
+        /// <param name="filterPropertyTypes">
+        /// This is normally an empty list but if additional property type aliases are passed in, any content types that have these aliases will be filtered out.
+        /// This is required because in the case of creating/modifying a content type because new property types being added to it are not yet persisted so cannot
+        /// be looked up via the db, they need to be passed in.
+        /// </param>
+        /// <returns></returns>
+        public HttpResponseMessage GetAvailableCompositeMemberTypes(int contentTypeId,
+            [FromUri]string[] filterContentTypes,
+            [FromUri]string[] filterPropertyTypes)
         {
-            return PerformGetAvailableCompositeContentTypes(contentTypeId, UmbracoObjectTypes.MemberType);
+            var result = PerformGetAvailableCompositeContentTypes(contentTypeId, UmbracoObjectTypes.MemberType, filterContentTypes, filterPropertyTypes)
+                .Select(x => new
+                {
+                    contentType = x.Item1,
+                    allowed = x.Item2
+                });
+            return Request.CreateResponse(result);
         }
 
         public ContentTypeCompositionDisplay GetEmpty()
@@ -110,10 +132,11 @@ namespace Umbraco.Web.Editors
         public ContentTypeCompositionDisplay PostSave(ContentTypeSave contentTypeSave)
         {
             var savedCt = PerformPostSave<IMemberType, ContentTypeCompositionDisplay>(
-                contentTypeSave:        contentTypeSave,
-                getContentType:         i => Services.MemberTypeService.Get(i),
-                saveContentType:        type => Services.MemberTypeService.Save(type),
-                validateComposition:    false);
+                contentTypeSave:            contentTypeSave,
+                getContentType:             i => Services.MemberTypeService.Get(i),
+                getContentTypeByAlias:      alias => Services.MemberTypeService.Get(alias),
+                saveContentType:            type => Services.MemberTypeService.Save(type),
+                validateComposition:        false);
 
             var display = Mapper.Map<ContentTypeCompositionDisplay>(savedCt);
 

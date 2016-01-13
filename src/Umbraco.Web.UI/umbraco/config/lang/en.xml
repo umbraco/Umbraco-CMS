@@ -918,6 +918,17 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="allowAllRowConfigurations">Allow all row configurations</key>
   </area>
 
+  <area alias="contentTypeEditor">
+      <key alias="allowAsRootHeading">Allow as root</key>
+      <key alias="allowAsRootDescription">Allow editors to create content of this type in the root of the content tree</key>
+      <key alias="allowAsRootCheckbox">Yes - allow content of this type in the root</key>
+
+      <key alias="childNodesHeading">Allowed child node types</key>
+      <key alias="childNodesDescription">Allow content of the specified types to be created underneath content of this type</key>
+
+      <key alias="chooseChildNode">Choose child node</key>
+  </area>
+
   <area alias="templateEditor">
     <key alias="alternativeField">Alternative field</key>
     <key alias="alternativeText">Alternative Text</key>

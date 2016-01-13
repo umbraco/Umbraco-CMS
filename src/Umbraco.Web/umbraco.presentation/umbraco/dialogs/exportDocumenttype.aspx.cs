@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Linq;
 using System.Web;
 using System.Web.SessionState;
 using System.Web.UI;
@@ -11,6 +13,7 @@ using System.Web.UI.HtmlControls;
 
 using umbraco.cms.businesslogic.web;
 using System.Xml;
+using Umbraco.Core;
 
 namespace umbraco.presentation.dialogs
 {
@@ -29,26 +32,42 @@ namespace umbraco.presentation.dialogs
 			int documentTypeId = int.Parse(helper.Request("nodeID"));
 			if (documentTypeId > 0) 
 			{
-				cms.businesslogic.web.DocumentType dt = new cms.businesslogic.web.DocumentType(documentTypeId);
-				if (dt != null) 
-				{
-					Response.AddHeader("Content-Disposition", "attachment;filename=" + dt.Alias + ".udt");
-					Response.ContentType = "application/octet-stream";
+				var dt = new cms.businesslogic.web.DocumentType(documentTypeId);
+                var folderNames = string.Empty;
+                if (dt.Level != 1)
+                {
+                    var folders = new List<string>();
 
-					XmlDocument doc = new XmlDocument();
-					doc.AppendChild(dt.ToXml(doc));
+                    var current = dt.Parent;
+                    while (current.Level >= 1)
+                    {
+                        if (current.nodeObjectType == Constants.ObjectTypes.DocumentTypeContainerGuid)
+                            folders.Add(HttpUtility.UrlEncode(current.Text));
+
+                        if (current.Level == 1)
+                            break;
+                        current = current.Parent;
+                    }
+
+                    folderNames = string.Join("/", folders.ToArray().Reverse());
+                }
+
+                Response.AddHeader("Content-Disposition", "attachment;filename=" + dt.Alias + ".udt");
+                Response.ContentType = "application/octet-stream";
+
+                XmlDocument doc = new XmlDocument();
+                doc.AppendChild(dt.ToXml(doc, folderNames));
 
 
-					XmlWriterSettings writerSettings = new XmlWriterSettings();
-					writerSettings.Indent = true;
+                XmlWriterSettings writerSettings = new XmlWriterSettings();
+                writerSettings.Indent = true;
 
-					XmlWriter xmlWriter = XmlWriter.Create(Response.OutputStream, writerSettings);
-					doc.Save(xmlWriter);
+                XmlWriter xmlWriter = XmlWriter.Create(Response.OutputStream, writerSettings);
+                doc.Save(xmlWriter);
 
-					//Response.Write(editDataType.ToXml(new XmlDocument()).OuterXml);
-				}
-			}
-		}
+                //Response.Write(editDataType.ToXml(new XmlDocument()).OuterXml);
+            }
+        }
 
 		#region Web Form Designer generated code
 		override protected void OnInit(EventArgs e)

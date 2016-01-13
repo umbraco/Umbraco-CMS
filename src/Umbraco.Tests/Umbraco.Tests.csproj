@@ -176,6 +176,10 @@
     <Compile Include="Cache\CacheRefresherTests.cs" />
     <Compile Include="Models\Mapping\ContentTypeModelMappingTests.cs" />
     <Compile Include="Cache\DeepCloneRuntimeCacheProviderTests.cs" />
+    <Compile Include="Cache\DefaultCachePolicyTests.cs" />
+    <Compile Include="Cache\FullDataSetCachePolicyTests.cs" />
+    <Compile Include="Cache\SingleItemsOnlyCachePolicyTests.cs" />
+    <Compile Include="Collections\DeepCloneableListTests.cs" />
     <Compile Include="Controllers\BackOfficeControllerUnitTests.cs" />
     <Compile Include="DelegateExtensionsTests.cs" />
     <Compile Include="Logging\AsyncRollingFileAppenderTest.cs" />
@@ -191,6 +195,7 @@
     <Compile Include="Resolvers\ResolverBaseTest.cs" />
     <Compile Include="Routing\UrlRoutingTestBase.cs" />
     <Compile Include="Security\UmbracoBackOfficeIdentityTests.cs" />
+    <Compile Include="Services\ContentTypeServiceExtensionsTests.cs" />
     <Compile Include="Services\PublicAccessServiceTests.cs" />
     <Compile Include="StringNewlineExtensions.cs" />
     <Compile Include="Strings\StylesheetHelperTests.cs" />

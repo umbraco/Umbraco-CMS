@@ -1,16 +1,17 @@
 (function() {
    'use strict';
 
-   function listViewHelper($cookieStore) {
+   function listViewHelper(localStorageService) {
 
       var firstSelectedIndex = 0;
+      var localStorageKey = "umblistViewLayout";
 
       function getLayout(nodeId, availableLayouts) {
 
           var storedLayouts = [];
 
-          if ($cookieStore.get("umblistViewLayout")) {
-              storedLayouts = $cookieStore.get("umblistViewLayout");
+          if(localStorageService.get(localStorageKey)) {
+              storedLayouts = localStorageService.get(localStorageKey);
           }
 
           if (storedLayouts && storedLayouts.length > 0) {
@@ -47,19 +48,18 @@
               activeLayout = getFirstAllowedLayout(availableLayouts);
           }
 
-          setLayoutCookie(nodeId, activeLayout);
+          saveLayoutInLocalStorage(nodeId, activeLayout);
 
           return activeLayout;
 
       }
 
-      function setLayoutCookie(nodeId, selectedLayout) {
-
+      function saveLayoutInLocalStorage(nodeId, selectedLayout) {
           var layoutFound = false;
           var storedLayouts = [];
 
-          if($cookieStore.get("umblistViewLayout")) {
-              storedLayouts = $cookieStore.get("umblistViewLayout");
+          if(localStorageService.get(localStorageKey)) {
+              storedLayouts = localStorageService.get(localStorageKey);
           }
 
           if(storedLayouts.length > 0) {
@@ -73,14 +73,14 @@
           }
 
           if(!layoutFound) {
-              var cookieObject = {
+              var storageObject = {
                   "nodeId": nodeId,
                   "path": selectedLayout.path
               };
-              storedLayouts.push(cookieObject);
+              storedLayouts.push(storageObject);
           }
 
-          document.cookie="umblistViewLayout=" + JSON.stringify(storedLayouts);
+          localStorageService.set(localStorageKey, storedLayouts);
 
       }
 
@@ -106,7 +106,7 @@
          var item = null;
 
          if ($event.shiftKey === true) {
-             
+
             if(selectedIndex > firstSelectedIndex) {
 
                start = firstSelectedIndex;
@@ -266,7 +266,7 @@
          getLayout: getLayout,
          getFirstAllowedLayout: getFirstAllowedLayout,
          setLayout: setLayout,
-         setLayoutCookie: setLayoutCookie,
+         saveLayoutInLocalStorage: saveLayoutInLocalStorage,
          selectHandler: selectHandler,
          selectItem: selectItem,
          deselectItem: deselectItem,

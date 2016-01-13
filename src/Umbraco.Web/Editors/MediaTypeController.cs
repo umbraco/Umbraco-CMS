@@ -51,6 +51,10 @@ namespace Umbraco.Web.Editors
            
         }
 
+        public int GetCount()
+        {
+            return Services.ContentTypeService.CountContentTypes();
+        }
 
         public ContentTypeCompositionDisplay GetById(int id)
         {
@@ -83,9 +87,31 @@ namespace Umbraco.Web.Editors
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
-        public IEnumerable<EntityBasic> GetAvailableCompositeMediaTypes(int contentTypeId)
+        /// <summary>
+        /// Returns the avilable compositions for this content type
+        /// </summary>
+        /// <param name="contentTypeId"></param>
+        /// <param name="filterContentTypes">
+        /// This is normally an empty list but if additional content type aliases are passed in, any content types containing those aliases will be filtered out
+        /// along with any content types that have matching property types that are included in the filtered content types
+        /// </param>
+        /// <param name="filterPropertyTypes">
+        /// This is normally an empty list but if additional property type aliases are passed in, any content types that have these aliases will be filtered out.
+        /// This is required because in the case of creating/modifying a content type because new property types being added to it are not yet persisted so cannot
+        /// be looked up via the db, they need to be passed in.
+        /// </param>
+        /// <returns></returns>
+        public HttpResponseMessage GetAvailableCompositeMediaTypes(int contentTypeId,
+            [FromUri]string[] filterContentTypes,
+            [FromUri]string[] filterPropertyTypes)
         {
-            return PerformGetAvailableCompositeContentTypes(contentTypeId, UmbracoObjectTypes.MediaType);
+            var result = PerformGetAvailableCompositeContentTypes(contentTypeId, UmbracoObjectTypes.MediaType, filterContentTypes, filterPropertyTypes)
+                .Select(x => new
+                {
+                    contentType = x.Item1,
+                    allowed = x.Item2
+                });
+            return Request.CreateResponse(result);            
         }
 
         public ContentTypeCompositionDisplay GetEmpty(int parentId)
@@ -134,9 +160,10 @@ namespace Umbraco.Web.Editors
         public ContentTypeCompositionDisplay PostSave(ContentTypeSave contentTypeSave)
         {
             var savedCt = PerformPostSave<IMediaType, ContentTypeCompositionDisplay>(
-                contentTypeSave:    contentTypeSave,
-                getContentType:     i => Services.ContentTypeService.GetMediaType(i),
-                saveContentType:    type => Services.ContentTypeService.Save(type));
+                contentTypeSave:        contentTypeSave,
+                getContentType:         i => Services.ContentTypeService.GetMediaType(i),
+                getContentTypeByAlias:  alias => Services.ContentTypeService.GetMediaType(alias),
+                saveContentType:        type => Services.ContentTypeService.Save(type));
 
             var display = Mapper.Map<ContentTypeCompositionDisplay>(savedCt);
 

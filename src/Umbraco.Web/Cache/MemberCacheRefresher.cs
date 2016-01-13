@@ -69,7 +69,9 @@ namespace Umbraco.Web.Cache
             ApplicationContext.Current.ApplicationCache.RuntimeCache.
                 ClearCacheByKeySearch(string.Format("{0}{1}", CacheKeys.MemberBusinessLogicCacheKey, id));
 
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(RepositoryBase.GetCacheIdKey<IMember>(id));
+            var memberCache = ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<IMember>();
+            if (memberCache)
+                memberCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IMember>(id));
         }
     }
 }

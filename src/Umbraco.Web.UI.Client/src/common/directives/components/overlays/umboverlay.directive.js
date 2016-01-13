@@ -11,6 +11,10 @@
 
       function link(scope, el, attr, ctrl) {
 
+          scope.directive = {
+              enableConfirmButton: false
+          };
+
          var overlayNumber = 0;
          var numberOfOverlays = 0;
          var isRegistered = false;
@@ -23,8 +27,6 @@
 
             setButtonText();
 
-            registerOverlay();
-
             modelCopy = makeModelCopy(scope.model);
 
             $timeout(function() {
@@ -32,6 +34,10 @@
                if (scope.position === "target") {
                   setTargetPosition();
                }
+
+               // this has to be done inside a timeout to ensure the destroy
+               // event on other overlays is run before registering a new one
+               registerOverlay();
 
                setOverlayIndent();
 
@@ -220,21 +226,23 @@
          }
 
          scope.submitForm = function(model) {
-
             if(scope.model.submit) {
+                 if (formHelper.submitForm({scope: scope})) {
+                    formHelper.resetForm({ scope: scope });
 
-               if (formHelper.submitForm({scope: scope})) {
+                    if(scope.model.confirmSubmit && scope.model.confirmSubmit.enable && !scope.directive.enableConfirmButton) {
+                        scope.model.submit(model, modelCopy, scope.directive.enableConfirmButton);
+                    } else {
+                        unregisterOverlay();
+                        scope.model.submit(model, modelCopy, scope.directive.enableConfirmButton);
+                    }
 
-                  formHelper.resetForm({ scope: scope });
+                 }
+             }
+         };
 
-                  unregisterOverlay();
-
-                  scope.model.submit(model);
-
-               }
-
-            }
-
+         scope.cancelConfirmSubmit = function() {
+             scope.model.confirmSubmit.show = false;
          };
 
          scope.closeOverLay = function() {

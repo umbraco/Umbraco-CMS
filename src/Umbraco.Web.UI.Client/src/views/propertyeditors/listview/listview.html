@@ -66,7 +66,7 @@
                    <div class="inner-addon left-addon">
                        <i class="icon icon-search" ng-click="enterSearch($event)"></i>
                        <input
-                        class="form-control"
+                        class="form-control search-input"
                         type="text"
                         localize="placeholder"
                         placeholder="@general_typeToSearch"
@@ -153,7 +153,7 @@
          on-get-content="reloadView">
       </umb-list-view-layout>
 
-      <umb-load-indicator ng-if="!viewLoaded"></umb-load-indicator>
+      <umb-load-indicator ng-show="!viewLoaded"></umb-load-indicator>
 
       <umb-pagination
          ng-if="listViewResultSet.totalPages"
