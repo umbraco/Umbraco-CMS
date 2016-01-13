@@ -25,7 +25,7 @@ namespace umbraco.cms.businesslogic.cache
         public static void ClearAllCache()
         {
 	        var helper = new CacheHelper(System.Web.HttpRuntime.Cache);
-			helper.ClearAllCache();
+			helper.RuntimeCache.ClearAllCache();
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace umbraco.cms.businesslogic.cache
         public static void ClearCacheItem(string key)
         {
 			var helper = new CacheHelper(System.Web.HttpRuntime.Cache);
-	        helper.ClearCacheItem(key);
+	        helper.RuntimeCache.ClearCacheItem(key);
         }
 
 
@@ -49,7 +49,7 @@ namespace umbraco.cms.businesslogic.cache
         public static void ClearCacheObjectTypes(string TypeName)
         {
 			var helper = new CacheHelper(System.Web.HttpRuntime.Cache);
-			helper.ClearCacheObjectTypes(TypeName);
+			helper.RuntimeCache.ClearCacheObjectTypes(TypeName);
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace umbraco.cms.businesslogic.cache
         public static void ClearCacheByKeySearch(string KeyStartsWith)
         {
 			var helper = new CacheHelper(System.Web.HttpRuntime.Cache);
-			helper.ClearCacheByKeySearch(KeyStartsWith);
+			helper.RuntimeCache.ClearCacheByKeySearch(KeyStartsWith);
         }
 
         /// <summary>

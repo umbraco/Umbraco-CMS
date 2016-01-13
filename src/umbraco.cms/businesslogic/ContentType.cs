@@ -175,10 +175,10 @@ namespace umbraco.cms.businesslogic
         /// <returns></returns>
         public static ContentType GetContentType(int id)
         {
-            return ApplicationContext.Current.ApplicationCache.GetCacheItem
+            return ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<ContentType>
                 (string.Format("{0}{1}", CacheKeys.ContentTypeCacheKey, id),
-                 TimeSpan.FromMinutes(30),
-                 () => new ContentType(id));
+                 timeout:       TimeSpan.FromMinutes(30),
+                 getCacheItem:  () => new ContentType(id));
         }
 
         // This is needed, because the Tab class is protected and as such it's not possible for 
@@ -588,10 +588,10 @@ namespace umbraco.cms.businesslogic
             {
                 var cacheKey = GetPropertiesCacheKey();
 
-                return ApplicationContext.Current.ApplicationCache.GetCacheItem(
+                return ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<List<PropertyType>>(
                     cacheKey,
-                    TimeSpan.FromMinutes(15),
-                    () =>
+                    timeout:        TimeSpan.FromMinutes(15),
+                    getCacheItem:   () =>
                     {
                         //MCH NOTE: For the timing being I have changed this to a dictionary to ensure that property types
                         //aren't added multiple times through the MasterContentType structure, because each level loads
@@ -1205,8 +1205,8 @@ namespace umbraco.cms.businesslogic
         {
             
             var ct = new ContentType(id);
-            ApplicationContext.Current.ApplicationCache.ClearCacheItem(string.Format("{0}{1}", CacheKeys.ContentTypeCacheKey, id));
-            ApplicationContext.Current.ApplicationCache.ClearCacheItem(ct.GetPropertiesCacheKey());
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(string.Format("{0}{1}", CacheKeys.ContentTypeCacheKey, id));
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(ct.GetPropertiesCacheKey());
             ct.ClearVirtualTabs();
 
             //clear the content type from the property datatype cache used by razor
@@ -1229,8 +1229,8 @@ namespace umbraco.cms.businesslogic
         [Obsolete("The content type cache is automatically cleared by Umbraco when a content type is saved, this method is no longer used")]
         protected internal void FlushAllFromCache()
         {
-            ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(CacheKeys.ContentTypeCacheKey);
-            ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(CacheKeys.ContentTypePropertiesCacheKey);
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.ContentTypeCacheKey);
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.ContentTypePropertiesCacheKey);
 
             RemoveAllDataTypeCache();
             ClearVirtualTabs();

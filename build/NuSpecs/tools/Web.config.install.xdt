@@ -54,7 +54,7 @@
       </providers>
       </siteMap>	
     <httpRuntime xdt:Transform="InsertIfMissing" />
-    <httpRuntime targetFramework="4.5" xdt:Transform="SetAttributes(targetFramework)" />
+    <httpRuntime targetFramework="4.5" maxRequestLength="1048576" fcnMode="Single" xdt:Transform="SetAttributes(targetFramework,fcnMode,maxRequestLength)" />
     <membership defaultProvider="DefaultMembershipProvider" xdt:Locator="Match(defaultProvider)" xdt:Transform="Remove" />
     <roleManager defaultProvider="DefaultRoleProvider" xdt:Locator="Match(defaultProvider)" xdt:Transform="Remove"/>
     <profile defaultProvider="DefaultProfileProvider" xdt:Locator="Match(defaultProvider)" xdt:Transform="Remove"/>>
@@ -140,6 +140,13 @@
       <remove name="SpellChecker" xdt:Locator="Match(name)" xdt:Transform="Remove" />
       <add name="SpellChecker" xdt:Locator="Match(name)" xdt:Transform="Remove" />
     </handlers>
+
+    <security xdt:Transform="InsertIfMissing">
+      <requestFiltering xdt:Transform="InsertIfMissing">
+        <requestLimits maxAllowedContentLength="1073741824" xdt:Transform="InsertIfMissing" />
+      </requestFiltering>
+    </security>
+    
   </system.webServer>
 
   <system.codedom xdt:Transform="Remove" />

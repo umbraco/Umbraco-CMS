@@ -168,6 +168,7 @@
   <area alias="media">
     <key alias="clickToUpload">Click to upload</key>
     <key alias="dropFilesHere">Drop your files here...</key>
+	<key alias="urls">Link to media</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Create a new member</key>
@@ -696,6 +697,9 @@ To manage your website, simply open the Umbraco back office and start adding con
       %0% could not be published because the item is scheduled for release.
     ]]>
     </key>
+	<key alias="contentPublishedFailedExpired"><![CDATA[
+      %0% could not be published because the item has expired.
+    ]]></key>  
     <key alias="contentPublishedFailedInvalid"><![CDATA[
       %0% could not be published because these properties:  %1%  did not pass validation rules.
     ]]></key>

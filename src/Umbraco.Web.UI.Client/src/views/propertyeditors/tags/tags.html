@@ -14,6 +14,7 @@
         </span>
 
         <input type="text"
+               id="{{model.alias}}"
                class="typeahead tags-{{model.alias}}"
                ng-model="$parent.tagToAdd"
                ng-keydown="$parent.addTagOnEnter($event)"

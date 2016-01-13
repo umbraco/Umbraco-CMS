@@ -494,7 +494,7 @@ namespace umbraco
         {
             var tId = templateID;
 
-            var t = ApplicationContext.Current.ApplicationCache.GetCacheItem(
+            var t = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<template>(
                string.Format("{0}{1}", CacheKeys.TemplateFrontEndCacheKey, tId), () =>
                {
                    using (var templateData = SqlHelper.ExecuteReader(@"select nodeId, alias, node.parentID as master, text, design

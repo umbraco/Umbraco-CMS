@@ -76,7 +76,7 @@ namespace Umbraco.Web.Cache
             content.Instance.ClearDocumentCache(id);
             DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
             DistributedCache.Instance.ClearXsltCacheOnCurrentServer();
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<PublicAccessEntry>();
+            ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
             base.Remove(id);
         }
 
@@ -86,7 +86,7 @@ namespace Umbraco.Web.Cache
             content.Instance.UpdateDocumentCache(new Document(instance));
             DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
             DistributedCache.Instance.ClearXsltCacheOnCurrentServer();
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<PublicAccessEntry>();
+            ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
             base.Refresh(instance);
         }
 
@@ -96,7 +96,7 @@ namespace Umbraco.Web.Cache
             content.Instance.ClearDocumentCache(new Document(instance));
             DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
             DistributedCache.Instance.ClearXsltCacheOnCurrentServer();
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<PublicAccessEntry>();
+            ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
             base.Remove(instance);
         }
     }

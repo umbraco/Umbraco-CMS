@@ -234,8 +234,15 @@ namespace Umbraco.Core.Persistence.Repositories
             var processed = 0;
             do
             {
-                var descendants = GetPagedResultsByQuery(query, pageIndex, pageSize, out total, "Path", Direction.Ascending);
-
+                //NOTE: This is an important call, we cannot simply make a call to:
+                //  GetPagedResultsByQuery(query, pageIndex, pageSize, out total, "Path", Direction.Ascending);
+                // because that method is used to query 'latest' content items where in this case we don't necessarily
+                // want latest content items because a pulished content item might not actually be the latest.
+                // see: http://issues.umbraco.org/issue/U4-6322 & http://issues.umbraco.org/issue/U4-5982
+                var descendants = GetPagedResultsByQuery<DocumentDto, Content>(query, pageIndex, pageSize, out total,
+                    new Tuple<string, string>("cmsDocument", "nodeId"),
+                    ProcessQuery, "Path", Direction.Ascending);
+                
                 var xmlItems = (from descendant in descendants
                                 let xml = serializer(descendant)
                                 select new ContentXmlDto { NodeId = descendant.Id, Xml = xml.ToDataString() }).ToArray();
@@ -728,7 +735,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="content"></param>
         /// <param name="xml"></param>
         public void AddOrUpdateContentXml(IContent content, Func<IContent, XElement> xml)
-        {           
+        {
             _contentXmlRepository.AddOrUpdate(new ContentXmlEntity<IContent>(content, xml));
         }
 
@@ -826,11 +833,11 @@ namespace Umbraco.Core.Persistence.Repositories
             var contentTypes = _contentTypeRepository.GetAll(dtos.Select(x => x.ContentVersionDto.ContentDto.ContentTypeId).ToArray())
                 .ToArray();
 
-            
+
             var ids = dtos
                 .Where(dto => dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
                 .Select(x => x.TemplateId.Value).ToArray();
-            
+
             //NOTE: This should be ok for an SQL 'IN' statement, there shouldn't be an insane amount of content types
             var templates = ids.Length == 0 ? Enumerable.Empty<ITemplate>() : _templateRepository.GetAll(ids).ToArray();
 
