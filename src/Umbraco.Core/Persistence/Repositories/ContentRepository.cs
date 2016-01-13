@@ -234,8 +234,15 @@ namespace Umbraco.Core.Persistence.Repositories
             var processed = 0;
             do
             {
-                var descendants = GetPagedResultsByQueryNoFilter(query, pageIndex, pageSize, out total, "Path", Direction.Ascending);
-
+                //NOTE: This is an important call, we cannot simply make a call to:
+                //  GetPagedResultsByQuery(query, pageIndex, pageSize, out total, "Path", Direction.Ascending);
+                // because that method is used to query 'latest' content items where in this case we don't necessarily
+                // want latest content items because a pulished content item might not actually be the latest.
+                // see: http://issues.umbraco.org/issue/U4-6322 & http://issues.umbraco.org/issue/U4-5982
+                var descendants = GetPagedResultsByQuery<DocumentDto, Content>(query, pageIndex, pageSize, out total,
+                    new Tuple<string, string>("cmsDocument", "nodeId"),
+                    ProcessQuery, "Path", Direction.Ascending);
+                
                 var xmlItems = (from descendant in descendants
                                 let xml = serializer(descendant)
                                 select new ContentXmlDto { NodeId = descendant.Id, Xml = xml.ToDataString() }).ToArray();
@@ -784,26 +791,6 @@ namespace Umbraco.Core.Persistence.Repositories
                 new Tuple<string, string>("cmsDocument", "nodeId"),
                 ProcessQuery, orderBy, orderDirection,
                 filterCallback);
-
-        }
-
-        /// <summary>
-        /// Gets paged content results
-        /// </summary>
-        /// <param name="query">Query to excute</param>
-        /// <param name="pageIndex">Page number</param>
-        /// <param name="pageSize">Page size</param>
-        /// <param name="totalRecords">Total records query would return without paging</param>
-        /// <param name="orderBy">Field to order by</param>
-        /// <param name="orderDirection">Direction to order by</param>
-        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
-        public IEnumerable<IContent> GetPagedResultsByQueryNoFilter(IQuery<IContent> query, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy, Direction orderDirection)
-        {
-
-            return GetPagedResultsByQuery<DocumentDto, Content>(query, pageIndex, pageSize, out totalRecords,
-                new Tuple<string, string>("cmsDocument", "nodeId"),
-                ProcessQuery, orderBy, orderDirection);
 
         }
 
