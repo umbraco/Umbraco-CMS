@@ -171,7 +171,12 @@
                                     <span ng-if="property.dataTypeName == undefined">Preview</span>
                                 </span>
 
-                                <umb-property-editor model="property" ng-if="property.view !== undefined"></umb-property-editor>
+                                <ng-form name="propertyEditorPreviewForm" umb-disable-form-validation>
+                                    <umb-property-editor
+                                        ng-if="property.view !== undefined"
+                                        model="property">
+                                    </umb-property-editor>
+                                </ng-form>
 
                             </div>
 
