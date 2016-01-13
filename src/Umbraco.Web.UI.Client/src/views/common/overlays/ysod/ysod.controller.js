@@ -1,5 +1,5 @@
 angular.module("umbraco")
-    .controller("Umbraco.Overlays.YsodController", function ($scope, legacyResource, treeService, navigationService) {
+    .controller("Umbraco.Overlays.YsodController", function ($scope, legacyResource, treeService, navigationService, localizationService) {
 
         if(!$scope.model.title) {
             $scope.model.title = localizationService.localize("errors_receivedErrorFromServer").then(function (value) {return value;});
