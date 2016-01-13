@@ -106,11 +106,22 @@ namespace Umbraco.Web.Editors
 
             var filtered = Services.ContentTypeService.GetAvailableCompositeContentTypes(source, allContentTypes, filterContentTypes, filterPropertyTypes);
 
+            var currCompositions = source == null ? new string[] { } : source.ContentTypeComposition.Select(x => x.Alias).ToArray();
+
             return filtered                
                 .Select(x => new Tuple<EntityBasic, bool>(Mapper.Map<IContentTypeComposition, EntityBasic>(x.Item1), x.Item2))
                 .Select(x =>
                 {
+                    //translate the name
                     x.Item1.Name = TranslateItem(x.Item1.Name);
+
+                    //we need to ensure that the item is enabled if it is already selected
+                    if (currCompositions.Contains(x.Item1.Alias))
+                    {
+                        //re-set x to be allowed (NOTE: I didn't know you could set an enumerable item in a lambda!)
+                        x = new Tuple<EntityBasic, bool>(x.Item1, true);
+                    }
+
                     return x;
                 })
                 .ToList();

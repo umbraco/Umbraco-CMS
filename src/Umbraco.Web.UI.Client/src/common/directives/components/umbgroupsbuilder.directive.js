@@ -317,7 +317,7 @@
                       return c.contentType;
                   });
                   // convert icons for composite content types
-                  iconHelper.formatContentTypeIcons(contentTypes);
+                  iconHelper.formatContentTypeIcons(contentTypes);                  
               }),
               //get content type count
               countContentTypeResource().then(function(result) {

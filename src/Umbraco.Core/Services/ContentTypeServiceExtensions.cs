@@ -77,9 +77,7 @@ namespace Umbraco.Core.Services
             //At this point we have a list of content types that 'could' be compositions
             
             //now we'll filter this list based on the filters requested
-            var filtered = list
-                //not itself
-                .Where(x => x.Id != sourceId)
+            var filtered = list                
                 .Where(x =>
                 {
                     //need to filter any content types that are included in this list
@@ -95,9 +93,11 @@ namespace Umbraco.Core.Services
                 })
                 .OrderBy(x => x.Name)                
                 .ToList();
-
-            //now we can create our result based on what is still available
+            
+            //now we can create our result based on what is still available            
             var result = list
+                //not itself
+                .Where(x => x.Id != sourceId)
                 .OrderBy(x => x.Name)
                 .Select(composition => filtered.Contains(composition)
                 ? new Tuple<IContentTypeComposition, bool>(composition, true)
