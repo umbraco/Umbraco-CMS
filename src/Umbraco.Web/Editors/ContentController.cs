@@ -659,9 +659,17 @@ namespace Umbraco.Web.Editors
                             new[] {string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id)}).Trim());
                     break;
                 case PublishStatusType.FailedHasExpired:
-                    //TODO: We should add proper error messaging for this!
+                    display.AddWarningNotification(
+                        Services.TextService.Localize("publish"),
+                        Services.TextService.Localize("publish/contentPublishedFailedExpired",
+                            new[]
+                            {
+                                string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id),
+                            }).Trim());
+                    break;
                 case PublishStatusType.FailedIsTrashed:
                     //TODO: We should add proper error messaging for this!
+                    break;
                 case PublishStatusType.FailedContentInvalid:
                     display.AddWarningNotification(
                         Services.TextService.Localize("publish"),
