@@ -1,7 +1,11 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Overlays.MediaPickerController",
-        function ($scope, mediaResource, umbRequestHelper, entityResource, $log, mediaHelper, eventsService, treeService, $element, $timeout, $cookies, $cookieStore) {
+        function ($scope, mediaResource, umbRequestHelper, entityResource, $log, mediaHelper, eventsService, treeService, $element, $timeout, $cookies, $cookieStore, localizationService) {
+
+            if(!$scope.model.title) {
+                $scope.model.title = localizationService.localize("defaultdialogs_selectMedia").then(function (value) {return value;});
+            }
 
             var dialogOptions = $scope.model;
 

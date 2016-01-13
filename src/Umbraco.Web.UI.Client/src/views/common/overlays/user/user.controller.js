@@ -7,6 +7,10 @@ angular.module("umbraco")
         $scope.changePasswordButtonState = "init";
         $scope.model.subtitle = "Umbraco version" + " " + $scope.version;
 
+        if(!$scope.model.title) {
+            $scope.model.title = localizationService.localize("general_user").then(function (value) {return value;});
+        }
+
         $scope.externalLoginProviders = externalLoginInfo.providers;
         $scope.externalLinkLoginFormAction = Umbraco.Sys.ServerVariables.umbracoUrls.externalLinkLoginsUrl;
         var evts = [];

@@ -23,10 +23,19 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 
 			  if(contentType === "content") {
 				  entityType = "Document";
+				  if(!$scope.model.title) {
+					  $scope.model.title = localizationService.localize("defaultdialogs_selectContent").then(function (value) {return value;});
+				  }
 			  } else if(contentType === "member") {
 				  entityType = "Member";
+				  if(!$scope.model.title) {
+					  $scope.model.title = localizationService.localize("defaultdialogs_selectMember").then(function (value) {return value;});
+				  }
 			  } else if(contentType === "media") {
 				  entityType = "Media";
+				  if(!$scope.model.title) {
+					  $scope.model.title = localizationService.localize("defaultdialogs_selectMedia").then(function (value) {return value;});
+				  }
 			  }
 		  }
 

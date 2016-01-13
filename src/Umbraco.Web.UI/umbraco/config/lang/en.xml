@@ -252,7 +252,15 @@
     <key alias="openInParentFrame">Opens the linked document in the parent frame</key>
 
     <key alias="linkToMedia">Link to media</key>
-    <key alias="selectMedia">SelectMedia</key>
+
+    <key alias="selectMedia">Select media</key>
+    <key alias="selectIcon">Select icon</key>
+    <key alias="selectItem">Select item</key>
+    <key alias="selectLink">Select link</key>
+    <key alias="selectMacro">Select macro</key>
+    <key alias="selectContent">Select content</key>
+    <key alias="selectMember">Select member</key>
+    <key alias="selectMemberGroup">Select member group</key>
 
     <key alias="noMacroParams">There are no parameters for this macro</key>
 
@@ -265,6 +273,7 @@
 
     <key alias="account">account</key>
 
+    <key alias="selectEditor">Select editor</key>
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
@@ -461,6 +470,8 @@
     <key alias="listView">List view</key>
     <key alias="saving">Saving...</key>
     <key alias="current">current</key>
+    <key alias="move">Move</key>
+    <key alias="embed">Embed</key>
   </area>
 
   <area alias="colors">
@@ -1206,5 +1217,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="yourProfile" version="7.0">Your profile</key>
     <key alias="yourHistory" version="7.0">Your recent history</key>
     <key alias="sessionExpires" version="7.0">Session expires in</key>
+  </area>
+  <area alias="errors">
+      <key alias="receivedErrorFromServer">Received an error from the server</key>
   </area>
 </language>

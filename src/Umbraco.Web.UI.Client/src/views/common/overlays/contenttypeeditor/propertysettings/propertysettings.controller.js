@@ -65,7 +65,6 @@
          vm.focusOnMandatoryField = false;
 
          vm.editorPickerOverlay = {};
-         vm.editorPickerOverlay.title = "Choose editor";
          vm.editorPickerOverlay.property = $scope.model.property;
          vm.editorPickerOverlay.contentTypeName = $scope.model.contentTypeName;
          vm.editorPickerOverlay.view = "views/common/overlays/contenttypeeditor/editorpicker/editorpicker.html";

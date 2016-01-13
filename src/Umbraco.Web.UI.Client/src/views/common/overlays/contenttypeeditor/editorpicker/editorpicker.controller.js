@@ -14,6 +14,10 @@
 
 		var vm = this;
 
+        if(!$scope.model.title) {
+            $scope.model.title = localizationService.localize("defaultdialogs_selectEditor").then(function (value) {return value;});
+        }
+
 		vm.searchTerm = "";
 		vm.showTabs = false;
 		vm.tabsLoaded = 0;
