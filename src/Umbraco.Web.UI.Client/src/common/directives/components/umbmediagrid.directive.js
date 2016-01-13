@@ -7,8 +7,8 @@
 
          var itemDefaultHeight = 200;
          var itemDefaultWidth = 200;
-         var itemMaxWidth = 300;
-         var itemMaxHeight = 300;
+         var itemMaxWidth = 200;
+         var itemMaxHeight = 200;
 
          function activate() {
 
@@ -60,14 +60,18 @@
              item.aspectRatio = item.width / item.height;
 
              // set max width and height
-             if(item.width > itemMaxWidth) {
-                item.width = itemMaxWidth;
-                item.height = itemMaxWidth / item.aspectRatio;
-             }
-
-             if(item.height > itemMaxHeight) {
-                item.height = itemMaxHeight;
-                item.width = itemMaxHeight * item.aspectRatio;
+             // landscape
+             if(item.aspectRatio >= 1) {
+                 if(item.width > itemMaxWidth) {
+                    item.width = itemMaxWidth;
+                    item.height = itemMaxWidth / item.aspectRatio;
+                 }
+            // portrait
+             } else {
+                 if(item.height > itemMaxHeight) {
+                    item.height = itemMaxHeight;
+                    item.width = itemMaxHeight * item.aspectRatio;
+                 }
              }
 
          }
@@ -100,7 +104,8 @@
 
                var flexStyle = {
                   "flex": flex + " 1 " + imageMinWidth + "px",
-                  "max-width": mediaItem.width + "px"
+                  "max-width": mediaItem.width + "px",
+                  "min-width": "125px"
                };
 
                mediaItem.flexStyle = flexStyle;
@@ -109,16 +114,16 @@
 
          }
 
-         scope.selectItem = function(item, $event, $index) {
-            if(scope.onSelect) {
-               scope.onSelect(item, $event, $index);
-               $event.stopPropagation();
+         scope.clickItem = function(item, $event, $index) {
+            if(scope.onClick) {
+               scope.onClick(item, $event, $index);
             }
          };
 
-         scope.clickItem = function(item) {
-            if(scope.onClick) {
-               scope.onClick(item);
+         scope.clickItemName = function(item, $event, $index) {
+            if(scope.onClickName) {
+                scope.onClickName(item, $event, $index);
+                $event.stopPropagation();
             }
          };
 
@@ -147,8 +152,8 @@
          scope: {
             items: '=',
             onDetailsHover: "=",
-            onSelect: '=',
             onClick: '=',
+            onClickName: "=",
             filterBy: "="
          },
          link: link

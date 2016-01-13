@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using Umbraco.Core.Models;
 
@@ -23,6 +24,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="alias"></param>
         /// <returns></returns>
         [Obsolete("Use GetDescendants instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         TemplateNode GetTemplateNode(string alias);
 
         /// <summary>
@@ -32,6 +34,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="alias"></param>
         /// <returns></returns>
         [Obsolete("Use GetDescendants instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         TemplateNode FindTemplateInTree(TemplateNode anyNode, string alias);
 
         /// <summary>

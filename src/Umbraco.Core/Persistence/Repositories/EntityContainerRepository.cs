@@ -47,6 +47,12 @@ namespace Umbraco.Core.Persistence.Repositories
             return nodeDto == null ? null : CreateEntity(nodeDto);
         }
 
+        public IEnumerable<EntityContainer> Get(string name, int level, Guid umbracoObjectTypeId)
+        {
+            var sql = GetBaseQuery(false).Where("text=@name AND level=@level AND nodeObjectType=@umbracoObjectTypeId", new { name, level, umbracoObjectTypeId });
+            return Database.Fetch<NodeDto>(sql).Select(CreateEntity);
+        }
+
         protected override IEnumerable<EntityContainer> PerformGetAll(params int[] ids)
         {
             throw new NotImplementedException();

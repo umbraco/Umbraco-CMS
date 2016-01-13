@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using AutoMapper;
+using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
@@ -14,6 +15,7 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Trees;
 using Umbraco.Web.Routing;
 using umbraco.BusinessLogic.Actions;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -65,7 +67,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(display => display.Notifications, expression => expression.Ignore())
                 .ForMember(display => display.Errors, expression => expression.Ignore())
                 .ForMember(display => display.Alias, expression => expression.Ignore())
-                .ForMember(display => display.Tabs, expression => expression.ResolveUsing<TabsAndPropertiesResolver>())
+                .ForMember(display => display.Tabs, expression => expression.ResolveUsing(new TabsAndPropertiesResolver(applicationContext.Services.TextService)))
                 .ForMember(display => display.AllowedActions, expression => expression.ResolveUsing(
                     new ActionButtonsResolver(new Lazy<IUserService>(() => applicationContext.Services.UserService))))
                 .AfterMap((media, display) => AfterMap(media, display, applicationContext.Services.DataTypeService, applicationContext.Services.TextService,
@@ -159,11 +161,18 @@ namespace Umbraco.Web.Models.Mapping
 
             if (content.ContentType.IsContainer)
             {
-                TabsAndPropertiesResolver.AddListView(display, "content", dataTypeService);
+                TabsAndPropertiesResolver.AddListView(display, "content", dataTypeService, localizedText);
             }
-
+            
             var properties = new List<ContentPropertyDisplay>
             {
+                new ContentPropertyDisplay
+                {
+                    Alias = string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Label = localizedText.Localize("content/documentType"),
+                    Value = localizedText.UmbracoDictionaryTranslate(display.ContentTypeName),
+                    View = PropertyEditorResolver.Current.GetByAlias(Constants.PropertyEditors.NoEditAlias).ValueEditor.View
+                },
                 new ContentPropertyDisplay
                 {
                     Alias = string.Format("{0}releasedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
@@ -181,7 +190,7 @@ namespace Umbraco.Web.Models.Mapping
                 new ContentPropertyDisplay
                 {
                     Alias = string.Format("{0}template", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                    Label = "Template", //TODO: localize this?
+                    Label = localizedText.Localize("template/template"),
                     Value = display.TemplateAlias,
                     View = "dropdown", //TODO: Hard coding until we make a real dropdown property editor to lookup
                     Config = new Dictionary<string, object>
@@ -198,7 +207,7 @@ namespace Umbraco.Web.Models.Mapping
                 }
             };
 
-            TabsAndPropertiesResolver.MapGenericProperties(content, display, properties.ToArray(),
+            TabsAndPropertiesResolver.MapGenericProperties(content, display, localizedText, properties.ToArray(),
                 genericProperties =>
                 {
                     //TODO: This would be much nicer with the IUmbracoContextAccessor so we don't use singletons

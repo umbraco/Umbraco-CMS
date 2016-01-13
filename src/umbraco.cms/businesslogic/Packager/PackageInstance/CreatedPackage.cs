@@ -13,6 +13,7 @@ using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.macro;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using File = System.IO.File;
 using Template = umbraco.cms.businesslogic.template.Template;
 
@@ -221,9 +222,29 @@ namespace umbraco.cms.businesslogic.packager
 
                     }
                 }
+                
                 foreach (DocumentType d in dtl)
                 {
-                    docTypes.AppendChild(d.ToXml(_packageManifest));
+                    var folderNames = string.Empty;
+                    if (d.Level != 1)
+                    {
+                        var folders = new List<string>();
+
+                        var current = d.Parent;
+                        while (current.Level >= 1)
+                        {
+                            if (current.nodeObjectType == Constants.ObjectTypes.DocumentTypeContainerGuid)
+                                folders.Add(HttpUtility.UrlEncode(current.Text));
+
+                            if (current.Level == 1)
+                                break;
+                            current = current.Parent;
+                        }
+
+                        folderNames = string.Join("/", folders.ToArray().Reverse());
+                    }
+
+                    docTypes.AppendChild(d.ToXml(_packageManifest, folderNames));
                 }
 
                 AppendElement(docTypes);
@@ -295,7 +316,28 @@ namespace umbraco.cms.businesslogic.packager
                     if (int.TryParse(dtId, out outInt))
                     {
                         datatype.DataTypeDefinition dtd = new datatype.DataTypeDefinition(outInt);
-                        dataTypes.AppendChild(dtd.ToXml(_packageManifest));
+
+                        var folderNames = string.Empty;
+                        var dataTypeService = ApplicationContext.Current.Services.DataTypeService;
+                        var dataTypeDefinition = dataTypeService.GetDataTypeDefinitionById(dtd.Id);
+                        if (dataTypeDefinition.Level != 1)
+                        {
+                            var folders = new List<string>();
+                            
+                            var current = dataTypeService.GetContainer(dataTypeDefinition.ParentId);
+                            while (current.Level >= 1)
+                            {
+                                folders.Add(HttpUtility.UrlEncode(current.Name));
+
+                                if (current.Level == 1)
+                                    break;
+                                current = dataTypeService.GetContainer(current.ParentId);
+                            }
+
+                            folderNames = string.Join("/", folders.ToArray().Reverse());
+                        }
+
+                        dataTypes.AppendChild(dtd.ToXml(_packageManifest, folderNames));
                     }
                 }
                 AppendElement(dataTypes);
@@ -371,16 +413,14 @@ namespace umbraco.cms.businesslogic.packager
             }
 
         }
-
+        
         private void AddDocumentType(DocumentType dt, ref List<DocumentType> dtl)
         {
-            if (dt.MasterContentType != 0)
+            if (dt.MasterContentType != 0 && dt.Parent.nodeObjectType == Constants.ObjectTypes.DocumentTypeGuid)
             {
                 //first add masters
                 var mDocT = new DocumentType(dt.MasterContentType);
-
                 AddDocumentType(mDocT, ref dtl);
-
             }
 
             if (dtl.Contains(dt) == false)

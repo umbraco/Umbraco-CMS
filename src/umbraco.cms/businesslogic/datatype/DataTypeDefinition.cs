@@ -142,11 +142,16 @@ namespace umbraco.cms.businesslogic.datatype
 
         public XmlElement ToXml(XmlDocument xd)
         {
-            var serializer = new EntityXmlSerializer();
-            var xml = serializer.Serialize(ApplicationContext.Current.Services.DataTypeService, DataTypeItem);
-            return (XmlElement)xml.GetXmlNode(xd);
-
+            return ToXml(xd, string.Empty);
         }
+
+        public XmlElement ToXml(XmlDocument xd, string folders)
+        {
+            var serializer = new EntityXmlSerializer();
+            var xml = serializer.Serialize(ApplicationContext.Current.Services.DataTypeService, DataTypeItem, folders);
+            return (XmlElement)xml.GetXmlNode(xd);
+        }
+
         #endregion
 
         #region Static methods

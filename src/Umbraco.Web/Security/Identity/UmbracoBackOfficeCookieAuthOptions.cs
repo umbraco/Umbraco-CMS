@@ -89,7 +89,6 @@ namespace Umbraco.Web.Security.Identity
 
             return cookieOptions;
         }
-
           
     }
 }

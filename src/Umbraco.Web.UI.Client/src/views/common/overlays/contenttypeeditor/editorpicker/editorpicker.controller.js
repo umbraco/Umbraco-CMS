@@ -28,7 +28,7 @@
 			{
 				active: false,
 				id: 2,
-				label: "Re-use",
+				label: "Reuse",
 				alias: "Reuse",
 				userConfigured: []
 			}

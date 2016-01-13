@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Xml.Linq;
 using System.Threading;
+using AutoMapper;
 using Umbraco.Core.Auditing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
@@ -141,16 +142,25 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public IEnumerable<EntityContainer> GetMediaTypeContainers(string name, int level)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow))
+            {
+                return repo.Get(name, level, Constants.ObjectTypes.MediaTypeContainerGuid);
+            }
+        }
+
         public EntityContainer GetContentTypeContainer(Guid containerId)
         {
             return GetContainer(containerId, Constants.ObjectTypes.DocumentTypeGuid);
         }
-
+        
         public EntityContainer GetMediaTypeContainer(Guid containerId)
         {
             return GetContainer(containerId, Constants.ObjectTypes.MediaTypeGuid);
         }
-
+        
         private EntityContainer GetContainer(Guid containerId, Guid containedObjectType)
         {
             var uow = UowProvider.GetUnitOfWork();
@@ -160,6 +170,15 @@ namespace Umbraco.Core.Services
                 return container != null && container.ContainedObjectType == containedObjectType
                     ? container
                     : null;
+            }
+        }
+
+        public IEnumerable<EntityContainer> GetContentTypeContainers(string name, int level)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow))
+            {
+                return repo.Get(name, level, Constants.ObjectTypes.DocumentTypeContainerGuid);
             }
         }
 
@@ -458,6 +477,22 @@ namespace Umbraco.Core.Services
                 }
             }
             
+        }
+
+        public int CountContentTypes()
+        {
+            using (var repository = RepositoryFactory.CreateContentTypeRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.Count(Query<IContentType>.Builder);
+            }
+        }
+
+        public int CountMediaTypes()
+        {
+            using (var repository = RepositoryFactory.CreateMediaTypeRepository(UowProvider.GetUnitOfWork()))
+            {
+                return repository.Count(Query<IMediaType>.Builder);
+            }
         }
 
         /// <summary>

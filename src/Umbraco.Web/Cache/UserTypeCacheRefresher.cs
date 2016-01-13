@@ -29,19 +29,23 @@ namespace Umbraco.Web.Cache
 
         public override void RefreshAll()
         {
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IUserType>();
+            ClearAllIsolatedCacheByEntityType<IUserType>();
             base.RefreshAll();
         }
 
         public override void Refresh(int id)
         {
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(RepositoryBase.GetCacheIdKey<IUserType>(id));
+            var userTypeCache = ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<IUserType>();
+            if (userTypeCache)
+                userTypeCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IUserType>(id));
             base.Refresh(id);
         }
 
         public override void Remove(int id)
         {
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(RepositoryBase.GetCacheIdKey<IUserType>(id));
+            var userTypeCache = ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<IUserType>();
+            if (userTypeCache)
+                userTypeCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IUserType>(id));
             base.Remove(id);
         }
 

@@ -78,7 +78,7 @@ namespace Umbraco.Web.PropertyEditors
                     fs.DeleteFile(pathToRemove, true);
                 return string.Empty; // no more files
             }
-           
+
             // ensure we have the required guids
             if (editorValue.AdditionalData.ContainsKey("cuid") == false // for the content item
                 || editorValue.AdditionalData.ContainsKey("puid") == false) // and the property type
@@ -133,10 +133,11 @@ namespace Umbraco.Web.PropertyEditors
             // remove all temp files
             foreach (var file in files)
                 File.Delete(file.TempFilePath);
-                    
+
             // remove files that are not there anymore
             foreach (var pathToRemove in currentPaths.Except(newPaths))
                 fs.DeleteFile(pathToRemove, true);
+
 
             return string.Join(",", newPaths.Select(x => fs.GetUrl(x)));
         }

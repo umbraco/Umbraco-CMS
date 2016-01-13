@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
@@ -385,6 +386,8 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="alias"></param>
         /// <returns></returns>
+        [Obsolete("Use GetDescendants instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public TemplateNode GetTemplateNode(string alias)
         {
             using (var repository = _repositoryFactory.CreateTemplateRepository(_dataUowProvider.GetUnitOfWork()))
@@ -399,6 +402,8 @@ namespace Umbraco.Core.Services
         /// <param name="anyNode"></param>
         /// <param name="alias"></param>
         /// <returns></returns>
+        [Obsolete("Use GetDescendants instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public TemplateNode FindTemplateInTree(TemplateNode anyNode, string alias)
         {
             using (var repository = _repositoryFactory.CreateTemplateRepository(_dataUowProvider.GetUnitOfWork()))

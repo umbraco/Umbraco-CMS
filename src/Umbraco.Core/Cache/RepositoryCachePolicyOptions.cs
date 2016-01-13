@@ -1,16 +1,33 @@
-namespace Umbraco.Core.Persistence.Repositories
+using System;
+
+namespace Umbraco.Core.Cache
 {
-    internal class RepositoryCacheOptions
+    internal class RepositoryCachePolicyOptions
     {
         /// <summary>
-        /// Constructor sets defaults
+        /// Ctor - sets GetAllCacheValidateCount = true
         /// </summary>
-        public RepositoryCacheOptions()
+        public RepositoryCachePolicyOptions(Func<int> performCount)
         {
+            PerformCount = performCount;
             GetAllCacheValidateCount = true;
             GetAllCacheAllowZeroCount = false;
-            GetAllCacheThresholdLimit = 100;
         }
+
+        /// <summary>
+        /// Ctor - sets GetAllCacheValidateCount = false
+        /// </summary>
+        public RepositoryCachePolicyOptions()
+        {
+            PerformCount = null;
+            GetAllCacheValidateCount = false;
+            GetAllCacheAllowZeroCount = false;
+        }
+
+        /// <summary>
+        /// Callback required to get count for GetAllCacheValidateCount
+        /// </summary>
+        public Func<int> PerformCount { get; private set; }
 
         /// <summary>
         /// True/false as to validate the total item count when all items are returned from cache, the default is true but this
@@ -21,16 +38,11 @@ namespace Umbraco.Core.Persistence.Repositories
         /// setting this to return false will improve performance of GetAll cache with no params but should only be used
         /// for specific circumstances
         /// </remarks>
-        public bool GetAllCacheValidateCount { get; set; }
+        public bool GetAllCacheValidateCount { get; private set; }
 
         /// <summary>
         /// True if the GetAll method will cache that there are zero results so that the db is not hit when there are no results found
         /// </summary>
         public bool GetAllCacheAllowZeroCount { get; set; }
-
-        /// <summary>
-        /// The threshold entity count for which the GetAll method will cache entities
-        /// </summary>
-        public int GetAllCacheThresholdLimit { get; set; }
     }
 }

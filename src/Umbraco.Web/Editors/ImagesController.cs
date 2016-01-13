@@ -95,8 +95,6 @@ namespace Umbraco.Web.Editors
             return GetResized(imagePath, width, Convert.ToString(width));
         }
 
-        //TODO: We should delegate this to ImageProcessing
-
         /// <summary>
         /// Gets a resized image - if the requested max width is greater than the original image, only the original image will be returned.
         /// </summary>
@@ -113,35 +111,11 @@ namespace Umbraco.Web.Editors
             if (ImageHelper.IsImageFile(ext) == false)
                 return Request.CreateResponse(HttpStatusCode.NotFound);
 
-            var resizedPath = imagePath.TrimEnd(ext) + "_" + sizeName + ext;
-            var generate = fs.FileExists(resizedPath) == false;
-            if (generate)
-            {
-                // we need to generate it - if we have a source
-                if (fs.FileExists(imagePath) == false)
-                    return Request.CreateResponse(HttpStatusCode.NotFound);
-
-                using (var fileStream = fs.OpenFile(imagePath))
-                using (var originalImage = Image.FromStream(fileStream))
-                {
-                    // if original image is bigger than requested size, then resize, else return original image
-                    if (originalImage.Width >= width && originalImage.Height >= width)
-                        ImageHelper.GenerateResizedAt(fs, originalImage, resizedPath, width);
-                    else
-                        resizedPath = imagePath;
-                }
-            }
-
-            var result = Request.CreateResponse(HttpStatusCode.OK);
-            //NOTE: That we are not closing this stream as the framework will do that for us, if we try it will
-            // fail. See http://stackoverflow.com/questions/9541351/returning-binary-file-from-controller-in-asp-net-web-api
-            var stream = fs.OpenFile(resizedPath);
-            if (stream.CanSeek) stream.Seek(0, 0);
-            result.Content = new StreamContent(stream);
-            result.Headers.Date = fs.GetLastModified(imagePath);
-            result.Content.Headers.ContentType = new MediaTypeHeaderValue(System.Web.MimeMapping.GetMimeMapping(imagePath));
-            
-            return result;
+            //redirect to ImageProcessor thumbnail with rnd generated from last modified time of original media file
+            var response = Request.CreateResponse( HttpStatusCode.Found );
+            var imageLastModified = fs.GetLastModified( imagePath );
+            response.Headers.Location = new Uri( string.Format( "{0}?rnd={1}&width={2}", imagePath, string.Format( "{0:yyyyMMddHHmmss}", imageLastModified ), width ), UriKind.Relative );
+            return response;
         }
     }
 }

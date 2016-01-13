@@ -9,7 +9,7 @@
 (function () {
     "use strict";
 
-    function MemberTypesEditController($scope, $rootScope, $routeParams, $log, $filter, memberTypeResource, dataTypeResource, editorState, iconHelper, formHelper, navigationService, contentEditingHelper, notificationsService, $q, localizationService) {
+    function MemberTypesEditController($scope, $rootScope, $routeParams, $log, $filter, memberTypeResource, dataTypeResource, editorState, iconHelper, formHelper, navigationService, contentEditingHelper, notificationsService, $q, localizationService, overlayHelper) {
 
         var vm = this;
 
@@ -78,44 +78,51 @@
         }
 
         function save() {
+            // only save if there is no overlays open
+            if(overlayHelper.getNumberOfOverlays() === 0) {
 
-            var deferred = $q.defer();
+                var deferred = $q.defer();
 
-            vm.page.saveButtonState = "busy";
-            
-            contentEditingHelper.contentEditorPerformSave({
-                statusMessage: "Saving...",
-                saveMethod: memberTypeResource.save,
-                scope: $scope,
-                content: vm.contentType,
-                //no-op for rebind callback... we don't really need to rebind for content types
-                rebindCallback: angular.noop
-            }).then(function (data) {
-                //success            
-                syncTreeNode(vm.contentType, data.path);
+                vm.page.saveButtonState = "busy";
 
-                vm.page.saveButtonState = "success";
+                contentEditingHelper.contentEditorPerformSave({
+                    statusMessage: "Saving...",
+                    saveMethod: memberTypeResource.save,
+                    scope: $scope,
+                    content: vm.contentType,
+                    //We do not redirect on failure for doc types - this is because it is not possible to actually save the doc
+                    // type when server side validation fails - as opposed to content where we are capable of saving the content
+                    // item if server side validation fails
+                    redirectOnFailure: false,
+                    //no-op for rebind callback... we don't really need to rebind for content types
+                    rebindCallback: angular.noop
+                }).then(function (data) {
+                    //success
+                    syncTreeNode(vm.contentType, data.path);
 
-                deferred.resolve(data);
-            }, function (err) {
-                //error
-                if (err) {
-                    editorState.set($scope.content);
-                }
-                else {
-                    localizationService.localize("speechBubbles_validationFailedHeader").then(function (headerValue) {
-                        localizationService.localize("speechBubbles_validationFailedMessage").then(function (msgValue) {
-                            notificationsService.error(headerValue, msgValue);
+                    vm.page.saveButtonState = "success";
+
+                    deferred.resolve(data);
+                }, function (err) {
+                    //error
+                    if (err) {
+                        editorState.set($scope.content);
+                    }
+                    else {
+                        localizationService.localize("speechBubbles_validationFailedHeader").then(function (headerValue) {
+                            localizationService.localize("speechBubbles_validationFailedMessage").then(function (msgValue) {
+                                notificationsService.error(headerValue, msgValue);
+                            });
                         });
-                    });
-                }
+                    }
 
-                vm.page.saveButtonState = "error";
+                    vm.page.saveButtonState = "error";
 
-                deferred.reject(err);
-            });
+                    deferred.reject(err);
+                });
 
-            return deferred.promise;
+                return deferred.promise;
+            }
 
         }
 
@@ -135,11 +142,6 @@
 
             // convert legacy icons
             convertLegacyIcons(contentType);
-
-            // sort properties after sort order
-            angular.forEach(contentType.groups, function (group) {
-                group.properties = $filter('orderBy')(group.properties, 'sortOrder');
-            });
 
             //set a shared state
             editorState.set(contentType);

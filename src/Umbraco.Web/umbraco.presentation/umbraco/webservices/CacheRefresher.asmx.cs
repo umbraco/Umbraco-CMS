@@ -3,12 +3,15 @@ using System.Linq;
 using System.Web;
 using System.Web.Services;
 using System.Xml;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
 using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
 using umbraco.interfaces;
+using Umbraco.Core.Security;
 
 namespace umbraco.presentation.webservices
 {
@@ -57,10 +60,31 @@ namespace umbraco.presentation.webservices
             return jsonRefresher;
         }
 
-        private static bool NotAutorized(string login, string rawPassword)
+        private bool NotAutorized(string login, string rawPassword)
         {
+            //TODO: This technique of passing the raw password in is a legacy idea and isn't really 
+            // a very happy way to secure this webservice. To prevent brute force attacks, we need 
+            // to ensure that the lockout policies are applied, though because we are not authenticating
+            // the user with their real password, we need to do this a bit manually.
+
+            var userMgr = Context.GetOwinContext().GetUserManager<BackOfficeUserManager>();
+            
             var user = ApplicationContext.Current.Services.UserService.GetByUsername(login);
-            return user == null || user.RawPasswordValue != rawPassword;
+            if (user == null) return false;
+
+            var u = userMgr.FindById(user.Id);
+            if (u == null) return false;
+
+            if (u.IsLockedOut) return false;
+
+            if (user.RawPasswordValue != rawPassword)
+            {
+                //this performs the lockout and/or increments the access failed count
+                userMgr.AccessFailed(u.Id);
+                return false;
+            }
+
+            return true;
         }
 
         #endregion

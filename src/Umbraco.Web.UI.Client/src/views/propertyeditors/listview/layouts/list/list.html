@@ -13,12 +13,13 @@
            files-uploaded="vm.onUploadComplete"
            accept="{{vm.acceptedFileTypes}}"
            max-file-size="{{vm.maxFileSize}}"
-           hide-dropzone="{{!vm.activeDrag && items.length > 0 }}"
+           hide-dropzone="{{!vm.activeDrag && items.length > 0 || !items && options.filter }}"
            compact="{{ items.length > 0 }}"
            files-queued="vm.onFilesQueue">
         </umb-file-dropzone>
 
-        <umb-table ng-if="items"
+        <umb-table
+            ng-if="items"
             items="items"
             item-properties="options.includeProperties"
             on-select="vm.selectItem"
@@ -34,6 +35,7 @@
     <div ng-if="entityType !== 'media'">
 
         <umb-table
+            ng-if="items || !items && !options.filter"
             items="items"
             item-properties="options.includeProperties"
             on-select="vm.selectItem"
@@ -45,5 +47,11 @@
         </umb-table>
 
     </div>
+
+    <umb-empty-state
+        ng-if="!items && options.filter"
+        position="center">
+        Sorry, we can not find what you are looking for
+    </umb-empty-state>
 
 </div>

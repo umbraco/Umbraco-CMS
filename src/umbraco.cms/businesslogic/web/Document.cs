@@ -393,7 +393,7 @@ namespace umbraco.cms.businesslogic.web
             ApplicationContext.Current.DatabaseContext.Database.Execute(
                 "update cmsDocument set templateId = NULL where templateId = @TemplateId", new {TemplateId = templateId});
             //We need to clear cache for Documents since this is touching the database directly
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IContent>();
+            ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.ClearCache<IContent>();
         }
 
         /// <summary>

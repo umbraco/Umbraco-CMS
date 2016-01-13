@@ -130,9 +130,9 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
 
     $scope.save = function() {
 
-        $scope.page.saveButtonState = "busy";
-
         if (formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {
+
+            $scope.page.saveButtonState = "busy";
 
             dataTypeResource.save($scope.content, $scope.preValues, $routeParams.create)
                 .then(function(data) {

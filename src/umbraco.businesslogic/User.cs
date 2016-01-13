@@ -821,7 +821,7 @@ namespace umbraco.BusinessLogic
         public void FlushFromCache()
         {
             OnFlushingFromCache(EventArgs.Empty);
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IUser>();
+            ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.ClearCache<IUser>();
         }
 
         /// <summary>

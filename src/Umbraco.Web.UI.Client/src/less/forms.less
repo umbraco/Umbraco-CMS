@@ -17,7 +17,9 @@ label small, .guiDialogTiny {
 }
 
 label.control-label {
-  padding: 8px 10px 0 0 !important;
+  padding: 0 10px 0 0 !important;
+  font-weight: bold;
+
 }
 
 .umb-status-label{
@@ -66,6 +68,7 @@ label.control-label {
   top: 6px;
   left: 4px;
   color: @grayLight;
+  pointer-events: none;
 }
 .form-search input {
   width: 90%;
@@ -76,6 +79,28 @@ label.control-label {
   padding-left: 25px !Important;
   line-height: 22px;
   background: @white
+}
+
+
+.form-search .search-input {
+    font-weight: bold;
+    border-color: @grayLight;
+
+    &:hover,
+    &:focus,
+    &:focus:hover {
+        border-color: #ccc;
+    }
+
+    &:-moz-placeholder {
+      font-weight: normal;
+    }
+    &:-ms-input-placeholder {
+      font-weight: normal;
+    }
+    &::-webkit-input-placeholder {
+      font-weight: normal;
+    }
 }
 
 
@@ -175,6 +200,7 @@ input.-full-width-input {
    width: 100%;
    box-sizing: border-box;
    padding: 4px 6px;
+   height: 30px;
 }
 
 // Reset appearance properties for textual inputs and textarea
@@ -447,7 +473,7 @@ input[type="checkbox"][readonly] {
 // --------------------------
 
 // Error
-.show-validation.ng-invalid .control-group.error, 
+.show-validation.ng-invalid .control-group.error,
 .show-validation.ng-invalid .umb-panel-header-content-wrapper {
     .formFieldState(@formErrorText, @formErrorText, @formErrorBackground);
 }
@@ -537,7 +563,6 @@ input[type="checkbox"][readonly] {
     margin-bottom: 0; // prevent bottom margin from screwing up alignment in stacked forms
     *margin-left: 0;
     vertical-align: top;
-    .border-radius(0 @inputBorderRadius @inputBorderRadius 0);
     // Make input on top when focused so blue border and shadow always show
     &:focus {
       z-index: 2;
@@ -574,30 +599,13 @@ input[type="checkbox"][readonly] {
   .btn {
     margin-right: -1px;
   }
-  .add-on:first-child,
-  .btn:first-child {
-    .border-radius(@inputBorderRadius 0 0 @inputBorderRadius);
-  }
 }
 
 .input-append {
-  input,
-  select,
-  .uneditable-input {
-    .border-radius(@inputBorderRadius 0 0 @inputBorderRadius);
-    + .btn-group .btn:last-child {
-      .border-radius(0 @inputBorderRadius @inputBorderRadius 0);
-    }
-  }
   .add-on,
   .btn,
   .btn-group {
     margin-left: -1px;
-  }
-  .add-on:last-child,
-  .btn:last-child,
-  .btn-group:last-child > .dropdown-toggle {
-    .border-radius(0 @inputBorderRadius @inputBorderRadius 0);
   }
 }
 

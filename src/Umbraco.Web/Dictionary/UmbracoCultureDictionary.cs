@@ -18,6 +18,11 @@ namespace Umbraco.Web.Dictionary
     /// <summary>
     /// A culture dictionary that uses the Umbraco ILocalizationService
     /// </summary>
+    /// <remarks>
+    /// TODO: The ICultureDictionary needs to represent the 'fast' way to do dictionary item retrieval - for front-end and back office.
+    /// The ILocalizationService is the service used for interacting with this data from the database which isn't all that fast 
+    /// (even though there is caching involved, if there's lots of dictionary items the caching is not great)
+    /// </remarks>
 	public class DefaultCultureDictionary : Umbraco.Core.Dictionary.ICultureDictionary
 	{
 	    private readonly ILocalizationService _localizationService;
@@ -93,6 +98,11 @@ namespace Umbraco.Web.Dictionary
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// NOTE: The result of this is not cached anywhere - the underlying repository does not cache 
+        /// the child lookups because that is done by a query lookup. This method isn't used in our codebase
+        /// so I don't think this is a performance issue but if devs are using this it could be optimized here.
+        /// </remarks>
         public IDictionary<string, string> GetChildren(string key)
         {
             var result = new Dictionary<string, string>();
@@ -126,6 +136,7 @@ namespace Umbraco.Web.Dictionary
             get
             {
                 //ensure it's stored/retrieved from request cache
+                //NOTE: This is no longer necessary since these are cached at the runtime level, but we can leave it here for now.
                 return _requestCacheProvider.GetCacheItem<ILanguage>(typeof (DefaultCultureDictionary).Name + "Culture",
                     () => _localizationService.GetLanguageByIsoCode(Culture.Name));
             }

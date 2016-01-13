@@ -1,7 +1,7 @@
 (function() {
   'use strict';
 
-  function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource, dataTypeHelper, dataTypeResource, $filter) {
+  function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource, dataTypeHelper, dataTypeResource, $filter, iconHelper, $q) {
 
     function link(scope, el, attr, ctrl) {
 
@@ -9,10 +9,9 @@
       scope.toolbar = [];
       scope.sortableOptionsGroup = {};
       scope.sortableOptionsProperty = {};
+      scope.sortingButtonLabel = "Reorder";
 
       function activate() {
-
-          setToolbar();
 
           setSortingOptions();
 
@@ -25,36 +24,6 @@
 
           // add init tab
           addInitGroup(scope.model.groups);
-
-      }
-
-      function setToolbar() {
-
-        scope.toolbar = [];
-
-        var compositionTool = {
-          "name": "Compositions",
-          "icon": "icon-merge",
-          "action": function(tool) {
-            scope.openCompositionsDialog(tool);
-          }
-        };
-
-        var sortingTool = {
-          "name": "Reorder",
-          "icon": "icon-navigation",
-          "action": function(tool) {
-            scope.toggleSortingMode(tool);
-          }
-        };
-
-        if(scope.compositions || scope.compositions === undefined) {
-          scope.toolbar.push(compositionTool);
-        }
-
-        if(scope.sorting || scope.sorting === undefined) {
-          scope.toolbar.push(sortingTool);
-        }
 
       }
 
@@ -174,73 +143,120 @@
          scope.sortingMode = !scope.sortingMode;
 
          if(scope.sortingMode === true) {
-            tool.name = "I'm done reordering";
+            scope.sortingButtonLabel = "I'm done reordering";
          } else {
-            tool.name = "Reorder";
+            scope.sortingButtonLabel = "Reorder";
          }
 
       };
 
       scope.openCompositionsDialog = function() {
-        scope.compositionsDialogModel = {};
-        scope.compositionsDialogModel.title = "Compositions";
-        scope.compositionsDialogModel.contentType = scope.model;
-        scope.compositionsDialogModel.availableCompositeContentTypes = scope.model.availableCompositeContentTypes;
-        scope.compositionsDialogModel.compositeContentTypes = scope.model.compositeContentTypes;
-        scope.compositionsDialogModel.view = "views/common/overlays/contenttypeeditor/compositions/compositions.html";
-        scope.compositionsDialogModel.show = true;
 
-        scope.compositionsDialogModel.submit = function(model) {
+        scope.compositionsDialogModel = {
+            title: "Compositions",
+            contentType: scope.model,
+            compositeContentTypes: scope.model.compositeContentTypes,
+            view: "views/common/overlays/contenttypeeditor/compositions/compositions.html",
+            confirmSubmit: {
+                title: "Warning",
+                description: "Removing a composition will delete all the associated property data. Once you save the document type there's no way back, are you sure?",
+                checkboxLabel: "I know what I'm doing",
+                enable: true
+            },
+            submit: function(model, oldModel, confirmed) {
 
-          // make sure that all tabs has an init property
-          if (scope.model.groups.length !== 0) {
-            angular.forEach(scope.model.groups, function(group) {
-              addInitProperty(group);
-            });
-          }
+                var compositionRemoved = false;
 
-          // remove overlay
-          scope.compositionsDialogModel.show = false;
-          scope.compositionsDialogModel = null;
-        };
+                // check if any compositions has been removed
+                for(var i = 0; oldModel.compositeContentTypes.length > i; i++) {
 
-        scope.compositionsDialogModel.close = function(oldModel) {
-          // reset composition changes
-          scope.model.groups = oldModel.contentType.groups;
-          scope.model.compositeContentTypes = oldModel.contentType.compositeContentTypes;
+                    var oldComposition = oldModel.compositeContentTypes[i];
 
-          // remove overlay
-          scope.compositionsDialogModel.show = false;
-          scope.compositionsDialogModel = null;
-        };
+                    if(_.contains(model.compositeContentTypes, oldComposition) === false) {
+                        compositionRemoved = true;
+                    }
 
-        scope.compositionsDialogModel.selectCompositeContentType = function(compositeContentType) {
+                }
 
-          if (scope.model.compositeContentTypes.indexOf(compositeContentType.alias) === -1) {
-            //merge composition with content type
+                // show overlay confirm box if compositions has been removed.
+                if(compositionRemoved && confirmed === false) {
 
-            if(scope.contentType === "documentType") {
+                    scope.compositionsDialogModel.confirmSubmit.show = true;
 
-               contentTypeResource.getById(compositeContentType.id).then(function(composition){
-                  contentTypeHelper.mergeCompositeContentType(scope.model, composition);
-               });
+                // submit overlay if no compositions has been removed
+                // or the action has been confirmed
+                } else {
+
+                    // make sure that all tabs has an init property
+                    if (scope.model.groups.length !== 0) {
+                      angular.forEach(scope.model.groups, function(group) {
+                        addInitProperty(group);
+                      });
+                    }
+
+                    // remove overlay
+                    scope.compositionsDialogModel.show = false;
+                    scope.compositionsDialogModel = null;
+                }
+
+            },
+            close: function(oldModel) {
+
+                // reset composition changes
+                scope.model.groups = oldModel.contentType.groups;
+                scope.model.compositeContentTypes = oldModel.contentType.compositeContentTypes;
+
+                // remove overlay
+                scope.compositionsDialogModel.show = false;
+                scope.compositionsDialogModel = null;
+
+            },
+            selectCompositeContentType: function(compositeContentType) {
+
+                if (scope.model.compositeContentTypes.indexOf(compositeContentType.alias) === -1) {
+                  //merge composition with content type
+
+                  if(scope.contentType === "documentType") {
+
+                     contentTypeResource.getById(compositeContentType.id).then(function(composition){
+                        contentTypeHelper.mergeCompositeContentType(scope.model, composition);
+                     });
 
 
-            } else if(scope.contentType === "mediaType") {
+                  } else if(scope.contentType === "mediaType") {
 
-               mediaTypeResource.getById(compositeContentType.id).then(function(composition){
-                  contentTypeHelper.mergeCompositeContentType(scope.model, composition);
-               });
+                     mediaTypeResource.getById(compositeContentType.id).then(function(composition){
+                        contentTypeHelper.mergeCompositeContentType(scope.model, composition);
+                     });
+
+                  }
+
+
+                } else {
+                  // split composition from content type
+                  contentTypeHelper.splitCompositeContentType(scope.model, compositeContentType);
+                }
 
             }
-
-
-          } else {
-            // split composition from content type
-            contentTypeHelper.splitCompositeContentType(scope.model, compositeContentType);
-          }
-
         };
+
+        var availableContentTypeResource = scope.contentType === "documentType" ? contentTypeResource.getAvailableCompositeContentTypes : mediaTypeResource.getAvailableCompositeContentTypes;
+        var countContentTypeResource = scope.contentType === "documentType" ? contentTypeResource.getCount : mediaTypeResource.getCount;
+        $q.all([
+              //get available composite types
+              availableContentTypeResource(scope.model.id).then(function (result) {
+                  scope.compositionsDialogModel.availableCompositeContentTypes = result;
+                  // convert icons for composite content types
+                  iconHelper.formatContentTypeIcons(scope.compositionsDialogModel.availableCompositeContentTypes);
+              }),
+              //get content type count
+              countContentTypeResource().then(function (result) {
+                  scope.compositionsDialogModel.totalContentTypes = parseInt(result, 10);
+              })
+        ]).then(function () {
+            //resolves when both other promises are done, now show it
+            scope.compositionsDialogModel.show = true;
+        });
 
       };
 

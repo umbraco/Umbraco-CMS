@@ -61,11 +61,20 @@
 
             </umb-editor-sub-header-section>
 
-            <umb-editor-sub-header-section ng-if="!actionInProgress && !isAnythingSelected()">
+            <umb-editor-sub-header-section ng-if="!isAnythingSelected()">
                <form class="form-search -no-margin-bottom pull-right" novalidate>
                    <div class="inner-addon left-addon">
                        <i class="icon icon-search" ng-click="enterSearch($event)"></i>
-                       <input type="text" class="form-control" localize="placeholder" placeholder="@general_typeToSearch" ng-model="options.filter" ng-keydown="filterResults($event)" prevent-enter-submit no-dirty-check>
+                       <input
+                        class="form-control search-input"
+                        type="text"
+                        localize="placeholder"
+                        placeholder="@general_typeToSearch"
+                        ng-model="options.filter"
+                        ng-change="enterSearch()"
+                        ng-keydown="forceSearch($event)"
+                        prevent-enter-submit
+                        no-dirty-check>
                    </div>
                </form>
             </umb-editor-sub-header-section>
@@ -143,6 +152,8 @@
          entity-type="{{entityType}}"
          on-get-content="reloadView">
       </umb-list-view-layout>
+
+      <umb-load-indicator ng-show="!viewLoaded"></umb-load-indicator>
 
       <umb-pagination
          ng-if="listViewResultSet.totalPages"
