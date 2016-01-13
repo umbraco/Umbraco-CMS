@@ -134,6 +134,7 @@
     <key alias="itemChanged">This item has been changed after publication</key>
     <key alias="itemNotPublished">This item is not published</key>
     <key alias="lastPublished">Last published</key>
+    <key alias="noItemsToShow">There are no items to show</key>
     <key alias="listViewNoItems" version="7.1.5">There are no items to show in the list.</key>
     <key alias="mediatype">Media Type</key>
     <key alias="mediaLinks">Link to media item(s)</key>
@@ -357,6 +358,7 @@
     <key alias="actions">Actions</key>
     <key alias="add">Add</key>
     <key alias="alias">Alias</key>
+    <key alias="all">All</key>
     <key alias="areyousure">Are you sure?</key>
     <key alias="border">Border</key>
     <key alias="by">by</key>
@@ -394,6 +396,7 @@
     <key alias="innerMargin">Inner margin</key>
     <key alias="insert">Insert</key>
     <key alias="install">Install</key>
+    <key alias="invalid">Invalid</key>
     <key alias="justify">Justify</key>
     <key alias="language">Language</key>
     <key alias="layout">Layout</key>
@@ -457,6 +460,7 @@
     <key alias="to">to</key>
     <key alias="listView">List view</key>
     <key alias="saving">Saving...</key>
+    <key alias="current">current</key>
   </area>
 
   <area alias="colors">
@@ -474,12 +478,14 @@
       <key alias="addEditor">Add editor</key>
       <key alias="addTemplate">Add template</key>
       <key alias="addChildNode">Add child node</key>
+      <key alias="addChild">Add child</key>
 
       <key alias="editDataType">Edit data type</key>
 
       <key alias="navigateSections">Navigate sections</key>
 
       <key alias="shortcut">Shortcuts</key>
+      <key alias="showShortcuts">show shortcuts</key>
 
       <key alias="toggleListView">Toggle list view</key>
       <key alias="toggleAllowAsRoot">Toggle allow as root</key>
@@ -981,6 +987,10 @@ To manage your website, simply open the Umbraco back office and start adding con
 
     <key alias="allowAllEditors">Allow all editors</key>
     <key alias="allowAllRowConfigurations">Allow all row configurations</key>
+    <key alias="setAsDefault">Set as default</key>
+    <key alias="chooseExtra">Choose extra</key>
+    <key alias="choooseDefault">Choose default</key>
+    <key alias="areAdded">are added</key>
   </area>
 
   <area alias="contentTypeEditor">
