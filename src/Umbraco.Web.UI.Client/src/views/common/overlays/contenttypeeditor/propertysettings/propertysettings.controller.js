@@ -10,7 +10,7 @@
  (function() {
  	"use strict";
 
-   function PropertySettingsOverlay($scope, contentTypeResource, dataTypeResource, dataTypeHelper) {
+   function PropertySettingsOverlay($scope, contentTypeResource, dataTypeResource, dataTypeHelper, localizationService) {
 
       var vm = this;
 
@@ -20,25 +20,25 @@
       vm.selectedValidationType = {};
       vm.validationTypes = [
          {
-            "name": "Validate as email",
+            "name": localizationService.localize("validation_validateAsEmail").then(function (value) {return value;}),
             "key": "email",
             "pattern": "[a-zA-Z0-9_\.\+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-\.]+",
             "enableEditing": true
          },
          {
-            "name": "Validate as a number",
+            "name": localizationService.localize("validation_validateAsNumber").then(function (value) {return value;}),
             "key": "number",
             "pattern": "^[0-9]*$",
             "enableEditing": true
          },
          {
-            "name": "Validate as a Url",
+            "name": localizationService.localize("validation_validateAsUrl").then(function (value) {return value;}),
             "key": "url",
             "pattern": "https?\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,}",
             "enableEditing": true
          },
          {
-            "name": "...or enter a custom validation",
+            "name": localizationService.localize("validation_enterCustomValidation").then(function (value) {return value;}),
             "key": "custom",
             "pattern": "",
             "enableEditing": true
