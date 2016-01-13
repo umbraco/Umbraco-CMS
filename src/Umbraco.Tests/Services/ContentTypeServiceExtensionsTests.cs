@@ -47,7 +47,7 @@ namespace Umbraco.Tests.Services
                 new[] { ct1, ct2, ct3, ct4, ct5 },
                 new[] { ct2.Alias },
                 new[] { "blah" })
-                .Where(x => x.Item2).Select(x => x.Item1).ToArray();
+                .Results.Where(x => x.Allowed).Select(x => x.Composition).ToArray();
 
             Assert.AreEqual(1, availableTypes.Count());
             Assert.AreEqual(ct4.Id, availableTypes.ElementAt(0).Id);
@@ -84,7 +84,7 @@ namespace Umbraco.Tests.Services
                 new[] { ct1, ct2, ct3, ct4 },
                 new string[] { },
                 new[] { "title" })
-                .Where(x => x.Item2).Select(x => x.Item1).ToArray();
+                .Results.Where(x => x.Allowed).Select(x => x.Composition).ToArray();
 
             Assert.AreEqual(1, availableTypes.Count());
             Assert.AreEqual(ct4.Id, availableTypes.ElementAt(0).Id);
@@ -120,7 +120,7 @@ namespace Umbraco.Tests.Services
                 ct1,
                 new[] { ct1, ct2, ct3, ct4 },
                 new [] {ct2.Alias})
-                .Where(x => x.Item2).Select(x => x.Item1).ToArray();
+                .Results.Where(x => x.Allowed).Select(x => x.Composition).ToArray();
 
             Assert.AreEqual(1, availableTypes.Count());
             Assert.AreEqual(ct4.Id, availableTypes.ElementAt(0).Id);
@@ -141,7 +141,7 @@ namespace Umbraco.Tests.Services
             var availableTypes = service.Object.GetAvailableCompositeContentTypes(
                 ct1,
                 new[] {ct1, ct2, ct3})
-                .Where(x => x.Item2).Select(x => x.Item1).ToArray();
+                .Results.Where(x => x.Allowed).Select(x => x.Composition).ToArray();
 
             Assert.AreEqual(2, availableTypes.Count());
             Assert.AreEqual(ct2.Id, availableTypes.ElementAt(0).Id);
@@ -163,7 +163,7 @@ namespace Umbraco.Tests.Services
 
             var availableTypes = service.Object.GetAvailableCompositeContentTypes(
                 ct1,
-                new[] { ct1, ct2, ct3 });
+                new[] { ct1, ct2, ct3 }).Results;
 
             Assert.AreEqual(0, availableTypes.Count());
         }
@@ -185,7 +185,7 @@ namespace Umbraco.Tests.Services
 
             var availableTypes = service.Object.GetAvailableCompositeContentTypes(
                 ct1,
-                new[] { ct1, ct2, ct3 });
+                new[] { ct1, ct2, ct3 }).Results;
 
             Assert.AreEqual(0, availableTypes.Count());
         }
@@ -207,7 +207,7 @@ namespace Umbraco.Tests.Services
             var availableTypes = service.Object.GetAvailableCompositeContentTypes(
                 ct1,
                 new[] { ct1, ct2, ct3 })
-                .Where(x => x.Item2).Select(x => x.Item1).ToArray();
+                .Results.Where(x => x.Allowed).Select(x => x.Composition).ToArray();
 
             Assert.AreEqual(1, availableTypes.Count());
             Assert.AreEqual(ct3.Id, availableTypes.Single().Id);
@@ -230,7 +230,7 @@ namespace Umbraco.Tests.Services
             var availableTypes = service.Object.GetAvailableCompositeContentTypes(
                 ct1,
                 new[] { ct1, ct2, ct3 })
-                .Where(x => x.Item2).Select(x => x.Item1).ToArray();
+                .Results.Where(x => x.Allowed).Select(x => x.Composition).ToArray();
 
             Assert.AreEqual(2, availableTypes.Count());
             Assert.AreEqual(ct2.Id, availableTypes.ElementAt(0).Id);
@@ -257,7 +257,7 @@ namespace Umbraco.Tests.Services
             var availableTypes = service.Object.GetAvailableCompositeContentTypes(
                 ct1,
                 new[] { ct1, ct2, ct3 })
-                .Where(x => x.Item2).Select(x => x.Item1).ToArray();
+                .Results.Where(x => x.Allowed).Select(x => x.Composition).ToArray();
 
             Assert.AreEqual(3, availableTypes.Count());
             Assert.AreEqual(ct2.Id, availableTypes.ElementAt(0).Id);

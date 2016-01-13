@@ -31,22 +31,22 @@
    <li class="umb-checkbox-list__item" 
        
        ng-repeat="compositeContentType in model.availableCompositeContentTypes | filter:searchTerm" 
-       ng-class="{'-disabled': vm.isDisabled(compositeContentType.alias), '-selected': vm.isSelected(compositeContentType.alias)}">
+       ng-class="{'-disabled': vm.isDisabled(compositeContentType.contentType.alias), '-selected': vm.isSelected(compositeContentType.contentType.alias)}">
        
       <div class="umb-checkbox-list__item-checkbox"            
-           ng-class="{ '-selected': model.compositeContentTypes.indexOf(compositeContentType.alias)+1 }">
+           ng-class="{ '-selected': model.compositeContentTypes.indexOf(compositeContentType.contentType.alias)+1 }">
          <input type="checkbox"                
-                id="umb-overlay-comp-{{compositeContentType.key}}"
+            id="umb-overlay-comp-{{compositeContentType.contentType.key}}"
             checklist-model="model.compositeContentTypes"
             checklist-value="compositeContentType.contentType.alias"
             ng-change="model.selectCompositeContentType(compositeContentType.contentType)"
             ng-disabled="compositeContentType.allowed===false" />
       </div>
 
-          <label for="umb-overlay-comp-{{compositeContentType.key}}" class="umb-checkbox-list__item-text" ng-class="{'-faded': vm.isDisabled(compositeContentType.alias)}">
+          <label for="umb-overlay-comp-{{compositeContentType.contentType.key}}" class="umb-checkbox-list__item-text" ng-class="{'-faded': vm.isDisabled(compositeContentType.contentType.alias)}">
          <i class="{{ compositeContentType.contentType.icon }} umb-checkbox-list__item-icon"></i>
          {{ compositeContentType.contentType.name }}
-              <span class="umb-checkbox-list__item-caption" ng-if="vm.isDisabled(compositeContentType.alias)">(inherited)</span>
+              <span class="umb-checkbox-list__item-caption" ng-if="vm.isDisabled(compositeContentType.contentType.alias)">(inherited)</span>
           </label>
 
 
