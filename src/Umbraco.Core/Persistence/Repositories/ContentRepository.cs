@@ -234,7 +234,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var processed = 0;
             do
             {
-                var descendants = GetPagedResultsByQuery(query, pageIndex, pageSize, out total, "Path", Direction.Ascending);
+                var descendants = GetPagedResultsByQueryNoFilter(query, pageIndex, pageSize, out total, "Path", Direction.Ascending);
 
                 var xmlItems = (from descendant in descendants
                                 let xml = serializer(descendant)
@@ -728,7 +728,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="content"></param>
         /// <param name="xml"></param>
         public void AddOrUpdateContentXml(IContent content, Func<IContent, XElement> xml)
-        {           
+        {
             _contentXmlRepository.AddOrUpdate(new ContentXmlEntity<IContent>(content, xml));
         }
 
@@ -787,6 +787,26 @@ namespace Umbraco.Core.Persistence.Repositories
 
         }
 
+        /// <summary>
+        /// Gets paged content results
+        /// </summary>
+        /// <param name="query">Query to excute</param>
+        /// <param name="pageIndex">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalRecords">Total records query would return without paging</param>
+        /// <param name="orderBy">Field to order by</param>
+        /// <param name="orderDirection">Direction to order by</param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        public IEnumerable<IContent> GetPagedResultsByQueryNoFilter(IQuery<IContent> query, long pageIndex, int pageSize, out long totalRecords,
+            string orderBy, Direction orderDirection)
+        {
+
+            return GetPagedResultsByQuery<DocumentDto, Content>(query, pageIndex, pageSize, out totalRecords,
+                new Tuple<string, string>("cmsDocument", "nodeId"),
+                ProcessQuery, orderBy, orderDirection);
+
+        }
+
         #endregion
 
         #region IRecycleBinRepository members
@@ -826,11 +846,11 @@ namespace Umbraco.Core.Persistence.Repositories
             var contentTypes = _contentTypeRepository.GetAll(dtos.Select(x => x.ContentVersionDto.ContentDto.ContentTypeId).ToArray())
                 .ToArray();
 
-            
+
             var ids = dtos
                 .Where(dto => dto.TemplateId.HasValue && dto.TemplateId.Value > 0)
                 .Select(x => x.TemplateId.Value).ToArray();
-            
+
             //NOTE: This should be ok for an SQL 'IN' statement, there shouldn't be an insane amount of content types
             var templates = ids.Length == 0 ? Enumerable.Empty<ITemplate>() : _templateRepository.GetAll(ids).ToArray();
 
