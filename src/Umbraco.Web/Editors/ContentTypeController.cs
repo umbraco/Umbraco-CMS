@@ -1,23 +1,19 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Web.Http;
 using AutoMapper;
-using Umbraco.Core;
-using Umbraco.Core.Dictionary;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.WebApi;
-using System.Linq;
-using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
-using Newtonsoft.Json;
-using Umbraco.Core.PropertyEditors;
-using System;
-using System.Net.Http;
 using Umbraco.Core.Services;
+using Umbraco.Core.PropertyEditors;
+using System.Net.Http;
+using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Web.WebApi;
+using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Editors
 {
@@ -51,6 +47,10 @@ namespace Umbraco.Web.Editors
         {
         }
 
+        public int GetCount()
+        {
+            return Services.ContentTypeService.CountContentTypes();
+        }
 
         public ContentTypeDisplay GetById(int id)
         {
@@ -96,9 +96,31 @@ namespace Umbraco.Web.Editors
             return ApplicationContext.Services.ContentTypeService.GetAllPropertyTypeAliases();
         }
 
-        public IEnumerable<EntityBasic> GetAvailableCompositeContentTypes(int contentTypeId)
+        /// <summary>
+        /// Returns the avilable compositions for this content type
+        /// </summary>
+        /// <param name="contentTypeId"></param>
+        /// <param name="filterContentTypes">
+        /// This is normally an empty list but if additional content type aliases are passed in, any content types containing those aliases will be filtered out
+        /// along with any content types that have matching property types that are included in the filtered content types
+        /// </param>
+        /// <param name="filterPropertyTypes">
+        /// This is normally an empty list but if additional property type aliases are passed in, any content types that have these aliases will be filtered out.
+        /// This is required because in the case of creating/modifying a content type because new property types being added to it are not yet persisted so cannot
+        /// be looked up via the db, they need to be passed in.
+        /// </param>
+        /// <returns></returns>
+        public HttpResponseMessage GetAvailableCompositeContentTypes(int contentTypeId, 
+            [FromUri]string[] filterContentTypes,
+            [FromUri]string[] filterPropertyTypes)
         {
-            return PerformGetAvailableCompositeContentTypes(contentTypeId, UmbracoObjectTypes.DocumentType);
+            var result = PerformGetAvailableCompositeContentTypes(contentTypeId, UmbracoObjectTypes.DocumentType, filterContentTypes, filterPropertyTypes)
+                .Select(x => new
+                {
+                    contentType = x.Item1,
+                    allowed = x.Item2
+                });
+            return Request.CreateResponse(result);
         }
 
         [UmbracoTreeAuthorize(
@@ -152,10 +174,11 @@ namespace Umbraco.Web.Editors
         public ContentTypeDisplay PostSave(ContentTypeSave contentTypeSave)
         {
             var savedCt = PerformPostSave<IContentType, ContentTypeDisplay>(
-                contentTypeSave:    contentTypeSave,
-                getContentType:     i => Services.ContentTypeService.GetContentType(i),
-                saveContentType:    type => Services.ContentTypeService.Save(type),
-                beforeCreateNew:    ctSave =>
+                contentTypeSave:        contentTypeSave,
+                getContentType:         i => Services.ContentTypeService.GetContentType(i),
+                getContentTypeByAlias:  alias => Services.ContentTypeService.GetContentType(alias),
+                saveContentType:        type => Services.ContentTypeService.Save(type),
+                beforeCreateNew:        ctSave =>
                 {
                     //create a default template if it doesnt exist -but only if default template is == to the content type
                     //TODO: Is this really what we want? What if we don't want any template assigned at all ?
@@ -250,10 +273,11 @@ namespace Umbraco.Web.Editors
 
             var basics = types.Select(Mapper.Map<IContentType, ContentTypeBasic>).ToList();
 
+            var localizedTextService = Services.TextService;
             foreach (var basic in basics)
             {
-                basic.Name = TranslateItem(basic.Name);
-                basic.Description = TranslateItem(basic.Description);
+                basic.Name = localizedTextService.UmbracoDictionaryTranslate(basic.Name);
+                basic.Description = localizedTextService.UmbracoDictionaryTranslate(basic.Description);
             }
 
             return basics;
