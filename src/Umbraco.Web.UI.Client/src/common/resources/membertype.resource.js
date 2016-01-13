@@ -7,13 +7,37 @@ function memberTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
 
     return {
 
-        getAvailableCompositeContentTypes: function (contentTypeId) {
+        getAvailableCompositeContentTypes: function (contentTypeId, filterContentTypes, filterPropertyTypes) {
+            if (!filterContentTypes) {
+                filterContentTypes = [];
+            }
+            if (!filterPropertyTypes) {
+                filterPropertyTypes = [];
+            }
+
+            var query = "";
+            _.each(filterContentTypes, function (item) {
+                query += "filterContentTypes=" + item + "&";
+            });
+            // if filterContentTypes array is empty we need a empty variable in the querystring otherwise the service returns a error
+            if (filterContentTypes.length === 0) {
+                query += "filterContentTypes=&";
+            }
+            _.each(filterPropertyTypes, function (item) {
+                query += "filterPropertyTypes=" + item + "&";
+            });
+            // if filterPropertyTypes array is empty we need a empty variable in the querystring otherwise the service returns a error
+            if (filterPropertyTypes.length === 0) {
+                query += "filterPropertyTypes=&";
+            }
+            query += "contentTypeId=" + contentTypeId;
+
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "memberTypeApiBaseUrl",
                        "GetAvailableCompositeMemberTypes",
-                       [{ contentTypeId: contentTypeId }])),
+                       query)),
                'Failed to retrieve data for content type id ' + contentTypeId);
         },
 

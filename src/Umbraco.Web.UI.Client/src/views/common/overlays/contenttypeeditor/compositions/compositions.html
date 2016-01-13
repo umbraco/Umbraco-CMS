@@ -26,18 +26,23 @@
 </umb-empty-state>
 
 <ul class="umb-checkbox-list">
-   <li class="umb-checkbox-list__item" ng-repeat="compositeContentType in model.availableCompositeContentTypes | filter:searchTerm" ng-class="{ '-selected': model.contentType.compositeContentTypes.indexOf(compositeContentType.alias)+1 }">
-
-      <div class="umb-checkbox-list__item-checkbox" ng-class="{ '-selected': model.contentType.compositeContentTypes.indexOf(compositeContentType.alias)+1 }">
-         <input type="checkbox"
+   <li class="umb-checkbox-list__item" 
+       
+       ng-repeat="compositeContentType in model.availableCompositeContentTypes | filter:searchTerm" 
+       ng-class="{ '-selected': model.compositeContentTypes.indexOf(compositeContentType.alias)+1 }">
+       
+      <div class="umb-checkbox-list__item-checkbox"            
+           ng-class="{ '-selected': model.compositeContentTypes.indexOf(compositeContentType.alias)+1 }">
+         <input type="checkbox"                
             checklist-model="model.compositeContentTypes"
-            checklist-value="compositeContentType.alias"
-            ng-change="model.selectCompositeContentType(compositeContentType)" />
+            checklist-value="compositeContentType.contentType.alias"
+            ng-change="model.selectCompositeContentType(compositeContentType.contentType)"
+            ng-disabled="compositeContentType.allowed===false" />
       </div>
 
       <div class="umb-checkbox-list__item-text">
-         <i class="{{ compositeContentType.icon }} umb-checkbox-list__item-icon"></i>
-         {{ compositeContentType.name }}
+         <i class="{{ compositeContentType.contentType.icon }} umb-checkbox-list__item-icon"></i>
+         {{ compositeContentType.contentType.name }}
       </div>
 
    </li>

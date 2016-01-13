@@ -49,8 +49,22 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Returns the available composite content types for a given content type
         /// </summary>
+        /// <param name="type"></param>
+        /// <param name="filterContentTypes">
+        /// This is normally an empty list but if additional content type aliases are passed in, any content types containing those aliases will be filtered out
+        /// along with any content types that have matching property types that are included in the filtered content types
+        /// </param>
+        /// <param name="filterPropertyTypes">
+        /// This is normally an empty list but if additional property type aliases are passed in, any content types that have these aliases will be filtered out.
+        /// This is required because in the case of creating/modifying a content type because new property types being added to it are not yet persisted so cannot
+        /// be looked up via the db, they need to be passed in.
+        /// </param>
+        /// <param name="contentTypeId"></param>        
         /// <returns></returns>
-        protected IEnumerable<EntityBasic> PerformGetAvailableCompositeContentTypes(int contentTypeId, UmbracoObjectTypes type)
+        protected IEnumerable<Tuple<EntityBasic, bool>> PerformGetAvailableCompositeContentTypes(int contentTypeId, 
+            UmbracoObjectTypes type, 
+            string[] filterContentTypes,
+            string[] filterPropertyTypes)
         {
             IContentTypeComposition source = null;
 
@@ -90,13 +104,24 @@ namespace Umbraco.Web.Editors
                     throw new ArgumentOutOfRangeException("The entity type was not a content type");
             }
 
-            var filtered = Services.ContentTypeService.GetAvailableCompositeContentTypes(source, allContentTypes);
+            var filtered = Services.ContentTypeService.GetAvailableCompositeContentTypes(source, allContentTypes, filterContentTypes, filterPropertyTypes);
+
+            var currCompositions = source == null ? new string[] { } : source.ContentTypeComposition.Select(x => x.Alias).ToArray();
 
             return filtered                
-                .Select(Mapper.Map<IContentTypeComposition, EntityBasic>)
+                .Select(x => new Tuple<EntityBasic, bool>(Mapper.Map<IContentTypeComposition, EntityBasic>(x.Item1), x.Item2))
                 .Select(x =>
                 {
-                    x.Name = TranslateItem(x.Name);
+                    //translate the name
+                    x.Item1.Name = TranslateItem(x.Item1.Name);
+
+                    //we need to ensure that the item is enabled if it is already selected
+                    if (currCompositions.Contains(x.Item1.Alias))
+                    {
+                        //re-set x to be allowed (NOTE: I didn't know you could set an enumerable item in a lambda!)
+                        x = new Tuple<EntityBasic, bool>(x.Item1, true);
+                    }
+
                     return x;
                 })
                 .ToList();
