@@ -11,12 +11,6 @@ namespace Umbraco.Core.Models.Rdbms
     [ExplicitColumns]
     internal class PropertyTypeGroupDto
     {
-        public PropertyTypeGroupDto()
-        {
-            //by default always create a new guid
-            UniqueId = Guid.NewGuid();
-        }
-
         [Column("id")]
         [PrimaryKeyColumn(IdentitySeed = 12)]
         public int Id { get; set; }
