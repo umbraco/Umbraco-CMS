@@ -16,13 +16,17 @@
                <div class="umb-panel-header-title-wrapper">
 
                    <ng-form name="headerNameForm">
-                       <input type="text" class="umb-panel-header-name-input" placeholder="Enter name..."
-                              name="headerName"
-                              ng-show="!nameLocked"
-                              ng-model="name"
-                              ng-class="{'name-is-empty': $parent.name===null || $parent.name===''}"
-                              umb-auto-focus
-                              required />
+                       <input
+                        type="text"
+                        class="umb-panel-header-name-input"
+                        localize="placeholder"
+                        placeholder="@placeholders_entername"
+                        name="headerName"
+                        ng-show="!nameLocked"
+                        ng-model="name"
+                        ng-class="{'name-is-empty': $parent.name===null || $parent.name===''}"
+                        umb-auto-focus
+                        required />
                    </ng-form>
 
                   <div class="umb-panel-header-name" ng-if="nameLocked">{{ name }}</div>
@@ -34,7 +38,13 @@
                                       enable-lock="true"
                                       server-validation-field="Alias"></umb-generate-alias>
 
-                  <input type="text" class="umb-panel-header-description" placeholder="Enter description..." ng-if="!hideDescription" ng-model="$parent.description" />
+                  <input
+                    type="text"
+                    class="umb-panel-header-description"
+                    localize="placeholder"
+                    placeholder="@placeholders_enterDescription"
+                    ng-if="!hideDescription"
+                    ng-model="$parent.description" />
 
                </div>
 
