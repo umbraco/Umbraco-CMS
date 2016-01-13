@@ -192,7 +192,7 @@ namespace Umbraco.Web.Editors
             
             //Validate that there's no other ct with the same name
             var exists = getContentTypeByAlias(contentTypeSave.Alias);
-            if (exists != null)
+            if (exists != null && exists.Id.ToInvariantString() != contentTypeSave.Id.ToString())
             {
                 ModelState.AddModelError("Alias", "A content type with this alias already exists");
             }
