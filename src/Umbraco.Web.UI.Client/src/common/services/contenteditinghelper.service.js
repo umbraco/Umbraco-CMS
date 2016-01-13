@@ -46,6 +46,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 throw "args.saveMethod is not defined";
             }
 
+            var redirectOnFailure = args.redirectOnFailure !== undefined ? args.redirectOnFailure : true;
+
             var self = this;
 
             //we will use the default one for content if not specified
@@ -75,7 +77,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
 
                     }, function (err) {
                         self.handleSaveError({
-                            redirectOnFailure: true,
+                            redirectOnFailure: redirectOnFailure,
                             err: err,
                             rebindCallback: function() {
                                 rebindCallback.apply(self, [args.content, err.data]);

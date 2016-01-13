@@ -169,6 +169,7 @@
   <area alias="media">
     <key alias="clickToUpload">Click to upload</key>
     <key alias="dropFilesHere">Drop your files here...</key>
+	<key alias="urls">Link to media</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Create a new member</key>

@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net.Http.Formatting;
 using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
@@ -139,6 +141,18 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="XElement"/> containing the xml representation of the IDataTypeDefinition object</returns>
         public XElement Serialize(IDataTypeService dataTypeService, IDataTypeDefinition dataTypeDefinition)
         {
+            return Serialize(dataTypeService, dataTypeDefinition, string.Empty);
+        }
+
+        /// <summary>
+        /// Exports an <see cref="IDataTypeDefinition"/> item to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="dataTypeService"></param>
+        /// <param name="dataTypeDefinition">IDataTypeDefinition type to export</param>
+        /// <param name="folders">The path of folders for this data type separated by a backslash, for example: `SEO/Meta`</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the IDataTypeDefinition object</returns>
+        public XElement Serialize(IDataTypeService dataTypeService, IDataTypeDefinition dataTypeDefinition, string folders)
+        {
             var prevalues = new XElement("PreValues");
             var prevalueList = dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeDefinition.Id)
                 .FormatAsDictionary();
@@ -161,6 +175,8 @@ namespace Umbraco.Core.Services
             xml.Add(new XAttribute("Id", dataTypeDefinition.PropertyEditorAlias));
             xml.Add(new XAttribute("Definition", dataTypeDefinition.Key));
             xml.Add(new XAttribute("DatabaseType", dataTypeDefinition.DatabaseType.ToString()));
+            if(string.IsNullOrWhiteSpace(folders) == false)
+                xml.Add(new XAttribute("Folders", folders));
 
             return xml;
         }
@@ -325,6 +341,18 @@ namespace Umbraco.Core.Services
         /// <returns><see cref="XElement"/> containing the xml representation of the IContentType object</returns>
         public XElement Serialize(IDataTypeService dataTypeService, IContentType contentType)
         {
+            return Serialize(dataTypeService, contentType, string.Empty);
+        }
+
+        /// <summary>
+        /// Exports an <see cref="IContentType"/> item to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="dataTypeService"></param>
+        /// <param name="contentType">Content type to export</param>
+        /// <param name="folders">The path of folders for this content type separated by a backslash, for example: `SEO/Meta`</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the IContentType object</returns>
+        public XElement Serialize(IDataTypeService dataTypeService, IContentType contentType, string folders)
+        {
             var info = new XElement("Info",
                                     new XElement("Name", contentType.Name),
                                     new XElement("Alias", contentType.Alias),
@@ -397,11 +425,16 @@ namespace Umbraco.Core.Services
                 tabs.Add(tab);
             }
 
-            return new XElement("DocumentType",
-                                   info,
-                                   structure,
-                                   genericProperties,
-                                   tabs);
+            var xml = new XElement("DocumentType",
+                info,
+                structure,
+                genericProperties,
+                tabs);
+
+            if(string.IsNullOrWhiteSpace(folders) == false)
+                xml.Add(new XAttribute("Folders", folders));
+
+            return xml;
         }
 
         /// <summary>

@@ -38,15 +38,15 @@
       <umb-folder-grid
          ng-if="folders.length > 0"
          folders="folders"
-         on-select="vm.selectFolder"
-         on-click="vm.clickItem">
+         on-click="vm.selectFolder"
+         on-click-name="vm.goToItem">
       </umb-folder-grid>
 
       <umb-media-grid
          items="vm.itemsWithoutFolders"
          on-details-hover="vm.hoverMediaItemDetails"
-         on-select="vm.selectItem"
-         on-click="vm.clickItem">
+         on-click="vm.selectItem"
+         on-click-name="vm.goToItem">
       </umb-media-grid>
 
       <umb-tooltip

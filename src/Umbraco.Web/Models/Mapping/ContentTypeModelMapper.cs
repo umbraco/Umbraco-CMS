@@ -9,6 +9,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
 using System.Collections.Generic;
 using AutoMapper.Internal;
+using Umbraco.Core.Services;
 using Property = umbraco.NodeFactory.Property;
 
 namespace Umbraco.Web.Models.Mapping
@@ -29,7 +30,7 @@ namespace Umbraco.Web.Models.Mapping
         //ctor can be used for testing
         public ContentTypeModelMapper(Lazy<PropertyEditorResolver> propertyEditorResolver)
         {
-            _propertyEditorResolver = propertyEditorResolver;
+            _propertyEditorResolver = propertyEditorResolver;            
         }
 
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)

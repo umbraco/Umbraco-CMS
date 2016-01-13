@@ -52,8 +52,8 @@ namespace Umbraco.Web.Cache
             // all three of these types are referenced by templates, and the cache needs to be cleared on every server,
             // otherwise things like looking up content type's after a template is removed is still going to show that
             // it has an associated template.
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IContent>();
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IContentType>();
+            ClearAllIsolatedCacheByEntityType<IContent>();
+            ClearAllIsolatedCacheByEntityType<IContentType>();
 
             base.Remove(id);
         }
@@ -66,7 +66,7 @@ namespace Umbraco.Web.Cache
                 string.Format("{0}{1}", CacheKeys.TemplateFrontEndCacheKey, id));
 
             //need to clear the runtime cache for templates
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<ITemplate>();
+            ClearAllIsolatedCacheByEntityType<ITemplate>();
         }
 
     }

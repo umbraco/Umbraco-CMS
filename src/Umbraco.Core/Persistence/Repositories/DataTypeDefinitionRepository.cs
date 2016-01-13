@@ -26,17 +26,15 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class DataTypeDefinitionRepository : PetaPocoRepositoryBase<int, IDataTypeDefinition>, IDataTypeDefinitionRepository
     {
-        private readonly CacheHelper _cacheHelper;
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly DataTypePreValueRepository _preValRepository;
 
-        public DataTypeDefinitionRepository(IDatabaseUnitOfWork work, CacheHelper cache, CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider sqlSyntax,
+        public DataTypeDefinitionRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax,
             IContentTypeRepository contentTypeRepository)
             : base(work, cache, logger, sqlSyntax)
         {
-            _cacheHelper = cacheHelper;
             _contentTypeRepository = contentTypeRepository;
-            _preValRepository = new DataTypePreValueRepository(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax);
+            _preValRepository = new DataTypePreValueRepository(work, CacheHelper.CreateDisabledCacheHelper(), logger, sqlSyntax);            
         }
 
         #region Overrides of RepositoryBase<int,DataTypeDefinition>
@@ -239,7 +237,7 @@ AND umbracoNode.id <> @id",
 
             //NOTE: This is a special case, we need to clear the custom cache for pre-values here so they are not stale if devs
             // are querying for them in the Saved event (before the distributed call cache is clearing it)
-            _cacheHelper.RuntimeCache.ClearCacheItem(GetPrefixedCacheKey(entity.Id));
+            RuntimeCache.ClearCacheItem(GetPrefixedCacheKey(entity.Id));
 
             entity.ResetDirtyProperties();
         }
@@ -278,7 +276,7 @@ AND umbracoNode.id <> @id",
 
         public PreValueCollection GetPreValuesCollectionByDataTypeId(int dataTypeId)
         {
-            var cached = _cacheHelper.RuntimeCache.GetCacheItemsByKeySearch<PreValueCollection>(GetPrefixedCacheKey(dataTypeId));
+            var cached = RuntimeCache.GetCacheItemsByKeySearch<PreValueCollection>(GetPrefixedCacheKey(dataTypeId));
             if (cached != null && cached.Any())
             {
                 //return from the cache, ensure it's a cloned result
@@ -297,7 +295,7 @@ AND umbracoNode.id <> @id",
         {
             //We need to see if we can find the cached PreValueCollection based on the cache key above
 
-            var cached = _cacheHelper.RuntimeCache.GetCacheItemsByKeyExpression<PreValueCollection>(GetCacheKeyRegex(preValueId));
+            var cached = RuntimeCache.GetCacheItemsByKeyExpression<PreValueCollection>(GetCacheKeyRegex(preValueId));
             if (cached != null && cached.Any())
             {
                 //return from the cache
@@ -457,7 +455,7 @@ AND umbracoNode.id <> @id",
                       + string.Join(",", collection.FormatAsDictionary().Select(x => x.Value.Id).ToArray());
 
             //store into cache
-            _cacheHelper.RuntimeCache.InsertCacheItem(key, () => collection,
+            RuntimeCache.InsertCacheItem(key, () => collection,
                 //30 mins
                 new TimeSpan(0, 0, 30),
                 //sliding is true

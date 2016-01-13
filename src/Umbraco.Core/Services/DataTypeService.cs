@@ -78,6 +78,15 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public IEnumerable<EntityContainer> GetContainers(string name, int level)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow))
+            {
+                return repo.Get(name, level, Constants.ObjectTypes.DataTypeContainerGuid);
+            }
+        }
+
         public void SaveContainer(EntityContainer container, int userId = 0)
         {
             if (container.ContainedObjectType != Constants.ObjectTypes.DataTypeGuid) 
