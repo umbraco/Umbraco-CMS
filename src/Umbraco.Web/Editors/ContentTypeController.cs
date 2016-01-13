@@ -187,8 +187,12 @@ namespace Umbraco.Web.Editors
                         var template = Services.FileService.GetTemplate(ctSave.Alias);
                         if (template == null)
                         {
+                            //ensure is safe and always pascal cased, per razor standard
+                            var classname = ctSave.Name.ToSafeAlias(false);
+                            classname = char.ToUpper(classname[0]) + classname.Substring(1);
+
                             template = new Template(ctSave.Name, ctSave.Alias);
-                            template.Content = ViewHelper.GetDefaultFileContent(modelClassName: ctSave.Name.ToSafeAlias(false));
+                            template.Content = ViewHelper.GetDefaultFileContent(modelClassName: classname);
                             Services.FileService.SaveTemplate(template);
                         }
 
