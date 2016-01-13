@@ -95,9 +95,31 @@ namespace Umbraco.Web.Editors
             return ApplicationContext.Services.ContentTypeService.GetAllPropertyTypeAliases();
         }
 
-        public IEnumerable<EntityBasic> GetAvailableCompositeContentTypes(int contentTypeId)
+        /// <summary>
+        /// Returns the avilable compositions for this content type
+        /// </summary>
+        /// <param name="contentTypeId"></param>
+        /// <param name="filterContentTypes">
+        /// This is normally an empty list but if additional content type aliases are passed in, any content types containing those aliases will be filtered out
+        /// along with any content types that have matching property types that are included in the filtered content types
+        /// </param>
+        /// <param name="filterPropertyTypes">
+        /// This is normally an empty list but if additional property type aliases are passed in, any content types that have these aliases will be filtered out.
+        /// This is required because in the case of creating/modifying a content type because new property types being added to it are not yet persisted so cannot
+        /// be looked up via the db, they need to be passed in.
+        /// </param>
+        /// <returns></returns>
+        public HttpResponseMessage GetAvailableCompositeContentTypes(int contentTypeId, 
+            [FromUri]string[] filterContentTypes,
+            [FromUri]string[] filterPropertyTypes)
         {
-            return PerformGetAvailableCompositeContentTypes(contentTypeId, UmbracoObjectTypes.DocumentType);
+            var result = PerformGetAvailableCompositeContentTypes(contentTypeId, UmbracoObjectTypes.DocumentType, filterContentTypes, filterPropertyTypes)
+                .Select(x => new
+                {
+                    contentType = x.Item1,
+                    allowed = x.Item2
+                });
+            return Request.CreateResponse(result);
         }
 
         [UmbracoTreeAuthorize(
@@ -189,7 +211,15 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public ContentTypeDisplay GetEmpty(int parentId)
         {
-            var ct = new ContentType(parentId);
+            IContentType ct;
+            if (parentId != Constants.System.Root)
+            {
+                var parent = Services.ContentTypeService.GetContentType(parentId);
+                ct = parent != null ? new ContentType(parent, string.Empty) : new ContentType(parentId);
+            }
+            else
+                ct = new ContentType(parentId);
+            
             ct.Icon = "icon-document";
 
             var dto = Mapper.Map<IContentType, ContentTypeDisplay>(ct);

@@ -44,6 +44,10 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "compositeContentTypes")]
         public IEnumerable<string> CompositeContentTypes { get; set; }
         
+        //Locked compositions
+        [DataMember(Name = "lockedCompositeContentTypes")]
+        public IEnumerable<string> LockedCompositeContentTypes { get; set; }
+
         [DataMember(Name = "allowAsRoot")]
         public bool AllowAsRoot { get; set; }
 

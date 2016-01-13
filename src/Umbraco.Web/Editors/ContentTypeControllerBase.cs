@@ -9,6 +9,7 @@ using System.Web.Http;
 using AutoMapper;
 using Newtonsoft.Json;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -49,14 +50,29 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Returns the available composite content types for a given content type
         /// </summary>
+        /// <param name="type"></param>
+        /// <param name="filterContentTypes">
+        /// This is normally an empty list but if additional content type aliases are passed in, any content types containing those aliases will be filtered out
+        /// along with any content types that have matching property types that are included in the filtered content types
+        /// </param>
+        /// <param name="filterPropertyTypes">
+        /// This is normally an empty list but if additional property type aliases are passed in, any content types that have these aliases will be filtered out.
+        /// This is required because in the case of creating/modifying a content type because new property types being added to it are not yet persisted so cannot
+        /// be looked up via the db, they need to be passed in.
+        /// </param>
+        /// <param name="contentTypeId"></param>        
         /// <returns></returns>
-        protected IEnumerable<EntityBasic> PerformGetAvailableCompositeContentTypes(int contentTypeId, UmbracoObjectTypes type)
+        protected IEnumerable<Tuple<EntityBasic, bool>> PerformGetAvailableCompositeContentTypes(int contentTypeId, 
+            UmbracoObjectTypes type, 
+            string[] filterContentTypes,
+            string[] filterPropertyTypes)
         {
             IContentTypeComposition source = null;
 
             //below is all ported from the old doc type editor and comes with the same weaknesses /insanity / magic
             
             IContentTypeComposition[] allContentTypes;
+
             switch (type)
             {
                 case UmbracoObjectTypes.DocumentType:
@@ -90,18 +106,31 @@ namespace Umbraco.Web.Editors
                     throw new ArgumentOutOfRangeException("The entity type was not a content type");
             }
 
-            var filtered = Services.ContentTypeService.GetAvailableCompositeContentTypes(source, allContentTypes);
+            var availableCompositions = Services.ContentTypeService.GetAvailableCompositeContentTypes(source, allContentTypes, filterContentTypes, filterPropertyTypes);
 
-            return filtered                
-                .Select(Mapper.Map<IContentTypeComposition, EntityBasic>)
+            var currCompositions = source == null ? new IContentTypeComposition[] { } : source.ContentTypeComposition.ToArray();
+            var compAliases = currCompositions.Select(x => x.Alias).ToArray();
+            var ancestors = availableCompositions.Ancestors.Select(x => x.Alias);
+
+            return availableCompositions.Results
+                .Select(x => new Tuple<EntityBasic, bool>(Mapper.Map<IContentTypeComposition, EntityBasic>(x.Composition), x.Allowed))
                 .Select(x =>
                 {
-                    x.Name = TranslateItem(x.Name);
+                    //translate the name
+                    x.Item1.Name = TranslateItem(x.Item1.Name);
+
+                    //we need to ensure that the item is enabled if it is already selected
+                    // but do not allow it if it is any of the ancestors
+                    if (compAliases.Contains(x.Item1.Alias) && ancestors.Contains(x.Item1.Alias) == false)
+                    {
+                        //re-set x to be allowed (NOTE: I didn't know you could set an enumerable item in a lambda!)
+                        x = new Tuple<EntityBasic, bool>(x.Item1, true);
+                    }
+
                     return x;
                 })
                 .ToList();
         }
-        
 
         /// <summary>
         /// Validates the composition and adds errors to the model state if any are found then throws an error response if there are errors
@@ -166,7 +195,7 @@ namespace Umbraco.Web.Editors
             
             //Validate that there's no other ct with the same name
             var exists = getContentTypeByAlias(contentTypeSave.Alias);
-            if (exists != null)
+            if (exists != null && exists.Id.ToInvariantString() != contentTypeSave.Id.ToString())
             {
                 ModelState.AddModelError("Alias", "A content type with this alias already exists");
             }
