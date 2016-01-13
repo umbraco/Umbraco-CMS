@@ -171,6 +171,9 @@
     <key alias="clickToUpload">Click to upload</key>
     <key alias="dropFilesHere">Drop your files here...</key>
 	<key alias="urls">Link to media</key>
+    <key alias="orClickHereToUpload">or click here to choose files</key>
+    <key alias="onlyAllowedFiles">Only allowed file types are</key>
+    <key alias="maxFileSize">Max file size is</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Create a new member</key>
