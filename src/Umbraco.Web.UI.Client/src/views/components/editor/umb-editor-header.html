@@ -8,7 +8,9 @@
 
                <div class="umb-panel-header-icon" ng-if="!hideIcon" ng-click="openIconPicker()" ng-class="{'-placeholder': $parent.icon==='' || $parent.icon===null}">
                    <i class="icon {{$parent.icon}}"  ng-if="$parent.icon!=='' && $parent.icon!==null"></i>
-                   <div class="umb-panel-header-icon-text" ng-if="$parent.icon==='' || $parent.icon===null">Add icon</div>
+                   <div class="umb-panel-header-icon-text" ng-if="$parent.icon==='' || $parent.icon===null">
+                       <localize key="settings_addIcon"></localize>
+                   </div>
                </div>
 
                <div class="umb-panel-header-title-wrapper">
