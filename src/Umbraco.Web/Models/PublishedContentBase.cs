@@ -28,56 +28,54 @@ namespace Umbraco.Web.Models
 		/// </remarks>
 		public virtual string Url
 		{
-			get
-			{
-                // should be thread-safe although it won't prevent url from being resolved more than once
-				if (_url != null)
-					return _url;
+	        get
+	        {
+	            // should be thread-safe although it won't prevent url from being resolved more than once
+	            if (_url != null)
+	                return _url;
 
-				switch (ItemType)
-				{
-					case PublishedItemType.Content:
-						if (UmbracoContext.Current == null)
-							throw new InvalidOperationException("Cannot resolve a Url for a content item when UmbracoContext.Current is null.");
-						if (UmbracoContext.Current.UrlProvider == null)
-							throw new InvalidOperationException("Cannot resolve a Url for a content item when UmbracoContext.Current.UrlProvider is null.");
-						_url= UmbracoContext.Current.UrlProvider.GetUrl(Id);
-						break;
-					case PublishedItemType.Media:
-						var prop = GetProperty(Constants.Conventions.Media.File);
-						if (prop == null)
-							throw new NotSupportedException("Cannot resolve a Url for a media item when there is no 'umbracoFile' property defined.");
+	            switch (ItemType)
+	            {
+	                case PublishedItemType.Content:
+	                    if (UmbracoContext.Current == null)
+	                        throw new InvalidOperationException(
+	                            "Cannot resolve a Url for a content item when UmbracoContext.Current is null.");
+	                    if (UmbracoContext.Current.UrlProvider == null)
+	                        throw new InvalidOperationException(
+	                            "Cannot resolve a Url for a content item when UmbracoContext.Current.UrlProvider is null.");
+	                    _url = UmbracoContext.Current.UrlProvider.GetUrl(Id);
+	                    break;
+	                case PublishedItemType.Media:
+	                    var prop = GetProperty(Constants.Conventions.Media.File);
+	                    if (prop == null || prop.Value == null)
+	                    {
+	                        _url = string.Empty;
+	                        return _url;
+	                    }
 
-				        if (prop.Value == null)
-				        {
-				            _url = string.Empty;
-				            return _url;
-				        }
+	                    var propType = ContentType.GetPropertyType(Constants.Conventions.Media.File);
 
-				        var propType = ContentType.GetPropertyType(Constants.Conventions.Media.File);
-                        
-                        //This is a hack - since we now have 2 properties that support a URL: upload and cropper, we need to detect this since we always
-                        // want to return the normal URL and the cropper stores data as json
-                        switch (propType.PropertyEditorAlias)
-				        {
-                            case Constants.PropertyEditors.UploadFieldAlias:
-                                _url = prop.Value.ToString();
-				                break;
-                            case Constants.PropertyEditors.ImageCropperAlias:
-                                //get the url from the json format
-                                var val = prop.Value.ToString();
-				                var crops = val.SerializeToCropDataSet();
-                                _url = crops != null ? crops.Src : string.Empty;                                
-				                break;
-				        }
-                        
-						break;
-					default:
-						throw new NotSupportedException();
-				}
+	                    //This is a hack - since we now have 2 properties that support a URL: upload and cropper, we need to detect this since we always
+	                    // want to return the normal URL and the cropper stores data as json
+	                    switch (propType.PropertyEditorAlias)
+	                    {
+	                        case Constants.PropertyEditors.UploadFieldAlias:
+	                            _url = prop.Value.ToString();
+	                            break;
+	                        case Constants.PropertyEditors.ImageCropperAlias:
+	                            //get the url from the json format
+	                            var val = prop.Value.ToString();
+	                            var crops = val.SerializeToCropDataSet();
+	                            _url = crops != null ? crops.Src : string.Empty;
+	                            break;
+	                    }
+	                    break;
+	                default:
+	                    throw new NotSupportedException();
+	            }
 
-				return _url;
-			}
+	            return _url;
+	        }
 		}
 
 		public abstract PublishedItemType ItemType { get; }
