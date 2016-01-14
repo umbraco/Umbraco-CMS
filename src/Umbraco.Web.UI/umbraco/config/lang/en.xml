@@ -1061,6 +1061,8 @@ To manage your website, simply open the Umbraco back office and start adding con
       <key alias="andAllDocuments">and all documents using this type</key>
       <key alias="andAllMediaItems">and all media items using this type</key>
       <key alias="andAllMembers">and all members using this type</key>
+
+      <key alias="thisEditorUpdateSettings">using this editor will get updated with the new settings</key>
   </area>
 
   <area alias="templateEditor">
