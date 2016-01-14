@@ -300,7 +300,7 @@ namespace Umbraco.Core.Services
             }
 
             var exporter = new EntityXmlSerializer();
-            var xml = exporter.Serialize(_dataTypeService, contentType);
+            var xml = exporter.Serialize(_dataTypeService, _contentTypeService, contentType);
 
             if (raiseEvents)
                 ExportedContentType.RaiseEvent(new ExportEventArgs<IContentType>(contentType, xml, false), this);

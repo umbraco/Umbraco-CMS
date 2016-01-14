@@ -474,18 +474,16 @@ namespace umbraco.cms.businesslogic.web
 
         public XmlElement ToXml(XmlDocument xd)
         {
-            return ToXml(xd, string.Empty);
-        }
-
-        public XmlElement ToXml(XmlDocument xd, string folders)
-        {
             var exporter = new EntityXmlSerializer();
-            var xml = exporter.Serialize(ApplicationContext.Current.Services.DataTypeService, ContentType, folders);
+            var xml = exporter.Serialize(
+                ApplicationContext.Current.Services.DataTypeService,
+                ApplicationContext.Current.Services.ContentTypeService,
+                ContentType);
 
             //convert the Linq to Xml structure to the old .net xml structure
             var xNode = xml.GetXmlNode();
             var doc = (XmlElement)xd.ImportNode(xNode, true);
-            return doc;   
+            return doc;
         }
 
         [Obsolete("Obsolete, Use SetDefaultTemplate(null) on Umbraco.Core.Models.ContentType", false)]

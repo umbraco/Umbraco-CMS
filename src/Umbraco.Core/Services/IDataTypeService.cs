@@ -15,6 +15,8 @@ namespace Umbraco.Core.Services
         EntityContainer GetContainer(int containerId);
         EntityContainer GetContainer(Guid containerId);
         IEnumerable<EntityContainer> GetContainers(string folderName, int level);
+        IEnumerable<EntityContainer> GetContainers(IDataTypeDefinition dataTypeDefinition);
+        IEnumerable<EntityContainer> GetContainers(int[] containerIds);
         void DeleteContainer(int containerId, int userId = 0);
 
         /// <summary>
@@ -160,5 +162,6 @@ namespace Umbraco.Core.Services
         string GetPreValueAsString(int id);
 
         Attempt<OperationStatus<MoveOperationStatusType>> Move(IDataTypeDefinition toMove, int parentId);
+        
     }
 }

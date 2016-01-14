@@ -68,7 +68,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //schedule it for updating in the transaction
             AddOrUpdate(toMove);
 
-            //update all descendants from the original path, update in order of level
+            //update all descendants, update in order of level
             var descendants = this.GetByQuery(
                 new Query<TEntity>().Where(type => type.Path.StartsWith(origPath + ",")));
 
@@ -77,8 +77,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 moveInfo.Add(new MoveEventInfo<TEntity>(descendant, descendant.Path, descendant.ParentId));
 
-                //all we're doing here is setting the parent Id to be dirty so that it resets the path/level/etc...
-                descendant.ParentId = descendant.ParentId;
+                descendant.ParentId = lastParent.Id;
                 descendant.Path = string.Concat(lastParent.Path, ",", descendant.Id);
 
                 //schedule it for updating in the transaction
