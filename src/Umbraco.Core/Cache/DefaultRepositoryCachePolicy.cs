@@ -35,8 +35,6 @@ namespace Umbraco.Core.Cache
 
         public void CreateOrUpdate(TEntity entity, Action<TEntity> persistMethod)
         {
-            var cacheKey = GetCacheIdKey(entity.Id);
-
             try
             {
                 persistMethod(entity);
@@ -44,7 +42,12 @@ namespace Umbraco.Core.Cache
                 //set the disposal action                
                 SetCacheAction(() =>
                 {
-                    Cache.InsertCacheItem(cacheKey, () => entity);
+                    //just to be safe, we cannot cache an item without an identity
+                    if (entity.HasIdentity)
+                    {
+                        Cache.InsertCacheItem(GetCacheIdKey(entity.Id), () => entity);
+                    }
+                    
                     //If there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
                     Cache.ClearCacheItem(GetCacheTypeKey());
                 });
@@ -57,7 +60,7 @@ namespace Umbraco.Core.Cache
                 {
                     //if an exception is thrown we need to remove the entry from cache, this is ONLY a work around because of the way
                     // that we cache entities: http://issues.umbraco.org/issue/U4-4259
-                    Cache.ClearCacheItem(cacheKey);
+                    Cache.ClearCacheItem(GetCacheIdKey(entity.Id));
 
                     //If there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
                     Cache.ClearCacheItem(GetCacheTypeKey());
@@ -188,7 +191,14 @@ namespace Umbraco.Core.Cache
         /// <param name="entity"></param>
         protected virtual void SetCacheAction(string cacheKey, TEntity entity)
         {
-            SetCacheAction(() => Cache.InsertCacheItem(cacheKey, () => entity));
+            SetCacheAction(() =>
+            {
+                //just to be safe, we cannot cache an item without an identity
+                if (entity.HasIdentity)
+                {
+                    Cache.InsertCacheItem(cacheKey, () => entity);
+                }
+            });
         }
 
         /// <summary>
@@ -214,7 +224,11 @@ namespace Umbraco.Core.Cache
                     foreach (var entity in entityCollection.WhereNotNull())
                     {
                         var localCopy = entity;
-                        Cache.InsertCacheItem(GetCacheIdKey(entity.Id), () => localCopy);
+                        //just to be safe, we cannot cache an item without an identity
+                        if (localCopy.HasIdentity)
+                        {
+                            Cache.InsertCacheItem(GetCacheIdKey(entity.Id), () => localCopy);
+                        }
                     }
                 }
             });
