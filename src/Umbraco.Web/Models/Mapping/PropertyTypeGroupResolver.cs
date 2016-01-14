@@ -117,6 +117,19 @@ namespace Umbraco.Web.Models.Mapping
                 groups.Add(genericTab);
             }
 
+            // handle locked properties
+            var lockedPropertyAliases = new List<string>();
+            // add built-in member property aliases to list of aliases to be locked
+            foreach (var propertyAlias in Constants.Conventions.Member.GetStandardPropertyTypeStubs().Keys)
+            {
+                lockedPropertyAliases.Add(propertyAlias);
+            }
+            // lock properties by aliases
+            foreach (var property in groups.SelectMany(x => x.Properties))
+            {
+                property.Locked = lockedPropertyAliases.Contains(property.Alias);
+            }
+
             // now merge tabs based on names
             // as for one name, we might have one local tab, plus some inherited tabs
             var groupsGroupsByName = groups.GroupBy(x => x.Name).ToArray();
