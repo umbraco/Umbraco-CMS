@@ -709,6 +709,11 @@ Mange hilsner fra Umbraco robotten
 
     <key alias="allowAllEditors">Tillad alle editorer</key>
     <key alias="allowAllRowConfigurations">Tillad alle rækkekonfigurationer</key>
+
+    <key alias="setAsDefault">Sæt som standard</key>
+    <key alias="chooseExtra">Vælg ekstra</key>
+    <key alias="chooseDefault">Vælg standard</key>
+    <key alias="areAdded">er tilføjet</key>
   </area>
 
   <area alias="contentTypeEditor">
