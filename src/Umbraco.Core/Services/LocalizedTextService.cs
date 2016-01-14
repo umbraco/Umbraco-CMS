@@ -112,19 +112,15 @@ namespace Umbraco.Core.Services
                 }
 
                 //convert all areas + keys to a single key with a '/'
-                var areas = xmlSource[culture].Value.XPathSelectElements("//area");
-                foreach (var area in areas)
+                result = GetStoredTranslations(xmlSource, culture);
+
+                //merge with the english file in case there's keys in there that don't exist in the local file
+                var englishCulture = new CultureInfo("en-US");
+                if (culture.Equals(englishCulture) == false)
                 {
-                    var keys = area.XPathSelectElements("./key");
-                    foreach (var key in keys)
-                    {
-                        var dictionaryKey = string.Format("{0}/{1}", (string) area.Attribute("alias"), (string) key.Attribute("alias"));
-                        //there could be duplicates if the language file isn't formatted nicely - which is probably the case for quite a few lang files
-                        if (result.ContainsKey(dictionaryKey) == false)
-                        {
-                            result.Add(dictionaryKey, key.Value);
-                        }
-                    }
+                    var englishResults = GetStoredTranslations(xmlSource, englishCulture);
+                    foreach (var englishResult in englishResults.Where(englishResult => result.ContainsKey(englishResult.Key) == false))
+                        result.Add(englishResult.Key, englishResult.Value);
                 }
             }
             else
@@ -150,6 +146,25 @@ namespace Umbraco.Core.Services
                 }
             }
 
+            return result;
+        }
+
+        private Dictionary<string, string> GetStoredTranslations(IDictionary<CultureInfo, Lazy<XDocument>> xmlSource, CultureInfo cult)
+        {
+            var result = new Dictionary<string, string>();
+            var areas = xmlSource[cult].Value.XPathSelectElements("//area");
+            foreach (var area in areas)
+            {
+                var keys = area.XPathSelectElements("./key");
+                foreach (var key in keys)
+                {
+                    var dictionaryKey = string.Format("{0}/{1}", (string)area.Attribute("alias"),
+                        (string)key.Attribute("alias"));
+                    //there could be duplicates if the language file isn't formatted nicely - which is probably the case for quite a few lang files
+                    if (result.ContainsKey(dictionaryKey) == false)
+                        result.Add(dictionaryKey, key.Value);
+                }
+            }
             return result;
         }
 
