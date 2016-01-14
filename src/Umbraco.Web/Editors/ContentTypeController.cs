@@ -12,6 +12,7 @@ using Umbraco.Core.PropertyEditors;
 using System.Net.Http;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Core.Strings;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 
@@ -188,9 +189,8 @@ namespace Umbraco.Web.Editors
                         if (template == null)
                         {
                             //ensure is safe and always pascal cased, per razor standard
-                            var classname = ctSave.Name.ToSafeAlias(false);
-                            classname = char.ToUpper(classname[0]) + classname.Substring(1);
-
+                            var classname = ctSave.Name.ToCleanString(CleanStringType.Alias | CleanStringType.PascalCase);
+                            
                             template = new Template(ctSave.Name, ctSave.Alias);
                             template.Content = ViewHelper.GetDefaultFileContent(modelClassName: classname);
                             Services.FileService.SaveTemplate(template);
