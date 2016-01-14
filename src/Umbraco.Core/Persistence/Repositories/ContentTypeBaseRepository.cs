@@ -37,7 +37,7 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         private readonly GuidReadOnlyContentTypeBaseRepository _guidRepo;
-
+        
         public IEnumerable<MoveEventInfo<TEntity>> Move(TEntity toMove, EntityContainer container)
         {
             var parentId = -1;
@@ -57,22 +57,34 @@ namespace Umbraco.Core.Persistence.Repositories
                 new MoveEventInfo<TEntity>(toMove, toMove.Path, parentId)
             };
 
+            var origPath = toMove.Path;
+
             //do the move to a new parent
             toMove.ParentId = parentId;
+
+            //set the updated path
+            toMove.Path = string.Concat(container == null ? parentId.ToInvariantString() : container.Path, ",", toMove.Id);
+
             //schedule it for updating in the transaction
             AddOrUpdate(toMove);
 
-            //update all descendants
+            //update all descendants from the original path, update in order of level
             var descendants = this.GetByQuery(
-                new Query<TEntity>().Where(type => type.Path.StartsWith(toMove.Path + ",")));
-            foreach (var descendant in descendants)
+                new Query<TEntity>().Where(type => type.Path.StartsWith(origPath + ",")));
+
+            var lastParent = toMove;
+            foreach (var descendant in descendants.OrderBy(x => x.Level))
             {
                 moveInfo.Add(new MoveEventInfo<TEntity>(descendant, descendant.Path, descendant.ParentId));
 
                 //all we're doing here is setting the parent Id to be dirty so that it resets the path/level/etc...
                 descendant.ParentId = descendant.ParentId;
+                descendant.Path = string.Concat(lastParent.Path, ",", descendant.Id);
+
                 //schedule it for updating in the transaction
                 AddOrUpdate(descendant);
+
+                lastParent = descendant;
             }
 
             return moveInfo;
