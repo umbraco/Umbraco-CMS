@@ -23,7 +23,7 @@ namespace Umbraco.Core.Services
         /// be looked up via the db, they need to be passed in.
         /// </param>
         /// <returns></returns>
-        public static IEnumerable<Tuple<IContentTypeComposition, bool>> GetAvailableCompositeContentTypes(this IContentTypeService ctService,
+        internal static ContentTypeAvailableCompositionsResults GetAvailableCompositeContentTypes(this IContentTypeService ctService,
             IContentTypeComposition source,
             IContentTypeComposition[] allContentTypes,
             string[] filterContentTypes = null,
@@ -54,7 +54,7 @@ namespace Umbraco.Core.Services
             if (isUsing.Length > 0)
             {
                 //if already in use a composition, do not allow any composited types
-                return new List<Tuple<IContentTypeComposition, bool>>();
+                return new ContentTypeAvailableCompositionsResults();
             }
 
             // if it is not used then composition is possible
@@ -68,7 +68,7 @@ namespace Umbraco.Core.Services
                 .Where(x => x.ContentTypeComposition.Any() == false).ToArray();
             foreach (var x in usableContentTypes)
                 list.Add(x);
-
+            
             // indirect types are those that we use, directly or indirectly
             var indirectContentTypes = GetDirectOrIndirect(source).ToArray();
             foreach (var x in indirectContentTypes)
@@ -93,21 +93,46 @@ namespace Umbraco.Core.Services
                 })
                 .OrderBy(x => x.Name)                
                 .ToList();
-            
-            //now we can create our result based on what is still available            
+
+            //get ancestor ids - we will filter all ancestors
+            var ancestors = GetAncestors(source, allContentTypes);
+            var ancestorIds = ancestors.Select(x => x.Id).ToArray();
+
+            //now we can create our result based on what is still available and the ancestors
             var result = list
                 //not itself
                 .Where(x => x.Id != sourceId)
                 .OrderBy(x => x.Name)
                 .Select(composition => filtered.Contains(composition)
-                ? new Tuple<IContentTypeComposition, bool>(composition, true)
-                : new Tuple<IContentTypeComposition, bool>(composition, false)).ToList();
+                ? new ContentTypeAvailableCompositionsResult(composition, ancestorIds.Contains(composition.Id) == false)
+                : new ContentTypeAvailableCompositionsResult(composition, false)).ToList();
 
-            return result;
+            return new ContentTypeAvailableCompositionsResults(ancestors, result);
+        }
+
+        private static IContentTypeComposition[] GetAncestors(IContentTypeComposition ctype, IContentTypeComposition[] allContentTypes)
+        {
+            if (ctype == null) return new IContentTypeComposition[] {};
+            var ancestors = new List<IContentTypeComposition>();
+            var parentId = ctype.ParentId;
+            while (parentId > 0)
+            {
+                var parent = allContentTypes.FirstOrDefault(x => x.Id == parentId);
+                if (parent != null)
+                {
+                    ancestors.Add(parent);
+                    parentId = parent.ParentId;
+                }
+                else
+                {
+                    parentId = -1;
+                }
+            }
+            return ancestors.ToArray();
         }
 
         /// <summary>
-        /// Get those that we use directly or indirectly
+        /// Get those that we use directly
         /// </summary>
         /// <param name="ctype"></param>
         /// <returns></returns>
@@ -121,12 +146,9 @@ namespace Umbraco.Core.Services
                 x => x.Id));
 
             var stack = new Stack<IContentTypeComposition>();
-
-            if (ctype != null)
-            {
-                foreach (var x in ctype.ContentTypeComposition)
-                    stack.Push(x);
-            }
+            
+            foreach (var x in ctype.ContentTypeComposition)
+                stack.Push(x);
 
             while (stack.Count > 0)
             {

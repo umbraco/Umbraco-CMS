@@ -78,7 +78,7 @@ namespace Umbraco.Tests.Services.Importing
         public void PackagingService_Can_Import_Inherited_ContentTypes_And_Verify_PropertyTypes_UniqueIds()
         {
             // Arrange
-            string strXml = ImportResources.InheritedDocTypes_Package;
+            var strXml = ImportResources.InheritedDocTypes_Package;
             var xml = XElement.Parse(strXml);
             var dataTypeElement = xml.Descendants("DataTypes").First();
             var templateElement = xml.Descendants("Templates").First();

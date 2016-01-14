@@ -217,7 +217,15 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public ContentTypeDisplay GetEmpty(int parentId)
         {
-            var ct = new ContentType(parentId);
+            IContentType ct;
+            if (parentId != Constants.System.Root)
+            {
+                var parent = Services.ContentTypeService.GetContentType(parentId);
+                ct = parent != null ? new ContentType(parent, string.Empty) : new ContentType(parentId);
+            }
+            else
+                ct = new ContentType(parentId);
+            
             ct.Icon = "icon-document";
 
             var dto = Mapper.Map<IContentType, ContentTypeDisplay>(ct);

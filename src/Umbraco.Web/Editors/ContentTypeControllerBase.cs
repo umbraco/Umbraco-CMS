@@ -9,6 +9,7 @@ using System.Web.Http;
 using AutoMapper;
 using Newtonsoft.Json;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -71,6 +72,7 @@ namespace Umbraco.Web.Editors
             //below is all ported from the old doc type editor and comes with the same weaknesses /insanity / magic
             
             IContentTypeComposition[] allContentTypes;
+
             switch (type)
             {
                 case UmbracoObjectTypes.DocumentType:
@@ -104,19 +106,22 @@ namespace Umbraco.Web.Editors
                     throw new ArgumentOutOfRangeException("The entity type was not a content type");
             }
 
-            var filtered = Services.ContentTypeService.GetAvailableCompositeContentTypes(source, allContentTypes, filterContentTypes, filterPropertyTypes);
+            var availableCompositions = Services.ContentTypeService.GetAvailableCompositeContentTypes(source, allContentTypes, filterContentTypes, filterPropertyTypes);
 
-            var currCompositions = source == null ? new string[] { } : source.ContentTypeComposition.Select(x => x.Alias).ToArray();
+            var currCompositions = source == null ? new IContentTypeComposition[] { } : source.ContentTypeComposition.ToArray();
+            var compAliases = currCompositions.Select(x => x.Alias).ToArray();
+            var ancestors = availableCompositions.Ancestors.Select(x => x.Alias);
 
-            return filtered                
-                .Select(x => new Tuple<EntityBasic, bool>(Mapper.Map<IContentTypeComposition, EntityBasic>(x.Item1), x.Item2))
+            return availableCompositions.Results
+                .Select(x => new Tuple<EntityBasic, bool>(Mapper.Map<IContentTypeComposition, EntityBasic>(x.Composition), x.Allowed))
                 .Select(x =>
                 {
                     //translate the name
                     x.Item1.Name = TranslateItem(x.Item1.Name);
 
                     //we need to ensure that the item is enabled if it is already selected
-                    if (currCompositions.Contains(x.Item1.Alias))
+                    // but do not allow it if it is any of the ancestors
+                    if (compAliases.Contains(x.Item1.Alias) && ancestors.Contains(x.Item1.Alias) == false)
                     {
                         //re-set x to be allowed (NOTE: I didn't know you could set an enumerable item in a lambda!)
                         x = new Tuple<EntityBasic, bool>(x.Item1, true);
@@ -126,7 +131,6 @@ namespace Umbraco.Web.Editors
                 })
                 .ToList();
         }
-        
 
         /// <summary>
         /// Validates the composition and adds errors to the model state if any are found then throws an error response if there are errors
@@ -191,7 +195,7 @@ namespace Umbraco.Web.Editors
             
             //Validate that there's no other ct with the same name
             var exists = getContentTypeByAlias(contentTypeSave.Alias);
-            if (exists != null && exists.Id != ctId)
+            if (exists != null && exists.Id.ToInvariantString() != contentTypeSave.Id.ToString())
             {
                 ModelState.AddModelError("Alias", "A content type with this alias already exists");
             }
