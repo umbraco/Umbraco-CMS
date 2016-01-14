@@ -440,7 +440,7 @@
 
       scope.editPropertyTypeSettings = function(property, group) {
 
-        if (!property.inherited) {
+        if (!property.inherited && !property.locked) {
 
           scope.propertySettingsDialogModel = {};
           scope.propertySettingsDialogModel.title = "Property settings";
