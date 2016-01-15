@@ -434,13 +434,18 @@ namespace Umbraco.Web.Editors
 
                 if (UmbracoConfig.For.UmbracoSettings().Content.DisallowedUploadFiles.Contains(ext) == false)
                 {
+                    // Sanitize media item name (U4-5572)
+                    var fileNameParts = fileName.Substring(0, fileName.LastIndexOf('.'))
+                                                .Split(new String[] { " ", "_" }, StringSplitOptions.RemoveEmptyEntries);
+                    var fileNameCleaned = String.Join(" ", fileNameParts.Select(p => p.ToLower().ToFirstUpper()));
+
                     var mediaType = Constants.Conventions.MediaTypes.File;
 
                     if (UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes.Contains(ext))
                         mediaType = Constants.Conventions.MediaTypes.Image;
 
                     var mediaService = ApplicationContext.Services.MediaService;
-                    var f = mediaService.CreateMedia(fileName, parentId, mediaType, Security.CurrentUser.Id);
+                    var f = mediaService.CreateMedia(fileNameCleaned, parentId, mediaType, Security.CurrentUser.Id);
 
                     var fileInfo = new FileInfo(file.LocalFileName);
                     var fs = fileInfo.OpenReadWithRetry();
