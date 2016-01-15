@@ -350,12 +350,16 @@
       <Name>umbraco.providers</Name>
     </ProjectReference>
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="UrlRewritingNet.UrlRewriter, Version=2.0.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\UrlRewritingNet.UrlRewriter.2.0.7\lib\UrlRewritingNet.UrlRewriter.dll</HintPath>
+    <Reference Include="Umbraco.ModelsBuilder, Version=2.2.0.64, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Umbraco.ModelsBuilder.2.2.0-beta002\lib\Umbraco.ModelsBuilder.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Zbu.ModelsBuilder, Version=2.2.0.59, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Zbu.ModelsBuilder.2.2.0-beta001\lib\Zbu.ModelsBuilder.dll</HintPath>
+    <Reference Include="Umbraco.ModelsBuilder.AspNet, Version=2.2.0.64, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Umbraco.ModelsBuilder.AspNet.2.2.0-beta002\lib\Umbraco.ModelsBuilder.AspNet.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="UrlRewritingNet.UrlRewriter, Version=2.0.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\UrlRewritingNet.UrlRewriter.2.0.7\lib\UrlRewritingNet.UrlRewriter.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Zbu.ModelsBuilder.AspNet, Version=2.2.0.59, Culture=neutral, processorArchitecture=MSIL">
@@ -582,6 +586,8 @@
     <Compile Include="Umbraco\TreeInit.aspx.designer.cs">
       <DependentUpon>treeInit.aspx</DependentUpon>
     </Compile>
+    <Content Include="App_Plugin\ModelsBuilder\modelsbuilder.controller.js" />
+    <Content Include="App_Plugin\ModelsBuilder\modelsbuilder.htm" />
     <Content Include="Config\grid.editors.config.js" />
     <Content Include="Config\Lang\cs-CZ.user.xml" />
     <Content Include="Config\Lang\da-DK.user.xml" />
@@ -640,6 +646,7 @@
       </SubType>
     </Content>
     <Content Include="Umbraco\Install\Views\Web.config" />
+    <Content Include="App_Plugin\ModelsBuilder\package.manifest" />
     <None Include="Config\404handlers.Release.config">
       <DependentUpon>404handlers.config</DependentUpon>
     </None>
@@ -1962,8 +1969,6 @@
     <Content Include="Umbraco\PartialViewMacros\Templates\SiteMap.cshtml" />
     <Content Include="Umbraco\Views\AuthorizeUpgrade.cshtml" />
     <Content Include="Umbraco\Translation\translationTasks.dtd" />
-    <Content Include="UserControls\Zbu\ModelsBuilder\BuildModels.ascx" />
-    <Content Include="UserControls\Zbu\ModelsBuilder\logo32x32.png" />
     <Content Include="Views\Web.config">
       <SubType>Designer</SubType>
     </Content>
