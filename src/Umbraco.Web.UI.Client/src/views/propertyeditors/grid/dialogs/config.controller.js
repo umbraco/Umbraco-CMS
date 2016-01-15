@@ -34,7 +34,7 @@ angular.module("umbraco")
         // if opening a settings dialog from a control - use only settings from this control
         // otherwise use editor configuration for row/cell settings
         if ($scope.dialogOptions.itemType === 'control') {
-            $scope.config = $scope.dialogOptions.gridItem.editor.config.settings;
+            $scope.config = angular.copy($scope.dialogOptions.gridItem.editor.config.settings);
             $scope.styles = null;
         } else {
             $scope.styles = _.filter(angular.copy($scope.dialogOptions.config.items.styles), function (item) { return (item.applyTo === undefined || item.applyTo === $scope.dialogOptions.itemType); });
