@@ -240,7 +240,7 @@ angular.module("umbraco")
           $scope.editorOverlay = {
               view: "itempicker",
               filter: false,
-              title: localizationService.localize("grid_insertControl").then(function (value) {return value;}),
+              title: localizationService.localize("grid_insertControl"),
               availableItems: area.$allowedEditors,
               event: event,
               show: true,
@@ -330,8 +330,15 @@ angular.module("umbraco")
         $scope.editGridItemSettings = function (gridItem, itemType) {
 
             placeHolder = "{0}";
-            var styles = _.filter( angular.copy($scope.model.config.items.styles), function(item){return (item.applyTo === undefined || item.applyTo === itemType); });
-            var config = _.filter( angular.copy($scope.model.config.items.config), function(item){return (item.applyTo === undefined || item.applyTo === itemType); });
+
+            var styles, config;
+            if (itemType === 'control') {
+                styles = null;
+                config = angular.copy(gridItem.editor.config.settings);
+            } else {
+                styles = _.filter(angular.copy($scope.model.config.items.styles), function (item) { return (item.applyTo === undefined || item.applyTo === itemType); });
+                config = _.filter(angular.copy($scope.model.config.items.config), function (item) { return (item.applyTo === undefined || item.applyTo === itemType); });
+            }
 
             if(angular.isObject(gridItem.config)){
                 _.each(config, function(cfg){
@@ -389,7 +396,7 @@ angular.module("umbraco")
             };
 
         };
-
+        
         function stripModifier(val, modifier) {
             if (!val || !modifier || modifier.indexOf(placeHolder) < 0) {
                 return val;

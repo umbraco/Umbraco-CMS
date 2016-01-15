@@ -17,6 +17,10 @@
           searchText = value + "...";
       });
 
+      if(!$scope.model.title) {
+          $scope.model.title = localizationService.localize("actions_move");
+      }
+
       $scope.model.relateToOriginal = true;
       $scope.dialogTreeEventHandler = $({});
 

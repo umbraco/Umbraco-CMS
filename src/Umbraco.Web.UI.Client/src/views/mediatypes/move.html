@@ -1,10 +1,10 @@
 <div class="umb-dialog umb-pane" ng-controller="Umbraco.Editors.MediaTypes.MoveController">
-    
+
     <div class="umb-dialog-body">
         <div class="umb-pane">
 
             <p class="abstract" ng-hide="success">
-                Select the folder to move <strong>{{currentNode.name}}</strong>&nbsp;to in the tree structure below
+                    <localize key="contentTypeEditor_folderToMove">Select the folder to move</localize> <strong>{{currentNode.name}}</strong>&nbsp;<localize key="contentTypeEditor_structureBelow">to in the tree structure below</localize>
             </p>
 
             <div class="umb-loader-wrapper" ng-show="busy">
@@ -17,7 +17,7 @@
             </div>
 
             <div ng-show="success">
-                <h5 class="text-success"><strong>{{currentNode.name}}</strong> was moved underneath&nbsp;<strong>{{target.name}}</strong></h5>
+                <h5 class="text-success"><strong>{{currentNode.name}}</strong> <localize key="contentTypeEditor_movedUnderneath">was moved underneath</localize>&nbsp;<strong>{{target.name}}</strong></h5>
                 <button class="btn btn-primary" ng-click="nav.hideDialog()">Ok</button>
             </div>
 

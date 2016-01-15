@@ -32,7 +32,9 @@
 
     <div class="umb-control-group external-logins" ng-if="externalLoginProviders.length > 0 && !showPasswordFields">
 
-        <h5>External login providers</h5>
+        <h5>
+            <localize key="defaultdialogs_externalLoginProviders">External login providers</localize>
+        </h5>
 
         <div ng-repeat="login in externalLoginProviders">
 
@@ -45,7 +47,7 @@
                         name="provider"
                         value="{{login.authType}}">
                     <i class="fa" ng-class="login.properties.SocialIcon"></i>
-                    Link your {{login.caption}} account
+                    <localize key="defaultdialogs_linkYour">Link your</localize> {{login.caption}} <localize key="defaultdialogs_account">account</localize>
                 </button>
             </form>
 
@@ -57,7 +59,7 @@
                     name="provider"
                     value="{{login.authType}}">
                 <i class="fa" ng-class="login.properties.SocialIcon"></i>
-                Un-link your {{login.caption}} account
+                <localize key="defaultdialogs_unLinkYour">Un-link your</localize> {{login.caption}} <localize key="defaultdialogs_account">account</localize>
             </button>
         </div>
 
@@ -76,7 +78,9 @@
 
     <div ng-show="showPasswordFields">
 
-       <h5>Change password</h5>
+       <h5>
+           <localize key="general_changePassword">Change password</localize>
+       </h5>
 
        <form
           name="passwordForm"
