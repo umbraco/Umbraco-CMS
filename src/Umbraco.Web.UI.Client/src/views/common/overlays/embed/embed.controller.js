@@ -1,13 +1,16 @@
 (function() {
    "use strict";
 
-   function EmbedOverlay($scope, $http, umbRequestHelper) {
+   function EmbedOverlay($scope, $http, umbRequestHelper, localizationService) {
 
       var vm = this;
       var origWidth = 500;
       var origHeight = 300;
 
-      $scope.model.title = "Embed";
+      if(!$scope.model.title) {
+          $scope.model.title = localizationService.localize("general_embed");
+      }
+
       $scope.model.embed = {
          url: "",
          width: 360,

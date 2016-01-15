@@ -1,7 +1,10 @@
-function MacroPickerController($scope, entityResource, macroResource, umbPropEditorHelper, macroService, formHelper) {
+function MacroPickerController($scope, entityResource, macroResource, umbPropEditorHelper, macroService, formHelper, localizationService) {
 
 
-    $scope.model.title = "Macro picker";
+    if(!$scope.model.title) {
+        $scope.model.title = localizationService.localize("defaultdialogs_selectMacro");
+    }
+
     $scope.macros = [];
     $scope.model.selectedMacro = null;
     $scope.wizardStep = "macroSelect";

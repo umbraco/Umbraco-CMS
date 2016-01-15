@@ -240,7 +240,7 @@ angular.module("umbraco")
           $scope.editorOverlay = {
               view: "itempicker",
               filter: false,
-              title: localizationService.localize("grid_insertControl").then(function (value) {return value;}),
+              title: localizationService.localize("grid_insertControl"),
               availableItems: area.$allowedEditors,
               event: event,
               show: true,
