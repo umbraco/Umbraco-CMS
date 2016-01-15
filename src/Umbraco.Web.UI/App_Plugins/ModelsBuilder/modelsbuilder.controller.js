@@ -1,4 +1,4 @@
-﻿function modelsBuilderController($scope, umbRequestHelper, $log, $http) {
+﻿function modelsBuilderController($scope, umbRequestHelper, $log, $http /*, $sce*/) {
 
     $scope.generate = function() {
         $scope.generating = true;
@@ -15,7 +15,7 @@
                 $http.get(umbRequestHelper.getApiUrl("modelsBuilderBaseUrl", "GetDashboard")),
                 'Failed to get dashboard.')
             .then(function (result) {
-                //result.text = $sce.trustAsHtml(result.text);
+                //result.text = $sce.trustAsHtml(result.text); // accept html
                 $scope.dashboard = result;
                 $scope.ready = true;
             });
