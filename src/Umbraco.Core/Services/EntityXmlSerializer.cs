@@ -422,7 +422,8 @@ namespace Umbraco.Core.Services
                 tabs);
 
             var folderNames = string.Empty;
-            if (contentType.Level != 1)
+            //don't add folders if this is a child doc type
+            if (contentType.Level != 1 && masterContentType == null)
             {
                 //get url encoded folder names
                 var folders = contentTypeService.GetContentTypeContainers(contentType)
