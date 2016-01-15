@@ -11,7 +11,7 @@
 
     function MediaTypesEditController($scope, $routeParams, mediaTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter, $q, localizationService, overlayHelper) {
         var vm = this;
-        var localizeSaving = localizationService.localize("general_saving").then(function (value) {return value;});
+        var localizeSaving = localizationService.localize("general_saving");
 
         vm.save = save;
 
@@ -22,18 +22,18 @@
         vm.page.saveButtonState = "init";
         vm.page.navigation = [
 			{
-			    "name": localizationService.localize("general_design").then(function (value) {return value;}),
+			    "name": localizationService.localize("general_design"),
 			    "icon": "icon-document-dashed-line",
 			    "view": "views/mediatypes/views/design/design.html",
 			    "active": true
 			},
 			{
-			    "name": localizationService.localize("general_listView").then(function (value) {return value;}),
+			    "name": localizationService.localize("general_listView"),
 			    "icon": "icon-list",
 			    "view": "views/mediatypes/views/listview/listview.html"
 			},
 			{
-			    "name": localizationService.localize("general_rights").then(function (value) {return value;}),
+			    "name": localizationService.localize("general_rights"),
 			    "icon": "icon-keychain",
 			    "view": "views/mediatypes/views/permissions/permissions.html"
 			}
@@ -41,54 +41,54 @@
 
         vm.page.keyboardShortcutsOverview = [
 			{
-			    "name": localizationService.localize("main_sections").then(function (value) {return value;}),
+			    "name": localizationService.localize("main_sections"),
 			    "shortcuts": [
 					{
-					    "description": localizationService.localize("shortcuts_navigateSections").then(function (value) {return value;}),
+					    "description": localizationService.localize("shortcuts_navigateSections"),
 					    "keys": [{ "key": "1" }, { "key": "3" }],
 					    "keyRange": true
 					}
 			    ]
 			},
 			{
-			    "name": localizationService.localize("general_design").then(function (value) {return value;}),
+			    "name": localizationService.localize("general_design"),
 			    "shortcuts": [
 				{
-				    "description": localizationService.localize("shortcuts_addTab").then(function (value) {return value;}),
+				    "description": localizationService.localize("shortcuts_addTab"),
 				    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "t" }]
 				},
 				{
-				    "description": localizationService.localize("shortcuts_addProperty").then(function (value) {return value;}),
+				    "description": localizationService.localize("shortcuts_addProperty"),
 				    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "p" }]
 				},
 				{
-				    "description": localizationService.localize("shortcuts_addEditor").then(function (value) {return value;}),
+				    "description": localizationService.localize("shortcuts_addEditor"),
 				    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "e" }]
 				},
 				{
-				    "description": localizationService.localize("shortcuts_editDataType").then(function (value) {return value;}),
+				    "description": localizationService.localize("shortcuts_editDataType"),
 				    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "d" }]
 				}
 			    ]
 			},
 		{
-		    "name": localizationService.localize("general_listView").then(function (value) {return value;}),
+		    "name": localizationService.localize("general_listView"),
 		    "shortcuts": [
 				{
-				    "description": localizationService.localize("shortcuts_toggleListView").then(function (value) {return value;}),
+				    "description": localizationService.localize("shortcuts_toggleListView"),
 				    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "l" }]
 				}
 		    ]
 		},
 		{
-		    "name": localizationService.localize("general_rights").then(function (value) {return value;}),
+		    "name": localizationService.localize("general_rights"),
 		    "shortcuts": [
 				{
-				    "description": localizationService.localize("shortcuts_toggleAllowAsRoot").then(function (value) {return value;}),
+				    "description": localizationService.localize("shortcuts_toggleAllowAsRoot"),
 				    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "r" }]
 				},
 				{
-				    "description": localizationService.localize("shortcuts_addChildNode").then(function (value) {return value;}),
+				    "description": localizationService.localize("shortcuts_addChildNode"),
 				    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "c" }]
 				}
 		    ]

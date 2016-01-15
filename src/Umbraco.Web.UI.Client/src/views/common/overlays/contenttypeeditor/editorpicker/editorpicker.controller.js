@@ -15,7 +15,7 @@
 		var vm = this;
 
         if(!$scope.model.title) {
-            $scope.model.title = localizationService.localize("defaultdialogs_selectEditor").then(function (value) {return value;});
+            $scope.model.title = localizationService.localize("defaultdialogs_selectEditor");
         }
 
 		vm.searchTerm = "";
@@ -25,14 +25,14 @@
 			{
 				active: true,
 				id: 1,
-                label: localizationService.localize("contentTypeEditor_availableEditors").then(function (value) {return value;}),
+                label: localizationService.localize("contentTypeEditor_availableEditors"),
 				alias: "Default",
 				typesAndEditors: []
 			},
 			{
 				active: false,
 				id: 2,
-                label: localizationService.localize("contentTypeEditor_reuse").then(function (value) {return value;}),
+                label: localizationService.localize("contentTypeEditor_reuse"),
 				alias: "Reuse",
 				userConfigured: []
 			}
@@ -148,7 +148,7 @@
 
       function openEditorSettingsOverlay(dataType, isNew) {
          vm.editorSettingsOverlay = {
-             title: localizationService.localize("contentTypeEditor_editorSettings").then(function (value) {return value;}),
+             title: localizationService.localize("contentTypeEditor_editorSettings"),
              dataType: dataType,
              view: "views/common/overlays/contenttypeeditor/editorsettings/editorsettings.html",
              show: true,

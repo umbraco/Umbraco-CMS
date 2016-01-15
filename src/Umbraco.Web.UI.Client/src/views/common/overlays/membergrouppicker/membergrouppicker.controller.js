@@ -3,7 +3,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.MemberGroupPickerControll
     function($scope, eventsService, entityResource, searchService, $log, localizationService) {
 
         if(!$scope.model.title) {
-            $scope.model.title = localizationService.localize("defaultdialogs_selectMemberGroup").then(function (value) {return value;});
+            $scope.model.title = localizationService.localize("defaultdialogs_selectMemberGroup");
         }
 
         $scope.dialogTreeEventHandler = $({});

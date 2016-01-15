@@ -8,7 +8,7 @@ angular.module("umbraco")
         $scope.model.subtitle = "Umbraco version" + " " + $scope.version;
 
         if(!$scope.model.title) {
-            $scope.model.title = localizationService.localize("general_user").then(function (value) {return value;});
+            $scope.model.title = localizationService.localize("general_user");
         }
 
         $scope.externalLoginProviders = externalLoginInfo.providers;

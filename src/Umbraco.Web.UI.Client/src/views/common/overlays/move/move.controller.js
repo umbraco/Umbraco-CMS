@@ -18,7 +18,7 @@
       });
 
       if(!$scope.model.title) {
-          $scope.model.title = localizationService.localize("actions_move").then(function (value) {return value;});
+          $scope.model.title = localizationService.localize("actions_move");
       }
 
       $scope.model.relateToOriginal = true;

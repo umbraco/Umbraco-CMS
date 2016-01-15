@@ -8,7 +8,7 @@
       var origHeight = 300;
 
       if(!$scope.model.title) {
-          $scope.model.title = localizationService.localize("general_embed").then(function (value) {return value;});
+          $scope.model.title = localizationService.localize("general_embed");
       }
 
       $scope.model.embed = {

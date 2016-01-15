@@ -20,7 +20,7 @@
 
         function init() {
 
-            childNodeSelectorOverlayTitle = localizationService.localize("contentTypeEditor_chooseChildNode").then(function (value) {return value;});
+            childNodeSelectorOverlayTitle = localizationService.localize("contentTypeEditor_chooseChildNode");
 
             mediaTypeResource.getAll().then(function(mediaTypes){
 

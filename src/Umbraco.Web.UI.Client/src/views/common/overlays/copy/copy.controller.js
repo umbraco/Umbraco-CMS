@@ -6,7 +6,7 @@
       var vm = this;
 
       if(!$scope.model.title) {
-          $scope.model.title = localizationService.localize("general_copy").then(function (value) {return value;});
+          $scope.model.title = localizationService.localize("general_copy");
       }
 
       vm.hideSearch = hideSearch;

@@ -14,7 +14,7 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
     };
 
     var node = $scope.dialogOptions.currentNode,
-        localizeCreateFolder = localizationService.localize("defaultdialog_createFolder").then(function (value) {return value;});
+        localizeCreateFolder = localizationService.localize("defaultdialog_createFolder");
 
     $scope.showCreateFolder = function() {
         $scope.model.creatingFolder = true;

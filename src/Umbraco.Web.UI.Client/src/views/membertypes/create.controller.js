@@ -14,7 +14,7 @@ function MemberTypesCreateController($scope, $location, navigationService, membe
     };
 
     var node = $scope.dialogOptions.currentNode,
-        localizeCreateFolder = localizationService.localize("defaultdialog_createFolder").then(function (value) {return value;});
+        localizeCreateFolder = localizationService.localize("defaultdialog_createFolder");
 
 
     $scope.showCreateFolder = function() {

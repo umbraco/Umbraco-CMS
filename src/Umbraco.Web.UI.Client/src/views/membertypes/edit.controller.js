@@ -12,7 +12,7 @@
     function MemberTypesEditController($scope, $rootScope, $routeParams, $log, $filter, memberTypeResource, dataTypeResource, editorState, iconHelper, formHelper, navigationService, contentEditingHelper, notificationsService, $q, localizationService, overlayHelper) {
 
         var vm = this;
-        var localizeSaving = localizationService.localize("general_saving").then(function (value) {return value;});
+        var localizeSaving = localizationService.localize("general_saving");
 
         vm.save = save;
 
@@ -23,7 +23,7 @@
         vm.page.saveButtonState = "init";
         vm.page.navigation = [
 			{
-			    "name": localizationService.localize("general_design").then(function (value) {return value;}),
+			    "name": localizationService.localize("general_design"),
 			    "icon": "icon-document-dashed-line",
 			    "view": "views/membertypes/views/design/design.html",
 			    "active": true
@@ -32,22 +32,22 @@
 
         vm.page.keyboardShortcutsOverview = [
 			{
-                "name": localizationService.localize("shortcuts_shortcut").then(function (value) {return value;}),
+                "name": localizationService.localize("shortcuts_shortcut"),
 			    "shortcuts": [
 					{
-					    "description": localizationService.localize("shortcuts_addTab").then(function (value) {return value;}),
+					    "description": localizationService.localize("shortcuts_addTab"),
 					    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "t" }]
 					},
 					{
-					    "description": localizationService.localize("shortcuts_addProperty").then(function (value) {return value;}),
+					    "description": localizationService.localize("shortcuts_addProperty"),
 					    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "p" }]
 					},
 					{
-					    "description": localizationService.localize("shortcuts_addEditor").then(function (value) {return value;}),
+					    "description": localizationService.localize("shortcuts_addEditor"),
 					    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "e" }]
 					},
 					{
-					    "description": localizationService.localize("shortcuts_editDataType").then(function (value) {return value;}),
+					    "description": localizationService.localize("shortcuts_editDataType"),
 					    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "d" }]
 					}
 			    ]

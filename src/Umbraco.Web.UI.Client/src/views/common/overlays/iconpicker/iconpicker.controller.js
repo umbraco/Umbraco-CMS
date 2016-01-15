@@ -12,9 +12,7 @@ function IconPickerOverlay($scope, iconHelper, localizationService) {
    $scope.model.hideSubmitButton = true;
 
     if (!$scope.model.title) {
-        $scope.model.title = localizationService.localize("defaultdialogs_selectIcon").then(function(value) {
-            return value;
-        });
+        $scope.model.title = localizationService.localize("defaultdialogs_selectIcon");
     }
 
    iconHelper.getIcons().then(function(icons) {

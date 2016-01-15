@@ -20,25 +20,25 @@
       vm.selectedValidationType = {};
       vm.validationTypes = [
          {
-            "name": localizationService.localize("validation_validateAsEmail").then(function (value) {return value;}),
+            "name": localizationService.localize("validation_validateAsEmail"),
             "key": "email",
             "pattern": "[a-zA-Z0-9_\.\+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-\.]+",
             "enableEditing": true
          },
          {
-            "name": localizationService.localize("validation_validateAsNumber").then(function (value) {return value;}),
+            "name": localizationService.localize("validation_validateAsNumber"),
             "key": "number",
             "pattern": "^[0-9]*$",
             "enableEditing": true
          },
          {
-            "name": localizationService.localize("validation_validateAsUrl").then(function (value) {return value;}),
+            "name": localizationService.localize("validation_validateAsUrl"),
             "key": "url",
             "pattern": "https?\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,}",
             "enableEditing": true
          },
          {
-            "name": localizationService.localize("validation_enterCustomValidation").then(function (value) {return value;}),
+            "name": localizationService.localize("validation_enterCustomValidation"),
             "key": "custom",
             "pattern": "",
             "enableEditing": true

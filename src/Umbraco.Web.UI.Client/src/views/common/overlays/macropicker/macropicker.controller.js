@@ -2,7 +2,7 @@ function MacroPickerController($scope, entityResource, macroResource, umbPropEdi
 
 
     if(!$scope.model.title) {
-        $scope.model.title = localizationService.localize("defaultdialogs_selectMacro").then(function (value) {return value;});
+        $scope.model.title = localizationService.localize("defaultdialogs_selectMacro");
     }
 
     $scope.macros = [];
