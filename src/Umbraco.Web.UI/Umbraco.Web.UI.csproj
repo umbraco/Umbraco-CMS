@@ -362,10 +362,6 @@
       <HintPath>..\packages\UrlRewritingNet.UrlRewriter.2.0.7\lib\UrlRewritingNet.UrlRewriter.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Zbu.ModelsBuilder.AspNet, Version=2.2.0.59, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Zbu.ModelsBuilder.AspNet.2.2.0-beta001\lib\Zbu.ModelsBuilder.AspNet.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\SolutionInfo.cs">
