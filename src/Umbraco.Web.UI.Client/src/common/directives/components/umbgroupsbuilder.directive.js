@@ -9,7 +9,7 @@
       scope.toolbar = [];
       scope.sortableOptionsGroup = {};
       scope.sortableOptionsProperty = {};
-      scope.sortingButtonLabel = "Reorder";
+      scope.sortingButtonKey = "general_reorder";
 
       function activate() {
 
@@ -200,9 +200,9 @@
          scope.sortingMode = !scope.sortingMode;
 
          if(scope.sortingMode === true) {
-            scope.sortingButtonLabel = "I'm done reordering";
+            scope.sortingButtonKey = "general_reorderDone";
          } else {
-            scope.sortingButtonLabel = "Reorder";
+            scope.sortingButtonKey = "general_reorder";
          }
 
       };

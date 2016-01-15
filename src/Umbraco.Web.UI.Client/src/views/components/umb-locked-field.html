@@ -25,8 +25,8 @@
 
    </div>
 
-   <div class="umb-validation-label" val-msg-for="lockedField" val-toggle-msg="required">Required alias</div>
-   <div ng-if="regexValidation.length > 0" class="umb-validation-label" val-msg-for="lockedField" val-toggle-msg="valRegex">Invalid alias</div>
+   <div class="umb-validation-label" val-msg-for="lockedField" val-toggle-msg="required"><localize key="general_required">Required</localize> <localize key="content_alias">alias</localize></div>
+   <div ng-if="regexValidation.length > 0" class="umb-validation-label" val-msg-for="lockedField" val-toggle-msg="valRegex"><localize key="general_invalid">Invalid</localize> <localize key="content_alias">alias</localize></div>
    <div ng-if="serverValidationField.length > 0" class="umb-validation-label" val-msg-for="lockedField" val-toggle-msg="valServerField"></div>
 
 </ng-form>

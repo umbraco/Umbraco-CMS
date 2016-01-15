@@ -6,21 +6,26 @@
  * @description
  * The controller for the media type creation dialog
  */
-function MediaTypesCreateController($scope, $location, navigationService, mediaTypeResource, formHelper, appState) {
+function MediaTypesCreateController($scope, $location, navigationService, mediaTypeResource, formHelper, appState, localizationService) {
 
     $scope.model = {
         folderName: "",
         creatingFolder: false
     };
 
-    var node = $scope.dialogOptions.currentNode;
+    var node = $scope.dialogOptions.currentNode,
+        localizeCreateFolder = localizationService.localize("defaultdialog_createFolder");
 
     $scope.showCreateFolder = function() {
         $scope.model.creatingFolder = true;
     }
 
     $scope.createContainer = function () {
-        if (formHelper.submitForm({ scope: $scope, formCtrl: this.createFolderForm, statusMessage: "Creating folder..." })) {
+        if (formHelper.submitForm({
+            scope: $scope,
+            formCtrl: this.createFolderForm,
+            statusMessage: localizeCreateFolder
+        })) {
             mediaTypeResource.createContainer(node.id, $scope.model.folderName).then(function (folderId) {
 
                 navigationService.hideMenu();

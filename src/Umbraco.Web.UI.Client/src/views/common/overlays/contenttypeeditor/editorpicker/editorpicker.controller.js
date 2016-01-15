@@ -10,9 +10,13 @@
  (function() {
 	"use strict";
 
-	function EditorPickerOverlay($scope, dataTypeResource, dataTypeHelper, contentTypeResource) {
+	function EditorPickerOverlay($scope, dataTypeResource, dataTypeHelper, contentTypeResource, localizationService) {
 
 		var vm = this;
+
+        if(!$scope.model.title) {
+            $scope.model.title = localizationService.localize("defaultdialogs_selectEditor");
+        }
 
 		vm.searchTerm = "";
 		vm.showTabs = false;
@@ -21,14 +25,14 @@
 			{
 				active: true,
 				id: 1,
-				label: "Available Editors",
+                label: localizationService.localize("contentTypeEditor_availableEditors"),
 				alias: "Default",
 				typesAndEditors: []
 			},
 			{
 				active: false,
 				id: 2,
-				label: "Reuse",
+                label: localizationService.localize("contentTypeEditor_reuse"),
 				alias: "Reuse",
 				userConfigured: []
 			}
@@ -143,34 +147,27 @@
       }
 
       function openEditorSettingsOverlay(dataType, isNew) {
-         vm.editorSettingsOverlay = {};
-         vm.editorSettingsOverlay.title = "Editor settings";
-         vm.editorSettingsOverlay.dataType = dataType;
-         vm.editorSettingsOverlay.view = "views/common/overlays/contenttypeeditor/editorsettings/editorsettings.html";
-         vm.editorSettingsOverlay.show = true;
+         vm.editorSettingsOverlay = {
+             title: localizationService.localize("contentTypeEditor_editorSettings"),
+             dataType: dataType,
+             view: "views/common/overlays/contenttypeeditor/editorsettings/editorsettings.html",
+             show: true,
+             submit: function(model) {
+                 var preValues = dataTypeHelper.createPreValueProps(model.dataType.preValues);
 
-         vm.editorSettingsOverlay.submit = function(model) {
+                 dataTypeResource.save(model.dataType, preValues, isNew).then(function(newDataType) {
 
-            var preValues = dataTypeHelper.createPreValueProps(model.dataType.preValues);
+                    contentTypeResource.getPropertyTypeScaffold(newDataType.id).then(function(propertyType) {
 
-            dataTypeResource.save(model.dataType, preValues, isNew).then(function(newDataType) {
+                       submitOverlay(newDataType, propertyType, true);
 
-               contentTypeResource.getPropertyTypeScaffold(newDataType.id).then(function(propertyType) {
+                       vm.editorSettingsOverlay.show = false;
+                       vm.editorSettingsOverlay = null;
 
-                  submitOverlay(newDataType, propertyType, true);
+                    });
 
-                  vm.editorSettingsOverlay.show = false;
-                  vm.editorSettingsOverlay = null;
-
-               });
-
-            });
-
-         };
-
-         vm.editorSettingsOverlay.close = function(oldModel) {
-            vm.editorSettingsOverlay.show = false;
-            vm.editorSettingsOverlay = null;
+                 });
+             }
          };
 
       }

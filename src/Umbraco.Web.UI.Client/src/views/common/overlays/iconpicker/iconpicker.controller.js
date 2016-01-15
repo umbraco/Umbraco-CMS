@@ -6,14 +6,14 @@
  * @description
  * The controller for the content type editor property dialog
  */
-function IconPickerOverlay($scope, iconHelper) {
+function IconPickerOverlay($scope, iconHelper, localizationService) {
 
    $scope.loading = true;
    $scope.model.hideSubmitButton = true;
 
-   if(!$scope.model.title) {
-       $scope.model.title = "Select an icon";
-   }
+    if (!$scope.model.title) {
+        $scope.model.title = localizationService.localize("defaultdialogs_selectIcon");
+    }
 
    iconHelper.getIcons().then(function(icons) {
       $scope.icons = icons;
