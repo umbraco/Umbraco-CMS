@@ -248,7 +248,7 @@ angular.module("umbraco")
                         $scope.mediaPickerOverlay = {
                             currentTarget: currentTarget,
                             onlyImages: true,
-                            showDetails: false,
+                            showDetails: true,
                             disableFolderSelect: true,
                             startNodeId: userData.startMediaId,
                             view: "mediapicker",
