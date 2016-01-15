@@ -341,6 +341,7 @@
     <key alias="errorRegExpWithoutTab">%0% is not in a correct format</key>
   </area>
   <area alias="errors">
+    <key alias="receivedErrorFromServer">Received an error from the server</key>
     <key alias="dissallowedMediaType">The specified file type has been disallowed by the administrator</key>
     <key alias="codemirroriewarning">NOTE! Even though CodeMirror is enabled by configuration, it is disabled in Internet Explorer because it's not stable enough.</key>
     <key alias="contentTypeAliasAndNameNotNull">Please fill both alias and name on the new property type!</key>
@@ -1224,10 +1225,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="yourProfile" version="7.0">Your profile</key>
     <key alias="yourHistory" version="7.0">Your recent history</key>
     <key alias="sessionExpires" version="7.0">Session expires in</key>
-  </area>
-  <area alias="errors">
-      <key alias="receivedErrorFromServer">Received an error from the server</key>
-  </area>
+  </area>  
   <area alias="validation">
       <key alias="validation">Validation</key>
       <key alias="validateAsEmail">Validate as email</key>

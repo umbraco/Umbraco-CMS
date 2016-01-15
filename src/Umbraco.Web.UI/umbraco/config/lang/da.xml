@@ -293,7 +293,8 @@
     <key alias="errorRegExpWithoutTab">%0% er ikke i et korrekt format</key>
   </area>
   <area alias="errors">
-	<key alias="dissallowedMediaType">Denne filttype er blevet deaktiveret af administratoren</key>
+    <key alias="receivedErrorFromServer">Der skete en fejl på severen</key>
+	  <key alias="dissallowedMediaType">Denne filttype er blevet deaktiveret af administratoren</key>
     <key alias="codemirroriewarning">OBS! Selvom CodeMirror er slået til i konfigurationen, så er den deaktiveret i Internet Explorer fordi den ikke er stabil nok.</key>
     <key alias="contentTypeAliasAndNameNotNull">Du skal udfylde både Alias &amp; Navn på den nye egenskabstype!</key>
     <key alias="filePermissionsError">Der mangler læse/skrive rettigheder til bestemte filer og mapper</key>
@@ -1042,9 +1043,6 @@ Mange hilsner fra Umbraco robotten
     <key alias="yourProfile">Din profil</key>
     <key alias="yourHistory">Din historik</key>
     <key alias="sessionExpires">Session udløber</key>
-  </area>
-  <area alias="errors">
-      <key alias="receivedErrorFromServer">Der skete en fejl på severen</key>
   </area>
   <area alias="validation">
       <key alias="validation">Validation</key>
