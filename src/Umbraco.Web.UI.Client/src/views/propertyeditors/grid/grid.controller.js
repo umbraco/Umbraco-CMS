@@ -307,28 +307,6 @@ angular.module("umbraco")
 
         };
         
-        
-        // *********************************************
-        // Control management functions
-        // *********************************************
-
-        $scope.editControlSettings = function (control) {
-
-            var obj = $scope.model.config;
-            obj.items.config = control.editor.config.settings;
-
-            dialogService.open(
-            {
-                template: "views/propertyeditors/grid/dialogs/config.html",
-                gridItem: { "config": (control.value ? control.value.settings : null) },
-                itemType: null,
-                config: obj,
-                callback: function (data) {
-                    control.settings = data.config;
-                }
-            });
-        };
-
         // *********************************************
         // Area management functions
         // *********************************************

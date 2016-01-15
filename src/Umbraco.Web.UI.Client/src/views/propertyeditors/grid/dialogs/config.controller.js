@@ -30,11 +30,16 @@ angular.module("umbraco")
                 }
             }
         }
-
-
-        $scope.styles = _.filter( angular.copy($scope.dialogOptions.config.items.styles), function(item){return (item.applyTo === undefined || item.applyTo === $scope.dialogOptions.itemType); });
-        $scope.config = _.filter( angular.copy($scope.dialogOptions.config.items.config), function(item){return (item.applyTo === undefined || item.applyTo === $scope.dialogOptions.itemType); });
-
+        
+        // if opening a settings dialog from a control - use only settings from this control
+        // otherwise use editor configuration for row/cell settings
+        if ($scope.dialogOptions.itemType === 'control') {
+            $scope.config = $scope.dialogOptions.gridItem.editor.config.settings;
+            $scope.styles = null;
+        } else {
+            $scope.styles = _.filter(angular.copy($scope.dialogOptions.config.items.styles), function (item) { return (item.applyTo === undefined || item.applyTo === $scope.dialogOptions.itemType); });
+            $scope.config = _.filter(angular.copy($scope.dialogOptions.config.items.config), function (item) { return (item.applyTo === undefined || item.applyTo === $scope.dialogOptions.itemType); });
+        }
 
         var element = $scope.dialogOptions.gridItem;
         if(angular.isObject(element.config)){
