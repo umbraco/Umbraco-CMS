@@ -38,7 +38,7 @@
       <dependency id="semver" version="[1.1.2, 2.0.0)" />
       <dependency id="Microsoft.AspNet.WebHelpers" version="[3.2.3, 4.0.0)" />
       <dependency id="Microsoft.AspNet.WebPages.Data" version="[3.2.3, 4.0.0)" />
-	  <dependency id="Umbraco.ModelsBuilder.AspNet" version="[2.1.5, 3.0.0)" />	
+	  <dependency id="Umbraco.ModelsBuilder.AspNet" version="[2.2.0-beta003, 3.0.0)" />	
     </dependencies>
   </metadata>
   <files>
