@@ -39,6 +39,10 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(x => x.Alias, expression => expression.Ignore())
                 .ForMember(x => x.IsSystemDataType, expression => expression.MapFrom(definition => systemIds.Contains(definition.Id)));
 
+            config.CreateMap<PropertyEditor, ContentPropertyDisplay>()
+                .ForMember(x => x.View, expression => expression.MapFrom(definition => definition.ValueEditor.View))
+                .ForMember(x => x.Editor, expression => expression.MapFrom(definition => definition.Name));
+
             config.CreateMap<IDataTypeDefinition, DataTypeDisplay>()
                 .ForMember(display => display.AvailableEditors, expression => expression.ResolveUsing<AvailablePropertyEditorsResolver>())
                 .ForMember(display => display.PreValues, expression => expression.ResolveUsing(

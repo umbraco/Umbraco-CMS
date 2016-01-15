@@ -1,0 +1,42 @@
+﻿<div ng-controller="Umbraco.PropertyEditors.NestedPropertiesListController" class="umb-editor umb-nestedpropertieslist">
+   <div ui-sortable="sortableOptions" ng-model="value">
+    <div class="control-group" ng-repeat="item in value" ng-init="expand=false">
+        <ng-form name="keyvalueForm">
+            <p>
+    			<i class="icon icon-navigation handle"></i>
+
+                <a prevent-default href="" title="Remove this item" class="pull-right"
+                    ng-show="value.length > model.config.min"
+                    ng-click="remove($index)">
+                <i class="icon icon icon-delete"></i>
+                </a>
+                <a prevent-default href="" ng-click="expand=!expand" ng-show="!expand">
+                    <span ng-repeat="property in item | filter:{showsummary: true}">
+                        <span ng-bind="property.label"></span>: <span ng-bind="property.value"></span><span ng-show="!$last">, </span>
+                    </span>
+                    
+                    <i class="icon icon-navigation-down pull-right"></i>
+
+                </a>
+                <a prevent-default href="" ng-click="!item || (expand=!expand)" ng-disabled="!item" ng-show="expand">
+                    Edit "<span ng-bind="item.label"></span><span ng-show="!item.label">Add New Item</span>" 
+                    <i class="icon icon-navigation-up pull-right"></i>
+                </a>
+            </p>
+          
+            <div ng-show="expand">
+                <umb-property 
+                    property="property"
+                    ng-repeat="property in item">
+                    <umb-editor model="property" ></umb-editor>
+                </umb-property>
+            </div>
+        </ng-form>
+    </div>
+	</div>
+    <a prevent-default href="" title="Add another item"
+        ng-show="model.config.max <= 0 || value.length < model.config.max"
+        ng-click="add()">
+        <i class="icon icon-add"></i>
+    </a>
+</div>
