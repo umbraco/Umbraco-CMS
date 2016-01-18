@@ -135,7 +135,7 @@ namespace Umbraco.Web
             ViewEngines.Engines.Add(new PluginViewEngine());
 
             //set model binder
-            ModelBinders.Binders.Add(new KeyValuePair<Type, IModelBinder>(typeof(RenderModel), new RenderModelBinder()));
+            ModelBinderProviders.BinderProviders.Add(new RenderModelBinder()); // is a provider
 
             ////add the profiling action filter
             //GlobalFilters.Filters.Add(new ProfilingActionFilter());
