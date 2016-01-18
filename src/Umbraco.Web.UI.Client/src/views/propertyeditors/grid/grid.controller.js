@@ -233,6 +233,17 @@ angular.module("umbraco")
             }
         };
 
+        $scope.showReorderButton = function() {
+            if($scope.model.value && $scope.model.value.sections) {
+                for(var i = 0; $scope.model.value.sections.length > i; i++) {
+                    var section = $scope.model.value.sections[i];
+                    if(section.rows && section.rows.length > 0) {
+                        return true;
+                    }
+                }
+            }
+        };
+
         // *********************************************
         // Add items overlay menu
         // *********************************************
