@@ -50,7 +50,6 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                'Failed to retrieve data for content type id ' + contentTypeId);
         },
 
-
         /**
          * @ngdoc method
          * @name umbraco.resources.contentTypeResource#getAllowedTypes
@@ -66,7 +65,7 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
          *        $scope.type = type;
          *    });
          * </pre>
-         * @param {Int} contentTypeId id of the content item to retrive allowed child types for
+         * @param {Int} contentTypeId id of the content item to retrieve allowed child types for
          * @returns {Promise} resourcePromise object.
          *
          */
@@ -81,6 +80,34 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                'Failed to retrieve data for content id ' + contentTypeId);
         },
 
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.contentTypeResource#getTypesUsingComposite
+         * @methodOf umbraco.resources.contentTypeResource
+         *
+         * @description
+         * Returns a list of types that have the passed types as a composite
+         *
+         * ##usage
+         * <pre>
+         * contentTypeResource.getTypesUsingComposite(1234)
+         *    .then(function(array) {
+         *        $scope.type = type;
+         *    });
+         * </pre>
+         * @param {Int} contentTypeId id of the content item to retrieve composed types for
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        getTypesUsingComposite: function (contentTypeId) {
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "contentTypeApiBaseUrl",
+                       "GetTypesUsingComposite",
+                       [{ contentTypeId: contentTypeId }])),
+               'Failed to retrieve data for content id ' + contentTypeId);
+        },
 
         /**
          * @ngdoc method

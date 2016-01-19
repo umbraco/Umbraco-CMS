@@ -1232,7 +1232,9 @@ namespace Umbraco.Core.Services
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
                     var repository = RepositoryFactory.CreateContentRepository(uow);
-                    //NOTE What about content that has the contenttype as part of its composition?
+                    //NOTE: Q. What about content that has the contenttype as part of its composition?
+                    //      A. This is OK as there shouldn't be any - we prevent deletion of a document type if used in a composition
+                    //         until all document types that use it are themselves deleted
                     var query = Query<IContent>.Builder.Where(x => x.ContentTypeId == contentTypeId);
                     var contents = repository.GetByQuery(query).ToArray();
 
