@@ -95,6 +95,7 @@
     <key alias="styleChoose">Choose style</key>
     <key alias="styleShow">Show styles</key>
     <key alias="tableInsert">Insert table</key>
+    <key alias="generateModels">Generate models</key>
   </area>
   <area alias="changeDocType">
     <key alias="changeDocTypeInstruction">To change the document type for the selected content, first select from the list of valid types for this location.</key>
