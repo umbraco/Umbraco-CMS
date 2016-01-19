@@ -569,7 +569,6 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="instruction">ウェブサイトにログインします。</key>
     <key alias="timeout">セッションタイムアウトしました。</key>
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
-    <key alias="topText">Umbraco にようこそ。ユーザー名とパスワードを入力してください:</key>
   </area>
   <area alias="main">
     <key alias="dashboard">ダッシュボード</key>
@@ -718,21 +717,13 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="noColors">設定済みの色はありません。</key>
   </area>
   <area alias="relatedlinks">
-    <key alias="addExternal">外部リンクを追加</key>
-    <key alias="addInternal">内部リンクを追加</key>
-    <key alias="addlink">追加</key>
-    <key alias="caption">タイトル</key>
-    <key alias="captionPlaceholder">キャプション表示を入力</key>
-    <key alias="chooseInternal">内部リンクを選択</key>
     <key alias="enterExternal">外部リンクを入力</key>
-    <key alias="externalLinkPlaceholder">リンクを入力</key>
-    <key alias="internalPage">内部ページ</key>
-    <key alias="link">リンク</key>
-    <key alias="linkurl">URL</key>
-    <key alias="modeDown">下に移動</key>
-    <key alias="modeUp">上に移動</key>
+    <key alias="chooseInternal">内部リンクを選択</key>
+    <key alias="caption">タイトル</key>
+	<key alias="link">リンク</key>
     <key alias="newWindow">新規ウィンドウで開く</key>
-    <key alias="removeLink">リンクを削除</key>
+	<key alias="captionPlaceholder">キャプションを入力</key>
+    <key alias="externalLinkPlaceholder">リンクを入力</key>
   </area>
   <area alias="imagecropper">
     <key alias="reset">リセット</key>
