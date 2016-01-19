@@ -23,6 +23,7 @@
         vm.tabsLoaded = 0;
         vm.typesAndEditors = [];
         vm.userConfigured = [];
+        vm.loading = false;
         vm.tabs = [{
             active: true,
             id: 1,
@@ -52,6 +53,8 @@
 
         function getGroupedPropertyEditors() {
 
+            vm.loading = true;
+
             dataTypeResource.getGroupedPropertyEditors().then(function(data) {
                 vm.tabs[0].typesAndEditors = data;
                 vm.typesAndEditors = data;
@@ -62,6 +65,8 @@
         }
 
         function getGroupedDataTypes() {
+
+            vm.loading = true;
 
             dataTypeResource.getGroupedDataTypes().then(function(data) {
                 vm.tabs[1].userConfigured = data;
@@ -74,6 +79,7 @@
 
         function checkIfTabContentIsLoaded() {
             if (vm.tabsLoaded === 2) {
+                vm.loading = false;
                 vm.showTabs = true;
             }
         }
