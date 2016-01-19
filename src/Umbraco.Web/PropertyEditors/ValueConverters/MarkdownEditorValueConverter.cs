@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MarkdownSharp;
+using System;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
@@ -31,8 +32,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
         public override object ConvertSourceToObject(PublishedPropertyType propertyType, object source, bool preview)
         {
+            // Convert markup to html for frontend rendering.
+            Markdown mark = new Markdown();
+
             // source should come from ConvertSource and be a string (or null) already
-            return new HtmlString(source == null ? string.Empty : (string)source);
+            return new HtmlString(source == null ? string.Empty : mark.Transform((string)source));
         }
 
         public override object ConvertSourceToXPath(PublishedPropertyType propertyType, object source, bool preview)
