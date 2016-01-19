@@ -60,10 +60,10 @@
 
          function setButtonText() {
              if (!scope.model.closeButtonLabelKey && !scope.model.closeButtonLabel) {
-                 scope.model.closeButtonLabel = localizationService.localize("general_close").then(function (value) {return value;});
+                 scope.model.closeButtonLabel = localizationService.localize("general_close");
              }
              if (!scope.model.submitButtonLabelKey && !scope.model.submitButtonLabel) {
-                 scope.model.submitButtonLabel = localizationService.localize("general_submit").then(function (value) {return value;});
+                 scope.model.submitButtonLabel = localizationService.localize("general_submit");
              }
          }
 

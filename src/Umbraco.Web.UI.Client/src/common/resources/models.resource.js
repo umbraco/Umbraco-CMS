@@ -1,6 +1,7 @@
 function modelsResource($q, $http, umbRequestHelper) {
 
-    // fixme - should use BackOfficeController to register urls? How can we extend it?
+    // TODO - should use BackOfficeController to register urls? How can we extend it?
+    // TODO - this shouldn't exist in core!!
 
     return {
         getModelsOutOfDateStatus: function() {
@@ -8,7 +9,7 @@ function modelsResource($q, $http, umbRequestHelper) {
                 $http.get(
                     /*umbRequestHelper.getApiUrl(
                         "modelsApiBaseUrl",
-                        "GetModelsOutOfDateStatus")*/ "/Umbraco/BackOffice/Zbu/ModelsBuilderApi/GetModelsOutOfDateStatus"),
+                        "GetModelsOutOfDateStatus")*/ "/Umbraco/BackOffice/ModelsBuilder/ModelsBuilder/GetModelsOutOfDateStatus"),
                 "Failed to get models out-of-date status");
         },
 
@@ -17,7 +18,7 @@ function modelsResource($q, $http, umbRequestHelper) {
                 $http.get(
                     /*umbRequestHelper.getApiUrl(
                         "modelsApiBaseUrl",
-                        "BuildModels")*/ "/Umbraco/BackOffice/Zbu/ModelsBuilderApi/BuildModels"),
+                        "BuildModels")*/ "/Umbraco/BackOffice/ModelsBuilder/ModelsBuilder/BuildModels"),
                 "Failed to build models");
         }
     };

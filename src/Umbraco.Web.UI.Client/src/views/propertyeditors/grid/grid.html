@@ -4,6 +4,7 @@
 
         <umb-editor-sub-header-content-right>
             <umb-button
+                ng-if="showReorderButton()"
                 type="button"
                 icon="icon-navigation"
                 button-style="link"
@@ -190,6 +191,10 @@
                                                                       </div>
 
                                                                       <div class="umb-tools" ng-if="control.active">
+
+                                                                          <div class="umb-control-tool" ng-if="control.editor.config.settings">
+                                                                              <i class="umb-control-tool-icon icon-settings" ng-click="editGridItemSettings(control, 'control')"></i>
+                                                                          </div>
 
                                                                         <div class="umb-control-tool">
                                                                             <i class="umb-control-tool-icon icon-trash"  ng-click="togglePrompt(control)"></i>

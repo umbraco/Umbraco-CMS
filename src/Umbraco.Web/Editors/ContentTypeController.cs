@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
@@ -10,7 +11,10 @@ using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Services;
 using Umbraco.Core.PropertyEditors;
 using System.Net.Http;
+using umbraco;
 using Umbraco.Core;
+using Umbraco.Core.IO;
+using Umbraco.Core.Strings;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 
@@ -173,25 +177,40 @@ namespace Umbraco.Web.Editors
         public ContentTypeDisplay PostSave(ContentTypeSave contentTypeSave)
         {
             var savedCt = PerformPostSave<IContentType, ContentTypeDisplay>(
-                contentTypeSave:        contentTypeSave,
-                getContentType:         i => Services.ContentTypeService.GetContentType(i),
-                getContentTypeByAlias:  alias => Services.ContentTypeService.GetContentType(alias),
-                saveContentType:        type => Services.ContentTypeService.Save(type),
-                beforeCreateNew:        ctSave =>
+                contentTypeSave: contentTypeSave,
+                getContentType: i => Services.ContentTypeService.GetContentType(i),
+                getContentTypeByAlias: alias => Services.ContentTypeService.GetContentType(alias),
+                saveContentType: type => Services.ContentTypeService.Save(type),
+                beforeCreateNew: ctSave =>
                 {
                     //create a default template if it doesnt exist -but only if default template is == to the content type
                     //TODO: Is this really what we want? What if we don't want any template assigned at all ?
                     if (ctSave.DefaultTemplate.IsNullOrWhiteSpace() == false && ctSave.DefaultTemplate == ctSave.Alias)
                     {
+
                         var template = Services.FileService.GetTemplate(ctSave.Alias);
                         if (template == null)
                         {
+                            string className = null;
+
+                            //TODO: HACK until this is done: http://issues.umbraco.org/issue/U4-7747
+                            bool enabled = false;
+                            if (ConfigurationManager.AppSettings["Umbraco.ModelsBuilder.Enable"] != null &&
+                                bool.TryParse(ConfigurationManager.AppSettings["Umbraco.ModelsBuilder.Enable"], out enabled)
+                                && enabled)
+                            {
+                                //ensure is safe and always pascal cased, per razor standard
+                                className = ctSave.Name.ToCleanString(CleanStringType.Alias | CleanStringType.PascalCase);
+                            }
+
                             template = new Template(ctSave.Name, ctSave.Alias);
+                            template.Content = ViewHelper.GetDefaultFileContent(modelClassName: className);
                             Services.FileService.SaveTemplate(template);
                         }
 
                         //make sure the template alias is set on the default and allowed template so we can map it back
                         ctSave.DefaultTemplate = template.Alias;
+                        
                     }
                 });
 

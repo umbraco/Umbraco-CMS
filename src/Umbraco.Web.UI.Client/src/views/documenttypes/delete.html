@@ -17,15 +17,20 @@
 
             <div ng-switch-default>
                 <p>
-                	<i class="icon-alert red"></i> <strong class="red">All Documents</strong>
-                    using this document type will be deleted permanently, please confirm you want to delete these as well.
+                	<i class="icon-alert red"></i>
+                    <strong class="red">
+                        <localize key="contentTypeEditor_allDocuments">All Documents</localize>
+                    </strong>
+                    <localize key="contentTypeEditor_usingThisDocument">
+                        using this document type will be deleted permanently, please confirm you want to delete these as well.
+                    </localize>
                 </p>
 
                 <hr />
 
                 <label class="checkbox">
                 	<input type="checkbox" ng-model="confirmed" />
-                    Yes, delete {{currentNode.name}} and all documents using this type
+                    <localize key="contentTypeEditor_yesDelete">Yes, delete</localize> {{currentNode.name}} <localize key="contentTypeEditor_andAllDocuments">and all documents using this type</localize>
                 </label>
 
                 <umb-confirm ng-if="confirmed" on-confirm="performDelete" on-cancel="cancel">

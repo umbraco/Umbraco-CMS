@@ -6,21 +6,26 @@
  * @description
  * The controller for the doc type creation dialog
  */
-function DocumentTypesCreateController($scope, $location, navigationService, contentTypeResource, formHelper, appState, notificationsService) {
+function DocumentTypesCreateController($scope, $location, navigationService, contentTypeResource, formHelper, appState, notificationsService, localizationService) {
 
     $scope.model = {
         folderName: "",
-        creatingFolder: false,        
+        creatingFolder: false,
     };
 
-    var node = $scope.dialogOptions.currentNode;
+    var node = $scope.dialogOptions.currentNode,
+        localizeCreateFolder = localizationService.localize("defaultdialog_createFolder");
 
     $scope.showCreateFolder = function() {
         $scope.model.creatingFolder = true;
     }
 
     $scope.createContainer = function () {
-        if (formHelper.submitForm({ scope: $scope, formCtrl: this.createFolderForm, statusMessage: "Creating folder..." })) {
+        if (formHelper.submitForm({
+            scope: $scope,
+            formCtrl: this.createFolderForm,
+            statusMessage: localizeCreateFolder
+        })) {
             contentTypeResource.createContainer(node.id, $scope.model.folderName).then(function (folderId) {
 
                 navigationService.hideMenu();
@@ -29,8 +34,8 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
 
                 formHelper.resetForm({ scope: $scope });
 
-                var section = appState.getSectionState("currentSection"); 
-                
+                var section = appState.getSectionState("currentSection");
+
             }, function(err) {
 
                 $scope.error = err;
