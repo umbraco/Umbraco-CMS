@@ -293,7 +293,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 templateRepository.AddOrUpdate(template);
                 unitOfWork.Commit();
 
-                ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage2", "Textpage");                
+                ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage2", "Textpage");
+                contentType.AllowedTemplates = Enumerable.Empty<ITemplate>(); // because CreateSimple... assigns one
                 contentType.SetDefaultTemplate(template);
                 Content textpage = MockedContent.CreateSimpleContent(contentType);
 

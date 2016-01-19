@@ -326,5 +326,13 @@ namespace Umbraco.Core.Persistence
                 _noCache, //never cache
                 _logger, _sqlSyntax);
         }
+
+        internal virtual EntityContainerRepository CreateEntityContainerRepository(IDatabaseUnitOfWork uow)
+        {
+            return new EntityContainerRepository(
+                uow,
+                _cacheHelper,
+                _logger, _sqlSyntax);
+        }
     }
 }

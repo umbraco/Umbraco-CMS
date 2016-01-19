@@ -3,24 +3,20 @@
         <div class="umb-pane">
 
             <p class="abstract" ng-hide="success">
-                Choose where to move <strong>{{currentNode.name}}</strong> to in the tree structure below
+                Choose where to move <strong>{{currentNode.name}}</strong>&nbsp;to in the tree structure below
             </p>
             
             <div class="umb-loader-wrapper" ng-show="busy">
                 <div class="umb-loader"></div>
             </div>
 
-            <div class="alert alert-error" ng-show="error">
-                <h4>{{error.errorMsg}}</h4>
-                <p>{{error.data.Message}}</p>
+            <div ng-show="error">
+                <h5 class="text-error">{{error.errorMsg}}</h5>
+                <p class="text-error">{{error.data.message}}</p>
             </div>
 
-            <div class="alert alert-success" ng-show="success">
-                <p>
-                    <strong>{{currentNode.name}}</strong> was moved underneath
-                    <strong>{{target.name}}</strong>
-                </p>
-
+            <div ng-show="success">
+                <h5 class="text-success"><strong>{{currentNode.name}}</strong> was moved underneath&nbsp;<strong>{{target.name}}</strong></h5>
                 <button class="btn btn-primary" ng-click="nav.hideDialog()">Ok</button>
             </div>
 

@@ -609,6 +609,17 @@ namespace umbraco
             get { return UmbracoConfig.For.UmbracoSettings().Content.DefaultDocumentTypeProperty; }
         }
 
+        /// <summary>
+        /// Enables inherited document types.
+        /// This feature is not recommended and therefore is not enabled by default in new installations.
+        /// Inherited document types will not be supported in v8.
+        /// </summary>
+        //[Obsolete("This will not be supported in v8")]
+        public static bool EnableInheritedDocumentTypes
+        {
+            get { return UmbracoConfig.For.UmbracoSettings().Content.EnableInheritedDocumentTypes; }
+        }
+
         private static string _path;
 
         /// <summary>

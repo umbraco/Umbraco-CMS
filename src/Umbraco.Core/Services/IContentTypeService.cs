@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Services
 {
@@ -10,6 +11,29 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IContentTypeService : IService
     {
+        int CountContentTypes();
+        int CountMediaTypes();
+
+        /// <summary>
+        /// Validates the composition, if its invalid a list of property type aliases that were duplicated is returned
+        /// </summary>
+        /// <param name="compo"></param>
+        /// <returns></returns>
+        Attempt<string[]> ValidateComposition(IContentTypeComposition compo);
+
+        Attempt<int> CreateContentTypeContainer(int parentId, string name, int userId = 0);
+        Attempt<int> CreateMediaTypeContainer(int parentId, string name, int userId = 0);
+        void SaveContentTypeContainer(EntityContainer container, int userId = 0);
+        void SaveMediaTypeContainer(EntityContainer container, int userId = 0);
+        EntityContainer GetContentTypeContainer(int containerId);
+        EntityContainer GetContentTypeContainer(Guid containerId);
+        IEnumerable<EntityContainer> GetContentTypeContainers(string folderName, int level);
+        EntityContainer GetMediaTypeContainer(int containerId);
+        EntityContainer GetMediaTypeContainer(Guid containerId);
+        IEnumerable<EntityContainer> GetMediaTypeContainers(string folderName, int level);
+        void DeleteMediaTypeContainer(int folderId, int userId = 0);
+        void DeleteContentTypeContainer(int containerId, int userId = 0);
+
         /// <summary>
         /// Gets all property type aliases.
         /// </summary>
@@ -249,5 +273,8 @@ namespace Umbraco.Core.Services
         /// <param name="id">Id of the <see cref="IMediaType"/></param>
         /// <returns>True if the media type has any children otherwise False</returns>
         bool MediaTypeHasChildren(Guid id);
+
+        Attempt<OperationStatus<MoveOperationStatusType>> MoveMediaType(IMediaType toMove, int containerId);
+        Attempt<OperationStatus<MoveOperationStatusType>> MoveContentType(IContentType toMove, int containerId);
     }
 }

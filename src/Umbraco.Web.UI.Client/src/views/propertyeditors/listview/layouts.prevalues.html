@@ -1,0 +1,57 @@
+<div ng-controller="Umbraco.PrevalueEditors.ListViewLayoutsPreValsController as vm">
+
+   <div class="list-view-layouts" ui-sortable="vm.layoutsSortableOptions" ng-model="model.value">
+
+      <div class="list-view-layout" ng-repeat="layout in model.value">
+
+         <i class="icon-navigation list-view-layout__sort-handle"></i>
+
+         <div>
+
+            <a ng-if="layout.isSystem !== 1" href="" ng-click="vm.openIconPicker(layout)" class="list-view-layout__icon" umb-auto-focus>
+               <i class="{{ layout.icon }}"></i>
+            </a>
+
+            <div ng-if="layout.isSystem === 1" class="list-view-layout__icon">
+               <i class="{{ layout.icon }}"></i>
+            </div>
+
+         </div>
+
+         <div class="list-view-layout__name">
+            <input ng-if="layout.isSystem !== 1" type="text" ng-model="layout.name" placeholder="Name..." class="-full-width-input" focus-when="{{ vm.focusLayoutName }}" />
+            <span ng-if="layout.isSystem === 1" class="list-view-layout__name-text">{{ layout.name }}</span>
+            <span ng-if="layout.isSystem === 1" class="list-view-layout__system">(system layout)</span>
+         </div>
+
+         <div class="list-view-layout__path">
+            <input ng-if="layout.isSystem !== 1" type="text" ng-model="layout.path" placeholder="Layout path..." class="-full-width-input" />
+         </div>
+
+         <div>
+            <input ng-if="layout.isSystem === 1" type="checkbox" ng-model="layout.selected" />
+            <div class="list-view-layout__remove" ng-if="layout.isSystem !== 1">
+                <i class="icon-trash" ng-click="vm.showPrompt(layout)"></i>
+                <umb-confirm-action
+                    ng-if="layout.deletePrompt"
+                    direction="left"
+                    on-confirm="vm.removeLayout($index, layout)"
+                    on-cancel="vm.hidePrompt(layout)">
+                </umb-confirm-action>
+            </div>
+         </div>
+
+      </div>
+
+      <a href="" class="list-view-add-layout" ng-click="vm.addLayout()">Add layout</a>
+
+   </div>
+
+   <umb-overlay
+      ng-if="vm.iconPickerDialog.show"
+      model="vm.iconPickerDialog"
+      view="vm.iconPickerDialog.view"
+      position="right">
+   </umb-overlay>
+
+</div>

@@ -98,16 +98,5 @@ namespace Umbraco.Core.Models
                         enumerable => enumerable.GetHashCode()));
             }
         }
-
-        /// <summary>
-        /// Method to call before inserting a new entity in the db
-        /// </summary>
-        internal override void AddingEntity()
-        {
-            base.AddingEntity();
-
-            Key = Guid.NewGuid();            
-        }
-        
     }
 }

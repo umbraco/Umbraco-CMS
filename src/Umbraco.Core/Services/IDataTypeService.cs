@@ -10,6 +10,13 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IDataTypeService : IService
     {
+        Attempt<int> CreateContainer(int parentId, string name, int userId = 0);
+        void SaveContainer(EntityContainer container, int userId = 0);
+        EntityContainer GetContainer(int containerId);
+        EntityContainer GetContainer(Guid containerId);
+        IEnumerable<EntityContainer> GetContainers(string folderName, int level);
+        void DeleteContainer(int containerId, int userId = 0);
+
         /// <summary>
         /// Gets a <see cref="IDataTypeDefinition"/> by its Name
         /// </summary>
@@ -151,5 +158,7 @@ namespace Umbraco.Core.Services
         /// <param name="id">Id of the PreValue to retrieve the value from</param>
         /// <returns>PreValue as a string</returns>
         string GetPreValueAsString(int id);
+
+        Attempt<OperationStatus<MoveOperationStatusType>> Move(IDataTypeDefinition toMove, int parentId);
     }
 }

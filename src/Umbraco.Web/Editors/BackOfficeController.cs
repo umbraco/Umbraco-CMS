@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using System.Web.Configuration;
 using System.Web.Mvc;
 using System.Web.UI;
 using ClientDependency.Core.Config;
@@ -98,7 +101,8 @@ namespace Umbraco.Web.Editors
             var cultureInfo = string.IsNullOrWhiteSpace(culture)
                 //if the user is logged in, get their culture, otherwise default to 'en'
                 ? Security.IsAuthenticated()
-                    ? Security.CurrentUser.GetUserCulture(Services.TextService)
+                    //current culture is set at the very beginning of each request
+                    ? Thread.CurrentThread.CurrentCulture
                     : CultureInfo.GetCultureInfo("en")
                 : CultureInfo.GetCultureInfo(culture);
 
@@ -175,6 +179,13 @@ namespace Umbraco.Web.Editors
                 HttpContext.IsDebuggingEnabled);
 
             return new JsonNetResult { Data = gridConfig.EditorsConfig.Editors, Formatting = Formatting.Indented };
+        }
+
+        private string GetMaxRequestLength()
+        {
+            var section = ConfigurationManager.GetSection("system.web/httpRuntime") as HttpRuntimeSection;
+            if (section == null) return string.Empty;
+            return section.MaxRequestLength.ToString();
         }
 
         /// <summary>
@@ -339,6 +350,10 @@ namespace Umbraco.Web.Editors
                             {
                                 "imageFileTypes",
                                 string.Join(",", UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes)
+                            },
+                            {
+                                "maxFileSize",
+                                GetMaxRequestLength()
                             },
                             {"keepUserLoggedIn", UmbracoConfig.For.UmbracoSettings().Security.KeepUserLoggedIn},
                             {"cssPath", IOHelper.ResolveUrl(SystemDirectories.Css).TrimEnd('/')},

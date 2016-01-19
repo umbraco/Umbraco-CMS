@@ -10,9 +10,6 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("PropertyTypeGroupId")]
         public int? Id { get; set; }
 
-        [Column("parentGroupId")]
-        public int? ParentGroupId { get; set; }
-
         [Column("PropertyGroupName")]
         public string Text { get; set; }
 

@@ -1,0 +1,51 @@
+<div ng-controller="Umbraco.Overlays.IconPickerOverlay">
+
+    <div class="umb-control-group">
+        <div class="form-search">
+            <i class="icon-search"></i>
+            <input type="text"
+                   style="width: 100%"
+                   ng-model="searchTerm"
+                   class="umb-search-field search-query input-block-level"
+                   localize="placeholder"
+                   placeholder="@placeholders_filter"
+                   umb-auto-focus>
+        </div>
+    </div>
+
+    <div class="umb-control-group">
+        <select ng-model="color" class="input-block-level">
+            <option value="">
+                <localize key="color_black">Black</localize>
+            </option>
+            <option value="color-green">
+                <localize key="color_green">Green</localize>
+            </option>
+            <option value="color-yellow">
+                <localize key="color_yellow">Yellow</localize>
+            </option>
+            <option value="color-orange">
+                <localize key="color_orange">Orange</localize>
+            </option>
+            <option value="color-blue">
+                <localize key="color_blue">Blue</localize>
+            </option>
+            <option value="color-red">
+                <localize key="color_red">Red</localize>
+            </option>
+        </select>
+    </div>
+
+    <umb-load-indicator ng-if="loading"></umb-load-indicator>
+
+    <div class="umb-control-group" ng-show="!loading">
+        <ul class="umb-thumbnails thumbnails" ng-class="color">
+            <li class="span1" ng-repeat="icon in icons|filter: searchTerm">
+                <a href="#" title="{{icon}}" class="thumbnail" ng-click="selectIcon(icon, color)" prevent-default>
+                    <i class="{{icon}} large" style="font-size: 32px"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+</div>

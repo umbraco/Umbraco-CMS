@@ -11,7 +11,7 @@ namespace Umbraco.Core.Models
     /// <summary>
     /// Implementation of the <see cref="IUmbracoEntity"/> for internal use.
     /// </summary>
-    internal class UmbracoEntity : Entity, IUmbracoEntity
+    public class UmbracoEntity : Entity, IUmbracoEntity
     {
         private int _creatorId;
         private int _level;

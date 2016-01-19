@@ -66,7 +66,7 @@ namespace Umbraco.Core.IO
             return viewContent;
         }
 
-        internal static string GetDefaultFileContent(string layoutPageAlias = null)
+        internal static string GetDefaultFileContent(string layoutPageAlias = null, string modelClassName = null)
         {
             var design = @"@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
 @{
@@ -75,6 +75,10 @@ namespace Umbraco.Core.IO
 
             if (layoutPageAlias.IsNullOrWhiteSpace() == false)
                 design = design.Replace("null", string.Format("\"{0}.cshtml\"", layoutPageAlias));
+
+            if (modelClassName.IsNullOrWhiteSpace() == false)
+                design = design.Replace(".UmbracoTemplatePage", string.Format(".UmbracoTemplatePage<{0}>", modelClassName));
+
 
             return design;
         }

@@ -8,10 +8,14 @@
  * 
  */
 
-function ContentRecycleBinController($scope, $routeParams, dataTypeResource, navigationService) {
+function ContentRecycleBinController($scope, $routeParams, dataTypeResource, navigationService, localizationService) {
 
     //ensures the list view doesn't actually load until we query for the list view config
     // for the section
+    $scope.page = {};
+    $scope.page.name = "Recycle Bin";
+    $scope.page.nameLocked = true;
+
     $scope.listViewPath = null;
 
     $routeParams.id = "-20";
@@ -26,6 +30,18 @@ function ContentRecycleBinController($scope, $routeParams, dataTypeResource, nav
 
     // sync tree node
     navigationService.syncTree({ tree: "content", path: ["-1", $routeParams.id], forceReload: false });
+
+    localizePageName();
+
+    function localizePageName() {
+
+       var pageName = "general_recycleBin";
+
+       localizationService.localize(pageName).then(function(value) {
+          $scope.page.name = value;
+       });
+
+    }
 }
 
 angular.module('umbraco').controller("Umbraco.Editors.Content.RecycleBinController", ContentRecycleBinController);

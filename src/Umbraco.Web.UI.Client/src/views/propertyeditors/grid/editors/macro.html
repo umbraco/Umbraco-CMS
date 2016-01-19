@@ -1,6 +1,6 @@
 <div ng-controller="Umbraco.PropertyEditors.Grid.MacroController">
 
-	<div class="usky-editor-placeholder" ng-click="setMacro()">
+	<div class="umb-editor-placeholder" ng-click="setMacro()">
 		<div ng-if="!preview">
 			<i class="icon icon-settings-alt"></i>
 			<div class="help-text">{{title}}</div>
@@ -13,5 +13,11 @@
 		</div>
 	</div>
 
-</div>
+	<umb-overlay
+		ng-if="macroPickerOverlay.show"
+		model="macroPickerOverlay"
+		view="macroPickerOverlay.view"
+		position="right">
+	</umb-overlay>
 
+</div>

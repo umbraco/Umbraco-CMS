@@ -221,7 +221,7 @@ namespace Umbraco.Web.Models.Mapping
 
                         var currentDocumentTypeId = currentDocumentType == null ? string.Empty : currentDocumentType.Id.ToString(CultureInfo.InvariantCulture);
                         //TODO: Hard coding this is not good
-                        var docTypeLink = string.Format("#/settings/framed/settings%252FeditNodeTypeNew.aspx%253Fid%253D{0}", currentDocumentTypeId);
+                        var docTypeLink = string.Format("#/settings/documenttypes/edit/{0}", currentDocumentTypeId);
 
                         //Replace the doc type property
                         var docTypeProp = genericProperties.First(x => x.Alias == string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix));

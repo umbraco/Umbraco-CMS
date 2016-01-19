@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Events;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -114,9 +116,9 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = new Sql();
             sql.Select(isCount ? "COUNT(*)" : "*")
-               .From<DataTypeDto>()
-               .InnerJoin<NodeDto>()
-               .On<DataTypeDto, NodeDto>(left => left.DataTypeId, right => right.NodeId)
+               .From<DataTypeDto>(SqlSyntax)
+               .InnerJoin<NodeDto>(SqlSyntax)
+               .On<DataTypeDto, NodeDto>(SqlSyntax, left => left.DataTypeId, right => right.NodeId)
                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             return sql;
         }
@@ -144,6 +146,10 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             ((DataTypeDefinition)entity).AddingEntity();
 
+            //ensure a datatype has a unique name before creating it
+            entity.Name = EnsureUniqueNodeName(entity.Name);
+
+            //TODO: should the below be removed?
             //Cannot add a duplicate data type
             var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsDataType
 INNER JOIN umbracoNode ON cmsDataType.nodeId = umbracoNode.id
@@ -188,6 +194,8 @@ WHERE umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + "= @name", new { n
 
         protected override void PersistUpdatedItem(IDataTypeDefinition entity)
         {
+
+            entity.Name = EnsureUniqueNodeName(entity.Name, entity.Id);
 
             //Cannot change to a duplicate alias
             var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsDataType
@@ -321,6 +329,47 @@ AND umbracoNode.id <> @id",
             AddOrUpdatePreValues(dtd, values);
         }
 
+        public IEnumerable<MoveEventInfo<IDataTypeDefinition>> Move(IDataTypeDefinition toMove, EntityContainer container)
+        {
+            var parentId = -1;
+            if (container != null)
+            {
+                // Check on paths
+                if ((string.Format(",{0},", container.Path)).IndexOf(string.Format(",{0},", toMove.Id), StringComparison.Ordinal) > -1)
+                {
+                    throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedNotAllowedByPath);
+                }
+                parentId = container.Id;
+            }
+
+            //used to track all the moved entities to be given to the event
+            var moveInfo = new List<MoveEventInfo<IDataTypeDefinition>>
+            {
+                new MoveEventInfo<IDataTypeDefinition>(toMove, toMove.Path, parentId)
+            };
+
+            //do the move to a new parent
+            toMove.ParentId = parentId;
+            //schedule it for updating in the transaction
+            AddOrUpdate(toMove);
+
+            //update all descendants
+            var descendants = this.GetByQuery(
+                new Query<IDataTypeDefinition>().Where(type => type.Path.StartsWith(toMove.Path + ",")));
+            foreach (var descendant in descendants)
+            {
+                moveInfo.Add(new MoveEventInfo<IDataTypeDefinition>(descendant, descendant.Path, descendant.ParentId));
+
+                //all we're doing here is setting the parent Id to be dirty so that it resets the path/level/etc...
+                descendant.ParentId = descendant.ParentId + 1;
+                descendant.ParentId = descendant.ParentId - 1;
+                //schedule it for updating in the transaction
+                AddOrUpdate(descendant);
+            }
+
+            return moveInfo;
+        }
+
         public void AddOrUpdatePreValues(IDataTypeDefinition dataType, IDictionary<string, PreValue> values)
         {
             var currentVals = new DataTypePreValueDto[] { };
@@ -328,9 +377,9 @@ AND umbracoNode.id <> @id",
             {
                 //first just get all pre-values for this data type so we can compare them to see if we need to insert or update or replace
                 var sql = new Sql().Select("*")
-                                   .From<DataTypePreValueDto>()
+                                   .From<DataTypePreValueDto>(SqlSyntax)
                                    .Where<DataTypePreValueDto>(dto => dto.DataTypeNodeId == dataType.Id)
-                                   .OrderBy<DataTypePreValueDto>(dto => dto.SortOrder);
+                                   .OrderBy<DataTypePreValueDto>(dto => dto.SortOrder, SqlSyntax);
                 currentVals = Database.Fetch<DataTypePreValueDto>(sql).ToArray();
             }
 
@@ -413,6 +462,37 @@ AND umbracoNode.id <> @id",
                 true);
 
             return collection;
+        }
+
+        private string EnsureUniqueNodeName(string nodeName, int id = 0)
+        {
+         
+
+            var sql = new Sql();
+            sql.Select("*")
+               .From<NodeDto>(SqlSyntax)
+               .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId && x.Text.StartsWith(nodeName));
+
+            int uniqueNumber = 1;
+            var currentName = nodeName;
+
+            var dtos = Database.Fetch<NodeDto>(sql);
+            if (dtos.Any())
+            {
+                var results = dtos.OrderBy(x => x.Text, new SimilarNodeNameComparer());
+                foreach (var dto in results)
+                {
+                    if (id != 0 && id == dto.NodeId) continue;
+
+                    if (dto.Text.ToLowerInvariant().Equals(currentName.ToLowerInvariant()))
+                    {
+                        currentName = nodeName + string.Format(" ({0})", uniqueNumber);
+                        uniqueNumber++;
+                    }
+                }
+            }
+
+            return currentName;
         }
 
         /// <summary>
@@ -525,6 +605,8 @@ AND umbracoNode.id <> @id",
                 };
                 Database.Update(dto);
             }
+
+            
         }
 
         internal static class PreValueConverter
