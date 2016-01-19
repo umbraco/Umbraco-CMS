@@ -21,6 +21,8 @@
 		vm.searchTerm = "";
 		vm.showTabs = false;
 		vm.tabsLoaded = 0;
+        vm.typesAndEditors = [];
+        vm.userConfigured = [];
 		vm.tabs = [
 			{
 				active: true,
@@ -55,6 +57,7 @@
 
 			dataTypeResource.getGroupedPropertyEditors().then(function(data){
 				vm.tabs[0].typesAndEditors = data;
+                vm.typesAndEditors = data;
 				vm.tabsLoaded = vm.tabsLoaded + 1;
 				checkIfTabContentIsLoaded();
 			});
@@ -65,6 +68,7 @@
 
 		    dataTypeResource.getGroupedDataTypes().then(function (data) {
 				vm.tabs[1].userConfigured = data;
+                vm.userConfigured = data;
 				vm.tabsLoaded = vm.tabsLoaded + 1;
 				checkIfTabContentIsLoaded();
 			});
@@ -80,6 +84,15 @@
       function filterItems() {
          // clear item details
          $scope.model.itemDetails = null;
+
+         if(vm.searchTerm) {
+             vm.showFilterResult = true;
+             vm.showTabs = false;
+         } else {
+             vm.showFilterResult = false;
+             vm.showTabs = true;
+         }
+
       }
 
 		function showDetailsOverlay(property) {
