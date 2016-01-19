@@ -73,7 +73,7 @@ namespace Umbraco.Web.Mvc
                 if (modelType.Implements<IPublishedContent>())
                 {
                     if ((sourceContent.GetType().Inherits(modelType)) == false)
-                        throw new Exception(string.Format("Cannot bind source content type {0} to model type {1}.",
+                        throw new ModelBindingException(string.Format("Cannot bind source content type {0} to model type {1}.",
                             sourceContent.GetType(), modelType));
                     return sourceContent;
                 }
@@ -89,7 +89,7 @@ namespace Umbraco.Web.Mvc
                 {
                     var targetContentType = modelType.GetGenericArguments()[0];
                     if ((sourceContent.GetType().Inherits(targetContentType)) == false)
-                        throw new Exception(string.Format("Cannot bind source content type {0} to model content type {1}.",
+                        throw new ModelBindingException(string.Format("Cannot bind source content type {0} to model content type {1}.",
                             sourceContent.GetType(), targetContentType));
                     return Activator.CreateInstance(modelType, sourceContent, culture);
                 }
@@ -100,7 +100,7 @@ namespace Umbraco.Web.Mvc
             if (attempt2.Success) return attempt2.Result;
 
             // fail
-            throw new Exception(string.Format("Cannot bind source type {0} to model type {1}.",
+            throw new ModelBindingException(string.Format("Cannot bind source type {0} to model type {1}.",
                 sourceType, modelType));
         }
     }
