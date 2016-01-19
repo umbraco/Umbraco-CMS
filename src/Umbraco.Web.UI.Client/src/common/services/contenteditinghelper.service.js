@@ -5,7 +5,7 @@
 * @description A helper service for most editors, some methods are specific to content/media/member model types but most are used by
 * all editors to share logic and reduce the amount of replicated code among editors.
 **/
-function contentEditingHelper(fileManager, $q, $location, $routeParams, notificationsService, serverValidationManager, dialogService, formHelper, appState, keyboardService) {
+function contentEditingHelper(fileManager, $q, $location, $routeParams, notificationsService, serverValidationManager, dialogService, formHelper, appState) {
 
     function isValidIdentifier(id){
         //empty id <= 0
@@ -128,8 +128,6 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 switch (ch) {
                     case "U":
                         //publish action
-                        keyboardService.bind("ctrl+p", args.methods.saveAndPublish);
-
                         return {
                             letter: ch,
                             labelKey: "buttons_saveAndPublish",
@@ -138,8 +136,6 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                         };
                     case "H":
                         //send to publish
-                        keyboardService.bind("ctrl+p", args.methods.sendToPublish);
-
                         return {
                             letter: ch,
                             labelKey: "buttons_saveToPublish",
@@ -148,7 +144,6 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                         };
                     case "A":
                         //save
-                        keyboardService.bind("ctrl+s", args.methods.save);
                         return {
                             letter: ch,
                             labelKey: "buttons_save",
@@ -157,12 +152,11 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                         };
                     case "Z":
                         //unpublish
-                        keyboardService.bind("ctrl+u", args.methods.unPublish);
-
                         return {
                             letter: ch,
                             labelKey: "content_unPublish",
-                            handler: args.methods.unPublish
+                            handler: args.methods.unPublish,
+                            hotKey: "ctrl+u"
                         };
                     default:
                         return null;

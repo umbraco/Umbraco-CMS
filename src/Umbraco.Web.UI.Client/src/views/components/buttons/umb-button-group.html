@@ -6,7 +6,8 @@
       button-style="success"
       state="state"
       label="{{defaultButton.labelKey}}"
-      label-key="{{defaultButton.labelKey}}">
+      label-key="{{defaultButton.labelKey}}"
+      shortcut="{{defaultButton.hotKey}}">
    </umb-button>
 
    <a class="btn btn-success dropdown-toggle umb-button-group__toggle" data-toggle="dropdown" ng-if="subButtons.length > 0">
@@ -15,7 +16,7 @@
 
    <ul aria-labelledby="dLabel" class="dropdown-menu bottom-up umb-button-group__sub-buttons" ng-if="subButtons.length > 0" role="menu" ng-class="{'-align-right': float === 'right'}">
       <li ng-repeat="subButton in subButtons">
-         <a href="#" ng-click="subButton.handler()" prevent-default>
+         <a href="#" ng-click="subButton.handler()" hotkey="{{subButton.hotKey}}" prevent-default>
             <localize key="{{subButton.labelKey}}">{{subButton.labelKey}}</localize>
          </a>
       </li>
