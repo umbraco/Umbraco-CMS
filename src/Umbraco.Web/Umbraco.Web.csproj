@@ -316,6 +316,7 @@
     <Compile Include="Models\Mapping\LockedCompositionsResolver.cs" />
     <Compile Include="Models\PublishedContentWithKeyBase.cs" />
     <Compile Include="Mvc\IRenderController.cs" />
+    <Compile Include="Mvc\ModelBindingException.cs" />
     <Compile Include="Mvc\RenderIndexActionSelectorAttribute.cs" />
     <Compile Include="Mvc\ValidateMvcAngularAntiForgeryTokenAttribute.cs" />
     <Compile Include="PropertyEditors\DatePreValueEditor.cs" />
