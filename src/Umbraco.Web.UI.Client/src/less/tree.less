@@ -60,10 +60,13 @@
 .umb-tree li.root > div h5 {
 	margin: 0;
 	width: 100%;
+
+	display: flex;
+	align-items: center;
 }
 
-.umb-tree li.root > div h5 > a {
-	display: block;
+.umb-tree li.root > div h5 > a, .umb-tree-header {
+	display: flex;
 	padding: 20px 0 20px 20px;
 	box-sizing: border-box;
 }
@@ -186,6 +189,16 @@
     /*color:@turquoise;*/
 }
 
+.umb-tree .umb-search-group-item {
+	padding-left: 20px;
+}
+
+.umb-tree .umb-search-group-item-link {
+	display: flex;
+	flex-wrap: wrap;
+	flex-direction: column;
+}
+
 .icon-check:before {
 	content: "\e165";
 }
@@ -200,14 +213,14 @@
 
 a.umb-options {
 	visibility: hidden;
-	cursor: pointer;
-	display: inline-block;
-	text-align: center;
-	position: absolute;
-	right: 10px;
-	top: 2px;
-	padding: 0 5px 5px 5px;
-	border: 1px solid transparent;
+
+	display: flex;
+	justify-content: flex-end;
+
+    padding: 9px 5px;
+    text-align: center;
+    cursor: pointer;
+    margin-right: 10px;
 }
 
 a.umb-options i {
@@ -225,7 +238,6 @@ a.umb-options i:last-child {
 
 a.umb-options:hover {
 	background: @btnBackgroundHighlight;
-	border: 1px solid @grayLight;
 	.border-radius(@baseBorderRadius);
 }
 
