@@ -36,16 +36,19 @@
                     <ul class="umb-tree">
                         <li class="root">
                             <div>
-                                <h5><localize key="general_searchResults">Search results</localize></h5>
+                                <h5 class="umb-tree-header"><localize key="general_searchResults">Search results</localize></h5>
                             </div>
 
                             <ul class="umb-search-group" ng-repeat="group in groups">
                                 <li ng-repeat="result in group.results" ng-class="{'current':selectedItem == result}">
-                                    <div>
-                                        <a ng-class="{'first':$first}" ng-click="searchHide()" ng-href="#/{{result.editorPath}}">
+                                    <div class="umb-search-group-item">
+                                        <a class="umb-search-group-item-link" ng-class="{'first':$first}" ng-click="searchHide()" ng-href="#/{{result.editorPath}}">
 
-                                            <i class="icon umb-tree-icon sprTree {{result.icon}}"></i>
-                                            {{result.name}}
+                                            <div class="umb-search-group-item-name">
+                                                <i class="icon umb-tree-icon sprTree {{result.icon}}"></i>
+                                                {{result.name}}
+                                            </div>
+
                                             <small class="search-subtitle" ng-show="result.subTitle">
                                                 {{result.subTitle}}
                                             </small>
