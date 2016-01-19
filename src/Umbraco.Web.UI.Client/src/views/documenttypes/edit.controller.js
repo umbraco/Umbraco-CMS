@@ -46,59 +46,6 @@
 			}
         ];
 
-        var modelsResource = $injector.has("modelsBuilderResource") ? $injector.get("modelsBuilderResource") : null;
-        var modelsBuilderEnabled = Umbraco.Sys.ServerVariables.umbracoPlugins.modelsBuilder.enabled;
-        
-        //disable by default, turn on if detected correctly.
-        vm.page.modelsBuilder = false;
-        if (modelsBuilderEnabled && modelsResource) {
-            modelsResource.getModelsOutOfDateStatus().then(function (result) {
-
-                if (result.status === 100) {
-                    return;
-                }
-
-                vm.page.modelsBuilder = true;
-
-                //Models builder mode:
-
-                vm.page.defaultButton = {
-                    hotKey: "ctrl+s",
-                    labelKey: "buttons_save",
-                    letter: "S",
-                    type: "submit",
-                    handler: function () { vm.save(); }
-                };
-                vm.page.subButtons = [{
-                    hotKey: "ctrl+g",
-                    labelKey: "buttons_generateModels",
-                    letter: "G",
-                    handler: function () {
-
-                        vm.page.saveButtonState = "busy";
-                        notificationsService.info("Building models", "this can take abit of time, don't worry");
-
-                        if (modelsBuilderEnabled && modelsResource) {
-                            modelsResource.buildModels().then(function () {
-                                vm.page.saveButtonState = "init";
-
-                                //clear and add success
-                                notificationsService.success("Models Generated");
-
-                                //just calling this to get the servar back to life
-                                modelsResource.getModelsOutOfDateStatus();
-
-                            }, function () {
-                                notificationsService.error("Models could not be generated");
-                                vm.page.saveButtonState = "error";
-                            });
-                        }
-                    }
-                }];
-
-            });
-        }
-
         vm.page.keyboardShortcutsOverview = [
 			{
 			    "name": localizationService.localize("main_sections"),
@@ -163,6 +110,39 @@
 		    ]
 		}
         ];
+
+        contentTypeHelper.checkModelsBuilderStatus().then(function (result) {
+            vm.page.modelsBuilder = result;
+            if (result) {
+                //Models builder mode:
+                vm.page.defaultButton = {
+                    hotKey: "ctrl+s",
+                    labelKey: "buttons_save",
+                    letter: "S",
+                    type: "submit",
+                    handler: function () { vm.save(); }
+                };
+                vm.page.subButtons = [{
+                    hotKey: "ctrl+g",
+                    labelKey: "buttons_generateModels",
+                    letter: "G",
+                    handler: function () {
+
+                        vm.page.saveButtonState = "busy";
+                        notificationsService.info("Building models", "this can take abit of time, don't worry");
+
+                        contentTypeHelper.generateModels().then(function (result) {
+                            vm.page.saveButtonState = "init";
+                            //clear and add success
+                            notificationsService.success("Models Generated");
+                        }, function () {
+                            notificationsService.error("Models could not be generated");
+                            vm.page.saveButtonState = "error";
+                        });
+                    }
+                }];
+            }
+        });
 
         if ($routeParams.create) {
             vm.page.loading = true;
