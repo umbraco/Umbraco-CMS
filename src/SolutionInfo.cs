@@ -11,5 +11,5 @@ using System.Resources;
 
 [assembly: AssemblyVersion("1.0.*")]
 
-[assembly: AssemblyFileVersion("7.3.5")]
-[assembly: AssemblyInformationalVersion("7.3.5")]
+[assembly: AssemblyFileVersion("7.3.6")]
+[assembly: AssemblyInformationalVersion("7.3.6")]
