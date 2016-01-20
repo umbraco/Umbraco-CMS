@@ -303,6 +303,9 @@
     <Compile Include="AreaRegistrationContextExtensions.cs" />
     <Compile Include="BatchedDatabaseServerMessengerStartup.cs" />
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
+    <Compile Include="Editors\EditorValidationResolver.cs" />
+    <Compile Include="Editors\EditorValidator.cs" />
+    <Compile Include="Editors\IEditorValidator.cs" />
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
     <Compile Include="Install\InstallSteps\Version73FileCleanup.cs" />
     <Compile Include="Models\ContentEditing\ContentTypeDisplay.cs" />
@@ -2162,7 +2165,6 @@
       <CachedSettingsPropName>umbraco_org_umbraco_update_CheckForUpgrade</CachedSettingsPropName>
     </WebReferenceUrl>
   </ItemGroup>
-  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
     <VSToolsPath Condition="exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v11.0\WebApplications\Microsoft.WebApplication.targets')">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v11.0</VSToolsPath>

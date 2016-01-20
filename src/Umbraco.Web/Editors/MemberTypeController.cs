@@ -134,7 +134,6 @@ namespace Umbraco.Web.Editors
             var savedCt = PerformPostSave<IMemberType, ContentTypeCompositionDisplay>(
                 contentTypeSave:            contentTypeSave,
                 getContentType:             i => Services.MemberTypeService.Get(i),
-                getContentTypeByAlias:      alias => Services.MemberTypeService.Get(alias),
                 saveContentType:            type => Services.MemberTypeService.Save(type),
                 validateComposition:        false);
 

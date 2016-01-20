@@ -18,9 +18,16 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class EntityContainerRepository : PetaPocoRepositoryBase<int, EntityContainer>
     {
-        public EntityContainerRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax) 
+        private readonly Guid _containerObjectType;
+
+        public EntityContainerRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, Guid containerObjectType) 
             : base(work, cache, logger, sqlSyntax)
-        { }
+        {
+            var allowedContainers = new[] {Constants.ObjectTypes.DocumentTypeContainerGuid, Constants.ObjectTypes.MediaTypeContainerGuid, Constants.ObjectTypes.DataTypeContainerGuid};
+            _containerObjectType = containerObjectType;
+            if (allowedContainers.Contains(_containerObjectType) == false)
+                throw new InvalidOperationException("No container type exists with ID: " + _containerObjectType);
+        }
 
         /// <summary>
         /// Do not cache anything
@@ -32,7 +39,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override EntityContainer PerformGet(int id)
         {
-            var sql = GetBaseQuery(false).Where(GetBaseWhereClause(), new { id });
+            var sql = GetBaseQuery(false).Where(GetBaseWhereClause(), new { id = id, NodeObjectType = NodeObjectTypeId });
 
             var nodeDto = Database.Fetch<NodeDto>(sql).FirstOrDefault();
             return nodeDto == null ? null : CreateEntity(nodeDto);
@@ -47,15 +54,25 @@ namespace Umbraco.Core.Persistence.Repositories
             return nodeDto == null ? null : CreateEntity(nodeDto);
         }
 
-        public IEnumerable<EntityContainer> Get(string name, int level, Guid umbracoObjectTypeId)
+        public IEnumerable<EntityContainer> Get(string name, int level)
         {
-            var sql = GetBaseQuery(false).Where("text=@name AND level=@level AND nodeObjectType=@umbracoObjectTypeId", new { name, level, umbracoObjectTypeId });
+            var sql = GetBaseQuery(false).Where("text=@name AND level=@level AND nodeObjectType=@umbracoObjectTypeId", new { name, level, umbracoObjectTypeId = NodeObjectTypeId });
             return Database.Fetch<NodeDto>(sql).Select(CreateEntity);
         }
 
         protected override IEnumerable<EntityContainer> PerformGetAll(params int[] ids)
         {
-            throw new NotImplementedException();
+            //we need to batch these in groups of 2000 so we don't exceed the max 2100 limit
+            return ids.InGroupsOf(2000).SelectMany(@group =>
+            {
+                var sql = GetBaseQuery(false)
+                    .Where("nodeObjectType=@umbracoObjectTypeId", new { umbracoObjectTypeId = NodeObjectTypeId })
+                    .Where(string.Format("{0} IN (@ids)", SqlSyntax.GetQuotedColumnName("id")), new { ids = @group });
+
+                sql.OrderBy<NodeDto>(x => x.Level, SqlSyntax);
+
+                return Database.Fetch<NodeDto>(sql).Select(CreateEntity);
+            });
         }
 
         protected override IEnumerable<EntityContainer> PerformGetByQuery(IQuery<EntityContainer> query)
@@ -99,7 +116,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override string GetBaseWhereClause()
         {
-            return "umbracoNode.id = @id"; //" and nodeObjectType = @NodeObjectType";
+            return "umbracoNode.id = @id and nodeObjectType = @NodeObjectType";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
@@ -109,7 +126,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override Guid NodeObjectTypeId
         {
-            get { throw new NotImplementedException(); }
+            get { return _containerObjectType; }
         }
 
         protected override void PersistDeletedItem(EntityContainer entity)

@@ -7,7 +7,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.IO
 {
-    internal class ViewHelper
+    public class ViewHelper
     {
         private readonly IFileSystem _viewFileSystem;
 
@@ -66,7 +66,7 @@ namespace Umbraco.Core.IO
             return viewContent;
         }
 
-        internal static string GetDefaultFileContent(string layoutPageAlias = null, string modelClassName = null)
+        public static string GetDefaultFileContent(string layoutPageAlias = null, string modelClassName = null)
         {
             var design = @"@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
 @{

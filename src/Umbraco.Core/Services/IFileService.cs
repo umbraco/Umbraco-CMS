@@ -187,6 +187,17 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user saving the template</param>
         void SaveTemplate(ITemplate template, int userId = 0);
 
+        /// <summary>
+        /// Creates a template for a content type
+        /// </summary>
+        /// <param name="contentTypeAlias"></param>
+        /// <param name="contentTypeName"></param>
+        /// <param name="userId"></param>
+        /// <returns>
+        /// The template created
+        /// </returns>
+        Attempt<OperationStatus<ITemplate, OperationStatusType>> CreateTemplateForContentType(string contentTypeAlias, string contentTypeName, int userId = 0);
+
         ITemplate CreateTemplateWithIdentity(string name, string content, ITemplate masterTemplate = null, int userId = 0);
 
         /// <summary>

@@ -403,7 +403,7 @@ namespace Umbraco.Web.Editors
 
             return JavaScript(result);
         }
-
+        
         [HttpPost]
         public ActionResult ExternalLogin(string provider, string redirectUrl = null)
         {
@@ -643,6 +643,7 @@ namespace Umbraco.Web.Editors
             app.Add("applicationPath", HttpContext.Request.ApplicationPath.EnsureEndsWith('/'));
             return app;
         }
+        
 
         private IEnumerable<Dictionary<string, string>> GetTreePluginsMetaData()
         {

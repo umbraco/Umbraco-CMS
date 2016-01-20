@@ -132,7 +132,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             letter: ch,
                             labelKey: "buttons_saveAndPublish",
                             handler: args.methods.saveAndPublish,
-                            hotKey: "ctrl+p"
+                            hotKey: "ctrl+p",
+                            hotKeyWhenHidden: true
                         };
                     case "H":
                         //send to publish
@@ -140,7 +141,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             letter: ch,
                             labelKey: "buttons_saveToPublish",
                             handler: args.methods.sendToPublish,
-                            hotKey: "ctrl+p"
+                            hotKey: "ctrl+p",
+                            hotKeyWhenHidden: true
                         };
                     case "A":
                         //save
@@ -148,7 +150,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             letter: ch,
                             labelKey: "buttons_save",
                             handler: args.methods.save,
-                            hotKey: "ctrl+s"
+                            hotKey: "ctrl+s",
+                            hotKeyWhenHidden: true
                         };
                     case "Z":
                         //unpublish
@@ -156,7 +159,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             letter: ch,
                             labelKey: "content_unPublish",
                             handler: args.methods.unPublish,
-                            hotKey: "ctrl+u"
+                            hotKey: "ctrl+u",
+                            hotKeyWhenHidden: true
                         };
                     default:
                         return null;
