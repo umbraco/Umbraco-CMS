@@ -731,6 +731,8 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="createMatchingTemplate">Zugehörige Vorlage anlegen</key>
   </area>
   <area alias="sort">
+    <key alias="sortOrder">Sortierreihenfolge</key>
+    <key alias="sortCreationDate">Erstellungsdatum</key>
     <key alias="sortDone">Sortierung abgeschlossen.</key>
     <key alias="sortHelp">Ziehen Sie die Elemente an ihre gewünschte neue Position.</key>
     <key alias="sortPleaseWait">Bitte warten, die Seiten werden sortiert. Das kann einen Moment dauern. Bitte schließen Sie dieses Fenster nicht, bis der Sortiervorgang abgeschlossen ist.</key>

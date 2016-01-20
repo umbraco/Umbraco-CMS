@@ -698,6 +698,8 @@
     <key alias="noPropertiesDefinedOnTab">没有字段设置在该标签页</key>
   </area>
   <area alias="sort">
+    <key alias="sortOrder">Sort order</key>
+    <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">排序完成。</key>
     <key alias="sortHelp">上下拖拽项目或单击列头进行排序</key>
     <key alias="sortPleaseWait"><![CDATA[正在排序请稍候…<br/><br/>请不要关闭窗口]]></key>
