@@ -10,7 +10,7 @@ angular.module('umbraco.services')
 		'target':           $window.document,
 		'keyCode':          false
 	};
-	
+
 	var isMac = navigator.platform.toUpperCase().indexOf('MAC')>=0;
 
 	// Store all keyboard combination shortcuts
@@ -25,19 +25,16 @@ angular.module('umbraco.services')
 		  label = label.replace("ctrl","meta");
 		}
 
-		//always try to unbind first, so we dont have multiple actions on the same key
-		keyboardManagerService.unbind(label);
-
 		var fct, elt, code, k;
 		// Initialize opt object
 		opt   = angular.extend({}, defaultOpt, opt);
 		label = label.toLowerCase();
 		elt   = opt.target;
 		if(typeof opt.target === 'string'){
-			elt = document.getElementById(opt.target);	
-		} 
+			elt = document.getElementById(opt.target);
+		}
 
-	
+
 		fct = function (e) {
 			e = e || $window.event;
 
@@ -45,21 +42,21 @@ angular.module('umbraco.services')
 			if (opt['inputDisabled']) {
 				var elt;
 				if (e.target){
-					elt = e.target;	
+					elt = e.target;
 				}else if (e.srcElement){
-					elt = e.srcElement;	
-				} 
+					elt = e.srcElement;
+				}
 
-				if (elt.nodeType === 3){elt = elt.parentNode;} 
+				if (elt.nodeType === 3){elt = elt.parentNode;}
 				if (elt.tagName === 'INPUT' || elt.tagName === 'TEXTAREA'){return;}
 			}
 
 			// Find out which key is pressed
 			if (e.keyCode){
-				code = e.keyCode;	
+				code = e.keyCode;
 			}else if (e.which){
-				code = e.which;	
-			} 
+				code = e.which;
+			}
 
 			var character = String.fromCharCode(code).toLowerCase();
 
@@ -95,7 +92,7 @@ angular.module('umbraco.services')
 			var special_keys = {
 				'esc':27,
 				'escape':27,
-				'tab':9,				
+				'tab':9,
 				'space':32,
 				'return':13,
 				'enter':13,
@@ -148,11 +145,11 @@ angular.module('umbraco.services')
 			// Some modifiers key
 			var modifiers = {
 				shift: {
-					wanted:		false, 
+					wanted:		false,
 					pressed:	e.shiftKey ? true : false
 				},
 				ctrl : {
-					wanted:		false, 
+					wanted:		false,
 					pressed:	e.ctrlKey ? true : false
 				},
 				alt  : {
@@ -160,7 +157,7 @@ angular.module('umbraco.services')
 					pressed:	e.altKey ? true : false
 				},
 				meta : { //Meta is Mac specific
-					wanted:		false, 
+					wanted:		false,
 					pressed:	e.metaKey ? true : false
 				}
 			};
@@ -252,13 +249,13 @@ angular.module('umbraco.services')
 		label = label.toLowerCase();
 		var binding = keyboardManagerService.keyboardEvent[label];
 		delete(keyboardManagerService.keyboardEvent[label]);
-		
+
 		if(!binding){return;}
 
 		var type		= binding['event'],
 		elt			= binding['target'],
 		callback	= binding['callback'];
-		
+
 		if(elt.detachEvent){
 			elt.detachEvent('on' + type, callback);
 		}else if(elt.removeEventListener){
@@ -270,4 +267,4 @@ angular.module('umbraco.services')
 	//
 
 	return keyboardManagerService;
-}]);
+}]);

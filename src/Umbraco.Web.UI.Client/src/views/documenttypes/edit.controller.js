@@ -57,6 +57,7 @@
 
 		vm.page.defaultButton = {
 			hotKey: "ctrl+s",
+            hotKeyWhenHidden: true,
 			labelKey: "buttons_save",
 			letter: "S",
 			type: "submit",
@@ -64,6 +65,7 @@
 		};
 		vm.page.subButtons = [{
 			hotKey: "ctrl+g",
+            hotKeyWhenHidden: true,
 			labelKey: "buttons_generateModels",
 			letter: "G",
 			handler: function(){
