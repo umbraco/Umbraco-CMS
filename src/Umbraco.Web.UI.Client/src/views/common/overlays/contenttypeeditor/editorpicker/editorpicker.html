@@ -69,7 +69,7 @@
 	<!-- FILTER RESULTS -->
 	<div ng-if="vm.showFilterResult">
 
-		<h5 class="-border-bottom -black">Reuse</h5>
+		<h5 class="-border-bottom -black"><localize key="contentTypeEditor_reuse"></localize></h5>
 		<div ng-repeat="(key,value) in vm.userConfigured">
 			<div ng-if="(value | filter:vm.searchTerm).length > 0">
 				<h5>{{key}}</h5>
@@ -87,7 +87,7 @@
 			</div>
 		</div>
 
-		<h5 class="-border-bottom -black">Available editors</h5>
+		<h5 class="-border-bottom -black"><localize key="contentTypeEditor_availableEditors"></localize></h5>
 		<div ng-repeat="(key,value) in vm.typesAndEditors">
 			<div ng-if="(value | filter:vm.searchTerm).length > 0">
 				<h5>{{key}}</h5>
