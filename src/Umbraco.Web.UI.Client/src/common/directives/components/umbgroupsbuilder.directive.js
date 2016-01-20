@@ -173,6 +173,11 @@
             scope.compositionsDialogModel.availableCompositeContentTypes = result;            
             //iterate each one and set it up
             _.each(scope.compositionsDialogModel.availableCompositeContentTypes, function (c) {
+                //enable it if it's part of the selected model
+                if (scope.compositionsDialogModel.compositeContentTypes.indexOf(c.contentType.alias) !== -1) {
+                    c.allowed = true;
+                }
+
                 //set the inherited flags
                 c.inherited = false;
                 if (scope.model.lockedCompositeContentTypes.indexOf(c.contentType.alias) > -1) {
