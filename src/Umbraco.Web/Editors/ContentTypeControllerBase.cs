@@ -205,6 +205,9 @@ namespace Umbraco.Web.Editors
                 ModelState.AddModelError("Alias", "A content type, media type or member type with this alias already exists");
             }
 
+            //now let the external validators execute
+            EditorValidationResolver.Current.Validate(contentTypeSave, new EditorValidationErrors((key, msg) => ModelState.AddModelError(key, msg)));
+
             if (ModelState.IsValid == false)
             {
                 TContentTypeDisplay forDisplay;

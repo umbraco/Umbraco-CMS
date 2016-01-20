@@ -1,7 +1,10 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Web;
+using System.Web.Http.ModelBinding;
 using Umbraco.Core.Models.Validation;
+using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Editors
 {
