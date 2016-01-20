@@ -46,8 +46,6 @@
 			}
         ];
 
-            hotKeyWhenHidden: true,
-            hotKeyWhenHidden: true,
         vm.page.keyboardShortcutsOverview = [
 			{
 			    "name": localizationService.localize("main_sections"),
