@@ -1709,6 +1709,7 @@ namespace Umbraco.Core.Services
             }
         }
 
+        //TODO: All of this needs to be moved to the repository
         private void PerformMove(IContent content, int parentId, int userId, ICollection<MoveEventInfo<IContent>> moveInfo)
         {
             //add a tracking item to use in the Moved event
