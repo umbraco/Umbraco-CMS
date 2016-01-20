@@ -49,7 +49,7 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
         checkModelsBuilderStatus: function () {
             var deferred = $q.defer();
             var modelsResource = $injector.has("modelsBuilderResource") ? $injector.get("modelsBuilderResource") : null;
-            var modelsBuilderEnabled = Umbraco.Sys.ServerVariables.umbracoPlugins.modelsBuilder.enabled;
+            var modelsBuilderEnabled = (Umbraco && Umbraco.Sys && Umbraco.Sys.ServerVariables && Umbraco.Sys.ServerVariables.umbracoPlugins && Umbraco.Sys.ServerVariables.umbracoPlugins.modelsBuilder && Umbraco.Sys.ServerVariables.umbracoPlugins.modelsBuilder.enabled === true);            
             
             if (modelsBuilderEnabled && modelsResource) {
                 modelsResource.getModelsOutOfDateStatus().then(function(result) {

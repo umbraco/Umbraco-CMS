@@ -185,7 +185,10 @@ namespace Umbraco.Web.Models.Mapping
                     if (destAllowedTemplateAliases.SequenceEqual(source.AllowedTemplates) == false)
                     {
                         var templates = applicationContext.Services.FileService.GetTemplates(source.AllowedTemplates.ToArray());
-                        dest.AllowedTemplates = source.AllowedTemplates.Select(x => Mapper.Map<EntityBasic>(templates.Single(t => t.Alias == x))).ToArray();
+                        dest.AllowedTemplates = source.AllowedTemplates
+                            .Select(x => Mapper.Map<EntityBasic>(templates.SingleOrDefault(t => t.Alias == x)))
+                            .WhereNotNull()
+                            .ToArray();
                     }
 
                     if (source.DefaultTemplate.IsNullOrWhiteSpace() == false)

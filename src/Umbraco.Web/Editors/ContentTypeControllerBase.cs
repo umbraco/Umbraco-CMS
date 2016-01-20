@@ -184,29 +184,43 @@ namespace Umbraco.Web.Editors
         protected TContentType PerformPostSave<TContentType, TContentTypeDisplay>(
             ContentTypeSave contentTypeSave,
             Func<int, TContentType> getContentType,
-            Func<string, TContentType> getContentTypeByAlias,
             Action<TContentType> saveContentType,
             bool validateComposition = true,
             Action<ContentTypeSave> beforeCreateNew = null)
-            where TContentType : IContentTypeComposition
+            where TContentType : class, IContentTypeComposition
             where TContentTypeDisplay : ContentTypeCompositionDisplay
         {
             var ctId = Convert.ToInt32(contentTypeSave.Id);
-            
-            //Validate that there's no other ct with the same name
-            var exists = getContentTypeByAlias(contentTypeSave.Alias);
-            if (exists != null && exists.Id.ToInvariantString() != contentTypeSave.Id.ToString())
+            var ct = ctId > 0 ? getContentType(ctId) : null;
+            if (ctId > 0 && ct == null) throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            //Validate that there's no other ct with the same alias
+            // it in fact cannot be the same as any content type alias (member, content or media) because
+            // this would interfere with how ModelsBuilder works and also how many of the published caches
+            // works since that is based on aliases.
+            var allAliases = Services.ContentTypeService.GetAllContentTypeAliases();
+            var exists = allAliases.InvariantContains(contentTypeSave.Alias);
+            if ((exists) && (ctId == 0 || ct.Alias != contentTypeSave.Alias))
             {
-                ModelState.AddModelError("Alias", "A content type with this alias already exists");
+                ModelState.AddModelError("Alias", "A content type, media type or member type with this alias already exists");
             }
 
             if (ModelState.IsValid == false)
             {
-                var ct = getContentType(ctId);
-                //Required data is invalid so we cannot continue
-                var forDisplay = Mapper.Map<TContentTypeDisplay>(ct);
-                //map the 'save' data on top
-                forDisplay = Mapper.Map(contentTypeSave, forDisplay);
+                TContentTypeDisplay forDisplay;
+                if (ctId > 0)
+                {
+                    //Required data is invalid so we cannot continue
+                    forDisplay = Mapper.Map<TContentTypeDisplay>(ct);
+                    //map the 'save' data on top
+                    forDisplay = Mapper.Map(contentTypeSave, forDisplay);
+                }
+                else
+                {
+                    //map the 'save' data to display
+                    forDisplay = Mapper.Map<TContentTypeDisplay>(contentTypeSave);
+                }
+                
                 forDisplay.Errors = ModelState.ToErrorDictionary();
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
             }
@@ -220,22 +234,19 @@ namespace Umbraco.Web.Editors
             
             if (ctId > 0)
             {
-                //its an update to an existing
-                var found = getContentType(ctId);
-                if (found == null)
-                    throw new HttpResponseException(HttpStatusCode.NotFound);
+                //its an update to an existing                
 
-                Mapper.Map(contentTypeSave, found);
+                Mapper.Map(contentTypeSave, ct);
 
                 if (validateComposition)
                 {
                     //NOTE: this throws an error response if it is not valid
-                    ValidateComposition(contentTypeSave, found);
+                    ValidateComposition(contentTypeSave, ct);
                 }
 
-                saveContentType(found);
+                saveContentType(ct);
 
-                return found;
+                return ct;
             }
             else
             {
