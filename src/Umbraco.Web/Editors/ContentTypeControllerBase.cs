@@ -206,7 +206,7 @@ namespace Umbraco.Web.Editors
             }
 
             //now let the external validators execute
-            EditorValidationResolver.Current.Validate(contentTypeSave, new EditorValidationErrors((key, msg) => ModelState.AddModelError(key, msg)));
+            ValidationHelper.ValidateEditorModelWithResolver(ModelState, contentTypeSave);
 
             if (ModelState.IsValid == false)
             {

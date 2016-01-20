@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 
@@ -18,12 +20,12 @@ namespace Umbraco.Web.Editors
             get { return Values; }
         }
 
-        public void Validate(object model, EditorValidationErrors editorValidations)
+        public IEnumerable<ValidationResult> Validate(object model)
         {
-            foreach (var validator in EditorValidators.Where(x => x.GetType() == x.ModelType))
-            {
-                validator.Validate(model, editorValidations);
-            }
+            return EditorValidators
+                .Where(x => model.GetType() == x.ModelType)
+                .WhereNotNull()
+                .SelectMany(x => x.Validate(model));
         }
     }
 }

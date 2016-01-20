@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Umbraco.Web.Editors
 {
@@ -9,6 +11,11 @@ namespace Umbraco.Web.Editors
             get { return typeof (T); }
         }
 
-        public abstract void Validate(object model, EditorValidationErrors editorValidations);
+        protected abstract IEnumerable<ValidationResult> PerformValidate(T model);
+
+        public IEnumerable<ValidationResult> Validate(object model)
+        {
+            return PerformValidate((T) model);
+        }
     }
 }
