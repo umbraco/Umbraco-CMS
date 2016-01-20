@@ -809,7 +809,7 @@ order by level,sortOrder";
                 if (Level == 1) throw new ArgumentException("No newParent node");
                 if (_parent == null)
                 {
-                    _parent = ApplicationContext.Current.Services.EntityService.Get(Entity.ParentId);
+                    _parent = ApplicationContext.Current.Services.EntityService.Get(_parentid);
                 }
                 return new CMSNode(_parent);
             }
