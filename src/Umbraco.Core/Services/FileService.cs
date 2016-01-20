@@ -259,8 +259,16 @@ namespace Umbraco.Core.Services
 
             var evtMsgs = EventMessagesFactory.Get();
 
+            //NOTE: This isn't pretty but we need to maintain backwards compatibility so we cannot change
+            // the event args here. The other option is to create a different event with different event
+            // args specifically for this method... which also isn't pretty. So for now, we'll use this
+            // dictionary approach to store 'additional data' in.
+            var additionalData = new Dictionary<string, object>
+            {
+                {"CreateTemplateForContentType", true}
+            };
             if (SavingTemplate.IsRaisedEventCancelled(
-                  new SaveEventArgs<ITemplate>(template, evtMsgs),
+                  new SaveEventArgs<ITemplate>(template, true, evtMsgs, additionalData),
                   this))
             {
                 return Attempt.Fail(new OperationStatus<ITemplate, OperationStatusType>(template, OperationStatusType.FailedCancelledByEvent, evtMsgs));
