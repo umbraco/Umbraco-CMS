@@ -265,7 +265,8 @@ namespace Umbraco.Core.Services
             // dictionary approach to store 'additional data' in.
             var additionalData = new Dictionary<string, object>
             {
-                {"CreateTemplateForContentType", true}
+                {"CreateTemplateForContentType", true},
+                {"ContentTypeAlias", contentTypeAlias},
             };
             if (SavingTemplate.IsRaisedEventCancelled(
                   new SaveEventArgs<ITemplate>(template, true, evtMsgs, additionalData),
