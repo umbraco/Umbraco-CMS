@@ -647,6 +647,8 @@
     <key alias="createMatchingTemplate">Crear template correspondiente</key>
   </area>
   <area alias="sort">
+    <key alias="sortOrder">Sort order</key>
+    <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">Ordenación completa.</key>
     <key alias="sortHelp">Arrastra las diferentes páginas debajo para colocarlas como deberían estar. O haz click en las cabeceras de las columnas para ordenar todas las páginas</key>
     <key alias="sortPleaseWait"><![CDATA[Espere por favor, las páginas están siendo ordenadas. El proceso puede durar un poco.<br/>

@@ -758,6 +758,8 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="createMatchingTemplate">Créer le template correspondant</key>
   </area>
   <area alias="sort">
+    <key alias="sortOrder">Sort order</key>
+    <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">Tri achevé.</key>
     <key alias="sortHelp">Faites glisser les différents éléments ci-dessous vers le haut ou le bas pour définir comment ils doivent être triés. Ou cliquez sur les entêtes de colonne pour trier la collection complète d'éléments</key>
     <key alias="sortPleaseWait"><![CDATA[Veuillez patienter. Les éléments sont en cours de tri, cela peut prendre un moment.<br/> <br/> Ne fermez pas cette fenêtre durant le tri.]]></key>

@@ -743,6 +743,8 @@
     <key alias="noPropertiesDefinedOnTab">Na této záložce nejsou definovány žádné vlastnosti. Pro vytvoření nové vlastnosti klikněte na odkaz "přidat novou vlastnost" nahoře.</key>
   </area>
   <area alias="sort">
+    <key alias="sortOrder">Sort order</key>
+    <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">Třídění bylo ukončeno.</key>
     <key alias="sortHelp">Abyste nastavili, jak mají být položky seřazeny, přetáhněte jednotlivé z nich nahoru či dolů. Anebo klikněte na hlavičku sloupce pro setřídění celé kolekce</key>
     <key alias="sortPleaseWait"><![CDATA[ Čekejte, prosím. Položky jsou tříděny a může to chvíli trvat.<br/> <br/> Během třídění nezavírejte toto okno]]></key>
