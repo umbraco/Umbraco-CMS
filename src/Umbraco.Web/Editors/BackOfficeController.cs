@@ -26,6 +26,7 @@ using Umbraco.Core.Manifest;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
+using Umbraco.ModelsBuilder.Configuration;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PropertyEditors;
@@ -362,7 +363,8 @@ namespace Umbraco.Web.Editors
                     {
                         "umbracoPlugins", new Dictionary<string, object>
                         {
-                            {"trees", GetTreePluginsMetaData()}
+                            {"trees", GetTreePluginsMetaData()},
+                            {"modelsBuilder", GetModelsBuilderSettings() }
                         }
                     },
                     {
@@ -403,7 +405,7 @@ namespace Umbraco.Web.Editors
 
             return JavaScript(result);
         }
-
+        
         [HttpPost]
         public ActionResult ExternalLogin(string provider, string redirectUrl = null)
         {
@@ -642,6 +644,20 @@ namespace Umbraco.Web.Editors
             //useful for dealing with virtual paths on the client side when hosted in virtual directories especially
             app.Add("applicationPath", HttpContext.Request.ApplicationPath.EnsureEndsWith('/'));
             return app;
+        }
+
+
+        private Dictionary<string, object> GetModelsBuilderSettings()
+        {
+            if (ApplicationContext.IsConfigured == false)
+                return null;
+
+            var settings = new Dictionary<string, object>
+                {
+                    {"enabled", UmbracoConfig.For.ModelsBuilder().Enable}
+                };
+
+            return settings;
         }
 
         private IEnumerable<Dictionary<string, string>> GetTreePluginsMetaData()

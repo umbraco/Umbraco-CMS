@@ -3,7 +3,7 @@
  * @name umbraco.services.contentTypeHelper
  * @description A helper service for the content type editor
  **/
-function contentTypeHelper(contentTypeResource, dataTypeResource, $filter) {
+function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $injector, $q) {
 
     var contentTypeHelperService = {
 
@@ -23,6 +23,44 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter) {
 
           return newArray;
 
+        },
+
+        generateModels: function () {
+            var deferred = $q.defer();
+            var modelsResource = $injector.has("modelsBuilderResource") ? $injector.get("modelsBuilderResource") : null;
+            var modelsBuilderEnabled = Umbraco.Sys.ServerVariables.umbracoPlugins.modelsBuilder.enabled;
+            if (modelsBuilderEnabled && modelsResource) {
+                modelsResource.buildModels().then(function(result) {
+                    deferred.resolve(result);
+
+                    //just calling this to get the servar back to life
+                    modelsResource.getModelsOutOfDateStatus();
+
+                }, function(e) {
+                    deferred.reject(e);
+                });
+            }
+            else {                
+                deferred.resolve(false);                
+            }
+            return deferred.promise;
+        },
+
+        checkModelsBuilderStatus: function () {
+            var deferred = $q.defer();
+            var modelsResource = $injector.has("modelsBuilderResource") ? $injector.get("modelsBuilderResource") : null;
+            var modelsBuilderEnabled = Umbraco.Sys.ServerVariables.umbracoPlugins.modelsBuilder.enabled;
+            
+            if (modelsBuilderEnabled && modelsResource) {
+                modelsResource.getModelsOutOfDateStatus().then(function(result) {
+                    //Generate models buttons should be enabled if its not 100
+                    deferred.resolve(result.status !== 100);
+                });
+            }
+            else {
+                deferred.resolve(false);
+            }
+            return deferred.promise;
         },
 
         makeObjectArrayFromId: function (idArray, objectArray) {
