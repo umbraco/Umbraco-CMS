@@ -303,6 +303,9 @@
     <Compile Include="AreaRegistrationContextExtensions.cs" />
     <Compile Include="BatchedDatabaseServerMessengerStartup.cs" />
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
+    <Compile Include="Editors\EditorValidationResolver.cs" />
+    <Compile Include="Editors\EditorValidator.cs" />
+    <Compile Include="Editors\IEditorValidator.cs" />
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
     <Compile Include="Install\InstallSteps\Version73FileCleanup.cs" />
     <Compile Include="Models\ContentEditing\ContentTypeDisplay.cs" />

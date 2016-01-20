@@ -87,7 +87,30 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             return Database.Fetch<string>("SELECT DISTINCT Alias FROM cmsPropertyType ORDER BY Alias");
         }
-        
+
+        /// <summary>
+        /// Gets all content type aliases
+        /// </summary>
+        /// <param name="objectTypes">
+        /// If this list is empty, it will return all content type aliases for media, members and content, otherwise
+        /// it will only return content type aliases for the object types specified
+        /// </param>
+        /// <returns></returns>
+        public IEnumerable<string> GetAllContentTypeAliases(params Guid[] objectTypes)
+        {
+            var sql = new Sql().Select("cmsContentType.alias")
+                .From<ContentTypeDto>(SqlSyntax)
+                .InnerJoin<NodeDto>(SqlSyntax)
+                .On<ContentTypeDto, NodeDto>(SqlSyntax, dto => dto.NodeId, dto => dto.NodeId);
+
+            if (objectTypes.Any())
+            {
+                sql = sql.Where("umbracoNode.nodeObjectType IN (@objectTypes)", objectTypes);
+            }
+
+            return Database.Fetch<string>(sql);
+        }
+
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sql = new Sql();

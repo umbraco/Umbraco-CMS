@@ -178,11 +178,10 @@ namespace Umbraco.Web.Editors
         public ContentTypeDisplay PostSave(ContentTypeSave contentTypeSave)
         {
             var savedCt = PerformPostSave<IContentType, ContentTypeDisplay>(
-                contentTypeSave: contentTypeSave,
-                getContentType: i => Services.ContentTypeService.GetContentType(i),
-                getContentTypeByAlias: alias => Services.ContentTypeService.GetContentType(alias),
-                saveContentType: type => Services.ContentTypeService.Save(type),
-                beforeCreateNew: ctSave =>
+                contentTypeSave:    contentTypeSave,
+                getContentType:     i => Services.ContentTypeService.GetContentType(i),
+                saveContentType:    type => Services.ContentTypeService.Save(type),
+                beforeCreateNew:    ctSave =>
                 {
                     //create a default template if it doesnt exist -but only if default template is == to the content type
                     if (ctSave.DefaultTemplate.IsNullOrWhiteSpace() == false && ctSave.DefaultTemplate == ctSave.Alias)

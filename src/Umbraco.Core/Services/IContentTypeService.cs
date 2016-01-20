@@ -45,6 +45,16 @@ namespace Umbraco.Core.Services
         IEnumerable<string> GetAllPropertyTypeAliases();
 
         /// <summary>
+        /// Gets all content type aliases
+        /// </summary>
+        /// <param name="objectTypes">
+        /// If this list is empty, it will return all content type aliases for media, members and content, otherwise
+        /// it will only return content type aliases for the object types specified
+        /// </param>
+        /// <returns></returns>
+        IEnumerable<string> GetAllContentTypeAliases(params Guid[] objectTypes);
+
+        /// <summary>
         /// Copies a content type as a child under the specified parent if specified (otherwise to the root)
         /// </summary>
         /// <param name="original">
