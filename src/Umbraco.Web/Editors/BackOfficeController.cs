@@ -26,7 +26,6 @@ using Umbraco.Core.Manifest;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
-using Umbraco.ModelsBuilder.Configuration;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PropertyEditors;
@@ -363,8 +362,7 @@ namespace Umbraco.Web.Editors
                     {
                         "umbracoPlugins", new Dictionary<string, object>
                         {
-                            {"trees", GetTreePluginsMetaData()},
-                            {"modelsBuilder", GetModelsBuilderSettings() }
+                            {"trees", GetTreePluginsMetaData()}
                         }
                     },
                     {
@@ -645,20 +643,7 @@ namespace Umbraco.Web.Editors
             app.Add("applicationPath", HttpContext.Request.ApplicationPath.EnsureEndsWith('/'));
             return app;
         }
-
-
-        private Dictionary<string, object> GetModelsBuilderSettings()
-        {
-            if (ApplicationContext.IsConfigured == false)
-                return null;
-
-            var settings = new Dictionary<string, object>
-                {
-                    {"enabled", UmbracoConfig.For.ModelsBuilder().Enable}
-                };
-
-            return settings;
-        }
+        
 
         private IEnumerable<Dictionary<string, string>> GetTreePluginsMetaData()
         {
