@@ -199,23 +199,6 @@ namespace Umbraco.Web.Editors
                                     () => tryCreateTemplate.Result.StatusType);
                             }
                             template = tryCreateTemplate.Result.Entity;
-
-
-                            //string className = null;
-
-                            ////TODO: HACK until this is done: http://issues.umbraco.org/issue/U4-7747
-                            //bool enabled = false;
-                            //if (ConfigurationManager.AppSettings["Umbraco.ModelsBuilder.Enable"] != null &&
-                            //    bool.TryParse(ConfigurationManager.AppSettings["Umbraco.ModelsBuilder.Enable"], out enabled)
-                            //    && enabled)
-                            //{
-                            //    //ensure is safe and always pascal cased, per razor standard
-                            //    className = ctSave.Name.ToCleanString(CleanStringType.Alias | CleanStringType.PascalCase);
-                            //}
-
-                            //template = new Template(ctSave.Name, ctSave.Alias);
-                            //template.Content = ViewHelper.GetDefaultFileContent(modelClassName: className);
-                            //Services.FileService.SaveTemplate(template);
                         }
 
                         //make sure the template alias is set on the default and allowed template so we can map it back
