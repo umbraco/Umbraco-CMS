@@ -195,7 +195,7 @@ namespace Umbraco.Tests.Models.Mapping
 
             //Act
 
-            var result = Mapper.Map<ContentTypeDisplay>(contentType);
+            var result = Mapper.Map<DocumentTypeDisplay>(contentType);
 
             //Assert
 
@@ -289,7 +289,7 @@ namespace Umbraco.Tests.Models.Mapping
                 }
             };
 
-            var contentType = new ContentTypeSave
+            var contentType = new DocumentTypeSave
             {
                 Id = 0,
                 ParentId = -1,
@@ -394,7 +394,7 @@ namespace Umbraco.Tests.Models.Mapping
 
             //Act
 
-            var result = Mapper.Map<ContentTypeDisplay>(contentType);
+            var result = Mapper.Map<DocumentTypeDisplay>(contentType);
 
             //Assert
 
@@ -443,9 +443,9 @@ namespace Umbraco.Tests.Models.Mapping
         }
 
 
-        private ContentTypeSave CreateContentTypeSave()
+        private DocumentTypeSave CreateContentTypeSave()
         {            
-            return new ContentTypeSave
+            return new DocumentTypeSave
             {
                 Alias = "test",     
                 AllowAsRoot = true,
@@ -495,9 +495,9 @@ namespace Umbraco.Tests.Models.Mapping
             };
         }
 
-        private ContentTypeSave CreateCompositionContentTypeSave()
+        private DocumentTypeSave CreateCompositionContentTypeSave()
         {
-            return new ContentTypeSave
+            return new DocumentTypeSave
             {
                 Alias = "test",
                 AllowAsRoot = true,

@@ -50,9 +50,9 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(type => type.UpdateDate, expression => expression.Ignore())
                 .ForMember(type => type.HasIdentity, expression => expression.Ignore());
 
-            config.CreateMap<ContentTypeSave, IContentType>()
+            config.CreateMap<DocumentTypeSave, IContentType>()
                 //do the base mapping
-                .MapBaseContentTypeSaveToEntity(applicationContext)
+                .MapBaseContentTypeSaveToEntity<DocumentTypeSave, PropertyTypeBasic, IContentType>(applicationContext)
                 .ConstructUsing((source) => new ContentType(source.ParentId))
                 .ForMember(source => source.AllowedTemplates, expression => expression.Ignore())
                 .ForMember(dto => dto.DefaultTemplate, expression => expression.Ignore())
@@ -69,18 +69,18 @@ namespace Umbraco.Web.Models.Mapping
                     ContentTypeModelMapperExtensions.AfterMapContentTypeSaveToEntity(source, dest, applicationContext);
                 });
 
-            config.CreateMap<ContentTypeSave, IMediaType>()
+            config.CreateMap<MediaTypeSave, IMediaType>()
                 //do the base mapping
-                .MapBaseContentTypeSaveToEntity(applicationContext)
+                .MapBaseContentTypeSaveToEntity<MediaTypeSave, PropertyTypeBasic, IMediaType>(applicationContext)
                 .ConstructUsing((source) => new MediaType(source.ParentId))                
                 .AfterMap((source, dest) =>
                 {
                     ContentTypeModelMapperExtensions.AfterMapContentTypeSaveToEntity(source, dest, applicationContext);
                 });
 
-            config.CreateMap<ContentTypeSave, IMemberType>()
+            config.CreateMap<MemberTypeSave, IMemberType>()
                 //do the base mapping
-                .MapBaseContentTypeSaveToEntity(applicationContext)
+                .MapBaseContentTypeSaveToEntity<MemberTypeSave, MemberPropertyTypeBasic, IMemberType>(applicationContext)
                 .ConstructUsing((source) => new MemberType(source.ParentId))
                 .AfterMap((source, dest) =>
                 {
@@ -89,13 +89,13 @@ namespace Umbraco.Web.Models.Mapping
 
             config.CreateMap<IContentTypeComposition, string>().ConvertUsing(x => x.Alias);
 
-            config.CreateMap<IMemberType, ContentTypeCompositionDisplay>()
+            config.CreateMap<IMemberType, MemberTypeDisplay>()
                 //map base logic
-                .MapBaseContentTypeEntityToDisplay(applicationContext, _propertyEditorResolver);
+                .MapBaseContentTypeEntityToDisplay<IMemberType, MemberTypeDisplay, MemberPropertyTypeDisplay>(applicationContext, _propertyEditorResolver);
 
-            config.CreateMap<IMediaType, ContentTypeCompositionDisplay>()
+            config.CreateMap<IMediaType, MediaTypeDisplay>()
                 //map base logic
-                .MapBaseContentTypeEntityToDisplay(applicationContext, _propertyEditorResolver)
+                .MapBaseContentTypeEntityToDisplay<IMediaType, MediaTypeDisplay, PropertyTypeDisplay>(applicationContext, _propertyEditorResolver)
                 .AfterMap((source, dest) =>
                  {
                      //default listview
@@ -109,9 +109,9 @@ namespace Umbraco.Web.Models.Mapping
                      }
                  });
 
-            config.CreateMap<IContentType, ContentTypeDisplay>()
+            config.CreateMap<IContentType, DocumentTypeDisplay>()
                 //map base logic
-                .MapBaseContentTypeEntityToDisplay(applicationContext, _propertyEditorResolver)
+                .MapBaseContentTypeEntityToDisplay<IContentType, DocumentTypeDisplay, PropertyTypeDisplay>(applicationContext, _propertyEditorResolver)
                 .ForMember(dto => dto.AllowedTemplates, expression => expression.Ignore())
                 .ForMember(dto => dto.DefaultTemplate, expression => expression.Ignore())
                 .ForMember(display => display.Notifications, expression => expression.Ignore())
@@ -141,7 +141,7 @@ namespace Umbraco.Web.Models.Mapping
 
             config.CreateMap<PropertyTypeBasic, PropertyType>()
 
-                .ConstructUsing((PropertyTypeBasic propertyTypeBasic) =>
+                .ConstructUsing(propertyTypeBasic =>
                 {
                     var dataType = applicationContext.Services.DataTypeService.GetDataTypeDefinitionById(propertyTypeBasic.DataTypeId);
                     if (dataType == null) throw new NullReferenceException("No data type found with id " + propertyTypeBasic.DataTypeId);
@@ -170,11 +170,14 @@ namespace Umbraco.Web.Models.Mapping
 
             #region *** Used for mapping on top of an existing display object from a save object ***
 
-            config.CreateMap<ContentTypeSave, ContentTypeCompositionDisplay>()
-                .MapBaseContentTypeSaveToDisplay();
+            config.CreateMap<MemberTypeSave, MemberTypeDisplay>()
+                .MapBaseContentTypeSaveToDisplay<MemberTypeSave, MemberTypeDisplay, MemberPropertyTypeDisplay>();
+
+            config.CreateMap<MediaTypeSave, MediaTypeDisplay>()
+                .MapBaseContentTypeSaveToDisplay<MediaTypeSave, MediaTypeDisplay, PropertyTypeDisplay>();
             
-            config.CreateMap<ContentTypeSave, ContentTypeDisplay>()
-                .MapBaseContentTypeSaveToDisplay()
+            config.CreateMap<DocumentTypeSave, DocumentTypeDisplay>()
+                .MapBaseContentTypeSaveToDisplay<DocumentTypeSave, DocumentTypeDisplay, PropertyTypeDisplay>()
                 .ForMember(dto => dto.AllowedTemplates, expression => expression.Ignore())
                 .ForMember(dto => dto.DefaultTemplate, expression => expression.Ignore())
                 .AfterMap((source, dest) =>
@@ -221,7 +224,7 @@ namespace Umbraco.Web.Models.Mapping
                     //.ForMember(dest => dest.PropertyTypes, map => map.MapFrom(source =>
                     //    source.Properties.Select(Mapper.Map<PropertyType>)));
 
-            config.CreateMap<PropertyGroupBasic<PropertyTypeBasic>, PropertyGroupDisplay>()
+            config.CreateMap<PropertyGroupBasic<PropertyTypeBasic>, PropertyGroupDisplay<PropertyTypeDisplay>>()
                 .ForMember(dest => dest.Id, expression => expression.Condition(source => source.Id > 0))
                 .ForMember(g => g.ContentTypeId, expression => expression.Ignore())
                 .ForMember(g => g.ParentTabContentTypes, expression => expression.Ignore())
@@ -232,8 +235,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(g => g.Editor, expression => expression.Ignore())
                 .ForMember(g => g.View, expression => expression.Ignore())
                 .ForMember(g => g.Config, expression => expression.Ignore())
-                .ForMember(g => g.ContentTypeId, expression => expression.Ignore())
-                .ForMember(g => g.ContentTypeName, expression => expression.Ignore())
+                //.ForMember(g => g.ContentTypeId, expression => expression.Ignore())
+                //.ForMember(g => g.ContentTypeName, expression => expression.Ignore())
                 .ForMember(g => g.Locked, exp => exp.Ignore());
 
             #endregion

@@ -56,7 +56,7 @@ namespace Umbraco.Web.Editors
             return Services.ContentTypeService.CountContentTypes();
         }
 
-        public ContentTypeDisplay GetById(int id)
+        public DocumentTypeDisplay GetById(int id)
         {
             var ct = Services.ContentTypeService.GetContentType(id);
             if (ct == null)
@@ -64,7 +64,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var dto = Mapper.Map<IContentType, ContentTypeDisplay>(ct);
+            var dto = Mapper.Map<IContentType, DocumentTypeDisplay>(ct);
             return dto;
         }
 
@@ -175,9 +175,9 @@ namespace Umbraco.Web.Editors
                 : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
         }
 
-        public ContentTypeDisplay PostSave(ContentTypeSave contentTypeSave)
+        public DocumentTypeDisplay PostSave(DocumentTypeSave contentTypeSave)
         {
-            var savedCt = PerformPostSave<IContentType, ContentTypeDisplay>(
+            var savedCt = PerformPostSave<IContentType, DocumentTypeDisplay, DocumentTypeSave, PropertyTypeBasic>(
                 contentTypeSave:    contentTypeSave,
                 getContentType:     i => Services.ContentTypeService.GetContentType(i),
                 saveContentType:    type => Services.ContentTypeService.Save(type),
@@ -206,7 +206,7 @@ namespace Umbraco.Web.Editors
                     }
                 });
 
-            var display = Mapper.Map<ContentTypeDisplay>(savedCt);
+            var display = Mapper.Map<DocumentTypeDisplay>(savedCt);
 
             display.AddSuccessNotification(
                             Services.TextService.Localize("speechBubbles/contentTypeSavedHeader"),
@@ -220,7 +220,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="parentId"></param>
         /// <returns></returns>
-        public ContentTypeDisplay GetEmpty(int parentId)
+        public DocumentTypeDisplay GetEmpty(int parentId)
         {
             IContentType ct;
             if (parentId != Constants.System.Root)
@@ -233,7 +233,7 @@ namespace Umbraco.Web.Editors
             
             ct.Icon = "icon-document";
 
-            var dto = Mapper.Map<IContentType, ContentTypeDisplay>(ct);
+            var dto = Mapper.Map<IContentType, DocumentTypeDisplay>(ct);
             return dto;
         }
 

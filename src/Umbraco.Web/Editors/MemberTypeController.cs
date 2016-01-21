@@ -48,7 +48,7 @@ namespace Umbraco.Web.Editors
 
         private readonly MembershipProvider _provider;
 
-        public ContentTypeCompositionDisplay GetById(int id)
+        public MemberTypeDisplay GetById(int id)
         {
             var ct = Services.MemberTypeService.Get(id);
             if (ct == null)
@@ -56,7 +56,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var dto = Mapper.Map<IMemberType, ContentTypeCompositionDisplay>(ct);
+            var dto = Mapper.Map<IMemberType, MemberTypeDisplay>(ct);
             return dto;
         }
 
@@ -106,12 +106,12 @@ namespace Umbraco.Web.Editors
             return Request.CreateResponse(result);
         }
 
-        public ContentTypeCompositionDisplay GetEmpty()
+        public MemberTypeDisplay GetEmpty()
         {
             var ct = new MemberType(-1);
             ct.Icon = "icon-user";
 
-            var dto = Mapper.Map<IMemberType, ContentTypeCompositionDisplay>(ct);
+            var dto = Mapper.Map<IMemberType, MemberTypeDisplay>(ct);
             return dto;
         }
 
@@ -129,9 +129,9 @@ namespace Umbraco.Web.Editors
             return Enumerable.Empty<ContentTypeBasic>();
         }
 
-        public ContentTypeCompositionDisplay PostSave(ContentTypeSave contentTypeSave)
+        public ContentTypeCompositionDisplay PostSave(MemberTypeSave contentTypeSave)
         {
-            var savedCt = PerformPostSave<IMemberType, ContentTypeCompositionDisplay>(
+            var savedCt = PerformPostSave<IMemberType, ContentTypeCompositionDisplay, MemberTypeSave, MemberPropertyTypeBasic>(
                 contentTypeSave:            contentTypeSave,
                 getContentType:             i => Services.MemberTypeService.Get(i),
                 saveContentType:            type => Services.MemberTypeService.Save(type),

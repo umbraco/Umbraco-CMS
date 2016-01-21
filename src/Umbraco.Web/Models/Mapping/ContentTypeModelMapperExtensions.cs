@@ -47,10 +47,11 @@ namespace Umbraco.Web.Models.Mapping
             }
         }
 
-        public static IMappingExpression<TSource, TDestination> MapBaseContentTypeSaveToDisplay<TSource, TDestination>(
+        public static IMappingExpression<TSource, TDestination> MapBaseContentTypeSaveToDisplay<TSource, TDestination, TPropertyTypeDisplay>(
             this IMappingExpression<TSource, TDestination> mapping)
             where TSource : ContentTypeSave
-            where TDestination : ContentTypeCompositionDisplay
+            where TDestination : ContentTypeCompositionDisplay<TPropertyTypeDisplay> 
+            where TPropertyTypeDisplay : PropertyTypeDisplay
         {
             return mapping
                 .ForMember(dto => dto.CreateDate, expression => expression.Ignore())
@@ -58,13 +59,15 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.ListViewEditorName, expression => expression.Ignore())
                 .ForMember(dto => dto.Notifications, expression => expression.Ignore())
                 .ForMember(dto => dto.Errors, expression => expression.Ignore())
-                .ForMember(dto => dto.LockedCompositeContentTypes, exp => exp.Ignore());
+                .ForMember(dto => dto.LockedCompositeContentTypes, exp => exp.Ignore())
+                .ForMember(dto => dto.Groups, expression => expression.ResolveUsing(new PropertyGroupDisplayResolver<TSource, TPropertyTypeDisplay>()));
         }
 
-        public static IMappingExpression<TSource, TDestination> MapBaseContentTypeEntityToDisplay<TSource, TDestination>(
+        public static IMappingExpression<TSource, TDestination> MapBaseContentTypeEntityToDisplay<TSource, TDestination, TPropertyTypeDisplay>(
             this IMappingExpression<TSource, TDestination> mapping, ApplicationContext applicationContext, Lazy<PropertyEditorResolver> propertyEditorResolver)
             where TSource : IContentTypeComposition
-            where TDestination : ContentTypeCompositionDisplay
+            where TDestination : ContentTypeCompositionDisplay<TPropertyTypeDisplay>
+            where TPropertyTypeDisplay : PropertyTypeDisplay, new()
         {
             return mapping
                 .ForMember(display => display.Notifications, expression => expression.Ignore())
@@ -88,7 +91,7 @@ namespace Umbraco.Web.Models.Mapping
 
                 .ForMember(
                     dto => dto.Groups,
-                    expression => expression.ResolveUsing(new PropertyTypeGroupResolver(applicationContext, propertyEditorResolver)));
+                    expression => expression.ResolveUsing(new PropertyTypeGroupResolver<TPropertyTypeDisplay>(applicationContext, propertyEditorResolver)));
         }
 
         /// <summary>
@@ -96,14 +99,16 @@ namespace Umbraco.Web.Models.Mapping
         /// </summary>
         /// <typeparam name="TSource"></typeparam>
         /// <typeparam name="TDestination"></typeparam>
+        /// <typeparam name="TSourcePropertyType"></typeparam>
         /// <param name="mapping"></param>
         /// <param name="applicationContext"></param>
         /// <returns></returns>        
-        public static IMappingExpression<TSource, TDestination> MapBaseContentTypeSaveToEntity<TSource, TDestination>(
+        public static IMappingExpression<TSource, TDestination> MapBaseContentTypeSaveToEntity<TSource, TSourcePropertyType, TDestination>(
             this IMappingExpression<TSource, TDestination> mapping, ApplicationContext applicationContext)
             //where TSource : ContentTypeCompositionDisplay
-            where TSource : ContentTypeSave
-            where TDestination : IContentTypeComposition
+            where TSource : ContentTypeSave<TSourcePropertyType>
+            where TDestination : IContentTypeComposition 
+            where TSourcePropertyType : PropertyTypeBasic
         {
             return mapping
                 //only map id if set to something higher then zero
@@ -200,7 +205,8 @@ namespace Umbraco.Web.Models.Mapping
                 });
         }
 
-        private static PropertyGroup MapSaveGroup(PropertyGroupBasic<PropertyTypeBasic> sourceGroup, IEnumerable<PropertyGroup> destOrigGroups)
+        private static PropertyGroup MapSaveGroup<TPropertyType>(PropertyGroupBasic<TPropertyType> sourceGroup, IEnumerable<PropertyGroup> destOrigGroups)
+            where TPropertyType: PropertyTypeBasic
         {
             PropertyGroup destGroup;
             if (sourceGroup.Id > 0)

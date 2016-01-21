@@ -56,7 +56,7 @@ namespace Umbraco.Web.Editors
             return Services.ContentTypeService.CountContentTypes();
         }
 
-        public ContentTypeCompositionDisplay GetById(int id)
+        public MediaTypeDisplay GetById(int id)
         {
             var ct = Services.ContentTypeService.GetMediaType(id);
             if (ct == null)
@@ -64,7 +64,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var dto = Mapper.Map<IMediaType, ContentTypeCompositionDisplay>(ct);
+            var dto = Mapper.Map<IMediaType, MediaTypeDisplay>(ct);
             return dto;
         }
 
@@ -114,12 +114,12 @@ namespace Umbraco.Web.Editors
             return Request.CreateResponse(result);            
         }
 
-        public ContentTypeCompositionDisplay GetEmpty(int parentId)
+        public MediaTypeDisplay GetEmpty(int parentId)
         {
             var ct = new MediaType(parentId);
             ct.Icon = "icon-picture";
 
-            var dto = Mapper.Map<IMediaType, ContentTypeCompositionDisplay>(ct);
+            var dto = Mapper.Map<IMediaType, MediaTypeDisplay>(ct);
             return dto;
         }
 
@@ -157,9 +157,9 @@ namespace Umbraco.Web.Editors
                 : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
         }
 
-        public ContentTypeCompositionDisplay PostSave(ContentTypeSave contentTypeSave)
+        public ContentTypeCompositionDisplay PostSave(MediaTypeSave contentTypeSave)
         {
-            var savedCt = PerformPostSave<IMediaType, ContentTypeCompositionDisplay>(
+            var savedCt = PerformPostSave<IMediaType, ContentTypeCompositionDisplay, MediaTypeSave, PropertyTypeBasic>(
                 contentTypeSave:        contentTypeSave,
                 getContentType:         i => Services.ContentTypeService.GetMediaType(i),
                 saveContentType:        type => Services.ContentTypeService.Save(type));
