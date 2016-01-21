@@ -128,7 +128,11 @@ namespace Umbraco.Web.Cache
         {
             ClearAllIsolatedCacheByEntityType<IContent>();
             ClearAllIsolatedCacheByEntityType<IContentType>();
-            
+            ClearAllIsolatedCacheByEntityType<IMedia>();
+            ClearAllIsolatedCacheByEntityType<IMediaType>();
+            ClearAllIsolatedCacheByEntityType<IMember>();
+            ClearAllIsolatedCacheByEntityType<IMemberType>();
+
             //all property type cache
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.PropertyTypeCacheKey);
             //all content type property cache

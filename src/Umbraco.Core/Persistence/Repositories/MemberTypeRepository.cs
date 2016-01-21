@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using log4net;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models;
@@ -24,6 +25,16 @@ namespace Umbraco.Core.Persistence.Repositories
         public MemberTypeRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
         {
+        }
+
+        private FullDataSetRepositoryCachePolicyFactory<IMemberType, int> _cachePolicyFactory;
+        protected override IRepositoryCachePolicyFactory<IMemberType, int> CachePolicyFactory
+        {
+            get
+            {
+                //Use a FullDataSet cache policy - this will cache the entire GetAll result in a single collection
+                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<IMemberType, int>(RuntimeCache));
+            }
         }
 
         #region Overrides of RepositoryBase<int, IMemberType>
@@ -256,38 +267,36 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IMemberType PerformGet(Guid id)
         {
-            var sql = GetBaseQuery(false);
-            sql.Where("umbracoNode.uniqueID = @Id", new { Id = id });
-            sql.OrderByDescending<NodeDto>(x => x.NodeId);
-
-            var dtos =
-                Database.Fetch<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto, MemberTypeReadOnlyDto>(
-                    new PropertyTypePropertyGroupRelator().Map, sql);
-
-            if (dtos == null || dtos.Any() == false)
-                return null;
-
-            var factory = new MemberTypeReadOnlyFactory();
-            var member = factory.BuildEntity(dtos.First());
-
-            return member;
+            //use the underlying GetAll which will force cache all content types
+            return GetAll().FirstOrDefault(x => x.Key == id);
         }
 
         protected override IEnumerable<IMemberType> PerformGetAll(params Guid[] ids)
         {
-            var sql = GetBaseQuery(false);
+            //use the underlying GetAll which will force cache all content types
+
             if (ids.Any())
             {
-                var statement = string.Join(" OR ", ids.Select(x => string.Format("umbracoNode.uniqueID='{0}'", x)));
-                sql.Where(statement);
+                return GetAll().Where(x => ids.Contains(x.Key));
             }
-            sql.OrderByDescending<NodeDto>(x => x.NodeId, SqlSyntax);
+            else
+            {
+                return GetAll();
+                //var sql = new Sql().Select("id").From<NodeDto>(SqlSyntax).Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId);
+                //var allIds = Database.Fetch<int>(sql).ToArray();
+                //return ContentTypeQueryMapper.GetContentTypes(allIds, Database, SqlSyntax, this, _templateRepository);
+            }
+        }
 
-            var dtos =
-                Database.Fetch<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto, MemberTypeReadOnlyDto>(
-                    new PropertyTypePropertyGroupRelator().Map, sql);
+        protected override bool PerformExists(Guid id)
+        {
+            return GetAll().FirstOrDefault(x => x.Key == id) != null;
+        }
 
-            return BuildFromDtos(dtos);
+        protected override IMemberType PerformGet(string alias)
+        {
+            //use the underlying GetAll which will force cache all content types
+            return GetAll().FirstOrDefault(x => x.Alias.InvariantEquals(alias));
         }
 
         /// <summary>

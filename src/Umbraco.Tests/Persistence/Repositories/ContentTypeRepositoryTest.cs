@@ -603,7 +603,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var allGuidIds = repository.GetAll().Select(x => x.Key).ToArray();
 
                 // Act
-                var contentTypes = repository.GetAll(allGuidIds);
+                var contentTypes = ((IReadRepository<Guid, IContentType>)repository).GetAll(allGuidIds);
                 int count =
                     DatabaseContext.Database.ExecuteScalar<int>(
                         "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",
