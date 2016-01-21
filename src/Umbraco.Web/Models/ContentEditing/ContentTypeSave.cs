@@ -9,6 +9,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// <summary>
     /// Abstract model used to save content types
     /// </summary>
+    [DataContract(Name = "contentType", Namespace = "")]
     public abstract class ContentTypeSave : ContentTypeBasic, IValidatableObject
     {
         protected ContentTypeSave()
@@ -47,6 +48,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// Abstract model used to save content types
     /// </summary>
     /// <typeparam name="TPropertyType"></typeparam>
+    [DataContract(Name = "contentType", Namespace = "")]
     public abstract class ContentTypeSave<TPropertyType> : ContentTypeSave
         where TPropertyType : PropertyTypeBasic
     {

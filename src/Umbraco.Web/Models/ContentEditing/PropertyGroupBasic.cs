@@ -4,6 +4,7 @@ using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
+    [DataContract(Name = "propertyGroup", Namespace = "")]
     public abstract class PropertyGroupBasic
     {
         /// <summary>
