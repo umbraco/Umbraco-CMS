@@ -131,7 +131,7 @@ namespace Umbraco.Web.Editors
 
         public MemberTypeDisplay PostSave(MemberTypeSave contentTypeSave)
         {
-            var savedCt = PerformPostSave<IMemberType, ContentTypeCompositionDisplay, MemberTypeSave, MemberPropertyTypeBasic>(
+            var savedCt = PerformPostSave<IMemberType, MemberTypeDisplay, MemberTypeSave, MemberPropertyTypeBasic>(
                 contentTypeSave:            contentTypeSave,
                 getContentType:             i => Services.MemberTypeService.Get(i),
                 saveContentType:            type => Services.MemberTypeService.Save(type),

@@ -315,6 +315,76 @@ namespace Umbraco.Tests.Models.Mapping
         }
 
         [Test]
+        public void IMemberType_To_MemberTypeDisplay()
+        {
+            //Arrange
+
+            // setup the mocks to return the data we want to test against...
+
+            // for any call to GetPreValuesCollectionByDataTypeId just return an empty dictionary for now
+            // TODO: but we'll need to change this to return some pre-values to test the mappings
+            _dataTypeService.Setup(x => x.GetPreValuesCollectionByDataTypeId(It.IsAny<int>()))
+                .Returns(new PreValueCollection(new Dictionary<string, PreValue>()));
+
+            //return a textbox property editor for any requested editor by alias
+            _propertyEditorResolver.Setup(resolver => resolver.GetByAlias(It.IsAny<string>()))
+                .Returns(new TextboxPropertyEditor());
+            //for testing, just return a list of whatever property editors we want
+            _propertyEditorResolver.Setup(resolver => resolver.PropertyEditors)
+                .Returns(new[] { new TextboxPropertyEditor() });
+
+            var memberType = MockedContentTypes.CreateSimpleMemberType();
+            memberType.MemberTypePropertyTypes[memberType.PropertyTypes.Last().Alias] = new MemberTypePropertyProfileAccess(true, true);
+            
+            MockedContentTypes.EnsureAllIds(memberType, 8888);
+
+            //Act
+
+            var result = Mapper.Map<MemberTypeDisplay>(memberType);
+
+            //Assert
+
+            Assert.AreEqual(memberType.Alias, result.Alias);
+            Assert.AreEqual(memberType.Description, result.Description);
+            Assert.AreEqual(memberType.Icon, result.Icon);
+            Assert.AreEqual(memberType.Id, result.Id);
+            Assert.AreEqual(memberType.Name, result.Name);
+            Assert.AreEqual(memberType.ParentId, result.ParentId);
+            Assert.AreEqual(memberType.Path, result.Path);
+            Assert.AreEqual(memberType.Thumbnail, result.Thumbnail);
+            Assert.AreEqual(memberType.IsContainer, result.IsContainer);
+            Assert.AreEqual(memberType.CreateDate, result.CreateDate);
+            Assert.AreEqual(memberType.UpdateDate, result.UpdateDate);
+
+            //TODO: Now we need to assert all of the more complicated parts
+
+            Assert.AreEqual(memberType.PropertyGroups.Count(), result.Groups.Count());
+            for (var i = 0; i < memberType.PropertyGroups.Count(); i++)
+            {
+                Assert.AreEqual(memberType.PropertyGroups.ElementAt(i).Id, result.Groups.ElementAt(i).Id);
+                Assert.AreEqual(memberType.PropertyGroups.ElementAt(i).Name, result.Groups.ElementAt(i).Name);
+                var propTypes = memberType.PropertyGroups.ElementAt(i).PropertyTypes;
+
+                Assert.AreEqual(propTypes.Count(), result.Groups.ElementAt(i).Properties.Count());
+                for (var j = 0; j < propTypes.Count(); j++)
+                {
+                    Assert.AreEqual(propTypes.ElementAt(j).Id, result.Groups.ElementAt(i).Properties.ElementAt(j).Id);
+                    Assert.AreEqual(propTypes.ElementAt(j).DataTypeDefinitionId, result.Groups.ElementAt(i).Properties.ElementAt(j).DataTypeId);
+                    
+                    Assert.AreEqual(memberType.MemberCanViewProperty(propTypes.ElementAt(j).Alias), result.Groups.ElementAt(i).Properties.ElementAt(j).MemberCanViewProperty);
+                    Assert.AreEqual(memberType.MemberCanEditProperty(propTypes.ElementAt(j).Alias), result.Groups.ElementAt(i).Properties.ElementAt(j).MemberCanEditProperty);
+                }
+            }
+
+            Assert.AreEqual(memberType.AllowedContentTypes.Count(), result.AllowedContentTypes.Count());
+            for (var i = 0; i < memberType.AllowedContentTypes.Count(); i++)
+            {
+                Assert.AreEqual(memberType.AllowedContentTypes.ElementAt(i).Id.Value, result.AllowedContentTypes.ElementAt(i));
+            }
+
+        }
+
+        [Test]
         public void IMediaType_To_MediaTypeDisplay()
         {
             //Arrange
@@ -655,7 +725,7 @@ namespace Umbraco.Tests.Models.Mapping
         }
 
         [Test]
-        public void IMemberTypeComposition_To_MemberTypeDisplay()
+        public void IMediaTypeComposition_To_MediaTypeDisplay()
         {
             //Arrange
 
@@ -854,6 +924,78 @@ namespace Umbraco.Tests.Models.Mapping
                 Assert.AreEqual(contentType.AllowedContentTypes.ElementAt(i).Id.Value, result.AllowedContentTypes.ElementAt(i));
             }
 
+        }
+
+        [Test]
+        public void MemberPropertyTypeBasic_To_MemberPropertyTypeDisplay()
+        {
+            _dataTypeService.Setup(x => x.GetDataTypeDefinitionById(It.IsAny<int>()))
+                .Returns(new DataTypeDefinition("test"));
+
+            var basic = new MemberPropertyTypeBasic()
+            {
+                Id = 33,
+                SortOrder = 1,
+                Alias = "prop1",
+                Description = "property 1",
+                DataTypeId = 99,
+                GroupId = 222,
+                Label = "Prop 1",
+                MemberCanViewProperty = true,
+                MemberCanEditProperty = true,
+                Validation = new PropertyTypeValidation()
+                {
+                    Mandatory = true,
+                    Pattern = "xyz"
+                }
+            };
+
+            var result = Mapper.Map<MemberPropertyTypeDisplay>(basic);
+
+            Assert.AreEqual(basic.Id, result.Id);
+            Assert.AreEqual(basic.SortOrder, result.SortOrder);
+            Assert.AreEqual(basic.Alias, result.Alias);
+            Assert.AreEqual(basic.Description, result.Description);
+            Assert.AreEqual(basic.GroupId, result.GroupId);
+            Assert.AreEqual(basic.Inherited, result.Inherited);
+            Assert.AreEqual(basic.Label, result.Label);
+            Assert.AreEqual(basic.Validation, result.Validation);
+            Assert.AreEqual(basic.MemberCanViewProperty, result.MemberCanViewProperty);
+            Assert.AreEqual(basic.MemberCanEditProperty, result.MemberCanEditProperty);
+        }
+
+        [Test]
+        public void PropertyTypeBasic_To_PropertyTypeDisplay()
+        {
+            _dataTypeService.Setup(x => x.GetDataTypeDefinitionById(It.IsAny<int>()))
+                .Returns(new DataTypeDefinition("test"));
+
+            var basic = new PropertyTypeBasic()
+            {
+                Id = 33,
+                SortOrder = 1,
+                Alias = "prop1",
+                Description = "property 1",
+                DataTypeId = 99,
+                GroupId = 222,
+                Label = "Prop 1",
+                Validation = new PropertyTypeValidation()
+                {
+                    Mandatory = true,
+                    Pattern = "xyz"
+                }
+            };
+
+            var result = Mapper.Map<PropertyTypeDisplay>(basic);
+
+            Assert.AreEqual(basic.Id, result.Id);
+            Assert.AreEqual(basic.SortOrder, result.SortOrder);
+            Assert.AreEqual(basic.Alias, result.Alias);
+            Assert.AreEqual(basic.Description, result.Description);
+            Assert.AreEqual(basic.GroupId, result.GroupId);
+            Assert.AreEqual(basic.Inherited, result.Inherited);
+            Assert.AreEqual(basic.Label, result.Label);
+            Assert.AreEqual(basic.Validation, result.Validation);
         }
 
         private MemberTypeSave CreateMemberTypeSave()

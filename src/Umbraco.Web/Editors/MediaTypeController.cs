@@ -159,7 +159,7 @@ namespace Umbraco.Web.Editors
 
         public MediaTypeDisplay PostSave(MediaTypeSave contentTypeSave)
         {
-            var savedCt = PerformPostSave<IMediaType, ContentTypeCompositionDisplay, MediaTypeSave, PropertyTypeBasic>(
+            var savedCt = PerformPostSave<IMediaType, MediaTypeDisplay, MediaTypeSave, PropertyTypeBasic>(
                 contentTypeSave:        contentTypeSave,
                 getContentType:         i => Services.ContentTypeService.GetMediaType(i),
                 saveContentType:        type => Services.ContentTypeService.Save(type));

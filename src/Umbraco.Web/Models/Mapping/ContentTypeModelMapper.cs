@@ -85,13 +85,39 @@ namespace Umbraco.Web.Models.Mapping
                 .AfterMap((source, dest) =>
                 {
                     ContentTypeModelMapperExtensions.AfterMapContentTypeSaveToEntity(source, dest, applicationContext);
+
+                    //map the MemberCanEditProperty,MemberCanViewProperty
+                    foreach (var propertyType in source.Groups.SelectMany(x => x.Properties))
+                    {
+                        var localCopy = propertyType;
+                        var destProp = dest.PropertyTypes.SingleOrDefault(x => x.Alias.InvariantEquals(localCopy.Alias));
+                        if (destProp != null)
+                        {
+                            dest.SetMemberCanEditProperty(localCopy.Alias, localCopy.MemberCanEditProperty);
+                            dest.SetMemberCanViewProperty(localCopy.Alias, localCopy.MemberCanViewProperty);
+                        }
+                    }
                 });
 
             config.CreateMap<IContentTypeComposition, string>().ConvertUsing(x => x.Alias);
 
             config.CreateMap<IMemberType, MemberTypeDisplay>()
                 //map base logic
-                .MapBaseContentTypeEntityToDisplay<IMemberType, MemberTypeDisplay, MemberPropertyTypeDisplay>(applicationContext, _propertyEditorResolver);
+                .MapBaseContentTypeEntityToDisplay<IMemberType, MemberTypeDisplay, MemberPropertyTypeDisplay>(applicationContext, _propertyEditorResolver)
+                .AfterMap((memberType, display) =>
+                {
+                    //map the MemberCanEditProperty,MemberCanViewProperty
+                    foreach (var propertyType in memberType.PropertyTypes)
+                    {
+                        var localCopy = propertyType;
+                        var displayProp = display.Groups.SelectMany(x => x.Properties).SingleOrDefault(x => x.Alias.InvariantEquals(localCopy.Alias));
+                        if (displayProp != null)
+                        {
+                            displayProp.MemberCanEditProperty = memberType.MemberCanEditProperty(localCopy.Alias);
+                            displayProp.MemberCanViewProperty = memberType.MemberCanViewProperty(localCopy.Alias);
+                        }
+                    }
+                });
 
             config.CreateMap<IMediaType, MediaTypeDisplay>()
                 //map base logic
@@ -229,15 +255,19 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(g => g.Editor, expression => expression.Ignore())
                 .ForMember(g => g.View, expression => expression.Ignore())
                 .ForMember(g => g.Config, expression => expression.Ignore())
-                //.ForMember(g => g.ContentTypeId, expression => expression.Ignore())
-                //.ForMember(g => g.ContentTypeName, expression => expression.Ignore())
+                .ForMember(g => g.Locked, exp => exp.Ignore());
+
+            config.CreateMap<MemberPropertyTypeBasic, MemberPropertyTypeDisplay>()
+                .ForMember(g => g.Editor, expression => expression.Ignore())
+                .ForMember(g => g.View, expression => expression.Ignore())
+                .ForMember(g => g.Config, expression => expression.Ignore())
                 .ForMember(g => g.Locked, exp => exp.Ignore());
 
             #endregion
 
-            
 
-            
+
+
         }
 
 
