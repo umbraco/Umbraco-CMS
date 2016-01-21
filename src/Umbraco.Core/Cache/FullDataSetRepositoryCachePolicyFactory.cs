@@ -14,7 +14,7 @@ namespace Umbraco.Core.Cache
         
         public FullDataSetRepositoryCachePolicyFactory(IRuntimeCacheProvider runtimeCache)
         {
-            _runtimeCache = runtimeCache;
+            _runtimeCache = runtimeCache;            
         }
 
         public virtual IRepositoryCachePolicy<TEntity, TId> CreatePolicy()
