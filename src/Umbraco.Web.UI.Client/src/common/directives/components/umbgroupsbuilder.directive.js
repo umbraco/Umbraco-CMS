@@ -380,6 +380,7 @@
 
       scope.removeGroup = function(groupIndex) {
         scope.model.groups.splice(groupIndex, 1);
+        addInitGroup(scope.model.groups);
       };
 
       scope.updateGroupTitle = function(group) {
