@@ -64,10 +64,10 @@ namespace Umbraco.Web.Models.ContentEditing
             if (duplicateGroups.Any())
             {
                 //we need to return the field name with an index so it's wired up correctly
-                var firstIndex = Groups.IndexOf(duplicateGroups.First().First());
+                var lastIndex = Groups.IndexOf(duplicateGroups.Last().Last());
                 yield return new ValidationResult("Duplicate group names not allowed", new[]
                 {
-                    string.Format("Groups[{0}].Name", firstIndex)
+                    string.Format("Groups[{0}].Name", lastIndex)
                 });
             }
             
@@ -75,14 +75,12 @@ namespace Umbraco.Web.Models.ContentEditing
             if (duplicateProperties.Any())
             {
                 //we need to return the field name with an index so it's wired up correctly
-                var firstProperty = duplicateProperties.First().First();
-                var propertyGroup = Groups.Single(x => x.Properties.Contains(firstProperty));
-                var groupIndex = Groups.IndexOf(propertyGroup);
-                var propertyIndex = propertyGroup.Properties.IndexOf(firstProperty);
+                var lastProperty = duplicateProperties.Last().Last();
+                var propertyGroup = Groups.Single(x => x.Properties.Contains(lastProperty));                
 
                 yield return new ValidationResult("Duplicate property aliases not allowed", new[]
                 {
-                    string.Format("Groups[{0}].Properties[{1}].Alias", groupIndex, propertyIndex)
+                    string.Format("Groups[{0}].Properties[{1}].Alias", propertyGroup.SortOrder, lastProperty.SortOrder)
                 });
             }
             
