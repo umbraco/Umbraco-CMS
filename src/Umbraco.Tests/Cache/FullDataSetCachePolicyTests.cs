@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web.Caching;
 using Moq;
 using NUnit.Framework;
@@ -13,6 +14,48 @@ namespace Umbraco.Tests.Cache
     [TestFixture]
     public class FullDataSetCachePolicyTests
     {
+        [Test]
+        public void Get_All_Caches_Empty_List()
+        {
+            var cached = new List<string>();
+            
+            IList list = null;
+
+            var cache = new Mock<IRuntimeCacheProvider>();
+            cache.Setup(x => x.InsertCacheItem(It.IsAny<string>(), It.IsAny<Func<object>>(), It.IsAny<TimeSpan?>(), It.IsAny<bool>(),
+                It.IsAny<CacheItemPriority>(), It.IsAny<CacheItemRemovedCallback>(), It.IsAny<string[]>()))
+                .Callback((string cacheKey, Func<object> o, TimeSpan? t, bool b, CacheItemPriority cip, CacheItemRemovedCallback circ, string[] s) =>
+                {
+                    cached.Add(cacheKey);
+
+                    list = o() as IList;
+                });
+            cache.Setup(x => x.GetCacheItem(It.IsAny<string>())).Returns(() =>
+            {
+                //return null if this is the first pass
+                return cached.Any() ? new DeepCloneableList<AuditItem>() : null;
+            });
+
+            var defaultPolicy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object);
+            using (defaultPolicy)
+            {
+                var found = defaultPolicy.GetAll(new object[] {}, o => new AuditItem[] {});
+            }
+
+            Assert.AreEqual(1, cached.Count);
+            Assert.IsNotNull(list);
+
+            //Do it again, ensure that its coming from the cache!
+            defaultPolicy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object);
+            using (defaultPolicy)
+            {
+                var found = defaultPolicy.GetAll(new object[] { }, o => new AuditItem[] { });
+            }
+
+            Assert.AreEqual(1, cached.Count);
+            Assert.IsNotNull(list);
+        }
+
         [Test]
         public void Get_All_Caches_As_Single_List()
         {
@@ -28,7 +71,7 @@ namespace Umbraco.Tests.Cache
 
                     list = o() as IList;
                 });
-            cache.Setup(x => x.GetCacheItemsByKeySearch(It.IsAny<string>())).Returns(new AuditItem[] { });
+            cache.Setup(x => x.GetCacheItem(It.IsAny<string>())).Returns(new AuditItem[] { });
 
             var defaultPolicy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object);
             using (defaultPolicy)
