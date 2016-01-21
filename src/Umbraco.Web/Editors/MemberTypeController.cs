@@ -129,7 +129,7 @@ namespace Umbraco.Web.Editors
             return Enumerable.Empty<ContentTypeBasic>();
         }
 
-        public ContentTypeCompositionDisplay PostSave(MemberTypeSave contentTypeSave)
+        public MemberTypeDisplay PostSave(MemberTypeSave contentTypeSave)
         {
             var savedCt = PerformPostSave<IMemberType, ContentTypeCompositionDisplay, MemberTypeSave, MemberPropertyTypeBasic>(
                 contentTypeSave:            contentTypeSave,
@@ -137,7 +137,7 @@ namespace Umbraco.Web.Editors
                 saveContentType:            type => Services.MemberTypeService.Save(type),
                 validateComposition:        false);
 
-            var display = Mapper.Map<ContentTypeCompositionDisplay>(savedCt);
+            var display = Mapper.Map<MemberTypeDisplay>(savedCt);
 
             display.AddSuccessNotification(
                             Services.TextService.Localize("speechBubbles/contentTypeSavedHeader"),

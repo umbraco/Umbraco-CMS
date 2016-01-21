@@ -157,14 +157,14 @@ namespace Umbraco.Web.Editors
                 : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
         }
 
-        public ContentTypeCompositionDisplay PostSave(MediaTypeSave contentTypeSave)
+        public MediaTypeDisplay PostSave(MediaTypeSave contentTypeSave)
         {
             var savedCt = PerformPostSave<IMediaType, ContentTypeCompositionDisplay, MediaTypeSave, PropertyTypeBasic>(
                 contentTypeSave:        contentTypeSave,
                 getContentType:         i => Services.ContentTypeService.GetMediaType(i),
                 saveContentType:        type => Services.ContentTypeService.Save(type));
 
-            var display = Mapper.Map<ContentTypeCompositionDisplay>(savedCt);
+            var display = Mapper.Map<MediaTypeDisplay>(savedCt);
 
             display.AddSuccessNotification(
                             Services.TextService.Localize("speechBubbles/contentTypeSavedHeader"),

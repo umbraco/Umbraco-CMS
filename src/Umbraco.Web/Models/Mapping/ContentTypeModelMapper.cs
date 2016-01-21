@@ -171,13 +171,13 @@ namespace Umbraco.Web.Models.Mapping
             #region *** Used for mapping on top of an existing display object from a save object ***
 
             config.CreateMap<MemberTypeSave, MemberTypeDisplay>()
-                .MapBaseContentTypeSaveToDisplay<MemberTypeSave, MemberTypeDisplay, MemberPropertyTypeDisplay>();
+                .MapBaseContentTypeSaveToDisplay<MemberTypeSave, MemberPropertyTypeBasic, MemberTypeDisplay, MemberPropertyTypeDisplay>();
 
             config.CreateMap<MediaTypeSave, MediaTypeDisplay>()
-                .MapBaseContentTypeSaveToDisplay<MediaTypeSave, MediaTypeDisplay, PropertyTypeDisplay>();
+                .MapBaseContentTypeSaveToDisplay<MediaTypeSave, PropertyTypeBasic, MediaTypeDisplay, PropertyTypeDisplay>();
             
             config.CreateMap<DocumentTypeSave, DocumentTypeDisplay>()
-                .MapBaseContentTypeSaveToDisplay<DocumentTypeSave, DocumentTypeDisplay, PropertyTypeDisplay>()
+                .MapBaseContentTypeSaveToDisplay<DocumentTypeSave, PropertyTypeBasic, DocumentTypeDisplay, PropertyTypeDisplay>()
                 .ForMember(dto => dto.AllowedTemplates, expression => expression.Ignore())
                 .ForMember(dto => dto.DefaultTemplate, expression => expression.Ignore())
                 .AfterMap((source, dest) =>
@@ -209,27 +209,21 @@ namespace Umbraco.Web.Models.Mapping
                     }
                 });
 
+            //for doc types, media types
             config.CreateMap<PropertyGroupBasic<PropertyTypeBasic>, PropertyGroup>()
-                    .ForMember(dest => dest.Id, map => map.Condition(source => source.Id > 0))
-                    .ForMember(dest => dest.Key, map => map.Ignore())
-                    .ForMember(dest => dest.HasIdentity, map => map.Ignore())
-                    .ForMember(dest => dest.CreateDate, map => map.Ignore())
-                    .ForMember(dest => dest.UpdateDate, map => map.Ignore())
-                    // fixme
-                    // this is basically *replacing* dest properties by a mapped version of
-                    // *every* source properties (including, I guess, inherited properties?)
-                    // also, ContentTypeModelMapperExtensions will map properties *again* so
-                    // this makes little sense - ignore for now
-                    .ForMember(dest => dest.PropertyTypes, map => map.Ignore());
-                    //.ForMember(dest => dest.PropertyTypes, map => map.MapFrom(source =>
-                    //    source.Properties.Select(Mapper.Map<PropertyType>)));
+                .MapPropertyGroupBasicToPropertyGroupPersistence<PropertyGroupBasic<PropertyTypeBasic>, PropertyTypeBasic>();
 
+            //for members
+            config.CreateMap<PropertyGroupBasic<MemberPropertyTypeBasic>, PropertyGroup>()
+                .MapPropertyGroupBasicToPropertyGroupPersistence<PropertyGroupBasic<MemberPropertyTypeBasic>, MemberPropertyTypeBasic>();
+
+            //for doc types, media types
             config.CreateMap<PropertyGroupBasic<PropertyTypeBasic>, PropertyGroupDisplay<PropertyTypeDisplay>>()
-                .ForMember(dest => dest.Id, expression => expression.Condition(source => source.Id > 0))
-                .ForMember(g => g.ContentTypeId, expression => expression.Ignore())
-                .ForMember(g => g.ParentTabContentTypes, expression => expression.Ignore())
-                .ForMember(g => g.ParentTabContentTypeNames, expression => expression.Ignore())
-                .ForMember(g => g.Properties, expression => expression.MapFrom(display => display.Properties.Select(Mapper.Map<PropertyTypeDisplay>)));
+                .MapPropertyGroupBasicToPropertyGroupDisplay<PropertyGroupBasic<PropertyTypeBasic>, PropertyTypeBasic, PropertyTypeDisplay>();
+
+            //for members
+            config.CreateMap<PropertyGroupBasic<MemberPropertyTypeBasic>, PropertyGroupDisplay<MemberPropertyTypeDisplay>>()
+                .MapPropertyGroupBasicToPropertyGroupDisplay<PropertyGroupBasic<MemberPropertyTypeBasic>, MemberPropertyTypeBasic, MemberPropertyTypeDisplay>();
 
             config.CreateMap<PropertyTypeBasic, PropertyTypeDisplay>()
                 .ForMember(g => g.Editor, expression => expression.Ignore())
