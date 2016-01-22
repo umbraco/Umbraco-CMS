@@ -30,12 +30,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected ContentTypeBaseRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
-        {
-            _guidRepo = new GuidReadOnlyContentTypeBaseRepository(this, work, cache, logger, sqlSyntax);
+        {            
         }
-
-        private readonly GuidReadOnlyContentTypeBaseRepository _guidRepo;
-
+        
         /// <summary>
         /// Returns the content type ids that match the query
         /// </summary>
@@ -1197,71 +1194,20 @@ AND umbracoNode.id <> @id",
 
         }
 
-        /// <summary>
-        /// Inner repository to support the GUID lookups and keep the caching consistent
-        /// </summary>
-        internal class GuidReadOnlyContentTypeBaseRepository : PetaPocoRepositoryBase<Guid, TEntity>
-        {
-            private readonly ContentTypeBaseRepository<TEntity> _parentRepo;
-
-            public GuidReadOnlyContentTypeBaseRepository(
-                ContentTypeBaseRepository<TEntity> parentRepo,
-                IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
-                : base(work, cache, logger, sqlSyntax)
-            {
-                _parentRepo = parentRepo;
-            }
-
-            protected override TEntity PerformGet(Guid id)
-            {
-                return _parentRepo.PerformGet(id);
-            }
-
-            protected override IEnumerable<TEntity> PerformGetAll(params Guid[] ids)
-            {
-                return _parentRepo.PerformGetAll(ids);
-            }
-
-            protected override Sql GetBaseQuery(bool isCount)
-            {
-                return _parentRepo.GetBaseQuery(isCount);
-            }
-
-            protected override string GetBaseWhereClause()
-            {
-                return "umbracoNode.uniqueID = @Id";
-            }
-
-            #region No implementation required
-            protected override IEnumerable<TEntity> PerformGetByQuery(IQuery<TEntity> query)
-            {
-                throw new NotImplementedException();
-            }
-
-            protected override IEnumerable<string> GetDeleteClauses()
-            {
-                throw new NotImplementedException();
-            }
-
-            protected override Guid NodeObjectTypeId
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            protected override void PersistNewItem(TEntity entity)
-            {
-                throw new NotImplementedException();
-            }
-
-            protected override void PersistUpdatedItem(TEntity entity)
-            {
-                throw new NotImplementedException();
-            } 
-            #endregion
-        }
-
         protected abstract TEntity PerformGet(Guid id);
+        protected abstract TEntity PerformGet(string alias);
         protected abstract IEnumerable<TEntity> PerformGetAll(params Guid[] ids);
+        protected abstract bool PerformExists(Guid id);
+
+        /// <summary>
+        /// Gets an Entity by alias
+        /// </summary>
+        /// <param name="alias"></param>
+        /// <returns></returns>
+        public TEntity Get(string alias)
+        {
+            return PerformGet(alias);
+        }
 
         /// <summary>
         /// Gets an Entity by Id
@@ -1270,7 +1216,7 @@ AND umbracoNode.id <> @id",
         /// <returns></returns>
         public TEntity Get(Guid id)
         {
-            return _guidRepo.Get(id);
+            return PerformGet(id);
         }
 
         /// <summary>
@@ -1278,9 +1224,12 @@ AND umbracoNode.id <> @id",
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public IEnumerable<TEntity> GetAll(params Guid[] ids)
+        /// <remarks>
+        /// Ensure explicit implementation, we don't want to have any accidental calls to this since it is essentially the same signature as the main GetAll when there are no parameters
+        /// </remarks>
+        IEnumerable<TEntity> IReadRepository<Guid, TEntity>.GetAll(params Guid[] ids)
         {
-            return _guidRepo.GetAll(ids);
+            return PerformGetAll(ids);
         }
 
         /// <summary>
@@ -1290,7 +1239,7 @@ AND umbracoNode.id <> @id",
         /// <returns></returns>
         public bool Exists(Guid id)
         {
-            return _guidRepo.Exists(id);
+            return PerformExists(id);
         }
     }
 }

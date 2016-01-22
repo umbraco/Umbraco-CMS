@@ -5,7 +5,7 @@ using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface IContentTypeRepository : IRepositoryQueryable<int, IContentType>, IReadRepository<Guid, IContentType>
+    public interface IContentTypeRepository : IContentTypeCompositionRepository<IContentType>
     {
         /// <summary>
         /// Gets all entities of the specified <see cref="PropertyType"/> query

@@ -188,7 +188,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
 
-                var mediaTypes = repository.GetAll(allGuidIds);
+                var mediaTypes = ((IReadRepository<Guid, IMediaType>)repository).GetAll(allGuidIds);
 
                 int count =
                     DatabaseContext.Database.ExecuteScalar<int>(
