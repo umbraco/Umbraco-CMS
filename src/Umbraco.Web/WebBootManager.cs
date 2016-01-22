@@ -184,7 +184,9 @@ namespace Umbraco.Web
             base.InitializeProfilerResolver();
 
             //Set the profiler to be the web profiler
-            ProfilerResolver.Current.SetProfiler(new WebProfiler());
+            var profiler = new WebProfiler();
+            ProfilerResolver.Current.SetProfiler(profiler);
+            profiler.Start();
         }
         
         /// <summary>
