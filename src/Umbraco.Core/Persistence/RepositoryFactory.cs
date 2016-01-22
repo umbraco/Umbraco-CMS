@@ -31,29 +31,27 @@ namespace Umbraco.Core.Persistence
             //if (sqlSyntax == null) throw new ArgumentNullException("sqlSyntax");
             if (settings == null) throw new ArgumentNullException("settings");
 
-            _cacheHelper = cacheHelper;
+            _cacheHelper = cacheHelper;            
 
             //IMPORTANT: We will force the DeepCloneRuntimeCacheProvider to be used here which is a wrapper for the underlying
             // runtime cache to ensure that anything that can be deep cloned in/out is done so, this also ensures that our tracks
             // changes entities are reset.
             if ((_cacheHelper.RuntimeCache is DeepCloneRuntimeCacheProvider) == false)
             {
-                var originalHelper = cacheHelper;
-
-                _cacheHelper = new CacheHelper(
-                    new DeepCloneRuntimeCacheProvider(originalHelper.RuntimeCache),
-                    originalHelper.StaticCache,
-                    originalHelper.RequestCache,
-                    new IsolatedRuntimeCache(type =>
-                    {
-                        var cache = originalHelper.IsolatedRuntimeCache.GetOrCreateCache(type);
-                        return (cache is DeepCloneRuntimeCacheProvider) == false
-                            //wrap the original if it's not DeepCloneRuntimeCacheProvider
-                            ? new DeepCloneRuntimeCacheProvider(cache) 
-                            : cache;
-                    }));
+                var origRuntimeCache = cacheHelper.RuntimeCache;
+                _cacheHelper.RuntimeCache = new DeepCloneRuntimeCacheProvider(origRuntimeCache);
             }
-            
+            //If the factory for isolated cache doesn't return DeepCloneRuntimeCacheProvider, then ensure it does
+            if (_cacheHelper.IsolatedRuntimeCache.CacheFactory.Method.ReturnType != typeof (DeepCloneRuntimeCacheProvider))
+            {
+                var origFactory = cacheHelper.IsolatedRuntimeCache.CacheFactory;
+                _cacheHelper.IsolatedRuntimeCache.CacheFactory = type =>
+                {
+                    var cache = origFactory(type);
+                    return new DeepCloneRuntimeCacheProvider(cache);
+                };
+            }
+
             _noCache = CacheHelper.CreateDisabledCacheHelper();
             _logger = logger;
             _sqlSyntax = sqlSyntax;
