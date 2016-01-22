@@ -123,21 +123,23 @@ ul.color-picker li a  {
 // Media picker
 // --------------------------------------------------
 .umb-mediapicker .add-link {
-  display: inline-block;
-  height: 120px;
-  width: 120px;
-  text-align: center;
-  color: @grayLight;
-  border: 2px @grayLight dashed;
-  line-height: 120px;
-  text-decoration: none;
+    display: inline-block;
+    height: 120px;
+    width: 120px;
+    text-align: center;
+    color: @grayLight;
+    border: 2px @grayLight dashed;
+    line-height: 120px;
+    text-decoration: none;
+    -moz-transition: all 150ms ease-in-out;
+    -o-transition: all 150ms ease-in-out;
+    -webkit-transition: all 150ms ease-in-out;
+    transition: all 150ms ease-in-out;
 
-  transition: all 150ms ease-in-out;
-
-  &:hover {
-      color: @blue;
-      border-color: @blue;
-  }
+    &:hover {
+        color: @blue;
+        border-color: @blue;
+    }
 }
 
 .umb-mediapicker .picked-image {
@@ -162,15 +164,31 @@ ul.color-picker li a  {
   text-decoration: none;
 }
 
-
-
-.umb-thumbnails{
+.umb-thumbnails {
   position: relative;
+  display: flex;
+  -ms-flex-direction: row;
+  -webkit-flex-direction: row;
+  flex-direction: row;
+  -ms-flex-wrap: wrap;
+  -webkit-flex-wrap: wrap;
+  flex-wrap: wrap;
+  justify-content: flex-start;
 }
 
+.umb-thumbnails.icons {
+  & > li.icon {
+    width: 14%;
+    text-align: center;
+  }
+  & + p.no-icons {
+    text-align: center;
+    padding: 25px 0;
+  }
+}
 
-.umb-thumbnails i{margin: auto;}
-.umb-thumbnails a{
+.umb-thumbnails i {margin: auto;}
+.umb-thumbnails a {
   outline: none;
   border:none !important;
   box-shadow:none !important;
@@ -182,7 +200,11 @@ ul.color-picker li a  {
     margin: 0;
     padding: 0;
     display: flex;
+    -ms-flex-direction: row;
+    -webkit-flex-direction: row;
     flex-direction: row;
+    -ms-flex-wrap: wrap;
+    -webkit-flex-wrap: wrap;
     flex-wrap: wrap;
 }
 
@@ -190,9 +212,13 @@ ul.color-picker li a  {
 .umb-sortable-thumbnails li {
     position: relative;
     display: flex;
+    -ms-flex-direction: row;
+    -webkit-flex-direction: row;
     flex-direction: row;
     justify-content: center;
     align-items: center;
+    -ms-flex-wrap: wrap;
+    -webkit-flex-wrap: wrap;
     flex-wrap: wrap;
     padding: 2px;
     margin: 5px;
@@ -497,21 +523,22 @@ ul.color-picker li a  {
 
 //this is a temp hack, to provide selectors in the dialog:
 .umb-photo-folder .pic:hover .selector-overlay {
-  position: absolute;
-  bottom: 0px;
-  left: 0px;
-  right: 0px;
-  padding: 5px;
-  background: black;
-  z-index: 100;
-  display: block;
-  text-align: center;
-  color: white;
-  opacity: 0.4;
-  text-decoration:none;
-
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 5px;
+    background: black;
+    z-index: 100;
+    display: block;
+    text-align: center;
+    color: white;
+    opacity: 0.4;
+    text-decoration: none;
     overflow: hidden;
-    text-overlow: ellipsis;
+    -ms-text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
     white-space: nowrap;
 }
 
