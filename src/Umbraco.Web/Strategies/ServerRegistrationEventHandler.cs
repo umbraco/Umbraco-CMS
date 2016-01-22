@@ -91,8 +91,8 @@ namespace Umbraco.Web.Strategies
 
             //Perform the rest async, we don't want to block the startup sequence
             // this will just reoccur on a background thread
-            _backgroundTaskRunner.Add(new TouchServerTask(_backgroundTaskRunner, 
-                5,                                              //delay before first execution
+            _backgroundTaskRunner.Add(new TouchServerTask(_backgroundTaskRunner,
+                15000,                                              //delay before first execution
                 _registrar.Options.RecurringSeconds * 1000,     //amount of ms between executions
                 svc, _registrar, serverAddress));
         }
