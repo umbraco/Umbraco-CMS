@@ -158,8 +158,7 @@ namespace Umbraco.Core.Cache
                 else if (_options.GetAllCacheAllowZeroCount)
                 {
                     //if the repository allows caching a zero count, then check the zero count cache
-                    var zeroCount = Cache.GetCacheItem<TEntity[]>(GetCacheTypeKey());
-                    if (zeroCount != null && zeroCount.Any() == false)
+                    if (HasZeroCountCache())
                     {
                         //there is a zero count cache so return an empty list
                         return new TEntity[] {};
@@ -177,6 +176,16 @@ namespace Umbraco.Core.Cache
             SetCacheAction(ids, entityCollection);
 
             return entityCollection;
+        }
+
+        /// <summary>
+        /// Looks up the zero count cache, must return null if it doesn't exist
+        /// </summary>
+        /// <returns></returns>
+        protected virtual bool HasZeroCountCache()
+        {
+            var zeroCount = Cache.GetCacheItem<TEntity[]>(GetCacheTypeKey());
+            return (zeroCount != null && zeroCount.Any() == false);
         }
 
         /// <summary>
