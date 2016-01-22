@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using System.Xml.XPath;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
@@ -84,7 +85,7 @@ namespace Umbraco.Core.Services
                                         // based on the ApplicationTreeRegistrar - and as noted there this is not an ideal way to do things but were stuck like this
                                         // currently because of the legacy assemblies and types not in the Core.
 
-                                        //Get all the trees not registered in the config
+                                        //Get all the trees not registered in the config (those not matching by alias casing will be detected as "unregistered")
                                         var unregistered = _allAvailableTrees
                                             .Where(x => list.Any(l => l.Alias == x.Alias) == false)
                                             .ToArray();
@@ -93,19 +94,35 @@ namespace Umbraco.Core.Services
 
                                         if (hasChanges == false) return false;
 
-                                        //add the unregistered ones to the list and re-save the file if any changes were found
+                                        //add or edit the unregistered ones and re-save the file if any changes were found
                                         var count = 0;
                                         foreach (var tree in unregistered)
                                         {
-                                            doc.Root.Add(new XElement("add",
-                                                new XAttribute("initialize", tree.Initialize),
-                                                new XAttribute("sortOrder", tree.SortOrder),
-                                                new XAttribute("alias", tree.Alias),
-                                                new XAttribute("application", tree.ApplicationAlias),
-                                                new XAttribute("title", tree.Title),
-                                                new XAttribute("iconClosed", tree.IconClosed),
-                                                new XAttribute("iconOpen", tree.IconOpened),
-                                                new XAttribute("type", tree.Type)));
+                                            //ugly translate hack to allow case insensitive matching since 'matches' is a xpath2.0 feature...
+                                            var existingElement = doc.Root.XPathSelectElement("//add[translate(@alias,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')=translate('" + tree.Alias + "','abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')]");
+                                            if (existingElement != null)
+                                            {
+                                                existingElement.SetAttributeValue("initialize", tree.Initialize);
+                                                existingElement.SetAttributeValue("sortOrder", tree.Initialize);
+                                                existingElement.SetAttributeValue("alias", tree.Alias);
+                                                existingElement.SetAttributeValue("application", tree.ApplicationAlias);
+                                                existingElement.SetAttributeValue("title", tree.Title);
+                                                existingElement.SetAttributeValue("iconClosed", tree.IconClosed);
+                                                existingElement.SetAttributeValue("iconOpen", tree.IconOpened);
+                                                existingElement.SetAttributeValue("type", tree.Type);
+                                            }
+                                            else
+                                            {
+                                                doc.Root.Add(new XElement("add",
+                                                    new XAttribute("initialize", tree.Initialize),
+                                                    new XAttribute("sortOrder", tree.SortOrder),
+                                                    new XAttribute("alias", tree.Alias),
+                                                    new XAttribute("application", tree.ApplicationAlias),
+                                                    new XAttribute("title", tree.Title),
+                                                    new XAttribute("iconClosed", tree.IconClosed),
+                                                    new XAttribute("iconOpen", tree.IconOpened),
+                                                    new XAttribute("type", tree.Type)));
+                                            }
                                             count++;
                                         }
 
