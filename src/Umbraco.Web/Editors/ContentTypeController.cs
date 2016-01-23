@@ -99,9 +99,9 @@ namespace Umbraco.Web.Editors
         {
             return ApplicationContext.Services.ContentTypeService.GetAllPropertyTypeAliases();
         }
-
+        
         /// <summary>
-        /// Returns the avilable compositions for this content type
+        /// Returns the available compositions for this content type
         /// </summary>
         /// <param name="contentTypeId"></param>
         /// <param name="filterContentTypes">
@@ -244,14 +244,7 @@ namespace Umbraco.Web.Editors
         public IEnumerable<ContentTypeBasic> GetAll()
         {
             var types = Services.ContentTypeService.GetAllContentTypes();
-            var basics = types.Select(Mapper.Map<IContentType, ContentTypeBasic>);
-
-            return basics.Select(basic =>
-            {
-                basic.Name = TranslateItem(basic.Name);
-                basic.Description = TranslateItem(basic.Description);
-                return basic;
-            });
+            return MapTypesForResponse(types);
         }
 
         /// <summary>
@@ -288,16 +281,32 @@ namespace Umbraco.Web.Editors
                 types = Services.ContentTypeService.GetAllContentTypes(ids).ToList();
             }
 
-            var basics = types.Select(Mapper.Map<IContentType, ContentTypeBasic>).ToList();
+            return MapTypesForResponse(types);
+        }
 
-            var localizedTextService = Services.TextService;
-            foreach (var basic in basics)
+        /// <summary>
+        /// Returns the content types that use the passed type as a composition
+        /// </summary>
+        /// <param name="contentTypeId"></param>
+        /// <returns></returns>
+        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes, Constants.Trees.Content)]
+        public IEnumerable<ContentTypeBasic> GetTypesUsingComposite(int contentTypeId)
+        {
+            var types = Services.ContentTypeService.GetAllContentTypes()
+                .Where(x => x.ContentTypeComposition.Any(y => y.Id == contentTypeId));
+            return MapTypesForResponse(types);
+        }
+
+        private IEnumerable<ContentTypeBasic> MapTypesForResponse(IEnumerable<IContentType> types)
+        {
+            var basics = types.Select(Mapper.Map<IContentType, ContentTypeBasic>);
+
+            return basics.Select(basic =>
             {
-                basic.Name = localizedTextService.UmbracoDictionaryTranslate(basic.Name);
-                basic.Description = localizedTextService.UmbracoDictionaryTranslate(basic.Description);
-            }
-
-            return basics;
+                basic.Name = TranslateItem(basic.Name);
+                basic.Description = TranslateItem(basic.Description);
+                return basic;
+            });
         }
 
         /// <summary>

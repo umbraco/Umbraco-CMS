@@ -50,6 +50,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Returns the available composite content types for a given content type
         /// </summary>
+        /// <param name="contentTypeId"></param>       
         /// <param name="type"></param>
         /// <param name="filterContentTypes">
         /// This is normally an empty list but if additional content type aliases are passed in, any content types containing those aliases will be filtered out
@@ -60,7 +61,6 @@ namespace Umbraco.Web.Editors
         /// This is required because in the case of creating/modifying a content type because new property types being added to it are not yet persisted so cannot
         /// be looked up via the db, they need to be passed in.
         /// </param>
-        /// <param name="contentTypeId"></param>        
         /// <returns></returns>
         protected IEnumerable<Tuple<EntityBasic, bool>> PerformGetAvailableCompositeContentTypes(int contentTypeId, 
             UmbracoObjectTypes type, 

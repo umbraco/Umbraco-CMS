@@ -1064,6 +1064,8 @@ To manage your website, simply open the Umbraco back office and start adding con
       <key alias="andAllMembers">and all members using this type</key>
 
       <key alias="thisEditorUpdateSettings">using this editor will get updated with the new settings</key>
+
+      <key alias="cannotDeleteType">This document type cannot be deleted as it used as a composition in one or more other types.  To remove this type, remove it as a composition from those other types first.</key>
   </area>
 
   <area alias="templateEditor">

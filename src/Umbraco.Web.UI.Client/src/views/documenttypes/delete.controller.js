@@ -8,6 +8,12 @@
  */
 function DocumentTypesDeleteController($scope, dataTypeResource, contentTypeResource, treeService, navigationService) {
 
+    $scope.canDelete = true;
+
+    contentTypeResource.getTypesUsingComposite($scope.currentNode.id).then(function (data) {
+        $scope.canDelete = data.length === 0;
+    });
+
     $scope.performDelete = function() {
 
         //mark it for deletion (used in the UI)

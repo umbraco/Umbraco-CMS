@@ -706,6 +706,15 @@ namespace Umbraco.Core.Services
 	        if (DeletingContentType.IsRaisedEventCancelled(new DeleteEventArgs<IContentType>(contentType), this)) 
 				return;
 
+            // Check to see if the document type being deleted is used in a composition.  If so, prevent the deletion to avoid
+            // a potentially dangerous and expensive operation that deletes more content than expected.  The user will need
+            // to delete all types that use this type as a composition first.
+            // The UI should prevent access to deleting types used in composition so in normal back-office used this exception won't be thrown.
+            if (IsTypeUsedAsComposition(contentType))
+            {
+                throw new InvalidOperationException("Document type cannot be deleted as it is used as a composition in one or more other types");
+            }
+
             using (new WriteLock(Locker))
             {
                 _contentService.DeleteContentOfType(contentType.Id);
@@ -1161,6 +1170,12 @@ namespace Umbraco.Core.Services
 
             }
             return dtd.ToString();
+        }
+
+        private bool IsTypeUsedAsComposition(IContentType contentType)
+        {
+            return GetAllContentTypes()
+                .Any(x => x.ContentTypeComposition.Any(y => y.Id == contentType.Id));
         }
 
         private void Audit(AuditType type, string message, int userId, int objectId)
