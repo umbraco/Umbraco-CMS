@@ -70,9 +70,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 ? GetAll(dtos.DistinctBy(x => x.ContentTypeDto.NodeId).Select(x => x.ContentTypeDto.NodeId).ToArray())
                 : Enumerable.Empty<IContentType>();
         }
-
-        #endregion
-
+        
         /// <summary>
         /// Gets all entities of the specified <see cref="PropertyType"/> query
         /// </summary>
