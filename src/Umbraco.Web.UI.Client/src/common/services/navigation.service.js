@@ -215,8 +215,6 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             //this reacts to tree items themselves being clicked
             //the tree directive should not contain any handling, simply just bubble events
             mainTreeEventHandler.bind("treeNodeSelect", function (ev, args) {
-                console.log('navigating-ev', ev);
-                console.log('navigating-args', args);
                 var n = args.node;
                 ev.stopPropagation();
                 ev.preventDefault();
