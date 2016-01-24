@@ -71,9 +71,10 @@ namespace Umbraco.Web.PropertyEditors
                                          new RichTextEditorCommand()
                                          {
                                              IsStylePicker = isStyle,
+                                             Name = n.SelectSingleNode("./name").FirstChild.Value,
                                              Icon = n.SelectSingleNode("./icon").FirstChild.Value,
                                              Command = n.SelectSingleNode("./tinyMceCommand").FirstChild.Value,
-                                             Alias = n.SelectSingleNode("./umbracoAlias").FirstChild.Value.ToLower(),
+                                             Alias = alias,
                                              UserInterface = n.SelectSingleNode("./tinyMceCommand").Attributes.GetNamedItem("userInterface").Value,
                                              FrontEndCommand = n.SelectSingleNode("./tinyMceCommand").Attributes.GetNamedItem("frontendCommand").Value,
                                              Value = n.SelectSingleNode("./tinyMceCommand").Attributes.GetNamedItem("value").Value,
