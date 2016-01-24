@@ -138,7 +138,8 @@ namespace Umbraco.Web.Editors
         /// <param name="contentTypeSave"></param>
         /// <param name="composition"></param>
         /// <returns></returns>
-        protected void ValidateComposition(ContentTypeSave contentTypeSave, IContentTypeComposition composition)
+        protected void ValidateComposition<TPropertyType>(ContentTypeSave<TPropertyType> contentTypeSave, IContentTypeComposition composition) 
+            where TPropertyType : PropertyTypeBasic
         {
             var validateAttempt = Services.ContentTypeService.ValidateComposition(composition);
             if (validateAttempt == false)
@@ -158,7 +159,7 @@ namespace Umbraco.Web.Editors
                     ModelState.AddModelError(key, "Duplicate property aliases not allowed between compositions");
                 }
 
-                var display = Mapper.Map<ContentTypeDisplay>(composition);
+                var display = Mapper.Map<DocumentTypeDisplay>(composition);
                 //map the 'save' data on top
                 display = Mapper.Map(contentTypeSave, display);
                 display.Errors = ModelState.ToErrorDictionary();
@@ -181,14 +182,16 @@ namespace Umbraco.Web.Editors
             return CultureDictionary[text].IfNullOrWhiteSpace(text);
         }
 
-        protected TContentType PerformPostSave<TContentType, TContentTypeDisplay>(
-            ContentTypeSave contentTypeSave,
+        protected TContentType PerformPostSave<TContentType, TContentTypeDisplay, TContentTypeSave, TPropertyType>(
+            TContentTypeSave contentTypeSave,
             Func<int, TContentType> getContentType,
             Action<TContentType> saveContentType,
             bool validateComposition = true,
-            Action<ContentTypeSave> beforeCreateNew = null)
+            Action<TContentTypeSave> beforeCreateNew = null)
             where TContentType : class, IContentTypeComposition
             where TContentTypeDisplay : ContentTypeCompositionDisplay
+            where TContentTypeSave : ContentTypeSave<TPropertyType> 
+            where TPropertyType : PropertyTypeBasic
         {
             var ctId = Convert.ToInt32(contentTypeSave.Id);
             var ct = ctId > 0 ? getContentType(ctId) : null;

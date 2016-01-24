@@ -5,11 +5,12 @@ using System.Runtime.Serialization;
 namespace Umbraco.Web.Models.ContentEditing
 {
     [DataContract(Name = "propertyGroup", Namespace = "")]
-    public class PropertyGroupDisplay : PropertyGroupBasic<PropertyTypeDisplay>
+    public class PropertyGroupDisplay<TPropertyTypeDisplay> : PropertyGroupBasic<TPropertyTypeDisplay> 
+        where TPropertyTypeDisplay : PropertyTypeDisplay
     {
         public PropertyGroupDisplay()
         {
-            Properties = new List<PropertyTypeDisplay>();
+            Properties = new List<TPropertyTypeDisplay>();
             ParentTabContentTypeNames = new List<string>();
             ParentTabContentTypes = new List<int>();
         }
