@@ -58,7 +58,7 @@ namespace Umbraco.Web.Models.Mapping
                     ContentTypeId = source.Id
                 };
 
-                group.Properties = MapProperties(tab.PropertyTypes, source, tab.Id, false);
+                group.Properties = MapProperties(tab.PropertyTypes, tab.Id, false);
                 groups.Add(group);
             }         
 
@@ -85,7 +85,7 @@ namespace Umbraco.Web.Models.Mapping
                     ParentTabContentTypeNames = new[] { definingContentType.Name }
                 };
 
-                group.Properties = MapProperties(tab.PropertyTypes, definingContentType, tab.Id, true);
+                group.Properties = MapProperties(tab.PropertyTypes, tab.Id, true);
                 groups.Add(group);
             }
 
@@ -94,14 +94,14 @@ namespace Umbraco.Web.Models.Mapping
 
             // add generic properties local to this content type
             var entityGenericProperties = source.PropertyTypes.Where(x => x.PropertyGroupId == null);
-            genericProperties.AddRange(MapProperties(entityGenericProperties, source, PropertyGroupBasic.GenericPropertiesGroupId, false));
+            genericProperties.AddRange(MapProperties(entityGenericProperties, PropertyGroupBasic.GenericPropertiesGroupId, false));
 
             // add generic properties inherited through compositions
             var localGenericPropertyIds = genericProperties.Select(x => x.Id).ToArray();
             var compositionGenericProperties = source.CompositionPropertyTypes
                 .Where(x => x.PropertyGroupId == null // generic
                     && localGenericPropertyIds.Contains(x.Id) == false); // skip those that are local
-            genericProperties.AddRange(MapProperties(compositionGenericProperties, source, PropertyGroupBasic.GenericPropertiesGroupId, true));
+            genericProperties.AddRange(MapProperties(compositionGenericProperties, PropertyGroupBasic.GenericPropertiesGroupId, true));
 
             // if there are any generic properties, add the corresponding tab
             if (genericProperties.Any())
@@ -165,7 +165,7 @@ namespace Umbraco.Web.Models.Mapping
             return groups.OrderBy(x => x.SortOrder);
         }
 
-        private IEnumerable<TPropertyType> MapProperties(IEnumerable<PropertyType> properties, IContentTypeBase contentType, int groupId, bool inherited)
+        private IEnumerable<TPropertyType> MapProperties(IEnumerable<PropertyType> properties, int groupId, bool inherited)
         {
             var mappedProperties = new List<TPropertyType>();
 
@@ -185,8 +185,6 @@ namespace Umbraco.Web.Models.Mapping
                         View = propertyEditor.ValueEditor.View,
                         Config = propertyEditor.PreValueEditor.ConvertDbToEditor(propertyEditor.DefaultPreValues, preValues) ,
                         //Value = "",
-                        //ContentTypeId = contentType.Id,
-                        //ContentTypeName = contentType.Name,
                         GroupId = groupId,
                         Inherited = inherited,
                         DataTypeId = p.DataTypeDefinitionId,
