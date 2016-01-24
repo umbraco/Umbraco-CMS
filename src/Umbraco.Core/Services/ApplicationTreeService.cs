@@ -98,18 +98,14 @@ namespace Umbraco.Core.Services
                                         var count = 0;
                                         foreach (var tree in unregistered)
                                         {
-                                            //ugly translate hack to allow case insensitive matching since 'matches' is a xpath2.0 feature...
-                                            var existingElement = doc.Root.XPathSelectElement("//add[translate(@alias,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')=translate('" + tree.Alias + "','abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')]");
+                                            var existingElement = doc.Root.Elements("add").SingleOrDefault(x =>
+                                                string.Equals(x.Attribute("alias").Value, tree.Alias,
+                                                    StringComparison.InvariantCultureIgnoreCase) &&
+                                                string.Equals(x.Attribute("application").Value, tree.ApplicationAlias,
+                                                    StringComparison.InvariantCultureIgnoreCase));
                                             if (existingElement != null)
                                             {
-                                                existingElement.SetAttributeValue("initialize", tree.Initialize);
-                                                existingElement.SetAttributeValue("sortOrder", tree.Initialize);
                                                 existingElement.SetAttributeValue("alias", tree.Alias);
-                                                existingElement.SetAttributeValue("application", tree.ApplicationAlias);
-                                                existingElement.SetAttributeValue("title", tree.Title);
-                                                existingElement.SetAttributeValue("iconClosed", tree.IconClosed);
-                                                existingElement.SetAttributeValue("iconOpen", tree.IconOpened);
-                                                existingElement.SetAttributeValue("type", tree.Type);
                                             }
                                             else
                                             {
@@ -141,11 +137,7 @@ namespace Umbraco.Core.Services
                             }
                         }
                     }
-
-
                     return list;
-
-
                 }, new TimeSpan(0, 10, 0));
         }
 
