@@ -431,7 +431,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
             return contentType;
         }
 
-        public static void EnsureAllIds(ContentType contentType, int seedId)
+        public static void EnsureAllIds(ContentTypeCompositionBase contentType, int seedId)
         {
             //ensure everything has ids
             contentType.Id = seedId;
@@ -445,6 +445,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
                 propertyType.Id = itemid++;
             }
         }
+
 
         private static string RandomAlias(string alias, bool randomizeAliases)
         {

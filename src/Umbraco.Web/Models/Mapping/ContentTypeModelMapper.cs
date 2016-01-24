@@ -50,9 +50,9 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(type => type.UpdateDate, expression => expression.Ignore())
                 .ForMember(type => type.HasIdentity, expression => expression.Ignore());
 
-            config.CreateMap<ContentTypeSave, IContentType>()
+            config.CreateMap<DocumentTypeSave, IContentType>()
                 //do the base mapping
-                .MapBaseContentTypeSaveToEntity(applicationContext)
+                .MapBaseContentTypeSaveToEntity<DocumentTypeSave, PropertyTypeBasic, IContentType>(applicationContext)
                 .ConstructUsing((source) => new ContentType(source.ParentId))
                 .ForMember(source => source.AllowedTemplates, expression => expression.Ignore())
                 .ForMember(dto => dto.DefaultTemplate, expression => expression.Ignore())
@@ -69,33 +69,59 @@ namespace Umbraco.Web.Models.Mapping
                     ContentTypeModelMapperExtensions.AfterMapContentTypeSaveToEntity(source, dest, applicationContext);
                 });
 
-            config.CreateMap<ContentTypeSave, IMediaType>()
+            config.CreateMap<MediaTypeSave, IMediaType>()
                 //do the base mapping
-                .MapBaseContentTypeSaveToEntity(applicationContext)
+                .MapBaseContentTypeSaveToEntity<MediaTypeSave, PropertyTypeBasic, IMediaType>(applicationContext)
                 .ConstructUsing((source) => new MediaType(source.ParentId))                
                 .AfterMap((source, dest) =>
                 {
                     ContentTypeModelMapperExtensions.AfterMapContentTypeSaveToEntity(source, dest, applicationContext);
                 });
 
-            config.CreateMap<ContentTypeSave, IMemberType>()
+            config.CreateMap<MemberTypeSave, IMemberType>()
                 //do the base mapping
-                .MapBaseContentTypeSaveToEntity(applicationContext)
+                .MapBaseContentTypeSaveToEntity<MemberTypeSave, MemberPropertyTypeBasic, IMemberType>(applicationContext)
                 .ConstructUsing((source) => new MemberType(source.ParentId))
                 .AfterMap((source, dest) =>
                 {
                     ContentTypeModelMapperExtensions.AfterMapContentTypeSaveToEntity(source, dest, applicationContext);
+
+                    //map the MemberCanEditProperty,MemberCanViewProperty
+                    foreach (var propertyType in source.Groups.SelectMany(x => x.Properties))
+                    {
+                        var localCopy = propertyType;
+                        var destProp = dest.PropertyTypes.SingleOrDefault(x => x.Alias.InvariantEquals(localCopy.Alias));
+                        if (destProp != null)
+                        {
+                            dest.SetMemberCanEditProperty(localCopy.Alias, localCopy.MemberCanEditProperty);
+                            dest.SetMemberCanViewProperty(localCopy.Alias, localCopy.MemberCanViewProperty);
+                        }
+                    }
                 });
 
             config.CreateMap<IContentTypeComposition, string>().ConvertUsing(x => x.Alias);
 
-            config.CreateMap<IMemberType, ContentTypeCompositionDisplay>()
+            config.CreateMap<IMemberType, MemberTypeDisplay>()
                 //map base logic
-                .MapBaseContentTypeEntityToDisplay(applicationContext, _propertyEditorResolver);
+                .MapBaseContentTypeEntityToDisplay<IMemberType, MemberTypeDisplay, MemberPropertyTypeDisplay>(applicationContext, _propertyEditorResolver)
+                .AfterMap((memberType, display) =>
+                {
+                    //map the MemberCanEditProperty,MemberCanViewProperty
+                    foreach (var propertyType in memberType.PropertyTypes)
+                    {
+                        var localCopy = propertyType;
+                        var displayProp = display.Groups.SelectMany(x => x.Properties).SingleOrDefault(x => x.Alias.InvariantEquals(localCopy.Alias));
+                        if (displayProp != null)
+                        {
+                            displayProp.MemberCanEditProperty = memberType.MemberCanEditProperty(localCopy.Alias);
+                            displayProp.MemberCanViewProperty = memberType.MemberCanViewProperty(localCopy.Alias);
+                        }
+                    }
+                });
 
-            config.CreateMap<IMediaType, ContentTypeCompositionDisplay>()
+            config.CreateMap<IMediaType, MediaTypeDisplay>()
                 //map base logic
-                .MapBaseContentTypeEntityToDisplay(applicationContext, _propertyEditorResolver)
+                .MapBaseContentTypeEntityToDisplay<IMediaType, MediaTypeDisplay, PropertyTypeDisplay>(applicationContext, _propertyEditorResolver)
                 .AfterMap((source, dest) =>
                  {
                      //default listview
@@ -109,9 +135,9 @@ namespace Umbraco.Web.Models.Mapping
                      }
                  });
 
-            config.CreateMap<IContentType, ContentTypeDisplay>()
+            config.CreateMap<IContentType, DocumentTypeDisplay>()
                 //map base logic
-                .MapBaseContentTypeEntityToDisplay(applicationContext, _propertyEditorResolver)
+                .MapBaseContentTypeEntityToDisplay<IContentType, DocumentTypeDisplay, PropertyTypeDisplay>(applicationContext, _propertyEditorResolver)
                 .ForMember(dto => dto.AllowedTemplates, expression => expression.Ignore())
                 .ForMember(dto => dto.DefaultTemplate, expression => expression.Ignore())
                 .ForMember(display => display.Notifications, expression => expression.Ignore())
@@ -141,7 +167,7 @@ namespace Umbraco.Web.Models.Mapping
 
             config.CreateMap<PropertyTypeBasic, PropertyType>()
 
-                .ConstructUsing((PropertyTypeBasic propertyTypeBasic) =>
+                .ConstructUsing(propertyTypeBasic =>
                 {
                     var dataType = applicationContext.Services.DataTypeService.GetDataTypeDefinitionById(propertyTypeBasic.DataTypeId);
                     if (dataType == null) throw new NullReferenceException("No data type found with id " + propertyTypeBasic.DataTypeId);
@@ -170,11 +196,14 @@ namespace Umbraco.Web.Models.Mapping
 
             #region *** Used for mapping on top of an existing display object from a save object ***
 
-            config.CreateMap<ContentTypeSave, ContentTypeCompositionDisplay>()
-                .MapBaseContentTypeSaveToDisplay();
+            config.CreateMap<MemberTypeSave, MemberTypeDisplay>()
+                .MapBaseContentTypeSaveToDisplay<MemberTypeSave, MemberPropertyTypeBasic, MemberTypeDisplay, MemberPropertyTypeDisplay>();
+
+            config.CreateMap<MediaTypeSave, MediaTypeDisplay>()
+                .MapBaseContentTypeSaveToDisplay<MediaTypeSave, PropertyTypeBasic, MediaTypeDisplay, PropertyTypeDisplay>();
             
-            config.CreateMap<ContentTypeSave, ContentTypeDisplay>()
-                .MapBaseContentTypeSaveToDisplay()
+            config.CreateMap<DocumentTypeSave, DocumentTypeDisplay>()
+                .MapBaseContentTypeSaveToDisplay<DocumentTypeSave, PropertyTypeBasic, DocumentTypeDisplay, PropertyTypeDisplay>()
                 .ForMember(dto => dto.AllowedTemplates, expression => expression.Ignore())
                 .ForMember(dto => dto.DefaultTemplate, expression => expression.Ignore())
                 .AfterMap((source, dest) =>
@@ -206,41 +235,39 @@ namespace Umbraco.Web.Models.Mapping
                     }
                 });
 
+            //for doc types, media types
             config.CreateMap<PropertyGroupBasic<PropertyTypeBasic>, PropertyGroup>()
-                    .ForMember(dest => dest.Id, map => map.Condition(source => source.Id > 0))
-                    .ForMember(dest => dest.Key, map => map.Ignore())
-                    .ForMember(dest => dest.HasIdentity, map => map.Ignore())
-                    .ForMember(dest => dest.CreateDate, map => map.Ignore())
-                    .ForMember(dest => dest.UpdateDate, map => map.Ignore())
-                    // fixme
-                    // this is basically *replacing* dest properties by a mapped version of
-                    // *every* source properties (including, I guess, inherited properties?)
-                    // also, ContentTypeModelMapperExtensions will map properties *again* so
-                    // this makes little sense - ignore for now
-                    .ForMember(dest => dest.PropertyTypes, map => map.Ignore());
-                    //.ForMember(dest => dest.PropertyTypes, map => map.MapFrom(source =>
-                    //    source.Properties.Select(Mapper.Map<PropertyType>)));
+                .MapPropertyGroupBasicToPropertyGroupPersistence<PropertyGroupBasic<PropertyTypeBasic>, PropertyTypeBasic>();
 
-            config.CreateMap<PropertyGroupBasic<PropertyTypeBasic>, PropertyGroupDisplay>()
-                .ForMember(dest => dest.Id, expression => expression.Condition(source => source.Id > 0))
-                .ForMember(g => g.ContentTypeId, expression => expression.Ignore())
-                .ForMember(g => g.ParentTabContentTypes, expression => expression.Ignore())
-                .ForMember(g => g.ParentTabContentTypeNames, expression => expression.Ignore())
-                .ForMember(g => g.Properties, expression => expression.MapFrom(display => display.Properties.Select(Mapper.Map<PropertyTypeDisplay>)));
+            //for members
+            config.CreateMap<PropertyGroupBasic<MemberPropertyTypeBasic>, PropertyGroup>()
+                .MapPropertyGroupBasicToPropertyGroupPersistence<PropertyGroupBasic<MemberPropertyTypeBasic>, MemberPropertyTypeBasic>();
+
+            //for doc types, media types
+            config.CreateMap<PropertyGroupBasic<PropertyTypeBasic>, PropertyGroupDisplay<PropertyTypeDisplay>>()
+                .MapPropertyGroupBasicToPropertyGroupDisplay<PropertyGroupBasic<PropertyTypeBasic>, PropertyTypeBasic, PropertyTypeDisplay>();
+
+            //for members
+            config.CreateMap<PropertyGroupBasic<MemberPropertyTypeBasic>, PropertyGroupDisplay<MemberPropertyTypeDisplay>>()
+                .MapPropertyGroupBasicToPropertyGroupDisplay<PropertyGroupBasic<MemberPropertyTypeBasic>, MemberPropertyTypeBasic, MemberPropertyTypeDisplay>();
 
             config.CreateMap<PropertyTypeBasic, PropertyTypeDisplay>()
                 .ForMember(g => g.Editor, expression => expression.Ignore())
                 .ForMember(g => g.View, expression => expression.Ignore())
                 .ForMember(g => g.Config, expression => expression.Ignore())
-                .ForMember(g => g.ContentTypeId, expression => expression.Ignore())
-                .ForMember(g => g.ContentTypeName, expression => expression.Ignore())
+                .ForMember(g => g.Locked, exp => exp.Ignore());
+
+            config.CreateMap<MemberPropertyTypeBasic, MemberPropertyTypeDisplay>()
+                .ForMember(g => g.Editor, expression => expression.Ignore())
+                .ForMember(g => g.View, expression => expression.Ignore())
+                .ForMember(g => g.Config, expression => expression.Ignore())
                 .ForMember(g => g.Locked, exp => exp.Ignore());
 
             #endregion
 
-            
 
-            
+
+
         }
 
 
