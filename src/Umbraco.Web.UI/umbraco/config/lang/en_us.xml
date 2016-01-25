@@ -440,6 +440,7 @@
     <key alias="properties">Properties</key>
     <key alias="reciept">Email to receive form data</key>
     <key alias="recycleBin">Recycle Bin</key>
+    <key alias="recycleBinEmpty">Your recycle bin is empty</key>
     <key alias="remaining">Remaining</key>
     <key alias="rename">Rename</key>
     <key alias="renew">Renew</key>

@@ -19,6 +19,7 @@
       vm.activeDrag = false;
       vm.mediaDetailsTooltip = {};
       vm.itemsWithoutFolders = [];
+      vm.isRecycleBin = $scope.contentId === '-21';
 
       vm.dragEnter = dragEnter;
       vm.dragLeave = dragLeave;
