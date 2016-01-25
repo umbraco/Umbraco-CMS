@@ -199,11 +199,11 @@ namespace Umbraco.Web.Editors
                 }
                 catch (Exception ex)
                 {
-                    var responseEx = CreateInvalidCompositionResponseException<TContentTypeDisplay, TContentType>(ex, contentTypeSave, ct, ctId);
+                    var responseEx = CreateInvalidCompositionResponseException<TContentTypeDisplay, TContentType, TContentTypeSave, TPropertyType>(ex, contentTypeSave, ct, ctId);
                     if (responseEx != null) throw responseEx;
                 }
 
-                var exResult = CreateCompositionValidationExceptionIfInvalid(contentTypeSave, ct);
+                var exResult = CreateCompositionValidationExceptionIfInvalid<TContentTypeSave, TPropertyType, TContentTypeDisplay>(contentTypeSave, ct);
                 if (exResult != null) throw exResult;
 
                 saveContentType(ct);
@@ -236,11 +236,11 @@ namespace Umbraco.Web.Editors
                 }
                 catch (Exception ex)
                 {
-                    var responseEx = CreateInvalidCompositionResponseException<TContentTypeDisplay, TContentType>(ex, contentTypeSave, ct, ctId);
+                    var responseEx = CreateInvalidCompositionResponseException<TContentTypeDisplay, TContentType, TContentTypeSave, TPropertyType>(ex, contentTypeSave, ct, ctId);
                     if (responseEx != null) throw responseEx;
                 }
 
-                var exResult = CreateCompositionValidationExceptionIfInvalid(contentTypeSave, newCt);
+                var exResult = CreateCompositionValidationExceptionIfInvalid<TContentTypeSave, TPropertyType, TContentTypeDisplay>(contentTypeSave, newCt);
                 if (exResult != null) throw exResult;
 
                 //set id to null to ensure its handled as a new type
@@ -311,7 +311,10 @@ namespace Umbraco.Web.Editors
         /// <param name="contentTypeSave"></param>
         /// <param name="composition"></param>
         /// <returns></returns>
-        private HttpResponseException CreateCompositionValidationExceptionIfInvalid(ContentTypeSave contentTypeSave, IContentTypeComposition composition)
+        private HttpResponseException CreateCompositionValidationExceptionIfInvalid<TContentTypeSave, TPropertyType, TContentTypeDisplay>(TContentTypeSave contentTypeSave, IContentTypeComposition composition)
+            where TContentTypeSave : ContentTypeSave<TPropertyType> 
+            where TPropertyType : PropertyTypeBasic
+            where TContentTypeDisplay : ContentTypeCompositionDisplay
         {
             var validateAttempt = Services.ContentTypeService.ValidateComposition(composition);
             if (validateAttempt == false)
@@ -319,9 +322,9 @@ namespace Umbraco.Web.Editors
                 //if it's not successful then we need to return some model state for the property aliases that 
                 // are duplicated
                 var invalidPropertyAliases = validateAttempt.Result.Distinct();
-                AddCompositionValidationErrors(contentTypeSave, invalidPropertyAliases);
+                AddCompositionValidationErrors<TContentTypeSave, TPropertyType>(contentTypeSave, invalidPropertyAliases);
 
-                var display = Mapper.Map<ContentTypeDisplay>(composition);
+                var display = Mapper.Map<TContentTypeDisplay>(composition);
                 //map the 'save' data on top
                 display = Mapper.Map(contentTypeSave, display);
                 display.Errors = ModelState.ToErrorDictionary();
@@ -336,7 +339,9 @@ namespace Umbraco.Web.Editors
         /// <param name="contentTypeSave"></param>
         /// <param name="invalidPropertyAliases"></param>
         /// <returns></returns>
-        private void AddCompositionValidationErrors(ContentTypeSave contentTypeSave, IEnumerable<string> invalidPropertyAliases)
+        private void AddCompositionValidationErrors<TContentTypeSave, TPropertyType>(TContentTypeSave contentTypeSave, IEnumerable<string> invalidPropertyAliases)
+            where TContentTypeSave : ContentTypeSave<TPropertyType> 
+            where TPropertyType : PropertyTypeBasic
         {
             foreach (var propertyAlias in invalidPropertyAliases)
             {
@@ -354,15 +359,19 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <typeparam name="TContentTypeDisplay"></typeparam>
         /// <typeparam name="TContentType"></typeparam>
+        /// <typeparam name="TContentTypeSave"></typeparam>
+        /// <typeparam name="TPropertyType"></typeparam>
         /// <param name="ex"></param>
         /// <param name="contentTypeSave"></param>
         /// <param name="ct"></param>
         /// <param name="ctId"></param>
         /// <returns></returns>
-        private HttpResponseException CreateInvalidCompositionResponseException<TContentTypeDisplay, TContentType>(
-            Exception ex, ContentTypeSave contentTypeSave, TContentType ct, int ctId)
+        private HttpResponseException CreateInvalidCompositionResponseException<TContentTypeDisplay, TContentType, TContentTypeSave, TPropertyType>(
+            Exception ex, TContentTypeSave contentTypeSave, TContentType ct, int ctId)
             where TContentType : class, IContentTypeComposition
-            where TContentTypeDisplay : ContentTypeCompositionDisplay
+            where TContentTypeDisplay : ContentTypeCompositionDisplay 
+            where TContentTypeSave : ContentTypeSave<TPropertyType> 
+            where TPropertyType : PropertyTypeBasic
         {
             InvalidCompositionException invalidCompositionException = null;
             if (ex is AutoMapperMappingException && ex.InnerException is InvalidCompositionException)
@@ -375,7 +384,7 @@ namespace Umbraco.Web.Editors
             }
             if (invalidCompositionException != null)
             {
-                AddCompositionValidationErrors(contentTypeSave, invalidCompositionException.PropertyTypeAliases);
+                AddCompositionValidationErrors<TContentTypeSave, TPropertyType>(contentTypeSave, invalidCompositionException.PropertyTypeAliases);
                 return CreateModelStateValidationException<TContentTypeDisplay, TContentType>(ctId, contentTypeSave, ct);
             }
             return null;
