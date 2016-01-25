@@ -107,7 +107,20 @@ namespace Umbraco.Core.Services
                                             }
                                             else
                                             {
-                                                doc.Root.Add(new XElement("add",
+                                                if (tree.Title.IsNullOrWhiteSpace())
+                                                {
+                                                    doc.Root.Add(new XElement("add",
+                                                        new XAttribute("initialize", tree.Initialize),
+                                                        new XAttribute("sortOrder", tree.SortOrder),
+                                                        new XAttribute("alias", tree.Alias),
+                                                        new XAttribute("application", tree.ApplicationAlias),                                                        
+                                                        new XAttribute("iconClosed", tree.IconClosed),
+                                                        new XAttribute("iconOpen", tree.IconOpened),
+                                                        new XAttribute("type", tree.Type)));
+                                                }
+                                                else
+                                                {
+                                                    doc.Root.Add(new XElement("add",
                                                     new XAttribute("initialize", tree.Initialize),
                                                     new XAttribute("sortOrder", tree.SortOrder),
                                                     new XAttribute("alias", tree.Alias),
@@ -116,6 +129,8 @@ namespace Umbraco.Core.Services
                                                     new XAttribute("iconClosed", tree.IconClosed),
                                                     new XAttribute("iconOpen", tree.IconOpened),
                                                     new XAttribute("type", tree.Type)));
+                                                }
+                                                
                                             }
                                             count++;
                                         }
