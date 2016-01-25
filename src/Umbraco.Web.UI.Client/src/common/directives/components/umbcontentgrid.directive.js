@@ -5,16 +5,15 @@
 
       function link(scope, el, attr, ctrl) {
 
-         scope.clickItem = function(item) {
+         scope.clickItem = function(item, $event, $index) {
             if(scope.onClick) {
-               scope.onClick(item);
+               scope.onClick(item, $event, $index);
             }
          };
 
-         scope.selectItem = function(item, $event, $index) {
-            if(scope.onSelect) {
-               scope.onSelect(item, $event, $index);
-               $event.stopPropagation();
+         scope.clickItemName = function(item, $event, $index) {
+            if(scope.onClickName) {
+               scope.onClickName(item, $event, $index);
             }
          };
 
@@ -27,8 +26,8 @@
          scope: {
             content: '=',
             contentProperties: "=",
-            onSelect: '=',
-            onClick: "="
+            onClick: "=",
+            onClickName: "="
          },
          link: link
       };
