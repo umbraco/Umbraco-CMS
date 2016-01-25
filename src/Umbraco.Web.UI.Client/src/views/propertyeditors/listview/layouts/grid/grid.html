@@ -7,8 +7,8 @@
          ng-if="items || !items && !options.filter"
          content="items"
          content-properties="options.includeProperties"
-         on-click="vm.clickItem"
-         on-select="vm.selectItem">
+         on-click="vm.selectContentItem"
+         on-click-name="vm.goToItem">
       </umb-content-grid>
 
       <umb-empty-state

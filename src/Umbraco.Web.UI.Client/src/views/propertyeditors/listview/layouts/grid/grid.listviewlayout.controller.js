@@ -26,6 +26,7 @@
       vm.onUploadComplete = onUploadComplete;
 
       vm.hoverMediaItemDetails = hoverMediaItemDetails;
+      vm.selectContentItem = selectContentItem;
       vm.selectItem = selectItem;
       vm.selectFolder = selectFolder;
       vm.goToItem = goToItem;
@@ -84,6 +85,10 @@
 
          }
 
+      }
+
+      function selectContentItem(item, $event, $index) {
+          listViewHelper.selectHandler(item, $index, $scope.items, $scope.selection, $event);
       }
 
       function selectItem(item, $event, $index) {
