@@ -190,6 +190,16 @@ input.umb-group-builder__group-sort-value {
   border: transparent;
 }
 
+.umb-group-builder__property.-locked {
+  border: transparent;
+  background: #FDFDFD;
+  animation: fadeIn 0.5s;
+}
+
+.umb-group-builder__property.-locked:hover {
+  border: transparent;
+}
+
 .umb-group-builder__property.-sortable,
 .umb-group-builder__property.-sortable-locked {
     min-height: 35px;
@@ -264,7 +274,7 @@ input.umb-group-builder__group-sort-value {
   height: 30px;
   overflow: hidden;
   position: relative;
-  padding: 25px 10px;
+  padding: 35px 10px 25px 10px;
 }
 
 .umb-group-builder__property-preview:hover {
@@ -326,16 +336,40 @@ input.umb-group-builder__group-sort-value {
     color: @blueDark;
 }
 
-.umb-group-builder__property-inherited-label {
-  font-size: 11px;
-  background-color: #E9E9E9;
-  margin-left: 5px;
-  position: absolute;
-  right: 0;
-  z-index: 100;
-  padding: 0 10px 0 5px;
-  top: 0;
+.umb-group-builder__property-tags {
+    position: absolute;
+    z-index: 20;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: row;
 }
+
+.umb-group-builder__property-tags.-right {
+    right: 0;
+    left: auto;
+}
+
+.umb-group-builder__property-tag {
+    font-size: 11px;
+    background-color: @grayLight;
+    margin-left: 10px;
+    padding: 0 4px;
+    display: flex;
+}
+
+.umb-group-builder__property-tag:first-child {
+    margin-left: 0;
+}
+
+.umb-group-builder__property-tag.-white {
+    background-color: @white;
+}
+
+.umb-group-builder__property-tag-icon {
+    margin-right: 3px;
+}
+
 
 /* ---------- PLACEHOLDER BOX ---------- */
 

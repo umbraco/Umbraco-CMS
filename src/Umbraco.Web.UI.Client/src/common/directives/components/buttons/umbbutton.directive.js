@@ -50,6 +50,7 @@
             buttonStyle: "@?",
             state: "=?",
             shortcut: "@?",
+            shortcutWhenHidden: "@",
             label: "@?",
             labelKey: "@?",
             icon: "@?",

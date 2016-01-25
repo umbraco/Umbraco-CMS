@@ -130,7 +130,7 @@ app.config(function ($routeProvider) {
                 // angular dashboards working. Perhaps a normal section dashboard would list out the registered
                 // dashboards (as tabs if we wanted) and each tab could actually be a route link to one of these views?
 
-                return ('views/' + rp.tree + '/' + rp.method + '.html').toLowerCase();
+                return ('views/' + rp.tree + '/' + rp.method + '.html');
             },
             resolve: canRoute(true)
         })
@@ -156,10 +156,10 @@ app.config(function ($routeProvider) {
                 if (packageTreeFolder) {
                     $scope.templateUrl = (Umbraco.Sys.ServerVariables.umbracoSettings.appPluginsPath +
                         "/" + packageTreeFolder +
-                        "/backoffice/" + $routeParams.tree + "/" + $routeParams.method + ".html").toLowerCase();
+                        "/backoffice/" + $routeParams.tree + "/" + $routeParams.method + ".html");
                 }
                 else {
-                    $scope.templateUrl = ('views/' + $routeParams.tree + '/' + $routeParams.method + '.html').toLowerCase();
+                    $scope.templateUrl = ('views/' + $routeParams.tree + '/' + $routeParams.method + '.html');
                 }
 
             },

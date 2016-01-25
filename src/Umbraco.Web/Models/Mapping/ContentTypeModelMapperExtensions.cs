@@ -20,6 +20,34 @@ namespace Umbraco.Web.Models.Mapping
     internal static class ContentTypeModelMapperExtensions
     {
 
+        public static IMappingExpression<TSource, PropertyGroup> MapPropertyGroupBasicToPropertyGroupPersistence<TSource, TPropertyTypeBasic>(
+            this IMappingExpression<TSource, PropertyGroup> mapping)
+            where TSource : PropertyGroupBasic<TPropertyTypeBasic> 
+            where TPropertyTypeBasic : PropertyTypeBasic
+        {
+            return mapping
+                .ForMember(dest => dest.Id, map => map.Condition(source => source.Id > 0))
+                .ForMember(dest => dest.Key, map => map.Ignore())
+                .ForMember(dest => dest.HasIdentity, map => map.Ignore())
+                .ForMember(dest => dest.CreateDate, map => map.Ignore())
+                .ForMember(dest => dest.UpdateDate, map => map.Ignore())
+                .ForMember(dest => dest.PropertyTypes, map => map.Ignore());
+        }
+
+        public static IMappingExpression<TSource, PropertyGroupDisplay<TPropertyTypeDisplay>> MapPropertyGroupBasicToPropertyGroupDisplay<TSource, TPropertyTypeBasic, TPropertyTypeDisplay>(
+            this IMappingExpression<TSource, PropertyGroupDisplay<TPropertyTypeDisplay>> mapping)
+            where TSource : PropertyGroupBasic<TPropertyTypeBasic>
+            where TPropertyTypeBasic : PropertyTypeBasic 
+            where TPropertyTypeDisplay : PropertyTypeDisplay
+        {
+            return mapping
+                .ForMember(dest => dest.Id, expression => expression.Condition(source => source.Id > 0))
+                .ForMember(g => g.ContentTypeId, expression => expression.Ignore())
+                .ForMember(g => g.ParentTabContentTypes, expression => expression.Ignore())
+                .ForMember(g => g.ParentTabContentTypeNames, expression => expression.Ignore())
+                .ForMember(g => g.Properties, expression => expression.MapFrom(display => display.Properties.Select(Mapper.Map<TPropertyTypeDisplay>)));
+        }
+
         public static void AfterMapContentTypeSaveToEntity<TSource, TDestination>(
             TSource source, TDestination dest,
             ApplicationContext applicationContext)
@@ -47,23 +75,28 @@ namespace Umbraco.Web.Models.Mapping
             }
         }
 
-        public static IMappingExpression<TSource, TDestination> MapBaseContentTypeSaveToDisplay<TSource, TDestination>(
+        public static IMappingExpression<TSource, TDestination> MapBaseContentTypeSaveToDisplay<TSource, TPropertyTypeSource, TDestination, TPropertyTypeDestination>(
             this IMappingExpression<TSource, TDestination> mapping)
-            where TSource : ContentTypeSave
-            where TDestination : ContentTypeCompositionDisplay
+            where TSource : ContentTypeSave<TPropertyTypeSource>
+            where TDestination : ContentTypeCompositionDisplay<TPropertyTypeDestination> 
+            where TPropertyTypeDestination : PropertyTypeDisplay 
+            where TPropertyTypeSource : PropertyTypeBasic
         {
             return mapping
                 .ForMember(dto => dto.CreateDate, expression => expression.Ignore())
-                .ForMember(dto => dto.UpdateDate, expression => expression.Ignore())                
+                .ForMember(dto => dto.UpdateDate, expression => expression.Ignore())
                 .ForMember(dto => dto.ListViewEditorName, expression => expression.Ignore())
                 .ForMember(dto => dto.Notifications, expression => expression.Ignore())
-                .ForMember(dto => dto.Errors, expression => expression.Ignore());
+                .ForMember(dto => dto.Errors, expression => expression.Ignore())
+                .ForMember(dto => dto.LockedCompositeContentTypes, exp => exp.Ignore())
+                .ForMember(dto => dto.Groups, expression => expression.ResolveUsing(new PropertyGroupDisplayResolver<TSource, TPropertyTypeSource, TPropertyTypeDestination>()));
         }
 
-        public static IMappingExpression<TSource, TDestination> MapBaseContentTypeEntityToDisplay<TSource, TDestination>(
+        public static IMappingExpression<TSource, TDestination> MapBaseContentTypeEntityToDisplay<TSource, TDestination, TPropertyTypeDisplay>(
             this IMappingExpression<TSource, TDestination> mapping, ApplicationContext applicationContext, Lazy<PropertyEditorResolver> propertyEditorResolver)
             where TSource : IContentTypeComposition
-            where TDestination : ContentTypeCompositionDisplay
+            where TDestination : ContentTypeCompositionDisplay<TPropertyTypeDisplay>
+            where TPropertyTypeDisplay : PropertyTypeDisplay, new()
         {
             return mapping
                 .ForMember(display => display.Notifications, expression => expression.Ignore())
@@ -82,8 +115,12 @@ namespace Umbraco.Web.Models.Mapping
                     expression => expression.MapFrom(dto => dto.ContentTypeComposition))
 
                 .ForMember(
+                    dto => dto.LockedCompositeContentTypes,
+                    expression => expression.ResolveUsing(new LockedCompositionsResolver(applicationContext)))
+
+                .ForMember(
                     dto => dto.Groups,
-                    expression => expression.ResolveUsing(new PropertyTypeGroupResolver(applicationContext, propertyEditorResolver)));
+                    expression => expression.ResolveUsing(new PropertyTypeGroupResolver<TPropertyTypeDisplay>(applicationContext, propertyEditorResolver)));
         }
 
         /// <summary>
@@ -91,14 +128,16 @@ namespace Umbraco.Web.Models.Mapping
         /// </summary>
         /// <typeparam name="TSource"></typeparam>
         /// <typeparam name="TDestination"></typeparam>
+        /// <typeparam name="TSourcePropertyType"></typeparam>
         /// <param name="mapping"></param>
         /// <param name="applicationContext"></param>
         /// <returns></returns>        
-        public static IMappingExpression<TSource, TDestination> MapBaseContentTypeSaveToEntity<TSource, TDestination>(
+        public static IMappingExpression<TSource, TDestination> MapBaseContentTypeSaveToEntity<TSource, TSourcePropertyType, TDestination>(
             this IMappingExpression<TSource, TDestination> mapping, ApplicationContext applicationContext)
             //where TSource : ContentTypeCompositionDisplay
-            where TSource : ContentTypeSave
-            where TDestination : IContentTypeComposition
+            where TSource : ContentTypeSave<TSourcePropertyType>
+            where TDestination : IContentTypeComposition 
+            where TSourcePropertyType : PropertyTypeBasic
         {
             return mapping
                 //only map id if set to something higher then zero
@@ -195,7 +234,8 @@ namespace Umbraco.Web.Models.Mapping
                 });
         }
 
-        private static PropertyGroup MapSaveGroup(PropertyGroupBasic<PropertyTypeBasic> sourceGroup, IEnumerable<PropertyGroup> destOrigGroups)
+        private static PropertyGroup MapSaveGroup<TPropertyType>(PropertyGroupBasic<TPropertyType> sourceGroup, IEnumerable<PropertyGroup> destOrigGroups)
+            where TPropertyType: PropertyTypeBasic
         {
             PropertyGroup destGroup;
             if (sourceGroup.Id > 0)

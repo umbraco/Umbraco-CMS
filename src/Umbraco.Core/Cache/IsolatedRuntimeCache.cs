@@ -12,7 +12,7 @@ namespace Umbraco.Core.Cache
     /// </remarks>
     public class IsolatedRuntimeCache
     {
-        private readonly Func<Type, IRuntimeCacheProvider> _cacheFactory;
+        internal Func<Type, IRuntimeCacheProvider> CacheFactory { get; set; }
 
         /// <summary>
         /// Constructor that allows specifying a factory for the type of runtime isolated cache to create
@@ -20,7 +20,7 @@ namespace Umbraco.Core.Cache
         /// <param name="cacheFactory"></param>
         public IsolatedRuntimeCache(Func<Type, IRuntimeCacheProvider> cacheFactory)
         {
-            _cacheFactory = cacheFactory;
+            CacheFactory = cacheFactory;
         }
 
         private readonly ConcurrentDictionary<Type, IRuntimeCacheProvider> _isolatedCache = new ConcurrentDictionary<Type, IRuntimeCacheProvider>();
@@ -32,7 +32,7 @@ namespace Umbraco.Core.Cache
         /// <returns></returns>        
         public IRuntimeCacheProvider GetOrCreateCache<T>()
         {
-            return _isolatedCache.GetOrAdd(typeof(T), type => _cacheFactory(type));
+            return _isolatedCache.GetOrAdd(typeof(T), type => CacheFactory(type));
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace Umbraco.Core.Cache
         /// <returns></returns>        
         public IRuntimeCacheProvider GetOrCreateCache(Type type)
         {
-            return _isolatedCache.GetOrAdd(type, t => _cacheFactory(t));
+            return _isolatedCache.GetOrAdd(type, t => CacheFactory(t));
         }
 
         /// <summary>

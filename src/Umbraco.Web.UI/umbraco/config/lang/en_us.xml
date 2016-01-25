@@ -89,11 +89,13 @@
     <key alias="save">Save</key>
     <key alias="saveAndPublish">Save and publish</key>
     <key alias="saveToPublish">Save and send for approval</key>
+    <key alias="saveListView">Save list view</key>
     <key alias="showPage">Preview</key>
     <key alias="showPageDisabled">Preview is disabled because there's no template assigned</key>
     <key alias="styleChoose">Choose style</key>
     <key alias="styleShow">Show styles</key>
     <key alias="tableInsert">Insert table</key>
+    <key alias="generateModels">Generate models</key>
   </area>
   <area alias="changeDocType">
     <key alias="changeDocTypeInstruction">To change the document type for the selected content, first select from the list of valid types for this location.</key>
@@ -133,6 +135,7 @@
     <key alias="itemChanged">This item has been changed after publication</key>
     <key alias="itemNotPublished">This item is not published</key>
     <key alias="lastPublished">Last published</key>
+    <key alias="noItemsToShow">There are no items to show</key>
     <key alias="listViewNoItems" version="7.1.5">There are no items to show in the list.</key>
     <key alias="mediatype">Media Type</key>
     <key alias="mediaLinks">Link to media item(s)</key>
@@ -168,6 +171,10 @@
   <area alias="media">
     <key alias="clickToUpload">Click to upload</key>
     <key alias="dropFilesHere">Drop your files here...</key>
+	  <key alias="urls">Link to media</key>
+    <key alias="orClickHereToUpload">or click here to choose files</key>
+    <key alias="onlyAllowedFiles">Only allowed file types are</key>
+    <key alias="maxFileSize">Max file size is</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Create a new member</key>
@@ -179,6 +186,7 @@
     <key alias="updateData">Choose a type and a title</key>
     <key alias="noDocumentTypes" version="7.0"><![CDATA[There are no allowed document types available. You must enable these in the settings section under <strong>"document types"</strong>.]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[There are no allowed media types available. You must enable these in the settings section under <strong>"media types"</strong>.]]></key>
+    <key alias="documentTypeWithoutTemplate">Document Type without a template</key>
   </area>
   <area alias="dashboard">
     <key alias="browser">Browse your website</key>
@@ -236,6 +244,40 @@
     <key alias="thumbnailimageclickfororiginal">Click on the image to see full size</key>
     <key alias="treepicker">Pick item</key>
     <key alias="viewCacheItem">View Cache Item</key>
+    <key alias="createFolder">Create folder...</key>
+    
+    <key alias="relateToOriginalLabel">Relate to original</key>
+    <key alias="theFriendliestCommunity">The friendliest community</key>
+    
+    <key alias="linkToPage">Link to page</key>
+    
+    <key alias="openInNewWindow">Opens the linked document in a new window or tab</key>
+    <key alias="openInFullBody">Opens the linked document in the full body of the window</key>
+    <key alias="openInParentFrame">Opens the linked document in the parent frame</key>
+    
+    <key alias="linkToMedia">Link to media</key>
+    
+    <key alias="selectMedia">Select media</key>
+    <key alias="selectIcon">Select icon</key>
+    <key alias="selectItem">Select item</key>
+    <key alias="selectLink">Select link</key>
+    <key alias="selectMacro">Select macro</key>
+    <key alias="selectContent">Select content</key>
+    <key alias="selectMember">Select member</key>
+    <key alias="selectMemberGroup">Select member group</key>
+    
+    <key alias="noMacroParams">There are no parameters for this macro</key>
+    
+    <key alias="externalLoginProviders">External login providers</key>
+    <key alias="exceptionDetail">Exception Details</key>
+    <key alias="stracktrace">Stacktrace</key>
+    
+    <key alias="linkYour">Link your</key>
+    <key alias="unLinkYour">Un-Link your</key>
+    
+    <key alias="account">account</key>
+    
+    <key alias="selectEditor">Select editor</key>
   </area>
   <area alias="dictionaryItem">
     <key alias="description"><![CDATA[
@@ -248,6 +290,8 @@
     <key alias="password">Enter your password</key>
     <key alias="nameentity">Name the %0%...</key>
     <key alias="entername">Enter a name...</key>
+    <key alias="label">Label...</key>
+    <key alias="enterDescription">Enter a description...</key>
     <key alias="search">Type to search...</key>
     <key alias="filter">Type to filter...</key>
     <key alias="enterTags">Type to add tags (press enter after each tag)...</key>
@@ -298,6 +342,7 @@
     <key alias="errorRegExpWithoutTab">%0% is not in a correct format</key>
   </area>
   <area alias="errors">
+    <key alias="receivedErrorFromServer">Received an error from the server</key>
     <key alias="dissallowedMediaType">The specified file type has been disallowed by the administrator</key>
     <key alias="codemirroriewarning">NOTE! Even though CodeMirror is enabled by configuration, it is disabled in Internet Explorer because it's not stable enough.</key>
     <key alias="contentTypeAliasAndNameNotNull">Please fill both alias and name on the new property type!</key>
@@ -328,6 +373,7 @@
     <key alias="actions">Actions</key>
     <key alias="add">Add</key>
     <key alias="alias">Alias</key>
+    <key alias="all">All</key>
     <key alias="areyousure">Are you sure?</key>
     <key alias="border">Border</key>
     <key alias="by">by</key>
@@ -365,6 +411,7 @@
     <key alias="innerMargin">Inner margin</key>
     <key alias="insert">Insert</key>
     <key alias="install">Install</key>
+    <key alias="invalid">Invalid</key>
     <key alias="justify">Justify</key>
     <key alias="language">Language</key>
     <key alias="layout">Layout</key>
@@ -374,6 +421,7 @@
     <key alias="logoff">Log off</key>
     <key alias="logout">Logout</key>
     <key alias="macro">Macro</key>
+    <key alias="mandatory">Mandatory</key>
     <key alias="move">Move</key>
     <key alias="more">More</key>
     <key alias="name">Name</key>
@@ -392,6 +440,7 @@
     <key alias="properties">Properties</key>
     <key alias="reciept">Email to receive form data</key>
     <key alias="recycleBin">Recycle Bin</key>
+    <key alias="recycleBinEmpty">Your recycle bin is empty</key>
     <key alias="remaining">Remaining</key>
     <key alias="rename">Rename</key>
     <key alias="renew">Renew</key>
@@ -404,7 +453,7 @@
     <key alias="showPageOnSend">Show page on Send</key>
     <key alias="size">Size</key>
     <key alias="sort">Sort</key>
-    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
+    <key alias="submit">Submit</key>
     <key alias="type">Type</key>
     <key alias="typeToSearch">Type to search...</key>
     <key alias="up">Up</key>
@@ -423,6 +472,40 @@
     <key alias="searchResults">Search results</key>
     <key alias="reorder">Reorder</key>
     <key alias="reorderDone">I am done reordering</key>
+    <key alias="preview">Preview</key>
+    <key alias="changePassword">Change password</key>
+    <key alias="to">to</key>
+    <key alias="listView">List view</key>
+    <key alias="saving">Saving...</key>
+    <key alias="current">current</key>
+    <key alias="move">Move</key>
+    <key alias="embed">Embed</key>
+  </area>
+  <area alias="colors">
+    <key alias="black">Black</key>
+    <key alias="green">Green</key>
+    <key alias="yellow">Yellow</key>
+    <key alias="orange">Orange</key>
+    <key alias="blue">Blue</key>
+    <key alias="red">Red</key>
+  </area>
+  <area alias="shortcuts">
+    <key alias="addTab">Add tab</key>
+    <key alias="addProperty">Add property</key>
+    <key alias="addEditor">Add editor</key>
+    <key alias="addTemplate">Add template</key>
+    <key alias="addChildNode">Add child node</key>
+    <key alias="addChild">Add child</key>
+    
+    <key alias="editDataType">Edit data type</key>
+    
+    <key alias="navigateSections">Navigate sections</key>
+    
+    <key alias="shortcut">Shortcuts</key>
+    <key alias="showShortcuts">show shortcuts</key>
+    
+    <key alias="toggleListView">Toggle list view</key>
+    <key alias="toggleAllowAsRoot">Toggle allow as root</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Background color</key>
@@ -446,7 +529,7 @@
     <key alias="databaseNotFound"><![CDATA[<p>Database not found! Please check that the information in the "connection string" of the "web.config" file is correct.</p>
               <p>To proceed, please edit the "web.config" file (using Visual Studio or your favourite text editor), scroll to the bottom, add the connection string for your database in the key named "UmbracoDbDSN" and save the file. </p>
               <p>
-              Click the <strong>retry</strong> button when 
+              Click the <strong>retry</strong> button when
               done.<br /><a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
 			              More information on editing web.config here.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[To complete this step, you must know some information regarding your database server ("connection string").<br />
@@ -459,21 +542,17 @@
       Don't worry - no content will be deleted and everything will continue working afterwards!
       </p>    
       ]]></key>
-    <key alias="databaseUpgradeDone"><![CDATA[Your database has been upgraded to the final version %0%.<br />Press <strong>Next</strong> to 
-      proceed. ]]></key>
+    <key alias="databaseUpgradeDone">
+      <![CDATA[Your database has been upgraded to the final version %0%.<br/>Press <strong>Next</strong> to
+      proceed. ]]>
+    </key>
     <key alias="databaseUpToDate"><![CDATA[Your current database is up-to-date!. Click <strong>next</strong> to continue the configuration wizard]]></key>
     <key alias="defaultUserChangePass"><![CDATA[<strong>The Default users' password needs to be changed!</strong>]]></key>
     <key alias="defaultUserDisabled"><![CDATA[<strong>The Default user has been disabled or has no access to Umbraco!</strong></p><p>No further actions needs to be taken. Click <b>Next</b> to proceed.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>The Default user's password has been successfully changed since the installation!</strong></p><p>No further actions needs to be taken. Click <strong>Next</strong> to proceed.]]></key>
     <key alias="defaultUserPasswordChanged">The password is changed!</key>
-    <key alias="defaultUserText"><![CDATA[
-        <p>
-          Umbraco creates a default user with a login <strong>('admin')</strong> and password <strong>('default')</strong>. It's <strong>important</strong> that the password is 
-          changed to something unique.
-        </p>
-        <p>
-          This step will check the default user's password and suggest if it needs to be changed.
-        </p>
+    <key alias="defaultUserText">
+          <![CDATA[Umbraco creates a default user with a login <strong>('admin')</strong> and password <strong> ('default')</strong>. It's <strong>important</strong> that the password is changed to something unique.     
       ]]></key>
     <key alias="greatStart">Get a great start, watch our introduction videos</key>
     <key alias="licenseText">By clicking the next button (or modifying the umbracoConfigurationStatus in web.config), you accept the license for this software as specified in the box below. Notice that this Umbraco distribution consists of two different licenses, the open source MIT license for the framework and the Umbraco freeware license that covers the UI.</key>
@@ -502,8 +581,9 @@
       It also stores temporary data (aka: cache) for enhancing the performance of your website.
     ]]></key>
     <key alias="runwayFromScratch">I want to start from scratch</key>
-    <key alias="runwayFromScratchText"><![CDATA[
-        Your website is completely empty at the moment, so that's perfect if you want to start from scratch and create your own document types and templates. 
+    <key alias="runwayFromScratchText">
+      <![CDATA[
+        Your website is completely empty at the moment, so that's perfect if you want to start from scratch and create your own document types and templates.
         (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
         You can still choose to install Runway later on. Please go to the Developer section and choose Packages.
       ]]></key>
@@ -515,10 +595,11 @@
       ]]></key>
     <key alias="runwayOnlyProUsers">Only recommended for experienced users</key>
     <key alias="runwaySimpleSite">I want to start with a simple website</key>
-    <key alias="runwaySimpleSiteText"><![CDATA[
+    <key alias="runwaySimpleSiteText">
+      <![CDATA[
       <p>
-      "Runway" is a simple website providing some basic document types and templates. The installer can set up Runway for you automatically, 
-        but you can easily edit, extend or remove it. It's not necessary and you can perfectly use Umbraco without it. However, 
+      "Runway" is a simple website providing some basic document types and templates. The installer can set up Runway for you automatically,
+        but you can easily edit, extend or remove it. It's not necessary and you can perfectly use Umbraco without it. However,
         Runway offers an easy foundation based on best practices to get you started faster than ever.
         If you choose to install Runway, you can optionally select basic building blocks called Runway Modules to enhance your Runway pages.
         </p>
@@ -607,7 +688,8 @@ To manage your website, simply open the Umbraco back office and start adding con
 
       Cheers from the Umbraco robot
     ]]></key>
-    <key alias="mailBodyHtml"><![CDATA[<p>Hi %0%</p>
+    <key alias="mailBodyHtml">
+          <![CDATA[<p>Hi %0%</p>
 
 		  <p>This is an automated mail to inform you that the task <strong>'%1%'</strong> 
 		  has been performed on the page <a href="http://%4%/#/content/content/edit/%5%"><strong>'%2%'</strong></a>
@@ -615,7 +697,7 @@ To manage your website, simply open the Umbraco back office and start adding con
 	  </p>
 		  <div style="margin: 8px 0; padding: 8px; display: block;">
 				<br />
-				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
 				<br />
 		  </div>
 		  <p>
@@ -699,6 +781,9 @@ To manage your website, simply open the Umbraco back office and start adding con
       %0% could not be published because the item is scheduled for release.
     ]]>
     </key>
+	<key alias="contentPublishedFailedExpired"><![CDATA[
+      %0% could not be published because the item has expired.
+    ]]></key>  
     <key alias="contentPublishedFailedInvalid"><![CDATA[
       %0% could not be published because these properties:  %1%  did not pass validation rules.
     ]]></key>
@@ -787,8 +872,11 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="noPropertiesDefinedOnTab">No properties defined on this tab. Click on the "add a new property" link at the top to create a new property.</key>
     <key alias="masterDocumentType">Master Document Type</key>
     <key alias="createMatchingTemplate">Create matching template</key>
+    <key alias="addIcon">Add icon</key>
   </area>
   <area alias="sort">
+    <key alias="sortOrder">Sort order</key>
+    <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">Sorting complete.</key>
     <key alias="sortHelp">Drag the different items up or down below to set how they should be arranged. Or click the column headers to sort the entire collection of items</key>
     <key alias="sortPleaseWait"><![CDATA[ Please wait. Items are being sorted, this can take a while.<br/> <br/> Do not close this window during sorting]]></key>
@@ -917,7 +1005,68 @@ To manage your website, simply open the Umbraco back office and start adding con
 
     <key alias="allowAllEditors">Allow all editors</key>
     <key alias="allowAllRowConfigurations">Allow all row configurations</key>
+    <key alias="setAsDefault">Set as default</key>
+    <key alias="chooseExtra">Choose extra</key>
+    <key alias="chooseDefault">Choose default</key>
+    <key alias="areAdded">are added</key>
   </area>
+
+  <area alias="contentTypeEditor">
+    <key alias="compositions">Compositions</key>
+    <key alias="noTabs">You have not added any tabs</key>
+    <key alias="addNewTab">Add new tab</key>
+    <key alias="addAnotherTab">Add another tab</key>
+    <key alias="inheritedFrom">Inherited from</key>
+    <key alias="addProperty">Add property</key>
+    <key alias="requiredLabel">Required label</key>
+    
+    <key alias="enableListViewHeading">Enable list view</key>
+    <key alias="enableListViewDescription">Configures the content item to show a sortable and searchable list of its children, the children will not be shown in the tree</key>
+    
+    <key alias="allowedTemplatesHeading">Allowed Templates</key>
+    <key alias="allowedTemplatesDescription">Choose which templates editors are allowed to use on content of this type</key>
+    <key alias="allowAsRootHeading">Allow as root</key>
+    <key alias="allowAsRootDescription">Allow editors to create content of this type in the root of the content tree</key>
+    <key alias="allowAsRootCheckbox">Yes - allow content of this type in the root</key>
+
+    <key alias="childNodesHeading">Allowed child node types</key>
+    <key alias="childNodesDescription">Allow content of the specified types to be created underneath content of this type</key>
+
+    <key alias="chooseChildNode">Choose child node</key>
+    <key alias="compositionsDescription">Inherit tabs and properties from an existing document type. New tabs will be added to the current document type or merged if a tab with an identical name exists.</key>
+    <key alias="compositionInUse">This content type is used in a composition, and therefore cannot be composed itself.</key>
+    <key alias="noAvailableCompositions">There are no content types available to use as a composition.</key>
+    
+    <key alias="availableEditors">Available editors</key>
+    <key alias="reuse">Reuse</key>
+    <key alias="editorSettings">Editor settings</key>
+    
+    <key alias="configuration">Configuration</key>
+    
+    <key alias="yesDelete">Yes, delete</key>
+    
+    <key alias="movedUnderneath">was moved underneath</key>
+    <key alias="folderToMove">Select the folder to move</key>
+    <key alias="structureBelow">to in the tree structure below</key>
+    
+    <key alias="allDocumentTypes">All Document types</key>
+    <key alias="allDocuments">All Documents</key>
+    <key alias="allMediaItems">All media items</key>
+    
+    <key alias="usingThisDocument">using this document type will be deleted permanently, please confirm you want to delete these as well.</key>
+    <key alias="usingThisMedia">using this media type will be deleted permanently, please confirm you want to delete these as well.</key>
+    <key alias="usingThisMember">using this member type will be deleted permanently, please confirm you want to delete these as well</key>
+    
+    <key alias="andAllDocuments">and all documents using this type</key>
+    <key alias="andAllMediaItems">and all media items using this type</key>
+    <key alias="andAllMembers">and all members using this type</key>
+    
+    <key alias="thisEditorUpdateSettings">using this editor will get updated with the new settings</key>
+
+    <key alias="memberCanEdit">Member can edit</key>
+    <key alias="showOnMemberProfile">Show on member profile</key>
+  </area>
+  
   <area alias="templateEditor">
     <key alias="alternativeField">Alternative field</key>
     <key alias="alternativeText">Alternative Text</key>
@@ -1077,5 +1226,13 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="yourProfile" version="7.0">Your profile</key>
     <key alias="yourHistory" version="7.0">Your recent history</key>
     <key alias="sessionExpires" version="7.0">Session expires in</key>
+  </area>
+  <area alias="validation">
+    <key alias="validation">Validation</key>
+    <key alias="validateAsEmail">Validate as email</key>
+    <key alias="validateAsNumber">Validate as a number</key>
+    <key alias="validateAsUrl">Validate as a Url</key>
+    <key alias="enterCustomValidation">...or enter a custom validation</key>
+    <key alias="fieldIsMandatory">Field is mandatory</key>
   </area>
 </language>

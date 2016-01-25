@@ -280,6 +280,18 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
+        [ConfigurationProperty("EnableInheritedDocumentTypes")]
+        internal InnerTextConfigurationElement<bool> EnableInheritedDocumentTypes
+        {
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<bool>(
+                    (InnerTextConfigurationElement<bool>) this["EnableInheritedDocumentTypes"],
+                    //set the default
+                    true);
+            }
+        }
+        
         string IContentSection.NotificationEmailAddress
         {
             get { return Notifications.NotificationEmailAddress; }
@@ -413,6 +425,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         string IContentSection.DefaultDocumentTypeProperty
         {
             get { return DefaultDocumentTypeProperty; }
+        }
+
+        bool IContentSection.EnableInheritedDocumentTypes
+        {
+            get { return EnableInheritedDocumentTypes; }
         }
     }
 }

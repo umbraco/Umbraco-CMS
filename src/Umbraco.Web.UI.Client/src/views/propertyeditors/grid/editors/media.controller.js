@@ -7,6 +7,8 @@ angular.module("umbraco")
             $scope.mediaPickerOverlay.view = "mediapicker";
             $scope.mediaPickerOverlay.cropSize = $scope.control.editor.config && $scope.control.editor.config.size ? $scope.control.editor.config.size : undefined;
             $scope.mediaPickerOverlay.showDetails = true;
+            $scope.mediaPickerOverlay.disableFolderSelect = true;
+            $scope.mediaPickerOverlay.onlyImages = true;
             $scope.mediaPickerOverlay.show = true;
 
             $scope.mediaPickerOverlay.submit = function(model) {

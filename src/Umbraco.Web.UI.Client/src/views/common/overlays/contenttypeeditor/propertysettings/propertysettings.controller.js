@@ -10,7 +10,7 @@
  (function() {
  	"use strict";
 
-   function PropertySettingsOverlay($scope, contentTypeResource, dataTypeResource, dataTypeHelper) {
+   function PropertySettingsOverlay($scope, contentTypeResource, dataTypeResource, dataTypeHelper, localizationService) {
 
       var vm = this;
 
@@ -20,25 +20,25 @@
       vm.selectedValidationType = {};
       vm.validationTypes = [
          {
-            "name": "Validate as email",
+            "name": localizationService.localize("validation_validateAsEmail"),
             "key": "email",
             "pattern": "[a-zA-Z0-9_\.\+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-\.]+",
             "enableEditing": true
          },
          {
-            "name": "Validate as a number",
+            "name": localizationService.localize("validation_validateAsNumber"),
             "key": "number",
             "pattern": "^[0-9]*$",
             "enableEditing": true
          },
          {
-            "name": "Validate as a Url",
+            "name": localizationService.localize("validation_validateAsUrl"),
             "key": "url",
             "pattern": "https?\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,}",
             "enableEditing": true
          },
          {
-            "name": "...or enter a custom validation",
+            "name": localizationService.localize("validation_enterCustomValidation"),
             "key": "custom",
             "pattern": "",
             "enableEditing": true
@@ -65,7 +65,6 @@
          vm.focusOnMandatoryField = false;
 
          vm.editorPickerOverlay = {};
-         vm.editorPickerOverlay.title = "Choose editor";
          vm.editorPickerOverlay.property = $scope.model.property;
          vm.editorPickerOverlay.contentTypeName = $scope.model.contentTypeName;
          vm.editorPickerOverlay.view = "views/common/overlays/contenttypeeditor/editorpicker/editorpicker.html";

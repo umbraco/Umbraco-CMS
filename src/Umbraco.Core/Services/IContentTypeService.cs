@@ -27,10 +27,14 @@ namespace Umbraco.Core.Services
         void SaveMediaTypeContainer(EntityContainer container, int userId = 0);
         EntityContainer GetContentTypeContainer(int containerId);
         EntityContainer GetContentTypeContainer(Guid containerId);
+        IEnumerable<EntityContainer> GetContentTypeContainers(int[] containerIds);
+        IEnumerable<EntityContainer> GetContentTypeContainers(IContentType contentType);
         IEnumerable<EntityContainer> GetContentTypeContainers(string folderName, int level);
         EntityContainer GetMediaTypeContainer(int containerId);
         EntityContainer GetMediaTypeContainer(Guid containerId);
+        IEnumerable<EntityContainer> GetMediaTypeContainers(int[] containerIds);
         IEnumerable<EntityContainer> GetMediaTypeContainers(string folderName, int level);
+        IEnumerable<EntityContainer> GetMediaTypeContainers(IMediaType mediaType);
         void DeleteMediaTypeContainer(int folderId, int userId = 0);
         void DeleteContentTypeContainer(int containerId, int userId = 0);
 
@@ -39,6 +43,16 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <returns></returns>
         IEnumerable<string> GetAllPropertyTypeAliases();
+
+        /// <summary>
+        /// Gets all content type aliases
+        /// </summary>
+        /// <param name="objectTypes">
+        /// If this list is empty, it will return all content type aliases for media, members and content, otherwise
+        /// it will only return content type aliases for the object types specified
+        /// </param>
+        /// <returns></returns>
+        IEnumerable<string> GetAllContentTypeAliases(params Guid[] objectTypes);
 
         /// <summary>
         /// Copies a content type as a child under the specified parent if specified (otherwise to the root)

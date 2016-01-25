@@ -1,0 +1,31 @@
+﻿<div id="modelsBuilder" ng-controller="Umbraco.Dashboard.ModelsBuilderController">
+
+    <h3>Models Builder</h3>
+
+    <div ng-show="!ready">
+        Loading...
+    </div>
+
+    <div ng-show="ready">
+        <div ng-bind-html-unsafe="dashboard.text"></div>
+
+        <div ng-if="dashboard.outOfDateModels">
+            <p>Models are <strong>out-of-date</strong>.</p>
+        </div>
+
+        <div ng-if="dashboard.canGenerate">
+            <div ng-if="dashboard.generateCausesRestart">
+                <p style="color: red; font-weight: bold;">Generating models will restart the application.</p>
+            </div>
+            <div ng-show="!generating">
+                <button type="button" ng-click="generate()" class="btn btn-danger">
+                    <span>Generate models</span>
+                </button>
+            </div>
+            <div class="umb-loader-wrapper" ng-show="generating">
+                <div class="umb-loader"></div>
+            </div>
+        </div>
+    </div>
+
+</div>

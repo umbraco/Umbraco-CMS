@@ -3,7 +3,7 @@
  * @name umbraco.services.contentTypeHelper
  * @description A helper service for the content type editor
  **/
-function contentTypeHelper(contentTypeResource, dataTypeResource, $filter) {
+function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $injector, $q) {
 
     var contentTypeHelperService = {
 
@@ -25,6 +25,44 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter) {
 
         },
 
+        generateModels: function () {
+            var deferred = $q.defer();
+            var modelsResource = $injector.has("modelsBuilderResource") ? $injector.get("modelsBuilderResource") : null;
+            var modelsBuilderEnabled = Umbraco.Sys.ServerVariables.umbracoPlugins.modelsBuilder.enabled;
+            if (modelsBuilderEnabled && modelsResource) {
+                modelsResource.buildModels().then(function(result) {
+                    deferred.resolve(result);
+
+                    //just calling this to get the servar back to life
+                    modelsResource.getModelsOutOfDateStatus();
+
+                }, function(e) {
+                    deferred.reject(e);
+                });
+            }
+            else {                
+                deferred.resolve(false);                
+            }
+            return deferred.promise;
+        },
+
+        checkModelsBuilderStatus: function () {
+            var deferred = $q.defer();
+            var modelsResource = $injector.has("modelsBuilderResource") ? $injector.get("modelsBuilderResource") : null;
+            var modelsBuilderEnabled = (Umbraco && Umbraco.Sys && Umbraco.Sys.ServerVariables && Umbraco.Sys.ServerVariables.umbracoPlugins && Umbraco.Sys.ServerVariables.umbracoPlugins.modelsBuilder && Umbraco.Sys.ServerVariables.umbracoPlugins.modelsBuilder.enabled === true);            
+            
+            if (modelsBuilderEnabled && modelsResource) {
+                modelsResource.getModelsOutOfDateStatus().then(function(result) {
+                    //Generate models buttons should be enabled if its not 100
+                    deferred.resolve(result.status !== 100);
+                });
+            }
+            else {
+                deferred.resolve(false);
+            }
+            return deferred.promise;
+        },
+
         makeObjectArrayFromId: function (idArray, objectArray) {
            var newArray = [];
 
@@ -43,7 +81,40 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter) {
            return newArray;
         },
 
+        validateAddingComposition: function(contentType, compositeContentType) {
+
+            //Validate that by adding this group that we are not adding duplicate property type aliases
+
+            var propertiesAdding = _.flatten(_.map(compositeContentType.groups, function(g) {
+                return _.map(g.properties, function(p) {
+                    return p.alias;
+                });
+            }));
+            var propAliasesExisting = _.filter(_.flatten(_.map(contentType.groups, function(g) {
+                return _.map(g.properties, function(p) {
+                    return p.alias;
+                });
+            })), function(f) {
+                return f !== null && f !== undefined;
+            });
+
+            var intersec = _.intersection(propertiesAdding, propAliasesExisting);
+            if (intersec.length > 0) {
+                //return the overlapping property aliases
+                return intersec;
+            }
+
+            //no overlapping property aliases
+            return [];
+        },
+
         mergeCompositeContentType: function(contentType, compositeContentType) {
+
+            //Validate that there are no overlapping aliases
+            var overlappingAliases = this.validateAddingComposition(contentType, compositeContentType);
+            if (overlappingAliases.length > 0) {
+                throw new Error("Cannot add this composition, these properties already exist on the content type: " + overlappingAliases.join());
+            }
 
            angular.forEach(compositeContentType.groups, function(compositionGroup) {
 
@@ -134,7 +205,7 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter) {
 
                  // push id to array of merged composite content types
                  compositionGroup.parentTabContentTypes.push(compositeContentType.id);
-
+                  
                  // push group before placeholder tab
                  contentType.groups.unshift(compositionGroup);
 

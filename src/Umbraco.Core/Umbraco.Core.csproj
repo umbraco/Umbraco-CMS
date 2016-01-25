@@ -181,7 +181,7 @@
     <Compile Include="Cache\RepositoryCachePolicyOptions.cs" />
     <Compile Include="Cache\StaticCacheProvider.cs" />
     <Compile Include="Cache\TypedCacheRefresherBase.cs" />
-	<Compile Include="Cache\DeepCloneRuntimeCacheProvider.cs" />
+    <Compile Include="Cache\DeepCloneRuntimeCacheProvider.cs" />
     <Compile Include="CodeAnnotations\FriendlyNameAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoObjectTypeAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoWillObsoleteAttribute.cs" />
@@ -372,6 +372,8 @@
     <Compile Include="Media\UploadAutoFillProperties.cs" />
     <Compile Include="Models\AuditItem.cs" />
     <Compile Include="Models\AuditType.cs" />
+    <Compile Include="Models\ContentTypeAvailableCompositionsResult.cs" />
+    <Compile Include="Models\ContentTypeAvailableCompositionsResults.cs" />
     <Compile Include="Models\EntityContainer.cs" />
     <Compile Include="Models\Identity\IdentityModelMappings.cs" />
     <Compile Include="Models\Identity\IdentityUser.cs" />
@@ -471,6 +473,7 @@
     <Compile Include="Persistence\Repositories\DomainRepository.cs" />
     <Compile Include="Persistence\Repositories\ExternalLoginRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IAuditRepository.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\IContentTypeCompositionRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IDomainRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IExternalLoginRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IMigrationEntryRepository.cs" />
@@ -483,6 +486,7 @@
     <Compile Include="Persistence\Repositories\PublicAccessRepository.cs" />
     <Compile Include="Persistence\Repositories\TaskRepository.cs" />
     <Compile Include="Persistence\Repositories\TaskTypeRepository.cs" />
+    <Compile Include="Profiling\StartupWebProfilerProvider.cs" />
     <Compile Include="PropertyEditors\DecimalValidator.cs" />
     <Compile Include="PropertyEditors\ValueConverters\GridValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\DecimalValueConverter.cs" />

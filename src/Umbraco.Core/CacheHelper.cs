@@ -18,12 +18,8 @@ namespace Umbraco.Core
 	/// </summary>
     public class CacheHelper
 	{
-	    private readonly IsolatedRuntimeCache _isolatedCacheManager;
-	    private readonly ICacheProvider _requestCache;
         private static readonly ICacheProvider NullRequestCache = new NullCacheProvider();
-        private readonly ICacheProvider _staticCache;
         private static readonly ICacheProvider NullStaticCache = new NullCacheProvider();
-        private readonly IRuntimeCacheProvider _runtimeCache;
         private static readonly IRuntimeCacheProvider NullRuntimeCache = new NullCacheProvider();
         
         /// <summary>
@@ -90,45 +86,33 @@ namespace Umbraco.Core
 	        if (staticCacheProvider == null) throw new ArgumentNullException("staticCacheProvider");
 	        if (requestCacheProvider == null) throw new ArgumentNullException("requestCacheProvider");
 	        if (isolatedCacheManager == null) throw new ArgumentNullException("isolatedCacheManager");
-	        _runtimeCache = httpCacheProvider;
-            _staticCache = staticCacheProvider;
-            _requestCache = requestCacheProvider;
-            _isolatedCacheManager = isolatedCacheManager;
+	        RuntimeCache = httpCacheProvider;
+            StaticCache = staticCacheProvider;
+            RequestCache = requestCacheProvider;
+            IsolatedRuntimeCache = isolatedCacheManager;
         }
 
         /// <summary>
         /// Returns the current Request cache
         /// </summary>
-        public ICacheProvider RequestCache
-        {
-            get { return _requestCache; }
-        }
+        public ICacheProvider RequestCache { get; internal set; }
         
         /// <summary>
         /// Returns the current Runtime cache
         /// </summary>
-        public ICacheProvider StaticCache
-        {
-            get { return _staticCache; }
-        }
+        public ICacheProvider StaticCache { get; internal set; }
 
         /// <summary>
         /// Returns the current Runtime cache
         /// </summary>
-	    public IRuntimeCacheProvider RuntimeCache
-	    {
-	        get { return _runtimeCache; }
-	    }
+	    public IRuntimeCacheProvider RuntimeCache { get; internal set; }
 
         /// <summary>
         /// Returns the current Isolated Runtime cache manager
         /// </summary>
-        public IsolatedRuntimeCache IsolatedRuntimeCache
-        {
-            get { return _isolatedCacheManager; }
-        }
-        
-	    #region Legacy Runtime/Http Cache accessors
+        public IsolatedRuntimeCache IsolatedRuntimeCache { get; internal set; }
+
+        #region Legacy Runtime/Http Cache accessors
 
         /// <summary>
         /// Clears the item in umbraco's runtime cache
@@ -137,8 +121,8 @@ namespace Umbraco.Core
         [EditorBrowsable(EditorBrowsableState.Never)]
         public void ClearAllCache()
         {
-            _runtimeCache.ClearAllCache();
-            _isolatedCacheManager.ClearAllCaches();
+            RuntimeCache.ClearAllCache();
+            IsolatedRuntimeCache.ClearAllCaches();
         }
 
         /// <summary>
@@ -149,7 +133,7 @@ namespace Umbraco.Core
         [EditorBrowsable(EditorBrowsableState.Never)]
         public void ClearCacheItem(string key)
         {
-            _runtimeCache.ClearCacheItem(key);
+            RuntimeCache.ClearCacheItem(key);
         }
 
 
@@ -161,7 +145,7 @@ namespace Umbraco.Core
         [Obsolete("Do not use this method, access the runtime cache from the RuntimeCache property")]
         public void ClearCacheObjectTypes(string typeName)
         {
-            _runtimeCache.ClearCacheObjectTypes(typeName);
+            RuntimeCache.ClearCacheObjectTypes(typeName);
         }
 
         /// <summary>
@@ -171,7 +155,7 @@ namespace Umbraco.Core
         [EditorBrowsable(EditorBrowsableState.Never)]
         public void ClearCacheObjectTypes<T>()
         {
-            _runtimeCache.ClearCacheObjectTypes<T>();
+            RuntimeCache.ClearCacheObjectTypes<T>();
         }
 
         /// <summary>
@@ -182,7 +166,7 @@ namespace Umbraco.Core
         [EditorBrowsable(EditorBrowsableState.Never)]
         public void ClearCacheByKeySearch(string keyStartsWith)
         {
-            _runtimeCache.ClearCacheByKeySearch(keyStartsWith);
+            RuntimeCache.ClearCacheByKeySearch(keyStartsWith);
         }
 
         /// <summary>
@@ -193,14 +177,14 @@ namespace Umbraco.Core
         [EditorBrowsable(EditorBrowsableState.Never)]
         public void ClearCacheByKeyExpression(string regexString)
         {
-            _runtimeCache.ClearCacheByKeyExpression(regexString);
+            RuntimeCache.ClearCacheByKeyExpression(regexString);
         }
 
         [Obsolete("Do not use this method, access the runtime cache from the RuntimeCache property")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public IEnumerable<T> GetCacheItemsByKeySearch<T>(string keyStartsWith)
         {
-            return _runtimeCache.GetCacheItemsByKeySearch<T>(keyStartsWith);
+            return RuntimeCache.GetCacheItemsByKeySearch<T>(keyStartsWith);
         }
 
         /// <summary>
@@ -213,7 +197,7 @@ namespace Umbraco.Core
         [EditorBrowsable(EditorBrowsableState.Never)]
         public TT GetCacheItem<TT>(string cacheKey)
         {
-            return _runtimeCache.GetCacheItem<TT>(cacheKey);
+            return RuntimeCache.GetCacheItem<TT>(cacheKey);
         }
 
         /// <summary>
@@ -227,7 +211,7 @@ namespace Umbraco.Core
         [EditorBrowsable(EditorBrowsableState.Never)]
         public TT GetCacheItem<TT>(string cacheKey, Func<TT> getCacheItem)
         {
-            return _runtimeCache.GetCacheItem<TT>(cacheKey, getCacheItem);
+            return RuntimeCache.GetCacheItem<TT>(cacheKey, getCacheItem);
 
         }
 
@@ -244,7 +228,7 @@ namespace Umbraco.Core
         public TT GetCacheItem<TT>(string cacheKey,
             TimeSpan timeout, Func<TT> getCacheItem)
         {
-            return _runtimeCache.GetCacheItem<TT>(cacheKey, getCacheItem, timeout);
+            return RuntimeCache.GetCacheItem<TT>(cacheKey, getCacheItem, timeout);
 
         }
 
@@ -263,7 +247,7 @@ namespace Umbraco.Core
             CacheItemRemovedCallback refreshAction, TimeSpan timeout,
             Func<TT> getCacheItem)
         {
-            return _runtimeCache.GetCacheItem<TT>(cacheKey, getCacheItem, timeout, removedCallback: refreshAction);
+            return RuntimeCache.GetCacheItem<TT>(cacheKey, getCacheItem, timeout, removedCallback: refreshAction);
 
         }
 
@@ -283,7 +267,7 @@ namespace Umbraco.Core
             CacheItemPriority priority, CacheItemRemovedCallback refreshAction, TimeSpan timeout,
             Func<TT> getCacheItem)
         {
-            return _runtimeCache.GetCacheItem<TT>(cacheKey, getCacheItem, timeout, false, priority, refreshAction);
+            return RuntimeCache.GetCacheItem<TT>(cacheKey, getCacheItem, timeout, false, priority, refreshAction);
 
         }
 
@@ -306,7 +290,7 @@ namespace Umbraco.Core
             TimeSpan timeout,
             Func<TT> getCacheItem)
         {
-            var cache = _runtimeCache as HttpRuntimeCacheProvider;
+            var cache = RuntimeCache as HttpRuntimeCacheProvider;
             if (cache != null)
             {
                 var result = cache.GetCacheItem(cacheKey, () => getCacheItem(), timeout, false, priority, refreshAction, cacheDependency);
@@ -330,7 +314,7 @@ namespace Umbraco.Core
             CacheDependency cacheDependency,
             Func<TT> getCacheItem)
         {
-            var cache = _runtimeCache as HttpRuntimeCacheProvider;
+            var cache = RuntimeCache as HttpRuntimeCacheProvider;
             if (cache != null)
             {
                 var result = cache.GetCacheItem(cacheKey, () => getCacheItem(), null, false, priority, null, cacheDependency);
@@ -352,7 +336,7 @@ namespace Umbraco.Core
                                        CacheItemPriority priority,
                                        Func<T> getCacheItem)
         {
-            _runtimeCache.InsertCacheItem<T>(cacheKey, getCacheItem, priority: priority);
+            RuntimeCache.InsertCacheItem<T>(cacheKey, getCacheItem, priority: priority);
 
         }
 
@@ -371,7 +355,7 @@ namespace Umbraco.Core
                                        TimeSpan timeout,
                                        Func<T> getCacheItem)
         {
-            _runtimeCache.InsertCacheItem<T>(cacheKey, getCacheItem, timeout, priority: priority);
+            RuntimeCache.InsertCacheItem<T>(cacheKey, getCacheItem, timeout, priority: priority);
         }
 
         /// <summary>
@@ -390,7 +374,7 @@ namespace Umbraco.Core
                                        TimeSpan timeout,
                                        Func<T> getCacheItem)
         {
-            var cache = _runtimeCache as HttpRuntimeCacheProvider;
+            var cache = RuntimeCache as HttpRuntimeCacheProvider;
             if (cache != null)
             {
                 cache.InsertCacheItem(cacheKey, () => getCacheItem(), timeout, false, priority, null, cacheDependency);
@@ -416,7 +400,7 @@ namespace Umbraco.Core
                                        TimeSpan? timeout,
                                        Func<T> getCacheItem)
         {
-            var cache = _runtimeCache as HttpRuntimeCacheProvider;
+            var cache = RuntimeCache as HttpRuntimeCacheProvider;
             if (cache != null)
             {
                 cache.InsertCacheItem(cacheKey, () => getCacheItem(), timeout, false, priority, refreshAction, cacheDependency);

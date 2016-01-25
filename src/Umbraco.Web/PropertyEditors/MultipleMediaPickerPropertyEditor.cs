@@ -22,6 +22,9 @@ namespace Umbraco.Web.PropertyEditors
             [PreValueField("multiPicker", "Pick multiple items", "boolean")]
             public bool MultiPicker { get; set; }
 
+            [PreValueField("onlyImages", "Pick only images", "boolean", Description = "Only let the editor choose images from media.")]
+            public bool OnlyImages { get; set; }
+
             [PreValueField("startNodeId", "Start node", "mediapicker")]
  			public int StartNodeId { get; set; }
         }

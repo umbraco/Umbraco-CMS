@@ -140,8 +140,8 @@
       <HintPath>..\packages\ImageProcessor.2.3.2.0\lib\net45\ImageProcessor.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ImageProcessor.Web, Version=4.5.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ImageProcessor.Web.4.5.0.0\lib\net45\ImageProcessor.Web.dll</HintPath>
+    <Reference Include="ImageProcessor.Web, Version=4.5.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ImageProcessor.Web.4.5.1.0\lib\net45\ImageProcessor.Web.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, processorArchitecture=MSIL">
@@ -159,6 +159,14 @@
     <Reference Include="Microsoft.AspNet.Identity.Owin, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.2.2.1\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeAnalysis.Common.1.0.0\lib\net45\Microsoft.CodeAnalysis.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.CSharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.1.0.0\lib\net45\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Owin">
@@ -204,6 +212,10 @@
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
+    <Reference Include="System.Collections.Immutable, Version=1.1.36.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Collections.Immutable.1.1.36\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data">
@@ -235,6 +247,10 @@
     <Reference Include="System.Net.Http.WebRequest, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Reflection.Metadata, Version=1.0.21.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reflection.Metadata.1.0.21\lib\portable-net45+win8\System.Reflection.Metadata.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
@@ -334,6 +350,14 @@
       <Name>umbraco.providers</Name>
     </ProjectReference>
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="Umbraco.ModelsBuilder, Version=3.0.0.79, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Umbraco.ModelsBuilder.3.0.0-beta006\lib\Umbraco.ModelsBuilder.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Umbraco.ModelsBuilder.AspNet, Version=3.0.0.79, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Umbraco.ModelsBuilder.AspNet.3.0.0-beta006\lib\Umbraco.ModelsBuilder.AspNet.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="UrlRewritingNet.UrlRewriter, Version=2.0.7.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\UrlRewritingNet.UrlRewriter.2.0.7\lib\UrlRewritingNet.UrlRewriter.dll</HintPath>
       <Private>True</Private>
@@ -2363,11 +2387,16 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="App_Plugins\" />
     <Folder Include="Media\" />
     <Folder Include="Umbraco\preview\" />
     <Folder Include="Umbraco_Client\FolderBrowser\Images\" />
     <Folder Include="Umbraco_Client\Tags\images\" />
     <Folder Include="Views\MacroPartials\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.0.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
+    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.0.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>

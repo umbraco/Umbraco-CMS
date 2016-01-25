@@ -5,6 +5,10 @@
 
       var vm = this;
 
+      if(!$scope.model.title) {
+          $scope.model.title = localizationService.localize("general_copy");
+      }
+
       vm.hideSearch = hideSearch;
       vm.selectResult = selectResult;
       vm.onSearchResults = onSearchResults;

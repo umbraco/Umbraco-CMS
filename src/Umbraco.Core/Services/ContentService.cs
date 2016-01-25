@@ -1709,6 +1709,7 @@ namespace Umbraco.Core.Services
             }
         }
 
+        //TODO: All of this needs to be moved to the repository
         private void PerformMove(IContent content, int parentId, int userId, ICollection<MoveEventInfo<IContent>> moveInfo)
         {
             //add a tracking item to use in the Moved event
@@ -1977,6 +1978,10 @@ namespace Umbraco.Core.Services
                 var uow = UowProvider.GetUnitOfWork();
                 using (var repository = RepositoryFactory.CreateContentRepository(uow))
                 {
+                    if (published == false)
+                    {
+                        content.ChangePublishedState(PublishedState.Saved);
+                    }
                     //Since this is the Save and Publish method, the content should be saved even though the publish fails or isn't allowed
                     if (content.HasIdentity == false)
                     {
@@ -2118,6 +2123,22 @@ namespace Umbraco.Core.Services
                         "Content '{0}' with Id '{1}' could not be published because its parent is not published.",
                         content.Name, content.Id));
                 return PublishStatusType.FailedPathNotPublished;
+            }
+            else if (content.ExpireDate.HasValue && content.ExpireDate.Value > DateTime.MinValue && DateTime.Now > content.ExpireDate.Value)
+            {
+                Logger.Info<ContentService>(
+                    string.Format(
+                        "Content '{0}' with Id '{1}' has expired and could not be published.",
+                        content.Name, content.Id));
+                return PublishStatusType.FailedHasExpired;
+            }
+            else if (content.ReleaseDate.HasValue && content.ReleaseDate.Value > DateTime.MinValue && content.ReleaseDate.Value > DateTime.Now)
+            {
+                Logger.Info<ContentService>(
+                    string.Format(
+                        "Content '{0}' with Id '{1}' is awaiting release and could not be published.",
+                        content.Name, content.Id));
+                return PublishStatusType.FailedAwaitingRelease;
             }
 
             return PublishStatusType.Success;

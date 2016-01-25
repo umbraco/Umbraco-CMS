@@ -1,0 +1,7 @@
+﻿{
+    //array of files we want to inject into the application on app_start
+    javascript: [
+        '~/App_Plugins/ModelsBuilder/modelsbuilder.controller.js',
+		'~/App_Plugins/ModelsBuilder/modelsbuilder.resource.js'
+    ]
+}

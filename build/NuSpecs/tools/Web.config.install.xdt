@@ -54,7 +54,7 @@
       </providers>
       </siteMap>	
     <httpRuntime xdt:Transform="InsertIfMissing" />
-    <httpRuntime targetFramework="4.5" xdt:Transform="SetAttributes(targetFramework)" />
+    <httpRuntime targetFramework="4.5" maxRequestLength="51200" fcnMode="Single" xdt:Transform="SetAttributes(targetFramework,fcnMode,maxRequestLength)" />
     <membership defaultProvider="DefaultMembershipProvider" xdt:Locator="Match(defaultProvider)" xdt:Transform="Remove" />
     <roleManager defaultProvider="DefaultRoleProvider" xdt:Locator="Match(defaultProvider)" xdt:Transform="Remove"/>
     <profile defaultProvider="DefaultProfileProvider" xdt:Locator="Match(defaultProvider)" xdt:Transform="Remove"/>>
@@ -66,6 +66,7 @@
         <add assembly="System.Net.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" xdt:Locator="Match(assembly)"
     xdt:Transform="InsertIfMissing" />
         <add assembly="System.Web.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" xdt:Locator="Match(assembly)" xdt:Transform="InsertIfMissing" />
+        <add assembly="System.Runtime, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" xdt:Locator="Match(assembly)" xdt:Transform="InsertIfMissing" />
         <add assembly="System.Design, Version=4.0.0.0, Culture=neutral, PublicKeyToken=B03F5F7F11D50A3A" xdt:Locator="Match(assembly)" xdt:Transform="Remove" />
         <add assembly="System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=B77A5C561934E089" xdt:Locator="Match(assembly)" xdt:Transform="Remove" />
         <add assembly="System.Web.Extensions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" xdt:Locator="Match(assembly)" xdt:Transform="Remove" />
@@ -84,10 +85,12 @@
       <assemblies>
         <remove assembly="System.Web.Http" xdt:Locator="Match(assembly)" xdt:Transform="Remove" />
         <remove assembly="System.Net.Http" xdt:Locator="Match(assembly)" xdt:Transform="Remove" />
+        <remove assembly="System.Runtime" xdt:Locator="Match(assembly)" xdt:Transform="Remove" />
       </assemblies>
       <assemblies>
         <remove assembly="System.Web.Http" xdt:Locator="Match(assembly)" xdt:Transform="InsertBefore(/configuration/system.web/compilation/assemblies/add)" />
         <remove assembly="System.Net.Http" xdt:Locator="Match(assembly)" xdt:Transform="InsertBefore(/configuration/system.web/compilation/assemblies/add)" />
+        <remove assembly="System.Runtime" xdt:Locator="Match(assembly)" xdt:Transform="InsertBefore(/configuration/system.web/compilation/assemblies/add)" />
       </assemblies>
     </compilation>
 
@@ -140,6 +143,13 @@
       <remove name="SpellChecker" xdt:Locator="Match(name)" xdt:Transform="Remove" />
       <add name="SpellChecker" xdt:Locator="Match(name)" xdt:Transform="Remove" />
     </handlers>
+
+    <security xdt:Transform="InsertIfMissing">
+      <requestFiltering xdt:Transform="InsertIfMissing">
+        <requestLimits maxAllowedContentLength="52428800" xdt:Transform="InsertIfMissing" />
+      </requestFiltering>
+    </security>
+    
   </system.webServer>
 
   <system.codedom xdt:Transform="Remove" />
@@ -151,20 +161,26 @@
   
   <runtime>
     <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
+      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='HtmlAgilityPack')" xdt:Transform="Remove" />
       <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Net.Http')" xdt:Transform="Remove" />
       <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='Newtonsoft.Json')" xdt:Transform="Remove" />
       <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Web.Mvc')" xdt:Transform="Remove" />
+      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Web.WebPages.Razor')" xdt:Transform="Remove" />
       <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Web.Http')" xdt:Transform="Remove" />
       <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='Microsoft.Owin')" xdt:Transform="Remove" />
       <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='Microsoft.Owin.Security.OAuth')" xdt:Transform="Remove" />
       <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='Microsoft.Owin.Security')" xdt:Transform="Remove" />
       <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='Microsoft.Owin.Security.Cookies')" xdt:Transform="Remove" />
-      <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Net.Http.Formatting')" xdt:Transform="Remove" />
+	  <dependentAssembly xdt:Locator="Condition(./_defaultNamespace:assemblyIdentity/@name='System.Net.Http.Formatting')" xdt:Transform="Remove" />
     </assemblyBinding>
   </runtime>
 
   <runtime>
     <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
+      <dependentAssembly>
+        <assemblyIdentity name="HtmlAgilityPack" publicKeyToken="bd319b19eaf3b43a" culture="neutral" />
+        <bindingRedirect oldVersion="0.0.0.0-1.4.9.0" newVersion="1.4.9.0" />
+      </dependentAssembly>	
       <dependentAssembly xdt:Transform="Insert">
         <assemblyIdentity name="System.Net.Http" publicKeyToken="b03f5f7f11d50a3a" culture="neutral"/>
         <bindingRedirect oldVersion="0.0.0.0-4.0.0.0" newVersion="4.0.0.0"/>
@@ -177,6 +193,10 @@
         <assemblyIdentity name="System.Web.Mvc" publicKeyToken="31bf3856ad364e35" culture="neutral" />
         <bindingRedirect oldVersion="0.0.0.0-4.0.0.1" newVersion="4.0.0.1" />
       </dependentAssembly>
+      <dependentAssembly xdt:Transform="Insert">
+        <assemblyIdentity name="System.Web.WebPages.Razor" publicKeyToken="31bf3856ad364e35" />
+        <bindingRedirect oldVersion="0.0.0.0-3.0.0.0" newVersion="3.0.0.0" />
+      </dependentAssembly>		  
       <dependentAssembly xdt:Transform="Insert">
         <assemblyIdentity name="System.Web.Http" publicKeyToken="31bf3856ad364e35" culture="neutral" />
         <bindingRedirect oldVersion="0.0.0.0-5.2.3.0" newVersion="5.2.3.0" />

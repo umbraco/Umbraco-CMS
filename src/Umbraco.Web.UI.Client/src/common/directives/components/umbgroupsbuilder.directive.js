@@ -1,7 +1,7 @@
 (function() {
   'use strict';
 
-  function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource, dataTypeHelper, dataTypeResource, $filter, iconHelper, $q) {
+  function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource, dataTypeHelper, dataTypeResource, $filter, iconHelper, $q, $timeout) {
 
     function link(scope, el, attr, ctrl) {
 
@@ -9,7 +9,7 @@
       scope.toolbar = [];
       scope.sortableOptionsGroup = {};
       scope.sortableOptionsProperty = {};
-      scope.sortingButtonLabel = "Reorder";
+      scope.sortingButtonKey = "general_reorder";
 
       function activate() {
 
@@ -116,6 +116,49 @@
 
       }
 
+        function filterAvailableCompositions(selectedContentType, selecting) {
+
+            //selecting = true if the user has check the item, false if the user has unchecked the item
+
+            var selectedContentTypeAliases = selecting ?
+                //the user has selected the item so add to the current list
+                _.union(scope.compositionsDialogModel.compositeContentTypes, [selectedContentType.alias]) :
+                //the user has unselected the item so remove from the current list
+                _.reject(scope.compositionsDialogModel.compositeContentTypes, function(i) {
+                    return i === selectedContentType.alias;
+                });
+
+            //get the currently assigned property type aliases - ensure we pass these to the server side filer
+            var propAliasesExisting = _.filter(_.flatten(_.map(scope.model.groups, function(g) {
+                return _.map(g.properties, function(p) {
+                    return p.alias;
+                });
+            })), function (f) {
+                return f !== null && f !== undefined;
+            });
+
+            //use a different resource lookup depending on the content type type
+            var resourceLookup = scope.contentType === "documentType" ? contentTypeResource.getAvailableCompositeContentTypes : mediaTypeResource.getAvailableCompositeContentTypes;
+
+            return resourceLookup(scope.model.id, selectedContentTypeAliases, propAliasesExisting).then(function (filteredAvailableCompositeTypes) {
+                _.each(scope.compositionsDialogModel.availableCompositeContentTypes, function (current) {
+                    //reset first 
+                    current.allowed = true;
+                    //see if this list item is found in the response (allowed) list
+                    var found = _.find(filteredAvailableCompositeTypes, function (f) {
+                        return current.contentType.alias === f.contentType.alias;
+                    });
+
+                    //allow if the item was  found in the response (allowed) list - 
+                    // and ensure its set to allowed if it is currently checked,
+                    // DO not allow if it's a locked content type.
+                    current.allowed = scope.model.lockedCompositeContentTypes.indexOf(current.contentType.alias) === -1 &&
+                        (selectedContentTypeAliases.indexOf(current.contentType.alias) !== -1) || ((found !== null && found !== undefined) ? found.allowed : false);
+
+                });
+            });
+        }
+
       function updatePropertiesSortOrder() {
 
         angular.forEach(scope.model.groups, function(group){
@@ -125,6 +168,25 @@
         });
 
       }
+
+        function setupAvailableContentTypesModel(result) {
+            scope.compositionsDialogModel.availableCompositeContentTypes = result;            
+            //iterate each one and set it up
+            _.each(scope.compositionsDialogModel.availableCompositeContentTypes, function (c) {
+                //enable it if it's part of the selected model
+                if (scope.compositionsDialogModel.compositeContentTypes.indexOf(c.contentType.alias) !== -1) {
+                    c.allowed = true;
+                }
+
+                //set the inherited flags
+                c.inherited = false;
+                if (scope.model.lockedCompositeContentTypes.indexOf(c.contentType.alias) > -1) {
+                    c.inherited = true;
+                }
+                // convert icons for composite content types
+                iconHelper.formatContentTypeIcons([c.contentType]);
+            });
+        }
 
       /* ---------- DELETE PROMT ---------- */
 
@@ -143,9 +205,9 @@
          scope.sortingMode = !scope.sortingMode;
 
          if(scope.sortingMode === true) {
-            scope.sortingButtonLabel = "I'm done reordering";
+            scope.sortingButtonKey = "general_reorderDone";
          } else {
-            scope.sortingButtonLabel = "Reorder";
+            scope.sortingButtonKey = "general_reorder";
          }
 
       };
@@ -186,7 +248,7 @@
                 // submit overlay if no compositions has been removed
                 // or the action has been confirmed
                 } else {
-
+                    
                     // make sure that all tabs has an init property
                     if (scope.model.groups.length !== 0) {
                       angular.forEach(scope.model.groups, function(group) {
@@ -211,30 +273,47 @@
                 scope.compositionsDialogModel = null;
 
             },
-            selectCompositeContentType: function(compositeContentType) {
+            selectCompositeContentType: function (selectedContentType) {
 
-                if (scope.model.compositeContentTypes.indexOf(compositeContentType.alias) === -1) {
-                  //merge composition with content type
+                //first check if this is a new selection - we need to store this value here before any further digests/async
+                // because after that the scope.model.compositeContentTypes will be populated with the selected value.
+                var newSelection = scope.model.compositeContentTypes.indexOf(selectedContentType.alias) === -1;
 
-                  if(scope.contentType === "documentType") {
+                if (newSelection) {
+                    //merge composition with content type
 
-                     contentTypeResource.getById(compositeContentType.id).then(function(composition){
-                        contentTypeHelper.mergeCompositeContentType(scope.model, composition);
-                     });
+                    //use a different resource lookup depending on the content type type
+                    var resourceLookup = scope.contentType === "documentType" ? contentTypeResource.getById : mediaTypeResource.getById;
 
+                    resourceLookup(selectedContentType.id).then(function (composition) {
+                        //based on the above filtering we shouldn't be able to select an invalid one, but let's be safe and
+                        // double check here.
+                        var overlappingAliases = contentTypeHelper.validateAddingComposition(scope.model, composition);
+                        if (overlappingAliases.length > 0) {
+                            //this will create an invalid composition, need to uncheck it
+                            scope.compositionsDialogModel.compositeContentTypes.splice(
+                                scope.compositionsDialogModel.compositeContentTypes.indexOf(composition.alias), 1);
+                            //dissallow this until something else is unchecked
+                            selectedContentType.allowed = false;
+                        }
+                        else {
+                            contentTypeHelper.mergeCompositeContentType(scope.model, composition);
+                        }
 
-                  } else if(scope.contentType === "mediaType") {
+                        //based on the selection, we need to filter the available composite types list
+                        filterAvailableCompositions(selectedContentType, newSelection).then(function () {
+                            //TODO: Here we could probably re-enable selection if we previously showed a throbber or something
+                        });
+                    });
+                }
+                else {
+                    // split composition from content type
+                    contentTypeHelper.splitCompositeContentType(scope.model, selectedContentType);
 
-                     mediaTypeResource.getById(compositeContentType.id).then(function(composition){
-                        contentTypeHelper.mergeCompositeContentType(scope.model, composition);
-                     });
-
-                  }
-
-
-                } else {
-                  // split composition from content type
-                  contentTypeHelper.splitCompositeContentType(scope.model, compositeContentType);
+                    //based on the selection, we need to filter the available composite types list
+                    filterAvailableCompositions(selectedContentType, newSelection).then(function () {
+                        //TODO: Here we could probably re-enable selection if we previously showed a throbber or something
+                    });
                 }
 
             }
@@ -242,21 +321,28 @@
 
         var availableContentTypeResource = scope.contentType === "documentType" ? contentTypeResource.getAvailableCompositeContentTypes : mediaTypeResource.getAvailableCompositeContentTypes;
         var countContentTypeResource = scope.contentType === "documentType" ? contentTypeResource.getCount : mediaTypeResource.getCount;
-        $q.all([
+
+          //get the currently assigned property type aliases - ensure we pass these to the server side filer
+          var propAliasesExisting = _.filter(_.flatten(_.map(scope.model.groups, function(g) {
+              return _.map(g.properties, function(p) {
+                  return p.alias;
+              });
+          })), function(f) {
+              return f !== null && f !== undefined;
+          });
+          $q.all([
               //get available composite types
-              availableContentTypeResource(scope.model.id).then(function (result) {
-                  scope.compositionsDialogModel.availableCompositeContentTypes = result;
-                  // convert icons for composite content types
-                  iconHelper.formatContentTypeIcons(scope.compositionsDialogModel.availableCompositeContentTypes);
+              availableContentTypeResource(scope.model.id, [], propAliasesExisting).then(function (result) {
+                  setupAvailableContentTypesModel(result);
               }),
               //get content type count
-              countContentTypeResource().then(function (result) {
+              countContentTypeResource().then(function(result) {
                   scope.compositionsDialogModel.totalContentTypes = parseInt(result, 10);
               })
-        ]).then(function () {
-            //resolves when both other promises are done, now show it
-            scope.compositionsDialogModel.show = true;
-        });
+          ]).then(function() {
+              //resolves when both other promises are done, now show it
+              scope.compositionsDialogModel.show = true;
+          });
 
       };
 
@@ -299,6 +385,7 @@
 
       scope.removeGroup = function(groupIndex) {
         scope.model.groups.splice(groupIndex, 1);
+        addInitGroup(scope.model.groups);
       };
 
       scope.updateGroupTitle = function(group) {
@@ -359,11 +446,12 @@
 
       scope.editPropertyTypeSettings = function(property, group) {
 
-        if (!property.inherited) {
+        if (!property.inherited && !property.locked) {
 
           scope.propertySettingsDialogModel = {};
           scope.propertySettingsDialogModel.title = "Property settings";
           scope.propertySettingsDialogModel.property = property;
+          scope.propertySettingsDialogModel.contentType = scope.contentType;
           scope.propertySettingsDialogModel.contentTypeName = scope.model.name;
           scope.propertySettingsDialogModel.view = "views/common/overlays/contenttypeeditor/propertysettings/propertysettings.html";
           scope.propertySettingsDialogModel.show = true;
@@ -412,6 +500,10 @@
             property.dataTypeId = oldModel.property.dataTypeId;
             property.dataTypeIcon = oldModel.property.dataTypeIcon;
             property.dataTypeName = oldModel.property.dataTypeName;
+            property.validation.mandatory = oldModel.property.validation.mandatory;
+            property.validation.pattern = oldModel.property.validation.pattern;
+            property.showOnMemberProfile = oldModel.property.showOnMemberProfile;
+            property.memberCanEdit = oldModel.property.memberCanEdit;
 
             // because we set state to active, to show a preview, we have to check if has been filled out
             // label is required so if it is not filled we know it is a placeholder

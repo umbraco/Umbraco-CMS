@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private EntityContainerRepository CreateContainerRepository(IDatabaseUnitOfWork unitOfWork)
         {
-            return new EntityContainerRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);
+            return new EntityContainerRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax, Constants.ObjectTypes.MediaTypeContainerGuid);
         }
 
         [Test]
@@ -340,7 +340,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
 
-                var mediaTypes = repository.GetAll(allGuidIds);
+                var mediaTypes = ((IReadRepository<Guid, IMediaType>)repository).GetAll(allGuidIds);
 
                 int count =
                     DatabaseContext.Database.ExecuteScalar<int>(

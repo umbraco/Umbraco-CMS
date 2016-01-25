@@ -90,7 +90,7 @@ namespace Umbraco.Tests.Mvc
 
             view.ViewContext = GetViewContext();
 
-            Assert.Throws<InvalidCastException>(() => view.SetViewDataX(viewData));
+            Assert.Throws<ModelBindingException>(() => view.SetViewDataX(viewData));
         }
 
         [Test]
@@ -133,7 +133,7 @@ namespace Umbraco.Tests.Mvc
 
             view.ViewContext = GetViewContext();
 
-            Assert.Throws<InvalidCastException>(() => view.SetViewDataX(viewData));
+            Assert.Throws<ModelBindingException>(() => view.SetViewDataX(viewData));
         }
 
         #endregion
@@ -191,7 +191,7 @@ namespace Umbraco.Tests.Mvc
             var viewData = new ViewDataDictionary(model);
 
             view.ViewContext = GetViewContext();
-            Assert.Throws<InvalidCastException>(() => view.SetViewDataX(viewData));
+            Assert.Throws<ModelBindingException>(() => view.SetViewDataX(viewData));
         }
 
         [Test]
@@ -233,7 +233,7 @@ namespace Umbraco.Tests.Mvc
             var viewData = new ViewDataDictionary(model);
 
             view.ViewContext = GetViewContext();
-            Assert.Throws<InvalidCastException>(() => view.SetViewDataX(viewData));
+            Assert.Throws<ModelBindingException>(() => view.SetViewDataX(viewData));
         }
 
         #endregion
@@ -289,7 +289,7 @@ namespace Umbraco.Tests.Mvc
             var viewData = new ViewDataDictionary(content);
 
             view.ViewContext = GetViewContext();
-            Assert.Throws<InvalidCastException>(() =>view.SetViewDataX(viewData));
+            Assert.Throws<ModelBindingException>(() =>view.SetViewDataX(viewData));
         }
         
         [Test]
@@ -313,7 +313,7 @@ namespace Umbraco.Tests.Mvc
             var viewData = new ViewDataDictionary(content);
 
             view.ViewContext = GetViewContext();
-            Assert.Throws<InvalidCastException>(() => view.SetViewDataX(viewData));
+            Assert.Throws<ModelBindingException>(() => view.SetViewDataX(viewData));
         }
 
         [Test]

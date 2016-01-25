@@ -48,7 +48,7 @@ namespace Umbraco.Web.Editors
 
         private readonly MembershipProvider _provider;
 
-        public ContentTypeCompositionDisplay GetById(int id)
+        public MemberTypeDisplay GetById(int id)
         {
             var ct = Services.MemberTypeService.Get(id);
             if (ct == null)
@@ -56,7 +56,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var dto = Mapper.Map<IMemberType, ContentTypeCompositionDisplay>(ct);
+            var dto = Mapper.Map<IMemberType, MemberTypeDisplay>(ct);
             return dto;
         }
 
@@ -79,17 +79,39 @@ namespace Umbraco.Web.Editors
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
-        public IEnumerable<EntityBasic> GetAvailableCompositeMemberTypes(int contentTypeId)
+        /// <summary>
+        /// Returns the avilable compositions for this content type
+        /// </summary>
+        /// <param name="contentTypeId"></param>
+        /// <param name="filterContentTypes">
+        /// This is normally an empty list but if additional content type aliases are passed in, any content types containing those aliases will be filtered out
+        /// along with any content types that have matching property types that are included in the filtered content types
+        /// </param>
+        /// <param name="filterPropertyTypes">
+        /// This is normally an empty list but if additional property type aliases are passed in, any content types that have these aliases will be filtered out.
+        /// This is required because in the case of creating/modifying a content type because new property types being added to it are not yet persisted so cannot
+        /// be looked up via the db, they need to be passed in.
+        /// </param>
+        /// <returns></returns>
+        public HttpResponseMessage GetAvailableCompositeMemberTypes(int contentTypeId,
+            [FromUri]string[] filterContentTypes,
+            [FromUri]string[] filterPropertyTypes)
         {
-            return PerformGetAvailableCompositeContentTypes(contentTypeId, UmbracoObjectTypes.MemberType);
+            var result = PerformGetAvailableCompositeContentTypes(contentTypeId, UmbracoObjectTypes.MemberType, filterContentTypes, filterPropertyTypes)
+                .Select(x => new
+                {
+                    contentType = x.Item1,
+                    allowed = x.Item2
+                });
+            return Request.CreateResponse(result);
         }
 
-        public ContentTypeCompositionDisplay GetEmpty()
+        public MemberTypeDisplay GetEmpty()
         {
             var ct = new MemberType(-1);
             ct.Icon = "icon-user";
 
-            var dto = Mapper.Map<IMemberType, ContentTypeCompositionDisplay>(ct);
+            var dto = Mapper.Map<IMemberType, MemberTypeDisplay>(ct);
             return dto;
         }
 
@@ -107,16 +129,14 @@ namespace Umbraco.Web.Editors
             return Enumerable.Empty<ContentTypeBasic>();
         }
 
-        public ContentTypeCompositionDisplay PostSave(ContentTypeSave contentTypeSave)
+        public MemberTypeDisplay PostSave(MemberTypeSave contentTypeSave)
         {
-            var savedCt = PerformPostSave<IMemberType, ContentTypeCompositionDisplay>(
+            var savedCt = PerformPostSave<IMemberType, MemberTypeDisplay, MemberTypeSave, MemberPropertyTypeBasic>(
                 contentTypeSave:            contentTypeSave,
                 getContentType:             i => Services.MemberTypeService.Get(i),
-                getContentTypeByAlias:      alias => Services.MemberTypeService.Get(alias),
-                saveContentType:            type => Services.MemberTypeService.Save(type),
-                validateComposition:        false);
+                saveContentType:            type => Services.MemberTypeService.Save(type));
 
-            var display = Mapper.Map<ContentTypeCompositionDisplay>(savedCt);
+            var display = Mapper.Map<MemberTypeDisplay>(savedCt);
 
             display.AddSuccessNotification(
                             Services.TextService.Localize("speechBubbles/contentTypeSavedHeader"),

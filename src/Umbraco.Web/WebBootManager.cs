@@ -40,10 +40,12 @@ using Umbraco.Web.Scheduling;
 using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
+using Umbraco.Web.Editors;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using ProfilingViewEngine = Umbraco.Core.Profiling.ProfilingViewEngine;
 
@@ -183,7 +185,9 @@ namespace Umbraco.Web
             base.InitializeProfilerResolver();
 
             //Set the profiler to be the web profiler
-            ProfilerResolver.Current.SetProfiler(new WebProfiler());
+            var profiler = new WebProfiler();
+            ProfilerResolver.Current.SetProfiler(profiler);
+            profiler.Start();
         }
         
         /// <summary>
@@ -241,7 +245,19 @@ namespace Umbraco.Web
         protected override CacheHelper CreateApplicationCache()
         {
             //create a web-based cache helper
-            return new CacheHelper();
+            var cacheHelper = new CacheHelper(
+                //we need to have the dep clone runtime cache provider to ensure 
+                //all entities are cached properly (cloned in and cloned out)
+                new DeepCloneRuntimeCacheProvider(new HttpRuntimeCacheProvider(HttpRuntime.Cache)),
+                new StaticCacheProvider(),
+                //we have no request based cache when not running in web-based context
+                new NullCacheProvider(),
+                new IsolatedRuntimeCache(type =>
+                    //we need to have the dep clone runtime cache provider to ensure 
+                    //all entities are cached properly (cloned in and cloned out)
+                    new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider())));
+
+            return cacheHelper;
         }
 
         /// <summary>
@@ -348,7 +364,9 @@ namespace Umbraco.Web
         {
             base.InitializeResolvers();
 
-            XsltExtensionsResolver.Current = new XsltExtensionsResolver(ServiceProvider, LoggerResolver.Current.Logger, () => PluginManager.Current.ResolveXsltExtensions());
+            XsltExtensionsResolver.Current = new XsltExtensionsResolver(ServiceProvider, LoggerResolver.Current.Logger, () => PluginManager.ResolveXsltExtensions());
+
+            EditorValidationResolver.Current= new EditorValidationResolver(ServiceProvider, LoggerResolver.Current.Logger, () => PluginManager.ResolveTypes<IEditorValidator>());
 
             //set the default RenderMvcController
             DefaultRenderMvcControllerResolver.Current = new DefaultRenderMvcControllerResolver(typeof(RenderMvcController));
@@ -436,11 +454,11 @@ namespace Umbraco.Web
 
             SurfaceControllerResolver.Current = new SurfaceControllerResolver(
                 ServiceProvider, LoggerResolver.Current.Logger,
-                PluginManager.Current.ResolveSurfaceControllers());
+                PluginManager.ResolveSurfaceControllers());
 
             UmbracoApiControllerResolver.Current = new UmbracoApiControllerResolver(
                 ServiceProvider, LoggerResolver.Current.Logger,
-                PluginManager.Current.ResolveUmbracoApiControllers());
+                PluginManager.ResolveUmbracoApiControllers());
 
             // both TinyMceValueConverter (in Core) and RteMacroRenderingValueConverter (in Web) will be
             // discovered when CoreBootManager configures the converters. We HAVE to remove one of them
@@ -509,11 +527,11 @@ namespace Umbraco.Web
 
             ThumbnailProvidersResolver.Current = new ThumbnailProvidersResolver(
                 ServiceProvider, LoggerResolver.Current.Logger,
-                PluginManager.Current.ResolveThumbnailProviders());
+                PluginManager.ResolveThumbnailProviders());
 
             ImageUrlProviderResolver.Current = new ImageUrlProviderResolver(
                 ServiceProvider, LoggerResolver.Current.Logger,
-                PluginManager.Current.ResolveImageUrlProviders());
+                PluginManager.ResolveImageUrlProviders());
 
             CultureDictionaryFactoryResolver.Current = new CultureDictionaryFactoryResolver(
                 new DefaultCultureDictionaryFactory());
@@ -528,3 +546,4 @@ namespace Umbraco.Web
         }
     }
 }
+

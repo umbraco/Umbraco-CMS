@@ -300,7 +300,7 @@ namespace Umbraco.Core.Services
             }
 
             var exporter = new EntityXmlSerializer();
-            var xml = exporter.Serialize(_dataTypeService, contentType);
+            var xml = exporter.Serialize(_dataTypeService, _contentTypeService, contentType);
 
             if (raiseEvents)
                 ExportedContentType.RaiseEvent(new ExportEventArgs<IContentType>(contentType, xml, false), this);
@@ -362,13 +362,13 @@ namespace Umbraco.Core.Services
                 {
                     var elementCopy = documentType;
                     var infoElement = elementCopy.Element("Info");
-                    var dependencies = new List<string>();
+                    var dependencies = new HashSet<string>();
 
                     //Add the Master as a dependency
-                    if (elementCopy.Element("Master") != null &&
-                        string.IsNullOrEmpty(elementCopy.Element("Master").Value) == false)
+                    if (infoElement.Element("Master") != null &&
+                        string.IsNullOrEmpty(infoElement.Element("Master").Value) == false)
                     {
-                        dependencies.Add(elementCopy.Element("Master").Value);
+                        dependencies.Add(infoElement.Element("Master").Value);
                     }
 
                     //Add compositions as dependencies
@@ -460,7 +460,11 @@ namespace Umbraco.Core.Services
             foreach (var documentType in unsortedDocumentTypes)
             {
                 var foldersAttribute = documentType.Attribute("Folders");
-                if (foldersAttribute != null)
+                var infoElement = documentType.Element("Info");
+                if (foldersAttribute != null && infoElement != null 
+                    //don't import any folder if this is a child doc type - the parent doc type will need to
+                    //exist which contains it's folders
+                    && ((string)infoElement.Element("Master")).IsNullOrWhiteSpace())
                 {
                     var alias = documentType.Element("Info").Element("Alias").Value;
                     var folders = foldersAttribute.Value.Split('/');

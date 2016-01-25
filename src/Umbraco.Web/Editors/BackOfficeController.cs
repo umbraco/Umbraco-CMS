@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Configuration;
@@ -100,7 +101,8 @@ namespace Umbraco.Web.Editors
             var cultureInfo = string.IsNullOrWhiteSpace(culture)
                 //if the user is logged in, get their culture, otherwise default to 'en'
                 ? Security.IsAuthenticated()
-                    ? Security.CurrentUser.GetUserCulture(Services.TextService)
+                    //current culture is set at the very beginning of each request
+                    ? Thread.CurrentThread.CurrentCulture
                     : CultureInfo.GetCultureInfo("en")
                 : CultureInfo.GetCultureInfo(culture);
 
@@ -401,7 +403,7 @@ namespace Umbraco.Web.Editors
 
             return JavaScript(result);
         }
-
+        
         [HttpPost]
         public ActionResult ExternalLogin(string provider, string redirectUrl = null)
         {
@@ -641,6 +643,7 @@ namespace Umbraco.Web.Editors
             app.Add("applicationPath", HttpContext.Request.ApplicationPath.EnsureEndsWith('/'));
             return app;
         }
+        
 
         private IEnumerable<Dictionary<string, string>> GetTreePluginsMetaData()
         {

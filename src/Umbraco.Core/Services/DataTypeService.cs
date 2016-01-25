@@ -32,7 +32,7 @@ namespace Umbraco.Core.Services
         public Attempt<int> CreateContainer(int parentId, string name, int userId = 0)
         {
             var uow = UowProvider.GetUnitOfWork();
-            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow))
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.DataTypeContainerGuid))
             {
                 try
                 {
@@ -57,33 +57,53 @@ namespace Umbraco.Core.Services
         public EntityContainer GetContainer(int containerId)
         {
             var uow = UowProvider.GetUnitOfWork();
-            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow))
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.DataTypeContainerGuid))
             {
                 var container = repo.Get(containerId);
-                return container != null && container.ContainedObjectType == Constants.ObjectTypes.DataTypeGuid
-                    ? container
-                    : null;
+                return container;
             }
         }
 
         public EntityContainer GetContainer(Guid containerId)
         {
             var uow = UowProvider.GetUnitOfWork();
-            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow))
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.DataTypeContainerGuid))
             {
                 var container = repo.Get(containerId);
-                return container != null && container.ContainedObjectType == Constants.ObjectTypes.DataTypeGuid
-                    ? container
-                    : null;
+                return container;
             }
         }
 
         public IEnumerable<EntityContainer> GetContainers(string name, int level)
         {
             var uow = UowProvider.GetUnitOfWork();
-            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow))
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.DataTypeContainerGuid))
             {
-                return repo.Get(name, level, Constants.ObjectTypes.DataTypeContainerGuid);
+                return repo.Get(name, level);
+            }
+        }
+
+        public IEnumerable<EntityContainer> GetContainers(IDataTypeDefinition dataTypeDefinition)
+        {
+            var ancestorIds = dataTypeDefinition.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(x =>
+                {
+                    var asInt = x.TryConvertTo<int>();
+                    if (asInt) return asInt.Result;
+                    return int.MinValue;
+                })
+                .Where(x => x != int.MinValue && x != dataTypeDefinition.Id)
+                .ToArray();
+
+            return GetContainers(ancestorIds);
+        }
+
+        public IEnumerable<EntityContainer> GetContainers(int[] containerIds)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.DataTypeContainerGuid))
+            {
+                return repo.GetAll(containerIds);
             }
         }
 
@@ -95,7 +115,7 @@ namespace Umbraco.Core.Services
                 throw new InvalidOperationException("Cannot save a container with a modified parent, move the container instead.");
 
             var uow = UowProvider.GetUnitOfWork();
-            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow))
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.DataTypeContainerGuid))
             {
                 repo.AddOrUpdate(container);
                 uow.Commit();
@@ -106,11 +126,10 @@ namespace Umbraco.Core.Services
         public void DeleteContainer(int containerId, int userId = 0)
         {
             var uow = UowProvider.GetUnitOfWork();
-            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow))
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.DataTypeContainerGuid))
             {
                 var container = repo.Get(containerId);
                 if (container == null) return;
-                if (container.ContainedObjectType != Constants.ObjectTypes.DataTypeGuid) return;
                 repo.Delete(container);
                 uow.Commit();
                 //TODO: Audit trail ?
@@ -261,7 +280,7 @@ namespace Umbraco.Core.Services
 
             var moveInfo = new List<MoveEventInfo<IDataTypeDefinition>>();
             var uow = UowProvider.GetUnitOfWork();
-            using (var containerRepository = RepositoryFactory.CreateEntityContainerRepository(uow))
+            using (var containerRepository = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.DataTypeContainerGuid))
             using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(uow))
             {
                 try
@@ -270,7 +289,7 @@ namespace Umbraco.Core.Services
                     if (parentId > 0)
                     {
                         container = containerRepository.Get(parentId);
-                        if (container == null || container.ContainedObjectType != Constants.ObjectTypes.DataTypeGuid)
+                        if (container == null)
                             throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound);
                     }
                     moveInfo.AddRange(repository.Move(toMove, container));
