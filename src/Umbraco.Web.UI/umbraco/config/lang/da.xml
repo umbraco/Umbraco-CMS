@@ -382,6 +382,7 @@
     <key alias="properties">Egenskaber</key>
     <key alias="reciept">Email der skal modtage indhold af formular</key>
     <key alias="recycleBin">Papirkurv</key>
+    <key alias="recycleBinEmpty">Din papirkurv er tom</key>
     <key alias="remaining">Mangler</key>
     <key alias="rename">Omdøb</key>
     <key alias="renew">Forny</key>

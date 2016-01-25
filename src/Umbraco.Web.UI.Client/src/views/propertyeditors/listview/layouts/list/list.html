@@ -9,6 +9,7 @@
         on-drag-enter="vm.dragEnter()">
 
         <umb-file-dropzone
+           ng-if="!vm.isRecycleBin"
            parent-id="{{vm.nodeId}}"
            files-uploaded="vm.onUploadComplete"
            accept="{{vm.acceptedFileTypes}}"
@@ -29,6 +30,12 @@
             on-sorting-direction="vm.isSortDirection"
             on-sort="vm.sort">
         </umb-table>
+
+        <umb-empty-state
+            ng-if="!items && vm.isRecycleBin"
+            position="center">
+            <localize key="general_recycleBinEmpty"></localize>
+        </umb-empty-state>
 
     </div>
 
