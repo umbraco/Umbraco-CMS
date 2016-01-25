@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    public interface IMediaTypeRepository : IRepositoryQueryable<int, IMediaType>, IReadRepository<Guid, IMediaType>
+    public interface IMediaTypeRepository : IContentTypeCompositionRepository<IMediaType>
     {
         /// <summary>
         /// Gets all entities of the specified <see cref="PropertyType"/> query

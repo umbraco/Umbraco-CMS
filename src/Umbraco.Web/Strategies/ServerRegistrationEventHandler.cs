@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Web;
 using Newtonsoft.Json;
 using Umbraco.Core;
@@ -6,6 +8,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Scheduling;
 
 namespace Umbraco.Web.Strategies
 {
@@ -22,74 +25,137 @@ namespace Umbraco.Web.Strategies
     /// </remarks>
     public sealed class ServerRegistrationEventHandler : ApplicationEventHandler
     {
-        private readonly object _locko = new object();
         private DatabaseServerRegistrar _registrar;
-        private DateTime _lastUpdated = DateTime.MinValue;
+        private BackgroundTaskRunner<IBackgroundTask> _backgroundTaskRunner;
+        private bool _started = false;
 
         // bind to events
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
             _registrar = ServerRegistrarResolver.Current.Registrar as DatabaseServerRegistrar;
 
+            _backgroundTaskRunner = new BackgroundTaskRunner<IBackgroundTask>(
+                new BackgroundTaskRunnerOptions { AutoStart = true },
+                applicationContext.ProfilingLogger.Logger);
+
             // only for the DatabaseServerRegistrar
             if (_registrar == null) return;
 
+            //We will start the whole process when a successful request is made
             UmbracoModule.RouteAttempt += UmbracoModuleRouteAttempt;
         }
 
-        // handles route attempts.
+        /// <summary>
+        /// Handle when a request is made
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <remarks>
+        /// We require this because:
+        /// - ApplicationContext.UmbracoApplicationUrl is initialized by UmbracoModule in BeginRequest
+        /// - RegisterServer is called on UmbracoModule.RouteAttempt which is triggered in ProcessRequest
+        ///      we are safe, UmbracoApplicationUrl has been initialized
+        /// </remarks>
         private void UmbracoModuleRouteAttempt(object sender, RoutableAttemptEventArgs e)
         {
-            if (e.HttpContext.Request == null || e.HttpContext.Request.Url == null) return;
-
             switch (e.Outcome)
             {
                 case EnsureRoutableOutcome.IsRoutable:
                     // front-end request
                     RegisterServer(e);
+                    //remove handler, we're done
+                    UmbracoModule.RouteAttempt -= UmbracoModuleRouteAttempt;
                     break;
                 case EnsureRoutableOutcome.NotDocumentRequest:
                     // anything else (back-end request, service...)
                     //so it's not a document request, we'll check if it's a back office request
                     if (e.HttpContext.Request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath))
+                    {
                         RegisterServer(e);
-                    break;
-                /*
-                case EnsureRoutableOutcome.NotReady:
-                case EnsureRoutableOutcome.NotConfigured:
-                case EnsureRoutableOutcome.NoContent:
-                default:
-                    // otherwise, do nothing
-                    break;
-                */
+                        //remove handler, we're done
+                        UmbracoModule.RouteAttempt -= UmbracoModuleRouteAttempt;
+                    }
+                    break;                  
             }
         }
-
-        // register current server (throttled).
+        
         private void RegisterServer(UmbracoRequestEventArgs e)
         {
-            lock (_locko) // ensure we trigger only once
-            {
-                var secondsSinceLastUpdate = DateTime.Now.Subtract(_lastUpdated).TotalSeconds;
-                if (secondsSinceLastUpdate < _registrar.Options.ThrottleSeconds) return;
-                _lastUpdated = DateTime.Now;
-            }
+            //only process once
+            if (_started) return;
 
+            _started = true;
+
+            var serverAddress = e.UmbracoContext.Application.UmbracoApplicationUrl;
             var svc = e.UmbracoContext.Application.Services.ServerRegistrationService;
 
-            // because
-            // - ApplicationContext.UmbracoApplicationUrl is initialized by UmbracoModule in BeginRequest
-            // - RegisterServer is called on UmbracoModule.RouteAttempt which is triggered in ProcessRequest
-            // we are safe, UmbracoApplicationUrl has been initialized
-            var serverAddress = e.UmbracoContext.Application.UmbracoApplicationUrl;
+            //Perform the rest async, we don't want to block the startup sequence
+            // this will just reoccur on a background thread
+            _backgroundTaskRunner.Add(new TouchServerTask(_backgroundTaskRunner,
+                15000,                                              //delay before first execution
+                _registrar.Options.RecurringSeconds * 1000,     //amount of ms between executions
+                svc, _registrar, serverAddress));
+        }
 
-            try
+        private class TouchServerTask : RecurringTaskBase
+        {
+            private readonly IServerRegistrationService _svc;
+            private readonly DatabaseServerRegistrar _registrar;
+            private readonly string _serverAddress;
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="RecurringTaskBase"/> class.
+            /// </summary>
+            /// <param name="runner">The task runner.</param>
+            /// <param name="delayMilliseconds">The delay.</param>
+            /// <param name="periodMilliseconds">The period.</param>
+            /// <param name="svc"></param>
+            /// <param name="registrar"></param>
+            /// <param name="serverAddress"></param>
+            /// <remarks>The task will repeat itself periodically. Use this constructor to create a new task.</remarks>
+            public TouchServerTask(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
+                IServerRegistrationService svc, DatabaseServerRegistrar registrar, string serverAddress)
+                : base(runner, delayMilliseconds, periodMilliseconds)
             {
-                svc.TouchServer(serverAddress, svc.CurrentServerIdentity, _registrar.Options.StaleServerTimeout);
+                if (svc == null) throw new ArgumentNullException("svc");
+                _svc = svc;
+                _registrar = registrar;
+                _serverAddress = serverAddress;
             }
-            catch (Exception ex)
+
+            public override bool IsAsync
             {
-                LogHelper.Error<ServerRegistrationEventHandler>("Failed to update server record in database.", ex);
+                get { return false; }
+            }
+
+            public override bool RunsOnShutdown
+            {
+                get { return false; }
+            }
+
+            /// <summary>
+            /// Runs the background task.
+            /// </summary>
+            /// <returns>A value indicating whether to repeat the task.</returns>
+            public override bool PerformRun()
+            {
+                try
+                {
+                    _svc.TouchServer(_serverAddress, _svc.CurrentServerIdentity, _registrar.Options.StaleServerTimeout);
+
+                    return true; // repeat
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.Error<ServerRegistrationEventHandler>("Failed to update server record in database.", ex);
+
+                    return false; // probably stop if we have an error
+                }
+            }
+
+            public override Task<bool> PerformRunAsync(CancellationToken token)
+            {
+                throw new NotImplementedException();
             }
         }
     }

@@ -5,14 +5,8 @@ using System.Runtime.Serialization;
 namespace Umbraco.Web.Models.ContentEditing
 {
     [DataContract(Name = "propertyGroup", Namespace = "")]
-    public class PropertyGroupBasic<TPropertyType>
-        where TPropertyType: PropertyTypeBasic
+    public abstract class PropertyGroupBasic
     {
-        public PropertyGroupBasic()
-        {
-            Properties = new List<TPropertyType>();
-        }
-
         /// <summary>
         /// Gets the special generic properties tab identifier.
         /// </summary>
@@ -38,14 +32,28 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "id")]
         public int Id { get; set; }
 
-        [DataMember(Name = "properties")]
-        public IEnumerable<TPropertyType> Properties { get; set; }
-
         [DataMember(Name = "sortOrder")]
         public int SortOrder { get; set; }
 
         [Required]
         [DataMember(Name = "name")]
         public string Name { get; set; }
+    }
+
+    [DataContract(Name = "propertyGroup", Namespace = "")]
+    public class PropertyGroupBasic<TPropertyType> : PropertyGroupBasic
+        where TPropertyType: PropertyTypeBasic
+    {
+        public PropertyGroupBasic()
+        {
+            Properties = new List<TPropertyType>();
+        }
+
+        
+
+        [DataMember(Name = "properties")]
+        public IEnumerable<TPropertyType> Properties { get; set; }
+
+       
     }
 }

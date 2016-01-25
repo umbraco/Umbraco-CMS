@@ -297,7 +297,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // there is NO mapping from display to contentType, but only from save
                 // to contentType, so if we want to test, let's to it properly!
-                var display = Mapper.Map<ContentTypeDisplay>(contentType);
+                var display = Mapper.Map<DocumentTypeDisplay>(contentType);
                 var save = MapToContentTypeSave(display);
                 var mapped = Mapper.Map<IContentType>(save);
 
@@ -358,9 +358,9 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         // this is for tests only because it makes no sense at all to have such a
         // mapping defined, we only need it for the weird tests that use it
-        private ContentTypeSave MapToContentTypeSave(ContentTypeDisplay display)
+        private DocumentTypeSave MapToContentTypeSave(DocumentTypeDisplay display)
         {
-            return new ContentTypeSave
+            return new DocumentTypeSave
             {
                 // EntityBasic
                 Name = display.Name,
@@ -410,7 +410,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // there is NO mapping from display to contentType, but only from save
                 // to contentType, so if we want to test, let's to it properly!
-                var display = Mapper.Map<ContentTypeDisplay>(contentType);
+                var display = Mapper.Map<DocumentTypeDisplay>(contentType);
                 var save = MapToContentTypeSave(display);
 
                 // modify...
@@ -603,7 +603,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var allGuidIds = repository.GetAll().Select(x => x.Key).ToArray();
 
                 // Act
-                var contentTypes = repository.GetAll(allGuidIds);
+                var contentTypes = ((IReadRepository<Guid, IContentType>)repository).GetAll(allGuidIds);
                 int count =
                     DatabaseContext.Database.ExecuteScalar<int>(
                         "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @NodeObjectType",

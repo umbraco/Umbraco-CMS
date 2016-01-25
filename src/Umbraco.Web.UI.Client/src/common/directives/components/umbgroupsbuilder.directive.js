@@ -173,6 +173,11 @@
             scope.compositionsDialogModel.availableCompositeContentTypes = result;            
             //iterate each one and set it up
             _.each(scope.compositionsDialogModel.availableCompositeContentTypes, function (c) {
+                //enable it if it's part of the selected model
+                if (scope.compositionsDialogModel.compositeContentTypes.indexOf(c.contentType.alias) !== -1) {
+                    c.allowed = true;
+                }
+
                 //set the inherited flags
                 c.inherited = false;
                 if (scope.model.lockedCompositeContentTypes.indexOf(c.contentType.alias) > -1) {
@@ -380,6 +385,7 @@
 
       scope.removeGroup = function(groupIndex) {
         scope.model.groups.splice(groupIndex, 1);
+        addInitGroup(scope.model.groups);
       };
 
       scope.updateGroupTitle = function(group) {
@@ -445,6 +451,7 @@
           scope.propertySettingsDialogModel = {};
           scope.propertySettingsDialogModel.title = "Property settings";
           scope.propertySettingsDialogModel.property = property;
+          scope.propertySettingsDialogModel.contentType = scope.contentType;
           scope.propertySettingsDialogModel.contentTypeName = scope.model.name;
           scope.propertySettingsDialogModel.view = "views/common/overlays/contenttypeeditor/propertysettings/propertysettings.html";
           scope.propertySettingsDialogModel.show = true;
@@ -493,6 +500,10 @@
             property.dataTypeId = oldModel.property.dataTypeId;
             property.dataTypeIcon = oldModel.property.dataTypeIcon;
             property.dataTypeName = oldModel.property.dataTypeName;
+            property.validation.mandatory = oldModel.property.validation.mandatory;
+            property.validation.pattern = oldModel.property.validation.pattern;
+            property.showOnMemberProfile = oldModel.property.showOnMemberProfile;
+            property.memberCanEdit = oldModel.property.memberCanEdit;
 
             // because we set state to active, to show a preview, we have to check if has been filled out
             // label is required so if it is not filled we know it is a placeholder

@@ -40,6 +40,7 @@ using Umbraco.Web.Scheduling;
 using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
@@ -184,7 +185,9 @@ namespace Umbraco.Web
             base.InitializeProfilerResolver();
 
             //Set the profiler to be the web profiler
-            ProfilerResolver.Current.SetProfiler(new WebProfiler());
+            var profiler = new WebProfiler();
+            ProfilerResolver.Current.SetProfiler(profiler);
+            profiler.Start();
         }
         
         /// <summary>
@@ -242,7 +245,19 @@ namespace Umbraco.Web
         protected override CacheHelper CreateApplicationCache()
         {
             //create a web-based cache helper
-            return new CacheHelper();
+            var cacheHelper = new CacheHelper(
+                //we need to have the dep clone runtime cache provider to ensure 
+                //all entities are cached properly (cloned in and cloned out)
+                new DeepCloneRuntimeCacheProvider(new HttpRuntimeCacheProvider(HttpRuntime.Cache)),
+                new StaticCacheProvider(),
+                //we have no request based cache when not running in web-based context
+                new NullCacheProvider(),
+                new IsolatedRuntimeCache(type =>
+                    //we need to have the dep clone runtime cache provider to ensure 
+                    //all entities are cached properly (cloned in and cloned out)
+                    new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider())));
+
+            return cacheHelper;
         }
 
         /// <summary>

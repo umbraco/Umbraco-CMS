@@ -148,13 +148,15 @@ namespace Umbraco.Web.Editors
             return CultureDictionary[text].IfNullOrWhiteSpace(text);
         }
 
-        protected TContentType PerformPostSave<TContentType, TContentTypeDisplay>(
-            ContentTypeSave contentTypeSave,
+        protected TContentType PerformPostSave<TContentType, TContentTypeDisplay, TContentTypeSave, TPropertyType>(
+            TContentTypeSave contentTypeSave,
             Func<int, TContentType> getContentType,
             Action<TContentType> saveContentType,
-            Action<ContentTypeSave> beforeCreateNew = null)
+            Action<TContentTypeSave> beforeCreateNew = null)
             where TContentType : class, IContentTypeComposition
             where TContentTypeDisplay : ContentTypeCompositionDisplay
+            where TContentTypeSave : ContentTypeSave<TPropertyType> 
+            where TPropertyType : PropertyTypeBasic
         {
             var ctId = Convert.ToInt32(contentTypeSave.Id);
             var ct = ctId > 0 ? getContentType(ctId) : null;

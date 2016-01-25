@@ -27,15 +27,5 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "locked")]
         [ReadOnly(true)]
         public bool Locked { get; set; }
-
-        //SD: Seems strange that this is needed
-        [DataMember(Name = "contentTypeId")]
-        [ReadOnly(true)]
-        public int ContentTypeId { get; set; }
-
-        //SD: Seems strange that this is needed
-        [DataMember(Name = "contentTypeName")]
-        [ReadOnly(true)]
-        public string ContentTypeName { get; set; }
     }
 }

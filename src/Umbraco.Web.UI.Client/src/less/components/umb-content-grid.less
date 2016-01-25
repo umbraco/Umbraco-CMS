@@ -11,16 +11,11 @@
    cursor: pointer;
    position: relative;
    margin: 10px;
-   border: 1px solid #ffffff;
    user-select: none;
 }
 
-.umb-content-grid__item:hover {
-   border: 1px solid @blue;
-}
-
-.umb-content-grid__item:hover .umb-content-grid__action {
-   opacity: 1;
+.umb-content-grid__item.-selected {
+    box-shadow: 0 2px 8px 0 rgba(0,0,0,0.35);
 }
 
 .umb-content-grid__icon-container {
@@ -48,12 +43,16 @@
 
 .umb-content-grid__item-name {
    font-weight: bold;
-   color: @grayDark;
    margin-bottom: 10px;
    color: black;
    padding-bottom: 10px;
    line-height: 1.4em;
    border-bottom: 1px solid @grayLight;
+   display: inline-block;
+}
+
+.umb-content-grid__item-name:hover {
+    text-decoration: underline;
 }
 
 .umb-content-grid__item-name.-light {
@@ -80,15 +79,14 @@
    display: inline-block;
 }
 
-.umb-content-grid__action {
+.umb-content-grid__checkmark {
    position: absolute;
-   opacity: 0;
    top: 10px;
    right: 10px;
    border: 1px solid #ffffff;
    width: 25px;
    height: 25px;
-   background: rgba(0, 0, 0, 0.4);
+   background: @blue;
    border-radius: 50px;
    box-sizing: border-box;
    display: flex;
@@ -96,16 +94,6 @@
    align-items: center;
    color: #ffffff;
    cursor: pointer;
-}
-
-.umb-content-grid__action:hover {
-   background: @blue;
-   transition: background 0.1s;
-}
-
-.umb-content-grid__action.-selected {
-   opacity: 1;
-   background: @blue;
 }
 
 .umb-content-grid__item:hover .umb-content-grid__action:not(.-selected) {

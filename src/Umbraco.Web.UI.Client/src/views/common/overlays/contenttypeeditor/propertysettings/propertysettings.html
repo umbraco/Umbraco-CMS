@@ -61,6 +61,8 @@
 
    <div class="umb-control-group clearfix">
 
+       <h5><localize key="validation_validation"></localize></h5>
+
       <label class="checkbox no-indent">
          <input type="checkbox" ng-model="model.property.validation.mandatory" focus-when="{{vm.focusOnMandatoryField}}">
          <localize key="validation_fieldIsMandatory"></localize>
@@ -80,6 +82,22 @@
          focus-when="{{vm.focusOnPatternField}}"
          overlay-submit-on-enter>
       </textarea>
+
+   </div>
+
+   <div class="umb-control-group clearfix" ng-if="model.contentType === 'memberType'">
+
+       <h5><localize key="general_rights"></localize></h5>
+
+       <label class="checkbox no-indent">
+          <input type="checkbox" ng-model="model.property.showOnMemberProfile">
+          <localize key="contentTypeEditor_showOnMemberProfile"></localize>
+       </label>
+
+      <label class="checkbox no-indent">
+         <input type="checkbox" ng-model="model.property.memberCanEdit">
+         <localize key="contentTypeEditor_memberCanEdit"></localize>
+      </label>
 
    </div>
 
