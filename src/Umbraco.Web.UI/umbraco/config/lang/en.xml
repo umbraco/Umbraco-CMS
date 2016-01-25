@@ -725,7 +725,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   <area alias="packager">
     <key alias="chooseLocalPackageText"><![CDATA[
       Choose Package from your machine, by clicking the Browse<br />
-         button and locating the package. Umbraco packages usually has a ".zip" extension.
+         button and locating the package. Umbraco packages usually have a ".zip" extension.
       ]]></key>
     <key alias="packageAuthor">Author</key>
     <key alias="packageDemonstration">Demonstration</key>
