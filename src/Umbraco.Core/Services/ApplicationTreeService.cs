@@ -373,13 +373,15 @@ namespace Umbraco.Core.Services
                     {
                         list.Add(new ApplicationTree(
                                      addElement.Attribute("initialize") == null || Convert.ToBoolean(addElement.Attribute("initialize").Value),
-                                     addElement.Attribute("sortOrder") != null ? Convert.ToByte(addElement.Attribute("sortOrder").Value) : (byte)0,
-                                     addElement.Attribute("application").Value,
-                                     addElement.Attribute("alias").Value,
-                                     addElement.Attribute("title").Value,
-                                     addElement.Attribute("iconClosed").Value,
-                                     addElement.Attribute("iconOpen").Value,
-                                     addElement.Attribute("type").Value));
+                                     addElement.Attribute("sortOrder") != null 
+                                        ? Convert.ToByte(addElement.Attribute("sortOrder").Value) 
+                                        : (byte)0,
+                                     (string)addElement.Attribute("application"),
+                                     (string)addElement.Attribute("alias"),
+                                     (string)addElement.Attribute("title"),
+                                     (string)addElement.Attribute("iconClosed"),
+                                     (string)addElement.Attribute("iconOpen"),
+                                     (string)addElement.Attribute("type")));
                     }
                 }
 
