@@ -597,7 +597,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="notifications">Notificeringer</key>
   </area>
   <area alias="packager">
-    <key alias="chooseLocalPackageText">Vælg hvor den lokale pakke skal placeres</key>
+    <key alias="chooseLocalPackageText">Vælg pakken fra din computer. Umbraco pakker er oftest en ".zip" fil</key>
     <key alias="packageAuthor">Udvikler</key>
     <key alias="packageDemonstration">Demonstration</key>
     <key alias="packageDocumentation">Dokumentation</key>
