@@ -113,6 +113,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 container = new EntityContainer(Constants.ObjectTypes.MediaTypeGuid) { Name = "blah" };
                 containerRepository.AddOrUpdate(container);
                 unitOfWork.Commit();
+                Assert.That(container.Id, Is.GreaterThan(0));
             }
             using (var containerRepository = CreateContainerRepository(unitOfWork))
             {
