@@ -12,27 +12,26 @@ namespace Umbraco.Core.IO
         // eg "c:" or "c:\path\to\site" or "\\server\path"
         private readonly string _rootPath;
 
-        // _rootPath, with separators replaced by forward-slashes.
+        // _rootPath, but with separators replaced by forward-slashes
+        // eg "c:" or "c:/path/to/site" or "//server/path"
+        // (is used in GetRelativePath)
         private readonly string _rootPathFwd;
 
-        // the ??? url, using url separator chars, NOT ending with a separator
-        // eg "" (?) or "/Scripts" or ???
+        // the relative url, using url separator chars, NOT ending with a separator
+        // eg "" or "/Views" or "/Media" or "/<vpath>/Media" in case of a virtual path
         private readonly string _rootUrl;
 
+        // virtualRoot should be "~/path/to/root" eg "~/Views"
+        // the "~/" is mandatory.
         public PhysicalFileSystem(string virtualRoot)
         {
 	        if (virtualRoot == null) throw new ArgumentNullException("virtualRoot");
 			if (virtualRoot.StartsWith("~/") == false)
 				throw new ArgumentException("The virtualRoot argument must be a virtual path and start with '~/'");
 
-            _rootPath = IOHelper.MapPath(virtualRoot);
-            _rootPath = EnsureDirectorySeparatorChar(_rootPath);
-            _rootPath = _rootPath.TrimEnd(Path.DirectorySeparatorChar);
+            _rootPath = EnsureDirectorySeparatorChar(IOHelper.MapPath(virtualRoot)).TrimEnd(Path.DirectorySeparatorChar);
             _rootPathFwd = EnsureUrlSeparatorChar(_rootPath);
-
-            _rootUrl = IOHelper.ResolveUrl(virtualRoot);
-            _rootUrl = EnsureUrlSeparatorChar(_rootUrl);
-            _rootUrl = _rootUrl.TrimEnd('/');
+            _rootUrl = EnsureUrlSeparatorChar(IOHelper.ResolveUrl(virtualRoot)).TrimEnd('/');
         }
 
         public PhysicalFileSystem(string rootPath, string rootUrl)
@@ -47,19 +46,16 @@ namespace Umbraco.Core.IO
 				throw new ArgumentException("The rootPath argument cannot be a virtual path and cannot start with '~/'");
 
             // rootPath should be... rooted, as in, it's a root path!
-            // but the test suite App.config cannot really "root" anything so we'll have to do it here
-
-            //var localRoot = AppDomain.CurrentDomain.BaseDirectory;
-            var localRoot = IOHelper.GetRootDirectorySafe();
             if (Path.IsPathRooted(rootPath) == false)
+            {
+                // but the test suite App.config cannot really "root" anything so we have to do it here
+                var localRoot = IOHelper.GetRootDirectorySafe();
                 rootPath = Path.Combine(localRoot, rootPath);
+            }
 
-            rootPath = EnsureDirectorySeparatorChar(rootPath);
-            _rootPath = rootPath.TrimEnd(Path.DirectorySeparatorChar);
+            _rootPath = EnsureDirectorySeparatorChar(rootPath).TrimEnd(Path.DirectorySeparatorChar);
             _rootPathFwd = EnsureUrlSeparatorChar(_rootPath);
-
-            rootUrl = EnsureUrlSeparatorChar(rootUrl);
-            _rootUrl = rootUrl.TrimEnd('/');
+            _rootUrl = EnsureUrlSeparatorChar(rootUrl).TrimEnd('/');
         }
 
         /// <summary>
@@ -152,7 +148,7 @@ namespace Umbraco.Core.IO
         {
             var fullPath = GetFullPath(path);
             var exists = File.Exists(fullPath);
-            if (exists && overrideExisting == false) 
+            if (exists && overrideExisting == false)
                 throw new InvalidOperationException(string.Format("A file at path '{0}' already exists", path));
 
             var directory = Path.GetDirectoryName(fullPath);
@@ -261,13 +257,15 @@ namespace Umbraco.Core.IO
             // test url
             var path = fullPathOrUrl.Replace('\\', '/'); // ensure url separator char
 
-            if (IOHelper.PathStartsWith(path, _rootUrl, '/')) // if it starts with the root url...
-                return path.Substring(_rootUrl.Length) // strip it
-                            .TrimStart('/'); // it's relative
+            // if it starts with the root url, strip it and trim the starting slash to make it relative
+            // eg "/Media/1234/img.jpg" => "1234/img.jpg"
+            if (IOHelper.PathStartsWith(path, _rootUrl, '/'))
+                return path.Substring(_rootUrl.Length).TrimStart('/');
 
-            if (IOHelper.PathStartsWith(path, _rootPathFwd, '/')) // if it starts with the root url...
-                return path.Substring(_rootPathFwd.Length) // strip it
-                            .TrimStart('/'); // it's relative
+            // if it starts with the root path, strip it and trim the starting slash to make it relative
+            // eg "c:/websites/test/root/Media/1234/img.jpg" => "1234/img.jpg"
+            if (IOHelper.PathStartsWith(path, _rootPathFwd, '/'))
+                return path.Substring(_rootPathFwd.Length).TrimStart('/');
 
             // unchanged - what else?
             return path;

@@ -39,6 +39,11 @@ namespace Umbraco.Core.IO
 
         public static long GetSize(this IFileSystem fs, string path)
         {
+            // unwrap, eg MediaFileSystem is wrapping an IFileSystem
+            FileSystemWrapper w;
+            while ((w = fs as FileSystemWrapper) != null)
+                fs = w.Wrapped;
+
             // no idea why GetSize is not part of IFileSystem, but
             // for physical file system we have way better & faster ways
             // to get the size, than to read the entire thing in memory!

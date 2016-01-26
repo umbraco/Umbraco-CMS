@@ -111,7 +111,7 @@ namespace Umbraco.Core.IO
         {
             get
             {
-                if (_length != null) return _length.Value;
+                if (_length.HasValue) return _length.Value;
                 _length = Exists ? _fs.GetSize(Path) : -1;
                 return _length.Value;
             }
@@ -129,7 +129,7 @@ namespace Umbraco.Core.IO
 
         public Size GetDimensions()
         {
-            if (_size != null) return _size.Value;
+            if (_size.HasValue) return _size.Value;
 
             if (_fs.FileExists(Path))
             {
@@ -157,12 +157,12 @@ namespace Umbraco.Core.IO
             return _fs.GetUrl(filepath);
         }
 
-        public string Resize(int maxWidthHeight, string filenameAddition)
+        public string Resize(int maxWidthHeight, string fileNameAddition)
         {
             if (Exists == false) return string.Empty;
 
             EnsureFileSupportsResizing();
-            var filepath = Resize(-1, -1, maxWidthHeight, filenameAddition);
+            var filepath = Resize(-1, -1, maxWidthHeight, fileNameAddition);
             return _fs.GetUrl(filepath);
         }
 

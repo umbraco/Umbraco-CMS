@@ -16,10 +16,10 @@ namespace Umbraco.Core.IO
         void DeleteDirectory(string path, bool recursive);
 
         bool DirectoryExists(string path);
-        
+
         void AddFile(string path, Stream stream);
 
-        void AddFile(string path, Stream stream, bool overrideExisting);
+        void AddFile(string path, Stream stream, bool overrideIfExists);
 
         IEnumerable<string> GetFiles(string path);
 

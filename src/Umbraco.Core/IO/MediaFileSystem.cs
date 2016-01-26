@@ -51,6 +51,7 @@ namespace Umbraco.Core.IO
         // MediaFileSystem is not just IFileSystem
         // etc
 
+        [Obsolete("", true)]
 		public IEnumerable<string> GetThumbnails(string path)
 		{
 			var parentDirectory = Path.GetDirectoryName(path);
@@ -61,7 +62,8 @@ namespace Umbraco.Core.IO
 				.ToList();
 		}
 
-		public void DeleteFile(string path, bool deleteThumbnails)
+        [Obsolete("", true)]
+        public void DeleteFile(string path, bool deleteThumbnails)
 		{
 			DeleteFile(path);
 
@@ -71,13 +73,15 @@ namespace Umbraco.Core.IO
 			DeleteThumbnails(path);
 		}
 
-		public void DeleteThumbnails(string path)
+        [Obsolete("", true)]
+        public void DeleteThumbnails(string path)
 		{
 			GetThumbnails(path)
 				.ForEach(DeleteFile);
 		}
 
-	    public void CopyThumbnails(string sourcePath, string targetPath)
+        [Obsolete("", true)]
+        public void CopyThumbnails(string sourcePath, string targetPath)
 	    {
             var targetPathBase = Path.GetDirectoryName(targetPath) ?? "";
             foreach (var sourceThumbPath in GetThumbnails(sourcePath))

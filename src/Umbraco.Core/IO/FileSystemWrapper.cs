@@ -23,6 +23,8 @@ namespace Umbraco.Core.IO
 			_wrapped = wrapped;
 		}
 
+        internal IFileSystem Wrapped { get { return _wrapped; } }
+
 		public IEnumerable<string> GetDirectories(string path)
 		{
 			return _wrapped.GetDirectories(path);

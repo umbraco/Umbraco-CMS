@@ -89,6 +89,47 @@ namespace Umbraco.Core.Media
             return codec.MimeType;
         }
 
+        #region Manage thumbnails
+
+        public static IEnumerable<string> GetThumbnails(IFileSystem fs, string path)
+        {
+            var parentDirectory = Path.GetDirectoryName(path);
+            var extension = Path.GetExtension(path);
+
+            return fs.GetFiles(parentDirectory)
+                .Where(x => x.StartsWith(path.TrimEnd(extension) + "_thumb") || x.StartsWith(path.TrimEnd(extension) + "_big-thumb"))
+                .ToList();
+        }
+
+        public static void DeleteFile(IFileSystem fs, string path, bool deleteThumbnails)
+        {
+            fs.DeleteFile(path);
+
+            if (deleteThumbnails == false)
+                return;
+
+            DeleteThumbnails(fs, path);
+        }
+
+        public static void DeleteThumbnails(IFileSystem fs, string path)
+        {
+            GetThumbnails(fs, path)
+                .ForEach(fs.DeleteFile);
+        }
+
+        public static void CopyThumbnails(IFileSystem fs, string sourcePath, string targetPath)
+        {
+            var targetPathBase = Path.GetDirectoryName(targetPath) ?? "";
+            foreach (var sourceThumbPath in GetThumbnails(fs, sourcePath))
+            {
+                var sourceThumbFilename = Path.GetFileName(sourceThumbPath) ?? "";
+                var targetThumbPath = Path.Combine(targetPathBase, sourceThumbFilename);
+                fs.CopyFile(sourceThumbPath, targetThumbPath);
+            }
+        }
+        
+        #endregion
+
         #region GenerateThumbnails
 
         public static IEnumerable<ResizedImage> GenerateThumbnails(
