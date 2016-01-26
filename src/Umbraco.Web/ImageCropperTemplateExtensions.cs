@@ -119,6 +119,10 @@
 
             if (mediaItem.HasProperty(propertyAlias) && mediaItem.HasValue(propertyAlias))
             {
+                //TODO: We should change this, the default value is JObject now, this means we are ToString() ing the value,
+                // then re-deserializing it back to json and then to a strongly typed model.
+                // With a tiny bit of work we can make this more efficient since it's already a JObject.
+
                 imageCropperValue = mediaItem.GetPropertyValue<string>(propertyAlias);
 
                 // get the raw value (this will be json)
