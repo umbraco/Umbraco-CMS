@@ -2,7 +2,7 @@
 //with a specified callback, this callback will receive an object with a selection on it
 angular.module('umbraco')
     .controller("Umbraco.PropertyEditors.ImageCropperController",
-    function ($rootScope, $routeParams, $scope, $log, mediaHelper, cropperHelper, $timeout, editorState, umbRequestHelper, fileManager) {
+    function ($rootScope, $routeParams, $scope, $log, mediaHelper, cropperHelper, $timeout, editorState, umbRequestHelper, fileManager, angularHelper) {
 
         var config = angular.copy($scope.model.config);
 
@@ -55,6 +55,10 @@ angular.module('umbraco')
             if ($scope.model.value) {
                 delete $scope.model.value;
             }
+
+            // set form to dirty to tricker discard changes dialog
+            var currForm = angularHelper.getCurrentForm($scope);
+            currForm.$setDirty();
         };
 
         //show previews
