@@ -92,17 +92,30 @@ body {
 }
 
 #search-form {
-  display: block;
-  margin: 0px;
-  z-index: 100;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-}
+    display: block;
+    margin: 0;
+    z-index: 100;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    overflow: hidden;
 
-#search-form form{
-  margin-top: 17px;
+    .form-search {
+        display: -ms-flexbox;
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: flex;
+        margin-top: 17px;
+
+        .umb-search-field {
+            width: auto;
+            min-width: 160px;
+            -webkit-flex: 1;
+            -ms-flex: 1;
+            flex: 1;
+        }
+    }
 }
 
 #navigation {
@@ -180,9 +193,10 @@ body {
     bottom: 0;
     background-color: @grayLighter;
     border: solid 1px @grayLight;
+    border-top: none;
+    border-bottom: none;
     position:absolute;
     z-index:9999 !important;
-
 }
 
 @media (min-width: 1101px) {

@@ -10,6 +10,7 @@
         vm.acceptedFileTypes = mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes);
         vm.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB";
         vm.activeDrag = false;
+        vm.isRecycleBin = $scope.contentId === '-21';
 
         vm.selectItem = selectItem;
         vm.clickItem = clickItem;

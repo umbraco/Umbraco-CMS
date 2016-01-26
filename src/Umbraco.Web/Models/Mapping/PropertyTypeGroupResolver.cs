@@ -174,6 +174,9 @@ namespace Umbraco.Web.Models.Mapping
                 var propertyEditor = _propertyEditorResolver.Value.GetByAlias(p.PropertyEditorAlias);
                 var preValues = _applicationContext.Services.DataTypeService.GetPreValuesCollectionByDataTypeId(p.DataTypeDefinitionId);
 
+                if (propertyEditor == null) 
+                    throw new InvalidOperationException("No property editor could be resolved with the alias: " + p.PropertyEditorAlias + ", ensure all packages are installed correctly.");
+
                 mappedProperties.Add(new TPropertyType
                 {
                         Id = p.Id,

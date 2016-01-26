@@ -10,8 +10,8 @@
       </div>
 
       <div class="umb-media-grid__image-background" ng-if="item.thumbnail"></div>
-      <img class="umb-media-grid__item-image" width="{{item.width}}" height="{{item.height}}" ng-if="item.thumbnail" ng-src="{{item.thumbnail}}" alt="{{item.name}}" />
-      <img class="umb-media-grid__item-image-placeholder" ng-if="!item.thumbnail" src="assets/img/transparent.png" alt="{{item.name}}" />
+      <img class="umb-media-grid__item-image" width="{{item.width}}" height="{{item.height}}" ng-if="item.thumbnail" ng-src="{{item.thumbnail}}" alt="{{item.name}}" draggable="false" />
+      <img class="umb-media-grid__item-image-placeholder" ng-if="!item.thumbnail" src="assets/img/transparent.png" alt="{{item.name}}" draggable="false" />
 
       <i class="umb-media-grid__item-icon {{ item.icon }}" ng-if="!item.thumbnail"></i>
 

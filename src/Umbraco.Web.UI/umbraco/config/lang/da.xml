@@ -382,6 +382,7 @@
     <key alias="properties">Egenskaber</key>
     <key alias="reciept">Email der skal modtage indhold af formular</key>
     <key alias="recycleBin">Papirkurv</key>
+    <key alias="recycleBinEmpty">Din papirkurv er tom</key>
     <key alias="remaining">Mangler</key>
     <key alias="rename">Omdøb</key>
     <key alias="renew">Forny</key>
@@ -596,7 +597,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="notifications">Notificeringer</key>
   </area>
   <area alias="packager">
-    <key alias="chooseLocalPackageText">Vælg hvor den lokale pakke skal placeres</key>
+    <key alias="chooseLocalPackageText">Vælg pakken fra din computer. Umbraco pakker er oftest en ".zip" fil</key>
     <key alias="packageAuthor">Udvikler</key>
     <key alias="packageDemonstration">Demonstration</key>
     <key alias="packageDocumentation">Dokumentation</key>
@@ -825,6 +826,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="createMatchingTemplate">Opret matchende skabelon</key>
   </area>
   <area alias="sort">
+    <key alias="sortOrder">Sorteringsrækkefølge</key>
+    <key alias="sortCreationDate">Oprettelsesdato</key>
     <key alias="sortDone">Sortering udført</key>
     <key alias="sortHelp">Træk de forskellige sider op eller ned for at indstille hvordan de skal arrangeres, eller klik på kolonnehovederne for at sortere hele rækken af sider</key>
     <key alias="sortPleaseWait"><![CDATA[Vent venligst mens siderne sorteres. Det kan tage et stykke tid<br/><br/>Luk ikke dette vindue imens]]></key>

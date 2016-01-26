@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -131,42 +132,7 @@ namespace Umbraco.Web.Editors
                 })
                 .ToList();
         }
-
-        /// <summary>
-        /// Validates the composition and adds errors to the model state if any are found then throws an error response if there are errors
-        /// </summary>
-        /// <param name="contentTypeSave"></param>
-        /// <param name="composition"></param>
-        /// <returns></returns>
-        protected void ValidateComposition<TPropertyType>(ContentTypeSave<TPropertyType> contentTypeSave, IContentTypeComposition composition) 
-            where TPropertyType : PropertyTypeBasic
-        {
-            var validateAttempt = Services.ContentTypeService.ValidateComposition(composition);
-            if (validateAttempt == false)
-            {
-                //if it's not successful then we need to return some model state for the property aliases that 
-                // are duplicated
-                var propertyAliases = validateAttempt.Result.Distinct();
-                foreach (var propertyAlias in propertyAliases)
-                {
-                    //find the property relating to these
-                    var prop = contentTypeSave.Groups.SelectMany(x => x.Properties).Single(x => x.Alias == propertyAlias);
-                    var group = contentTypeSave.Groups.Single(x => x.Properties.Contains(prop));
-                    var propIndex = group.Properties.IndexOf(prop);
-                    var groupIndex = contentTypeSave.Groups.IndexOf(group);
-
-                    var key = string.Format("Groups[{0}].Properties[{1}].Alias", groupIndex, propIndex);
-                    ModelState.AddModelError(key, "Duplicate property aliases not allowed between compositions");
-                }
-
-                var display = Mapper.Map<DocumentTypeDisplay>(composition);
-                //map the 'save' data on top
-                display = Mapper.Map(contentTypeSave, display);
-                display.Errors = ModelState.ToErrorDictionary();
-                throw new HttpResponseException(Request.CreateValidationErrorResponse(display));
-            }
-
-        }
+        
 
         protected string TranslateItem(string text)
         {
@@ -186,7 +152,6 @@ namespace Umbraco.Web.Editors
             TContentTypeSave contentTypeSave,
             Func<int, TContentType> getContentType,
             Action<TContentType> saveContentType,
-            bool validateComposition = true,
             Action<TContentTypeSave> beforeCreateNew = null)
             where TContentType : class, IContentTypeComposition
             where TContentTypeDisplay : ContentTypeCompositionDisplay
@@ -213,22 +178,7 @@ namespace Umbraco.Web.Editors
 
             if (ModelState.IsValid == false)
             {
-                TContentTypeDisplay forDisplay;
-                if (ctId > 0)
-                {
-                    //Required data is invalid so we cannot continue
-                    forDisplay = Mapper.Map<TContentTypeDisplay>(ct);
-                    //map the 'save' data on top
-                    forDisplay = Mapper.Map(contentTypeSave, forDisplay);
-                }
-                else
-                {
-                    //map the 'save' data to display
-                    forDisplay = Mapper.Map<TContentTypeDisplay>(contentTypeSave);
-                }
-                
-                forDisplay.Errors = ModelState.ToErrorDictionary();
-                throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
+                throw CreateModelStateValidationException<TContentTypeDisplay, TContentType>(ctId, contentTypeSave, ct);
             }
 
             //filter out empty properties
@@ -240,15 +190,21 @@ namespace Umbraco.Web.Editors
             
             if (ctId > 0)
             {
-                //its an update to an existing                
+                //its an update to an existing content type     
 
-                Mapper.Map(contentTypeSave, ct);
-
-                if (validateComposition)
+                //This mapping will cause a lot of content type validation to occur which we need to deal with
+                try
                 {
-                    //NOTE: this throws an error response if it is not valid
-                    ValidateComposition(contentTypeSave, ct);
+                    Mapper.Map(contentTypeSave, ct);
                 }
+                catch (Exception ex)
+                {
+                    var responseEx = CreateInvalidCompositionResponseException<TContentTypeDisplay, TContentType, TContentTypeSave, TPropertyType>(ex, contentTypeSave, ct, ctId);
+                    if (responseEx != null) throw responseEx;
+                }
+
+                var exResult = CreateCompositionValidationExceptionIfInvalid<TContentTypeSave, TPropertyType, TContentTypeDisplay>(contentTypeSave, ct);
+                if (exResult != null) throw exResult;
 
                 saveContentType(ct);
 
@@ -260,12 +216,7 @@ namespace Umbraco.Web.Editors
                 {
                     beforeCreateNew(contentTypeSave);
                 }
-
-                //set id to null to ensure its handled as a new type
-                contentTypeSave.Id = null;
-                contentTypeSave.CreateDate = DateTime.Now;
-                contentTypeSave.UpdateDate = DateTime.Now;
-
+                
                 //check if the type is trying to allow type 0 below itself - id zero refers to the currently unsaved type
                 //always filter these 0 types out
                 var allowItselfAsChild = false;
@@ -276,13 +227,26 @@ namespace Umbraco.Web.Editors
                 }
 
                 //save as new
-                var newCt = Mapper.Map<TContentType>(contentTypeSave);
-
-                if (validateComposition)
+                
+                TContentType newCt = null;
+                try
                 {
-                    //NOTE: this throws an error response if it is not valid
-                    ValidateComposition(contentTypeSave, newCt);
+                    //This mapping will cause a lot of content type validation to occur which we need to deal with
+                    newCt = Mapper.Map<TContentType>(contentTypeSave);                    
                 }
+                catch (Exception ex)
+                {
+                    var responseEx = CreateInvalidCompositionResponseException<TContentTypeDisplay, TContentType, TContentTypeSave, TPropertyType>(ex, contentTypeSave, ct, ctId);
+                    if (responseEx != null) throw responseEx;
+                }
+
+                var exResult = CreateCompositionValidationExceptionIfInvalid<TContentTypeSave, TPropertyType, TContentTypeDisplay>(contentTypeSave, newCt);
+                if (exResult != null) throw exResult;
+
+                //set id to null to ensure its handled as a new type
+                contentTypeSave.Id = null;
+                contentTypeSave.CreateDate = DateTime.Now;
+                contentTypeSave.UpdateDate = DateTime.Now;
 
                 saveContentType(newCt);
 
@@ -296,7 +260,7 @@ namespace Umbraco.Web.Editors
                 return newCt;
             }
         }
-
+        
         /// <summary>
         /// Change the sort order for media
         /// </summary>
@@ -341,6 +305,121 @@ namespace Umbraco.Web.Editors
             }
         }
 
+        /// <summary>
+        /// Validates the composition and adds errors to the model state if any are found then throws an error response if there are errors
+        /// </summary>
+        /// <param name="contentTypeSave"></param>
+        /// <param name="composition"></param>
+        /// <returns></returns>
+        private HttpResponseException CreateCompositionValidationExceptionIfInvalid<TContentTypeSave, TPropertyType, TContentTypeDisplay>(TContentTypeSave contentTypeSave, IContentTypeComposition composition)
+            where TContentTypeSave : ContentTypeSave<TPropertyType> 
+            where TPropertyType : PropertyTypeBasic
+            where TContentTypeDisplay : ContentTypeCompositionDisplay
+        {
+            var validateAttempt = Services.ContentTypeService.ValidateComposition(composition);
+            if (validateAttempt == false)
+            {
+                //if it's not successful then we need to return some model state for the property aliases that 
+                // are duplicated
+                var invalidPropertyAliases = validateAttempt.Result.Distinct();
+                AddCompositionValidationErrors<TContentTypeSave, TPropertyType>(contentTypeSave, invalidPropertyAliases);
+
+                var display = Mapper.Map<TContentTypeDisplay>(composition);
+                //map the 'save' data on top
+                display = Mapper.Map(contentTypeSave, display);
+                display.Errors = ModelState.ToErrorDictionary();
+                throw new HttpResponseException(Request.CreateValidationErrorResponse(display));
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Adds errors to the model state if any invalid aliases are found then throws an error response if there are errors
+        /// </summary>
+        /// <param name="contentTypeSave"></param>
+        /// <param name="invalidPropertyAliases"></param>
+        /// <returns></returns>
+        private void AddCompositionValidationErrors<TContentTypeSave, TPropertyType>(TContentTypeSave contentTypeSave, IEnumerable<string> invalidPropertyAliases)
+            where TContentTypeSave : ContentTypeSave<TPropertyType> 
+            where TPropertyType : PropertyTypeBasic
+        {
+            foreach (var propertyAlias in invalidPropertyAliases)
+            {
+                //find the property relating to these
+                var prop = contentTypeSave.Groups.SelectMany(x => x.Properties).Single(x => x.Alias == propertyAlias);
+                var group = contentTypeSave.Groups.Single(x => x.Properties.Contains(prop));
+
+                var key = string.Format("Groups[{0}].Properties[{1}].Alias", group.SortOrder, prop.SortOrder);
+                ModelState.AddModelError(key, "Duplicate property aliases not allowed between compositions");
+            }
+        }
+
+        /// <summary>
+        /// If the exception is an InvalidCompositionException create a response exception to be thrown for validation errors
+        /// </summary>
+        /// <typeparam name="TContentTypeDisplay"></typeparam>
+        /// <typeparam name="TContentType"></typeparam>
+        /// <typeparam name="TContentTypeSave"></typeparam>
+        /// <typeparam name="TPropertyType"></typeparam>
+        /// <param name="ex"></param>
+        /// <param name="contentTypeSave"></param>
+        /// <param name="ct"></param>
+        /// <param name="ctId"></param>
+        /// <returns></returns>
+        private HttpResponseException CreateInvalidCompositionResponseException<TContentTypeDisplay, TContentType, TContentTypeSave, TPropertyType>(
+            Exception ex, TContentTypeSave contentTypeSave, TContentType ct, int ctId)
+            where TContentType : class, IContentTypeComposition
+            where TContentTypeDisplay : ContentTypeCompositionDisplay 
+            where TContentTypeSave : ContentTypeSave<TPropertyType> 
+            where TPropertyType : PropertyTypeBasic
+        {
+            InvalidCompositionException invalidCompositionException = null;
+            if (ex is AutoMapperMappingException && ex.InnerException is InvalidCompositionException)
+            {
+                invalidCompositionException = (InvalidCompositionException)ex.InnerException;
+            }
+            else if (ex.InnerException is InvalidCompositionException)
+            {
+                invalidCompositionException = (InvalidCompositionException)ex;
+            }
+            if (invalidCompositionException != null)
+            {
+                AddCompositionValidationErrors<TContentTypeSave, TPropertyType>(contentTypeSave, invalidCompositionException.PropertyTypeAliases);
+                return CreateModelStateValidationException<TContentTypeDisplay, TContentType>(ctId, contentTypeSave, ct);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Used to throw the ModelState validation results when the ModelState is invalid
+        /// </summary>
+        /// <typeparam name="TContentTypeDisplay"></typeparam>
+        /// <typeparam name="TContentType"></typeparam>
+        /// <param name="ctId"></param>
+        /// <param name="contentTypeSave"></param>
+        /// <param name="ct"></param>
+        private HttpResponseException CreateModelStateValidationException<TContentTypeDisplay, TContentType>(int ctId, ContentTypeSave contentTypeSave, TContentType ct)
+            where TContentType : class, IContentTypeComposition
+            where TContentTypeDisplay : ContentTypeCompositionDisplay
+        {
+            TContentTypeDisplay forDisplay;
+            if (ctId > 0)
+            {
+                //Required data is invalid so we cannot continue
+                forDisplay = Mapper.Map<TContentTypeDisplay>(ct);
+                //map the 'save' data on top
+                forDisplay = Mapper.Map(contentTypeSave, forDisplay);
+            }
+            else
+            {
+                //map the 'save' data to display
+                forDisplay = Mapper.Map<TContentTypeDisplay>(contentTypeSave);
+            }
+
+            forDisplay.Errors = ModelState.ToErrorDictionary();
+            return new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
+        }
+
         private ICultureDictionary CultureDictionary
         {
             get
@@ -351,5 +430,6 @@ namespace Umbraco.Web.Editors
             }
         }
         
+
     }
 }

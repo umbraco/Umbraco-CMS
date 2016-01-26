@@ -108,7 +108,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
          * @param {String} source The URL to load into the iframe
          */
         loadLegacyIFrame: function (source) {
-            $location.path("/" + appState.getSectionState("currentSection").toLowerCase() + "/framed/" + encodeURIComponent(source));
+            $location.path("/" + appState.getSectionState("currentSection") + "/framed/" + encodeURIComponent(source));
         },
 
         /**
@@ -132,7 +132,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             appState.setSectionState("currentSection", sectionAlias);
             this.showTree(sectionAlias);
 
-            $location.path(sectionAlias.toLowerCase());
+            $location.path(sectionAlias);
         },
 
         /**
@@ -214,7 +214,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
 
             //this reacts to tree items themselves being clicked
             //the tree directive should not contain any handling, simply just bubble events
-            mainTreeEventHandler.bind("treeNodeSelect", function(ev, args) {
+            mainTreeEventHandler.bind("treeNodeSelect", function (ev, args) {
                 var n = args.node;
                 ev.stopPropagation();
                 ev.preventDefault();
@@ -250,10 +250,10 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                     appState.setMenuState("currentNode", args.node);
 
                     //not legacy, lets just set the route value and clear the query string if there is one.
-                    $location.path(n.routePath.toLowerCase()).search("");
+                    $location.path(n.routePath).search("");
                 }
                 else if (args.element.section) {
-                    $location.path(args.element.section.toLowerCase()).search("");
+                    $location.path(args.element.section).search("");
                 }
 
                 service.hideNavigation();
@@ -446,7 +446,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             if (action.metaData && action.metaData["actionRoute"] && angular.isString(action.metaData["actionRoute"])) {
                 //first check if the menu item simply navigates to a route
                 var parts = action.metaData["actionRoute"].split("?");
-                $location.path(parts[0].toLowerCase()).search(parts.length > 1 ? parts[1] : "");
+                $location.path(parts[0]).search(parts.length > 1 ? parts[1] : "");
                 this.hideNavigation();
                 return;
             }
