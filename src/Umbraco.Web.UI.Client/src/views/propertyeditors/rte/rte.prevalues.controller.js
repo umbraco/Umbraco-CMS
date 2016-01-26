@@ -22,14 +22,14 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
 
         tinyMceService.configuration().then(function(config){
             $scope.tinyMceConfig = config;
-
+            //console.log("tinyMceConfig", $scope.tinyMceConfig);
         });
 
         stylesheetResource.getAll().then(function(stylesheets){
             $scope.stylesheets = stylesheets;
         });
 
-        $scope.selected = function(cmd, alias, lookup){
+        $scope.selected = function (cmd, alias, lookup) {
             if (lookup && angular.isArray(lookup)) {
                 cmd.selected = lookup.indexOf(alias) >= 0;
                 return cmd.selected;
