@@ -6,6 +6,7 @@ using umbraco.BasePages;
 using System.Web.UI;
 using Umbraco.Core.IO;
 using umbraco.BusinessLogic;
+using Umbraco.Core;
 
 namespace umbraco.BasePages
 {
@@ -180,8 +181,12 @@ namespace umbraco.BasePages
         {
             if (url.StartsWith("/") && !url.StartsWith(IOHelper.ResolveUrl(SystemDirectories.Umbraco)))
             {
-                url = IOHelper.ResolveUrl(SystemDirectories.Umbraco) + url;
+                url = IOHelper.ResolveUrl(SystemDirectories.Umbraco).EnsureEndsWith('/') + url;
             }
+
+            if (url.Trim().StartsWith("~"))
+                url = IOHelper.ResolveUrl(url);
+
             return url;
         }
 
