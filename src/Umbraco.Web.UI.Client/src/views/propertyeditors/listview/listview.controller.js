@@ -276,28 +276,28 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
             if (!(result.data && angular.isArray(result.data.notifications)))
                 showNotificationsAndReset(result, true, getSuccessMsg(selected.length));
         });
-    };
+    }
 
     $scope.delete = function () {
         applySelected(
-            function (selected, index) { return deleteItemCallback(getIdCallback(selected[index])) },
-            function (count, total) { return "Deleted " + count + " out of " + total + " item" + (total > 1 ? "s" : "") },
-            function (total) { return "Deleted " + total + " item" + (total > 1 ? "s" : "") },
+            function (selected, index) { return deleteItemCallback(getIdCallback(selected[index])); },
+            function (count, total) { return "Deleted " + count + " out of " + total + " item" + (total > 1 ? "s" : ""); },
+            function (total) { return "Deleted " + total + " item" + (total > 1 ? "s" : ""); },
             "Sure you want to delete?");
     };
 
     $scope.publish = function () {
         applySelected(
             function (selected, index) { return contentResource.publishById(getIdCallback(selected[index])); },
-            function (count, total) { return "Published " + count + " out of " + total + " item" + (total > 1 ? "s" : "") },
-            function (total) { return "Published " + total + " item" + (total > 1 ? "s" : "") });
+            function (count, total) { return "Published " + count + " out of " + total + " item" + (total > 1 ? "s" : ""); },
+            function (total) { return "Published " + total + " item" + (total > 1 ? "s" : ""); });
     };
 
     $scope.unpublish = function() {
         applySelected(
             function (selected, index) { return contentResource.unPublish(getIdCallback(selected[index])); },
-            function (count, total) { return "Unpublished " + count + " out of " + total + " item" + (total > 1 ? "s" : "") },
-            function (total) { return "Unpublished " + total + " item" + (total > 1 ? "s" : "") });
+            function (count, total) { return "Unpublished " + count + " out of " + total + " item" + (total > 1 ? "s" : ""); },
+            function (total) { return "Unpublished " + total + " item" + (total > 1 ? "s" : ""); });
     };
 
     $scope.move = function() {
@@ -381,7 +381,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
         }
 
         return value;
-    };
+    }
 
     /** This ensures that the correct value is set for each item in a row, we don't want to call a function during interpolation or ng-bind as performance is really bad that way */
     function setPropertyValues(result) {
@@ -416,14 +416,14 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
         });
 
 
-    };
+    }
 
     function isDate(val) {
         if (angular.isString(val)) {
             return val.match(/^(\d{4})\-(\d{2})\-(\d{2})\ (\d{2})\:(\d{2})\:(\d{2})$/);
         }
         return false;
-    };
+    }
 
     function initView() {
         //default to root id if the id is undefined
@@ -438,7 +438,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
         $scope.isTrashed = id === "-20" || id === "-21";
 
         $scope.reloadView($scope.contentId);
-    };
+    }
 
     function getLocalizedKey(alias) {
 
