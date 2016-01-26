@@ -40,9 +40,14 @@ namespace Umbraco.Web.Install.InstallSteps
             var clientDependencyConfig = new ClientDependencyConfiguration(_applicationContext.ProfilingLogger.Logger);
             var clientDependencyUpdated = clientDependencyConfig.IncreaseVersionNumber();
 
-            var security = new WebSecurity(_httpContext, _applicationContext);
-            security.PerformLogin(0);
-
+            //During a new install we'll log the default user in (which is id = 0).
+            // During an upgrade, the user will already need to be logged in in order to run the installer.
+            if (InstallTypeTarget == InstallationType.NewInstall)
+            {
+                var security = new WebSecurity(_httpContext, _applicationContext);
+                security.PerformLogin(0);
+            }
+            
             //reports the ended install
             var ih = new InstallHelper(UmbracoContext.Current);
             ih.InstallStatus(true, "");
