@@ -636,8 +636,11 @@ namespace umbraco.cms.businesslogic
             {
                 if (m_masterContentTypes == null)
                 {
-                    var ct = ApplicationContext.Current.Services.ContentTypeService.GetContentType(Id);
-                    m_masterContentTypes = ct.CompositionPropertyGroups.Select(x => x.Id).ToList();
+                    // fixme - oops, what's this?
+                    //var ct = ApplicationContext.Current.Services.ContentTypeService.GetContentType(Id);
+                    //m_masterContentTypes = ct.CompositionPropertyGroups.Select(x => x.Id).ToList();
+
+                    // back to normal
                     m_masterContentTypes = ContentTypeItem == null
                         ? new List<int>()
                         : ContentTypeItem.CompositionIds().ToList();
@@ -1307,7 +1310,7 @@ namespace umbraco.cms.businesslogic
         private void InitializeVirtualTabs()
         {
             // somewhat fixing... this whole class should be removed anyways
-            var ct = ContentTypeItem ?? ApplicationContext.Current.Services.ContentTypeService.GetContentType(Id);
+            var ct = ContentTypeItem ?? CallGetContentTypeMethod(Id);
 
             var tmp1 = ct.PropertyGroups
                 .Select(x => (TabI) new Tab(x.Id, x.Name, x.SortOrder, this))
@@ -1316,6 +1319,27 @@ namespace umbraco.cms.businesslogic
                 .DistinctBy(x => x.Id)
                 .ToList();
             _virtualTabs = tmp1;
+
+            /*
+            // While we are initialising, we should not use the class-scoped list, as it may be used by other threads
+            var temporaryList = new List<TabI>();
+            foreach (PropertyTypeGroup ptg in PropertyTypeGroups.Where(x => x.ParentId == 0 && x.ContentTypeId == this.Id))
+                temporaryList.Add(new Tab(ptg.Id, ptg.Name, ptg.SortOrder, this));
+
+            // Master Content Type
+            if (MasterContentTypes.Count > 0)
+            {
+                foreach (var mct in MasterContentTypes)
+                    temporaryList.AddRange(GetContentType(mct).getVirtualTabs.ToList());
+            }
+
+
+            // sort all tabs
+            temporaryList.Sort((a, b) => a.SortOrder.CompareTo(b.SortOrder));
+
+            // now that we aren't going to modify the list, we can set it to the class-scoped variable.
+            _virtualTabs = temporaryList.DistinctBy(x => x.Id).ToList();
+            */
         }
 
         private static void PopulateMasterContentTypes(PropertyType pt, int docTypeId)
@@ -1480,13 +1504,31 @@ namespace umbraco.cms.businesslogic
             // regardless of the PropertyTypes belonging to the current ContentType.
             public List<PropertyType> GetAllPropertyTypes()
             {
-                // somewhat fixing... this whole class should be removed anyways
-                var ct = _contenttype.ContentTypeItem ?? ApplicationContext.Current.Services.ContentTypeService.GetContentType(_contenttype.Id);
+                var ct = _contenttype.ContentTypeItem ?? _contenttype.CallGetContentTypeMethod(_contenttype.Id);
                 return ct.CompositionPropertyTypes
                     .OrderBy(x => x.SortOrder)
                     .Select(x => x.Id)
                     .Select(PropertyType.GetPropertyType)
                     .ToList();
+
+                /*
+                var db = ApplicationContext.Current.DatabaseContext.Database;
+                var propertyTypeDtos = db.Fetch<PropertyTypeDto>("WHERE propertyTypeGroupId = @Id", new { Id = _id });
+                var tmp = propertyTypeDtos
+                            .Select(propertyTypeDto => PropertyType.GetPropertyType(propertyTypeDto.Id))
+                            .ToList();
+
+                var propertyTypeGroupDtos = db.Fetch<PropertyTypeGroupDto>("WHERE parentGroupId = @Id", new { Id = _id });
+                foreach (var propertyTypeGroupDto in propertyTypeGroupDtos)
+                {
+                    var inheritedPropertyTypeDtos = db.Fetch<PropertyTypeDto>("WHERE propertyTypeGroupId = @Id", new { Id = propertyTypeGroupDto.Id });
+                    tmp.AddRange(inheritedPropertyTypeDtos
+                                     .Select(propertyTypeDto => PropertyType.GetPropertyType(propertyTypeDto.Id))
+                                     .ToList());
+                }
+
+                return tmp;
+                */
             }
 
             /// <summary>
