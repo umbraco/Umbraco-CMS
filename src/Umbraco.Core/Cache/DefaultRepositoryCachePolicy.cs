@@ -11,6 +11,10 @@ namespace Umbraco.Core.Cache
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
     /// <typeparam name="TId"></typeparam>
+    /// <remarks>
+    /// This cache policy uses sliding expiration and caches instances for 5 minutes. However if allow zero count is true, then we use the
+    /// default policy with no expiry.
+    /// </remarks>
     internal class DefaultRepositoryCachePolicy<TEntity, TId> : DisposableObject, IRepositoryCachePolicy<TEntity, TId>
         where TEntity : class, IAggregateRoot
     {
@@ -54,7 +58,9 @@ namespace Umbraco.Core.Cache
                     //just to be safe, we cannot cache an item without an identity
                     if (entity.HasIdentity)
                     {
-                        Cache.InsertCacheItem(GetCacheIdKey(entity.Id), () => entity);
+                        Cache.InsertCacheItem(GetCacheIdKey(entity.Id), () => entity,
+                            timeout: TimeSpan.FromMinutes(5),
+                            isSliding: true);
                     }
                     
                     //If there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
@@ -225,7 +231,9 @@ namespace Umbraco.Core.Cache
                 //just to be safe, we cannot cache an item without an identity
                 if (entity.HasIdentity)
                 {
-                    Cache.InsertCacheItem(cacheKey, () => entity);
+                    Cache.InsertCacheItem(cacheKey, () => entity,
+                        timeout: TimeSpan.FromMinutes(5),
+                        isSliding: true);
                 }
             });
         }
@@ -244,6 +252,7 @@ namespace Umbraco.Core.Cache
                 {
                     //there was nothing returned but we want to cache a zero count result so add an TEntity[] to the cache
                     // to signify that there is a zero count cache
+                    //NOTE: Don't set expiry/sliding for a zero count
                     Cache.InsertCacheItem(GetCacheTypeKey(), () => new TEntity[] {});
                 }
                 else
@@ -256,7 +265,9 @@ namespace Umbraco.Core.Cache
                         //just to be safe, we cannot cache an item without an identity
                         if (localCopy.HasIdentity)
                         {
-                            Cache.InsertCacheItem(GetCacheIdKey(entity.Id), () => localCopy);
+                            Cache.InsertCacheItem(GetCacheIdKey(entity.Id), () => localCopy,
+                                timeout: TimeSpan.FromMinutes(5),
+                                isSliding: true);
                         }
                     }
                 }
