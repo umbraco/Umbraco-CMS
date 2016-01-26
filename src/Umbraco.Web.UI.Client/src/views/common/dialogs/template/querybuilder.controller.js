@@ -33,7 +33,7 @@ angular.module("umbraco").controller('Umbraco.Dialogs.Template.QueryBuilderContr
 						alias: "",
 						name: "",
 					},
-					direction: "Ascending"
+					direction: "ascending"
 				}
 			};
 
