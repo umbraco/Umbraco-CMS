@@ -141,9 +141,7 @@ namespace Umbraco.Web.Cache
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.ContentTypeCacheKey);
             //clear static object cache
             global::umbraco.cms.businesslogic.ContentType.RemoveAllDataTypeCache();
-
-            PublishedContentType.ClearAll();
-
+            
             base.RefreshAll();
         }
 
@@ -280,9 +278,7 @@ namespace Umbraco.Web.Cache
 
             //clears the dictionary object cache of the legacy ContentType
             global::umbraco.cms.businesslogic.ContentType.RemoveFromDataTypeCache(payload.Alias);
-
-            PublishedContentType.ClearContentType(payload.Id);
-
+            
             //need to recursively clear the cache for each child content type
             foreach (var descendant in payload.DescendantPayloads)
             {
