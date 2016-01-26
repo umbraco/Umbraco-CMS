@@ -182,6 +182,22 @@ namespace Umbraco.Core.Persistence.Repositories
                 PersistDeletedItem((IEntity)child);
             }
 
+            //Before we call the base class methods to run all delete clauses, we need to first 
+            // delete all of the property data associated with this document type. Normally this will
+            // be done in the ContentTypeService by deleting all associated content first, but in some cases
+            // like when we switch a document type, there is property data left over that is linked
+            // to the previous document type. So we need to ensure it's removed.
+            var sql = new Sql().Select("DISTINCT cmsPropertyData.propertytypeid")
+                .From<PropertyDataDto>(SqlSyntax)
+                .InnerJoin<PropertyTypeDto>(SqlSyntax)
+                .On<PropertyDataDto, PropertyTypeDto>(SqlSyntax, dto => dto.PropertyTypeId, dto => dto.Id)
+                .InnerJoin<ContentTypeDto>(SqlSyntax)
+                .On<ContentTypeDto, PropertyTypeDto>(SqlSyntax, dto => dto.NodeId, dto => dto.ContentTypeId)
+                .Where<ContentTypeDto>(dto => dto.NodeId == entity.Id);
+
+            //Delete all cmsPropertyData where propertytypeid EXISTS in the subquery above
+            Database.Execute(SqlSyntax.GetDeleteSubquery("cmsPropertyData", "propertytypeid", sql));
+
             base.PersistDeletedItem(entity);
         }
 
