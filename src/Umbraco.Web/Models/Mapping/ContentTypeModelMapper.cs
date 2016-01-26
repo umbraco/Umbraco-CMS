@@ -152,9 +152,9 @@ namespace Umbraco.Web.Models.Mapping
                     //default listview
                     dest.ListViewEditorName = Constants.Conventions.DataTypes.ListViewPrefix + "Content";
 
-                    if (string.IsNullOrEmpty(source.Name) == false)
+                    if (string.IsNullOrEmpty(source.Alias) == false)
                     {
-                        var name = Constants.Conventions.DataTypes.ListViewPrefix + source.Name;
+                        var name = Constants.Conventions.DataTypes.ListViewPrefix + source.Alias;
                         if (applicationContext.Services.DataTypeService.GetDataTypeDefinitionByName(name) != null)
                             dest.ListViewEditorName = name;
                     }
