@@ -194,7 +194,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
         private IEnumerable<PropertyType> GetPropertiesOfContentType(IContentType contentType)
         {
             var properties = contentType.PropertyTypes.ToList();
-            while (contentType.ParentId > -1)
+            while (contentType.ParentId > -1 && contentType.CompositionAliases().Any())
             {
                 contentType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(contentType.ParentId);
                 properties.AddRange(contentType.PropertyTypes);
