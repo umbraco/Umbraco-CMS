@@ -9,17 +9,24 @@
 }
 
 .umb-media-grid__item {
-   margin: 10px;
-   position: relative;
-   overflow: hidden;
-   cursor: pointer;
-   display: flex;
-   align-content: center;
-   align-items: center;
-   align-self: stretch;
-   box-shadow: 0 1px 1px 0 rgba(0,0,0,.2);
-   justify-content: center;
-   transition: box-shadow 100ms;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+
+    justify-content: center;
+
+    align-content: center;
+    align-items: center;
+    align-self: stretch;
+
+    margin: 10px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,.2);
+
+    transition: box-shadow 100ms;
 }
 
 .umb-media-grid__item.-file {
