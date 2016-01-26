@@ -21,7 +21,10 @@
          umb-auto-resize
          required
          val-server-field="{{serverValidationField}}"
-         title="{{ngModel}}" />
+         title="{{ngModel}}"
+         focus-when="{{!locked}}"
+         umb-select-when="{{!locked}}"
+         on-blur="lock()" />
 
    </div>
 
