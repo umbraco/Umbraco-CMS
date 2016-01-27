@@ -319,6 +319,7 @@
     <Compile Include="Editors\EditorValidationResolver.cs" />
     <Compile Include="Editors\EditorValidator.cs" />
     <Compile Include="Editors\IEditorValidator.cs" />
+    <Compile Include="Editors\EditorModelEventManager.cs" />
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
     <Compile Include="Install\InstallSteps\Version73FileCleanup.cs" />
     <Compile Include="Models\ContentEditing\DocumentTypeDisplay.cs" />
@@ -686,6 +687,7 @@
     <Compile Include="WebApi\Filters\EnableOverrideAuthorizationAttribute.cs" />
     <Compile Include="WebApi\Filters\FilterGrouping.cs" />
     <Compile Include="WebApi\Filters\LegacyTreeAuthorizeAttribute.cs" />
+    <Compile Include="WebApi\Filters\OutgoingEditorModelEventAttribute.cs" />
     <Compile Include="WebApi\Filters\OutgoingNoHyphenGuidFormatAttribute.cs" />
     <Compile Include="WebApi\Filters\OverridableAuthorizationAttribute.cs" />
     <Compile Include="WebApi\Filters\SetAngularAntiForgeryTokensAttribute.cs" />
