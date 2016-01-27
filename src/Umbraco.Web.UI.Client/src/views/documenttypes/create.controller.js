@@ -19,7 +19,7 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
 
     $scope.showCreateFolder = function() {
         $scope.model.creatingFolder = true;
-    }
+    };
 
     $scope.createContainer = function () {
         if (formHelper.submitForm({
@@ -48,22 +48,22 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
                     }
                 }
             });
-        };
-    }
+        }
+    };
 
     $scope.createDocType = function() {
         $location.search('create', null);
         $location.search('notemplate', null);
         $location.path("/settings/documenttypes/edit/" + node.id).search("create", "true");
         navigationService.hideMenu();
-    }
+    };
 
     $scope.createComponent = function() {
       $location.search('create', null);
       $location.search('notemplate', null);
       $location.path("/settings/documenttypes/edit/" + node.id).search("create", "true").search("notemplate", "true");
       navigationService.hideMenu();
-    }
+  };
 }
 
 angular.module('umbraco').controller("Umbraco.Editors.DocumentTypes.CreateController", DocumentTypesCreateController);
