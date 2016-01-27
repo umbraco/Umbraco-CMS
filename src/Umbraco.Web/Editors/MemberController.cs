@@ -145,6 +145,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
+        [OutgoingEditorModelEvent]
         public MemberDisplay GetByKey(Guid key)
         {
             MembershipUser foundMembershipMember;
@@ -196,6 +197,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="contentTypeAlias"></param>
         /// <returns></returns>
+        [OutgoingEditorModelEvent]
         public MemberDisplay GetEmpty(string contentTypeAlias = null)
         {
             IMember emptyContent;

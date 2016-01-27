@@ -63,13 +63,14 @@ namespace Umbraco.Web.Editors
             : base(umbracoContext)
         {
         }
-        
+
         /// <summary>
         /// Gets an empty content item for the 
         /// </summary>
         /// <param name="contentTypeAlias"></param>
         /// <param name="parentId"></param>
         /// <returns></returns>
+        [OutgoingEditorModelEvent]
         public MediaItemDisplay GetEmpty(string contentTypeAlias, int parentId)
         {
             var contentType = Services.ContentTypeService.GetMediaType(contentTypeAlias);
@@ -92,6 +93,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [OutgoingEditorModelEvent]
         [EnsureUserPermissionForMedia("id")]
         public MediaItemDisplay GetById(int id)
         {
