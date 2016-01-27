@@ -475,7 +475,7 @@ namespace Umbraco.Core.Persistence.Repositories
             if (aliases.Any() == false) return base.GetAll();
 
             //return from base.GetAll, this is all cached
-            return base.GetAll().Where(x => aliases.Contains(x.Alias));
+            return base.GetAll().Where(x => aliases.InvariantContains(x.Alias));
         }
 
         public IEnumerable<ITemplate> GetChildren(int masterTemplateId)

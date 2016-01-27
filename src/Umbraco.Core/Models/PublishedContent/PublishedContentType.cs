@@ -98,45 +98,10 @@ namespace Umbraco.Core.Models.PublishedContent
 
         #endregion
 
-        #region Cache
-
-        // these methods are called by ContentTypeCacheRefresher and DataTypeCacheRefresher
-
-        internal static void ClearAll()
-        {
-            Logging.LogHelper.Debug<PublishedContentType>("Clear all.");
-            // ok and faster to do it by types, assuming noone else caches PublishedContentType instances
-            //ApplicationContext.Current.ApplicationCache.ClearStaticCacheByKeySearch("PublishedContentType_");
-            ApplicationContext.Current.ApplicationCache.StaticCache.ClearCacheObjectTypes<PublishedContentType>();
-        }
-
-        internal static void ClearContentType(int id)
-        {
-            Logging.LogHelper.Debug<PublishedContentType>("Clear content type w/id {0}.", () => id);
-            // requires a predicate because the key does not contain the ID
-            // faster than key strings comparisons anyway
-            ApplicationContext.Current.ApplicationCache.StaticCache.ClearCacheObjectTypes<PublishedContentType>(
-                (key, value) => value.Id == id);
-        }
-
-        internal static void ClearDataType(int id)
-        {
-            Logging.LogHelper.Debug<PublishedContentType>("Clear data type w/id {0}.", () => id);
-            // there is no recursion to handle here because a PublishedContentType contains *all* its
-            // properties ie both its own properties and those that were inherited (it's based upon an
-            // IContentTypeComposition) and so every PublishedContentType having a property based upon
-            // the cleared data type, be it local or inherited, will be cleared.
-            ApplicationContext.Current.ApplicationCache.StaticCache.ClearCacheObjectTypes<PublishedContentType>(
-                (key, value) => value.PropertyTypes.Any(x => x.DataTypeId == id));
-        }
-
+        
         public static PublishedContentType Get(PublishedItemType itemType, string alias)
         {
-            var key = string.Format("PublishedContentType_{0}_{1}",
-                itemType.ToString().ToLowerInvariant(), alias.ToLowerInvariant());
-
-            var type = ApplicationContext.Current.ApplicationCache.StaticCache.GetCacheItem<PublishedContentType>(key,
-                () => CreatePublishedContentType(itemType, alias));
+            var type = CreatePublishedContentType(itemType, alias);
 
             return type;
         }
@@ -169,21 +134,8 @@ namespace Umbraco.Core.Models.PublishedContent
             return new PublishedContentType(contentType);
         }
 
-        // for unit tests - changing the callback must reset the cache obviously
-        private static Func<string, PublishedContentType> _getPublishedContentTypeCallBack;
-        internal static Func<string, PublishedContentType> GetPublishedContentTypeCallback
-        {
-            get { return _getPublishedContentTypeCallBack; }
-            set
-            {
-                // see note above
-                //ClearAll();
-                ApplicationContext.Current.ApplicationCache.StaticCache.ClearCacheByKeySearch("PublishedContentType_");
-
-                _getPublishedContentTypeCallBack = value;
-            }
-        }
-
-        #endregion
+        // for unit tests
+        internal static Func<string, PublishedContentType> GetPublishedContentTypeCallback { get; set; }
+        
     }
 }
