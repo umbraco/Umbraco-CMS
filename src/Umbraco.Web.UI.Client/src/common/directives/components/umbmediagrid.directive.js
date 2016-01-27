@@ -9,18 +9,36 @@
          var itemDefaultWidth = 200;
          var itemMaxWidth = 200;
          var itemMaxHeight = 200;
+         var itemMinWidth = 125;
+         var itemMinHeight = 125;
 
          function activate() {
 
-            for (var i = 0; scope.items.length > i; i++) {
-               var item = scope.items[i];
-               setItemData(item);
-               setOriginalSize(item, itemMaxHeight);
-            }
+             if (scope.itemMaxWidth) {
+                 itemMaxWidth = scope.itemMaxWidth;
+             }
 
-            if(scope.items.length > 0) {
-               setFlexValues(scope.items);
-            }
+             if (scope.itemMaxHeight) {
+                 itemMaxHeight = scope.itemMaxHeight;
+             }
+
+             if (scope.itemMinWidth) {
+                 itemMinWidth = scope.itemMinWidth;
+             }
+
+             if (scope.itemMinWidth) {
+                 itemMinHeight = scope.itemMinHeight;
+             }
+
+             for (var i = 0; scope.items.length > i; i++) {
+                 var item = scope.items[i];
+                 setItemData(item);
+                 setOriginalSize(item, itemMaxHeight);
+             }
+
+             if (scope.items.length > 0) {
+                 setFlexValues(scope.items);
+             }
 
          }
 
@@ -100,12 +118,13 @@
                   flex = 1;
                }
 
-               var imageMinWidth = smallestImageWidth * flex;
+               var imageMinFlexWidth = smallestImageWidth * flex;
 
                var flexStyle = {
-                  "flex": flex + " 1 " + imageMinWidth + "px",
+                  "flex": flex + " 1 " + imageMinFlexWidth + "px",
                   "max-width": mediaItem.width + "px",
-                  "min-width": "125px"
+                  "min-width": itemMinWidth + "px",
+                  "min-height": itemMinHeight + "px"
                };
 
                mediaItem.flexStyle = flexStyle;
@@ -154,7 +173,11 @@
             onDetailsHover: "=",
             onClick: '=',
             onClickName: "=",
-            filterBy: "="
+            filterBy: "=",
+            itemMaxWidth: "@",
+            itemMaxHeight: "@",
+            itemMinWidth: "@",
+            itemMinHeight: "@"
          },
          link: link
       };
