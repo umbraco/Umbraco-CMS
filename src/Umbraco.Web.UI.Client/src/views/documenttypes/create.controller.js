@@ -21,19 +21,26 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
         $scope.model.creatingFolder = true;
     };
 
-    $scope.createContainer = function () {
-        if (formHelper.submitForm({
-            scope: $scope,
-            formCtrl: this.createFolderForm,
-            statusMessage: localizeCreateFolder
-        })) {
-            contentTypeResource.createContainer(node.id, $scope.model.folderName).then(function (folderId) {
+    $scope.createContainer = function() {
+
+        if (formHelper.submitForm({scope: $scope, formCtrl: this.createFolderForm, statusMessage: localizeCreateFolder})) {
+
+            contentTypeResource.createContainer(node.id, $scope.model.folderName).then(function(folderId) {
 
                 navigationService.hideMenu();
-                var currPath = node.path ? node.path : "-1";
-                navigationService.syncTree({ tree: "documenttypes", path: currPath + "," + folderId, forceReload: true, activate: true });
 
-                formHelper.resetForm({ scope: $scope });
+                var currPath = node.path ? node.path : "-1";
+
+                navigationService.syncTree({
+                    tree: "documenttypes",
+                    path: currPath + "," + folderId,
+                    forceReload: true,
+                    activate: true
+                });
+
+                formHelper.resetForm({
+                    scope: $scope
+                });
 
                 var section = appState.getSectionState("currentSection");
 
@@ -59,11 +66,11 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
     };
 
     $scope.createComponent = function() {
-      $location.search('create', null);
-      $location.search('notemplate', null);
-      $location.path("/settings/documenttypes/edit/" + node.id).search("create", "true").search("notemplate", "true");
-      navigationService.hideMenu();
-  };
+        $location.search('create', null);
+        $location.search('notemplate', null);
+        $location.path("/settings/documenttypes/edit/" + node.id).search("create", "true").search("notemplate", "true");
+        navigationService.hideMenu();
+    };
 }
 
 angular.module('umbraco').controller("Umbraco.Editors.DocumentTypes.CreateController", DocumentTypesCreateController);
