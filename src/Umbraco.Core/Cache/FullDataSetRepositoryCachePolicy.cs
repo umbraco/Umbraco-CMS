@@ -30,6 +30,20 @@ namespace Umbraco.Core.Cache
 
         private bool? _hasZeroCountCache;
 
+
+        public override TEntity[] GetAll(TId[] ids, Func<TId[], IEnumerable<TEntity>> getFromRepo)
+        {
+            //process the base logic without any Ids - we want to cache them all!
+            var result = base.GetAll(new TId[] { }, getFromRepo);
+
+            //now that the base result has been calculated, they will all be cached. 
+            // Now we can just filter by ids if they have been supplied
+            
+            return ids.Any() 
+                ? result.Where(x => ids.Contains((TId) (object) x.Id)).ToArray() 
+                : result;
+        }
+
         /// <summary>
         /// For this type of caching policy, we don't cache individual items
         /// </summary>

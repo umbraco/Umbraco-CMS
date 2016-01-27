@@ -179,7 +179,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
             using (var p = CachePolicyFactory.CreatePolicy())
             {
-                return p.GetAll(ids, PerformGetAll);
+                var result = p.GetAll(ids, PerformGetAll);
+                return result;
             }          
         }
         
