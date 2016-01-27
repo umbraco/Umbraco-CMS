@@ -16,7 +16,12 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// The saving has been cancelled by a 3rd party add-in
         /// </summary>
-        FailedCancelledByEvent = 14
+        FailedCancelledByEvent = 14,
+
+        /// <summary>
+        /// Failed, an exception was thrown/handled
+        /// </summary>
+        FailedExceptionThrown = 15,
 
         //TODO: In the future, we might need to add more operations statuses, potentially like 'FailedByPermissions', etc...
     }

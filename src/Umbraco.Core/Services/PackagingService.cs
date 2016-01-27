@@ -480,7 +480,7 @@ namespace Umbraco.Core.Services
                             _logger.Error<PackagingService>("Could not create folder: " + rootFolder, tryCreateFolder.Exception);
                             throw tryCreateFolder.Exception;
                         }
-                        var rootFolderId = tryCreateFolder.Result;
+                        var rootFolderId = tryCreateFolder.Result.Entity.Id;
                         current = _contentTypeService.GetContentTypeContainer(rootFolderId);
                     }
 
@@ -514,7 +514,7 @@ namespace Umbraco.Core.Services
                 _logger.Error<PackagingService>("Could not create folder: " + folderName, tryCreateFolder.Exception);
                 throw tryCreateFolder.Exception;
             }
-            return _contentTypeService.GetContentTypeContainer(tryCreateFolder.Result);
+            return _contentTypeService.GetContentTypeContainer(tryCreateFolder.Result.Entity.Id);
         }
 
         private IContentType CreateContentTypeFromXml(XElement documentType)

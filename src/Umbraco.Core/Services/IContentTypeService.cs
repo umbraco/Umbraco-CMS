@@ -21,10 +21,11 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         Attempt<string[]> ValidateComposition(IContentTypeComposition compo);
 
-        Attempt<int> CreateContentTypeContainer(int parentId, string name, int userId = 0);
-        Attempt<int> CreateMediaTypeContainer(int parentId, string name, int userId = 0);
-        void SaveContentTypeContainer(EntityContainer container, int userId = 0);
-        void SaveMediaTypeContainer(EntityContainer container, int userId = 0);
+        Attempt<OperationStatus<EntityContainer, OperationStatusType>> CreateContentTypeContainer(int parentId, string name, int userId = 0);
+        Attempt<OperationStatus<EntityContainer, OperationStatusType>> CreateMediaTypeContainer(int parentId, string name, int userId = 0);
+        Attempt<OperationStatus> SaveContentTypeContainer(EntityContainer container, int userId = 0);
+        Attempt<OperationStatus> SaveMediaTypeContainer(EntityContainer container, int userId = 0);
+
         EntityContainer GetContentTypeContainer(int containerId);
         EntityContainer GetContentTypeContainer(Guid containerId);
         IEnumerable<EntityContainer> GetContentTypeContainers(int[] containerIds);

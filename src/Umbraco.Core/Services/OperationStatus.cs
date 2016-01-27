@@ -45,6 +45,12 @@ namespace Umbraco.Core.Services
 
         #region Static Helper methods
 
+        internal static OperationStatus Exception(EventMessages eventMessages, Exception ex)
+        {
+            eventMessages.Add(new EventMessage("", ex.Message, EventMessageType.Error));
+            return new OperationStatus(OperationStatusType.FailedExceptionThrown, eventMessages);
+        }
+
         internal static OperationStatus Cancelled(EventMessages eventMessages)
         {
             return new OperationStatus(OperationStatusType.FailedCancelledByEvent, eventMessages);
