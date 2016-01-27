@@ -55,10 +55,11 @@ namespace Umbraco.Tests.Persistence.Querying
                 transaction.Complete();
             }
 
-            IDictionary<int, IEnumerable<ContentTypeRepository.ContentTypeQueryMapper.AssociatedTemplate>> allAssociatedTemplates;
-            IDictionary<int, IEnumerable<int>> allParentContentTypeIds;
+            IDictionary<int, List<ContentTypeRepository.ContentTypeQueryMapper.AssociatedTemplate>> allAssociatedTemplates;
+            IDictionary<int, List<int>> allParentContentTypeIds;
             var contentTypes = ContentTypeRepository.ContentTypeQueryMapper.MapContentTypes(
-                new[] {99997, 99998}, DatabaseContext.Database, SqlSyntax, out allAssociatedTemplates, out allParentContentTypeIds)
+                DatabaseContext.Database, SqlSyntax, out allAssociatedTemplates, out allParentContentTypeIds)                
+                .Where(x => (new[] {99997, 99998}).Contains(x.Id))
                 .ToArray();
 
             var contentType1 = contentTypes.SingleOrDefault(x => x.Id == 99997);
@@ -109,9 +110,10 @@ namespace Umbraco.Tests.Persistence.Querying
                 transaction.Complete();
             }
 
-            IDictionary<int, IEnumerable<int>> allParentContentTypeIds;
+            IDictionary<int, List<int>> allParentContentTypeIds;
             var contentTypes = ContentTypeRepository.ContentTypeQueryMapper.MapMediaTypes(
-                new[] { 99997, 99998 }, DatabaseContext.Database, SqlSyntax, out allParentContentTypeIds)
+                DatabaseContext.Database, SqlSyntax, out allParentContentTypeIds)
+                .Where(x => (new[] { 99997, 99998 }).Contains(x.Id))
                 .ToArray();
 
             var contentType1 = contentTypes.SingleOrDefault(x => x.Id == 99997);
