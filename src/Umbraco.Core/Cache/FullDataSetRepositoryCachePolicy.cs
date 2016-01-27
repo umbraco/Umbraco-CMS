@@ -18,7 +18,9 @@ namespace Umbraco.Core.Cache
     internal class FullDataSetRepositoryCachePolicy<TEntity, TId> : DefaultRepositoryCachePolicy<TEntity, TId>
         where TEntity : class, IAggregateRoot
     {
-        public FullDataSetRepositoryCachePolicy(IRuntimeCacheProvider cache) : base(cache,
+        private readonly Func<TEntity, TId> _getEntityId;
+
+        public FullDataSetRepositoryCachePolicy(IRuntimeCacheProvider cache, Func<TEntity, TId> getEntityId) : base(cache,
             new RepositoryCachePolicyOptions
             {
                 //Definitely allow zero'd cache entires since this is a full set, in many cases there will be none,
@@ -26,6 +28,7 @@ namespace Umbraco.Core.Cache
                 GetAllCacheAllowZeroCount = true
             })
         {
+            _getEntityId = getEntityId;
         }
 
         private bool? _hasZeroCountCache;
@@ -40,7 +43,7 @@ namespace Umbraco.Core.Cache
             // Now we can just filter by ids if they have been supplied
             
             return ids.Any() 
-                ? result.Where(x => ids.Contains((TId) (object) x.Id)).ToArray() 
+                ? result.Where(x => ids.Contains(_getEntityId(x))).ToArray() 
                 : result;
         }
 

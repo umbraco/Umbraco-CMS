@@ -1,3 +1,4 @@
+using System;
 using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Cache
@@ -11,15 +12,17 @@ namespace Umbraco.Core.Cache
         where TEntity : class, IAggregateRoot
     {
         private readonly IRuntimeCacheProvider _runtimeCache;
-        
-        public FullDataSetRepositoryCachePolicyFactory(IRuntimeCacheProvider runtimeCache)
+        private readonly Func<TEntity, TId> _getEntityId;
+
+        public FullDataSetRepositoryCachePolicyFactory(IRuntimeCacheProvider runtimeCache, Func<TEntity, TId> getEntityId)
         {
-            _runtimeCache = runtimeCache;            
+            _runtimeCache = runtimeCache;
+            _getEntityId = getEntityId;
         }
 
         public virtual IRepositoryCachePolicy<TEntity, TId> CreatePolicy()
         {
-            return new FullDataSetRepositoryCachePolicy<TEntity, TId>(_runtimeCache);
+            return new FullDataSetRepositoryCachePolicy<TEntity, TId>(_runtimeCache, _getEntityId);
         }
     }
 }
