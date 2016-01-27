@@ -36,8 +36,8 @@ namespace Umbraco.Core.Services
         IEnumerable<EntityContainer> GetMediaTypeContainers(int[] containerIds);
         IEnumerable<EntityContainer> GetMediaTypeContainers(string folderName, int level);
         IEnumerable<EntityContainer> GetMediaTypeContainers(IMediaType mediaType);
-        void DeleteMediaTypeContainer(int folderId, int userId = 0);
-        void DeleteContentTypeContainer(int containerId, int userId = 0);
+        Attempt<OperationStatus> DeleteMediaTypeContainer(int folderId, int userId = 0);
+        Attempt<OperationStatus> DeleteContentTypeContainer(int containerId, int userId = 0);
 
         /// <summary>
         /// Gets all property type aliases.

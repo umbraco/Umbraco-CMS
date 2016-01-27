@@ -910,7 +910,7 @@ namespace Umbraco.Core.Services
                   new MoveEventArgs<IContent>(evtMsgs, new MoveEventInfo<IContent>(content, originalPath, Constants.System.RecycleBinContent)),
                   this))
                 {
-                    return Attempt.Fail(OperationStatus.Cancelled(evtMsgs));
+                    return OperationStatus.Cancelled(evtMsgs);
                 }
 
                 var moveInfo = new List<MoveEventInfo<IContent>>
@@ -957,7 +957,7 @@ namespace Umbraco.Core.Services
 
                 Audit(AuditType.Move, "Move Content to Recycle Bin performed by user", userId, content.Id);
 
-                return Attempt.Succeed(OperationStatus.Success(evtMsgs));
+                return OperationStatus.Success(evtMsgs);
             }
         }
 
@@ -1080,7 +1080,7 @@ namespace Umbraco.Core.Services
                     new SaveEventArgs<IContent>(asArray, evtMsgs),
                     this))
                 {
-                    return Attempt.Fail(OperationStatus.Cancelled(evtMsgs));
+                    return OperationStatus.Cancelled(evtMsgs);
                 }
             }
             using (new WriteLock(Locker))
@@ -1124,7 +1124,7 @@ namespace Umbraco.Core.Services
 
                 Audit(AuditType.Save, "Bulk Save content performed by user", userId == -1 ? 0 : userId, Constants.System.Root);
 
-                return Attempt.Succeed(OperationStatus.Success(evtMsgs));
+                return OperationStatus.Success(evtMsgs);
             }
         }
 
@@ -1147,7 +1147,7 @@ namespace Umbraco.Core.Services
                   new DeleteEventArgs<IContent>(content, evtMsgs),
                   this))
                 {
-                    return Attempt.Fail(OperationStatus.Cancelled(evtMsgs));
+                    return OperationStatus.Cancelled(evtMsgs);
                 }
 
                 //Make sure that published content is unpublished before being deleted
@@ -1178,7 +1178,7 @@ namespace Umbraco.Core.Services
 
                 Audit(AuditType.Delete, "Delete Content performed by user", userId, content.Id);
 
-                return Attempt.Succeed(OperationStatus.Success(evtMsgs));
+                return OperationStatus.Success(evtMsgs);
             }
         }
 
@@ -2043,7 +2043,7 @@ namespace Umbraco.Core.Services
                   new SaveEventArgs<IContent>(content, evtMsgs),
                   this))
                 {
-                    return Attempt.Fail(OperationStatus.Cancelled(evtMsgs));
+                    return OperationStatus.Cancelled(evtMsgs);
                 }
             }
 
@@ -2075,7 +2075,7 @@ namespace Umbraco.Core.Services
 
                 Audit(AuditType.Save, "Save Content performed by user", userId, content.Id);
 
-                return Attempt.Succeed(OperationStatus.Success(evtMsgs));
+                return OperationStatus.Success(evtMsgs);
             }
         }
 

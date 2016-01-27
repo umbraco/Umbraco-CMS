@@ -982,7 +982,7 @@ namespace Umbraco.Core.Services
                             _logger.Error<PackagingService>("Could not create folder: " + rootFolder, tryCreateFolder.Exception);
                             throw tryCreateFolder.Exception;
                         }                        
-                        current = _dataTypeService.GetContainer(tryCreateFolder.Result);
+                        current = _dataTypeService.GetContainer(tryCreateFolder.Result.Entity.Id);
                     }
 
                     importedFolders.Add(name, current.Id);
@@ -1015,7 +1015,7 @@ namespace Umbraco.Core.Services
                 _logger.Error<PackagingService>("Could not create folder: " + folderName, tryCreateFolder.Exception);
                 throw tryCreateFolder.Exception;
             }
-            return _dataTypeService.GetContainer(tryCreateFolder.Result);
+            return _dataTypeService.GetContainer(tryCreateFolder.Result.Entity.Id);
         }
 
         private void SavePrevaluesFromXml(List<IDataTypeDefinition> dataTypes, IEnumerable<XElement> dataTypeElements)

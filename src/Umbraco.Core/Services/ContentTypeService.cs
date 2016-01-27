@@ -68,13 +68,16 @@ namespace Umbraco.Core.Services
 
                     repo.AddOrUpdate(container);
                     uow.Commit();
+
+                    SavedContentTypeContainer.RaiseEvent(new SaveEventArgs<EntityContainer>(container, evtMsgs), this);
+                    //TODO: Audit trail ?
+
                     return Attempt.Succeed(new OperationStatus<EntityContainer, OperationStatusType>(container, OperationStatusType.Success, evtMsgs));
                 }
                 catch (Exception ex)
                 {
                     return Attempt.Fail(new OperationStatus<EntityContainer, OperationStatusType>(null, OperationStatusType.FailedExceptionThrown, evtMsgs), ex);
                 }
-                //TODO: Audit trail ?
             }
         }
 
@@ -93,7 +96,7 @@ namespace Umbraco.Core.Services
                         CreatorId = userId
                     };
 
-                    if (SavingContentTypeContainer.IsRaisedEventCancelled(
+                    if (SavingMediaTypeContainer.IsRaisedEventCancelled(
                         new SaveEventArgs<EntityContainer>(container, evtMsgs),
                         this))
                     {
@@ -102,13 +105,16 @@ namespace Umbraco.Core.Services
 
                     repo.AddOrUpdate(container);
                     uow.Commit();
+
+                    SavedMediaTypeContainer.RaiseEvent(new SaveEventArgs<EntityContainer>(container, evtMsgs), this);
+                    //TODO: Audit trail ?
+
                     return Attempt.Succeed(new OperationStatus<EntityContainer, OperationStatusType>(container, OperationStatusType.Success, evtMsgs));
                 }
                 catch (Exception ex)
                 {
                     return Attempt.Fail(new OperationStatus<EntityContainer, OperationStatusType>(null, OperationStatusType.FailedExceptionThrown, evtMsgs), ex);
                 }
-                //TODO: Audit trail ?
             }
         }
 
@@ -138,20 +144,20 @@ namespace Umbraco.Core.Services
             if (container.ContainedObjectType != containerObjectType)
             {
                 var ex = new InvalidOperationException("Not a " + objectTypeName + " container.");
-                return Attempt.Fail(OperationStatus.Exception(evtMsgs, ex), ex);
+                return OperationStatus.Exception(evtMsgs, ex);
             }
 
             if (container.HasIdentity && container.IsPropertyDirty("ParentId"))
             {
                 var ex = new InvalidOperationException("Cannot save a container with a modified parent, move the container instead.");
-                return Attempt.Fail(OperationStatus.Exception(evtMsgs, ex), ex);
+                return OperationStatus.Exception(evtMsgs, ex);
             }
 
             if (savingEvent.IsRaisedEventCancelled(
                         new SaveEventArgs<EntityContainer>(container, evtMsgs),
                         this))
             {
-                return Attempt.Fail(OperationStatus.Cancelled(evtMsgs));
+                return OperationStatus.Cancelled(evtMsgs);
             }
 
             var uow = UowProvider.GetUnitOfWork();
@@ -165,7 +171,7 @@ namespace Umbraco.Core.Services
 
             //TODO: Audit trail ?
 
-            return Attempt.Succeed(OperationStatus.Success(evtMsgs));
+            return OperationStatus.Success(evtMsgs);
         }
 
         public EntityContainer GetContentTypeContainer(int containerId)
@@ -274,28 +280,54 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public void DeleteContentTypeContainer(int containerId, int userId = 0)
+        public Attempt<OperationStatus> DeleteContentTypeContainer(int containerId, int userId = 0)
         {
+            var evtMsgs = EventMessagesFactory.Get();
             var uow = UowProvider.GetUnitOfWork();
             using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.DocumentTypeContainerGuid))
             {
                 var container = repo.Get(containerId);
-                if (container == null) return;
+                if (container == null) return OperationStatus.NoOperation(evtMsgs);
+
+                if (DeletingContentTypeContainer.IsRaisedEventCancelled(
+                        new DeleteEventArgs<EntityContainer>(container, evtMsgs),
+                        this))
+                {
+                    return Attempt.Fail(new OperationStatus(OperationStatusType.FailedCancelledByEvent, evtMsgs));
+                }
+
                 repo.Delete(container);
                 uow.Commit();
+
+                DeletedContentTypeContainer.RaiseEvent(new DeleteEventArgs<EntityContainer>(container, evtMsgs), this);
+
+                return OperationStatus.Success(evtMsgs);
                 //TODO: Audit trail ?
             }
         }
 
-        public void DeleteMediaTypeContainer(int containerId, int userId = 0)
+        public Attempt<OperationStatus> DeleteMediaTypeContainer(int containerId, int userId = 0)
         {
+            var evtMsgs = EventMessagesFactory.Get();
             var uow = UowProvider.GetUnitOfWork();
             using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.MediaTypeContainerGuid))
             {
                 var container = repo.Get(containerId);
-                if (container == null) return;
+                if (container == null) return OperationStatus.NoOperation(evtMsgs);
+
+                if (DeletingMediaTypeContainer.IsRaisedEventCancelled(
+                        new DeleteEventArgs<EntityContainer>(container, evtMsgs),
+                        this))
+                {
+                    return Attempt.Fail(new OperationStatus(OperationStatusType.FailedCancelledByEvent, evtMsgs));
+                }
+
                 repo.Delete(container);
                 uow.Commit();
+
+                DeletedMediaTypeContainer.RaiseEvent(new DeleteEventArgs<EntityContainer>(container, evtMsgs), this);
+
+                return OperationStatus.Success(evtMsgs);
                 //TODO: Audit trail ?
             }
         }
