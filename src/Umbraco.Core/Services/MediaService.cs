@@ -747,7 +747,7 @@ namespace Umbraco.Core.Services
             if (Deleting.IsRaisedEventCancelled(                
                 new DeleteEventArgs<IMedia>(media, evtMsgs), this))
             {
-                return Attempt.Fail(OperationStatus.Cancelled(evtMsgs));
+                return OperationStatus.Cancelled(evtMsgs);
             }
 
             //Delete children before deleting the 'possible parent'
@@ -772,7 +772,7 @@ namespace Umbraco.Core.Services
 
             Audit(AuditType.Delete, "Delete Media performed by user", userId, media.Id);
 
-            return Attempt.Succeed(OperationStatus.Success(evtMsgs));
+            return OperationStatus.Success(evtMsgs);
         }
 
         /// <summary>
@@ -791,7 +791,7 @@ namespace Umbraco.Core.Services
                     new SaveEventArgs<IMedia>(media, evtMsgs),
                     this))
                 {
-                    return Attempt.Fail(OperationStatus.Cancelled(evtMsgs));
+                    return OperationStatus.Cancelled(evtMsgs);
                 }
 
             }
@@ -816,7 +816,7 @@ namespace Umbraco.Core.Services
 
             Audit(AuditType.Save, "Save Media performed by user", userId, media.Id);
 
-            return Attempt.Succeed(OperationStatus.Success(evtMsgs));
+            return OperationStatus.Success(evtMsgs);
         }
 
         /// <summary>
@@ -836,7 +836,7 @@ namespace Umbraco.Core.Services
                     new SaveEventArgs<IMedia>(asArray, evtMsgs),
                     this))
                 {
-                    return Attempt.Fail(OperationStatus.Cancelled(evtMsgs));
+                    return OperationStatus.Cancelled(evtMsgs);
                 }
             }
 
@@ -864,7 +864,7 @@ namespace Umbraco.Core.Services
 
             Audit(AuditType.Save, "Save Media items performed by user", userId, -1);
 
-            return Attempt.Succeed(OperationStatus.Success(evtMsgs));
+            return OperationStatus.Success(evtMsgs);
         }
 
         /// <summary>
@@ -966,7 +966,7 @@ namespace Umbraco.Core.Services
             if (Trashing.IsRaisedEventCancelled(
                 new MoveEventArgs<IMedia>(new MoveEventInfo<IMedia>(media, originalPath, Constants.System.RecycleBinMedia)), this))
             {
-                return Attempt.Fail(OperationStatus.Cancelled(evtMsgs));
+                return OperationStatus.Cancelled(evtMsgs);
             }
 
             var moveInfo = new List<MoveEventInfo<IMedia>>
@@ -1008,7 +1008,7 @@ namespace Umbraco.Core.Services
 
             Audit(AuditType.Move, "Move Media to Recycle Bin performed by user", userId, media.Id);
 
-            return Attempt.Succeed(OperationStatus.Success(evtMsgs));
+            return OperationStatus.Success(evtMsgs);
         }
 
         /// <summary>

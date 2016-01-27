@@ -24,12 +24,10 @@
 	                // scope object, but that would mean we'd have to watch that value too in order to set the outer
                     // ngModelCtrl.$modelValue. It's seems like less overhead to just do this and not have 2x watches.
 	                scope.lockedFieldForm.lockedField.$modelValue = undefined;
-                    scope.lockedFieldForm.lockedField.$setViewValue(newValue);
-                    scope.lockedFieldForm.lockedField.$render();
+					scope.lockedFieldForm.lockedField.$render();
                 }
+				scope.lockedFieldForm.lockedField.$setViewValue(scope.lockedFieldForm.lockedField.$modelValue);
 	        });
-	        
-			var input = el.find('.umb-locked-field__input');
 
 			function activate() {
 
@@ -57,35 +55,13 @@
 
 			scope.lock = function() {
 				scope.locked = true;
-				input.unbind("blur");
 			};
 
 			scope.unlock = function() {
 				scope.locked = false;
-				autoFocusField();
 			};
 
-			function autoFocusField() {
-
-				var onBlurHandler = function() {
-					scope.$apply(function(){
-						scope.lock();
-					});
-				};
-
-				$timeout(function() {
-					input.focus();
-					input.select();
-					input.on("blur", onBlurHandler);
-				});
-
-			}
-
 			activate();
-
-			scope.$on('$destroy', function() {
-				input.unbind('blur');
-			});
 
 		}
 
