@@ -179,7 +179,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(@"@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
 @{
 " + "\t" + @"Layout = null;
-}".CrLf(), template.Content);
+}".Lf(), template.Content.Lf());
             }
 
         }
@@ -209,7 +209,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.AreEqual(@"@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
 @{
 " + "\t" + @"Layout = ""test.cshtml"";
-}".CrLf(), template2.Content);
+}".Lf(), template2.Content.Lf());
             }
 
         }
