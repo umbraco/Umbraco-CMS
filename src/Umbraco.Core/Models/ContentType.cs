@@ -53,6 +53,9 @@ namespace Umbraco.Core.Models
 
         /// <summary>
         /// Gets or sets the alias of the default Template.
+        /// TODO: This should be ignored from cloning!!!!!!!!!!!!!!
+        ///  - but to do that we have to implement callback hacks, this needs to be fixed in v8, 
+        ///     we should not store direct entity
         /// </summary>
         [IgnoreDataMember]
         public ITemplate DefaultTemplate
@@ -79,6 +82,9 @@ namespace Umbraco.Core.Models
 
         /// <summary>
         /// Gets or Sets a list of Templates which are allowed for the ContentType
+        /// TODO: This should be ignored from cloning!!!!!!!!!!!!!!
+        ///  - but to do that we have to implement callback hacks, this needs to be fixed in v8, 
+        ///     we should not store direct entity
         /// </summary>
         [DataMember]
         public IEnumerable<ITemplate> AllowedTemplates
