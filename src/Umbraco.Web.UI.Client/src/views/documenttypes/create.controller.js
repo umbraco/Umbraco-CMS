@@ -9,6 +9,7 @@
 function DocumentTypesCreateController($scope, $location, navigationService, contentTypeResource, formHelper, appState, notificationsService, localizationService) {
 
     $scope.model = {
+        allowCreateFolder: $scope.dialogOptions.currentNode.parentId === null || $scope.dialogOptions.currentNode.nodeType === "container",
         folderName: "",
         creatingFolder: false,
     };
