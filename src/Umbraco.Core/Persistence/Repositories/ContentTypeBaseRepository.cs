@@ -85,7 +85,6 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return moveInfo;
         }
-
         /// <summary>
         /// Returns the content type ids that match the query
         /// </summary>

@@ -21,10 +21,11 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         Attempt<string[]> ValidateComposition(IContentTypeComposition compo);
 
-        Attempt<int> CreateContentTypeContainer(int parentId, string name, int userId = 0);
-        Attempt<int> CreateMediaTypeContainer(int parentId, string name, int userId = 0);
-        void SaveContentTypeContainer(EntityContainer container, int userId = 0);
-        void SaveMediaTypeContainer(EntityContainer container, int userId = 0);
+        Attempt<OperationStatus<EntityContainer, OperationStatusType>> CreateContentTypeContainer(int parentId, string name, int userId = 0);
+        Attempt<OperationStatus<EntityContainer, OperationStatusType>> CreateMediaTypeContainer(int parentId, string name, int userId = 0);
+        Attempt<OperationStatus> SaveContentTypeContainer(EntityContainer container, int userId = 0);
+        Attempt<OperationStatus> SaveMediaTypeContainer(EntityContainer container, int userId = 0);
+
         EntityContainer GetContentTypeContainer(int containerId);
         EntityContainer GetContentTypeContainer(Guid containerId);
         IEnumerable<EntityContainer> GetContentTypeContainers(int[] containerIds);
@@ -35,8 +36,8 @@ namespace Umbraco.Core.Services
         IEnumerable<EntityContainer> GetMediaTypeContainers(int[] containerIds);
         IEnumerable<EntityContainer> GetMediaTypeContainers(string folderName, int level);
         IEnumerable<EntityContainer> GetMediaTypeContainers(IMediaType mediaType);
-        void DeleteMediaTypeContainer(int folderId, int userId = 0);
-        void DeleteContentTypeContainer(int containerId, int userId = 0);
+        Attempt<OperationStatus> DeleteMediaTypeContainer(int folderId, int userId = 0);
+        Attempt<OperationStatus> DeleteContentTypeContainer(int containerId, int userId = 0);
 
         /// <summary>
         /// Gets all property type aliases.

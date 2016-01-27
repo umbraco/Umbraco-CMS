@@ -108,7 +108,6 @@ namespace Umbraco.Web.Cache
                 if (dataTypeCache)
                     dataTypeCache.Result.ClearCacheByKeySearch(string.Format("{0}{1}", CacheKeys.DataTypePreValuesCacheKey, payload.Id));
                 
-                PublishedContentType.ClearDataType(payload.Id);
             });
 
             base.Refresh(jsonPayload);

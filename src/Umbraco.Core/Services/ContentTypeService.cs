@@ -44,8 +44,9 @@ namespace Umbraco.Core.Services
 
         #region Containers
 
-        public Attempt<int> CreateContentTypeContainer(int parentId, string name, int userId = 0)
+        public Attempt<OperationStatus<EntityContainer, OperationStatusType>> CreateContentTypeContainer(int parentId, string name, int userId = 0)
         {
+            var evtMsgs = EventMessagesFactory.Get();
             var uow = UowProvider.GetUnitOfWork();
             using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.DocumentTypeContainerGuid))
             {
@@ -57,20 +58,32 @@ namespace Umbraco.Core.Services
                         ParentId = parentId,
                         CreatorId = userId
                     };
+
+                    if (SavingContentTypeContainer.IsRaisedEventCancelled(
+                        new SaveEventArgs<EntityContainer>(container, evtMsgs),
+                        this))
+                    {
+                        return Attempt.Fail(new OperationStatus<EntityContainer, OperationStatusType>(container, OperationStatusType.FailedCancelledByEvent, evtMsgs));
+                    }
+
                     repo.AddOrUpdate(container);
                     uow.Commit();
-                    return Attempt.Succeed(container.Id);
+
+                    SavedContentTypeContainer.RaiseEvent(new SaveEventArgs<EntityContainer>(container, evtMsgs), this);
+                    //TODO: Audit trail ?
+
+                    return Attempt.Succeed(new OperationStatus<EntityContainer, OperationStatusType>(container, OperationStatusType.Success, evtMsgs));
                 }
                 catch (Exception ex)
                 {
-                    return Attempt<int>.Fail(ex);
+                    return Attempt.Fail(new OperationStatus<EntityContainer, OperationStatusType>(null, OperationStatusType.FailedExceptionThrown, evtMsgs), ex);
                 }
-                //TODO: Audit trail ?
             }
         }
 
-        public Attempt<int> CreateMediaTypeContainer(int parentId, string name, int userId = 0)
+        public Attempt<OperationStatus<EntityContainer, OperationStatusType>> CreateMediaTypeContainer(int parentId, string name, int userId = 0)
         {
+            var evtMsgs = EventMessagesFactory.Get();
             var uow = UowProvider.GetUnitOfWork();
             using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.MediaTypeContainerGuid))
             {
@@ -82,42 +95,83 @@ namespace Umbraco.Core.Services
                         ParentId = parentId,
                         CreatorId = userId
                     };
+
+                    if (SavingMediaTypeContainer.IsRaisedEventCancelled(
+                        new SaveEventArgs<EntityContainer>(container, evtMsgs),
+                        this))
+                    {
+                        return Attempt.Fail(new OperationStatus<EntityContainer, OperationStatusType>(container, OperationStatusType.FailedCancelledByEvent, evtMsgs));
+                    }
+
                     repo.AddOrUpdate(container);
                     uow.Commit();
-                    return Attempt.Succeed(container.Id);
+
+                    SavedMediaTypeContainer.RaiseEvent(new SaveEventArgs<EntityContainer>(container, evtMsgs), this);
+                    //TODO: Audit trail ?
+
+                    return Attempt.Succeed(new OperationStatus<EntityContainer, OperationStatusType>(container, OperationStatusType.Success, evtMsgs));
                 }
                 catch (Exception ex)
                 {
-                    return Attempt<int>.Fail(ex);
+                    return Attempt.Fail(new OperationStatus<EntityContainer, OperationStatusType>(null, OperationStatusType.FailedExceptionThrown, evtMsgs), ex);
                 }
-                //TODO: Audit trail ?
             }
         }
 
-        public void SaveContentTypeContainer(EntityContainer container, int userId = 0)
+        public Attempt<OperationStatus> SaveContentTypeContainer(EntityContainer container, int userId = 0)
         {
-            SaveContainer(container, Constants.ObjectTypes.DocumentTypeContainerGuid, "document type", userId);
+            return SaveContainer(
+                SavingContentTypeContainer, SavedContentTypeContainer,
+                container, Constants.ObjectTypes.DocumentTypeContainerGuid, "document type", userId);
         }
 
-        public void SaveMediaTypeContainer(EntityContainer container, int userId = 0)
+        public Attempt<OperationStatus> SaveMediaTypeContainer(EntityContainer container, int userId = 0)
         {
-            SaveContainer(container, Constants.ObjectTypes.MediaTypeContainerGuid, "media type", userId);
+            return SaveContainer(
+                SavingMediaTypeContainer, SavedMediaTypeContainer,
+                container, Constants.ObjectTypes.MediaTypeContainerGuid, "media type", userId);
         }
 
-        private void SaveContainer(EntityContainer container, Guid containerObjectType, string objectTypeName, int userId)
+        private Attempt<OperationStatus> SaveContainer(
+            TypedEventHandler<IContentTypeService, SaveEventArgs<EntityContainer>> savingEvent,
+            TypedEventHandler<IContentTypeService, SaveEventArgs<EntityContainer>> savedEvent,
+            EntityContainer container, 
+            Guid containerObjectType, 
+            string objectTypeName, int userId)
         {
+            var evtMsgs = EventMessagesFactory.Get();
+
             if (container.ContainedObjectType != containerObjectType)
-                throw new InvalidOperationException("Not a " + objectTypeName + " container.");
+            {
+                var ex = new InvalidOperationException("Not a " + objectTypeName + " container.");
+                return OperationStatus.Exception(evtMsgs, ex);
+            }
+
             if (container.HasIdentity && container.IsPropertyDirty("ParentId"))
-                throw new InvalidOperationException("Cannot save a container with a modified parent, move the container instead.");
+            {
+                var ex = new InvalidOperationException("Cannot save a container with a modified parent, move the container instead.");
+                return OperationStatus.Exception(evtMsgs, ex);
+            }
+
+            if (savingEvent.IsRaisedEventCancelled(
+                        new SaveEventArgs<EntityContainer>(container, evtMsgs),
+                        this))
+            {
+                return OperationStatus.Cancelled(evtMsgs);
+            }
 
             var uow = UowProvider.GetUnitOfWork();
             using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow, containerObjectType))
             {
                 repo.AddOrUpdate(container);
-                uow.Commit();
-                //TODO: Audit trail ?
+                uow.Commit();                
             }
+
+            savedEvent.RaiseEvent(new SaveEventArgs<EntityContainer>(container, evtMsgs), this);
+
+            //TODO: Audit trail ?
+
+            return OperationStatus.Success(evtMsgs);
         }
 
         public EntityContainer GetContentTypeContainer(int containerId)
@@ -226,28 +280,54 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public void DeleteContentTypeContainer(int containerId, int userId = 0)
+        public Attempt<OperationStatus> DeleteContentTypeContainer(int containerId, int userId = 0)
         {
+            var evtMsgs = EventMessagesFactory.Get();
             var uow = UowProvider.GetUnitOfWork();
             using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.DocumentTypeContainerGuid))
             {
                 var container = repo.Get(containerId);
-                if (container == null) return;
+                if (container == null) return OperationStatus.NoOperation(evtMsgs);
+
+                if (DeletingContentTypeContainer.IsRaisedEventCancelled(
+                        new DeleteEventArgs<EntityContainer>(container, evtMsgs),
+                        this))
+                {
+                    return Attempt.Fail(new OperationStatus(OperationStatusType.FailedCancelledByEvent, evtMsgs));
+                }
+
                 repo.Delete(container);
                 uow.Commit();
+
+                DeletedContentTypeContainer.RaiseEvent(new DeleteEventArgs<EntityContainer>(container, evtMsgs), this);
+
+                return OperationStatus.Success(evtMsgs);
                 //TODO: Audit trail ?
             }
         }
 
-        public void DeleteMediaTypeContainer(int containerId, int userId = 0)
+        public Attempt<OperationStatus> DeleteMediaTypeContainer(int containerId, int userId = 0)
         {
+            var evtMsgs = EventMessagesFactory.Get();
             var uow = UowProvider.GetUnitOfWork();
             using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.MediaTypeContainerGuid))
             {
                 var container = repo.Get(containerId);
-                if (container == null) return;
+                if (container == null) return OperationStatus.NoOperation(evtMsgs);
+
+                if (DeletingMediaTypeContainer.IsRaisedEventCancelled(
+                        new DeleteEventArgs<EntityContainer>(container, evtMsgs),
+                        this))
+                {
+                    return Attempt.Fail(new OperationStatus(OperationStatusType.FailedCancelledByEvent, evtMsgs));
+                }
+
                 repo.Delete(container);
                 uow.Commit();
+
+                DeletedMediaTypeContainer.RaiseEvent(new DeleteEventArgs<EntityContainer>(container, evtMsgs), this);
+
+                return OperationStatus.Success(evtMsgs);
                 //TODO: Audit trail ?
             }
         }
@@ -1172,13 +1252,23 @@ namespace Umbraco.Core.Services
                 uow.Commit();
             }
         }
-        
+
         #region Event Handlers
 
-		/// <summary>
-		/// Occurs before Delete
-		/// </summary>
-		public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<IContentType>> DeletingContentType;
+        public static event TypedEventHandler<IContentTypeService, SaveEventArgs<EntityContainer>> SavingContentTypeContainer;
+        public static event TypedEventHandler<IContentTypeService, SaveEventArgs<EntityContainer>> SavedContentTypeContainer;
+        public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<EntityContainer>> DeletingContentTypeContainer;
+        public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<EntityContainer>> DeletedContentTypeContainer;
+        public static event TypedEventHandler<IContentTypeService, SaveEventArgs<EntityContainer>> SavingMediaTypeContainer;
+        public static event TypedEventHandler<IContentTypeService, SaveEventArgs<EntityContainer>> SavedMediaTypeContainer;
+        public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<EntityContainer>> DeletingMediaTypeContainer;
+        public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<EntityContainer>> DeletedMediaTypeContainer;
+
+
+        /// <summary>
+        /// Occurs before Delete
+        /// </summary>
+        public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<IContentType>> DeletingContentType;
 
 		/// <summary>
 		/// Occurs after Delete

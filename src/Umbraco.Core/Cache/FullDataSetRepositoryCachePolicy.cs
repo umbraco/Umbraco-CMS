@@ -11,6 +11,10 @@ namespace Umbraco.Core.Cache
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
     /// <typeparam name="TId"></typeparam>
+    /// <remarks>
+    /// This caching policy has no sliding expiration but uses the default ObjectCache.InfiniteAbsoluteExpiration as it's timeout, so it
+    /// should not leave the cache unless the cache memory is exceeded and it gets thrown out.
+    /// </remarks>
     internal class FullDataSetRepositoryCachePolicy<TEntity, TId> : DefaultRepositoryCachePolicy<TEntity, TId>
         where TEntity : class, IAggregateRoot
     {

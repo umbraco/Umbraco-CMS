@@ -7,8 +7,8 @@ using Umbraco.Web.Models;
 
 namespace Umbraco.Web.Mvc
 {
-	public class RenderModelBinder : IModelBinder
-	{
+	public class RenderModelBinder : IModelBinder, IModelBinderProvider
+    {
 		/// <summary>
 		/// Binds the model to a value by using the specified controller context and binding context.
 		/// </summary>
@@ -18,14 +18,13 @@ namespace Umbraco.Web.Mvc
 		/// <param name="controllerContext">The controller context.</param><param name="bindingContext">The binding context.</param>
 		public object BindModel(ControllerContext controllerContext, ModelBindingContext bindingContext)
 		{
-		    if (bindingContext.ModelType != typeof (RenderModel)) return null;
-
             object model;
             if (controllerContext.RouteData.DataTokens.TryGetValue("umbraco", out model) == false)
                 return null;
 
-		    return model as RenderModel;
-		}
+            var culture = UmbracoContext.Current.PublishedContentRequest.Culture;
+            return BindModel(model, bindingContext.ModelType, culture);
+        }
 
         // source is the model that we have
         // modelType is the type of the model that we need to bind to
@@ -102,6 +101,19 @@ namespace Umbraco.Web.Mvc
             // fail
             throw new ModelBindingException(string.Format("Cannot bind source type {0} to model type {1}.",
                 sourceType, modelType));
+        }
+
+        public IModelBinder GetBinder(Type modelType)
+        {
+            // can bind to RenderModel
+            if (modelType == typeof(RenderModel)) return this;
+
+            // can bind to RenderModel<TContent>
+            if (modelType.IsGenericType && modelType.GetGenericTypeDefinition() == typeof(RenderModel<>)) return this;
+
+            // can bind to TContent where TContent : IPublishedContent
+            if (typeof(IPublishedContent).IsAssignableFrom(modelType)) return this;
+            return null;
         }
     }
 }
