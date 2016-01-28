@@ -515,11 +515,11 @@ namespace Umbraco.Web.Routing
 				{
 					// redirect to another page
                     var node = _routingContext.UmbracoContext.ContentCache.GetById(internalRedirectId);
-
-                    _pcr.SetInternalRedirectPublishedContent(node); // don't use .PublishedContent here
+                    
                     if (node != null)
 					{
-						redirect = true;
+                        _pcr.SetInternalRedirectPublishedContent(node); // don't use .PublishedContent here
+                        redirect = true;
 						ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Redirecting to id={1}", () => tracePrefix, () => internalRedirectId);
 					}
 					else
