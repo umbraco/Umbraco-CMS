@@ -36,7 +36,7 @@ namespace Umbraco.Tests.Cache
                 return cached.Any() ? new DeepCloneableList<AuditItem>() : null;
             });
 
-            var defaultPolicy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object);
+            var defaultPolicy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, item => item.Id);
             using (defaultPolicy)
             {
                 var found = defaultPolicy.GetAll(new object[] {}, o => new AuditItem[] {});
@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Cache
             Assert.IsNotNull(list);
 
             //Do it again, ensure that its coming from the cache!
-            defaultPolicy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object);
+            defaultPolicy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, item => item.Id);
             using (defaultPolicy)
             {
                 var found = defaultPolicy.GetAll(new object[] { }, o => new AuditItem[] { });
@@ -73,7 +73,7 @@ namespace Umbraco.Tests.Cache
                 });
             cache.Setup(x => x.GetCacheItem(It.IsAny<string>())).Returns(new AuditItem[] { });
 
-            var defaultPolicy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object);
+            var defaultPolicy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, item => item.Id);
             using (defaultPolicy)
             {
                 var found = defaultPolicy.GetAll(new object[] { }, o => new[]
@@ -98,7 +98,7 @@ namespace Umbraco.Tests.Cache
                 new AuditItem(2, "blah2", AuditType.Copy, 123)
             });
 
-            var defaultPolicy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object);
+            var defaultPolicy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, item => item.Id);
             using (defaultPolicy)
             {
                 var found = defaultPolicy.GetAll(new object[] { }, o => new[] { (AuditItem)null });

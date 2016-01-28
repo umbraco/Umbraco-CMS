@@ -33,29 +33,14 @@ namespace Umbraco.Core.Persistence.Repositories
             get
             {
                 //Use a FullDataSet cache policy - this will cache the entire GetAll result in a single collection
-                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<IMemberType, int>(RuntimeCache));
+                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<IMemberType, int>(RuntimeCache, GetEntityId));
             }
         }
-
-        #region Overrides of RepositoryBase<int, IMemberType>
-
+        
         protected override IMemberType PerformGet(int id)
         {
-            var sql = GetBaseQuery(false);
-            sql.Where(GetBaseWhereClause(), new { Id = id });
-            sql.OrderByDescending<NodeDto>(x => x.NodeId, SqlSyntax);
-
-            var dtos =
-                Database.Fetch<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto, MemberTypeReadOnlyDto>(
-                    new PropertyTypePropertyGroupRelator().Map, sql);
-
-            if (dtos == null || dtos.Any() == false)
-                return null;
-
-            var factory = new MemberTypeReadOnlyFactory();
-            var member = factory.BuildEntity(dtos.First());
-
-            return member;
+            //use the underlying GetAll which will force cache all content types
+            return GetAll().FirstOrDefault(x => x.Id == id);
         }
 
         protected override IEnumerable<IMemberType> PerformGetAll(params int[] ids)
@@ -63,10 +48,11 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false);
             if (ids.Any())
             {
+                //NOTE: This logic should never be executed according to our cache policy
                 var statement = string.Join(" OR ", ids.Select(x => string.Format("umbracoNode.id='{0}'", x)));
                 sql.Where(statement);
             }
-            sql.OrderByDescending<NodeDto>(x => x.NodeId);
+            sql.OrderByDescending<NodeDto>(x => x.NodeId, SqlSyntax);
 
             var dtos =
                 Database.Fetch<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto, MemberTypeReadOnlyDto>(
@@ -82,7 +68,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var subquery = translator.Translate();
             var sql = GetBaseQuery(false)
                 .Append(new Sql("WHERE umbracoNode.id IN (" + subquery.SQL + ")", subquery.Arguments))
-                .OrderBy<NodeDto>(x => x.SortOrder);
+                .OrderBy<NodeDto>(x => x.SortOrder, SqlSyntax);
 
             var dtos =
                 Database.Fetch<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto, MemberTypeReadOnlyDto>(
@@ -90,11 +76,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return BuildFromDtos(dtos);
         }
-
-        #endregion
-
-        #region Overrides of PetaPocoRepositoryBase<int, IMemberType>
-
+        
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sql = new Sql();
@@ -168,11 +150,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             get { return new Guid(Constants.ObjectTypes.MemberType); }
         }
-
-        #endregion
-
-        #region Unit of Work Implementation
-
+        
         protected override void PersistNewItem(IMemberType entity)
         {
             ValidateAlias(entity);
@@ -243,8 +221,6 @@ namespace Umbraco.Core.Persistence.Repositories
 
             entity.ResetDirtyProperties();
         }
-
-        #endregion
         
         /// <summary>
         /// Override so we can specify explicit db type's on any property types that are built-in.
@@ -282,9 +258,6 @@ namespace Umbraco.Core.Persistence.Repositories
             else
             {
                 return GetAll();
-                //var sql = new Sql().Select("id").From<NodeDto>(SqlSyntax).Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId);
-                //var allIds = Database.Fetch<int>(sql).ToArray();
-                //return ContentTypeQueryMapper.GetContentTypes(allIds, Database, SqlSyntax, this, _templateRepository);
             }
         }
 

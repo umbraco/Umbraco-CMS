@@ -580,11 +580,11 @@ angular.module("umbraco")
 
 
         // *********************************************
-        // INITIALISATION
+        // Initialization
         // these methods are called from ng-init on the template
         // so we can controll their first load data
         //
-        // intialisation sets non-saved data like percentage sizing, allowed editors and
+        // intialization sets non-saved data like percentage sizing, allowed editors and
         // other data that should all be pre-fixed with $ to strip it out on save
         // *********************************************
 
