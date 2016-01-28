@@ -182,11 +182,8 @@ namespace Umbraco.Web
         protected override void InitializeProfilerResolver()
         {
             base.InitializeProfilerResolver();
-
             //Set the profiler to be the web profiler
-            var profiler = new WebProfiler();
-            ProfilerResolver.Current.SetProfiler(profiler);
-            profiler.Start();
+            ProfilerResolver.Current.SetProfiler(new WebProfiler());
         }
 
         /// <summary>
