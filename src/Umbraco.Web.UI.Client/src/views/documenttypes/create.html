@@ -20,7 +20,7 @@
                 <span class="menu-label"><localize key="create_documentTypeWithoutTemplate"></localize></span>
               </a>
             </li>
-            <li>
+            <li ng-if="model.allowCreateFolder">
                 <a href="" ng-click="showCreateFolder()">
                     <i class="large icon-folder"></i>
                     <span class="menu-label"><localize key="general_folder"></localize></span>
