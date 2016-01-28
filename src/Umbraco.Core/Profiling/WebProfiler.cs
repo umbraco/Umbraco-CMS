@@ -12,28 +12,16 @@ namespace Umbraco.Core.Profiling
     /// </summary>
     internal class WebProfiler : IProfiler
     {
-        private StartupWebProfilerProvider _startupWebProfilerProvider;
 
         /// <summary>
         /// Constructor
-        /// </summary>        
+        /// </summary>
+        /// <remarks>
+        /// Binds to application events to enable the MiniProfiler
+        /// </remarks>
         internal WebProfiler()
         {
-            if (GlobalSettings.DebugMode)
-            {
-                //setup some defaults
-                MiniProfiler.Settings.SqlFormatter = new SqlServerFormatter();
-                MiniProfiler.Settings.StackMaxLength = 5000;
-
-                //At this point we know that we've been constructed during app startup, there won't be an HttpRequest in the HttpContext 
-                // since it hasn't started yet. So we need to do some hacking to enable profiling during startup.
-                _startupWebProfilerProvider = new StartupWebProfilerProvider();
-                //this should always be the case during startup, we'll need to set a custom profiler provider
-                MiniProfiler.Settings.ProfilerProvider = _startupWebProfilerProvider;
-
-                //Binds to application events to enable the MiniProfiler with a real HttpRequest
-                UmbracoApplicationBase.ApplicationInit += UmbracoApplicationApplicationInit;
-            }
+            UmbracoApplicationBase.ApplicationInit += UmbracoApplicationApplicationInit;
         }
 
         /// <summary>
@@ -65,12 +53,7 @@ namespace Umbraco.Core.Profiling
         /// <param name="e"></param>
         void UmbracoApplicationEndRequest(object sender, EventArgs e)
         {
-            if (_startupWebProfilerProvider != null)
-            {
-                Stop();
-                _startupWebProfilerProvider = null;
-            }
-            else if (CanPerformProfilingAction(sender))
+            if (CanPerformProfilingAction(sender))
             {
                 Stop();
             }
@@ -83,11 +66,6 @@ namespace Umbraco.Core.Profiling
         /// <param name="e"></param>
         void UmbracoApplicationBeginRequest(object sender, EventArgs e)
         {
-            if (_startupWebProfilerProvider != null)
-            {
-                _startupWebProfilerProvider.BootComplete();
-            }
-
             if (CanPerformProfilingAction(sender))
             {
                 Start();
@@ -126,7 +104,7 @@ namespace Umbraco.Core.Profiling
         /// </remarks>
         public string Render()
         {
-            return GlobalSettings.DebugMode ? MiniProfiler.RenderIncludes(RenderPosition.Right).ToString() : string.Empty;
+            return MiniProfiler.RenderIncludes(RenderPosition.Right).ToString();
         }
 
         /// <summary>
@@ -147,10 +125,9 @@ namespace Umbraco.Core.Profiling
         /// </summary>
         public void Start()
         {
-            if (GlobalSettings.DebugMode)
-            {
-                MiniProfiler.Start();
-            }
+            MiniProfiler.Settings.SqlFormatter = new SqlServerFormatter();
+            MiniProfiler.Settings.StackMaxLength = 5000;
+            MiniProfiler.Start();
         }
 
         /// <summary>
@@ -162,10 +139,7 @@ namespace Umbraco.Core.Profiling
         /// </remarks>
         public void Stop(bool discardResults = false)
         {
-            if (GlobalSettings.DebugMode)
-            {
-                MiniProfiler.Stop(discardResults);
-            }
+            MiniProfiler.Stop(discardResults);
         }
 
         /// <summary>
