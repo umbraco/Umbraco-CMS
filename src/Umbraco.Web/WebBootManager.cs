@@ -52,13 +52,13 @@ using ProfilingViewEngine = Umbraco.Core.Profiling.ProfilingViewEngine;
 namespace Umbraco.Web
 {
     /// <summary>
-    /// A bootstrapper for the Umbraco application which initializes all objects including the Web portion of the application 
+    /// A bootstrapper for the Umbraco application which initializes all objects including the Web portion of the application
     /// </summary>
     public class WebBootManager : CoreBootManager
     {
         private readonly bool _isForTesting;
         //NOTE: see the Initialize method for what this is used for
-        private static readonly List<BaseIndexProvider> IndexesToRebuild = new List<BaseIndexProvider>(); 
+        private static readonly List<BaseIndexProvider> IndexesToRebuild = new List<BaseIndexProvider>();
 
         public WebBootManager(UmbracoApplicationBase umbracoApplication)
             : base(umbracoApplication)
@@ -105,7 +105,7 @@ namespace Umbraco.Web
         public override IBootManager Initialize()
         {
              //This is basically a hack for this item: http://issues.umbraco.org/issue/U4-5976
-            // when Examine initializes it will try to rebuild if the indexes are empty, however in many cases not all of Examine's 
+            // when Examine initializes it will try to rebuild if the indexes are empty, however in many cases not all of Examine's
             // event handlers will be assigned during bootup when the rebuilding starts which is a problem. So with the examine 0.1.58.2941 build
             // it has an event we can subscribe to in order to cancel this rebuilding process, but what we'll do is cancel it and postpone the rebuilding until the
             // boot process has completed. It's a hack but it works.
@@ -146,7 +146,7 @@ namespace Umbraco.Web
                 { "compositeFileHandlerPath", ClientDependencySettings.Instance.CompositeFileHandlerPath }
             });
             ClientDependencySettings.Instance.MvcRendererCollection.Add(renderer);
-            
+
             // Disable the X-AspNetMvc-Version HTTP Header
             MvcHandler.DisableMvcResponseHeader = true;
 
@@ -155,9 +155,9 @@ namespace Umbraco.Web
 
             return this;
         }
-        
+
         /// <summary>
-        /// Override this method in order to ensure that the UmbracoContext is also created, this can only be 
+        /// Override this method in order to ensure that the UmbracoContext is also created, this can only be
         /// created after resolution is frozen!
         /// </summary>
         protected override void FreezeResolution()
@@ -171,8 +171,8 @@ namespace Umbraco.Web
                 httpContext,
                 ApplicationContext,
                 new WebSecurity(httpContext, ApplicationContext),
-                UmbracoConfig.For.UmbracoSettings(), 
-                UrlProviderResolver.Current.Providers, 
+                UmbracoConfig.For.UmbracoSettings(),
+                UrlProviderResolver.Current.Providers,
                 false);
         }
 
@@ -188,7 +188,7 @@ namespace Umbraco.Web
             ProfilerResolver.Current.SetProfiler(profiler);
             profiler.Start();
         }
-        
+
         /// <summary>
         /// Ensure that the OnApplicationStarted methods of the IApplicationEvents are called
         /// </summary>
@@ -206,8 +206,8 @@ namespace Umbraco.Web
 
             //Now, startup all of our legacy startup handler
             ApplicationEventsResolver.Current.InstantiateLegacyStartupHandlers();
-            
-            //Ok, now that everything is complete we'll check if we've stored any references to index that need rebuilding and run them 
+
+            //Ok, now that everything is complete we'll check if we've stored any references to index that need rebuilding and run them
             // (see the initialize method for notes) - we'll ensure we remove the event handler too in case examine manager doesn't actually
             // initialize during startup, in which case we want it to rebuild the indexes itself.
             ExamineManager.Instance.BuildingEmptyIndexOnStartup -= OnInstanceOnBuildingEmptyIndexOnStartup;
@@ -245,14 +245,14 @@ namespace Umbraco.Web
         {
             //create a web-based cache helper
             var cacheHelper = new CacheHelper(
-                //we need to have the dep clone runtime cache provider to ensure 
+                //we need to have the dep clone runtime cache provider to ensure
                 //all entities are cached properly (cloned in and cloned out)
                 new DeepCloneRuntimeCacheProvider(new HttpRuntimeCacheProvider(HttpRuntime.Cache)),
                 new StaticCacheProvider(),
                 //we have no request based cache when not running in web-based context
                 new NullCacheProvider(),
                 new IsolatedRuntimeCache(type =>
-                    //we need to have the dep clone runtime cache provider to ensure 
+                    //we need to have the dep clone runtime cache provider to ensure
                     //all entities are cached properly (cloned in and cloned out)
                     new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider())));
 
@@ -283,7 +283,7 @@ namespace Umbraco.Web
             //plugin controllers must come first because the next route will catch many things
             RoutePluginControllers();
         }
-        
+
         private void RoutePluginControllers()
         {
             var umbracoPath = GlobalSettings.UmbracoMvcArea;
@@ -350,14 +350,14 @@ namespace Umbraco.Web
                 umbracoPath + "/Surface/" + meta.ControllerName + "/{action}/{id}",//url to match
                 new { controller = meta.ControllerName, action = "Index", id = UrlParameter.Optional },
                 new[] { meta.ControllerNamespace }); //look in this namespace to create the controller
-            route.DataTokens.Add("umbraco", "surface"); //ensure the umbraco token is set                
+            route.DataTokens.Add("umbraco", "surface"); //ensure the umbraco token is set
             route.DataTokens.Add("UseNamespaceFallback", false); //Don't look anywhere else except this namespace!
             //make it use our custom/special SurfaceMvcHandler
             route.RouteHandler = new SurfaceRouteHandler();
         }
 
         /// <summary>
-        /// Initializes all web based and core resolves 
+        /// Initializes all web based and core resolves
         /// </summary>
         protected override void InitializeResolvers()
         {
@@ -376,7 +376,7 @@ namespace Umbraco.Web
                 //set the legacy one by default - this maintains backwards compat
                 ServerMessengerResolver.Current.SetServerMessenger(new BatchedWebServiceServerMessenger(() =>
                 {
-                    //we should not proceed to change this if the app/database is not configured since there will 
+                    //we should not proceed to change this if the app/database is not configured since there will
                     // be no user, plus we don't need to have server messages sent if this is the case.
                     if (ApplicationContext.IsConfigured && ApplicationContext.DatabaseContext.IsDatabaseConfigured)
                     {
@@ -404,12 +404,12 @@ namespace Umbraco.Web
             else
             {
 
-                //We are using a custom action here so we can check the examine settings value first, we don't want to 
-                // put that check into the CreateIndexesOnColdBoot method because developers may choose to use this 
+                //We are using a custom action here so we can check the examine settings value first, we don't want to
+                // put that check into the CreateIndexesOnColdBoot method because developers may choose to use this
                 // method directly and they will be in charge of this check if they need it
                 Action rebuildIndexes = () =>
                 {
-                    //If the developer has explicitly opted out of rebuilding indexes on startup then we 
+                    //If the developer has explicitly opted out of rebuilding indexes on startup then we
                     // should adhere to that and not do it, this means that if they are load balancing things will be
                     // out of sync if they are auto-scaling but there's not much we can do about that.
                     if (ExamineSettings.Instance.RebuildOnAppStart == false) return;
@@ -433,8 +433,8 @@ namespace Umbraco.Web
                             //rebuild the xml cache file if the server is not synced
                             () => global::umbraco.content.Instance.RefreshContentFromDatabase(),
                             //rebuild indexes if the server is not synced
-                            // NOTE: This will rebuild ALL indexes including the members, if developers want to target specific 
-                            // indexes then they can adjust this logic themselves.                        
+                            // NOTE: This will rebuild ALL indexes including the members, if developers want to target specific
+                            // indexes then they can adjust this logic themselves.
                             rebuildIndexes
                         }
                     }));
@@ -462,7 +462,7 @@ namespace Umbraco.Web
                 new PublishedCache.XmlPublishedCache.PublishedContentCache(),
                 new PublishedCache.XmlPublishedCache.PublishedMediaCache(ApplicationContext)));
 
-            GlobalConfiguration.Configuration.Services.Replace(typeof(IHttpControllerSelector), 
+            GlobalConfiguration.Configuration.Services.Replace(typeof(IHttpControllerSelector),
                 new NamespaceHttpControllerSelector(GlobalConfiguration.Configuration));
 
             FilteredControllerFactoriesResolver.Current = new FilteredControllerFactoriesResolver(
@@ -527,41 +527,37 @@ namespace Umbraco.Web
 
         /// <summary>
         /// The method used to create indexes on a cold boot
-        /// </summary>        
+        /// </summary>
         /// <remarks>
         /// A cold boot is when the server determines it will not (or cannot) process instructions in the cache table and
         /// will rebuild it's own caches itself.
         /// </remarks>
         public static IEnumerable<BaseIndexProvider> GetIndexesForColdBoot()
         {
-            // NOTE: This is IMPORTANT! ... we don't want to rebuild any index that is already flagged to be re-indexed 
-            // on startup based on our _indexesToRebuild variable and how Examine auto-rebuilds when indexes are empty
-            // this callback is used below for the DatabaseServerMessenger startup options
-            
+            // NOTE: This is IMPORTANT! ... we don't want to rebuild any index that is already flagged to be re-indexed
+            // on startup based on our _indexesToRebuild variable and how Examine auto-rebuilds when indexes are empty.
+            // This callback is used above for the DatabaseServerMessenger startup options.
+
+            // all indexes
+            IEnumerable<BaseIndexProvider> indexes = ExamineManager.Instance.IndexProviderCollection;
+
+            // except those that are already flagged
+            // and are processed in Complete()
             if (IndexesToRebuild.Any())
-            {
-                var otherIndexes = ExamineManager.Instance.IndexProviderCollection.Cast<BaseIndexProvider>().Except(IndexesToRebuild);
+                indexes = indexes.Except(IndexesToRebuild);
 
-                foreach (var otherIndex in otherIndexes)
-                {
-                    yield return otherIndex;
-                }
-            }
-            else
-            {
-                foreach (var index in ExamineManager.Instance.IndexProviderCollection.Cast<BaseIndexProvider>())
-                {
-                    yield return index;
-                }
-            }
+            // return
+            foreach (var index in indexes)
+                yield return index;
 
+            // and clear
             IndexesToRebuild.Clear();
         }
 
 
         private void OnInstanceOnBuildingEmptyIndexOnStartup(object sender, BuildingEmptyIndexOnStartupEventArgs args)
         {
-            //store the indexer that needs rebuilding because it's empty for when the boot process 
+            //store the indexer that needs rebuilding because it's empty for when the boot process
             // is complete and cancel this current event so the rebuild process doesn't start right now.
             args.Cancel = true;
             IndexesToRebuild.Add((BaseIndexProvider)args.Indexer);
