@@ -34,7 +34,7 @@ angular.module("umbraco")
 
             //These are absolutely required in order for the macros to render inline
             //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
-            var extendedValidElements = "@[id|class|style],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style]";
+            var extendedValidElements = "@[id|class|style],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style], span[id|class|style]";
 
             var invalidElements = tinyMceConfig.inValidElements;
             var plugins = _.map(tinyMceConfig.plugins, function (plugin) {
