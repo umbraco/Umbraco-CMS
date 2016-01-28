@@ -954,8 +954,8 @@
     <key alias="toggleAllowAsRoot">Разрешить в качестве корневого</key>
   </area>
   <area alias="sort">
-    <key alias="sortOrder">Sort order</key>
-    <key alias="sortCreationDate">Creation date</key>
+    <key alias="sortOrder">Порядок сортировки</key>
+    <key alias="sortCreationDate">Дата создания</key>
     <key alias="sortDone">Сортировка завершена</key>
     <key alias="sortHelp">Перетаскивайте элементы на нужное место вверх или вниз для определения необходимого Вам порядка сортировки. Также можно щелкнуть по заголовкам столбцов, чтобы отсортировать все элементы сразу.</key>
     <key alias="sortPleaseWait"><![CDATA[Пожалуйста, подождите... Страницы сортируются, это может занять некоторое время.<br/> <br/> Не закрывайте это окно до окончания процесса сортировки.]]></key>
