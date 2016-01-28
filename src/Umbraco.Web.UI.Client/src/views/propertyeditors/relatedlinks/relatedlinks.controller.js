@@ -5,6 +5,8 @@
             if (!$scope.model.value) {
                 $scope.model.value = [];
             }
+
+            $scope.maxNumber = isNumeric($scope.model.config.maxNumber) && $scope.model.config.maxNumber !== 0 ? $scope.model.config.maxNumber : Number.MAX_VALUE;
             
             $scope.newCaption = '';
             $scope.newLink = 'http://';
@@ -141,9 +143,22 @@
                 $scope.model.value[index + direction] = temp;                
             };
 
+            //helper for determining if a user can add items
+            $scope.canAdd = function () {
+                return $scope.model.config.maxNumber > countVisible();
+            }
+
+            //helper that returns if an item can be sorted
+            $scope.canSort = function () {
+                return countVisible() > 1;
+            }
+
             $scope.sortableOptions = {
-                containment: 'parent',
+                axis: 'y',
+                handle: '.handle',
                 cursor: 'move',
+                cancel: '.no-drag',
+                containment: 'parent',
                 helper: function (e, ui) {
                     // When sorting <trs>, the cells collapse.  This helper fixes that: http://www.foliotek.com/devblog/make-table-rows-sortable-using-jquery-ui-sortable/
                     ui.children().each(function () {
@@ -151,7 +166,7 @@
                     });
                     return ui;
                 },
-                items: '> tr',
+                items: '> tr:not(.unsortable)',
                 tolerance: 'pointer',
                 update: function (e, ui) {
                     // Get the new and old index for the moved element (using the URL as the identifier)
@@ -165,6 +180,15 @@
                     $scope.model.value.splice(newIndex, 0, movedElement);
                 }
             };
+
+            //helper to count what is visible
+            function countVisible() {
+                return $scope.model.value.length;
+            }
+
+            function isNumeric(n) {
+                return !isNaN(parseFloat(n)) && isFinite(n);
+            }
 
             function getElementIndexByUrl(url) {
                 for (var i = 0; i < $scope.model.value.length; i++) {
