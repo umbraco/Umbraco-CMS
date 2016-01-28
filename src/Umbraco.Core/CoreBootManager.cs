@@ -136,7 +136,10 @@ namespace Umbraco.Core
                     {
                         try
                         {
-                            x.OnApplicationInitialized(UmbracoApplication, ApplicationContext);
+                            using (ProfilingLogger.DebugDuration<CoreBootManager>(string.Format("Executing {0} in ApplicationInitialized", x.GetType())))
+                            {
+                                x.OnApplicationInitialized(UmbracoApplication, ApplicationContext);
+                            }
                         }
                         catch (Exception ex)
                         {
@@ -299,7 +302,10 @@ namespace Umbraco.Core
 		            {
 		                try
 		                {
-		                    x.OnApplicationStarting(UmbracoApplication, ApplicationContext);
+		                    using (ProfilingLogger.DebugDuration<CoreBootManager>(string.Format("Executing {0} in ApplicationStarting", x.GetType())))
+		                    {
+		                        x.OnApplicationStarting(UmbracoApplication, ApplicationContext);
+		                    }
 		                }
 		                catch (Exception ex)
 		                {
@@ -350,7 +356,10 @@ namespace Umbraco.Core
                     {
                         try
                         {
-                            x.OnApplicationStarted(UmbracoApplication, ApplicationContext);
+                            using (ProfilingLogger.DebugDuration<CoreBootManager>(string.Format("Executing {0} in ApplicationStarted", x.GetType())))
+                            {
+                                x.OnApplicationStarted(UmbracoApplication, ApplicationContext);
+                            }
                         }
                         catch (Exception ex)
                         {
