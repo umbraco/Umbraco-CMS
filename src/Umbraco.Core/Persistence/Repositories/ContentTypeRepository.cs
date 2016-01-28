@@ -34,7 +34,7 @@ namespace Umbraco.Core.Persistence.Repositories
             get
             {
                 //Use a FullDataSet cache policy - this will cache the entire GetAll result in a single collection
-                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<IContentType, int>(RuntimeCache));
+                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<IContentType, int>(RuntimeCache, GetEntityId));
             }
         }
 
@@ -48,14 +48,12 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             if (ids.Any())
             {
-                return ContentTypeQueryMapper.GetContentTypes(ids, Database, SqlSyntax, this, _templateRepository);
+                //NOTE: This logic should never be executed according to our cache policy
+                return ContentTypeQueryMapper.GetContentTypes(Database, SqlSyntax, this, _templateRepository)
+                    .Where(x => ids.Contains(x.Id));
             }
-            else
-            {
-                var sql = new Sql().Select("id").From<NodeDto>().Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId);
-                var allIds = Database.Fetch<int>(sql).ToArray();
-                return ContentTypeQueryMapper.GetContentTypes(allIds, Database, SqlSyntax, this, _templateRepository);
-            }
+
+            return ContentTypeQueryMapper.GetContentTypes(Database, SqlSyntax, this, _templateRepository);
         }
 
         protected override IEnumerable<IContentType> PerformGetByQuery(IQuery<IContentType> query)
@@ -269,9 +267,6 @@ namespace Umbraco.Core.Persistence.Repositories
             else
             {
                 return GetAll();
-                //var sql = new Sql().Select("id").From<NodeDto>(SqlSyntax).Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId);
-                //var allIds = Database.Fetch<int>(sql).ToArray();
-                //return ContentTypeQueryMapper.GetContentTypes(allIds, Database, SqlSyntax, this, _templateRepository);
             }
         }
 
