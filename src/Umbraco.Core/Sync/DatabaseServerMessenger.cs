@@ -157,6 +157,30 @@ namespace Umbraco.Core.Sync
                         foreach (var callback in _options.InitializingCallbacks)
                             callback();
                 }
+                else
+                {
+                    //check for how many instructions there are to process
+                    var count = _appContext.DatabaseContext.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoCacheInstruction WHERE id > @lastId", new {lastId = _lastId});
+                    if (count > _options.MaxProcessingInstructionCount)
+                    {
+                        //too many instructions, proceed to cold boot
+                        _logger.Warn<DatabaseServerMessenger>("The instruction count {0} exceeds the specified MaxProcessingInstructionCount {1}, proceeding to cold boot",
+                            () => count, () => _options.MaxProcessingInstructionCount);
+
+                        // go get the last id in the db and store it
+                        // note: do it BEFORE initializing otherwise some instructions might get lost
+                        // when doing it before, some instructions might run twice - not an issue
+                        var lastId = _appContext.DatabaseContext.Database.ExecuteScalar<int>("SELECT MAX(id) FROM umbracoCacheInstruction");
+                        if (lastId > 0)
+                            SaveLastSynced(lastId);
+
+                        // execute initializing callbacks
+                        if (_options.InitializingCallbacks != null)
+                            foreach (var callback in _options.InitializingCallbacks)
+                                callback();
+
+                    }
+                }
 
                 _initialized = true;
             }

@@ -12,6 +12,7 @@ using System.Web.Routing;
 using ClientDependency.Core.Config;
 using Examine;
 using Examine.Config;
+using Examine.Providers;
 using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -57,7 +58,7 @@ namespace Umbraco.Web
     {
         private readonly bool _isForTesting;
         //NOTE: see the Initialize method for what this is used for
-        private readonly List<IIndexer> _indexesToRebuild = new List<IIndexer>(); 
+        private static readonly List<BaseIndexProvider> IndexesToRebuild = new List<BaseIndexProvider>(); 
 
         public WebBootManager(UmbracoApplicationBase umbracoApplication)
             : base(umbracoApplication)
@@ -210,9 +211,9 @@ namespace Umbraco.Web
             // (see the initialize method for notes) - we'll ensure we remove the event handler too in case examine manager doesn't actually
             // initialize during startup, in which case we want it to rebuild the indexes itself.
             ExamineManager.Instance.BuildingEmptyIndexOnStartup -= OnInstanceOnBuildingEmptyIndexOnStartup;
-            if (_indexesToRebuild.Any())
+            if (IndexesToRebuild.Any())
             {
-                foreach (var indexer in _indexesToRebuild)
+                foreach (var indexer in IndexesToRebuild)
                 {
                     indexer.RebuildIndex();
                 }
@@ -403,9 +404,9 @@ namespace Umbraco.Web
             else
             {
 
-                // NOTE: This is IMPORTANT! ... we don't want to rebuild any index that is already flagged to be re-indexed 
-                // on startup based on our _indexesToRebuild variable and how Examine auto-rebuilds when indexes are empty
-                // this callback is used below for the DatabaseServerMessenger startup options
+                //We are using a custom action here so we can check the examine settings value first, we don't want to 
+                // put that check into the CreateIndexesOnColdBoot method because developers may choose to use this 
+                // method directly and they will be in charge of this check if they need it
                 Action rebuildIndexes = () =>
                 {
                     //If the developer has explicitly opted out of rebuilding indexes on startup then we 
@@ -413,39 +414,30 @@ namespace Umbraco.Web
                     // out of sync if they are auto-scaling but there's not much we can do about that.
                     if (ExamineSettings.Instance.RebuildOnAppStart == false) return;
 
-                    if (_indexesToRebuild.Any())
+                    foreach (var indexer in GetIndexesForColdBoot())
                     {
-                        var otherIndexes = ExamineManager.Instance.IndexProviderCollection.Except(_indexesToRebuild);
-                        foreach (var otherIndex in otherIndexes)
-                        {
-                            otherIndex.RebuildIndex();
-                        }
-                    }
-                    else
-                    {
-                        //rebuild them all
-                        ExamineManager.Instance.RebuildIndex();
+                        indexer.RebuildIndex();
                     }
                 };
 
                 ServerMessengerResolver.Current.SetServerMessenger(new BatchedDatabaseServerMessenger(
-                ApplicationContext,
-                true,
-                //Default options for web including the required callbacks to build caches
-                new DatabaseServerMessengerOptions
-                {
-                    //These callbacks will be executed if the server has not been synced
-                    // (i.e. it is a new server or the lastsynced.txt file has been removed)
-                    InitializingCallbacks = new Action[]
+                    ApplicationContext,
+                    true,
+                    //Default options for web including the required callbacks to build caches
+                    new DatabaseServerMessengerOptions
                     {
-                        //rebuild the xml cache file if the server is not synced
-                        () => global::umbraco.content.Instance.RefreshContentFromDatabase(),
-                        //rebuild indexes if the server is not synced
-                        // NOTE: This will rebuild ALL indexes including the members, if developers want to target specific 
-                        // indexes then they can adjust this logic themselves.                        
-                        rebuildIndexes
-                    }
-                }));
+                        //These callbacks will be executed if the server has not been synced
+                        // (i.e. it is a new server or the lastsynced.txt file has been removed)
+                        InitializingCallbacks = new Action[]
+                        {
+                            //rebuild the xml cache file if the server is not synced
+                            () => global::umbraco.content.Instance.RefreshContentFromDatabase(),
+                            //rebuild indexes if the server is not synced
+                            // NOTE: This will rebuild ALL indexes including the members, if developers want to target specific 
+                            // indexes then they can adjust this logic themselves.                        
+                            rebuildIndexes
+                        }
+                    }));
             }
 
             SurfaceControllerResolver.Current = new SurfaceControllerResolver(
@@ -533,12 +525,46 @@ namespace Umbraco.Web
                 new DefaultCultureDictionaryFactory());
         }
 
+        /// <summary>
+        /// The method used to create indexes on a cold boot
+        /// </summary>        
+        /// <remarks>
+        /// A cold boot is when the server determines it will not (or cannot) process instructions in the cache table and
+        /// will rebuild it's own caches itself.
+        /// </remarks>
+        public static IEnumerable<BaseIndexProvider> GetIndexesForColdBoot()
+        {
+            // NOTE: This is IMPORTANT! ... we don't want to rebuild any index that is already flagged to be re-indexed 
+            // on startup based on our _indexesToRebuild variable and how Examine auto-rebuilds when indexes are empty
+            // this callback is used below for the DatabaseServerMessenger startup options
+            
+            if (IndexesToRebuild.Any())
+            {
+                var otherIndexes = ExamineManager.Instance.IndexProviderCollection.Cast<BaseIndexProvider>().Except(IndexesToRebuild);
+
+                foreach (var otherIndex in otherIndexes)
+                {
+                    yield return otherIndex;
+                }
+            }
+            else
+            {
+                foreach (var index in ExamineManager.Instance.IndexProviderCollection.Cast<BaseIndexProvider>())
+                {
+                    yield return index;
+                }
+            }
+
+            IndexesToRebuild.Clear();
+        }
+
+
         private void OnInstanceOnBuildingEmptyIndexOnStartup(object sender, BuildingEmptyIndexOnStartupEventArgs args)
         {
             //store the indexer that needs rebuilding because it's empty for when the boot process 
             // is complete and cancel this current event so the rebuild process doesn't start right now.
             args.Cancel = true;
-            _indexesToRebuild.Add(args.Indexer);
+            IndexesToRebuild.Add((BaseIndexProvider)args.Indexer);
         }
     }
 }

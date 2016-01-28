@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 
 namespace Umbraco.Core.Sync
-{
+{   
+
     /// <summary>
     /// Provides options to the <see cref="DatabaseServerMessenger"/>.
     /// </summary>
@@ -15,7 +16,14 @@ namespace Umbraco.Core.Sync
         {
             DaysToRetainInstructions = 2; // 2 days
             ThrottleSeconds = 5; // 5 seconds
+
+            MaxProcessingInstructionCount = 1000;
         }
+
+        /// <summary>
+        /// If the number of instructions exceeds this amount during startup then the server will cold boot (rebuild it's own caches)
+        /// </summary>
+        public int MaxProcessingInstructionCount { get; set; }
 
         /// <summary>
         /// A list of callbacks that will be invoked if the lastsynced.txt file does not exist.
