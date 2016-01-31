@@ -68,6 +68,7 @@
     <key alias="bold">Полужирный</key>
     <key alias="deindent">Уменьшить отступ</key>
     <key alias="formFieldInsert">Вставить поле формы</key>
+    <key alias="generateModels">Сгенерировать модели</key>
     <key alias="graphicHeadline">Вставить графический заголовок</key>
     <key alias="htmlEdit">Править исходный код HTML</key>
     <key alias="indent">Увеличить отступ</key>
@@ -230,6 +231,9 @@
     <key alias="andAllMembers">и все участники, использующие данный тип</key>
     
     <key alias="thisEditorUpdateSettings">, использующие этот редактор, будут обновлены с применением этих установок</key>
+
+    <key alias="memberCanEdit">Участник может изменить</key>
+    <key alias="showOnMemberProfile">Показать в профиле участника</key>
   </area>
   <area alias="create">
     <key alias="chooseNode">Где вы хотите создать новый %0%</key>
@@ -461,6 +465,7 @@
     <key alias="logoff">Выйти</key>
     <key alias="logout">Выход</key>
     <key alias="macro">Макрос</key>
+    <key alias="mandatory">Обязательно</key>
     <key alias="more">Больше</key>
     <key alias="move">Переместить</key>
     <key alias="name">Название</key>
@@ -479,6 +484,7 @@
     <key alias="properties">Свойства</key>
     <key alias="reciept">Email адрес для получения данных</key>
     <key alias="recycleBin">Корзина</key>
+    <key alias="recycleBinEmpty">Ваша корзина пуста</key>
     <key alias="remaining">Осталось</key>
     <key alias="rename">Переименовать</key>
     <key alias="renew">Обновить</key>
@@ -486,6 +492,7 @@
     <key alias="retry">Повторить</key>
     <key alias="rights">Разрешения</key>
     <key alias="search">Поиск</key>
+    <key alias="searchNoResult">К сожалению, ничего подходящего не нашлось</key>
     <key alias="searchResults">Результаты поиска</key>
     <key alias="server">Сервер</key>
     <key alias="show">Показать</key>
