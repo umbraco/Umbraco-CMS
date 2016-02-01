@@ -179,8 +179,6 @@
 
                             <div tabindex="-1" class="umb-group-builder__property-preview" ng-click="editPropertyTypeSettings(property, tab)" ng-if="!sortingMode" ng-class="{'-not-clickable': !sortingMode && (property.inherited || property.locked)}">
 
-                                <span class="umb-group-builder__property-preview-overlay"></span>
-
                                 <div class="umb-group-builder__property-tags">
 
                                     <span class="umb-group-builder__property-tag -white">
@@ -223,9 +221,12 @@
                                 <ng-form name="propertyEditorPreviewForm" umb-disable-form-validation>
                                     <umb-property-editor
                                         ng-if="property.view !== undefined"
-                                        model="property">
+                                        model="property"
+                                        preview="true">
                                     </umb-property-editor>
                                 </ng-form>
+
+                                <div class="umb-group-builder__property-preview-background"></div>
 
                             </div>
 
