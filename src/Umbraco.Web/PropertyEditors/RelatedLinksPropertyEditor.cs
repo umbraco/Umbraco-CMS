@@ -18,7 +18,7 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class RelatedLinksPreValueEditor : PreValueEditor
         {
-            [PreValueField("maxNumber", "Maximum number of items", "number")]
+            [PreValueField("max", "Maximum number of links", "number", Description = "Enter the maximum amount of links to be added, enter 0 for unlimited")]
             public int MaxNumber { get; set; }
         }
     }

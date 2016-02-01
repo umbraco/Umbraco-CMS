@@ -6,7 +6,7 @@
                 $scope.model.value = [];
             }
 
-            $scope.model.config.maxNumber = isNumeric($scope.model.config.maxNumber) && $scope.model.config.maxNumber !== 0 ? $scope.model.config.maxNumber : Number.MAX_VALUE;
+            $scope.model.config.max = isNumeric($scope.model.config.max) && $scope.model.config.max !== 0 ? $scope.model.config.max : Number.MAX_VALUE;
             
             $scope.newCaption = '';
             $scope.newLink = 'http://';
@@ -145,7 +145,7 @@
 
             //helper for determining if a user can add items
             $scope.canAdd = function () {
-                return $scope.model.config.maxNumber > countVisible();
+                return $scope.model.config.max <= 0 || $scope.model.config.max > countVisible();
             }
 
             //helper that returns if an item can be sorted
