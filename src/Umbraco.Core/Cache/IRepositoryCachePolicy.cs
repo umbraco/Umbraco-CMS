@@ -10,9 +10,7 @@ namespace Umbraco.Core.Cache
         TEntity Get(TId id, Func<TId, TEntity> getFromRepo);
         TEntity Get(TId id);
         bool Exists(TId id, Func<TId, bool> getFromRepo);
-
-        string GetCacheIdKey(object id);
-        string GetCacheTypeKey();
+        
         void CreateOrUpdate(TEntity entity, Action<TEntity> persistMethod);
         void Remove(TEntity entity, Action<TEntity> persistMethod);
         TEntity[] GetAll(TId[] ids, Func<TId[], IEnumerable<TEntity>> getFromRepo);
