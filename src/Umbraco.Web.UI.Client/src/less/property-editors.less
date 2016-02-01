@@ -620,7 +620,21 @@ ul.color-picker li a  {
 }
 
 //
-// tags
+// Related links
+// --------------------------------------------------
+.umb-relatedlinks table > tr > td { word-wrap:break-word; word-break: break-all; }
+.umb-relatedlinks .handle { cursor:move; }
+.umb-relatedlinks table > tbody > tr.unsortable .handle { cursor:default; }
+
+/* sortable placeholder */
+.umb-relatedlinks .sortable-placeholder {
+    //background-color: #fff;
+    margin-bottom: 47px;
+}
+
+
+//
+// Tags
 // --------------------------------------------------
 .umb-tags{border: @grayLighter solid 1px; padding: 10px; font-size: 13px; text-shadow: none;}
 .umb-tags .tag{cursor: pointer;  margin: 7px; padding: 7px; background: @blue}

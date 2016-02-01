@@ -6,7 +6,7 @@
                 $scope.model.value = [];
             }
 
-            $scope.maxNumber = isNumeric($scope.model.config.maxNumber) && $scope.model.config.maxNumber !== 0 ? $scope.model.config.maxNumber : Number.MAX_VALUE;
+            $scope.model.config.maxNumber = isNumeric($scope.model.config.maxNumber) && $scope.model.config.maxNumber !== 0 ? $scope.model.config.maxNumber : Number.MAX_VALUE;
             
             $scope.newCaption = '';
             $scope.newLink = 'http://';
@@ -160,7 +160,7 @@
                 cancel: '.no-drag',
                 containment: 'parent',
                 helper: function (e, ui) {
-                    // When sorting <trs>, the cells collapse.  This helper fixes that: http://www.foliotek.com/devblog/make-table-rows-sortable-using-jquery-ui-sortable/
+                    // When sorting table rows, the cells collapse. This helper fixes that: http://www.foliotek.com/devblog/make-table-rows-sortable-using-jquery-ui-sortable/
                     ui.children().each(function () {
                         $(this).width($(this).width());
                     });
