@@ -15,6 +15,10 @@
                     } else {
                        scope.icon = model.icon;
                     }
+
+                    // set form to dirty
+                    ctrl.$setDirty();
+
                     scope.dialogModel.show = false;
                     scope.dialogModel = null;
                 }
@@ -23,6 +27,7 @@
       }
 
       var directive = {
+          require: '^form',
          transclude: true,
          restrict: 'E',
          replace: true,
