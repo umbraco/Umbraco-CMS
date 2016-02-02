@@ -14,18 +14,24 @@ namespace Umbraco.Core.Collections
     /// <typeparam name="T"></typeparam>
     internal class DeepCloneableList<T> : List<T>, IDeepCloneable, IRememberBeingDirty
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="T:System.Collections.Generic.List`1"/> class that is empty and has the default initial capacity.
-        /// </summary>
-        public DeepCloneableList()
+        private readonly ListCloneBehavior _listCloneBehavior;
+        
+        public DeepCloneableList(ListCloneBehavior listCloneBehavior)
         {
+            _listCloneBehavior = listCloneBehavior;
+        }
+        
+        public DeepCloneableList(IEnumerable<T> collection, ListCloneBehavior listCloneBehavior) : base(collection)
+        {
+            _listCloneBehavior = listCloneBehavior;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:System.Collections.Generic.List`1"/> class that contains elements copied from the specified collection and has sufficient capacity to accommodate the number of elements copied.
+        /// Default behavior is CloneOnce
         /// </summary>
-        /// <param name="collection">The collection whose elements are copied to the new list.</param><exception cref="T:System.ArgumentNullException"><paramref name="collection"/> is null.</exception>
-        public DeepCloneableList(IEnumerable<T> collection) : base(collection)
+        /// <param name="collection"></param>
+        public DeepCloneableList(IEnumerable<T> collection)
+            : this(collection, ListCloneBehavior.CloneOnce)
         {
         }
 
@@ -35,20 +41,47 @@ namespace Umbraco.Core.Collections
         /// <returns></returns>
         public object DeepClone()
         {
-            var newList = new DeepCloneableList<T>();
-            foreach (var item in this)
+            switch (_listCloneBehavior)
             {
-                var dc = item as IDeepCloneable;
-                if (dc != null)
-                {
-                    newList.Add((T) dc.DeepClone());
-                }
-                else
-                {
-                    newList.Add(item);
-                }
+                case ListCloneBehavior.CloneOnce:
+                    //we are cloning once, so create a new list in none mode
+                    // and deep clone all items into it
+                    var newList = new DeepCloneableList<T>(ListCloneBehavior.None);
+                    foreach (var item in this)
+                    {
+                        var dc = item as IDeepCloneable;
+                        if (dc != null)
+                        {
+                            newList.Add((T)dc.DeepClone());
+                        }
+                        else
+                        {
+                            newList.Add(item);
+                        }
+                    }
+                    return newList;
+                case ListCloneBehavior.None:
+                    //we are in none mode, so just return a new list with the same items
+                    return new DeepCloneableList<T>(this, ListCloneBehavior.None);
+                case ListCloneBehavior.Always:
+                    //always clone to new list
+                    var newList2 = new DeepCloneableList<T>(ListCloneBehavior.Always);
+                    foreach (var item in this)
+                    {
+                        var dc = item as IDeepCloneable;
+                        if (dc != null)
+                        {
+                            newList2.Add((T)dc.DeepClone());
+                        }
+                        else
+                        {
+                            newList2.Add(item);
+                        }
+                    }
+                    return newList2;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
-            return newList;
         }
 
         public bool IsDirty()

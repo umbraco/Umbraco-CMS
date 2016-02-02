@@ -85,29 +85,35 @@ namespace Umbraco.Core.Cache
         public override TEntity Get(TId id, Func<TId, TEntity> getFromRepo)
         {
             //Force get all with cache
-            var found = GetAll(new TId[] { }, ids => _getAllFromRepo());
+            var found = GetAll(new TId[] { }, ids => _getAllFromRepo().WhereNotNull());
 
             //we don't have anything in cache (this should never happen), just return from the repo
-            return found == null
-                ? getFromRepo(id)
-                : found.FirstOrDefault(x => _getEntityId(x).Equals(id));
+            if (found == null) return getFromRepo(id);
+            var entity = found.FirstOrDefault(x => _getEntityId(x).Equals(id));
+            if (entity == null) return null;
+
+            //We must ensure to deep clone each one out manually since the deep clone list only clones one way
+            return (TEntity)entity.DeepClone();
         }
 
         public override TEntity Get(TId id)
         {
             //Force get all with cache
-            var found = GetAll(new TId[] { }, ids => _getAllFromRepo());
+            var found = GetAll(new TId[] { }, ids => _getAllFromRepo().WhereNotNull());
 
             //we don't have anything in cache (this should never happen), just return null
-            return found == null
-                ? null
-                : found.FirstOrDefault(x => _getEntityId(x).Equals(id));
+            if (found == null) return null;
+            var entity = found.FirstOrDefault(x => _getEntityId(x).Equals(id));
+            if (entity == null) return null;
+
+            //We must ensure to deep clone each one out manually since the deep clone list only clones one way
+            return (TEntity)entity.DeepClone();
         }
 
         public override bool Exists(TId id, Func<TId, bool> getFromRepo)
         {
             //Force get all with cache
-            var found = GetAll(new TId[] {}, ids => _getAllFromRepo());
+            var found = GetAll(new TId[] {}, ids => _getAllFromRepo().WhereNotNull());
 
             //we don't have anything in cache (this should never happen), just return from the repo
             return found == null
@@ -123,12 +129,15 @@ namespace Umbraco.Core.Cache
             //now that the base result has been calculated, they will all be cached. 
             // Now we can just filter by ids if they have been supplied
             
-            return ids.Any() 
+            return (ids.Any() 
                 ? result.Where(x => ids.Contains(_getEntityId(x))).ToArray() 
-                : result;
+                : result)
+                //We must ensure to deep clone each one out manually since the deep clone list only clones one way
+                .Select(x => (TEntity)x.DeepClone())
+                .ToArray();
         }
 
-        protected TEntity[] PerformGetAll(Func<TId[], IEnumerable<TEntity>> getFromRepo)
+        private TEntity[] PerformGetAll(Func<TId[], IEnumerable<TEntity>> getFromRepo)
         {
             var allEntities = GetAllFromCache();
             if (allEntities.Any())

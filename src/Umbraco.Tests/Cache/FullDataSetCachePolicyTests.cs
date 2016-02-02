@@ -81,7 +81,7 @@ namespace Umbraco.Tests.Cache
             cache.Setup(x => x.GetCacheItem(It.IsAny<string>())).Returns(() =>
             {
                 //return null if this is the first pass
-                return cached.Any() ? new DeepCloneableList<AuditItem>() : null;
+                return cached.Any() ? new DeepCloneableList<AuditItem>(ListCloneBehavior.CloneOnce) : null;
             });
 
             var defaultPolicy = new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, item => item.Id, () => getAll, false);
@@ -144,7 +144,7 @@ namespace Umbraco.Tests.Cache
 
             var cache = new Mock<IRuntimeCacheProvider>();
 
-            cache.Setup(x => x.GetCacheItem(It.IsAny<string>())).Returns(() => new DeepCloneableList<AuditItem>
+            cache.Setup(x => x.GetCacheItem(It.IsAny<string>())).Returns(() => new DeepCloneableList<AuditItem>(ListCloneBehavior.CloneOnce)
             {
                 new AuditItem(1, "blah", AuditType.Copy, 123),
                 new AuditItem(2, "blah2", AuditType.Copy, 123)
