@@ -105,7 +105,7 @@ namespace Umbraco.Tests.Security
 
             var identity = new UmbracoBackOfficeIdentity(userData);
 
-            Assert.AreEqual(10, identity.Claims.Count());
+            Assert.AreEqual(11, identity.Claims.Count());
         }
 
         [Test]
@@ -132,7 +132,7 @@ namespace Umbraco.Tests.Security
 
             var backofficeIdentity = new UmbracoBackOfficeIdentity(claimsIdentity, userData);
 
-            Assert.AreEqual(12, backofficeIdentity.Claims.Count());
+            Assert.AreEqual(13, backofficeIdentity.Claims.Count());
         }
 
         [Test]
@@ -156,7 +156,7 @@ namespace Umbraco.Tests.Security
 
             var identity = new UmbracoBackOfficeIdentity(ticket);
 
-            Assert.AreEqual(11, identity.Claims.Count());
+            Assert.AreEqual(12, identity.Claims.Count());
         }
 
         [Test]
@@ -182,7 +182,7 @@ namespace Umbraco.Tests.Security
 
             var cloned = identity.Clone();
 
-            Assert.AreEqual(11, cloned.Claims.Count());
+            Assert.AreEqual(12, cloned.Claims.Count());
         }
 
     }
