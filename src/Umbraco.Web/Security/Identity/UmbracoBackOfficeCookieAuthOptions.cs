@@ -44,7 +44,7 @@ namespace Umbraco.Web.Security.Identity
             CookieName = securitySection.AuthCookieName;
             CookieHttpOnly = true;
             CookieSecure = forceSsl ? CookieSecureOption.Always : CookieSecureOption.SameAsRequest;
-            CookiePath = "/";
+            CookiePath = "/";            
 
             //Custom cookie manager so we can filter requests
             CookieManager = new BackOfficeCookieManager(new SingletonUmbracoContextAccessor(), explicitPaths);
@@ -84,7 +84,7 @@ namespace Umbraco.Web.Security.Identity
 
             if (ticket.Properties.IsPersistent)
             {
-                cookieOptions.Expires = expiresUtc.ToUniversalTime().DateTime;
+                cookieOptions.Expires = expiresUtc.UtcDateTime;
             }
 
             return cookieOptions;
