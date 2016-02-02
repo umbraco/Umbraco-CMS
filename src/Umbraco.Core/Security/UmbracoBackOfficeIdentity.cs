@@ -210,7 +210,7 @@ namespace Umbraco.Core.Security
             if (HasClaim(x => x.Type == ClaimTypes.Locality) == false)
                 AddClaim(new Claim(ClaimTypes.Locality, Culture, ClaimValueTypes.String, Issuer, Issuer, this));
 
-            if (HasClaim(x => x.Type == Constants.Security.SessionIdClaimType) == false)
+            if (HasClaim(x => x.Type == Constants.Security.SessionIdClaimType) == false && SessionId.IsNullOrWhiteSpace() == false)
             {
                 AddClaim(new Claim(Constants.Security.SessionIdClaimType, SessionId, ClaimValueTypes.String, Issuer, Issuer, this));
 
