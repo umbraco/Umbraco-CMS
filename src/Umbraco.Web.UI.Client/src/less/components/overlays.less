@@ -189,7 +189,9 @@
 
 /*ensures dialogs doesnt have side-by-side labels*/
 .umb-overlay .control-label,
-.umb-overlay .form-horizontal .control-label {
+.umb-overlay .form-horizontal .control-label,
+.form-horizontal .umb-overlay .control-label
+ {
     width: 100%;
     display: block;
     box-sizing: border-box;
@@ -198,6 +200,8 @@
 }
 
 
-.umb-overlay .controls-row {
+.umb-overlay .controls-row,
+.umb-overlay .form-horizontal .controls,
+.form-horizontal .umb-overlay .controls {
     margin-left: 0 !important;
 }
