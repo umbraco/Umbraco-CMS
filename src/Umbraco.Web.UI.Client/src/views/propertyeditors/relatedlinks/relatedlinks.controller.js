@@ -75,6 +75,9 @@
                 $scope.model.value[idx].edit = true;
             };
   
+            $scope.cancelEdit = function (idx) {
+                $scope.model.value[idx].edit = false;
+            };
 
             $scope.saveEdit = function (idx) {
                 $scope.model.value[idx].title = $scope.model.value[idx].caption;
@@ -159,6 +162,8 @@
                 cursor: 'move',
                 cancel: '.no-drag',
                 containment: 'parent',
+                placeholder: 'sortable-placeholder',
+                forcePlaceholderSize: true,
                 helper: function (e, ui) {
                     // When sorting table rows, the cells collapse. This helper fixes that: http://www.foliotek.com/devblog/make-table-rows-sortable-using-jquery-ui-sortable/
                     ui.children().each(function () {
@@ -178,6 +183,24 @@
                     var movedElement = $scope.model.value[originalIndex];
                     $scope.model.value.splice(originalIndex, 1);
                     $scope.model.value.splice(newIndex, 0, movedElement);
+                },
+                start: function (e, ui) {
+                    //ui.placeholder.html("<td colspan='5'></td>");
+
+                    // Build a placeholder cell that spans all the cells in the row: http://stackoverflow.com/questions/25845310/jquery-ui-sortable-and-table-cell-size
+                    var cellCount = 0;
+                    $('td, th', ui.helper).each(function () {
+                        // For each td or th try and get it's colspan attribute, and add that or 1 to the total
+                        var colspan = 1;
+                        var colspanAttr = $(this).attr('colspan');
+                        if (colspanAttr > 1) {
+                            colspan = colspanAttr;
+                        }
+                        cellCount += colspan;
+                    });
+
+                    // Add the placeholder UI - note that this is the item's content, so td rather than tr
+                    ui.placeholder.html('<td colspan="' + cellCount + '">&nbsp;</td>');
                 }
             };
 
