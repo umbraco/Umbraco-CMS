@@ -104,7 +104,7 @@ angular.module("umbraco.directives")
                                 statusbar: false,
                                 relative_urls: false,
                                 toolbar: toolbar,
-                                content_css: stylesheets.join(','),
+                                content_css: stylesheets,
                                 style_formats: styleFormats,
                                 autoresize_bottom_margin: 0
                             };
