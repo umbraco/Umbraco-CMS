@@ -839,8 +839,8 @@ AND umbracoNode.id <> @id",
 
                 //now create the content type object
 
-                var factory = new MediaTypeFactory(new Guid(Constants.ObjectTypes.MediaType));
-                var mediaType = factory.BuildEntity(contentTypeDto);
+                var factory = new ContentTypeFactory();
+                var mediaType = factory.BuildMediaTypeEntity(contentTypeDto);
 
                 //map the allowed content types
                 mediaType.AllowedContentTypes = currAllowedContentTypes;
