@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -504,7 +504,7 @@ namespace Umbraco.Core.Services
             var found = children.Any(x => x.Name.InvariantEquals(folderName));
             if (found)
             {
-                var containerId = children.Single(x => x.Name.InvariantEquals(folderName)).Id;
+                var containerId = children.SingleOrDefault(x => x.Name.InvariantEquals(folderName)).Id;
                 return _contentTypeService.GetContentTypeContainer(containerId);
             }
 
@@ -698,7 +698,7 @@ namespace Umbraco.Core.Services
                                                   : _dataTypeService.GetDataTypeDefinitionByPropertyEditorAlias(propertyEditorAlias);
                     if (dataTypeDefinitions != null && dataTypeDefinitions.Any())
                     {
-                        dataTypeDefinition = dataTypeDefinitions.First();
+                        dataTypeDefinition = dataTypeDefinitions.FirstOrDefault();
                     }
                 }
                 else if (legacyPropertyEditorId != Guid.Empty && dataTypeDefinition.ControlId != legacyPropertyEditorId)
@@ -706,7 +706,7 @@ namespace Umbraco.Core.Services
                     var dataTypeDefinitions = _dataTypeService.GetDataTypeDefinitionByControlId(legacyPropertyEditorId);
                     if (dataTypeDefinitions != null && dataTypeDefinitions.Any())
                     {
-                        dataTypeDefinition = dataTypeDefinitions.First();
+                        dataTypeDefinition = dataTypeDefinitions.FirstOrDefault();
                     }
                 }
                 else if (dataTypeDefinition.PropertyEditorAlias != propertyEditorAlias)
@@ -714,7 +714,7 @@ namespace Umbraco.Core.Services
                     var dataTypeDefinitions = _dataTypeService.GetDataTypeDefinitionByPropertyEditorAlias(propertyEditorAlias);
                     if (dataTypeDefinitions != null && dataTypeDefinitions.Any())
                     {
-                        dataTypeDefinition = dataTypeDefinitions.First();
+                        dataTypeDefinition = dataTypeDefinitions.FirstOrDefault();
                     }
                 }
 
@@ -762,7 +762,7 @@ namespace Umbraco.Core.Services
         private IContentType UpdateContentTypesStructure(IContentType contentType, XElement structureElement)
         {
             var allowedChildren = contentType.AllowedContentTypes.ToList();
-            int sortOrder = allowedChildren.Any() ? allowedChildren.Last().SortOrder : 0;
+            int sortOrder = allowedChildren.Any() ? allowedChildren.LastOrDefault().SortOrder : 0;
             foreach (var element in structureElement.Elements("DocumentType"))
             {
                 var alias = element.Value;
@@ -804,7 +804,7 @@ namespace Umbraco.Core.Services
                         string.Format("No ContentType matching the passed in Alias: '{0}' was found",
                                       contentTypeAlias));
 
-                var contentType = types.First();
+                var contentType = types.FirstOrDefault();
 
                 if (contentType == null)
                     throw new Exception(string.Format("ContentType matching the passed in Alias: '{0}' was null",
@@ -1005,7 +1005,7 @@ namespace Umbraco.Core.Services
             var found = children.Any(x => x.Name.InvariantEquals(folderName));
             if (found)
             {
-                var containerId = children.Single(x => x.Name.InvariantEquals(folderName)).Id;
+                var containerId = children.SingleOrDefault(x => x.Name.InvariantEquals(folderName)).Id;
                 return _dataTypeService.GetContainer(containerId);
             }
 
@@ -1026,7 +1026,7 @@ namespace Umbraco.Core.Services
                 if (prevaluesElement == null) continue;
 
                 var dataTypeDefinitionName = dataTypeElement.Attribute("Name").Value;
-                var dataTypeDefinition = dataTypes.First(x => x.Name == dataTypeDefinitionName);
+                var dataTypeDefinition = dataTypes.FirstOrDefault(x => x.Name == dataTypeDefinitionName);
 
                 var valuesWithoutKeys = prevaluesElement.Elements("PreValue")
                                                         .Where(x => ((string)x.Attribute("Alias")).IsNullOrWhiteSpace())
