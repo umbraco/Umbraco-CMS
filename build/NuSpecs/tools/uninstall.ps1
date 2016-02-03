@@ -23,7 +23,6 @@ if ($project) {
 
 	# Remove app_data files
 	Write-Host "removing app_data files:" "${appData}"
-	if(Test-Path $appData\TEMP) { Remove-Item $appData\TEMP -Force -Recurse -Confirm:$false }
 	if(Test-Path $appData\packages) { Remove-Item $appData\packages -Recurse -Force -Confirm:$false }
 
 	Write-Host "removing app_browsers:" "${appBrowsers}"
