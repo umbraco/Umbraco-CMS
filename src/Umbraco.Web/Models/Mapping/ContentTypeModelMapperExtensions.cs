@@ -69,7 +69,12 @@ namespace Umbraco.Web.Models.Mapping
             foreach (var a in add)
             {
                 //TODO: Remove N+1 lookup
-                var addCt = applicationContext.Services.ContentTypeService.GetContentType(a);
+                //since we don't really know from the alias what type of content type this is,
+                //we look up by content type first and then by media type if not found.
+                //content type aliases are unique so this should be safe to do.
+                IContentTypeComposition addCt = applicationContext.Services.ContentTypeService.GetContentType(a);
+                if (addCt == null)
+                    addCt = applicationContext.Services.ContentTypeService.GetMediaType(a);
                 if (addCt != null)
                     dest.AddContentType(addCt);
             }
