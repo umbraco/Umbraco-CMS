@@ -2,9 +2,7 @@
 
    <umb-load-indicator ng-if="vm.page.loading"></umb-load-indicator>
 
-    <form novalidate name="contentTypeForm"
-          ng-submit="vm.save()"
-          val-form-manager>
+    <form novalidate name="contentTypeForm" val-form-manager>
 
         <umb-editor-view ng-if="!vm.page.loading">
 
@@ -40,7 +38,8 @@
                <umb-editor-footer-content-right>
 
                    <umb-button ng-if="!vm.page.modelsBuilder"
-                               type="submit"
+                               type="button"
+                               action="vm.save()"
                                state="vm.page.saveButtonState"
                                button-style="success"
                                shortcut="ctrl+s"
