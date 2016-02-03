@@ -8,7 +8,7 @@
                                                    
 ----------------------------------------------------
 
-Don't forget to build!
+Umbraco is now installed!
 
 When upgrading your website using NuGet you should answer "No" to the questions to overwrite the Web.config 
 file (and config files in the config folder). 

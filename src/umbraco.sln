@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Web.UI", "Umbraco.Web.UI\Umbraco.Web.UI.csproj", "{4C4C194C-B5E4-4991-8F87-4373E24CC19F}"
 EndProject
@@ -27,9 +27,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B5BD12C1
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuSpecs", "NuSpecs", "{227C3B55-80E5-4E7E-A802-BE16C5128B9D}"
 	ProjectSection(SolutionItems) = preProject
-		..\build\NuSpecs\UmbracoCms.Core.AllBinaries.nuspec = ..\build\NuSpecs\UmbracoCms.Core.AllBinaries.nuspec
 		..\build\NuSpecs\UmbracoCms.Core.nuspec = ..\build\NuSpecs\UmbracoCms.Core.nuspec
-		..\build\NuSpecs\UmbracoCms.Core.Symbols.nuspec = ..\build\NuSpecs\UmbracoCms.Core.Symbols.nuspec
 		..\build\NuSpecs\UmbracoCms.nuspec = ..\build\NuSpecs\UmbracoCms.nuspec
 	EndProjectSection
 EndProject
@@ -97,8 +95,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{E3F9F378
 		..\build\NuSpecs\tools\install.core.ps1 = ..\build\NuSpecs\tools\install.core.ps1
 		..\build\NuSpecs\tools\install.ps1 = ..\build\NuSpecs\tools\install.ps1
 		..\build\NuSpecs\tools\Readme.txt = ..\build\NuSpecs\tools\Readme.txt
+		..\build\NuSpecs\tools\ReadmeUpgrade.txt = ..\build\NuSpecs\tools\ReadmeUpgrade.txt
 		..\build\NuSpecs\tools\trees.config.install.xdt = ..\build\NuSpecs\tools\trees.config.install.xdt
+		..\build\NuSpecs\tools\uninstall.core.ps1 = ..\build\NuSpecs\tools\uninstall.core.ps1
+		..\build\NuSpecs\tools\uninstall.ps1 = ..\build\NuSpecs\tools\uninstall.ps1
 		..\build\NuSpecs\tools\Web.config.install.xdt = ..\build\NuSpecs\tools\Web.config.install.xdt
+		..\build\NuSpecs\tools\Web.config.uninstall.xdt = ..\build\NuSpecs\tools\Web.config.uninstall.xdt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{5B03EF4E-E0AC-4905-861B-8C3EC1A0D458}"
+	ProjectSection(SolutionItems) = preProject
+		..\build\NuSpecs\build\UmbracoCms.props = ..\build\NuSpecs\build\UmbracoCms.props
+		..\build\NuSpecs\build\UmbracoCms.targets = ..\build\NuSpecs\build\UmbracoCms.targets
 	EndProjectSection
 EndProject
 Global
@@ -173,5 +181,6 @@ Global
 		{227C3B55-80E5-4E7E-A802-BE16C5128B9D} = {2849E9D4-3B4E-40A3-A309-F3CB4F0E125F}
 		{5D3B8245-ADA6-453F-A008-50ED04BFE770} = {B5BD12C1-A454-435E-8A46-FF4A364C0382}
 		{E3F9F378-AFE1-40A5-90BD-82833375DBFE} = {227C3B55-80E5-4E7E-A802-BE16C5128B9D}
+		{5B03EF4E-E0AC-4905-861B-8C3EC1A0D458} = {227C3B55-80E5-4E7E-A802-BE16C5128B9D}
 	EndGlobalSection
 EndGlobal
