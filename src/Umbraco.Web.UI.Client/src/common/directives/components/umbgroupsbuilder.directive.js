@@ -1,9 +1,12 @@
 (function() {
   'use strict';
 
-  function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource, dataTypeHelper, dataTypeResource, $filter, iconHelper, $q, $timeout) {
+  function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource, dataTypeHelper, dataTypeResource, $filter, iconHelper, $q, $timeout, notificationsService, localizationService) {
 
     function link(scope, el, attr, ctrl) {
+
+        var validationTranslated = "";
+        var tabNoSortOrderTranslated = "";
 
       scope.sortingMode = false;
       scope.toolbar = [];
@@ -25,6 +28,14 @@
           // add init tab
           addInitGroup(scope.model.groups);
 
+          // localize texts
+          localizationService.localize("validation_validation").then(function(value) {
+              validationTranslated = value;
+          });
+
+          localizationService.localize("contentTypeEditor_tabHasNoSortOrder").then(function(value) {
+              tabNoSortOrderTranslated = value;
+          });
       }
 
       function setSortingOptions() {
@@ -202,13 +213,30 @@
 
       scope.toggleSortingMode = function(tool) {
 
-         scope.sortingMode = !scope.sortingMode;
+          if (scope.sortingMode === true) {
 
-         if(scope.sortingMode === true) {
-            scope.sortingButtonKey = "general_reorderDone";
-         } else {
-            scope.sortingButtonKey = "general_reorder";
-         }
+              var sortOrderMissing = false;
+
+              for (var i = 0; i < scope.model.groups.length; i++) {
+                  var group = scope.model.groups[i];
+                  if (group.tabState !== "init" && group.sortOrder === undefined) {
+                      sortOrderMissing = true;
+                      group.showSortOrderMissing = true;
+                      notificationsService.error(validationTranslated + ": " + group.name + " " + tabNoSortOrderTranslated);
+                  }
+              }
+
+              if (!sortOrderMissing) {
+                  scope.sortingMode = false;
+                  scope.sortingButtonKey = "general_reorder";
+              }
+
+          } else {
+
+              scope.sortingMode = true;
+              scope.sortingButtonKey = "general_reorderDone";
+
+          }
 
       };
 
@@ -394,8 +422,12 @@
         }
       };
 
-      scope.changeSortOrderValue = function() {
-        scope.model.groups = $filter('orderBy')(scope.model.groups, 'sortOrder');
+      scope.changeSortOrderValue = function(group) {
+
+          if (group.sortOrder !== undefined) {
+              group.showSortOrderMissing = false;
+          }
+          scope.model.groups = $filter('orderBy')(scope.model.groups, 'sortOrder');
       };
 
       function addInitGroup(groups) {
