@@ -13,9 +13,9 @@ if ($project) {
 	$backupPath = Join-Path $projectPath "App_Data\NuGetBackup"
 	Write-Host "backupPath:" "${backupPath}"
 	$appBrowsers = Join-Path $projectPath "App_Browsers"
-	Write-Host "umbracoBinFolder:" "${appBrowsers}"
+	Write-Host "appBrowsers:" "${appBrowsers}"
 	$appData = Join-Path $projectPath "App_Data"
-	Write-Host "umbracoBinFolder:" "${appData}"
+	Write-Host "appData:" "${appData}"
 	
 	# Remove backups
 	Write-Host "removing backups:" "${backupPath}"
@@ -23,8 +23,8 @@ if ($project) {
 
 	# Remove app_data files
 	Write-Host "removing app_data files:" "${appData}"
-	if(Test-Path $appData\TEMP) { Remove-Item $appBrowsers\TEMP -Force -Recurse -Confirm:$false }
-	if(Test-Path $appData\packages) { Remove-Item $appBrowsers\packages -Recurse -Force -Confirm:$false }
+	if(Test-Path $appData\TEMP) { Remove-Item $appData\TEMP -Force -Recurse -Confirm:$false }
+	if(Test-Path $appData\packages) { Remove-Item $appData\packages -Recurse -Force -Confirm:$false }
 
 	Write-Host "removing app_browsers:" "${appBrowsers}"
 	if(Test-Path $appBrowsers\Form.browser) { Remove-Item $appBrowsers\Form.browser -Force -Confirm:$false }
