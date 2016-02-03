@@ -69,12 +69,34 @@ namespace Umbraco.Web.Models.Mapping
             foreach (var a in add)
             {
                 //TODO: Remove N+1 lookup
-                //since we don't really know from the alias what type of content type this is,
-                //we look up by content type first and then by media type if not found.
-                //content type aliases are unique so this should be safe to do.
-                IContentTypeComposition addCt = applicationContext.Services.ContentTypeService.GetContentType(a);
-                if (addCt == null)
-                    addCt = applicationContext.Services.ContentTypeService.GetMediaType(a);
+                var addCt = applicationContext.Services.ContentTypeService.GetContentType(a);
+                if (addCt != null)
+                    dest.AddContentType(addCt);
+            }
+        }
+
+        public static void AfterMapMediaTypeSaveToEntity<TSource, TDestination>(
+            TSource source, TDestination dest,
+            ApplicationContext applicationContext)
+            where TSource : MediaTypeSave
+            where TDestination : IContentTypeComposition
+        {
+            //sync compositions
+            var current = dest.CompositionAliases().ToArray();
+            var proposed = source.CompositeContentTypes;
+
+            var remove = current.Where(x => proposed.Contains(x) == false);
+            var add = proposed.Where(x => current.Contains(x) == false);
+
+            foreach (var rem in remove)
+            {
+                dest.RemoveContentType(rem);
+            }
+
+            foreach (var a in add)
+            {
+                //TODO: Remove N+1 lookup
+                var addCt = applicationContext.Services.ContentTypeService.GetMediaType(a);
                 if (addCt != null)
                     dest.AddContentType(addCt);
             }
