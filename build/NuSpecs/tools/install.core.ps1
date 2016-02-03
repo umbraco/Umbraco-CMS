@@ -52,9 +52,9 @@ if ($project) {
 		if(Test-Path $umbracoBinFolder\Umbraco.Web.UI.dll) { Remove-Item $umbracoBinFolder\Umbraco.Web.UI.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\UmbracoExamine.dll) { Remove-Item $umbracoBinFolder\UmbracoExamine.dll -Force -Confirm:$false }
 		
-		$amd64Folder = Join-Path $projectPath "bin\amd64"
+		$amd64Folder = Join-Path $umbracoBinFolder "amd64"
 		if(Test-Path $amd64Folder) { Remove-Item $amd64Folder -Force -Recurse -Confirm:$false }
-		$x86Folder = Join-Path $projectPath "bin\x86"
+		$x86Folder = Join-Path $umbracoBinFolder "x86"
 		if(Test-Path $x86Folder) { Remove-Item $x86Folder -Force -Recurse -Confirm:$false }		
 		
 	}
