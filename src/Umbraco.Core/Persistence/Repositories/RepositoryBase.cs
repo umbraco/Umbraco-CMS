@@ -82,7 +82,11 @@ namespace Umbraco.Core.Persistence.Repositories
         {
         }
 
-        
+
+        protected virtual TId GetEntityId(TEntity entity)
+        {
+            return (TId)(object)entity.Id;
+        }
 
         /// <summary>
         /// The runtime cache used for this repo by default is the isolated cache for this type
@@ -179,7 +183,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
             using (var p = CachePolicyFactory.CreatePolicy())
             {
-                return p.GetAll(ids, PerformGetAll);
+                var result = p.GetAll(ids, PerformGetAll);
+                return result;
             }          
         }
         

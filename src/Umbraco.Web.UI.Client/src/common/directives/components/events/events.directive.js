@@ -150,6 +150,7 @@ angular.module('umbraco.directives')
 
         function oneTimeClick(event) {
                 var el = event.target.nodeName;
+
                 //ignore link and button clicks
                 var els = ["INPUT","A","BUTTON"];
                 if(els.indexOf(el) >= 0){return;}
@@ -164,6 +165,12 @@ angular.module('umbraco.directives')
                 // ignore clicks on dialog from old dialog service
                 var oldDialog = $(el).parents("#old-dialog-service");
                 if (oldDialog.length === 1) {
+                    return;
+                }
+
+                // ignore clicks in tinyMCE dropdown(floatpanel)
+                var floatpanel = $(el).parents(".mce-floatpanel");
+                if (floatpanel.length === 1) {
                     return;
                 }
 

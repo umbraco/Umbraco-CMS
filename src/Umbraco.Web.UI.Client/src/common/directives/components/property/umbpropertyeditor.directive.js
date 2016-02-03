@@ -11,7 +11,8 @@ var _umbPropertyEditor = function (umbPropEditorHelper) {
         return {
             scope: {
                 model: "=",
-                isPreValue: "@"
+                isPreValue: "@",
+                preview: "@"
             },
             
             require: "^form",

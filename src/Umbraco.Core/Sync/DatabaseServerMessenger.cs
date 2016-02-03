@@ -175,7 +175,7 @@ namespace Umbraco.Core.Sync
                 if (_released)
                     return;
 
-                if ((DateTime.UtcNow - _lastSync).Seconds <= _options.ThrottleSeconds)
+                if ((DateTime.UtcNow - _lastSync).TotalSeconds <= _options.ThrottleSeconds)
                     return;
 
                 _syncing = true;
