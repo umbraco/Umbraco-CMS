@@ -74,10 +74,6 @@
                 }
                 $scope.model.value[idx].edit = true;
             };
-  
-            $scope.cancelEdit = function (idx) {
-                $scope.model.value[idx].edit = false;
-            };
 
             $scope.saveEdit = function (idx) {
                 $scope.model.value[idx].title = $scope.model.value[idx].caption;
@@ -199,8 +195,8 @@
                         cellCount += colspan;
                     });
 
-                    // Add the placeholder UI - note that this is the item's content, so td rather than tr
-                    ui.placeholder.html('<td colspan="' + cellCount + '">&nbsp;</td>');
+                    // Add the placeholder UI - note that this is the item's content, so td rather than tr - and set height of tr
+                    ui.placeholder.html('<td colspan="' + cellCount + '"></td>').height(ui.item.height());
                 }
             };
 
