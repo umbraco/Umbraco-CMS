@@ -1,52 +1,57 @@
 (function() {
-   'use strict';
+    'use strict';
 
-   function EditorHeaderDirective(iconHelper) {
+    function EditorHeaderDirective(iconHelper) {
 
-      function link(scope, el, attr, ctrl) {
+        function link(scope, el, attr, ctrl) {
 
-         scope.openIconPicker = function() {
-            scope.dialogModel = {
-                view: "iconpicker",
-                show: true,
-                submit: function(model) {
-                    if (model.color) {
-                       scope.icon = model.icon + " " + model.color;
-                    } else {
-                       scope.icon = model.icon;
+            scope.openIconPicker = function() {
+                scope.dialogModel = {
+                    view: "iconpicker",
+                    show: true,
+                    submit: function(model) {
+                        if (model.color) {
+                            scope.icon = model.icon + " " + model.color;
+                        } else {
+                            scope.icon = model.icon;
+                        }
+
+                        // set form to dirty
+                        ctrl.$setDirty();
+
+                        scope.dialogModel.show = false;
+                        scope.dialogModel = null;
                     }
-                    scope.dialogModel.show = false;
-                    scope.dialogModel = null;
-                }
+                };
             };
-         };
-      }
+        }
 
-      var directive = {
-         transclude: true,
-         restrict: 'E',
-         replace: true,
-         templateUrl: 'views/components/editor/umb-editor-header.html',
-         scope: {
-            tabs: "=",
-            actions: "=",
-            name: "=",
-            nameLocked: "=",
-            menu: "=",
-            icon: "=",
-            hideIcon: "@",
-            alias: "=",
-            hideAlias: "@",
-            description: "=",
-            hideDescription: "@",
-            navigation: "="
-         },
-         link: link
-      };
+        var directive = {
+            require: '^form',
+            transclude: true,
+            restrict: 'E',
+            replace: true,
+            templateUrl: 'views/components/editor/umb-editor-header.html',
+            scope: {
+                tabs: "=",
+                actions: "=",
+                name: "=",
+                nameLocked: "=",
+                menu: "=",
+                icon: "=",
+                hideIcon: "@",
+                alias: "=",
+                hideAlias: "@",
+                description: "=",
+                hideDescription: "@",
+                navigation: "="
+            },
+            link: link
+        };
 
-      return directive;
-   }
+        return directive;
+    }
 
-   angular.module('umbraco.directives').directive('umbEditorHeader', EditorHeaderDirective);
+    angular.module('umbraco.directives').directive('umbEditorHeader', EditorHeaderDirective);
 
 })();
