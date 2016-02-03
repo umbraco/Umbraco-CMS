@@ -646,13 +646,10 @@ AND umbracoNode.id <> @id",
                     var allParentIdsAsArray = allParentContentTypeIds.SelectMany(x => x.Value).Distinct().ToArray();
                     if (allParentIdsAsArray.Any())
                     {
-                        //NO!!!!!!!!!!! Do not recurse lookup, we've already looked them all up
-                        //var allParentContentTypes = contentTypeRepository.GetAll(allParentIdsAsArray).ToArray();
-
                         var allParentContentTypes = contentTypes.Where(x => allParentIdsAsArray.Contains(x.Id)).ToArray();
 
                         foreach (var contentType in contentTypes)
-                        {
+                        {                            
                             var entityId = contentType.Id;
 
                             var parentContentTypes = allParentContentTypes.Where(x =>
@@ -717,10 +714,10 @@ AND umbracoNode.id <> @id",
                 out IDictionary<int, List<int>> parentMediaTypeIds)
             {
                 Mandate.ParameterNotNull(db, "db");
-
+                
                 var sql = @"SELECT cmsContentType.pk as ctPk, cmsContentType.alias as ctAlias, cmsContentType.allowAtRoot as ctAllowAtRoot, cmsContentType.description as ctDesc,
                                 cmsContentType.icon as ctIcon, cmsContentType.isContainer as ctIsContainer, cmsContentType.nodeId as ctId, cmsContentType.thumbnail as ctThumb,
-                                AllowedTypes.AllowedId as ctaAllowedId, AllowedTypes.SortOrder as ctaSortOrder, AllowedTypes.alias as ctaAlias,
+                                AllowedTypes.AllowedId as ctaAllowedId, AllowedTypes.SortOrder as ctaSortOrder, AllowedTypes.alias as ctaAlias,		                        
                                 ParentTypes.parentContentTypeId as chtParentId, ParentTypes.parentContentTypeKey as chtParentKey,
                                 umbracoNode.createDate as nCreateDate, umbracoNode." + sqlSyntax.GetQuotedColumnName("level") + @" as nLevel, umbracoNode.nodeObjectType as nObjectType, umbracoNode.nodeUser as nUser,
 		                        umbracoNode.parentID as nParentId, umbracoNode." + sqlSyntax.GetQuotedColumnName("path") + @" as nPath, umbracoNode.sortOrder as nSortOrder, umbracoNode." + sqlSyntax.GetQuotedColumnName("text") + @" as nName, umbracoNode.trashed as nTrashed,
@@ -744,7 +741,7 @@ AND umbracoNode.id <> @id",
                         ON ParentTypes.childContentTypeId = cmsContentType.nodeId
                         WHERE (umbracoNode.nodeObjectType = @nodeObjectType)
                         ORDER BY ctId";
-
+                
                 var result = db.Fetch<dynamic>(sql, new { nodeObjectType = new Guid(Constants.ObjectTypes.MediaType) });
 
                 if (result.Any() == false)
@@ -761,6 +758,7 @@ AND umbracoNode.id <> @id",
                 // we used to do.
                 var queue = new Queue<dynamic>(result);
                 var currAllowedContentTypes = new List<ContentTypeSort>();
+
                 while (queue.Count > 0)
                 {
                     var ct = queue.Dequeue();
@@ -841,8 +839,8 @@ AND umbracoNode.id <> @id",
 
                 //now create the content type object
 
-                var factory = new ContentTypeFactory();
-                var mediaType = factory.BuildMediaTypeEntity(contentTypeDto);
+                var factory = new MediaTypeFactory(new Guid(Constants.ObjectTypes.MediaType));
+                var mediaType = factory.BuildEntity(contentTypeDto);
 
                 //map the allowed content types
                 mediaType.AllowedContentTypes = currAllowedContentTypes;
@@ -850,16 +848,16 @@ AND umbracoNode.id <> @id",
                 return mediaType;
             }
 
-            internal static IEnumerable<IContentType> MapContentTypes(Database db, ISqlSyntaxProvider sqlSyntax,
+            internal static IEnumerable<IContentType> MapContentTypes(Database db, ISqlSyntaxProvider sqlSyntax,                
                 out IDictionary<int, List<AssociatedTemplate>> associatedTemplates,
                 out IDictionary<int, List<int>> parentContentTypeIds)
             {
                 Mandate.ParameterNotNull(db, "db");
-
+                
                 var sql = @"SELECT cmsDocumentType.IsDefault as dtIsDefault, cmsDocumentType.templateNodeId as dtTemplateId,
                                 cmsContentType.pk as ctPk, cmsContentType.alias as ctAlias, cmsContentType.allowAtRoot as ctAllowAtRoot, cmsContentType.description as ctDesc,
                                 cmsContentType.icon as ctIcon, cmsContentType.isContainer as ctIsContainer, cmsContentType.nodeId as ctId, cmsContentType.thumbnail as ctThumb,
-                                AllowedTypes.AllowedId as ctaAllowedId, AllowedTypes.SortOrder as ctaSortOrder, AllowedTypes.alias as ctaAlias,
+                                AllowedTypes.AllowedId as ctaAllowedId, AllowedTypes.SortOrder as ctaSortOrder, AllowedTypes.alias as ctaAlias,		                        
                                 ParentTypes.parentContentTypeId as chtParentId,ParentTypes.parentContentTypeKey as chtParentKey,
                                 umbracoNode.createDate as nCreateDate, umbracoNode." + sqlSyntax.GetQuotedColumnName("level") + @" as nLevel, umbracoNode.nodeObjectType as nObjectType, umbracoNode.nodeUser as nUser,
 		                        umbracoNode.parentID as nParentId, umbracoNode." + sqlSyntax.GetQuotedColumnName("path") + @" as nPath, umbracoNode.sortOrder as nSortOrder, umbracoNode." + sqlSyntax.GetQuotedColumnName("text") + @" as nName, umbracoNode.trashed as nTrashed,
@@ -892,7 +890,7 @@ AND umbracoNode.id <> @id",
                         ON ParentTypes.childContentTypeId = cmsContentType.nodeId
                         WHERE (umbracoNode.nodeObjectType = @nodeObjectType)
                         ORDER BY ctId";
-
+                
                 var result = db.Fetch<dynamic>(sql, new { nodeObjectType = new Guid(Constants.ObjectTypes.DocumentType)});
 
                 if (result.Any() == false)
@@ -913,7 +911,7 @@ AND umbracoNode.id <> @id",
                 {
                     var ct = queue.Dequeue();
 
-                    //check for default templates
+                    //check for default templates                    
                     bool? isDefaultTemplate = Convert.ToBoolean(ct.dtIsDefault);
                     int? templateId = ct.dtTemplateId;
                     if (currDefaultTemplate == -1 && isDefaultTemplate.HasValue && templateId.HasValue)
