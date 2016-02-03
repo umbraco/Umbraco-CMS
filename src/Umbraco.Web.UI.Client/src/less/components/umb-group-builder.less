@@ -21,7 +21,6 @@
 }
 
 .umb-group-builder__group.-inherited {
-  background: #FDFDFD;
   border-color: #F2F2F2;
   animation: fadeIn 0.5s;
 }
@@ -109,7 +108,6 @@
 
 .umb-group-builder__group-title.-inherited {
   border-color: #F2F2F2;
-  background: #FDFDFD;
 }
 
 input.umb-group-builder__group-title-input {
@@ -182,7 +180,6 @@ input.umb-group-builder__group-sort-value {
 
 .umb-group-builder__property.-inherited {
   border: transparent;
-  background: #FDFDFD;
   animation: fadeIn 0.5s;
 }
 
@@ -223,6 +220,7 @@ input.umb-group-builder__group-sort-value {
 .umb-group-builder__property-meta {
   flex: 0 0 175px;
   margin-right: 20px;
+  word-break: break-word;
 }
 
 .umb-group-builder__property-meta.-full-width {
@@ -232,7 +230,9 @@ input.umb-group-builder__group-sort-value {
 .umb-group-builder__property-meta-alias {
   font-size: 10px;
   color: @gray;
-  word-wrap: break-word;
+  word-break: break-word;
+  line-height: 1.5;
+  margin-bottom: 5px;
 }
 
 .umb-group-builder__property-meta-label textarea {
@@ -256,6 +256,7 @@ input.umb-group-builder__group-sort-value {
 
 .umb-group-builder__property-meta-description textarea {
   font-size: 12px;
+  line-height: 1.5;
   color: @grayDark;
   margin-bottom: 0;
   padding: 0;
