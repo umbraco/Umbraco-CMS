@@ -21,14 +21,6 @@ ECHO Building Umbraco %version%
 
 ReplaceIISExpressPortNumber.exe ..\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj %release%
 
-ECHO Installing the Microsoft.Bcl.Build package before anything else, otherwise you'd have to run build.cmd twice
-SET nuGetFolder=%CD%\..\src\packages\
-..\src\.nuget\NuGet.exe sources Remove -Name MyGetUmbracoCore >NUL
-..\src\.nuget\NuGet.exe sources Add -Name MyGetUmbracoCore -Source https://www.myget.org/F/umbracocore/api/v2/ >NUL
-..\src\.nuget\NuGet.exe install ..\src\Umbraco.Web.UI\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
-..\src\.nuget\NuGet.exe install ..\src\umbraco.businesslogic\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
-..\src\.nuget\NuGet.exe install ..\src\Umbraco.Core\packages.config -OutputDirectory %nuGetFolder% -Verbosity quiet
-
 ECHO Removing the belle build folder and bower_components folder to make sure everything is clean as a whistle
 RD ..\src\Umbraco.Web.UI.Client\build /Q /S
 RD ..\src\Umbraco.Web.UI.Client\bower_components /Q /S
