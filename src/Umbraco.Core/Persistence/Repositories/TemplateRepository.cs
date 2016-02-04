@@ -51,7 +51,8 @@ namespace Umbraco.Core.Persistence.Repositories
             get
             {
                 //Use a FullDataSet cache policy - this will cache the entire GetAll result in a single collection
-                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<ITemplate, int>(RuntimeCache, GetEntityId));
+                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<ITemplate, int>(
+                    RuntimeCache, GetEntityId, () => PerformGetAll(), false));
             }
         }
 
@@ -488,7 +489,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var parent = all.FirstOrDefault(x => x.Id == masterTemplateId);
             if (parent == null) return Enumerable.Empty<ITemplate>();
 
-            var children = all.Where(x => x.MasterTemplateAlias == parent.Alias);
+            var children = all.Where(x => x.MasterTemplateAlias.InvariantEquals(parent.Alias));
             return children;
         }
 
@@ -497,7 +498,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //return from base.GetAll, this is all cached
             return base.GetAll().Where(x => alias.IsNullOrWhiteSpace()
                 ? x.MasterTemplateAlias.IsNullOrWhiteSpace()
-                : x.MasterTemplateAlias == alias);
+                : x.MasterTemplateAlias.InvariantEquals(alias));
         }
 
         public IEnumerable<ITemplate> GetDescendants(int masterTemplateId)
@@ -532,7 +533,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var descendants = new List<ITemplate>();
             if (alias.IsNullOrWhiteSpace() == false)
             {
-                var parent = all.FirstOrDefault(x => x.Alias == alias);
+                var parent = all.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
                 if (parent == null) return Enumerable.Empty<ITemplate>();
                 //recursively add all children
                 AddChildren(all, descendants, parent.Alias);
@@ -552,7 +553,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private void AddChildren(ITemplate[] all, List<ITemplate> descendants, string masterAlias)
         {
-            var c = all.Where(x => x.MasterTemplateAlias == masterAlias).ToArray();
+            var c = all.Where(x => x.MasterTemplateAlias.InvariantEquals(masterAlias)).ToArray();
             descendants.AddRange(c);
             if (c.Any() == false) return;
             //recurse through all children
@@ -573,7 +574,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //first get all template objects
             var allTemplates = base.GetAll().ToArray();
 
-            var selfTemplate = allTemplates.SingleOrDefault(x => x.Alias == alias);
+            var selfTemplate = allTemplates.SingleOrDefault(x => x.Alias.InvariantEquals(alias));
             if (selfTemplate == null)
             {
                 return null;
@@ -582,11 +583,11 @@ namespace Umbraco.Core.Persistence.Repositories
             var top = selfTemplate;
             while (top.MasterTemplateAlias.IsNullOrWhiteSpace() == false)
             {
-                top = allTemplates.Single(x => x.Alias == top.MasterTemplateAlias);
+                top = allTemplates.Single(x => x.Alias.InvariantEquals(top.MasterTemplateAlias));
             }
 
             var topNode = new TemplateNode(allTemplates.Single(x => x.Id == top.Id));
-            var childTemplates = allTemplates.Where(x => x.MasterTemplateAlias == top.Alias);
+            var childTemplates = allTemplates.Where(x => x.MasterTemplateAlias.InvariantEquals(top.Alias));
             //This now creates the hierarchy recursively
             topNode.Children = CreateChildren(topNode, childTemplates, allTemplates);
 
@@ -598,7 +599,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private static TemplateNode WalkTree(TemplateNode current, string alias)
         {
             //now walk the tree to find the node
-            if (current.Template.Alias == alias)
+            if (current.Template.Alias.InvariantEquals(alias))
             {
                 return current;
             }
@@ -730,7 +731,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
                 //get this node's children
                 var local = childTemplate;
-                var kids = allTemplates.Where(x => x.MasterTemplateAlias == local.Alias);
+                var kids = allTemplates.Where(x => x.MasterTemplateAlias.InvariantEquals(local.Alias));
 
                 //recurse
                 child.Children = CreateChildren(child, kids, allTemplates);
@@ -760,7 +761,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private bool AliasAlreadExists(ITemplate template)
         {
-            var sql = GetBaseQuery(true).Where<TemplateDto>(x => x.Alias == template.Alias && x.NodeId != template.Id);
+            var sql = GetBaseQuery(true).Where<TemplateDto>(x => x.Alias.InvariantEquals(template.Alias) && x.NodeId != template.Id);
             var count = Database.ExecuteScalar<int>(sql);
             return count > 0;
         }

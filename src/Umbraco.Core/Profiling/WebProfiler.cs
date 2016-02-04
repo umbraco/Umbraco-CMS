@@ -12,24 +12,15 @@ namespace Umbraco.Core.Profiling
     /// </summary>
     internal class WebProfiler : IProfiler
     {
-        private StartupWebProfilerProvider _startupWebProfilerProvider;
 
         /// <summary>
         /// Constructor
-        /// </summary>        
+        /// </summary>
+        /// <remarks>
+        /// Binds to application events to enable the MiniProfiler
+        /// </remarks>
         internal WebProfiler()
         {
-            //setup some defaults
-            MiniProfiler.Settings.SqlFormatter = new SqlServerFormatter();
-            MiniProfiler.Settings.StackMaxLength = 5000;
-
-            //At this point we know that we've been constructed during app startup, there won't be an HttpRequest in the HttpContext 
-            // since it hasn't started yet. So we need to do some hacking to enable profiling during startup.
-            _startupWebProfilerProvider = new StartupWebProfilerProvider();
-            //this should always be the case during startup, we'll need to set a custom profiler provider
-            MiniProfiler.Settings.ProfilerProvider = _startupWebProfilerProvider;
-
-            //Binds to application events to enable the MiniProfiler with a real HttpRequest
             UmbracoApplicationBase.ApplicationInit += UmbracoApplicationApplicationInit;
         }
 
@@ -62,12 +53,7 @@ namespace Umbraco.Core.Profiling
         /// <param name="e"></param>
         void UmbracoApplicationEndRequest(object sender, EventArgs e)
         {
-            if (_startupWebProfilerProvider != null)
-            {
-                Stop();
-                _startupWebProfilerProvider = null;
-            }
-            else if (CanPerformProfilingAction(sender))
+            if (CanPerformProfilingAction(sender))
             {
                 Stop();
             }
@@ -80,11 +66,6 @@ namespace Umbraco.Core.Profiling
         /// <param name="e"></param>
         void UmbracoApplicationBeginRequest(object sender, EventArgs e)
         {
-            if (_startupWebProfilerProvider != null)
-            {
-                _startupWebProfilerProvider.BootComplete();
-            }
-
             if (CanPerformProfilingAction(sender))
             {
                 Start();
@@ -143,7 +124,9 @@ namespace Umbraco.Core.Profiling
         /// Start the profiler
         /// </summary>
         public void Start()
-        {            
+        {
+            MiniProfiler.Settings.SqlFormatter = new SqlServerFormatter();
+            MiniProfiler.Settings.StackMaxLength = 5000;
             MiniProfiler.Start();
         }
 

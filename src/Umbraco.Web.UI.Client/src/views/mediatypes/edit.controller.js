@@ -9,9 +9,11 @@
 (function () {
     "use strict";
 
-    function MediaTypesEditController($scope, $routeParams, mediaTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter, $q, localizationService, overlayHelper) {
+    function MediaTypesEditController($scope, $routeParams, mediaTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter, $q, localizationService, overlayHelper, eventsService) {
+
         var vm = this;
         var localizeSaving = localizationService.localize("general_saving");
+        var evts = [];
 
         vm.save = save;
 
@@ -140,6 +142,10 @@
                 });
         }
         else {
+            loadMediaType();
+        }
+
+        function loadMediaType() {
             vm.page.loading = true;
 
             mediaTypeResource.getById($routeParams.id).then(function(dt) {
@@ -260,6 +266,17 @@
                 vm.currentNode = syncArgs.node;
             });
         }
+
+        evts.push(eventsService.on("app.refreshEditor", function(name, error) {
+            loadMediaType();
+        }));
+
+        //ensure to unregister from all events!
+        $scope.$on('$destroy', function () {
+            for (var e in evts) {
+                eventsService.unsubscribe(evts[e]);
+            }
+        });
     }
 
     angular.module("umbraco").controller("Umbraco.Editors.MediaTypes.EditController", MediaTypesEditController);

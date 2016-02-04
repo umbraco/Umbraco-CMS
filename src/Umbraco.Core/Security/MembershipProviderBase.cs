@@ -759,12 +759,13 @@ namespace Umbraco.Core.Security
 
             //This is the correct way to implement this (as per the sql membership provider)
 
-            switch ((int)PasswordFormat)
+            switch (PasswordFormat)
             {
-                case 0:
+                case MembershipPasswordFormat.Clear:
                     return pass;
-                case 1:
+                case MembershipPasswordFormat.Hashed:
                     throw new ProviderException("Provider can not decrypt hashed password");
+                case MembershipPasswordFormat.Encrypted:
                 default:
                     var bytes = DecryptPassword(Convert.FromBase64String(pass));
                     return bytes == null ? null : Encoding.Unicode.GetString(bytes, 16, bytes.Length - 16);

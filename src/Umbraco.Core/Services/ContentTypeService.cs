@@ -29,7 +29,7 @@ namespace Umbraco.Core.Services
 	    private readonly IContentService _contentService;
         private readonly IMediaService _mediaService;
 
-        //Support recursive locks because some of the methods that require locking call other methods that require locking. 
+        //Support recursive locks because some of the methods that require locking call other methods that require locking.
         //for example, the Move method needs to be locked but this calls the Save method which also needs to be locked.
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
@@ -135,8 +135,8 @@ namespace Umbraco.Core.Services
         private Attempt<OperationStatus> SaveContainer(
             TypedEventHandler<IContentTypeService, SaveEventArgs<EntityContainer>> savingEvent,
             TypedEventHandler<IContentTypeService, SaveEventArgs<EntityContainer>> savedEvent,
-            EntityContainer container, 
-            Guid containerObjectType, 
+            EntityContainer container,
+            Guid containerObjectType,
             string objectTypeName, int userId)
         {
             var evtMsgs = EventMessagesFactory.Get();
@@ -164,7 +164,7 @@ namespace Umbraco.Core.Services
             using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow, containerObjectType))
             {
                 repo.AddOrUpdate(container);
-                uow.Commit();                
+                uow.Commit();
             }
 
             savedEvent.RaiseEvent(new SaveEventArgs<EntityContainer>(container, evtMsgs), this);
@@ -253,14 +253,14 @@ namespace Umbraco.Core.Services
                 .Where(x => x != int.MinValue && x != contentType.Id)
                 .ToArray();
 
-            return GetContentTypeContainers(ancestorIds);            
+            return GetContentTypeContainers(ancestorIds);
         }
 
         public EntityContainer GetMediaTypeContainer(Guid containerId)
         {
             return GetContainer(containerId, Constants.ObjectTypes.MediaTypeGuid);
         }
-        
+
         private EntityContainer GetContainer(Guid containerId, Guid containerObjectType)
         {
             var uow = UowProvider.GetUnitOfWork();
@@ -380,7 +380,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IContentType Copy(IContentType original, string alias, string name, int parentId = -1)
         {
-            IContentType parent = null;            
+            IContentType parent = null;
             if (parentId > 0)
             {
                 parent = GetContentType(parentId);
@@ -414,7 +414,7 @@ namespace Umbraco.Core.Services
             Mandate.ParameterNotNullOrEmpty(alias, "alias");
             if (parent != null)
             {
-                Mandate.That(parent.HasIdentity, () => new InvalidOperationException("The parent content type must have an identity"));    
+                Mandate.That(parent.HasIdentity, () => new InvalidOperationException("The parent content type must have an identity"));
             }
 
             var clone = original.DeepCloneWithResetIdentities(alias);
@@ -440,7 +440,7 @@ namespace Umbraco.Core.Services
                 //set to root
                 clone.ParentId = -1;
             }
-            
+
             Save(clone);
             return clone;
         }
@@ -505,7 +505,7 @@ namespace Umbraco.Core.Services
         public IEnumerable<IContentType> GetAllContentTypes(IEnumerable<Guid> ids)
         {
             using (var repository = RepositoryFactory.CreateContentTypeRepository(UowProvider.GetUnitOfWork()))
-            {                
+            {
                 return repository.GetAll(ids.ToArray());
             }
         }
@@ -599,7 +599,7 @@ namespace Umbraco.Core.Services
                     {
                         //this should never occur, the content service should always be typed but we'll check anyways.
                         _contentService.RePublishAll();
-                    }    
+                    }
                 }
                 else if (firstType is IMediaType)
                 {
@@ -608,10 +608,10 @@ namespace Umbraco.Core.Services
                     if (typedContentService != null)
                     {
                         typedContentService.RebuildXmlStructures(toUpdate.Select(x => x.Id).ToArray());
-                    }                     
+                    }
                 }
             }
-            
+
         }
 
         public int CountContentTypes()
@@ -661,14 +661,17 @@ namespace Umbraco.Core.Services
 
             var contentType = compositionContentType as IContentType;
             var mediaType = compositionContentType as IMediaType;
+            var memberType = compositionContentType as IMemberType; // should NOT do it here but... v8!
 
             IContentTypeComposition[] allContentTypes;
             if (contentType != null)
                 allContentTypes = GetAllContentTypes().Cast<IContentTypeComposition>().ToArray();
             else if (mediaType != null)
                 allContentTypes = GetAllMediaTypes().Cast<IContentTypeComposition>().ToArray();
+            else if (memberType != null)
+                return; // no compositions on members, always validate
             else
-                throw new Exception("Composition is neither IContentType nor IMediaType?");
+                throw new Exception("Composition is neither IContentType nor IMediaType nor IMemberType?");
 
             var compositionAliases = compositionContentType.CompositionAliases();
             var compositions = allContentTypes.Where(x => compositionAliases.Any(y => x.Alias.Equals(y)));
@@ -684,7 +687,7 @@ namespace Umbraco.Core.Services
                 dependencies.Add(indirectReference);
                 //Get all compositions for the current indirect reference
                 var directReferences = indirectReference.ContentTypeComposition;
-                
+
                 foreach (var directReference in directReferences)
                 {
                     if (directReference.Id == compositionContentType.Id || directReference.Alias.Equals(compositionContentType.Alias)) continue;
@@ -704,7 +707,7 @@ namespace Umbraco.Core.Services
                 if (contentTypeDependency == null) continue;
                 var intersect = contentTypeDependency.PropertyTypes.Select(x => x.Alias.ToLowerInvariant()).Intersect(propertyTypeAliases).ToArray();
                 if (intersect.Length == 0) continue;
-                
+
                 throw new InvalidCompositionException(compositionContentType.Alias, intersect.ToArray());
             }
         }
@@ -716,7 +719,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user saving the ContentType</param>
         public void Save(IContentType contentType, int userId = 0)
         {
-	        if (SavingContentType.IsRaisedEventCancelled(new SaveEventArgs<IContentType>(contentType), this)) 
+	        if (SavingContentType.IsRaisedEventCancelled(new SaveEventArgs<IContentType>(contentType), this))
 				return;
 
             using (new WriteLock(Locker))
@@ -746,7 +749,7 @@ namespace Umbraco.Core.Services
         {
             var asArray = contentTypes.ToArray();
 
-            if (SavingContentType.IsRaisedEventCancelled(new SaveEventArgs<IContentType>(asArray), this)) 
+            if (SavingContentType.IsRaisedEventCancelled(new SaveEventArgs<IContentType>(asArray), this))
 				return;
 
             using (new WriteLock(Locker))
@@ -782,12 +785,19 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user issueing the delete</param>
         /// <remarks>Deleting a <see cref="IContentType"/> will delete all the <see cref="IContent"/> objects based on this <see cref="IContentType"/></remarks>
         public void Delete(IContentType contentType, int userId = 0)
-        {            
-	        if (DeletingContentType.IsRaisedEventCancelled(new DeleteEventArgs<IContentType>(contentType), this)) 
+        {
+	        if (DeletingContentType.IsRaisedEventCancelled(new DeleteEventArgs<IContentType>(contentType), this))
 				return;
 
             using (new WriteLock(Locker))
             {
+
+                //TODO: This needs to change, if we are deleting a content type, we should just delete the data,
+                // this method will recursively go lookup every content item, check if any of it's descendants are
+                // of a different type, move them to the recycle bin, then permanently delete the content items. 
+                // The main problem with this is that for every content item being deleted, events are raised...
+                // which we need for many things like keeping caches in sync, but we can surely do this MUCH better.
+
                 _contentService.DeleteContentOfType(contentType.Id);
 
                 var uow = UowProvider.GetUnitOfWork();
@@ -815,7 +825,7 @@ namespace Umbraco.Core.Services
         {
             var asArray = contentTypes.ToArray();
 
-            if (DeletingContentType.IsRaisedEventCancelled(new DeleteEventArgs<IContentType>(asArray), this)) 
+            if (DeletingContentType.IsRaisedEventCancelled(new DeleteEventArgs<IContentType>(asArray), this))
 				return;
 
             using (new WriteLock(Locker))
@@ -841,7 +851,7 @@ namespace Umbraco.Core.Services
                 Audit(AuditType.Delete, string.Format("Delete ContentTypes performed by user"), userId, -1);
             }
         }
-        
+
         /// <summary>
         /// Gets an <see cref="IMediaType"/> object by its Id
         /// </summary>
@@ -974,7 +984,7 @@ namespace Umbraco.Core.Services
         public Attempt<OperationStatus<MoveOperationStatusType>> MoveMediaType(IMediaType toMove, int containerId)
         {
             var evtMsgs = EventMessagesFactory.Get();
-            
+
             if (MovingMediaType.IsRaisedEventCancelled(
                   new MoveEventArgs<IMediaType>(evtMsgs, new MoveEventInfo<IMediaType>(toMove, toMove.Path, containerId)),
                   this))
@@ -1029,7 +1039,7 @@ namespace Umbraco.Core.Services
 
             var moveInfo = new List<MoveEventInfo<IContentType>>();
             var uow = UowProvider.GetUnitOfWork();
-            using (var containerRepository = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.DocumentTypeContainerGuid)) 
+            using (var containerRepository = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.DocumentTypeContainerGuid))
             using (var repository = RepositoryFactory.CreateContentTypeRepository(uow))
             {
                 try
@@ -1064,7 +1074,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the user saving the MediaType</param>
         public void Save(IMediaType mediaType, int userId = 0)
         {
-	        if (SavingMediaType.IsRaisedEventCancelled(new SaveEventArgs<IMediaType>(mediaType), this)) 
+	        if (SavingMediaType.IsRaisedEventCancelled(new SaveEventArgs<IMediaType>(mediaType), this))
 				return;
 
             using (new WriteLock(Locker))
@@ -1076,7 +1086,7 @@ namespace Umbraco.Core.Services
                     mediaType.CreatorId = userId;
                     repository.AddOrUpdate(mediaType);
                     uow.Commit();
-                    
+
                 }
 
                 UpdateContentXmlStructure(mediaType);
@@ -1115,7 +1125,7 @@ namespace Umbraco.Core.Services
                     }
 
                     //save it all in one go
-                    uow.Commit();                    
+                    uow.Commit();
                 }
 
                 UpdateContentXmlStructure(asArray.Cast<IContentTypeBase>().ToArray());
@@ -1133,7 +1143,7 @@ namespace Umbraco.Core.Services
         /// <remarks>Deleting a <see cref="IMediaType"/> will delete all the <see cref="IMedia"/> objects based on this <see cref="IMediaType"/></remarks>
         public void Delete(IMediaType mediaType, int userId = 0)
         {
-	        if (DeletingMediaType.IsRaisedEventCancelled(new DeleteEventArgs<IMediaType>(mediaType), this)) 
+	        if (DeletingMediaType.IsRaisedEventCancelled(new DeleteEventArgs<IMediaType>(mediaType), this))
 				return;
             using (new WriteLock(Locker))
             {
@@ -1163,7 +1173,7 @@ namespace Umbraco.Core.Services
         {
             var asArray = mediaTypes.ToArray();
 
-            if (DeletingMediaType.IsRaisedEventCancelled(new DeleteEventArgs<IMediaType>(asArray), this)) 
+            if (DeletingMediaType.IsRaisedEventCancelled(new DeleteEventArgs<IMediaType>(asArray), this))
 				return;
             using (new WriteLock(Locker))
             {
@@ -1185,7 +1195,7 @@ namespace Umbraco.Core.Services
                 }
 
                 Audit(AuditType.Delete, string.Format("Delete MediaTypes performed by user"), userId, -1);
-            }            
+            }
         }
 
         /// <summary>
@@ -1274,7 +1284,7 @@ namespace Umbraco.Core.Services
 		/// Occurs after Delete
 		/// </summary>
 		public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<IContentType>> DeletedContentType;
-		
+
 		/// <summary>
 		/// Occurs before Delete
 		/// </summary>
@@ -1284,7 +1294,7 @@ namespace Umbraco.Core.Services
 		/// Occurs after Delete
 		/// </summary>
 		public static event TypedEventHandler<IContentTypeService, DeleteEventArgs<IMediaType>> DeletedMediaType;
-		
+
         /// <summary>
         /// Occurs before Save
         /// </summary>

@@ -26,7 +26,7 @@ namespace Umbraco.Web.WebApi.Filters
 
                 if (model != null)
                 {
-                    EditorModelEventManager.EmitEvent(actionExecutedContext, new EditorModelEventArgs<ContentItemDisplay>(
+                    EditorModelEventManager.EmitEvent(actionExecutedContext, new EditorModelEventArgs(
                         (dynamic)model,
                         UmbracoContext.Current));
                 }

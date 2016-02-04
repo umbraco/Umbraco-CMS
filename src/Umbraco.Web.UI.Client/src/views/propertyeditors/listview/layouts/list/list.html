@@ -22,6 +22,7 @@
         <umb-table
             ng-if="items"
             items="items"
+            allow-select-all="options.bulkActionsAllowed"
             item-properties="options.includeProperties"
             on-select="vm.selectItem"
             on-click="vm.clickItem"
@@ -38,6 +39,7 @@
         <umb-table
             ng-if="items"
             items="items"
+            allow-select-all="options.bulkActionsAllowed"
             item-properties="options.includeProperties"
             on-select="vm.selectItem"
             on-click="vm.clickItem"
