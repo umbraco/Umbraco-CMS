@@ -9,7 +9,7 @@
 		<img
 			ng-if="url"
 			ng-click="setImage()"
-			ng-src="{{url}}"
+			ng-src="{{url}}?width=800&upscale=false"
 			class="fullSizeImage" />
         <input type="text" class="caption" ng-model="control.value.caption" localize="placeholder" placeholder="@grid_placeholderImageCaption" />
  	</div>
