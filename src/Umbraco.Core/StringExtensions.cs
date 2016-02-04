@@ -46,9 +46,9 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="txt"></param>
         /// <returns></returns>
-        internal static string StripBlockWhitespace(this string txt)
+        internal static string StripWhitespace(this string txt)
         {
-            return Regex.Replace(txt, @"^\s+|\s+$|\s+(?=\s)|\n|\r\n|\t", string.Empty);
+            return Regex.Replace(txt, @"\s", string.Empty);
         }
 
         internal static string StripFileExtension(this string fileName)

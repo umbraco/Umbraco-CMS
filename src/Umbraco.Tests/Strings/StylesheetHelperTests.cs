@@ -23,7 +23,7 @@ namespace Umbraco.Tests.Strings
             });
 
             Assert.AreEqual(@"body {font-family:Arial;}/**umb_name:My new rule*/
-p{font-size:1em; color:blue;} /** umb_name:  Test2 */ li {padding:0px;} table {margin:0;}".StripBlockWhitespace(), result.StripBlockWhitespace());
+p{font-size:1em; color:blue;} /** umb_name:  Test2 */ li {padding:0px;} table {margin:0;}".StripWhitespace(), result.StripWhitespace());
         }
 
         [Test]
@@ -41,7 +41,7 @@ p{font-size:1em; color:blue;} /** umb_name:  Test2 */ li {padding:0px;} table {m
             Assert.AreEqual(@"body {font-family:Arial;}/** Umb_Name: Test1 */ p { font-size: 1em; } /** umb_name:  Test2 */ li {padding:0px;} table {margin:0;}
 
 /**umb_name:My new rule*/
-p{font-size:1em; color:blue;}".StripBlockWhitespace(), result.StripBlockWhitespace());
+p{font-size:1em; color:blue;}".StripWhitespace(), result.StripWhitespace());
         }
 
         [Test]
@@ -96,7 +96,7 @@ font-size: 1em;
             //Assert.IsTrue(results.First().RuleId.Value.Value.ToString() == file.Id.Value.Value + "/" + name);
             Assert.AreEqual(name, results.First().Name);
             Assert.AreEqual(selector, results.First().Selector);
-            Assert.AreEqual(styles.StripBlockWhitespace(), results.First().Styles.StripBlockWhitespace());
+            Assert.AreEqual(styles.StripWhitespace(), results.First().Styles.StripWhitespace());
         }
 
         // No Name: keyword
