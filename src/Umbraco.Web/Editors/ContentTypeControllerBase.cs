@@ -178,7 +178,7 @@ namespace Umbraco.Web.Editors
 
             if (ModelState.IsValid == false)
             {
-                throw CreateModelStateValidationException<TContentTypeDisplay, TContentType>(ctId, contentTypeSave, ct);
+                throw CreateModelStateValidationException<TContentTypeSave, TContentTypeDisplay, TContentType>(ctId, contentTypeSave, ct);
             }
 
             //filter out empty properties
@@ -385,7 +385,7 @@ namespace Umbraco.Web.Editors
             if (invalidCompositionException != null)
             {
                 AddCompositionValidationErrors<TContentTypeSave, TPropertyType>(contentTypeSave, invalidCompositionException.PropertyTypeAliases);
-                return CreateModelStateValidationException<TContentTypeDisplay, TContentType>(ctId, contentTypeSave, ct);
+                return CreateModelStateValidationException<TContentTypeSave, TContentTypeDisplay, TContentType>(ctId, contentTypeSave, ct);
             }
             return null;
         }
@@ -395,12 +395,14 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <typeparam name="TContentTypeDisplay"></typeparam>
         /// <typeparam name="TContentType"></typeparam>
+        /// <typeparam name="TContentTypeSave"></typeparam>
         /// <param name="ctId"></param>
         /// <param name="contentTypeSave"></param>
         /// <param name="ct"></param>
-        private HttpResponseException CreateModelStateValidationException<TContentTypeDisplay, TContentType>(int ctId, ContentTypeSave contentTypeSave, TContentType ct)
+        private HttpResponseException CreateModelStateValidationException<TContentTypeSave, TContentTypeDisplay, TContentType>(int ctId, TContentTypeSave contentTypeSave, TContentType ct)
             where TContentType : class, IContentTypeComposition
             where TContentTypeDisplay : ContentTypeCompositionDisplay
+            where TContentTypeSave : ContentTypeSave
         {
             TContentTypeDisplay forDisplay;
             if (ctId > 0)
