@@ -91,7 +91,7 @@ namespace Umbraco.Web.Models.ContentEditing
                 var lastProperty = duplicateProperties.Last().Last();
                 var propertyGroup = Groups.Single(x => x.Properties.Contains(lastProperty));                
 
-                yield return new ValidationResult("Duplicate property aliases not allowed", new[]
+                yield return new ValidationResult("Duplicate property aliases not allowed: " + lastProperty.Alias, new[]
                 {
                     string.Format("Groups[{0}].Properties[{1}].Alias", propertyGroup.SortOrder, lastProperty.SortOrder)
                 });
