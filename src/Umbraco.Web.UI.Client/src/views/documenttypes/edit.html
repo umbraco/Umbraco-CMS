@@ -14,13 +14,15 @@
                 icon="vm.contentType.icon">
             </umb-editor-header>
 
-            <umb-editor-container>
+            <umb-editor-container class="editors-document-type-container">
 
-                <umb-editor-sub-views
-                    ng-if="!vm.page.loading"
-                    sub-views="vm.page.navigation"
-                    model="vm.contentType">
-                </umb-editor-sub-views>
+                <div class="editors-document-type-canvas">
+                    <umb-editor-sub-views
+                        ng-if="!vm.page.loading"
+                        sub-views="vm.page.navigation"
+                        model="vm.contentType">
+                    </umb-editor-sub-views>
+                </div>
 
             </umb-editor-container>
 
@@ -38,7 +40,8 @@
 
                     <umb-button
                         ng-if="!vm.page.modelsBuilder"
-                        type="button" action="vm.save()"
+                        type="button" 
+                        action="vm.save()"
                         state="vm.page.saveButtonState"
                         button-style="success"
                         shortcut="ctrl+s"
