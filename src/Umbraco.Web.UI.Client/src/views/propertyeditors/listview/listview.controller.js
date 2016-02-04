@@ -440,7 +440,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
         $scope.options.allowBulkPublish = $scope.options.allowBulkPublish && !$scope.isTrashed;
         $scope.options.allowBulkUnpublish = $scope.options.allowBulkUnpublish && !$scope.isTrashed;
 
-        $scope.bulkActionsAllowed = $scope.options.allowBulkPublish ||
+        $scope.options.bulkActionsAllowed = $scope.options.allowBulkPublish ||
             $scope.options.allowBulkUnpublish ||
             $scope.options.allowBulkCopy ||
             $scope.options.allowBulkMove ||

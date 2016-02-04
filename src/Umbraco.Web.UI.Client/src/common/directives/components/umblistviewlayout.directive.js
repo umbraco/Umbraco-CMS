@@ -21,7 +21,6 @@
             contentId: '=',
             folders: '=',
             items: '=',
-            allowSelectAll: '=',
             selection: '=',
             options: '=',
             entityType: '@',
