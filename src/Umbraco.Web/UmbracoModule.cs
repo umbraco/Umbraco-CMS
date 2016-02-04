@@ -61,12 +61,12 @@ namespace Umbraco.Web
             legacyRequestInitializer.InitializeRequest();
 
             // create the UmbracoContext singleton, one per request, and assign
-            // NOTE: we assign 'true' to ensure the context is replaced if it is already set (i.e. during app startup)            
+            // NOTE: we assign 'true' to ensure the context is replaced if it is already set (i.e. during app startup)
             UmbracoContext.EnsureContext(
-                httpContext, 
-                ApplicationContext.Current, 
-                new WebSecurity(httpContext, ApplicationContext.Current), 
-                true);    
+                httpContext,
+                ApplicationContext.Current,
+                new WebSecurity(httpContext, ApplicationContext.Current),
+                true);
 		}
 
 		/// <summary>
@@ -74,12 +74,12 @@ namespace Umbraco.Web
 		/// </summary>
 		/// <param name="httpContext"></param>
 		/// <remarks>
-		/// 
+		///
 		/// This will check if we are trying to route to the default back office page (i.e. ~/Umbraco/ or ~/Umbraco or ~/Umbraco/Default )
-		/// and ensure that the MVC handler executes for that. This is required because the route for /Umbraco will never execute because 
+		/// and ensure that the MVC handler executes for that. This is required because the route for /Umbraco will never execute because
         /// files/folders exist there and we cannot set the RouteCollection.RouteExistingFiles = true since that will muck a lot of other things up.
         /// So we handle it here and explicitly execute the MVC controller.
-		/// 
+		///
 		/// </remarks>
 		void ProcessRequest(HttpContextBase httpContext)
 		{
@@ -99,7 +99,7 @@ namespace Umbraco.Web
             {
                 if (EnsureIsConfigured(httpContext, umbracoContext.OriginalRequestUrl))
                 {
-                    RewriteToBackOfficeHandler(httpContext);                    
+                    RewriteToBackOfficeHandler(httpContext);
                 }
                 return;
             }
@@ -119,7 +119,7 @@ namespace Umbraco.Web
 			{
                 return;
 			}
-				
+
 
 			httpContext.Trace.Write("UmbracoModule", "Umbraco request confirmed");
 
@@ -149,10 +149,10 @@ namespace Umbraco.Web
 		#endregion
 
 		#region Methods
-        
+
 		/// <summary>
 		/// Checks the current request and ensures that it is routable based on the structure of the request and URI
-		/// </summary>		
+		/// </summary>
 		/// <param name="context"></param>
 		/// <param name="httpContext"></param>
 		/// <returns></returns>
@@ -171,12 +171,12 @@ namespace Umbraco.Web
 			else if (!EnsureIsReady(httpContext, uri))
 			{
 			    reason = EnsureRoutableOutcome.NotReady;
-			}                
+			}
 			// ensure Umbraco is properly configured to serve documents
 			else if (!EnsureIsConfigured(httpContext, uri))
             {
                 reason = EnsureRoutableOutcome.NotConfigured;
-            }                
+            }
             // ensure Umbraco has documents to serve
             else if (!EnsureHasContent(context, httpContext))
             {
@@ -220,7 +220,8 @@ namespace Umbraco.Web
 
 			// if the path contains an extension that is not .aspx
 			// then it cannot be a document request
-			if (maybeDoc && lpath.Contains('.') && !lpath.EndsWith(".aspx"))
+		    var extension = Path.GetExtension(lpath);
+            if (maybeDoc && extension.IsNullOrWhiteSpace() == false && extension != ".aspx")
 				maybeDoc = false;
 
 			// at that point, either we have no extension, or it is .aspx
@@ -261,7 +262,7 @@ namespace Umbraco.Web
 					httpContext.Response.StatusCode = 503;
 
                     var bootUrl = "~/config/splashes/booting.aspx";
-					
+
 					httpContext.RewritePath(UriUtility.ToAbsolute(bootUrl) + "?url=" + HttpUtility.UrlEncode(uri.ToString()));
 
 					return false;
@@ -280,7 +281,7 @@ namespace Umbraco.Web
 		        return true;
 
             LogHelper.Warn<UmbracoModule>("Umbraco has no content");
-            
+
 			const string noContentUrl = "~/config/splashes/noNodes.aspx";
 			httpContext.RewritePath(UriUtility.ToAbsolute(noContentUrl));
 
@@ -337,7 +338,7 @@ namespace Umbraco.Web
                 response.TrySkipIisCustomErrors = UmbracoConfig.For.UmbracoSettings().WebRouting.TrySkipIisCustomErrors;
 
                 if (response.TrySkipIisCustomErrors == false)
-                    LogHelper.Warn<UmbracoModule>("Status code is 404 yet TrySkipIisCustomErrors is false - IIS will take over.");          
+                    LogHelper.Warn<UmbracoModule>("Status code is 404 yet TrySkipIisCustomErrors is false - IIS will take over.");
             }
 
             if (pcr.ResponseStatusCode > 0)
@@ -373,8 +374,8 @@ namespace Umbraco.Web
             // rewrite the path to the path of the handler (i.e. /umbraco/RenderMvc)
             context.RewritePath(rewritePath, "", "", false);
 
-            //if it is MVC we need to do something special, we are not using TransferRequest as this will 
-            //require us to rewrite the path with query strings and then reparse the query strings, this would 
+            //if it is MVC we need to do something special, we are not using TransferRequest as this will
+            //require us to rewrite the path with query strings and then reparse the query strings, this would
             //also mean that we need to handle IIS 7 vs pre-IIS 7 differently. Instead we are just going to create
             //an instance of the UrlRoutingModule and call it's PostResolveRequestCache method. This does:
             // * Looks up the route based on the new rewritten URL
@@ -389,7 +390,7 @@ namespace Umbraco.Web
         /// <summary>
 		/// Rewrites to the Umbraco handler - we always send the request via our MVC rendering engine, this will deal with
 		/// requests destined for webforms.
-        /// </summary>		
+        /// </summary>
         /// <param name="context"></param>
         /// <param name="pcr"> </param>
         private static void RewriteToUmbracoHandler(HttpContextBase context, PublishedContentRequest pcr)
@@ -406,8 +407,8 @@ namespace Umbraco.Web
             // rewrite the path to the path of the handler (i.e. /umbraco/RenderMvc)
             context.RewritePath(rewritePath, "", query, false);
 
-            //if it is MVC we need to do something special, we are not using TransferRequest as this will 
-            //require us to rewrite the path with query strings and then reparse the query strings, this would 
+            //if it is MVC we need to do something special, we are not using TransferRequest as this will
+            //require us to rewrite the path with query strings and then reparse the query strings, this would
             //also mean that we need to handle IIS 7 vs pre-IIS 7 differently. Instead we are just going to create
             //an instance of the UrlRoutingModule and call it's PostResolveRequestCache method. This does:
             // * Looks up the route based on the new rewritten URL
@@ -419,7 +420,7 @@ namespace Umbraco.Web
             urlRouting.PostResolveRequestCache(context);
         }
 
-       
+
 	    /// <summary>
         /// Any object that is in the HttpContext.Items collection that is IDisposable will get disposed on the end of the request
         /// </summary>
@@ -431,7 +432,7 @@ namespace Umbraco.Web
                 return;
 
             //get a list of keys to dispose
-            var keys = new HashSet<object>();            
+            var keys = new HashSet<object>();
             foreach (DictionaryEntry i in http.Items)
             {
                 if (i.Value is IDisposeOnRequestEnd || i.Key is IDisposeOnRequestEnd)
@@ -466,7 +467,7 @@ namespace Umbraco.Web
 		#region IHttpModule
 
 		/// <summary>
-		/// Initialize the module,  this will trigger for each new application 
+		/// Initialize the module,  this will trigger for each new application
 		/// and there may be more than 1 application per application domain
 		/// </summary>
 		/// <param name="app"></param>
@@ -480,7 +481,7 @@ namespace Umbraco.Web
 				};
 
             //disable asp.net headers (security)
-            // This is the correct place to modify headers according to MS: 
+            // This is the correct place to modify headers according to MS:
             // https://our.umbraco.org/forum/umbraco-7/using-umbraco-7/65241-Heap-error-from-header-manipulation?p=0#comment220889
 		    app.PostReleaseRequestState += (sender, args) =>
 		    {
@@ -507,7 +508,7 @@ namespace Umbraco.Web
 
 			app.EndRequest += (sender, args) =>
 				{
-					var httpContext = ((HttpApplication)sender).Context;					
+					var httpContext = ((HttpApplication)sender).Context;
 					if (UmbracoContext.Current != null && UmbracoContext.Current.IsFrontEndUmbracoRequest)
 					{
 						LogHelper.Debug<UmbracoModule>(
@@ -541,7 +542,7 @@ namespace Umbraco.Web
         {
             if (EndRequest != null)
                 EndRequest(this, args);
-        } 
+        }
         #endregion
 
 
@@ -573,7 +574,7 @@ namespace Umbraco.Web
             }
 
             return allRoutes;
-        }); 
+        });
 
         /// <summary>
         /// This is used internally to track any registered callback paths for Identity providers. If the request path matches
