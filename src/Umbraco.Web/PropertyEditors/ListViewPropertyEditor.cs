@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Umbraco.Core;
-using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
@@ -40,14 +35,21 @@ namespace Umbraco.Web.PropertyEditors
                             new {name = "List", path = "views/propertyeditors/listview/layouts/list/list.html", icon = "icon-list", isSystem = 1, selected = true},
                             new {name = "Grid", path = "views/propertyeditors/listview/layouts/grid/grid.html", icon = "icon-thumbnails-small", isSystem = 1, selected = true}
                         }
-                    }
+                    },
+                    {"bulkActionPermissions", new
+                        {
+                            allowBulkPublish = true,
+                            allowBulkUnpublish = true,
+                            allowBulkCopy = true,
+                            allowBulkMove = true,
+                            allowBulkDelete = true
+                        }}
                 };
             }
         }
 
         internal class ListViewPreValueEditor : PreValueEditor
         {
-
             [PreValueField("pageSize", "Page Size", "number", Description = "Number of items per page")]
             public int PageSize { get; set; }
 
@@ -64,8 +66,23 @@ namespace Umbraco.Web.PropertyEditors
             [PreValueField("includeProperties", "Columns Displayed", "views/propertyeditors/listview/includeproperties.prevalues.html", 
                 Description = "The properties that will be displayed for each column")]
             public object IncludeProperties { get; set; }
+
+            [PreValueField("bulkActionPermissions", "Bulk Action Permissions", "views/propertyeditors/listview/bulkactionpermissions.prevalues.html",
+                Description = "The bulk actions that are allowed from the list view")]
+            public BulkActionPermissionSettings BulkActionPermissions { get; set; }
+
+            internal class BulkActionPermissionSettings
+            {
+                public bool AllowBulkPublish { get; set; }
+
+                public bool AllowBulkUnpublish { get; set; }
+
+                public bool AllowBulkCopy { get; set; }
+
+                public bool AllowBulkMove { get; set; }
+
+                public bool AllowBulkDelete { get; set; }                
+            }
         }
-
-
     }
 }
