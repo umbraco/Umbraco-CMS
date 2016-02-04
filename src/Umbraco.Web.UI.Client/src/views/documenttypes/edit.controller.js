@@ -9,10 +9,11 @@
 (function () {
     "use strict";
 
-    function DocumentTypesEditController($scope, $routeParams, $injector, contentTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter, $q, localizationService, overlayHelper) {
+    function DocumentTypesEditController($scope, $routeParams, $injector, contentTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter, $q, localizationService, overlayHelper, eventsService) {
 
         var vm = this;
         var localizeSaving = localizationService.localize("general_saving");
+        var evts = [];
 
         vm.save = save;
 
@@ -158,6 +159,11 @@
 				});
         }
         else {
+            loadDocumentType();
+        }
+
+        function loadDocumentType() {
+
             vm.page.loading = true;
 
             contentTypeResource.getById($routeParams.id).then(function (dt) {
@@ -168,6 +174,7 @@
                 vm.page.loading = false;
 
             });
+
         }
 
 
@@ -316,6 +323,17 @@
                 vm.currentNode = syncArgs.node;
             });
         }
+
+        evts.push(eventsService.on("app.refreshEditor", function(name, error) {
+            loadDocumentType();
+        }));
+
+        //ensure to unregister from all events!
+        $scope.$on('$destroy', function () {
+            for (var e in evts) {
+                eventsService.unsubscribe(evts[e]);
+            }
+        });
 
     }
 
