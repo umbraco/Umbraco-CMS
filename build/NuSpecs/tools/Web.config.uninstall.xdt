@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+  <configSections xdt:Transform="InsertIfMissing" />
+  <configSections>
+    <section name="BaseRestExtensions" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+    <section name="FileSystemProviders" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+    <section name="ExamineLuceneIndexSets" type="Examine.LuceneEngine.Config.IndexSets, Examine" requirePermission="false" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+    <sectionGroup name="applicationSettings" xdt:Locator="Match(name)">
+      <section name="umbraco.presentation.Properties.Settings" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+    </sectionGroup>
+    <sectionGroup name="system.web.webPages.razor" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+    <sectionGroup name="umbracoConfiguration" xdt:Locator="Match(name)" xdt:Transform="Remove"/>
+  </configSections>
+
+  <ExamineLuceneIndexSets xdt:Transform="Remove"/>
+  <urlrewritingnet xdt:Transform="Remove"/>
+  <microsoft.scripting xdt:Transform="Remove"/>
+  <clientDependency xdt:Transform="Remove"/>
+  <Examine xdt:Transform="Remove"/>
+  <log4net xdt:Transform="Remove"/>
+
+  <appSettings>
+    <add key="umbracoConfigurationStatus" xdt:Locator="Match(key)" xdt:Transform="Remove"/>
+    <add key="umbracoReservedUrls" xdt:Locator="Match(key)" xdt:Transform="Remove"/>
+    <add key="umbracoReservedPaths" xdt:Locator="Match(key)" xdt:Transform="Remove"/>
+    <add key="umbracoPath" xdt:Locator="Match(key)" xdt:Transform="Remove"/>
+    <add key="umbracoHideTopLevelNodeFromPath" xdt:Locator="Match(key)" xdt:Transform="Remove"/>
+    <add key="umbracoUseDirectoryUrls" xdt:Locator="Match(key)" xdt:Transform="Remove"/>
+    <add key="umbracoTimeOutInMinutes" xdt:Locator="Match(key)" xdt:Transform="Remove"/>
+    <add key="umbracoDefaultUILanguage" xdt:Locator="Match(key)" xdt:Transform="Remove"/>
+    <add key="umbracoUseSSL" xdt:Locator="Match(key)" xdt:Transform="Remove"/>
+    <add key="owin:appStartup" value="UmbracoDefaultOwinStartup" xdt:Locator="Match(key,value)" xdt:Transform="Remove" />
+  </appSettings>
+
+  <umbracoConfiguration xdt:Transform="Remove"/>
+  <FileSystemProviders xdt:Transform="Remove" />
+  <BaseRestExtensions xdt:Transform="Remove" />
+  <connectionStrings>
+    <remove name="umbracoDbDSN" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+    <add name="umbracoDbDSN" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+  </connectionStrings>
+
+  <system.web>
+    <pages>
+      <controls>
+        <add tagPrefix="umbraco" xdt:Locator="Match(tagPrefix)" xdt:Transform="Remove" />
+      </controls>
+    </pages>
+    <httpModules>
+      <add name="UmbracoModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+    </httpModules>
+    <httpHandlers>
+      <add type="umbraco.presentation.channels.api, umbraco" xdt:Locator="Match(type)" xdt:Transform="Remove" />
+      <add type="umbraco.presentation.channels.wordApi, umbraco" xdt:Locator="Match(type)" xdt:Transform="Remove" />
+    </httpHandlers>
+    <compilation>
+      <buildProviders>
+        <add type="umbraco.MacroEngines.RazorBuildProvider, umbraco.MacroEngines" xdt:Locator="Match(type)" xdt:Transform="Remove" />
+        <add type="umbraco.MacroEngines.RazorBuildProvider, umbraco.MacroEngines" xdt:Locator="Match(type)" xdt:Transform="Remove" />
+        <add type="umbraco.MacroEngines.RazorBuildProvider, umbraco.MacroEngines" xdt:Locator="Match(type)" xdt:Transform="Remove" />
+      </buildProviders>
+    </compilation>
+    <membership>
+      <providers>
+        <add name="UmbracoMembershipProvider" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+        <add name="UsersMembershipProvider" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+      </providers>
+    </membership>
+    <roleManager>
+      <providers>
+        <add name="UmbracoRoleProvider" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+      </providers>
+    </roleManager>
+  </system.web>
+  <system.webServer>
+    <modules>
+      <remove name="UmbracoModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+      <add name="UmbracoModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+    </modules>
+    <handlers>
+      <remove name="Channels" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+      <remove name="Channels_Word" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+      <add name="Channels" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+      <add name="Channels_Word" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+    </handlers>
+  </system.webServer>
+  <location path="umbraco" xdt:Locator="Match(path)" xdt:Transform="Remove" />/>
+  <location path="App_Plugins" xdt:Locator="Match(path)" xdt:Transform="Remove" />/>
+
+</configuration>
