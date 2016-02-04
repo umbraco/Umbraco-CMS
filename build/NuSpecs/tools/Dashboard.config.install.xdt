@@ -77,7 +77,4 @@
   <section alias="uGoLiveDashboardSection" xdt:Locator="Match(alias)" xdt:Transform="Remove" />
   
   <section alias="ExamineManagement" xdt:Locator="Match(alias)" xdt:Transform="Remove" />
-  
-  <section alias="StartupDashboardSection" xdt:Locator="Match(alias)" xdt:Transform="Remove" />
-    
 </dashBoard>
