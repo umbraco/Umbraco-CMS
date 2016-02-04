@@ -51,13 +51,14 @@
          templateUrl: 'views/components/umb-table.html',
          scope: {
             items: '=',
-            itemProperties: "=",
+            itemProperties: '=',
+            allowSelectAll: '=',
             onSelect: '=',
-            onClick: "=",
-            onSelectAll: "=",
-            onSelectedAll: "=",
-            onSortingDirection: "=",
-            onSort:"="
+            onClick: '=',
+            onSelectAll: '=',
+            onSelectedAll: '=',
+            onSortingDirection: '=',
+            onSort: '='
          },
          link: link
       };
