@@ -164,6 +164,9 @@ namespace Umbraco.Core.Models.PublishedContent
 
         private void InitializeConverters()
         {
+            //TODO: Look at optimizing this method, it gets run for every property type for the document being rendered at startup,
+            // every precious second counts!
+
             var converters = PropertyValueConvertersResolver.Current.Converters.ToArray();            
             var defaultConvertersWithAttributes = PropertyValueConvertersResolver.Current.DefaultConverters;
 

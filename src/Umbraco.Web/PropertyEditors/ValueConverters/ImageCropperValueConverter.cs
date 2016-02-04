@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 
@@ -14,7 +15,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     /// <summary>
     /// Used to strongly type the value for the image cropper
     /// </summary>
-    [DefaultPropertyValueConverter(typeof (Core.PropertyEditors.ValueConverters.ImageCropperValueConverter))] //this shadows the Core.PropertyEditors.ValueConverters.ImageCropperValueConverter
+    [DefaultPropertyValueConverter(typeof (JsonValueConverter))] //this shadows the JsonValueConverter
     [PropertyValueType(typeof (ImageCropDataSet))]
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     public class ImageCropperValueConverter : Core.PropertyEditors.ValueConverters.ImageCropperValueConverter
