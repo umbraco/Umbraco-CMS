@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -220,8 +220,13 @@ namespace Umbraco.Web
 
 			// if the path contains an extension that is not .aspx
 			// then it cannot be a document request
-			if (maybeDoc && lpath.Contains('.') && !lpath.EndsWith(".aspx"))
-				maybeDoc = false;
+			//get extension from path 
+			//previously was: 
+			//if (maybeDoc && lpath.Contains('.') && !lpath.EndsWith(".aspx"))
+			//but this means that umbraco in a virtual directory where the virtual directory name contains . will trip here
+			string extension = Path.GetExtension(lpath);
+			if (maybeDoc && !string.IsNullOrEmpty(extension) && !string.Equals(extension, ".aspx"))
+				maybeDoc = false;    
 
 			// at that point, either we have no extension, or it is .aspx
 
