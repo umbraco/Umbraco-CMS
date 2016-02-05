@@ -1,10 +1,11 @@
 using System;
 using System.Runtime.Serialization;
+using Umbraco.Core.Dynamics;
 
 namespace Umbraco.Web.Models
 {
     [DataContract(Name = "imageCropFocalPoint")]
-    public class ImageCropFocalPoint : IEquatable<ImageCropFocalPoint>
+    public class ImageCropFocalPoint : CaseInsensitiveDynamicObject<ImageCropFocalPoint>, IEquatable<ImageCropFocalPoint>
     {
         [DataMember(Name = "left")]
         public decimal Left { get; set; }

@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using Umbraco.Core.Dynamics;
 
 namespace Umbraco.Web.Models
 {
     [DataContract(Name = "imageCropData")]
-    public class ImageCropData : IEquatable<ImageCropData>
+    public class ImageCropData : CaseInsensitiveDynamicObject<ImageCropData>, IEquatable<ImageCropData>
     {
         [DataMember(Name = "alias")]
         public string Alias { get; set; }

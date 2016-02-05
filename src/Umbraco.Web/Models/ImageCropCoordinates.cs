@@ -1,10 +1,11 @@
 using System;
 using System.Runtime.Serialization;
+using Umbraco.Core.Dynamics;
 
 namespace Umbraco.Web.Models
 {
     [DataContract(Name = "imageCropCoordinates")]
-    public class ImageCropCoordinates : IEquatable<ImageCropCoordinates>
+    public class ImageCropCoordinates : CaseInsensitiveDynamicObject<ImageCropCoordinates>, IEquatable<ImageCropCoordinates>
     {
         [DataMember(Name = "x1")]
         public decimal X1 { get; set; }

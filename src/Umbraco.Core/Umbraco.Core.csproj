@@ -309,6 +309,7 @@
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="Dictionary\CultureDictionaryFactoryResolver.cs" />
     <Compile Include="Dictionary\ICultureDictionaryFactory.cs" />
+    <Compile Include="Dynamics\CaseInsensitiveDynamicObject.cs" />
     <Compile Include="Dynamics\DynamicInstanceHelper.cs" />
     <Compile Include="Dynamics\DynamicXmlConverter.cs" />
     <Compile Include="Events\CancellableEventArgs.cs" />

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using Moq;
 using Newtonsoft.Json;
@@ -24,7 +25,86 @@ namespace Umbraco.Tests.PropertyEditors
         private const string cropperJson2 = "{\"focalPoint\": {\"left\": 0.98,\"top\": 0.80827067669172936},\"src\": \"/media/1005/img_0672.jpg\",\"crops\": [{\"alias\":\"thumb\",\"width\": 100,\"height\": 100,\"coordinates\": {\"x1\": 0.58729977382575338,\"y1\": 0.055768992440203169,\"x2\": 0,\"y2\": 0.32457553600198386}}]}";
         private const string cropperJson3 = "{\"focalPoint\": {\"left\": 0.98,\"top\": 0.80827067669172936},\"src\": \"/media/1005/img_0672.jpg\",\"crops\": []}";
         private const string mediaPath = "/media/1005/img_0671.jpg";
-        
+
+        [Test]
+        public void ImageCropData_Properties_As_Dynamic()
+        {
+            var sourceObj = cropperJson1.SerializeToCropDataSet();
+            dynamic d = sourceObj;
+
+            var index = 0;
+            foreach (var crop in d.crops)
+            {
+                var realObjCrop = sourceObj.Crops.ElementAt(index);
+                Assert.AreEqual(realObjCrop.Alias, crop.Alias);
+                Assert.AreEqual(realObjCrop.Alias, crop.alias);
+
+                Assert.AreEqual(realObjCrop.Height, crop.Height);
+                Assert.AreEqual(realObjCrop.Height, crop.height);
+
+                Assert.AreEqual(realObjCrop.Coordinates.X1, crop.Coordinates.X1);
+                Assert.AreEqual(realObjCrop.Coordinates.X1, crop.coordinates.x1);
+
+                Assert.AreEqual(realObjCrop.Coordinates.X2, crop.Coordinates.X2);
+                Assert.AreEqual(realObjCrop.Coordinates.X2, crop.coordinates.x2);
+
+                Assert.AreEqual(realObjCrop.Coordinates.Y1, crop.Coordinates.Y1);
+                Assert.AreEqual(realObjCrop.Coordinates.Y1, crop.coordinates.y1);
+
+                Assert.AreEqual(realObjCrop.Coordinates.Y2, crop.Coordinates.Y2);
+                Assert.AreEqual(realObjCrop.Coordinates.Y2, crop.coordinates.y2);
+                index++;
+            }
+
+            Assert.AreEqual(index, 1);            
+        }
+
+        [Test]
+        public void ImageCropFocalPoint_Properties_As_Dynamic()
+        {
+            var sourceObj = cropperJson1.SerializeToCropDataSet();
+            dynamic d = sourceObj;
+
+            Assert.AreEqual(sourceObj.FocalPoint.Left, d.FocalPoint.Left);
+            Assert.AreEqual(sourceObj.FocalPoint.Left, d.focalPoint.left);
+
+            Assert.AreEqual(sourceObj.FocalPoint.Top, d.FocalPoint.Top);
+            Assert.AreEqual(sourceObj.FocalPoint.Top, d.focalPoint.top);
+        }
+
+        [Test]
+        public void ImageCropDataSet_Properties_As_Dynamic()
+        {
+            var sourceObj = cropperJson1.SerializeToCropDataSet();
+            dynamic d = sourceObj;
+
+            Assert.AreEqual(sourceObj.Src, d.Src);
+            Assert.AreEqual(sourceObj.Src, d.src);
+
+            Assert.AreEqual(sourceObj.FocalPoint, d.FocalPoint);
+            Assert.AreEqual(sourceObj.FocalPoint, d.focalPoint);
+
+            Assert.AreEqual(sourceObj.Crops, d.Crops);
+            Assert.AreEqual(sourceObj.Crops, d.crops);
+        }
+
+        [Test]
+        public void ImageCropDataSet_Methods_As_Dynamic()
+        {
+            var sourceObj = cropperJson1.SerializeToCropDataSet();
+            dynamic d = sourceObj;
+
+            Assert.AreEqual(sourceObj.HasCrop("thumb"), d.HasCrop("thumb"));
+            Assert.AreEqual(sourceObj.HasCrop("thumb"), d.hasCrop("thumb"));
+
+            Assert.AreEqual(sourceObj.GetCropUrl("thumb"), d.GetCropUrl("thumb"));
+            Assert.AreEqual(sourceObj.GetCropUrl("thumb"), d.getCropUrl("thumb"));
+
+            Assert.AreEqual(sourceObj.HasFocalPoint(), d.HasFocalPoint());
+            Assert.AreEqual(sourceObj.HasFocalPoint(), d.hasFocalPoint());
+        }
+
+        [Test]
         public void CanConvertImageCropperDataSetSrcToString()
         {
             //cropperJson3 - has not crops
@@ -34,6 +114,7 @@ namespace Umbraco.Tests.PropertyEditors
             Assert.AreEqual(destObj.Result, "/media/1005/img_0672.jpg");
         }
 
+        [Test]
         public void CanConvertImageCropperDataSetJObject()
         {
             //cropperJson3 - has not crops
@@ -43,13 +124,14 @@ namespace Umbraco.Tests.PropertyEditors
             Assert.AreEqual(sourceObj, destObj.Result.ToObject<ImageCropDataSet>());
         }
 
+        [Test]
         public void CanConvertImageCropperDataSetJsonToString()
         {
             var sourceObj = cropperJson1.SerializeToCropDataSet();
             var destObj = sourceObj.TryConvertTo<string>();
             Assert.IsTrue(destObj.Success);
             Assert.IsTrue(destObj.Result.DetectIsJson());
-            var obj = JsonConvert.DeserializeObject<ImageCropDataSet>(cropperJson1);
+            var obj = JsonConvert.DeserializeObject<ImageCropDataSet>(cropperJson1, new JsonSerializerSettings {Culture = CultureInfo.InvariantCulture, FloatParseHandling = FloatParseHandling.Decimal});
             Assert.AreEqual(sourceObj, obj);
         }
 

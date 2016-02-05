@@ -1,11 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Dynamic;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Web;
 using Newtonsoft.Json;
+using Umbraco.Core;
+using Umbraco.Core.Dynamics;
 using Umbraco.Core.Serialization;
 using Umbraco.Web.PropertyEditors.ValueConverters;
 
@@ -14,8 +19,9 @@ namespace Umbraco.Web.Models
     [JsonConverter(typeof(NoTypeConverterJsonConverter<ImageCropDataSet>))]
     [TypeConverter(typeof(ImageCropDataSetConverter))]
     [DataContract(Name="imageCropDataSet")]
-    public class ImageCropDataSet : IHtmlString, IEquatable<ImageCropDataSet>
-    {
+    public class ImageCropDataSet : CaseInsensitiveDynamicObject<ImageCropDataSet>, IHtmlString, IEquatable<ImageCropDataSet>
+    {   
+
         [DataMember(Name="src")]
         public string Src { get; set;}
 
@@ -88,6 +94,7 @@ namespace Umbraco.Web.Models
         {
             return Crops.Any() ? JsonConvert.SerializeObject(this) : Src;
         }
+               
 
         /// <summary>
         /// Indicates whether the current object is equal to another object of the same type.
