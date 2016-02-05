@@ -49,6 +49,7 @@ if ($project) {
 		if(Test-Path $umbracoBinFolder\umbraco.editorControls.dll) { Remove-Item $umbracoBinFolder\umbraco.editorControls.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\umbraco.MacroEngines.dll) { Remove-Item $umbracoBinFolder\umbraco.MacroEngines.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Umbraco.ModelsBuilder.dll) { Remove-Item $umbracoBinFolder\Umbraco.ModelsBuilder.dll -Force -Confirm:$false }
+		if(Test-Path $umbracoBinFolder\Umbraco.ModelsBuilder.AspNet.dll) { Remove-Item $umbracoBinFolder\Umbraco.ModelsBuilder.AspNet.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\umbraco.providers.dll) { Remove-Item $umbracoBinFolder\umbraco.providers.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Umbraco.Web.UI.dll) { Remove-Item $umbracoBinFolder\Umbraco.Web.UI.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\UmbracoExamine.dll) { Remove-Item $umbracoBinFolder\UmbracoExamine.dll -Force -Confirm:$false }
