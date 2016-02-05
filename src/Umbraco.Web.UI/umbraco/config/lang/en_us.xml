@@ -375,6 +375,7 @@
     <key alias="alias">Alias</key>
     <key alias="all">All</key>
     <key alias="areyousure">Are you sure?</key>
+    <key alias="back">Back</key>
     <key alias="border">Border</key>
     <key alias="by">by</key>
     <key alias="cancel">Cancel</key>
@@ -1189,7 +1190,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="administrators">Administrator</key>
     <key alias="categoryField">Category field</key>
     <key alias="changePassword">Change Your Password</key>
-    <key alias="newPassword">Change Your Password</key>
+    <key alias="newPassword">New password</key>
     <key alias="confirmNewPassword">Confirm new password</key>
     <key alias="changePasswordDescription">You can change your password for accessing the Umbraco Back Office by filling out the form below and click the 'Change Password' button</key>
     <key alias="contentChannel">Content Channel</key>
@@ -1203,6 +1204,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="mediastartnode">Start Node in Media Library</key>
     <key alias="modules">Sections</key>
     <key alias="noConsole">Disable Umbraco Access</key>
+    <key alias="oldPassword">Old password</key>
     <key alias="password">Password</key>
     <key alias="resetPassword">Reset password</key>
     <key alias="passwordChanged">Your password has been changed!</key>

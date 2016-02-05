@@ -319,6 +319,7 @@
     <key alias="add">Tilføj</key>
     <key alias="alias">Alias</key>
     <key alias="areyousure">Er du sikker?</key>
+    <key alias="back">Tilbage</key>
     <key alias="border">Kant</key>
     <key alias="by">af</key>
     <key alias="cancel">Fortryd</key>
@@ -1007,7 +1008,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="administrators">Administrator</key>
     <key alias="categoryField">Kategorifelt</key>
     <key alias="changePassword">Skift dit kodeord</key>
-    <key alias="newPassword">Skift dit kodeord</key>
+    <key alias="newPassword">Nyt kodeord</key>
     <key alias="confirmNewPassword">Gentag dit nye kodeord</key>
     <key alias="changePasswordDescription">Du kan ændre dit kodeord, som giver dig adgang til Umbraco Back Office ved at udfylde formularen og klikke på knappen 'Skift dit kodeord'</key>
     <key alias="contentChannel">Indholdskanal</key>
@@ -1021,6 +1022,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="mediastartnode">Startnode i mediearkivet</key>
     <key alias="modules">Moduler</key>
     <key alias="noConsole">Deaktivér adgang til Umbraco</key>
+    <key alias="oldPassword">Gammelt kodeord</key>
     <key alias="password">Adgangskode</key>
     <key alias="resetPassword">Nulstil kodeord</key>
     <key alias="passwordChanged">Dit kodeord er blevet ændret!</key>
