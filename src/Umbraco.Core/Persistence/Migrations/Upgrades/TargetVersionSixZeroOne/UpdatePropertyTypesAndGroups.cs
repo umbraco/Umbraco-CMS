@@ -33,36 +33,40 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixZeroOne
                 // won't exist yet
                 var propertyTypes = database.Fetch<dynamic>("SELECT * FROM cmsPropertyType WHERE propertyTypeGroupId > 0");
 
-                var propertyGroups = database.Fetch<PropertyTypeGroupDto>("WHERE id > 0");
+                // need to use dynamic, as PropertyTypeGroupDto has new properties
+                var propertyGroups = database.Fetch<dynamic>("SELECT * FROM cmsPropertyTypeGroup WHERE id > 0");
 
                 foreach (var propertyType in propertyTypes)
                 {
                     // get the PropertyTypeGroup of the current PropertyType, skip if not found
-                    var propertyTypeGroup = propertyGroups.FirstOrDefault(x => x.Id == propertyType.propertyTypeGroupId);
+                    var propertyTypeGroup = propertyGroups.FirstOrDefault(x => x.id == propertyType.propertyTypeGroupId);
                     if (propertyTypeGroup == null) continue;
 
                     // if the PropretyTypeGroup belongs to the same content type as the PropertyType, then fine
-                    if (propertyTypeGroup.ContentTypeNodeId == propertyType.contentTypeId) continue;
+                    if (propertyTypeGroup.contenttypeNodeId == propertyType.contentTypeId) continue;
 
                     // else we want to assign the PropertyType to a proper PropertyTypeGroup
                     // ie one that does belong to the same content - look for it
                     var okPropertyTypeGroup = propertyGroups.FirstOrDefault(x =>
-                        x.Text == propertyTypeGroup.Text && // same name
-                        x.ContentTypeNodeId == propertyType.contentTypeId); // but for proper content type
+                        x.text == propertyTypeGroup.text && // same name
+                        x.contenttypeNodeId == propertyType.contentTypeId); // but for proper content type
 
                     if (okPropertyTypeGroup == null)
                     {
-                        // does not exist, create a new PropertyTypeGroup,
-                        var propertyGroup = new PropertyTypeGroupDto
+                        // does not exist, create a new PropertyTypeGroup
+                        // cannot use a PropertyTypeGroupDto because of the new (not-yet-existing) uniqueID property
+                        // cannot use a dynamic because database.Insert fails to set the value of property
+                        var propertyGroup = new PropertyTypeGroupDtoTemp
                         {
-                            ContentTypeNodeId = propertyType.contentTypeId,
-                            Text = propertyTypeGroup.Text,
-                            SortOrder = propertyTypeGroup.SortOrder
+                            id = 0,
+                            contenttypeNodeId = propertyType.contentTypeId,
+                            text = propertyTypeGroup.text,
+                            sortorder = propertyTypeGroup.sortorder
                         };
 
                         // save + add to list of groups
-                        int id = Convert.ToInt16(database.Insert(propertyGroup));
-                        propertyGroup.Id = id;
+                        int id = Convert.ToInt16(database.Insert("cmsPropertyTypeGroup", "id", propertyGroup));
+                        propertyGroup.id = id;
                         propertyGroups.Add(propertyGroup);
 
                         // update the PropertyType to use the new PropertyTypeGroup
@@ -71,13 +75,21 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixZeroOne
                     else
                     {
                         // exists, update PropertyType to use the PropertyTypeGroup
-                        propertyType.propertyTypeGroupId = okPropertyTypeGroup.Id;
+                        propertyType.propertyTypeGroupId = okPropertyTypeGroup.id;
                     }
                     database.Update("cmsPropertyType", "id", propertyType);
                 }
             }
 
             return string.Empty;
+        }
+
+        private class PropertyTypeGroupDtoTemp
+        {
+            public int id { get; set; }
+            public int contenttypeNodeId { get; set; }
+            public string text { get; set; }
+            public int sortorder { get; set; }
         }
     }
 }

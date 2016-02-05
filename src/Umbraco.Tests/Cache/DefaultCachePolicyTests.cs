@@ -120,5 +120,37 @@ namespace Umbraco.Tests.Cache
                 Assert.IsTrue(cacheCleared);
             }
         }
+
+        [Test]
+        public void If_Removes_Throws_Cache_Is_Removed()
+        {
+            var cacheCleared = false;
+            var cache = new Mock<IRuntimeCacheProvider>();
+            cache.Setup(x => x.ClearCacheItem(It.IsAny<string>()))
+                .Callback(() =>
+                {
+                    cacheCleared = true;
+                });
+
+            var defaultPolicy = new DefaultRepositoryCachePolicy<AuditItem, object>(cache.Object, new RepositoryCachePolicyOptions());
+            try
+            {
+                using (defaultPolicy)
+                {
+                    defaultPolicy.Remove(new AuditItem(1, "blah", AuditType.Copy, 123), item =>
+                    {
+                        throw new Exception("blah!");
+                    });
+                }
+            }
+            catch
+            {
+                //we need this catch or nunit throw up
+            }
+            finally
+            {
+                Assert.IsTrue(cacheCleared);
+            }
+        }
     }
 }

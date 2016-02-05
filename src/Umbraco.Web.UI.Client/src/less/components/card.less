@@ -88,8 +88,7 @@
 	display: flex;
 	flex-flow: row wrap;
 	justify-content: flex-start;
- }
-
+}
 
 .umb-card-grid li {
 	padding: 5px;
@@ -98,31 +97,42 @@
 	text-align: center;
 
 	width: 100px;
-	height: 100px;
+	height: 105px;
 
 	box-sizing: border-box;
- }
+}
 
- .umb-card-grid li.-four-in-row {
-	 flex: 0 0 25%;
- }
+.umb-card-grid li.-four-in-row {
+	flex: 0 0 25%;
+}
 
- .umb-card-grid li.-three-in-row {
-	 flex: 0 0 33.33%;
- }
+.umb-card-grid li.-three-in-row {
+	flex: 0 0 33.33%;
+}
 
-.umb-card-grid li:hover, .umb-card-grid li:hover * {
-     background: @blue;
-     color: white;
-	 cursor: pointer;
- }
+.umb-card-grid .umb-card-grid-item {
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+
+
+ .umb-card-grid .umb-card-grid-item:hover,
+ .umb-card-grid .umb-card-grid-item:focus,
+ .umb-card-grid .umb-card-grid-item:hover > *,
+ .umb-card-grid .umb-card-grid-item:focus > *  {
+	background: @blue;
+	color: white;
+	cursor: pointer;
+	outline: none;
+}
 
 .umb-card-grid a {
      color: #222;
      text-decoration: none;
  }
 
-.umb-card-grid i{
+.umb-card-grid i {
      font-size: 30px;
      line-height: 50px;
      display: block;

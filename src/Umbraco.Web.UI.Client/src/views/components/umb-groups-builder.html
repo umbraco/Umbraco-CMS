@@ -84,7 +84,13 @@
                         </div>
                     </ng-form>
 
-                    <input type="number" class="umb-group-builder__group-sort-value" ng-if="sortingMode" ng-model="tab.sortOrder" ng-disabled="tab.inherited" on-blur="changeSortOrderValue()" />
+                    <ng-form name="groupSortOrderForm">
+                        <div class="umb-group-builder__group-sort-order" ng-if="sortingMode">
+                            <input name="groupSortOrder" type="number" class="umb-group-builder__group-sort-value" ng-model="tab.sortOrder" ng-disabled="tab.inherited" on-blur="changeSortOrderValue(tab)" required />
+                            <div class="umb-validation-label -arrow-left" ng-if="groupSortOrderForm.groupSortOrder.$error.required && tab.showSortOrderMissing"><localize key="required"></localize></div>
+                            <div class="umb-validation-label -arrow-left" ng-if="!tab.showSortOrderMissing" val-msg-for="groupSortOrder" val-toggle-msg="required"><localize key="required"></localize></div>
+                        </div>
+                    </ng-form>
 
                     <div class="umb-group-builder__group-inherited-label" ng-if="tab.inherited">
                         <i class="icon icon-merge"></i>
@@ -225,8 +231,6 @@
                                         preview="true">
                                     </umb-property-editor>
                                 </ng-form>
-
-                                <div class="umb-group-builder__property-preview-background"></div>
 
                             </div>
 

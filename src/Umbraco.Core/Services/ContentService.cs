@@ -1227,6 +1227,13 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the user issueing the delete operation</param>
         public void DeleteContentOfType(int contentTypeId, int userId = 0)
         {
+            //TODO: This currently this is called from the ContentTypeService but that needs to change, 
+            // if we are deleting a content type, we should just delete the data and do this operation slightly differently.
+            // This method will recursively go lookup every content item, check if any of it's descendants are
+            // of a different type, move them to the recycle bin, then permanently delete the content items. 
+            // The main problem with this is that for every content item being deleted, events are raised...
+            // which we need for many things like keeping caches in sync, but we can surely do this MUCH better.
+
             using (new WriteLock(Locker))
             {
                 using (var uow = UowProvider.GetUnitOfWork())

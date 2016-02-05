@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -103,7 +104,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 <asp:Content ContentPlaceHolderID=""ContentPlaceHolderDefault"" runat=""server"">
 
 </asp:Content>
-".CrLf(), template.Content);
+".StripWhitespace(), template.Content.StripWhitespace());
             }
 
         }
@@ -132,7 +133,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(_masterPageFileSystem.FileExists("test2.master"), Is.True);
                 Assert.AreEqual(@"<%@ Master Language=""C#"" MasterPageFile=""~/masterpages/test.master"" AutoEventWireup=""true"" %>
 
-".CrLf(), template2.Content);
+".StripWhitespace(), template2.Content.StripWhitespace());
             }
 
         }
@@ -176,10 +177,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //Assert
                 Assert.That(repository.Get("test"), Is.Not.Null);
                 Assert.That(_viewsFileSystem.FileExists("test.cshtml"), Is.True);
-                Assert.AreEqual(@"@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
-@{
-" + "\t" + @"Layout = null;
-}".Lf(), template.Content.Lf());
+                Assert.AreEqual(
+                    @"@inherits Umbraco.Web.Mvc.UmbracoTemplatePage @{ Layout = null;}".StripWhitespace(), 
+                    template.Content.StripWhitespace());
             }
 
         }
@@ -206,12 +206,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //Assert
                 Assert.That(repository.Get("test2"), Is.Not.Null);
                 Assert.That(_viewsFileSystem.FileExists("test2.cshtml"), Is.True);
-                Assert.AreEqual(@"@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
-@{
-" + "\t" + @"Layout = ""test.cshtml"";
-}".Lf(), template2.Content.Lf());
+                Assert.AreEqual(
+                    "@inherits Umbraco.Web.Mvc.UmbracoTemplatePage @{ Layout = \"test.cshtml\";}".StripWhitespace(),
+                    template2.Content.StripWhitespace());
             }
-
         }
 
         [Test]

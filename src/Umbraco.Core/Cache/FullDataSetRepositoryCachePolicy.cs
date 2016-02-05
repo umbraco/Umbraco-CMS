@@ -11,40 +11,157 @@ namespace Umbraco.Core.Cache
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
     /// <typeparam name="TId"></typeparam>
-    /// <remarks>
-    /// This caching policy has no sliding expiration but uses the default ObjectCache.InfiniteAbsoluteExpiration as it's timeout, so it
-    /// should not leave the cache unless the cache memory is exceeded and it gets thrown out.
-    /// </remarks>
-    internal class FullDataSetRepositoryCachePolicy<TEntity, TId> : DefaultRepositoryCachePolicy<TEntity, TId>
+    internal class FullDataSetRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyBase<TEntity, TId>
         where TEntity : class, IAggregateRoot
     {
         private readonly Func<TEntity, TId> _getEntityId;
+        private readonly Func<IEnumerable<TEntity>> _getAllFromRepo;
+        private readonly bool _expires;
 
-        public FullDataSetRepositoryCachePolicy(IRuntimeCacheProvider cache, Func<TEntity, TId> getEntityId) : base(cache,
-            new RepositoryCachePolicyOptions
-            {
-                //Definitely allow zero'd cache entires since this is a full set, in many cases there will be none,
-                // and we must cache this!
-                GetAllCacheAllowZeroCount = true
-            })
+        public FullDataSetRepositoryCachePolicy(IRuntimeCacheProvider cache, Func<TEntity, TId> getEntityId, Func<IEnumerable<TEntity>> getAllFromRepo, bool expires)
+            : base(cache)
         {
             _getEntityId = getEntityId;
+            _getAllFromRepo = getAllFromRepo;
+            _expires = expires;
         }
 
         private bool? _hasZeroCountCache;
 
 
+        protected string GetCacheTypeKey()
+        {
+            return string.Format("uRepo_{0}_", typeof(TEntity).Name);
+        }
+
+        public override void CreateOrUpdate(TEntity entity, Action<TEntity> persistMethod)
+        {
+            if (entity == null) throw new ArgumentNullException("entity");
+            if (persistMethod == null) throw new ArgumentNullException("persistMethod");
+
+            try
+            {
+                persistMethod(entity);
+
+                //set the disposal action                
+                SetCacheAction(() =>
+                {
+                    //Clear all
+                    Cache.ClearCacheItem(GetCacheTypeKey());
+                });
+            }
+            catch
+            {
+                //set the disposal action                
+                SetCacheAction(() =>
+                {
+                    //Clear all
+                    Cache.ClearCacheItem(GetCacheTypeKey());
+                });
+                throw;
+            }
+        }
+
+        public override void Remove(TEntity entity, Action<TEntity> persistMethod)
+        {
+            if (entity == null) throw new ArgumentNullException("entity");
+            if (persistMethod == null) throw new ArgumentNullException("persistMethod");
+
+            try
+            {
+                persistMethod(entity);
+            }
+            finally
+            {
+                //set the disposal action
+                SetCacheAction(() =>
+                {
+                    //Clear all
+                    Cache.ClearCacheItem(GetCacheTypeKey());
+                });
+            }
+        }
+
+        public override TEntity Get(TId id, Func<TId, TEntity> getFromRepo)
+        {
+            //Force get all with cache
+            var found = GetAll(new TId[] { }, ids => _getAllFromRepo().WhereNotNull());
+
+            //we don't have anything in cache (this should never happen), just return from the repo
+            if (found == null) return getFromRepo(id);
+            var entity = found.FirstOrDefault(x => _getEntityId(x).Equals(id));
+            if (entity == null) return null;
+
+            //We must ensure to deep clone each one out manually since the deep clone list only clones one way
+            return (TEntity)entity.DeepClone();
+        }
+
+        public override TEntity Get(TId id)
+        {
+            //Force get all with cache
+            var found = GetAll(new TId[] { }, ids => _getAllFromRepo().WhereNotNull());
+
+            //we don't have anything in cache (this should never happen), just return null
+            if (found == null) return null;
+            var entity = found.FirstOrDefault(x => _getEntityId(x).Equals(id));
+            if (entity == null) return null;
+
+            //We must ensure to deep clone each one out manually since the deep clone list only clones one way
+            return (TEntity)entity.DeepClone();
+        }
+
+        public override bool Exists(TId id, Func<TId, bool> getFromRepo)
+        {
+            //Force get all with cache
+            var found = GetAll(new TId[] { }, ids => _getAllFromRepo().WhereNotNull());
+
+            //we don't have anything in cache (this should never happen), just return from the repo
+            return found == null
+                ? getFromRepo(id)
+                : found.Any(x => _getEntityId(x).Equals(id));
+        }
+
         public override TEntity[] GetAll(TId[] ids, Func<TId[], IEnumerable<TEntity>> getFromRepo)
         {
-            //process the base logic without any Ids - we want to cache them all!
-            var result = base.GetAll(new TId[] { }, getFromRepo);
+            //process getting all including setting the cache callback
+            var result = PerformGetAll(getFromRepo);
 
             //now that the base result has been calculated, they will all be cached. 
             // Now we can just filter by ids if they have been supplied
-            
-            return ids.Any() 
-                ? result.Where(x => ids.Contains(_getEntityId(x))).ToArray() 
-                : result;
+
+            return (ids.Any()
+                ? result.Where(x => ids.Contains(_getEntityId(x))).ToArray()
+                : result)
+                //We must ensure to deep clone each one out manually since the deep clone list only clones one way
+                .Select(x => (TEntity)x.DeepClone())
+                .ToArray();
+        }
+
+        private TEntity[] PerformGetAll(Func<TId[], IEnumerable<TEntity>> getFromRepo)
+        {
+            var allEntities = GetAllFromCache();
+            if (allEntities.Any())
+            {
+                return allEntities;
+            }
+
+            //check the zero count cache
+            if (HasZeroCountCache())
+            {
+                //there is a zero count cache so return an empty list
+                return new TEntity[] { };
+            }
+
+            //we need to do the lookup from the repo
+            var entityCollection = getFromRepo(new TId[] { })
+                //ensure we don't include any null refs in the returned collection!
+                .WhereNotNull()
+                .ToArray();
+
+            //set the disposal action
+            SetCacheAction(entityCollection);
+
+            return entityCollection;
         }
 
         /// <summary>
@@ -52,26 +169,32 @@ namespace Umbraco.Core.Cache
         /// </summary>
         /// <param name="cacheKey"></param>
         /// <param name="entity"></param>
-        protected override void SetCacheAction(string cacheKey, TEntity entity)
+        protected void SetCacheAction(string cacheKey, TEntity entity)
         {
-            //do nothing
+            //No-op
         }
 
         /// <summary>
         /// Sets the action to execute on disposal for an entity collection
         /// </summary>
-        /// <param name="ids"></param>
         /// <param name="entityCollection"></param>
-        protected override void SetCacheAction(TId[] ids, TEntity[] entityCollection)
+        protected void SetCacheAction(TEntity[] entityCollection)
         {
-            //for this type of caching policy, we don't want to cache any GetAll request containing specific Ids
-            if (ids.Any()) return;
-
             //set the disposal action
             SetCacheAction(() =>
             {
                 //We want to cache the result as a single collection
-                Cache.InsertCacheItem(GetCacheTypeKey(), () => new DeepCloneableList<TEntity>(entityCollection));
+
+                if (_expires)
+                {
+                    Cache.InsertCacheItem(GetCacheTypeKey(), () => new DeepCloneableList<TEntity>(entityCollection),
+                        timeout: TimeSpan.FromMinutes(5),
+                        isSliding: true);
+                }
+                else
+                {
+                    Cache.InsertCacheItem(GetCacheTypeKey(), () => new DeepCloneableList<TEntity>(entityCollection));
+                }
             });
         }
 
@@ -79,7 +202,7 @@ namespace Umbraco.Core.Cache
         /// Looks up the zero count cache, must return null if it doesn't exist
         /// </summary>
         /// <returns></returns>
-        protected override bool HasZeroCountCache()
+        protected bool HasZeroCountCache()
         {
             if (_hasZeroCountCache.HasValue)
                 return _hasZeroCountCache.Value;
@@ -92,14 +215,15 @@ namespace Umbraco.Core.Cache
         /// This policy will cache the full data set as a single collection
         /// </summary>
         /// <returns></returns>
-        protected override TEntity[] GetAllFromCache()
+        protected TEntity[] GetAllFromCache()
         {
             var found = Cache.GetCacheItem<DeepCloneableList<TEntity>>(GetCacheTypeKey());
-            
+
             //This method will get called before checking for zero count cache, so we'll just set the flag here
             _hasZeroCountCache = found != null;
 
             return found == null ? new TEntity[] { } : found.WhereNotNull().ToArray();
         }
+
     }
 }

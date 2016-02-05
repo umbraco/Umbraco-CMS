@@ -75,7 +75,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ConstructUsing((source) => new MediaType(source.ParentId))                
                 .AfterMap((source, dest) =>
                 {
-                    ContentTypeModelMapperExtensions.AfterMapContentTypeSaveToEntity(source, dest, applicationContext);
+                    ContentTypeModelMapperExtensions.AfterMapMediaTypeSaveToEntity(source, dest, applicationContext);
                 });
 
             config.CreateMap<MemberTypeSave, IMemberType>()

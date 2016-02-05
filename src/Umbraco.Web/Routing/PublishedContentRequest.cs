@@ -166,7 +166,8 @@ namespace Umbraco.Web.Routing
         /// preserve or reset the template, if any.</remarks>
         public void SetInternalRedirectPublishedContent(IPublishedContent content)
         {
-            EnsureWriteable();
+		    if (content == null) throw new ArgumentNullException("content");
+		    EnsureWriteable();
 
             // unless a template has been set already by the finder,
             // template should be null at that point. 

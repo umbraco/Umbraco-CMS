@@ -73,11 +73,11 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
            layouts: $scope.model.config.layouts,
            activeLayout: listViewHelper.getLayout($routeParams.id, $scope.model.config.layouts)
         },
-        allowBulkPublish: true,
-        allowBulkUnpublish: true,
-        allowBulkCopy: true,
-        allowBulkMove: true,
-        allowBulkDelete: true,
+        allowBulkPublish: $scope.entityType === 'content' && $scope.model.config.bulkActionPermissions.allowBulkPublish,
+        allowBulkUnpublish: $scope.entityType === 'content' && $scope.model.config.bulkActionPermissions.allowBulkUnpublish,
+        allowBulkCopy: $scope.entityType === 'content' && $scope.model.config.bulkActionPermissions.allowBulkCopy,
+        allowBulkMove: $scope.model.config.bulkActionPermissions.allowBulkMove,
+        allowBulkDelete: $scope.model.config.bulkActionPermissions.allowBulkDelete
     };
 
     //update all of the system includeProperties to enable sorting
@@ -436,6 +436,15 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
 
         $scope.contentId = id;
         $scope.isTrashed = id === "-20" || id === "-21";
+
+        $scope.options.allowBulkPublish = $scope.options.allowBulkPublish && !$scope.isTrashed;
+        $scope.options.allowBulkUnpublish = $scope.options.allowBulkUnpublish && !$scope.isTrashed;
+
+        $scope.options.bulkActionsAllowed = $scope.options.allowBulkPublish ||
+            $scope.options.allowBulkUnpublish ||
+            $scope.options.allowBulkCopy ||
+            $scope.options.allowBulkMove ||
+            $scope.options.allowBulkDelete;
 
         $scope.reloadView($scope.contentId);
     }

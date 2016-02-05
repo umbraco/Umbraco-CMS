@@ -17,7 +17,6 @@
     <dependencies>
       <dependency id="Microsoft.AspNet.Mvc" version="[5.2.3,6.0.0)" />
       <dependency id="Microsoft.AspNet.WebApi" version="[5.2.3,6.0.0)" />
-      <dependency id="Microsoft.Net.Http" version="[2.2.29, 3.0.0)" />
       <dependency id="Microsoft.AspNet.Identity.Owin" version="[2.2.1, 3.0.0)" />
       <dependency id="Microsoft.Owin.Security.Cookies" version="[3.0.1, 4.0.0)" />
       <dependency id="Microsoft.Owin.Security.OAuth" version="[3.0.1, 4.0.0)" />
@@ -37,6 +36,7 @@
       <dependency id="ImageProcessor.Web" version="[4.5.1, 5.0.0)" />
       <dependency id="semver" version="[1.1.2, 2.0.0)" />
       <dependency id="UrlRewritingNet" version="[2.0.7, 3.0.0)" />	  
+      <dependency id="Markdown" version="[1.14.4, 2.0.0)" />	  
     </dependencies>
   </metadata>
   <files>
@@ -72,6 +72,7 @@
     <file src="..\_BuildOutput\WebApp\bin\UmbracoExamine.dll" target="lib\UmbracoExamine.dll" />
     <file src="..\_BuildOutput\WebApp\bin\UmbracoExamine.xml" target="lib\UmbracoExamine.xml" />
     <file src="tools\install.core.ps1" target="tools\install.ps1" />
+    <file src="tools\uninstall.core.ps1" target="tools\uninstall.ps1" />
 
     <!-- Added to be able to produce a symbols package -->
     <file src="..\_BuildOutput\bin\SQLCE4Umbraco.pdb" target="lib" />

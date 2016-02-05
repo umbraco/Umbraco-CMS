@@ -8,13 +8,21 @@ using Umbraco.Core.Models.EntityBase;
 namespace Umbraco.Core.Cache
 {
     /// <summary>
+    /// Interface describing this cache provider as a wrapper for another
+    /// </summary>
+    internal interface IRuntimeCacheProviderWrapper
+    {
+        IRuntimeCacheProvider InnerProvider { get; }
+    }
+
+    /// <summary>
     /// A wrapper for any IRuntimeCacheProvider that ensures that all inserts and returns 
     /// are a deep cloned copy of the item when the item is IDeepCloneable and that tracks changes are
     /// reset if the object is TracksChangesEntityBase
     /// </summary>
-    internal class DeepCloneRuntimeCacheProvider : IRuntimeCacheProvider
+    internal class DeepCloneRuntimeCacheProvider : IRuntimeCacheProvider, IRuntimeCacheProviderWrapper
     {
-        internal IRuntimeCacheProvider InnerProvider { get; private set; }
+        public IRuntimeCacheProvider InnerProvider { get; private set; }
 
         public DeepCloneRuntimeCacheProvider(IRuntimeCacheProvider innerProvider)
         {

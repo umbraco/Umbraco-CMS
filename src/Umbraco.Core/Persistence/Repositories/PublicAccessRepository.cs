@@ -26,7 +26,8 @@ namespace Umbraco.Core.Persistence.Repositories
             get
             {
                 //Use a FullDataSet cache policy - this will cache the entire GetAll result in a single collection
-                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<PublicAccessEntry, Guid>(RuntimeCache, GetEntityId));
+                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<PublicAccessEntry, Guid>(
+                    RuntimeCache, GetEntityId, () => PerformGetAll(), false));
             }
         }
 

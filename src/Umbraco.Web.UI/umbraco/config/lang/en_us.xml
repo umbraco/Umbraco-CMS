@@ -375,6 +375,7 @@
     <key alias="alias">Alias</key>
     <key alias="all">All</key>
     <key alias="areyousure">Are you sure?</key>
+    <key alias="back">Back</key>
     <key alias="border">Border</key>
     <key alias="by">by</key>
     <key alias="cancel">Cancel</key>
@@ -1037,37 +1038,38 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="compositionsDescription">Inherit tabs and properties from an existing document type. New tabs will be added to the current document type or merged if a tab with an identical name exists.</key>
     <key alias="compositionInUse">This content type is used in a composition, and therefore cannot be composed itself.</key>
     <key alias="noAvailableCompositions">There are no content types available to use as a composition.</key>
-    
+
     <key alias="availableEditors">Available editors</key>
     <key alias="reuse">Reuse</key>
     <key alias="editorSettings">Editor settings</key>
-    
+
     <key alias="configuration">Configuration</key>
-    
+
     <key alias="yesDelete">Yes, delete</key>
-    
+
     <key alias="movedUnderneath">was moved underneath</key>
     <key alias="folderToMove">Select the folder to move</key>
     <key alias="structureBelow">to in the tree structure below</key>
-    
+
     <key alias="allDocumentTypes">All Document types</key>
     <key alias="allDocuments">All Documents</key>
     <key alias="allMediaItems">All media items</key>
-    
+
     <key alias="usingThisDocument">using this document type will be deleted permanently, please confirm you want to delete these as well.</key>
     <key alias="usingThisMedia">using this media type will be deleted permanently, please confirm you want to delete these as well.</key>
     <key alias="usingThisMember">using this member type will be deleted permanently, please confirm you want to delete these as well</key>
-    
+
     <key alias="andAllDocuments">and all documents using this type</key>
     <key alias="andAllMediaItems">and all media items using this type</key>
     <key alias="andAllMembers">and all members using this type</key>
-    
+
     <key alias="thisEditorUpdateSettings">using this editor will get updated with the new settings</key>
 
     <key alias="memberCanEdit">Member can edit</key>
     <key alias="showOnMemberProfile">Show on member profile</key>
+    <key alias="tabHasNoSortOrder">tab has no sort order</key>
   </area>
-  
+
   <area alias="templateEditor">
     <key alias="alternativeField">Alternative field</key>
     <key alias="alternativeText">Alternative Text</key>
@@ -1188,7 +1190,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="administrators">Administrator</key>
     <key alias="categoryField">Category field</key>
     <key alias="changePassword">Change Your Password</key>
-    <key alias="newPassword">Change Your Password</key>
+    <key alias="newPassword">New password</key>
     <key alias="confirmNewPassword">Confirm new password</key>
     <key alias="changePasswordDescription">You can change your password for accessing the Umbraco Back Office by filling out the form below and click the 'Change Password' button</key>
     <key alias="contentChannel">Content Channel</key>
@@ -1202,6 +1204,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="mediastartnode">Start Node in Media Library</key>
     <key alias="modules">Sections</key>
     <key alias="noConsole">Disable Umbraco Access</key>
+    <key alias="oldPassword">Old password</key>
     <key alias="password">Password</key>
     <key alias="resetPassword">Reset password</key>
     <key alias="passwordChanged">Your password has been changed!</key>
