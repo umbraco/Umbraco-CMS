@@ -24,29 +24,18 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                 filterPropertyTypes = [];
             }
 
-            var query = "";
-            _.each(filterContentTypes, function (item) {
-                query += "filterContentTypes=" + item + "&";
-            });
-            // if filterContentTypes array is empty we need a empty variable in the querystring otherwise the service returns a error
-            if (filterContentTypes.length === 0) {
-                query += "filterContentTypes=&";
-            }
-            _.each(filterPropertyTypes, function (item) {
-                query += "filterPropertyTypes=" + item + "&";
-            });
-            // if filterPropertyTypes array is empty we need a empty variable in the querystring otherwise the service returns a error
-            if (filterPropertyTypes.length === 0) {
-                query += "filterPropertyTypes=&";
-            }
-            query += "contentTypeId=" + contentTypeId;
+            var query = {
+                contentTypeId: contentTypeId,
+                filterContentTypes: filterContentTypes,
+                filterPropertyTypes: filterPropertyTypes
+            };
 
             return umbRequestHelper.resourcePromise(
-               $http.get(
+               $http.post(
                    umbRequestHelper.getApiUrl(
                        "mediaTypeApiBaseUrl",
-                       "GetAvailableCompositeMediaTypes",
-                       query)),
+                       "GetAvailableCompositeMediaTypes"),
+                       query),
                'Failed to retrieve data for content type id ' + contentTypeId);
         },
 
