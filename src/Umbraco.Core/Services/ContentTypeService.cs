@@ -229,7 +229,7 @@ namespace Umbraco.Core.Services
 
         public EntityContainer GetContentTypeContainer(Guid containerId)
         {
-            return GetContainer(containerId, Constants.ObjectTypes.DocumentTypeGuid);
+            return GetContainer(containerId, Constants.ObjectTypes.DocumentTypeContainerGuid);
         }
 
         public IEnumerable<EntityContainer> GetContentTypeContainers(int[] containerIds)
@@ -258,7 +258,7 @@ namespace Umbraco.Core.Services
 
         public EntityContainer GetMediaTypeContainer(Guid containerId)
         {
-            return GetContainer(containerId, Constants.ObjectTypes.MediaTypeGuid);
+            return GetContainer(containerId, Constants.ObjectTypes.MediaTypeContainerGuid);
         }
 
         private EntityContainer GetContainer(Guid containerId, Guid containerObjectType)
