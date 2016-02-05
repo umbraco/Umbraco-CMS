@@ -361,6 +361,12 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
             rootScope : function(){
                 return getRootScope();
             },
+
+            reloadLocation: function() {
+                var injector = getRootInjector();
+                var $route = injector.get("$route");
+                $route.reload();
+            },
             
             closeModalWindow: function(rVal) {
                 
