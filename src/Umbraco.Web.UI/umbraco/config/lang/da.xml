@@ -871,6 +871,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="fileSavedHeader">Fil gemt</key>
     <key alias="fileSavedText">Fil gemt uden fejl</key>
     <key alias="languageSaved">Sprog gemt</key>
+    <key alias="mediaTypeSavedHeader">Medietype gemt</key>
+    <key alias="memberTypeSavedHeader">Medlemstype gemt</key>
     <key alias="pythonErrorHeader">Python script ikke gemt</key>
     <key alias="pythonErrorText">Python-script kunne ikke gemmes pga. fejl</key>
     <key alias="pythonSavedHeader">Python-script gemt</key>
