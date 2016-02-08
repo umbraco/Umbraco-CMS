@@ -167,7 +167,7 @@ namespace Umbraco.Web.Editors
             var display = Mapper.Map<MediaTypeDisplay>(savedCt);
 
             display.AddSuccessNotification(
-                            Services.TextService.Localize("speechBubbles/contentTypeSavedHeader"),
+                            Services.TextService.Localize("speechBubbles/mediaTypeSavedHeader"),
                             string.Empty);
 
             return display;
