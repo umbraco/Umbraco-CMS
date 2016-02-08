@@ -54,7 +54,7 @@
         <tfoot>
             <tr>
                     <td></td>
-                    <td><input type="text" ng-model="newCaption" localize="placeholder" placeholder="@relatedlinks_captionPlaceholder"  val-highlight="hasError" /></td>
+                    <td><input type="text" ng-model="newCaption" localize="placeholder" placeholder="@relatedlinks_captionPlaceholder"  val-highlight="{{hasError}}" /></td>
                     <td>
                         <div ng-show="addExternal">
                             <input type="text" ng-model="newLink" localize="placeholder" placeholder="@relatedlinks_externalLinkPlaceholder" />
