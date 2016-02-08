@@ -1,9 +1,11 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.GridController",
-    function ($scope, $http, assetsService, localizationService, $rootScope, dialogService, gridService, mediaResource, imageHelper, $timeout, umbRequestHelper) {
+    function ($scope, $http, assetsService, localizationService, $rootScope, dialogService, gridService, mediaResource, imageHelper, $timeout, umbRequestHelper, angularHelper) {
 
         // Grid status variables
         var placeHolder = "";
+        var currentForm = angularHelper.getCurrentForm($scope);
+
         $scope.currentRow = null;
         $scope.currentCell = null;
         $scope.currentToolsControl = null;
@@ -73,6 +75,7 @@ angular.module("umbraco")
                     tinyMCE.execCommand("mceRemoveEditor", false, id);
                     tinyMCE.init(draggedRteSettings[id]);
                 });
+                currentForm.$setDirty();
             }
         };
 
@@ -160,6 +163,7 @@ angular.module("umbraco")
                         }
                     });
                 }
+                currentForm.$setDirty();
             },
 
             start: function (e, ui) {
@@ -320,6 +324,8 @@ angular.module("umbraco")
                 section.rows.push(row);
             }
 
+            currentForm.$setDirty();
+
             $scope.showRowConfigurations = false;
 
         };
@@ -329,8 +335,7 @@ angular.module("umbraco")
                 section.rows.splice($index, 1);
                 $scope.currentRow = null;
                 $scope.openRTEToolbarId = null;
-
-                //$scope.initContent();
+                currentForm.$setDirty();
             }
 
             if(section.rows.length === 0) {
@@ -397,6 +402,8 @@ angular.module("umbraco")
                 gridItem.config = configObject;
                 gridItem.hasConfig = gridItemHasConfig(styleObject, configObject);
 
+                currentForm.$setDirty();
+
                 $scope.gridItemSettingsDialog.show = false;
                 $scope.gridItemSettingsDialog = null;
             };
@@ -407,7 +414,7 @@ angular.module("umbraco")
             };
 
         };
-        
+
         function stripModifier(val, modifier) {
             if (!val || !modifier || modifier.indexOf(placeHolder) < 0) {
                 return val;
