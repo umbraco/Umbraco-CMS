@@ -77,8 +77,8 @@ Use this directive to render a button with a dropdown of alternative actions.
 @param {object} defaultButton The model of the default button.
 @param {array} subButtons Array of sub buttons.
 @param {string=} state Set a progress state on the button (init, busy, success, error).
-@param {string=} direction Set the direction of the drop down (up, down).
-@param {string=} float Set the float of the drop down. (left, right).
+@param {string=} direction Set the direction of the dropdown (up, down).
+@param {string=} float Set the float of the dropdown. (left, right).
 **/
 
 (function() {

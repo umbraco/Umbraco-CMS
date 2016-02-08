@@ -1,13 +1,8 @@
 /**
-<<<<<<< HEAD
- * @ngdoc directive
- * @name umbraco.directives.directive:headline
- **/
-=======
 * @ngdoc directive
 * @name umbraco.directives.directive:hotkey
 **/
->>>>>>> fix broken directives overview + set marker on deprecated directives
+
 angular.module("umbraco.directives")
     .directive('hotkey', function($window, keyboardService, $log) {
 
