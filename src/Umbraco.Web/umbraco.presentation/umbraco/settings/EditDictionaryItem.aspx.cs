@@ -25,6 +25,7 @@ namespace umbraco.settings
 		protected uicontrols.TabView tbv = new uicontrols.TabView();
 		private System.Collections.ArrayList languageFields = new System.Collections.ArrayList();
         private cms.businesslogic.Dictionary.DictionaryItem currentItem;
+	    protected TextBox keyNameBox;
 
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
@@ -33,15 +34,15 @@ namespace umbraco.settings
 			// Put user code to initialize the page here
 			Panel1.hasMenu = true;
 			Panel1.Text = ui.Text("editdictionary") + ": " + currentItem.key;
-			
-            uicontrols.Pane p = new uicontrols.Pane();
 
-			var save = Panel1.Menu.NewButton();
+		    var save = Panel1.Menu.NewButton();
             save.Text = ui.Text("save");
             save.Click += save_Click;
 			save.ToolTip = ui.Text("save");
             save.ID = "save";
             save.ButtonType = uicontrols.MenuButtonType.Primary;
+
+            uicontrols.Pane p = new uicontrols.Pane();
 
             Literal txt = new Literal();
             txt.Text = "<p>" + ui.Text("dictionaryItem", "description", currentItem.key, base.getUser()) + "</p><br/>";
@@ -63,14 +64,29 @@ namespace umbraco.settings
 
 			}
 
-			if (!IsPostBack)
+            keyNameBox = new TextBox
+            {
+                ID = "editname-" + currentItem.id,
+                CssClass = "umbEditorTextField",
+                Text = currentItem.key
+            };
+
+            var txtChangeKey = new Literal
+            {
+                Text = "<p>&nbsp;</p>" +
+                       "<p>Change the key of the dictionary item. Carefull :)</p>"
+            };
+
+            p.addProperty(txtChangeKey);
+            p.addProperty(keyNameBox);
+
+            if (!IsPostBack)
 			{
 			    var path = BuildPath(currentItem);
 				ClientTools
 					.SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadDictionary>().Tree.Alias)
 					.SyncTree(path, false);
 			}
-
 
             Panel1.Controls.Add(p);
 		}
@@ -92,8 +108,21 @@ namespace umbraco.settings
 					currentItem.setValue(int.Parse(t.ID),t.Text);
 				}
 			}
+
+            var newKey = keyNameBox.Text;
+            if (string.IsNullOrWhiteSpace(newKey) == false && newKey != currentItem.key)
+            {
+                currentItem.setKey(newKey);
+
+                Panel1.title.InnerHtml = ui.Text("editdictionary") + ": " + currentItem.key;
+
+                var path = BuildPath(currentItem);
+                ClientTools.SyncTree(path, true);
+            }            
+
             ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "dictionaryItemSaved"), "");	
 		}
+
 		#region Web Form Designer generated code
 		override protected void OnInit(EventArgs e)
 		{
