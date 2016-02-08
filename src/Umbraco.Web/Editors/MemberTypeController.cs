@@ -139,7 +139,7 @@ namespace Umbraco.Web.Editors
             var display = Mapper.Map<MemberTypeDisplay>(savedCt);
 
             display.AddSuccessNotification(
-                            Services.TextService.Localize("speechBubbles/contentTypeSavedHeader"),
+                            Services.TextService.Localize("speechBubbles/memberTypeSavedHeader"),
                             string.Empty);
 
             return display;

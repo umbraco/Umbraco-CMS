@@ -75,6 +75,7 @@
                                    ng-disabled="tab.inherited"
                                    umb-auto-focus
                                    umb-auto-resize
+                                   on-focus="activateGroup(tab)"
                                    required
                                    val-server-field="{{'Groups[' + $index + '].Name'}}" />
 
@@ -109,7 +110,15 @@
                     <li ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited && !property.locked}" ng-repeat="property in tab.properties">
 
                         <!-- Init property / Property placeholder / add new property -->
-                        <a href="" class="umb-group-builder__property -placeholder" ng-if="property.propertyState=='init' && !sortingMode" ng-class="{'-placeholder': property.propertyState=='init'}" hotkey="alt+shift+p" ng-click="addProperty(property, tab)" focus-when="{{property.focus}}">
+                        <a href=""
+                            class="umb-group-builder__property -placeholder"
+                            ng-if="property.propertyState=='init' && !sortingMode"
+                            ng-class="{'-placeholder': property.propertyState=='init'}"
+                            hotkey="alt+shift+p"
+                            hotkey-when="{{tab.tabState === 'active' && property.propertyState=='init'}}"
+                            ng-click="addProperty(property, tab)"
+                            on-focus="activateGroup(tab)"
+                            focus-when="{{property.focus}}">
 
                             <div class="umb-group-builder__property-meta">
                                 <div class="umb-group-builder__placeholder-box -input-small"></div>
