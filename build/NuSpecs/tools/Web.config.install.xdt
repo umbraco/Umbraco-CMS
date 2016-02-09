@@ -152,8 +152,6 @@
     
   </system.webServer>
 
-  <system.codedom xdt:Transform="Remove" />
-
   <runtime xdt:Transform="InsertIfMissing" />
   <runtime>
     <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1" xdt:Transform="InsertIfMissing" />
