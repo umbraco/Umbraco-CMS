@@ -144,16 +144,26 @@
                             });
 
                             contentTypeHelper.generateModels().then(function (result) {
-                                vm.page.saveButtonState = "init";
-                                //clear and add success
-                                localizationService.localize("modelsBuilder_modelsGenerated").then(function(value) {
-                                    notificationsService.success(value);
-                                });
+
+                                if(result.success) {
+                                    //clear and add success
+                                    vm.page.saveButtonState = "init";
+                                    localizationService.localize("modelsBuilder_modelsGenerated").then(function(value) {
+                                        notificationsService.success(value);
+                                    });
+
+                                } else {
+                                    vm.page.saveButtonState = "error";
+                                    localizationService.localize("modelsBuilder_modelsExceptionInUlog").then(function(value) {
+                                        notificationsService.error(value);
+                                    });
+                                }
+
                             }, function () {
+                                vm.page.saveButtonState = "error";
                                 localizationService.localize("modelsBuilder_modelsGeneratedError").then(function(value) {
                                     notificationsService.error(value);
                                 });
-                                vm.page.saveButtonState = "error";
                             });
 
                         });
