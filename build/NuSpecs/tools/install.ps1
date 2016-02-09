@@ -2,9 +2,9 @@ param($rootPath, $toolsPath, $package, $project)
 
 if ($project) {
 	$dateTime = Get-Date -Format yyyyMMdd-HHmmss
-	$backupPath = Join-Path (Split-Path $project.FullName -Parent) "\App_Data\NuGetBackup\$dateTime"
-	$copyLogsPath = Join-Path $backupPath "CopyLogs"
-	$projectDestinationPath = Split-Path $project.FullName -Parent
+	$projectDestinationPath = $project.Properties.Item("FullPath").Value
+	$backupPath = Join-Path $projectDestinationPath "\App_Data\NuGetBackup\$dateTime"
+	$copyLogsPath = Join-Path $backupPath "CopyLogs" 
 
 	# Create backup folder and logs folder if it doesn't exist yet
 	New-Item -ItemType Directory -Force -Path $backupPath
@@ -23,6 +23,28 @@ if ($project) {
 		robocopy $configFolder $umbracoBackupPath /e /LOG:$copyLogsPath\ConfigBackup.log
 	}
 	
+	# Check to see if this is a new install or not
+	$newInstall = $true
+	$destinationWebConfig = Join-Path $projectDestinationPath "Web.config"
+
+	if(Test-Path $destinationWebConfig) 
+	{
+		Try 
+		{
+			[xml]$config = Get-Content $destinationWebConfig
+			
+			$config.configuration.appSettings.ChildNodes | ForEach-Object { 
+				if($_.key -eq "umbracoConfigurationStatus") 
+				{
+					# The web.config has an umbraco-specific appSetting in it
+					# so must be an upgrade rather than a clean install
+					$newInstall = $false 
+				}
+			}
+		} 
+		Catch { }
+	}
+
 	# Copy umbraco and umbraco_files from package to project folder
 	# This is only done when these folders already exist because we 
 	# only want to do this for upgrades
@@ -48,40 +70,84 @@ if ($project) {
 		robocopy $umbracoClientFolderSource $umbracoClientFolder /is /it /e /LOG:$copyLogsPath\UmbracoClientCopy.log		
 	}
 
-	$copyWebconfig = $true
-	$destinationWebConfig = Join-Path $projectDestinationPath "Web.config"
-
-	if(Test-Path $destinationWebConfig) 
-	{
-		Try 
-		{
-			[xml]$config = Get-Content $destinationWebConfig
-			
-			$config.configuration.appSettings.ChildNodes | ForEach-Object { 
-				if($_.key -eq "umbracoConfigurationStatus") 
-				{
-					# The web.config has an umbraco-specific appSetting in it
-					# don't overwrite it and let config transforms do their thing
-					$copyWebconfig = $false 
-				}
-			}
-		} 
-		Catch { }
-	}
-	
-	if($copyWebconfig -eq $true) 
+	if($newInstall -eq $true) 
 	{
 		$packageWebConfigSource = Join-Path $rootPath "UmbracoFiles\Web.config"
 		Copy-Item $packageWebConfigSource $destinationWebConfig -Force
 	} 
 
+	# Always remove the install folder if one exists
 	$installFolder = Join-Path $projectDestinationPath "Install"
 	if(Test-Path $installFolder) {
 		Remove-Item $installFolder -Force -Recurse -Confirm:$false
 	}
-	
+
+    # Handle web app / web site specific logic
+    if($project.Object -is "VSWebSite.VSWebSite"){
+	    if($newInstall -eq $true) {
+
+			# Website project, so copy umbraco files manually
+
+			$umbracoFilesSource = Join-Path $rootPath "UmbracoFiles"
+
+			robocopy $umbracoFilesSource $projectDestinationPath /e /xf $umbracoFilesSource\web.config /LOG:$copyLogsPath\UmbracoFilesBackup.log
+
+		}
+	} else {
+
+		# Need to load MSBuild assembly if it's not loaded yet.
+	    Add-Type -AssemblyName 'Microsoft.Build, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a'
+
+	    # Grab the loaded MSBuild project for the project
+	    $msbuild = [Microsoft.Build.Evaluation.ProjectCollection]::GlobalProjectCollection.GetLoadedProjects($project.FullName) | Select-Object -First 1
+
+	    # Get props / target paths
+	    $propsFile = [System.IO.Path]::Combine($toolsPath, '..\msbuild\UmbracoCms.props')
+	    $targetsFile = [System.IO.Path]::Combine($toolsPath, '..\msbuild\UmbracoCms.targets')
+	 
+	    # Make paths relative to project folder.
+	    $projectUri = new-object Uri($project.FullName, [System.UriKind]::Absolute)
+
+	    $propsUri = new-object Uri($propsFile, [System.UriKind]::Absolute)
+	    $propsRelPath = [System.Uri]::UnescapeDataString($projectUri.MakeRelativeUri($propsUri).ToString()).Replace([System.IO.Path]::AltDirectorySeparatorChar, [System.IO.Path]::DirectorySeparatorChar)
+
+	    $targetUri = new-object Uri($targetsFile, [System.UriKind]::Absolute)
+	    $targetRelPath = [System.Uri]::UnescapeDataString($projectUri.MakeRelativeUri($targetUri).ToString()).Replace([System.IO.Path]::AltDirectorySeparatorChar, [System.IO.Path]::DirectorySeparatorChar)
+
+	    # Check for current imports
+		$propsImportExists = $false
+		$targetsImportExists = $false
+		$msbuild.Xml.Imports | ForEach-Object { 
+			if($_.Project -eq $propsRelPath) 
+			{
+				$propsImportExists = $true 
+			}
+			if($_.Project -eq $targetRelPath) 
+			{
+				$targetsImportExists = $true 
+			}
+		}
+
+		# Add the props import
+	    if($propsImportExists -eq $false) {
+		    $propsImport = $msbuild.Xml.AddImport($propsRelPath)
+		    $propsImport.Condition = "Exists('$propsRelPath')"
+	    }
+
+	    # Add the targets import
+	    if($targetsImportExists -eq $false) {
+		    $targetsImport = $msbuild.Xml.AddImport($targetRelPath)
+		    $targetsImport.Condition = "Exists('$targetRelPath')"
+	    }
+
+	    # Save the project changes
+	    if($propsImportExists -eq $false -or $targetsImportExists -eq $false) {
+	    	$project.Save()
+	    }
+	}
+
 	# Open appropriate readme
-	if($copyWebconfig -eq $true)  
+	if($newInstall -eq $true)  
 	{
 		$DTE.ItemOperations.OpenFile($toolsPath + '\Readme.txt')
 	} 

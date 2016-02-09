@@ -2,9 +2,9 @@ param($rootPath, $toolsPath, $package, $project)
 
 if ($project) {
 	$dateTime = Get-Date -Format yyyyMMdd-HHmmss
-	$backupPath = Join-Path (Split-Path $project.FullName -Parent) "\App_Data\NuGetBackup\$dateTime"
-	$copyLogsPath = Join-Path $backupPath "CopyLogs"
-	$projectDestinationPath = Split-Path $project.FullName -Parent
+	$projectDestinationPath = $project.Properties.Item("FullPath").Value
+	$backupPath = Join-Path $projectDestinationPath "\App_Data\NuGetBackup\$dateTime"
+	$copyLogsPath = Join-Path $backupPath "CopyLogs" 
 	
 	# Create backup folder and logs folder if it doesn't exist yet
 	New-Item -ItemType Directory -Force -Path $backupPath
