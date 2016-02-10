@@ -87,7 +87,13 @@
 
                             contentTypeHelper.generateModels().then(function (result) {
 
-                                if(result.success) {
+                                if (result.success) { 
+
+                                    //re-check model status
+                                    contentTypeHelper.checkModelsBuilderStatus().then(function (statusResult) {
+                                        vm.page.modelsBuilder = statusResult;
+                                    });
+
                                     //clear and add success
                                     vm.page.saveButtonState = "init";
                                     localizationService.localize("modelsBuilder_modelsGenerated").then(function(value) {

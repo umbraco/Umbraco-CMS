@@ -53,8 +53,8 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
             
             if (modelsBuilderEnabled && modelsResource) {
                 modelsResource.getModelsOutOfDateStatus().then(function(result) {
-                    //Generate models buttons should be enabled if its not 100
-                    deferred.resolve(result.status !== 100);
+                    //Generate models buttons should be enabled if it is 0
+                    deferred.resolve(result.status === 0);
                 });
             }
             else {
