@@ -52,7 +52,7 @@ angular.module("umbraco")
                 // set default size if no crop present (moved from the view)
                 if (url.indexOf('?') == -1)
                 {
-                    url += "?width=800&upscale=false"
+                    url += "?width=800&upscale=false&&animationprocessmode=false"
                 }
                 $scope.url = url;
             }
