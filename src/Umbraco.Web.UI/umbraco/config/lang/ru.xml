@@ -1006,6 +1006,8 @@
     <key alias="fileSavedHeader">Файл сохранен</key>
     <key alias="fileSavedText">Файл сохранен без ошибок</key>
     <key alias="languageSaved">Язык сохранен</key>
+    <key alias="mediaTypeSavedHeader">Тип медиа сохранен</key>
+    <key alias="memberTypeSavedHeader">Тип участника сохранен</key>
     <key alias="partialViewErrorHeader">Представление не сохранено</key>
     <key alias="partialViewErrorText">Произошла ошибка при сохранении файла</key>
     <key alias="partialViewSavedHeader">Представление сохранено</key>
