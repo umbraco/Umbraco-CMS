@@ -41,6 +41,7 @@ angular.module("umbraco")
                 if($scope.control.editor.config && $scope.control.editor.config.size){
                     url += "?width=" + $scope.control.editor.config.size.width;
                     url += "&height=" + $scope.control.editor.config.size.height;
+                    url += "&animationprocessmode=first";
 
                     if($scope.control.value.focalPoint){
                         url += "&center=" + $scope.control.value.focalPoint.top +"," + $scope.control.value.focalPoint.left;
