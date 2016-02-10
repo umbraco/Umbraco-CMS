@@ -41,6 +41,26 @@ namespace Umbraco.Web.Models.Mapping
                 .FirstOrDefault(x => x != null);
         }
 
+        /// <summary>
+        /// Gets the content type that defines a property group, within a composition.
+        /// </summary>
+        /// <param name="contentType">The composition.</param>
+        /// <param name="propertyTypeId">The identifier of the property type.</param>
+        /// <returns>The composition content type that defines the specified property group.</returns>
+        private static IContentTypeComposition GetContentTypeForPropertyType(IContentTypeComposition contentType, int propertyTypeId)
+        {
+            // test local property types
+            if (contentType.PropertyTypes.Any(x => x.Id == propertyTypeId))
+                return contentType;
+
+            // test composition property types
+            // .ContentTypeComposition is just the local ones, not recursive,
+            // so we have to recurse here
+            return contentType.ContentTypeComposition
+                .Select(x => GetContentTypeForPropertyType(x, propertyTypeId))
+                .FirstOrDefault(x => x != null);
+        }
+
         protected override IEnumerable<PropertyGroupDisplay<TPropertyType>> ResolveCore(IContentTypeComposition source)
         {
             // deal with groups
@@ -58,7 +78,7 @@ namespace Umbraco.Web.Models.Mapping
                     ContentTypeId = source.Id
                 };
 
-                group.Properties = MapProperties(tab.PropertyTypes, tab.Id, false);
+                group.Properties = MapProperties(tab.PropertyTypes, source, tab.Id, false);
                 groups.Add(group);
             }         
 
@@ -85,7 +105,7 @@ namespace Umbraco.Web.Models.Mapping
                     ParentTabContentTypeNames = new[] { definingContentType.Name }
                 };
 
-                group.Properties = MapProperties(tab.PropertyTypes, tab.Id, true);
+                group.Properties = MapProperties(tab.PropertyTypes, definingContentType, tab.Id, true);
                 groups.Add(group);
             }
 
@@ -94,14 +114,20 @@ namespace Umbraco.Web.Models.Mapping
 
             // add generic properties local to this content type
             var entityGenericProperties = source.PropertyTypes.Where(x => x.PropertyGroupId == null);
-            genericProperties.AddRange(MapProperties(entityGenericProperties, PropertyGroupBasic.GenericPropertiesGroupId, false));
+            genericProperties.AddRange(MapProperties(entityGenericProperties, source, PropertyGroupBasic.GenericPropertiesGroupId, false));
 
             // add generic properties inherited through compositions
             var localGenericPropertyIds = genericProperties.Select(x => x.Id).ToArray();
             var compositionGenericProperties = source.CompositionPropertyTypes
                 .Where(x => x.PropertyGroupId == null // generic
                     && localGenericPropertyIds.Contains(x.Id) == false); // skip those that are local
-            genericProperties.AddRange(MapProperties(compositionGenericProperties, PropertyGroupBasic.GenericPropertiesGroupId, true));
+            foreach (var compositionGenericProperty in compositionGenericProperties)
+            {
+                var definingContentType = GetContentTypeForPropertyType(source, compositionGenericProperty.Id);
+                if (definingContentType == null)
+                    throw new Exception("PropertyType with id=" + compositionGenericProperty.Id + " was not found on any of the content type's compositions.");
+                genericProperties.AddRange(MapProperties(new [] { compositionGenericProperty }, definingContentType, PropertyGroupBasic.GenericPropertiesGroupId, true));
+            }
 
             // if there are any generic properties, add the corresponding tab
             if (genericProperties.Any())
@@ -165,7 +191,7 @@ namespace Umbraco.Web.Models.Mapping
             return groups.OrderBy(x => x.SortOrder);
         }
 
-        private IEnumerable<TPropertyType> MapProperties(IEnumerable<PropertyType> properties, int groupId, bool inherited)
+        private IEnumerable<TPropertyType> MapProperties(IEnumerable<PropertyType> properties, IContentTypeBase contentType, int groupId, bool inherited)
         {
             var mappedProperties = new List<TPropertyType>();
 
@@ -179,20 +205,21 @@ namespace Umbraco.Web.Models.Mapping
 
                 mappedProperties.Add(new TPropertyType
                 {
-                        Id = p.Id,
-                        Alias = p.Alias,
-                        Description = p.Description,
-                        Editor = p.PropertyEditorAlias,
-                        Validation = new PropertyTypeValidation { Mandatory = p.Mandatory, Pattern = p.ValidationRegExp },
-                        Label = p.Name,
-                        View = propertyEditor.ValueEditor.View,
-                        Config = propertyEditor.PreValueEditor.ConvertDbToEditor(propertyEditor.DefaultPreValues, preValues) ,
-                        //Value = "",
-                        GroupId = groupId,
-                        Inherited = inherited,
-                        DataTypeId = p.DataTypeDefinitionId,
-                        SortOrder = p.SortOrder
-                    });
+                    Id = p.Id,
+                    Alias = p.Alias,
+                    Description = p.Description,
+                    Editor = p.PropertyEditorAlias,
+                    Validation = new PropertyTypeValidation {Mandatory = p.Mandatory, Pattern = p.ValidationRegExp},
+                    Label = p.Name,
+                    View = propertyEditor.ValueEditor.View,
+                    Config = propertyEditor.PreValueEditor.ConvertDbToEditor(propertyEditor.DefaultPreValues, preValues),
+                    //Value = "",
+                    GroupId = groupId,
+                    Inherited = inherited,
+                    DataTypeId = p.DataTypeDefinitionId,
+                    SortOrder = p.SortOrder,
+                    ContentTypeId = contentType.Id
+                });
             }
 
             return mappedProperties;
