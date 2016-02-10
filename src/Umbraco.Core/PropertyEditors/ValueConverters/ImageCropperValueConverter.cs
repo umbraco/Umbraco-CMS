@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Logging;
@@ -63,17 +64,42 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                 if (dt != null && dt.IsDictionaryBased && dt.PreValuesAsDictionary.ContainsKey("crops"))
                 {
                     var cropsString = dt.PreValuesAsDictionary["crops"].Value;
-                    JArray crops;
+                    JArray preValueCrops;
                     try
                     {
-                        crops = JsonConvert.DeserializeObject<JArray>(cropsString);
+                        preValueCrops = JsonConvert.DeserializeObject<JArray>(cropsString);
                     }
                     catch (Exception ex)
                     {
                         LogHelper.Error<ImageCropperValueConverter>("Could not parse the string " + cropsString + " to a json object", ex);
                         return sourceString;
                     }
-                    obj["crops"] = crops;
+
+                    //now we need to merge the crop values - the alias + width + height comes from pre-configured pre-values,
+                    // however, each crop can store it's own coordinates
+
+                    var existingCropsArray = obj["crops"] != null ? (JArray) obj["crops"] : new JArray();
+
+                    foreach (var preValueCrop in preValueCrops.Where(x => x.HasValues))
+                    {
+                        var found = existingCropsArray.FirstOrDefault(x =>
+                        {
+                            if (x.HasValues && x["alias"] != null)
+                            {
+                                return x["alias"].Value<string>() == preValueCrop["alias"].Value<string>();
+                            }
+                            return false;
+                        });
+                        if (found != null)
+                        {
+                            found["width"] = preValueCrop["width"];
+                            found["height"] = preValueCrop["height"];
+                        }
+                        else
+                        {
+                            existingCropsArray.Add(preValueCrop);
+                        }
+                    }
                 }
                 
                 return obj;
