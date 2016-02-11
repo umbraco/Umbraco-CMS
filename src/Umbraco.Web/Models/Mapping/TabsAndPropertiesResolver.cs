@@ -126,6 +126,7 @@ namespace Umbraco.Web.Models.Mapping
         /// <param name="display"></param>
         /// <param name="entityType">This must be either 'content' or 'media'</param>
         /// <param name="dataTypeService"></param>
+        /// <param name="localizedTextService"></param>
         internal static void AddListView<TPersisted>(TabbedContentItem<ContentPropertyDisplay, TPersisted> display, string entityType, IDataTypeService dataTypeService, ILocalizedTextService localizedTextService)
              where TPersisted : IContentBase
         {
