@@ -33,7 +33,7 @@
       <dependency id="Newtonsoft.Json" version="[6.0.8, 9.0.0)" />
       <dependency id="Examine" version="[0.1.68, 1.0.0)" />
       <dependency id="ImageProcessor" version="[2.3.3, 3.0.0)" />
-      <dependency id="ImageProcessor.Web" version="[4.5.2, 5.0.0)" />
+      <dependency id="ImageProcessor.Web" version="[4.5.3, 5.0.0)" />
       <dependency id="semver" version="[1.1.2, 2.0.0)" />
       <dependency id="UrlRewritingNet" version="[2.0.7, 3.0.0)" />	  
       <dependency id="Markdown" version="[1.14.4, 2.0.0)" />	  
