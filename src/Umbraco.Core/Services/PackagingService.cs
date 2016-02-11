@@ -365,8 +365,7 @@ namespace Umbraco.Core.Services
                     var dependencies = new HashSet<string>();
 
                     //Add the Master as a dependency
-                    if (infoElement.Element("Master") != null &&
-                        string.IsNullOrEmpty(infoElement.Element("Master").Value) == false)
+                    if (string.IsNullOrEmpty((string)infoElement.Element("Master")) == false)
                     {
                         dependencies.Add(infoElement.Element("Master").Value);
                     }
@@ -504,7 +503,7 @@ namespace Umbraco.Core.Services
             var found = children.Any(x => x.Name.InvariantEquals(folderName));
             if (found)
             {
-                var containerId = children.SingleOrDefault(x => x.Name.InvariantEquals(folderName)).Id;
+                var containerId = children.Single(x => x.Name.InvariantEquals(folderName)).Id;
                 return _contentTypeService.GetContentTypeContainer(containerId);
             }
 
@@ -627,7 +626,7 @@ namespace Umbraco.Core.Services
                 contentType.AllowedTemplates = allowedTemplates;
             }
 
-            if (string.IsNullOrEmpty(defaultTemplateElement.Value) == false)
+            if (string.IsNullOrEmpty((string)defaultTemplateElement) == false)
             {
                 var defaultTemplate = _fileService.GetTemplate(defaultTemplateElement.Value.ToSafeAlias());
                 if (defaultTemplate != null)
@@ -741,13 +740,13 @@ namespace Umbraco.Core.Services
                 var propertyType = new PropertyType(dataTypeDefinition, property.Element("Alias").Value)
                 {
                     Name = property.Element("Name").Value,
-                    Description = property.Element("Description") != null ? property.Element("Description").Value : null,
+                    Description = (string)property.Element("Description"),
                     Mandatory = property.Element("Mandatory") != null ? property.Element("Mandatory").Value.ToLowerInvariant().Equals("true") : false,
-                    ValidationRegExp = property.Element("Validation") != null ? property.Element("Validation").Value : null,
+                    ValidationRegExp = (string)property.Element("Validation"),
                     SortOrder = sortOrder
                 };
 
-                var tab = property.Element("Tab").Value;
+                var tab = (string)property.Element("Tab");
                 if (string.IsNullOrEmpty(tab))
                 {
                     contentType.AddPropertyType(propertyType);
@@ -762,7 +761,7 @@ namespace Umbraco.Core.Services
         private IContentType UpdateContentTypesStructure(IContentType contentType, XElement structureElement)
         {
             var allowedChildren = contentType.AllowedContentTypes.ToList();
-            int sortOrder = allowedChildren.Any() ? allowedChildren.LastOrDefault().SortOrder : 0;
+            int sortOrder = allowedChildren.Any() ? allowedChildren.Last().SortOrder : 0;
             foreach (var element in structureElement.Elements("DocumentType"))
             {
                 var alias = element.Value;
@@ -797,9 +796,9 @@ namespace Umbraco.Core.Services
             using (var repository = _repositoryFactory.CreateContentTypeRepository(_uowProvider.GetUnitOfWork()))
             {
                 var query = Query<IContentType>.Builder.Where(x => x.Alias == contentTypeAlias);
-                var types = repository.GetByQuery(query);
+                var types = repository.GetByQuery(query).ToArray();
 
-                if (!types.Any())
+                if (types.Any() == false)
                     throw new Exception(
                         string.Format("No ContentType matching the passed in Alias: '{0}' was found",
                                       contentTypeAlias));
@@ -889,7 +888,7 @@ namespace Umbraco.Core.Services
             {
                 var dataTypeDefinitionName = dataTypeElement.Attribute("Name").Value;
 
-                var legacyPropertyEditorId = Guid.Empty;
+                Guid legacyPropertyEditorId;
                 Guid.TryParse(dataTypeElement.Attribute("Id").Value, out legacyPropertyEditorId);
 
                 var dataTypeDefinitionId = new Guid(dataTypeElement.Attribute("Definition").Value);
@@ -1005,7 +1004,7 @@ namespace Umbraco.Core.Services
             var found = children.Any(x => x.Name.InvariantEquals(folderName));
             if (found)
             {
-                var containerId = children.SingleOrDefault(x => x.Name.InvariantEquals(folderName)).Id;
+                var containerId = children.Single(x => x.Name.InvariantEquals(folderName)).Id;
                 return _dataTypeService.GetContainer(containerId);
             }
 
@@ -1028,21 +1027,28 @@ namespace Umbraco.Core.Services
                 var dataTypeDefinitionName = dataTypeElement.Attribute("Name").Value;
                 var dataTypeDefinition = dataTypes.FirstOrDefault(x => x.Name == dataTypeDefinitionName);
 
-                var valuesWithoutKeys = prevaluesElement.Elements("PreValue")
-                                                        .Where(x => ((string)x.Attribute("Alias")).IsNullOrWhiteSpace())
-                                                        .Select(x => x.Attribute("Value").Value);
+                if (dataTypeDefinition != null)
+                {
+                    var valuesWithoutKeys = prevaluesElement.Elements("PreValue")
+                        .Where(x => ((string) x.Attribute("Alias")).IsNullOrWhiteSpace())
+                        .Select(x => x.Attribute("Value").Value);
 
-                var valuesWithKeys = prevaluesElement.Elements("PreValue")
-                    .Where(x => ((string)x.Attribute("Alias")).IsNullOrWhiteSpace() == false)
-                    .ToDictionary(
-                        key => (string)key.Attribute("Alias"),
-                        val => new PreValue((string)val.Attribute("Value")));
+                    var valuesWithKeys = prevaluesElement.Elements("PreValue")
+                        .Where(x => ((string) x.Attribute("Alias")).IsNullOrWhiteSpace() == false)
+                        .ToDictionary(
+                            key => (string) key.Attribute("Alias"),
+                            val => new PreValue((string) val.Attribute("Value")));
 
-                //save the values with keys
-                _dataTypeService.SavePreValues(dataTypeDefinition, valuesWithKeys);
+                    //save the values with keys
+                    _dataTypeService.SavePreValues(dataTypeDefinition, valuesWithKeys);
 
-                //save the values without keys (this is legacy)
-                _dataTypeService.SavePreValues(dataTypeDefinition.Id, valuesWithoutKeys);
+                    //save the values without keys (this is legacy)
+                    _dataTypeService.SavePreValues(dataTypeDefinition.Id, valuesWithoutKeys);
+                }
+                else
+                {
+                    _logger.Warn<PackagingService>("No data type found with name " + dataTypeDefinitionName + " data type pre-values will not be saved");
+                }
             }
         }
 
@@ -1329,31 +1335,31 @@ namespace Umbraco.Core.Services
             //Following xml elements are treated as nullable properties
             var useInEditorElement = macroElement.Element("useInEditor");
             var useInEditor = false;
-            if (useInEditorElement != null && string.IsNullOrEmpty(useInEditorElement.Value) == false)
+            if (useInEditorElement != null && string.IsNullOrEmpty((string)useInEditorElement) == false)
             {
                 useInEditor = bool.Parse(useInEditorElement.Value);
             }
             var cacheDurationElement = macroElement.Element("refreshRate");
             var cacheDuration = 0;
-            if (cacheDurationElement != null && string.IsNullOrEmpty(cacheDurationElement.Value) == false)
+            if (cacheDurationElement != null && string.IsNullOrEmpty((string)cacheDurationElement) == false)
             {
                 cacheDuration = int.Parse(cacheDurationElement.Value);
             }
             var cacheByMemberElement = macroElement.Element("cacheByMember");
             var cacheByMember = false;
-            if (cacheByMemberElement != null && string.IsNullOrEmpty(cacheByMemberElement.Value) == false)
+            if (cacheByMemberElement != null && string.IsNullOrEmpty((string)cacheByMemberElement) == false)
             {
                 cacheByMember = bool.Parse(cacheByMemberElement.Value);
             }
             var cacheByPageElement = macroElement.Element("cacheByPage");
             var cacheByPage = false;
-            if (cacheByPageElement != null && string.IsNullOrEmpty(cacheByPageElement.Value) == false)
+            if (cacheByPageElement != null && string.IsNullOrEmpty((string)cacheByPageElement) == false)
             {
                 cacheByPage = bool.Parse(cacheByPageElement.Value);
             }
             var dontRenderElement = macroElement.Element("dontRender");
             var dontRender = true;
-            if (dontRenderElement != null && string.IsNullOrEmpty(dontRenderElement.Value) == false)
+            if (dontRenderElement != null && string.IsNullOrEmpty((string)dontRenderElement) == false)
             {
                 dontRender = bool.Parse(dontRenderElement.Value);
             }
@@ -1526,23 +1532,20 @@ namespace Umbraco.Core.Services
                 var dependencies = new List<string>();
                 var elementCopy = tempElement;
                 //Ensure that the Master of the current template is part of the import, otherwise we ignore this dependency as part of the dependency sorting.
-                if (elementCopy.Element("Master") != null &&
-                    string.IsNullOrEmpty(elementCopy.Element("Master").Value) == false &&
-                    templateElements.Any(x => x.Element("Alias").Value == elementCopy.Element("Master").Value))
+                if (string.IsNullOrEmpty((string)elementCopy.Element("Master")) == false &&
+                    templateElements.Any(x => (string)x.Element("Alias") == (string)elementCopy.Element("Master")))
                 {
-                    dependencies.Add(elementCopy.Element("Master").Value);
+                    dependencies.Add((string)elementCopy.Element("Master"));
                 }
-                else if (elementCopy.Element("Master") != null &&
-                         string.IsNullOrEmpty(elementCopy.Element("Master").Value) == false &&
-                         templateElements.Any(x => x.Element("Alias").Value == elementCopy.Element("Master").Value) ==
-                         false)
+                else if (string.IsNullOrEmpty((string)elementCopy.Element("Master")) == false &&
+                    templateElements.Any(x => (string)x.Element("Alias") == (string)elementCopy.Element("Master")) == false)
                 {
-                    _logger.Info<PackagingService>(string.Format("Template '{0}' has an invalid Master '{1}', so the reference has been ignored.", elementCopy.Element("Alias").Value, elementCopy.Element("Master").Value));
+                    _logger.Info<PackagingService>(string.Format("Template '{0}' has an invalid Master '{1}', so the reference has been ignored.", (string)elementCopy.Element("Alias"), (string)elementCopy.Element("Master")));
                 }
 
                 var field = new TopologicalSorter.DependencyField<XElement>
                 {
-                    Alias = elementCopy.Element("Alias").Value,
+                    Alias = (string)elementCopy.Element("Alias"),
                     Item = new Lazy<XElement>(() => elementCopy),
                     DependsOn = dependencies.ToArray()
                 };
@@ -1564,7 +1567,7 @@ namespace Umbraco.Core.Services
                 var existingTemplate = _fileService.GetTemplate(alias) as Template;
                 var template = existingTemplate ?? new Template(path, templateName, alias);
                 template.Content = design;
-                if (masterElement != null && string.IsNullOrEmpty(masterElement.Value) == false)
+                if (masterElement != null && string.IsNullOrEmpty((string)masterElement) == false)
                 {
                     template.MasterTemplateAlias = masterElement.Value;
                     var masterTemplate = templates.FirstOrDefault(x => x.Alias == masterElement.Value);
