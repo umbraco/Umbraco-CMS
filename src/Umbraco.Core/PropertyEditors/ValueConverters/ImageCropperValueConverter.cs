@@ -35,6 +35,62 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.ImageCropperAlias);
         }
 
+        internal static void MergePreValues(JObject currentValue, IDataTypeService dataTypeService, int dataTypeId)
+        {
+            //need to lookup the pre-values for this data type
+            //TODO: Change all singleton access to use ctor injection in v8!!!
+            var dt = dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeId);
+
+            if (dt != null && dt.IsDictionaryBased && dt.PreValuesAsDictionary.ContainsKey("crops"))
+            {
+                var cropsString = dt.PreValuesAsDictionary["crops"].Value;
+                JArray preValueCrops;
+                try
+                {
+                    preValueCrops = JsonConvert.DeserializeObject<JArray>(cropsString);
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.Error<ImageCropperValueConverter>("Could not parse the string " + cropsString + " to a json object", ex);
+                    return;
+                }
+
+                //now we need to merge the crop values - the alias + width + height comes from pre-configured pre-values,
+                // however, each crop can store it's own coordinates
+
+                JArray existingCropsArray;
+                if (currentValue["crops"] != null)
+                {
+                    existingCropsArray = (JArray)currentValue["crops"];
+                }
+                else
+                {
+                    currentValue["crops"] = existingCropsArray = new JArray();
+                }
+
+                foreach (var preValueCrop in preValueCrops.Where(x => x.HasValues))
+                {
+                    var found = existingCropsArray.FirstOrDefault(x =>
+                    {
+                        if (x.HasValues && x["alias"] != null)
+                        {
+                            return x["alias"].Value<string>() == preValueCrop["alias"].Value<string>();
+                        }
+                        return false;
+                    });
+                    if (found != null)
+                    {
+                        found["width"] = preValueCrop["width"];
+                        found["height"] = preValueCrop["height"];
+                    }
+                    else
+                    {
+                        existingCropsArray.Add(preValueCrop);
+                    }
+                }
+            }
+        }
+
         public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
         {
             if (source == null) return null;
@@ -57,51 +113,8 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                     return sourceString;
                 }
 
-                //need to lookup the pre-values for this data type
-                //TODO: Change all singleton access to use ctor injection in v8!!!
-                var dt = _dataTypeService.GetPreValuesCollectionByDataTypeId(propertyType.DataTypeId);
+                MergePreValues(obj, _dataTypeService, propertyType.DataTypeId);
 
-                if (dt != null && dt.IsDictionaryBased && dt.PreValuesAsDictionary.ContainsKey("crops"))
-                {
-                    var cropsString = dt.PreValuesAsDictionary["crops"].Value;
-                    JArray preValueCrops;
-                    try
-                    {
-                        preValueCrops = JsonConvert.DeserializeObject<JArray>(cropsString);
-                    }
-                    catch (Exception ex)
-                    {
-                        LogHelper.Error<ImageCropperValueConverter>("Could not parse the string " + cropsString + " to a json object", ex);
-                        return sourceString;
-                    }
-
-                    //now we need to merge the crop values - the alias + width + height comes from pre-configured pre-values,
-                    // however, each crop can store it's own coordinates
-
-                    var existingCropsArray = obj["crops"] != null ? (JArray) obj["crops"] : new JArray();
-
-                    foreach (var preValueCrop in preValueCrops.Where(x => x.HasValues))
-                    {
-                        var found = existingCropsArray.FirstOrDefault(x =>
-                        {
-                            if (x.HasValues && x["alias"] != null)
-                            {
-                                return x["alias"].Value<string>() == preValueCrop["alias"].Value<string>();
-                            }
-                            return false;
-                        });
-                        if (found != null)
-                        {
-                            found["width"] = preValueCrop["width"];
-                            found["height"] = preValueCrop["height"];
-                        }
-                        else
-                        {
-                            existingCropsArray.Add(preValueCrop);
-                        }
-                    }
-                }
-                
                 return obj;
             }
 
