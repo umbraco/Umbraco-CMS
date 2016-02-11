@@ -85,6 +85,7 @@
     <key alias="relations">Править связи</key>
     <key alias="returnToList">Вернуться к списку</key>
     <key alias="save">Сохранить</key>
+    <key alias="saveAndGenerateModels">Сохранить и построить модели</key>
     <key alias="saveAndPublish">Сохранить и опубликовать</key>
     <key alias="saveToPublish">Сохранить и направить на публикацию</key>
     <key alias="saveListView">Сохранить список</key>
@@ -732,6 +733,13 @@
   <area alias="member">
     <key alias="createNewMember">Создать нового участника</key>
     <key alias="allMembers">Все участники</key>
+  </area>
+  <area alias="modelsBuilder">
+      <key alias="buildingModels">Построение моделей</key>
+      <key alias="waitingMessage">это может занять некоторое время, пожалуйста, подождите</key>
+      <key alias="modelsGenerated">Модели построены</key>
+      <key alias="modelsGeneratedError">Модели не могут быть построены</key>
+      <key alias="modelsExceptionInUlog">Процесс построения моделей завершился ошибкой, подробности в системном журнале Umbraco</key>
   </area>
   <area alias="moveOrCopy">
     <key alias="choose">Выберите страницу...</key>
