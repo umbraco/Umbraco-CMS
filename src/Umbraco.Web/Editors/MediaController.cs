@@ -507,7 +507,17 @@ namespace Umbraco.Web.Editors
                     if (UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes.Contains(ext))
                         mediaType = Constants.Conventions.MediaTypes.Image;
 
-                    var f = mediaService.CreateMedia(fileName, parentId, mediaType, Security.CurrentUser.Id);
+                    //TODO: make the media item name "nice" since file names could be pretty ugly, we have 
+                    // string extensions to do much of this but we'll need:
+                    // * Pascalcase the name (use string extensions)
+                    // * strip the file extension
+                    // * underscores to spaces
+                    // * probably remove 'ugly' characters - let's discuss
+                    // All of this logic should exist in a string extensions method and be unit tested
+                    // http://issues.umbraco.org/issue/U4-5572
+                    var mediaItemName = fileName;
+
+                    var f = mediaService.CreateMedia(mediaItemName, parentId, mediaType, Security.CurrentUser.Id);
 
                     var fileInfo = new FileInfo(file.LocalFileName);
                     var fs = fileInfo.OpenReadWithRetry();
@@ -521,7 +531,7 @@ namespace Umbraco.Web.Editors
                     if (saveResult == false)
                     {
                         AddCancelMessage(tempFiles,
-                            message: Services.TextService.Localize("speechBubbles/operationCancelledText") + " -- " + fileName,
+                            message: Services.TextService.Localize("speechBubbles/operationCancelledText") + " -- " + mediaItemName,
                             localizeMessage: false);
                     }
                     else
