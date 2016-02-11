@@ -89,6 +89,29 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Returns an item to be used to display the recycle bin for media
+        /// </summary>
+        /// <returns></returns>
+        public ContentItemDisplay GetRecycleBin()
+        {
+            var display = new ContentItemDisplay
+            {
+                Id = Constants.System.RecycleBinMedia,
+                Alias = "recycleBin",
+                ParentId = -1,
+                Name = Services.TextService.Localize("general/recycleBin"),
+                ContentTypeAlias = "recycleBin",
+                CreateDate = DateTime.Now,
+                IsContainer = true,
+                Path = "-1," + Constants.System.RecycleBinMedia
+            };
+
+            TabsAndPropertiesResolver.AddListView(display, "media", Services.DataTypeService, Services.TextService);
+
+            return display;
+        }
+
+        /// <summary>
         /// Gets the content json for the content id
         /// </summary>
         /// <param name="id"></param>
@@ -123,7 +146,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Returns media items known to be a container of other media items
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
         [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>>))]
         public IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildFolders(int id = -1)

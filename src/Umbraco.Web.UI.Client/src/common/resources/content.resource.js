@@ -42,6 +42,15 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
     return {
         
+        getRecycleBin: function() {
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "contentApiBaseUrl",
+                       "GetRecycleBin")),
+               'Failed to retrieve data for content recycle bin');
+        },
+
         /**
          * @ngdoc method
          * @name umbraco.resources.contentResource#sort
