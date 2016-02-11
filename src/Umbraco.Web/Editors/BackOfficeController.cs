@@ -352,6 +352,10 @@ namespace Umbraco.Web.Editors
                                 string.Join(",", UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes)
                             },
                             {
+                                "disallowedUploadFiles",
+                                string.Join(",", UmbracoConfig.For.UmbracoSettings().Content.DisallowedUploadFiles)
+                            },
+                            {
                                 "maxFileSize",
                                 GetMaxRequestLength()
                             },
