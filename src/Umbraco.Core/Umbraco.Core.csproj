@@ -513,6 +513,7 @@
     <Compile Include="Services\IServerRegistrationService.cs" />
     <Compile Include="Services\ITaskService.cs" />
     <Compile Include="Services\LocalizedTextServiceSupplementaryFileSource.cs" />
+    <Compile Include="Models\MediaExtensions.cs" />
     <Compile Include="Services\MigrationEntryService.cs" />
     <Compile Include="Services\MoveOperationStatusType.cs" />
     <Compile Include="Services\PublicAccessService.cs" />
