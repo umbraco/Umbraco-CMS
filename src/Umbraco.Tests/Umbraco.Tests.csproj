@@ -193,6 +193,7 @@
     <Compile Include="Persistence\Repositories\TaskRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\TaskTypeRepositoryTest.cs" />
     <Compile Include="Resolvers\ResolverBaseTest.cs" />
+    <Compile Include="Routing\RoutesCacheTests.cs" />
     <Compile Include="Routing\UrlRoutingTestBase.cs" />
     <Compile Include="Security\UmbracoBackOfficeIdentityTests.cs" />
     <Compile Include="Services\ContentTypeServiceExtensionsTests.cs" />
