@@ -38,7 +38,7 @@
 
     <umb-load-indicator ng-if="loading"></umb-load-indicator>
 
-    <div class="umb-control-group" ng-show="!loading">
+    <div class="umb-control-group" ng-show="!loading && filtered.length > 0 ">
         <ul class="umb-iconpicker" ng-class="color" ng-show="icons">
             <li class="umb-iconpicker-item" ng-repeat="icon in filtered = (icons | filter: searchTerm) track by $id(icon)">
                 <a href="#" title="{{icon}}" ng-click="selectIcon(icon, color)" prevent-default>
@@ -46,12 +46,11 @@
                 </a>
             </li>
         </ul>
-
-        <umb-empty-state
-            ng-if="filtered.length === 0"
-            position="center">
-            <localize key="defaultdialogs_noIconsFound">No icons were found.</localize>
-        </umb-empty-state>
-
     </div>
+
+    <umb-empty-state
+        ng-if="filtered.length === 0"
+        position="center">
+        <localize key="defaultdialogs_noIconsFound">No icons were found.</localize>
+    </umb-empty-state>
 </div>
