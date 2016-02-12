@@ -265,6 +265,7 @@
     <key alias="selectContent">Select content</key>
     <key alias="selectMember">Select member</key>
     <key alias="selectMemberGroup">Select member group</key>
+    <key alias="noIconsFound">No icons were found</key>
 
     <key alias="noMacroParams">There are no parameters for this macro</key>
 
