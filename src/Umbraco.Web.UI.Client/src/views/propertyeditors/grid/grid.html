@@ -174,7 +174,8 @@
                                                               ng-click="clickControl($index, area.controls, area)"
                                                               ng-class="{'-active': control.active}"
                                                               on-outside-click="clickOutsideControl($index, area.controls, area)"
-                                                              bind-click-on="{{control.active}}">
+                                                              bind-click-on="{{control.active}}"
+                                                              umb-set-dirty-on-change="{{control.value}}">
 
                                                               <div class="umb-control-click-overlay" ng-show="!control.active && !sortMode"></div>
 

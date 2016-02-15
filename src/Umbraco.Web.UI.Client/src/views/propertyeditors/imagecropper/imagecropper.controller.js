@@ -116,7 +116,7 @@ angular.module('umbraco')
                 if (property.value.src) {
 
                     if (thumbnail === true) {
-                        return property.value.src + "?width=500&mode=max";
+                        return property.value.src + "?width=500&mode=max&animationprocessmode=first";
                     }
                     else {
                         return property.value.src;

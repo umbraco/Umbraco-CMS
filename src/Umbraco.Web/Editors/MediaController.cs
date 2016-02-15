@@ -89,6 +89,29 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Returns an item to be used to display the recycle bin for media
+        /// </summary>
+        /// <returns></returns>
+        public ContentItemDisplay GetRecycleBin()
+        {
+            var display = new ContentItemDisplay
+            {
+                Id = Constants.System.RecycleBinMedia,
+                Alias = "recycleBin",
+                ParentId = -1,
+                Name = Services.TextService.Localize("general/recycleBin"),
+                ContentTypeAlias = "recycleBin",
+                CreateDate = DateTime.Now,
+                IsContainer = true,
+                Path = "-1," + Constants.System.RecycleBinMedia
+            };
+
+            TabsAndPropertiesResolver.AddListView(display, "media", Services.DataTypeService, Services.TextService);
+
+            return display;
+        }
+
+        /// <summary>
         /// Gets the content json for the content id
         /// </summary>
         /// <param name="id"></param>
@@ -123,7 +146,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Returns media items known to be a container of other media items
         /// </summary>
-        /// <param name="ids"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
         [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>>))]
         public IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildFolders(int id = -1)
@@ -507,7 +530,17 @@ namespace Umbraco.Web.Editors
                     if (UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes.Contains(ext))
                         mediaType = Constants.Conventions.MediaTypes.Image;
 
-                    var f = mediaService.CreateMedia(fileName, parentId, mediaType, Security.CurrentUser.Id);
+                    //TODO: make the media item name "nice" since file names could be pretty ugly, we have 
+                    // string extensions to do much of this but we'll need:
+                    // * Pascalcase the name (use string extensions)
+                    // * strip the file extension
+                    // * underscores to spaces
+                    // * probably remove 'ugly' characters - let's discuss
+                    // All of this logic should exist in a string extensions method and be unit tested
+                    // http://issues.umbraco.org/issue/U4-5572
+                    var mediaItemName = fileName;
+
+                    var f = mediaService.CreateMedia(mediaItemName, parentId, mediaType, Security.CurrentUser.Id);
 
                     var fileInfo = new FileInfo(file.LocalFileName);
                     var fs = fileInfo.OpenReadWithRetry();
@@ -521,7 +554,7 @@ namespace Umbraco.Web.Editors
                     if (saveResult == false)
                     {
                         AddCancelMessage(tempFiles,
-                            message: Services.TextService.Localize("speechBubbles/operationCancelledText") + " -- " + fileName,
+                            message: Services.TextService.Localize("speechBubbles/operationCancelledText") + " -- " + mediaItemName,
                             localizeMessage: false);
                     }
                     else

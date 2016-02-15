@@ -159,7 +159,7 @@ angular.module("umbraco")
                         if (thumbnail) {
                             if (mediaHelper.detectIfImageByExtension(property.value)) {
                                 //get default big thumbnail from image processor
-                                var thumbnailUrl = property.value + "?rnd=" + moment(entity.updateDate).format("YYYYMMDDHHmmss") + "&width=500";
+                                var thumbnailUrl = property.value + "?rnd=" + moment(entity.updateDate).format("YYYYMMDDHHmmss") + "&width=500&animationprocessmode=first";
                                 return thumbnailUrl;
                             }
                             else {

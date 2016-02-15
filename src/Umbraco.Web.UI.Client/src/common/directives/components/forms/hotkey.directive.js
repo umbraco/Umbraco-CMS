@@ -15,45 +15,55 @@ angular.module("umbraco.directives")
                 keyCombo = scope.$eval(attrs["hotkey"]);
             }
 
-            // disable shortcuts in input fields if keycombo is 1 character
-            if (keyCombo) {
+            function activate() {
 
-                if (keyCombo.length === 1) {
-                    options = {
-                        inputDisabled: true
-                    };
-                }
+                if (keyCombo) {
 
-                keyboardService.bind(keyCombo, function() {
-
-                    var element = $(el);
-                    var activeElementType = document.activeElement.tagName;
-                    var clickableElements = ["A", "BUTTON"];
-
-                    if (element.is("a,div,button,input[type='button'],input[type='submit'],input[type='checkbox']") && !element.is(':disabled')) {
-
-                        if (element.is(':visible') || attrs.hotkeyWhenHidden) {
-
-                            // when keycombo is enter and a link or button has focus - click the link or button instead of using the hotkey
-                            if (keyCombo === "enter" && clickableElements.indexOf(activeElementType) === 0) {
-                                document.activeElement.click();
-                            } else {
-                                element.click();
-                            }
-
-                        }
-
-                    } else {
-                        element.focus();
+                    // disable shortcuts in input fields if keycombo is 1 character
+                    if (keyCombo.length === 1) {
+                        options = {
+                            inputDisabled: true
+                        };
                     }
 
-                }, options);
+                    keyboardService.bind(keyCombo, function() {
 
-                el.on('$destroy', function() {
-                    keyboardService.unbind(keyCombo);
-                });
+                        var element = $(el);
+                        var activeElementType = document.activeElement.tagName;
+                        var clickableElements = ["A", "BUTTON"];
+
+                        if (element.is("a,div,button,input[type='button'],input[type='submit'],input[type='checkbox']") && !element.is(':disabled')) {
+
+                            if (element.is(':visible') || attrs.hotkeyWhenHidden) {
+
+                                if (attrs.hotkeyWhen && attrs.hotkeyWhen === "false") {
+                                    return;
+                                }
+
+                                // when keycombo is enter and a link or button has focus - click the link or button instead of using the hotkey
+                                if (keyCombo === "enter" && clickableElements.indexOf(activeElementType) === 0) {
+                                    document.activeElement.click();
+                                } else {
+                                    element.click();
+                                }
+
+                            }
+
+                        } else {
+                            element.focus();
+                        }
+
+                    }, options);
+
+                    el.on('$destroy', function() {
+                        keyboardService.unbind(keyCombo);
+                    });
+
+                }
 
             }
+
+            activate();
 
         };
     });

@@ -85,6 +85,7 @@
     <key alias="relations">Править связи</key>
     <key alias="returnToList">Вернуться к списку</key>
     <key alias="save">Сохранить</key>
+    <key alias="saveAndGenerateModels">Сохранить и построить модели</key>
     <key alias="saveAndPublish">Сохранить и опубликовать</key>
     <key alias="saveToPublish">Сохранить и направить на публикацию</key>
     <key alias="saveListView">Сохранить список</key>
@@ -234,6 +235,7 @@
 
     <key alias="memberCanEdit">Участник может изменить</key>
     <key alias="showOnMemberProfile">Показать в профиле участника</key>
+    <key alias="tabHasNoSortOrder">для вкладки не указан порядок сортировки</key>
   </area>
   <area alias="create">
     <key alias="chooseNode">Где вы хотите создать новый %0%</key>
@@ -418,6 +420,7 @@
     <key alias="alias">Алиас</key>
     <key alias="all">Все</key>
     <key alias="areyousure">Вы уверены?</key>
+    <key alias="back">Назад</key>
     <key alias="border">Границы</key>
     <key alias="by">пользователем</key>
     <key alias="cancel">Отмена</key>
@@ -731,6 +734,13 @@
     <key alias="createNewMember">Создать нового участника</key>
     <key alias="allMembers">Все участники</key>
   </area>
+  <area alias="modelsBuilder">
+      <key alias="buildingModels">Построение моделей</key>
+      <key alias="waitingMessage">это может занять некоторое время, пожалуйста, подождите</key>
+      <key alias="modelsGenerated">Модели построены</key>
+      <key alias="modelsGeneratedError">Модели не могут быть построены</key>
+      <key alias="modelsExceptionInUlog">Процесс построения моделей завершился ошибкой, подробности в системном журнале Umbraco</key>
+  </area>
   <area alias="moveOrCopy">
     <key alias="choose">Выберите страницу...</key>
     <key alias="copyDone">Узел %0% был скопирован в %1%</key>
@@ -1004,6 +1014,8 @@
     <key alias="fileSavedHeader">Файл сохранен</key>
     <key alias="fileSavedText">Файл сохранен без ошибок</key>
     <key alias="languageSaved">Язык сохранен</key>
+    <key alias="mediaTypeSavedHeader">Тип медиа сохранен</key>
+    <key alias="memberTypeSavedHeader">Тип участника сохранен</key>
     <key alias="partialViewErrorHeader">Представление не сохранено</key>
     <key alias="partialViewErrorText">Произошла ошибка при сохранении файла</key>
     <key alias="partialViewSavedHeader">Представление сохранено</key>
@@ -1174,6 +1186,7 @@
     <key alias="modules">Разделы</key>
     <key alias="newPassword">Новый пароль</key>
     <key alias="noConsole">Отключить доступ к административной панели Umbraco</key>
+    <key alias="oldPassword">Прежний пароль</key>
     <key alias="password">Пароль</key>
     <key alias="passwordChanged">Ваш пароль доступа изменен!</key>
     <key alias="passwordConfirm">Подвердите новый пароль</key>

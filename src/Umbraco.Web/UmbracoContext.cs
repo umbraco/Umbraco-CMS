@@ -133,7 +133,7 @@ namespace Umbraco.Web
                 UmbracoContext.Current._replacing = true;
             }
 
-            var umbracoContext = CreateContext(httpContext, applicationContext, webSecurity, umbracoSettings, urlProviders, preview ?? false);
+            var umbracoContext = CreateContext(httpContext, applicationContext, webSecurity, umbracoSettings, urlProviders, preview);
 
             //assign the singleton
             UmbracoContext.Current = umbracoContext;
@@ -158,7 +158,7 @@ namespace Umbraco.Web
             WebSecurity webSecurity,
             IUmbracoSettingsSection umbracoSettings,
             IEnumerable<IUrlProvider> urlProviders,        
-            bool preview)
+            bool? preview)
         {
             if (httpContext == null) throw new ArgumentNullException("httpContext");
             if (applicationContext == null) throw new ArgumentNullException("applicationContext");

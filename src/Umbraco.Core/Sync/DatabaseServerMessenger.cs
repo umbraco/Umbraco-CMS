@@ -171,9 +171,11 @@ namespace Umbraco.Core.Sync
                     // go get the last id in the db and store it
                     // note: do it BEFORE initializing otherwise some instructions might get lost
                     // when doing it before, some instructions might run twice - not an issue
-                    var lastId = _appContext.DatabaseContext.Database.ExecuteScalar<int>("SELECT MAX(id) FROM umbracoCacheInstruction");
-                    if (lastId > 0)
-                        SaveLastSynced(lastId);
+                    var maxId = _appContext.DatabaseContext.Database.ExecuteScalar<int>("SELECT MAX(id) FROM umbracoCacheInstruction");
+
+                    //if there is a max currently, or if we've never synced
+                    if (maxId > 0 || _lastId < 0)
+                        SaveLastSynced(maxId);
 
                     // execute initializing callbacks
                     if (_options.InitializingCallbacks != null)

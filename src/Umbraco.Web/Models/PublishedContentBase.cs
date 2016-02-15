@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -64,9 +67,22 @@ namespace Umbraco.Web.Models
 	                            break;
 	                        case Constants.PropertyEditors.ImageCropperAlias:
 	                            //get the url from the json format
-	                            var val = prop.Value.ToString();
-	                            var crops = val.SerializeToCropDataSet();
-	                            _url = crops != null ? crops.Src : string.Empty;
+
+	                            var stronglyTyped = prop.Value as ImageCropDataSet;
+	                            if (stronglyTyped != null)
+	                            {
+                                    _url = stronglyTyped.Src;
+                                    break;
+                                }
+
+                                var json = prop.Value as JObject;
+	                            if (json != null)
+	                            {
+                                    _url = json.ToObject<ImageCropDataSet>(new JsonSerializer { Culture = CultureInfo.InvariantCulture, FloatParseHandling = FloatParseHandling.Decimal }).Src;
+	                                break;
+	                            }
+                                
+	                            _url = prop.Value.ToString();
 	                            break;
 	                    }
 	                    break;
