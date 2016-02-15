@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
@@ -147,8 +148,10 @@ namespace Umbraco.Web.Mvc
             // map the view data (may change its type, may set model to null)
             viewData = MapViewDataDictionary(viewData, typeof (TModel));
 
-            // bind the model (use context culture as default)
-            var culture = UmbracoContext.PublishedContentRequest.Culture;
+            var culture = CultureInfo.CurrentCulture;
+            // bind the model (use context culture as default, if available)
+            if (UmbracoContext.PublishedContentRequest != null && UmbracoContext.PublishedContentRequest.Culture != null)
+                culture = UmbracoContext.PublishedContentRequest.Culture;
             viewData.Model = RenderModelBinder.BindModel(viewDataModel, typeof (TModel), culture);
 
             // set the view data
