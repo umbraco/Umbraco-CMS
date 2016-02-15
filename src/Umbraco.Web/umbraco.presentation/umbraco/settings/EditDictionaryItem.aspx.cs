@@ -8,6 +8,7 @@ using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
+using umbraco.cms.businesslogic;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
 using Umbraco.Core.IO;
@@ -25,7 +26,8 @@ namespace umbraco.settings
 		protected uicontrols.TabView tbv = new uicontrols.TabView();
 		private System.Collections.ArrayList languageFields = new System.Collections.ArrayList();
         private cms.businesslogic.Dictionary.DictionaryItem currentItem;
-	    protected TextBox keyNameBox;
+	    protected TextBox boxChangeKey;
+	    protected Label labelChangeKey;
 
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
@@ -64,21 +66,26 @@ namespace umbraco.settings
 
 			}
 
-            keyNameBox = new TextBox
+            boxChangeKey = new TextBox
             {
-                ID = "editname-" + currentItem.id,
+                ID = "changeKey-" + currentItem.id,
                 CssClass = "umbEditorTextField",
                 Text = currentItem.key
             };
 
-            var txtChangeKey = new Literal
+            labelChangeKey = new Label
+            {
+                ID = "changeKeyLabel",
+                CssClass = "text-error"
+            };
+            
+            p.addProperty(new Literal
             {
                 Text = "<p>&nbsp;</p>" +
                        "<p>Change the key of the dictionary item. Carefull :)</p>"
-            };
-
-            p.addProperty(txtChangeKey);
-            p.addProperty(keyNameBox);
+            });
+            p.addProperty(boxChangeKey);
+            p.addProperty(labelChangeKey);
 
             if (!IsPostBack)
 			{
@@ -109,15 +116,28 @@ namespace umbraco.settings
 				}
 			}
 
-            var newKey = keyNameBox.Text;
+            labelChangeKey.Text = "";
+            var newKey = boxChangeKey.Text;
             if (string.IsNullOrWhiteSpace(newKey) == false && newKey != currentItem.key)
             {
-                currentItem.setKey(newKey);
+                // key already exists, save but inform
+                if (Dictionary.DictionaryItem.hasKey(newKey) == true)
+                {
+                    labelChangeKey.Text = "The key '" + newKey + "' already exists, sorry..";
+                    boxChangeKey.Text = currentItem.key; // reset the key                    
+                }
+                else
+                {
+                    // set the new key
+                    currentItem.setKey(newKey);
 
-                Panel1.title.InnerHtml = ui.Text("editdictionary") + ": " + currentItem.key;
+                    // update the title with the new key
+                    Panel1.title.InnerHtml = ui.Text("editdictionary") + ": " + newKey;
 
-                var path = BuildPath(currentItem);
-                ClientTools.SyncTree(path, true);
+                    // sync the content tree
+                    var path = BuildPath(currentItem);
+                    ClientTools.SyncTree(path, true);
+                }
             }            
 
             ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "dictionaryItemSaved"), "");	
