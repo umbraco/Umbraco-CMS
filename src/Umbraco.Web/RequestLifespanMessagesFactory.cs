@@ -8,21 +8,21 @@ namespace Umbraco.Web
     /// </summary>
     internal class RequestLifespanMessagesFactory : IEventMessagesFactory
     {
-        private readonly IUmbracoContextAccessor _ctxAccessor;
+        private readonly IHttpContextAccessor _httpAccessor;
 
-        public RequestLifespanMessagesFactory(IUmbracoContextAccessor ctxAccessor)
+        public RequestLifespanMessagesFactory(IHttpContextAccessor httpAccessor)
         {
-            if (ctxAccessor == null) throw new ArgumentNullException("ctxAccessor");
-            _ctxAccessor = ctxAccessor;
+            if (httpAccessor == null) throw new ArgumentNullException("httpAccessor");
+            _httpAccessor = httpAccessor;
         }
 
         public EventMessages Get()
         {
-            if (_ctxAccessor.Value.HttpContext.Items[typeof (RequestLifespanMessagesFactory).Name] == null)
+            if (_httpAccessor.Value.Items[typeof (RequestLifespanMessagesFactory).Name] == null)
             {
-                _ctxAccessor.Value.HttpContext.Items[typeof(RequestLifespanMessagesFactory).Name] = new EventMessages();
+                _httpAccessor.Value.Items[typeof(RequestLifespanMessagesFactory).Name] = new EventMessages();
             }
-            return (EventMessages)_ctxAccessor.Value.HttpContext.Items[typeof (RequestLifespanMessagesFactory).Name];
+            return (EventMessages)_httpAccessor.Value.Items[typeof (RequestLifespanMessagesFactory).Name];
         }
     }
 }
