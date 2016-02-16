@@ -9,7 +9,7 @@ Use this directive to render a ui component for selecting child items to a paren
 
 <h3>Markup example</h3>
 <pre>
-	<div ng-controller="Umbraco.Controller as vm">
+	<div ng-controller="My.Controller as vm">
 
         <umb-child-selector
                 selected-children="vm.selectedChildren"
@@ -89,7 +89,7 @@ Use this directive to render a ui component for selecting child items to a paren
 
         }
 
-		angular.module("umbraco").controller("Umbraco.Controller", Controller);
+		angular.module("umbraco").controller("My.Controller", Controller);
 
 	})();
 </pre>
