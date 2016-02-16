@@ -84,7 +84,7 @@ namespace umbraco.settings
             
             p.addProperty(new Literal
             {
-                Text = "<p>&nbsp;</p><p>" + ui.Text("dictionaryItem", "changeKey") + "</p>"
+                Text = "<p>&nbsp;</p><p>" + ui.Text("dictionaryItem", "changeKey", currentUser) + "</p>"
             });
             p.addProperty(boxChangeKey);
             p.addProperty(labelChangeKey);
