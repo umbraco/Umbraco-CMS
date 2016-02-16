@@ -9,7 +9,7 @@ Use this directive to render a tooltip.
 
 <h3>Markup example</h3>
 <pre>
-    <div ng-controller="Umbraco.Controller as vm">
+    <div ng-controller="My.Controller as vm">
 
         <div
             ng-mouseover="vm.mouseOver($event)"
@@ -35,8 +35,8 @@ Use this directive to render a tooltip.
 
             var vm = this;
             vm.tooltip = {
-                show: false;
-                event: null;
+                show: false,
+                event: null
             };
 
             vm.mouseOver = mouseOver;
@@ -44,21 +44,21 @@ Use this directive to render a tooltip.
 
             function mouseOver($event) {
                 vm.tooltip = {
-                    show: true;
-                    event: $event;
+                    show: true,
+                    event: $event
                 };
             }
 
             function mouseLeave() {
                 vm.tooltip = {
-                    show: false;
-                    event: null;
+                    show: false,
+                    event: null
                 };
             }
 
         }
 
-        angular.module("umbraco").controller("Umbraco.Controller", Controller);
+        angular.module("umbraco").controller("My.Controller", Controller);
 
     })();
 </pre>
