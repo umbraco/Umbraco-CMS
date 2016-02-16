@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Web;
 using Microsoft.Owin;
 using Moq;
@@ -24,6 +25,9 @@ namespace Umbraco.Tests.Security
         [Test]
         public void ShouldAuthenticateRequest_When_Not_Configured()
         {
+            //should force app ctx to show not-configured
+            ConfigurationManager.AppSettings.Set("umbracoConfigurationStatus", "");
+
             var dbCtx = new Mock<DatabaseContext>(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), Mock.Of<ISqlSyntaxProvider>(), "test");
             dbCtx.Setup(x => x.IsDatabaseConfigured).Returns(false);
 
