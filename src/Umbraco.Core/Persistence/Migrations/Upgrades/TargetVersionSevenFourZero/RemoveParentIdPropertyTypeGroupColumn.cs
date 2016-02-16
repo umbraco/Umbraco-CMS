@@ -20,7 +20,17 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFourZer
             if (columns.Any(x => x.TableName.InvariantEquals("cmsPropertyTypeGroup") && x.ColumnName.InvariantEquals("parentGroupId")) == false)
                 return;
 
-            Delete.ForeignKey("FK_cmsPropertyTypeGroup_cmsPropertyTypeGroup_id").OnTable("cmsPropertyTypeGroup");
+            //This constraing can be based on old aliases, before removing them, check they exist
+            var constraints = SqlSyntax.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
+            if (constraints.Any(x => x.Item1.InvariantEquals("cmsPropertyTypeGroup") && x.Item3.InvariantEquals("FK_cmsPropertyTypeGroup_cmsPropertyTypeGroup_id")))
+            {
+                Delete.ForeignKey("FK_cmsPropertyTypeGroup_cmsPropertyTypeGroup_id").OnTable("cmsPropertyTypeGroup");
+            }
+            if (constraints.Any(x => x.Item1.InvariantEquals("cmsPropertyTypeGroup") && x.Item3.InvariantEquals("FK_cmsPropertyTypeGroup_cmsPropertyTypeGroup")))
+            {
+                Delete.ForeignKey("FK_cmsPropertyTypeGroup_cmsPropertyTypeGroup").OnTable("cmsPropertyTypeGroup");
+            }
+            
             Delete.Column("parentGroupId").FromTable("cmsPropertyTypeGroup");
         }
 
