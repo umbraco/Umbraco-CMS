@@ -7,7 +7,7 @@ namespace Umbraco.Core.Strings.Css
 {
     internal class StylesheetHelper
     {
-        private const string RuleRegexFormat = @"/\*\*\s*umb_name:\s*(?<Name>{0}?)\s*\*/\s*(?<Selector>[^\s,{{]*?)\s*{{\s*(?<Styles>.*?)\s*}}";
+        private const string RuleRegexFormat = @"/\*\*\s*umb_name:\s*(?<Name>{0}?)\s*\*/\s*(?<Selector>[^,{{]*?)\s*{{\s*(?<Styles>.*?)\s*}}";
 
         public static IEnumerable<StylesheetRule> ParseRules(string input)
         {
