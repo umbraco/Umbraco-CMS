@@ -7,7 +7,35 @@
 Use this directive to left align content in a sub header in the main editor window.
 
 <h3>Markup example</h3>
-For examples see: {@link umbraco.directives.directive:umbEditorSubHeader umbEditorSubHeader}
+<pre>
+    <div ng-controller="MySection.Controller as vm">
+
+        <form name="mySectionForm" novalidate>
+
+            <umb-editor-view>
+
+                <umb-editor-container>
+
+                    <umb-editor-sub-header>
+
+                        <umb-editor-sub-header-content-left>
+                            // left content here
+                        </umb-editor-sub-header-content-left>
+
+                        <umb-editor-sub-header-content-right>
+                            // right content here
+                        </umb-editor-sub-header-content-right>
+
+                    </umb-editor-sub-header>
+
+                </umb-editor-container>
+
+            </umb-editor-view>
+
+        </form>
+
+    </div>
+</pre>
 
 <h3>Use in combination with</h3>
 <ul>

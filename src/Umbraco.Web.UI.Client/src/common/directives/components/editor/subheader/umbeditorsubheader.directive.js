@@ -9,43 +9,23 @@ The sub header is sticky and will follow along down the page when scrolling.
 
 <h3>Markup example</h3>
 <pre>
-    <div ng-controller="Umbraco.Controller as vm">
+    <div ng-controller="MySection.Controller as vm">
 
-        <umb-editor-view>
+        <form name="mySectionForm" novalidate>
 
-            <umb-editor-container>
+            <umb-editor-view>
 
-                <umb-editor-sub-header>
+                <umb-editor-container>
 
-                    <umb-editor-sub-header-content-left>
+                    <umb-editor-sub-header>
+                        // sub header content here
+                    </umb-editor-sub-header>
 
-                        <umb-editor-sub-header-section>
-                            // content goes here
-                        </umb-editor-sub-header-section>
+                </umb-editor-container>
 
-                        <umb-editor-sub-header-section>
-                            // content goes here
-                        </umb-editor-sub-header-section>
+            </umb-editor-view>
 
-                    </umb-editor-sub-header-content-left>
-
-                    <umb-editor-sub-header-content-right>
-
-                        <umb-editor-sub-header-section>
-                            // content goes here
-                        </umb-editor-sub-header-section>
-
-                        <umb-editor-sub-header-section>
-                            // content goes here
-                        </umb-editor-sub-header-section>
-
-                    </umb-editor-sub-header-content-right>
-
-                </umb-editor-sub-header>
-
-            </umb-editor-container>
-
-        </umb-editor-view>
+        </form>
 
     </div>
 </pre>
