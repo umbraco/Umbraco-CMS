@@ -8,6 +8,7 @@ using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
+using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
@@ -28,10 +29,12 @@ namespace umbraco.settings
         private cms.businesslogic.Dictionary.DictionaryItem currentItem;
 	    protected TextBox boxChangeKey;
 	    protected Label labelChangeKey;
+	    protected User currentUser;
 
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
 			currentItem = new cms.businesslogic.Dictionary.DictionaryItem(int.Parse(Request.QueryString["id"]));
+		    currentUser = getUser();
 
 			// Put user code to initialize the page here
 			Panel1.hasMenu = true;
@@ -47,7 +50,7 @@ namespace umbraco.settings
             uicontrols.Pane p = new uicontrols.Pane();
 
             Literal txt = new Literal();
-            txt.Text = "<p>" + ui.Text("dictionaryItem", "description", currentItem.key, base.getUser()) + "</p><br/>";
+            txt.Text = "<p>" + ui.Text("dictionaryItem", "description", currentItem.key, currentUser) + "</p><br/>";
             p.addProperty(txt);
 			
 			foreach (cms.businesslogic.language.Language l in cms.businesslogic.language.Language.getAll)
@@ -81,8 +84,7 @@ namespace umbraco.settings
             
             p.addProperty(new Literal
             {
-                Text = "<p>&nbsp;</p>" +
-                       "<p>Change the key of the dictionary item. Carefull :)</p>"
+                Text = "<p>&nbsp;</p><p>" + ui.Text("dictionaryItem", "changeKey") + "</p>"
             });
             p.addProperty(boxChangeKey);
             p.addProperty(labelChangeKey);
@@ -116,15 +118,15 @@ namespace umbraco.settings
 				}
 			}
 
-            labelChangeKey.Text = "";
+            labelChangeKey.Text = ""; // reset error text 
             var newKey = boxChangeKey.Text;
             if (string.IsNullOrWhiteSpace(newKey) == false && newKey != currentItem.key)
             {
                 // key already exists, save but inform
                 if (Dictionary.DictionaryItem.hasKey(newKey) == true)
                 {
-                    labelChangeKey.Text = "The key '" + newKey + "' already exists, sorry..";
-                    boxChangeKey.Text = currentItem.key; // reset the key                    
+                    labelChangeKey.Text = ui.Text("dictionaryItem", "changeKeyError", newKey, currentUser);
+                    boxChangeKey.Text = currentItem.key; // reset key                    
                 }
                 else
                 {

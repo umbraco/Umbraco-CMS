@@ -236,6 +236,12 @@
   <area alias="dictionaryItem">
     <key alias="description">Rediger de forskellige sprogversioner for ordbogselementet '%0%' herunder. Du tilføjer flere sprog under 'sprog' i menuen til venstre </key>
     <key alias="displayName">Kulturnavn</key>
+    <key alias="changeKey">Her kan du ændre nøglen på ordbogselementet.</key>
+    <key alias="changeKeyError">
+      <![CDATA[
+      Nøglen '%0%' eksisterer allerede.
+   ]]>
+    </key>
   </area>
   <area alias="placeholders">
     <key alias="username">Indtast dit brugernavn</key>
