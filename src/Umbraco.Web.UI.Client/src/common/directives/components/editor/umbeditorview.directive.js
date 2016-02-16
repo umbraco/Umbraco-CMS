@@ -9,26 +9,49 @@ Use this directive to construct the main editor window.
 
 <h3>Markup example</h3>
 <pre>
-    <div ng-controller="Umbraco.Controller as vm">
+    <div ng-controller="MySection.Controller as vm">
 
-        <umb-editor-view>
+        <form name="mySectionForm" novalidate>
 
-            <umb-editor-header
-                // header configuration>
-            </umb-editor-header>
+            <umb-editor-view>
 
-            <umb-editor-container>
-                // main content here
-            </umb-editor-container>
+                <umb-editor-header
+                    name="vm.content.name"
+                    hide-alias="true"
+                    hide-description="true"
+                    hide-icon="true">
+                </umb-editor-header>
 
-            <umb-editor-footer>
-                // footer content here
-            </umb-editor-footer>
+                <umb-editor-container>
+                    // main content here
+                </umb-editor-container>
 
-        </umb-editor-view>
+                <umb-editor-footer>
+                    // footer content here
+                </umb-editor-footer>
+
+            </umb-editor-view>
+
+        </form>
 
     </div>
 </pre>
+<h3>Controller example</h3>
+<pre>
+    (function () {
+
+        "use strict";
+
+        function Controller() {
+
+            var vm = this;
+
+        }
+
+        angular.module("umbraco").controller("MySection.Controller", Controller);
+    })();
+</pre>
+
 
 <h3>Use in combination with</h3>
 <ul>
