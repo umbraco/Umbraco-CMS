@@ -9,57 +9,73 @@ Use this directive to construct a header inside the main editor window.
 
 <h3>Markup example</h3>
 <pre>
-    <div ng-controller="Umbraco.Controller as vm">
+    <div ng-controller="MySection.Controller as vm">
 
-        <umb-editor-view>
+        <form name="mySectionForm" novalidate>
 
-            <umb-editor-header
-                name="vm.content.name"
-                alias="vm.content.alias"
-                description="vm.content.description"
-                icon="vm.content.icon">
-            </umb-editor-header>
+            <umb-editor-view>
 
-            <umb-editor-container>
-                // main content here
-            </umb-editor-container>
+                <umb-editor-header
+                    name="vm.content.name"
+                    hide-alias="true"
+                    hide-description="true"
+                    hide-icon="true">
+                </umb-editor-header>
 
-            <umb-editor-footer>
-                // footer content here
-            </umb-editor-footer>
+                <umb-editor-container>
+                    // main content here
+                </umb-editor-container>
 
-        </umb-editor-view>
+                <umb-editor-footer>
+                    // footer content here
+                </umb-editor-footer>
+
+            </umb-editor-view>
+
+        </form>
 
     </div>
 </pre>
 
 <h3>Markup example - with tabs</h3>
 <pre>
-    <div ng-controller="Umbraco.Controller as vm">
+    <div ng-controller="MySection.Controller as vm">
 
-        <umb-editor-view umb-tabs>
+        <form name="mySectionForm" val-form-manager novalidate>
 
-            <umb-editor-header
-               name="content.name"
-               tabs="content.tabs"
-               hide-icon="true"
-               hide-description="true"
-               hide-alias="true">
-            </umb-editor-header>
+            <umb-editor-view umb-tabs>
 
-            <umb-editor-container>
-               <umb-tabs-content class="form-horizontal" view="true">
-                  <umb-tab id="tab{{tab.id}}" ng-repeat="tab in vm.content.tabs" rel="{{tab.id}}">
-                    // tab content here
-                  </umb-tab>
-               </umb-tabs-content>
-            </umb-editor-container>
+                <umb-editor-header
+                    name="vm.content.name"
+                    tabs="vm.content.tabs"
+                    hide-alias="true"
+                    hide-description="true"
+                    hide-icon="true">
+                </umb-editor-header>
 
-            <umb-editor-footer>
-                // footer content here
-            </umb-editor-footer>
+                <umb-editor-container>
+                    <umb-tabs-content class="form-horizontal" view="true">
+                        <umb-tab id="tab{{tab.id}}" ng-repeat="tab in vm.content.tabs" rel="{{tab.id}}">
 
-        </umb-editor-view>
+                            <div ng-show="tab.alias==='tab1'">
+                                // tab 1 content
+                            </div>
+
+                            <div ng-show="tab.alias==='tab2'">
+                                // tab 2 content
+                            </div>
+
+                        </umb-tab>
+                    </umb-tabs-content>
+                </umb-editor-container>
+
+                <umb-editor-footer>
+                    // footer content here
+                </umb-editor-footer>
+
+            </umb-editor-view>
+
+        </form>
 
     </div>
 </pre>
@@ -73,7 +89,7 @@ Use this directive to construct a header inside the main editor window.
 
             var vm = this;
             vm.content = {
-                name: "My editor",
+                name: "",
                 tabs: [
                     {
                         id: 1,
@@ -92,36 +108,42 @@ Use this directive to construct a header inside the main editor window.
 
         }
 
-        angular.module("umbraco").controller("Umbraco.Controller", Controller);
+        angular.module("umbraco").controller("MySection.Controller", Controller);
     })();
 </pre>
 
 <h3>Markup example - with sub views</h3>
 <pre>
-    <div ng-controller="Umbraco.Controller as vm">
+    <div ng-controller="MySection.Controller as vm">
 
-        <umb-editor-view>
+        <form name="mySectionForm" val-form-manager novalidate>
 
-            <umb-editor-header
-                name="vm.content.name"
-                navigation="vm.content.navigation"
-                hide-icon="true"
-                hide-description="true"
-                hide-alias="true">
-            </umb-editor-header>
+            <umb-editor-view>
 
-            <umb-editor-container>
-                <umb-editor-sub-views
-                    sub-views="vm.content.navigation"
-                    model="vm.content">
-                </umb-editor-sub-views>
-            </umb-editor-container>
+                <umb-editor-header
+                    name="vm.content.name"
+                    navigation="vm.content.navigation"
+                    hide-alias="true"
+                    hide-description="true"
+                    hide-icon="true">
+                </umb-editor-header>
 
-            <umb-editor-footer>
-                // footer content here
-            </umb-editor-footer>
+                <umb-editor-container>
 
-        </umb-editor-view>
+                    <umb-editor-sub-views
+                        sub-views="vm.content.navigation"
+                        model="vm.content">
+                    </umb-editor-sub-views>
+
+                </umb-editor-container>
+
+                <umb-editor-footer>
+                    // footer content here
+                </umb-editor-footer>
+
+            </umb-editor-view>
+
+        </form>
 
     </div>
 </pre>
@@ -136,25 +158,25 @@ Use this directive to construct a header inside the main editor window.
 
             var vm = this;
             vm.content = {
-                name: "My editor",
+                name: "",
                 navigation: [
                     {
                         "name": "Section 1",
                         "icon": "icon-document-dashed-line",
-                        "view": "path/to/html/file.html",
+                        "view": "/App_Plugins/path/to/html.html",
                         "active": true
                     },
                     {
                         "name": "Section 2",
                         "icon": "icon-list",
-                        "view": "path/to/html/file.html"
+                        "view": "/App_Plugins/path/to/html.html",
                     }
                 ]
             };
 
         }
 
-        angular.module("umbraco").controller("Umbraco.Controller", Controller);
+        angular.module("umbraco").controller("MySection.Controller", Controller);
     })();
 </pre>
 
@@ -167,6 +189,7 @@ Use this directive to construct a header inside the main editor window.
 
 @param {string} name The content name.
 @param {array=} tabs Array of tabs. See example above.
+@param {array=} navigation Array of sub views. See example above.
 @param {boolean=} nameLocked Set to <code>true</code> to lock the name.
 @param {object=} menu Add a context menu to the editor.
 @param {string=} icon Show and edit the content icon. Opens an overlay to change the icon.
@@ -175,7 +198,6 @@ Use this directive to construct a header inside the main editor window.
 @param {boolean=} hideAlias Set to <code>true</code> to hide alias.
 @param {string=} description Add a description to the content.
 @param {boolean=} hideDescription Set to <code>true</code> to hide description.
-@param {array=} navigation Array of sub views. See example above.
 
 **/
 
