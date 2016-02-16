@@ -290,7 +290,7 @@ namespace Umbraco.Core
             TimeSpan timeout,
             Func<TT> getCacheItem)
         {
-            var cache = RuntimeCache as HttpRuntimeCacheProvider;
+            var cache = GetHttpRuntimeCacheProvider(RuntimeCache);
             if (cache != null)
             {
                 var result = cache.GetCacheItem(cacheKey, () => getCacheItem(), timeout, false, priority, refreshAction, cacheDependency);
@@ -314,7 +314,7 @@ namespace Umbraco.Core
             CacheDependency cacheDependency,
             Func<TT> getCacheItem)
         {
-            var cache = RuntimeCache as HttpRuntimeCacheProvider;
+            var cache = GetHttpRuntimeCacheProvider(RuntimeCache);
             if (cache != null)
             {
                 var result = cache.GetCacheItem(cacheKey, () => getCacheItem(), null, false, priority, null, cacheDependency);
@@ -374,7 +374,7 @@ namespace Umbraco.Core
                                        TimeSpan timeout,
                                        Func<T> getCacheItem)
         {
-            var cache = RuntimeCache as HttpRuntimeCacheProvider;
+            var cache = GetHttpRuntimeCacheProvider(RuntimeCache);
             if (cache != null)
             {
                 cache.InsertCacheItem(cacheKey, () => getCacheItem(), timeout, false, priority, null, cacheDependency);
@@ -400,7 +400,7 @@ namespace Umbraco.Core
                                        TimeSpan? timeout,
                                        Func<T> getCacheItem)
         {
-            var cache = RuntimeCache as HttpRuntimeCacheProvider;
+            var cache = GetHttpRuntimeCacheProvider(RuntimeCache);
             if (cache != null)
             {
                 cache.InsertCacheItem(cacheKey, () => getCacheItem(), timeout, false, priority, refreshAction, cacheDependency);
@@ -409,6 +409,20 @@ namespace Umbraco.Core
         } 
         #endregion
 
-	}
+	    private HttpRuntimeCacheProvider GetHttpRuntimeCacheProvider(IRuntimeCacheProvider runtimeCache)
+	    {
+	        HttpRuntimeCacheProvider cache;
+            var wrapper = RuntimeCache as IRuntimeCacheProviderWrapper;
+	        if (wrapper != null)
+	        {
+	            cache = wrapper.InnerProvider as HttpRuntimeCacheProvider;
+	        }
+	        else
+	        {
+                cache = RuntimeCache as HttpRuntimeCacheProvider;
+            }
+	        return cache;
+	    }
+    }
 
 }
