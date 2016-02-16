@@ -8,23 +8,27 @@ Use this directive to align content right inside the main editor footer.
 
 <h3>Markup example</h3>
 <pre>
-    <div ng-controller="Umbraco.Controller as vm">
+    <div ng-controller="MySection.Controller as vm">
 
-        <umb-editor-view>
+        <form name="mySectionForm" novalidate>
 
-            <umb-editor-footer>
+            <umb-editor-view>
 
-                <umb-editor-footer-content-left>
-                    // align content left
-                </umb-editor-footer-content-left>
+                <umb-editor-footer>
 
-                <umb-editor-footer-content-right>
-                    // align content right
-                </umb-editor-footer-content-right>
+                    <umb-editor-footer-content-left>
+                        // align content left
+                    </umb-editor-footer-content-left>
 
-            </umb-editor-footer>
+                    <umb-editor-footer-content-right>
+                        // align content right
+                    </umb-editor-footer-content-right>
 
-        </umb-editor-view>
+                </umb-editor-footer>
+
+            </umb-editor-view>
+
+        </form>
 
     </div>
 </pre>
