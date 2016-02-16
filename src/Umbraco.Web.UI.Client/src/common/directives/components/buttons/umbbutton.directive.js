@@ -9,15 +9,15 @@ Use this directive to render an umbraco button. The directive can be used to gen
 
 <h3>Markup example</h3>
 <pre>
-    <div ng-controller="Umbraco.Controller as vm">
+    <div ng-controller="My.Controller as vm">
 
         <umb-button
-            action="vm.clickButton"
+            action="vm.clickButton()"
             type="button"
             button-style="success"
             state="vm.buttonState"
             shortcut="ctrl+c"
-            labelKey="general_buttonText"
+            label="My button"
             disabled="vm.buttonState === 'busy'">
         </umb-button>
 
@@ -49,16 +49,16 @@ Use this directive to render an umbraco button. The directive can be used to gen
             }
         }
 
-        angular.module("umbraco").controller("Umbraco.Controller", Controller);
+        angular.module("umbraco").controller("My.Controller", Controller);
 
     })();
 </pre>
 
 @param {callback} action The button action which should be performed when the button is clicked.
-@param {string=} href Url/Path to navigato to. (The "href" attribute can not be used in combination with the "action" attribute).
+@param {string=} href Url/Path to navigato to.
 @param {string=} type Set the button type ("button" or "submit").
 @param {string=} buttonStyle Set the style of the button. The directive uses the default bootstrap styles ("primary", "info", "success", "warning", "danger", "inverse", "link").
-@param {string=} state Set a progress state on the button (init, busy, success, error).
+@param {string=} state Set a progress state on the button ("init", "busy", "success", "error").
 @param {string=} shortcut Set a keyboard shortcut for the button ("ctrl+c").
 @param {string=} label Set the button label.
 @param {string=} labelKey Set a localization key to make a multi lingual button ("general_buttonText").
