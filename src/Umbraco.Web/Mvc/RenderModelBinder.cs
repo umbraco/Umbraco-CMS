@@ -22,7 +22,13 @@ namespace Umbraco.Web.Mvc
             if (controllerContext.RouteData.DataTokens.TryGetValue("umbraco", out model) == false)
                 return null;
 
-            var culture = UmbracoContext.Current.PublishedContentRequest.Culture;
+            var culture = CultureInfo.CurrentCulture;
+            // bind the model (use context culture as default, if available)
+            if (UmbracoContext.Current != null 
+                && UmbracoContext.Current.PublishedContentRequest != null
+                && UmbracoContext.Current.PublishedContentRequest.Culture != null)
+                culture = UmbracoContext.Current.PublishedContentRequest.Culture;
+
             return BindModel(model, bindingContext.ModelType, culture);
         }
 
