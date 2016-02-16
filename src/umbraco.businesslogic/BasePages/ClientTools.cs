@@ -52,8 +52,8 @@ namespace umbraco.BasePages
 			public static string ReloadContentFrameUrlIfPathLoaded(string url) {
                 return string.Format(ClientMgrScript + ".reloadContentFrameUrlIfPathLoaded('{0}');", url);
 			}
-
-			public static string ChildNodeCreated = GetMainTree + ".childNodeCreated();";
+            public static string ReloadLocation { get { return string.Format(ClientMgrScript + ".reloadLocation();"); } }
+            public static string ChildNodeCreated = GetMainTree + ".childNodeCreated();";
 			public static string SyncTree { get { return GetMainTree + ".syncTree('{0}', {1});"; } }
 			public static string ClearTreeCache { get { return GetMainTree + ".clearTreeCache();"; } }
 			public static string CopyNode { get { return GetMainTree + ".copyNode('{0}', '{1}');"; } }
