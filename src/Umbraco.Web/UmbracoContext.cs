@@ -21,7 +21,7 @@ namespace Umbraco.Web
     /// </summary>
     public class UmbracoContext : DisposableObject, IDisposeOnRequestEnd
     {
-        private const string HttpContextItemName = "Umbraco.Web.UmbracoContext";
+        internal const string HttpContextItemName = "Umbraco.Web.UmbracoContext";
         private static readonly object Locker = new object();
 
         private bool _replacing;

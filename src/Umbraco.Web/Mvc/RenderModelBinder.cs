@@ -19,15 +19,19 @@ namespace Umbraco.Web.Mvc
 		public object BindModel(ControllerContext controllerContext, ModelBindingContext bindingContext)
 		{
             object model;
-            if (controllerContext.RouteData.DataTokens.TryGetValue("umbraco", out model) == false)
+            if (controllerContext.RouteData.DataTokens.TryGetValue(Core.Constants.Web.UmbracoDataToken, out model) == false)
                 return null;
 
+            //default culture
             var culture = CultureInfo.CurrentCulture;
-            // bind the model (use context culture as default, if available)
-            if (UmbracoContext.Current != null 
-                && UmbracoContext.Current.PublishedContentRequest != null
-                && UmbracoContext.Current.PublishedContentRequest.Culture != null)
-                culture = UmbracoContext.Current.PublishedContentRequest.Culture;
+
+		    var umbracoContext = controllerContext.GetUmbracoContext()
+		                         ?? UmbracoContext.Current;
+
+		    if (umbracoContext != null && umbracoContext.PublishedContentRequest != null)
+		    {
+		        culture = umbracoContext.PublishedContentRequest.Culture;
+		    }          
 
             return BindModel(model, bindingContext.ModelType, culture);
         }
