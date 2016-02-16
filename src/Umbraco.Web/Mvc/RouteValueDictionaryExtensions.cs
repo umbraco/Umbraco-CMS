@@ -32,7 +32,7 @@ namespace Umbraco.Web.Mvc
 		public static object GetRequiredObject(this RouteValueDictionary items, string key)
 		{
 			if (key == null) throw new ArgumentNullException("key");
-			if (!items.Keys.Contains(key))
+			if (items.Keys.Contains(key) == false)
 				throw new ArgumentNullException("The " + key + " parameter was not found but is required");
 			return items[key];
 		}

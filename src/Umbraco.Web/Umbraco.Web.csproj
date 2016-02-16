@@ -341,6 +341,7 @@
     <Compile Include="Models\Mapping\LockedCompositionsResolver.cs" />
     <Compile Include="Models\Mapping\PropertyGroupDisplayResolver.cs" />
     <Compile Include="Models\PublishedContentWithKeyBase.cs" />
+    <Compile Include="Mvc\ControllerContextExtensions.cs" />
     <Compile Include="Mvc\IRenderController.cs" />
     <Compile Include="Mvc\ModelBindingException.cs" />
     <Compile Include="Mvc\RenderIndexActionSelectorAttribute.cs" />
@@ -350,6 +351,7 @@
     <Compile Include="PropertyEditors\ValueConverters\ImageCropDataSetConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValueConverter.cs" />
     <Compile Include="RequestLifespanMessagesFactory.cs" />
+    <Compile Include="RouteDataExtensions.cs" />
     <Compile Include="Scheduling\LatchedBackgroundTaskBase.cs" />
     <Compile Include="Security\Identity\ExternalSignInAutoLinkOptions.cs" />
     <Compile Include="Security\Identity\FixWindowsAuthMiddlware.cs" />

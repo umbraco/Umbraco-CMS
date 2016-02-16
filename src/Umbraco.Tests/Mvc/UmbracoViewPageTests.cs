@@ -445,7 +445,7 @@ namespace Umbraco.Tests.Mvc
 
             var context = new ViewContext();
             context.RouteData = new RouteData();
-            context.RouteData.DataTokens.Add("umbraco-context", umbracoContext);
+            context.RouteData.DataTokens.Add(Umbraco.Core.Constants.Web.UmbracoContextDataToken, umbracoContext);
 
             return context;
         }
