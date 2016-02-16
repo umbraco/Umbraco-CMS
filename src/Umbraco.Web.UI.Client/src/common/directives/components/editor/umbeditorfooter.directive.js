@@ -8,23 +8,27 @@ Use this directive to construct a footer inside the main editor window.
 
 <h3>Markup example</h3>
 <pre>
-    <div ng-controller="Umbraco.Controller as vm">
+    <div ng-controller="MySection.Controller as vm">
 
-        <umb-editor-view>
+        <form name="mySectionForm" novalidate>
 
-            <umb-editor-header
-                // header configuration>
-            </umb-editor-header>
+            <umb-editor-view>
 
-            <umb-editor-container>
-                // main content here
-            </umb-editor-container>
+                <umb-editor-header
+                    // header configuration>
+                </umb-editor-header>
 
-            <umb-editor-footer>
-                // footer content here
-            </umb-editor-footer>
+                <umb-editor-container>
+                    // main content here
+                </umb-editor-container>
 
-        </umb-editor-view>
+                <umb-editor-footer>
+                    // footer content here
+                </umb-editor-footer>
+
+            </umb-editor-view>
+
+        </form>
 
     </div>
 </pre>
