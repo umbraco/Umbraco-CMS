@@ -11,15 +11,15 @@ The prompt can be opened in four direction up, down, left or right.</p>
 
 <h3>Markup example</h3>
 <pre>
-    <div ng-controller="Umbraco.Controller as vm">
+    <div ng-controller="My.Controller as vm">
 
-        <div class="my-action">
+        <div class="my-action" style="position:relative;">
             <i class="icon-trash" ng-click="vm.showPrompt()"></i>
             <umb-confirm-action
                 ng-if="vm.promptIsVisible"
                 direction="left"
-                on-confirm="confirmAction()"
-                on-cancel="hidePrompt()">
+                on-confirm="vm.confirmAction()"
+                on-cancel="vm.hidePrompt()">
             </umb-confirm-action>
         </div>
 
@@ -55,7 +55,7 @@ The prompt can be opened in four direction up, down, left or right.</p>
 
         }
 
-        angular.module("umbraco").controller("Umbraco.Controller", Controller);
+        angular.module("umbraco").controller("My.Controller", Controller);
     })();
 </pre>
 
