@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Threading;
 using System.Web;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
@@ -191,5 +193,9 @@ namespace Umbraco.Web.Security.Identity
         }
         #endregion
 
+        public static void SanitizeThreadCulture(this IAppBuilder app)
+        {
+            Thread.CurrentThread.SanitizeThreadCulture();
+        }
     }
 }

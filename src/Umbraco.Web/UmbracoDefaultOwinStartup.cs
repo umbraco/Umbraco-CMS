@@ -21,6 +21,8 @@ namespace Umbraco.Web
     {
         public virtual void Configuration(IAppBuilder app)
         {
+            app.SanitizeThreadCulture();
+
             app.SetUmbracoLoggerFactory();
 
             //Configure the Identity user manager for use with Umbraco Back office 

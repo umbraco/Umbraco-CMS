@@ -361,6 +361,7 @@
     <Compile Include="Services\MacroServiceTests.cs" />
     <Compile Include="Services\UserServiceTests.cs" />
     <Compile Include="Manifest\ManifestParserTests.cs" />
+    <Compile Include="Templates\TemplateRepositoryTests.cs" />
     <Compile Include="TestHelpers\BaseSeleniumTest.cs" />
     <Compile Include="Integration\InstallPackage.cs" />
     <Compile Include="CoreXml\NavigableNavigatorTests.cs" />

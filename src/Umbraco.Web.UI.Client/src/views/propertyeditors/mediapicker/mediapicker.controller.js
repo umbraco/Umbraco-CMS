@@ -1,7 +1,7 @@
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
 angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerController",
-    function ($rootScope, $scope, dialogService, entityResource, mediaResource, mediaHelper, $timeout, userService) {
+    function ($rootScope, $scope, dialogService, entityResource, mediaResource, mediaHelper, $timeout, userService, angularHelper) {
 
         //check the pre-values for multi-picker
         var multiPicker = $scope.model.config.multiPicker && $scope.model.config.multiPicker !== '0' ? true : false;
@@ -54,6 +54,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         $scope.remove = function(index) {
             $scope.images.splice(index, 1);
             $scope.ids.splice(index, 1);
+            angularHelper.getCurrentForm($scope).$setDirty();
             $scope.sync();
         };
 
@@ -76,6 +77,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
 
                         $scope.images.push(media);
                         $scope.ids.push(media.id);
+                        angularHelper.getCurrentForm($scope).$setDirty();
                     });
 
                     $scope.sync();

@@ -48,6 +48,11 @@
   <system.web xdt:Transform="InsertIfMissing" />
   <system.web>
     <siteMap xdt:Transform="Remove" />
+	<siteMap xdt:Transform="InsertIfMissing">
+      <providers xdt:Transform="InsertIfMissing">
+        <remove name="MySqlSiteMapProvider"  xdt:Transform="InsertIfMissing" />
+      </providers>
+      </siteMap>	
     <httpRuntime xdt:Transform="InsertIfMissing" />
     <httpRuntime targetFramework="4.5" xdt:Transform="SetAttributes(targetFramework)" />
     <membership defaultProvider="DefaultMembershipProvider" xdt:Locator="Match(defaultProvider)" xdt:Transform="Remove" />
@@ -76,6 +81,10 @@
     </compilation>
 
     <compilation>
+      <assemblies>
+        <remove assembly="System.Web.Http" xdt:Locator="Match(assembly)" xdt:Transform="Remove" />
+        <remove assembly="System.Net.Http" xdt:Locator="Match(assembly)" xdt:Transform="Remove" />
+      </assemblies>
       <assemblies>
         <remove assembly="System.Web.Http" xdt:Locator="Match(assembly)" xdt:Transform="InsertBefore(/configuration/system.web/compilation/assemblies/add)" />
         <remove assembly="System.Net.Http" xdt:Locator="Match(assembly)" xdt:Transform="InsertBefore(/configuration/system.web/compilation/assemblies/add)" />
@@ -172,23 +181,23 @@
         <assemblyIdentity name="System.Web.Http" publicKeyToken="31bf3856ad364e35" culture="neutral" />
         <bindingRedirect oldVersion="0.0.0.0-5.2.3.0" newVersion="5.2.3.0" />
       </dependentAssembly>
-      <dependentAssembly>
+      <dependentAssembly xdt:Transform="Insert">
         <assemblyIdentity name="Microsoft.Owin" publicKeyToken="31bf3856ad364e35" culture="neutral" />
         <bindingRedirect oldVersion="0.0.0.0-3.0.1.0" newVersion="3.0.1.0" />
       </dependentAssembly>
-      <dependentAssembly>
+      <dependentAssembly xdt:Transform="Insert">
         <assemblyIdentity name="Microsoft.Owin.Security.OAuth" publicKeyToken="31bf3856ad364e35" culture="neutral" />
         <bindingRedirect oldVersion="0.0.0.0-3.0.1.0" newVersion="3.0.1.0" />
       </dependentAssembly>	  
-      <dependentAssembly>
+      <dependentAssembly xdt:Transform="Insert">
         <assemblyIdentity name="Microsoft.Owin.Security" publicKeyToken="31bf3856ad364e35" culture="neutral" />
         <bindingRedirect oldVersion="0.0.0.0-3.0.1.0" newVersion="3.0.1.0" />
       </dependentAssembly>	  
-      <dependentAssembly>
+      <dependentAssembly xdt:Transform="Insert">
         <assemblyIdentity name="Microsoft.Owin.Security.Cookies" publicKeyToken="31bf3856ad364e35" culture="neutral" />
         <bindingRedirect oldVersion="0.0.0.0-3.0.1.0" newVersion="3.0.1.0" />
       </dependentAssembly>	  	 
-	  <dependentAssembly>
+	  <dependentAssembly xdt:Transform="Insert">
         <assemblyIdentity name="System.Net.Http.Formatting" publicKeyToken="31bf3856ad364e35" culture="neutral" />
         <bindingRedirect oldVersion="0.0.0.0-5.2.3.0" newVersion="5.2.3.0" />
       </dependentAssembly>

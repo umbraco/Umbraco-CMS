@@ -3,6 +3,7 @@ using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZero
@@ -117,6 +118,22 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                 //TODO: Hopefully it's not named something else silly in some crazy old versions
             }
 
+
+            var dbIndexes = SqlSyntax.GetDefinedIndexes(Context.Database)
+                .Select(x => new DbIndexDefinition()
+                {
+                    TableName = x.Item1,
+                    IndexName = x.Item2,
+                    ColumnName = x.Item3,
+                    IsUnique = x.Item4
+                }).ToArray();
+
+            //in some databases there's an index (IX_Master) on the master column which needs to be dropped first
+            var foundIndex = dbIndexes.FirstOrDefault(x => x.TableName.InvariantEquals("cmsTemplate") && x.ColumnName.InvariantEquals("master"));
+            if (foundIndex != null)
+            {
+                Delete.Index(foundIndex.IndexName).OnTable("cmsTemplate");
+            }
 
             if (cols.Any(x => x.ColumnName.InvariantEquals("master") && x.TableName.InvariantEquals("cmsTemplate")))
             {

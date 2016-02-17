@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Models.ContentEditing
@@ -47,8 +48,8 @@ namespace Umbraco.Web.Models.ContentEditing
             get
             {
                 return IconIsClass
-                           ? string.Empty
-                           : IOHelper.ResolveUrl("~/umbraco/images/umbraco/" + Icon);
+                    ? string.Empty
+                    : string.Format("{0}images/umbraco/{1}", GlobalSettings.Path.EnsureEndsWith("/"), Icon);
             }
         }
 

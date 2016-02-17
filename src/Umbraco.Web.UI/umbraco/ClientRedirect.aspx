@@ -10,7 +10,7 @@
     <script type="text/javascript">
         
         var parts = window.location.href.split("?redirectUrl=");
-        if (parts.length != 2) {
+        if (parts.length !== 2) {
             window.location.href = "/";
         }
         else {
@@ -23,12 +23,12 @@
                 parser.href = parts[1];
 
                 // => "http:"
-                if (!parser.protocol || (parser.protocol.toLowerCase() != "http:" && parser.protocol.toLowerCase() != "https:")) {
+                if (!parser.protocol || (parser.protocol.toLowerCase() !== "http:" && parser.protocol.toLowerCase() !== "https:")) {
                     throw "invalid protocol";
                 };
 
                 // => "example.com"
-                if (!parser.hostname || parser.hostname == "") {
+                if (!parser.hostname || parser.hostname === "") {
                     throw "invalid hostname";
                 }
 
@@ -37,13 +37,15 @@
                 //parser.search => "?search=test"
 
                 // => "#hash"
-                if (parser.hash && parser.hash.indexOf("#/developer/framed/") != 0) {
+                if (parser.hash && parser.hash.indexOf("#/developer/framed/") !== 0) {
                     throw "invalid hash";
                 }
 
                 //parser.host;     // => "example.com:3000"
                 
-                window.location.href = parts[1];
+                if (parser.host === window.location.host) {
+                    window.location.href = parts[1];
+                }
 
             } catch (e) {
                 alert(e);

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
@@ -104,14 +105,21 @@ namespace Umbraco.Core.Services
             return Attempt.If(result != null, result);
         }
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use AddRule instead, this method will be removed in future versions")]
+        public Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>> AddOrUpdateRule(IContent content, string ruleType, string ruleValue)
+        {
+            return AddRule(content, ruleType, ruleValue);
+        }
+
         /// <summary>
-        /// Adds/updates a rule
+        /// Adds a rule
         /// </summary>
         /// <param name="content"></param>
         /// <param name="ruleType"></param>
-        /// <param name="newRuleValue"></param>
+        /// <param name="ruleValue"></param>
         /// <returns></returns>
-        public Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>> AddOrUpdateRule(IContent content, string ruleType, string newRuleValue)
+        public Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>> AddRule(IContent content, string ruleType, string ruleValue)
         {
             var evtMsgs = EventMessagesFactory.Get();
             var uow = UowProvider.GetUnitOfWork();
@@ -121,15 +129,16 @@ namespace Umbraco.Core.Services
                 if (entry == null)
                     return Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>>.Fail();
 
-                var existingRule = entry.Rules.FirstOrDefault(x => x.RuleType == ruleType);
+                var existingRule = entry.Rules.FirstOrDefault(x => x.RuleType == ruleType && x.RuleValue == ruleValue);
                 if (existingRule == null)
                 {
-                    entry.AddRule(newRuleValue, ruleType);
+                    entry.AddRule(ruleValue, ruleType);
                 }
                 else
                 {
-                    existingRule.RuleType = ruleType;
-                    existingRule.RuleValue = newRuleValue;
+                    //If they are both the same already then there's nothing to update, exit
+                    return Attempt<OperationStatus<PublicAccessEntry, OperationStatusType>>.Succeed(
+                        new OperationStatus<PublicAccessEntry, OperationStatusType>(entry, OperationStatusType.Success, evtMsgs));
                 }
 
                 if (Saving.IsRaisedEventCancelled(
