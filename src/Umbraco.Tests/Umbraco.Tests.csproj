@@ -427,7 +427,9 @@
     <Compile Include="PublishedContent\PublishedContentDataTableTests.cs" />
     <Compile Include="PublishedContent\PublishedContentTestBase.cs" />
     <Compile Include="PublishedContent\PublishedContentTestElements.cs" />
-    <Compile Include="PublishedContent\PublishedContentTests.cs" />
+    <Compile Include="PublishedContent\PublishedContentTests.cs">
+      <ExcludeFromStyleCop>True</ExcludeFromStyleCop>
+    </Compile>
     <Compile Include="PublishedContent\PublishedMediaTests.cs" />
     <Compile Include="HashCodeCombinerTests.cs" />
     <Compile Include="Web\Mvc\HtmlHelperExtensionMethodsTests.cs" />
