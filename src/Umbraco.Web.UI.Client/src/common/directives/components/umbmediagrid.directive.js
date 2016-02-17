@@ -1,3 +1,87 @@
+/**
+@ngdoc directive
+@name umbraco.directives.directive:umbMediaGrid
+@restrict E
+@scope
+
+@description
+Use this directive to generate a thumbnail grid of media items.
+
+<h3>Markup example</h3>
+<pre>
+    <div ng-controller="My.Controller as vm">
+
+        <umb-media-grid
+           items="vm.mediaItems"
+           on-click="vm.clickItem"
+           on-click-name="vm.clickItemName">
+        </umb-media-grid>
+
+    </div>
+</pre>
+
+<h3>Controller example</h3>
+<pre>
+    (function () {
+        "use strict";
+
+        function Controller() {
+
+            var vm = this;
+            vm.mediaItems = [];
+
+            vm.clickItem = clickItem;
+            vm.clickItemName = clickItemName;
+
+            myService.getMediaItems().then(function (mediaItems) {
+                vm.mediaItems = mediaItems;
+            });
+
+            function clickItem(item, $event, $index){
+                // do magic here
+            }
+
+            function clickItemName(item, $event, $index) {
+                // set item.selected = true; to select the item
+                // do magic here
+            }
+
+        }
+
+        angular.module("umbraco").controller("My.Controller", Controller);
+    })();
+</pre>
+
+@param {array} items (<code>binding</code>): Array of media items.
+@param {callback=} onDetailsHover (<code>binding</code>): Callback method when the details icon is hovered.
+    <h3>The callback returns:</h3>
+    <ul>
+        <li><code>item</code>: The hovered item</li>
+        <li><code>$event</code>: The hover event</li>
+        <li><code>hover</code>: Boolean to tell if the item is hovered or not</li>
+    </ul>
+@param {callback=} onClick (<code>binding</code>): Callback method to handle click events on the media item.
+    <h3>The callback returns:</h3>
+    <ul>
+        <li><code>item</code>: The clicked item</li>
+        <li><code>$event</code>: The click event</li>
+        <li><code>$index</code>: The item index</li>
+    </ul>
+@param {callback=} onClickName (<code>binding</code>): Callback method to handle click events on the media item name.
+    <h3>The callback returns:</h3>
+    <ul>
+        <li><code>item</code>: The clicked item</li>
+        <li><code>$event</code>: The click event</li>
+        <li><code>$index</code>: The item index</li>
+    </ul>
+@param {string=} filterBy (<code>binding</code>): String to filter media items by
+@param {string=} itemMaxWidth (<code>attribute</code>): Sets a max width on the media item thumbnails.
+@param {string=} itemMaxHeight (<code>attribute</code>): Sets a max height on the media item thumbnails.
+@param {string=} itemMinWidth (<code>attribute</code>): Sets a min width on the media item thumbnails.
+@param {string=} itemMinHeight (<code>attribute</code>): Sets a min height on the media item thumbnails.
+
+**/
+
 (function() {
     'use strict';
 
