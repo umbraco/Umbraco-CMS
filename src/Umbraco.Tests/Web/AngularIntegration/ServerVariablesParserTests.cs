@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
 using Umbraco.Web.UI.JavaScript;
+using Umbraco.Core;
 
 namespace Umbraco.Tests.Web.AngularIntegration
 {
@@ -19,7 +20,7 @@ namespace Umbraco.Tests.Web.AngularIntegration
             d.Add("test4", "Test 4");
             d.Add("test5", "Test 5");
 
-            var output = ServerVariablesParser.Parse(d);
+            var output = ServerVariablesParser.Parse(d).StripWhitespace();
 
             Assert.IsTrue(output.Contains(@"Umbraco.Sys.ServerVariables = {
   ""test1"": ""Test 1"",
@@ -27,7 +28,7 @@ namespace Umbraco.Tests.Web.AngularIntegration
   ""test3"": ""Test 3"",
   ""test4"": ""Test 4"",
   ""test5"": ""Test 5""
-} ;"));
+} ;".StripWhitespace()));
         }
     }
 }

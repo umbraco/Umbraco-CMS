@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Web.UI.JavaScript;
 
 namespace Umbraco.Tests.Web.AngularIntegration
@@ -29,7 +30,7 @@ namespace Umbraco.Tests.Web.AngularIntegration
         angular.bootstrap(document, ['umbraco']);
 
     });
-});", result);
+});".StripWhitespace(), result.StripWhitespace());
         }
     }
 }
