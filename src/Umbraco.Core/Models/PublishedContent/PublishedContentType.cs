@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web.Caching;
-using System.Web.UI;
 using Umbraco.Core.Cache;
 
 namespace Umbraco.Core.Models.PublishedContent
@@ -27,6 +24,7 @@ namespace Umbraco.Core.Models.PublishedContent
         {
             Id = contentType.Id;
             Alias = contentType.Alias;
+            CompositionAliases = contentType.CompositionAliases();
             _propertyTypes = contentType.CompositionPropertyTypes
                 .Select(x => new PublishedPropertyType(this, x))
                 .ToArray();
@@ -34,10 +32,11 @@ namespace Umbraco.Core.Models.PublishedContent
         }
 
         // internal so it can be used for unit tests
-        internal PublishedContentType(int id, string alias, IEnumerable<PublishedPropertyType> propertyTypes)
+        internal PublishedContentType(int id, string alias, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes)
         {
             Id = id;
             Alias = alias;
+            CompositionAliases = compositionAliases;
             _propertyTypes = propertyTypes.ToArray();
             foreach (var propertyType in _propertyTypes)
                 propertyType.ContentType = this;
@@ -45,8 +44,8 @@ namespace Umbraco.Core.Models.PublishedContent
         }
 
         // create detached content type - ie does not match anything in the DB
-        internal PublishedContentType(string alias, IEnumerable<PublishedPropertyType> propertyTypes)
-            : this (0, alias, propertyTypes)
+        internal PublishedContentType(string alias, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes)
+            : this(0, alias, compositionAliases, propertyTypes)
         { }
 
         private void InitializeIndexes()
@@ -63,6 +62,7 @@ namespace Umbraco.Core.Models.PublishedContent
 
         public int Id { get; private set; }
         public string Alias { get; private set; }
+        public IEnumerable<string> CompositionAliases { get; private set; }
 
         #endregion
 
