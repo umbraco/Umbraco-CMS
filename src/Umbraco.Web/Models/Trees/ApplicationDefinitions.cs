@@ -1,4 +1,7 @@
-﻿namespace Umbraco.Core.Models
+﻿using Umbraco.Core;
+using Umbraco.Core.Models;
+
+namespace Umbraco.Web.Models.Trees
 {
     // The application definitions are intended as a means to auto populate
     // the application.config. On app startup, Umbraco will look for any

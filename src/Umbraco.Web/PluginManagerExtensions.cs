@@ -9,6 +9,7 @@ using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using umbraco;
 using umbraco.interfaces;
+using Umbraco.Web.Models.Trees;
 
 namespace Umbraco.Web
 {
@@ -28,7 +29,7 @@ namespace Umbraco.Web
             return resolver.ResolveTypesWithAttribute<TreeController, TreeAttribute>();
         }
 
-		internal static IEnumerable<Type> ResolveSurfaceControllers(this PluginManager resolver)
+        internal static IEnumerable<Type> ResolveSurfaceControllers(this PluginManager resolver)
 		{
 			return resolver.ResolveTypes<SurfaceController>();
 		}

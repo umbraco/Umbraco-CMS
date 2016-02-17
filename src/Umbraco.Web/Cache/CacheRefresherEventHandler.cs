@@ -12,6 +12,7 @@ using System.Linq;
 using umbraco.cms.businesslogic.web;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Publishing;
+using Umbraco.Web.Services;
 using Content = Umbraco.Core.Models.Content;
 using ApplicationTree = Umbraco.Core.Models.ApplicationTree;
 using DeleteEventArgs = umbraco.cms.businesslogic.DeleteEventArgs;

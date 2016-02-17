@@ -342,13 +342,11 @@
     <Compile Include="Logging\OwinLogger.cs" />
     <Compile Include="Logging\OwinLoggerFactory.cs" />
     <Compile Include="Logging\ParallelForwardingAppender.cs" />
+    <Compile Include="Mandate.cs" />
     <Compile Include="Manifest\GridEditorConverter.cs" />
-    <Compile Include="Models\ApplicationAttribute.cs" />
-    <Compile Include="Models\ApplicationDefinitions.cs" />
     <Compile Include="Models\AuditItem.cs" />
     <Compile Include="Models\AuditType.cs" />
     <Compile Include="Models\EntityContainer.cs" />
-    <Compile Include="Models\IApplication.cs" />
     <Compile Include="ObjectResolution\ContainerLazyManyObjectsResolver.cs" />
     <Compile Include="ObjectResolution\ContainerManyObjectsResolver.cs" />
     <Compile Include="Models\Identity\IdentityModelMappings.cs" />
@@ -1095,7 +1093,6 @@
     <Compile Include="IO\FileSystemExtensions.cs" />
     <Compile Include="IO\MediaFileSystem.cs" />
     <Compile Include="Macros\MacroTagParser.cs" />
-    <Compile Include="Mandate.cs" />
     <Compile Include="Models\Content.cs" />
     <Compile Include="Models\ContentStatus.cs" />
     <Compile Include="Models\ContentType.cs" />
@@ -1262,7 +1259,6 @@
     <Compile Include="Services\NotificationService.cs" />
     <Compile Include="Packaging\ConflictingPackageData.cs" />
     <Compile Include="Services\RelationService.cs" />
-    <Compile Include="Services\SectionService.cs" />
     <Compile Include="Services\ServerRegistrationService.cs" />
     <Compile Include="Services\PackagingService.cs" />
     <Compile Include="Services\ServiceContext.cs" />
@@ -1313,7 +1309,6 @@
     <Compile Include="Strings\StringAliasCaseTypeExtensions.cs" />
     <Compile Include="Strings\DefaultShortStringHelper.cs" />
     <Compile Include="Models\ApplicationTree.cs" />
-    <Compile Include="Services\ApplicationTreeService.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="ReadLock.cs" />
     <Compile Include="TypeFinder.cs" />

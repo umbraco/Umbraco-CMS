@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Web.Models.Trees
 {
     /// <summary>
     /// Identifies an application tree

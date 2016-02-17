@@ -348,6 +348,13 @@
     <Compile Include="LegacyActions\ActionUpdate.cs" />
     <Compile Include="LegacyActions\ContextMenuSeperator.cs" />
     <Compile Include="LegacyActions\LegacyActionMenuItemAttribute.cs" />
+    <Compile Include="Models\ContentEditing\EntityBasic.cs" />
+    <Compile Include="Models\Trees\ApplicationAttribute.cs" />
+    <Compile Include="Models\Trees\ApplicationDefinitions.cs" />
+    <Compile Include="Models\Trees\IApplication.cs" />
+    <Compile Include="Services\SectionService.cs" />
+    <Compile Include="Trees\TreeAttribute.cs" />
+    <Compile Include="Models\Trees\TreeNode.cs" />
     <Compile Include="Routing\NotFoundHandlerHelper.cs" />
     <Compile Include="Install\InstallSteps\Version73FileCleanup.cs" />
     <Compile Include="Models\ContentEditing\ContentTypeDisplay.cs" />
@@ -378,6 +385,7 @@
     <Compile Include="Media\EmbedProviders\OEmbedPhoto.cs" />
     <Compile Include="Security\Identity\IUmbracoBackOfficeTwoFactorOptions.cs" />
     <Compile Include="Models\Mapping\PropertyTypeGroupResolver.cs" />
+    <Compile Include="Services\ApplicationTreeService.cs" />
     <Compile Include="Trees\ContentTypeTreeController.cs" />
     <Compile Include="Trees\MediaTypeTreeController.cs" />
     <Compile Include="Trees\MemberTypeTreeController.cs" />
@@ -590,7 +598,6 @@
     <Compile Include="Models\ContentEditing\DashboardControl.cs" />
     <Compile Include="Models\ContentEditing\DataTypeDisplay.cs" />
     <Compile Include="Models\ContentEditing\DataTypeSave.cs" />
-    <Compile Include="Models\ContentEditing\EntityBasic.cs" />
     <Compile Include="Models\ContentEditing\PreValueFieldDisplay.cs" />
     <Compile Include="Models\ContentEditing\PreValueFieldSave.cs" />
     <Compile Include="Models\ContentEditing\PropertyEditorBasic.cs" />
@@ -777,7 +784,6 @@
     <Compile Include="Models\Trees\ActionMenuItem.cs" />
     <Compile Include="Models\Trees\ActionMenuItemAttribute.cs" />
     <Compile Include="Trees\ActionUrlMethod.cs" />
-    <Compile Include="Trees\ApplicationTreeRegistrar.cs" />
     <Compile Include="Trees\ContentTreeControllerBase.cs" />
     <Compile Include="Trees\LegacyTreeController.cs" />
     <Compile Include="Trees\ISearchableTree.cs" />
@@ -791,8 +797,6 @@
     <Compile Include="Models\Trees\SectionRootNode.cs" />
     <Compile Include="Trees\TreeController.cs" />
     <Compile Include="Trees\ApplicationTreeExtensions.cs" />
-    <Compile Include="Trees\TreeAttribute.cs" />
-    <Compile Include="Models\Trees\TreeNode.cs" />
     <Compile Include="Models\Trees\TreeNodeCollection.cs" />
     <Compile Include="Models\Trees\TreeNodeExtensions.cs" />
     <Compile Include="Trees\TreeNodeRenderingEventArgs.cs" />

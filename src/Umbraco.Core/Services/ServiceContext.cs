@@ -279,10 +279,10 @@ namespace Umbraco.Core.Services
                 _relationService = new Lazy<IRelationService>(() => new RelationService(provider, repositoryFactory, logger, eventMessagesFactory, _entityService.Value));
 
             if (_treeService == null)
-                _treeService = new Lazy<IApplicationTreeService>(() => new ApplicationTreeService(logger, cache));
+                _treeService = new Lazy<IApplicationTreeService>(() => new EmptyApplicationTreeService());
 
             if (_sectionService == null)
-                _sectionService = new Lazy<ISectionService>(() => new SectionService(_userService.Value, _treeService.Value, provider, cache));
+                _sectionService = new Lazy<ISectionService>(() => new EmptySectionService());
 
             if (_macroService == null)
                 _macroService = new Lazy<IMacroService>(() => new MacroService(provider, repositoryFactory, logger, eventMessagesFactory));
