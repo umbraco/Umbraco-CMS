@@ -12,10 +12,12 @@ When this combination is hit an overview is opened with shortcuts based on the m
 
 <h3>Markup example</h3>
 <pre>
-    <div ng-controller="Umbraco.Controller as vm">
+    <div ng-controller="My.Controller as vm">
+
         <umb-keyboard-shortcuts-overview
             model="vm.keyboardShortcutsOverview">
         </umb-keyboard-shortcuts-overview>
+
     </div>
 </pre>
 
@@ -29,7 +31,7 @@ When this combination is hit an overview is opened with shortcuts based on the m
 
             var vm = this;
 
-            vm.keyboardShortcuts = [
+            vm.keyboardShortcutsOverview = [
                 {
                     "name": "Sections",
                     "shortcuts": [
@@ -60,7 +62,7 @@ When this combination is hit an overview is opened with shortcuts based on the m
 
         }
 
-        angular.module("umbraco").controller("Umbraco.Controller", Controller);
+        angular.module("umbraco").controller("My.Controller", Controller);
     })();
 </pre>
 
