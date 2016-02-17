@@ -17,9 +17,9 @@ namespace Umbraco.Web
         {
             if (routeData == null) throw new ArgumentNullException("routeData");
 
-            if (routeData.DataTokens.ContainsKey(UmbracoContext.HttpContextItemName))
+            if (routeData.DataTokens.ContainsKey(Core.Constants.Web.UmbracoContextDataToken))
             {
-                var umbCtx = routeData.DataTokens[UmbracoContext.HttpContextItemName] as UmbracoContext;
+                var umbCtx = routeData.DataTokens[Core.Constants.Web.UmbracoContextDataToken] as UmbracoContext;
                 return umbCtx;
             }
             return null;
