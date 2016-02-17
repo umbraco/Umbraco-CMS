@@ -165,7 +165,7 @@ namespace Umbraco.Tests.Mvc
             };
 
             var routeData = new RouteData();
-            routeData.DataTokens.Add("umbraco-route-def", routeDefinition);
+            routeData.DataTokens.Add(Umbraco.Core.Constants.Web.UmbracoRouteDefinitionDataToken, routeDefinition);
 
             var ctrl = new TestSurfaceController(umbCtx, new UmbracoHelper());
             ctrl.ControllerContext = new ControllerContext(contextBase, routeData, ctrl);

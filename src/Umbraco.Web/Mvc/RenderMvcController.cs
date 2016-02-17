@@ -59,11 +59,11 @@ namespace Umbraco.Web.Mvc
             {
                 if (_publishedContentRequest != null)
                     return _publishedContentRequest;
-                if (RouteData.DataTokens.ContainsKey("umbraco-doc-request") == false)
+                if (RouteData.DataTokens.ContainsKey(Core.Constants.Web.PublishedDocumentRequestDataToken) == false)
                 {
                     throw new InvalidOperationException("DataTokens must contain an 'umbraco-doc-request' key with a PublishedContentRequest object");
                 }
-                _publishedContentRequest = (PublishedContentRequest)RouteData.DataTokens["umbraco-doc-request"];
+                _publishedContentRequest = (PublishedContentRequest)RouteData.DataTokens[Core.Constants.Web.PublishedDocumentRequestDataToken];
                 return _publishedContentRequest;
             }
         }

@@ -255,7 +255,12 @@ namespace Umbraco.Core.Services
         /// </returns>
         public Attempt<OperationStatus<ITemplate, OperationStatusType>> CreateTemplateForContentType(string contentTypeAlias, string contentTypeName, int userId = 0)
         {
-            var template = new Template(contentTypeName, contentTypeAlias);
+            var template = new Template(contentTypeName,
+                //NOTE: We are NOT passing in the content type alias here, we want to use it's name since we don't
+                // want to save template file names as camelCase, the Template ctor will clean the alias as
+                // `alias.ToCleanString(CleanStringType.UnderscoreAlias)` which has been the default.
+                // This fixes: http://issues.umbraco.org/issue/U4-7953
+                contentTypeName);
 
             var evtMsgs = EventMessagesFactory.Get();
 
