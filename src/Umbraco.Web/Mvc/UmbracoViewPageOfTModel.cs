@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
@@ -167,10 +168,12 @@ namespace Umbraco.Web.Mvc
 
             var ok = sourceContent != null;
             if (sourceContent != null)
-            {
-                // try to grab the culture
-                // using context's culture by default
-                var culture = UmbracoContext.PublishedContentRequest.Culture;
+            {                
+                // use context culture as default, if available
+                var culture = CultureInfo.CurrentCulture;
+                if (UmbracoContext.PublishedContentRequest != null && UmbracoContext.PublishedContentRequest.Culture != null)
+                    culture = UmbracoContext.PublishedContentRequest.Culture;
+                
                 var sourceRenderModel = source as RenderModel;
                 if (sourceRenderModel != null)
                     culture = sourceRenderModel.CurrentCulture;
