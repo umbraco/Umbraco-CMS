@@ -8,6 +8,7 @@ using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Profiling;
+using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -29,9 +30,9 @@ namespace Umbraco.Tests.TestHelpers
         public virtual void Initialize()
         {
             var container = new ServiceContainer();
-            container.Register<ISqlSyntaxProvider>(factory => SqlSyntax, new PerContainerLifetime());
-            container.Register<ILogger>(factory => Mock.Of<ILogger>(), new PerContainerLifetime());
-            container.Register<IProfiler>(factory => Mock.Of<IProfiler>(), new PerContainerLifetime());
+            container.RegisterSingleton<ISqlSyntaxProvider>(factory => SqlSyntax);
+            container.RegisterSingleton<ILogger>(factory => Mock.Of<ILogger>());
+            container.RegisterSingleton<IProfiler>(factory => Mock.Of<IProfiler>());
 
             _mappingResolver = new MappingResolver(container, Mock.Of<ILogger>(),
                 () => PluginManager.Current.ResolveAssignedMapperTypes());

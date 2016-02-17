@@ -49,6 +49,39 @@ namespace Umbraco.Core.Services
         private Lazy<IExternalLoginService> _externalLoginService;
 
         /// <summary>
+        /// Constructor used for IoC
+        /// </summary>
+        public ServiceContext(Lazy<IMigrationEntryService> migrationEntryService, Lazy<IPublicAccessService> publicAccessService, Lazy<ITaskService> taskService, Lazy<IDomainService> domainService, Lazy<IAuditService> auditService, Lazy<ILocalizedTextService> localizedTextService, Lazy<ITagService> tagService, Lazy<IContentService> contentService, Lazy<IUserService> userService, Lazy<IMemberService> memberService, Lazy<IMediaService> mediaService, Lazy<IContentTypeService> contentTypeService, Lazy<IDataTypeService> dataTypeService, Lazy<IFileService> fileService, Lazy<ILocalizationService> localizationService, Lazy<IPackagingService> packagingService, Lazy<IServerRegistrationService> serverRegistrationService, Lazy<IEntityService> entityService, Lazy<IRelationService> relationService, Lazy<IApplicationTreeService> treeService, Lazy<ISectionService> sectionService, Lazy<IMacroService> macroService, Lazy<IMemberTypeService> memberTypeService, Lazy<IMemberGroupService> memberGroupService, Lazy<INotificationService> notificationService, Lazy<IExternalLoginService> externalLoginService)
+        {
+            _migrationEntryService = migrationEntryService;
+            _publicAccessService = publicAccessService;
+            _taskService = taskService;
+            _domainService = domainService;
+            _auditService = auditService;
+            _localizedTextService = localizedTextService;
+            _tagService = tagService;
+            _contentService = contentService;
+            _userService = userService;
+            _memberService = memberService;
+            _mediaService = mediaService;
+            _contentTypeService = contentTypeService;
+            _dataTypeService = dataTypeService;
+            _fileService = fileService;
+            _localizationService = localizationService;
+            _packagingService = packagingService;
+            _serverRegistrationService = serverRegistrationService;
+            _entityService = entityService;
+            _relationService = relationService;
+            _treeService = treeService;
+            _sectionService = sectionService;
+            _macroService = macroService;
+            _memberTypeService = memberTypeService;
+            _memberGroupService = memberGroupService;
+            _notificationService = notificationService;
+            _externalLoginService = externalLoginService;
+        }
+
+        /// <summary>
         /// public ctor - will generally just be used for unit testing all items are optional and if not specified, the defaults will be used
         /// </summary>
         /// <param name="contentService"></param>
@@ -145,7 +178,7 @@ namespace Umbraco.Core.Services
             RepositoryFactory repositoryFactory,
             IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider, 
             IUnitOfWorkProvider fileUnitOfWorkProvider, 
-            BasePublishingStrategy publishingStrategy, 
+            IPublishingStrategy publishingStrategy, 
             CacheHelper cache, 
             ILogger logger,
             IEventMessagesFactory eventMessagesFactory,
@@ -171,7 +204,7 @@ namespace Umbraco.Core.Services
         private void BuildServiceCache(
             IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider,
             IUnitOfWorkProvider fileUnitOfWorkProvider,
-            BasePublishingStrategy publishingStrategy,
+            IPublishingStrategy publishingStrategy,
             CacheHelper cache,
             RepositoryFactory repositoryFactory,
             ILogger logger,

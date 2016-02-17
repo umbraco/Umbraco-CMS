@@ -162,16 +162,16 @@ namespace Umbraco.Core
             container.Register<IServiceContainer>(factory => container);
             
             //Logging
-            container.Register<ILogger>(factory => _umbracoApplication.Logger, new PerContainerLifetime());
-            container.Register<IProfiler>(factory => ProfilingLogger.Profiler, new PerContainerLifetime());
-            container.Register<ProfilingLogger>(factory => ProfilingLogger, new PerContainerLifetime());
+            container.RegisterSingleton<ILogger>(factory => _umbracoApplication.Logger);
+            container.RegisterSingleton<IProfiler>(factory => ProfilingLogger.Profiler);
+            container.RegisterSingleton<ProfilingLogger>(factory => ProfilingLogger);
             
             //Config
             container.RegisterFrom<ConfigurationCompositionRoot>();
 
             //Cache
-            container.Register<CacheHelper>(factory => ApplicationCache, new PerContainerLifetime());
-            container.Register<IRuntimeCacheProvider>(factory => ApplicationCache.RuntimeCache, new PerContainerLifetime());
+            container.RegisterSingleton<CacheHelper>(factory => ApplicationCache);
+            container.RegisterSingleton<IRuntimeCacheProvider>(factory => ApplicationCache.RuntimeCache);
 
             //Datalayer/Repositories/SQL/Database/etc...
             container.RegisterFrom<RepositoryCompositionRoot>();
@@ -179,10 +179,10 @@ namespace Umbraco.Core
             //Data Services/ServiceContext/etc...
             container.RegisterFrom<ServicesCompositionRoot>();
 
-            container.Register<IServiceProvider, ActivatorServiceProvider>();
-            container.Register<PluginManager>(factory => PluginManager, new PerContainerLifetime());                                    
+            container.RegisterSingleton<IServiceProvider, ActivatorServiceProvider>();
+            container.RegisterSingleton<PluginManager>(factory => PluginManager);
 
-            container.Register<ApplicationContext>(new PerContainerLifetime());
+            container.RegisterSingleton<ApplicationContext>();
             container.Register<MediaFileSystem>(factory => FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>());
             
         }

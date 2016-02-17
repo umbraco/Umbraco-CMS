@@ -21,25 +21,24 @@ namespace Umbraco.Core.DependencyInjection
     {
         public void Compose(IServiceRegistry container)
         {
-            container.Register<IDatabaseFactory>(factory => new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, factory.GetInstance<ILogger>()), new PerContainerLifetime());
-            container.Register<DatabaseContext>(factory => GetDbContext(factory), new PerContainerLifetime());
-            container.Register<SqlSyntaxProviders>(factory => SqlSyntaxProviders.CreateDefault(factory.GetInstance<ILogger>()), new PerContainerLifetime());
-            container.Register<IUnitOfWorkProvider, FileUnitOfWorkProvider>(new PerContainerLifetime());
-            container.Register<IDatabaseUnitOfWorkProvider>(factory => new PetaPocoUnitOfWorkProvider(factory.GetInstance<ILogger>()), new PerContainerLifetime());
-            container.Register<IMappingResolver>(factory => new MappingResolver(
+            container.RegisterSingleton<IDatabaseFactory>(factory => new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName, factory.GetInstance<ILogger>()));
+            container.RegisterSingleton<DatabaseContext>(factory => GetDbContext(factory));
+            container.RegisterSingleton<SqlSyntaxProviders>(factory => SqlSyntaxProviders.CreateDefault(factory.GetInstance<ILogger>()));
+            container.RegisterSingleton<IUnitOfWorkProvider, FileUnitOfWorkProvider>();
+            container.RegisterSingleton<IDatabaseUnitOfWorkProvider>(factory => new PetaPocoUnitOfWorkProvider(factory.GetInstance<ILogger>()));
+            container.RegisterSingleton<IMappingResolver>(factory => new MappingResolver(
                 factory.GetInstance<IServiceContainer>(),
                 factory.GetInstance<ILogger>(),
-                () => factory.GetInstance<PluginManager>().ResolveAssignedMapperTypes()),
-                new PerContainerLifetime());
+                () => factory.GetInstance<PluginManager>().ResolveAssignedMapperTypes()));
             container.Register<RepositoryFactory>();
             container.Register<ISqlSyntaxProvider>(factory => factory.GetInstance<DatabaseContext>().SqlSyntax);
-            container.Register<CacheHelper>(factory => CacheHelper.CreateDisabledCacheHelper(), "DisabledCache", new PerContainerLifetime());
-            container.Register<IFileSystem>(factory => new PhysicalFileSystem(SystemDirectories.Scripts), "ScriptFileSystem", new PerContainerLifetime());
-            container.Register<IFileSystem>(factory => new PhysicalFileSystem(SystemDirectories.MvcViews + "/Partials/"), "PartialViewFileSystem", new PerContainerLifetime());
-            container.Register<IFileSystem>(factory => new PhysicalFileSystem(SystemDirectories.MvcViews + "/MacroPartials/"), "PartialViewMacroFileSystem", new PerContainerLifetime());
-            container.Register<IFileSystem>(factory => new PhysicalFileSystem(SystemDirectories.Css), "StylesheetFileSystem", new PerContainerLifetime());
-            container.Register<IFileSystem>(factory => new PhysicalFileSystem(SystemDirectories.Masterpages), "MasterpageFileSystem", new PerContainerLifetime());
-            container.Register<IFileSystem>(factory => new PhysicalFileSystem(SystemDirectories.MvcViews), "ViewFileSystem", new PerContainerLifetime());
+            container.RegisterSingleton<CacheHelper>(factory => CacheHelper.CreateDisabledCacheHelper(), "DisabledCache");
+            container.RegisterSingleton<IFileSystem>(factory => new PhysicalFileSystem(SystemDirectories.Scripts), "ScriptFileSystem");
+            container.RegisterSingleton<IFileSystem>(factory => new PhysicalFileSystem(SystemDirectories.MvcViews + "/Partials/"), "PartialViewFileSystem");
+            container.RegisterSingleton<IFileSystem>(factory => new PhysicalFileSystem(SystemDirectories.MvcViews + "/MacroPartials/"), "PartialViewMacroFileSystem");
+            container.RegisterSingleton<IFileSystem>(factory => new PhysicalFileSystem(SystemDirectories.Css), "StylesheetFileSystem");
+            container.RegisterSingleton<IFileSystem>(factory => new PhysicalFileSystem(SystemDirectories.Masterpages), "MasterpageFileSystem");
+            container.RegisterSingleton<IFileSystem>(factory => new PhysicalFileSystem(SystemDirectories.MvcViews), "ViewFileSystem");
 
             //Repository factories:
             //NOTE: Wondering if we can pass in parameters at resolution time with LightInject 

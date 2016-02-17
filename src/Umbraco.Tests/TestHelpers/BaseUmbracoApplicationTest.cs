@@ -108,21 +108,21 @@ namespace Umbraco.Tests.TestHelpers
             Container.Register<ILogger>(factory => Logger);
             Container.Register<CacheHelper>(factory => CacheHelper);
             Container.Register<ProfilingLogger>(factory => ProfilingLogger);
-            Container.Register<IUmbracoSettingsSection>(factory => SettingsForTests.GetDefault(), new PerContainerLifetime());
-            Container.Register<IContentSection>(factory => settings.Content, new PerContainerLifetime());
-            Container.Register<ITemplatesSection>(factory => settings.Templates, new PerContainerLifetime());
+            Container.RegisterSingleton<IUmbracoSettingsSection>(factory => SettingsForTests.GetDefault());
+            Container.RegisterSingleton<IContentSection>(factory => settings.Content);
+            Container.RegisterSingleton<ITemplatesSection>(factory => settings.Templates);
             Container.Register<IRuntimeCacheProvider>(factory => CacheHelper.RuntimeCache);
             Container.Register<IServiceProvider, ActivatorServiceProvider>();
             Container.Register<MediaFileSystem>(factory => new MediaFileSystem(Mock.Of<IFileSystem>()));
 
             //replace some stuff
             Container.Register<ISqlSyntaxProvider>(factory => SqlSyntax);
-            Container.Register<IFileSystem>(factory => Mock.Of<IFileSystem>(), "ScriptFileSystem", new PerContainerLifetime());
-            Container.Register<IFileSystem>(factory => Mock.Of<IFileSystem>(), "PartialViewFileSystem", new PerContainerLifetime());
-            Container.Register<IFileSystem>(factory => Mock.Of<IFileSystem>(), "PartialViewMacroFileSystem", new PerContainerLifetime());
-            Container.Register<IFileSystem>(factory => Mock.Of<IFileSystem>(), "StylesheetFileSystem", new PerContainerLifetime());
-            Container.Register<IFileSystem>(factory => Mock.Of<IFileSystem>(), "MasterpageFileSystem", new PerContainerLifetime());
-            Container.Register<IFileSystem>(factory => Mock.Of<IFileSystem>(), "ViewFileSystem", new PerContainerLifetime());
+            Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "ScriptFileSystem");
+            Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "PartialViewFileSystem");
+            Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "PartialViewMacroFileSystem");
+            Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "StylesheetFileSystem");
+            Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "MasterpageFileSystem");
+            Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "ViewFileSystem");
         }
 
         private static readonly object Locker = new object();

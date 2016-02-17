@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
 using System.Linq;
-using System.Reflection;
 using System.Web;
 using System.Web.Configuration;
 using System.Web.Http;
@@ -14,39 +13,31 @@ using ClientDependency.Core.Config;
 using Examine;
 using Examine.Config;
 using LightInject;
-using umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Macros;
-using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Dictionary;
 using Umbraco.Web.Install;
-using Umbraco.Web.Macros;
 using Umbraco.Web.Media;
 using Umbraco.Web.Media.ThumbnailProviders;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.PropertyEditors;
-using Umbraco.Web.PropertyEditors.ValueConverters;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
-using Umbraco.Web.Scheduling;
 using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi;
-using umbraco.BusinessLogic;
 using Umbraco.Core.Events;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
+using Umbraco.Web.Services;
+using Umbraco.Core.DependencyInjection;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using ProfilingViewEngine = Umbraco.Core.Profiling.ProfilingViewEngine;
 using TypeHelper = Umbraco.Core.TypeHelper;
@@ -316,16 +307,18 @@ namespace Umbraco.Web
 
             container.EnablePerWebRequestScope();
 
-            container.Register<IUmbracoContextAccessor, DefaultUmbracoContextAccessor>(new PerContainerLifetime());
-            container.Register<IPublishedContentCache>(factory => new PublishedContentCache(), new PerContainerLifetime());
-            container.Register<IPublishedMediaCache, PublishedMediaCache>(new PerContainerLifetime());
+            container.RegisterSingleton<IUmbracoContextAccessor, DefaultUmbracoContextAccessor>();
+            container.RegisterSingleton<IPublishedContentCache>(factory => new PublishedContentCache());
+            container.RegisterSingleton<IPublishedMediaCache, PublishedMediaCache>();
 
             //no need to declare as per request, currently we manage it's lifetime as the singleton
             container.Register<UmbracoContext>(factory => UmbracoContext.Current);
-            container.Register<UmbracoHelper>(new PerRequestLifeTime());
+            container.RegisterSingleton<UmbracoHelper>();
 
             //Replace services:
             container.Register<IEventMessagesFactory, RequestLifespanMessagesFactory>();
+            container.RegisterSingleton<IApplicationTreeService, ApplicationTreeService>();
+            container.RegisterSingleton<ISectionService, SectionService>();
         }
 
         /// <summary>
