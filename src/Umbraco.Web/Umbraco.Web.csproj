@@ -304,11 +304,13 @@
     <Compile Include="Media\EmbedProviders\Flickr.cs" />
     <Compile Include="Models\ContentEditing\SimpleNotificationModel.cs" />
     <Compile Include="Models\PublishedContentWithKeyBase.cs" />
+    <Compile Include="Mvc\ControllerContextExtensions.cs" />
     <Compile Include="Mvc\IRenderController.cs" />
     <Compile Include="Mvc\RenderIndexActionSelectorAttribute.cs" />
     <Compile Include="Mvc\ValidateMvcAngularAntiForgeryTokenAttribute.cs" />
     <Compile Include="PropertyEditors\DatePreValueEditor.cs" />
     <Compile Include="RequestLifespanMessagesFactory.cs" />
+    <Compile Include="RouteDataExtensions.cs" />
     <Compile Include="Scheduling\LatchedBackgroundTaskBase.cs" />
     <Compile Include="Security\Identity\ExternalSignInAutoLinkOptions.cs" />
     <Compile Include="Security\Identity\FixWindowsAuthMiddlware.cs" />

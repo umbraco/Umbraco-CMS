@@ -97,9 +97,9 @@ namespace Umbraco.Web.Mvc
         internal void SetupRouteDataForRequest(RenderModel renderModel, RequestContext requestContext, PublishedContentRequest docRequest)
         {
             //put essential data into the data tokens, the 'umbraco' key is required to be there for the view engine
-            requestContext.RouteData.DataTokens.Add("umbraco", renderModel); //required for the RenderModelBinder and view engine
-            requestContext.RouteData.DataTokens.Add("umbraco-doc-request", docRequest); //required for RenderMvcController
-            requestContext.RouteData.DataTokens.Add("umbraco-context", UmbracoContext); //required for UmbracoTemplatePage
+            requestContext.RouteData.DataTokens.Add(Core.Constants.Web.UmbracoDataToken, renderModel); //required for the RenderModelBinder and view engine
+            requestContext.RouteData.DataTokens.Add(Core.Constants.Web.PublishedDocumentRequestDataToken, docRequest); //required for RenderMvcController
+            requestContext.RouteData.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, UmbracoContext); //required for UmbracoTemplatePage
         }
 
         private void UpdateRouteDataForRequest(RenderModel renderModel, RequestContext requestContext)
@@ -107,7 +107,7 @@ namespace Umbraco.Web.Mvc
             if (renderModel == null) throw new ArgumentNullException("renderModel");
             if (requestContext == null) throw new ArgumentNullException("requestContext");
 
-            requestContext.RouteData.DataTokens["umbraco"] = renderModel;
+            requestContext.RouteData.DataTokens[Core.Constants.Web.UmbracoDataToken] = renderModel;
             // the rest should not change -- it's only the published content that has changed
         }
 
@@ -337,7 +337,7 @@ namespace Umbraco.Web.Mvc
             }
 
             //store the route definition
-            requestContext.RouteData.DataTokens["umbraco-route-def"] = def;
+            requestContext.RouteData.DataTokens[Umbraco.Core.Constants.Web.UmbracoRouteDefinitionDataToken] = def;
 
             return def;
         }
