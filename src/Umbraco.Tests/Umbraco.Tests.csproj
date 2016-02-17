@@ -187,12 +187,12 @@
     <Compile Include="Cache\FullDataSetCachePolicyTests.cs" />
     <Compile Include="Cache\SingleItemsOnlyCachePolicyTests.cs" />
     <Compile Include="Collections\DeepCloneableListTests.cs" />
-    <Compile Include="Controllers\BackOfficeControllerUnitTests.cs" />
+    <Compile Include="Web\Controllers\BackOfficeControllerUnitTests.cs" />
     <Compile Include="DelegateExtensionsTests.cs" />
     <Compile Include="Logging\AsyncRollingFileAppenderTest.cs" />
     <Compile Include="Logging\DebugAppender.cs" />
     <Compile Include="Logging\ParallelForwarderTest.cs" />
-    <Compile Include="Mvc\RenderIndexActionSelectorAttributeTests.cs" />
+    <Compile Include="Web\Mvc\RenderIndexActionSelectorAttributeTests.cs" />
     <Compile Include="Persistence\Repositories\AuditRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\DomainRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\PartialViewRepositoryTests.cs" />
@@ -242,8 +242,8 @@
     <Compile Include="Models\UmbracoEntityTests.cs" />
     <Compile Include="Models\UserTests.cs" />
     <Compile Include="Models\UserTypeTests.cs" />
-    <Compile Include="Mvc\SurfaceControllerTests.cs" />
-    <Compile Include="Mvc\UmbracoViewPageTests.cs" />
+    <Compile Include="Web\Mvc\SurfaceControllerTests.cs" />
+    <Compile Include="Web\Mvc\UmbracoViewPageTests.cs" />
     <Compile Include="BootManagers\CoreBootManagerTests.cs" />
     <Compile Include="BootManagers\WebBootManagerTests.cs" />
     <Compile Include="Cache\ObjectCacheProviderTests.cs" />
@@ -318,9 +318,9 @@
     <Compile Include="Configurations\UmbracoSettings\ViewstateMoverModuleElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\WebRoutingElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\WebRoutingElementTests.cs" />
-    <Compile Include="Controllers\WebApiEditors\ContentControllerUnitTests.cs" />
-    <Compile Include="Controllers\WebApiEditors\FilterAllowedOutgoingContentAttributeTests.cs" />
-    <Compile Include="Controllers\WebApiEditors\MediaControllerUnitTests.cs" />
+    <Compile Include="Web\Controllers\WebApiEditors\ContentControllerUnitTests.cs" />
+    <Compile Include="Web\Controllers\WebApiEditors\FilterAllowedOutgoingContentAttributeTests.cs" />
+    <Compile Include="Web\Controllers\WebApiEditors\MediaControllerUnitTests.cs" />
     <Compile Include="CoreXml\FrameworkXmlTests.cs" />
     <Compile Include="DynamicsAndReflection\QueryableExtensionTests.cs" />
     <Compile Include="DynamicsAndReflection\ExtensionMethodFinderTests.cs" />
@@ -330,8 +330,8 @@
     <Compile Include="Migrations\Upgrades\ValidateV7UpgradeTest.cs" />
     <Compile Include="Models\ContentExtensionsTests.cs" />
     <Compile Include="Models\UserExtensionsTests.cs" />
-    <Compile Include="Mvc\MergeParentContextViewDataAttributeTests.cs" />
-    <Compile Include="Mvc\ViewDataDictionaryExtensionTests.cs" />
+    <Compile Include="Web\Mvc\MergeParentContextViewDataAttributeTests.cs" />
+    <Compile Include="Web\Mvc\ViewDataDictionaryExtensionTests.cs" />
     <Compile Include="Persistence\PetaPocoExtensionsTest.cs" />
     <Compile Include="Persistence\Querying\ContentTypeSqlMappingTests.cs" />
     <Compile Include="Persistence\Repositories\MacroRepositoryTest.cs" />
@@ -427,7 +427,7 @@
     <Compile Include="PublishedContent\PublishedContentTests.cs" />
     <Compile Include="PublishedContent\PublishedMediaTests.cs" />
     <Compile Include="HashCodeCombinerTests.cs" />
-    <Compile Include="Mvc\HtmlHelperExtensionMethodsTests.cs" />
+    <Compile Include="Web\Mvc\HtmlHelperExtensionMethodsTests.cs" />
     <Compile Include="IO\IOHelperTest.cs" />
     <Compile Include="LibraryTests.cs" />
     <Compile Include="PropertyEditors\PropertyEditorValueConverterTests.cs" />
@@ -512,7 +512,7 @@
       <DependentUpon>ImportResources.resx</DependentUpon>
     </Compile>
     <Compile Include="Services\ThreadSafetyServiceTest.cs" />
-    <Compile Include="Controllers\PluginControllerAreaTests.cs" />
+    <Compile Include="Web\Controllers\PluginControllerAreaTests.cs" />
     <Compile Include="Cache\DistributedCache\DistributedCacheTests.cs" />
     <Compile Include="Templates\MasterPageHelperTests.cs" />
     <Compile Include="TestHelpers\BaseDatabaseFactoryTest.cs" />

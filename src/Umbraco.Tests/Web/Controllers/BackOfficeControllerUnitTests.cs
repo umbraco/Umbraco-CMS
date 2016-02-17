@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using Umbraco.Web.Editors;
 
-namespace Umbraco.Tests.Controllers
+namespace Umbraco.Tests.Web.Controllers
 {
     [TestFixture]
     public class BackOfficeControllerUnitTests
