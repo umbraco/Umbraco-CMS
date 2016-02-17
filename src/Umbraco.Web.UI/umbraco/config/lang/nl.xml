@@ -163,12 +163,16 @@
     <key alias="memberof">Lid van groep(en)</key>
     <key alias="notmemberof">Geen lid van groep(en)</key>
     
-    <key alias="childItems" version="7.0">Kinderen</key>
+    <key alias="childItems" version="7.0">Subitems</key>
     <key alias="target" version="7.0">Doel</key>
   </area>
   <area alias="media">
     <key alias="clickToUpload">Klik om te uploaden</key>
     <key alias="dropFilesHere">Plaats je bestanden hier...</key>
+  </area>
+  <area alias="member">
+    <key alias="createNewMember">Nieuw lid aanmaken</key>
+    <key alias="allMembers">Alle Leden</key>
   </area>
   <area alias="create">
     <key alias="chooseNode">Waar wil je de nieuwe %0% aanmaken?</key>
@@ -532,7 +536,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="notAllowedByContentType">De huidige node is niet toegestaan onder de geselecteerde node vanwege het node type</key>
     <key alias="notAllowedByPath">De huidige node kan niet naar een van zijn subpagina’s worden verplaatst.</key>
     <key alias="notAllowedAtRoot">De huidige node kan niet worden gebruikt op root-niveau</key>
-    <key alias="notValid">Deze actie is niet toegestaan omdat je onvoldoende rechten hebt op 1 of meer kinderen.</key>
+    <key alias="notValid">Deze actie is niet toegestaan omdat je onvoldoende rechten hebt op 1 of meer subitems.</key>
     <key alias="relateToOriginal">Relateer gekopieerde items aan het origineel</key>
   </area>
   <area alias="notifications">
@@ -620,7 +624,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="removeSpecialFormattering">Plakken, en verwijder de opmaak (aanbevolen)</key>
   </area>
   <area alias="publicAccess">
-    <key alias="paAdvanced">Geavanceerd: Beveilig door de Member Groups te seecteren die toegang hebben op de pagina</key>
+    <key alias="paAdvanced">Geavanceerd: Beveilig door de Member Groups te selecteren die toegang hebben op de pagina</key>
     <key alias="paAdvancedHelp"><![CDATA[Als je toegang tot pagina's wilt regelen met behulp van role-based authenticatie,<br /> gebruik makend van Umbraco's member groups.]]></key>
     <key alias="paAdvancedNoGroups"><![CDATA[Je moet eerst een membergroup maken voordat je kunt werken met <br />role-based authentication.]]></key>
     <key alias="paErrorPage">Error Pagina</key>
@@ -650,14 +654,14 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
       %0% kon niet worden gepubliceerd doordat een 3rd party extensie het heeft geannuleerd.
     
         ]]></key>
-    <key alias="includeUnpublished">Inclusief ongepubliceerde kinderen</key>
+    <key alias="includeUnpublished">Inclusief ongepubliceerde subitems</key>
     <key alias="inProgress">Publicatie in uitvoering - even geduld...</key>
     <key alias="inProgressCounter">%0% van %1% pagina’s zijn gepubliceerd...</key>
     <key alias="nodePublish">%0% is gepubliceerd</key>
     <key alias="nodePublishAll">%0% en onderliggende pagina’s zijn gepubliceerd</key>
-    <key alias="publishAll">Publiceer %0% en alle kinderen</key>
+    <key alias="publishAll">Publiceer %0% en alle subitems</key>
     <key alias="publishHelp"><![CDATA[Klik <em>ok</em> om <strong>%0%</strong> te publiceren en de wijzigingen zichtbaar te maken voor bezoekers.<br/><br />
-      Je kunt deze pagina publiceren en alle onderliggende sub-pagina's door <em>publiceer alle kinderen</em> aan te vinken hieronder.
+      Je kunt deze pagina publiceren en alle onderliggende sub-pagina's door <em>publiceer alle subitems</em> aan te vinken hieronder.
       ]]></key>
   </area>
   <area alias="colorpicker">
@@ -986,10 +990,10 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="passwordInvalid">Ongeldig huidig wachtwoord</key>
     <key alias="passwordIsDifferent">Beide wachtwoorden waren niet hetzelfde. Probeer opnieuw!</key>
     <key alias="passwordMismatch">Beide wachtwoorden zijn niet hetzelfde!</key>
-    <key alias="permissionReplaceChildren">Vervang rechten op de subnodes</key>
+    <key alias="permissionReplaceChildren">Vervang rechten op de subitems</key>
     <key alias="permissionSelectedPages">U bent momenteel rechten aan het aanpassen voor volgende pagina's:</key>
     <key alias="permissionSelectPages">Selecteer pagina's om hun rechten aan te passen</key>
-    <key alias="searchAllChildren">Doorzoek alle subnodes</key>
+    <key alias="searchAllChildren">Doorzoek alle subitems</key>
     <key alias="startnode">Startnode in Content</key>
     <key alias="username">Gebruikersnaam</key>
     <key alias="userPermissions">Gebruikersrechten</key>
