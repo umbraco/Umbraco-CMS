@@ -1,3 +1,88 @@
+/**
+@ngdoc directive
+@name umbraco.directives.directive:umbPagination
+@restrict E
+@scope
+
+@description
+Use this directive to generate a pagination.
+
+<h3>Markup example</h3>
+<pre>
+    <div ng-controller="My.Controller as vm">
+
+        <umb-pagination
+            page-number="vm.pagination.pageNumber"
+            total-pages="vm.pagination.totalPages"
+            on-next="vm.nextPage"
+            on-prev="vm.prevPage"
+            on-go-to-page="vm.goToPage">
+        </umb-pagination>
+
+    </div>
+</pre>
+
+<h3>Controller example</h3>
+<pre>
+    (function () {
+        "use strict";
+
+        function Controller() {
+
+            var vm = this;
+
+            vm.pagination = {
+                pageNumber: 1,
+                totalPages: 10
+            }
+
+            vm.nextPage = nextPage;
+            vm.prevPage = prevPage;
+            vm.goToPage = goToPage;
+
+            function nextPage(pageNumber) {
+                // do magic here
+                console.log(pageNumber);
+                alert("nextpage");
+            }
+
+            function prevPage(pageNumber) {
+                // do magic here
+                console.log(pageNumber);
+                alert("prevpage");
+            }
+
+            function goToPage(pageNumber) {
+                // do magic here
+                console.log(pageNumber);
+                alert("go to");
+            }
+
+        }
+
+        angular.module("umbraco").controller("My.Controller", Controller);
+    })();
+</pre>
+
+@param {number} pageNumber (<code>binding</code>): Current page number.
+@param {number} totalPages (<code>binding</code>): The total number of pages.
+@param {callback} onNext (<code>binding</code>): Callback method to go to the next page.
+    <h3>The callback returns:</h3>
+    <ul>
+        <li><code>pageNumber</code>: The page number</li>
+    </ul>
+@param {callback=} onPrev (<code>binding</code>): Callback method to go to the previous page.
+    <h3>The callback returns:</h3>
+    <ul>
+        <li><code>pageNumber</code>: The page number</li>
+    </ul>
+@param {callback=} onGoToPage (<code>binding</code>): Callback method to go to a specific page.
+    <h3>The callback returns:</h3>
+    <ul>
+        <li><code>pageNumber</code>: The page number</li>
+    </ul>
+**/
+
 (function() {
    'use strict';
 
