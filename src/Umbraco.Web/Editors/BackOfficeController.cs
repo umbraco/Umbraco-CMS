@@ -38,6 +38,11 @@ using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
+    public class AuthorizeUpgradeModel
+    {
+        public string Path { get; set; }
+    }
+
     /// <summary>
     /// A controller to render out the default back office view and JS results
     /// </summary>
@@ -84,7 +89,7 @@ namespace Umbraco.Web.Editors
         {
             return await RenderDefaultOrProcessExternalLoginAsync(
                 //The default view to render when there is no external login info or errors
-                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml"),
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml", new AuthorizeUpgradeModel { Path = GlobalSettings.Path}),
                 //The ActionResult to perform if external login is successful
                 () => Redirect("/"));
         }

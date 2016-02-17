@@ -109,6 +109,7 @@ namespace Umbraco.Core.Services
         /// <param name="publicAccessService"></param>
         /// <param name="externalLoginService"></param>
         /// <param name="migrationEntryService"></param>
+        /// <param name="serverRegistrationService"></param>
         public ServiceContext(
             IContentService contentService = null,
             IMediaService mediaService = null,
@@ -134,8 +135,10 @@ namespace Umbraco.Core.Services
             IMacroService macroService = null,
             IPublicAccessService publicAccessService = null,
             IExternalLoginService externalLoginService = null,
-            IMigrationEntryService migrationEntryService = null)
+            IMigrationEntryService migrationEntryService = null,
+            IServerRegistrationService serverRegistrationService = null)
         {
+            if (serverRegistrationService != null) _serverRegistrationService = new Lazy<IServerRegistrationService>(() => serverRegistrationService);
             if (migrationEntryService != null) _migrationEntryService = new Lazy<IMigrationEntryService>(() => migrationEntryService);
             if (externalLoginService != null) _externalLoginService = new Lazy<IExternalLoginService>(() => externalLoginService);
             if (auditService != null) _auditService = new Lazy<IAuditService>(() => auditService);

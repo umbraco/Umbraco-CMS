@@ -11,7 +11,7 @@ namespace Umbraco.Core.DependencyInjection
         /// </summary>
         public static void RegisterSingleton<TService>(this IServiceRegistry container, Func<IServiceFactory, TService> factory, string serviceName)
         {
-            container.Register<TService>(factory, new PerContainerLifetime());
+            container.Register<TService>(factory, serviceName, new PerContainerLifetime());
         }
 
         /// <summary>
