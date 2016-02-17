@@ -11,7 +11,7 @@ the directive will use {@link umbraco.directives.directive:umbLockedField umbLoc
 
 <h3>Markup example</h3>
 <pre>
-    <div ng-controller="Umbraco.Controller as vm">
+    <div ng-controller="My.Controller as vm">
 
         <input type="text" ng-model="vm.name" />
 
@@ -38,7 +38,7 @@ the directive will use {@link umbraco.directives.directive:umbLockedField umbLoc
 
         }
 
-        angular.module("umbraco").controller("Umbraco.Controller", Controller);
+        angular.module("umbraco").controller("My.Controller", Controller);
     })();
 </pre>
 
