@@ -9,7 +9,7 @@ Use this directive to generate a list of content items presented as a flexbox gr
 
 <h3>Markup example</h3>
 <pre>
-    <div ng-controller="Umbraco.Controller as vm">
+    <div ng-controller="My.Controller as vm">
 
         <umb-content-grid
             content="vm.contentItems"
@@ -81,7 +81,7 @@ Use this directive to generate a list of content items presented as a flexbox gr
 
         }
 
-        angular.module("umbraco").controller("Umbraco.Controller", Controller);
+        angular.module("umbraco").controller("My.Controller", Controller);
     })();
 </pre>
 
