@@ -13,6 +13,7 @@ namespace Umbraco.Core.Models.PublishedContent
     public class PublishedContentType
     {
         private readonly PublishedPropertyType[] _propertyTypes;
+        private readonly HashSet<string> _compositionAliases;
 
         // fast alias-to-index xref containing both the raw alias and its lowercase version
         private readonly Dictionary<string, int> _indexes = new Dictionary<string, int>();
@@ -24,7 +25,7 @@ namespace Umbraco.Core.Models.PublishedContent
         {
             Id = contentType.Id;
             Alias = contentType.Alias;
-            CompositionAliases = contentType.CompositionAliases();
+            _compositionAliases = new HashSet<string>(contentType.CompositionAliases(), StringComparer.InvariantCultureIgnoreCase);
             _propertyTypes = contentType.CompositionPropertyTypes
                 .Select(x => new PublishedPropertyType(this, x))
                 .ToArray();
@@ -36,7 +37,7 @@ namespace Umbraco.Core.Models.PublishedContent
         {
             Id = id;
             Alias = alias;
-            CompositionAliases = compositionAliases;
+            _compositionAliases = new HashSet<string>(compositionAliases, StringComparer.InvariantCultureIgnoreCase);
             _propertyTypes = propertyTypes.ToArray();
             foreach (var propertyType in _propertyTypes)
                 propertyType.ContentType = this;
@@ -62,7 +63,7 @@ namespace Umbraco.Core.Models.PublishedContent
 
         public int Id { get; private set; }
         public string Alias { get; private set; }
-        public IEnumerable<string> CompositionAliases { get; private set; }
+        public HashSet<string> CompositionAliases { get { return _compositionAliases; } }
 
         #endregion
 
