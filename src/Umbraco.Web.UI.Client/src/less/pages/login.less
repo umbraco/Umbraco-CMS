@@ -16,7 +16,7 @@
     border-radius: 0;
 }
 
-/* 1.5 dpr */
+
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5),
        only screen and (min-resolution: 144dpi)
 {
@@ -25,7 +25,7 @@
     }
 }
 
-/* 2.0 dpr */
+
 @media only screen and (-webkit-min-device-pixel-ratio: 2),
        only screen and (min-resolution: 192dpi)
 {
@@ -34,10 +34,10 @@
     }
 }
 
-/* 3.0 dpr - For iPhone 6 Plus, Samsung Galaxy S5 and similar devices */
+
 @media only screen and (-webkit-min-device-pixel-ratio: 3),
-       only screen and (min-resolution: 3dppx), /* default way */
-       only screen and (min-resolution: 350dpi) /* dppx fallback */
+       only screen and (min-resolution: 3dppx),
+       only screen and (min-resolution: 350dpi)
 {
     .login-overlay {
         background-image: url(../img/application/logo@3x.png) !important;
