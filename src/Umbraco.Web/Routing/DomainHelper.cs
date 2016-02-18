@@ -173,7 +173,25 @@ namespace Umbraco.Web.Routing
         /// <returns>The domains and their normalized uris, that match the specified uri.</returns>
         internal static IEnumerable<DomainAndUri> DomainsForUri(IEnumerable<IDomain> domains, Uri current)
         {
-            var scheme = current == null ? Uri.UriSchemeHttp : current.Scheme;
+            bool isHttps = false;
+            if (!String.IsNullOrEmpty(System.Web.HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_PROTO"]))            // Standarized way for the loadbalancer to let us know this is https
+                isHttps = System.Web.HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_PROTO"].ToLower() == "https";       // this says "https"
+            else if (!String.IsNullOrEmpty(System.Web.HttpContext.Current.Request.Headers.Get("Front-End-Https")))                  // Some other loadbalancers use this key
+                isHttps = System.Web.HttpContext.Current.Request.Headers.Get("Front-End-Https") == "on";                               // this one says "on"
+            else // Default .net logic
+                isHttps = System.Web.HttpContext.Current.Request.IsSecureConnection;
+
+            // Default
+            var scheme = Uri.UriSchemeHttp;
+
+            if (current != null)
+            {
+                if (isHttps)
+                    scheme = Uri.UriSchemeHttps;
+                else
+                    scheme = current.Scheme;
+            }
+        	
             return domains
                 .Where(d => d.IsWildcard == false)
                 .Select(SanitizeForBackwardCompatibility)
