@@ -2,7 +2,7 @@ function booleanEditorController($scope, $rootScope, assetsService) {
 
     function setupViewModel() {
         $scope.renderModel = {
-            value: false
+            value: $scope.model.config.default || false
         };
 
         if($scope.model.config.default.toString() === "1" && $scope.model && !$scope.model.value) {
