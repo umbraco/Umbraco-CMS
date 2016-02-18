@@ -114,9 +114,6 @@ namespace Umbraco.Web.Models.Mapping
 
             //re-assign
             genericProps.Properties = contentProps;
-
-           
-
         }
 
         /// <summary>
@@ -187,12 +184,38 @@ namespace Umbraco.Web.Models.Mapping
             });
             listViewTab.Properties = listViewProperties;
 
-            //Is there a better way?
-            var tabs = new List<Tab<ContentPropertyDisplay>>();
-            tabs.Add(listViewTab);
-            tabs.AddRange(display.Tabs);
-            display.Tabs = tabs;
+            SetChildItemsTabPosition(display, listViewConfig, listViewTab);
+        }
 
+        private static void SetChildItemsTabPosition<TPersisted>(TabbedContentItem<ContentPropertyDisplay, TPersisted> display, 
+                IDictionary<string, object> listViewConfig,
+                Tab<ContentPropertyDisplay> listViewTab) 
+            where TPersisted : IContentBase
+        {
+            // Find position of tab from config
+            var tabIndexForChildItems = 0;
+            if (listViewConfig["displayAtTabNumber"] != null && int.TryParse((string)listViewConfig["displayAtTabNumber"], out tabIndexForChildItems))
+            {
+                // Tab position is recorded 1-based but we insert into collection 0-based
+                tabIndexForChildItems--;
+
+                // Ensure within bounds
+                if (tabIndexForChildItems < 0)
+                {
+                    tabIndexForChildItems = 0;
+                }
+
+                if (tabIndexForChildItems > display.Tabs.Count())
+                {
+                    tabIndexForChildItems = display.Tabs.Count();
+                }
+            }
+
+            // Recreate tab list with child items tab at configured position
+            var tabs = new List<Tab<ContentPropertyDisplay>>();
+            tabs.AddRange(display.Tabs);
+            tabs.Insert(tabIndexForChildItems, listViewTab);
+            display.Tabs = tabs;
         }
 
         protected override IEnumerable<Tab<ContentPropertyDisplay>> ResolveCore(IContentBase content)
