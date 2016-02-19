@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -34,7 +35,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            return Mapper.Map<IEnumerable<MacroParameter>>(macro);
+            return Mapper.Map<IEnumerable<MacroParameter>>(macro).OrderBy(x => x.SortOrder);
         }
 
         /// <summary>

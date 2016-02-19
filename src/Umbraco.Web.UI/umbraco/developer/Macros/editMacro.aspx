@@ -137,6 +137,9 @@
                             <th>
                                 <%=umbraco.ui.Text("general", "type",UmbracoUser)%>
                             </th>
+                            <th>
+                                <%=umbraco.ui.Text("general", "sort",UmbracoUser)%>
+                            </th>
                             <th></th>
                         </tr>
                     </thead>
@@ -161,6 +164,11 @@
                             DataTextFormatString="" DataTextField='Name' DataValueField="Alias">
                         </asp:DropDownList>
                     </td>
+                    <td>                        
+                        <asp:RequiredFieldValidator ID="RequiredFieldValidator6" runat="server" ControlToValidate="macroPropertySortOrder" Display="Dynamic" ForeColor="#b94a48">Required<br/></asp:RequiredFieldValidator>
+                         <asp:RegularExpressionValidator ID="RegularExpressionValidator1" runat="server" ControlToValidate="macroPropertySortOrder" Display="Dynamic" ForeColor="#b94a48" ValidationExpression="^\d+$">Numbers only<br/></asp:RegularExpressionValidator>
+                        <asp:TextBox runat="server" ID="macroPropertySortOrder" Text='<%#Eval("SortOrder")%>' />
+                    </td>
                     <td>
                         <asp:Button OnClick="deleteMacroProperty" ID="delete" Text="Delete" runat="server" CssClass="btn btn-default delete-button" />
                     </td>
@@ -183,6 +191,9 @@
                                     DataValueField="Alias" 
                                     DataSource='<%# GetMacroParameterEditors()%>'>
                                 </asp:DropDownList>
+                            </td>
+                            <td>                        
+                                <%-- The macro parameter will automatically get sort order when created. --%>
                             </td>
                             <td>
                                 <asp:Button ID="createNew" Text="Add" runat="server" CssClass="btn btn-default add-button" OnClick="macroPropertyCreate" />
