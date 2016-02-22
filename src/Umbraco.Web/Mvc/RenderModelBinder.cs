@@ -23,6 +23,19 @@ namespace Umbraco.Web.Mvc
             if (controllerContext.RouteData.DataTokens.TryGetValue(Core.Constants.Web.UmbracoDataToken, out model) == false)
                 return null;
 
+            // when rendering "special" stuff such as surface controllers, etc, the token does *not* contain
+            // the model source, but some special strings - and then we have to find the source using the
+            // "default" MVC way
+            var modelString = model as string;
+            if (modelString == "surface" || modelString == "api" || modelString == "backoffice") // fixme - more?
+            {
+                var value = bindingContext.ValueProvider.GetValue(bindingContext.ModelName);
+                model = value.RawValue;
+
+                // fixme - should we return here?
+                // or go with the binding logic below that's nicer with strongly typed models
+            }
+
             //default culture
             var culture = CultureInfo.CurrentCulture;
 
