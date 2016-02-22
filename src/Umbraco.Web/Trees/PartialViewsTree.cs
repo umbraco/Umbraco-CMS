@@ -77,8 +77,8 @@ namespace Umbraco.Web.Trees
 		protected override void OnRenderFileNode(ref XmlTreeNode xNode)
 		{
 			ChangeNodeAction(xNode);
-			xNode.Icon = "icon-newspaper-alt";
-			xNode.OpenIcon = "icon-newspaper-alt";
+			xNode.Icon = "icon-article";
+			xNode.OpenIcon = "icon-article";
 
             xNode.Text = xNode.Text.StripFileExtension();
 		}
