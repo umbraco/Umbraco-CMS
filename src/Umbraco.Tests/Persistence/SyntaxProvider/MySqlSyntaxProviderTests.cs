@@ -8,12 +8,13 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence.SyntaxProvider
 {
     //[NUnit.Framework.Ignore("This doesn't actually test anything")]
     [TestFixture]
-    public class MySqlSyntaxProviderTests
+    public class MySqlSyntaxProviderTests : BaseUsingSqlCeSyntax
     {
         [SetUp]
         public void SetUp()
