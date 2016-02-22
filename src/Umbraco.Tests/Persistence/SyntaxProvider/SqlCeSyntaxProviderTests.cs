@@ -9,11 +9,12 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Migrations.Syntax.Create.Index;
 using Umbraco.Core.Persistence.Migrations.Syntax.Expressions;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence.SyntaxProvider
 {
     [TestFixture]
-    public class SqlCeSyntaxProviderTests
+    public class SqlCeSyntaxProviderTests : BaseUsingSqlCeSyntax
     {
 
         [Test]
