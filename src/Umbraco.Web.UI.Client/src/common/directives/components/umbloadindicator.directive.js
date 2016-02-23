@@ -8,7 +8,7 @@ Use this directive to generate a loading indicator.
 
 <h3>Markup example</h3>
 <pre>
-    <div ng-controller="Umbraco.Controller as vm">
+    <div ng-controller="My.Controller as vm">
 
         <umb-load-indicator
             ng-if="vm.loading">
@@ -39,8 +39,8 @@ Use this directive to generate a loading indicator.
             });
 
         }
-
-        angular.module("umbraco").controller("Umbraco.Controller", Controller);
+½
+        angular.module("umbraco").controller("My.Controller", Controller);
     })();
 </pre>
 **/

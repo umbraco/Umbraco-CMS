@@ -9,7 +9,7 @@ Use this directive to render a value with a lock next to it. When the lock is cl
 
 <h3>Markup example</h3>
 <pre>
-	<div ng-controller="Umbraco.Controller as vm">
+	<div ng-controller="My.Controller as vm">
 
 		<umb-locked-field
 			ng-model="vm.value"
@@ -31,13 +31,13 @@ Use this directive to render a value with a lock next to it. When the lock is cl
 
         }
 
-		angular.module("umbraco").controller("Umbraco.Controller", Controller);
+		angular.module("umbraco").controller("My.Controller", Controller);
 
 	})();
 </pre>
 
 @param {string} ngModel (<code>binding</code>): The locked text.
-@param {boolean} locked (<code>binding</code>: Set to <code>true</code> to unlock the text.
+@param {boolean=} locked (<code>binding</code>): <Code>true</code> by default. Set to <code>false</code> to unlock the text.
 @param {string=} placeholderText (<code>binding</code>): If ngModel is empty this text will be shown.
 @param {string=} regexValidation (<code>binding</code>): Set a regex expression for validation of the field.
 @param {string=} serverValidationField (<code>attribute</code>): Set a server validation field.

@@ -9,9 +9,9 @@ Use this directive to generate a list of folders presented as a flexbox grid.
 
 <h3>Markup example</h3>
 <pre>
-    <div ng-controller="Umbraco.Controller as vm">
+    <div ng-controller="My.Controller as vm">
         <umb-folder-grid
-            ng-if="vm.folders"
+            ng-if="vm.folders.length > 0"
             folders="vm.folders"
             on-click="vm.clickFolder"
             on-select="vm.selectFolder">
@@ -27,7 +27,17 @@ Use this directive to generate a list of folders presented as a flexbox grid.
         function Controller(myService) {
 
             var vm = this;
-            vm.folders = [];
+            vm.folders = [
+                {
+                    "name": "Folder 1",
+                    "icon": "icon-folder"
+                },
+                {
+                    "name": "Folder 2",
+                    "icon": "icon-folder"
+                }
+
+            ];
 
             vm.clickFolder = clickFolder;
             vm.selectFolder = selectFolder;
@@ -37,17 +47,17 @@ Use this directive to generate a list of folders presented as a flexbox grid.
             });
 
             function clickFolder(folder){
-                // do magic here
+                // Execute when clicking folder name/link
             }
 
             function selectFolder(folder, event, index) {
-                // set folder.selected = true; to select the folder
-                // do magic here
+                // Execute when clicking folder
+                // set folder.selected = true; to show checkmark icon
             }
 
         }
 
-        angular.module("umbraco").controller("Umbraco.Controller", Controller);
+        angular.module("umbraco").controller("My.Controller", Controller);
     })();
 </pre>
 
