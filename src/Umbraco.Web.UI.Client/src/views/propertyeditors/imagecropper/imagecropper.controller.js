@@ -5,6 +5,7 @@ angular.module('umbraco')
     function ($rootScope, $routeParams, $scope, $log, mediaHelper, cropperHelper, $timeout, editorState, umbRequestHelper, fileManager, angularHelper) {
 
         var config = angular.copy($scope.model.config);
+        $scope.imageIsLoaded = false;
 
         //move previously saved value to the editor
         if ($scope.model.value) {
@@ -69,6 +70,10 @@ angular.module('umbraco')
             } else {
                 $scope.showPreviews = true;
             }
+        };
+
+        $scope.imageLoaded = function() {
+            $scope.imageIsLoaded = true;
         };
 
         //on image selected, update the cropper

@@ -17,7 +17,7 @@
         <div class="imagecropper clearfix">
 
             <div ng-if="currentCrop" style="float:left;" class="clearfix">
-                <div style="position: relative; margin-bottom: 10px; width: 492px; border: 1px solid #f8f8f8;">
+                <div class="umb-cropper__container">
 
                     <i ng-click="done()" style="opacity: 0.5; position: absolute; top: 3px; right: 3px" class="icon icon-delete btn-round"></i>
 
@@ -37,11 +37,15 @@
                 </div>
             </div>
             <div ng-if="!currentCrop" class="umb-cropper-imageholder clearfix">
-                <umb-image-gravity src="imageSrc"
-                                   center="model.value.focalPoint" />
+                <umb-image-gravity
+                    src="imageSrc"
+                    center="model.value.focalPoint"
+                    on-image-loaded="imageLoaded">
+                </umb-image-gravity>
+                <a href class="btn btn-link btn-crop-delete" ng-show="imageIsLoaded" ng-click="clear()"><i class="icon-delete red"></i> <localize key="content_uploadClear">Remove file</localize></a>
             </div>
 
-            <ul class="umb-sortable-thumbnails cropList clearfix" ng-class="{'many':model.value.crops.length >= 4}">
+            <ul class="umb-sortable-thumbnails cropList clearfix">
                 <li ng-repeat=" (key,value) in model.value.crops" ng-class="{'current':currentCrop.alias === value.alias}">
                     <a href title="{{value.alias}}: {{value.width}}px x {{value.height}}px" ng-click="crop(value)">
                         <umb-image-thumbnail center="model.value.focalPoint"
@@ -59,7 +63,6 @@
 
 
         </div>
-        <a href class="btn btn-link btn-crop-delete" ng-click="clear()"><i class="icon-delete red"></i> <localize key="content_uploadClear">Remove file</localize></a>
 
     </div>
 </div>
