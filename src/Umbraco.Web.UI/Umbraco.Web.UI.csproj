@@ -2014,12 +2014,7 @@
     <Content Include="Umbraco\Translation\default.aspx" />
     <Content Include="Umbraco\Translation\preview.aspx" />
     <Content Include="Umbraco\Translation\xml.aspx" />
-    <Content Include="Umbraco\Create\content.ascx" />
     <Content Include="Umbraco\Create\language.ascx">
-      <SubType>UserControl</SubType>
-    </Content>
-    <Content Include="Umbraco\Create\member.ascx" />
-    <Content Include="Umbraco\Create\nodeType.ascx">
       <SubType>UserControl</SubType>
     </Content>
     <Content Include="Umbraco\Create\simple.ascx" />
