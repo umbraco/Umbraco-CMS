@@ -301,6 +301,8 @@ ul.color-picker li a  {
     overflow: hidden;
     position: relative;
     margin: auto;
+    max-width: 100%;
+    height: auto;
  }
 
 .umb-cropper-gravity .viewport{
@@ -337,27 +339,38 @@ ul.color-picker li a  {
   opacity: 0.8;
 }
 
-.umb-cropper-gravity .overlay i{
+.umb-cropper-gravity .overlay i {
   font-size: 26px;
   line-height: 26px;
   opacity: 0.8 !important;
 }
 
-.umb-cropper .crop-container{
+.umb-cropper .crop-container {
     text-align: center;
 }
 
-.umb-cropper .crop-slider{
+.umb-cropper .crop-slider {
    vertical-align: middle;
-   padding: 10px 50px 10px 50px;
+   padding: 10px;
    border-top: 1px solid @grayLighter;
    margin-top: 10px;
+
+   @media (min-width: 769px) {
+        padding: 10px 50px 10px 50px;
+   }
 }
 
-.umb-cropper .crop-slider i{color: @gray;}
-.umb-cropper .crop-slider input{
-   margin-top: 7px;
-   width: 320px;
+.umb-cropper .crop-slider i{
+    color: @gray;
+}
+
+.umb-cropper .crop-slider input {
+    margin-top: 7px;
+    width: ~"calc(100% - 45px)";
+
+   @media (min-width: 769px) {
+        width: 320px;
+   }
 }
    .umb-cropper-gravity .viewport, .umb-cropper-gravity, .umb-cropper-imageholder {
         display: inline-block;
@@ -377,6 +390,10 @@ ul.color-picker li a  {
         max-width: 600px;
     }
 
+    .gravity-container .viewport:hover {
+        cursor: pointer;
+    }
+
     .imagecropper {
         display: flex;
         align-items: flex-start;
@@ -385,14 +402,31 @@ ul.color-picker li a  {
         @media (max-width: 768px) {
             flex-direction: column;
             float: left;
+            max-width: 100%;
         }
     }
 
     .imagecropper .umb-cropper__container {
         position: relative;
         margin-bottom: 10px;
-        //width: 492px;
+        max-width: 100%;
         border: 1px solid #f8f8f8;
+
+        @media (min-width: 769px) {
+            width: 600px;
+        }
+    }
+
+    .umb-close-cropper {
+        position: absolute;
+        top: 3px;
+        right: 3px;
+        cursor: pointer;
+    }
+
+    .umb-close-cropper:hover {
+        opacity: .9;
+        background: @grayLighter;
     }
 
     .imagecropper .umb-sortable-thumbnails {
@@ -402,43 +436,49 @@ ul.color-picker li a  {
     }
 
     .imagecropper .umb-sortable-thumbnails li {
-        display: block;
-    }
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
 
-    .imagecropper .umb-sortable-thumbnails li.current a, .imagecropper .umb-sortable-thumbnails li.current a:hover {
-        background: #eeeeee;
-        text-decoration: none;
-    }
-
-    .imagecropper .umb-sortable-thumbnails li:first-of-type {
+        padding: 8px;
         margin-top: 0;
-        padding-top: 0;
     }
 
-    .imagecropper .umb-sortable-thumbnails li .crop-name, .imagecropper .umb-sortable-thumbnails li .crop-size {
+    .imagecropper .umb-sortable-thumbnails li.current {
+        border-color: @grayLight;
+        background: @grayLighter;
+        color: @black;
+        cursor: pointer;
+    }
+
+    .imagecropper .umb-sortable-thumbnails li:hover,
+    .imagecropper .umb-sortable-thumbnails li.current:hover {
+        border-color: @grayLight;
+        background: @grayLighter;
+        color: @black;
+
+        cursor: pointer;
+
+        opacity: .95;
+    }
+
+    .imagecropper .umb-sortable-thumbnails li .crop-name,
+    .imagecropper .umb-sortable-thumbnails li .crop-size {
         display: block;
         text-align: left;
-        font-size: 11px;
+        font-size: 13px;
+        line-height: 1;
+    }
+
+    .imagecropper .umb-sortable-thumbnails li .crop-name {
+        font-weight: bold;
+        margin: 10px 0 5px;
     }
 
     .imagecropper .umb-sortable-thumbnails li .crop-size {
         font-size: 10px;
         font-style: italic;
-        color: #666;
-    }
-
-    .imagecropper .umb-sortable-thumbnails li a {
-        display: block;
-        padding: 5px;
-    }
-
-    .imagecropper .umb-sortable-thumbnails li a:hover {
-        background: #f8f8f8;
-        text-decoration: none;
-    }
-
-    .imagecropper .umb-sortable-thumbnails li a:hover .crop-text {
-        text-decoration: none;
+        margin: 0 0 5px;
     }
 
     .btn-crop-delete {
