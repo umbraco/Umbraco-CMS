@@ -350,27 +350,34 @@ ul.color-picker li a  {
 }
 
 .umb-cropper .crop-slider {
-   vertical-align: middle;
    padding: 10px;
    border-top: 1px solid @grayLighter;
    margin-top: 10px;
+
+   display: flex;
+   align-items: center;
+   justify-content: center;
+
+   flex-wrap: wrap;
 
    @media (min-width: 769px) {
         padding: 10px 50px 10px 50px;
    }
 }
 
-.umb-cropper .crop-slider i{
+.umb-cropper .crop-slider i {
     color: @gray;
+    flex: 0 0 25px;
+    padding: 0 5px;
+    box-sizing: border-box;
+}
+
+.umb-cropper .crop-slider i:first-of-type {
+    text-align: right;
 }
 
 .umb-cropper .crop-slider input {
-    margin-top: 7px;
-    width: ~"calc(100% - 45px)";
-
-   @media (min-width: 769px) {
-        width: 320px;
-   }
+    flex: 0 1 auto;
 }
    .umb-cropper-gravity .viewport, .umb-cropper-gravity, .umb-cropper-imageholder {
         display: inline-block;
