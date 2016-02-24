@@ -26,6 +26,7 @@ angular.module("umbraco.directives")
 				link: function(scope, element, attrs) {
 					//// INIT /////
 					var $image = element.find("img");
+					scope.loaded = false;
 
 					$image.load(function(){
 						$timeout(function(){
@@ -52,6 +53,7 @@ angular.module("umbraco.directives")
 							}
 
 							setPreviewStyle();
+							scope.loaded = true;
 						});
 					});
 
