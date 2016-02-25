@@ -266,12 +266,12 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="move"></param>
         /// <param name="getContentType"></param>
-        /// <param name="doMoveOrCopy"></param>
+        /// <param name="doMove"></param>
         /// <returns></returns>
-        protected HttpResponseMessage PerformMoveOrCopy<TContentType>(
+        protected HttpResponseMessage PerformMove<TContentType>(
             MoveOrCopy move,
             Func<int, TContentType> getContentType,
-            Func<TContentType, int, Attempt<OperationStatus<MoveOperationStatusType>>> doMoveOrCopy)
+            Func<TContentType, int, Attempt<OperationStatus<MoveOperationStatusType>>> doMove)
             where TContentType : IContentTypeComposition
         {
             var toMove = getContentType(move.Id);
@@ -280,11 +280,56 @@ namespace Umbraco.Web.Editors
                 return Request.CreateResponse(HttpStatusCode.NotFound);
             }
 
-            var result = doMoveOrCopy(toMove, move.ParentId);
+            var result = doMove(toMove, move.ParentId);
             if (result.Success)
             {
                 var response = Request.CreateResponse(HttpStatusCode.OK);
                 response.Content = new StringContent(toMove.Path, Encoding.UTF8, "application/json");
+                return response;
+            }
+
+            switch (result.Result.StatusType)
+            {
+                case MoveOperationStatusType.FailedParentNotFound:
+                    return Request.CreateResponse(HttpStatusCode.NotFound);
+                case MoveOperationStatusType.FailedCancelledByEvent:
+                    //returning an object of INotificationModel will ensure that any pending
+                    // notification messages are added to the response.
+                    return Request.CreateValidationErrorResponse(new SimpleNotificationModel());
+                case MoveOperationStatusType.FailedNotAllowedByPath:
+                    var notificationModel = new SimpleNotificationModel();
+                    notificationModel.AddErrorNotification(Services.TextService.Localize("moveOrCopy/notAllowedByPath"), "");
+                    return Request.CreateValidationErrorResponse(notificationModel);
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        /// <summary>
+        /// Move
+        /// </summary>
+        /// <param name="move"></param>
+        /// <param name="getContentType"></param>
+        /// <param name="doCopy"></param>
+        /// <returns></returns>
+        protected HttpResponseMessage PerformCopy<TContentType>(
+            MoveOrCopy move,
+            Func<int, TContentType> getContentType,
+            Func<TContentType, int, Attempt<OperationStatus<TContentType, MoveOperationStatusType>>> doCopy)
+            where TContentType : IContentTypeComposition
+        {
+            var toMove = getContentType(move.Id);
+            if (toMove == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+
+            var result = doCopy(toMove, move.ParentId);
+            if (result.Success)
+            {
+                var copy = result.Result.Entity;
+                var response = Request.CreateResponse(HttpStatusCode.OK);
+                response.Content = new StringContent(copy.Path, Encoding.UTF8, "application/json");
                 return response;
             }
 

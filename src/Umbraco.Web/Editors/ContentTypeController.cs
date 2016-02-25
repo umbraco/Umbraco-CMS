@@ -309,10 +309,10 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public HttpResponseMessage PostMove(MoveOrCopy move)
         {
-            return PerformMoveOrCopy(
+            return PerformMove(
                 move,
                 getContentType: i => Services.ContentTypeService.GetContentType(i),
-                doMoveOrCopy: (type, i) => Services.ContentTypeService.MoveContentType(type, i));
+                doMove: (type, i) => Services.ContentTypeService.MoveContentType(type, i));
         }
 
         /// <summary>
@@ -322,10 +322,10 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public HttpResponseMessage PostCopy(MoveOrCopy copy)
         {
-            return PerformMoveOrCopy(
+            return PerformCopy(
                 copy,
                 getContentType: i => Services.ContentTypeService.GetContentType(i),
-                doMoveOrCopy: (type, i) => Services.ContentTypeService.CopyContentType(type, i));
+                doCopy: (type, i) => Services.ContentTypeService.CopyContentType(type, i));
         }
     }
 }

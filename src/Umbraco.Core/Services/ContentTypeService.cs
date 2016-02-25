@@ -1067,10 +1067,11 @@ namespace Umbraco.Core.Services
                 new OperationStatus<MoveOperationStatusType>(MoveOperationStatusType.Success, evtMsgs));
         }
 
-        public Attempt<OperationStatus<MoveOperationStatusType>> CopyMediaType(IMediaType toCopy, int containerId)
+        public Attempt<OperationStatus<IMediaType, MoveOperationStatusType>> CopyMediaType(IMediaType toCopy, int containerId)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
+            IMediaType copy;
             var uow = UowProvider.GetUnitOfWork();
             using (var containerRepository = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.MediaTypeContainerGuid))
             using (var repository = RepositoryFactory.CreateMediaTypeRepository(uow))
@@ -1084,7 +1085,7 @@ namespace Umbraco.Core.Services
                             throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound);
                     }
                     var alias = repository.GetUniqueAlias(toCopy.Alias);
-                    var copy = toCopy.DeepCloneWithResetIdentities(alias);
+                    copy = toCopy.DeepCloneWithResetIdentities(alias);
                     copy.Name = copy.Name + " (copy)"; // might not be unique
 
                     // if it has a parent, and the parent is a content type, unplug composition
@@ -1101,18 +1102,19 @@ namespace Umbraco.Core.Services
                 }
                 catch (DataOperationException<MoveOperationStatusType> ex)
                 {
-                    return Attempt.Fail(new OperationStatus<MoveOperationStatusType>(ex.Operation, evtMsgs));
+                    return Attempt.Fail(new OperationStatus<IMediaType, MoveOperationStatusType>(null, ex.Operation, evtMsgs));
                 }
                 uow.Commit();
             }
 
-            return Attempt.Succeed(new OperationStatus<MoveOperationStatusType>(MoveOperationStatusType.Success, evtMsgs));
+            return Attempt.Succeed(new OperationStatus<IMediaType, MoveOperationStatusType>(copy, MoveOperationStatusType.Success, evtMsgs));
         }
 
-        public Attempt<OperationStatus<MoveOperationStatusType>> CopyContentType(IContentType toCopy, int containerId)
+        public Attempt<OperationStatus<IContentType, MoveOperationStatusType>> CopyContentType(IContentType toCopy, int containerId)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
+            IContentType copy;
             var uow = UowProvider.GetUnitOfWork();
             using (var containerRepository = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.DocumentTypeContainerGuid))
             using (var repository = RepositoryFactory.CreateContentTypeRepository(uow))
@@ -1126,7 +1128,7 @@ namespace Umbraco.Core.Services
                             throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound);
                     }
                     var alias = repository.GetUniqueAlias(toCopy.Alias);
-                    var copy = toCopy.DeepCloneWithResetIdentities(alias);
+                    copy = toCopy.DeepCloneWithResetIdentities(alias);
                     copy.Name = copy.Name + " (copy)"; // might not be unique
 
                     // if it has a parent, and the parent is a content type, unplug composition
@@ -1143,12 +1145,12 @@ namespace Umbraco.Core.Services
                 }
                 catch (DataOperationException<MoveOperationStatusType> ex)
                 {
-                    return Attempt.Fail(new OperationStatus<MoveOperationStatusType>(ex.Operation, evtMsgs));
+                    return Attempt.Fail(new OperationStatus<IContentType, MoveOperationStatusType>(null, ex.Operation, evtMsgs));
                 }
                 uow.Commit();
             }
 
-            return Attempt.Succeed(new OperationStatus<MoveOperationStatusType>(MoveOperationStatusType.Success, evtMsgs));
+            return Attempt.Succeed(new OperationStatus<IContentType, MoveOperationStatusType>(copy, MoveOperationStatusType.Success, evtMsgs));
         }
 
         /// <summary>
