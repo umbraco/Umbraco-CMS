@@ -794,7 +794,7 @@ namespace Umbraco.Core.Services
 
                 //TODO: This needs to change, if we are deleting a content type, we should just delete the data,
                 // this method will recursively go lookup every content item, check if any of it's descendants are
-                // of a different type, move them to the recycle bin, then permanently delete the content items. 
+                // of a different type, move them to the recycle bin, then permanently delete the content items.
                 // The main problem with this is that for every content item being deleted, events are raised...
                 // which we need for many things like keeping caches in sync, but we can surely do this MUCH better.
 
@@ -1065,6 +1065,48 @@ namespace Umbraco.Core.Services
 
             return Attempt.Succeed(
                 new OperationStatus<MoveOperationStatusType>(MoveOperationStatusType.Success, evtMsgs));
+        }
+
+        public Attempt<OperationStatus<MoveOperationStatusType>> CopyContentType(IContentType toCopy, int containerId)
+        {
+            var evtMsgs = EventMessagesFactory.Get();
+
+            var uow = UowProvider.GetUnitOfWork();
+            using (var containerRepository = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.DocumentTypeContainerGuid))
+            using (var repository = RepositoryFactory.CreateContentTypeRepository(uow))
+            {
+                try
+                {
+                    if (containerId > 0)
+                    {
+                        var container = containerRepository.Get(containerId);
+                        if (container == null)
+                            throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound);
+                    }
+                    var alias = repository.GetUniqueAlias(toCopy.Alias);
+                    var copy = toCopy.DeepCloneWithResetIdentities(alias);
+                    copy.Name = copy.Name + " (copy)"; // might not be unique
+
+                    // if it has a parent, and the parent is a content type, unplug composition
+                    // all other compositions remain in place in the copied content type
+                    if (copy.ParentId > 0)
+                    {
+                        var parent = repository.Get(copy.ParentId);
+                        if (parent != null)
+                            copy.RemoveContentType(parent.Alias);
+                    }
+
+                    copy.ParentId = containerId;
+                    repository.AddOrUpdate(copy);
+                }
+                catch (DataOperationException<MoveOperationStatusType> ex)
+                {
+                    return Attempt.Fail(new OperationStatus<MoveOperationStatusType>(ex.Operation, evtMsgs));
+                }
+                uow.Commit();
+            }
+
+            return Attempt.Succeed(new OperationStatus<MoveOperationStatusType>(MoveOperationStatusType.Success, evtMsgs));
         }
 
         /// <summary>

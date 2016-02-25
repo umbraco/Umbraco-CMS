@@ -32,5 +32,12 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </param>
         /// <returns></returns>
         IEnumerable<string> GetAllContentTypeAliases(params Guid[] objectTypes);
+
+        /// <summary>
+        /// Derives a unique alias from an existing alias.
+        /// </summary>
+        /// <param name="alias">The original alias.</param>
+        /// <returns>The original alias with a number appended to it, so that it is unique.</returns>
+        string GetUniqueAlias(string alias);
     }
 }
