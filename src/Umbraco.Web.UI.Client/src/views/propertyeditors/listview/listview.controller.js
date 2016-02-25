@@ -76,6 +76,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
             $scope.currentNodePermissions = {
                 "isAdminUser": data.userType.toLowerCase() === "admin",
                 "canCopy": _.contains(currentUserPermissions, 'O'), //Magic Char = O
+                "canCreate": _.contains(currentUserPermissions, 'C'), //Magic Char = C
                 "canDelete": _.contains(currentUserPermissions, 'D'), //Magic Char = D
                 "canMove": _.contains(currentUserPermissions, 'M'), //Magic Char = M                
                 "canPublish": _.contains(currentUserPermissions, 'U'), //Magic Char = U
