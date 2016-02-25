@@ -1,4 +1,4 @@
-function listViewController($rootScope, $scope, $routeParams, $injector, $cookieStore, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q, mediaResource, listViewHelper) {
+function listViewController($rootScope, $scope, $routeParams, $injector, $cookieStore, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q, mediaResource, listViewHelper, userService) {
 
     //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content
     // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -58,6 +58,36 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
         totalPages: 0,
         items: []
     };
+
+        
+    $scope.currentNodePermissions = {}
+    
+    //Just ensure we do have an editorState
+    if(editorState.current){
+        
+        //Get Current User to check if their usertype is an admin (overwrites all permissions!)
+        userService.getCurrentUser().then(function(data){
+            
+            //Fetch current node allowed actions for the current user
+            //This is the current node & not each individual child node in the list
+            var currentUserPermissions = editorState.current.allowedActions;
+                
+            //Create a nicer model rather than the funky & hard to remember permissions strings
+            $scope.currentNodePermissions = {
+                "isAdminUser": data.userType.toLowerCase() === "admin",
+                "canCopy": _.contains(currentUserPermissions, 'O'), //Magic Char = O
+                "canDelete": _.contains(currentUserPermissions, 'D'), //Magic Char = D
+                "canMove": _.contains(currentUserPermissions, 'M'), //Magic Char = M                
+                "canPublish": _.contains(currentUserPermissions, 'U'), //Magic Char = U
+                "canUnpublish": _.contains(currentUserPermissions, 'Z'), //Magic Char = Z 
+                "rawPermissions": currentUserPermissions
+            };
+            
+        });
+    }       
+        
+
+    
 
     $scope.options = {
         displayAtTabNumber: $scope.model.config.displayAtTabNumber ? $scope.model.config.displayAtTabNumber : 1,
@@ -166,9 +196,8 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
         getListResultsCallback(id, $scope.options).then(function(data) {
 
             $scope.actionInProgress = false;
-
             $scope.listViewResultSet = data;
-
+            
             //update all values for display
             if ($scope.listViewResultSet.items) {
                 _.each($scope.listViewResultSet.items, function(e, index) {

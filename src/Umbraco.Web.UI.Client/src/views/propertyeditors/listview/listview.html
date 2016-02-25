@@ -82,7 +82,7 @@
                <umb-editor-sub-header-section ng-if="isAnythingSelected()">
 
                    <umb-button
-                       ng-if="options.allowBulkPublish"
+                       ng-if="options.allowBulkPublish && (currentNodePermissions.canPublish || currentNodePermissions.isAdminUser)"
                        type="button"
                        button-style="link"
                        label="Publish"
@@ -93,7 +93,7 @@
                    </umb-button>
 
                    <umb-button
-                       ng-if="options.allowBulkUnpublish"
+                       ng-if="options.allowBulkUnpublish && (currentNodePermissions.canUnpublish || currentNodePermissions.isAdminUser)"
                        type="button"
                        button-style="link"
                        label="Unpublish"
@@ -104,7 +104,7 @@
                    </umb-button>
 
                    <umb-button
-                       ng-if="options.allowBulkCopy"
+                       ng-if="options.allowBulkCopy && (currentNodePermissions.canCopy || currentNodePermissions.isAdminUser)"
                        type="button"
                        button-style="link"
                        label="Copy"
@@ -115,7 +115,7 @@
                    </umb-button>
 
                    <umb-button
-                       ng-if="options.allowBulkMove"
+                       ng-if="(options.allowBulkMove) && (currentNodePermissions.canMove || currentNodePermissions.isAdminUser)"
                        type="button"
                        button-style="link"
                        label="Move"
@@ -126,7 +126,7 @@
                    </umb-button>
 
                    <umb-button
-                       ng-if="options.allowBulkDelete"
+                       ng-if="options.allowBulkDelete && (currentNodePermissions.canDelete || currentNodePermissions.isAdminUser)"
                        type="button"
                        button-style="link"
                        label="Delete"
@@ -152,6 +152,8 @@
          entity-type="{{entityType}}"
          on-get-content="reloadView">
       </umb-list-view-layout>
+      
+      <pre>{{ currentNodePermissions | json }}</pre>
 
       <umb-load-indicator ng-show="!viewLoaded"></umb-load-indicator>
 
