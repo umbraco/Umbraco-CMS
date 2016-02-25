@@ -46,7 +46,7 @@ namespace Umbraco.Web.Cache
         public override void Remove(int id)
         {
             if (UserPermissionsCache)
-                UserPermissionsCache.Result.ClearCacheItem(string.Format("{0}{1}", CacheKeys.UserPermissionsCacheKey, id));
+                UserPermissionsCache.Result.ClearCacheByKeySearch(string.Format("{0}{1}", CacheKeys.UserPermissionsCacheKey, id));
             base.Remove(id);
         }
 
