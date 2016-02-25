@@ -291,6 +291,7 @@ namespace Umbraco.Core.Services
 
         Attempt<OperationStatus<MoveOperationStatusType>> MoveMediaType(IMediaType toMove, int containerId);
         Attempt<OperationStatus<MoveOperationStatusType>> MoveContentType(IContentType toMove, int containerId);
+        Attempt<OperationStatus<MoveOperationStatusType>> CopyMediaType(IMediaType toCopy, int containerId);
         Attempt<OperationStatus<MoveOperationStatusType>> CopyContentType(IContentType toCopy, int containerId);
     }
 }

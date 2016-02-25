@@ -232,5 +232,18 @@ namespace Umbraco.Web.Editors
                 getContentType: i => Services.ContentTypeService.GetMediaType(i),
                 doMoveOrCopy: (type, i) => Services.ContentTypeService.MoveMediaType(type, i));
         }
+
+        /// <summary>
+        /// Copy the media type
+        /// </summary>
+        /// <param name="copy"></param>
+        /// <returns></returns>
+        public HttpResponseMessage PostCopy(MoveOrCopy copy)
+        {
+            return PerformMoveOrCopy(
+                copy,
+                getContentType: i => Services.ContentTypeService.GetMediaType(i),
+                doMoveOrCopy: (type, i) => Services.ContentTypeService.CopyMediaType(type, i));
+        }
     }
 }

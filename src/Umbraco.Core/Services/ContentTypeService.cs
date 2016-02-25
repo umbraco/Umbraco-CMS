@@ -1067,6 +1067,48 @@ namespace Umbraco.Core.Services
                 new OperationStatus<MoveOperationStatusType>(MoveOperationStatusType.Success, evtMsgs));
         }
 
+        public Attempt<OperationStatus<MoveOperationStatusType>> CopyMediaType(IMediaType toCopy, int containerId)
+        {
+            var evtMsgs = EventMessagesFactory.Get();
+
+            var uow = UowProvider.GetUnitOfWork();
+            using (var containerRepository = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.MediaTypeContainerGuid))
+            using (var repository = RepositoryFactory.CreateMediaTypeRepository(uow))
+            {
+                try
+                {
+                    if (containerId > 0)
+                    {
+                        var container = containerRepository.Get(containerId);
+                        if (container == null)
+                            throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound);
+                    }
+                    var alias = repository.GetUniqueAlias(toCopy.Alias);
+                    var copy = toCopy.DeepCloneWithResetIdentities(alias);
+                    copy.Name = copy.Name + " (copy)"; // might not be unique
+
+                    // if it has a parent, and the parent is a content type, unplug composition
+                    // all other compositions remain in place in the copied content type
+                    if (copy.ParentId > 0)
+                    {
+                        var parent = repository.Get(copy.ParentId);
+                        if (parent != null)
+                            copy.RemoveContentType(parent.Alias);
+                    }
+
+                    copy.ParentId = containerId;
+                    repository.AddOrUpdate(copy);
+                }
+                catch (DataOperationException<MoveOperationStatusType> ex)
+                {
+                    return Attempt.Fail(new OperationStatus<MoveOperationStatusType>(ex.Operation, evtMsgs));
+                }
+                uow.Commit();
+            }
+
+            return Attempt.Succeed(new OperationStatus<MoveOperationStatusType>(MoveOperationStatusType.Success, evtMsgs));
+        }
+
         public Attempt<OperationStatus<MoveOperationStatusType>> CopyContentType(IContentType toCopy, int containerId)
         {
             var evtMsgs = EventMessagesFactory.Get();
