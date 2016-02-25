@@ -152,7 +152,7 @@ namespace Umbraco.Core.Persistence.Querying
                 case "COALESCE":
                     return string.Format("{0}({1},{2})", operand, left, right);
                 default:
-                    return left + " " + operand + " " + right;
+                    return "(" + left + " " + operand + " " + right + ")";
             }
         }
 
