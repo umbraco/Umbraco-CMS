@@ -44,8 +44,9 @@
             return listViewHelper.setSortingDirection(col, direction, $scope.options);
         }
 
-        function sort(field, allow) {
+        function sort(field, allow, isSystem) {
             if (allow) {
+				$scope.options.orderBySystemField = isSystem;
                 listViewHelper.setSorting(field, allow, $scope.options);
                 $scope.getContent($scope.contentId);
             }

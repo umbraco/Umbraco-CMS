@@ -16,207 +16,208 @@ using Lucene.Net.Analysis;
 
 namespace UmbracoExamine
 {
-   
+
+ /// <summary>
+ /// Custom indexer for members
+ /// </summary>
+ public class UmbracoMemberIndexer : UmbracoContentIndexer
+ {
+
+	private readonly IMemberService _memberService;
+	private readonly IDataTypeService _dataTypeService;
+
 	/// <summary>
-    /// Custom indexer for members
-    /// </summary>
-    public class UmbracoMemberIndexer : UmbracoContentIndexer
-    {
+	/// Default constructor
+	/// </summary>
+	public UmbracoMemberIndexer() : base()
+	{
+	 _dataTypeService = ApplicationContext.Current.Services.DataTypeService;
+	 _memberService = ApplicationContext.Current.Services.MemberService;
+	}
 
-        private readonly IMemberService _memberService;
-        private readonly IDataTypeService _dataTypeService;
+	/// <summary>
+	/// Constructor to allow for creating an indexer at runtime
+	/// </summary>
+	/// <param name="indexerData"></param>
+	/// <param name="indexPath"></param>
+	/// <param name="dataService"></param>
+	/// <param name="analyzer"></param>
+	[Obsolete("Use the overload that specifies the Umbraco services")]
+	public UmbracoMemberIndexer(IIndexCriteria indexerData, DirectoryInfo indexPath, IDataService dataService, Analyzer analyzer, bool async)
+			: base(indexerData, indexPath, dataService, analyzer, async)
+	{
+	 _dataTypeService = ApplicationContext.Current.Services.DataTypeService;
+	 _memberService = ApplicationContext.Current.Services.MemberService;
+	}
 
-	    /// <summary>
-	    /// Default constructor
-	    /// </summary>
-	    public UmbracoMemberIndexer() : base()
-	    {
-            _dataTypeService = ApplicationContext.Current.Services.DataTypeService;
-            _memberService = ApplicationContext.Current.Services.MemberService;
-	    }
+	/// <summary>
+	/// Constructor to allow for creating an indexer at runtime
+	/// </summary>
+	/// <param name="indexerData"></param>
+	/// <param name="indexPath"></param>
+	/// <param name="dataService"></param>
+	/// <param name="dataTypeService"></param>
+	/// <param name="memberService"></param>
+	/// <param name="analyzer"></param>
+	/// <param name="async"></param>
+	public UmbracoMemberIndexer(IIndexCriteria indexerData, DirectoryInfo indexPath, IDataService dataService,
+				IDataTypeService dataTypeService,
+				IMemberService memberService,
+				Analyzer analyzer, bool async)
+			: base(indexerData, indexPath, dataService, analyzer, async)
+	{
+	 _dataTypeService = dataTypeService;
+	 _memberService = memberService;
+	}
 
-	    /// <summary>
-	    /// Constructor to allow for creating an indexer at runtime
-	    /// </summary>
-	    /// <param name="indexerData"></param>
-	    /// <param name="indexPath"></param>
-	    /// <param name="dataService"></param>
-	    /// <param name="analyzer"></param>
-	    [Obsolete("Use the overload that specifies the Umbraco services")]
-	    public UmbracoMemberIndexer(IIndexCriteria indexerData, DirectoryInfo indexPath, IDataService dataService, Analyzer analyzer, bool async)
-	        : base(indexerData, indexPath, dataService, analyzer, async)
-	    {
-            _dataTypeService = ApplicationContext.Current.Services.DataTypeService;
-            _memberService = ApplicationContext.Current.Services.MemberService;
-	    }
 
-        /// <summary>
-        /// Constructor to allow for creating an indexer at runtime
-        /// </summary>
-        /// <param name="indexerData"></param>
-        /// <param name="indexPath"></param>
-        /// <param name="dataService"></param>
-        /// <param name="dataTypeService"></param>
-        /// <param name="memberService"></param>
-        /// <param name="analyzer"></param>
-        /// <param name="async"></param>
-	    public UmbracoMemberIndexer(IIndexCriteria indexerData, DirectoryInfo indexPath, IDataService dataService,
-            IDataTypeService dataTypeService,
-            IMemberService memberService,
-            Analyzer analyzer, bool async)
-	        : base(indexerData, indexPath, dataService, analyzer, async)
-	    {
-            _dataTypeService = dataTypeService;
-            _memberService = memberService;
-	    }
 
-	    
+	/// <summary>
+	/// Ensures that the'_searchEmail' is added to the user fields so that it is indexed - without having to modify the config
+	/// </summary>
+	/// <param name="indexSet"></param>
+	/// <returns></returns>
+	protected override IIndexCriteria GetIndexerData(IndexSet indexSet)
+	{
+	 var indexerData = base.GetIndexerData(indexSet);
 
-	    /// <summary>
-        /// Ensures that the'_searchEmail' is added to the user fields so that it is indexed - without having to modify the config
-        /// </summary>
-        /// <param name="indexSet"></param>
-        /// <returns></returns>
-        protected override IIndexCriteria GetIndexerData(IndexSet indexSet)
-        {
-            var indexerData = base.GetIndexerData(indexSet);
+	 if (CanInitialize())
+	 {
+		//If the fields are missing a custom _searchEmail, then add it
 
-            if (CanInitialize())
-            {
-                //If the fields are missing a custom _searchEmail, then add it
+		if (indexerData.UserFields.Any(x => x.Name == "_searchEmail") == false)
+		{
+		 var field = new IndexField { Name = "_searchEmail" };
+		 var policy = IndexFieldPolicies.FirstOrDefault(x => x.Name == "_searchEmail");
+		 if (policy != null)
+		 {
+			field.Type = policy.Type;
+			field.EnableSorting = policy.EnableSorting;
+		 }
 
-                if (indexerData.UserFields.Any(x => x.Name == "_searchEmail") == false)
-                {
-                    var field = new IndexField {Name = "_searchEmail"};
-                    var policy = IndexFieldPolicies.FirstOrDefault(x => x.Name == "_searchEmail");
-                    if (policy != null)
-                    {
-                        field.Type = policy.Type;
-                        field.EnableSorting = policy.EnableSorting;
-                    }
+		 return new IndexCriteria(
+				 indexerData.StandardFields,
+				 indexerData.UserFields.Concat(new[] { field }),
+				 indexerData.IncludeNodeTypes,
+				 indexerData.ExcludeNodeTypes,
+				 indexerData.ParentNodeId
+				 );
+		}
+	 }
 
-                    return new IndexCriteria(
-                        indexerData.StandardFields,
-                        indexerData.UserFields.Concat(new[] {field}),
-                        indexerData.IncludeNodeTypes,
-                        indexerData.ExcludeNodeTypes,
-                        indexerData.ParentNodeId
-                        );
-                }
-            }
+	 return indexerData;
+	}
 
-	        return indexerData;
-        }
+	/// <summary>
+	/// The supported types for this indexer
+	/// </summary>
+	protected override IEnumerable<string> SupportedTypes
+	{
+	 get
+	 {
+		return new string[] { IndexTypes.Member };
+	 }
+	}
 
-	    /// <summary>
-        /// The supported types for this indexer
-        /// </summary>
-        protected override IEnumerable<string> SupportedTypes
-        {
-            get
-            {
-                return new string[] { IndexTypes.Member };
-            }
-        }
+	/// <summary>
+	/// Reindex all members
+	/// </summary>
+	/// <param name="type"></param>
+	protected override void PerformIndexAll(string type)
+	{
+	 //This only supports members
+	 if (SupportedTypes.Contains(type) == false)
+		return;
 
-	    /// <summary>
-	    /// Reindex all members
-	    /// </summary>
-	    /// <param name="type"></param>
-	    protected override void PerformIndexAll(string type)
-	    {
-            //This only supports members
-            if (SupportedTypes.Contains(type) == false)
-                return;
-            
-            const int pageSize = 1000;
-            var pageIndex = 0;
+	 const int pageSize = 1000;
+	 var pageIndex = 0;
 
-            IMember[] members;
+	 IMember[] members;
 
-            if (IndexerData.IncludeNodeTypes.Any())
-	        {
-                //if there are specific node types then just index those
-                foreach (var nodeType in IndexerData.IncludeNodeTypes)
-	            {
-                    do
-                    {
-                        long total;
-                        members = _memberService.GetAll(pageIndex, pageSize, out total, "LoginName", Direction.Ascending, nodeType).ToArray();
+	 if (IndexerData.IncludeNodeTypes.Any())
+	 {
+		//if there are specific node types then just index those
+		foreach (var nodeType in IndexerData.IncludeNodeTypes)
+		{
+		 do
+		 {
+			long total;
+			members = _memberService.GetAll(pageIndex, pageSize, out total, "LoginName"
+			 , Direction.Ascending, true, nodeType).ToArray();
 
-                        AddNodesToIndex(GetSerializedMembers(members), type);
+			AddNodesToIndex(GetSerializedMembers(members), type);
 
-                        pageIndex++;
-                    } while (members.Length == pageSize);
-	            }
-	        }
-	        else
-	        {
-                //no node types specified, do all members
-                do
-                {
-                    int total;
-                    members = _memberService.GetAll(pageIndex, pageSize, out total).ToArray();
+			pageIndex++;
+		 } while (members.Length == pageSize);
+		}
+	 }
+	 else
+	 {
+		//no node types specified, do all members
+		do
+		{
+		 int total;
+		 members = _memberService.GetAll(pageIndex, pageSize, out total).ToArray();
 
-                    AddNodesToIndex(GetSerializedMembers(members), type);
+		 AddNodesToIndex(GetSerializedMembers(members), type);
 
-                    pageIndex++;
-                } while (members.Length == pageSize);
-	        }
-	    }
+		 pageIndex++;
+		} while (members.Length == pageSize);
+	 }
+	}
 
-        private IEnumerable<XElement> GetSerializedMembers(IEnumerable<IMember> members)
-        {
-            var serializer = new EntityXmlSerializer();
-            return members.Select(member => serializer.Serialize(_dataTypeService, member));
-        }
+	private IEnumerable<XElement> GetSerializedMembers(IEnumerable<IMember> members)
+	{
+	 var serializer = new EntityXmlSerializer();
+	 return members.Select(member => serializer.Serialize(_dataTypeService, member));
+	}
 
-	    protected override XDocument GetXDocument(string xPath, string type)
-	    {
-	        throw new NotSupportedException();
-	    }
-        
-        protected override Dictionary<string, string> GetSpecialFieldsToIndex(Dictionary<string, string> allValuesForIndexing)
-        {
-            var fields = base.GetSpecialFieldsToIndex(allValuesForIndexing);
+	protected override XDocument GetXDocument(string xPath, string type)
+	{
+	 throw new NotSupportedException();
+	}
 
-            //adds the special path property to the index
-            fields.Add("__key", allValuesForIndexing["__key"]);
-            
-            return fields;
+	protected override Dictionary<string, string> GetSpecialFieldsToIndex(Dictionary<string, string> allValuesForIndexing)
+	{
+	 var fields = base.GetSpecialFieldsToIndex(allValuesForIndexing);
 
-        }
+	 //adds the special path property to the index
+	 fields.Add("__key", allValuesForIndexing["__key"]);
 
-        /// <summary>
-        /// Add the special __key and _searchEmail fields
-        /// </summary>
-        /// <param name="e"></param>
-        protected override void OnGatheringNodeData(IndexingNodeDataEventArgs e)
-        {
-            base.OnGatheringNodeData(e);
+	 return fields;
 
-            if (e.Node.Attribute("key") != null)
-            {
-                if (e.Fields.ContainsKey("__key") == false)
-                    e.Fields.Add("__key", e.Node.Attribute("key").Value);
-            }
+	}
 
-            if (e.Node.Attribute("email") != null)
-            {
-                //NOTE: the single underscore = it's not a 'special' field which means it will be indexed normally
-                if (e.Fields.ContainsKey("_searchEmail") == false)
-                    e.Fields.Add("_searchEmail", e.Node.Attribute("email").Value.Replace(".", " ").Replace("@", " "));
-            }
-            
-            if (e.Fields.ContainsKey(IconFieldName) == false)
-                e.Fields.Add(IconFieldName, (string)e.Node.Attribute("icon"));
-        }
+	/// <summary>
+	/// Add the special __key and _searchEmail fields
+	/// </summary>
+	/// <param name="e"></param>
+	protected override void OnGatheringNodeData(IndexingNodeDataEventArgs e)
+	{
+	 base.OnGatheringNodeData(e);
 
-        private static XElement GetMemberItem(int nodeId)
-        {
-			//TODO: Change this so that it is not using the LegacyLibrary, just serialize manually!
-            var nodes = LegacyLibrary.GetMember(nodeId);
-            return XElement.Parse(nodes.Current.OuterXml);
-        }
-    }
+	 if (e.Node.Attribute("key") != null)
+	 {
+		if (e.Fields.ContainsKey("__key") == false)
+		 e.Fields.Add("__key", e.Node.Attribute("key").Value);
+	 }
+
+	 if (e.Node.Attribute("email") != null)
+	 {
+		//NOTE: the single underscore = it's not a 'special' field which means it will be indexed normally
+		if (e.Fields.ContainsKey("_searchEmail") == false)
+		 e.Fields.Add("_searchEmail", e.Node.Attribute("email").Value.Replace(".", " ").Replace("@", " "));
+	 }
+
+	 if (e.Fields.ContainsKey(IconFieldName) == false)
+		e.Fields.Add(IconFieldName, (string)e.Node.Attribute("icon"));
+	}
+
+	private static XElement GetMemberItem(int nodeId)
+	{
+	 //TODO: Change this so that it is not using the LegacyLibrary, just serialize manually!
+	 var nodes = LegacyLibrary.GetMember(nodeId);
+	 return XElement.Parse(nodes.Current.OuterXml);
+	}
+ }
 }
