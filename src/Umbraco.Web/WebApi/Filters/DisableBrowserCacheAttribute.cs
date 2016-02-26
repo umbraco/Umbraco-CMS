@@ -23,7 +23,11 @@ namespace Umbraco.Web.WebApi.Filters
             //See: http://stackoverflow.com/questions/17755239/how-to-stop-chrome-from-caching-rest-response-from-webapi
 
             base.OnActionExecuted(actionExecutedContext);
-
+            if (actionExecutedContext == null || actionExecutedContext.Response == null ||
+                    actionExecutedContext.Response.Headers == null)
+            {
+                return;
+            }
             //NOTE: Until we upgraded to WebApi 2, this didn't work correctly and we had to revert to using
             // HttpContext.Current responses. I've changed this back to what it should be now since it works
             // and now with WebApi2, the HttpContext.Current responses dont! Anyways, all good now.
@@ -39,12 +43,12 @@ namespace Umbraco.Web.WebApi.Filters
             if (actionExecutedContext.Response.Content != null)
             {
                 actionExecutedContext.Response.Content.Headers.Expires =
-                    //Mon, 01 Jan 1990 00:00:00 GMT
-                    new DateTimeOffset(1990, 1, 1, 0, 0, 0, TimeSpan.Zero);
+                        //Mon, 01 Jan 1990 00:00:00 GMT
+                        new DateTimeOffset(1990, 1, 1, 0, 0, 0, TimeSpan.Zero);
             }
 
-            
-            
+
+
         }
     }
 }

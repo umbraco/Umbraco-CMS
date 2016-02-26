@@ -52,7 +52,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         public MediaController()
             : this(UmbracoContext.Current)
-        {            
+        {
         }
 
         /// <summary>
@@ -156,7 +156,7 @@ namespace Umbraco.Web.Editors
             var folderTypes = Services.ContentTypeService.GetAllMediaTypes().ToArray().Where(x => x.Alias.EndsWith("Folder")).Select(x => x.Id);
 
             var children = (id < 0) ? Services.MediaService.GetRootMedia() : Services.MediaService.GetById(id).Children();
-            return children.Where(x =>  folderTypes.Contains(x.ContentTypeId)).Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>);
+            return children.Where(x => folderTypes.Contains(x.ContentTypeId)).Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>);
         }
 
         /// <summary>
@@ -180,13 +180,16 @@ namespace Umbraco.Web.Editors
             int pageSize = 0,
             string orderBy = "SortOrder",
             Direction orderDirection = Direction.Ascending,
+            bool orderBySystemField = true,
             string filter = "")
         {
             int totalChildren;
             IMedia[] children;
             if (pageNumber > 0 && pageSize > 0)
             {
-                children = Services.MediaService.GetPagedChildren(id, (pageNumber - 1), pageSize, out totalChildren, orderBy, orderDirection, filter).ToArray();
+                children = Services.MediaService
+                 .GetPagedChildren(id, (pageNumber - 1), pageSize, out totalChildren
+                 , orderBy, orderDirection, orderBySystemField, filter).ToArray();
             }
             else
             {
@@ -261,7 +264,7 @@ namespace Umbraco.Web.Editors
 
             var response = Request.CreateResponse(HttpStatusCode.OK);
             response.Content = new StringContent(toMove.Path, Encoding.UTF8, "application/json");
-            return response; 
+            return response;
         }
 
         /// <summary>
@@ -307,7 +310,7 @@ namespace Umbraco.Web.Editors
 
             //return the updated model
             var display = Mapper.Map<IMedia, MediaItemDisplay>(contentItem.PersistedContent);
-            
+
             //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
             HandleInvalidModelState(display);
 
@@ -334,8 +337,8 @@ namespace Umbraco.Web.Editors
                             throw new HttpResponseException(Request.CreateValidationErrorResponse(display));
                         }
                     }
-                    
-                    break;                
+
+                    break;
             }
 
             return display;
@@ -364,7 +367,7 @@ namespace Umbraco.Web.Editors
             Services.MediaService.EmptyRecycleBin();
             return Request.CreateResponse(HttpStatusCode.OK);
         }
-        
+
         /// <summary>
         /// Change the sort order for media
         /// </summary>
@@ -383,7 +386,7 @@ namespace Umbraco.Web.Editors
             {
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
-            
+
             var mediaService = base.ApplicationContext.Services.MediaService;
             var sortedMedia = new List<IMedia>();
             try
@@ -405,7 +408,7 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        [EnsureUserPermissionForMedia("folder.ParentId")]        
+        [EnsureUserPermissionForMedia("folder.ParentId")]
         public MediaItemDisplay PostAddFolder(EntityBasic folder)
         {
             var mediaService = ApplicationContext.Services.MediaService;
@@ -436,7 +439,7 @@ namespace Umbraco.Web.Editors
             var provider = new MultipartFormDataStreamProvider(root);
 
             var result = await Request.Content.ReadAsMultipartAsync(provider);
-            
+
             //must have a file
             if (result.FileData.Count == 0)
             {
@@ -449,10 +452,10 @@ namespace Umbraco.Web.Editors
             {
                 return Request.CreateValidationErrorResponse("The request was not formatted correctly, the currentFolder is not an integer");
             }
-            
+
             //ensure the user has access to this folder by parent id!
             if (CheckPermissions(
-               new Dictionary<string, object>(), 
+               new Dictionary<string, object>(),
                Security.CurrentUser,
                Services.MediaService, parentId) == false)
             {
@@ -463,65 +466,65 @@ namespace Umbraco.Web.Editors
                         Services.TextService.Localize("speechBubbles/invalidUserPermissionsText"),
                         SpeechBubbleIcon.Warning)));
             }
-            
+
             var tempFiles = new PostedFiles();
             var mediaService = ApplicationContext.Services.MediaService;
 
 
             //in case we pass a path with a folder in it, we will create it and upload media to it.
-	        if (result.FormData.ContainsKey("path"))
-	        {
+            if (result.FormData.ContainsKey("path"))
+            {
 
-		        var folders = result.FormData["path"].Split('/');
+                var folders = result.FormData["path"].Split('/');
 
-	            for (int i = 0; i < folders.Length - 1; i++)
-	            {
-	                var folderName = folders[i];
-	                IMedia folderMediaItem;
+                for (int i = 0; i < folders.Length - 1; i++)
+                {
+                    var folderName = folders[i];
+                    IMedia folderMediaItem;
 
-	                //if uploading directly to media root and not a subfolder
-	                if (parentId == -1)
-	                {
-	                    //look for matching folder
-	                    folderMediaItem =
-	                        mediaService.GetRootMedia().FirstOrDefault(x => x.Name == folderName && x.ContentType.Alias == Constants.Conventions.MediaTypes.Folder);
-	                    if (folderMediaItem == null)
-	                    {
-	                        //if null, create a folder
-	                        folderMediaItem = mediaService.CreateMedia(folderName, -1, Constants.Conventions.MediaTypes.Folder);
-	                        mediaService.Save(folderMediaItem);
-	                    }
-	                }
-	                else
-	                {
-	                    //get current parent
-	                    var mediaRoot = mediaService.GetById(parentId);
+                    //if uploading directly to media root and not a subfolder
+                    if (parentId == -1)
+                    {
+                        //look for matching folder
+                        folderMediaItem =
+                            mediaService.GetRootMedia().FirstOrDefault(x => x.Name == folderName && x.ContentType.Alias == Constants.Conventions.MediaTypes.Folder);
+                        if (folderMediaItem == null)
+                        {
+                            //if null, create a folder
+                            folderMediaItem = mediaService.CreateMedia(folderName, -1, Constants.Conventions.MediaTypes.Folder);
+                            mediaService.Save(folderMediaItem);
+                        }
+                    }
+                    else
+                    {
+                        //get current parent
+                        var mediaRoot = mediaService.GetById(parentId);
 
-	                    //if the media root is null, something went wrong, we'll abort
-	                    if (mediaRoot == null)
-	                        return Request.CreateErrorResponse(HttpStatusCode.InternalServerError,
-	                            "The folder: " + folderName + " could not be used for storing images, its ID: " + parentId +
-	                            " returned null");
+                        //if the media root is null, something went wrong, we'll abort
+                        if (mediaRoot == null)
+                            return Request.CreateErrorResponse(HttpStatusCode.InternalServerError,
+                                "The folder: " + folderName + " could not be used for storing images, its ID: " + parentId +
+                                " returned null");
 
-	                    //look for matching folder
-	                    folderMediaItem = mediaRoot.Children().FirstOrDefault(x => x.Name == folderName && x.ContentType.Alias == Constants.Conventions.MediaTypes.Folder);
-	                    if (folderMediaItem == null)
-	                    {
-	                        //if null, create a folder
-	                        folderMediaItem = mediaService.CreateMedia(folderName, mediaRoot, Constants.Conventions.MediaTypes.Folder);
-	                        mediaService.Save(folderMediaItem);
-	                    }
-	                }
-	                //set the media root to the folder id so uploaded files will end there.
-	                parentId = folderMediaItem.Id;
-	            }
-	        }
+                        //look for matching folder
+                        folderMediaItem = mediaRoot.Children().FirstOrDefault(x => x.Name == folderName && x.ContentType.Alias == Constants.Conventions.MediaTypes.Folder);
+                        if (folderMediaItem == null)
+                        {
+                            //if null, create a folder
+                            folderMediaItem = mediaService.CreateMedia(folderName, mediaRoot, Constants.Conventions.MediaTypes.Folder);
+                            mediaService.Save(folderMediaItem);
+                        }
+                    }
+                    //set the media root to the folder id so uploaded files will end there.
+                    parentId = folderMediaItem.Id;
+                }
+            }
 
-	        //get the files
+            //get the files
             foreach (var file in result.FileData)
             {
                 var fileName = file.Headers.ContentDisposition.FileName.Trim(new[] { '\"' });
-                var ext = fileName.Substring(fileName.LastIndexOf('.')+1).ToLower();
+                var ext = fileName.Substring(fileName.LastIndexOf('.') + 1).ToLower();
 
                 if (UmbracoConfig.For.UmbracoSettings().Content.DisallowedUploadFiles.Contains(ext) == false)
                 {
@@ -583,7 +586,7 @@ namespace Umbraco.Web.Editors
                 if (origin.Value == "blueimp")
                 {
                     return Request.CreateResponse(HttpStatusCode.OK,
-                        tempFiles, 
+                        tempFiles,
                         //Don't output the angular xsrf stuff, blue imp doesn't like that
                         new JsonMediaTypeFormatter());
                 }
