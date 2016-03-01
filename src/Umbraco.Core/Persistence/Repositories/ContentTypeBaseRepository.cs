@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NPoco;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
@@ -28,7 +29,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     /// <remarks>Exposes shared functionality</remarks>
     /// <typeparam name="TEntity"></typeparam>
-    internal abstract class ContentTypeBaseRepository<TEntity> : PetaPocoRepositoryBase<int, TEntity>, IReadRepository<Guid, TEntity>
+    internal abstract class ContentTypeBaseRepository<TEntity> : NPocoRepositoryBase<int, TEntity>, IReadRepository<Guid, TEntity>
         where TEntity : class, IContentTypeComposition
     {
         protected ContentTypeBaseRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
@@ -139,7 +140,7 @@ AND umbracoNode.nodeObjectType = @objectType",
             nodeDto.Path = parent.Path;
             nodeDto.Level = short.Parse(level.ToString(CultureInfo.InvariantCulture));
             nodeDto.SortOrder = sortOrder;
-            var o = Database.IsNew(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
+            var o = Database.IsNew<NodeDto>(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
 
             //Update with new correct path
             nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
@@ -1219,7 +1220,7 @@ AND umbracoNode.id <> @id",
         /// <summary>
         /// Inner repository to support the GUID lookups and keep the caching consistent
         /// </summary>
-        internal class GuidReadOnlyContentTypeBaseRepository : PetaPocoRepositoryBase<Guid, TEntity>
+        internal class GuidReadOnlyContentTypeBaseRepository : NPocoRepositoryBase<Guid, TEntity>
         {
             private readonly ContentTypeBaseRepository<TEntity> _parentRepo;
 

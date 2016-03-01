@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -19,7 +20,7 @@ namespace Umbraco.Core.Persistence.Repositories
 {
 
 
-    internal class MemberGroupRepository : PetaPocoRepositoryBase<int, IMemberGroup>, IMemberGroupRepository
+    internal class MemberGroupRepository : NPocoRepositoryBase<int, IMemberGroup>, IMemberGroupRepository
     {
         private readonly CacheHelper _cacheHelper;
 
@@ -113,7 +114,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var group = (MemberGroup)entity;
             group.AddingEntity();
             var dto = _modelFactory.BuildDto(group);
-            var o = Database.IsNew(dto) ? Convert.ToInt32(Database.Insert(dto)) : Database.Update(dto);
+            var o = Database.IsNew<NodeDto>(dto) ? Convert.ToInt32(Database.Insert(dto)) : Database.Update(dto);
             group.Id = dto.NodeId; //Set Id on entity to ensure an Id is set
             
             //Update with new correct path and id            

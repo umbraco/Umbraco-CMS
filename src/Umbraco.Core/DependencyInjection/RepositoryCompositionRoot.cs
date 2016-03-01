@@ -25,7 +25,7 @@ namespace Umbraco.Core.DependencyInjection
             container.Register<DatabaseContext>(factory => GetDbContext(factory), new PerContainerLifetime());
             container.Register<SqlSyntaxProviders>(factory => SqlSyntaxProviders.CreateDefault(factory.GetInstance<ILogger>()), new PerContainerLifetime());
             container.Register<IUnitOfWorkProvider, FileUnitOfWorkProvider>(new PerContainerLifetime());
-            container.Register<IDatabaseUnitOfWorkProvider>(factory => new PetaPocoUnitOfWorkProvider(factory.GetInstance<ILogger>()), new PerContainerLifetime());
+            container.Register<IDatabaseUnitOfWorkProvider>(factory => new NPocoUnitOfWorkProvider(factory.GetInstance<ILogger>()), new PerContainerLifetime());
             container.Register<IMappingResolver>(factory => new MappingResolver(
                 factory.GetInstance<IServiceContainer>(),
                 factory.GetInstance<ILogger>(),

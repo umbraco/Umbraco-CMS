@@ -99,7 +99,7 @@ namespace Umbraco.Tests.TestHelpers
                 //assign the service context
                 new ServiceContext(
                         Container.GetInstance<RepositoryFactory>(),
-                        new PetaPocoUnitOfWorkProvider(dbFactory),
+                        new NPocoUnitOfWorkProvider(dbFactory),
                         new FileUnitOfWorkProvider(),
                         new PublishingStrategy(evtMsgs, Logger),
                         CacheHelper,

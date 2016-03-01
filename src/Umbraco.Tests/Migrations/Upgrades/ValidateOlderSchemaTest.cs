@@ -4,6 +4,7 @@ using System.Data.SqlServerCe;
 using System.IO;
 using System.Text.RegularExpressions;
 using Moq;
+using NPoco;
 using NUnit.Framework;
 using SQLCE4Umbraco;
 using Umbraco.Core.Configuration;

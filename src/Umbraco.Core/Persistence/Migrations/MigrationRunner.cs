@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using log4net;
+using NPoco;
 using Semver;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;

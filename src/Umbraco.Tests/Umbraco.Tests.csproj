@@ -389,7 +389,7 @@
     <Compile Include="Persistence\Mappers\PropertyTypeMapperTest.cs" />
     <Compile Include="Persistence\Mappers\RelationMapperTest.cs" />
     <Compile Include="Persistence\Mappers\RelationTypeMapperTest.cs" />
-    <Compile Include="Persistence\Querying\PetaPocoSqlTests.cs" />
+    <Compile Include="Persistence\Querying\NPocoSqlTests.cs" />
     <Compile Include="Persistence\Querying\QueryBuilderTests.cs" />
     <Compile Include="Persistence\Repositories\ContentRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\ContentTypeRepositoryTest.cs" />
@@ -582,6 +582,10 @@
     <ProjectReference Include="..\UmbracoExamine\UmbracoExamine.csproj">
       <Project>{07fbc26b-2927-4a22-8d96-d644c667fecc}</Project>
       <Name>UmbracoExamine</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\Stéphane\Documents\Development\Umbraco Elements\NPoco\src\NPoco\NPoco.csproj">
+      <Project>{bccbf883-0c0d-40ff-95b6-a2777dff63dc}</Project>
+      <Name>NPoco</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

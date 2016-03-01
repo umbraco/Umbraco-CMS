@@ -44,7 +44,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_On_UserRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             UserTypeRepository userTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
@@ -65,7 +65,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Multiple_Adds_On_UserRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             UserTypeRepository userTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
@@ -90,7 +90,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Verify_Fresh_Entity_Is_Not_Dirty()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             UserTypeRepository userTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
@@ -112,7 +112,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_On_UserRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             UserTypeRepository userTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
@@ -162,7 +162,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_On_UserRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             UserTypeRepository userTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
@@ -223,7 +223,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_On_UserRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             UserTypeRepository userTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
@@ -244,7 +244,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetByQuery_On_UserRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             UserTypeRepository userTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
@@ -264,7 +264,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_By_Param_Ids_On_UserRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             UserTypeRepository userTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
@@ -285,7 +285,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_On_UserRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             UserTypeRepository userTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
@@ -306,7 +306,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Exists_On_UserRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             UserTypeRepository userTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
@@ -325,7 +325,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Count_On_UserRepository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             UserTypeRepository userTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
@@ -345,7 +345,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Remove_Section_For_User()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             UserTypeRepository userTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
@@ -380,7 +380,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Add_Section_For_User()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             UserTypeRepository userTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
@@ -424,7 +424,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Update_Section_For_User()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             UserTypeRepository userTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
@@ -452,7 +452,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Get_Users_Assigned_To_Section()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             UserTypeRepository userTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out userTypeRepository))
@@ -481,7 +481,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Default_User_Permissions_Based_On_User_Type()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var utRepo = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, MappingResolver))
             using (var repository = new UserRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, utRepo, MappingResolver))
@@ -532,7 +532,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private IUserType CreateAndCommitUserType()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = new UserTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Logger, SqlSyntax, MappingResolver))
             {

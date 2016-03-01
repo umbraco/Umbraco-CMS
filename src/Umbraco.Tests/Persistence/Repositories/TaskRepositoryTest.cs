@@ -16,7 +16,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Delete()
         {
-             var provider = new PetaPocoUnitOfWorkProvider(Logger);
+             var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, MappingResolver))
             {
@@ -43,7 +43,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Add()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, MappingResolver))
             {
@@ -75,7 +75,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Update()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, MappingResolver))
             {
@@ -111,7 +111,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Get_By_Id()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, MappingResolver))
             {
@@ -139,7 +139,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             CreateTestData(false, 20);
 
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, MappingResolver))
             {
@@ -154,7 +154,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             CreateTestData(false, 10);
             CreateTestData(true, 5);
 
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, MappingResolver))
             {
@@ -169,7 +169,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             CreateTestData(false, 10, -20);
             CreateTestData(false, 5, -21);
 
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, MappingResolver))
             {
@@ -184,7 +184,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             CreateTestData(false, 10);
             CreateTestData(true, 5);
 
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, MappingResolver))
             {
@@ -195,7 +195,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private void CreateTestData(bool closed, int count, int entityId = -1)
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, MappingResolver))
             {

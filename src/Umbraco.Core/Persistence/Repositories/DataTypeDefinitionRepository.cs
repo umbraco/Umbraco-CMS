@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
+using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
@@ -25,7 +26,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="DataTypeDefinition"/>
     /// </summary>
-    internal class DataTypeDefinitionRepository : PetaPocoRepositoryBase<int, IDataTypeDefinition>, IDataTypeDefinitionRepository
+    internal class DataTypeDefinitionRepository : NPocoRepositoryBase<int, IDataTypeDefinition>, IDataTypeDefinitionRepository
     {
         private readonly CacheHelper _cacheHelper;
         private readonly IContentTypeRepository _contentTypeRepository;
@@ -177,7 +178,7 @@ WHERE umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + "= @name", new { n
             nodeDto.Path = parent.Path;
             nodeDto.Level = short.Parse(level.ToString(CultureInfo.InvariantCulture));
             nodeDto.SortOrder = sortOrder;
-            var o = Database.IsNew(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
+            var o = Database.IsNew<NodeDto>(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
 
             //Update with new correct path
             nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
@@ -513,7 +514,7 @@ AND umbracoNode.id <> @id",
         /// <summary>
         /// Private class to handle pre-value crud based on standard principles and units of work with transactions
         /// </summary>
-        private class DataTypePreValueRepository : PetaPocoRepositoryBase<int, PreValueEntity>
+        private class DataTypePreValueRepository : NPocoRepositoryBase<int, PreValueEntity>
         {
             public DataTypePreValueRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
                 : base(work, cache, logger, sqlSyntax, mappingResolver)

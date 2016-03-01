@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using NPoco;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
@@ -26,7 +27,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <summary>
     /// Represents the Template Repository
     /// </summary>
-    internal class TemplateRepository : PetaPocoRepositoryBase<int, ITemplate>, ITemplateRepository
+    internal class TemplateRepository : NPocoRepositoryBase<int, ITemplate>, ITemplateRepository
     {
         private readonly IFileSystem _masterpagesFileSystem;
         private readonly IFileSystem _viewsFileSystem;
@@ -180,7 +181,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //Create the (base) node data - umbracoNode
             var nodeDto = dto.NodeDto;
             nodeDto.Path = "-1," + dto.NodeDto.NodeId;
-            var o = Database.IsNew(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
+            var o = Database.IsNew<NodeDto>(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
 
             //Update with new correct path
             var parent = Get(template.MasterTemplateId.Value);

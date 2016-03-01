@@ -106,6 +106,10 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="C:\Users\Stéphane\Documents\Development\Umbraco Elements\NPoco\src\NPoco\NPoco.csproj">
+      <Project>{bccbf883-0c0d-40ff-95b6-a2777dff63dc}</Project>
+      <Name>NPoco</Name>
+    </ProjectReference>
     <Reference Include="ClientDependency.Core, Version=1.8.4.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ClientDependency.1.8.4\lib\net45\ClientDependency.Core.dll</HintPath>
       <Private>True</Private>

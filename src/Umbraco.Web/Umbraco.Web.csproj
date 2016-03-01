@@ -97,6 +97,10 @@
       <Project>{07fbc26b-2927-4a22-8d96-d644c667fecc}</Project>
       <Name>UmbracoExamine</Name>
     </ProjectReference>
+    <ProjectReference Include="C:\Users\Stéphane\Documents\Development\Umbraco Elements\NPoco\src\NPoco\NPoco.csproj">
+      <Project>{bccbf883-0c0d-40ff-95b6-a2777dff63dc}</Project>
+      <Name>NPoco</Name>
+    </ProjectReference>
     <Reference Include="AutoMapper, Version=4.1.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
       <HintPath>..\packages\AutoMapper.4.1.1\lib\net45\AutoMapper.dll</HintPath>
       <Private>True</Private>

@@ -1,10 +1,11 @@
-﻿using Umbraco.Core.Persistence;
+﻿using NPoco;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Models.Rdbms
 {
     [TableName("cmsDocumentType")]
-    [PrimaryKey("contentTypeNodeId", autoIncrement = false)]
+    [PrimaryKey("contentTypeNodeId", AutoIncrement = false)]
     [ExplicitColumns]
     internal class ContentTypeTemplateDto
     {

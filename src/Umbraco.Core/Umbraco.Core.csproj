@@ -371,6 +371,9 @@
     <Compile Include="Models\PublishedContent\PublishedContentWithKeyWrapped.cs" />
     <Compile Include="Models\Rdbms\AccessDto.cs" />
     <Compile Include="ObjectResolution\ContainerSingleObjectResolver.cs" />
+    <Compile Include="Persistence\FaultHandling\RetryDbConnection.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Persistence\Mappers\AuditItemMapper.cs" />
     <Compile Include="Persistence\Mappers\IMappingResolver.cs" />
     <Compile Include="Persistence\Migrations\IMigrationResolver.cs" />
@@ -772,7 +775,7 @@
     <Compile Include="Persistence\Mappers\MapperForAttribute.cs" />
     <Compile Include="Persistence\Mappers\MemberMapper.cs" />
     <Compile Include="Persistence\Mappers\MemberTypeMapper.cs" />
-    <Compile Include="Persistence\Mappers\PetaPocoMapper.cs" />
+    <Compile Include="Persistence\Mappers\PocoMapper.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\ConstraintAttribute.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\SpecialDbTypeAttribute.cs" />
     <Compile Include="Persistence\DatabaseAnnotations\LengthAttribute.cs" />
@@ -970,10 +973,8 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\UpdateCmsContentVersionTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\UpdateCmsPropertyTypeGroupTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSix\RenameCmsTabTable.cs" />
-    <Compile Include="Persistence\PetaPocoCommandExtensions.cs" />
-    <Compile Include="Persistence\PetaPocoConnectionExtensions.cs" />
-    <Compile Include="Persistence\PetaPocoExtensions.cs" />
-    <Compile Include="Persistence\PetaPocoSqlExtensions.cs" />
+    <Compile Include="Persistence\NPocoDatabaseExtensions.cs" />
+    <Compile Include="Persistence\NPocoSqlExtensions.cs" />
     <Compile Include="Persistence\Querying\BaseExpressionHelper.cs" />
     <Compile Include="Persistence\Querying\PocoToSqlExpressionHelper.cs" />
     <Compile Include="Persistence\Querying\IQuery.cs" />
@@ -1018,7 +1019,7 @@
     <Compile Include="Persistence\Repositories\MemberRepository.cs" />
     <Compile Include="Persistence\Repositories\MemberTypeRepository.cs" />
     <Compile Include="Persistence\Repositories\PermissionRepository.cs" />
-    <Compile Include="Persistence\Repositories\PetaPocoRepositoryBase.cs" />
+    <Compile Include="Persistence\Repositories\NPocoRepositoryBase.cs" />
     <Compile Include="Persistence\Repositories\RecycleBinRepository.cs" />
     <Compile Include="Persistence\Repositories\RelationRepository.cs" />
     <Compile Include="Persistence\Repositories\RelationTypeRepository.cs" />
@@ -1051,8 +1052,8 @@
     <Compile Include="Persistence\UnitOfWork\IUnitOfWork.cs" />
     <Compile Include="Persistence\UnitOfWork\IUnitOfWorkProvider.cs" />
     <Compile Include="Persistence\UnitOfWork\IUnitOfWorkRepository.cs" />
-    <Compile Include="Persistence\UnitOfWork\PetaPocoUnitOfWork.cs" />
-    <Compile Include="Persistence\UnitOfWork\PetaPocoUnitOfWorkProvider.cs" />
+    <Compile Include="Persistence\UnitOfWork\NPocoUnitOfWork.cs" />
+    <Compile Include="Persistence\UnitOfWork\NPocoUnitOfWorkProvider.cs" />
     <Compile Include="Profiling\IProfiler.cs" />
     <Compile Include="Profiling\LogProfiler.cs" />
     <Compile Include="Profiling\ProfilerExtensions.cs" />
@@ -1395,6 +1396,10 @@
     <ProjectReference Include="..\umbraco.interfaces\umbraco.interfaces.csproj">
       <Project>{511F6D8D-7717-440A-9A57-A507E9A8B27F}</Project>
       <Name>umbraco.interfaces</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\Stéphane\Documents\Development\Umbraco Elements\NPoco\src\NPoco\NPoco.csproj">
+      <Project>{bccbf883-0c0d-40ff-95b6-a2777dff63dc}</Project>
+      <Name>NPoco</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

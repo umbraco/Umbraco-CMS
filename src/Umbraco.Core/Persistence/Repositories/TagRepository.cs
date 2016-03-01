@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using NPoco;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -15,7 +16,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal class TagRepository : PetaPocoRepositoryBase<int, ITag>, ITagRepository
+    internal class TagRepository : NPocoRepositoryBase<int, ITag>, ITagRepository
     {
         public TagRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver)
             : base(work, cache, logger, sqlSyntax, mappingResolver)
@@ -568,7 +569,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var array = tagsToInsert
                 .Select(tag =>
                     string.Format("select '{0}' as Tag, '{1}' as " + SqlSyntax.GetQuotedColumnName("group") + @"",
-                        PetaPocoExtensions.EscapeAtSymbols(tag.Text.Replace("'", "''")), tag.Group))
+                        NPocoDatabaseExtensions.EscapeAtSymbols(tag.Text.Replace("'", "''")), tag.Group))
                 .ToArray();
             return "(" + string.Join(" union ", array).Replace("  ", " ") + ") as TagSet";
         }

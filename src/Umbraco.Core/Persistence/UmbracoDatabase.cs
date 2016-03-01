@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
+using NPoco;
 using StackExchange.Profiling;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence.FaultHandling;
+using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Persistence
 {
@@ -57,47 +60,75 @@ namespace Umbraco.Core.Persistence
         /// </summary>
         internal int SqlCount { get; private set; }
 
+        private void CommonInitialize()
+        {
+            EnableSqlTrace = false;
+            Mapper = new PocoMapper(); // fixme inject!
+            IsolationLevel = IsolationLevel.RepeatableRead; // fixme else comes from dbType.GetDefaultTransactionIsolationLevel() and cannot override?
+        }
+
+        // not used
         public UmbracoDatabase(IDbConnection connection, ILogger logger)
             : base(connection)
         {
             _logger = logger;
-            EnableSqlTrace = false;
+            CommonInitialize();
         }
 
+        // used by DefaultDatabaseFactory
+        // creates one instance per request
+        // also used by DatabaseContext for creating DBs and upgrading
         public UmbracoDatabase(string connectionString, string providerName, ILogger logger)
             : base(connectionString, providerName)
         {
             _logger = logger;
-            EnableSqlTrace = false;
+            CommonInitialize();
         }
 
+        // not used
         public UmbracoDatabase(string connectionString, DbProviderFactory provider, ILogger logger)
             : base(connectionString, provider)
         {
             _logger = logger;
-            EnableSqlTrace = false;
+            CommonInitialize();
         }
 
+        // used by DefaultDatabaseFactory
+        // creates one instance per request
         public UmbracoDatabase(string connectionStringName, ILogger logger)
             : base(connectionStringName)
         {
             _logger = logger;
-            EnableSqlTrace = false;
+            CommonInitialize();
         }
 
-        public override IDbConnection OnConnectionOpened(IDbConnection connection)
+        protected override IDbConnection OnConnectionOpened(IDbConnection connection)
         {
+            if (connection == null) throw new ArgumentNullException("connection");
+            var con = connection as DbConnection;
+            if (con == null) throw new ArgumentException("Not a DbConnection.", "connection");
+
             // wrap the connection with a profiling connection that tracks timings 
-            return new StackExchange.Profiling.Data.ProfiledDbConnection(connection as DbConnection, MiniProfiler.Current);
+            con = new StackExchange.Profiling.Data.ProfiledDbConnection(con, MiniProfiler.Current);
+
+            // wrap the connection with a retrying connection
+            // fixme - inject policies, do not recompute all the time!
+            var connectionString = connection.ConnectionString ?? string.Empty;
+            var conRetryPolicy = RetryPolicyFactory.GetDefaultSqlConnectionRetryPolicyByConnectionString(connectionString);
+            var cmdRetryPolicy = RetryPolicyFactory.GetDefaultSqlCommandRetryPolicyByConnectionString(connectionString);
+            if (conRetryPolicy != null || cmdRetryPolicy != null)
+                con = new RetryDbConnection(con, conRetryPolicy, cmdRetryPolicy);
+
+            return con;
         }
 
-        public override void OnException(Exception x)
+        protected override void OnException(Exception x)
         {
             _logger.Error<UmbracoDatabase>("Database exception occurred", x);
             base.OnException(x);
         }
 
-        public override void OnExecutedCommand(IDbCommand cmd)
+        protected override void OnExecutedCommand(IDbCommand cmd)
         {
             if (EnableSqlTrace)
             {

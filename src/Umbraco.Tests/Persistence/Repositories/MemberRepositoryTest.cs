@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Xml.Linq;
 using Moq;
+using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -46,7 +47,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Rebuild_All_Xml_Structures()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
             MemberGroupRepository memberGroupRepository;
@@ -74,7 +75,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Rebuild_All_Xml_Structures_For_Content_Type()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
             MemberGroupRepository memberGroupRepository;
@@ -117,7 +118,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void MemberRepository_Can_Get_Member_By_Id()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
             MemberGroupRepository memberGroupRepository;
@@ -135,7 +136,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Get_Members_By_Ids()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
             MemberGroupRepository memberGroupRepository;
@@ -157,7 +158,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void MemberRepository_Can_Get_All_Members()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
             MemberGroupRepository memberGroupRepository;
@@ -182,7 +183,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void MemberRepository_Can_Perform_GetByQuery_With_Key()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
             MemberGroupRepository memberGroupRepository;
@@ -204,7 +205,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Persist_Member()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
             MemberGroupRepository memberGroupRepository;
@@ -227,7 +228,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void New_Member_Has_Built_In_Properties_By_Default()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
             MemberGroupRepository memberGroupRepository;
@@ -261,7 +262,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void MemberRepository_Does_Not_Replace_Password_When_Null()
         {
             IMember sut;
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
             MemberGroupRepository memberGroupRepository;
@@ -290,7 +291,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void MemberRepository_Can_Update_Email_And_Login_When_Changed()
         {
             IMember sut;
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
             MemberGroupRepository memberGroupRepository;
@@ -337,7 +338,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private IMember CreateTestMember(IMemberType memberType = null, string name = null, string email = null, string password = null, string username = null, Guid? key = null)
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
             MemberGroupRepository memberGroupRepository;
@@ -360,7 +361,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private IMemberType CreateTestMemberType(string alias = null)
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var provider = new NPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
             MemberGroupRepository memberGroupRepository;

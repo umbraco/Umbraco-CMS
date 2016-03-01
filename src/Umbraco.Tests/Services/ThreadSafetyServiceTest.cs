@@ -267,7 +267,7 @@ namespace Umbraco.Tests.Services
 			{
 				//Create or get a database instance for this thread.
 				var db = _dbFactory.CreateDatabase();
-				return new PetaPocoUnitOfWork(db);
+				return new NPocoUnitOfWork(db);
 			}
 
 			protected override void DisposeResources()

@@ -178,6 +178,10 @@
       <Project>{511f6d8d-7717-440a-9a57-a507e9a8b27f}</Project>
       <Name>umbraco.interfaces</Name>
     </ProjectReference>
+    <ProjectReference Include="C:\Users\Stéphane\Documents\Development\Umbraco Elements\NPoco\src\NPoco\NPoco.csproj">
+      <Project>{bccbf883-0c0d-40ff-95b6-a2777dff63dc}</Project>
+      <Name>NPoco</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
