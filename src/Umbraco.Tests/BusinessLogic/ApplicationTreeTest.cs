@@ -32,7 +32,7 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.IsNotNull(app);
 
             //create the new app tree assigned to the new app
-            ApplicationTree.MakeNew(false, false, 0, app.alias, name, name, "icon.jpg", "icon.jpg", "nullassembly", "nulltype", string.Empty);
+            ApplicationTree.MakeNew(false, false, 0, app.alias, name, name, "icon.jpg", "icon.jpg", "", "umbraco.loadContent, umbraco", string.Empty);
             var tree = ApplicationTree.getByAlias(name);
             Assert.IsNotNull(tree);
 

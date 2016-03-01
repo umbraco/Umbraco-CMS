@@ -26,6 +26,22 @@ namespace umbraco.BusinessLogic
         internal const string AppConfigFileName = "applications.config";
         private static string _appConfig;
         private static readonly object Locker = new object();
+        private static IEnumerable<Application> _allAvailableSections;
+        private static volatile bool _isInitialized = false;
+
+        /// <summary>
+        /// Initializes the service with all available application plugins
+        /// </summary>
+        /// <param name="allAvailableSections">
+        /// All application plugins found in assemblies
+        /// </param>
+        /// <remarks>
+        /// This is used to populate the app.config file with any applications declared in plugins that don't exist in the file
+        /// </remarks>
+        internal static void Initialize(IEnumerable<Application> allAvailableSections)
+        {
+            _allAvailableSections = allAvailableSections;
+        }
 
         /// <summary>
         /// gets/sets the application.config file path
@@ -49,52 +65,75 @@ namespace umbraco.BusinessLogic
         /// <summary>
         /// The cache storage for all applications
         /// </summary>
-        internal static List<Application> Apps
+        public static List<Application> GetSections()
         {
-            get
-            {
-                return ApplicationContext.Current.ApplicationCache.GetCacheItem(
-                    CacheKeys.ApplicationsCacheKey,
-                    () =>
+            return ApplicationContext.Current.ApplicationCache.GetCacheItem<List<Application>>(
+                CacheKeys.ApplicationsCacheKey,
+                () =>
+                {
+                    ////used for unit tests
+                    //if (_testApps != null)
+                    //    return _testApps;
+
+                    var list = ReadFromXmlAndSort();
+
+                    //On first access we need to do some initialization
+                    if (_isInitialized == false)
+                    {
+                        lock (Locker)
                         {
-                            ////used for unit tests
-                            //if (_testApps != null)
-                            //    return _testApps;
-
-                            var tmp = new List<Application>();
-
-                            try
+                            if (_isInitialized == false)
                             {
-                                LoadXml(doc =>
+                                //now we can check the non-volatile flag
+                                if (_allAvailableSections != null)
+                                {
+                                    var hasChanges = false;
+
+                                    LoadXml(doc =>
                                     {
-                                        foreach (var addElement in doc.Root.Elements("add").OrderBy(x =>
-                                            {
-                                                var sortOrderAttr = x.Attribute("sortOrder");
-                                                return sortOrderAttr != null ? Convert.ToInt32(sortOrderAttr.Value) : 0;
-                                            }))
+                                        //Now, load in the xml structure and update it with anything that is not declared there and save the file.
+
+                                        //NOTE: On the first iteration here, it will lazily scan all apps, etc... this is because this ienumerable is lazy
+                                        // based on the ApplicationRegistrar - and as noted there this is not an ideal way to do things but were stuck like this
+                                        // currently because of the legacy assemblies and types not in the Core.
+
+                                        //Get all the trees not registered in the config
+                                        var unregistered = _allAvailableSections
+                                            .Where(x => list.Any(l => l.alias == x.alias) == false)
+                                            .ToArray();
+
+                                        hasChanges = unregistered.Any();
+
+                                        var count = 0;
+                                        foreach (var attr in unregistered)
                                         {
-                                            var sortOrderAttr = addElement.Attribute("sortOrder");
-                                            tmp.Add(new Application(addElement.Attribute("name").Value,
-                                                                    addElement.Attribute("alias").Value,
-                                                                    addElement.Attribute("icon").Value,
-                                                                    sortOrderAttr != null ? Convert.ToInt32(sortOrderAttr.Value) : 0));
+                                            doc.Root.Add(new XElement("add",
+                                                new XAttribute("alias", attr.alias),
+                                                new XAttribute("name", attr.name),
+                                                new XAttribute("icon", attr.icon),
+                                                new XAttribute("sortOrder", attr.sortOrder)));
+                                            count++;
                                         }
 
-                                    }, false);
-                                return tmp;
-                            }
-                            catch
-                            {
-                                //this is a bit of a hack that just ensures the application doesn't crash when the
-                                //installer is run and there is no database or connection string defined.
-                                //the reason this method may get called during the installation is that the 
-                                //SqlHelper of this class is shared amongst everything "Application" wide.
+                                        //don't save if there's no changes
+                                        return count > 0;
+                                    }, true);
 
-                                //TODO: Perhaps we should log something  here??
-                                return null;
+                                    if (hasChanges)
+                                    {
+                                        //If there were changes, we need to re-read the structures from the XML
+                                        list = ReadFromXmlAndSort();
+                                    }
+                                }
+
+                                _isInitialized = true;
                             }
-                        });
-            }                   
+                        }
+                    }
+
+                    return list;
+
+                });
         }
 
         /// <summary>
@@ -200,7 +239,7 @@ namespace umbraco.BusinessLogic
         [MethodImpl(MethodImplOptions.Synchronized)]
         public static void MakeNew(string name, string alias, string icon)
         {
-            MakeNew(name, alias, icon, Apps.Max(x => x.sortOrder) + 1);
+            MakeNew(name, alias, icon, GetSections().Max(x => x.sortOrder) + 1);
         }
 
         /// <summary>
@@ -224,6 +263,9 @@ namespace umbraco.BusinessLogic
                         new XAttribute("name", name),
                         new XAttribute("icon", icon),
                         new XAttribute("sortOrder", sortOrder)));
+
+                    return true;
+
                 }, true);
 
                 //raise event
@@ -238,7 +280,7 @@ namespace umbraco.BusinessLogic
         /// <returns></returns>
         public static Application getByAlias(string appAlias)
         {
-            return Apps.Find(t => t.alias == appAlias);
+            return GetSections().Find(t => t.alias == appAlias);
         }
 
         /// <summary>
@@ -259,6 +301,9 @@ namespace umbraco.BusinessLogic
             LoadXml(doc =>
             {
                 doc.Root.Elements("add").Where(x => x.Attribute("alias") != null && x.Attribute("alias").Value == this.alias).Remove();
+
+                return true;
+
             }, true);
 
             //raise event
@@ -271,7 +316,7 @@ namespace umbraco.BusinessLogic
         /// <returns>Returns a Application Array</returns>
         public static List<Application> getAll()
         {
-            return Apps;
+            return GetSections();
         }
 
         /// <summary>
@@ -282,8 +327,32 @@ namespace umbraco.BusinessLogic
         {
             ApplicationStartupHandler.RegisterHandlers();
         }
-   
-        internal static void LoadXml(Action<XDocument> callback, bool saveAfterCallback)
+
+        private static List<Application> ReadFromXmlAndSort()
+        {
+            var tmp = new List<Application>();
+
+            LoadXml(doc =>
+            {
+                foreach (var addElement in doc.Root.Elements("add").OrderBy(x =>
+                {
+                    var sortOrderAttr = x.Attribute("sortOrder");
+                    return sortOrderAttr != null ? Convert.ToInt32(sortOrderAttr.Value) : 0;
+                }))
+                {
+                    var sortOrderAttr = addElement.Attribute("sortOrder");
+                    tmp.Add(new Application(addElement.Attribute("name").Value,
+                                        addElement.Attribute("alias").Value,
+                                        addElement.Attribute("icon").Value,
+                                        sortOrderAttr != null ? Convert.ToInt32(sortOrderAttr.Value) : 0));
+                }
+                return false;
+            }, false);
+
+            return tmp;
+        } 
+
+        internal static void LoadXml(Func<XDocument, bool> callback, bool saveAfterCallbackIfChanged)
         {
             lock (Locker)
             {
@@ -293,9 +362,9 @@ namespace umbraco.BusinessLogic
 
                 if (doc.Root != null)
                 {
-                    callback.Invoke(doc);
+                    var changed = callback.Invoke(doc);
 
-                    if (saveAfterCallback)
+                    if (saveAfterCallbackIfChanged && changed)
                     {
                         //ensure the folder is created!
                         Directory.CreateDirectory(Path.GetDirectoryName(AppConfigFilePath));

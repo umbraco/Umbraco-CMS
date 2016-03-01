@@ -14,6 +14,16 @@ namespace Umbraco.Core.Models.EntityBase
     [DataContract(IsReference = true)]
     public abstract class TracksChangesEntityBase : IRememberBeingDirty
     {
+
+        //TODO: This needs to go on to ICanBeDirty http://issues.umbraco.org/issue/U4-5662
+        public virtual IEnumerable<string> GetDirtyProperties()
+        {
+            return _propertyChangedInfo.Where(x => x.Value).Select(x => x.Key);
+        }
+
+        private bool _changeTrackingEnabled = true;
+
+
         /// <summary>
         /// Tracks the properties that have changed
         /// </summary>
@@ -35,6 +45,9 @@ namespace Umbraco.Core.Models.EntityBase
         /// <param name="propertyInfo">The property info.</param>
         protected virtual void OnPropertyChanged(PropertyInfo propertyInfo)
         {
+            //return if we're not tracking changes
+            if (_changeTrackingEnabled == false) return;
+
             _propertyChangedInfo[propertyInfo.Name] = true;
 
             if (PropertyChanged != null)
@@ -126,6 +139,22 @@ namespace Umbraco.Core.Models.EntityBase
             _propertyChangedInfo = new Dictionary<string, bool>();
         }
 
+        protected void ResetChangeTrackingCollections()
+        {
+            _propertyChangedInfo = new Dictionary<string, bool>();
+            _lastPropertyChangedInfo = new Dictionary<string, bool>();
+        }
+
+        protected void DisableChangeTracking()
+        {
+            _changeTrackingEnabled = false;
+        }
+
+        protected void EnableChangeTracking()
+        {
+            _changeTrackingEnabled = true;
+        }
+
         /// <summary>
         /// Used by inheritors to set the value of properties, this will detect if the property value actually changed and if it did
         /// it will ensure that the property has a dirty flag set.
@@ -143,12 +172,20 @@ namespace Umbraco.Core.Models.EntityBase
         {
             var initVal = value;
             var newVal = setValue(value);
+
             if (!Equals(initVal, newVal))
+
+            //don't track changes, just set the value (above)
+            if (_changeTrackingEnabled == false) return false;
+
+            if (Equals(initVal, newVal) == false)
             {
                 OnPropertyChanged(propertySelector);
                 return true;
             }
             return false;
         }
+
+
     }
 }

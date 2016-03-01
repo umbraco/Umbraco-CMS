@@ -93,7 +93,6 @@ namespace umbraco.cms.businesslogic
         /// </summary>
         public class DictionaryItem
         {
-
             private string _key;
 
             internal Guid UniqueId { get; private set; }
@@ -118,13 +117,12 @@ namespace umbraco.cms.businesslogic
             {
                 EnsureCache();
 
-                var item = DictionaryItems.Values.SingleOrDefault(x => x.key == key);
-
-                if (item == null)
+                if (!DictionaryItems.ContainsKey(key))
                 {
                     throw new ArgumentException("No key " + key + " exists in dictionary");
                 }
 
+                var item = DictionaryItems[key];
                 this.id = item.id;
                 this._key = item.key;
                 this.ParentId = item.ParentId;
