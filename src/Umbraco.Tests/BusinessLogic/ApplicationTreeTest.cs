@@ -21,6 +21,7 @@ namespace Umbraco.Tests.BusinessLogic
         /// Creates a new app tree linked to an application, then delete the application and make sure the tree is gone as well
         ///</summary>
         [Test()]
+		[Ignore]
         public void ApplicationTree_Make_New_Then_Delete_App()
         {
             //create new app
