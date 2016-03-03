@@ -82,7 +82,8 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
             statusMessage: args.statusMessage,
             saveMethod: args.saveMethod,
             scope: $scope,
-            content: $scope.content
+            content: $scope.content,
+            action: args.action
         }).then(function (data) {
             //success            
             init($scope.content);
@@ -195,15 +196,15 @@ function ContentEditController($scope, $rootScope, $routeParams, $q, $timeout, $
     };
 
     $scope.sendToPublish = function () {
-        return performSave({ saveMethod: contentResource.sendToPublish, statusMessage: "Sending..." });
+        return performSave({ saveMethod: contentResource.sendToPublish, statusMessage: "Sending...", action: "sendToPublish" });
     };
 
     $scope.saveAndPublish = function () {
-        return performSave({ saveMethod: contentResource.publish, statusMessage: "Publishing..." });
+        return performSave({ saveMethod: contentResource.publish, statusMessage: "Publishing...", action: "publish" });
     };
 
     $scope.save = function () {
-        return performSave({ saveMethod: contentResource.save, statusMessage: "Saving..." });
+        return performSave({ saveMethod: contentResource.save, statusMessage: "Saving...", action: "save" });
     };
 
     $scope.preview = function (content) {

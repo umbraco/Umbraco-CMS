@@ -1,5 +1,4 @@
 using System;
-using System.CodeDom;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -12,7 +11,6 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Profiling;
@@ -20,11 +18,10 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 
-namespace Umbraco.Tests.Mvc
+namespace Umbraco.Tests.Web.Mvc
 {
     [TestFixture]
     public class SurfaceControllerTests
@@ -165,7 +162,7 @@ namespace Umbraco.Tests.Mvc
             };
 
             var routeData = new RouteData();
-            routeData.DataTokens.Add("umbraco-route-def", routeDefinition);
+            routeData.DataTokens.Add(Umbraco.Core.Constants.Web.UmbracoRouteDefinitionDataToken, routeDefinition);
 
             var ctrl = new TestSurfaceController(umbCtx, new UmbracoHelper());
             ctrl.ControllerContext = new ControllerContext(contextBase, routeData, ctrl);

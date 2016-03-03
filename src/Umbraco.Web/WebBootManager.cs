@@ -89,7 +89,7 @@ namespace Umbraco.Web
         protected override ServiceContext CreateServiceContext(DatabaseContext dbContext, IDatabaseFactory dbFactory)
         {
             //use a request based messaging factory
-            var evtMsgs = new RequestLifespanMessagesFactory(new SingletonUmbracoContextAccessor());
+            var evtMsgs = new RequestLifespanMessagesFactory(new SingletonHttpContextAccessor());
             return new ServiceContext(
                 new RepositoryFactory(ApplicationCache, ProfilingLogger.Logger, dbContext.SqlSyntax, UmbracoConfig.For.UmbracoSettings()),
                 new PetaPocoUnitOfWorkProvider(dbFactory),
@@ -107,7 +107,7 @@ namespace Umbraco.Web
         public override IBootManager Initialize()
         {
              //This is basically a hack for this item: http://issues.umbraco.org/issue/U4-5976
-             // when Examine initializes it will try to rebuild if the indexes are empty, however in many cases not all of Examine's 
+             // when Examine initializes it will try to rebuild if the indexes are empty, however in many cases not all of Examine's
              // event handlers will be assigned during bootup when the rebuilding starts which is a problem. So with the examine 0.1.58.2941 build
              // it has an event we can subscribe to in order to cancel this rebuilding process, but what we'll do is cancel it and postpone the rebuilding until the
              // boot process has completed. It's a hack but it works.
@@ -248,8 +248,8 @@ namespace Umbraco.Web
                 //all entities are cached properly (cloned in and cloned out)
                 new DeepCloneRuntimeCacheProvider(new HttpRuntimeCacheProvider(HttpRuntime.Cache)),
                 new StaticCacheProvider(),
-                //we have no request based cache when not running in web-based context
-                new NullCacheProvider(),
+                //we need request based cache when running in web-based context
+                new HttpRequestCacheProvider(),
                 new IsolatedRuntimeCache(type =>
                     //we need to have the dep clone runtime cache provider to ensure
                     //all entities are cached properly (cloned in and cloned out)
@@ -338,7 +338,7 @@ namespace Umbraco.Web
             {
                 route.DataTokens = new RouteValueDictionary();
             }
-            route.DataTokens.Add("umbraco", "api"); //ensure the umbraco token is set
+            route.DataTokens.Add(Core.Constants.Web.UmbracoDataToken, "api"); //ensure the umbraco token is set
         }
 
         private void RouteLocalSurfaceController(Type controller, string umbracoPath)
@@ -349,7 +349,7 @@ namespace Umbraco.Web
                 umbracoPath + "/Surface/" + meta.ControllerName + "/{action}/{id}",//url to match
                 new { controller = meta.ControllerName, action = "Index", id = UrlParameter.Optional },
                 new[] { meta.ControllerNamespace }); //look in this namespace to create the controller
-            route.DataTokens.Add("umbraco", "surface"); //ensure the umbraco token is set
+            route.DataTokens.Add(Core.Constants.Web.UmbracoDataToken, "surface"); //ensure the umbraco token is set
             route.DataTokens.Add("UseNamespaceFallback", false); //Don't look anywhere else except this namespace!
             //make it use our custom/special SurfaceMvcHandler
             route.RouteHandler = new SurfaceRouteHandler();

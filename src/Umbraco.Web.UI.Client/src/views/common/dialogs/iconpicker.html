@@ -2,55 +2,48 @@
 	<div class="umb-panel-header">
 		<div class="umb-el-wrap umb-panel-buttons">
 	        <div class="form-search">
-                <i class="icon-search"></i>	                    
+                <i class="icon-search"></i>
                 <input type="text"
-                	   style="width: 100%" 
-                       ng-model="searchTerm" 
-                       class="umb-search-field search-query input-block-level" 
+                	   style="width: 100%"
+                       ng-model="searchTerm"
+                       class="umb-search-field search-query input-block-level"
                        placeholder="Filter...">
             </div>
     	</div>
 	</div>
 
 	<div class="umb-panel-body with-footer">
-        
+
         <div class="umb-control-group">
         	<select ng-model="color" class="input-block-level">
         		<option value="">Black</option>
-        		<option value="color-green">Green</option>	
-        		<option value="color-yellow">Yellow</option>	
+        		<option value="color-green">Green</option>
+        		<option value="color-yellow">Yellow</option>
         		<option value="color-orange">Orange</option>
-        		<option value="color-blue">Blue</option>	
+        		<option value="color-blue">Blue</option>
         		<option value="color-red">Red</option>
         	</select>
-<!--
-        	<select class="input-block-level">
-        		<option value="">Black</option>
-        		<option value="color-green">Green</option>	
-        		<option value="color-blue">Turquoise</option>	
-        		<option value="color-purple">Purple</option>	
-        		<option value="color-red">Red</option>	
-        		<option value="color-orange">Orange</option>	
-        		<option value="color-sky-blue">Sky blue</option>	
-        		<option value="color-yellow">Yellow</option>		
-        	</select>-->
-
         </div>
 
-        <div class="umb-loader" ng-hide="icons"></div>
+        <umb-load-indicator ng-if="loading"></umb-load-indicator>
 
-        <div class="umb-control-group">
-	        <ul class="umb-thumbnails thumbnails" ng-class="color">
-		        <li class="span1" ng-repeat="icon in icons|filter: searchTerm">
-				    <a href="#" title="{{icon}}" class="thumbnail" ng-click="submitClass(icon)" prevent-default>
-						<i class="{{icon}} large" style="font-size: 32px"></i>
+        <div class="umb-control-group" ng-show="!loading">
+	        <ul class="umb-iconpicker" ng-class="color" ng-show="icons">
+		        <li class="umb-iconpicker-item" ng-repeat="icon in filtered = (icons | filter: searchTerm) track by $id(icon)">
+				    <a href="#" title="{{icon}}" ng-click="submitClass(icon)" prevent-default>
+						<i class="{{icon}} large"></i>
 		            </a>
 		        </li>
 		    </ul>
 		</div>
 
+		<umb-empty-state
+			ng-if="filtered.length === 0"
+			position="center">
+			<localize key="defaultdialogs_noIconsFound">No icons were found.</localize>
+		</umb-empty-state>
 	</div>
-	
+
 	<div class="umb-panel-footer" >
 		<div class="umb-el-wrap umb-panel-buttons">
 	        <div class="btn-toolbar umb-btn-toolbar pull-right">

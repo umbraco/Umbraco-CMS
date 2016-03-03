@@ -17,7 +17,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 
-namespace Umbraco.Tests.Mvc
+namespace Umbraco.Tests.Web.Mvc
 {
     [TestFixture]
     public class RenderIndexActionSelectorAttributeTests

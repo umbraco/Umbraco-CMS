@@ -28,6 +28,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             GuidColumnDefinition = "char(36)";
             
             DefaultValueFormat = "DEFAULT {0}";
+
+            InitColumnTypeMap();
         }
 
         public override IEnumerable<string> GetTablesInSchema(Database db)

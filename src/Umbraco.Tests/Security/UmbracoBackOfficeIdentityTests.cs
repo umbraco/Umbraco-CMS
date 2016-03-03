@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
@@ -9,6 +8,7 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Security;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Tests.Security
 {

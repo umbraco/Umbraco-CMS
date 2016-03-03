@@ -222,14 +222,12 @@
       <Name>System.Data</Name>
     </Reference>
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Data.SqlServerCe, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
-      <HintPath>..\packages\SqlServerCE.4.0.0.0\lib\System.Data.SqlServerCe.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="System.Data.SqlServerCe, Version=4.0.0.1, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\SqlServerCE.4.0.0.1\lib\System.Data.SqlServerCe.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Data.SqlServerCe.Entity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
-      <HintPath>..\packages\SqlServerCE.4.0.0.0\lib\System.Data.SqlServerCe.Entity.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="System.Data.SqlServerCe.Entity, Version=4.0.0.1, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\SqlServerCE.4.0.0.1\lib\System.Data.SqlServerCe.Entity.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Drawing" />
@@ -2016,12 +2014,7 @@
     <Content Include="Umbraco\Translation\default.aspx" />
     <Content Include="Umbraco\Translation\preview.aspx" />
     <Content Include="Umbraco\Translation\xml.aspx" />
-    <Content Include="Umbraco\Create\content.ascx" />
     <Content Include="Umbraco\Create\language.ascx">
-      <SubType>UserControl</SubType>
-    </Content>
-    <Content Include="Umbraco\Create\member.ascx" />
-    <Content Include="Umbraco\Create\nodeType.ascx">
       <SubType>UserControl</SubType>
     </Content>
     <Content Include="Umbraco\Create\simple.ascx" />
@@ -2405,10 +2398,10 @@
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>
-    </PreBuildEvent>
-    <PostBuildEvent>xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.0\amd64\*.* "$(TargetDir)amd64\" /Y /F /E /D
-xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.0\x86\*.* "$(TargetDir)x86\" /Y /F /E /D</PostBuildEvent>
+    <PreBuildEvent>xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\amd64\*.* "$(TargetDir)amd64\" /Y /F /E /I /C /D
+xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\x86\*.* "$(TargetDir)x86\" /Y /F /E /I /C /D</PreBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
@@ -2418,9 +2411,9 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.0\x86\*.* "$(TargetDir)x86\" 
         <WebProjectProperties>
           <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>7400</DevelopmentServerPort>
+          <DevelopmentServerPort>7410</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:7400</IISUrl>
+          <IISUrl>http://localhost:7410</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

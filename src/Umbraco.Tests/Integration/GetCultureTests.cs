@@ -56,19 +56,19 @@ namespace Umbraco.Tests.Integration
             ServiceContext.DomainService.Save(new UmbracoDomain("*100112") { DomainName = "*100112", RootContentId = c3.Id, LanguageId = l2.Id });
 
             var content = c2;
-            var culture = Web.Models.ContentExtensions.GetCulture(null,
+            var culture = global::Umbraco.Web.Models.ContentExtensions.GetCulture(null,
                 ServiceContext.DomainService, ServiceContext.LocalizationService, ServiceContext.ContentService,
                 content.Id, content.Path, new Uri("http://domain1.com/"));
             Assert.AreEqual("en-US", culture.Name);
 
             content = c2;
-            culture = Web.Models.ContentExtensions.GetCulture(null,
+            culture = global::Umbraco.Web.Models.ContentExtensions.GetCulture(null,
                 ServiceContext.DomainService, ServiceContext.LocalizationService, ServiceContext.ContentService, 
                 content.Id, content.Path, new Uri("http://domain1.fr/"));
             Assert.AreEqual("fr-FR", culture.Name);
 
             content = c4;
-            culture = Web.Models.ContentExtensions.GetCulture(null,
+            culture = global::Umbraco.Web.Models.ContentExtensions.GetCulture(null,
                 ServiceContext.DomainService, ServiceContext.LocalizationService, ServiceContext.ContentService, 
                 content.Id, content.Path, new Uri("http://domain1.fr/"));
             Assert.AreEqual("de-DE", culture.Name);
@@ -104,13 +104,13 @@ namespace Umbraco.Tests.Integration
             //ServiceContext.DomainService.Save(new UmbracoDomain("*100112") { DomainName = "*100112", RootContentId = c3.Id, LanguageId = l2.Id });
 
             var content = c2;
-            var culture = Web.Models.ContentExtensions.GetCulture(null,
+            var culture = Umbraco.Web.Models.ContentExtensions.GetCulture(null,
                 ServiceContext.DomainService, ServiceContext.LocalizationService, ServiceContext.ContentService,
                 content.Id, content.Path, new Uri("http://domain1.com/"));
             Assert.AreEqual("de-DE", culture.Name);
 
             content = c4;
-            culture = Web.Models.ContentExtensions.GetCulture(null,
+            culture = Umbraco.Web.Models.ContentExtensions.GetCulture(null,
                 ServiceContext.DomainService, ServiceContext.LocalizationService, ServiceContext.ContentService,
                 content.Id, content.Path, new Uri("http://domain1.fr/"));
             Assert.AreEqual("fr-FR", culture.Name);

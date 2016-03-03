@@ -84,6 +84,11 @@ namespace Umbraco.Web.Routing
 			//   so that they point to a non-existing page eg /redirect-404.aspx
 			//   TODO: SD: We need more information on this for when we release 4.10.0 as I'm not sure what this means.
 
+            // trigger the Preparing event - at that point anything can still be changed
+            // the idea is that it is possible to change the uri
+            //
+		    _pcr.OnPreparing();
+
 			//find domain
 			FindDomain();
 
