@@ -160,15 +160,9 @@ namespace Umbraco.Web.Mvc
 
         public IModelBinder GetBinder(Type modelType)
         {
-            // can bind to RenderModel
-            if (modelType == typeof(RenderModel)) return this;
-
-            // can bind to RenderModel<TContent>
-            if (modelType.IsGenericType && modelType.GetGenericTypeDefinition() == typeof(RenderModel<>)) return this;
-
-            // can bind to TContent where TContent : IPublishedContent
-            if (typeof(IPublishedContent).IsAssignableFrom(modelType)) return this;
-            return null;
+            return TypeHelper.IsTypeAssignableFrom<IRenderModel>(modelType) || TypeHelper.IsTypeAssignableFrom<IPublishedContent>(modelType)
+                ? this
+                : null;            
         }
     }
 }
