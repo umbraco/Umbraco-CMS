@@ -1,4 +1,8 @@
+using System.Collections.Generic;
 using System.Globalization;
+using System.Web;
+using System.Web.Mvc;
+using System.Web.Routing;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
@@ -67,6 +71,75 @@ namespace Umbraco.Tests.Web.Mvc
             var content = new MyContent(Mock.Of<IPublishedContent>());
             var bound = (IRenderModel)RenderModelBinder.BindModel(content, typeof(RenderModel<MyContent>), CultureInfo.CurrentCulture);
             Assert.AreSame(content, bound.Content);
+        }
+
+        [Test]
+        public void No_DataToken_Returns_Null()
+        {
+            var binder = new RenderModelBinder();
+            var routeData = new RouteData();
+            var result = binder.BindModel(new ControllerContext(Mock.Of<HttpContextBase>(), routeData, Mock.Of<ControllerBase>()),
+                new ModelBindingContext());
+
+            Assert.IsNull(result);
+        }
+
+        [Test]
+        public void Invalid_DataToken_Model_Type_Returns_Null()
+        {
+            var binder = new RenderModelBinder();
+            var routeData = new RouteData();
+            routeData.DataTokens[Core.Constants.Web.UmbracoDataToken] = "hello";
+
+            //the value provider is the default implementation
+            var valueProvider = new Mock<IValueProvider>();
+            //also IUnvalidatedValueProvider
+            var invalidatedValueProvider = valueProvider.As<IUnvalidatedValueProvider>();
+            invalidatedValueProvider.Setup(x => x.GetValue(It.IsAny<string>(), It.IsAny<bool>())).Returns(() =>
+                new ValueProviderResult(null, "", CultureInfo.CurrentCulture));
+
+            var controllerCtx = new ControllerContext(
+                Mock.Of<HttpContextBase>(http => http.Items == new Dictionary<object, object>()),
+                routeData,
+                Mock.Of<ControllerBase>());
+
+            var result = binder.BindModel(controllerCtx,
+                new ModelBindingContext
+                {
+                    ValueProvider = valueProvider.Object,
+                    ModelMetadata = new ModelMetadata(new EmptyModelMetadataProvider(), null, () => null, typeof(IPublishedContent), "content")
+                });
+
+            Assert.IsNull(result);
+        }
+
+        [Test]
+        public void IPublishedContent_DataToken_Model_Type_Uses_DefaultImplementation()
+        {
+            var content = new MyContent(Mock.Of<IPublishedContent>());
+            var binder = new RenderModelBinder();
+            var routeData = new RouteData();
+            routeData.DataTokens[Core.Constants.Web.UmbracoDataToken] = content;
+
+            //the value provider is the default implementation
+            var valueProvider = new Mock<IValueProvider>();            
+            //also IUnvalidatedValueProvider
+            var invalidatedValueProvider = valueProvider.As<IUnvalidatedValueProvider>();
+            invalidatedValueProvider.Setup(x => x.GetValue(It.IsAny<string>(), It.IsAny<bool>())).Returns(() =>
+                new ValueProviderResult(content, "content", CultureInfo.CurrentCulture));
+
+            var controllerCtx = new ControllerContext(
+                Mock.Of<HttpContextBase>(http => http.Items == new Dictionary<object, object>()), 
+                routeData, 
+                Mock.Of<ControllerBase>());
+            var result = binder.BindModel(controllerCtx,
+                new ModelBindingContext
+                {
+                    ValueProvider = valueProvider.Object,
+                    ModelMetadata = new ModelMetadata(new EmptyModelMetadataProvider(), null, () => null, typeof(IPublishedContent), "content")
+                });
+
+            Assert.AreEqual(content, result);
         }
 
         public class MyOtherContent

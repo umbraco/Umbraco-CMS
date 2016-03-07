@@ -33,10 +33,8 @@ namespace Umbraco.Web.Mvc
             var renderModel = model as IRenderModel;
             if (renderModel == null)
             {
-                var value = bindingContext.ValueProvider.GetValue(bindingContext.ModelName);
-                if (value == null) return null;
-
-                model = value.RawValue;
+                model = base.BindModel(controllerContext, bindingContext);
+                if (model == null) return null;
             }           
 
             //if for any reason the model is not either IRenderModel or IPublishedContent, then we return since those are the only
