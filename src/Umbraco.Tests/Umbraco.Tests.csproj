@@ -245,6 +245,7 @@
     <Compile Include="Models\UmbracoEntityTests.cs" />
     <Compile Include="Models\UserTests.cs" />
     <Compile Include="Models\UserTypeTests.cs" />
+    <Compile Include="Web\Mvc\RenderModelBinderTests.cs" />
     <Compile Include="Web\Mvc\SurfaceControllerTests.cs" />
     <Compile Include="Web\Mvc\UmbracoViewPageTests.cs" />
     <Compile Include="BootManagers\CoreBootManagerTests.cs" />

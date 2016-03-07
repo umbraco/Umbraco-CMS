@@ -8,7 +8,10 @@ using Umbraco.Web.Models;
 
 namespace Umbraco.Web.Mvc
 {
-	public class RenderModelBinder : IModelBinder, IModelBinderProvider
+    /// <summary>
+    /// Allows for Model Binding any IPublishedContent or IRenderModel
+    /// </summary>
+	public class RenderModelBinder : DefaultModelBinder, IModelBinder, IModelBinderProvider
     {
 		/// <summary>
 		/// Binds the model to a value by using the specified controller context and binding context.
@@ -17,14 +20,29 @@ namespace Umbraco.Web.Mvc
 		/// The bound value.
 		/// </returns>
 		/// <param name="controllerContext">The controller context.</param><param name="bindingContext">The binding context.</param>
-		public object BindModel(ControllerContext controllerContext, ModelBindingContext bindingContext)
+		public override object BindModel(ControllerContext controllerContext, ModelBindingContext bindingContext)
 		{
             object model;
             if (controllerContext.RouteData.DataTokens.TryGetValue(Core.Constants.Web.UmbracoDataToken, out model) == false)
                 return null;
 
-            //default culture
-            var culture = CultureInfo.CurrentCulture;
+            //This model binder deals with IRenderModel and IPublishedContent by extracting the model from the route's
+            // datatokens. This data token is set in 2 places: RenderRouteHandler, UmbracoVirtualNodeRouteHandler
+            // and both always set the model to an instance of `RenderModel`. So if this isn't an instance of IRenderModel then
+            // we need to let the DefaultModelBinder deal with the logic.
+            var renderModel = model as IRenderModel;
+            if (renderModel == null)
+            {
+                model = base.BindModel(controllerContext, bindingContext);
+                if (model == null) return null;
+            }           
+
+            //if for any reason the model is not either IRenderModel or IPublishedContent, then we return since those are the only
+            // types this binder is dealing with.
+		    if ((model is IRenderModel) == false && (model is IPublishedContent) == false) return null;
+
+		    //default culture
+		    var culture = CultureInfo.CurrentCulture;
 
 		    var umbracoContext = controllerContext.GetUmbracoContext()
 		                         ?? UmbracoContext.Current;
@@ -34,8 +52,8 @@ namespace Umbraco.Web.Mvc
 		        culture = umbracoContext.PublishedContentRequest.Culture;
 		    }
 
-            return BindModel(model, bindingContext.ModelType, culture);
-        }
+		    return BindModel(model, bindingContext.ModelType, culture);
+		}
 
         // source is the model that we have
         // modelType is the type of the model that we need to bind to
@@ -140,15 +158,9 @@ namespace Umbraco.Web.Mvc
 
         public IModelBinder GetBinder(Type modelType)
         {
-            // can bind to RenderModel
-            if (modelType == typeof(RenderModel)) return this;
-
-            // can bind to RenderModel<TContent>
-            if (modelType.IsGenericType && modelType.GetGenericTypeDefinition() == typeof(RenderModel<>)) return this;
-
-            // can bind to TContent where TContent : IPublishedContent
-            if (typeof(IPublishedContent).IsAssignableFrom(modelType)) return this;
-            return null;
+            return TypeHelper.IsTypeAssignableFrom<IRenderModel>(modelType) || TypeHelper.IsTypeAssignableFrom<IPublishedContent>(modelType)
+                ? this
+                : null;            
         }
     }
 }
