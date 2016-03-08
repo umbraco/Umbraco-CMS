@@ -67,7 +67,6 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
     if ($scope.entityType === "content") {
 
         var idsWithPermissions = null;
-        var intersectPermissions = null;
 
         $scope.buttonPermissions = {
             canCopy: true,
@@ -83,24 +82,35 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
         }, function(newVal, oldVal) {
 
             if ((idsWithPermissions == null && newVal > 0) || (idsWithPermissions != null)) {
-
-                //go get the permissions for the selected items
+                
+                //get all of the selected ids
                 var ids = _.map($scope.selection, function(i) {
-                    return i.id;
+                    return i.id.toString();
                 });
 
                 //remove the dictionary items that don't have matching ids
                 var filtered = {};
                 _.each(idsWithPermissions, function (value, key, list) {
-                    if (_.contains(ids, Number(key))) {
+                    if (_.contains(ids, key)) {
                         filtered[key] = value;
-                    }                    
+                    }
                 });
                 idsWithPermissions = filtered;
 
-                contentResource.getPermissions(ids).then(function (p) {
-                    $scope.buttonPermissions = listViewHelper.getButtonPermissions(p, idsWithPermissions);
+                //find all ids that we haven't looked up permissions for
+                var existingIds = _.keys(idsWithPermissions);
+                var missingLookup = _.map(_.difference(ids, existingIds), function (i) {
+                    return Number(i);
                 });
+
+                if (missingLookup.length > 0) {
+                    contentResource.getPermissions(missingLookup).then(function(p) {
+                        $scope.buttonPermissions = listViewHelper.getButtonPermissions(p, idsWithPermissions);
+                    });
+                }
+                else {
+                    $scope.buttonPermissions = listViewHelper.getButtonPermissions({}, idsWithPermissions);
+                }
             }
         });
 
