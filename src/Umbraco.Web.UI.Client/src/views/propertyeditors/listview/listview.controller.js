@@ -64,7 +64,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
 
     //When we are dealing with 'content', we need to deal with permissions on child nodes.
     // Currently there is no real good way to 
-    if ($scope.entityType = "content") {
+    if ($scope.entityType === "content") {
 
         var idsWithPermissions = null;
         var intersectPermissions = null;
