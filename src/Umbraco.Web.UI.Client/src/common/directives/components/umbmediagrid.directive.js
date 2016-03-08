@@ -34,6 +34,13 @@
                     var item = scope.items[i];
                     setItemData(item);
                     setOriginalSize(item, itemMaxHeight);
+
+                    // remove non images when onlyImages is set to true
+                    if(scope.onlyImages === "true" && !item.isFolder && !item.thumbnail){
+                        scope.items.splice(i, 1);
+                        i--;
+                    }
+
                 }
 
                 if (scope.items.length > 0) {
@@ -181,7 +188,8 @@
                 itemMaxWidth: "@",
                 itemMaxHeight: "@",
                 itemMinWidth: "@",
-                itemMinHeight: "@"
+                itemMinHeight: "@",
+                onlyImages: "@"
             },
             link: link
         };
