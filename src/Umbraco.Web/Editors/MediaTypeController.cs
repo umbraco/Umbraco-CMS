@@ -22,7 +22,7 @@ using Umbraco.Web.Models;
 
 namespace Umbraco.Web.Editors
 {
-    //TODO:  We'll need to be careful about the security on this controller, when we start implementing 
+    //TODO:  We'll need to be careful about the security on this controller, when we start implementing
     // methods to modify content types we'll need to enforce security on the individual methods, we
     // cannot put security on the whole controller because things like GetAllowedChildren are required for content editing.
 
@@ -49,7 +49,7 @@ namespace Umbraco.Web.Editors
         public MediaTypeController(UmbracoContext umbracoContext)
             : base(umbracoContext)
         {
-           
+
         }
 
         public int GetCount()
@@ -112,7 +112,7 @@ namespace Umbraco.Web.Editors
                     contentType = x.Item1,
                     allowed = x.Item2
                 });
-            return Request.CreateResponse(result);            
+            return Request.CreateResponse(result);
         }
 
         public MediaTypeDisplay GetEmpty(int parentId)
@@ -129,8 +129,8 @@ namespace Umbraco.Web.Editors
         /// Returns all member types
         /// </summary>
         public IEnumerable<ContentTypeBasic> GetAll()
-        {   
-            
+        {
+
             return Services.ContentTypeService.GetAllMediaTypes()
                                .Select(Mapper.Map<IMediaType, ContentTypeBasic>);
         }
@@ -154,7 +154,7 @@ namespace Umbraco.Web.Editors
             var result = Services.ContentTypeService.CreateMediaTypeContainer(parentId, name, Security.CurrentUser.Id);
 
             return result
-                ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id 
+                ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id
                 : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
         }
 
@@ -228,10 +228,22 @@ namespace Umbraco.Web.Editors
         public HttpResponseMessage PostMove(MoveOrCopy move)
         {
             return PerformMove(
-                move, 
-                getContentType: i => Services.ContentTypeService.GetMediaType(i), 
-                doMove:         (type, i) => Services.ContentTypeService.MoveMediaType(type, i));            
+                move,
+                getContentType: i => Services.ContentTypeService.GetMediaType(i),
+                doMove: (type, i) => Services.ContentTypeService.MoveMediaType(type, i));
         }
-        
+
+        /// <summary>
+        /// Copy the media type
+        /// </summary>
+        /// <param name="copy"></param>
+        /// <returns></returns>
+        public HttpResponseMessage PostCopy(MoveOrCopy copy)
+        {
+            return PerformCopy(
+                copy,
+                getContentType: i => Services.ContentTypeService.GetMediaType(i),
+                doCopy: (type, i) => Services.ContentTypeService.CopyMediaType(type, i));
+        }
     }
 }

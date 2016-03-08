@@ -1212,5 +1212,19 @@ AND umbracoNode.id <> @id",
         {
             return PerformExists(id);
         }
+
+        public string GetUniqueAlias(string alias)
+        {
+            // alias is unique accross ALL content types!
+            var aliasColumn = SqlSyntax.GetQuotedColumnName("alias");
+            var aliases = Database.Fetch<string>(@"SELECT cmsContentType." + aliasColumn + @" FROM cmsContentType
+INNER JOIN umbracoNode ON cmsContentType.nodeId = umbracoNode.id
+WHERE cmsContentType." + aliasColumn + @" LIKE @pattern",
+                new { pattern = alias + "%", objectType = NodeObjectTypeId });
+            var i = 1;
+            string test;
+            while (aliases.Contains(test = alias + i)) i++;
+            return test;
+        }
     }
 }
