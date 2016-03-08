@@ -36,15 +36,16 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Where(GetBaseWhereClause(), new { Id = id });
             sql.OrderByDescending<NodeDto>(SqlSyntax, x => x.NodeId);
 
-            var dtos =
-                Database.Fetch<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto, MemberTypeReadOnlyDto>(
-                    new PropertyTypePropertyGroupRelator().Map, sql);
+            var dto = Database
+                .FetchMultiple<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto>(sql)
+                .Map(new PropertyTypePropertyGroupRelator().Map)
+                .FirstOrDefault();
 
-            if (dtos == null || dtos.Any() == false)
+            if (dto == null)
                 return null;
 
             var factory = new MemberTypeReadOnlyFactory();
-            var member = factory.BuildEntity(dtos.First());
+            var member = factory.BuildEntity(dto);
 
             return member;
         }
@@ -59,9 +60,10 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             sql.OrderByDescending<NodeDto>(SqlSyntax, x => x.NodeId);
 
-            var dtos =
-                Database.Fetch<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto, MemberTypeReadOnlyDto>(
-                    new PropertyTypePropertyGroupRelator().Map, sql);
+            var dtos = Database
+                .FetchMultiple<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto>(sql)
+                .Map(new PropertyTypePropertyGroupRelator().Map)
+                .ToList();
 
             return BuildFromDtos(dtos);
         }
@@ -75,9 +77,10 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Append(new Sql("WHERE umbracoNode.id IN (" + subquery.SQL + ")", subquery.Arguments))
                 .OrderBy<NodeDto>(SqlSyntax, x => x.SortOrder);
 
-            var dtos =
-                Database.Fetch<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto, MemberTypeReadOnlyDto>(
-                    new PropertyTypePropertyGroupRelator().Map, sql);
+            var dtos = Database
+                .FetchMultiple<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto>(sql)
+                .Map(new PropertyTypePropertyGroupRelator().Map)
+                .ToList();
 
             return BuildFromDtos(dtos);
         }
@@ -262,15 +265,16 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Where("umbracoNode.uniqueID = @Id", new { Id = id });
             sql.OrderByDescending<NodeDto>(SqlSyntax, x => x.NodeId);
 
-            var dtos =
-                Database.Fetch<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto, MemberTypeReadOnlyDto>(
-                    new PropertyTypePropertyGroupRelator().Map, sql);
+            var dto = Database
+                .FetchMultiple<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto>(sql)
+                .Map(new PropertyTypePropertyGroupRelator().Map)
+                .FirstOrDefault();
 
-            if (dtos == null || dtos.Any() == false)
+            if (dto == null)
                 return null;
 
             var factory = new MemberTypeReadOnlyFactory();
-            var member = factory.BuildEntity(dtos.First());
+            var member = factory.BuildEntity(dto);
 
             return member;
         }
@@ -285,9 +289,10 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             sql.OrderByDescending<NodeDto>(SqlSyntax, x => x.NodeId);
 
-            var dtos =
-                Database.Fetch<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto, MemberTypeReadOnlyDto>(
-                    new PropertyTypePropertyGroupRelator().Map, sql);
+            var dtos = Database
+                .FetchMultiple<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto>(sql)
+                .Map(new PropertyTypePropertyGroupRelator().Map)
+                .ToList();
 
             return BuildFromDtos(dtos);
         }

@@ -70,7 +70,7 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override ITemplate PerformGet(int id)
         {
             var sql = GetBaseQuery(false).Where<TemplateDto>(SqlSyntax, x => x.NodeId == id);
-            var result = Database.Fetch<TemplateDto, NodeDto>(sql).FirstOrDefault();
+            var result = Database.FetchMultiple<TemplateDto, NodeDto>(sql).Item1.FirstOrDefault();
             if (result == null) return null;
 
             //look up the simple template definitions that have a master template assigned, this is used 
@@ -93,7 +93,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 sql.Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
             }
 
-            var dtos = Database.Fetch<TemplateDto, NodeDto>(sql);
+            var dtos = Database.FetchMultiple<TemplateDto, NodeDto>(sql).Item1;
 
             if (dtos.Count == 0) return Enumerable.Empty<ITemplate>();
 
@@ -117,7 +117,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var translator = new SqlTranslator<ITemplate>(sqlClause, query);
             var sql = translator.Translate();
 
-            var dtos = Database.Fetch<TemplateDto, NodeDto>(sql);
+            var dtos = Database.FetchMultiple<TemplateDto, NodeDto>(sql).Item1;
 
             if (dtos.Count == 0) return Enumerable.Empty<ITemplate>();
 
@@ -483,7 +483,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var sql = GetBaseQuery(false).Where<TemplateDto>(SqlSyntax, x => x.Alias == alias);
 
-            var dto = Database.Fetch<TemplateDto, NodeDto>(sql).FirstOrDefault();
+            var dto = Database.FetchMultiple<TemplateDto, NodeDto>(sql).Item1.FirstOrDefault();
 
             if (dto == null)
                 return null;
@@ -500,7 +500,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 sql.Where("cmsTemplate.alias IN (@aliases)", new {aliases = aliases});
             }
 
-            var dtos = Database.Fetch<TemplateDto, NodeDto>(sql).ToArray();
+            var dtos = Database.FetchMultiple<TemplateDto, NodeDto>(sql).Item1.ToArray();
             if (dtos.Length == 0) return Enumerable.Empty<ITemplate>();
 
             var axisDefos = GetAxisDefinitions(dtos).ToArray();
@@ -519,7 +519,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 sql.Where<NodeDto>(SqlSyntax, x => x.ParentId == masterTemplateId);
             }
 
-            var dtos = Database.Fetch<TemplateDto, NodeDto>(sql).ToArray();
+            var dtos = Database.FetchMultiple<TemplateDto, NodeDto>(sql).Item1.ToArray();
             if (dtos.Length == 0) return Enumerable.Empty<ITemplate>();
 
             var axisDefos = GetAxisDefinitions(dtos).ToArray();
@@ -543,7 +543,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 sql.Where<NodeDto>(SqlSyntax, x => x.ParentId == parent.Value);
             }
 
-            var dtos = Database.Fetch<TemplateDto, NodeDto>(sql).ToArray();
+            var dtos = Database.FetchMultiple<TemplateDto, NodeDto>(sql).Item1.ToArray();
             if (dtos.Length == 0) return Enumerable.Empty<ITemplate>();
 
             var axisDefos = GetAxisDefinitions(dtos).ToArray();
@@ -571,7 +571,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             sql.OrderBy("umbracoNode." + SqlSyntax.GetQuotedColumnName("level"));
 
-            var dtos = Database.Fetch<TemplateDto, NodeDto>(sql).ToArray();
+            var dtos = Database.FetchMultiple<TemplateDto, NodeDto>(sql).Item1.ToArray();
             if (dtos.Length == 0) return Enumerable.Empty<ITemplate>();
 
             var axisDefos = GetAxisDefinitions(dtos).ToArray();

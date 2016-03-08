@@ -67,7 +67,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Where<DocumentDto>(SqlSyntax, x => x.Newest)
                 .OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate);
 
-            var dto = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sql).FirstOrDefault();
+            var dto = Database.FetchMultiple<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sql).Item1.FirstOrDefault();
 
             if (dto == null)
                 return null;
@@ -257,7 +257,7 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Where("cmsContentVersion.VersionId = @VersionId", new { VersionId = versionId });
             sql.OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate);
 
-            var dto = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sql).FirstOrDefault();
+            var dto = Database.FetchMultiple<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sql).Item1.FirstOrDefault();
 
             if (dto == null)
                 return null;
@@ -296,7 +296,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Where<ContentVersionDto>(SqlSyntax, x => x.NodeId == id)
                 .Where<ContentVersionDto>(SqlSyntax, x => x.VersionDate < versionDate)
                 .Where<DocumentDto>(SqlSyntax, x => x.Newest != true);
-            var list = Database.Fetch<DocumentDto, ContentVersionDto>(sql);
+            var list = Database.FetchMultiple<DocumentDto, ContentVersionDto>(sql).Item1;
             if (list.Any() == false) return;
 
             using (var transaction = Database.GetTransaction())
@@ -660,7 +660,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                 .OrderBy<NodeDto>(SqlSyntax, x => x.SortOrder);
 
             //NOTE: This doesn't allow properties to be part of the query
-            var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sql);
+            var dtos = Database.FetchMultiple<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sql).Item1;
 
             foreach (var dto in dtos)
             {
@@ -818,7 +818,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private IEnumerable<IContent> ProcessQuery(Sql sql)
         {
             //NOTE: This doesn't allow properties to be part of the query
-            var dtos = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sql);
+            var dtos = Database.FetchMultiple<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(sql).Item1;
 
             //nothing found
             if (dtos.Any() == false) return Enumerable.Empty<IContent>();

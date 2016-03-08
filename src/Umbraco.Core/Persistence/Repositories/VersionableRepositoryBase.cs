@@ -53,11 +53,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Where<NodeDto>(SqlSyntax, x => x.NodeId == id)
                 .OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate);
 
-            var dtos = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sql);
-            foreach (var dto in dtos)
-            {
-                yield return GetByVersion(dto.VersionId);
-            }
+            var dtos = Database.FetchMultiple<ContentVersionDto, ContentDto, NodeDto>(sql).Item1;
+            return dtos.Select(x => GetByVersion(x.VersionId));
         }
 
         public virtual void DeleteVersion(Guid versionId)

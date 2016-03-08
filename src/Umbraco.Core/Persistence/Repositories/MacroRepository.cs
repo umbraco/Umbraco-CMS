@@ -29,7 +29,10 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
 
-            var macroDto = Database.Fetch<MacroDto, MacroPropertyDto, MacroDto>(new MacroPropertyRelator().Map, sql).FirstOrDefault();
+            var macroDto = Database
+                .FetchMultiple<MacroDto, MacroPropertyDto>(sql)
+                .Map(new MacroPropertyRelator().Map)
+                .FirstOrDefault();
             if (macroDto == null)
                 return null;
 
@@ -52,8 +55,10 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var sql = GetBaseQuery(false);
 
-            return ConvertFromDtos(Database.Fetch<MacroDto, MacroPropertyDto, MacroDto>(new MacroPropertyRelator().Map, sql))
-                .ToArray();// we don't want to re-iterate again!
+            var dtos = Database
+                .FetchMultiple<MacroDto, MacroPropertyDto>(sql)
+                .Map(new MacroPropertyRelator().Map);
+            return ConvertFromDtos(dtos).ToArray(); // do it now and once
         }
 
         private IEnumerable<IMacro> PerformGetAllOnIds(params int[] ids)
@@ -84,12 +89,10 @@ namespace Umbraco.Core.Persistence.Repositories
             var translator = new SqlTranslator<IMacro>(sqlClause, query);
             var sql = translator.Translate();
 
-            var dtos = Database.Fetch<MacroDto, MacroPropertyDto, MacroDto>(new MacroPropertyRelator().Map, sql);
-
-            foreach (var dto in dtos)
-            {
-                yield return Get(dto.Id);
-            }
+            return Database
+                .FetchMultiple<MacroDto, MacroPropertyDto>(sql)
+                .Map(new MacroPropertyRelator().Map)
+                .Select(x => Get(x.Id));
         }
 
         protected override Sql GetBaseQuery(bool isCount)

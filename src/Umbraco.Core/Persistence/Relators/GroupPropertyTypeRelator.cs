@@ -43,6 +43,5 @@ namespace Umbraco.Core.Persistence.Relators
             // Return the now populated previous Tab (or null if first time through)
             return prev;
         }
-
     }
 }

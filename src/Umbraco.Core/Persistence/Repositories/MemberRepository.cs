@@ -56,7 +56,7 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Where(GetBaseWhereClause(), new { Id = id });
             sql.OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate);
 
-            var dto = Database.Fetch<MemberDto, ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
+            var dto = Database.FetchMultiple<MemberDto, ContentVersionDto, ContentDto, NodeDto>(sql).Item1.FirstOrDefault();
 
             if (dto == null)
                 return null;
@@ -470,7 +470,7 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Where("cmsContentVersion.VersionId = @VersionId", new { VersionId = versionId });
             sql.OrderByDescending<ContentVersionDto>(SqlSyntax, x => x.VersionDate);
 
-            var dto = Database.Fetch<MemberDto, ContentVersionDto, ContentDto, NodeDto>(sql).FirstOrDefault();
+            var dto = Database.FetchMultiple<MemberDto, ContentVersionDto, ContentDto, NodeDto>(sql).Item1.FirstOrDefault();
 
             if (dto == null)
                 return null;
@@ -674,7 +674,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private IEnumerable<IMember> ProcessQuery(Sql sql)
         {
             //NOTE: This doesn't allow properties to be part of the query
-            var dtos = Database.Fetch<MemberDto, ContentVersionDto, ContentDto, NodeDto>(sql);
+            var dtos = Database.FetchMultiple<MemberDto, ContentVersionDto, ContentDto, NodeDto>(sql).Item1;
 
             var ids = dtos.Select(x => x.ContentVersionDto.ContentDto.ContentTypeId).ToArray();
 

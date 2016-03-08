@@ -62,7 +62,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 dataTypeSql.Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == NodeObjectTypeId);
             }
 
-            var dtos = Database.Fetch<DataTypeDto, NodeDto>(dataTypeSql);
+            var dtos = Database.FetchMultiple<DataTypeDto, NodeDto>(dataTypeSql).Item1;
             return dtos.Select(factory.BuildEntity).ToArray();
         }
 
@@ -74,7 +74,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var translator = new SqlTranslator<IDataTypeDefinition>(sqlClause, query);
             var sql = translator.Translate();
 
-            var dtos = Database.Fetch<DataTypeDto, NodeDto>(sql);
+            var dtos = Database.FetchMultiple<DataTypeDto, NodeDto>(sql).Item1;
 
             return dtos.Select(factory.BuildEntity).ToArray();
         }

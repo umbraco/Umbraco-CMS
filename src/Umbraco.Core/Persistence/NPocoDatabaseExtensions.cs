@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -248,7 +249,7 @@ namespace Umbraco.Core.Persistence
         internal static IDbCommand[] GenerateBulkInsertCommand<T>(
             this Database db,
             IEnumerable<T> collection,
-            IDbConnection connection,
+            DbConnection connection,
             out string[] sql)
         {
             //A filter used below a few times to get all columns except result cols and not the primary key if it is auto-incremental
@@ -331,54 +332,6 @@ namespace Umbraco.Core.Persistence
         {
             var transaction = database.Transaction;
             return transaction == null ? IsolationLevel.Unspecified : transaction.IsolationLevel;
-        }
-
-        public static List<TRet> Fetch<T1, T2, T3, T4, T5, TRet>(this Database database,
-            Func<T1, T2, T3, T4, T5, TRet> cb, string sql, params object[] args)
-        {
-            return database.Query(cb, sql, args).ToList();
-        }
-
-        public static IEnumerable<TRet> Query<T1, T2, T3, T4, T5, TRet>(this Database database,
-            Func<T1, T2, T3, T4, T5, TRet> cb, string sql, params object[] args)
-        {
-            return database.Query<TRet>(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5) }, cb, new Sql(sql, args));
-        }
-
-        public static List<TRet> Fetch<T1, T2, T3, T4, T5, TRet>(this Database database,
-            Func<T1, T2, T3, T4, T5, TRet> cb, Sql sql)
-        {
-            return database.Query(cb, sql.SQL, sql.Arguments).ToList();
-        }
-
-        public static IEnumerable<TRet> Query<T1, T2, T3, T4, T5, TRet>(this Database database,
-            Func<T1, T2, T3, T4, T5, TRet> cb, Sql sql)
-        {
-            return database.Query<TRet>(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5) }, cb, sql);
-        }
-
-        public static List<T1> Fetch<T1, T2, T3, T4, T5>(this Database database,
-            string sql, params object[] args)
-        {
-            return database.Query<T1, T2, T3, T4, T5>(sql, args).ToList();
-        }
-
-        public static IEnumerable<T1> Query<T1, T2, T3, T4, T5>(this Database database,
-            string sql, params object[] args)
-        {
-            return database.Query<T1>(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5) }, null, new Sql(sql, args));
-        }
-
-        public static List<T1> Fetch<T1, T2, T3, T4, T5>(this Database database,
-            Sql sql)
-        {
-            return database.Query<T1, T2, T3, T4, T5>(sql.SQL, sql.Arguments).ToList();
-        }
-
-        public static IEnumerable<T1> Query<T1, T2, T3, T4, T5>(this Database database,
-            Sql sql)
-        {
-            return database.Query<T1>(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5) }, null, sql);
         }
     }
 }

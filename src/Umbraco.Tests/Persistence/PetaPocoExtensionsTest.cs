@@ -16,6 +16,8 @@ using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Persistence
 {
+    // fixme - what shall we do with those tests?
+    //
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, NUnit.Framework.Ignore]
     public class PetaPocoCachesTest : BaseServiceTest
@@ -31,81 +33,72 @@ namespace Umbraco.Tests.Persistence
         ///
         /// This test confirms this, if you analyze the DIFFERENCE output below you can see why the cached queries grow.
         /// </remarks>
-        [Test]
-        public void Check_Peta_Poco_Caches()
-        {
-            var result = new List<Tuple<double, int, IEnumerable<string>>>();
+        //[Test]
+        //public void Check_Peta_Poco_Caches()
+        //{
+        //    var result = new List<Tuple<double, int, IEnumerable<string>>>();
 
-            MappingFactory.UseLongKeys = true;
+        //    Database.PocoData.UseLongKeys = true;
 
-            for (int i = 0; i < 2; i++)
-            {
-                int id1, id2, id3;
-                string alias;
-                CreateStuff(out id1, out id2, out id3, out alias);
-                QueryStuff(id1, id2, id3, alias);
+        //    for (int i = 0; i < 2; i++)
+        //    {
+        //        int id1, id2, id3;
+        //        string alias;
+        //        CreateStuff(out id1, out id2, out id3, out alias);
+        //        QueryStuff(id1, id2, id3, alias);
 
-                double totalBytes1;
-                IEnumerable<string> keys;
-                // fixme - which cache?!
-                totalBytes1 = 0;
-                keys = Enumerable.Empty<string>();
-                //Console.Write(PocoData.PrintDebugCacheReport(out totalBytes1, out keys));
+        //        double totalBytes1;
+        //        IEnumerable<string> keys;
+        //        Console.Write(PocoData.PrintDebugCacheReport(out totalBytes1, out keys));
 
-                result.Add(new Tuple<double, int, IEnumerable<string>>(totalBytes1, keys.Count(), keys));
-            }
+        //        result.Add(new Tuple<double, int, IEnumerable<string>>(totalBytes1, keys.Count(), keys));
+        //    }
 
-            for (int index = 0; index < result.Count; index++)
-            {
-                var tuple = result[index];
-                Console.WriteLine("Bytes: {0}, Delegates: {1}", tuple.Item1, tuple.Item2);
-                if (index != 0)
-                {
-                    Console.WriteLine("----------------DIFFERENCE---------------------");
-                    var diff = tuple.Item3.Except(result[index - 1].Item3);
-                    foreach (var d in diff)
-                    {
-                        Console.WriteLine(d);
-                    }
-                }
+        //    for (int index = 0; index < result.Count; index++)
+        //    {
+        //        var tuple = result[index];
+        //        Console.WriteLine("Bytes: {0}, Delegates: {1}", tuple.Item1, tuple.Item2);
+        //        if (index != 0)
+        //        {
+        //            Console.WriteLine("----------------DIFFERENCE---------------------");
+        //            var diff = tuple.Item3.Except(result[index - 1].Item3);
+        //            foreach (var d in diff)
+        //            {
+        //                Console.WriteLine(d);
+        //            }
+        //        }
 
-            }
+        //    }
 
-            var allByteResults = result.Select(x => x.Item1).Distinct();
-            var totalKeys = result.Select(x => x.Item2).Distinct();
+        //    var allByteResults = result.Select(x => x.Item1).Distinct();
+        //    var totalKeys = result.Select(x => x.Item2).Distinct();
 
-            Assert.AreEqual(1, allByteResults.Count());
-            Assert.AreEqual(1, totalKeys.Count());
-        }
+        //    Assert.AreEqual(1, allByteResults.Count());
+        //    Assert.AreEqual(1, totalKeys.Count());
+        //}
 
-        [Test]
-        public void Verify_Memory_Expires()
-        {
-            // MappingFactory uses Cache<string, Delegate>
-            Cache<string, Delegate>.SlidingExpirationSeconds = 2;
+        //[Test]
+        //public void Verify_Memory_Expires()
+        //{
+        //    Database.PocoData.SlidingExpirationSeconds = 2;
 
-            // fixme - wtf?
-            /*
-            var managedCache = new Database.ManagedCache();
-            var pocoDataFactory = new UmbracoDatabase().PocoDataFactory;
-            var z = pocoDataFactory.
+        //    var managedCache = new Database.ManagedCache();
 
-            int id1, id2, id3;
-            string alias;
-            CreateStuff(out id1, out id2, out id3, out alias);
-            QueryStuff(id1, id2, id3, alias);
+        //    int id1, id2, id3;
+        //    string alias;
+        //    CreateStuff(out id1, out id2, out id3, out alias);
+        //    QueryStuff(id1, id2, id3, alias);
 
-            var count1 = managedCache.GetCache().GetCount();
-            Console.WriteLine("Keys = " + count1);
-            Assert.Greater(count1, 0);
+        //    var count1 = managedCache.GetCache().GetCount();
+        //    Console.WriteLine("Keys = " + count1);
+        //    Assert.Greater(count1, 0);
 
-            Thread.Sleep(10000);
+        //    Thread.Sleep(10000);
 
-            var count2 = managedCache.GetCache().GetCount();
-            Console.WriteLine("Keys = " + count2);
-            Assert.Less(count2, count1);
-            */
-        }
+        //    var count2 = managedCache.GetCache().GetCount();
+        //    Console.WriteLine("Keys = " + count2);
+        //    Assert.Less(count2, count1);
+        //}
 
         private void QueryStuff(int id1, int id2, int id3, string alias1)
         {

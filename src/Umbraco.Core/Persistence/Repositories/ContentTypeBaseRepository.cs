@@ -99,12 +99,10 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = translator.Translate()
                                 .OrderBy<PropertyTypeDto>(SqlSyntax, x => x.PropertyTypeGroupId);
 
-            var dtos = Database.Fetch<PropertyTypeGroupDto, PropertyTypeDto, DataTypeDto, PropertyTypeGroupDto>(new GroupPropertyTypeRelator().Map, sql);
-
-            foreach (var dto in dtos.DistinctBy(x => x.ContentTypeNodeId))
-            {
-                yield return dto.ContentTypeNodeId;
-            }
+            return Database
+                .FetchMultiple<PropertyTypeGroupDto, PropertyTypeDto, DataTypeDto>(sql)
+                .Map(new GroupPropertyTypeRelator().Map)
+                .Select(x => x.ContentTypeNodeId).Distinct();
         }
 
         protected virtual PropertyType CreatePropertyType(string propertyEditorAlias, DataTypeDatabaseType dbType, string propertyTypeAlias)
@@ -275,7 +273,7 @@ AND umbracoNode.id <> @id",
                    .Where<NodeDto>(SqlSyntax, x => x.NodeObjectType == new Guid(Constants.ObjectTypes.Document))
                    .Where<ContentDto>(SqlSyntax, x => x.ContentTypeId == entity.Id);
 
-                var contentDtos = Database.Fetch<ContentDto, NodeDto>(sql);
+                var contentDtos = Database.FetchMultiple<ContentDto, NodeDto>(sql).Item1;
                 //Loop through all tracked keys, which corresponds to the ContentTypes that has been removed from the composition
                 foreach (var key in compositionBase.RemovedContentTypeKeyTracker)
                 {
@@ -426,7 +424,7 @@ AND umbracoNode.id <> @id",
                .On<ContentTypeAllowedContentTypeDto, ContentTypeDto>(SqlSyntax, left => left.AllowedId, right => right.NodeId)
                .Where<ContentTypeAllowedContentTypeDto>(SqlSyntax, x => x.Id == id);
 
-            var allowedContentTypeDtos = Database.Fetch<ContentTypeAllowedContentTypeDto, ContentTypeDto>(sql);
+            var allowedContentTypeDtos = Database.FetchMultiple<ContentTypeAllowedContentTypeDto, ContentTypeDto>(sql).Item1;
             return allowedContentTypeDtos.Select(x => new ContentTypeSort(new Lazy<int>(() => x.AllowedId), x.SortOrder, x.ContentTypeDto.Alias)).ToList();
         }
 
@@ -442,7 +440,10 @@ AND umbracoNode.id <> @id",
                .Where<PropertyTypeGroupDto>(SqlSyntax, x => x.ContentTypeNodeId == id)
                .OrderBy<PropertyTypeGroupDto>(SqlSyntax, x => x.Id);
 
-            var dtos = Database.Fetch<PropertyTypeGroupDto, PropertyTypeDto, DataTypeDto, PropertyTypeGroupDto>(new GroupPropertyTypeRelator().Map, sql);
+
+            var dtos = Database
+                .FetchMultiple<PropertyTypeGroupDto, PropertyTypeDto, DataTypeDto>(sql)
+                .Map(new GroupPropertyTypeRelator().Map);
 
             var propertyGroupFactory = new PropertyGroupFactory(id, createDate, updateDate, CreatePropertyType);
             var propertyGroups = propertyGroupFactory.BuildEntity(dtos);
@@ -458,7 +459,7 @@ AND umbracoNode.id <> @id",
                .On<PropertyTypeDto, DataTypeDto>(SqlSyntax, left => left.DataTypeId, right => right.DataTypeId)
                .Where<PropertyTypeDto>(SqlSyntax, x => x.ContentTypeId == id);
 
-            var dtos = Database.Fetch<PropertyTypeDto, DataTypeDto>(sql);
+            var dtos = Database.FetchMultiple<PropertyTypeDto, DataTypeDto>(sql).Item1;
 
             //TODO Move this to a PropertyTypeFactory
             var list = new List<PropertyType>();

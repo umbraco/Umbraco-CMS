@@ -15,12 +15,15 @@ namespace Umbraco.Core.Persistence
     /// Represents the Umbraco implementation of the PetaPoco Database object
     /// </summary>
     /// <remarks>
-    /// Currently this object exists for 'future proofing' our implementation. By having our own inheritied implementation we 
+    /// Currently this object exists for 'future proofing' our implementation. By having our own inheritied implementation we
     /// can then override any additional execution (such as additional loggging, functionality, etc...) that we need to without breaking compatibility since we'll always be exposing
-    /// this object instead of the base PetaPoco database object.	
+    /// this object instead of the base PetaPoco database object.
     /// </remarks>
     public class UmbracoDatabase : Database, IDisposeOnRequestEnd
     {
+        // Umbraco's default isolation level is RepeatableRead
+        private const IsolationLevel DefaultIsolationLevel = IsolationLevel.RepeatableRead;
+
         private readonly ILogger _logger;
         private readonly Guid _instanceId = Guid.NewGuid();
         private bool _enableCount;
@@ -63,31 +66,18 @@ namespace Umbraco.Core.Persistence
         private void CommonInitialize()
         {
             EnableSqlTrace = false;
-            Mapper = new PocoMapper(); // fixme inject!
-            IsolationLevel = IsolationLevel.RepeatableRead; // fixme else comes from dbType.GetDefaultTransactionIsolationLevel() and cannot override?
-        }
 
-        // not used
-        public UmbracoDatabase(IDbConnection connection, ILogger logger)
-            : base(connection)
-        {
-            _logger = logger;
-            CommonInitialize();
+            // fixme - should inject somehow
+            // fixme - NPoco v2 has only 1 mapper, v3 has a collection?
+            Mappers.Clear();
+            Mappers.Add(new PocoMapper());
         }
 
         // used by DefaultDatabaseFactory
         // creates one instance per request
         // also used by DatabaseContext for creating DBs and upgrading
         public UmbracoDatabase(string connectionString, string providerName, ILogger logger)
-            : base(connectionString, providerName)
-        {
-            _logger = logger;
-            CommonInitialize();
-        }
-
-        // not used
-        public UmbracoDatabase(string connectionString, DbProviderFactory provider, ILogger logger)
-            : base(connectionString, provider)
+            : base(connectionString, providerName, DefaultIsolationLevel)
         {
             _logger = logger;
             CommonInitialize();
@@ -96,20 +86,18 @@ namespace Umbraco.Core.Persistence
         // used by DefaultDatabaseFactory
         // creates one instance per request
         public UmbracoDatabase(string connectionStringName, ILogger logger)
-            : base(connectionStringName)
+            : base(connectionStringName, DefaultIsolationLevel)
         {
             _logger = logger;
             CommonInitialize();
         }
 
-        protected override IDbConnection OnConnectionOpened(IDbConnection connection)
+        protected override DbConnection OnConnectionOpened(DbConnection connection)
         {
             if (connection == null) throw new ArgumentNullException("connection");
-            var con = connection as DbConnection;
-            if (con == null) throw new ArgumentException("Not a DbConnection.", "connection");
 
-            // wrap the connection with a profiling connection that tracks timings 
-            con = new StackExchange.Profiling.Data.ProfiledDbConnection(con, MiniProfiler.Current);
+            // wrap the connection with a profiling connection that tracks timings
+            connection = new StackExchange.Profiling.Data.ProfiledDbConnection(connection, MiniProfiler.Current);
 
             // wrap the connection with a retrying connection
             // fixme - inject policies, do not recompute all the time!
@@ -117,9 +105,9 @@ namespace Umbraco.Core.Persistence
             var conRetryPolicy = RetryPolicyFactory.GetDefaultSqlConnectionRetryPolicyByConnectionString(connectionString);
             var cmdRetryPolicy = RetryPolicyFactory.GetDefaultSqlCommandRetryPolicyByConnectionString(connectionString);
             if (conRetryPolicy != null || cmdRetryPolicy != null)
-                con = new RetryDbConnection(con, conRetryPolicy, cmdRetryPolicy);
+                connection = new RetryDbConnection(connection, conRetryPolicy, cmdRetryPolicy);
 
-            return con;
+            return connection;
         }
 
         protected override void OnException(Exception x)
@@ -128,7 +116,7 @@ namespace Umbraco.Core.Persistence
             base.OnException(x);
         }
 
-        protected override void OnExecutedCommand(IDbCommand cmd)
+        protected override void OnExecutedCommand(DbCommand cmd)
         {
             if (EnableSqlTrace)
             {

@@ -39,12 +39,17 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
 
-            var taskDto = Database.Fetch<AccessDto, AccessRuleDto, AccessDto>(new AccessRulesRelator().Map, sql).FirstOrDefault();
-            if (taskDto == null)
+            var dto = Database
+                .FetchMultiple<AccessDto, AccessRuleDto>(sql)
+                .Map(new AccessRulesRelator().Map)
+                .FirstOrDefault();
+
+            if (dto == null)
                 return null;
 
             var factory = new PublicAccessEntryFactory();
-            var entity = factory.BuildEntity(taskDto);
+            var entity = factory.BuildEntity(dto);
+
             return entity;
         }
 
@@ -58,7 +63,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             var factory = new PublicAccessEntryFactory();
-            var dtos = Database.Fetch<AccessDto, AccessRuleDto, AccessDto>(new AccessRulesRelator().Map, sql);
+            var dtos = Database.FetchMultiple<AccessDto, AccessRuleDto>(sql).Map(new AccessRulesRelator().Map);
             return dtos.Select(factory.BuildEntity);
         }
 
@@ -69,7 +74,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = translator.Translate();
 
             var factory = new PublicAccessEntryFactory();
-            var dtos = Database.Fetch<AccessDto, AccessRuleDto, AccessDto>(new AccessRulesRelator().Map, sql);
+            var dtos = Database.FetchMultiple<AccessDto, AccessRuleDto>(sql).Map(new AccessRulesRelator().Map);
             return dtos.Select(factory.BuildEntity);
         }
 

@@ -41,7 +41,10 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
 
-            var dto = Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql).FirstOrDefault();
+            var dto = Database
+                .FetchMultiple<UserDto, User2AppDto>(sql)
+                .Map(new UserSectionRelator().Map)
+                .FirstOrDefault();
             
             if (dto == null)
                 return null;
@@ -61,9 +64,12 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 sql.Where("umbracoUser.id in (@ids)", new {ids = ids});
             }
-            
-            return ConvertFromDtos(Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql))
-                    .ToArray(); // important so we don't iterate twice, if we don't do this we can end up with null values in cache if we were caching.    
+
+            var dtos = Database
+                .FetchMultiple<UserDto, User2AppDto>(sql)
+                .Map(new UserSectionRelator().Map);
+
+            return ConvertFromDtos(dtos).ToArray(); // do it now and do it once, else can end up with nulls in cache
         }
         
         protected override IEnumerable<IUser> PerformGetByQuery(IQuery<IUser> query)
@@ -72,17 +78,18 @@ namespace Umbraco.Core.Persistence.Repositories
             var translator = new SqlTranslator<IUser>(sqlClause, query);
             var sql = translator.Translate();
 
-            var dtos = Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql)
+            var dtos = Database
+                .FetchMultiple<UserDto, User2AppDto>(sql)
+                .Map(new UserSectionRelator().Map)
                 .DistinctBy(x => x.Id);
 
-            return ConvertFromDtos(dtos)
-                    .ToArray(); // important so we don't iterate twice, if we don't do this we can end up with null values in cache if we were caching.    
+            return ConvertFromDtos(dtos).ToArray(); // do it now and do it once, else can end up with nulls in cache
         }
-        
+
         #endregion
 
         #region Overrides of PetaPocoRepositoryBase<int,IUser>
-        
+
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sql = new Sql();
@@ -302,7 +309,11 @@ namespace Umbraco.Core.Persistence.Repositories
             innerSql.Where("umbracoUser2app.app = " + SqlSyntax.GetQuotedValue(sectionAlias));
             sql.Where(string.Format("umbracoUser.id IN ({0})", innerSql.SQL));
 
-            return ConvertFromDtos(Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql));
+            var dtos = Database
+                .FetchMultiple<UserDto, User2AppDto>(sql)
+                .Map(new UserSectionRelator().Map);
+
+            return ConvertFromDtos(dtos);
         }
 
         /// <summary>

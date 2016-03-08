@@ -10,16 +10,11 @@ namespace Umbraco.Core.Persistence.Mappers
     /// </summary>
     public class PocoMapper : DefaultMapper
     {
-        public override bool MapMemberToColumn(MemberInfo pi, ref string columnName, ref bool resultColumn)
-        {
-            return true;
-        }
-
-        public override Func<object, object> GetToDbConverter(Type destType, Type sourceType)
+        public override Func<object, object> GetToDbConverter(Type destType, MemberInfo sourceMemberInfo)
         {
             // ensures that NPoco does not try to insert an invalid date
             // from a nullable DateTime property
-            if (sourceType == typeof(DateTime))
+            if (sourceMemberInfo.GetMemberInfoType() == typeof(DateTime))
             {
                 return datetimeVal =>
                 {

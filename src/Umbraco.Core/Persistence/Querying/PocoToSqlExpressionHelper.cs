@@ -18,11 +18,11 @@ namespace Umbraco.Core.Persistence.Querying
         public PocoToSqlExpressionHelper(ISqlSyntaxProvider sqlSyntaxProvider)
             : base(sqlSyntaxProvider)
         {
-            // fixme
-            // not how it works - should go through the PocoDataFactory + should cache
-            //_pd = new PocoData(typeof(T));
-            var z = new PocoDataFactory(new PocoMapper());
-            _pd = z.ForType(typeof (T));
+            // fixme - this is a hack!
+            // should reuse some cached factory!
+            var m = new MapperCollection { new PocoMapper() };
+            var f = new PocoDataFactory(m);
+            _pd = f.ForType(typeof (T));
         }
 
         protected override string VisitMemberAccess(MemberExpression m)
@@ -55,7 +55,7 @@ namespace Umbraco.Core.Persistence.Querying
 
         protected virtual string GetFieldName(PocoData pocoData, string name)
         {
-            var column = pocoData.Columns.FirstOrDefault(x => x.Value.MemberInfo.Name == name);
+            var column = pocoData.Columns.FirstOrDefault(x => x.Value.MemberInfoData.Name == name);
             return string.Format("{0}.{1}",
                 SqlSyntax.GetQuotedTableName(pocoData.TableInfo.TableName),
                 SqlSyntax.GetQuotedColumnName(column.Value.ColumnName));

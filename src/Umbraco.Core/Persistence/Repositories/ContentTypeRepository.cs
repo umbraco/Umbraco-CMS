@@ -30,13 +30,13 @@ namespace Umbraco.Core.Persistence.Repositories
             : base(work, cache, logger, sqlSyntax, mappingResolver)
         {
             _templateRepository = templateRepository;
-        }        
+        }
 
         protected override IContentType PerformGet(int id)
         {
             var contentTypes = ContentTypeQueryMapper.GetContentTypes(
                 new[] {id}, Database, SqlSyntax, this, _templateRepository);
-            
+
             var contentType = contentTypes.SingleOrDefault();
             return contentType;
         }
@@ -62,12 +62,12 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = translator.Translate()
                 .OrderBy<NodeDto>(SqlSyntax, x => x.Text);
 
-            var dtos = Database.Fetch<ContentTypeTemplateDto, ContentTypeDto, NodeDto>(sql);
+            var dtos = Database.FetchMultiple<ContentTypeTemplateDto, ContentTypeDto, NodeDto>(sql).Item1;
             return dtos.Any()
                 ? GetAll(dtos.DistinctBy(x => x.ContentTypeDto.NodeId).Select(x => x.ContentTypeDto.NodeId).ToArray())
                 : Enumerable.Empty<IContentType>();
         }
-        
+
         /// <summary>
         /// Gets all entities of the specified <see cref="PropertyType"/> query
         /// </summary>
@@ -89,7 +89,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             return Database.Fetch<string>("SELECT DISTINCT Alias FROM cmsPropertyType ORDER BY Alias");
         }
-        
+
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sql = new Sql();
@@ -134,7 +134,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             get { return new Guid(Constants.ObjectTypes.DocumentType); }
         }
-        
+
         /// <summary>
         /// Deletes a content type
         /// </summary>
@@ -231,7 +231,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             entity.ResetDirtyProperties();
         }
-        
+
         protected override IContentType PerformGet(Guid id)
         {
             var contentTypes = ContentTypeQueryMapper.GetContentTypes(
