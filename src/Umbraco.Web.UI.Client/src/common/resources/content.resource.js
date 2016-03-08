@@ -509,6 +509,16 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 'Failed to check permission for item ' + id);
         },
 
+        getPermissions: function (nodeIds) {
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "GetPermissions"),
+                    nodeIds),
+                'Failed to get permissions');
+        },
+
         /**
          * @ngdoc method
          * @name umbraco.resources.contentResource#save

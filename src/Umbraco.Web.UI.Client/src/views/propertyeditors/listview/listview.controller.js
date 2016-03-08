@@ -58,37 +58,53 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
         totalPages: 0,
         items: []
     };
-
-        
-    $scope.currentNodePermissions = {}
     
-    //Just ensure we do have an editorState
-    if(editorState.current){
-        
-        //Get Current User to check if their usertype is an admin (overwrites all permissions!)
-        userService.getCurrentUser().then(function(data){
-            
-            //Fetch current node allowed actions for the current user
-            //This is the current node & not each individual child node in the list
-            var currentUserPermissions = editorState.current.allowedActions;
-                
-            //Create a nicer model rather than the funky & hard to remember permissions strings
-            $scope.currentNodePermissions = {
-                "isAdminUser": data.userType.toLowerCase() === "admin",
-                "canCopy": _.contains(currentUserPermissions, 'O'), //Magic Char = O
-                "canCreate": _.contains(currentUserPermissions, 'C'), //Magic Char = C
-                "canDelete": _.contains(currentUserPermissions, 'D'), //Magic Char = D
-                "canMove": _.contains(currentUserPermissions, 'M'), //Magic Char = M                
-                "canPublish": _.contains(currentUserPermissions, 'U'), //Magic Char = U
-                "canUnpublish": _.contains(currentUserPermissions, 'U'), //Magic Char = Z (however UI says it can't be set, so if we can publish 'U' we can unpublish)
-                "rawPermissions": currentUserPermissions
-            };
-            
+    //when this is null, we don't check permissions
+    $scope.buttonPermissions = null;
+
+    //When we are dealing with 'content', we need to deal with permissions on child nodes.
+    // Currently there is no real good way to 
+    if ($scope.entityType = "content") {
+
+        var idsWithPermissions = null;
+        var intersectPermissions = null;
+
+        $scope.buttonPermissions = {
+            canCopy: true,
+            canCreate: true,
+            canDelete: true,
+            canMove: true,
+            canPublish: true,
+            canUnpublish: true
+        };
+
+        $scope.$watch(function() {
+            return $scope.selection.length;
+        }, function(newVal, oldVal) {
+
+            if ((idsWithPermissions == null && newVal > 0) || (idsWithPermissions != null)) {
+
+                //go get the permissions for the selected items
+                var ids = _.map($scope.selection, function(i) {
+                    return i.id;
+                });
+
+                //remove the dictionary items that don't have matching ids
+                var filtered = {};
+                _.each(idsWithPermissions, function (value, key, list) {
+                    if (_.contains(ids, Number(key))) {
+                        filtered[key] = value;
+                    }                    
+                });
+                idsWithPermissions = filtered;
+
+                contentResource.getPermissions(ids).then(function (p) {
+                    $scope.buttonPermissions = listViewHelper.getButtonPermissions(p, idsWithPermissions);
+                });
+            }
         });
-    }       
-        
 
-    
+    }
 
     $scope.options = {
         displayAtTabNumber: $scope.model.config.displayAtTabNumber ? $scope.model.config.displayAtTabNumber : 1,
