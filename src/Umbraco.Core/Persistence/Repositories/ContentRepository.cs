@@ -275,7 +275,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .InnerJoin<ContentVersionDto>(SqlSyntax).On<ContentVersionDto, DocumentDto>(SqlSyntax, left => left.VersionId, right => right.VersionId)
                 .Where<ContentVersionDto>(SqlSyntax, x => x.VersionId == versionId)
                 .Where<DocumentDto>(SqlSyntax, x => x.Newest != true);
-            var dto = Database.Fetch<DocumentDto, ContentVersionDto>(sql).FirstOrDefault();
+            var dto = Database.FetchMultiple<DocumentDto, ContentVersionDto>(sql).Item1.FirstOrDefault();
 
             if (dto == null) return;
 

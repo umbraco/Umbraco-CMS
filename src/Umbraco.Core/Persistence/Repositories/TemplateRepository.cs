@@ -596,7 +596,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             sql.OrderBy("umbracoNode." + SqlSyntax.GetQuotedColumnName("level"));
 
-            var dtos = Database.Fetch<TemplateDto, NodeDto>(sql).ToArray();
+            var dtos = Database.FetchMultiple<TemplateDto, NodeDto>(sql).Item1.ToArray();
             if (dtos.Length == 0) return Enumerable.Empty<ITemplate>();
 
             var axisDefos = GetAxisDefinitions(dtos).ToArray();
