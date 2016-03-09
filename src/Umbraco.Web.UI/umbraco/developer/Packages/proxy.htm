@@ -15,6 +15,11 @@
             var parser = document.createElement('a');
             parser.href = window.location.search.substring(1);
 
+            // This next line may seem redundant but is required to get around a bug in IE 
+            // that doesn't set the parser.hostname or parser.protocol correctly for relative URLs.
+            // see https://gist.github.com/jlong/2428561#gistcomment-1461205
+            parser.href = parser.href;
+
             // => "http:"
             if (parser.protocol && (parser.protocol.toLowerCase() != "http:" && parser.protocol.toLowerCase() != "https:")) {
                 throw "invalid protocol";

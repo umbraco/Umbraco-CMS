@@ -1,6 +1,7 @@
 angular.module('umbraco.services')
 .factory('localizationService', function ($http, $q, eventsService, $window, $filter, userService) {
 
+    //TODO: This should be injected as server vars
     var url = "LocalizedText";
     var resourceFileLoadStatus = "none";
     var resourceLoadingPromise = [];
@@ -36,6 +37,11 @@ angular.module('umbraco.services')
         // loads the language resource file from the server
         initLocalizedResources: function () {
             var deferred = $q.defer();
+
+            if (resourceFileLoadStatus === "loaded") {
+                deferred.resolve(service.dictionary);
+                return deferred.promise;
+            }
 
             //if the resource is already loading, we don't want to force it to load another one in tandem, we'd rather
             // wait for that initial http promise to finish and then return this one with the dictionary loaded
@@ -91,25 +97,13 @@ angular.module('umbraco.services')
 
         // checks the dictionary for a localized resource string
         localize: function (value, tokens) {
-            var deferred = $q.defer();
-
-            if (resourceFileLoadStatus === "loaded") {
-                var val = _lookup(value, tokens, service.dictionary);
-                deferred.resolve(val);
-            } else {
-                service.initLocalizedResources().then(function (dic) {
-                    var val = _lookup(value, tokens, dic);
-                    deferred.resolve(val);
-                });
-            }
-
-            return deferred.promise;
+            return service.initLocalizedResources().then(function (dic) {
+                var val = _lookup(value, tokens, dic);
+                return val;
+            });
         },
-        
-    };
 
-    // force the load of the resource file
-    service.initLocalizedResources();
+    };
 
     //This happens after login / auth and assets loading
     eventsService.on("app.authenticated", function () {

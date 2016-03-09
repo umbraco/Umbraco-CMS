@@ -1,5 +1,5 @@
 ﻿<div class="umb-editor umb-relatedlinks" ng-controller="Umbraco.PropertyEditors.RelatedLinksController">
-    
+
     <table class="table table-striped">
         <thead>
             <tr>
@@ -10,7 +10,7 @@
                 <td></td>
             </tr>
         </thead>
-        <tbody ui-sortable="sortableOptions">
+        <tbody ui-sortable="sortableOptions" ng-model="model.value">
             <tr ng-repeat="link in model.value" data-link="{{link.link}}">
                 <td style="width: 20px"><i class="icon icon-navigation handle"></i></td>
                 <td style="word-wrap:break-word; word-break: break-all">
@@ -20,9 +20,7 @@
                 <td style="word-wrap:break-word; word-break: break-all">
                     <div ng-show="!link.edit">
                         <a href="{{link.link}}" target="_blank" ng-show="!link.isInternal">{{link.link}}</a>
-                            <a href="#/content/content/edit/{{link.internal}}" target="_blank" ng-show="link.isInternal" ng-bind="link.internalName">
-
-                        </a>
+                        <a href="#/content/content/edit/{{link.internal}}" target="_blank" ng-show="link.isInternal" ng-bind="link.internalName"></a>
                     </div>
                     <div ng-show="link.edit">
                         <div ng-show="!link.isInternal">
@@ -56,7 +54,7 @@
         <tfoot>
             <tr>
                     <td></td>
-                    <td><input type="text" ng-model="newCaption" localize="placeholder" placeholder="@relatedlinks_captionPlaceholder"  val-highlight="hasError" /></td>
+                    <td><input type="text" ng-model="newCaption" localize="placeholder" placeholder="@relatedlinks_captionPlaceholder"  val-highlight="{{hasError}}" /></td>
                     <td>
                         <div ng-show="addExternal">
                             <input type="text" ng-model="newLink" localize="placeholder" placeholder="@relatedlinks_externalLinkPlaceholder" />
@@ -78,4 +76,12 @@
             </tr>
         </tfoot>
     </table>
+
+   <umb-overlay
+      ng-if="contentPickerOverlay.show"
+      model="contentPickerOverlay"
+      view="contentPickerOverlay.view"
+      position="right">
+   </umb-overlay>
+
 </div>

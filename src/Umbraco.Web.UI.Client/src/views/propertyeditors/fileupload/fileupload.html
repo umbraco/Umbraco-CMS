@@ -1,19 +1,19 @@
 ﻿<div class="umb-editor umb-fileupload" ng-controller="Umbraco.PropertyEditors.FileUploadController">
-    
-    <div ng-show="persistedFiles.length > 0">        
+
+    <div ng-show="persistedFiles.length > 0">
         <ul class="thumbnails">
             <li class="span4 thumbnail" ng-repeat="file in persistedFiles">
                 <a href="{{file.file}}" target="_blank" ng-switch on="file.isImage" >
                     <img ng-src="{{file.thumbnail}}" ng-switch-when="true" alt="{{file.file}}"/>
                     <span ng-switch-default>{{file.file}}</span>
-                </a>                
+                </a>
             </li>
         </ul>
 
         <input type="checkbox" id="clearFiles-{{model.id}}" name="clearFiles" ng-model="clearFiles" />
-        <label for="clearFiles-{{model.id}}">
-            <localize key="content_uploadClear">Clear files</localize>
-        </label>
+            <label for="clearFiles-{{model.id}}" class="inline" style="font-size: 13px; vertical-align: top;">
+                <localize key="content_uploadClear">Clear files</localize>
+            </label>
         <hr/>
     </div>
 
@@ -23,7 +23,7 @@
         </div>
         <ul ng-show="files.length > 0">
             <li ng-repeat="file in files">{{file.file.name}}</li>
-        </ul> 
+        </ul>
     </div>
 
     <input type="hidden" name="fileCount" ng-model="files.length" val-property-validator="validateMandatory"/>

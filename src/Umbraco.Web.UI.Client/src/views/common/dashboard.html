@@ -1,31 +1,51 @@
-﻿<form ng-controller="Umbraco.DashboardController" class="umb-dashboard" val-form-manager> 
-<umb-panel>
-    <umb-header tabs="dashboard.tabs">
-    	<div class="umb-headline-editor-wrapper span12">
-    			<h1>{{dashboard.name}}</h1>
-    	</div>
-	</umb-header>
-	<umb-tab-view>
-        <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" ng-repeat="tab in dashboard.tabs">
-            <div class="umb-pane">
-            		<div ng-repeat="property in tab.properties" ng-switch on="property.serverSide">
+<div ng-controller="Umbraco.DashboardController">
 
-            			<div class="span12 umb-dashboard-control clearfix" 
-            				ng-switch-when="false">
-	            			<h3 ng-show="property.caption">{{property.caption}}</h3>
-            				<div ng-include="property.path"></div>
-            		    </div>
+   <umb-load-indicator ng-if="page.loading"></umb-load-indicator>
 
-                        <div class="span12 umb-dashboard-control clearfix" 
-                            ng-switch-when="true">
-                            <h3 ng-show="property.caption">{{property.caption}}</h3>
-                            
-                            <iframe ng-src="dashboard/usercontrolproxy.aspx?ctrl={{ property.path}}"></iframe>
-                        </div>
+   <form
+      ng-show="!page.loading"
+      class="umb-dashboard"
+      val-form-manager>
 
-                   	</div>
-            </div>
-        </umb-tab>
-    </umb-tab-view>
-</umb-panel>
-</form>
+      <umb-editor-view
+        footer="false"
+        umb-tabs>
+
+         <umb-editor-header
+            name="dashboard.name"
+            name-locked="page.nameLocked"
+            tabs="dashboard.tabs"
+            hide-icon="true"
+            hide-description="true"
+            hide-alias="true">
+         </umb-editor-header>
+
+         <umb-editor-container>
+
+            <umb-tabs-content view="true">
+               <umb-tab id="tab{{tab.id}}" ng-repeat="tab in dashboard.tabs" rel="{{tab.id}}">
+
+                  <div ng-repeat="property in tab.properties" ng-switch on="property.serverSide">
+
+                     <div class="span12 clearfix" ng-switch-when="false">
+                        <h3 ng-show="property.caption">{{property.caption}}</h3>
+                        <div ng-include="property.path"></div>
+                     </div>
+
+                     <div class="span12 umb-dashboard-control clearfix" ng-switch-when="true">
+                        <h3 ng-show="property.caption">{{property.caption}}</h3>
+
+                        <iframe ng-src="dashboard/usercontrolproxy.aspx?ctrl={{ property.path}}"></iframe>
+                     </div>
+
+                  </div>
+
+               </umb-tab>
+            </umb-tabs-content>
+
+         </umb-editor-container>
+
+      </umb-editor-view>
+
+   </form>﻿
+</div>

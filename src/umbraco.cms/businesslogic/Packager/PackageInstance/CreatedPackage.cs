@@ -13,6 +13,7 @@ using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.macro;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using File = System.IO.File;
 using Template = umbraco.cms.businesslogic.template.Template;
 
@@ -221,8 +222,9 @@ namespace umbraco.cms.businesslogic.packager
 
                     }
                 }
+                
                 foreach (DocumentType d in dtl)
-                {
+                {                   
                     docTypes.AppendChild(d.ToXml(_packageManifest));
                 }
 
@@ -371,16 +373,14 @@ namespace umbraco.cms.businesslogic.packager
             }
 
         }
-
+        
         private void AddDocumentType(DocumentType dt, ref List<DocumentType> dtl)
         {
-            if (dt.MasterContentType != 0)
+            if (dt.MasterContentType != 0 && dt.Parent.nodeObjectType == Constants.ObjectTypes.DocumentTypeGuid)
             {
                 //first add masters
                 var mDocT = new DocumentType(dt.MasterContentType);
-
                 AddDocumentType(mDocT, ref dtl);
-
             }
 
             if (dtl.Contains(dt) == false)

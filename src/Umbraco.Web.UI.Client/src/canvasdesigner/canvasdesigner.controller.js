@@ -102,6 +102,8 @@ var app = angular.module("Umbraco.canvasdesigner", ['colorpicker', 'ui.slider', 
     // Load parameters from GetLessParameters and init data of the Canvasdesigner config
     $scope.initCanvasdesigner = function () {
 
+        LazyLoad.js(['https://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js']);
+
         $http.get(apiController + 'Load', { params: { pageId: $scope.pageId } })
             .success(function (data) {
 
@@ -419,6 +421,7 @@ var app = angular.module("Umbraco.canvasdesigner", ['colorpicker', 'ui.slider', 
 
     var webFontScriptLoaded = false;
     var loadGoogleFont = function (font) {
+
         if (!webFontScriptLoaded) {
             $.getScript('https://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js')
             .done(function () {
@@ -446,6 +449,7 @@ var app = angular.module("Umbraco.canvasdesigner", ['colorpicker', 'ui.slider', 
                 }
             });
         }
+
     };
 
     /*****************************************************************************/
@@ -453,9 +457,11 @@ var app = angular.module("Umbraco.canvasdesigner", ['colorpicker', 'ui.slider', 
     /*****************************************************************************/
 
     // Preload of the google font
-    $http.get(apiController + 'GetGoogleFont').success(function (data) {
-        $scope.googleFontFamilies = data;
-    });
+    if ($scope.showStyleEditor) {
+        $http.get(apiController + 'GetGoogleFont').success(function (data) {
+            $scope.googleFontFamilies = data;
+        });
+    }
 
     // watch framLoaded, only if iframe page have enableCanvasdesigner()
     $scope.$watch("enableCanvasdesigner", function () {

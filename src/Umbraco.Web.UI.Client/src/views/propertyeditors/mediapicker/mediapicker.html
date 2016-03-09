@@ -2,23 +2,40 @@
 
 	<ul ui-sortable="sortableOptions" ng-model="images" class="umb-sortable-thumbnails">
 		<li style="width: 120px; height: 100px; overflow: hidden;" ng-repeat="image in images">
-				<img ng-src="{{image.thumbnail}}" alt="" ng-show="image.thumbnail">
 
-				<span class="icon-holder" ng-hide="image.thumbnail">
-					<i class="icon {{image.icon}} large" ></i>
-					<small>{{image.name}}</small>
-				</span>
+			<img ng-src="{{image.thumbnail}}" alt="" ng-show="image.thumbnail">
 
-				<a href class="picked-image" ng-click="remove($index)"><i class="icon icon-delete"></i></a>
+			<span class="icon-holder" ng-hide="image.thumbnail">
+				<i class="icon {{image.icon}} large" ></i>
+				<small>{{image.name}}</small>
+			</span>
+
+			<div class="umb-sortable-thumbnails__actions">
+				<a class="umb-sortable-thumbnails__action" href="" ng-click="goToItem(image)">
+					<i class="icon icon-edit"></i>
+				</a>
+				<a class="umb-sortable-thumbnails__action -red" href="" ng-click="remove($index)">
+					<i class="icon icon-delete"></i>
+				</a>
+			</div>
+
 		</li>
 	</ul>
 
 
 	<ul class="umb-sortable-thumbnails" ng-if="showAdd()">
-		<li style="border: none">	
+		<li style="border: none">
 			<a href="#" class="add-link" ng-click="add()" prevent-default>
-				<i class="icon icon-add large"></i> 
+				<i class="icon icon-add large"></i>
 			</a>
 		</li>
 	</ul>
+
+	<umb-overlay
+		ng-if="mediaPickerOverlay.show"
+		model="mediaPickerOverlay"
+		position="right"
+		view="mediaPickerOverlay.view">
+	</umb-overlay>
+
 </div>

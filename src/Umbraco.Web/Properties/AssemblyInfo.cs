@@ -34,5 +34,7 @@ using System.Security;
 [assembly: InternalsVisibleTo("Concorde.Sync")]
 [assembly: InternalsVisibleTo("Umbraco.Courier.Core")]
 [assembly: InternalsVisibleTo("Umbraco.Courier.Persistence")]
-
+[assembly: InternalsVisibleTo("Umbraco.VisualStudio")]
+[assembly: InternalsVisibleTo("Umbraco.ModelsBuilder")]
+[assembly: InternalsVisibleTo("Umbraco.ModelsBuilder.AspNet")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

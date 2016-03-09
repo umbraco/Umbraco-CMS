@@ -1,26 +1,36 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.Grid.MediaController",
-    function ($scope, $rootScope, $timeout, dialogService) {
+    function ($scope, $rootScope, $timeout) {
 
         $scope.setImage = function(){
+            $scope.mediaPickerOverlay = {};
+            $scope.mediaPickerOverlay.view = "mediapicker";
+            $scope.mediaPickerOverlay.cropSize = $scope.control.editor.config && $scope.control.editor.config.size ? $scope.control.editor.config.size : undefined;
+            $scope.mediaPickerOverlay.showDetails = true;
+            $scope.mediaPickerOverlay.disableFolderSelect = true;
+            $scope.mediaPickerOverlay.onlyImages = true;
+            $scope.mediaPickerOverlay.show = true;
 
-            dialogService.mediaPicker({
-                startNodeId: $scope.control.editor.config && $scope.control.editor.config.startNodeId ? $scope.control.editor.config.startNodeId : undefined,
-                multiPicker: false,
-                cropSize:  $scope.control.editor.config && $scope.control.editor.config.size ? $scope.control.editor.config.size : undefined,
-                showDetails: true,
-                callback: function (data) {
+            $scope.mediaPickerOverlay.submit = function(model) {
+                var selectedImage = model.selectedImages[0];
 
-                    $scope.control.value = {
-                        focalPoint: data.focalPoint,
-                        id: data.id,
-                        image: data.image,
-                        altText: data.altText
-                    };
+                $scope.control.value = {
+                    focalPoint: selectedImage.focalPoint,
+                    id: selectedImage.id,
+                    image: selectedImage.image,
+                    altText: selectedImage.altText
+                };
 
-                    $scope.setUrl();
-                }
-            });
+                $scope.setUrl();
+
+                $scope.mediaPickerOverlay.show = false;
+                $scope.mediaPickerOverlay = null;
+            };
+
+            $scope.mediaPickerOverlay.close = function(oldModel) {
+                $scope.mediaPickerOverlay.show = false;
+                $scope.mediaPickerOverlay = null;
+            };
         };
 
         $scope.setUrl = function(){
@@ -31,6 +41,7 @@ angular.module("umbraco")
                 if($scope.control.editor.config && $scope.control.editor.config.size){
                     url += "?width=" + $scope.control.editor.config.size.width;
                     url += "&height=" + $scope.control.editor.config.size.height;
+                    url += "&animationprocessmode=first";
 
                     if($scope.control.value.focalPoint){
                         url += "&center=" + $scope.control.value.focalPoint.top +"," + $scope.control.value.focalPoint.left;
@@ -38,6 +49,11 @@ angular.module("umbraco")
                     }
                 }
 
+                // set default size if no crop present (moved from the view)
+                if (url.indexOf('?') == -1)
+                {
+                    url += "?width=800&upscale=false&animationprocessmode=false"
+                }
                 $scope.url = url;
             }
         };

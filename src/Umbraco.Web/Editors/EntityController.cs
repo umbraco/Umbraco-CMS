@@ -43,6 +43,23 @@ namespace Umbraco.Web.Editors
     public class EntityController : UmbracoAuthorizedJsonController
     {
         /// <summary>
+        /// Returns an Umbraco alias given a string
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="camelCase"></param>
+        /// <returns></returns>
+        public dynamic GetSafeAlias(string value, bool camelCase = true)
+        {
+            var returnValue = (string.IsNullOrWhiteSpace(value)) ? string.Empty : value.ToSafeAlias(camelCase);
+            dynamic returnObj = new System.Dynamic.ExpandoObject();
+            returnObj.alias = returnValue;
+            returnObj.original = value;
+            returnObj.camelCase = camelCase;
+
+            return returnObj;
+        }
+
+        /// <summary>
         /// Searches for results based on the entity type
         /// </summary>
         /// <param name="query"></param>
@@ -535,6 +552,11 @@ namespace Umbraco.Web.Editors
             //now we need to convert the unknown ones
             switch (entityType)
             {
+                case UmbracoEntityTypes.Template:
+                    var templates = Services.FileService.GetTemplates();
+                    var filteredTemplates = ExecutePostFilter(templates, postFilter, postFilterParams);
+                    return filteredTemplates.Select(Mapper.Map<EntityBasic>);
+
                 case UmbracoEntityTypes.Macro:                    
                     //Get all macros from the macro service
                     var macros = Services.MacroService.GetAll().WhereNotNull().OrderBy(x => x.Name);
@@ -717,8 +739,6 @@ namespace Umbraco.Web.Editors
                     return UmbracoObjectTypes.Media;
                 case UmbracoEntityTypes.MemberType:
                     return UmbracoObjectTypes.MediaType;
-                case UmbracoEntityTypes.Template:
-                    return UmbracoObjectTypes.Template;
                 case UmbracoEntityTypes.MemberGroup:
                     return UmbracoObjectTypes.MemberGroup;
                 case UmbracoEntityTypes.ContentItem:

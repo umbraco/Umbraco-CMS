@@ -27,13 +27,13 @@ namespace Umbraco.Tests.Persistence.Querying
 
             var sql = new Sql();
             sql.Select("*")
-                .From<DocumentTypeDto>()
+                .From<ContentTypeTemplateDto>()
                 .RightJoin<ContentTypeDto>()
-                .On<ContentTypeDto, DocumentTypeDto>(left => left.NodeId, right => right.ContentTypeNodeId)
+                .On<ContentTypeDto, ContentTypeTemplateDto>(left => left.NodeId, right => right.ContentTypeNodeId)
                 .InnerJoin<NodeDto>()
                 .On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectType)
-                .Where<DocumentTypeDto>(x => x.IsDefault == true);
+                .Where<ContentTypeTemplateDto>(x => x.IsDefault == true);
 
             Assert.That(sql.SQL, Is.EqualTo(expected.SQL));
 
@@ -64,13 +64,13 @@ namespace Umbraco.Tests.Persistence.Querying
 
             var sql = new Sql();
             sql.Select("*")
-                .From<DocumentTypeDto>()
+                .From<ContentTypeTemplateDto>()
                 .RightJoin<ContentTypeDto>()
-                .On<ContentTypeDto, DocumentTypeDto>(left => left.NodeId, right => right.ContentTypeNodeId)
+                .On<ContentTypeDto, ContentTypeTemplateDto>(left => left.NodeId, right => right.ContentTypeNodeId)
                 .InnerJoin<NodeDto>()
                 .On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectType)
-                .Where<DocumentTypeDto>(x => x.IsDefault)
+                .Where<ContentTypeTemplateDto>(x => x.IsDefault)
                 .Where<NodeDto>(x => x.NodeId == 1050);
 
             Assert.That(sql.SQL, Is.EqualTo(expected.SQL));

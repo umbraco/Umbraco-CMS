@@ -11,7 +11,7 @@
     <ul ng-hide="loading">
         <li class="provider" ng-repeat="indexer in indexerDetails">
 
-            <a href="" ng-click="toggle(indexer, 'showProperties')">
+            <a class="btn-link -underline" href="" ng-click="toggle(indexer, 'showProperties')">
                 {{indexer.name}}
             </a>
 
@@ -25,11 +25,11 @@
                         <div>
                             <br />
                             <div ng-show="!indexer.isProcessing && (!indexer.processingAttempts || indexer.processingAttempts < 100)" class="btn-group">
-                                
+
                                 <button class="btn btn-warning" ng-click="rebuildIndex(indexer)">Rebuild index</button>
                                 <button class="btn btn-warning" ng-click="optimizeIndex(indexer)" ng-show="indexer.documentCount > 0">Optimize index</button>
                             </div>
-                            
+
                             <div ng-show="indexer.isProcessing" class="umb-loader-wrapper" ng-show="actionInProgress">
                                 <div class="umb-loader"></div>
                             </div>
@@ -147,7 +147,7 @@
 
     <ul ng-hide="loading">
         <li class="provider" ng-repeat="searcher in searcherDetails">
-            <a href="" ng-click="toggle(searcher, 'showProperties')">
+            <a class="btn-link -underline" href="" ng-click="toggle(searcher, 'showProperties')">
                 {{searcher.name}}
             </a>
 
@@ -185,7 +185,7 @@
                         </form>
 
                         <div class="search-results" ng-show="searcher.isSearching">
-                            
+
                             <div ng-show="indexer.isProcessing" class="umb-loader-wrapper" ng-show="indexer.isProcessing">
                                 <div class="umb-loader"></div>
                             </div>

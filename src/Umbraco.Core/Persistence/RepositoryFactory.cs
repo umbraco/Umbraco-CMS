@@ -1,5 +1,6 @@
 using Umbraco.Core.Configuration;
 using System;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -18,6 +19,7 @@ namespace Umbraco.Core.Persistence
         private readonly ILogger _logger;
         private readonly ISqlSyntaxProvider _sqlSyntax;
         private readonly CacheHelper _cacheHelper;
+        private readonly CacheHelper _noCache;
         private readonly IUmbracoSettingsSection _settings;
 
         #region Ctors
@@ -29,7 +31,28 @@ namespace Umbraco.Core.Persistence
             //if (sqlSyntax == null) throw new ArgumentNullException("sqlSyntax");
             if (settings == null) throw new ArgumentNullException("settings");
 
-            _cacheHelper = cacheHelper;
+            _cacheHelper = cacheHelper;            
+
+            //IMPORTANT: We will force the DeepCloneRuntimeCacheProvider to be used here which is a wrapper for the underlying
+            // runtime cache to ensure that anything that can be deep cloned in/out is done so, this also ensures that our tracks
+            // changes entities are reset.
+            if ((_cacheHelper.RuntimeCache is DeepCloneRuntimeCacheProvider) == false)
+            {
+                var origRuntimeCache = cacheHelper.RuntimeCache;
+                _cacheHelper.RuntimeCache = new DeepCloneRuntimeCacheProvider(origRuntimeCache);
+            }
+            //If the factory for isolated cache doesn't return DeepCloneRuntimeCacheProvider, then ensure it does
+            if (_cacheHelper.IsolatedRuntimeCache.CacheFactory.Method.ReturnType != typeof (DeepCloneRuntimeCacheProvider))
+            {
+                var origFactory = cacheHelper.IsolatedRuntimeCache.CacheFactory;
+                _cacheHelper.IsolatedRuntimeCache.CacheFactory = type =>
+                {
+                    var cache = origFactory(type);
+                    return new DeepCloneRuntimeCacheProvider(cache);
+                };
+            }
+
+            _noCache = CacheHelper.CreateDisabledCacheHelper();
             _logger = logger;
             _sqlSyntax = sqlSyntax;
             _settings = settings;
@@ -53,6 +76,7 @@ namespace Umbraco.Core.Persistence
         {
             if (cacheHelper == null) throw new ArgumentNullException("cacheHelper");
             _cacheHelper = cacheHelper;
+            _noCache = CacheHelper.CreateDisabledCacheHelper();
         }
 
         [Obsolete("Use the ctor specifying all dependencies instead")]
@@ -80,15 +104,15 @@ namespace Umbraco.Core.Persistence
 
         public virtual ITaskRepository CreateTaskRepository(IDatabaseUnitOfWork uow)
         {
-            return new TaskRepository(uow, 
-                CacheHelper.CreateDisabledCacheHelper(), //never cache
+            return new TaskRepository(uow,
+                _noCache, //never cache
                 _logger, _sqlSyntax);
         }
 
         public virtual IAuditRepository CreateAuditRepository(IDatabaseUnitOfWork uow)
         {
             return new AuditRepository(uow,
-                CacheHelper.CreateDisabledCacheHelper(), //never cache
+                _noCache, //never cache
                 _logger, _sqlSyntax);
         }
 
@@ -128,7 +152,6 @@ namespace Umbraco.Core.Persistence
         {
             return new DataTypeDefinitionRepository(
                 uow,
-                _cacheHelper,                
                 _cacheHelper,
                 _logger, _sqlSyntax,
                 CreateContentTypeRepository(uow));
@@ -140,8 +163,7 @@ namespace Umbraco.Core.Persistence
                 uow,
                 _cacheHelper,
                 _logger,
-                _sqlSyntax,
-                CreateLanguageRepository(uow));
+                _sqlSyntax);
         }
 
         public virtual ILanguageRepository CreateLanguageRepository(IDatabaseUnitOfWork uow)
@@ -175,7 +197,7 @@ namespace Umbraco.Core.Persistence
         {
             return new RelationRepository(
                 uow,
-                CacheHelper.CreateDisabledCacheHelper(), //never cache
+                _noCache, //never cache
                 _logger, _sqlSyntax,
                 CreateRelationTypeRepository(uow));
         }
@@ -184,7 +206,7 @@ namespace Umbraco.Core.Persistence
         {
             return new RelationTypeRepository(
                 uow,
-                CacheHelper.CreateDisabledCacheHelper(), //never cache
+                _noCache, //never cache
                 _logger, _sqlSyntax);
         }
 
@@ -222,7 +244,7 @@ namespace Umbraco.Core.Persistence
         {
             return new MigrationEntryRepository(
                 uow,
-                CacheHelper.CreateDisabledCacheHelper(), //never cache
+                _noCache, //never cache
                 _logger, _sqlSyntax);
         }
 
@@ -283,8 +305,7 @@ namespace Umbraco.Core.Persistence
         {
             return new MemberGroupRepository(uow,
                 _cacheHelper,
-                _logger, _sqlSyntax,
-                _cacheHelper);
+                _logger, _sqlSyntax);
         }
 
         public virtual IEntityRepository CreateEntityRepository(IDatabaseUnitOfWork uow)
@@ -292,16 +313,25 @@ namespace Umbraco.Core.Persistence
             return new EntityRepository(uow);
         }
 
-        public IDomainRepository CreateDomainRepository(IDatabaseUnitOfWork uow)
+        public virtual IDomainRepository CreateDomainRepository(IDatabaseUnitOfWork uow)
         {
             return new DomainRepository(uow, _cacheHelper, _logger, _sqlSyntax);
         }
 
         public ITaskTypeRepository CreateTaskTypeRepository(IDatabaseUnitOfWork uow)
         {
-            return new TaskTypeRepository(uow, 
-                CacheHelper.CreateDisabledCacheHelper(), //never cache
+            return new TaskTypeRepository(uow,
+                _noCache, //never cache
                 _logger, _sqlSyntax);
+        }
+
+        internal virtual EntityContainerRepository CreateEntityContainerRepository(IDatabaseUnitOfWork uow, Guid containerObjectType)
+        {
+            return new EntityContainerRepository(
+                uow,
+                _cacheHelper,
+                _logger, _sqlSyntax,
+                containerObjectType);
         }
     }
 }

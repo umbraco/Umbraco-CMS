@@ -1,0 +1,34 @@
+<div ng-controller="Umbraco.Overlays.TreePickerController">
+
+   <div class="umb-control-group">
+      <umb-tree-search-box
+         hide-search-callback="hideSearch"
+         search-callback="onSearchResults"
+         search-from-id="{{searchInfo.searchFromId}}"
+         search-from-name="{{searchInfo.searchFromName}}"
+         show-search="{{searchInfo.showSearch}}"
+         section="{{section}}">
+      </umb-tree-search-box>
+   </div>
+
+   <umb-tree-search-results
+      ng-if="searchInfo.showSearch"
+      results="searchInfo.results"
+      select-result-callback="selectResult">
+   </umb-tree-search-results>
+
+   <div ng-hide="searchInfo.showSearch" ng-animate="'tree-fade-out'">
+      <umb-tree
+         section="{{section}}"
+         treealias="{{treeAlias}}"
+         hideheader="{{hideHeader}}"
+         hideoptions="true"
+         isdialog="true"
+         customtreeparams="{{customTreeParams}}"
+         eventhandler="dialogTreeEventHandler"
+         enablelistviewsearch="true"
+         enablecheckboxes="{{multiPicker}}">
+      </umb-tree>
+   </div>
+
+</div>

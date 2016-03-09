@@ -39,6 +39,7 @@ namespace Umbraco.Core.Persistence.Mappers
             {
                 CacheMap<Template, TemplateDto>(src => src.Id, dto => dto.NodeId);
                 CacheMap<Template, NodeDto>(src => src.MasterTemplateId, dto => dto.ParentId);
+                CacheMap<Template, NodeDto>(src => src.Key, dto => dto.UniqueId);
                 CacheMap<Template, TemplateDto>(src => src.Alias, dto => dto.Alias);
                 CacheMap<Template, TemplateDto>(src => src.Content, dto => dto.Design);
             }

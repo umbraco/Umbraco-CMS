@@ -19,13 +19,13 @@ namespace umbraco
 		/// <returns>Media nodes as IEnumerable</returns>
 		public static IEnumerable<Media> GetAncestorMedia(this Media media)
 		{
-			var ancestor = new Media(media.Parent.Id);
+			var ancestor = new Media(media.ParentId);
 
 			while (ancestor != null && ancestor.Id != -1)
 			{
 				yield return ancestor;
 
-				ancestor = new Media(ancestor.Parent.Id);
+				ancestor = new Media(ancestor.ParentId);
 			}
 		}
 
@@ -53,7 +53,7 @@ namespace umbraco
 		{
 			if (media.Parent != null)
 			{
-				var parentMedia = new Media(media.Parent.Id);
+				var parentMedia = new Media(media.ParentId);
 
 				foreach (var siblingMedia in parentMedia.GetChildMedia().Where(childMedia => childMedia.Id != media.Id))
 				{
@@ -216,7 +216,7 @@ namespace umbraco
 				if (!string.IsNullOrEmpty(url))
 				{
 					var extension = media.GetProperty<string>(Constants.Conventions.Media.Extension);
-                    return url.Replace(string.Concat(".", extension), "_thumb.jpg", StringComparison.InvariantCultureIgnoreCase);
+                    return url.Replace(string.Concat(".", extension), "_thumb." + extension, StringComparison.InvariantCultureIgnoreCase);
 				}
 			}
 

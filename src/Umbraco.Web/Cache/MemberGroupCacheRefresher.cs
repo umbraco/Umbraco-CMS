@@ -104,13 +104,13 @@ namespace Umbraco.Web.Cache
         {
             if (payloads == null) return;
 
+            var memberGroupCache = ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<IMemberGroup>();
             payloads.ForEach(payload =>
             {
-                if (payload != null)
+                if (payload != null && memberGroupCache)
                 {
-                    ApplicationContext.Current.ApplicationCache.RuntimeCache
-                        .ClearCacheByKeySearch(string.Format("{0}.{1}", typeof(IMemberGroup).FullName, payload.Name));
-                    ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(RepositoryBase.GetCacheIdKey<IMemberGroup>(payload.Id));
+                    memberGroupCache.Result.ClearCacheByKeySearch(string.Format("{0}.{1}", typeof(IMemberGroup).FullName, payload.Name));
+                    memberGroupCache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IMemberGroup>(payload.Id));
                 }                
             });
             

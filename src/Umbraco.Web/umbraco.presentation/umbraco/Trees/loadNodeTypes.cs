@@ -1,20 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Text;
 using Umbraco.Core.Services;
-using umbraco.businesslogic;
 using umbraco.interfaces;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.presentation.Trees;
-using Umbraco.Core;
 using Umbraco.Web.umbraco.presentation.umbraco.Trees;
 
 
 namespace umbraco
 {
-    [Tree(Constants.Applications.Settings, "nodeTypes", "Document Types", sortOrder: 6)]
+    [Obsolete("This class is no longer used and will be removed from the codebase in future versions")]
     public class loadNodeTypes : BaseTree
     {
 

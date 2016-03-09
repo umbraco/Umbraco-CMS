@@ -2,16 +2,16 @@
  * @ngdoc controller
  * @name Umbraco.Editors.FileUploadController
  * @function
- * 
+ *
  * @description
  * The controller for the file upload property editor. It is important to note that the $scope.model.value
- *  doesn't necessarily depict what is saved for this property editor. $scope.model.value can be empty when we 
+ *  doesn't necessarily depict what is saved for this property editor. $scope.model.value can be empty when we
  *  are submitting files because in that case, we are adding files to the fileManager which is what gets peristed
  *  on the server. However, when we are clearing files, we are setting $scope.model.value to "{clearFiles: true}"
- *  to indicate on the server that we are removing files for this property. We will keep the $scope.model.value to 
+ *  to indicate on the server that we are removing files for this property. We will keep the $scope.model.value to
  *  be the name of the file selected (if it is a newly selected file) or keep it to be it's original value, this allows
  *  for the editors to check if the value has changed and to re-bind the property if that is true.
- * 
+ *
 */
 function fileUploadController($scope, $element, $compile, imageHelper, fileManager, umbRequestHelper, mediaHelper) {
 
@@ -21,11 +21,14 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
         fileManager.setFiles($scope.model.alias, []);
         //clear the current files
         $scope.files = [];
-        if ($scope.propertyForm.fileCount) {
-            //this is required to re-validate
-            $scope.propertyForm.fileCount.$setViewValue($scope.files.length);
+
+        if($scope.propertyForm) {
+           if ($scope.propertyForm.fileCount) {
+               //this is required to re-validate
+               $scope.propertyForm.fileCount.$setViewValue($scope.files.length);
+           }
         }
-       
+
     }
 
     /** this method is used to initialize the data and to re-initialize it if the server value is changed */
@@ -37,7 +40,7 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
             index = 1;
         }
 
-        //this is used in order to tell the umb-single-file-upload directive to 
+        //this is used in order to tell the umb-single-file-upload directive to
         //rebuild the html input control (and thus clearing the selected file) since
         //that is the only way to manipulate the html for the file input control.
         $scope.rebuildInput = {
@@ -49,7 +52,7 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
         $scope.originalValue = $scope.model.value;
 
         //create the property to show the list of files currently saved
-        if ($scope.model.value != "") {
+        if ($scope.model.value != "" && $scope.model.value != undefined) {
 
             var images = $scope.model.value.split(",");
 
@@ -95,7 +98,9 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
             //reset to original value
             $scope.model.value = $scope.originalValue;
             //this is required to re-validate
-            $scope.propertyForm.fileCount.$setViewValue($scope.files.length);
+            if($scope.propertyForm) {
+               $scope.propertyForm.fileCount.$setViewValue($scope.files.length);
+            }
         }
     });
 
@@ -127,12 +132,12 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
 
     //listen for when the model value has changed
     $scope.$watch("model.value", function (newVal, oldVal) {
-        //cannot just check for !newVal because it might be an empty string which we 
+        //cannot just check for !newVal because it might be an empty string which we
         //want to look for.
         if (newVal !== null && newVal !== undefined && newVal !== oldVal) {
             //now we need to check if we need to re-initialize our structure which is kind of tricky
             // since we only want to do that if the server has changed the value, not if this controller
-            // has changed the value. There's only 2 scenarios where we change the value internall so 
+            // has changed the value. There's only 2 scenarios where we change the value internall so
             // we know what those values can be, if they are not either of them, then we'll re-initialize.
 
             if (newVal.clearFiles !== true && newVal !== $scope.originalValue && !newVal.selectedFiles) {
@@ -144,31 +149,28 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
 };
 angular.module("umbraco")
     .controller('Umbraco.PropertyEditors.FileUploadController', fileUploadController)
-    .run(function(mediaHelper, umbRequestHelper){
+    .run(function(mediaHelper, umbRequestHelper, assetsService){
         if (mediaHelper && mediaHelper.registerFileResolver) {
-
-            //NOTE: The 'entity' can be either a normal media entity or an "entity" returned from the entityResource
-            // they contain different data structures so if we need to query against it we need to be aware of this.
-            mediaHelper.registerFileResolver("Umbraco.UploadField", function(property, entity, thumbnail){
-                if (thumbnail) {
-
-                    if (mediaHelper.detectIfImageByExtension(property.value)) {
-
-                        var thumbnailUrl = umbRequestHelper.getApiUrl(
-                            "imagesApiBaseUrl",
-                            "GetBigThumbnail",
-                            [{ originalImagePath: property.value }]);
-                            
-                        return thumbnailUrl;
-                    }
-                    else {
-                        return null;
-                    }
-                    
+            assetsService.load(["lib/moment/moment-with-locales.js"]).then(
+                function () {
+                    //NOTE: The 'entity' can be either a normal media entity or an "entity" returned from the entityResource
+                    // they contain different data structures so if we need to query against it we need to be aware of this.
+                    mediaHelper.registerFileResolver("Umbraco.UploadField", function(property, entity, thumbnail){
+                        if (thumbnail) {
+                            if (mediaHelper.detectIfImageByExtension(property.value)) {
+                                //get default big thumbnail from image processor
+                                var thumbnailUrl = property.value + "?rnd=" + moment(entity.updateDate).format("YYYYMMDDHHmmss") + "&width=500&animationprocessmode=first";
+                                return thumbnailUrl;
+                            }
+                            else {
+                                return null;
+                            }
+                        }
+                        else {
+                            return property.value;
+                        }
+                    });
                 }
-                else {
-                    return property.value;
-                }
-            });
+            );
         }
     });

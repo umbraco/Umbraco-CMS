@@ -14,6 +14,7 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class DictionaryItem : Entity, IDictionaryItem
     {
+        public Func<int, ILanguage> GetLanguage { get; set; }
         private Guid? _parentId;
         private string _itemKey;
         private IEnumerable<IDictionaryTranslation> _translations;
@@ -78,7 +79,17 @@ namespace Umbraco.Core.Models
             {
                 SetPropertyValueAndDetectChanges(o =>
                 {
-                    _translations = value;
+                    var asArray = value.ToArray();
+                    //ensure the language callback is set on each translation
+                    if (GetLanguage != null)
+                    {
+                        foreach (var translation in asArray.OfType<DictionaryTranslation>())
+                        {
+                            translation.GetLanguage = GetLanguage;
+                        }
+                    }
+
+                    _translations = asArray;                    
                     return _translations;
                 }, _translations, TranslationsSelector,
                     //Custom comparer for enumerable
@@ -87,16 +98,5 @@ namespace Umbraco.Core.Models
                         enumerable => enumerable.GetHashCode()));
             }
         }
-
-        /// <summary>
-        /// Method to call before inserting a new entity in the db
-        /// </summary>
-        internal override void AddingEntity()
-        {
-            base.AddingEntity();
-
-            Key = Guid.NewGuid();            
-        }
-        
     }
 }

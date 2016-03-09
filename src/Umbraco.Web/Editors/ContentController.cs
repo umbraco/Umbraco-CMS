@@ -30,6 +30,7 @@ using Umbraco.Core.Dynamics;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.preview;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.UI;
 using Constants = Umbraco.Core.Constants;
 using Notification = Umbraco.Web.Models.ContentEditing.Notification;
@@ -77,10 +78,34 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Returns an item to be used to display the recycle bin for content
+        /// </summary>
+        /// <returns></returns>
+        public ContentItemDisplay GetRecycleBin()
+        {
+            var display = new ContentItemDisplay
+            {
+                Id = Constants.System.RecycleBinContent,
+                Alias = "recycleBin",
+                ParentId = -1,
+                Name = Services.TextService.Localize("general/recycleBin"),
+                ContentTypeAlias = "recycleBin",
+                CreateDate = DateTime.Now,
+                IsContainer = true,
+                Path = "-1," + Constants.System.RecycleBinContent
+            };
+
+            TabsAndPropertiesResolver.AddListView(display, "content", Services.DataTypeService, Services.TextService);
+
+            return display;
+        }
+
+        /// <summary>
         /// Gets the content json for the content id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [OutgoingEditorModelEvent]
         [EnsureUserPermissionForContent("id")]
         public ContentItemDisplay GetById(int id)
         {
@@ -116,6 +141,7 @@ namespace Umbraco.Web.Editors
         /// If this is a container type, we'll remove the umbContainerView tab for a new item since
         /// it cannot actually list children if it doesn't exist yet.
         /// </returns>
+        [OutgoingEditorModelEvent]
         public ContentItemDisplay GetEmpty(string contentTypeAlias, int parentId)
         {
             var contentType = Services.ContentTypeService.GetContentType(contentTypeAlias);
@@ -603,7 +629,8 @@ namespace Umbraco.Web.Editors
                 if (toMove.ContentType.AllowedAsRoot == false)
                 {
                     throw new HttpResponseException(
-                        Request.CreateValidationErrorResponse(Services.TextService.Localize("moveOrCopy/notAllowedAtRoot")));
+                        Request.CreateNotificationValidationErrorResponse(
+                            Services.TextService.Localize("moveOrCopy/notAllowedAtRoot")));
                 }
             }
             else
@@ -619,14 +646,16 @@ namespace Umbraco.Web.Editors
                     .Any(x => x.Value == toMove.ContentType.Id) == false)
                 {
                     throw new HttpResponseException(
-                        Request.CreateValidationErrorResponse(Services.TextService.Localize("moveOrCopy/notAllowedByContentType")));
+                        Request.CreateNotificationValidationErrorResponse(
+                            Services.TextService.Localize("moveOrCopy/notAllowedByContentType")));
                 }
 
                 // Check on paths
                 if ((string.Format(",{0},", parent.Path)).IndexOf(string.Format(",{0},", toMove.Id), StringComparison.Ordinal) > -1)
-                {
+                {                    
                     throw new HttpResponseException(
-                        Request.CreateValidationErrorResponse(Services.TextService.Localize("moveOrCopy/notAllowedByPath")));
+                        Request.CreateNotificationValidationErrorResponse(
+                            Services.TextService.Localize("moveOrCopy/notAllowedByPath")));
                 }
             }
 
@@ -659,9 +688,17 @@ namespace Umbraco.Web.Editors
                             new[] {string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id)}).Trim());
                     break;
                 case PublishStatusType.FailedHasExpired:
-                    //TODO: We should add proper error messaging for this!
+                    display.AddWarningNotification(
+                        Services.TextService.Localize("publish"),
+                        Services.TextService.Localize("publish/contentPublishedFailedExpired",
+                            new[]
+                            {
+                                string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id),
+                            }).Trim());
+                    break;
                 case PublishStatusType.FailedIsTrashed:
                     //TODO: We should add proper error messaging for this!
+                    break;
                 case PublishStatusType.FailedContentInvalid:
                     display.AddWarningNotification(
                         Services.TextService.Localize("publish"),

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using log4net;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models;
@@ -26,25 +27,23 @@ namespace Umbraco.Core.Persistence.Repositories
         {
         }
 
-        #region Overrides of RepositoryBase<int, IMemberType>
-
+        private FullDataSetRepositoryCachePolicyFactory<IMemberType, int> _cachePolicyFactory;
+        protected override IRepositoryCachePolicyFactory<IMemberType, int> CachePolicyFactory
+        {
+            get
+            {
+                //Use a FullDataSet cache policy - this will cache the entire GetAll result in a single collection
+                return _cachePolicyFactory ?? (_cachePolicyFactory = new FullDataSetRepositoryCachePolicyFactory<IMemberType, int>(
+                    RuntimeCache, GetEntityId, () => PerformGetAll(),
+                    //allow this cache to expire
+                    expires: true));
+            }
+        }
+        
         protected override IMemberType PerformGet(int id)
         {
-            var sql = GetBaseQuery(false);
-            sql.Where(GetBaseWhereClause(), new { Id = id });
-            sql.OrderByDescending<NodeDto>(x => x.NodeId);
-
-            var dtos =
-                Database.Fetch<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto, MemberTypeReadOnlyDto>(
-                    new PropertyTypePropertyGroupRelator().Map, sql);
-
-            if (dtos == null || dtos.Any() == false)
-                return null;
-
-            var factory = new MemberTypeReadOnlyFactory();
-            var member = factory.BuildEntity(dtos.First());
-
-            return member;
+            //use the underlying GetAll which will force cache all content types
+            return GetAll().FirstOrDefault(x => x.Id == id);
         }
 
         protected override IEnumerable<IMemberType> PerformGetAll(params int[] ids)
@@ -52,10 +51,11 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false);
             if (ids.Any())
             {
+                //NOTE: This logic should never be executed according to our cache policy
                 var statement = string.Join(" OR ", ids.Select(x => string.Format("umbracoNode.id='{0}'", x)));
                 sql.Where(statement);
             }
-            sql.OrderByDescending<NodeDto>(x => x.NodeId);
+            sql.OrderByDescending<NodeDto>(x => x.NodeId, SqlSyntax);
 
             var dtos =
                 Database.Fetch<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto, MemberTypeReadOnlyDto>(
@@ -71,7 +71,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var subquery = translator.Translate();
             var sql = GetBaseQuery(false)
                 .Append(new Sql("WHERE umbracoNode.id IN (" + subquery.SQL + ")", subquery.Arguments))
-                .OrderBy<NodeDto>(x => x.SortOrder);
+                .OrderBy<NodeDto>(x => x.SortOrder, SqlSyntax);
 
             var dtos =
                 Database.Fetch<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto, MemberTypeReadOnlyDto>(
@@ -79,11 +79,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return BuildFromDtos(dtos);
         }
-
-        #endregion
-
-        #region Overrides of PetaPocoRepositoryBase<int, IMemberType>
-
+        
         protected override Sql GetBaseQuery(bool isCount)
         {
             var sql = new Sql();
@@ -102,7 +98,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 "cmsPropertyType.validationRegExp", "cmsPropertyType.dataTypeId", "cmsPropertyType.sortOrder AS PropertyTypeSortOrder",
                 "cmsPropertyType.propertyTypeGroupId AS PropertyTypesGroupId", "cmsMemberType.memberCanEdit", "cmsMemberType.viewOnProfile",
                 "cmsDataType.propertyEditorAlias", "cmsDataType.dbType", "cmsPropertyTypeGroup.id AS PropertyTypeGroupId", 
-                "cmsPropertyTypeGroup.text AS PropertyGroupName", "cmsPropertyTypeGroup.parentGroupId",
+                "cmsPropertyTypeGroup.text AS PropertyGroupName",
                 "cmsPropertyTypeGroup.sortorder AS PropertyGroupSortOrder", "cmsPropertyTypeGroup.contenttypeNodeId")
                 .From<NodeDto>()
                 .InnerJoin<ContentTypeDto>().On<ContentTypeDto, NodeDto>(left => left.NodeId, right => right.NodeId)
@@ -157,11 +153,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             get { return new Guid(Constants.ObjectTypes.MemberType); }
         }
-
-        #endregion
-
-        #region Unit of Work Implementation
-
+        
         protected override void PersistNewItem(IMemberType entity)
         {
             ValidateAlias(entity);
@@ -182,12 +174,10 @@ namespace Umbraco.Core.Persistence.Repositories
                 entity.AddPropertyType(standardPropertyType.Value, Constants.Conventions.Member.StandardPropertiesGroupName);
             }
 
-            var factory = new MemberTypeFactory(NodeObjectTypeId);
-            var dto = factory.BuildDto(entity);
+            var factory = new ContentTypeFactory();
 
             EnsureExplicitDataTypeForBuiltInProperties(entity);
-
-            PersistNewBaseContentType(dto, entity);
+            PersistNewBaseContentType(entity);
 
             //Handles the MemberTypeDto (cmsMemberType table)
             var memberTypeDtos = factory.BuildMemberTypeDtos(entity);
@@ -219,17 +209,13 @@ namespace Umbraco.Core.Persistence.Repositories
                 entity.SortOrder = maxSortOrder + 1;
             }
 
-            var factory = new MemberTypeFactory(NodeObjectTypeId);
-            var dto = factory.BuildDto(entity);
+            var factory = new ContentTypeFactory();
 
             EnsureExplicitDataTypeForBuiltInProperties(entity);
+            PersistUpdatedBaseContentType(entity);
 
-            PersistUpdatedBaseContentType(dto, entity);
-
-            //Remove existing entries before inserting new ones
+            // remove and insert - handle cmsMemberType table
             Database.Delete<MemberTypeDto>("WHERE NodeId = @Id", new { Id = entity.Id });
-
-            //Handles the MemberTypeDto (cmsMemberType table)
             var memberTypeDtos = factory.BuildMemberTypeDtos(entity);
             foreach (var memberTypeDto in memberTypeDtos)
             {
@@ -238,9 +224,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             entity.ResetDirtyProperties();
         }
-
-        #endregion
-
+        
         /// <summary>
         /// Override so we can specify explicit db type's on any property types that are built-in.
         /// </summary>
@@ -262,38 +246,33 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IMemberType PerformGet(Guid id)
         {
-            var sql = GetBaseQuery(false);
-            sql.Where("umbracoNode.uniqueID = @Id", new { Id = id });
-            sql.OrderByDescending<NodeDto>(x => x.NodeId);
-
-            var dtos =
-                Database.Fetch<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto, MemberTypeReadOnlyDto>(
-                    new PropertyTypePropertyGroupRelator().Map, sql);
-
-            if (dtos == null || dtos.Any() == false)
-                return null;
-
-            var factory = new MemberTypeReadOnlyFactory();
-            var member = factory.BuildEntity(dtos.First());
-
-            return member;
+            //use the underlying GetAll which will force cache all content types
+            return GetAll().FirstOrDefault(x => x.Key == id);
         }
 
         protected override IEnumerable<IMemberType> PerformGetAll(params Guid[] ids)
         {
-            var sql = GetBaseQuery(false);
+            //use the underlying GetAll which will force cache all content types
+
             if (ids.Any())
             {
-                var statement = string.Join(" OR ", ids.Select(x => string.Format("umbracoNode.uniqueID='{0}'", x)));
-                sql.Where(statement);
+                return GetAll().Where(x => ids.Contains(x.Key));
             }
-            sql.OrderByDescending<NodeDto>(x => x.NodeId, SqlSyntax);
+            else
+            {
+                return GetAll();
+            }
+        }
 
-            var dtos =
-                Database.Fetch<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto, MemberTypeReadOnlyDto>(
-                    new PropertyTypePropertyGroupRelator().Map, sql);
+        protected override bool PerformExists(Guid id)
+        {
+            return GetAll().FirstOrDefault(x => x.Key == id) != null;
+        }
 
-            return BuildFromDtos(dtos);
+        protected override IMemberType PerformGet(string alias)
+        {
+            //use the underlying GetAll which will force cache all content types
+            return GetAll().FirstOrDefault(x => x.Alias.InvariantEquals(alias));
         }
 
         /// <summary>

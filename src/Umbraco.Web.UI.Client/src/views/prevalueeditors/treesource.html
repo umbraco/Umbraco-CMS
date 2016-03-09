@@ -6,9 +6,11 @@
 		<option value="member">Members</option>
 	</select>
 
-	<ul class="unstyled list-icons" ng-if="node" style="margin-top: 30px">	
-		<li>	
-			<i class="icon icon-delete red hover-show pull-right" ng-click="clear()"></i>
+	<ul class="unstyled list-icons" ng-if="node" style="margin-top: 30px">
+		<li>
+			<a href="" class="hover-show pull-right" ng-click="clear()">
+				<i class="icon icon-delete red"></i>
+			</a>
 			<i class="icon {{node.icon}} hover-hide"></i>
 			
 			<a href prevent-default ng-click="openContentPicker()" >{{node.name}}</a>
@@ -74,4 +76,12 @@
 				</ul>
 		</span>
 	</div>
+
+	<umb-overlay
+		ng-if="treePickerOverlay.show"
+		model="treePickerOverlay"
+		position="right"
+		view="treePickerOverlay.view">
+	</umb-overlay>
+
 </div>

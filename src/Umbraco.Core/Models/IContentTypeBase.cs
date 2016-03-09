@@ -54,9 +54,14 @@ namespace Umbraco.Core.Models
         PropertyGroupCollection PropertyGroups { get; set; }
 
         /// <summary>
-        /// Gets an enumerable list of Property Types aggregated for all groups
+        /// Gets all property types, across all property groups.
         /// </summary>
         IEnumerable<PropertyType> PropertyTypes { get; }
+
+        /// <summary>
+        /// Gets or sets the property types that are not in a group.
+        /// </summary>
+        IEnumerable<PropertyType> NoGroupPropertyTypes { get; set; }
 
         /// <summary>
         /// Removes a PropertyType from the current ContentType

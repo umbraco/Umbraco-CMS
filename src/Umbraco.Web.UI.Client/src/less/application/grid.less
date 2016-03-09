@@ -1,0 +1,287 @@
+// Grid
+// -------------------------
+
+/* CONTAINS BASIC APPLICATION LAYOUT, POSITIONING AND AREA DIMENSIONS */
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+
+  font-family: @baseFontFamily;
+  font-size: @baseFontSize;
+  line-height: @baseLineHeight;
+  color: @textColor;
+  background-color: @bodyBackground;
+}
+
+
+.padded {
+  padding: 20px
+}
+
+
+#layout {
+  position: relative;
+  height: 100%;
+  padding: 0;
+  z-index: 1;
+}
+
+#mainwrapper {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+}
+
+#contentwrapper, #contentcolumn {
+  position: absolute;
+  top: 0px; bottom: 0px; right: 0px; left: 80px;
+  z-index: 10;
+  margin: 0
+}
+
+#umb-notifications-wrapper {
+    left: 80px;
+}
+
+#contentcolumn {
+  left: 0px;
+}
+
+#contentcolumn iframe#right {
+  display: block;
+  position: relative;
+  height: 100%;
+  width: 100%;
+  border: none;
+}
+
+#leftcolumn {
+  height: 100%;
+  z-index: 20;
+  width: 80px;
+  float: left;
+  position: absolute;
+}
+
+#applications {
+  z-index: 1000;
+  height: 100%;
+  left: 0px;
+  top: 0;
+  bottom: 0;
+  position: absolute;
+  text-align: center
+}
+
+#applications-tray {
+  z-index: 900;
+  left: 80px;
+  top: 0;
+  bottom: 0;
+  position: absolute;
+  height: 100%;
+  text-align: center;
+}
+
+#search-form {
+    display: block;
+    margin: 0;
+    z-index: 100;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    overflow: hidden;
+
+    .form-search {
+        display: -ms-flexbox;
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: flex;
+        margin-top: 17px;
+
+        .umb-search-field {
+            width: auto;
+            min-width: 160px;
+            -webkit-flex: 1;
+            -ms-flex: 1;
+            flex: 1;
+        }
+    }
+}
+
+#navigation {
+  left: 80px;
+  top: 0;
+  bottom: 0;
+  position: absolute;
+  z-index: 100;
+  background: @white;
+  height: 100%;
+
+}
+
+.navigation-inner-container{
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    padding-top: 100px;
+    border-right: 1px solid @grayLight;
+    z-index: 100;
+}
+
+#dialog {
+  min-width: 500px;
+  left: 100%;
+  top: 0;
+  position: absolute;
+  z-index: 50;
+  display: inline-block;
+}
+
+#tree {
+  padding: 0px;
+  z-index: 100 !important;
+  overflow: auto;
+}
+
+#tree .umb-tree {
+    padding: 0px 0px 20px 0px;
+}
+
+#search-results {
+  z-index: 200;
+}
+
+#contextMenu {
+  z-index: 50;
+  position: absolute;
+  top: 0px;
+  left: 100%;
+  min-width: 250px;
+}
+
+#speechbubble {
+  z-index: 1060;
+  position: absolute;
+  bottom: 100px;
+  left: 0;
+  right: 0;
+  border-bottom: none;
+  margin: auto;
+  padding: 0px;
+  border: none;
+  background: none;
+  border-radius: 0;
+}
+
+.ui-resizable-e {
+    cursor: e-resize;
+    width: 4px;
+    right: -5px;
+    top: 0;
+    bottom: 0;
+    background-color: @grayLighter;
+    border: solid 1px @grayLight;
+    border-top: none;
+    border-bottom: none;
+    position:absolute;
+    z-index:9999 !important;
+}
+
+@media (min-width: 1101px) {
+  #contentwrapper, #umb-notifications-wrapper {left: 440px;}
+  #speechbubble {left: 360px;}
+}
+
+//empty section modification
+.emptySection #contentwrapper, .emptySection #umb-notifications-wrapper {left: 80px;}
+.emptySection #speechbubble {left: 0;}
+.emptySection #navigation {display: none}
+
+.login-only #speechbubble {
+    z-index: 10000;
+    left: 0 !important;
+}
+.login-only #speechbubble ul {
+    padding-left:20px
+}
+
+
+
+@media (max-width: 767px) {
+
+    // make leftcolumn smaller on tablets
+    #leftcolumn {
+      width: 60px;
+    }
+    #applications ul.sections {
+        width: 60px;
+    }
+    ul.sections.sections-tray {
+        width: 60px;
+    }
+    #applications-tray {
+        left: 60px;
+    }
+    #navigation {
+        left: 60px;
+    }
+    #contentwrapper, #contentcolumn, #umb-notifications-wrapper {
+        left: 30px;
+    }
+    #umbracoMainPageBody .umb-modal-left.fade.in {
+      margin-left: 60px;
+    }
+}
+
+
+
+@media (max-width: 500px) {
+
+    // make leftcolumn smaller on mobiles
+    #leftcolumn {
+      width: 40px;
+    }
+    #applications ul.sections {
+        width: 40px;
+    }
+    ul.sections li [class^="icon-"]:before {
+        font-size: 25px!important;
+    }
+    #applications ul.sections li.avatar a img  {
+        width: 25px;
+    }
+    ul.sections a span {
+        display:none !important;
+    }
+    #applications ul.sections-tray {
+        width: 40px;
+    }
+    ul.sections.sections-tray {
+        width: 40px;
+    }
+    #applications-tray {
+        left: 40px;
+    }
+    #navigation {
+        left: 40px;
+    }
+    #contentwrapper, #contentcolumn, #umb-notifications-wrapper {
+        left: 20px;
+    }
+    #umbracoMainPageBody .umb-modal-left.fade.in {
+        margin-left: 40px;
+        width: 85%!important;
+    }
+}

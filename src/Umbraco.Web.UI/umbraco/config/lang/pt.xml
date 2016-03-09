@@ -306,6 +306,7 @@
     <key alias="showPageOnSend">Mostrar página durante envio</key>
     <key alias="size">Tamanho</key>
     <key alias="sort">Classificar</key>
+    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
     <key alias="type">Tipo</key>
     <key alias="typeToSearch">Digite para buscar...</key>
     <key alias="up">Acima</key>
@@ -320,6 +321,8 @@
     <key alias="welcome">Bem Vindo(a)...</key>
     <key alias="width">Largura</key>
     <key alias="yes">Sim</key>
+    <key alias="reorder">Reorder</key>
+    <key alias="reorderDone">I am done reordering</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Cor de fundo</key>
@@ -617,6 +620,8 @@ Você pode publicar esta página e todas suas sub-páginas ao selecionar <em>pub
     <key alias="tabs">Guias</key>
   </area>
   <area alias="sort">
+    <key alias="sortOrder">Sort order</key>
+    <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">Classificação concluída.</key>
     <key alias="sortHelp">Arraste os diferentes itens para cima ou para baixo para definir como os mesmos serão arranjados. Ou clique no título da coluna para classificar a coleção completa de itens</key>
     <key alias="sortPleaseWait"><![CDATA[Favor esperar. Itens estão sendo classificados, isto pode demorar um tempo. <br /><br /> Não feche esta janela durante a classificação]]></key>
@@ -686,6 +691,45 @@ Você pode publicar esta página e todas suas sub-páginas ao selecionar <em>pub
     <key alias="mastertemplate">Modelo mestre</key>
     <key alias="quickGuide">Guia rápido para etiquetas de modelos Umbraco</key>
     <key alias="template">Modelo</key>
+  </area>
+  <area alias="grid">
+    <key alias="insertControl">Choose type of content</key>
+    <key alias="chooseLayout">Choose a layout</key>
+    <key alias="addRows">Add a row</key>
+    <key alias="addElement">Add content</key>
+    <key alias="dropElement">Drop content</key>
+    <key alias="settingsApplied">Settings applied</key>
+
+    <key alias="contentNotAllowed">This content is not allowed here</key>
+    <key alias="contentAllowed">This content is allowed here</key>
+
+    <key alias="clickToEmbed">Click to embed</key>
+    <key alias="clickToInsertImage">Click to insert image</key>
+    <key alias="placeholderImageCaption">Image caption...</key>
+    <key alias="placeholderWriteHere">Write here...</key>
+
+    <key alias="gridLayouts">Grid Layouts</key>
+    <key alias="gridLayoutsDetail">Layouts are the overall work area for the grid editor, usually you only need one or two different layouts</key>
+    <key alias="addGridLayout">Add Grid Layout</key>
+    <key alias="addGridLayoutDetail">Adjust the layout by setting column widths and adding additional sections</key>
+    <key alias="rowConfigurations">Row configurations</key>
+    <key alias="rowConfigurationsDetail">Rows are predefined cells arranged horizontally</key>
+    <key alias="addRowConfiguration">Add row configuration</key>
+    <key alias="addRowConfigurationDetail">Adjust the row by setting cell widths and adding additional cells</key>
+
+    <key alias="columns">Columns</key>
+    <key alias="columnsDetails">Total combined number of columns in the grid layout</key>
+
+    <key alias="settings">Settings</key>
+    <key alias="settingsDetails">Configure what settings editors can change</key>
+
+    <key alias="styles">Styles</key>
+    <key alias="stylesDetails">Configure what styling editors can change</key>
+
+    <key alias="settingDialogDetails">Settings will only save if the entered json configuration is valid</key>
+
+    <key alias="allowAllEditors">Allow all editors</key>
+    <key alias="allowAllRowConfigurations">Allow all row configurations</key>
   </area>
   <area alias="templateEditor">
     <key alias="alternativeField">Campo alternativo</key>
@@ -761,7 +805,7 @@ Para fechar a tarefa de tradução vá até os detalhes e clique no botão "Fech
     <key alias="cacheBrowser">Navegador de Cache</key>
     <key alias="contentRecycleBin">Lixeira</key>
     <key alias="createdPackages">Pacotes criados</key>
-    <key alias="datatype">Tipo de Dado</key>
+    <key alias="dataTypes">Tipo de Dado</key>
     <key alias="dictionary">Dicionário</key>
     <key alias="installedPackages">Pacotes instalados</key>
     <key alias="installSkin">Instalar tema</key>
@@ -771,10 +815,10 @@ Para fechar a tarefa de tradução vá até os detalhes e clique no botão "Fech
     <key alias="macros">Macros</key>
     <key alias="mediaTypes">Tipos de Mídia</key>
     <key alias="member">Membros</key>
-    <key alias="memberGroup">Grupos de Membros</key>
+    <key alias="memberGroups">Grupos de Membros</key>
     <key alias="memberRoles">Funções</key>
-    <key alias="memberType">Tipo de Membro</key>
-    <key alias="nodeTypes">Tipos de Documentos</key>
+    <key alias="memberTypes">Tipo de Membro</key>
+    <key alias="documentTypes">Tipos de Documentos</key>
     <key alias="packager">Pacotes</key>
     <key alias="packages">Pacotes</key>
     <key alias="python">Arquivos Python</key>

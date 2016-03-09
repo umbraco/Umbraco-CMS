@@ -1,0 +1,41 @@
+<div ng-controller="Umbraco.Overlays.CopyOverlay as vm">
+
+   <div class="umb-control-group">
+      <umb-tree-search-box
+         hide-search-callback="vm.hideSearch"
+         search-callback="vm.onSearchResults"
+         search-from-id="{{vm.searchInfo.searchFromId}}"
+         search-from-name="{{vm.searchInfo.searchFromName}}"
+         show-search="{{vm.searchInfo.showSearch}}"
+         section="{{model.section}}">
+      </umb-tree-search-box>
+   </div>
+
+   <div class="umb-control-group" ng-show="vm.searchInfo.showSearch">
+      <umb-tree-search-results
+         ng-if="vm.searchInfo.showSearch"
+         results="vm.searchInfo.results"
+         select-result-callback="vm.selectResult">
+      </umb-tree-search-results>
+   </div>
+
+   <div class="umb-control-group -no-border" ng-hide="vm.searchInfo.showSearch">
+       <umb-tree
+         section="{{model.section}}"
+         hideheader="false"
+         hideoptions="true"
+         isdialog="true"
+         eventhandler="dialogTreeEventHandler"
+         enablecheckboxes="true">
+       </umb-tree>
+   </div>
+
+   <div class="umb-control-group -no-border">
+      <input type="checkbox" class="pull-left" style="margin-right: 10px;" ng-model="model.relateToOriginal" />
+      <label>
+          <localize key="defaultdialogs_relateToOriginalLabel">Relate to originalt</localize>
+      </label>
+
+   </div>
+
+</div>

@@ -22,6 +22,15 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
     return {
         
+        getRecycleBin: function () {
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "mediaApiBaseUrl",
+                       "GetRecycleBin")),
+               'Failed to retrieve data for media recycle bin');
+        },
+
         /**
          * @ngdoc method
          * @name umbraco.resources.mediaResource#sort
@@ -392,7 +401,45 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     }),
                 'Failed to add folder');
         },
-
+        
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.mediaResource#getChildFolders
+         * @methodOf umbraco.resources.mediaResource
+         *
+         * @description
+         * Retrieves all media children with types used as folders.
+         * Uses the convention of looking for media items with mediaTypes ending in
+         * *Folder so will match "Folder", "bannerFolder", "secureFolder" etc,
+         *
+         * ##usage
+         * <pre>
+         * mediaResource.getChildFolders(1234)
+         *    .then(function(data) {
+         *        alert('folders');
+         *    });
+         * </pre> 
+         *
+         * @param {int} parentId Id of the media item to query for child folders    
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        getChildFolders: function(parentId){
+            if(!parentId){
+                parentId = -1;
+            }
+            
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "mediaApiBaseUrl",
+                       "GetChildFolders",
+                       [
+                           { id: parentId }
+                       ])),
+               'Failed to retrieve child folders for media item ' + parentId);
+        },
+            
         /**
          * @ngdoc method
          * @name umbraco.resources.mediaResource#emptyRecycleBin

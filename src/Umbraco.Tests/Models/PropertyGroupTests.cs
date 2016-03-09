@@ -54,8 +54,7 @@ namespace Umbraco.Tests.Models
                 Key = Guid.NewGuid(),
                 Name = "Group1",
                 SortOrder = 555,
-                UpdateDate = DateTime.Now,
-                ParentId = 9
+                UpdateDate = DateTime.Now
             };
 
             var clone = (PropertyGroup)pg.DeepClone();
@@ -68,7 +67,6 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone.Name, pg.Name);
             Assert.AreEqual(clone.SortOrder, pg.SortOrder);
             Assert.AreEqual(clone.UpdateDate, pg.UpdateDate);
-            Assert.AreEqual(clone.ParentId, pg.ParentId);
             Assert.AreNotSame(clone.PropertyTypes, pg.PropertyTypes);
             Assert.AreEqual(clone.PropertyTypes, pg.PropertyTypes);
             Assert.AreEqual(clone.PropertyTypes.Count, pg.PropertyTypes.Count);
@@ -133,8 +131,7 @@ namespace Umbraco.Tests.Models
                 Key = Guid.NewGuid(),
                 Name = "Group1",
                 SortOrder = 555,
-                UpdateDate = DateTime.Now,
-                ParentId = 9
+                UpdateDate = DateTime.Now
             };
 
             var result = ss.ToStream(pg);

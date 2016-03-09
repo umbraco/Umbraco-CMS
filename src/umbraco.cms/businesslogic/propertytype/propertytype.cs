@@ -303,7 +303,7 @@ namespace umbraco.cms.businesslogic.propertytype
             finally
             {
                 // Clear cached items
-                ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(CacheKeys.PropertyTypeCacheKey);
+                ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.PropertyTypeCacheKey);
             }
 
             return pt;
@@ -458,42 +458,42 @@ namespace umbraco.cms.businesslogic.propertytype
         protected virtual void FlushCache()
         {
             // clear local cache
-            ApplicationContext.Current.ApplicationCache.ClearCacheItem(GetCacheKey(Id));
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(GetCacheKey(Id));
 
             // clear cache in contentype
-            ApplicationContext.Current.ApplicationCache.ClearCacheItem(CacheKeys.ContentTypePropertiesCacheKey + _contenttypeid);
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(CacheKeys.ContentTypePropertiesCacheKey + _contenttypeid);
 
             //Ensure that DocumentTypes are reloaded from db by clearing cache - this similar to the Save method on DocumentType.
             //NOTE Would be nice if we could clear cache by type instead of emptying the entire cache.
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IContent>();
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IContentType>();
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IMedia>();
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IMediaType>();
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IMember>();
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IMemberType>();
+            ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.ClearCache<IContent>();
+            ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.ClearCache<IContentType>();
+            ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.ClearCache<IMedia>();
+            ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.ClearCache<IMediaType>();
+            ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.ClearCache<IMember>();
+            ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.ClearCache<IMemberType>();
         }
 
         public static PropertyType GetPropertyType(int id)
         {
-            return ApplicationContext.Current.ApplicationCache.GetCacheItem(
+            return ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<PropertyType>(
                 GetCacheKey(id),
-                TimeSpan.FromMinutes(30),
-                delegate
+                timeout:        TimeSpan.FromMinutes(30),
+                getCacheItem: () =>
+                {
+                    try
                     {
-                        try
-                        {
-                            return new PropertyType(id);
-                        }
-                        catch
-                        {
-                            return null;
-                        }
-                    });
+                        return new PropertyType(id);
+                    }
+                    catch
+                    {
+                        return null;
+                    }
+                });
         }
 
         private void InvalidateCache()
         {
-            ApplicationContext.Current.ApplicationCache.ClearCacheItem(GetCacheKey(Id));
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(GetCacheKey(Id));
         }
 
         private static string GetCacheKey(int id)

@@ -375,6 +375,7 @@
     <key alias="showPageOnSend">Zobrazit stránku při odeslání</key>
     <key alias="size">Rozměr</key>
     <key alias="sort">Seřadit</key>
+    <key alias="submit">Submit</key> <!-- TODO: Translate this -->
     <key alias="type">Typ</key>
     <key alias="typeToSearch">Pro hledání pište...</key>
     <key alias="up">Nahoru</key>
@@ -391,6 +392,8 @@
     <key alias="yes">Ano</key>
     <key alias="folder">Složka</key>
     <key alias="searchResults">Výsledky hledání</key>
+    <key alias="reorder">Reorder</key>
+    <key alias="reorderDone">I am done reordering</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Background color</key>
@@ -740,6 +743,8 @@
     <key alias="noPropertiesDefinedOnTab">Na této záložce nejsou definovány žádné vlastnosti. Pro vytvoření nové vlastnosti klikněte na odkaz "přidat novou vlastnost" nahoře.</key>
   </area>
   <area alias="sort">
+    <key alias="sortOrder">Sort order</key>
+    <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">Třídění bylo ukončeno.</key>
     <key alias="sortHelp">Abyste nastavili, jak mají být položky seřazeny, přetáhněte jednotlivé z nich nahoru či dolů. Anebo klikněte na hlavičku sloupce pro setřídění celé kolekce</key>
     <key alias="sortPleaseWait"><![CDATA[ Čekejte, prosím. Položky jsou tříděny a může to chvíli trvat.<br/> <br/> Během třídění nezavírejte toto okno]]></key>
@@ -817,6 +822,40 @@
     <key alias="mastertemplate">Nadřazená šablona</key>
     <key alias="quickGuide">Rychlá příručka k šablonovým značkám umbraca</key>
     <key alias="template">Šablona</key>
+  </area>
+  <area alias="grid">
+    <key alias="insertControl">Choose type of content</key>
+    <key alias="chooseLayout">Choose a layout</key>
+    <key alias="addRows">Add a row</key>
+    <key alias="addElement">Add content</key>
+    <key alias="dropElement">Drop content</key>
+    <key alias="settingsApplied">Settings applied</key>
+
+    <key alias="contentNotAllowed">This content is not allowed here</key>
+    <key alias="contentAllowed">This content is allowed here</key>
+
+    <key alias="clickToEmbed">Click to embed</key>
+    <key alias="clickToInsertImage">Click to insert image</key>
+    <key alias="placeholderImageCaption">Image caption...</key>
+    <key alias="placeholderWriteHere">Write here...</key>
+
+    <key alias="gridLayouts">Grid Layouts</key>
+    <key alias="gridLayoutsDetail">Layouts are the overall work area for the grid editor, usually you only need one or two different layouts</key>
+    <key alias="addGridLayout">Add Grid Layout</key>
+    <key alias="addGridLayoutDetail">Adjust the layout by setting column widths and adding additional sections</key>
+    <key alias="rowConfigurations">Row configurations</key>
+    <key alias="rowConfigurationsDetail">Rows are predefined cells arranged horizontally</key>
+    <key alias="addRowConfiguration">Add row configuration</key>
+    <key alias="addRowConfigurationDetail">Adjust the row by setting cell widths and adding additional cells</key>
+    <key alias="columns">Columns</key>
+    <key alias="columnsDetails">Total combined number of columns in the grid layout</key>
+    <key alias="settings">Settings</key>
+    <key alias="settingsDetails">Configure what settings editors can change</key>
+    <key alias="styles">Styles</key>
+    <key alias="stylesDetails">Configure what styling editors can change</key>
+    <key alias="settingDialogDetails">Settings will only save if the entered json configuration is valid</key>
+    <key alias="allowAllEditors">Allow all editors</key>
+    <key alias="allowAllRowConfigurations">Allow all row configurations</key>
   </area>
   <area alias="templateEditor">
     <key alias="alternativeField">Alternativní pole</key>
@@ -899,7 +938,7 @@
     <key alias="cacheBrowser">Prohlížeč mezipaměti</key>
     <key alias="contentRecycleBin">Koš</key>
     <key alias="createdPackages">Vytvořené balíčky</key>
-    <key alias="datatype">Datové typy</key>
+    <key alias="dataTypes">Datové typy</key>
     <key alias="dictionary">Slovník</key>
     <key alias="installedPackages">Instalované balíčky</key>
     <key alias="installSkin">Instalovat téma</key>
@@ -909,10 +948,10 @@
     <key alias="macros">Makra</key>
     <key alias="mediaTypes">Typy medií</key>
     <key alias="member">Členové</key>
-    <key alias="memberGroup">Skupiny členů</key>
+    <key alias="memberGroups">Skupiny členů</key>
     <key alias="memberRoles">Role</key>
-    <key alias="memberType">Typy členů</key>
-    <key alias="nodeTypes">Typy dokumentů</key>
+    <key alias="memberTypes">Typy členů</key>
+    <key alias="documentTypes">Typy dokumentů</key>
     <key alias="packager">Balíčky</key>
     <key alias="packages">Balíčky</key>
     <key alias="python">Soubory python</key>

@@ -40,7 +40,8 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile />
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort />
+    <IISExpressSSLPort>
+    </IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
@@ -135,12 +136,12 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
-    <Reference Include="ImageProcessor, Version=2.3.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ImageProcessor.2.3.0.0\lib\net45\ImageProcessor.dll</HintPath>
+    <Reference Include="ImageProcessor, Version=2.3.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ImageProcessor.2.3.3.0\lib\net45\ImageProcessor.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ImageProcessor.Web, Version=4.4.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ImageProcessor.Web.4.4.0.0\lib\net45\ImageProcessor.Web.dll</HintPath>
+    <Reference Include="ImageProcessor.Web, Version=4.5.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ImageProcessor.Web.4.5.3.0\lib\net45\ImageProcessor.Web.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, processorArchitecture=MSIL">
@@ -158,6 +159,14 @@
     <Reference Include="Microsoft.AspNet.Identity.Owin, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.2.2.1\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeAnalysis.Common.1.0.0\lib\net45\Microsoft.CodeAnalysis.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.CSharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.1.0.0\lib\net45\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Owin">
@@ -203,6 +212,10 @@
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
+    <Reference Include="System.Collections.Immutable, Version=1.1.36.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Collections.Immutable.1.1.36\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data">
@@ -234,6 +247,10 @@
     <Reference Include="System.Net.Http.WebRequest, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Reflection.Metadata, Version=1.0.21.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reflection.Metadata.1.0.21\lib\portable-net45+win8\System.Reflection.Metadata.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
@@ -333,8 +350,13 @@
       <Name>umbraco.providers</Name>
     </ProjectReference>
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="UrlRewritingNet.UrlRewriter">
-      <HintPath>..\packages\UrlRewritingNet.UrlRewriter.2.0.60829.1\lib\UrlRewritingNet.UrlRewriter.dll</HintPath>
+    <Reference Include="Umbraco.ModelsBuilder, Version=3.0.0.90, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Umbraco.ModelsBuilder.3.0.0\lib\Umbraco.ModelsBuilder.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="UrlRewritingNet.UrlRewriter, Version=2.0.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\UrlRewritingNet.UrlRewriter.2.0.7\lib\UrlRewritingNet.UrlRewriter.dll</HintPath>
+      <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -361,13 +383,6 @@
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
-    <Compile Include="Umbraco\Controls\ContentTypeControlNew.ascx.cs">
-      <DependentUpon>ContentTypeControlNew.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Controls\ContentTypeControlNew.ascx.designer.cs">
-      <DependentUpon>ContentTypeControlNew.ascx</DependentUpon>
     </Compile>
     <Compile Include="Umbraco\Controls\Images\ImageViewer.ascx.cs">
       <DependentUpon>ImageViewer.ascx</DependentUpon>
@@ -529,13 +544,6 @@
     <Compile Include="Umbraco\Search\QuickSearch.ascx.designer.cs">
       <DependentUpon>QuickSearch.ascx</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\Settings\EditNodeTypeNew.aspx.cs">
-      <DependentUpon>EditNodeTypeNew.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Settings\EditNodeTypeNew.aspx.designer.cs">
-      <DependentUpon>EditNodeTypeNew.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Umbraco\Settings\EditTemplate.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -570,6 +578,9 @@
     <Compile Include="Umbraco\TreeInit.aspx.designer.cs">
       <DependentUpon>treeInit.aspx</DependentUpon>
     </Compile>
+    <Content Include="App_Plugins\ModelsBuilder\modelsbuilder.controller.js" />
+    <Content Include="App_Plugins\ModelsBuilder\modelsbuilder.htm" />
+    <Content Include="App_Plugins\ModelsBuilder\modelsbuilder.resource.js" />
     <Content Include="Config\grid.editors.config.js" />
     <Content Include="Config\Lang\cs-CZ.user.xml" />
     <Content Include="Config\Lang\da-DK.user.xml" />
@@ -595,7 +606,6 @@
     <Content Include="Umbraco\create.aspx" />
     <Content Include="Umbraco\Logout.aspx" />
     <Content Include="Umbraco\umbraco.aspx" />
-    <Content Include="Umbraco_Client\Editors\EditContentType.js" />
     <Content Include="Umbraco_Client\IconPicker\iconpicker.js" />
     <Compile Include="Umbraco\umbraco.aspx.cs">
       <DependentUpon>umbraco.aspx</DependentUpon>
@@ -629,6 +639,7 @@
       </SubType>
     </Content>
     <Content Include="Umbraco\Install\Views\Web.config" />
+    <Content Include="App_Plugins\ModelsBuilder\package.manifest" />
     <None Include="Config\404handlers.Release.config">
       <DependentUpon>404handlers.config</DependentUpon>
     </None>
@@ -1651,8 +1662,6 @@
     <Content Include="Umbraco\Controls\ProgressBar.ascx" />
     <Content Include="Umbraco_Client\DateTimePicker\datetimepicker.css" />
     <Content Include="Umbraco_Client\DateTimePicker\timepicker.js" />
-    <Content Include="Umbraco\Controls\ContentTypeControlNew.ascx" />
-    <Content Include="Umbraco\Controls\GenericProperties\GenericProperty.ascx" />
     <Content Include="Umbraco\Create\DlrScripting.ascx" />
     <Content Include="Umbraco\Images\Umbraco\developerRuby.gif" />
     <Content Include="Umbraco\Images\Umbraco\developerScript.gif" />
@@ -1695,7 +1704,7 @@
     <Content Include="Umbraco\Config\Lang\fr.xml" />
     <Content Include="Umbraco\Config\Lang\it.xml" />
     <Content Include="Umbraco\Config\Lang\nl.xml" />
-    <Content Include="Umbraco\Config\Lang\no.xml" />
+    <Content Include="Umbraco\Config\Lang\nb.xml" />
     <Content Include="Umbraco\Config\Lang\sv.xml" />
     <Content Include="Umbraco\Css\permissionsEditor.css" />
     <Content Include="Umbraco\Dialogs\mediaPicker.aspx" />
@@ -1856,6 +1865,7 @@
     <Content Include="Umbraco\Images\Editor\newdocument.gif" />
     <Content Include="Umbraco\Images\Editor\opacity.png" />
     <Content Include="Umbraco\Images\Editor\outdent.gif" />
+    <Content Include="Umbraco\Images\Editor\renderbody.gif" />
     <Content Include="Umbraco\Images\Editor\removeformat.gif" />
     <Content Include="Umbraco\Images\Editor\separator.gif" />
     <Content Include="Umbraco\Images\Editor\showStyles.png" />
@@ -1952,7 +1962,9 @@
     <Content Include="Umbraco\PartialViewMacros\Templates\SiteMap.cshtml" />
     <Content Include="Umbraco\Views\AuthorizeUpgrade.cshtml" />
     <Content Include="Umbraco\Translation\translationTasks.dtd" />
-    <Content Include="Views\Web.config" />
+    <Content Include="Views\Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -2008,7 +2020,6 @@
     <Content Include="Umbraco\Create\language.ascx">
       <SubType>UserControl</SubType>
     </Content>
-    <Content Include="Umbraco\Create\media.ascx" />
     <Content Include="Umbraco\Create\member.ascx" />
     <Content Include="Umbraco\Create\nodeType.ascx">
       <SubType>UserControl</SubType>
@@ -2018,7 +2029,6 @@
       <SubType>UserControl</SubType>
     </Content>
     <Content Include="Umbraco\Css\background.gif" />
-    <Content Include="Umbraco_Client\GenericProperty\genericproperty.css" />
     <Content Include="Umbraco\Css\splitter.gif" />
     <Content Include="Umbraco\Css\umbracoGui.css" />
     <Content Include="Umbraco\Dashboard\LatestEdits.ascx" />
@@ -2227,7 +2237,6 @@
     <Content Include="Umbraco\Images\Umbraco\userGroup.gif" />
     <Content Include="Umbraco\Images\Umbraco\userType.gif" />
     <Content Include="Umbraco\Js\dualSelectBox.js" />
-    <Content Include="Umbraco_Client\GenericProperty\genericProperty.js" />
     <Content Include="Umbraco\Js\guiFunctions.js" />
     <Content Include="Umbraco\Js\language.aspx" />
     <Content Include="Umbraco\Js\umbracoCheckKeys.js" />
@@ -2239,15 +2248,9 @@
     <Content Include="Umbraco\Members\EditMemberGroup.aspx">
       <SubType>Form</SubType>
     </Content>
-    <Content Include="Umbraco\Members\EditMemberType.aspx" />
-    <Content Include="Umbraco\ping.aspx">
-      <SubType>Form</SubType>
-    </Content>
     <Content Include="Umbraco\publishStatus.aspx" />
     <Content Include="Umbraco\Settings\EditDictionaryItem.aspx" />
     <Content Include="Umbraco\Settings\editLanguage.aspx" />
-    <Content Include="Umbraco\Settings\EditMediaType.aspx" />
-    <Content Include="Umbraco\Settings\EditNodeTypeNew.aspx" />
     <Content Include="Umbraco\Settings\editTemplate.aspx" />
     <Content Include="Umbraco\Settings\Modals\ShowUmbracoTags.aspx" />
     <Content Include="Umbraco\Settings\Stylesheet\editstylesheet.aspx" />
@@ -2390,6 +2393,10 @@
     <Folder Include="Umbraco_Client\Tags\images\" />
     <Folder Include="Views\MacroPartials\" />
   </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.0.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
+    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.0.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
     <VSToolsPath Condition="exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v11.0\WebApplications\Microsoft.WebApplication.targets')">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v11.0</VSToolsPath>
@@ -2411,9 +2418,9 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.0\x86\*.* "$(TargetDir)x86\" 
         <WebProjectProperties>
           <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>7310</DevelopmentServerPort>
+          <DevelopmentServerPort>7410</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:7320</IISUrl>
+          <IISUrl>http://localhost:7410</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
@@ -2449,10 +2456,5 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.0\x86\*.* "$(TargetDir)x86\" 
       <Output TaskParameter="Lines" PropertyName="VersionNumber" />
     </ReadLinesFromFile>
     <Exec WorkingDirectory="$(ProjectDir)\..\..\build\" Command="BuildBelle.bat $(VersionNumber)" ConsoleToMSBuild="true" IgnoreExitCode="true" ContinueOnError="WarnAndContinue" />
-  </Target>
-  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" />
-  <Target Name="EnsureBclBuildImported" BeforeTargets="BeforeBuild" Condition="'$(BclBuildImported)' == ''">
-    <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=317567." HelpKeyword="BCLBUILD2001" />
-    <Error Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568." HelpKeyword="BCLBUILD2002" />
   </Target>
 </Project>
