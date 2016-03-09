@@ -113,7 +113,24 @@ namespace Umbraco.Web.Security.Identity
         /// <param name="app"></param>
         /// <param name="appContext"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// By default this will be configured to execute on PipelineStage.Authenticate
+        /// </remarks>
         public static IAppBuilder UseUmbracoBackOfficeCookieAuthentication(this IAppBuilder app, ApplicationContext appContext)
+        {
+            return app.UseUmbracoBackOfficeCookieAuthentication(appContext, PipelineStage.Authenticate);
+        }
+
+        /// <summary>
+        /// Ensures that the UmbracoBackOfficeAuthenticationMiddleware is assigned to the pipeline
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="appContext"></param>
+        /// <param name="stage">
+        /// Configurable pipeline stage
+        /// </param>
+        /// <returns></returns>
+        public static IAppBuilder UseUmbracoBackOfficeCookieAuthentication(this IAppBuilder app, ApplicationContext appContext, PipelineStage stage)
         {
             if (app == null) throw new ArgumentNullException("app");
             if (appContext == null) throw new ArgumentNullException("appContext");
@@ -133,7 +150,7 @@ namespace Umbraco.Web.Security.Identity
             var authOptions = CreateCookieAuthOptions();
             authOptions.Provider = cookieAuthProvider;
 
-            app.UseUmbracoBackOfficeCookieAuthentication(authOptions, appContext);
+            app.UseUmbracoBackOfficeCookieAuthentication(authOptions, appContext, stage);
 
             //don't apply if app isnot ready
             if (appContext.IsUpgrading || appContext.IsConfigured)
@@ -153,7 +170,7 @@ namespace Umbraco.Web.Security.Identity
             return app;
         }
 
-        internal static IAppBuilder UseUmbracoBackOfficeCookieAuthentication(this IAppBuilder app, CookieAuthenticationOptions options, ApplicationContext appContext)
+        internal static IAppBuilder UseUmbracoBackOfficeCookieAuthentication(this IAppBuilder app, CookieAuthenticationOptions options, ApplicationContext appContext, PipelineStage stage = PipelineStage.Authenticate)
         {
             if (app == null)
             {
@@ -169,14 +186,13 @@ namespace Umbraco.Web.Security.Identity
                 app.Use(typeof(ForceRenewalCookieAuthenticationMiddleware), app, options, new SingletonUmbracoContextAccessor());
                 app.Use(typeof(FixWindowsAuthMiddlware));                
             }
-            //Marks all of the above middlewares to execute on Authenticate
-            app.UseStageMarker(PipelineStage.Authenticate);
 
-            
+            //Marks all of the above middlewares to execute on Authenticate
+            app.UseStageMarker(stage);
 
             return app;
         }
-        
+
 
         /// <summary>
         /// Ensures that the cookie middleware for validating external logins is assigned to the pipeline with the correct
@@ -185,7 +201,23 @@ namespace Umbraco.Web.Security.Identity
         /// <param name="app"></param>
         /// <param name="appContext"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// By default this will be configured to execute on PipelineStage.Authenticate
+        /// </remarks>
         public static IAppBuilder UseUmbracoBackOfficeExternalCookieAuthentication(this IAppBuilder app, ApplicationContext appContext)
+        {
+            return app.UseUmbracoBackOfficeExternalCookieAuthentication(appContext, PipelineStage.Authenticate);
+        }
+
+        /// <summary>
+        /// Ensures that the cookie middleware for validating external logins is assigned to the pipeline with the correct
+        /// Umbraco back office configuration
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="appContext"></param>
+        /// <param name="stage"></param>
+        /// <returns></returns>
+        public static IAppBuilder UseUmbracoBackOfficeExternalCookieAuthentication(this IAppBuilder app, ApplicationContext appContext, PipelineStage stage)
         {
             if (app == null) throw new ArgumentNullException("app");
             if (appContext == null) throw new ArgumentNullException("appContext");
@@ -202,7 +234,7 @@ namespace Umbraco.Web.Security.Identity
                 CookieSecure = GlobalSettings.UseSSL ? CookieSecureOption.Always : CookieSecureOption.SameAsRequest,
                 CookieHttpOnly = true,
                 CookieDomain = UmbracoConfig.For.UmbracoSettings().Security.AuthCookieDomain
-            });
+            }, stage);
 
             return app;
         }
@@ -217,7 +249,26 @@ namespace Umbraco.Web.Security.Identity
         /// This ensures that during a preview request that the back office use is also Authenticated and that the back office Identity
         /// is added as a secondary identity to the current IPrincipal so it can be used to Authorize the previewed document.
         /// </remarks>
+        /// <remarks>
+        /// By default this will be configured to execute on PipelineStage.PostAuthenticate
+        /// </remarks>
         public static IAppBuilder UseUmbracoPreviewAuthentication(this IAppBuilder app, ApplicationContext appContext)
+        {
+            return app.UseUmbracoPreviewAuthentication(appContext, PipelineStage.PostAuthenticate);
+        }
+
+        /// <summary>
+        /// In order for preview to work this needs to be called
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="appContext"></param>
+        /// <param name="stage"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This ensures that during a preview request that the back office use is also Authenticated and that the back office Identity
+        /// is added as a secondary identity to the current IPrincipal so it can be used to Authorize the previewed document.
+        /// </remarks>
+        public static IAppBuilder UseUmbracoPreviewAuthentication(this IAppBuilder app, ApplicationContext appContext, PipelineStage stage)
         {
             //don't apply if app isnot ready
             if (appContext.IsUpgrading || appContext.IsConfigured)
@@ -225,11 +276,16 @@ namespace Umbraco.Web.Security.Identity
                 var authOptions = CreateCookieAuthOptions();                
                 app.Use(typeof(PreviewAuthenticationMiddleware),  authOptions);
 
+                if (stage < PipelineStage.PostAuthenticate)
+                {
+                    throw new InvalidOperationException("The stage specified for UseUmbracoPreviewAuthentication must be greater than or equal to " + PipelineStage.PostAuthenticate);
+                }
+
                 //Marks the above middlewares to execute on PostAuthenticate
                 //NOTE: The above middleware needs to execute after the RoleManagerModule executes which is also during PostAuthenticate, 
                 // currently I've had 100% success with ensuring this fires after RoleManagerModule though not sure if that's always a
                 // guarantee.
-                app.UseStageMarker(PipelineStage.PostAuthenticate);
+                app.UseStageMarker(stage);
             }
 
             return app;
