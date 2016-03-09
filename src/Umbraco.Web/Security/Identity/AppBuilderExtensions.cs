@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Threading;
 using System.Web;
 using Microsoft.AspNet.Identity;
@@ -31,9 +32,7 @@ namespace Umbraco.Web.Security.Identity
         {
             app.SetLoggerFactory(new OwinLoggerFactory());
         }
-
-        #region Backoffice
-
+        
         /// <summary>
         /// Configure Default Identity User Manager for Umbraco
         /// </summary>
@@ -131,28 +130,18 @@ namespace Umbraco.Web.Security.Identity
                         identity => identity.GetUserId<int>()),
             };
 
-            var authOptions = new UmbracoBackOfficeCookieAuthOptions(
-                UmbracoConfig.For.UmbracoSettings().Security,
-                GlobalSettings.TimeOutInMinutes,
-                GlobalSettings.UseSSL)
-            {
-                Provider = cookieAuthProvider
-            };
+            var authOptions = CreateCookieAuthOptions();
+            authOptions.Provider = cookieAuthProvider;
 
             app.UseUmbracoBackOfficeCookieAuthentication(authOptions, appContext);
 
             //don't apply if app isnot ready
             if (appContext.IsUpgrading || appContext.IsConfigured)
             {
-                var getSecondsOptions = new UmbracoBackOfficeCookieAuthOptions(
+                var getSecondsOptions = CreateCookieAuthOptions(
                     //This defines the explicit path read cookies from for this middleware
-                    new[]{string.Format("{0}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds", GlobalSettings.Path)},
-                    UmbracoConfig.For.UmbracoSettings().Security,
-                    GlobalSettings.TimeOutInMinutes,
-                    GlobalSettings.UseSSL)
-                {
-                    Provider = cookieAuthProvider
-                };
+                    new[] {string.Format("{0}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds", GlobalSettings.Path)});
+                getSecondsOptions.Provider = cookieAuthProvider;
 
                 //This is a custom middleware, we need to return the user's remaining logged in seconds
                 app.Use<GetUserSecondsMiddleWare>(
@@ -173,21 +162,21 @@ namespace Umbraco.Web.Security.Identity
 
             //First the normal cookie middleware
             app.Use(typeof(CookieAuthenticationMiddleware), app, options);
-            app.UseStageMarker(PipelineStage.Authenticate);
-
             //don't apply if app isnot ready
             if (appContext.IsUpgrading || appContext.IsConfigured)
             {
                 //Then our custom middlewares
                 app.Use(typeof(ForceRenewalCookieAuthenticationMiddleware), app, options, new SingletonUmbracoContextAccessor());
-                app.UseStageMarker(PipelineStage.Authenticate);
-                app.Use(typeof(FixWindowsAuthMiddlware));
-                app.UseStageMarker(PipelineStage.Authenticate);
+                app.Use(typeof(FixWindowsAuthMiddlware));                
             }
+            //Marks all of the above middlewares to execute on Authenticate
+            app.UseStageMarker(PipelineStage.Authenticate);
+
             
 
             return app;
         }
+        
 
         /// <summary>
         /// Ensures that the cookie middleware for validating external logins is assigned to the pipeline with the correct
@@ -217,11 +206,53 @@ namespace Umbraco.Web.Security.Identity
 
             return app;
         }
-        #endregion
+
+        /// <summary>
+        /// In order for preview to work this needs to be called
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="appContext"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This ensures that during a preview request that the back office use is also Authenticated and that the back office Identity
+        /// is added as a secondary identity to the current IPrincipal so it can be used to Authorize the previewed document.
+        /// </remarks>
+        public static IAppBuilder UseUmbracoPreviewAuthentication(this IAppBuilder app, ApplicationContext appContext)
+        {
+            //don't apply if app isnot ready
+            if (appContext.IsUpgrading || appContext.IsConfigured)
+            {
+                var authOptions = CreateCookieAuthOptions();                
+                app.Use(typeof(PreviewAuthenticationMiddleware),  authOptions);
+
+                //Marks the above middlewares to execute on PostAuthenticate
+                //NOTE: The above middleware needs to execute after the RoleManagerModule executes which is also during PostAuthenticate, 
+                // currently I've had 100% success with ensuring this fires after RoleManagerModule though not sure if that's always a
+                // guarantee.
+                app.UseStageMarker(PipelineStage.PostAuthenticate);
+            }
+
+            return app;
+        }
 
         public static void SanitizeThreadCulture(this IAppBuilder app)
         {
             Thread.CurrentThread.SanitizeThreadCulture();
+        }
+
+        /// <summary>
+        /// Create the default umb cookie auth options
+        /// </summary>
+        /// <param name="explicitPaths"></param>
+        /// <returns></returns>
+        private static UmbracoBackOfficeCookieAuthOptions CreateCookieAuthOptions(string[] explicitPaths = null)
+        {
+            var authOptions = new UmbracoBackOfficeCookieAuthOptions(
+                explicitPaths,
+                UmbracoConfig.For.UmbracoSettings().Security,
+                GlobalSettings.TimeOutInMinutes,
+                GlobalSettings.UseSSL);
+            return authOptions;
         }
     }
 }

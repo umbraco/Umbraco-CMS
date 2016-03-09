@@ -1,4 +1,6 @@
-﻿using Microsoft.Owin;
+﻿using System.Web;
+using Microsoft.Owin;
+using Microsoft.Owin.Extensions;
 using Microsoft.Owin.Logging;
 using Owin;
 using Umbraco.Core;
@@ -35,7 +37,9 @@ namespace Umbraco.Web
             // cookie configuration, this must be declared after it.
             app
                 .UseUmbracoBackOfficeCookieAuthentication(ApplicationContext.Current)
-                .UseUmbracoBackOfficeExternalCookieAuthentication(ApplicationContext.Current);
+                .UseUmbracoBackOfficeExternalCookieAuthentication(ApplicationContext.Current)
+                .UseUmbracoPreviewAuthentication(ApplicationContext.Current);
+
         }
     }
 }
