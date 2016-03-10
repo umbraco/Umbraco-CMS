@@ -52,6 +52,7 @@ namespace umbraco
         
         private static string GetLanguage()
         {
+            return "en-US";
             throw new NotImplementedException("NOTHING WILL WORK UNTIL WE REPLACE ALL USAGES OF THE ui CLASS");
         }
 
