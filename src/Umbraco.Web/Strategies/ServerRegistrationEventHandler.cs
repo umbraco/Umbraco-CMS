@@ -28,18 +28,20 @@ namespace Umbraco.Web.Strategies
         private DatabaseServerRegistrar _registrar;
         private BackgroundTaskRunner<IBackgroundTask> _backgroundTaskRunner;
         private bool _started = false;
+        private TouchServerTask _task;
+        private object _lock = new object();
 
         // bind to events
         protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
         {
             _registrar = ServerRegistrarResolver.Current.Registrar as DatabaseServerRegistrar;
+            
+            // only for the DatabaseServerRegistrar
+            if (_registrar == null) return;
 
             _backgroundTaskRunner = new BackgroundTaskRunner<IBackgroundTask>(
                 new BackgroundTaskRunnerOptions { AutoStart = true },
                 applicationContext.ProfilingLogger.Logger);
-
-            // only for the DatabaseServerRegistrar
-            if (_registrar == null) return;
 
             //We will start the whole process when a successful request is made
             UmbracoModule.RouteAttempt += UmbracoModuleRouteAttempt;
@@ -61,40 +63,34 @@ namespace Umbraco.Web.Strategies
             switch (e.Outcome)
             {
                 case EnsureRoutableOutcome.IsRoutable:
-                    // front-end request
-                    RegisterServer(e);
-                    //remove handler, we're done
-                    UmbracoModule.RouteAttempt -= UmbracoModuleRouteAttempt;
-                    break;
                 case EnsureRoutableOutcome.NotDocumentRequest:
-                    // anything else (back-end request, service...)
-                    //so it's not a document request, we'll check if it's a back office request
-                    if (e.HttpContext.Request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath))
-                    {
-                        RegisterServer(e);
-                        //remove handler, we're done
-                        UmbracoModule.RouteAttempt -= UmbracoModuleRouteAttempt;
-                    }
-                    break;                  
+                    RegisterBackgroundTasks(e);
+                    break;                
             }
         }
         
-        private void RegisterServer(UmbracoRequestEventArgs e)
+        private void RegisterBackgroundTasks(UmbracoRequestEventArgs e)
         {
-            //only process once
-            if (_started) return;
+            //remove handler, we're done
+            UmbracoModule.RouteAttempt -= UmbracoModuleRouteAttempt;
 
-            _started = true;
+            //only perform this one time ever
+            LazyInitializer.EnsureInitialized(ref _task, ref _started, ref _lock, () =>
+            {
+                var serverAddress = e.UmbracoContext.Application.UmbracoApplicationUrl;
+                var svc = e.UmbracoContext.Application.Services.ServerRegistrationService;
 
-            var serverAddress = e.UmbracoContext.Application.UmbracoApplicationUrl;
-            var svc = e.UmbracoContext.Application.Services.ServerRegistrationService;
+                var task = new TouchServerTask(_backgroundTaskRunner,
+                    15000, //delay before first execution
+                    _registrar.Options.RecurringSeconds*1000, //amount of ms between executions
+                    svc, _registrar, serverAddress);
+                
+                //Perform the rest async, we don't want to block the startup sequence
+                // this will just reoccur on a background thread
+                _backgroundTaskRunner.TryAdd(task);
 
-            //Perform the rest async, we don't want to block the startup sequence
-            // this will just reoccur on a background thread
-            _backgroundTaskRunner.Add(new TouchServerTask(_backgroundTaskRunner,
-                15000,                                              //delay before first execution
-                _registrar.Options.RecurringSeconds * 1000,     //amount of ms between executions
-                svc, _registrar, serverAddress));
+                return task;
+            });
         }
 
         private class TouchServerTask : RecurringTaskBase
