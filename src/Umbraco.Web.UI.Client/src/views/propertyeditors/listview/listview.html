@@ -10,7 +10,7 @@
 
            <umb-editor-sub-header-content-left>
 
-               <umb-editor-sub-header-section ng-if="listViewAllowedTypes && listViewAllowedTypes.length > 0 && !isAnythingSelected()">
+               <umb-editor-sub-header-section ng-if="(listViewAllowedTypes && listViewAllowedTypes.length > 0 && !isAnythingSelected()) && currentNodePermissions.canCreate">
                    <div class="btn-group">
                        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
                            <localize key="actions_create">Create</localize>
@@ -82,7 +82,7 @@
                <umb-editor-sub-header-section ng-if="isAnythingSelected()">
 
                    <umb-button
-                       ng-if="options.allowBulkPublish"
+                       ng-if="options.allowBulkPublish && (buttonPermissions == null || buttonPermissions.canPublish)"
                        type="button"
                        button-style="link"
                        label="Publish"
@@ -93,7 +93,7 @@
                    </umb-button>
 
                    <umb-button
-                       ng-if="options.allowBulkUnpublish"
+                       ng-if="options.allowBulkUnpublish && (buttonPermissions == null || buttonPermissions.canUnpublish)"
                        type="button"
                        button-style="link"
                        label="Unpublish"
@@ -104,7 +104,7 @@
                    </umb-button>
 
                    <umb-button
-                       ng-if="options.allowBulkCopy"
+                       ng-if="options.allowBulkCopy && (buttonPermissions == null || buttonPermissions.canCopy)"
                        type="button"
                        button-style="link"
                        label="Copy"
@@ -115,7 +115,7 @@
                    </umb-button>
 
                    <umb-button
-                       ng-if="options.allowBulkMove"
+                       ng-if="options.allowBulkMove && (buttonPermissions == null || buttonPermissions.canMove)"
                        type="button"
                        button-style="link"
                        label="Move"
@@ -126,7 +126,7 @@
                    </umb-button>
 
                    <umb-button
-                       ng-if="options.allowBulkDelete"
+                       ng-if="options.allowBulkDelete && (buttonPermissions == null || buttonPermissions.canDelete)"
                        type="button"
                        button-style="link"
                        label="Delete"
