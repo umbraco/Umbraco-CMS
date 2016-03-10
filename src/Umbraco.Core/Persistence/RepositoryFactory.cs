@@ -1,5 +1,6 @@
 using Umbraco.Core.Configuration;
 using System;
+using Umbraco.Core.Cache;
 using LightInject;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
@@ -181,9 +182,10 @@ namespace Umbraco.Core.Persistence
             return _container.GetInstance<IDatabaseUnitOfWork, ITaskTypeRepository>(uow);
         }
 
-        internal virtual EntityContainerRepository CreateEntityContainerRepository(IDatabaseUnitOfWork uow)
+        internal virtual EntityContainerRepository CreateEntityContainerRepository(IDatabaseUnitOfWork uow, Guid containerObjectType)
         {
             return _container.GetInstance<IDatabaseUnitOfWork, EntityContainerRepository>(uow);            
+                containerObjectType);
         }
     }
 }

@@ -75,6 +75,31 @@ namespace Umbraco.Tests.Services.Importing
         }
 
         [Test]
+        public void PackagingService_Can_Import_Inherited_ContentTypes_And_Verify_PropertyTypes_UniqueIds()
+        {
+            // Arrange
+            var strXml = ImportResources.InheritedDocTypes_Package;
+            var xml = XElement.Parse(strXml);
+            var dataTypeElement = xml.Descendants("DataTypes").First();
+            var templateElement = xml.Descendants("Templates").First();
+            var docTypeElement = xml.Descendants("DocumentTypes").First();
+            var packagingService = ServiceContext.PackagingService;
+
+            // Act
+            var dataTypes = packagingService.ImportDataTypeDefinitions(dataTypeElement);
+            var templates = packagingService.ImportTemplates(templateElement);
+            var contentTypes = packagingService.ImportContentTypes(docTypeElement);
+
+            // Assert
+            var mRBasePage = contentTypes.First(x => x.Alias == "MRBasePage");
+            foreach (var propertyType in mRBasePage.PropertyTypes)
+            {
+                var propertyTypeDto = this.DatabaseContext.Database.First<PropertyTypeDto>("WHERE id = @id", new { id = propertyType.Id });
+                Assert.AreEqual(propertyTypeDto.UniqueId, propertyType.Key);
+            }
+        }
+
+        [Test]
         public void PackagingService_Can_Import_Inherited_ContentTypes_And_Verify_PropertyGroups_And_PropertyTypes()
         {
             // Arrange

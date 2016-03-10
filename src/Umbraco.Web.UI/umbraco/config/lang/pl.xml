@@ -547,6 +547,8 @@ Miłego dnia!]]></key>
     <key alias="tabs">Zakładki</key>
   </area>
   <area alias="sort">
+    <key alias="sortOrder">Sort order</key>
+    <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">Sortowanie zakończone.</key>
     <key alias="sortHelp">Przesuń poszczególne elementy w górę oraz w dół aż będą w odpowiedniej kolejności, lub kliknij na nagłówku kolumny aby posortować całą kolekcję elementów</key>
     <key alias="sortPleaseWait"><![CDATA[Proszę czekać. Trwa sortowanie elementów.<br/><br/>Nie zamykaj tego okna podczas sortowania]]></key>

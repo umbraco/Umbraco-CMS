@@ -1,38 +1,18 @@
-﻿namespace Umbraco.Web
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Text;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Umbraco.Core;
+using Umbraco.Core.Logging;
+using Umbraco.Web.Models;
+
+namespace Umbraco.Web
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.Linq;
-    using System.Text;
-
-    using Newtonsoft.Json;
-
-    using Umbraco.Core;
-    using Umbraco.Core.Logging;
-    using Umbraco.Web.Models;
-
     internal static class ImageCropperBaseExtensions
     {
-
-        internal static ImageCropData GetImageCrop(this string json, string id)
-        {
-            var ic = new ImageCropData();
-            if (json.DetectIsJson())
-            {
-                try
-                {
-                    var imageCropperSettings = JsonConvert.DeserializeObject<List<ImageCropData>>(json);
-                    ic = imageCropperSettings.GetCrop(id);
-                }
-                catch (Exception ex)
-                {
-                    LogHelper.Error(typeof(ImageCropperBaseExtensions), "Could not parse the json string: " + json, ex);
-                }
-            }
-            return ic;
-        }
-
         internal static ImageCropDataSet SerializeToCropDataSet(this string json)
         {
             var imageCrops = new ImageCropDataSet();
@@ -40,7 +20,11 @@
             {
                 try
                 {
-                    imageCrops = JsonConvert.DeserializeObject<ImageCropDataSet>(json);
+                    imageCrops = JsonConvert.DeserializeObject<ImageCropDataSet>(json, new JsonSerializerSettings
+                    {
+                        Culture = CultureInfo.InvariantCulture,
+                        FloatParseHandling = FloatParseHandling.Decimal
+                    });
                 }
                 catch (Exception ex)
                 {
@@ -61,13 +45,14 @@
 
         internal static ImageCropData GetCrop(this IEnumerable<ImageCropData> dataset, string cropAlias)
         {
-            if (dataset == null || !dataset.Any())
+            var imageCropDatas = dataset.ToArray();
+            if (dataset == null || imageCropDatas.Any() == false)
                 return null;
 
             if (string.IsNullOrEmpty(cropAlias))
-                return dataset.FirstOrDefault();
+                return imageCropDatas.FirstOrDefault();
 
-            return dataset.FirstOrDefault(x => x.Alias.ToLowerInvariant() == cropAlias.ToLowerInvariant());
+            return imageCropDatas.FirstOrDefault(x => x.Alias.ToLowerInvariant() == cropAlias.ToLowerInvariant());
         }
 
         internal static string GetCropBaseUrl(this ImageCropDataSet cropDataSet, string cropAlias, bool preferFocalPoint)

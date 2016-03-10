@@ -45,12 +45,12 @@
             /// <summary>callback used to display the modal dialog to insert a macro with parameters</summary>
             
             var self = this;
-
+           
             UmbClientMgr.openAngularModalWindow({
                 template: "views/common/dialogs/insertmacro.html",
                 dialogData: {
                     renderingEngine: "Mvc",
-                    selectedAlias: alias
+                    macroData: {macroAlias: alias}
                 },
                 callback: function (data) {
                     UmbEditor.Insert(data.syntax, '', self._opts.codeEditorElementId);
@@ -77,9 +77,9 @@
 
                     if (type === 'rendersection') {
                         if (data.required) {
-                            code = "\n@RenderSection(\"" + data.name + "\", true);\n";
+                            code = "\n@RenderSection(\"" + data.name + "\", true)\n";
                         } else {
-                            code = "\n@RenderSection(\"" + data.name + "\" false);\n";
+                            code = "\n@RenderSection(\"" + data.name + "\", false)\n";
                         }
                     }
 

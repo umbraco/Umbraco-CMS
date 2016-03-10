@@ -12,6 +12,7 @@ function valServerField(serverValidationManager) {
         link: function (scope, element, attr, ctrl) {
             
             var fieldName = null;
+            var eventBindings = [];
 
             attr.$observe("valServerField", function (newVal) {
                 if (newVal && fieldName === null) {
@@ -22,11 +23,11 @@ function valServerField(serverValidationManager) {
                     // resubmitted. So once a field is changed that has a server error assigned to it
                     // we need to re-validate it for the server side validator so the user can resubmit
                     // the form. Of course normal client-side validators will continue to execute.
-                    ctrl.$viewChangeListeners.push(function () {
+                    eventBindings.push(scope.$watch('ngModel', function(newValue){
                         if (ctrl.$invalid) {
                             ctrl.$setValidity('valServerField', true);
                         }
-                    });
+                    }));
 
                     //subscribe to the server validation changes
                     serverValidationManager.subscribe(null, fieldName, function (isValid, fieldErrors, allErrors) {
@@ -48,9 +49,16 @@ function valServerField(serverValidationManager) {
                     element.bind('$destroy', function () {
                         serverValidationManager.unsubscribe(null, fieldName);
                     });
-
                 }
             });
+
+            scope.$on('$destroy', function(){
+              // unbind watchers
+              for(var e in eventBindings) {
+                eventBindings[e]();
+               }
+            });
+
         }
     };
 }

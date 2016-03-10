@@ -59,7 +59,8 @@ namespace umbraco.presentation.developer.packages {
 
             }
 
-            ApplicationContext.Current.ApplicationCache.ClearAllCache();
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearAllCache();
+            ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.ClearAllCaches();
             library.RefreshContent();
 
             loadNitros.Visible = false;

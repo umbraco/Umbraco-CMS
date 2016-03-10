@@ -10,20 +10,18 @@ using Umbraco.Core.Models.Validation;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
-    [DataContract(Name = "contentType", Namespace = "")]
-    public class ContentTypeCompositionDisplay : ContentTypeBasic, INotificationModel
+    public abstract class ContentTypeCompositionDisplay : ContentTypeBasic, INotificationModel
     {
-        public ContentTypeCompositionDisplay()
+        protected ContentTypeCompositionDisplay()
         {
             //initialize collections so at least their never null
-            Groups = new List<PropertyGroupDisplay>();
             AllowedContentTypes = new List<int>();
             CompositeContentTypes = new List<string>();
             Notifications = new List<Notification>();
         }
 
         //name, alias, icon, thumb, desc, inherited from basic
-        
+
         //List view
         [DataMember(Name = "isContainer")]
         public bool IsContainer { get; set; }
@@ -32,10 +30,6 @@ namespace Umbraco.Web.Models.ContentEditing
         [ReadOnly(true)]
         public string ListViewEditorName { get; set; }
 
-        //Tabs
-        [DataMember(Name = "groups")]
-        public IEnumerable<PropertyGroupDisplay> Groups { get; set; }
-
         //Allowed child types
         [DataMember(Name = "allowedContentTypes")]
         public IEnumerable<int> AllowedContentTypes { get; set; }
@@ -43,7 +37,11 @@ namespace Umbraco.Web.Models.ContentEditing
         //Compositions
         [DataMember(Name = "compositeContentTypes")]
         public IEnumerable<string> CompositeContentTypes { get; set; }
-        
+
+        //Locked compositions
+        [DataMember(Name = "lockedCompositeContentTypes")]
+        public IEnumerable<string> LockedCompositeContentTypes { get; set; }
+
         [DataMember(Name = "allowAsRoot")]
         public bool AllowAsRoot { get; set; }
 
@@ -67,5 +65,21 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "ModelState")]
         [ReadOnly(true)]
         public IDictionary<string, object> Errors { get; set; }
+    }
+
+    [DataContract(Name = "contentType", Namespace = "")]
+    public abstract class ContentTypeCompositionDisplay<TPropertyTypeDisplay> : ContentTypeCompositionDisplay
+        where TPropertyTypeDisplay : PropertyTypeDisplay
+    {
+        protected ContentTypeCompositionDisplay()
+        {
+            //initialize collections so at least their never null
+            Groups = new List<PropertyGroupDisplay<TPropertyTypeDisplay>>();
+        }
+
+        //Tabs
+        [DataMember(Name = "groups")]
+        public IEnumerable<PropertyGroupDisplay<TPropertyTypeDisplay>> Groups { get; set; }
+        
     }
 }

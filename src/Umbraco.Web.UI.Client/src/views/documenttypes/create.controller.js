@@ -6,31 +6,44 @@
  * @description
  * The controller for the doc type creation dialog
  */
-function DocumentTypesCreateController($scope, $location, navigationService, contentTypeResource, formHelper, appState, notificationsService) {
+function DocumentTypesCreateController($scope, $location, navigationService, contentTypeResource, formHelper, appState, notificationsService, localizationService) {
 
     $scope.model = {
+        allowCreateFolder: $scope.dialogOptions.currentNode.parentId === null || $scope.dialogOptions.currentNode.nodeType === "container",
         folderName: "",
-        creatingFolder: false,        
+        creatingFolder: false,
     };
 
-    var node = $scope.dialogOptions.currentNode;
+    var node = $scope.dialogOptions.currentNode,
+        localizeCreateFolder = localizationService.localize("defaultdialog_createFolder");
 
     $scope.showCreateFolder = function() {
         $scope.model.creatingFolder = true;
-    }
+    };
 
-    $scope.createContainer = function () {
-        if (formHelper.submitForm({ scope: $scope, formCtrl: this.createFolderForm, statusMessage: "Creating folder..." })) {
-            contentTypeResource.createContainer(node.id, $scope.model.folderName).then(function (folderId) {
+    $scope.createContainer = function() {
+
+        if (formHelper.submitForm({scope: $scope, formCtrl: this.createFolderForm, statusMessage: localizeCreateFolder})) {
+
+            contentTypeResource.createContainer(node.id, $scope.model.folderName).then(function(folderId) {
 
                 navigationService.hideMenu();
+
                 var currPath = node.path ? node.path : "-1";
-                navigationService.syncTree({ tree: "documenttypes", path: currPath + "," + folderId, forceReload: true, activate: true });
 
-                formHelper.resetForm({ scope: $scope });
+                navigationService.syncTree({
+                    tree: "documenttypes",
+                    path: currPath + "," + folderId,
+                    forceReload: true,
+                    activate: true
+                });
 
-                var section = appState.getSectionState("currentSection"); 
-                
+                formHelper.resetForm({
+                    scope: $scope
+                });
+
+                var section = appState.getSectionState("currentSection");
+
             }, function(err) {
 
                 $scope.error = err;
@@ -42,22 +55,22 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
                     }
                 }
             });
-        };
-    }
+        }
+    };
 
     $scope.createDocType = function() {
         $location.search('create', null);
         $location.search('notemplate', null);
         $location.path("/settings/documenttypes/edit/" + node.id).search("create", "true");
         navigationService.hideMenu();
-    }
+    };
 
     $scope.createComponent = function() {
-      $location.search('create', null);
-      $location.search('notemplate', null);
-      $location.path("/settings/documenttypes/edit/" + node.id).search("create", "true").search("notemplate", "true");
-      navigationService.hideMenu();
-    }
+        $location.search('create', null);
+        $location.search('notemplate', null);
+        $location.path("/settings/documenttypes/edit/" + node.id).search("create", "true").search("notemplate", "true");
+        navigationService.hideMenu();
+    };
 }
 
 angular.module('umbraco').controller("Umbraco.Editors.DocumentTypes.CreateController", DocumentTypesCreateController);

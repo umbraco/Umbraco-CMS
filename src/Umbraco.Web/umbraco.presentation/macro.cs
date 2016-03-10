@@ -455,11 +455,11 @@ namespace umbraco
                                 }
 
                                 //insert the cache string result
-                                ApplicationContext.Current.ApplicationCache.InsertCacheItem(
+                                ApplicationContext.Current.ApplicationCache.RuntimeCache.InsertCacheItem(
                                     CacheKeys.MacroHtmlCacheKey + Model.CacheIdentifier,
-                                    CacheItemPriority.NotRemovable,
-                                    new TimeSpan(0, 0, Model.CacheDuration),
-                                    () => outputCacheString);
+                                    priority:       CacheItemPriority.NotRemovable,
+                                    timeout:        new TimeSpan(0, 0, Model.CacheDuration),
+                                    getCacheItem:   () => outputCacheString);
 
                                 dateAddedCacheKey = CacheKeys.MacroHtmlDateAddedCacheKey + Model.CacheIdentifier;
 
@@ -474,11 +474,11 @@ namespace umbraco
                             else
                             {
                                 //insert the cache control result
-                                ApplicationContext.Current.ApplicationCache.InsertCacheItem(
+                                ApplicationContext.Current.ApplicationCache.RuntimeCache.InsertCacheItem(
                                     CacheKeys.MacroControlCacheKey + Model.CacheIdentifier,
-                                    CacheItemPriority.NotRemovable,
-                                    new TimeSpan(0, 0, Model.CacheDuration),
-                                    () => new MacroCacheContent(macroControl, macroControl.ID));
+                                    priority:       CacheItemPriority.NotRemovable,
+                                    timeout:        new TimeSpan(0, 0, Model.CacheDuration),
+                                    getCacheItem:   () => new MacroCacheContent(macroControl, macroControl.ID));
 
                                 dateAddedCacheKey = CacheKeys.MacroControlDateAddedCacheKey + Model.CacheIdentifier;
 
@@ -487,11 +487,11 @@ namespace umbraco
                             }
 
                             //insert the date inserted (so we can check file modification date)
-                            ApplicationContext.Current.ApplicationCache.InsertCacheItem(
+                            ApplicationContext.Current.ApplicationCache.RuntimeCache.InsertCacheItem(
                                 dateAddedCacheKey,
-                                CacheItemPriority.NotRemovable,
-                                new TimeSpan(0, 0, Model.CacheDuration),
-                                () => DateTime.Now);
+                                priority:       CacheItemPriority.NotRemovable,
+                                timeout:        new TimeSpan(0, 0, Model.CacheDuration),
+                                getCacheItem:   () => DateTime.Now);
 
                         }
 
@@ -524,7 +524,7 @@ namespace umbraco
 
                 if (CacheMacroAsString(Model))
                 {
-                    macroHtml = ApplicationContext.Current.ApplicationCache.GetCacheItem<string>(
+                    macroHtml = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<string>(
                         CacheKeys.MacroHtmlCacheKey + Model.CacheIdentifier);
 
                     // FlorisRobbemont: 
@@ -550,7 +550,7 @@ namespace umbraco
                 }
                 else
                 {
-                    var cacheContent = ApplicationContext.Current.ApplicationCache.GetCacheItem<MacroCacheContent>(
+                    var cacheContent = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<MacroCacheContent>(
                         CacheKeys.MacroControlCacheKey + Model.CacheIdentifier);
 
                     if (cacheContent != null)
@@ -614,7 +614,7 @@ namespace umbraco
         {
             if (MacroIsFileBased(model))
             {
-                var cacheResult = ApplicationContext.Current.ApplicationCache.GetCacheItem<DateTime?>(dateAddedKey);
+                var cacheResult = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<DateTime?>(dateAddedKey);
 
                 if (cacheResult != null)
                 {

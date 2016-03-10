@@ -1,4 +1,4 @@
-<div class="umbracoDialog umb-dialog-body with-footer" ng-controller="Umbraco.Editors.MediaTypes.CreateController">
+<div class="umbracoDialog umb-dialog-body with-footer" ng-controller="Umbraco.Editors.MediaTypes.CreateController" ng-cloak>
 
     <div class="umb-pane" ng-if="!model.creatingFolder">
         <h5><localize key="create_createUnder">Create an item under</localize> {{currentNode.name}}</h5>
@@ -18,12 +18,8 @@
             </li>
             <li>
                 <a href="" ng-click="showCreateFolder()">
-
                     <i class="large icon-folder"></i>
-
-                    <span class="menu-label">
-                        Folder
-                    </span>
+                    <span class="menu-label"><localize key="general_folder"></localize></span>
                 </a>
             </li>
         </ul>

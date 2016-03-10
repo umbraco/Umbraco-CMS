@@ -356,7 +356,8 @@ namespace Umbraco.Core
                 //clear the cache
                 if (ApplicationCache != null)
                 {
-                    ApplicationCache.ClearAllCache();    
+                    ApplicationCache.RuntimeCache.ClearAllCache();
+                    ApplicationCache.IsolatedRuntimeCache.ClearAllCaches();
                 }
                 //reset all resolvers
                 ResolverCollection.ResetAll();

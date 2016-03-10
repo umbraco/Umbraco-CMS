@@ -228,13 +228,5 @@ namespace Umbraco.Core.Models
         {
             get { return _additionalData; }
         }
-
-        internal override void AddingEntity()
-        {
-            base.AddingEntity();
-
-            if(Key == default(Guid))
-                Key = Guid.NewGuid();
-        }
     }
 }

@@ -5,17 +5,17 @@
 
       function link(scope, el, attr, ctrl) {
 
-         scope.clickFolder = function(folder) {
+         scope.clickFolder = function(folder, $event, $index) {
             if(scope.onClick) {
-               scope.onClick(folder);
+               scope.onClick(folder, $event, $index);
             }
          };
 
-         scope.selectFolder = function(folder, $event, $index) {
-            if(scope.onSelect) {
-               scope.onSelect(folder, $event, $index);
+         scope.clickFolderName = function(folder, $event, $index) {
+            if(scope.onClickName) {
+               scope.onClickName(folder, $event, $index);
+               $event.stopPropagation();
             }
-            $event.stopPropagation();
          };
 
       }
@@ -26,8 +26,8 @@
          templateUrl: 'views/components/umb-folder-grid.html',
          scope: {
             folders: '=',
-            onSelect: '=',
-            onClick: "="
+            onClick: "=",
+            onClickName: "="
          },
          link: link
       };

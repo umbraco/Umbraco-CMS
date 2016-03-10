@@ -6,134 +6,143 @@
 
    <div class="row-fluid" ng-switch-when="false">
 
-      <umb-editor-sub-header>
+       <umb-editor-sub-header>
 
-         <umb-editor-sub-header-content-left>
+           <umb-editor-sub-header-content-left>
 
-            <umb-editor-sub-header-section ng-if="listViewAllowedTypes && listViewAllowedTypes.length > 0 && !isAnythingSelected()">
-               <div class="btn-group">
-                   <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-                       <localize key="actions_create">Create</localize>
-                       <span class="caret"></span>
-                   </a>
-                   <ul class="dropdown-menu">
-                       <li ng-repeat="contentType in listViewAllowedTypes">
-                           <a href="#/{{entityType}}/{{entityType}}/edit/{{contentId}}?doctype={{contentType.alias}}&create=true">
-                               <i class="icon-{{contentType.cssClass}}"></i>
-                               {{contentType.name}}
-                           </a>
-                       </li>
-                   </ul>
-               </div>
-            </umb-editor-sub-header-section>
-
-            <umb-editor-sub-header-section ng-if="isAnythingSelected()">
-               <umb-button
-                  type="button"
-                  label="Clear selection"
-                  action="clearSelection()"
-                  disabled="actionInProgress">
-               </umb-button>
-            </umb-editor-sub-header-section>
-
-            <umb-editor-sub-header-section ng-if="isAnythingSelected()">
-               <strong ng-show="!actionInProgress">{{ selectedItemsCount() }} of {{ listViewResultSet.items.length }} selected</strong>
-               <strong ng-show="actionInProgress" ng-bind="bulkStatus"></strong>
-
-               <div class="umb-loader-wrapper -bottom" ng-show="actionInProgress">
-                  <div class="umb-loader"></div>
-               </div>
-            </umb-editor-sub-header-section>
-
-         </umb-editor-sub-header-content-left>
-
-
-         <umb-editor-sub-header-content-right>
-
-            <umb-editor-sub-header-section ng-if="!isAnythingSelected()">
-
-               <umb-layout-selector
-                  ng-if="options.layout.layouts"
-                  layouts="options.layout.layouts"
-                  active-layout="options.layout.activeLayout"
-                  on-layout-select="selectLayout">
-               </umb-layout-selector>
-
-            </umb-editor-sub-header-section>
-
-            <umb-editor-sub-header-section ng-if="!actionInProgress && !isAnythingSelected()">
-               <form class="form-search -no-margin-bottom pull-right" novalidate>
-                   <div class="inner-addon left-addon">
-                       <i class="icon icon-search" ng-click="enterSearch($event)"></i>
-                       <input type="text" class="form-control" localize="placeholder" placeholder="@general_typeToSearch" ng-model="options.filter" ng-keydown="filterResults($event)" prevent-enter-submit no-dirty-check>
+               <umb-editor-sub-header-section ng-if="listViewAllowedTypes && listViewAllowedTypes.length > 0 && !isAnythingSelected()">
+                   <div class="btn-group">
+                       <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                           <localize key="actions_create">Create</localize>
+                           <span class="caret"></span>
+                       </a>
+                       <ul class="dropdown-menu">
+                           <li ng-repeat="contentType in listViewAllowedTypes">
+                               <a href="#/{{entityType}}/{{entityType}}/edit/{{contentId}}?doctype={{contentType.alias}}&create=true">
+                                   <i class="icon-{{contentType.cssClass}}"></i>
+                                   {{contentType.name}}
+                               </a>
+                           </li>
+                       </ul>
                    </div>
-               </form>
-            </umb-editor-sub-header-section>
+               </umb-editor-sub-header-section>
 
-            <umb-editor-sub-header-section ng-if="isAnythingSelected()">
+               <umb-editor-sub-header-section ng-if="isAnythingSelected()">
+                   <umb-button
+                       type="button"
+                       label="Clear selection"
+                       action="clearSelection()"
+                       disabled="actionInProgress">
+                   </umb-button>
+               </umb-editor-sub-header-section>
 
-               <umb-button
-                  ng-if="entityType === 'content' && !isTrashed && options.allowBulkPublish"
-                  type="button"
-                  button-style="link"
-                  label="Publish"
-                  key="actions_publish"
-                  icon="icon-globe"
-                  action="publish()"
-                  disabled="actionInProgress">
-               </umb-button>
+               <umb-editor-sub-header-section ng-if="isAnythingSelected()">
+                   <strong ng-show="!actionInProgress">{{ selectedItemsCount() }} of {{ listViewResultSet.items.length }} selected</strong>
+                   <strong ng-show="actionInProgress" ng-bind="bulkStatus"></strong>
 
-               <umb-button
-                  ng-if="entityType === 'content' && !isTrashed && options.allowBulkUnpublish"
-                  type="button"
-                  button-style="link"
-                  label="Unpublish"
-                  key="actions_unpublish"
-                  icon="icon-block"
-                  action="unpublish()"
-                  disabled="actionInProgress">
-               </umb-button>
+                   <div class="umb-loader-wrapper -bottom" ng-show="actionInProgress">
+                       <div class="umb-loader"></div>
+                   </div>
+               </umb-editor-sub-header-section>
 
-               <umb-button
-                  ng-if="entityType === 'content' && options.allowBulkCopy"
-                  type="button"
-                  button-style="link"
-                  label="Copy"
-                  key="actions_copy"
-                  icon="icon-documents"
-                  action="copy()"
-                  disabled="actionInProgress">
-               </umb-button>
+           </umb-editor-sub-header-content-left>
 
-               <umb-button
-                  ng-if="options.allowBulkMove"
-                  type="button"
-                  button-style="link"
-                  label="Move"
-                  key="actions_move"
-                  icon="icon-enter"
-                  action="move()"
-                  disabled="actionInProgress">
-               </umb-button>
 
-               <umb-button
-                  ng-if="options.allowBulkDelete"
-                  type="button"
-                  button-style="link"
-                  label="Delete"
-                  key="actions_delete"
-                  icon="icon-trash"
-                  action="delete()"
-                  disabled="actionInProgress">
-               </umb-button>
+           <umb-editor-sub-header-content-right>
 
-            </umb-editor-sub-header-section>
+               <umb-editor-sub-header-section ng-if="!isAnythingSelected()">
 
-         </umb-editor-sub-header-content-right>
+                   <umb-layout-selector
+                       ng-if="options.layout.layouts"
+                       layouts="options.layout.layouts"
+                       active-layout="options.layout.activeLayout"
+                       on-layout-select="selectLayout">
+                   </umb-layout-selector>
 
-      </umb-editor-sub-header>
+               </umb-editor-sub-header-section>
 
-      <umb-list-view-layout
+               <umb-editor-sub-header-section ng-if="!isAnythingSelected()">
+                   <form class="form-search -no-margin-bottom pull-right" novalidate>
+                       <div class="inner-addon left-addon">
+                           <i class="icon icon-search" ng-click="enterSearch($event)"></i>
+                           <input
+                               class="form-control search-input"
+                               type="text"
+                               localize="placeholder"
+                               placeholder="@general_typeToSearch"
+                               ng-model="options.filter"
+                               ng-change="enterSearch()"
+                               ng-keydown="forceSearch($event)"
+                               prevent-enter-submit
+                               no-dirty-check>
+                       </div>
+                   </form>
+               </umb-editor-sub-header-section>
+
+               <umb-editor-sub-header-section ng-if="isAnythingSelected()">
+
+                   <umb-button
+                       ng-if="options.allowBulkPublish"
+                       type="button"
+                       button-style="link"
+                       label="Publish"
+                       key="actions_publish"
+                       icon="icon-globe"
+                       action="publish()"
+                       disabled="actionInProgress">
+                   </umb-button>
+
+                   <umb-button
+                       ng-if="options.allowBulkUnpublish"
+                       type="button"
+                       button-style="link"
+                       label="Unpublish"
+                       key="actions_unpublish"
+                       icon="icon-block"
+                       action="unpublish()"
+                       disabled="actionInProgress">
+                   </umb-button>
+
+                   <umb-button
+                       ng-if="options.allowBulkCopy"
+                       type="button"
+                       button-style="link"
+                       label="Copy"
+                       key="actions_copy"
+                       icon="icon-documents"
+                       action="copy()"
+                       disabled="actionInProgress">
+                   </umb-button>
+
+                   <umb-button
+                       ng-if="options.allowBulkMove"
+                       type="button"
+                       button-style="link"
+                       label="Move"
+                       key="actions_move"
+                       icon="icon-enter"
+                       action="move()"
+                       disabled="actionInProgress">
+                   </umb-button>
+
+                   <umb-button
+                       ng-if="options.allowBulkDelete"
+                       type="button"
+                       button-style="link"
+                       label="Delete"
+                       key="actions_delete"
+                       icon="icon-trash"
+                       action="delete()"
+                       disabled="actionInProgress">
+                   </umb-button>
+
+               </umb-editor-sub-header-section>
+
+           </umb-editor-sub-header-content-right>
+
+       </umb-editor-sub-header>
+
+       <umb-list-view-layout
          ng-if="viewLoaded"
          content-id="contentId"
          folders="folders"
@@ -143,6 +152,8 @@
          entity-type="{{entityType}}"
          on-get-content="reloadView">
       </umb-list-view-layout>
+
+      <umb-load-indicator ng-show="!viewLoaded"></umb-load-indicator>
 
       <umb-pagination
          ng-if="listViewResultSet.totalPages"

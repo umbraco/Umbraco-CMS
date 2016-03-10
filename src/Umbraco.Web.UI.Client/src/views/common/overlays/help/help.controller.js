@@ -2,8 +2,11 @@ angular.module("umbraco")
     .controller("Umbraco.Overlays.HelpController", function ($scope, $location, $routeParams, helpService, userService, localizationService) {
         $scope.section = $routeParams.section;
         $scope.version = Umbraco.Sys.ServerVariables.application.version + " assembly: " + Umbraco.Sys.ServerVariables.application.assemblyVersion;
-        $scope.model.title = "Help";
         $scope.model.subtitle = "Umbraco version" + " " + $scope.version;
+
+        if(!$scope.model.title) {
+            $scope.model.title = localizationService.localize("general_help");
+        }
 
         if(!$scope.section){
             $scope.section = "content";
@@ -17,11 +20,6 @@ angular.module("umbraco")
         //translate section name
         localizationService.localize("sections_" + rq.section).then(function (value) {
             $scope.sectionName = value;
-        });
-
-        // translate dialog title
-        localizationService.localize("sections_help").then(function (value) {
-            $scope.model.title = value;
         });
 
         userService.getCurrentUser().then(function(user){

@@ -95,19 +95,19 @@
        xdt:Transform="SetAttributes()" />
 
   <!--Members-->
-  <add initialize="true" sortOrder="2" alias="member" application="member" title="Members" iconClosed="icon-folder" iconOpen="icon-folder-open" type="Umbraco.Web.Trees.MemberTreeController, umbraco" 
+  <add initialize="true" sortOrder="0" alias="member" application="member" title="Members" iconClosed="icon-folder" iconOpen="icon-folder-open" type="Umbraco.Web.Trees.MemberTreeController, umbraco" 
        xdt:Locator="Match(application,alias)" 
        xdt:Transform="SetAttributes()" />
   <add application="member" alias="memberGroup"
        xdt:Locator="Match(application,alias)" 
        xdt:Transform="Remove" />
-  <add application="member" alias="memberGroups" title="Member Groups" type="umbraco.loadMemberGroups, umbraco" iconClosed="icon-folder" iconOpen="icon-folder" sortOrder="1" 
+  <add application="member" sortOrder="2" alias="memberGroups" title="Member Groups" type="umbraco.loadMemberGroups, umbraco" iconClosed="icon-folder" iconOpen="icon-folder" 
        xdt:Locator="Match(application,alias)" 
        xdt:Transform="InsertIfMissing" />
   <add application="member" alias="memberType"
        xdt:Locator="Match(application,alias)" 
        xdt:Transform="Remove" />
-  <add application="member" alias="memberTypes" initialize="true" title="Member Types" type="Umbraco.Web.Trees.MemberTypeTreeController, umbraco" iconClosed="icon-folder" iconOpen="icon-folder-open" sortOrder="0" 
+  <add application="member" sortOrder="1" alias="memberTypes" initialize="true" title="Member Types" type="Umbraco.Web.Trees.MemberTypeTreeController, umbraco" iconClosed="icon-folder" iconOpen="icon-folder-open" 
        xdt:Locator="Match(application,alias)" 
        xdt:Transform="InsertIfMissing" />
 

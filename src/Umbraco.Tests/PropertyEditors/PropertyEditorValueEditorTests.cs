@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -17,6 +18,8 @@ namespace Umbraco.Tests.PropertyEditors
         [SetUp]
         public virtual void TestSetup()
         {
+            //normalize culture
+            Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture;
             ShortStringHelperResolver.Current = new ShortStringHelperResolver(new DefaultShortStringHelper(SettingsForTests.GetDefault()));
             Resolution.Freeze();
         }

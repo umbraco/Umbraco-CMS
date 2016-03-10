@@ -19,7 +19,7 @@
         <div class="content" >
 
             <!-- Drag and drop illustration -->
-            <img src="assets/img/uploader/upload-illustration.svg" alt="" draggable="false" />
+            <img class="illustration" src="assets/img/uploader/upload-illustration.svg" alt="" draggable="false" />
 
 
             <!-- Select files -->
@@ -30,7 +30,7 @@
                  ngf-multiple="true"
                  ngf-pattern="{{ accept }}"
                  ngf-max-size="{{ maxFileSize }}">
-                - or click here to choose files
+                - <localize key="media_orClickHereToUpload">or click here to choose files</localize>
             </div>
         </div>
     </div>
@@ -78,8 +78,8 @@
                <strong>{{ file.name }}</strong>
 
                <span class="file-error" ng-if="file.$error">
-                  <span ng-if="file.$error === 'pattern'" class="errorMessage color-red">(Only allowed file types are: "{{ accept }}")</span>
-                  <span ng-if="file.$error === 'maxSize'" class="errorMessage color-red">(Max file size is "{{maxFileSize}}")</span>
+                  <span ng-if="file.$error === 'pattern'" class="errorMessage color-red">(<localize key="media_onlyAllowedFiles"></localize>: "{{ accept }}")</span>
+                  <span ng-if="file.$error === 'maxSize'" class="errorMessage color-red">(<localize key="media_maxFileSize"></localize> "{{maxFileSize}}")</span>
                </span>
 
                <span class="file-error" ng-if="file.serverErrorMessage">

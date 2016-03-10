@@ -4,9 +4,11 @@ using System.Web;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Collections;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Tests.Collections;
 
 namespace Umbraco.Tests.Cache
 {
@@ -34,6 +36,23 @@ namespace Umbraco.Tests.Cache
         internal override IRuntimeCacheProvider RuntimeProvider
         {
             get { return _provider; }
+        }
+
+        [Test]
+        public void Clones_List()
+        {
+            var original = new DeepCloneableList<DeepCloneableListTests.TestClone>(ListCloneBehavior.Always);
+            original.Add(new DeepCloneableListTests.TestClone());
+            original.Add(new DeepCloneableListTests.TestClone());
+            original.Add(new DeepCloneableListTests.TestClone());
+
+            var val = _provider.GetCacheItem<DeepCloneableList<DeepCloneableListTests.TestClone>>("test", () => original);
+
+            Assert.AreEqual(original.Count, val.Count);
+            foreach (var item in val)
+            {
+                Assert.IsTrue(item.IsClone);
+            }
         }
 
         [Test]

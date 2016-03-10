@@ -537,6 +537,7 @@ order by level,sortOrder";
         }
 
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
 
         /// <summary>
         /// Deletes this instance.
@@ -711,6 +712,7 @@ order by level,sortOrder";
             internal set { _parentid = value; }
         }
 
+        private IUmbracoEntity _parent;
         /// <summary>
         /// Given the hierarchical tree structure a CMSNode has only one newParent but can have many children
         /// </summary>
@@ -720,15 +722,21 @@ order by level,sortOrder";
             get
             {
                 if (Level == 1) throw new ArgumentException("No newParent node");
-                return new CMSNode(_parentid);
+                if (_parent == null)
+                {
+                    _parent = ApplicationContext.Current.Services.EntityService.Get(_parentid);
+                }
+                return new CMSNode(_parent);
             }
             set
             {
                 _parentid = value.Id;
-                SqlHelper.ExecuteNonQuery("update umbracoNode set parentId = " + value.Id.ToString() + " where id = " + this.Id.ToString());
+                SqlHelper.ExecuteNonQuery("update umbracoNode set parentId = " + value.Id + " where id = " + this.Id.ToString());
 
                 if (Entity != null)
                     Entity.ParentId = value.Id;
+
+                _parent = value.Entity;
             }
         }
 
@@ -1089,7 +1097,7 @@ order by level,sortOrder";
             x.Attributes.Append(XmlHelper.AddAttribute(xd, "id", this.Id.ToString()));
             x.Attributes.Append(XmlHelper.AddAttribute(xd, "key", this.UniqueId.ToString()));
             if (this.Level > 1)
-                x.Attributes.Append(XmlHelper.AddAttribute(xd, "parentID", this.Parent.Id.ToString()));
+                x.Attributes.Append(XmlHelper.AddAttribute(xd, "parentID", this.ParentId.ToString()));
             else
                 x.Attributes.Append(XmlHelper.AddAttribute(xd, "parentID", "-1"));
             x.Attributes.Append(XmlHelper.AddAttribute(xd, "level", this.Level.ToString()));

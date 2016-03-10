@@ -34,6 +34,15 @@ h5{
   margin-top: 15px;
 }
 
+h5.-border-bottom {
+	border-bottom: 1px solid #ECECEC;
+	padding-bottom: 5px;
+}
+
+h5.-black {
+	color: @black;
+}
+
 /* MISC FORM ELEMENTS */
 .umb-form-actions {
     background: none;
@@ -131,7 +140,10 @@ h5{
 
 /* LABELS*/
 .umb-control-group label.control-label {
-  text-align: left
+  text-align: left;
+}
+.umb-control-group label.control-label > div > label {
+  padding-left: 0;
 }
 .umb-control-group label .help-block,
 .umb-control-group label small {
@@ -141,7 +153,7 @@ h5{
   padding-top: 5px;
 }
 .umb-nolabel .controls {
-  margin-left: 0px;
+  margin-left: 0;
 }
 
 .controls-row {
@@ -150,11 +162,15 @@ h5{
 }
 
 .umb-user-panel .controls-row {
-    margin-left: 0px;
+    margin-left: 0;
 }
 
 .controls-row label {
-  display: inline-block
+  display: inline-block;
+}
+
+.controls-row > div > label {
+  padding-left: 0;
 }
 
 .block-form .controls-row {
@@ -162,10 +178,24 @@ h5{
    padding-top: 0;
 }
 
-.hidelabel > div > .controls-row, .hidelabel > .controls-row, .hidelabel .controls {
-  padding: 0px;
+.hidelabel > div > .controls-row, .hidelabel > .controls-row, .hidelabel > div > .controls {
+  padding: 0;
   border: none;
-  margin: 0px !important;
+  margin: 0 !important;
+}
+
+.controls-row > .vertical-align-items {
+  display: flex;
+  align-items: center;
+}
+
+.controls-row > .vertical-align-items > input.umb-editor-tiny {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.controls-row > .vertical-align-items > input.umb-editor-tiny:first-child {
+  margin-left: 0;
 }
 
 .thumbnails .selected {
@@ -575,26 +605,11 @@ input[type=checkbox]:checked + .input-label--small {
 	line-height: 20px;
 }
 
-.umb-empty-state-text {
-	font-size: @fontSizeMedium;
-	line-height: 1.8em;
-	color: @grayMed;
-	text-align: center;
-}
 
-.umb-empty-state-text.-small {
-	font-size: @fontSizeSmall;
-}
-
-.umb-empty-state-text.-large {
-	font-size: @fontSizeLarge;
-}
-
-.umb-empty-state-text.-center {
-	position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%,-50%);
-    width: 80%;
-    max-width: 400px;
+// Datepicker styles
+.bootstrap-datetimepicker-widget,
+.bootstrap-datetimepicker-widget td,
+.bootstrap-datetimepicker-widget th,
+.bootstrap-datetimepicker-widget td span {
+	border-radius: 0 !important;
 }

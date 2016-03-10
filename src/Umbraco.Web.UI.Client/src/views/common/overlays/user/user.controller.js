@@ -1,11 +1,15 @@
 angular.module("umbraco")
-    .controller("Umbraco.Overlays.UserController", function ($scope, $location, $timeout, userService, historyService, eventsService, externalLoginInfo, authResource, currentUserResource, formHelper) {
+    .controller("Umbraco.Overlays.UserController", function ($scope, $location, $timeout, userService, historyService, eventsService, externalLoginInfo, authResource, currentUserResource, formHelper, localizationService) {
 
         $scope.history = historyService.getCurrent();
         $scope.version = Umbraco.Sys.ServerVariables.application.version + " assembly: " + Umbraco.Sys.ServerVariables.application.assemblyVersion;
         $scope.showPasswordFields = false;
         $scope.changePasswordButtonState = "init";
         $scope.model.subtitle = "Umbraco version" + " " + $scope.version;
+
+        if(!$scope.model.title) {
+            $scope.model.title = localizationService.localize("general_user");
+        }
 
         $scope.externalLoginProviders = externalLoginInfo.providers;
         $scope.externalLinkLoginFormAction = Umbraco.Sys.ServerVariables.umbracoUrls.externalLinkLoginsUrl;
@@ -26,18 +30,18 @@ angular.module("umbraco")
             var pendingChangeEvent = eventsService.on("valFormManager.pendingChanges", function (e, args) {
                 //one time listener, remove the event
                 pendingChangeEvent();
-                $scope.closeOverLay();
+                $scope.model.close();
             });
 
 
             //perform the path change, if it is successful then the promise will resolve otherwise it will fail
-            $scope.closeOverLay();
+            $scope.model.close();
             $location.path("/logout");
         };
 
         $scope.gotoHistory = function (link) {
             $location.path(link);
-            $scope.closeOverLay();
+            $scope.model.close();
         };
 
         //Manually update the remaining timeout seconds
@@ -143,6 +147,9 @@ angular.module("umbraco")
                     formHelper.resetForm({ scope: $scope, notifications: data.notifications });
 
                     $scope.changePasswordButtonState = "success";
+                    $timeout(function() {
+                        $scope.togglePasswordFields();
+                    }, 2000);
 
                 }, function (err) {
 

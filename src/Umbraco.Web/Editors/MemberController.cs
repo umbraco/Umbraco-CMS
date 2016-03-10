@@ -135,7 +135,7 @@ namespace Umbraco.Web.Editors
                 ParentId = -1
             };
 
-            TabsAndPropertiesResolver.AddListView(display, "member", Services.DataTypeService);
+            TabsAndPropertiesResolver.AddListView(display, "member", Services.DataTypeService, Services.TextService);
 
             return display;
         }
@@ -145,6 +145,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
+        [OutgoingEditorModelEvent]
         public MemberDisplay GetByKey(Guid key)
         {
             MembershipUser foundMembershipMember;
@@ -196,6 +197,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="contentTypeAlias"></param>
         /// <returns></returns>
+        [OutgoingEditorModelEvent]
         public MemberDisplay GetEmpty(string contentTypeAlias = null)
         {
             IMember emptyContent;
@@ -343,12 +345,13 @@ namespace Umbraco.Web.Editors
             //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
             HandleInvalidModelState(display);
 
+            var localizedTextService = Services.TextService;
             //put the correct msgs in 
             switch (contentItem.Action)
             {
                 case ContentSaveAction.Save:
                 case ContentSaveAction.SaveNew:
-                    display.AddSuccessNotification(ui.Text("speechBubbles", "editMemberSaved"), ui.Text("speechBubbles", "editMemberSaved"));
+                    display.AddSuccessNotification(localizedTextService.Localize("speechBubbles/editMemberSaved"), localizedTextService.Localize("speechBubbles/editMemberSaved"));
                     break;
             }
 

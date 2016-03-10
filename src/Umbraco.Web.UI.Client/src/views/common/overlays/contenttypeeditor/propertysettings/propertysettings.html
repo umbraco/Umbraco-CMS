@@ -5,7 +5,8 @@
            <textarea class="editor-label"
                name="propertyLabel"
                ng-model="model.property.label"
-               placeholder="Enter a name..."
+               localize="placeholder"
+               placeholder="@placeholders_entername"
                umb-auto-focus
                focus-on-filled="true"
                umb-auto-resize
@@ -23,7 +24,8 @@
       <textarea
           class="editor-description"
           ng-model="model.property.description"
-          placeholder="Add your description here..."
+          localize="placeholder"
+          placeholder="@placeholders_enterDescription"
           overlay-submit-on-enter
           umb-auto-resize>
       </textarea>
@@ -31,7 +33,9 @@
 
    <div class="editor-wrapper umb-control-group control-group" ng-model="model.property.editor" val-require-component>
 
-      <a href="" ng-if="!model.property.editor" class="editor-placeholder" hotkey="alt+shift+e" ng-click="vm.openEditorPickerOverlay(model.property)">Add Editor</a>
+      <a href="" ng-if="!model.property.editor" class="editor-placeholder" hotkey="alt+shift+e" ng-click="vm.openEditorPickerOverlay(model.property)">
+          <localize key="shortcuts_addEditor"></localize>
+      </a>
 
       <div class="editor clearfix" ng-if="model.property.editor">
 
@@ -57,8 +61,11 @@
 
    <div class="umb-control-group clearfix">
 
+       <h5><localize key="validation_validation"></localize></h5>
+
       <label class="checkbox no-indent">
-         <input type="checkbox" ng-model="model.property.validation.mandatory" focus-when="{{vm.focusOnMandatoryField}}"> Field is mandatory
+         <input type="checkbox" ng-model="model.property.validation.mandatory" focus-when="{{vm.focusOnMandatoryField}}">
+         <localize key="validation_fieldIsMandatory"></localize>
       </label>
 
       <select class="umb-dropdown" ng-options="validationType.name for validationType in vm.validationTypes" ng-model="vm.selectedValidationType" ng-change="vm.changeValidationType(vm.selectedValidationType)">
@@ -75,6 +82,22 @@
          focus-when="{{vm.focusOnPatternField}}"
          overlay-submit-on-enter>
       </textarea>
+
+   </div>
+
+   <div class="umb-control-group clearfix" ng-if="model.contentType === 'memberType'">
+
+       <h5><localize key="general_rights"></localize></h5>
+
+       <label class="checkbox no-indent">
+          <input type="checkbox" ng-model="model.property.showOnMemberProfile">
+          <localize key="contentTypeEditor_showOnMemberProfile"></localize>
+       </label>
+
+      <label class="checkbox no-indent">
+         <input type="checkbox" ng-model="model.property.memberCanEdit">
+         <localize key="contentTypeEditor_memberCanEdit"></localize>
+      </label>
 
    </div>
 

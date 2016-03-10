@@ -124,6 +124,9 @@
     <Compile Include="ExamineHelper.cs" />
     <Compile Include="IndexTypes.cs" />
     <Compile Include="LegacyLibrary.cs" />
+    <Compile Include="LocalStorage\AzureLocalStorageDirectory.cs" />
+    <Compile Include="LocalStorage\CodeGenLocalStorageDirectory.cs" />
+    <Compile Include="LocalStorage\ILocalStorageDirectory.cs" />
     <Compile Include="LocalStorage\LocalStorageType.cs" />
     <Compile Include="LocalStorage\LocalTempStorageDirectory.cs" />
     <Compile Include="LocalStorage\LocalTempStorageDirectoryTracker.cs" />

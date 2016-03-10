@@ -159,7 +159,7 @@ namespace umbraco.cms.businesslogic.web
             ApplicationContext.Current.DatabaseContext.Database.Execute(
                 "update cmsDocument set templateId = NULL where templateId = @TemplateId", new {TemplateId = templateId});
             //We need to clear cache for Documents since this is touching the database directly
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheObjectTypes<IContent>();
+            ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.ClearCache<IContent>();
         }
 
         /// <summary>
@@ -179,7 +179,7 @@ namespace umbraco.cms.businesslogic.web
         #endregion
 
         #region Public Properties
-
+        
         public override int sortOrder
         {
             get
@@ -220,10 +220,7 @@ namespace umbraco.cms.businesslogic.web
 
         public override int ParentId
         {
-            get
-            {
-                return ContentEntity == null ? base.ParentId : ContentEntity.ParentId;
-            }
+            get { return ContentEntity == null ? base.ParentId : ContentEntity.ParentId; }
         }
 
         public override string Path

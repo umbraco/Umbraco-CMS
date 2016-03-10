@@ -69,7 +69,123 @@ namespace Umbraco.Tests.Models.Mapping
                 entityMapper.ConfigureMappings(configuration, appContext);
             });
         }
-        
+
+        [Test]
+        public void MemberTypeSave_To_IMemberType()
+        {
+            //Arrange
+
+            // setup the mocks to return the data we want to test against...
+
+            _dataTypeService.Setup(x => x.GetDataTypeDefinitionById(It.IsAny<int>()))
+                .Returns(Mock.Of<IDataTypeDefinition>(
+                    definition =>
+                        definition.Id == 555
+                        && definition.PropertyEditorAlias == "myPropertyType"
+                        && definition.DatabaseType == DataTypeDatabaseType.Nvarchar));
+
+            var display = CreateMemberTypeSave();
+
+            //Act
+
+            var result = Mapper.Map<IMemberType>(display);
+
+            //Assert
+
+            Assert.AreEqual(display.Alias, result.Alias);
+            Assert.AreEqual(display.Description, result.Description);
+            Assert.AreEqual(display.Icon, result.Icon);
+            Assert.AreEqual(display.Id, result.Id);
+            Assert.AreEqual(display.Name, result.Name);
+            Assert.AreEqual(display.ParentId, result.ParentId);
+            Assert.AreEqual(display.Path, result.Path);
+            Assert.AreEqual(display.Thumbnail, result.Thumbnail);
+            Assert.AreEqual(display.IsContainer, result.IsContainer);
+            Assert.AreEqual(display.AllowAsRoot, result.AllowedAsRoot);
+            Assert.AreEqual(display.CreateDate, result.CreateDate);
+            Assert.AreEqual(display.UpdateDate, result.UpdateDate);
+
+            //TODO: Now we need to assert all of the more complicated parts
+            Assert.AreEqual(display.Groups.Count(), result.PropertyGroups.Count);
+            for (var i = 0; i < display.Groups.Count(); i++)
+            {
+                Assert.AreEqual(display.Groups.ElementAt(i).Id, result.PropertyGroups.ElementAt(i).Id);
+                Assert.AreEqual(display.Groups.ElementAt(i).Name, result.PropertyGroups.ElementAt(i).Name);
+                var propTypes = display.Groups.ElementAt(i).Properties;
+                Assert.AreEqual(propTypes.Count(), result.PropertyTypes.Count());
+                for (var j = 0; j < propTypes.Count(); j++)
+                {
+                    Assert.AreEqual(propTypes.ElementAt(j).Id, result.PropertyTypes.ElementAt(j).Id);
+                    Assert.AreEqual(propTypes.ElementAt(j).DataTypeId, result.PropertyTypes.ElementAt(j).DataTypeDefinitionId);
+                    Assert.AreEqual(propTypes.ElementAt(j).MemberCanViewProperty, result.MemberCanViewProperty(result.PropertyTypes.ElementAt(j).Alias));
+                    Assert.AreEqual(propTypes.ElementAt(j).MemberCanEditProperty, result.MemberCanEditProperty(result.PropertyTypes.ElementAt(j).Alias));
+                }
+            }
+
+            Assert.AreEqual(display.AllowedContentTypes.Count(), result.AllowedContentTypes.Count());
+            for (var i = 0; i < display.AllowedContentTypes.Count(); i++)
+            {
+                Assert.AreEqual(display.AllowedContentTypes.ElementAt(i), result.AllowedContentTypes.ElementAt(i).Id.Value);
+            }
+        }
+
+        [Test]
+        public void MediaTypeSave_To_IMediaType()
+        {
+            //Arrange
+
+            // setup the mocks to return the data we want to test against...
+
+            _dataTypeService.Setup(x => x.GetDataTypeDefinitionById(It.IsAny<int>()))
+                .Returns(Mock.Of<IDataTypeDefinition>(
+                    definition =>
+                        definition.Id == 555
+                        && definition.PropertyEditorAlias == "myPropertyType"
+                        && definition.DatabaseType == DataTypeDatabaseType.Nvarchar));            
+
+            var display = CreateMediaTypeSave();
+
+            //Act
+
+            var result = Mapper.Map<IMediaType>(display);
+
+            //Assert
+
+            Assert.AreEqual(display.Alias, result.Alias);
+            Assert.AreEqual(display.Description, result.Description);
+            Assert.AreEqual(display.Icon, result.Icon);
+            Assert.AreEqual(display.Id, result.Id);
+            Assert.AreEqual(display.Name, result.Name);
+            Assert.AreEqual(display.ParentId, result.ParentId);
+            Assert.AreEqual(display.Path, result.Path);
+            Assert.AreEqual(display.Thumbnail, result.Thumbnail);
+            Assert.AreEqual(display.IsContainer, result.IsContainer);
+            Assert.AreEqual(display.AllowAsRoot, result.AllowedAsRoot);
+            Assert.AreEqual(display.CreateDate, result.CreateDate);
+            Assert.AreEqual(display.UpdateDate, result.UpdateDate);
+
+            //TODO: Now we need to assert all of the more complicated parts
+            Assert.AreEqual(display.Groups.Count(), result.PropertyGroups.Count);
+            for (var i = 0; i < display.Groups.Count(); i++)
+            {
+                Assert.AreEqual(display.Groups.ElementAt(i).Id, result.PropertyGroups.ElementAt(i).Id);
+                Assert.AreEqual(display.Groups.ElementAt(i).Name, result.PropertyGroups.ElementAt(i).Name);
+                var propTypes = display.Groups.ElementAt(i).Properties;
+                Assert.AreEqual(propTypes.Count(), result.PropertyTypes.Count());
+                for (var j = 0; j < propTypes.Count(); j++)
+                {
+                    Assert.AreEqual(propTypes.ElementAt(j).Id, result.PropertyTypes.ElementAt(j).Id);
+                    Assert.AreEqual(propTypes.ElementAt(j).DataTypeId, result.PropertyTypes.ElementAt(j).DataTypeDefinitionId);
+                }
+            }            
+
+            Assert.AreEqual(display.AllowedContentTypes.Count(), result.AllowedContentTypes.Count());
+            for (var i = 0; i < display.AllowedContentTypes.Count(); i++)
+            {
+                Assert.AreEqual(display.AllowedContentTypes.ElementAt(i), result.AllowedContentTypes.ElementAt(i).Id.Value);
+            }
+        }
+
         [Test]
         public void ContentTypeSave_To_IContentType()
         {
@@ -145,6 +261,33 @@ namespace Umbraco.Tests.Models.Mapping
         }
 
         [Test]
+        public void MediaTypeSave_With_Composition_To_IMediaType()
+        {
+            //Arrange
+
+            // setup the mocks to return the data we want to test against...
+
+            _dataTypeService.Setup(x => x.GetDataTypeDefinitionById(It.IsAny<int>()))
+                .Returns(Mock.Of<IDataTypeDefinition>(
+                    definition =>
+                        definition.Id == 555
+                        && definition.PropertyEditorAlias == "myPropertyType"
+                        && definition.DatabaseType == DataTypeDatabaseType.Nvarchar));
+
+
+            var display = CreateCompositionMediaTypeSave();
+
+            //Act
+
+            var result = Mapper.Map<IMediaType>(display);
+
+            //Assert
+
+            //TODO: Now we need to assert all of the more complicated parts
+            Assert.AreEqual(display.Groups.Count(x => x.Inherited == false), result.PropertyGroups.Count);
+        }
+
+        [Test]
         public void ContentTypeSave_With_Composition_To_IContentType()
         {
             //Arrange
@@ -172,6 +315,141 @@ namespace Umbraco.Tests.Models.Mapping
         }
 
         [Test]
+        public void IMemberType_To_MemberTypeDisplay()
+        {
+            //Arrange
+
+            // setup the mocks to return the data we want to test against...
+
+            // for any call to GetPreValuesCollectionByDataTypeId just return an empty dictionary for now
+            // TODO: but we'll need to change this to return some pre-values to test the mappings
+            _dataTypeService.Setup(x => x.GetPreValuesCollectionByDataTypeId(It.IsAny<int>()))
+                .Returns(new PreValueCollection(new Dictionary<string, PreValue>()));
+
+            //return a textbox property editor for any requested editor by alias
+            _propertyEditorResolver.Setup(resolver => resolver.GetByAlias(It.IsAny<string>()))
+                .Returns(new TextboxPropertyEditor());
+            //for testing, just return a list of whatever property editors we want
+            _propertyEditorResolver.Setup(resolver => resolver.PropertyEditors)
+                .Returns(new[] { new TextboxPropertyEditor() });
+
+            var memberType = MockedContentTypes.CreateSimpleMemberType();
+            memberType.MemberTypePropertyTypes[memberType.PropertyTypes.Last().Alias] = new MemberTypePropertyProfileAccess(true, true);
+            
+            MockedContentTypes.EnsureAllIds(memberType, 8888);
+
+            //Act
+
+            var result = Mapper.Map<MemberTypeDisplay>(memberType);
+
+            //Assert
+
+            Assert.AreEqual(memberType.Alias, result.Alias);
+            Assert.AreEqual(memberType.Description, result.Description);
+            Assert.AreEqual(memberType.Icon, result.Icon);
+            Assert.AreEqual(memberType.Id, result.Id);
+            Assert.AreEqual(memberType.Name, result.Name);
+            Assert.AreEqual(memberType.ParentId, result.ParentId);
+            Assert.AreEqual(memberType.Path, result.Path);
+            Assert.AreEqual(memberType.Thumbnail, result.Thumbnail);
+            Assert.AreEqual(memberType.IsContainer, result.IsContainer);
+            Assert.AreEqual(memberType.CreateDate, result.CreateDate);
+            Assert.AreEqual(memberType.UpdateDate, result.UpdateDate);
+
+            //TODO: Now we need to assert all of the more complicated parts
+
+            Assert.AreEqual(memberType.PropertyGroups.Count(), result.Groups.Count());
+            for (var i = 0; i < memberType.PropertyGroups.Count(); i++)
+            {
+                Assert.AreEqual(memberType.PropertyGroups.ElementAt(i).Id, result.Groups.ElementAt(i).Id);
+                Assert.AreEqual(memberType.PropertyGroups.ElementAt(i).Name, result.Groups.ElementAt(i).Name);
+                var propTypes = memberType.PropertyGroups.ElementAt(i).PropertyTypes;
+
+                Assert.AreEqual(propTypes.Count(), result.Groups.ElementAt(i).Properties.Count());
+                for (var j = 0; j < propTypes.Count(); j++)
+                {
+                    Assert.AreEqual(propTypes.ElementAt(j).Id, result.Groups.ElementAt(i).Properties.ElementAt(j).Id);
+                    Assert.AreEqual(propTypes.ElementAt(j).DataTypeDefinitionId, result.Groups.ElementAt(i).Properties.ElementAt(j).DataTypeId);
+                    
+                    Assert.AreEqual(memberType.MemberCanViewProperty(propTypes.ElementAt(j).Alias), result.Groups.ElementAt(i).Properties.ElementAt(j).MemberCanViewProperty);
+                    Assert.AreEqual(memberType.MemberCanEditProperty(propTypes.ElementAt(j).Alias), result.Groups.ElementAt(i).Properties.ElementAt(j).MemberCanEditProperty);
+                }
+            }
+
+            Assert.AreEqual(memberType.AllowedContentTypes.Count(), result.AllowedContentTypes.Count());
+            for (var i = 0; i < memberType.AllowedContentTypes.Count(); i++)
+            {
+                Assert.AreEqual(memberType.AllowedContentTypes.ElementAt(i).Id.Value, result.AllowedContentTypes.ElementAt(i));
+            }
+
+        }
+
+        [Test]
+        public void IMediaType_To_MediaTypeDisplay()
+        {
+            //Arrange
+
+            // setup the mocks to return the data we want to test against...
+
+            // for any call to GetPreValuesCollectionByDataTypeId just return an empty dictionary for now
+            // TODO: but we'll need to change this to return some pre-values to test the mappings
+            _dataTypeService.Setup(x => x.GetPreValuesCollectionByDataTypeId(It.IsAny<int>()))
+                .Returns(new PreValueCollection(new Dictionary<string, PreValue>()));
+
+            //return a textbox property editor for any requested editor by alias
+            _propertyEditorResolver.Setup(resolver => resolver.GetByAlias(It.IsAny<string>()))
+                .Returns(new TextboxPropertyEditor());
+            //for testing, just return a list of whatever property editors we want
+            _propertyEditorResolver.Setup(resolver => resolver.PropertyEditors)
+                .Returns(new[] { new TextboxPropertyEditor() });
+
+            var mediaType = MockedContentTypes.CreateImageMediaType();
+            MockedContentTypes.EnsureAllIds(mediaType, 8888);
+
+            //Act
+
+            var result = Mapper.Map<MediaTypeDisplay>(mediaType);
+
+            //Assert
+
+            Assert.AreEqual(mediaType.Alias, result.Alias);
+            Assert.AreEqual(mediaType.Description, result.Description);
+            Assert.AreEqual(mediaType.Icon, result.Icon);
+            Assert.AreEqual(mediaType.Id, result.Id);
+            Assert.AreEqual(mediaType.Name, result.Name);
+            Assert.AreEqual(mediaType.ParentId, result.ParentId);
+            Assert.AreEqual(mediaType.Path, result.Path);
+            Assert.AreEqual(mediaType.Thumbnail, result.Thumbnail);
+            Assert.AreEqual(mediaType.IsContainer, result.IsContainer);
+            Assert.AreEqual(mediaType.CreateDate, result.CreateDate);
+            Assert.AreEqual(mediaType.UpdateDate, result.UpdateDate);
+
+            //TODO: Now we need to assert all of the more complicated parts
+
+            Assert.AreEqual(mediaType.PropertyGroups.Count(), result.Groups.Count());
+            for (var i = 0; i < mediaType.PropertyGroups.Count(); i++)
+            {
+                Assert.AreEqual(mediaType.PropertyGroups.ElementAt(i).Id, result.Groups.ElementAt(i).Id);
+                Assert.AreEqual(mediaType.PropertyGroups.ElementAt(i).Name, result.Groups.ElementAt(i).Name);
+                var propTypes = mediaType.PropertyGroups.ElementAt(i).PropertyTypes;
+
+                Assert.AreEqual(propTypes.Count(), result.Groups.ElementAt(i).Properties.Count());
+                for (var j = 0; j < propTypes.Count(); j++)
+                {
+                    Assert.AreEqual(propTypes.ElementAt(j).Id, result.Groups.ElementAt(i).Properties.ElementAt(j).Id);
+                    Assert.AreEqual(propTypes.ElementAt(j).DataTypeDefinitionId, result.Groups.ElementAt(i).Properties.ElementAt(j).DataTypeId);
+                }
+            }
+            
+            Assert.AreEqual(mediaType.AllowedContentTypes.Count(), result.AllowedContentTypes.Count());
+            for (var i = 0; i < mediaType.AllowedContentTypes.Count(); i++)
+            {
+                Assert.AreEqual(mediaType.AllowedContentTypes.ElementAt(i).Id.Value, result.AllowedContentTypes.ElementAt(i));
+            }
+
+        }
+
+        [Test]
         public void IContentType_To_ContentTypeDisplay()
         {
             //Arrange
@@ -195,7 +473,7 @@ namespace Umbraco.Tests.Models.Mapping
 
             //Act
 
-            var result = Mapper.Map<ContentTypeDisplay>(contentType);
+            var result = Mapper.Map<DocumentTypeDisplay>(contentType);
 
             //Assert
 
@@ -244,6 +522,75 @@ namespace Umbraco.Tests.Models.Mapping
         }
 
         [Test]
+        public void MemberPropertyGroupBasic_To_MemberPropertyGroup()
+        {
+            _dataTypeService.Setup(x => x.GetDataTypeDefinitionById(It.IsAny<int>()))
+                .Returns(new DataTypeDefinition("test"));
+
+            var basic = new PropertyGroupBasic<MemberPropertyTypeBasic>
+            {
+                Id = 222,
+                Name = "Group 1",
+                SortOrder = 1,
+                Properties = new[]
+                {
+                    new MemberPropertyTypeBasic()
+                    {
+                        MemberCanEditProperty = true,
+                        MemberCanViewProperty = true,
+                        Id = 33,
+                        SortOrder = 1,
+                        Alias = "prop1",
+                        Description = "property 1",
+                        DataTypeId = 99,
+                        GroupId = 222,
+                        Label = "Prop 1",
+                        Validation = new PropertyTypeValidation()
+                        {
+                            Mandatory = true,
+                            Pattern = null
+                        }
+                    },
+                    new MemberPropertyTypeBasic()
+                    {
+                        MemberCanViewProperty = false,
+                        MemberCanEditProperty = false,
+                        Id = 34,
+                        SortOrder = 2,
+                        Alias = "prop2",
+                        Description = "property 2",
+                        DataTypeId = 99,
+                        GroupId = 222,
+                        Label = "Prop 2",
+                        Validation = new PropertyTypeValidation()
+                        {
+                            Mandatory = false,
+                            Pattern = null
+                        }
+                    },
+                }
+            };
+
+            var contentType = new MemberTypeSave
+            {
+                Id = 0,
+                ParentId = -1,
+                Alias = "alias",
+                Groups = new[] { basic }
+            };
+
+            // proper group properties mapping takes place when mapping the content type,
+            // not when mapping the group - because of inherited properties and such
+            //var result = Mapper.Map<PropertyGroup>(basic);
+            var result = Mapper.Map<IMemberType>(contentType).PropertyGroups[0];
+
+            Assert.AreEqual(basic.Name, result.Name);
+            Assert.AreEqual(basic.Id, result.Id);
+            Assert.AreEqual(basic.SortOrder, result.SortOrder);
+            Assert.AreEqual(basic.Properties.Count(), result.PropertyTypes.Count());
+        }
+
+        [Test]
         public void PropertyGroupBasic_To_PropertyGroup()
         {
             _dataTypeService.Setup(x => x.GetDataTypeDefinitionById(It.IsAny<int>()))
@@ -289,7 +636,7 @@ namespace Umbraco.Tests.Models.Mapping
                 }
             };
 
-            var contentType = new ContentTypeSave
+            var contentType = new DocumentTypeSave
             {
                 Id = 0,
                 ParentId = -1,
@@ -307,6 +654,40 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(basic.Id, result.Id);
             Assert.AreEqual(basic.SortOrder, result.SortOrder);
             Assert.AreEqual(basic.Properties.Count(), result.PropertyTypes.Count());
+        }
+
+        [Test]
+        public void MemberPropertyTypeBasic_To_PropertyType()
+        {
+            _dataTypeService.Setup(x => x.GetDataTypeDefinitionById(It.IsAny<int>()))
+                .Returns(new DataTypeDefinition("test"));
+
+            var basic = new MemberPropertyTypeBasic()
+            {
+                Id = 33,
+                SortOrder = 1,
+                Alias = "prop1",
+                Description = "property 1",
+                DataTypeId = 99,
+                GroupId = 222,
+                Label = "Prop 1",
+                Validation = new PropertyTypeValidation()
+                {
+                    Mandatory = true,
+                    Pattern = "xyz"
+                }
+            };
+
+            var result = Mapper.Map<PropertyType>(basic);
+
+            Assert.AreEqual(basic.Id, result.Id);
+            Assert.AreEqual(basic.SortOrder, result.SortOrder);
+            Assert.AreEqual(basic.Alias, result.Alias);
+            Assert.AreEqual(basic.Description, result.Description);
+            Assert.AreEqual(basic.DataTypeId, result.DataTypeDefinitionId);
+            Assert.AreEqual(basic.Label, result.Name);
+            Assert.AreEqual(basic.Validation.Mandatory, result.Mandatory);
+            Assert.AreEqual(basic.Validation.Pattern, result.ValidationRegExp);
         }
 
         [Test]
@@ -341,6 +722,109 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(basic.Label, result.Name);
             Assert.AreEqual(basic.Validation.Mandatory, result.Mandatory);
             Assert.AreEqual(basic.Validation.Pattern, result.ValidationRegExp);
+        }
+
+        [Test]
+        public void IMediaTypeComposition_To_MediaTypeDisplay()
+        {
+            //Arrange
+
+            // setup the mocks to return the data we want to test against...
+
+            // for any call to GetPreValuesCollectionByDataTypeId just return an empty dictionary for now
+            // TODO: but we'll need to change this to return some pre-values to test the mappings
+            _dataTypeService.Setup(x => x.GetPreValuesCollectionByDataTypeId(It.IsAny<int>()))
+                .Returns(new PreValueCollection(new Dictionary<string, PreValue>()));
+
+            _entityService.Setup(x => x.GetObjectType(It.IsAny<int>()))
+                .Returns(UmbracoObjectTypes.DocumentType);
+
+            //return a textbox property editor for any requested editor by alias
+            _propertyEditorResolver.Setup(resolver => resolver.GetByAlias(It.IsAny<string>()))
+                .Returns(new TextboxPropertyEditor());
+            //for testing, just return a list of whatever property editors we want
+            _propertyEditorResolver.Setup(resolver => resolver.PropertyEditors)
+                .Returns(new[] { new TextboxPropertyEditor() });
+
+            var ctMain = MockedContentTypes.CreateSimpleMediaType("parent", "Parent");
+            //not assigned to tab
+            ctMain.AddPropertyType(new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "umbracoUrlName",
+                Name = "Slug",
+                Description = "",
+                Mandatory = false,
+                SortOrder = 1,
+                DataTypeDefinitionId = -88
+            });
+            MockedContentTypes.EnsureAllIds(ctMain, 8888);
+            var ctChild1 = MockedContentTypes.CreateSimpleMediaType("child1", "Child 1", ctMain, true);
+            ctChild1.AddPropertyType(new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "someProperty",
+                Name = "Some Property",
+                Description = "",
+                Mandatory = false,
+                SortOrder = 1,
+                DataTypeDefinitionId = -88
+            }, "Another tab");
+            MockedContentTypes.EnsureAllIds(ctChild1, 7777);
+            var contentType = MockedContentTypes.CreateSimpleMediaType("child2", "Child 2", ctChild1, true, "CustomGroup");
+            //not assigned to tab
+            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+            {
+                Alias = "umbracoUrlAlias",
+                Name = "AltUrl",
+                Description = "",
+                Mandatory = false,
+                SortOrder = 1,
+                DataTypeDefinitionId = -88
+            });
+            MockedContentTypes.EnsureAllIds(contentType, 6666);
+
+
+            //Act
+
+            var result = Mapper.Map<MediaTypeDisplay>(contentType);
+
+            //Assert
+
+            Assert.AreEqual(contentType.Alias, result.Alias);
+            Assert.AreEqual(contentType.Description, result.Description);
+            Assert.AreEqual(contentType.Icon, result.Icon);
+            Assert.AreEqual(contentType.Id, result.Id);
+            Assert.AreEqual(contentType.Name, result.Name);
+            Assert.AreEqual(contentType.ParentId, result.ParentId);
+            Assert.AreEqual(contentType.Path, result.Path);
+            Assert.AreEqual(contentType.Thumbnail, result.Thumbnail);
+            Assert.AreEqual(contentType.IsContainer, result.IsContainer);
+            Assert.AreEqual(contentType.CreateDate, result.CreateDate);
+            Assert.AreEqual(contentType.UpdateDate, result.UpdateDate);
+
+            //TODO: Now we need to assert all of the more complicated parts
+
+            Assert.AreEqual(contentType.CompositionPropertyGroups.Select(x => x.Name).Distinct().Count(), result.Groups.Count(x => x.IsGenericProperties == false));
+            Assert.AreEqual(1, result.Groups.Count(x => x.IsGenericProperties));
+            Assert.AreEqual(contentType.PropertyGroups.Count(), result.Groups.Count(x => x.Inherited == false && x.IsGenericProperties == false));
+
+            var allPropertiesMapped = result.Groups.SelectMany(x => x.Properties).ToArray();
+            var allPropertyIdsMapped = allPropertiesMapped.Select(x => x.Id).ToArray();
+            var allSourcePropertyIds = contentType.CompositionPropertyTypes.Select(x => x.Id).ToArray();
+
+            Assert.AreEqual(contentType.PropertyTypes.Count(), allPropertiesMapped.Count(x => x.Inherited == false));
+            Assert.AreEqual(allPropertyIdsMapped.Count(), allSourcePropertyIds.Count());
+            Assert.IsTrue(allPropertyIdsMapped.ContainsAll(allSourcePropertyIds));
+
+            Assert.AreEqual(2, result.Groups.Count(x => x.ParentTabContentTypes.Any()));
+            Assert.IsTrue(result.Groups.SelectMany(x => x.ParentTabContentTypes).ContainsAll(new[] { ctMain.Id, ctChild1.Id }));
+
+            
+            Assert.AreEqual(contentType.AllowedContentTypes.Count(), result.AllowedContentTypes.Count());
+            for (var i = 0; i < contentType.AllowedContentTypes.Count(); i++)
+            {
+                Assert.AreEqual(contentType.AllowedContentTypes.ElementAt(i).Id.Value, result.AllowedContentTypes.ElementAt(i));
+            }
+
         }
 
         [Test]
@@ -394,7 +878,7 @@ namespace Umbraco.Tests.Models.Mapping
 
             //Act
 
-            var result = Mapper.Map<ContentTypeDisplay>(contentType);
+            var result = Mapper.Map<DocumentTypeDisplay>(contentType);
 
             //Assert
 
@@ -442,10 +926,175 @@ namespace Umbraco.Tests.Models.Mapping
 
         }
 
+        [Test]
+        public void MemberPropertyTypeBasic_To_MemberPropertyTypeDisplay()
+        {
+            _dataTypeService.Setup(x => x.GetDataTypeDefinitionById(It.IsAny<int>()))
+                .Returns(new DataTypeDefinition("test"));
 
-        private ContentTypeSave CreateContentTypeSave()
+            var basic = new MemberPropertyTypeBasic()
+            {
+                Id = 33,
+                SortOrder = 1,
+                Alias = "prop1",
+                Description = "property 1",
+                DataTypeId = 99,
+                GroupId = 222,
+                Label = "Prop 1",
+                MemberCanViewProperty = true,
+                MemberCanEditProperty = true,
+                Validation = new PropertyTypeValidation()
+                {
+                    Mandatory = true,
+                    Pattern = "xyz"
+                }
+            };
+
+            var result = Mapper.Map<MemberPropertyTypeDisplay>(basic);
+
+            Assert.AreEqual(basic.Id, result.Id);
+            Assert.AreEqual(basic.SortOrder, result.SortOrder);
+            Assert.AreEqual(basic.Alias, result.Alias);
+            Assert.AreEqual(basic.Description, result.Description);
+            Assert.AreEqual(basic.GroupId, result.GroupId);
+            Assert.AreEqual(basic.Inherited, result.Inherited);
+            Assert.AreEqual(basic.Label, result.Label);
+            Assert.AreEqual(basic.Validation, result.Validation);
+            Assert.AreEqual(basic.MemberCanViewProperty, result.MemberCanViewProperty);
+            Assert.AreEqual(basic.MemberCanEditProperty, result.MemberCanEditProperty);
+        }
+
+        [Test]
+        public void PropertyTypeBasic_To_PropertyTypeDisplay()
+        {
+            _dataTypeService.Setup(x => x.GetDataTypeDefinitionById(It.IsAny<int>()))
+                .Returns(new DataTypeDefinition("test"));
+
+            var basic = new PropertyTypeBasic()
+            {
+                Id = 33,
+                SortOrder = 1,
+                Alias = "prop1",
+                Description = "property 1",
+                DataTypeId = 99,
+                GroupId = 222,
+                Label = "Prop 1",
+                Validation = new PropertyTypeValidation()
+                {
+                    Mandatory = true,
+                    Pattern = "xyz"
+                }
+            };
+
+            var result = Mapper.Map<PropertyTypeDisplay>(basic);
+
+            Assert.AreEqual(basic.Id, result.Id);
+            Assert.AreEqual(basic.SortOrder, result.SortOrder);
+            Assert.AreEqual(basic.Alias, result.Alias);
+            Assert.AreEqual(basic.Description, result.Description);
+            Assert.AreEqual(basic.GroupId, result.GroupId);
+            Assert.AreEqual(basic.Inherited, result.Inherited);
+            Assert.AreEqual(basic.Label, result.Label);
+            Assert.AreEqual(basic.Validation, result.Validation);
+        }
+
+        private MemberTypeSave CreateMemberTypeSave()
+        {
+            return new MemberTypeSave
+            {
+                Alias = "test",
+                AllowAsRoot = true,
+                AllowedContentTypes = new[] { 666, 667 },
+                Description = "hello world",
+                Icon = "tree-icon",
+                Id = 1234,
+                Key = new Guid("8A60656B-3866-46AB-824A-48AE85083070"),
+                Name = "My content type",
+                Path = "-1,1234",
+                ParentId = -1,
+                Thumbnail = "tree-thumb",
+                IsContainer = true,
+                Groups = new[]
+                {
+                    new PropertyGroupBasic<MemberPropertyTypeBasic>()
+                    {                        
+                        Id = 987,
+                        Name = "Tab 1",
+                        SortOrder = 0,
+                        Inherited = false,
+                        Properties = new []
+                        {
+                            new MemberPropertyTypeBasic
+                            {
+                                MemberCanEditProperty = true,
+                                MemberCanViewProperty = true,
+                                Alias = "property1",
+                                Description = "this is property 1",
+                                Inherited = false,
+                                Label = "Property 1",
+                                Validation = new PropertyTypeValidation
+                                {
+                                    Mandatory = false,
+                                    Pattern = ""
+                                },
+                                SortOrder = 0,
+                                DataTypeId = 555
+                            }
+                        }
+                    }
+                }
+            };
+        }
+
+        private MediaTypeSave CreateMediaTypeSave()
+        {
+            return new MediaTypeSave
+            {
+                Alias = "test",
+                AllowAsRoot = true,                
+                AllowedContentTypes = new[] { 666, 667 },
+                Description = "hello world",
+                Icon = "tree-icon",
+                Id = 1234,
+                Key = new Guid("8A60656B-3866-46AB-824A-48AE85083070"),
+                Name = "My content type",
+                Path = "-1,1234",
+                ParentId = -1,
+                Thumbnail = "tree-thumb",
+                IsContainer = true,
+                Groups = new[]
+                {
+                    new PropertyGroupBasic<PropertyTypeBasic>()
+                    {
+                        Id = 987,
+                        Name = "Tab 1",
+                        SortOrder = 0,
+                        Inherited = false,
+                        Properties = new []
+                        {
+                            new PropertyTypeBasic
+                            {
+                                Alias = "property1",
+                                Description = "this is property 1",
+                                Inherited = false,
+                                Label = "Property 1",
+                                Validation = new PropertyTypeValidation
+                                {
+                                    Mandatory = false,
+                                    Pattern = ""
+                                },
+                                SortOrder = 0,
+                                DataTypeId = 555
+                            }
+                        }
+                    }
+                }
+            };
+        }
+
+        private DocumentTypeSave CreateContentTypeSave()
         {            
-            return new ContentTypeSave
+            return new DocumentTypeSave
             {
                 Alias = "test",     
                 AllowAsRoot = true,
@@ -495,9 +1144,81 @@ namespace Umbraco.Tests.Models.Mapping
             };
         }
 
-        private ContentTypeSave CreateCompositionContentTypeSave()
+        private MediaTypeSave CreateCompositionMediaTypeSave()
         {
-            return new ContentTypeSave
+            return new MediaTypeSave
+            {
+                Alias = "test",
+                AllowAsRoot = true,                
+                AllowedContentTypes = new[] { 666, 667 },
+                Description = "hello world",
+                Icon = "tree-icon",
+                Id = 1234,
+                Key = new Guid("8A60656B-3866-46AB-824A-48AE85083070"),
+                Name = "My content type",
+                Path = "-1,1234",
+                ParentId = -1,
+                Thumbnail = "tree-thumb",
+                IsContainer = true,
+                Groups = new[]
+                {
+                    new PropertyGroupBasic<PropertyTypeBasic>()
+                    {
+                        Id = 987,
+                        Name = "Tab 1",
+                        SortOrder = 0,
+                        Inherited = false,
+                        Properties = new[]
+                        {
+                            new PropertyTypeBasic
+                            {
+                                Alias = "property1",
+                                Description = "this is property 1",
+                                Inherited = false,
+                                Label = "Property 1",
+                                Validation = new PropertyTypeValidation
+                                {
+                                    Mandatory = false,
+                                    Pattern = ""
+                                },
+                                SortOrder = 0,
+                                DataTypeId = 555
+                            }
+                        }
+                    },
+                    new PropertyGroupBasic<PropertyTypeBasic>()
+                    {
+                        Id = 894,
+                        Name = "Tab 2",
+                        SortOrder = 0,
+                        Inherited = true,
+                        Properties = new[]
+                        {
+                            new PropertyTypeBasic
+                            {
+                                Alias = "parentProperty",
+                                Description = "this is a property from the parent",
+                                Inherited = true,
+                                Label = "Parent property",
+                                Validation = new PropertyTypeValidation
+                                {
+                                    Mandatory = false,
+                                    Pattern = ""
+                                },
+                                SortOrder = 0,
+                                DataTypeId = 555
+                            }
+                        }
+
+                    }
+                }
+
+            };
+        }
+
+        private DocumentTypeSave CreateCompositionContentTypeSave()
+        {
+            return new DocumentTypeSave
             {
                 Alias = "test",
                 AllowAsRoot = true,

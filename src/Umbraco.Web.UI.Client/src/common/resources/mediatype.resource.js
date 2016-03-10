@@ -7,13 +7,35 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
 
     return {
 
-        getAvailableCompositeContentTypes: function (contentTypeId) {
+        getCount: function () {
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "mediaTypeApiBaseUrl",
-                       "GetAvailableCompositeMediaTypes",
-                       [{ contentTypeId: contentTypeId }])),
+                       "GetCount")),
+               'Failed to retrieve count');
+        },
+
+        getAvailableCompositeContentTypes: function (contentTypeId, filterContentTypes, filterPropertyTypes) {
+            if (!filterContentTypes) {
+                filterContentTypes = [];
+            }
+            if (!filterPropertyTypes) {
+                filterPropertyTypes = [];
+            }
+
+            var query = {
+                contentTypeId: contentTypeId,
+                filterContentTypes: filterContentTypes,
+                filterPropertyTypes: filterPropertyTypes
+            };
+
+            return umbRequestHelper.resourcePromise(
+               $http.post(
+                   umbRequestHelper.getApiUrl(
+                       "mediaTypeApiBaseUrl",
+                       "GetAvailableCompositeMediaTypes"),
+                       query),
                'Failed to retrieve data for content type id ' + contentTypeId);
         },
 

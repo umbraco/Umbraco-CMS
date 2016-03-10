@@ -2,7 +2,7 @@
     <ng-form name="datePickerForm">
         <div class="input-append date datepicker" style="position: relative;" id="datepicker{{model.alias}}">
             
-            <input name="datepicker" data-format="{{model.config.format}}" type="text"
+            <input name="datepicker" data-format="{{model.config.format}}" id="{{model.alias}}" type="text"
                    ng-model="datetimePickerValue"
                    ng-required="model.validation.mandatory"
                    val-server="value"

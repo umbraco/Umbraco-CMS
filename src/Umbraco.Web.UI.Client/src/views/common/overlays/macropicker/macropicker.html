@@ -30,7 +30,11 @@
                 </li>
             </ul>
 
-            <div ng-if="noMacroParams" class="umb-empty-state-text -center">There are no parameters for this macro</div>
+            <umb-empty-state
+                ng-if="noMacroParams"
+                position="center">
+                <localize key="defaultdialogs_noMacroParams">There are no parameters for this macro</localize>
+            </umb-empty-state>
 
         </div>
     </div>

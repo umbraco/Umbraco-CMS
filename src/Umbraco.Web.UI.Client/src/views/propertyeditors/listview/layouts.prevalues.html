@@ -19,18 +19,26 @@
          </div>
 
          <div class="list-view-layout__name">
-            <input ng-if="layout.isSystem !== 1" ng-model="layout.name" placeholder="Name..." class="-full-width-input" focus-when="{{ vm.focusLayoutName }}" />
+            <input ng-if="layout.isSystem !== 1" type="text" ng-model="layout.name" placeholder="Name..." class="-full-width-input" focus-when="{{ vm.focusLayoutName }}" />
             <span ng-if="layout.isSystem === 1" class="list-view-layout__name-text">{{ layout.name }}</span>
             <span ng-if="layout.isSystem === 1" class="list-view-layout__system">(system layout)</span>
          </div>
 
          <div class="list-view-layout__path">
-            <input ng-if="layout.isSystem !== 1" ng-model="layout.path" placeholder="Layout path..." class="-full-width-input" />
+            <input ng-if="layout.isSystem !== 1" type="text" ng-model="layout.path" placeholder="Layout path..." class="-full-width-input" />
          </div>
 
          <div>
             <input ng-if="layout.isSystem === 1" type="checkbox" ng-model="layout.selected" />
-            <umb-confirm-delete ng-if="layout.isSystem !== 1" confirm-action="vm.removeLayout($index, layout)"></umbraco-confirm-delete>
+            <div class="list-view-layout__remove" ng-if="layout.isSystem !== 1">
+                <i class="icon-trash" ng-click="vm.showPrompt(layout)"></i>
+                <umb-confirm-action
+                    ng-if="layout.deletePrompt"
+                    direction="left"
+                    on-confirm="vm.removeLayout($index, layout)"
+                    on-cancel="vm.hidePrompt(layout)">
+                </umb-confirm-action>
+            </div>
          </div>
 
       </div>

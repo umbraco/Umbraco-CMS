@@ -9,9 +9,10 @@
 (function () {
     "use strict";
 
-    function MemberTypesEditController($scope, $rootScope, $routeParams, $log, $filter, memberTypeResource, dataTypeResource, editorState, iconHelper, formHelper, navigationService, contentEditingHelper, notificationsService, $q, localizationService) {
+    function MemberTypesEditController($scope, $rootScope, $routeParams, $log, $filter, memberTypeResource, dataTypeResource, editorState, iconHelper, formHelper, navigationService, contentEditingHelper, notificationsService, $q, localizationService, overlayHelper, contentTypeHelper) {
 
         var vm = this;
+        var localizeSaving = localizationService.localize("general_saving");
 
         vm.save = save;
 
@@ -22,7 +23,7 @@
         vm.page.saveButtonState = "init";
         vm.page.navigation = [
 			{
-			    "name": "Design",
+			    "name": localizationService.localize("general_design"),
 			    "icon": "icon-document-dashed-line",
 			    "view": "views/membertypes/views/design/design.html",
 			    "active": true
@@ -31,26 +32,95 @@
 
         vm.page.keyboardShortcutsOverview = [
 			{
+                "name": localizationService.localize("shortcuts_shortcut"),
 			    "shortcuts": [
 					{
-					    "description": "Add tab",
+					    "description": localizationService.localize("shortcuts_addTab"),
 					    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "t" }]
 					},
 					{
-					    "description": "Add property",
+					    "description": localizationService.localize("shortcuts_addProperty"),
 					    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "p" }]
 					},
 					{
-					    "description": "Add editor",
+					    "description": localizationService.localize("shortcuts_addEditor"),
 					    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "e" }]
 					},
 					{
-					    "description": "Edit data type",
+					    "description": localizationService.localize("shortcuts_editDataType"),
 					    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "d" }]
 					}
 			    ]
 			}
         ];
+
+        contentTypeHelper.checkModelsBuilderStatus().then(function (result) {
+            vm.page.modelsBuilder = result;
+            if (result) {
+                //Models builder mode:
+                vm.page.defaultButton = {
+                    hotKey: "ctrl+s",
+                    hotKeyWhenHidden: true,
+                    labelKey: "buttons_save",
+                    letter: "S",
+                    type: "submit",
+                    handler: function () { vm.save(); }
+                };
+                vm.page.subButtons = [{
+                    hotKey: "ctrl+g",
+                    hotKeyWhenHidden: true,
+                    labelKey: "buttons_saveAndGenerateModels",
+                    letter: "G",
+                    handler: function () {
+
+                        vm.page.saveButtonState = "busy";
+
+                        vm.save().then(function (result) {
+
+                            vm.page.saveButtonState = "busy";
+
+                            localizationService.localize("modelsBuilder_buildingModels").then(function (headerValue) {
+                                localizationService.localize("modelsBuilder_waitingMessage").then(function(msgValue) {
+                                    notificationsService.info(headerValue, msgValue);
+                                });
+                            });
+
+                            contentTypeHelper.generateModels().then(function (result) {
+
+                                if (result.success) { 
+
+                                    //re-check model status
+                                    contentTypeHelper.checkModelsBuilderStatus().then(function (statusResult) {
+                                        vm.page.modelsBuilder = statusResult;
+                                    });
+
+                                    //clear and add success
+                                    vm.page.saveButtonState = "init";
+                                    localizationService.localize("modelsBuilder_modelsGenerated").then(function(value) {
+                                        notificationsService.success(value);
+                                    });
+
+                                } else {
+                                    vm.page.saveButtonState = "error";
+                                    localizationService.localize("modelsBuilder_modelsExceptionInUlog").then(function(value) {
+                                        notificationsService.error(value);
+                                    });
+                                }
+
+                            }, function () {
+                                vm.page.saveButtonState = "error";
+                                localizationService.localize("modelsBuilder_modelsGeneratedError").then(function(value) {
+                                    notificationsService.error(value);
+                                });
+                            });
+
+
+                        });
+
+                    }
+                }];
+            }
+        });
 
         if ($routeParams.create) {
 
@@ -78,44 +148,82 @@
         }
 
         function save() {
+            // only save if there is no overlays open
+            if(overlayHelper.getNumberOfOverlays() === 0) {
 
-            var deferred = $q.defer();
+                var deferred = $q.defer();
 
-            vm.page.saveButtonState = "busy";
-            
-            contentEditingHelper.contentEditorPerformSave({
-                statusMessage: "Saving...",
-                saveMethod: memberTypeResource.save,
-                scope: $scope,
-                content: vm.contentType,
-                //no-op for rebind callback... we don't really need to rebind for content types
-                rebindCallback: angular.noop
-            }).then(function (data) {
-                //success            
-                syncTreeNode(vm.contentType, data.path);
+                vm.page.saveButtonState = "busy";
 
-                vm.page.saveButtonState = "success";
+                contentEditingHelper.contentEditorPerformSave({
+                    statusMessage: localizeSaving,
+                    saveMethod: memberTypeResource.save,
+                    scope: $scope,
+                    content: vm.contentType,
+                    //We do not redirect on failure for doc types - this is because it is not possible to actually save the doc
+                    // type when server side validation fails - as opposed to content where we are capable of saving the content
+                    // item if server side validation fails
+                    redirectOnFailure: false,
+                    // we need to rebind... the IDs that have been created!
+                    rebindCallback: function (origContentType, savedContentType) {
+                        vm.contentType.id = savedContentType.id;
+                        vm.contentType.groups.forEach(function (group) {
+                            if (!group.name) return;
 
-                deferred.resolve(data);
-            }, function (err) {
-                //error
-                if (err) {
-                    editorState.set($scope.content);
-                }
-                else {
-                    localizationService.localize("speechBubbles_validationFailedHeader").then(function (headerValue) {
-                        localizationService.localize("speechBubbles_validationFailedMessage").then(function (msgValue) {
-                            notificationsService.error(headerValue, msgValue);
+                            var k = 0;
+                            while (k < savedContentType.groups.length && savedContentType.groups[k].name != group.name)
+                                k++;
+                            if (k == savedContentType.groups.length) {
+                                group.id = 0;
+                                return;
+                            }
+
+                            var savedGroup = savedContentType.groups[k];
+                            if (!group.id) group.id = savedGroup.id;
+
+                            group.properties.forEach(function (property) {
+                                if (property.id || !property.alias) return;
+
+                                k = 0;
+                                while (k < savedGroup.properties.length && savedGroup.properties[k].alias != property.alias)
+                                    k++;
+                                if (k == savedGroup.properties.length) {
+                                    property.id = 0;
+                                    return;
+                                }
+
+                                var savedProperty = savedGroup.properties[k];
+                                property.id = savedProperty.id;
+                            });
                         });
-                    });
-                }
+                    }
+                }).then(function (data) {
+                    //success
+                    syncTreeNode(vm.contentType, data.path);
 
-                vm.page.saveButtonState = "error";
+                    vm.page.saveButtonState = "success";
 
-                deferred.reject(err);
-            });
+                    deferred.resolve(data);
+                }, function (err) {
+                    //error
+                    if (err) {
+                        editorState.set($scope.content);
+                    }
+                    else {
+                        localizationService.localize("speechBubbles_validationFailedHeader").then(function (headerValue) {
+                            localizationService.localize("speechBubbles_validationFailedMessage").then(function (msgValue) {
+                                notificationsService.error(headerValue, msgValue);
+                            });
+                        });
+                    }
 
-            return deferred.promise;
+                    vm.page.saveButtonState = "error";
+
+                    deferred.reject(err);
+                });
+
+                return deferred.promise;
+            }
 
         }
 

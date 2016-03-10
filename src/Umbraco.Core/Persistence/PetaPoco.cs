@@ -834,7 +834,7 @@ namespace Umbraco.Core.Persistence
 					var pd = PocoData.ForType(typeof(T));
 					try
 					{
-						r = cmd.ExecuteReader();
+						r = cmd.ExecuteReaderWithRetry();
 						OnExecutedCommand(cmd);
 					}
 					catch (Exception x)

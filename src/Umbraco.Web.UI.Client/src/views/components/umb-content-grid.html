@@ -4,9 +4,9 @@
       class="umb-content-grid__item"
       ng-repeat="item in content"
       ng-class="{'-selected': item.selected}"
-      ng-click="clickItem(item)">
+      ng-click="clickItem(item, $event, $index)">
 
-      <i ng-if="onSelect" class="icon-check umb-content-grid__action" ng-click="selectItem(item, $event, $index)" ng-class="{'-selected': item.selected}"></i>
+      <i ng-if="item.selected" class="icon-check umb-content-grid__checkmark"></i>
 
       <div class="umb-content-grid__icon-container">
          <i class="{{ item.icon }} umb-content-grid__icon" ng-class="{'-light': !item.published}"></i>
@@ -14,7 +14,7 @@
 
       <div class="umb-content-grid__content">
 
-         <div class="umb-content-grid__item-name" ng-class="{'-light': !item.published}">{{ item.name }}</div>
+         <div class="umb-content-grid__item-name" ng-click="clickItemName(item, $event, $index)" ng-class="{'-light': !item.published}">{{ item.name }}</div>
 
          <ul class="umb-content-grid__details-list" ng-class="{'-light': !item.published}">
             <li class="umb-content-grid__details-item" ng-repeat="property in contentProperties">
@@ -27,6 +27,10 @@
 
    </div>
 
-   <div ng-if="!content" class="umb-empty-state-text -center">There are no items to show</div>
+    <umb-empty-state
+       ng-if="!content"
+       position="center">
+       <localize key="content_noItemsToShow">There are no items to show</localize>
+    </umb-empty-state>
 
 </div>

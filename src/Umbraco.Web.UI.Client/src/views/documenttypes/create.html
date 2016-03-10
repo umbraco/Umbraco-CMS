@@ -1,4 +1,4 @@
-<div class="umbracoDialog umb-dialog-body with-footer" ng-controller="Umbraco.Editors.DocumentTypes.CreateController">
+<div class="umbracoDialog umb-dialog-body with-footer" ng-controller="Umbraco.Editors.DocumentTypes.CreateController" ng-cloak>
 
     <div class="umb-pane" ng-if="!model.creatingFolder">
         <h5><localize key="create_createUnder">Create an item under</localize> {{currentNode.name}}</h5>
@@ -17,15 +17,13 @@
             <li>
               <a href="" ng-click="createComponent()">
                 <i class="large icon-item-arrangement"></i>
-                <span class="menu-label">
-                    Document Type Without Template
-                </span>
+                <span class="menu-label"><localize key="create_documentTypeWithoutTemplate"></localize></span>
               </a>
             </li>
-            <li>
+            <li ng-if="model.allowCreateFolder">
                 <a href="" ng-click="showCreateFolder()">
                     <i class="large icon-folder"></i>
-                    <span class="menu-label">Folder</span>
+                    <span class="menu-label"><localize key="general_folder"></localize></span>
                 </a>
             </li>
         </ul>
@@ -42,7 +40,7 @@
             </div>
 
             <umb-control-group label="Enter a folder name" hide-label="false">
-                <input type="text" name="folderName" ng-model="model.folderName" class="umb-textstring textstring input-block-level" required />
+                <input type="text" name="folderName" ng-model="model.folderName" class="umb-textstring textstring input-block-level" umb-auto-focus required />
             </umb-control-group>
 
             <button type="submit" class="btn btn-primary"><localize key="general_create">Create</localize></button>

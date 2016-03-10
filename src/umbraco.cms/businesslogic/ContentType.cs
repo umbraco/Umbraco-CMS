@@ -150,10 +150,10 @@ namespace umbraco.cms.businesslogic
         /// <returns></returns>
         public static ContentType GetContentType(int id)
         {
-            return ApplicationContext.Current.ApplicationCache.GetCacheItem
+            return ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<ContentType>
                 (string.Format("{0}{1}", CacheKeys.ContentTypeCacheKey, id),
-                 TimeSpan.FromMinutes(30),
-                 () => new ContentType(id));
+                 timeout:       TimeSpan.FromMinutes(30),
+                 getCacheItem:  () => new ContentType(id));
         }
 
         // This is needed, because the Tab class is protected and as such it's not possible for 
@@ -533,10 +533,10 @@ namespace umbraco.cms.businesslogic
             {
                 var cacheKey = GetPropertiesCacheKey();
 
-                return ApplicationContext.Current.ApplicationCache.GetCacheItem(
+                return ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<List<PropertyType>>(
                     cacheKey,
-                    TimeSpan.FromMinutes(15),
-                    () =>
+                    timeout:        TimeSpan.FromMinutes(15),
+                    getCacheItem:   () =>
                     {
                         //MCH NOTE: For the timing being I have changed this to a dictionary to ensure that property types
                         //aren't added multiple times through the MasterContentType structure, because each level loads
@@ -581,8 +581,11 @@ namespace umbraco.cms.businesslogic
             {
                 if (m_masterContentTypes == null)
                 {
-                    var ct = ApplicationContext.Current.Services.ContentTypeService.GetContentType(Id);
-                    m_masterContentTypes = ct.CompositionPropertyGroups.Select(x => x.Id).ToList();
+                    // fixme - oops, what's this?
+                    //var ct = ApplicationContext.Current.Services.ContentTypeService.GetContentType(Id);
+                    //m_masterContentTypes = ct.CompositionPropertyGroups.Select(x => x.Id).ToList();
+
+                    // back to normal
                     m_masterContentTypes = ContentTypeItem == null
                         ? new List<int>()
                         : ContentTypeItem.CompositionIds().ToList();
@@ -1128,8 +1131,8 @@ namespace umbraco.cms.businesslogic
         {
             
             var ct = new ContentType(id);
-            ApplicationContext.Current.ApplicationCache.ClearCacheItem(string.Format("{0}{1}", CacheKeys.ContentTypeCacheKey, id));
-            ApplicationContext.Current.ApplicationCache.ClearCacheItem(ct.GetPropertiesCacheKey());
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(string.Format("{0}{1}", CacheKeys.ContentTypeCacheKey, id));
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(ct.GetPropertiesCacheKey());
             ct.ClearVirtualTabs();
 
             //clear the content type from the property datatype cache used by razor
@@ -1152,8 +1155,8 @@ namespace umbraco.cms.businesslogic
         [Obsolete("The content type cache is automatically cleared by Umbraco when a content type is saved, this method is no longer used")]
         protected internal void FlushAllFromCache()
         {
-            ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(CacheKeys.ContentTypeCacheKey);
-            ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(CacheKeys.ContentTypePropertiesCacheKey);
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.ContentTypeCacheKey);
+            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.ContentTypePropertiesCacheKey);
 
             RemoveAllDataTypeCache();
             ClearVirtualTabs();
@@ -1228,7 +1231,7 @@ namespace umbraco.cms.businesslogic
         private void InitializeVirtualTabs()
         {
             // somewhat fixing... this whole class should be removed anyways
-            var ct = ContentTypeItem ?? ApplicationContext.Current.Services.ContentTypeService.GetContentType(Id);
+            var ct = ContentTypeItem ?? CallGetContentTypeMethod(Id);
 
             var tmp1 = ct.PropertyGroups
                 .Select(x => (TabI) new Tab(x.Id, x.Name, x.SortOrder, this))
@@ -1237,6 +1240,27 @@ namespace umbraco.cms.businesslogic
                 .DistinctBy(x => x.Id)
                 .ToList();
             _virtualTabs = tmp1;
+
+            /*
+            // While we are initialising, we should not use the class-scoped list, as it may be used by other threads
+            var temporaryList = new List<TabI>();
+            foreach (PropertyTypeGroup ptg in PropertyTypeGroups.Where(x => x.ParentId == 0 && x.ContentTypeId == this.Id))
+                temporaryList.Add(new Tab(ptg.Id, ptg.Name, ptg.SortOrder, this));
+
+            // Master Content Type
+            if (MasterContentTypes.Count > 0)
+            {
+                foreach (var mct in MasterContentTypes)
+                    temporaryList.AddRange(GetContentType(mct).getVirtualTabs.ToList());
+            }
+
+
+            // sort all tabs
+            temporaryList.Sort((a, b) => a.SortOrder.CompareTo(b.SortOrder));
+
+            // now that we aren't going to modify the list, we can set it to the class-scoped variable.
+            _virtualTabs = temporaryList.DistinctBy(x => x.Id).ToList();
+            */
         }
 
         private static void PopulateMasterContentTypes(PropertyType pt, int docTypeId)
@@ -1401,13 +1425,31 @@ namespace umbraco.cms.businesslogic
             // regardless of the PropertyTypes belonging to the current ContentType.
             public List<PropertyType> GetAllPropertyTypes()
             {
-                // somewhat fixing... this whole class should be removed anyways
-                var ct = _contenttype.ContentTypeItem ?? ApplicationContext.Current.Services.ContentTypeService.GetContentType(_contenttype.Id);
+                var ct = _contenttype.ContentTypeItem ?? _contenttype.CallGetContentTypeMethod(_contenttype.Id);
                 return ct.CompositionPropertyTypes
                     .OrderBy(x => x.SortOrder)
                     .Select(x => x.Id)
                     .Select(PropertyType.GetPropertyType)
                     .ToList();
+
+                /*
+                var db = ApplicationContext.Current.DatabaseContext.Database;
+                var propertyTypeDtos = db.Fetch<PropertyTypeDto>("WHERE propertyTypeGroupId = @Id", new { Id = _id });
+                var tmp = propertyTypeDtos
+                            .Select(propertyTypeDto => PropertyType.GetPropertyType(propertyTypeDto.Id))
+                            .ToList();
+
+                var propertyTypeGroupDtos = db.Fetch<PropertyTypeGroupDto>("WHERE parentGroupId = @Id", new { Id = _id });
+                foreach (var propertyTypeGroupDto in propertyTypeGroupDtos)
+                {
+                    var inheritedPropertyTypeDtos = db.Fetch<PropertyTypeDto>("WHERE propertyTypeGroupId = @Id", new { Id = propertyTypeGroupDto.Id });
+                    tmp.AddRange(inheritedPropertyTypeDtos
+                                     .Select(propertyTypeDto => PropertyType.GetPropertyType(propertyTypeDto.Id))
+                                     .ToList());
+                }
+
+                return tmp;
+                */
             }
 
             /// <summary>

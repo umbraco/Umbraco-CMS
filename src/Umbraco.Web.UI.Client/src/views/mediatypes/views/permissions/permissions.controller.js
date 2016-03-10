@@ -1,11 +1,12 @@
 (function() {
     'use strict';
 
-    function PermissionsController($scope, mediaTypeResource, iconHelper, contentTypeHelper) {
+    function PermissionsController($scope, mediaTypeResource, iconHelper, contentTypeHelper, localizationService) {
 
         /* ----------- SCOPE VARIABLES ----------- */
 
         var vm = this;
+        var childNodeSelectorOverlayTitle = "";
 
         vm.mediaTypes = [];
         vm.selectedChildren = [];
@@ -18,6 +19,8 @@
         init();
 
         function init() {
+
+            childNodeSelectorOverlayTitle = localizationService.localize("contentTypeEditor_chooseChildNode");
 
             mediaTypeResource.getAll().then(function(mediaTypes){
 
@@ -39,7 +42,7 @@
         function addChild($event) {
             vm.childNodeSelectorOverlay = {
                 view: "itempicker",
-                title: "Choose child node",
+                title: childNodeSelectorOverlayTitle,
                 availableItems: vm.mediaTypes,
                 selectedItems: vm.selectedChildren,
                 event: $event,

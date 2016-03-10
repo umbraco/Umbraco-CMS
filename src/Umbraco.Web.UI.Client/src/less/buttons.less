@@ -49,9 +49,10 @@
 
     // Disabled state
     &.disabled,
-    &[disabled] {
+    &[disabled],
+    &:disabled:hover {
         cursor: default;
-        background-image: none;
+        border-color: @btnBorder;
         .opacity(65);
         .box-shadow(none);
     }

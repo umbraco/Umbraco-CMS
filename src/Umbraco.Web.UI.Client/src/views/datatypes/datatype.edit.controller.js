@@ -6,7 +6,7 @@
  * @description
  * The controller for the content editor
  */
-function DataTypeEditController($scope, $routeParams, $location, appState, navigationService, treeService, dataTypeResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, formHelper, editorState, dataTypeHelper) {
+function DataTypeEditController($scope, $routeParams, $location, appState, navigationService, treeService, dataTypeResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, formHelper, editorState, dataTypeHelper, eventsService) {
 
     //setup scope vars
     $scope.page = {};
@@ -15,6 +15,7 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
     $scope.page.menu = {};
     $scope.page.menu.currentSection = appState.getSectionState("currentSection");
     $scope.page.menu.currentNode = null;
+    var evts = [];
 
     //method used to configure the pre-values when we retrieve them from the server
     function createPreValueProps(preVals) {
@@ -68,6 +69,10 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
             });
     }
     else {
+        loadDataType();
+    }
+
+    function loadDataType() {
 
         $scope.page.loading = true;
 
@@ -130,9 +135,9 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
 
     $scope.save = function() {
 
-        $scope.page.saveButtonState = "busy";
-
         if (formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {
+
+            $scope.page.saveButtonState = "busy";
 
             dataTypeResource.save($scope.content, $scope.preValues, $routeParams.create)
                 .then(function(data) {
@@ -179,6 +184,17 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
         }
 
     };
+
+    evts.push(eventsService.on("app.refreshEditor", function(name, error) {
+        loadDataType();
+    }));
+
+    //ensure to unregister from all events!
+    $scope.$on('$destroy', function () {
+        for (var e in evts) {
+            eventsService.unsubscribe(evts[e]);
+        }
+    });
 
 }
 

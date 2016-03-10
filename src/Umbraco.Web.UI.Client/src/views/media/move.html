@@ -6,13 +6,13 @@
 			Choose where to move <strong>{{currentNode.name}}</strong> to in the tree structure below
 		</p>
 
-		<div class="alert alert-error" ng-show="error">
+		<div class="alert alert-error" ng-show="error" ng-cloak>
 			<h4>{{error.errorMsg}}</h4>
 			<p>{{error.data.Message}}</p>
 		</div>
 
-		<div class="alert alert-success" ng-show="success">
-			<p><strong>{{currentNode.name}}</strong> was moved underneath 
+		<div class="alert alert-success" ng-show="success" ng-cloak>
+			<p><strong>{{currentNode.name}}</strong> was moved underneath
 			<strong>{{target.name}}</strong></p>
 
 			<button class="btn btn-primary" ng-click="nav.hideDialog()">Ok</button>

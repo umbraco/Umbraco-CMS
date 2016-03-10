@@ -1,6 +1,10 @@
 //used for the member picker dialog
 angular.module("umbraco").controller("Umbraco.Overlays.MemberGroupPickerController",
-    function($scope, eventsService, entityResource, searchService, $log) {
+    function($scope, eventsService, entityResource, searchService, $log, localizationService) {
+
+        if(!$scope.model.title) {
+            $scope.model.title = localizationService.localize("defaultdialogs_selectMemberGroup");
+        }
 
         $scope.dialogTreeEventHandler = $({});
         $scope.multiPicker = $scope.model.multiPicker;

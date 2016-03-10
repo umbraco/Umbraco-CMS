@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Configuration;
@@ -105,7 +106,8 @@ namespace Umbraco.Web.Editors
             var cultureInfo = string.IsNullOrWhiteSpace(culture)
                 //if the user is logged in, get their culture, otherwise default to 'en'
                 ? Security.IsAuthenticated()
-                    ? Security.CurrentUser.GetUserCulture(Services.TextService)
+                    //current culture is set at the very beginning of each request
+                    ? Thread.CurrentThread.CurrentCulture
                     : CultureInfo.GetCultureInfo("en")
                 : CultureInfo.GetCultureInfo(culture);
 
@@ -353,6 +355,10 @@ namespace Umbraco.Web.Editors
                                 string.Join(",", UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes)
                             },
                             {
+                                "disallowedUploadFiles",
+                                string.Join(",", UmbracoConfig.For.UmbracoSettings().Content.DisallowedUploadFiles)
+                            },
+                            {
                                 "maxFileSize",
                                 GetMaxRequestLength()
                             },
@@ -404,7 +410,7 @@ namespace Umbraco.Web.Editors
 
             return JavaScript(result);
         }
-
+        
         [HttpPost]
         public ActionResult ExternalLogin(string provider, string redirectUrl = null)
         {
@@ -572,6 +578,9 @@ namespace Umbraco.Web.Editors
                             else
                             {
 
+                                if (loginInfo.Email.IsNullOrWhiteSpace()) throw new InvalidOperationException("The Email value cannot be null");
+                                if (loginInfo.ExternalIdentity.Name.IsNullOrWhiteSpace()) throw new InvalidOperationException("The Name value cannot be null");
+
                                 var autoLinkUser = new BackOfficeIdentityUser()
                                 {
                                     Email = loginInfo.Email,
@@ -648,6 +657,7 @@ namespace Umbraco.Web.Editors
             app.Add("applicationPath", HttpContext.Request.ApplicationPath.EnsureEndsWith('/'));
             return app;
         }
+        
 
         private IEnumerable<Dictionary<string, string>> GetTreePluginsMetaData()
         {

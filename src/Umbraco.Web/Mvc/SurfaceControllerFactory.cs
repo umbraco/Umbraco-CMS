@@ -24,7 +24,7 @@ namespace Umbraco.Web.Mvc
 				return false;
 
 			//ensure there is an umbraco token set
-			var umbracoToken = request.RouteData.DataTokens["umbraco"];
+			var umbracoToken = request.RouteData.DataTokens[Core.Constants.Web.UmbracoDataToken];
 			if (umbracoToken == null || string.IsNullOrWhiteSpace(umbracoToken.ToString()))
 				return false;
 

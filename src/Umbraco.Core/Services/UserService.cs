@@ -266,7 +266,7 @@ namespace Umbraco.Core.Services
                 //should never be null but it could have been deleted by another thread.
                 user.RawPasswordValue = result.RawPasswordValue;
                 user.LastPasswordChangeDate = result.LastPasswordChangeDate;
-                user.UpdateDate = user.UpdateDate;
+                user.UpdateDate = result.UpdateDate;
             }
         }
 

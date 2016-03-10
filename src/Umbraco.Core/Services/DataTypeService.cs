@@ -29,10 +29,11 @@ namespace Umbraco.Core.Services
 
         #region Containers
 
-        public Attempt<int> CreateContainer(int parentId, string name, int userId = 0)
+        public Attempt<OperationStatus<EntityContainer, OperationStatusType>> CreateContainer(int parentId, string name, int userId = 0)
         {
+            var evtMsgs = EventMessagesFactory.Get();
             var uow = UowProvider.GetUnitOfWork();
-            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow))
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.DataTypeContainerGuid))
             {
                 try
                 {
@@ -42,68 +43,141 @@ namespace Umbraco.Core.Services
                         ParentId = parentId,
                         CreatorId = userId
                     };
+
+                    if (SavingContainer.IsRaisedEventCancelled(
+                        new SaveEventArgs<EntityContainer>(container, evtMsgs),
+                        this))
+                    {
+                        return Attempt.Fail(new OperationStatus<EntityContainer, OperationStatusType>(container, OperationStatusType.FailedCancelledByEvent, evtMsgs));
+                    }
+
                     repo.AddOrUpdate(container);
                     uow.Commit();
-                    return Attempt.Succeed(container.Id);
+
+                    SavedContainer.RaiseEvent(new SaveEventArgs<EntityContainer>(container, evtMsgs), this);
+                    //TODO: Audit trail ?
+
+                    return Attempt.Succeed(new OperationStatus<EntityContainer, OperationStatusType>(container, OperationStatusType.Success, evtMsgs));
                 }
                 catch (Exception ex)
                 {
-                    return Attempt<int>.Fail(ex);
+                    return Attempt.Fail(new OperationStatus<EntityContainer, OperationStatusType>(null, OperationStatusType.FailedExceptionThrown, evtMsgs), ex);
                 }
-                //TODO: Audit trail ?
             }
         }
 
         public EntityContainer GetContainer(int containerId)
         {
             var uow = UowProvider.GetUnitOfWork();
-            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow))
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.DataTypeContainerGuid))
             {
                 var container = repo.Get(containerId);
-                return container != null && container.ContainedObjectType == Constants.ObjectTypes.DataTypeGuid
-                    ? container
-                    : null;
+                return container;
             }
         }
 
         public EntityContainer GetContainer(Guid containerId)
         {
             var uow = UowProvider.GetUnitOfWork();
-            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow))
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.DataTypeContainerGuid))
             {
                 var container = repo.Get(containerId);
-                return container != null && container.ContainedObjectType == Constants.ObjectTypes.DataTypeGuid
-                    ? container
-                    : null;
+                return container;
             }
         }
 
-        public void SaveContainer(EntityContainer container, int userId = 0)
+        public IEnumerable<EntityContainer> GetContainers(string name, int level)
         {
-            if (container.ContainedObjectType != Constants.ObjectTypes.DataTypeGuid) 
-                throw new InvalidOperationException("Not a data type container.");
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.DataTypeContainerGuid))
+            {
+                return repo.Get(name, level);
+            }
+        }
+
+        public IEnumerable<EntityContainer> GetContainers(IDataTypeDefinition dataTypeDefinition)
+        {
+            var ancestorIds = dataTypeDefinition.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(x =>
+                {
+                    var asInt = x.TryConvertTo<int>();
+                    if (asInt) return asInt.Result;
+                    return int.MinValue;
+                })
+                .Where(x => x != int.MinValue && x != dataTypeDefinition.Id)
+                .ToArray();
+
+            return GetContainers(ancestorIds);
+        }
+
+        public IEnumerable<EntityContainer> GetContainers(int[] containerIds)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.DataTypeContainerGuid))
+            {
+                return repo.GetAll(containerIds);
+            }
+        }
+
+        public Attempt<OperationStatus> SaveContainer(EntityContainer container, int userId = 0)
+        {
+            var evtMsgs = EventMessagesFactory.Get();
+
+            if (container.ContainedObjectType != Constants.ObjectTypes.DataTypeGuid)
+            {
+                var ex = new InvalidOperationException("Not a " + Constants.ObjectTypes.DataTypeGuid + " container.");
+                return OperationStatus.Exception(evtMsgs, ex);
+            }
+
             if (container.HasIdentity && container.IsPropertyDirty("ParentId"))
-                throw new InvalidOperationException("Cannot save a container with a modified parent, move the container instead.");
+            {
+                var ex = new InvalidOperationException("Cannot save a container with a modified parent, move the container instead.");
+                return OperationStatus.Exception(evtMsgs, ex);
+            }
+
+            if (SavingContainer.IsRaisedEventCancelled(
+                        new SaveEventArgs<EntityContainer>(container, evtMsgs),
+                        this))
+            {
+                return OperationStatus.Cancelled(evtMsgs);
+            }
 
             var uow = UowProvider.GetUnitOfWork();
-            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow))
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.DataTypeContainerGuid))
             {
                 repo.AddOrUpdate(container);
                 uow.Commit();
-                //TODO: Audit trail ?
             }
+
+            SavedContainer.RaiseEvent(new SaveEventArgs<EntityContainer>(container, evtMsgs), this);
+
+            //TODO: Audit trail ?
+
+            return OperationStatus.Success(evtMsgs);
         }
 
-        public void DeleteContainer(int containerId, int userId = 0)
+        public Attempt<OperationStatus> DeleteContainer(int containerId, int userId = 0)
         {
+            var evtMsgs = EventMessagesFactory.Get();
             var uow = UowProvider.GetUnitOfWork();
-            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow))
+            using (var repo = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.DataTypeContainerGuid))
             {
                 var container = repo.Get(containerId);
-                if (container == null) return;
-                if (container.ContainedObjectType != Constants.ObjectTypes.DataTypeGuid) return;
+                if (container == null) return OperationStatus.NoOperation(evtMsgs);
+
+                if (DeletingContainer.IsRaisedEventCancelled(
+                        new DeleteEventArgs<EntityContainer>(container, evtMsgs),
+                        this))
+                {
+                    return Attempt.Fail(new OperationStatus(OperationStatusType.FailedCancelledByEvent, evtMsgs));
+                }
+
                 repo.Delete(container);
                 uow.Commit();
+
+                DeletedContainer.RaiseEvent(new DeleteEventArgs<EntityContainer>(container, evtMsgs), this);
+
+                return OperationStatus.Success(evtMsgs);
                 //TODO: Audit trail ?
             }
         }
@@ -238,7 +312,7 @@ namespace Umbraco.Core.Services
 
             var moveInfo = new List<MoveEventInfo<IDataTypeDefinition>>();
             var uow = UowProvider.GetUnitOfWork();
-            using (var containerRepository = RepositoryFactory.CreateEntityContainerRepository(uow))
+            using (var containerRepository = RepositoryFactory.CreateEntityContainerRepository(uow, Constants.ObjectTypes.DataTypeContainerGuid))
             using (var repository = RepositoryFactory.CreateDataTypeDefinitionRepository(uow))
             {
                 try
@@ -247,7 +321,7 @@ namespace Umbraco.Core.Services
                     if (parentId > 0)
                     {
                         container = containerRepository.Get(parentId);
-                        if (container == null || container.ContainedObjectType != Constants.ObjectTypes.DataTypeGuid)
+                        if (container == null)
                             throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound);
                     }
                     moveInfo.AddRange(repository.Move(toMove, container));
@@ -474,6 +548,12 @@ namespace Umbraco.Core.Services
         }
 
         #region Event Handlers
+
+        public static event TypedEventHandler<IDataTypeService, SaveEventArgs<EntityContainer>> SavingContainer;
+        public static event TypedEventHandler<IDataTypeService, SaveEventArgs<EntityContainer>> SavedContainer;
+        public static event TypedEventHandler<IDataTypeService, DeleteEventArgs<EntityContainer>> DeletingContainer;
+        public static event TypedEventHandler<IDataTypeService, DeleteEventArgs<EntityContainer>> DeletedContainer;
+
         /// <summary>
         /// Occurs before Delete
         /// </summary>

@@ -39,9 +39,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 
                 if (!dataTypeIds.Any()) return string.Empty;
 
-                var propertyData =
-                    database.Fetch<PropertyDataDto>(
-                        "WHERE propertyTypeId in (SELECT id from cmsPropertyType where dataTypeID IN (@dataTypeIds))", new { dataTypeIds = dataTypeIds });
+                // need to use dynamic, as PropertyDataDto has new properties
+                var propertyData = database.Fetch<dynamic>("SELECT * FROM cmsPropertyData"
+                        + " WHERE propertyTypeId in (SELECT id from cmsPropertyType where dataTypeID IN (@dataTypeIds))", new { dataTypeIds = dataTypeIds });
                 if (!propertyData.Any()) return string.Empty;
 
                 var nodesIdsWithProperty = propertyData.Select(x => x.NodeId).Distinct().ToArray();
@@ -75,11 +75,14 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                         }
                         catch (Exception ex)
                         {
-                            Logger.Error<UpdateRelatedLinksData>("The data stored for property id " + data.Id + " on document " + data.NodeId +
-                                " is not valid XML, the data will be removed because it cannot be converted to the new format. The value was: " + data.Text, ex);
+                            int dataId = data.id;
+                            int dataNodeId = data.nodeId;
+                            string dataText = data.dataNText;
+                            Logger.Error<UpdateRelatedLinksData>("The data stored for property id " + dataId + " on document " + dataNodeId + 
+                                " is not valid XML, the data will be removed because it cannot be converted to the new format. The value was: " + dataText, ex);
 
-                            data.Text = "";
-                            database.Update(data);
+                            data.dataNText = "";
+                            database.Update("cmsPropertyData", "id", data, new[] { "dataNText" });
 
                             UpdateXmlTable(propertyTypes, data, cmsContentXmlEntries, database);
 
@@ -93,11 +96,11 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                         {
                             var title = node.Attributes["title"].Value;
                             var type = node.Attributes["type"].Value;
-                            var newwindow = node.Attributes["newwindow"].Value.Equals("1") ? true : false;
+                            var newwindow = node.Attributes["newwindow"].Value.Equals("1");
                             var lnk = node.Attributes["link"].Value;
 
                             //create the links in the format the new prop editor expects it to be
-                            var link = new ExpandoObject() as IDictionary<string, Object>;
+                            var link = new ExpandoObject() as IDictionary<string, object>;
                             link.Add("title", title);
                             link.Add("caption", title);
                             link.Add("link", lnk);
@@ -112,9 +115,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                         }
 
                         //store the serialized data
-                        data.Text = JsonConvert.SerializeObject(links);
+                        data.dataNText = JsonConvert.SerializeObject(links);
 
-                        database.Update(data);
+                        database.Update("cmsPropertyData", "id", data, new[] { "dataNText" });
 
                         UpdateXmlTable(propertyTypes, data, cmsContentXmlEntries, database);
 

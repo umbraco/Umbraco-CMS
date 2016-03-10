@@ -1,4 +1,6 @@
 @ECHO OFF
+SETLOCAL
+
 SET release=%1
 ECHO Installing Npm NuGet Package
 
@@ -11,12 +13,9 @@ ECHO Current folder: %CD%
 for /f "delims=" %%A in ('dir %nuGetFolder%node.js.* /b') do set "nodePath=%nuGetFolder%%%A\"
 for /f "delims=" %%A in ('dir %nuGetFolder%npm.js.* /b') do set "npmPath=%nuGetFolder%%%A\tools\"
 
-ECHO Temporarily adding Npm and Node to path
-SET oldPath=%PATH%
-
-path=%npmPath%;%nodePath%;%PATH%
-
-ECHO %path%
+ECHO Adding Npm and Node to path 
+REM SETLOCAL is on, so changes to the path not persist to the actual user's path
+PATH=%npmPath%;%nodePath%;%PATH%
 
 SET buildFolder=%CD%
 
@@ -28,9 +27,6 @@ call npm install --quiet
 call npm install -g grunt-cli --quiet
 call npm install -g bower --quiet
 call grunt build --buildversion=%release%
-
-ECHO Reset path to what it was before
-path=%oldPath%
 
 ECHO Move back to the build folder
 CD %buildFolder% 

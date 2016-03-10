@@ -8,9 +8,9 @@ function valHighlight($timeout) {
     return {
         restrict: "A",
         link: function (scope, element, attrs, ctrl) {
-            
+
             attrs.$observe("valHighlight", function (newVal) {
-                if (newVal === true) {
+                if (newVal === "true") {
                     element.addClass("highlight-error");
                     $timeout(function () {
                         //set the bound scope property to false

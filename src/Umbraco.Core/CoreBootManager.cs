@@ -140,8 +140,11 @@ namespace Umbraco.Core
             {
                 try
                 {
+                            using (ProfilingLogger.DebugDuration<CoreBootManager>(string.Format("Executing {0} in ApplicationInitialized", x.GetType())))
+                            {
                     x.OnApplicationInitialized(UmbracoApplication, ApplicationContext);
                 }
+                        }
                 catch (Exception ex)
                 {
                     ProfilingLogger.Logger.Error<CoreBootManager>("An error occurred running OnApplicationInitialized for handler " + x.GetType(), ex);
@@ -202,10 +205,16 @@ namespace Umbraco.Core
         protected virtual CacheHelper CreateApplicationCache()
         {
             var cacheHelper = new CacheHelper(
-                new ObjectCacheRuntimeCacheProvider(),
+                //we need to have the dep clone runtime cache provider to ensure 
+                //all entities are cached properly (cloned in and cloned out)
+                new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()),
                 new StaticCacheProvider(),
                 //we have no request based cache when not running in web-based context
-                new NullCacheProvider());
+                new NullCacheProvider(),
+                new IsolatedRuntimeCache(type =>
+                    //we need to have the dep clone runtime cache provider to ensure 
+                    //all entities are cached properly (cloned in and cloned out)
+                    new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider())));
 
             return cacheHelper;
         }
@@ -264,8 +273,11 @@ namespace Umbraco.Core
             {
                 try
                 {
+		                    using (ProfilingLogger.DebugDuration<CoreBootManager>(string.Format("Executing {0} in ApplicationStarting", x.GetType())))
+		                    {
                     x.OnApplicationStarting(UmbracoApplication, ApplicationContext);
                 }
+		                }
                 catch (Exception ex)
                 {
                     ProfilingLogger.Logger.Error<CoreBootManager>("An error occurred running OnApplicationStarting for handler " + x.GetType(), ex);
@@ -310,7 +322,10 @@ namespace Umbraco.Core
             {
                 try
                 {
+                            using (ProfilingLogger.DebugDuration<CoreBootManager>(string.Format("Executing {0} in ApplicationStarted", x.GetType())))
+                            {
                     x.OnApplicationStarted(UmbracoApplication, ApplicationContext);
+                            }
                 }
                 catch (Exception ex)
                 {

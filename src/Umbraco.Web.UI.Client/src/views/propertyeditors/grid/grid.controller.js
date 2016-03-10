@@ -1,9 +1,11 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.GridController",
-    function ($scope, $http, assetsService, localizationService, $rootScope, dialogService, gridService, mediaResource, imageHelper, $timeout, umbRequestHelper) {
+    function ($scope, $http, assetsService, localizationService, $rootScope, dialogService, gridService, mediaResource, imageHelper, $timeout, umbRequestHelper, angularHelper) {
 
         // Grid status variables
         var placeHolder = "";
+        var currentForm = angularHelper.getCurrentForm($scope);
+
         $scope.currentRow = null;
         $scope.currentCell = null;
         $scope.currentToolsControl = null;
@@ -73,6 +75,7 @@ angular.module("umbraco")
                     tinyMCE.execCommand("mceRemoveEditor", false, id);
                     tinyMCE.init(draggedRteSettings[id]);
                 });
+                currentForm.$setDirty();
             }
         };
 
@@ -160,6 +163,7 @@ angular.module("umbraco")
                         }
                     });
                 }
+                currentForm.$setDirty();
             },
 
             start: function (e, ui) {
@@ -233,6 +237,17 @@ angular.module("umbraco")
             }
         };
 
+        $scope.showReorderButton = function() {
+            if($scope.model.value && $scope.model.value.sections) {
+                for(var i = 0; $scope.model.value.sections.length > i; i++) {
+                    var section = $scope.model.value.sections[i];
+                    if(section.rows && section.rows.length > 0) {
+                        return true;
+                    }
+                }
+            }
+        };
+
         // *********************************************
         // Add items overlay menu
         // *********************************************
@@ -240,7 +255,7 @@ angular.module("umbraco")
           $scope.editorOverlay = {
               view: "itempicker",
               filter: false,
-              title: localizationService.localize("grid_insertControl").then(function (value) {return value;}),
+              title: localizationService.localize("grid_insertControl"),
               availableItems: area.$allowedEditors,
               event: event,
               show: true,
@@ -309,6 +324,8 @@ angular.module("umbraco")
                 section.rows.push(row);
             }
 
+            currentForm.$setDirty();
+
             $scope.showRowConfigurations = false;
 
         };
@@ -318,8 +335,7 @@ angular.module("umbraco")
                 section.rows.splice($index, 1);
                 $scope.currentRow = null;
                 $scope.openRTEToolbarId = null;
-
-                //$scope.initContent();
+                currentForm.$setDirty();
             }
 
             if(section.rows.length === 0) {
@@ -330,8 +346,15 @@ angular.module("umbraco")
         $scope.editGridItemSettings = function (gridItem, itemType) {
 
             placeHolder = "{0}";
-            var styles = _.filter( angular.copy($scope.model.config.items.styles), function(item){return (item.applyTo === undefined || item.applyTo === itemType); });
-            var config = _.filter( angular.copy($scope.model.config.items.config), function(item){return (item.applyTo === undefined || item.applyTo === itemType); });
+
+            var styles, config;
+            if (itemType === 'control') {
+                styles = null;
+                config = angular.copy(gridItem.editor.config.settings);
+            } else {
+                styles = _.filter(angular.copy($scope.model.config.items.styles), function (item) { return (item.applyTo === undefined || item.applyTo === itemType); });
+                config = _.filter(angular.copy($scope.model.config.items.config), function (item) { return (item.applyTo === undefined || item.applyTo === itemType); });
+            }
 
             if(angular.isObject(gridItem.config)){
                 _.each(config, function(cfg){
@@ -378,6 +401,8 @@ angular.module("umbraco")
                 gridItem.styles = styleObject;
                 gridItem.config = configObject;
                 gridItem.hasConfig = gridItemHasConfig(styleObject, configObject);
+
+                currentForm.$setDirty();
 
                 $scope.gridItemSettingsDialog.show = false;
                 $scope.gridItemSettingsDialog = null;
@@ -562,11 +587,11 @@ angular.module("umbraco")
 
 
         // *********************************************
-        // INITIALISATION
+        // Initialization
         // these methods are called from ng-init on the template
         // so we can controll their first load data
         //
-        // intialisation sets non-saved data like percentage sizing, allowed editors and
+        // intialization sets non-saved data like percentage sizing, allowed editors and
         // other data that should all be pre-fixed with $ to strip it out on save
         // *********************************************
 

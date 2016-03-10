@@ -3,12 +3,11 @@
    <umb-load-indicator ng-if="page.loading"></umb-load-indicator>
 
    <form name="contentForm"
-      ng-show="!page.loading"
       ng-submit="save()"
       novalidate
       val-form-manager>
 
-      <umb-editor-view>
+      <umb-editor-view ng-if="!page.loading">
 
          <umb-editor-header
             menu="page.menu"

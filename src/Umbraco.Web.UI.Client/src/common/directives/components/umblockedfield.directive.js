@@ -11,9 +11,7 @@
 
 	function LockedFieldDirective($timeout, localizationService) {
 
-	    function link(scope, el, attr, ngModel) {
-
-			var input = el.find('.umb-locked-field__input');
+	    function link(scope, el, attr, ngModelCtrl) {
 
 			function activate() {
 
@@ -41,35 +39,13 @@
 
 			scope.lock = function() {
 				scope.locked = true;
-				input.unbind("blur");
 			};
 
 			scope.unlock = function() {
 				scope.locked = false;
-				autoFocusField();
 			};
 
-			function autoFocusField() {
-
-				var onBlurHandler = function() {
-					scope.$apply(function(){
-						scope.lock();
-					});
-				};
-
-				$timeout(function() {
-					input.focus();
-					input.select();
-					input.on("blur", onBlurHandler);
-				});
-
-			}
-
 			activate();
-
-			scope.$on('$destroy', function() {
-				input.unbind('blur');
-			});
 
 		}
 
@@ -79,7 +55,7 @@
 			replace: true,
 			templateUrl: 'views/components/umb-locked-field.html',
 			scope: {
-				model: '=ngModel',
+			    ngModel: "=",
 				locked: "=?",
 				placeholderText: "=?",
 				regexValidation: "=?",
