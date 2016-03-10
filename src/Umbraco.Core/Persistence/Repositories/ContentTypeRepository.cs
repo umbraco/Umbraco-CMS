@@ -199,7 +199,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .On<PropertyDataDto, PropertyTypeDto>(SqlSyntax, dto => dto.PropertyTypeId, dto => dto.Id)
                 .InnerJoin<ContentTypeDto>(SqlSyntax)
                 .On<ContentTypeDto, PropertyTypeDto>(SqlSyntax, dto => dto.NodeId, dto => dto.ContentTypeId)
-                .Where<ContentTypeDto>(dto => dto.NodeId == entity.Id);
+                .Where<ContentTypeDto>(SqlSyntax, dto => dto.NodeId == entity.Id);
 
             //Delete all cmsPropertyData where propertytypeid EXISTS in the subquery above
             Database.Execute(SqlSyntax.GetDeleteSubquery("cmsPropertyData", "propertytypeid", sql));

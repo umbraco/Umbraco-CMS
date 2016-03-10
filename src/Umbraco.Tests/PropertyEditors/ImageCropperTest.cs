@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using LightInject;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -141,7 +142,7 @@ namespace Umbraco.Tests.PropertyEditors
         {
             try
             {
-                PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(new ActivatorServiceProvider(), Mock.Of<ILogger>());
+                PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(Mock.Of<IServiceContainer>(), Mock.Of<ILogger>());
                 Resolution.Freeze();
 
                 var dataTypeService = new Mock<IDataTypeService>();

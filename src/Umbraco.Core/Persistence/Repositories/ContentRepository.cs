@@ -690,7 +690,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public int CountPublished()
         {
             var sql = GetBaseQuery(true).Where<NodeDto>(SqlSyntax, x => x.Trashed == false)
-                .Where<DocumentDto>(x => x.Published == true);
+                .Where<DocumentDto>(SqlSyntax, x => x.Published == true);
             return Database.ExecuteScalar<int>(sql);
         }
 

@@ -262,12 +262,7 @@ namespace Umbraco.Web.UI.Pages
 			RegisterClientScript(string.Format(Scripts.MoveNode, currNodeId, newParentPath));
 			return this;
 		}
-
-        public string ReloadContentFrameUrlIfPathLoaded(string url)
-        {
-            return string.Format(ClientTools.Scripts.ClientMgrScript + ".reloadContentFrameUrlIfPathLoaded('{0}');", url);
-        }
-
+        
         /// <summary>
         /// Reloads only the last node that the user interacted with via the context menu. To reload a specify node, use SyncTree.
         /// </summary>

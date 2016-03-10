@@ -328,10 +328,10 @@ namespace Umbraco.Tests.Models.Mapping
 
             //return a textbox property editor for any requested editor by alias
             _propertyEditorResolver.Setup(resolver => resolver.GetByAlias(It.IsAny<string>()))
-                .Returns(new TextboxPropertyEditor());
+                .Returns(new TextboxPropertyEditor(Mock.Of<ILogger>()));
             //for testing, just return a list of whatever property editors we want
             _propertyEditorResolver.Setup(resolver => resolver.PropertyEditors)
-                .Returns(new[] { new TextboxPropertyEditor() });
+                .Returns(new[] { new TextboxPropertyEditor(Mock.Of<ILogger>()) });
 
             var memberType = MockedContentTypes.CreateSimpleMemberType();
             memberType.MemberTypePropertyTypes[memberType.PropertyTypes.Last().Alias] = new MemberTypePropertyProfileAccess(true, true);
@@ -398,10 +398,10 @@ namespace Umbraco.Tests.Models.Mapping
 
             //return a textbox property editor for any requested editor by alias
             _propertyEditorResolver.Setup(resolver => resolver.GetByAlias(It.IsAny<string>()))
-                .Returns(new TextboxPropertyEditor());
+                .Returns(new TextboxPropertyEditor(Mock.Of<ILogger>()));
             //for testing, just return a list of whatever property editors we want
             _propertyEditorResolver.Setup(resolver => resolver.PropertyEditors)
-                .Returns(new[] { new TextboxPropertyEditor() });
+                .Returns(new[] { new TextboxPropertyEditor(Mock.Of<ILogger>()) });
 
             var mediaType = MockedContentTypes.CreateImageMediaType();
             MockedContentTypes.EnsureAllIds(mediaType, 8888);
@@ -741,10 +741,10 @@ namespace Umbraco.Tests.Models.Mapping
 
             //return a textbox property editor for any requested editor by alias
             _propertyEditorResolver.Setup(resolver => resolver.GetByAlias(It.IsAny<string>()))
-                .Returns(new TextboxPropertyEditor());
+                .Returns(new TextboxPropertyEditor(Mock.Of<ILogger>()));
             //for testing, just return a list of whatever property editors we want
             _propertyEditorResolver.Setup(resolver => resolver.PropertyEditors)
-                .Returns(new[] { new TextboxPropertyEditor() });
+                .Returns(new[] { new TextboxPropertyEditor(Mock.Of<ILogger>()) });
 
             var ctMain = MockedContentTypes.CreateSimpleMediaType("parent", "Parent");
             //not assigned to tab

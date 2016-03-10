@@ -21,9 +21,12 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class DictionaryRepository : PetaPocoRepositoryBase<int, IDictionaryItem>, IDictionaryRepository
     {
-        public DictionaryRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider syntax)
-            : base(work, cache, logger, syntax)
+        private readonly IMappingResolver _mappingResolver;
+
+        public DictionaryRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider syntax, IMappingResolver mappingResolver)
+            : base(work, cache, logger, syntax, mappingResolver)
         {
+            _mappingResolver = mappingResolver;
         }
 
         private IRepositoryCachePolicyFactory<IDictionaryItem, int> _cachePolicyFactory;

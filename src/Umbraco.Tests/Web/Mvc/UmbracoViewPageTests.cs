@@ -374,7 +374,6 @@ namespace Umbraco.Tests.Web.Mvc
         ServiceContext GetServiceContext()
         {
             return MockHelper.GetMockedServiceContext();
-                    new Mock<IEntityService>().Object,
         }
 
         ViewContext GetViewContext()

@@ -762,7 +762,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         private bool AliasAlreadExists(ITemplate template)
         {
-            var sql = GetBaseQuery(true).Where<TemplateDto>(x => x.Alias.InvariantEquals(template.Alias) && x.NodeId != template.Id);
+            var sql = GetBaseQuery(true).Where<TemplateDto>(SqlSyntax, x => x.Alias.InvariantEquals(template.Alias) && x.NodeId != template.Id);
             var count = Database.ExecuteScalar<int>(sql);
             return count > 0;
         }

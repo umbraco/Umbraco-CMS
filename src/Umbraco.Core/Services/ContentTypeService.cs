@@ -618,7 +618,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateContentTypeRepository(UowProvider.GetUnitOfWork()))
             {
-                return repository.Count(Query<IContentType>.Builder);
+                return repository.Count(repository.Query);
             }
         }
 
@@ -626,7 +626,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = RepositoryFactory.CreateMediaTypeRepository(UowProvider.GetUnitOfWork()))
             {
-                return repository.Count(Query<IMediaType>.Builder);
+                return repository.Count(repository.Query);
             }
         }
 

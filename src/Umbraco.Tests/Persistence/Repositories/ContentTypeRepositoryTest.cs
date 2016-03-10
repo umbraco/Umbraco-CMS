@@ -533,7 +533,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Commit();
 
                 // Act
-                var contentTypes = repository.GetByQuery(new Query<IContentType>().Where(x => x.ParentId == contentType.Id));
+                var contentTypes = repository.GetByQuery(repository.Query.Where(x => x.ParentId == contentType.Id));
 
                 // Assert
                 Assert.That(contentTypes.Count(), Is.EqualTo(3));

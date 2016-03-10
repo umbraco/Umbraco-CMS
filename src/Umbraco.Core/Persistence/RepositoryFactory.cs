@@ -184,8 +184,7 @@ namespace Umbraco.Core.Persistence
 
         internal virtual EntityContainerRepository CreateEntityContainerRepository(IDatabaseUnitOfWork uow, Guid containerObjectType)
         {
-            return _container.GetInstance<IDatabaseUnitOfWork, EntityContainerRepository>(uow);            
-                containerObjectType);
+            return _container.GetInstance<IDatabaseUnitOfWork, EntityContainerRepository>(uow);
         }
     }
 }

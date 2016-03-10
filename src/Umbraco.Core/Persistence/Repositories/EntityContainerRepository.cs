@@ -21,8 +21,8 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly Guid _containerObjectType;
 
-        public EntityContainerRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, Guid containerObjectType) 
-            : base(work, cache, logger, sqlSyntax)
+        public EntityContainerRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IMappingResolver mappingResolver, Guid containerObjectType) 
+            : base(work, cache, logger, sqlSyntax, mappingResolver)
         {
             var allowedContainers = new[] {Constants.ObjectTypes.DocumentTypeContainerGuid, Constants.ObjectTypes.MediaTypeContainerGuid, Constants.ObjectTypes.DataTypeContainerGuid};
             _containerObjectType = containerObjectType;
@@ -70,7 +70,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     .Where("nodeObjectType=@umbracoObjectTypeId", new { umbracoObjectTypeId = NodeObjectTypeId })
                     .Where(string.Format("{0} IN (@ids)", SqlSyntax.GetQuotedColumnName("id")), new { ids = @group });
 
-                sql.OrderBy<NodeDto>(x => x.Level, SqlSyntax);
+                sql.OrderBy<NodeDto>(SqlSyntax, x => x.Level);
 
                 return Database.Fetch<NodeDto>(sql).Select(CreateEntity);
             });
