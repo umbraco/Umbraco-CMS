@@ -198,6 +198,9 @@ namespace Umbraco.Web
             //Wrap viewengines in the profiling engine
             WrapViewEngines(ViewEngines.Engines);
 
+            //add global filters
+            ConfigureGlobalFilters();
+
             //set routes
             CreateRoutes();
 
@@ -222,6 +225,11 @@ namespace Umbraco.Web
             GlobalConfiguration.Configuration.EnsureInitialized();
 
             return this;
+        }
+
+        internal static void ConfigureGlobalFilters()
+        {
+            GlobalFilters.Filters.Add(new EnsurePartialViewMacroViewContextFilterAttribute());
         }
 
         internal static void WrapViewEngines(IList<IViewEngine> viewEngines)
