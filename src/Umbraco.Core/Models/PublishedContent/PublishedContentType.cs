@@ -114,10 +114,25 @@ namespace Umbraco.Core.Models.PublishedContent
         internal static void ClearContentType(int id)
         {
             Logging.LogHelper.Debug<PublishedContentType>("Clear content type w/id {0}.", () => id);
-            // requires a predicate because the key does not contain the ID
-            // faster than key strings comparisons anyway
+
+            // we don't support "get all" at the moment - so, cheating
+            var all = ApplicationContext.Current.ApplicationCache.StaticCache.GetCacheItemsByKeySearch<PublishedContentType>("PublishedContentType_").ToArray();
+
+            // the one we want to clear
+            var clr = all.FirstOrDefault(x => x.Id == id);
+            if (clr == null) return;
+
+            // those that have that one in their composition aliases
+            // note: CompositionAliases contains all recursive aliases
+            var oth = all.Where(x => x.CompositionAliases.InvariantContains(clr.Alias)).Select(x => x.Id);
+
+            // merge ids
+            var ids = oth.Concat(new[] { clr.Id }).ToArray();
+
+            // clear them all at once
+            // we don't support "clear many at once" at the moment - so, cheating
             ApplicationContext.Current.ApplicationCache.StaticCache.ClearCacheObjectTypes<PublishedContentType>(
-                (key, value) => value.Id == id);
+                (key, value) => ids.Contains(value.Id));
         }
 
         internal static void ClearDataType(int id)
