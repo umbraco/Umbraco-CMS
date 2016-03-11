@@ -62,17 +62,17 @@
 
          <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar"  data-bind="visible: processStatus() == 'init'">
             <a href="#" class="btn btn-link" data-bind="click: closeDialog">
-                <%=umbraco.ui.Text("general", "cancel", UmbracoUser)%>
+                <%=Services.TextService.Localize("general/cancel")%>
             </a>
              <button id="ok" class="btn btn-primary" data-bind="click: startPublish">
-                <%=umbraco.ui.Text("content", "publish", UmbracoUser)%>
+                <%=Services.TextService.Localize("content/publish")%>
             </button>
         </div>
 
         <div id="animDiv" class="propertyDiv" data-bind="visible: processStatus() == 'publishing'">
             <div>
                 <p>
-                    <%=umbraco.ui.Text("publish", "inProgress", UmbracoUser)%>
+                    <%=Services.TextService.Localize("publish/inProgress")%>
                 </p>
                 <cc1:ProgressBar runat="server" ID="ProgBar1" />
                 <br />

@@ -123,13 +123,13 @@
                     <thead>
                         <tr>
                             <th>
-                                <%=umbraco.ui.Text("general", "alias",UmbracoUser)%>
+                                <%=Services.TextService.Localize("general/alias")%>
                             </th>
                             <th>
-                                <%=umbraco.ui.Text("general", "name",UmbracoUser)%>
+                                <%=Services.TextService.Localize("general/name")%>
                             </th>
                             <th>
-                                <%=umbraco.ui.Text("general", "type",UmbracoUser)%>
+                                <%=Services.TextService.Localize("general/type")%>
                             </th>
                             <th></th>
                         </tr>

@@ -85,8 +85,8 @@
 		<p>
 			<asp:Button ID="ok" runat="server" CssClass="guiInputButton" OnClick="HandleMoveOrCopy" UseSubmitBehavior="false" OnClientClick="this.disabled = 'disabled';"></asp:Button>
 			&nbsp; <em>
-				<%=umbraco.ui.Text("general", "or", UmbracoUser)%></em> &nbsp; <a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()">
-					<%=umbraco.ui.Text("general", "cancel", UmbracoUser)%></a>
+				<%=Services.TextService.Localize("general/or")%></em> &nbsp; <a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()">
+					<%=Services.TextService.Localize("general/cancel")%></a>
 		</p>
 	</asp:Panel>
 </asp:Content>

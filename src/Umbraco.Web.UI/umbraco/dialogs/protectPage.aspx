@@ -106,7 +106,7 @@
 
                     <asp:Panel runat="server" Visible="false" ID="p_noGroupsFound" CssClass="error">
                         <p>
-                            <%= umbraco.ui.Text("publicAccess", "paAdvancedNoGroups", UmbracoUser)%>
+                            <%= Services.TextService.Localize("publicAccess/paAdvancedNoGroups")%>
                         </p>
                     </asp:Panel>
                 </label>
@@ -144,7 +144,7 @@
 
     <cc1:Pane ID="pane_advanced" runat="server" Visible="false" Text="Role based protection">
         <cc1:PropertyPanel ID="PropertyPanel3" runat="server">
-            <p><%= umbraco.ui.Text("publicAccess", "paSelectRoles", UmbracoUser)%></p>
+            <p><%= Services.TextService.Localize("publicAccess/paSelectRoles")%></p>
         </cc1:PropertyPanel>
         <cc1:PropertyPanel ID="PropertyPanel2" runat="server">
             <asp:PlaceHolder ID="groupsSelector" runat="server"></asp:PlaceHolder>

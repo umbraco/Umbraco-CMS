@@ -73,7 +73,7 @@
 	  
 		<br />
 		<div id="buttons">
-		<input type="button" ID="ok" value="<%=umbraco.ui.Text("actions", "emptyTrashcan", UmbracoUser) %>" class="guiInputButton" onclick="if ($get('confirmDelete').checked) {emptyRecycleBin();}" disabled="true" />  
+		<input type="button" ID="ok" value="<%=Services.TextService.Localize("actions/emptyTrashcan") %>" class="guiInputButton" onclick="if ($get('confirmDelete').checked) {emptyRecycleBin();}" disabled="true" />  
 		<em><%= umbraco.ui.Text("or") %></em> 
     <a href="#" onclick="UmbClientMgr.closeModalWindow();">
       <%=umbraco.ui.Text("cancel")%>

@@ -130,7 +130,7 @@
     <div class="umb-panel-footer">
         <div class="btn-toolbar umb-btn-toolbar">
             <a id="cancelButton" href="#" class="btn btn-link">
-                <%=umbraco.ui.Text("general", "cancel", UmbracoUser)%></a> 
+                <%=Services.TextService.Localize("general/cancel")%></a> 
     
             <input id="submitButton" type="button" name="gem" class="btn btn-primary" value="<%=umbraco.ui.Text("insert")%>" />
         </div>
