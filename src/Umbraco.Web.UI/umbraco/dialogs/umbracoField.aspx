@@ -45,17 +45,17 @@
             <cc1:FieldDropDownList ID="altFieldPicker" Width="170px" Rows="1" runat="server"></cc1:FieldDropDownList>
             <input type="text" size="25" name="useIfEmpty" class="guiInputTextTiny"/><br />
             <span class="guiDialogTiny">
-                <%=umbraco.ui.Text("templateEditor", "usedIfEmpty")%></span>
+                <%=Services.TextService.Localize("templateEditor/usedIfEmpty")%></span>
         </cc1:PropertyPanel>
         
         <cc1:PropertyPanel ID="pp_insertAltText" runat="server">
             <textarea rows="1" style="width: 310px;" name="alternativeText" class="guiInputTextTiny"></textarea><br />
             <span class="guiDialogTiny">
-                <%=umbraco.ui.Text("templateEditor", "usedIfAllEmpty")%></span>
+                <%=Services.TextService.Localize("templateEditor/usedIfAllEmpty")%></span>
         </cc1:PropertyPanel>
         
         <cc1:PropertyPanel ID="pp_recursive" runat="server">
-            <input type="checkbox" name="recursive" value="true"/> <%=umbraco.ui.Text("templateEditor", "recursive")%>
+            <input type="checkbox" name="recursive" value="true"/> <%=Services.TextService.Localize("templateEditor/recursive")%>
         </cc1:PropertyPanel>
 
     </cc1:Pane>
@@ -63,10 +63,10 @@
     <cc1:Pane runat="server" Title="Format and encoding">
         <cc1:PropertyPanel ID="pp_FormatAsDate" runat="server">
             <input type="radio" name="formatAsDate" value="formatAsDate"/>
-            <%=umbraco.ui.Text("templateEditor", "dateOnly")%>
+            <%=Services.TextService.Localize("templateEditor/dateOnly")%>
             &nbsp; &nbsp;
             <input type="radio" name="formatAsDate" value="formatAsDateWithTime"/>
-            <%=umbraco.ui.Text("templateEditor", "withTime")%>
+            <%=Services.TextService.Localize("templateEditor/withTime")%>
             <input type="text" size="6" name="formatAsDateWithTimeSeparator" style="width: 35px" class="guiInputTextTiny"/>
             <br />
             <span class="guiDialogTiny">Format the value as a date, or a date with time, accoring to the active culture.</span>
@@ -74,23 +74,23 @@
 
         <cc1:PropertyPanel ID="pp_casing" runat="server">
             <input type="radio" name="toCase" value=""/>
-            <%=umbraco.ui.Text("templateEditor", "none")%>
+            <%=Services.TextService.Localize("templateEditor/none")%>
             <input type="radio" name="toCase" value="lower"/>
-            <%=umbraco.ui.Text("templateEditor", "lowercase")%>
+            <%=Services.TextService.Localize("templateEditor/lowercase")%>
             <input type="radio" name="toCase" value="upper"/>
-            <%=umbraco.ui.Text("templateEditor", "uppercase")%>
+            <%=Services.TextService.Localize("templateEditor/uppercase")%>
         </cc1:PropertyPanel>
 
         <cc1:PropertyPanel ID="pp_encode" runat="server">
             <input type="radio" name="urlEncode" value=""/>
             <%=umbraco.ui.Text("none")%>
             <input type="radio" name="urlEncode" value="url"/>
-            <%=umbraco.ui.Text("templateEditor","urlEncode")%>
+            <%=Services.TextService.Localize("templateEditor/urlEncode")%>
             <input type="radio" name="urlEncode" value="html"/>
-            <%=umbraco.ui.Text("templateEditor", "htmlEncode")%>
+            <%=Services.TextService.Localize("templateEditor/htmlEncode")%>
             <br />
             <span class="guiDialogTiny">
-                <%=umbraco.ui.Text("templateEditor", "urlEncodeHelp")%>
+                <%=Services.TextService.Localize("templateEditor/urlEncodeHelp")%>
             </span>
         </cc1:PropertyPanel>
         </cc1:Pane>
@@ -99,29 +99,29 @@
         <cc1:PropertyPanel ID="pp_insertBefore" runat="server">
             <input type="text" size="40" name="insertTextBefore" class="guiInputTextTiny"/><br />
             <span class="guiDialogTiny">
-                <%=umbraco.ui.Text("templateEditor", "insertedBefore")%>
+                <%=Services.TextService.Localize("templateEditor/insertedBefore")%>
             </span>
         </cc1:PropertyPanel>
         <cc1:PropertyPanel ID="pp_insertAfter" runat="server">
             <input type="text" size="40" name="insertTextAfter" class="guiInputTextTiny"/><br />
             <span class="guiDialogTiny">
-                <%=umbraco.ui.Text("templateEditor", "insertedAfter")%>
+                <%=Services.TextService.Localize("templateEditor/insertedAfter")%>
             </span>
         </cc1:PropertyPanel>
 
         <cc1:PropertyPanel ID="pp_convertLineBreaks" runat="server">
-            <input type="checkbox" name="convertLineBreaks" value="true"/>  <%=umbraco.ui.Text("templateEditor", "convertLineBreaks")%>
+            <input type="checkbox" name="convertLineBreaks" value="true"/>  <%=Services.TextService.Localize("templateEditor/convertLineBreaks")%>
             
             <br />
             <span class="guiDialogTiny">
-                <%=umbraco.ui.Text("templateEditor", "convertLineBreaksHelp")%>
+                <%=Services.TextService.Localize("templateEditor/convertLineBreaksHelp")%>
             </span>
         </cc1:PropertyPanel>
 
         <cc1:PropertyPanel ID="pp_removePTags" runat="server">
-            <input type="checkbox" name="stripParagraph" value="true"/>  <%=umbraco.ui.Text("templateEditor", "removeParagraph")%>
+            <input type="checkbox" name="stripParagraph" value="true"/>  <%=Services.TextService.Localize("templateEditor/removeParagraph")%>
             <br />
-            <span class="guiDialogTiny"><%=umbraco.ui.Text("templateEditor", "removeParagraphHelp")%>
+            <span class="guiDialogTiny"><%=Services.TextService.Localize("templateEditor/removeParagraphHelp")%>
             </span>
         </cc1:PropertyPanel>
     </cc1:Pane>

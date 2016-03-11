@@ -22,7 +22,7 @@
          <asp:TextBox ID="DomainName" runat="server" Width="252px"></asp:TextBox>
          <asp:RequiredFieldValidator ControlToValidate="DomainName" ErrorMessage="*" ID="DomainValidator" runat="server" Display="Dynamic" />
          <asp:RegularExpressionValidator ControlToValidate="DomainName" ErrorMessage="*" ID="DomainValidator2" runat="server" Display="Dynamic" /> 
-         <br /><small><%= umbraco.ui.Text("assignDomain", "domainHelp") %></small>
+         <br /><small><%= Services.TextService.Localize("assignDomain/domainHelp") %></small>
       </cc1:PropertyPanel>
       
       <cc1:PropertyPanel ID="prop_lang" runat="server" Text="language">
@@ -42,6 +42,6 @@
     </cc1:Pane>
     
     <p>
-      <a href="#" onclick="UmbClientMgr.closeModalWindow()"><%= umbraco.ui.Text("defaultdialogs", "closeThisWindow")%></a>
+      <a href="#" onclick="UmbClientMgr.closeModalWindow()"><%= Services.TextService.Localize("defaultdialogs/closeThisWindow")%></a>
     </p>
 </asp:Content>

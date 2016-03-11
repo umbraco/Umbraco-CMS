@@ -61,7 +61,7 @@
     })(jQuery);
 </script>
 
-<a href="#" id="changePasswordButton"><%= umbraco.ui.Text("user", "changePassword") %></a><br />
+<a href="#" id="changePasswordButton"><%= Services.TextService.Localize("user/changePassword") %></a><br />
 
 <div class="propertyItem" id="umbPasswordChanger" style="display: none;">
 

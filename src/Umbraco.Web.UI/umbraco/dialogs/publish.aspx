@@ -52,7 +52,7 @@
             <div id="includeUnpublished">
                 <input type="checkbox" id="includeUnpublishedCheckBox" data-bind="checked: includeUnpublished, attr: { disabled: !publishAll() }" />
                 <label for="includeUnpublishedCheckBox" data-bind="css: { disabled: !publishAll() }">
-                    <%=umbraco.ui.Text("publish", "includeUnpublished") %>
+                    <%=Services.TextService.Localize("publish/includeUnpublished") %>
                 </label>
             </div>
             

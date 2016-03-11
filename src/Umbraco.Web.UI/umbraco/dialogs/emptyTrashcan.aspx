@@ -37,7 +37,7 @@
                 } else {
                     jQuery('#div_form').hide();
                     jQuery('#notification').show();
-                    jQuery('#notification').html("<p><%=umbraco.ui.Text("defaultdialogs", "recycleBinIsEmpty")%> </p> <p><a href='#' onclick='UmbClientMgr.closeModalWindow()'><%= umbraco.ui.Text("defaultdialogs", "closeThisWindow")%></a></p>");
+                    jQuery('#notification').html("<p><%=Services.TextService.Localize("defaultdialogs/recycleBinIsEmpty")%> </p> <p><a href='#' onclick='UmbClientMgr.closeModalWindow()'><%= Services.TextService.Localize("defaultdialogs/closeThisWindow")%></a></p>");
                     UmbClientMgr.mainTree().reloadActionNode();
                 }
                 
@@ -57,7 +57,7 @@
 		
 		
 		<div id="animation" align="center" style="display: none;">
-		<p><%= umbraco.ui.Text("defaultdialogs", "recycleBinDeleting")%></p>
+		<p><%= Services.TextService.Localize("defaultdialogs/recycleBinDeleting")%></p>
 		
 		<cc1:ProgressBar ID="progbar" runat="server" Title="Please wait..." />
 		<br />
@@ -65,7 +65,7 @@
 		</div>
 	  	  	  
 	  <div id="formDiv">
-	    <p><%= umbraco.ui.Text("defaultdialogs", "recycleBinWarning")%></p>
+	    <p><%= Services.TextService.Localize("defaultdialogs/recycleBinWarning")%></p>
 		   <input type="checkbox" id="confirmDelete" onclick="$get('ok').disabled = !this.checked;" /> <label for="confirmDelete"><%=umbraco.ui.Text("defaultdialogs", "confirmEmptyTrashcan", umbraco.cms.businesslogic.RecycleBin.Count(BinType).ToString(CultureInfo.InvariantCulture), UmbracoUser)%></label>
 		</div>
 	  </cc1:PropertyPanel>
