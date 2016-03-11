@@ -20,8 +20,8 @@
       
           <div id="buttons">
             <asp:Button ID="bt_go" OnClick="go" OnClientClick="showProgress(document.getElementById('buttons'),'progress'); return true;" runat="server" Text="Republish" />
-            <em><%= umbraco.ui.Text("or") %></em>  
-            <a href="#" onclick="UmbClientMgr.closeModalWindow();"><%=umbraco.ui.Text("cancel")%></a>
+            <em><%= Services.TextService.Localize("or") %></em>  
+            <a href="#" onclick="UmbClientMgr.closeModalWindow();"><%=Services.TextService.Localize("cancel")%></a>
           </div>     
       
       <div id="progress" style="visibility: hidden;">

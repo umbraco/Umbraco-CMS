@@ -24,7 +24,7 @@
 
 
 <cc1:Pane runat="server" CssClass="btn-toolbar umb-btn-toolbar">
-     <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("cancel")%></a>
+     <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=Services.TextService.Localize("cancel")%></a>
      <asp:Button id="sbmt" Runat="server" CssClass="btn btn-primary" onclick="sbmt_Click"></asp:Button>
 </cc1:Pane>
 

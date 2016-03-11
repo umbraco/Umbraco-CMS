@@ -22,7 +22,7 @@
                 <asp:TemplateColumn>
                   <HeaderTemplate>
                     <b>
-                      <%=umbraco.ui.Text("action")%>&nbsp;&nbsp;
+                      <%=Services.TextService.Localize("action")%>&nbsp;&nbsp;
                     </b>
                   </HeaderTemplate>
                   <ItemTemplate>
@@ -32,7 +32,7 @@
                 <asp:TemplateColumn>
                   <HeaderTemplate>
                     <b>
-                      <%=umbraco.ui.Text("user")%>
+                      <%=Services.TextService.Localize("user")%>
                     </b>
                   </HeaderTemplate>
                   <ItemTemplate>
@@ -42,7 +42,7 @@
                 <asp:TemplateColumn>
                   <HeaderTemplate>
                     <b>
-                      <%=umbraco.ui.Text("date")%>
+                      <%=Services.TextService.Localize("date")%>
                     </b>
                   </HeaderTemplate>
                   <ItemTemplate>
@@ -52,7 +52,7 @@
                 <asp:TemplateColumn>
                   <HeaderTemplate>
                     <b>
-                      <%=umbraco.ui.Text("comment")%>
+                      <%=Services.TextService.Localize("comment")%>
                     </b>
                   </HeaderTemplate>
                   <ItemTemplate>

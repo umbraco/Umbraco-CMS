@@ -7,8 +7,8 @@
     <br />
 <asp:TextBox ID="rename" runat="server" Width="350px" CssClass="bigInput"></asp:TextBox>
 <asp:Panel ID="memberChooser" runat="server">
-    <%=umbraco.ui.Text("choose")%>
-    <%=umbraco.ui.Text("membertype")%>:<asp:RequiredFieldValidator ID="memberTypeRequired" ErrorMessage="*" ControlToValidate="nodeType"
+    <%=Services.TextService.Localize("choose")%>
+    <%=Services.TextService.Localize("membertype")%>:<asp:RequiredFieldValidator ID="memberTypeRequired" ErrorMessage="*" ControlToValidate="nodeType"
         runat="server">*</asp:RequiredFieldValidator><br />
     <asp:ListBox ID="nodeType" runat="server" Width="350px" CssClass="bigInput" Rows="1"
         SelectionMode="Single"></asp:ListBox>
@@ -44,5 +44,5 @@
     <asp:Button ID="sbmt" runat="server" Style="margin-top: 14px" Width="90" OnClick="sbmt_Click">
     </asp:Button>
     &nbsp; <em>
-        <%= umbraco.ui.Text("or") %></em> &nbsp;<a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("cancel")%></a>
+        <%= Services.TextService.Localize("or") %></em> &nbsp;<a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()"><%=Services.TextService.Localize("cancel")%></a>
 </div>

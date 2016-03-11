@@ -27,6 +27,6 @@
    
   <cc1:Pane runat="server" CssClass="btn-toolbar umb-btn-toolbar">
             <a class="btn btn-link" onclick="UmbClientMgr.closeModalWindow(); return false;"><%=Services.TextService.Localize("general/cancel")%></a>
-            <input type="button" onclick="insertCode(); return false;" Class="btn btn-primary" value="<%= umbraco.ui.Text("insert") %>" />
+            <input type="button" onclick="insertCode(); return false;" Class="btn btn-primary" value="<%= Services.TextService.Localize("insert") %>" />
   </cc1:Pane>
 </asp:Content>

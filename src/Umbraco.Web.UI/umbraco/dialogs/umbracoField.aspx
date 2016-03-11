@@ -83,7 +83,7 @@
 
         <cc1:PropertyPanel ID="pp_encode" runat="server">
             <input type="radio" name="urlEncode" value=""/>
-            <%=umbraco.ui.Text("none")%>
+            <%=Services.TextService.Localize("none")%>
             <input type="radio" name="urlEncode" value="url"/>
             <%=Services.TextService.Localize("templateEditor/urlEncode")%>
             <input type="radio" name="urlEncode" value="html"/>
@@ -132,7 +132,7 @@
             <a id="cancelButton" href="#" class="btn btn-link">
                 <%=Services.TextService.Localize("general/cancel")%></a> 
     
-            <input id="submitButton" type="button" name="gem" class="btn btn-primary" value="<%=umbraco.ui.Text("insert")%>" />
+            <input id="submitButton" type="button" name="gem" class="btn btn-primary" value="<%=Services.TextService.Localize("insert")%>" />
         </div>
     </div>
 

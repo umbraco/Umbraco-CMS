@@ -9,7 +9,7 @@
     <HeaderTemplate>
     <table rules="rows" border="0" class="members_table">
     <thead>
-    <tr><th><%= umbraco.ui.Text("name") %></th><th><%= umbraco.ui.Text("email") %></th><th colspan="2"><%= umbraco.ui.Text("login") %></th></tr>
+    <tr><th><%= Services.TextService.Localize("name") %></th><th><%= Services.TextService.Localize("email") %></th><th colspan="2"><%= Services.TextService.Localize("login") %></th></tr>
     </thead>
     <tbody>
     </HeaderTemplate>

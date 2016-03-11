@@ -116,7 +116,7 @@
         </div>
 
         <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
-            <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("cancel")%></a>
+            <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=Services.TextService.Localize("cancel")%></a>
             <asp:Button ID="bt_selectMode" runat="server" Text="select" CssClass="btn btn-primary" OnClick="selectMode" />
         </div>
     </asp:Panel>
@@ -156,7 +156,7 @@
 
             <cc1:PropertyPanel runat="server" ID="pp_loginPage" CssClass="pa-select-pages">
                 <small class="umb-detail">
-                    <%=umbraco.ui.Text("paLoginPageHelp")%>
+                    <%=Services.TextService.Localize("paLoginPageHelp")%>
                 </small>
                 <div class="pa-choose-page">
                     <asp:PlaceHolder ID="ph_loginpage" runat="server" />
@@ -168,7 +168,7 @@
 
             <cc1:PropertyPanel runat="server" ID="pp_errorPage" CssClass="pa-select-pages">
                 <small class="umb-detail">
-                    <%=umbraco.ui.Text("paErrorPageHelp")%>
+                    <%=Services.TextService.Localize("paErrorPageHelp")%>
                 </small>
                 <div class="pa-choose-page">
                     <asp:PlaceHolder ID="ph_errorpage" runat="server" />
@@ -180,7 +180,7 @@
 
 
         <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
-            <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("cancel")%></a>
+            <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=Services.TextService.Localize("cancel")%></a>
             <asp:Button ID="bt_protect" CssClass="btn btn-primary" runat="server" OnCommand="protect_Click"></asp:Button>
             <asp:Button ID="bt_buttonRemoveProtection" CssClass="btn btn-danger" runat="server" Visible="False" OnClick="buttonRemoveProtection_Click" />
         </div>

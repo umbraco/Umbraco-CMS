@@ -52,11 +52,11 @@
         <cc1:Feedback runat="server" ID="PageNameHolder" type="notice" Style="margin-top: 10px;"
             Text='<%#Services.TextService.Localize("moveOrCopy/noNodeSelected")%>' />
         <div style="padding-top: 10px;" class="guiDialogNormal">
-            <input type="button" id="ok" value="<%=umbraco.ui.Text("ok")%>" onclick="onNodeSelectionConfirmed();"
+            <input type="button" id="ok" value="<%=Services.TextService.Localize("ok")%>" onclick="onNodeSelectionConfirmed();"
                 disabled="true" style="width: 100px" />
             &nbsp; <em>
-                <%= umbraco.ui.Text("or") %></em>&nbsp; <a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()">
-                    <%=umbraco.ui.Text("cancel")%></a>
+                <%= Services.TextService.Localize("or") %></em>&nbsp; <a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()">
+                    <%=Services.TextService.Localize("cancel")%></a>
         </div>
     </asp:Panel>
     <cc1:Pane ID="pane_chooseName" Visible="false" runat="server">

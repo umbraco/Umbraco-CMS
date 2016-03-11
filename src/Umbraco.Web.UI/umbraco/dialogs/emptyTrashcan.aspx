@@ -30,7 +30,7 @@
 		    }
 		    
 		    function updateStatusLabel(retVal) {
-                jQuery('#statusLabel').html("<strong>" + retVal + " <%=umbraco.ui.Text("remaining")%></strong>");            
+                jQuery('#statusLabel').html("<strong>" + retVal + " <%=Services.TextService.Localize("remaining")%></strong>");            
 
                 if (retVal != '' && retVal != '0') {
                     setTimeout('updateStatus();', 500);
@@ -74,9 +74,9 @@
 		<br />
 		<div id="buttons">
 		<input type="button" ID="ok" value="<%=Services.TextService.Localize("actions/emptyTrashcan") %>" class="guiInputButton" onclick="if ($get('confirmDelete').checked) {emptyRecycleBin();}" disabled="true" />  
-		<em><%= umbraco.ui.Text("or") %></em> 
+		<em><%= Services.TextService.Localize("or") %></em> 
     <a href="#" onclick="UmbClientMgr.closeModalWindow();">
-      <%=umbraco.ui.Text("cancel")%>
+      <%=Services.TextService.Localize("cancel")%>
     </a>
 		</div>
 		</div>

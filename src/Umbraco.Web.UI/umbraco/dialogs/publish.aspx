@@ -88,7 +88,7 @@
                 </ul>
             </div>
              <p>
-                 <a href='#' class="btn" data-bind="click: closeDialog"><%=umbraco.ui.Text("closeThisWindow") %></a>
+                 <a href='#' class="btn" data-bind="click: closeDialog"><%=Services.TextService.Localize("closeThisWindow") %></a>
              </p>
         </div> 
        

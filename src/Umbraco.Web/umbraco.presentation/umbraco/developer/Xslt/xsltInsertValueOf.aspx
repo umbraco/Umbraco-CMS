@@ -56,6 +56,6 @@ body{margin: 0px; padding: 0px;}
 </cc1:Pane>
 
 <p>
-          <input type="button" value="Insert value" onclick="doSubmit();" /> <em><%= umbraco.ui.Text("or") %></em> <a href="#" onclick="UmbClientMgr.closeModalWindow(); return false;"><%= umbraco.ui.Text("cancel") %></a>
+          <input type="button" value="Insert value" onclick="doSubmit();" /> <em><%= Services.TextService.Localize("or") %></em> <a href="#" onclick="UmbClientMgr.closeModalWindow(); return false;"><%= Services.TextService.Localize("cancel") %></a>
 </p>
 </asp:Content>

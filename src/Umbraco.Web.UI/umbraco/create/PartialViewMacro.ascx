@@ -33,6 +33,6 @@
 <input type="hidden" name="nodeType" value="-1">
 
 <cc1:Pane runat="server" CssClass="btn-toolbar umb-btn-toolbar">
-    <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("cancel")%></a>
+    <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=Services.TextService.Localize("cancel")%></a>
     <asp:Button ID="SubmitButton" CssClass="btn btn-primary" runat="server" OnClick="SubmitButton_Click" Text='<%#ui.Text("create") %>'></asp:Button>
 </cc1:Pane>
