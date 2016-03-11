@@ -11,8 +11,8 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
@@ -26,7 +26,6 @@ using IUser = Umbraco.Core.Models.Membership.IUser;
 
 namespace Umbraco.Web.Editors
 {
-
     /// <summary>
     /// The API controller used for editing content
     /// </summary>
@@ -231,6 +230,13 @@ namespace Umbraco.Web.Editors
         [SetAngularAntiForgeryTokens]
         public async Task<HttpResponseMessage> PostRequestPasswordReset(RequestPasswordResetModel model)
         {
+            // If this feature is switched off in configuration the UI will be amended to not make the request to reset password available.
+            // So this is just a server-side secondary check.
+            if (UmbracoConfig.For.UmbracoSettings().Security.AllowPasswordReset == false)
+            {
+                throw new HttpResponseException(HttpStatusCode.BadRequest);
+            }
+
             var http = EnsureHttpContext();
 
             var identityUser = await SignInManager.UserManager.FindByEmailAsync(model.Email);

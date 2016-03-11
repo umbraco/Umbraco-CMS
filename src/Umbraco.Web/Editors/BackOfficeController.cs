@@ -341,6 +341,7 @@ namespace Umbraco.Web.Editors
                                 string.Join(",", UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes)
                             },
                             {"keepUserLoggedIn", UmbracoConfig.For.UmbracoSettings().Security.KeepUserLoggedIn},
+                            {"allowPasswordReset", UmbracoConfig.For.UmbracoSettings().Security.AllowPasswordReset},
                         }
                     },
                     {

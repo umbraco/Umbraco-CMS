@@ -9,6 +9,8 @@ using Umbraco.Web.Editors;
 
 namespace Umbraco.Web
 {
+    using Umbraco.Core.Configuration;
+
     /// <summary>
     /// HtmlHelper extensions for the back office
     /// </summary>
@@ -38,6 +40,9 @@ namespace Umbraco.Web
                         ""authenticationApiBaseUrl"": """ + uri.GetUmbracoApiServiceBaseUrl<AuthenticationController>(controller => controller.PostLogin(null)) + @""",
                         ""serverVarsJs"": """ + uri.GetUrlWithCacheBust("ServerVariables", "BackOffice") + @""",
                         ""externalLoginsUrl"": """ + externalLoginsUrl + @"""
+                    },
+                    ""umbracoSettings"": {
+                        ""allowPasswordReset"": " + (UmbracoConfig.For.UmbracoSettings().Security.AllowPasswordReset ? "true" : "false") + @"
                     },
                     ""application"": {
                         ""applicationPath"": """ + html.ViewContext.HttpContext.Request.ApplicationPath + @"""

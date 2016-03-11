@@ -53,7 +53,7 @@
                         <div class="alert alert-error">{{errorMsg}}</div>
                     </div>
 
-                    <div class="switch-view">
+                    <div class="switch-view" ng-show="allowPasswordReset">
                         <a href="#" prevent-default ng-click="showRequestPasswordReset()"><localize key="login_forgottenPassword">Forgotten password?</localize></a>
                     </div>
                 </form>

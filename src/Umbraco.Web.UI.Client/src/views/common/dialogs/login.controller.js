@@ -7,6 +7,8 @@
             });
         }
 
+        $scope.allowPasswordReset = Umbraco.Sys.ServerVariables.umbracoSettings.allowPasswordReset;
+
         $scope.showLogin = function () {
             $scope.errorMsg = "";
             $scope.view = "login";
