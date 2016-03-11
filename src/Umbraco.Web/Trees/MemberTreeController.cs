@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -7,9 +6,7 @@ using System.Net.Http.Formatting;
 using System.Web.Http;
 using System.Web.Security;
 using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Services;
 using Umbraco.Core.Security;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
@@ -121,7 +118,7 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.Root.ToInvariantString())
             {
                 nodes.Add(
-                        CreateTreeNode(Constants.Conventions.MemberTypes.AllMembersListId, id, queryStrings, ui.Text("member", "allMembers"), "icon-users", false,
+                        CreateTreeNode(Constants.Conventions.MemberTypes.AllMembersListId, id, queryStrings, Services.TextService.Localize("member/allMembers"), "icon-users", false,
                             queryStrings.GetValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/list/" + Constants.Conventions.MemberTypes.AllMembersListId));
 
                 if (_isUmbracoProvider)

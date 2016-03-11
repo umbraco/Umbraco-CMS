@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Xml;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using umbraco.cms.businesslogic.task;
 //using umbraco.cms.businesslogic.utilities;
 using Umbraco.Core.IO;
@@ -30,28 +31,28 @@ namespace umbraco.presentation.translation
             tasks.Columns.Add("Language");
 
             taskList.Columns[0].HeaderText = ui.Text("nodeName");
-            taskList.Columns[1].HeaderText = ui.Text("translation", "taskAssignedBy");
+            taskList.Columns[1].HeaderText = Services.TextService.Localize("translation/taskAssignedBy");
             taskList.Columns[2].HeaderText = ui.Text("date");
 
-            ((System.Web.UI.WebControls.HyperLinkField)taskList.Columns[3]).Text = ui.Text("translation", "details");
-            ((System.Web.UI.WebControls.HyperLinkField)taskList.Columns[4]).Text = ui.Text("translation", "downloadTaskAsXml");
+            ((System.Web.UI.WebControls.HyperLinkField)taskList.Columns[3]).Text = Services.TextService.Localize("translation/details");
+            ((System.Web.UI.WebControls.HyperLinkField)taskList.Columns[4]).Text = Services.TextService.Localize("translation/downloadTaskAsXml");
 
             Tasks ts = new Tasks();
             if (Request["mode"] == "owned")
             {
                 ts = Task.GetOwnedTasks(UmbracoContext.UmbracoUser, false);
-                pane_tasks.Text = ui.Text("translation", "ownedTasks");
-                Panel2.Text = ui.Text("translation", "ownedTasks");
+                pane_tasks.Text = Services.TextService.Localize("translation/ownedTasks");
+                Panel2.Text = Services.TextService.Localize("translation/ownedTasks");
             }
             else
             {
                 ts = Task.GetTasks(UmbracoContext.UmbracoUser, false);
-                pane_tasks.Text = ui.Text("translation", "assignedTasks");
-                Panel2.Text = ui.Text("translation", "assignedTasks");
+                pane_tasks.Text = Services.TextService.Localize("translation/assignedTasks");
+                Panel2.Text = Services.TextService.Localize("translation/assignedTasks");
             }
 
             uploadFile.Text = ui.Text("upload");
-            pane_uploadFile.Text = ui.Text("translation", "uploadTranslationXml");
+            pane_uploadFile.Text = Services.TextService.Localize("translation/uploadTranslationXml");
 
             foreach (Task t in ts)
             {
@@ -120,12 +121,12 @@ namespace umbraco.presentation.translation
                         }
 
                         feedback.type = global::umbraco.uicontrols.Feedback.feedbacktype.success;
-                        feedback.Text = "<h3>" + ui.Text("translation", "MultipleTranslationDone") + "</h3><p>" + ui.Text("translation", "translationDoneHelp") + "</p><ul>" + sb.ToString() + "</ul>";
+                        feedback.Text = "<h3>" + Services.TextService.Localize("translation/MultipleTranslationDone") + "</h3><p>" + Services.TextService.Localize("translation/translationDoneHelp") + "</p><ul>" + sb.ToString() + "</ul>";
                     }
                     catch (Exception ex)
                     {
                         feedback.type = global::umbraco.uicontrols.Feedback.feedbacktype.error;
-                        feedback.Text = "<h3>" + ui.Text("translation", "translationFailed") + "</h3><p>" + ex.ToString() + "</>";
+                        feedback.Text = "<h3>" + Services.TextService.Localize("translation/translationFailed") + "</h3><p>" + ex.ToString() + "</>";
                     }
                 }
                 else
@@ -136,7 +137,7 @@ namespace umbraco.presentation.translation
                     if (l.Count == 1)
                     {
                         feedback.type = global::umbraco.uicontrols.Feedback.feedbacktype.success;
-                        feedback.Text = "<h3>" + ui.Text("translation", "translationDone") + "</h3><p>" + ui.Text("translation", "translationDoneHelp") + "</p><p><a target=\"_blank\" href=\"preview.aspx?id=" + l[0].Id + "\">" + ui.Text("preview") + "</a></p>";
+                        feedback.Text = "<h3>" + Services.TextService.Localize("translation/translationDone") + "</h3><p>" + Services.TextService.Localize("translation/translationDoneHelp") + "</p><p><a target=\"_blank\" href=\"preview.aspx?id=" + l[0].Id + "\">" + ui.Text("preview") + "</a></p>";
                     }
 
                     else
@@ -147,7 +148,7 @@ namespace umbraco.presentation.translation
                         }
 
                         feedback.type = global::umbraco.uicontrols.Feedback.feedbacktype.success;
-                        feedback.Text = "<h3>" + ui.Text("translation", "MultipleTranslationDone") + "</h3><p>" + ui.Text("translation", "translationDoneHelp") + "</p><ul>" + sb.ToString() + "</ul>";
+                        feedback.Text = "<h3>" + Services.TextService.Localize("translation/MultipleTranslationDone") + "</h3><p>" + Services.TextService.Localize("translation/translationDoneHelp") + "</p><ul>" + sb.ToString() + "</ul>";
                     }
                 }
 

@@ -6,6 +6,7 @@ using umbraco.cms.businesslogic;
 using umbraco.BusinessLogic;
 using umbraco.uicontrols;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -73,7 +74,7 @@ namespace umbraco.presentation.dialogs
                         translator.Items.Add(new ListItem(u.Name, u.Id.ToString()));
 
                 if (translator.Items.Count == 0) {
-                    feedback.Text = ui.Text("translation", "noTranslators");
+                    feedback.Text = Services.TextService.Localize("translation/noTranslators");
                     feedback.type = Feedback.feedbacktype.error;
                     doTranslation.Enabled = false;
                 }
@@ -103,7 +104,7 @@ namespace umbraco.presentation.dialogs
             pane_form.Visible = false;
             pl_buttons.Visible = false;
 
-            feedback.Text = ui.Text("translation","pageHasBeenSendToTranslation", _currentPage.Text, Security.CurrentUser) + "</p><p><a href=\"#\" onclick=\"" + ClientTools.Scripts.CloseModalWindow() + "\">" + ui.Text("defaultdialogs", "closeThisWindow") + "</a></p>";
+            feedback.Text = ui.Text("translation","pageHasBeenSendToTranslation", _currentPage.Text, Security.CurrentUser) + "</p><p><a href=\"#\" onclick=\"" + ClientTools.Scripts.CloseModalWindow() + "\">" + Services.TextService.Localize("defaultdialogs/closeThisWindow") + "</a></p>";
             feedback.type = Feedback.feedbacktype.success;
         }
 

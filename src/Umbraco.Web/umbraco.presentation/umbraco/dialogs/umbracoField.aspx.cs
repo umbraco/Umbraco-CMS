@@ -1,18 +1,8 @@
-﻿using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Web;
-using System.Web.SessionState;
-using System.Web.UI;
+﻿using System.Linq;
 using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
 using Umbraco.Core.Configuration;
 using Umbraco.Core;
-using Umbraco.Core.Persistence.SqlSyntax;
-using umbraco.DataLayer;
+using Umbraco.Core.Services;
 using Umbraco.Web;
 
 namespace umbraco.dialogs
@@ -34,14 +24,14 @@ namespace umbraco.dialogs
 		{
 
 			//set labels on properties...
-			pp_insertAltField.Text = ui.Text("templateEditor", "alternativeField");
-			pp_insertAltText.Text = ui.Text("templateEditor", "alternativeText");
-			pp_insertBefore.Text = ui.Text("templateEditor", "preContent");
-			pp_insertAfter.Text = ui.Text("templateEditor", "postContent");
+			pp_insertAltField.Text = Services.TextService.Localize("templateEditor/alternativeField");
+			pp_insertAltText.Text = Services.TextService.Localize("templateEditor/alternativeText");
+			pp_insertBefore.Text = Services.TextService.Localize("templateEditor/preContent");
+			pp_insertAfter.Text = Services.TextService.Localize("templateEditor/postContent");
 
-			pp_FormatAsDate.Text = ui.Text("templateEditor", "formatAsDate");
-			pp_casing.Text = ui.Text("templateEditor", "casing");
-			pp_encode.Text = ui.Text("templateEditor", "encoding");
+			pp_FormatAsDate.Text = Services.TextService.Localize("templateEditor/formatAsDate");
+			pp_casing.Text = Services.TextService.Localize("templateEditor/casing");
+			pp_encode.Text = Services.TextService.Localize("templateEditor/encoding");
 			
 
 
@@ -67,12 +57,12 @@ namespace umbraco.dialogs
 				fieldSql = string.Format(
                     "select distinct alias from cmsPropertyType where alias not in ({0}) order by alias",
                     string.Join(",", exclude));
-				pp_insertField.Text = ui.Text("templateEditor", "chooseField");
+				pp_insertField.Text = Services.TextService.Localize("templateEditor/chooseField");
 			}
 
-			fieldPicker.ChooseText = ui.Text("templateEditor", "chooseField");
-			fieldPicker.StandardPropertiesLabel = ui.Text("templateEditor", "standardFields");
-			fieldPicker.CustomPropertiesLabel = ui.Text("templateEditor", "customFields");
+			fieldPicker.ChooseText = Services.TextService.Localize("templateEditor/chooseField");
+			fieldPicker.StandardPropertiesLabel = Services.TextService.Localize("templateEditor/standardFields");
+			fieldPicker.CustomPropertiesLabel = Services.TextService.Localize("templateEditor/customFields");
 
 			var dataTypes = DatabaseContext.Database.Fetch<dynamic>(fieldSql);
 			fieldPicker.DataTextField = "alias";
@@ -81,9 +71,9 @@ namespace umbraco.dialogs
 			fieldPicker.DataBind();
 			fieldPicker.Attributes.Add("onChange", "document.forms[0].field.value = document.forms[0]." + fieldPicker.ClientID + "[document.forms[0]." + fieldPicker.ClientID + ".selectedIndex].value;");
 
-			altFieldPicker.ChooseText = ui.Text("templateEditor", "chooseField");
-			altFieldPicker.StandardPropertiesLabel = ui.Text("templateEditor", "standardFields");
-			altFieldPicker.CustomPropertiesLabel = ui.Text("templateEditor", "customFields");
+			altFieldPicker.ChooseText = Services.TextService.Localize("templateEditor/chooseField");
+			altFieldPicker.StandardPropertiesLabel = Services.TextService.Localize("templateEditor/standardFields");
+			altFieldPicker.CustomPropertiesLabel = Services.TextService.Localize("templateEditor/customFields");
 
 			var dataTypes2 = DatabaseContext.Database.Fetch<dynamic>(fieldSql);
 			altFieldPicker.DataTextField = "alias";

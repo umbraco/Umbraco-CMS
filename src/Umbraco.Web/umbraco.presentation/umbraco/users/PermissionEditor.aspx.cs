@@ -1,3 +1,4 @@
+using Umbraco.Core.Services;
 using System;
 using System.Web.UI;
 using Umbraco.Core;
@@ -45,8 +46,8 @@ namespace umbraco.cms.presentation.user
 
 
             nodePermissions.UserID = Convert.ToInt32(Request.QueryString["id"]);
-            pnlUmbraco.Text = ui.Text("user", "userPermissions");
-            pnl1.Text = ui.Text("user", "permissionSelectPages");
+            pnlUmbraco.Text = Services.TextService.Localize("user/userPermissions");
+            pnl1.Text = Services.TextService.Localize("user/permissionSelectPages");
 
 			if (!IsPostBack)
 			{	

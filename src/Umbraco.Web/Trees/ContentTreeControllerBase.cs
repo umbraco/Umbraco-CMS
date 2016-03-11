@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Web.Http;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
@@ -234,7 +235,7 @@ namespace Umbraco.Web.Trees
             if (RecycleBinId.ToInvariantString() == id)
             {
                 var menu = new MenuItemCollection();
-                menu.Items.Add<ActionEmptyTranscan>(ui.Text("actions", "emptyTrashcan"));
+                menu.Items.Add<ActionEmptyTranscan>(Services.TextService.Localize("actions/emptyTrashcan"));
                 menu.Items.Add<ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
                 return menu;
             }

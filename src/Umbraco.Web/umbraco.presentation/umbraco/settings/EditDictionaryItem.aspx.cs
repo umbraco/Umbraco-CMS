@@ -1,16 +1,9 @@
 using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Web;
-using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
-using Umbraco.Core.IO;
+using Umbraco.Core.Services;
 using Umbraco.Web.UI;
 
 namespace umbraco.settings
@@ -93,7 +86,7 @@ namespace umbraco.settings
 					currentItem.setValue(int.Parse(t.ID),t.Text);
 				}
 			}
-            ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, ui.Text("speechBubbles", "dictionaryItemSaved"), "");	
+            ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, Services.TextService.Localize("speechBubbles/dictionaryItemSaved"), "");	
 		}
 		#region Web Form Designer generated code
 		override protected void OnInit(EventArgs e)

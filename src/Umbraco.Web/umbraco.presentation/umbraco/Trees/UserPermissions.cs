@@ -1,15 +1,6 @@
-﻿using System;
-using System.Data;
-using System.Configuration;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.HtmlControls;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using umbraco.businesslogic;
+﻿using Umbraco.Core.Services;
+using System;
 using umbraco.interfaces;
-using System.Xml;
 using System.Collections.Generic;
 using System.Text;
 using Umbraco.Core;
@@ -68,7 +59,7 @@ namespace umbraco.cms.presentation.Trees
 
         protected override void CreateRootNode(ref XmlTreeNode rootNode)
         {
-            rootNode.Text = ui.Text("user", "userPermissions");
+            rootNode.Text = Services.TextService.Localize("user/userPermissions");
         }
 
         public override void RenderJS(ref StringBuilder Javascript)

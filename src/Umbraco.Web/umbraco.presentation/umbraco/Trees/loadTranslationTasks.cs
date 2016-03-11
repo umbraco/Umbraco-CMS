@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Umbraco.Core.Services;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using umbraco.BusinessLogic;
@@ -15,7 +16,7 @@ namespace umbraco {
 
         protected override void CreateRootNode(ref XmlTreeNode rootNode) {
             rootNode.Action = "javascript:openTranslationOverview(" + currentUser().Id + ",'open');";
-            rootNode.Text = ui.Text("translation", "assignedTasks");
+            rootNode.Text = Services.TextService.Localize("translation/assignedTasks");
         }
 
         protected override void CreateRootNodeActions(ref List<IAction> actions) {
@@ -69,7 +70,7 @@ namespace umbraco {
 
         protected override void CreateRootNode(ref XmlTreeNode rootNode) {
             rootNode.Action = "javascript:openTranslationOverview(" + currentUser().Id + ", 'owned');";
-            rootNode.Text = ui.Text("translation", "ownedTasks");
+            rootNode.Text = Services.TextService.Localize("translation/ownedTasks");
         }
 
         protected override void CreateRootNodeActions(ref List<IAction> actions) {

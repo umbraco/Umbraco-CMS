@@ -38,7 +38,7 @@ namespace umbraco.dialogs
             // Put user code to initialize the page here
             if (IsPostBack == false)
             {
-                pp_relate.Text = ui.Text("moveOrCopy", "relateToOriginal");
+                pp_relate.Text = Services.TextService.Localize("moveOrCopy/relateToOriginal");
 
                 //Document Type copy Hack...                
 

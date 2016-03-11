@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Web;
 using System.Web.UI;
 using System.Collections.Generic;
@@ -30,7 +31,7 @@ namespace umbraco.cms.presentation
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            sortDone.Text = ui.Text("sort", "sortDone");
+            sortDone.Text = Services.TextService.Localize("sort/sortDone");
         }
         protected override void OnPreRender(EventArgs e)
         {

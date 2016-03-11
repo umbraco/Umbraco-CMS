@@ -116,24 +116,24 @@ namespace Umbraco.Web.WebServices
             {
                 var partialView = currentView as PartialView;
                 if (partialView != null && validate != null && validate(svce, partialView) == false)
-                    return Failed(ui.Text("speechBubbles", "partialViewErrorText"), ui.Text("speechBubbles", "partialViewErrorHeader"),
+                    return Failed(Services.TextService.Localize("speechBubbles/partialViewErrorText"), Services.TextService.Localize("speechBubbles/partialViewErrorHeader"),
                                     new FileSecurityException("File '" + currentView.Path + "' is not a valid partial view file."));
 
                 attempt = save(svce, currentView);
             }
             catch (Exception e)
             {
-                return Failed(ui.Text("speechBubbles", "partialViewErrorText"), ui.Text("speechBubbles", "partialViewErrorHeader"), e);
+                return Failed(Services.TextService.Localize("speechBubbles/partialViewErrorText"), Services.TextService.Localize("speechBubbles/partialViewErrorHeader"), e);
             }
 
             if (attempt.Success == false)
             {
-                return Failed(ui.Text("speechBubbles", "partialViewErrorText"), ui.Text("speechBubbles", "partialViewErrorHeader"),
+                return Failed(Services.TextService.Localize("speechBubbles/partialViewErrorText"), Services.TextService.Localize("speechBubbles/partialViewErrorHeader"),
                                 attempt.Exception);
             }
 
 
-            return Success(ui.Text("speechBubbles", "partialViewSavedText"), ui.Text("speechBubbles", "partialViewSavedHeader"), new { name = currentView.Name, path = currentView.Path });
+            return Success(Services.TextService.Localize("speechBubbles/partialViewSavedText"), Services.TextService.Localize("speechBubbles/partialViewSavedHeader"), new { name = currentView.Name, path = currentView.Path });
         }
 
         /// <summary>
@@ -172,7 +172,7 @@ namespace Umbraco.Web.WebServices
             catch (ArgumentException ex)
             {
                 //the template does not exist
-                return Failed("Template does not exist", ui.Text("speechBubbles", "templateErrorHeader"), ex);
+                return Failed("Template does not exist", Services.TextService.Localize("speechBubbles/templateErrorHeader"), ex);
             }
 
             try
@@ -188,7 +188,7 @@ namespace Umbraco.Web.WebServices
                 }
                 var syncPath = "-1,init," + t.Path.Replace("-1,", "");
 
-                return Success(ui.Text("speechBubbles", "templateSavedText"), ui.Text("speechBubbles", "templateSavedHeader"),
+                return Success(Services.TextService.Localize("speechBubbles/templateSavedText"), Services.TextService.Localize("speechBubbles/templateSavedHeader"),
                     new
                     {
                         path = syncPath,
@@ -197,7 +197,7 @@ namespace Umbraco.Web.WebServices
             }
             catch (Exception ex)
             {
-                return Failed(ui.Text("speechBubbles", "templateErrorText"), ui.Text("speechBubbles", "templateErrorHeader"), ex);
+                return Failed(Services.TextService.Localize("speechBubbles/templateErrorText"), Services.TextService.Localize("speechBubbles/templateErrorHeader"), ex);
             }
         }
 
@@ -220,17 +220,17 @@ namespace Umbraco.Web.WebServices
             try
             {
                 if (svce.ValidateScript(script) == false)
-                    return Failed(ui.Text("speechBubbles", "scriptErrorText"), ui.Text("speechBubbles", "scriptErrorHeader"),
+                    return Failed(Services.TextService.Localize("speechBubbles/scriptErrorText"), Services.TextService.Localize("speechBubbles/scriptErrorHeader"),
                                     new FileSecurityException("File '" + filename + "' is not a valid script file."));
                 
                 svce.SaveScript(script);
             }
             catch (Exception e)
             {
-                return Failed(ui.Text("speechBubbles", "scriptErrorText"), ui.Text("speechBubbles", "scriptErrorHeader"), e);
+                return Failed(Services.TextService.Localize("speechBubbles/scriptErrorText"), Services.TextService.Localize("speechBubbles/scriptErrorHeader"), e);
             }
 
-            return Success(ui.Text("speechBubbles", "scriptSavedText"), ui.Text("speechBubbles", "scriptSavedHeader"),
+            return Success(Services.TextService.Localize("speechBubbles/scriptSavedText"), Services.TextService.Localize("speechBubbles/scriptSavedHeader"),
                 new
                 {
                     path = BaseTree.GetTreePathFromFilePath(script.Path),
@@ -260,17 +260,17 @@ namespace Umbraco.Web.WebServices
             try
             {
                 if (svce.ValidateStylesheet(stylesheet) == false)
-                    return Failed(ui.Text("speechBubbles", "cssErrorText"), ui.Text("speechBubbles", "cssErrorHeader"),
+                    return Failed(Services.TextService.Localize("speechBubbles/cssErrorText"), Services.TextService.Localize("speechBubbles/cssErrorHeader"),
                                     new FileSecurityException("File '" + filename + "' is not a valid stylesheet file."));
 
                 svce.SaveStylesheet(stylesheet);
             }
             catch (Exception e)
             {
-                return Failed(ui.Text("speechBubbles", "cssErrorText"), ui.Text("speechBubbles", "cssErrorHeader"), e);
+                return Failed(Services.TextService.Localize("speechBubbles/cssErrorText"), Services.TextService.Localize("speechBubbles/cssErrorHeader"), e);
             }
 
-            return Success(ui.Text("speechBubbles", "cssSavedText"), ui.Text("speechBubbles", "cssSavedHeader"),
+            return Success(Services.TextService.Localize("speechBubbles/cssSavedText"), Services.TextService.Localize("speechBubbles/cssSavedHeader"),
                 new
                 {
                     path = BaseTree.GetTreePathFromFilePath(stylesheet.Path),

@@ -191,7 +191,7 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 				ClientTools.Scripts.OpenModalWindow(
 					IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/umbracoField.aspx?objectId=" +
 					editorSource.ClientID + "&tagName=UMBRACOGETDATA&mvcView=true", Services.TextService.Localize("template/insertPageField"), 640, 550);
-			umbField.AltText = ui.Text("template", "insertPageField");
+			umbField.AltText = Services.TextService.Localize("template/insertPageField");
 
 
 			// TODO: Update icon
@@ -256,21 +256,21 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 
             MenuIconI umbRenderBody = editorSource.Menu.NewIcon();
             umbRenderBody.ImageURL = SystemDirectories.Umbraco + "/images/editor/renderbody.gif";
-            //umbContainer.AltText = ui.Text("template", "insertContentAreaPlaceHolder");
+            //umbContainer.AltText = Services.TextService.Localize("template/insertContentAreaPlaceHolder");
             umbRenderBody.AltText = "Insert @RenderBody()";
 
             umbRenderBody.OnClickCommand = "editViewEditor.insertRenderBody()";
 
             MenuIconI umbSection = editorSource.Menu.NewIcon();
             umbSection.ImageURL = SystemDirectories.Umbraco + "/images/editor/masterpagePlaceHolder.gif";
-            //umbContainer.AltText = ui.Text("template", "insertContentAreaPlaceHolder");
+            //umbContainer.AltText = Services.TextService.Localize("template/insertContentAreaPlaceHolder");
             umbSection.AltText = "Insert Section";
 
             umbSection.OnClickCommand = "editViewEditor.openSnippetModal('section')";
 
             MenuIconI umbRenderSection = editorSource.Menu.NewIcon();
             umbRenderSection.ImageURL = SystemDirectories.Umbraco + "/images/editor/masterpageContent.gif";
-            //umbContainer.AltText = ui.Text("template", "insertContentAreaPlaceHolder");
+            //umbContainer.AltText = Services.TextService.Localize("template/insertContentAreaPlaceHolder");
             umbRenderSection.AltText = "Insert @RenderSection";
 
             umbRenderSection.OnClickCommand = "editViewEditor.openSnippetModal('rendersection')";

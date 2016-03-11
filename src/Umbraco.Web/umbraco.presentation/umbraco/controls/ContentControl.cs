@@ -170,7 +170,7 @@
 //            }
 
 //            // Add property pane
-//            tpProp = NewTabPage(ui.Text("general", "properties"));
+//            tpProp = NewTabPage(Services.TextService.Localize("general/properties"));
 //            AddSaveAndPublishButtons(ref tpProp);
 //            tpProp.Controls.Add(
 //                new LiteralControl("<div id=\"errorPane_" + tpProp.ClientID +
@@ -181,7 +181,7 @@
 //            foreach (Property p in props.OrderBy(x => x.PropertyType.SortOrder))
 //            {
 //                if (inTab[p.PropertyType.Id.ToString()] == null)
-//                    AddControlNew(p, tpProp, ui.Text("general", "properties"));
+//                    AddControlNew(p, tpProp, Services.TextService.Localize("general/properties"));
 //            }
 
 //        }
@@ -290,15 +290,15 @@
 //                NameTxtHolder.Controls.Add(NameTxt);
 //                NameTxtHolder.Controls.Add(NameTxtValidator);
 //                NameTxtHolder.Controls.Add(_nameTxtCustomValidator);
-//                PropertiesPane.addProperty(ui.Text("general", "name"), NameTxtHolder);
+//                PropertiesPane.addProperty(Services.TextService.Localize("general/name"), NameTxtHolder);
 
 //                Literal ltt = new Literal();
 //                ltt.Text = _content.User.Name;
-//                PropertiesPane.addProperty(ui.Text("content", "createBy"), ltt);
+//                PropertiesPane.addProperty(Services.TextService.Localize("content/createBy"), ltt);
 
 //                ltt = new Literal();
 //                ltt.Text = _content.CreateDateTime.ToString();
-//                PropertiesPane.addProperty(ui.Text("content", "createDate"), ltt);
+//                PropertiesPane.addProperty(Services.TextService.Localize("content/createDate"), ltt);
 
 //                ltt = new Literal();
 //                ltt.Text = _content.Id.ToString();
@@ -306,7 +306,7 @@
 
 //                if (_content is Media)
 //                {
-//                    PropertiesPane.addProperty(ui.Text("content", "mediatype"), new LiteralControl(_content.ContentType.Alias));
+//                    PropertiesPane.addProperty(Services.TextService.Localize("content/mediatype"), new LiteralControl(_content.ContentType.Alias));
 //                }
 
 //                tpProp.Controls.AddAt(0, PropertiesPane);
@@ -411,7 +411,7 @@
 //            menuSave.ImageUrl = UmbracoPath + "/images/editor/save.gif";
 //            menuSave.Click += new ImageClickEventHandler(SaveClick);
 //            menuSave.OnClickCommand = "invokeSaveHandlers();";
-//            menuSave.AltText = ui.Text("buttons", "save");
+//            menuSave.AltText = Services.TextService.Localize("buttons/save");
 //            if (_canPublish == publishModes.Publish)
 //            {
 //                MenuImageButton menuPublish = tp.Menu.NewImageButton();
@@ -419,7 +419,7 @@
 //                menuPublish.ImageUrl = UmbracoPath + "/images/editor/saveAndPublish.gif";
 //                menuPublish.OnClickCommand = "invokeSaveHandlers();";
 //                menuPublish.Click += new ImageClickEventHandler(DoSaveAndPublish);
-//                menuPublish.AltText = ui.Text("buttons", "saveAndPublish");
+//                menuPublish.AltText = Services.TextService.Localize("buttons/saveAndPublish");
 //            }
 //            else if (_canPublish == publishModes.SendToPublish)
 //            {
@@ -428,7 +428,7 @@
 //                menuToPublish.ImageUrl = UmbracoPath + "/images/editor/saveToPublish.gif";
 //                menuToPublish.OnClickCommand = "invokeSaveHandlers();";
 //                menuToPublish.Click += new ImageClickEventHandler(DoSaveToPublish);
-//                menuToPublish.AltText = ui.Text("buttons", "saveToPublish");
+//                menuToPublish.AltText = Services.TextService.Localize("buttons/saveToPublish");
 //            }
 //        }
 
@@ -493,7 +493,7 @@
 //                            DropDownList ddl = tp.Menu.NewDropDownList();
 
 //                            ddl.Style.Add("margin-bottom", "5px");
-//                        ddl.Items.Add(ui.Text("buttons", "styleChoose"));
+//                        ddl.Items.Add(Services.TextService.Localize("buttons/styleChoose"));
 //                            ddl.ID = tp.ID + "_editorStyle";
 //                            if (StyleSheet.GetAll().Length > 0)
 //                            {
@@ -641,7 +641,7 @@
 
 //                var missingPropertyEditorLabel = new Literal
 //                {
-//                    Text = ui.Text("errors", "missingPropertyEditorErrorMessage")
+//                    Text = Services.TextService.Localize("errors/missingPropertyEditorErrorMessage")
 //                };
 
 //                pp.addProperty(p.PropertyType.Name, missingPropertyEditorLabel);

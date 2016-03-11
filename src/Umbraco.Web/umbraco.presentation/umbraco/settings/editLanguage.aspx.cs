@@ -1,18 +1,10 @@
 using System;
 using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Globalization;
-using System.Web;
-using System.Web.SessionState;
-using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
-using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Web;
-using Umbraco.Web.Trees;
 using Umbraco.Web.UI;
 
 namespace umbraco.settings
@@ -76,7 +68,7 @@ namespace umbraco.settings
 		    currentLanguage.Save();
 			updateCultureList();
 
-            ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, ui.Text("speechBubbles", "languageSaved"), "");	
+            ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, Services.TextService.Localize("speechBubbles/languageSaved"), "");	
 		}
 
 		#region Web Form Designer generated code
@@ -90,7 +82,7 @@ namespace umbraco.settings
 		    save.ID = "save";
             save.ButtonType = uicontrols.MenuButtonType.Primary;
 	
-			Panel1.Text = ui.Text("language", "editLanguage");
+			Panel1.Text = Services.TextService.Localize("language/editLanguage");
 
 			InitializeComponent();
 			base.OnInit(e);

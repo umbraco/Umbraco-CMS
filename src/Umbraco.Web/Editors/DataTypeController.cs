@@ -223,7 +223,7 @@ namespace Umbraco.Web.Editors
             }
 
             var display = Mapper.Map<IDataTypeDefinition, DataTypeDisplay>(dataType.PersistedDataType);
-            display.AddSuccessNotification(ui.Text("speechBubbles", "dataTypeSaved"), "");
+            display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/dataTypeSaved"), "");
 
             //now return the updated model
             return display;

@@ -4,6 +4,7 @@ using System.Web.UI.WebControls;
 using umbraco.cms.businesslogic.task;
 using umbraco.cms.businesslogic.web;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 
 namespace umbraco.presentation.umbraco.translation {
     public partial class details : Umbraco.Web.UI.Pages.UmbracoEnsuredPage {
@@ -34,18 +35,18 @@ namespace umbraco.presentation.umbraco.translation {
             Literal lt = new Literal();
             lt.Text = t.Date.ToLongDateString() + " " + t.Date.ToLongTimeString();
             pp_date.Controls.Add(lt);
-            pp_date.Text = ui.Text("translation","taskOpened");
+            pp_date.Text = Services.TextService.Localize("translation/taskOpened");
 
             lt = new Literal();
             lt.Text = t.ParentUser.Name;
             pp_owner.Controls.Add(lt);
-            pp_owner.Text = ui.Text("translation", "taskAssignedBy");
+            pp_owner.Text = Services.TextService.Localize("translation/taskAssignedBy");
 
             //TODO: Make this work again with correct APIs and angularized - so none of this code will exist anymore
             //lt = new Literal();
             //lt.Text = Translation.CountWords(t.Node.Id).ToString();
             //pp_totalWords.Controls.Add(lt);
-            //pp_totalWords.Text = ui.Text("translation", "totalWords");
+            //pp_totalWords.Text = Services.TextService.Localize("translation/totalWords");
 
             lt = new Literal();
             lt.Text = library.ReplaceLineBreaks(t.Comment);
@@ -55,22 +56,22 @@ namespace umbraco.presentation.umbraco.translation {
             lt = new Literal();
             lt.Text =  "<a target=\"_blank\" href=\"xml.aspx?id=" + t.Id + "\">" + ui.Text("download") + "</a>";
             pp_xml.Controls.Add(lt);
-            pp_xml.Text = ui.Text("translation", "downloadTaskAsXml");
+            pp_xml.Text = Services.TextService.Localize("translation/downloadTaskAsXml");
 
-            pane_details.Text = ui.Text("translation", "details");
-            panel1.Text = ui.Text("translation", "details");
+            pane_details.Text = Services.TextService.Localize("translation/details");
+            panel1.Text = Services.TextService.Localize("translation/details");
 
-            pane_fields.Text = ui.Text("translation", "fields");
-            pane_tasks.Text = ui.Text("translation", "translationOptions");
+            pane_fields.Text = Services.TextService.Localize("translation/fields");
+            pane_tasks.Text = Services.TextService.Localize("translation/translationOptions");
             lt = new Literal();
             lt.Text = "<a href=\"default.aspx?id=" + t.Id + "\">" + ui.Text("upload") + "</a>";
             pp_upload.Controls.Add(lt);
-            pp_upload.Text = ui.Text("translation", "uploadTranslationXml");
+            pp_upload.Text = Services.TextService.Localize("translation/uploadTranslationXml");
 
             if (t.Closed)
                 pp_closeTask.Visible = false;
             else {
-                pp_closeTask.Text = ui.Text("translation", "closeTask");
+                pp_closeTask.Text = Services.TextService.Localize("translation/closeTask");
                 bt_close.Text = ui.Text("close");
             }
 

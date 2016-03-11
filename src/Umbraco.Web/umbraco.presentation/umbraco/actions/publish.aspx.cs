@@ -68,7 +68,7 @@
 //                                   string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id),
 //                                   UmbracoUser).Trim();
 //                case PublishStatusType.FailedCancelledByEvent:
-//                    return ui.Text("speechBubbles", "contentPublishedFailedByEvent");
+//                    return Services.TextService.Localize("speechBubbles/contentPublishedFailedByEvent");
 //                case PublishStatusType.FailedHasExpired:
 //                case PublishStatusType.FailedAwaitingRelease:
 //                case PublishStatusType.FailedIsTrashed:
