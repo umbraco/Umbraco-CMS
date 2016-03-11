@@ -17,6 +17,7 @@ using Umbraco.Core;
 using umbraco.uicontrols;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.UI.Pages;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.UI.Umbraco.Settings.Views
 {
@@ -178,10 +179,10 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
             SaveButton.ID = "save";
             SaveButton.CssClass = "client-side";
 
-			Panel1.Text = ui.Text("edittemplate");
-			pp_name.Text = ui.Text("name", UmbracoContext.UmbracoUser);
-			pp_alias.Text = ui.Text("alias", UmbracoContext.UmbracoUser);
-			pp_masterTemplate.Text = ui.Text("mastertemplate", UmbracoContext.UmbracoUser);
+			Panel1.Text = Services.TextService.Localize("edittemplate");
+			pp_name.Text = Services.TextService.Localize("name");
+			pp_alias.Text = Services.TextService.Localize("alias");
+			pp_masterTemplate.Text = Services.TextService.Localize("mastertemplate");
 
 			// Editing buttons
             MenuIconI umbField = editorSource.Menu.NewIcon();
@@ -189,7 +190,7 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 			umbField.OnClickCommand =
 				ClientTools.Scripts.OpenModalWindow(
 					IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/umbracoField.aspx?objectId=" +
-					editorSource.ClientID + "&tagName=UMBRACOGETDATA&mvcView=true", ui.Text("template", "insertPageField"), 640, 550);
+					editorSource.ClientID + "&tagName=UMBRACOGETDATA&mvcView=true", Services.TextService.Localize("template/insertPageField"), 640, 550);
 			umbField.AltText = ui.Text("template", "insertPageField");
 
 
@@ -199,7 +200,7 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 			umbDictionary.OnClickCommand =
 				ClientTools.Scripts.OpenModalWindow(
 					IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/dialogs/umbracoField.aspx?objectId=" +
-                    editorSource.ClientID + "&tagName=UMBRACOGETDICTIONARY&mvcView=true", ui.Text("template", "insertDictionaryItem"),
+                    editorSource.ClientID + "&tagName=UMBRACOGETDICTIONARY&mvcView=true", Services.TextService.Localize("template/insertDictionaryItem"),
 					640, 550);
 			umbDictionary.AltText = "Insert umbraco dictionary item";
 

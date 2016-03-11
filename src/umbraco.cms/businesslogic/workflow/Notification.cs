@@ -11,6 +11,7 @@ using umbraco.cms.businesslogic.web;
 using Umbraco.Core.Models.Rdbms;
 using umbraco.DataLayer;
 using umbraco.interfaces;
+using Umbraco.Core.Models;
 
 namespace umbraco.cms.businesslogic.workflow
 {
@@ -59,7 +60,9 @@ namespace umbraco.cms.businesslogic.workflow
                 {
                     if (u.Disabled == false && u.GetNotifications(node.Path).IndexOf(action.Letter.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal) > -1)
                     {
-                        LogHelper.Debug<Notification>(string.Format("Notification about {0} sent to {1} ({2})", ui.Text(action.Alias, u), u.Name, u.Email));
+                        LogHelper.Debug<Notification>(string.Format("Notification about {0} sent to {1} ({2})", 
+                            ApplicationContext.Current.Services.TextService.Localize("actions/" + action.Alias, u.UserEntity.GetUserCulture(ApplicationContext.Current.Services.TextService)),
+                            u.Name, u.Email));
                         SendNotification(user, u, (Document)node, action);
                     }
                 }

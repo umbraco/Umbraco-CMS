@@ -27,29 +27,8 @@ namespace umbraco
     public class ui
     {
         private static readonly string UmbracoDefaultUiLanguage = Umbraco.Core.Configuration.GlobalSettings.DefaultUILanguage;
-        private static readonly string UmbracoPath = SystemDirectories.Umbraco;
+        private static readonly string UmbracoPath = SystemDirectories.Umbraco;       
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Get the current culture/language from the currently logged in IUser, the IUser object is available on most Umbraco base classes and on the UmbracoContext")]
-        public static string Culture(User u)
-        {
-            if (ApplicationContext.Current == null) return string.Empty;
-
-            var found = UserExtensions.GetUserCulture(u.Language, ApplicationContext.Current.Services.TextService);
-            return found == null ? string.Empty : found.Name;
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Get the current culture/language from the currently logged in IUser, the IUser object is available on most Umbraco base classes and on the UmbracoContext")]
-        internal static string Culture(IUser u)
-        {
-            if (ApplicationContext.Current == null) return string.Empty;
-
-            var found = u.GetUserCulture(ApplicationContext.Current.Services.TextService);
-            return found == null ? string.Empty : found.Name;
-        }
-        
-        
         private static string GetLanguage()
         {
             return "en-US";

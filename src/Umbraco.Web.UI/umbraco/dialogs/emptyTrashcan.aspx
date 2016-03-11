@@ -61,7 +61,7 @@
 		
 		<cc1:ProgressBar ID="progbar" runat="server" Title="Please wait..." />
 		<br />
-		<span class="guiDialogTiny" id="statusLabel"><%=umbraco.ui.Text("deleting", UmbracoUser)%></span>
+		<span class="guiDialogTiny" id="statusLabel"><%=Services.TextService.Localize("deleting")%></span>
 		</div>
 	  	  	  
 	  <div id="formDiv">
