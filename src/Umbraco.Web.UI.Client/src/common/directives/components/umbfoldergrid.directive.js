@@ -30,11 +30,13 @@ Use this directive to generate a list of folders presented as a flexbox grid.
             vm.folders = [
                 {
                     "name": "Folder 1",
-                    "icon": "icon-folder"
+                    "icon": "icon-folder",
+                    "selected": false
                 },
                 {
                     "name": "Folder 2",
-                    "icon": "icon-folder"
+                    "icon": "icon-folder",
+                    "selected": false
                 }
 
             ];
