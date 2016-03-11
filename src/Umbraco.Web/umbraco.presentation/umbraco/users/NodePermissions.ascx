@@ -1,6 +1,6 @@
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="NodePermissions.ascx.cs" Inherits="umbraco.cms.presentation.user.NodePermissions" %>
 <p class="umb-abstract">
-    <%=umbraco.ui.Text("user", "permissionSelectedPages")%>
+    <%=Services.TextService.Localize("user/permissionSelectedPages")%>
 	<br/>
 	<asp:Literal runat="server" ID="lt_names" />
 </p>
@@ -10,7 +10,7 @@
 		<input type="checkbox" name="chkChildPermissions" id="chkChildPermissions" />
 		<strong>
 			<label for="chkChildPermissions" class="checkbox inline">
-				<%= umbraco.ui.Text("user", "permissionReplaceChildren")%>
+				<%= Services.TextService.Localize("user/permissionReplaceChildren")%>
 			</label>
 		</strong>
 	</p>

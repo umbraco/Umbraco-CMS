@@ -17,7 +17,7 @@
   <cc1:Pane ID="pane_insert" runat="server">
     <cc1:PropertyPanel runat="server">
             <p>
-                <%= umbraco.ui.Text("defaultdialogs", "templateContentPlaceHolderHelp")%>
+                <%= Services.TextService.Localize("defaultdialogs/templateContentPlaceHolderHelp")%>
             </p>
     </cc1:PropertyPanel>
     <cc1:PropertyPanel runat="server" id="pp_placeholder" text="Placeholder ID">

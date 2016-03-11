@@ -9,7 +9,7 @@
 	  <cc1:PropertyPanel ID="pp_search" Text="Search" runat="server">
 		  <asp:TextBox ID="searchField" style="width: 250px;" runat="server" /> <asp:Button ID="bt_search" runat="server" Text="search" OnClick="findRegex" />
 				<p>
-				<small><%= umbraco.ui.Text("defaultdialogs", "regexSearchHelp")%> </small>
+				<small><%= Services.TextService.Localize("defaultdialogs/regexSearchHelp")%> </small>
 				</p>
 	  </cc1:PropertyPanel>
 	  

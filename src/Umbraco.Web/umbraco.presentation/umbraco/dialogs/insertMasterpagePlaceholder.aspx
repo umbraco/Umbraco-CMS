@@ -18,7 +18,7 @@
   <cc1:Pane ID="pane_insert" runat="server">
     <cc1:PropertyPanel runat="server">
             <p>
-                <%= umbraco.ui.Text("defaultdialogs", "templateContentAreaHelp")%>
+                <%= Services.TextService.Localize("defaultdialogs/templateContentAreaHelp")%>
             </p>
     </cc1:PropertyPanel>
 

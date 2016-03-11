@@ -91,13 +91,13 @@
     </cc1:Pane>
 
     <asp:PlaceHolder ID="SuccessPlaceholder" runat="server" Visible="false">
-        <p><%=umbraco.ui.Text("changeDocType", "docTypeChanged") %></p>
+        <p><%=Services.TextService.Localize("changeDocType/docTypeChanged") %></p>
         <p>        
             <asp:Literal ID="SuccessMessage" runat="server" />
             <asp:Literal ID="PropertiesMappedMessage" runat="server" />
             <asp:Literal ID="ContentPublishedMessage" runat="server" />
             <br /><br />
-            <a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("defaultdialogs", "closeThisWindow") %></a>  
+            <a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()"><%=Services.TextService.Localize("defaultdialogs/closeThisWindow") %></a>  
         </p>
     </asp:PlaceHolder>
 

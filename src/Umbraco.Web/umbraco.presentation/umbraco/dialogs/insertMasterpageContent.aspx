@@ -17,7 +17,7 @@
   <cc1:Pane ID="pane_insert" runat="server">
     <cc1:PropertyPanel runat="server">
             <p>
-                <%= umbraco.ui.Text("defaultdialogs", "templateContentPlaceHolderHelp")%>
+                <%= Services.TextService.Localize("defaultdialogs/templateContentPlaceHolderHelp")%>
             </p>
     </cc1:PropertyPanel>
     <cc1:PropertyPanel runat="server" id="pp_placeholder" text="Placeholder ID">
@@ -26,7 +26,7 @@
   </cc1:Pane>
    
   <cc1:Pane runat="server" CssClass="btn-toolbar umb-btn-toolbar">
-            <a class="btn btn-link" onclick="UmbClientMgr.closeModalWindow(); return false;"><%=umbraco.ui.Text("general", "cancel")%></a>
+            <a class="btn btn-link" onclick="UmbClientMgr.closeModalWindow(); return false;"><%=Services.TextService.Localize("general/cancel")%></a>
             <input type="button" onclick="insertCode(); return false;" Class="btn btn-primary" value="<%= umbraco.ui.Text("insert") %>" />
   </cc1:Pane>
 </asp:Content>

@@ -15,7 +15,7 @@
 <asp:Content ContentPlaceHolderID="body" runat="server">
 <asp:Panel ID="p_republish" runat="server">
       <div class="propertyDiv">      
-          <p><%= umbraco.ui.Text("defaultdialogs", "siterepublishHelp")%> </p>
+          <p><%= Services.TextService.Localize("defaultdialogs/siterepublishHelp")%> </p>
       </div>
       
           <div id="buttons">
@@ -32,7 +32,7 @@
     
     <asp:Panel ID="p_done" Visible="false" runat="server">
      <div class="success">
-      <p><%= umbraco.ui.Text("defaultdialogs", "siterepublished")%></p>
+      <p><%= Services.TextService.Localize("defaultdialogs/siterepublished")%></p>
       
      </div>
       <input type="button" class="guiInputButton" onclick="UmbClientMgr.closeModalWindow();" value="Ok" />

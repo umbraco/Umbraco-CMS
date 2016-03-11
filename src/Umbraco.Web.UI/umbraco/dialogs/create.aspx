@@ -24,12 +24,12 @@
 			    umbraco.presentation.webservices.CMSNode.GetNodeName('<%=umbracoUserContextID%>', id, updateName);
 				}
 			else			
-				pageName.html("<p><strong><%=umbraco.ui.Text(App)%></strong> <%= umbraco.ui.Text("moveOrCopy","nodeSelected") %></p>");
+				pageName.html("<p><strong><%=umbraco.ui.Text(App)%></strong> <%= Services.TextService.Localize("moveOrCopy/nodeSelected") %></p>");
 				pageNameHolder.attr("class","success");
 		}
 		
 		function updateName(result) {			  
-		    pageName.html("<p><strong>" + result + "</strong> <%= umbraco.ui.Text("moveOrCopy","nodeSelected") %></p>");
+		    pageName.html("<p><strong>" + result + "</strong> <%= Services.TextService.Localize("moveOrCopy/nodeSelected") %></p>");
 			pageNameHolder.attr("class","success");
 		}
 		
@@ -50,7 +50,7 @@
     </cc1:Pane>
     <asp:Panel runat="server" ID="panel_buttons">
         <cc1:Feedback runat="server" ID="PageNameHolder" type="notice" Style="margin-top: 10px;"
-            Text='<%#umbraco.ui.Text("moveOrCopy","noNodeSelected")%>' />
+            Text='<%#Services.TextService.Localize("moveOrCopy/noNodeSelected")%>' />
         <div style="padding-top: 10px;" class="guiDialogNormal">
             <input type="button" id="ok" value="<%=umbraco.ui.Text("ok")%>" onclick="onNodeSelectionConfirmed();"
                 disabled="true" style="width: 100px" />

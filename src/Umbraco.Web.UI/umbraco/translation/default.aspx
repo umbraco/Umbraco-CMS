@@ -31,9 +31,9 @@
        </p>
         
         <p>
-            <a href="xml.aspx?task=all" target="_blank"><%= umbraco.ui.Text("translation", "downloadAllAsXml") %></a>
+            <a href="xml.aspx?task=all" target="_blank"><%= Services.TextService.Localize("translation/downloadAllAsXml") %></a>
              &nbsp; &nbsp;
-            <a href="translationTasks.dtd" target="_blank"><%= umbraco.ui.Text("translation", "DownloadXmlDTD")%></a>        
+            <a href="translationTasks.dtd" target="_blank"><%= Services.TextService.Localize("translation/DownloadXmlDTD")%></a>        
         </p>              
       <asp:GridView GridLines="Horizontal" ID="taskList" runat="server" CssClass="fieldsTable" BorderStyle="None" Width="100%"
             CellPadding="5" AutoGenerateColumns="false">
