@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Umbraco.Core.Services;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -219,10 +220,10 @@ namespace umbraco.presentation.umbraco.dialogs
             pp_loginPage.Text = ui.Text("paLoginPage");
             pp_errorPage.Text = ui.Text("paErrorPage");
 
-            pane_chooseMode.Text = ui.Text("publicAccess", "paHowWould", UmbracoUser);
-            pane_pages.Text = ui.Text("publicAccess", "paSelectPages", UmbracoUser);
-            pane_simple.Text = ui.Text("publicAccess", "paSimple", UmbracoUser);
-            pane_advanced.Text = ui.Text("publicAccess", "paAdvanced", UmbracoUser);
+            pane_chooseMode.Text = Services.TextService.Localize("publicAccess/paHowWould");
+            pane_pages.Text = Services.TextService.Localize("publicAccess/paSelectPages");
+            pane_simple.Text = Services.TextService.Localize("publicAccess/paSimple");
+            pane_advanced.Text = Services.TextService.Localize("publicAccess/paAdvanced");
 
             if (IsPostBack == false)
             {

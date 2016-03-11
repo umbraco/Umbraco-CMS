@@ -14,6 +14,7 @@ using Umbraco.Web;
 using Umbraco.Core;
 using Umbraco.Web.UI.Pages;
 using Action = Umbraco.Web.LegacyActions.Action;
+using Umbraco.Core.Services;
 
 namespace umbraco.dialogs
 {
@@ -47,7 +48,7 @@ namespace umbraco.dialogs
                     pane_form_notice.Visible = false;
                     pane_settings.Visible = true;
 
-                    ok.Text = ui.Text("general", "ok", UmbracoUser);
+                    ok.Text = Services.TextService.Localize("general/ok");
                     ok.Attributes.Add("style", "width: 60px");
 
                     var documentType = Services.ContentTypeService.GetContentType(int.Parse(Request.GetItemAsString("id")));
@@ -75,7 +76,7 @@ namespace umbraco.dialogs
                     pane_settings.Visible = false;
 
                     // Caption and properies on BUTTON
-                    ok.Text = ui.Text("general", "ok", UmbracoUser);
+                    ok.Text = Services.TextService.Localize("general/ok");
                     ok.Attributes.Add("style", "width: 60px");
                     ok.Attributes.Add("disabled", "true");
 
@@ -235,7 +236,7 @@ namespace umbraco.dialogs
                     nodeAllowed = currContentType.AllowedAsRoot;
                     if (!nodeAllowed)
                     {
-                        feedback.Text = ui.Text("moveOrCopy", "notAllowedAtRoot", UmbracoUser);
+                        feedback.Text = Services.TextService.Localize("moveOrCopy/notAllowedAtRoot");
                         feedback.type = uicontrols.Feedback.feedbacktype.error;
                     }
                 }
@@ -249,7 +250,7 @@ namespace umbraco.dialogs
 
                     if (nodeAllowed == false)
                     {
-                        feedback.Text = ui.Text("moveOrCopy", "notAllowedByContentType", UmbracoUser);
+                        feedback.Text = Services.TextService.Localize("moveOrCopy/notAllowedByContentType");
                         feedback.type = uicontrols.Feedback.feedbacktype.error;
                     }
                     else
@@ -258,7 +259,7 @@ namespace umbraco.dialogs
                         if ((string.Format(",{0},", parentContent.Path)).IndexOf(string.Format(",{0},", currContent.Id)) > -1)
                         {
                             nodeAllowed = false;
-                            feedback.Text = ui.Text("moveOrCopy", "notAllowedByPath", UmbracoUser);
+                            feedback.Text = Services.TextService.Localize("moveOrCopy/notAllowedByPath");
                             feedback.type = uicontrols.Feedback.feedbacktype.error;
                         }
                     }

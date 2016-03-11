@@ -62,7 +62,7 @@
 //            {
 //                case PublishStatusType.Success:
 //                case PublishStatusType.SuccessAlreadyPublished:
-//                    return ui.Text("speechBubbles", "editContentPublishedText", UmbracoUser);
+//                    return Services.TextService.Localize("speechBubbles/editContentPublishedText");
 //                case PublishStatusType.FailedPathNotPublished:
 //                    return ui.Text("publish", "contentPublishedFailedByParent",
 //                                   string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id),

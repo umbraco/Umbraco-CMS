@@ -16,6 +16,7 @@ using Umbraco.Web;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
 using Umbraco.Web.UI;
+using Umbraco.Core.Services;
 
 namespace umbraco.cms.presentation.settings.stylesheet
 {
@@ -49,7 +50,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
             _stylesheetproperty = _sheet.Properties.FirstOrDefault(x => x.Name.InvariantEquals(propName));
             if (_stylesheetproperty == null) throw new InvalidOperationException("No stylesheet property found with name: " + Request.QueryString["prop"]);
 
-            Panel1.Text = ui.Text("stylesheet", "editstylesheetproperty", UmbracoUser);
+            Panel1.Text = Services.TextService.Localize("stylesheet/editstylesheetproperty");
 
             var bt = Panel1.Menu.NewButton();
             bt.Click += SaveClick;
@@ -98,7 +99,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
 
             Services.FileService.SaveStylesheet(_sheet);
 
-            ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, ui.Text("speechBubbles", "editStylesheetPropertySaved", UmbracoUser), "");
+            ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, Services.TextService.Localize("speechBubbles/editStylesheetPropertySaved"), "");
         }
 
 

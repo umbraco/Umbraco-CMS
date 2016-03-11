@@ -15,6 +15,7 @@ using umbraco.cms.presentation.Trees;
 using System.Linq;
 using Umbraco.Web.UI;
 using Umbraco.Web.UI.Pages;
+using Umbraco.Core.Services;
 
 namespace umbraco.cms.presentation.developer
 {
@@ -206,7 +207,7 @@ namespace umbraco.cms.presentation.developer
 			var macroPropertyNameNew = (TextBox)((Control)sender).Parent.FindControl("macroPropertyNameNew");
 			var macroPropertyTypeNew = (DropDownList)((Control)sender).Parent.FindControl("macroPropertyTypeNew");
 			
-			if (macroPropertyAliasNew.Text != ui.Text("general", "new", UmbracoUser) + " " + ui.Text("general", "alias", UmbracoUser))
+			if (macroPropertyAliasNew.Text != Services.TextService.Localize("general/new") + " " + Services.TextService.Localize("general/alias"))
 			{
                 if (_macro.Properties.ContainsKey(macroPropertyAliasNew.Text.Trim()))
                 {

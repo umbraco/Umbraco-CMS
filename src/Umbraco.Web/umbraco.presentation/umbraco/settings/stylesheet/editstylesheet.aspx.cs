@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Umbraco.Core.Services;
+using System;
 using System.IO;
 using System.Linq;
 using System.Web.UI;
@@ -49,7 +50,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
 
         protected void Page_Load(object sender, EventArgs e)
         {           
-            Panel1.Text = ui.Text("stylesheet", "editstylesheet", UmbracoUser);
+            Panel1.Text = Services.TextService.Localize("stylesheet/editstylesheet");
             pp_name.Text = ui.Text("name", UmbracoUser);
             pp_path.Text = ui.Text("path", UmbracoUser);
 

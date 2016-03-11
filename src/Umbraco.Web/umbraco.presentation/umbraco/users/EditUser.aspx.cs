@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Umbraco.Core.Services;
+using System;
 using System.Configuration.Provider;
 using System.Globalization;
 using System.Web;
@@ -162,26 +163,26 @@ namespace umbraco.cms.presentation.user
             passw.Controls.Add(passwordChanger);
             passw.Controls.Add(validatorContainer);
 
-            pp.addProperty(ui.Text("user", "username", UmbracoUser), uname);
-            pp.addProperty(ui.Text("user", "loginname", UmbracoUser), lname);
-            pp.addProperty(ui.Text("user", "password", UmbracoUser), passw);
+            pp.addProperty(Services.TextService.Localize("user/username"), uname);
+            pp.addProperty(Services.TextService.Localize("user/loginname"), lname);
+            pp.addProperty(Services.TextService.Localize("user/password"), passw);
             pp.addProperty(ui.Text("email", UmbracoUser), email);
-            pp.addProperty(ui.Text("user", "usertype", UmbracoUser), userType);
-            pp.addProperty(ui.Text("user", "language", UmbracoUser), userLanguage);
+            pp.addProperty(Services.TextService.Localize("user/usertype"), userType);
+            pp.addProperty(Services.TextService.Localize("user/language"), userLanguage);
 
             //Media  / content root nodes
             Pane ppNodes = new Pane();
-            ppNodes.addProperty(ui.Text("user", "startnode", UmbracoUser), content);
-            ppNodes.addProperty(ui.Text("user", "mediastartnode", UmbracoUser), medias);
+            ppNodes.addProperty(Services.TextService.Localize("user/startnode"), content);
+            ppNodes.addProperty(Services.TextService.Localize("user/mediastartnode"), medias);
 
             //Generel umrbaco access
             Pane ppAccess = new Pane();
-            ppAccess.addProperty(ui.Text("user", "noConsole", UmbracoUser), NoConsole);
-            ppAccess.addProperty(ui.Text("user", "disabled", UmbracoUser), Disabled);
+            ppAccess.addProperty(Services.TextService.Localize("user/noConsole"), NoConsole);
+            ppAccess.addProperty(Services.TextService.Localize("user/disabled"), Disabled);
 
             //access to which modules... 
             Pane ppModules = new Pane();
-            ppModules.addProperty(ui.Text("user", "modules", UmbracoUser), lapps);
+            ppModules.addProperty(Services.TextService.Localize("user/modules"), lapps);
             ppModules.addProperty(" ", sectionValidator);
 
             TabPage userInfo = UserTabs.NewTabPage(u.Name);
@@ -204,7 +205,7 @@ namespace umbraco.cms.presentation.user
 
             sectionValidator.ServerValidate += new ServerValidateEventHandler(sectionValidator_ServerValidate);
             sectionValidator.ControlToValidate = lapps.ID;
-            sectionValidator.ErrorMessage = ui.Text("errorHandling", "errorMandatoryWithoutTab", ui.Text("user", "modules", UmbracoUser), UmbracoUser);
+            sectionValidator.ErrorMessage = ui.Text("errorHandling", "errorMandatoryWithoutTab", Services.TextService.Localize("user/modules"), UmbracoUser);
             sectionValidator.CssClass = "error";
             sectionValidator.Style.Add("color", "red");
 
@@ -381,17 +382,17 @@ namespace umbraco.cms.presentation.user
                     u.Save();
 
 
-                    ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, ui.Text("speechBubbles", "editUserSaved", UmbracoUser), "");
+                    ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, Services.TextService.Localize("speechBubbles/editUserSaved"), "");
                 }
                 catch (Exception ex)
                 {
-                    ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Error, ui.Text("speechBubbles", "editUserError", UmbracoUser), "");
+                    ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Error, Services.TextService.Localize("speechBubbles/editUserError"), "");
                     LogHelper.Error<EditUser>("Exception", ex);
                 }
             }
             else
             {
-                ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Error, ui.Text("speechBubbles", "editUserError", UmbracoUser), "");
+                ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Error, Services.TextService.Localize("speechBubbles/editUserError"), "");
             }
         }
 
