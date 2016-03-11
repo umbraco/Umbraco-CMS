@@ -430,7 +430,7 @@
 //                else
 //                {
 					
-//                    ctctrl.prnt.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.error, ui.Text("error"), Services.TextService.Localize("errors/contentTypeAliasAndNameNotNull"));
+//                    ctctrl.prnt.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.error, Services.TextService.Localize("error"), Services.TextService.Localize("errors/contentTypeAliasAndNameNotNull"));
 //                }
 //            }
 //        }

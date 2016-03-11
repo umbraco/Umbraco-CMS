@@ -215,10 +215,10 @@ namespace umbraco.presentation.umbraco.dialogs
             ph_errorpage.Controls.Add(errorPagePicker);
             ph_loginpage.Controls.Add(loginPagePicker);
 
-            pp_login.Text = ui.Text("login");
-            pp_pass.Text = ui.Text("password");
-            pp_loginPage.Text = ui.Text("paLoginPage");
-            pp_errorPage.Text = ui.Text("paErrorPage");
+            pp_login.Text = Services.TextService.Localize("login");
+            pp_pass.Text = Services.TextService.Localize("password");
+            pp_loginPage.Text = Services.TextService.Localize("paLoginPage");
+            pp_errorPage.Text = Services.TextService.Localize("paErrorPage");
 
             pane_chooseMode.Text = Services.TextService.Localize("publicAccess/paHowWould");
             pane_pages.Text = Services.TextService.Localize("publicAccess/paSelectPages");
@@ -231,7 +231,7 @@ namespace umbraco.presentation.umbraco.dialogs
                     && GetProtectionType(documentId) != ProtectionType.NotProtected)
                 {
                     bt_buttonRemoveProtection.Visible = true;
-                    bt_buttonRemoveProtection.Attributes.Add("onClick", "return confirm('" + ui.Text("areyousure") + "')");
+                    bt_buttonRemoveProtection.Attributes.Add("onClick", "return confirm('" + Services.TextService.Localize("areyousure") + "')");
 
                     // Get login and error pages
                     int errorPage = GetErrorPage(documentObject.Path);
@@ -306,8 +306,8 @@ namespace umbraco.presentation.umbraco.dialogs
             groupsSelector.Controls.Add(_memberGroups);
 
 
-            bt_protect.Text = ui.Text("update");
-            bt_buttonRemoveProtection.Text = ui.Text("paRemoveProtection");
+            bt_protect.Text = Services.TextService.Localize("update");
+            bt_buttonRemoveProtection.Text = Services.TextService.Localize("paRemoveProtection");
 
             // Put user code to initialize the page here
         }
@@ -412,7 +412,7 @@ namespace umbraco.presentation.umbraco.dialogs
                 }
             }
 
-            feedback.Text = ui.Text("publicAccess", "paIsProtected", new cms.businesslogic.CMSNode(pageId).Text) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
+            feedback.Text = ui.Text("publicAccess", "paIsProtected", new cms.businesslogic.CMSNode(pageId).Text) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + Services.TextService.Localize("closeThisWindow") + "</a>";
 
             p_buttons.Visible = false;
             pane_advanced.Visible = false;
@@ -435,7 +435,7 @@ namespace umbraco.presentation.umbraco.dialogs
 
             RemoveProtection(pageId);
 
-            feedback.Text = ui.Text("publicAccess", "paIsRemoved", new cms.businesslogic.CMSNode(pageId).Text) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
+            feedback.Text = ui.Text("publicAccess", "paIsRemoved", new cms.businesslogic.CMSNode(pageId).Text) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + Services.TextService.Localize("closeThisWindow") + "</a>";
 
             var content = Services.ContentService.GetById(pageId);
             //reloads the current node in the tree

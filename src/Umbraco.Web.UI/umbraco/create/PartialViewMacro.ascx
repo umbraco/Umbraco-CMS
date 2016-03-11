@@ -34,5 +34,5 @@
 
 <cc1:Pane runat="server" CssClass="btn-toolbar umb-btn-toolbar">
     <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=Services.TextService.Localize("cancel")%></a>
-    <asp:Button ID="SubmitButton" CssClass="btn btn-primary" runat="server" OnClick="SubmitButton_Click" Text='<%#ui.Text("create") %>'></asp:Button>
+    <asp:Button ID="SubmitButton" CssClass="btn btn-primary" runat="server" OnClick="SubmitButton_Click" Text='<%#Services.TextService.Localize("create") %>'></asp:Button>
 </cc1:Pane>

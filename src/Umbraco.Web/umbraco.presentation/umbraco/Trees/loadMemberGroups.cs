@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Umbraco.Core.Services;
+using System;
 using System.Text;
 using System.Web;
 using umbraco.businesslogic;
@@ -23,7 +24,7 @@ namespace umbraco
             // if we're using 3rd party membership providers we should use the Role terminology
             if (!Member.IsUsingUmbracoRoles())
             {
-                rootNode.Text = ui.Text("memberRoles");
+                rootNode.Text = Services.TextService.Localize("memberRoles");
             }
             rootNode.NodeType = "initmemberGroup";
             rootNode.NodeID = "init";

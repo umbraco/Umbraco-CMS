@@ -45,7 +45,7 @@ namespace umbraco.cms.presentation.settings
 
 			if (!IsPostBack)
 			{
-				MasterTemplate.Items.Add(new ListItem(ui.Text("none"), "0"));
+				MasterTemplate.Items.Add(new ListItem(Services.TextService.Localize("none"), "0"));
 				foreach (Template t in Template.GetAllAsList())
 				{
 					if (t.Id != _template.Id)
@@ -88,19 +88,19 @@ namespace umbraco.cms.presentation.settings
 			base.OnInit(e);
 			Panel1.hasMenu = true;
 
-		    var editor = Panel1.NewTabPage(ui.Text("template"));
+		    var editor = Panel1.NewTabPage(Services.TextService.Localize("template"));
             editor.Controls.Add(Pane8);
 
-            var props = Panel1.NewTabPage(ui.Text("properties"));
+            var props = Panel1.NewTabPage(Services.TextService.Localize("properties"));
             props.Controls.Add(Pane7);
 
             SaveButton = Panel1.Menu.NewButton();
-            SaveButton.Text = ui.Text("save");
+            SaveButton.Text = Services.TextService.Localize("save");
             SaveButton.ButtonType = MenuButtonType.Primary;
             SaveButton.ID = "save";
             SaveButton.CssClass = "client-side";
 
-			Panel1.Text = ui.Text("edittemplate");
+			Panel1.Text = Services.TextService.Localize("edittemplate");
 			pp_name.Text = ui.Text("name", UmbracoUser);
             pp_alias.Text = ui.Text("alias", UmbracoUser);
             pp_masterTemplate.Text = ui.Text("mastertemplate", UmbracoUser);

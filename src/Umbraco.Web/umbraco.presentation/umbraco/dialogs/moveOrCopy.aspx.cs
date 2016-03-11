@@ -55,7 +55,7 @@ namespace umbraco.dialogs
 
                     //Load master types... 
                     masterType.Attributes.Add("style", "width: 350px;");
-                    masterType.Items.Add(new ListItem(ui.Text("none") + "...", "0"));
+                    masterType.Items.Add(new ListItem(Services.TextService.Localize("none") + "...", "0"));
 
                     foreach (var docT in Services.ContentTypeService.GetAllContentTypes().OrderBy(x => x.Name))
                     {
@@ -293,7 +293,7 @@ namespace umbraco.dialogs
                             Services.MediaService.Move(media, copyToId, UmbracoUser.Id);
                         }
 
-                        feedback.Text = ui.Text("moveOrCopy", "moveDone", nodes, UmbracoUser) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
+                        feedback.Text = ui.Text("moveOrCopy", "moveDone", nodes, UmbracoUser) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + Services.TextService.Localize("closeThisWindow") + "</a>";
                         feedback.type = uicontrols.Feedback.feedbacktype.success;
 
                         // refresh tree
@@ -306,7 +306,7 @@ namespace umbraco.dialogs
                         var newContent = (IContent)currContent;
                         Services.ContentService.Copy(newContent, Request.GetItemAs<int>("copyTo"), RelateDocuments.Checked, UmbracoUser.Id);
 
-                        feedback.Text = ui.Text("moveOrCopy", "copyDone", nodes, UmbracoUser) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
+                        feedback.Text = ui.Text("moveOrCopy", "copyDone", nodes, UmbracoUser) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + Services.TextService.Localize("closeThisWindow") + "</a>";
                         feedback.type = uicontrols.Feedback.feedbacktype.success;
 
                         // refresh tree

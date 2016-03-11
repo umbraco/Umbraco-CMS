@@ -1,15 +1,7 @@
 using System;
-using System.Data;
-using System.Configuration;
-using System.Collections;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
 using umbraco.cms.businesslogic.web;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Web;
 using Umbraco.Web.UI.Pages;
 
@@ -28,16 +20,16 @@ namespace umbraco.presentation.actions
             if (Security.ValidateUserNodeTreePermissions(UmbracoUser, d.Path, "D") == false)
                 throw new ArgumentException("The current user doesn't have permissions to delete this document. Please contact the system administrator.");
             
-            pane_delete.Text = ui.Text("delete") + " '" + d.Text + "'";
-            Panel2.Text = ui.Text("delete");
-            warning.Text = ui.Text("confirmdelete") + " '" + d.Text + "'";
-            deleteButton.Text = ui.Text("delete");
+            pane_delete.Text = Services.TextService.Localize("delete") + " '" + d.Text + "'";
+            Panel2.Text = Services.TextService.Localize("delete");
+            warning.Text = Services.TextService.Localize("confirmdelete") + " '" + d.Text + "'";
+            deleteButton.Text = Services.TextService.Localize("delete");
         }
 
         protected void deleteButton_Click(object sender, EventArgs e)
         {
-            deleteMessage.Text = ui.Text("deleted");
-            deleted.Text =  "'" + d.Text + "' " + ui.Text("deleted");
+            deleteMessage.Text = Services.TextService.Localize("deleted");
+            deleted.Text =  "'" + d.Text + "' " + Services.TextService.Localize("deleted");
             deleteMessage.Visible = true;
             confirm.Visible = false;
             

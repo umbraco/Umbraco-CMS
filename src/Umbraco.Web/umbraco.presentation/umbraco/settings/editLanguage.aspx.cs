@@ -30,8 +30,8 @@ namespace umbraco.settings
            
 
 			// Put user code to initialize the page here
-            Panel1.Text = ui.Text("editlanguage");
-            pp_language.Text = ui.Text("language", "displayName", Security.CurrentUser);
+            Panel1.Text = Services.TextService.Localize("editlanguage");
+            pp_language.Text = Services.TextService.Localize("language/displayName");
             if (!IsPostBack) 
 			{
 				updateCultureList();
@@ -47,7 +47,7 @@ namespace umbraco.settings
 		{
             SortedList sortedCultures = new SortedList();
             Cultures.Items.Clear();
-            Cultures.Items.Add(new ListItem(ui.Text("choose") + "...", ""));
+            Cultures.Items.Add(new ListItem(Services.TextService.Localize("choose") + "...", ""));
             foreach (CultureInfo ci in CultureInfo.GetCultures(CultureTypes.AllCultures))
                 sortedCultures.Add(ci.DisplayName + "|||" + Guid.NewGuid().ToString(), ci.Name);
 
@@ -77,8 +77,8 @@ namespace umbraco.settings
 			Panel1.hasMenu = true;
 			var save = Panel1.Menu.NewButton();
 			save.Click += save_click;
-			save.ToolTip = ui.Text("save");
-            save.Text = ui.Text("save");
+			save.ToolTip = Services.TextService.Localize("save");
+            save.Text = Services.TextService.Localize("save");
 		    save.ID = "save";
             save.ButtonType = uicontrols.MenuButtonType.Primary;
 	

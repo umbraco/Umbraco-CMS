@@ -30,6 +30,6 @@
 <!-- added to support missing postback on enter in IE -->
 <asp:TextBox runat="server" Style="visibility: hidden; display: none;" ID="Textbox1" />
 <div style="padding-top: 15px;">
-    <asp:Button ID="sbmt" runat="server" Style="margin-top: 14px" Width="90" OnClick="sbmt_Click" Text='<%# ui.Text("create") %>'></asp:Button>
-    &nbsp; <em><%= ui.Text("or") %></em> &nbsp;<a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()"><%=ui.Text("cancel")%></a>
+    <asp:Button ID="sbmt" runat="server" Style="margin-top: 14px" Width="90" OnClick="sbmt_Click" Text='<%# Services.TextService.Localize("create") %>'></asp:Button>
+    &nbsp; <em><%= Services.TextService.Localize("or") %></em> &nbsp;<a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()"><%=Services.TextService.Localize("cancel")%></a>
 </div>

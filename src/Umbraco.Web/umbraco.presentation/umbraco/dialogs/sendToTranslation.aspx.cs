@@ -29,10 +29,10 @@ namespace umbraco.presentation.dialogs
         {
             _currentPage = new CMSNode(Int32.Parse(Request.GetItemAsString("id")));
 
-            pp_translator.Text = ui.Text("translation","translator", Security.CurrentUser);
-            pp_language.Text = ui.Text("translation", "translateTo", Security.CurrentUser);
-            pp_includeSubs.Text = ui.Text("translation","includeSubpages", Security.CurrentUser);
-            pp_comment.Text = ui.Text("comment", Security.CurrentUser);
+            pp_translator.Text = Services.TextService.Localize("translation/translator");
+            pp_language.Text = Services.TextService.Localize("translation/translateTo");
+            pp_includeSubs.Text = Services.TextService.Localize("translation/includeSubpages");
+            pp_comment.Text = Services.TextService.Localize("comment");
             pane_form.Text = ui.Text("translation", "sendToTranslate", _currentPage.Text, Security.CurrentUser);
             
 
@@ -45,15 +45,15 @@ namespace umbraco.presentation.dialogs
                 if (domains != null)
                 {
                     selectedLanguage = domains[0].Language.id;
-                    defaultLanguage.Text = ui.Text("defaultLanguageIs", Security.CurrentUser) + " " + domains[0].Language.FriendlyName;
+                    defaultLanguage.Text = Services.TextService.Localize("defaultLanguageIs") + " " + domains[0].Language.FriendlyName;
                 }
                 else
                 {
-                    defaultLanguage.Text = ui.Text("defaultLanguageIsNotAssigned", Security.CurrentUser);
+                    defaultLanguage.Text = Services.TextService.Localize("defaultLanguageIsNotAssigned");
                 }
                 
                 // languages
-                language.Items.Add(new ListItem(ui.Text("general", "choose", Security.CurrentUser), ""));
+                language.Items.Add(new ListItem(Services.TextService.Localize("general/choose"), ""));
                 foreach (var l in Language.getAll)
                 {
                     var li = new ListItem();
@@ -80,7 +80,7 @@ namespace umbraco.presentation.dialogs
                 }
 
                 // send button
-                doTranslation.Text = ui.Text("general", "ok", Security.CurrentUser);
+                doTranslation.Text = Services.TextService.Localize("general/ok");
             }
         }
 

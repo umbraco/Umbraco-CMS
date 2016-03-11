@@ -97,10 +97,10 @@ namespace umbraco.dialogs
                 {
                     var name = d.Name.StartsWith("*") ? "*" : d.Name;
                     allDomains.Text += "<tr><td>" + name + "</td><td>(" + d.Language.CultureAlias + ")</td><td><a href=\"?id=" + _currentId + "&editDomain=" +
-                                       d.Id.ToString(CultureInfo.InvariantCulture) + "\">" + ui.Text("edit") + "</a></td><td><a href=\"?id=" + _currentId +
+                                       d.Id.ToString(CultureInfo.InvariantCulture) + "\">" + Services.TextService.Localize("edit") + "</a></td><td><a href=\"?id=" + _currentId +
                                        "&delDomain=" + d.Id.ToString(CultureInfo.InvariantCulture) + "\" onClick=\"return confirm('" +
                                        Services.TextService.Localize("defaultdialogs/confirmdelete") +
-                                       "');\" style=\"color: red\">" + ui.Text("delete") + "</a></td></tr>";
+                                       "');\" style=\"color: red\">" + Services.TextService.Localize("delete") + "</a></td></tr>";
                 }
 
                 allDomains.Text += "</table>";

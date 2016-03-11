@@ -278,7 +278,7 @@
 //                // Name validation
 //                NameTxtValidator.ControlToValidate = NameTxt.ID;
 //                _nameTxtCustomValidator.ControlToValidate = NameTxt.ID;
-//                string[] errorVars = { ui.Text("name") };
+//                string[] errorVars = { Services.TextService.Localize("name") };
 //                NameTxtValidator.ErrorMessage = " " + ui.Text("errorHandling", "errorMandatoryWithoutTab", errorVars) + "<br/>";
 //                NameTxtValidator.EnableClientScript = false;
 //                NameTxtValidator.Display = ValidatorDisplay.Dynamic;                

@@ -35,14 +35,14 @@ namespace umbraco.cms.presentation.settings.stylesheet
 
             filename = Request.QueryString["id"].Replace('\\', '/').TrimStart('/');
 
-            var editor = Panel1.NewTabPage(ui.Text("stylesheet"));
+            var editor = Panel1.NewTabPage(Services.TextService.Localize("stylesheet"));
             editor.Controls.Add(Pane7);
 
-            var props = Panel1.NewTabPage(ui.Text("properties"));
+            var props = Panel1.NewTabPage(Services.TextService.Localize("properties"));
             props.Controls.Add(Pane8);
 
             SaveButton = Panel1.Menu.NewButton();
-            SaveButton.Text = ui.Text("save");
+            SaveButton.Text = Services.TextService.Localize("save");
             SaveButton.ButtonType = MenuButtonType.Primary;
             SaveButton.ID = "save";
             SaveButton.CssClass = "client-side";

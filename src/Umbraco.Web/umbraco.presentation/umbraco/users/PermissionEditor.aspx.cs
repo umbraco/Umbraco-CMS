@@ -41,8 +41,8 @@ namespace umbraco.cms.presentation.user
             save.ID = "btnSave";
             save.ButtonType = uicontrols.MenuButtonType.Primary;
             save.OnClientClick = "SavePermissions(); return false;";
-            save.Text = ui.Text("save");
-            save.ToolTip = ui.Text("save");
+            save.Text = Services.TextService.Localize("save");
+            save.ToolTip = Services.TextService.Localize("save");
 
 
             nodePermissions.UserID = Convert.ToInt32(Request.QueryString["id"]);

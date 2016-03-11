@@ -58,9 +58,9 @@ namespace umbraco.cms.presentation.settings.scripts
             // name derives from filename, clean for xss
             NameTxt.Text = filename.CleanForXss('\\', '/');
 
-            Panel1.Text = ui.Text("editscript", Security.CurrentUser);
-            pp_name.Text = ui.Text("name", Security.CurrentUser);
-            pp_path.Text = ui.Text("path", Security.CurrentUser);
+            Panel1.Text = Services.TextService.Localize("editscript");
+            pp_name.Text = Services.TextService.Localize("name");
+            pp_path.Text = Services.TextService.Localize("path");
 
             if (IsPostBack == false)
             {
@@ -86,12 +86,12 @@ namespace umbraco.cms.presentation.settings.scripts
             var editor = Panel1.NewTabPage(Services.TextService.Localize("settings/script"));
             editor.Controls.Add(Pane7);
 
-            var props = Panel1.NewTabPage(ui.Text("properties"));
+            var props = Panel1.NewTabPage(Services.TextService.Localize("properties"));
             props.Controls.Add(Pane8);
 
 
             SaveButton = Panel1.Menu.NewButton();
-            SaveButton.Text = ui.Text("save");
+            SaveButton.Text = Services.TextService.Localize("save");
             SaveButton.ButtonType = MenuButtonType.Primary;
             SaveButton.ID = "save";
             SaveButton.CssClass = "client-side";

@@ -115,7 +115,7 @@
                 <asp:Button ID="ValidateAndSave" runat="server" OnClick="ValidateAndSave_Click" />
                 <em> <%= Services.TextService.Localize("or") %> </em>
             </asp:PlaceHolder>        
-            <a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("general", "cancel", Security.CurrentUser)%></a>  
+            <a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()"><%=Services.TextService.Localize("general/cancel")%></a>  
         </p>
     </asp:PlaceHolder>
   

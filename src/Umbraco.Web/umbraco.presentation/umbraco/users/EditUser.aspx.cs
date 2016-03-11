@@ -199,8 +199,8 @@ namespace umbraco.cms.presentation.user
             var save = userInfo.Menu.NewButton();
             save.Click += SaveUser_Click;
             save.ID = "save";
-            save.ToolTip = ui.Text("save");
-            save.Text = ui.Text("save");
+            save.ToolTip = Services.TextService.Localize("save");
+            save.Text = Services.TextService.Localize("save");
             save.ButtonType = MenuButtonType.Primary;
 
             sectionValidator.ServerValidate += new ServerValidateEventHandler(sectionValidator_ServerValidate);

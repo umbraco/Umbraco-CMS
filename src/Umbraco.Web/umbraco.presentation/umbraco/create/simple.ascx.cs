@@ -1,4 +1,5 @@
-﻿using System.Web;
+﻿using Umbraco.Core.Services;
+using System.Web;
 using Umbraco.Core;
 using Umbraco.Web.UI;
 using Umbraco.Web;
@@ -18,8 +19,8 @@ namespace umbraco.cms.presentation.create.controls
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            sbmt.Text = ui.Text("create");
-            rename.Attributes["placeholder"] = ui.Text("name");
+            sbmt.Text = Services.TextService.Localize("create");
+            rename.Attributes["placeholder"] = Services.TextService.Localize("name");
 
             // Put user code to initialize the page here
         }

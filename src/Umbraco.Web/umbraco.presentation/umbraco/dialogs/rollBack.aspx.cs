@@ -158,7 +158,7 @@
 //                feedBackMsg.type = global::umbraco.uicontrols.Feedback.feedbacktype.success;
 //                string[] vars = {rollback.Text, rollback.VersionDate.ToLongDateString()};
                 
-//                feedBackMsg.Text = ui.Text("rollback", "documentRolledBack", vars, new global::umbraco.BusinessLogic.User(0)) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
+//                feedBackMsg.Text = ui.Text("rollback", "documentRolledBack", vars, new global::umbraco.BusinessLogic.User(0)) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + Services.TextService.Localize("closeThisWindow") + "</a>";
 //                diffPanel.Visible = false;
 //                pl_buttons.Visible = false;
 //            }

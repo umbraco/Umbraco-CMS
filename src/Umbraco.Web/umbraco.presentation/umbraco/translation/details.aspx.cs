@@ -51,10 +51,10 @@ namespace umbraco.presentation.umbraco.translation {
             lt = new Literal();
             lt.Text = library.ReplaceLineBreaks(t.Comment);
             pp_comment.Controls.Add(lt);
-            pp_comment.Text = ui.Text("comment");
+            pp_comment.Text = Services.TextService.Localize("comment");
 
             lt = new Literal();
-            lt.Text =  "<a target=\"_blank\" href=\"xml.aspx?id=" + t.Id + "\">" + ui.Text("download") + "</a>";
+            lt.Text =  "<a target=\"_blank\" href=\"xml.aspx?id=" + t.Id + "\">" + Services.TextService.Localize("download") + "</a>";
             pp_xml.Controls.Add(lt);
             pp_xml.Text = Services.TextService.Localize("translation/downloadTaskAsXml");
 
@@ -64,7 +64,7 @@ namespace umbraco.presentation.umbraco.translation {
             pane_fields.Text = Services.TextService.Localize("translation/fields");
             pane_tasks.Text = Services.TextService.Localize("translation/translationOptions");
             lt = new Literal();
-            lt.Text = "<a href=\"default.aspx?id=" + t.Id + "\">" + ui.Text("upload") + "</a>";
+            lt.Text = "<a href=\"default.aspx?id=" + t.Id + "\">" + Services.TextService.Localize("upload") + "</a>";
             pp_upload.Controls.Add(lt);
             pp_upload.Text = Services.TextService.Localize("translation/uploadTranslationXml");
 
@@ -72,25 +72,25 @@ namespace umbraco.presentation.umbraco.translation {
                 pp_closeTask.Visible = false;
             else {
                 pp_closeTask.Text = Services.TextService.Localize("translation/closeTask");
-                bt_close.Text = ui.Text("close");
+                bt_close.Text = Services.TextService.Localize("close");
             }
 
 
             //Bind page fields
             DataTable pageTable = new DataTable();
-            pageTable.Columns.Add(ui.Text("name"));
-            pageTable.Columns.Add(ui.Text("value"));
+            pageTable.Columns.Add(Services.TextService.Localize("name"));
+            pageTable.Columns.Add(Services.TextService.Localize("value"));
             
             DataRow pageRow = pageTable.NewRow();
-            pageRow[ui.Text("name")] = ui.Text("nodeName");
-            pageRow[ui.Text("value")] = page.Text;
+            pageRow[Services.TextService.Localize("name")] = Services.TextService.Localize("nodeName");
+            pageRow[Services.TextService.Localize("value")] = page.Text;
             pageTable.Rows.Add(pageRow);
 
             //TODO: Make this work again with correct APIs and angularized - so none of this code will exist anymore
             //foreach (PropertyType pt in page.ContentType.PropertyTypes) {
             //    pageRow = pageTable.NewRow();
-            //    pageRow[ui.Text("name")] = pt.Name;
-            //    pageRow[ui.Text("value")] = page.getProperty(pt.Alias).Value;
+            //    pageRow[Services.TextService.Localize("name")] = pt.Name;
+            //    pageRow[Services.TextService.Localize("value")] = page.getProperty(pt.Alias).Value;
             //    pageTable.Rows.Add(pageRow);
             //}
             

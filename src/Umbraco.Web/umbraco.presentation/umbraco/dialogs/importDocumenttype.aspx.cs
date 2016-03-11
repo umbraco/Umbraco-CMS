@@ -1,3 +1,4 @@
+using Umbraco.Core.Services;
 using System;
 using System.Linq;
 using System.Web.UI.WebControls;
@@ -39,8 +40,8 @@ namespace umbraco.presentation.umbraco.dialogs
 		{
 			if (!IsPostBack) 
 			{
-				submit.Text = ui.Text("import");
-				import.Text = ui.Text("import");
+				submit.Text = Services.TextService.Localize("import");
+				import.Text = Services.TextService.Localize("import");
 			} 
 		}
 

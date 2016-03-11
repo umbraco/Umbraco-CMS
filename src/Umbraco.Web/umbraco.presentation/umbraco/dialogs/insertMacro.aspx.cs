@@ -7,6 +7,7 @@ using System.Security;
 using Umbraco.Core.IO;
 using umbraco.DataLayer;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Web;
 
 namespace umbraco.dialogs
@@ -29,8 +30,8 @@ namespace umbraco.dialogs
 
 		protected void Page_Load(object sender, EventArgs e)
 		{
-            pane_edit.Text = ui.Text("general", "edit",Security.CurrentUser) + " " + ui.Text("general", "macro",Security.CurrentUser);
-            pane_insert.Text = ui.Text("general", "insert",Security.CurrentUser) + " " + ui.Text("general", "macro",Security.CurrentUser);
+            pane_edit.Text = Services.TextService.Localize("general/edit") + " " + Services.TextService.Localize("general/macro");
+            pane_insert.Text = Services.TextService.Localize("general/insert") + " " + Services.TextService.Localize("general/macro");
 
 			if (Request["macroID"] != null || Request["macroAlias"] != null) 
 			{

@@ -1,4 +1,5 @@
-﻿using System.Web;
+﻿using Umbraco.Core.Services;
+using System.Web;
 using System.Web.UI.WebControls;
 using System.IO;
 using Umbraco.Core;
@@ -20,7 +21,7 @@ namespace umbraco.presentation.create
 
         protected void Page_Load(object sender, System.EventArgs e)
         {
-            sbmt.Text = ui.Text("create");
+            sbmt.Text = Services.TextService.Localize("create");
             foreach (string fileName in Directory.GetFiles(IOHelper.MapPath(SystemDirectories.Umbraco + GetXsltTemplatePath()), "*.xslt"))
             {
                 FileInfo fi = new FileInfo(fileName);

@@ -31,23 +31,23 @@
 //            if (!base.ValidateUserNodeTreePermissions(d.Path, "U"))
 //                throw new ArgumentException("The current user doesn't have permissions to publish this document. Please contact the system administrator.");
             
-//            pane_publish.Text = ui.Text("publish") + " '" + d.Text + "'";
-//            Panel2.Text = ui.Text("publish");
-//            warning.Text = ui.Text("publish") + " '" + d.Text + "'. " + ui.Text("areyousure");
-//            deleteButton.Text = ui.Text("publish");
+//            pane_publish.Text = Services.TextService.Localize("publish") + " '" + d.Text + "'";
+//            Panel2.Text = Services.TextService.Localize("publish");
+//            warning.Text = Services.TextService.Localize("publish") + " '" + d.Text + "'. " + Services.TextService.Localize("areyousure");
+//            deleteButton.Text = Services.TextService.Localize("publish");
 //        }
 
 //        protected void deleteButton_Click(object sender, EventArgs e)
 //        {
 //            deleteMessage.Visible = true;
-//            deleteMessage.Text = ui.Text("editContentPublishedHeader");
+//            deleteMessage.Text = Services.TextService.Localize("editContentPublishedHeader");
 
 //            confirm.Visible = false;
 
 //            var result = d.SaveAndPublishWithResult(UmbracoUser);
 //            if (result.Success)
 //            {
-//                deleted.Text = ui.Text("editContentPublishedHeader") + " ('" + d.Text + "') " + ui.Text("editContentPublishedText") + "</p><p><a href=\"" + library.NiceUrl(d.Id) + "\"> " + ui.Text("view") + " " + d.Text + "</a>";
+//                deleted.Text = Services.TextService.Localize("editContentPublishedHeader") + " ('" + d.Text + "') " + Services.TextService.Localize("editContentPublishedText") + "</p><p><a href=\"" + library.NiceUrl(d.Id) + "\"> " + Services.TextService.Localize("view") + " " + d.Text + "</a>";
 //            }
 //            else
 //            {

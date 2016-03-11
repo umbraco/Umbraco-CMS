@@ -1,3 +1,4 @@
+using Umbraco.Core.Services;
 using System;
 using System.Web.UI.WebControls;
 using System.Collections.Generic;
@@ -19,18 +20,18 @@ namespace umbraco.cms.presentation.user
         }
         protected void Page_Load(object sender, EventArgs e)
         {
-            pnlUmbraco.Text = umbraco.ui.Text("usertype", Security.CurrentUser);
+            pnlUmbraco.Text = Services.TextService.Localize("usertype");
 
             var save = pnlUmbraco.Menu.NewButton();
             save.Click += save_Click;
             save.ID = "save";
-            save.ToolTip = ui.Text("save");
-            save.Text = ui.Text("save");
+            save.ToolTip = Services.TextService.Localize("save");
+            save.Text = Services.TextService.Localize("save");
 
-            pp_alias.Text = umbraco.ui.Text("usertype", Security.CurrentUser) + " " + umbraco.ui.Text("alias", Security.CurrentUser);
-            pp_name.Text = umbraco.ui.Text("usertype", Security.CurrentUser) + " " + umbraco.ui.Text("name", Security.CurrentUser);
+            pp_alias.Text = Services.TextService.Localize("usertype") + " " + Services.TextService.Localize("alias");
+            pp_name.Text = Services.TextService.Localize("usertype") + " " + Services.TextService.Localize("name");
 
-            pp_rights.Text = umbraco.ui.Text("default", Security.CurrentUser) + " " + umbraco.ui.Text("rights", Security.CurrentUser);
+            pp_rights.Text = Services.TextService.Localize("default") + " " + Services.TextService.Localize("rights");
             
             //ensure we have a query string
             if (string.IsNullOrEmpty(Request.QueryString["id"]))
@@ -64,7 +65,7 @@ namespace umbraco.cms.presentation.user
             userType.DefaultPermissions = actions;
             userType.Save();
 
-            ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, ui.Text("speechBubbles", "editUserTypeSaved", Security.CurrentUser), "");
+            ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, Services.TextService.Localize("speechBubbles/editUserTypeSaved"), "");
         }
 
         protected List<IAction> CurrentUserTypeActions

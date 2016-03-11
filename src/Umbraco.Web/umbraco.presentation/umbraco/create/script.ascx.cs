@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Umbraco.Core.Services;
+using System;
 using System.Linq;
 using System.Web;
 using System.Web.UI.WebControls;
@@ -15,7 +16,7 @@ namespace umbraco.presentation.umbraco.create
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-			sbmt.Text = ui.Text("create");
+			sbmt.Text = Services.TextService.Localize("create");
 
             // Enable new item in folders to place items in that folder.
             if (Request["nodeType"] == "scriptsFolder")
@@ -57,8 +58,8 @@ namespace umbraco.presentation.umbraco.create
 
             string[] fileTypes = UmbracoConfig.For.UmbracoSettings().Content.ScriptFileTypes.ToArray();
 
-            scriptType.Items.Add(new ListItem(ui.Text("folder"), ""));
-            scriptType.Items.FindByText(ui.Text("folder")).Selected = true;
+            scriptType.Items.Add(new ListItem(Services.TextService.Localize("folder"), ""));
+            scriptType.Items.FindByText(Services.TextService.Localize("folder")).Selected = true;
 
             foreach (string str in fileTypes)
             {

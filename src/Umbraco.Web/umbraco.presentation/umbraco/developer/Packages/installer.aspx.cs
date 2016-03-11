@@ -284,7 +284,7 @@ namespace umbraco.presentation.developer.packages
             bt_viewInstalledPackage.OnClientClick = "document.location = '" + packageViewUrl + "'; return false;";
 
             if (!string.IsNullOrEmpty(url))
-                lit_authorUrl.Text = " <em>" + ui.Text("or") + "</em> <a href='" + url + "' target=\"_blank\">" + ui.Text("viewPackageWebsite") + "</a>";
+                lit_authorUrl.Text = " <em>" + Services.TextService.Localize("or") + "</em> <a href='" + url + "' target=\"_blank\">" + Services.TextService.Localize("viewPackageWebsite") + "</a>";
 
 
             pane_success.Visible = true;

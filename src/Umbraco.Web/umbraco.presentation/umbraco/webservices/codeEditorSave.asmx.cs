@@ -126,7 +126,7 @@ namespace umbraco.presentation.webservices
                         {
                             //errorMessage = Services.TextService.Localize("developer/xsltErrorNoNodesPublished");
                             File.Delete(tempFileName);
-                            //base.speechBubble(speechBubbleIcon.info, ui.Text("errors", "xsltErrorHeader", Security.CurrentUser), "Unable to validate xslt as no published content nodes exist.");
+                            //base.speechBubble(speechBubbleIcon.info, Services.TextService.Localize("errors/xsltErrorHeader"), "Unable to validate xslt as no published content nodes exist.");
                         }
                     }
                     catch (Exception errorXslt)

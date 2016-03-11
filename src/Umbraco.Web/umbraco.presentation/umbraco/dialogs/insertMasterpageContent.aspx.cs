@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Web;
-using System.Web.UI;
+﻿using Umbraco.Core.Services;
+using System;
 using System.Web.UI.WebControls;
-using System.Text.RegularExpressions;
-using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic;
 using Umbraco.Core;
 
 namespace umbraco.presentation.umbraco.dialogs
@@ -20,7 +15,7 @@ namespace umbraco.presentation.umbraco.dialogs
         protected void Page_Load(object sender, EventArgs e)
         {
             //labels
-            pp_placeholder.Text = ui.Text("placeHolderID");
+            pp_placeholder.Text = Services.TextService.Localize("placeHolderID");
 
             //Add a default Item
             var li = new ListItem("Choose ID...");

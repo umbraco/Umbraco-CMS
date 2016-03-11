@@ -1,3 +1,4 @@
+using Umbraco.Core.Services;
 using System;
 using System.Collections;
 using System.Web.UI;
@@ -28,7 +29,7 @@ namespace umbraco.dialogs
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            Button1.Text = ui.Text("update");
+            Button1.Text = Services.TextService.Localize("update");
             pane_form.Text = ui.Text("notifications", "editNotifications", node.Text, Security.CurrentUser);
         }
 
@@ -97,7 +98,7 @@ namespace umbraco.dialogs
             UmbracoContext.UmbracoUser.initNotifications();
 
             var feedback = new umbraco.uicontrols.Feedback();
-            feedback.Text = ui.Text("notifications") + " " + ui.Text("ok") + "</p><p><a href='#' class='btn btn-primary' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
+            feedback.Text = Services.TextService.Localize("notifications") + " " + Services.TextService.Localize("ok") + "</p><p><a href='#' class='btn btn-primary' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + Services.TextService.Localize("closeThisWindow") + "</a>";
             feedback.type = umbraco.uicontrols.Feedback.feedbacktype.success;
 
             pane_form.Controls.Clear();

@@ -26,14 +26,14 @@ namespace umbraco.settings
 
 			// Put user code to initialize the page here
 			Panel1.hasMenu = true;
-			Panel1.Text = ui.Text("editdictionary") + ": " + currentItem.key;
+			Panel1.Text = Services.TextService.Localize("editdictionary") + ": " + currentItem.key;
 			
             uicontrols.Pane p = new uicontrols.Pane();
 
 			var save = Panel1.Menu.NewButton();
-            save.Text = ui.Text("save");
+            save.Text = Services.TextService.Localize("save");
             save.Click += save_Click;
-			save.ToolTip = ui.Text("save");
+			save.ToolTip = Services.TextService.Localize("save");
             save.ID = "save";
             save.ButtonType = uicontrols.MenuButtonType.Primary;
 

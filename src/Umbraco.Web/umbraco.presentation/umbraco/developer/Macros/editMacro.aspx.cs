@@ -281,7 +281,7 @@ namespace umbraco.cms.presentation.developer
 
             var save = TabView1.Menu.NewButton();
             save.ButtonType = MenuButtonType.Primary;
-            save.Text = ui.Text("save");
+            save.Text = Services.TextService.Localize("save");
             save.ID = "save";
             save.Click += Save_Click;
 	    }

@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
+﻿using Umbraco.Core.Services;
+using System;
 using System.Linq;
-using System.Web;
-using System.Web.SessionState;
-using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Collections.Generic;
@@ -34,7 +28,7 @@ namespace umbraco.dialogs
         
         protected void Page_Load(object sender, EventArgs e)
         {
-            Button1.Text = ui.Text("update");
+            Button1.Text = Services.TextService.Localize("update");
             pane_form.Text = "Set permissions for the page " + _node.Text;
         }
 
@@ -161,9 +155,9 @@ namespace umbraco.dialogs
             }
 
             // Update feedback message
-            //FeedBackMessage.Text = "<div class=\"feedbackCreate\">" + ui.Text("rights") + " " + ui.Text("ok") + "</div>";
+            //FeedBackMessage.Text = "<div class=\"feedbackCreate\">" + Services.TextService.Localize("rights") + " " + Services.TextService.Localize("ok") + "</div>";
             feedback1.type = uicontrols.Feedback.feedbacktype.success;
-            feedback1.Text = ui.Text("rights") + " " + ui.Text("ok");
+            feedback1.Text = Services.TextService.Localize("rights") + " " + Services.TextService.Localize("ok");
             PlaceHolder1.Visible = false;
             panel_buttons.Visible = false;
 

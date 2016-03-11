@@ -196,7 +196,7 @@
 //            saveMenuImageButton.ToolTip = "save relation type";
 //            saveMenuImageButton.Click +=saveMenuImageButton_Click;
 //            saveMenuImageButton.CausesValidation = true;
-//            saveMenuImageButton.Text = ui.Text("save");
+//            saveMenuImageButton.Text = Services.TextService.Localize("save");
 //            saveMenuImageButton.ValidationGroup = "RelationType";
 
 //            var relationsTabPage = this.tabControl.NewTabPage("Relations");

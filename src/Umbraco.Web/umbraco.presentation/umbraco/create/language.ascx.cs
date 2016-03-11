@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Umbraco.Core.Services;
+using System;
 using System.Collections;
 using System.Globalization;
 using System.Web;
@@ -17,12 +18,12 @@ namespace umbraco.cms.presentation.create.controls
         {
             // get all existing languages
 
-            pp1.Text = ui.Text("choose") + " " + ui.Text("language");
-            sbmt.Text = ui.Text("create");
+            pp1.Text = Services.TextService.Localize("choose") + " " + Services.TextService.Localize("language");
+            sbmt.Text = Services.TextService.Localize("create");
 
             var sortedCultures = new SortedList();
             Cultures.Items.Clear();
-            Cultures.Items.Add(new ListItem(ui.Text("choose") + "...", ""));
+            Cultures.Items.Add(new ListItem(Services.TextService.Localize("choose") + "...", ""));
             foreach (var cultureInfo in CultureInfo.GetCultures(CultureTypes.AllCultures))
                 sortedCultures.Add(cultureInfo.DisplayName + "|||" + Guid.NewGuid(), cultureInfo.Name);
 
