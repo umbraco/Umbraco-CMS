@@ -322,6 +322,7 @@ namespace Umbraco.Web
 
             container.EnablePerWebRequestScope();
 
+            container.RegisterSingleton<IHttpContextAccessor, DefaultHttpContextAccessor>();
             container.RegisterSingleton<IUmbracoContextAccessor, DefaultUmbracoContextAccessor>();
             container.RegisterSingleton<IPublishedContentCache>(factory => new PublishedContentCache());
             container.RegisterSingleton<IPublishedMediaCache, PublishedMediaCache>();
