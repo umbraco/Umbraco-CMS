@@ -18,6 +18,8 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Profiling;
+using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Scheduling;
@@ -204,13 +206,21 @@ namespace umbraco
 
         private static XmlNode GetPreviewOrPublishedNode(Document d, XmlDocument xmlContentCopy, bool isPreview)
         {
+            var contentItem = d.ContentEntity;
+            var serializer = new EntityXmlSerializer();
+            var services = ApplicationContext.Current.Services;
+
             if (isPreview)
             {
-                return d.ToPreviewXml(xmlContentCopy);
+                var xml = services.ContentService.GetContentPreviewXml(contentItem.Id, contentItem.Version);
+                return xml.GetXmlNode(xmlContentCopy);
+                //return d.ToPreviewXml(xmlContentCopy);
             }
             else
             {
-                return d.ToXml(xmlContentCopy, false);
+                var xml = services.ContentService.GetContentXml(contentItem.Id);
+                return xml.GetXmlNode(xmlContentCopy);
+                //return d.ToXml(xmlContentCopy, false);
             }
         }
 

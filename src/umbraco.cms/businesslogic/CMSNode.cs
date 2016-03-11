@@ -473,6 +473,8 @@ namespace umbraco.cms.businesslogic
         /// <returns>The CMSNode Xmlrepresentation</returns>
         public virtual XmlNode ToXml(XmlDocument xd, bool Deep)
         {
+            throw new NotSupportedException("DO NOT USE THIS METHOD, THIS NEEDS TO BE REMOVED FROM THE CODEBASE, REFACTOR ANYTHING THAT IS USING THIS IF YOU GET THIS EXCEPTION");
+
             XmlNode x = xd.CreateNode(XmlNodeType.Element, "node", "");
             XmlPopulate(xd, x, Deep);
             return x;

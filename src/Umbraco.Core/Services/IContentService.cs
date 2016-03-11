@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Xml.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -93,6 +94,21 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IContentService : IService
     {
+        /// <summary>
+        /// Returns the persisted content's XML structure
+        /// </summary>
+        /// <param name="contentId"></param>
+        /// <returns></returns>
+        XElement GetContentXml(int contentId);
+
+        /// <summary>
+        /// Returns the persisted content's preview XML structure
+        /// </summary>
+        /// <param name="contentId"></param>
+        /// <param name="version"></param>
+        /// <returns></returns>
+        XElement GetContentPreviewXml(int contentId, Guid version);
+
         /// <summary>
         /// Rebuilds all xml content in the cmsContentXml table for all documents
         /// </summary>

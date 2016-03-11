@@ -1836,9 +1836,6 @@
     <Content Include="umbraco.presentation\umbraco\members\EditMemberGroup.aspx">
       <SubType>Form</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\schemas\umbraco.xsd">
-      <SubType>Designer</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\settings\EditDictionaryItem.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -1892,22 +1889,6 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <None Include="umbraco.presentation\umbraco\schemas\package.xsd">
-      <SubType>
-      </SubType>
-    </None>
-    <None Include="umbraco.presentation\umbraco\schemas\package.xsx">
-      <DependentUpon>package.xsd</DependentUpon>
-    </None>
-    <None Include="umbraco.presentation\umbraco\schemas\umbraco.xsc">
-      <DependentUpon>umbraco.xsd</DependentUpon>
-    </None>
-    <None Include="umbraco.presentation\umbraco\schemas\umbraco.xss">
-      <DependentUpon>umbraco.xsd</DependentUpon>
-    </None>
-    <None Include="umbraco.presentation\umbraco\schemas\umbraco.xsx">
-      <DependentUpon>umbraco.xsd</DependentUpon>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <WebReferences Include="Web References\" />

@@ -1663,6 +1663,35 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Returns the persisted content's XML structure
+        /// </summary>
+        /// <param name="contentId"></param>
+        /// <returns></returns>
+        public XElement GetContentXml(int contentId)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateContentRepository(uow))
+            {
+                return repository.GetContentXml(contentId);
+            }
+        }
+
+        /// <summary>
+        /// Returns the persisted content's preview XML structure
+        /// </summary>
+        /// <param name="contentId"></param>
+        /// <param name="version"></param>
+        /// <returns></returns>
+        public XElement GetContentPreviewXml(int contentId, Guid version)
+        {
+            var uow = UowProvider.GetUnitOfWork();
+            using (var repository = RepositoryFactory.CreateContentRepository(uow))
+            {
+                return repository.GetContentPreviewXml(contentId, version);
+            }
+        }
+
+        /// <summary>
         /// Rebuilds all xml content in the cmsContentXml table for all documents
         /// </summary>
         /// <param name="contentTypeIds">

@@ -322,6 +322,8 @@ namespace Umbraco.Web
 
             container.EnablePerWebRequestScope();
 
+            //no need to declare as per request, it's lifetime is already managed as a singleton
+            container.Register<HttpContextBase>(factory => new HttpContextWrapper(HttpContext.Current));
             container.RegisterSingleton<IHttpContextAccessor, DefaultHttpContextAccessor>();
             container.RegisterSingleton<IUmbracoContextAccessor, DefaultUmbracoContextAccessor>();
             container.RegisterSingleton<IPublishedContentCache>(factory => new PublishedContentCache());

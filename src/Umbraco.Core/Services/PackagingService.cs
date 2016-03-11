@@ -165,11 +165,8 @@ namespace Umbraco.Core.Services
         {
             var contents = new List<IContent>();
             foreach (var root in roots)
-            {
-                bool isLegacySchema = root.Name.LocalName.ToLowerInvariant().Equals("node");
-                string contentTypeAlias = isLegacySchema
-                                              ? root.Attribute("nodeTypeAlias").Value
-                                              : root.Name.LocalName;
+            {                
+                var contentTypeAlias = root.Name.LocalName;
 
                 if (_importedContentTypes.ContainsKey(contentTypeAlias) == false)
                 {
@@ -177,26 +174,24 @@ namespace Umbraco.Core.Services
                     _importedContentTypes.Add(contentTypeAlias, contentType);
                 }
 
-                var content = CreateContentFromXml(root, _importedContentTypes[contentTypeAlias], null, parentId, isLegacySchema);
+                var content = CreateContentFromXml(root, _importedContentTypes[contentTypeAlias], null, parentId);
                 contents.Add(content);
 
                 var children = from child in root.Elements()
                                where (string)child.Attribute("isDoc") == ""
                                select child;
                 if (children.Any())
-                    contents.AddRange(CreateContentFromXml(children, content, isLegacySchema));
+                    contents.AddRange(CreateContentFromXml(children, content));
             }
             return contents;
         }
 
-        private IEnumerable<IContent> CreateContentFromXml(IEnumerable<XElement> children, IContent parent, bool isLegacySchema)
+        private IEnumerable<IContent> CreateContentFromXml(IEnumerable<XElement> children, IContent parent)
         {
             var list = new List<IContent>();
             foreach (var child in children)
             {
-                string contentTypeAlias = isLegacySchema
-                                              ? child.Attribute("nodeTypeAlias").Value
-                                              : child.Name.LocalName;
+                string contentTypeAlias = child.Name.LocalName;
 
                 if (_importedContentTypes.ContainsKey(contentTypeAlias) == false)
                 {
@@ -205,7 +200,7 @@ namespace Umbraco.Core.Services
                 }
 
                 //Create and add the child to the list
-                var content = CreateContentFromXml(child, _importedContentTypes[contentTypeAlias], parent, default(int), isLegacySchema);
+                var content = CreateContentFromXml(child, _importedContentTypes[contentTypeAlias], parent, default(int));
                 list.Add(content);
 
                 //Recursive call
@@ -215,19 +210,20 @@ namespace Umbraco.Core.Services
                                     select grand;
 
                 if (grandChildren.Any())
-                    list.AddRange(CreateContentFromXml(grandChildren, content, isLegacySchema));
+                    list.AddRange(CreateContentFromXml(grandChildren, content));
             }
 
             return list;
         }
 
-        private IContent CreateContentFromXml(XElement element, IContentType contentType, IContent parent, int parentId, bool isLegacySchema)
+        private IContent CreateContentFromXml(XElement element, IContentType contentType, IContent parent, int parentId)
         {
             var id = element.Attribute("id").Value;
             var level = element.Attribute("level").Value;
             var sortOrder = element.Attribute("sortOrder").Value;
             var nodeName = element.Attribute("nodeName").Value;
             var path = element.Attribute("path").Value;
+            //TODO: Shouldn't we be using this value???
             var template = element.Attribute("template").Value;
 
             var properties = from property in element.Elements()
@@ -248,7 +244,7 @@ namespace Umbraco.Core.Services
 
             foreach (var property in properties)
             {
-                string propertyTypeAlias = isLegacySchema ? property.Attribute("alias").Value : property.Name.LocalName;
+                string propertyTypeAlias = property.Name.LocalName;
                 if (content.HasProperty(propertyTypeAlias))
                 {
                     var propertyValue = property.Value;

@@ -348,7 +348,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		    var parent = _xmlNode == null ? null : _xmlNode.ParentNode;            
             if (parent == null) return;
 
-		    if (parent.Name == "node" || (parent.Attributes != null && parent.Attributes.GetNamedItem("isDoc") != null))
+		    if (parent.Attributes != null && parent.Attributes.GetNamedItem("isDoc") != null)
 		        _parent = (new XmlPublishedContent(parent, _isPreviewing, true)).CreateModel();
 		}
 

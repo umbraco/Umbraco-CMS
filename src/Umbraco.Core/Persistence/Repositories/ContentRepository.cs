@@ -794,6 +794,34 @@ namespace Umbraco.Core.Persistence.Repositories
 
         }
 
+        /// <summary>
+        /// Returns the persisted content's preview XML structure
+        /// </summary>
+        /// <param name="contentId"></param>
+        /// <returns></returns>
+        public XElement GetContentXml(int contentId)
+        {
+            var sql = new Sql().Select("*").From<ContentXmlDto>(SqlSyntax).Where<ContentXmlDto>(SqlSyntax, d => d.NodeId == contentId);
+            var dto = Database.SingleOrDefault<ContentXmlDto>(sql);
+            if (dto == null) return null;
+            return XElement.Parse(dto.Xml);
+        }
+
+        /// <summary>
+        /// Returns the persisted content's preview XML structure
+        /// </summary>
+        /// <param name="contentId"></param>
+        /// <param name="version"></param>
+        /// <returns></returns>
+        public XElement GetContentPreviewXml(int contentId, Guid version)
+        {
+            var sql = new Sql().Select("*").From<PreviewXmlDto>(SqlSyntax)
+                .Where<PreviewXmlDto>(SqlSyntax, d => d.NodeId == contentId && d.VersionId == version);
+            var dto = Database.SingleOrDefault<PreviewXmlDto>(sql);
+            if (dto == null) return null;
+            return XElement.Parse(dto.Xml);
+        }
+
         #endregion
 
         #region IRecycleBinRepository members
