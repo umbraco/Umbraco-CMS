@@ -69,7 +69,7 @@
 
     <asp:PlaceHolder runat="server" ID="ResetPlaceHolder" Visible="<%#Provider.EnablePasswordReset %>">
         <div class="umb-el-wrap">
-            <label class="control-label" for="<%=ResetPasswordCheckBox.ClientID %>"><%=umbraco.ui.GetText("user", "resetPassword")%></label>
+            <label class="control-label" for="<%=ResetPasswordCheckBox.ClientID %>"><%=Services.TextService.Localize("user/resetPassword")%></label>
             <div class="controls controls-row">
                 <asp:CheckBox runat="server" ID="ResetPasswordCheckBox" />
             </div>
@@ -79,7 +79,7 @@
     <div id="passwordInputArea">
         <asp:PlaceHolder runat="server" ID="CurrentPasswordPlaceHolder" Visible="<%#ShowOldPassword %>">
             <div class="umb-el-wrap ">
-                <label class="control-label" for="<%=umbPasswordChanger_passwordCurrent.ClientID %>"><%=umbraco.ui.GetText("user", "passwordCurrent")%></label>
+                <label class="control-label" for="<%=umbPasswordChanger_passwordCurrent.ClientID %>"><%=Services.TextService.Localize("user/passwordCurrent")%></label>
                 <div class="controls controls-row">
                     <asp:TextBox ID="umbPasswordChanger_passwordCurrent" autocomplete="off" AutoCompleteType="None" TextMode="password" runat="server"></asp:TextBox>
                     <asp:RequiredFieldValidator ID="CurrentPasswordValidator" Enabled="False" runat="server"
@@ -92,7 +92,7 @@
         </asp:PlaceHolder>
         
         <div class="umb-el-wrap ">
-            <label class="control-label" for="<%=umbPasswordChanger_passwordNew.ClientID %>"><%=umbraco.ui.GetText("user", "newPassword")%></label>
+            <label class="control-label" for="<%=umbPasswordChanger_passwordNew.ClientID %>"><%=Services.TextService.Localize("user/newPassword")%></label>
             <div class="controls controls-row">
                 <asp:TextBox ID="umbPasswordChanger_passwordNew" autocomplete="off" AutoCompleteType="None" TextMode="password" runat="server"></asp:TextBox>
                 <asp:RequiredFieldValidator ID="NewPasswordRequiredValidator" Enabled="False" runat="server"
@@ -108,7 +108,7 @@
         </div>
         
         <div class="umb-el-wrap ">
-            <label class="control-label" for="<%=umbPasswordChanger_passwordNewConfirm.ClientID %>"><%=umbraco.ui.GetText("user", "confirmNewPassword")%></label>
+            <label class="control-label" for="<%=umbPasswordChanger_passwordNewConfirm.ClientID %>"><%=Services.TextService.Localize("user/confirmNewPassword")%></label>
             <div class="controls controls-row">
                 <asp:TextBox ID="umbPasswordChanger_passwordNewConfirm" autocomplete="off" AutoCompleteType="None" TextMode="password" runat="server"></asp:TextBox>
                 <asp:CompareValidator ID="ConfirmPasswordValidator" runat="server" Enabled="False"

@@ -12,10 +12,11 @@ using System.Web.UI.HtmlControls;
 using Umbraco.Core;
 using Umbraco.Core.Security;
 using Umbraco.Web.Models;
+using Umbraco.Web.UI.Controls;
 
 namespace umbraco.controls
 {
-    public partial class passwordChanger : UserControl
+    public partial class passwordChanger : UmbracoUserControl
     {
         public string MembershipProviderName { get; set; }
 
