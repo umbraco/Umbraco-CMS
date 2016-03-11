@@ -9,7 +9,7 @@ Use this directive to generate a list of breadcrumbs.
 
 <h3>Markup example</h3>
 <pre>
-    <div ng-controller="Umbraco.Controller as vm">
+    <div ng-controller="My.Controller as vm">
         <umb-breadcrumbs
             ng-if="vm.ancestors && vm.ancestors.length > 0"
             ancestors="vm.ancestors"
@@ -34,7 +34,7 @@ Use this directive to generate a list of breadcrumbs.
 
         }
 
-        angular.module("umbraco").controller("Umbraco.Controller", Controller);
+        angular.module("umbraco").controller("My.Controller", Controller);
     })();
 </pre>
 
