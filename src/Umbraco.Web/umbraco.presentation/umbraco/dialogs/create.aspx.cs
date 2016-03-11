@@ -8,6 +8,7 @@ using Umbraco.Core.IO;
 using Umbraco.Web;
 using umbraco.cms.businesslogic;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Web.LegacyActions;
 using Umbraco.Web.UI.Pages;
 
@@ -71,7 +72,7 @@ namespace umbraco.dialogs
                 else
                 {
                     PageNameHolder.type = uicontrols.Feedback.feedbacktype.error;
-                    PageNameHolder.Text = ui.GetText("rights") + " " + ui.GetText("error");
+                    PageNameHolder.Text = Services.TextService.Localize("rights") + " " + Services.TextService.Localize("error");
                     JTree.DataBind();
                 }
             }

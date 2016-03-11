@@ -6,6 +6,9 @@ using umbraco.interfaces;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using umbraco.cms.businesslogic;
+using Umbraco.Core;
+using Umbraco.Core.Services;
+
 namespace umbraco.uicontrols.TreePicker
 {
 
@@ -207,8 +210,8 @@ namespace umbraco.uicontrols.TreePicker
             DeleteLink = new HtmlAnchor();
             DeleteLink.HRef = "#"; //set on pre-render
             DeleteLink.Style.Add(HtmlTextWriterStyle.Color, "red");
-            DeleteLink.Title = ui.GetText("delete");
-            DeleteLink.InnerText = ui.GetText("delete");
+            DeleteLink.Title = ApplicationContext.Current.Services.TextService.Localize("delete");
+            DeleteLink.InnerText = ApplicationContext.Current.Services.TextService.Localize("delete");
             DeleteLink.Attributes.Add("class", "clear");
 
             ButtonContainer.Controls.Add(DeleteLink);
@@ -224,7 +227,7 @@ namespace umbraco.uicontrols.TreePicker
             //add choose link with padding
             ChooseLink = new HtmlAnchor();
             ChooseLink.HRef = "#"; //filled in on pre-render
-            ChooseLink.InnerText = ui.GetText("choose") + "...";
+            ChooseLink.InnerText = ApplicationContext.Current.Services.TextService.Localize("choose") + "...";
             ChooseLink.Attributes.Add("data-section", this.TreePickerUrl);
             ChooseLink.Attributes.Add("class", "choose");
 

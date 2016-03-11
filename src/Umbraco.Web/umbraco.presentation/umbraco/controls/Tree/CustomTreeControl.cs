@@ -5,6 +5,7 @@ using System.Web.UI.HtmlControls;
 using ClientDependency.Core;
 using umbraco.controls.Tree;
 using Umbraco.Core.IO;
+using Umbraco.Core.Services;
 
 namespace umbraco.controls.Tree
 {
@@ -99,7 +100,7 @@ jQuery(document).ready(function() {
         doNotInit: " + ManualInitialization.ToString().ToLower() + @",
         jsonFullMenu: ctxMenu,
         appActions: UmbClientMgr.appActions(),
-        deletingText: '" + umbraco.ui.GetText("deleting") + @"',
+        deletingText: '" + Services.TextService.Localize("deleting") + @"',
         app: app,
         showContext: showContext,
         isDialog: isDialog,
