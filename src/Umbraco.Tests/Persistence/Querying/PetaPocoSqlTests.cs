@@ -52,6 +52,18 @@ namespace Umbraco.Tests.Persistence.Querying
         }
 
         [Test]
+        public void Where_Clause_With_EqualsFalse_Starts_With()
+        {
+            var level = 1;
+            var sql = new Sql("SELECT *").From<NodeDto>().Where<NodeDto>(x => x.Level == level && x.Path.StartsWith("-20") == false);
+
+            Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE ([umbracoNode].[level] = @0 AND NOT (upper([umbracoNode].[path]) LIKE upper(@1)))", sql.SQL.Replace("\n", " "));
+            Assert.AreEqual(2, sql.Arguments.Length);
+            Assert.AreEqual(level, sql.Arguments[0]);
+            Assert.AreEqual("-20%", sql.Arguments[1]);
+        }
+
+        [Test]
         public void Where_Clause_With_Equals_Clause()
         {
             var sql = new Sql("SELECT *").From<NodeDto>().Where<NodeDto>(x => x.Text.Equals("Hello@world.com"));
@@ -65,6 +77,16 @@ namespace Umbraco.Tests.Persistence.Querying
         public void Where_Clause_With_False_Boolean()
         {
             var sql = new Sql("SELECT *").From<NodeDto>().Where<NodeDto>(x => !x.Trashed);
+
+            Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE (NOT ([umbracoNode].[trashed] = @0))", sql.SQL.Replace("\n", " "));
+            Assert.AreEqual(1, sql.Arguments.Length);
+            Assert.AreEqual(true, sql.Arguments[0]);
+        }
+
+        [Test]
+        public void Where_Clause_With_EqualsFalse_Boolean()
+        {
+            var sql = new Sql("SELECT *").From<NodeDto>().Where<NodeDto>(x => x.Trashed == false);
 
             Assert.AreEqual("SELECT * FROM [umbracoNode] WHERE (NOT ([umbracoNode].[trashed] = @0))", sql.SQL.Replace("\n", " "));
             Assert.AreEqual(1, sql.Arguments.Length);
