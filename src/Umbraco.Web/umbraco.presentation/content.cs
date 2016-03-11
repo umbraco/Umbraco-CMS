@@ -207,20 +207,17 @@ namespace umbraco
         private static XmlNode GetPreviewOrPublishedNode(Document d, XmlDocument xmlContentCopy, bool isPreview)
         {
             var contentItem = d.ContentEntity;
-            var serializer = new EntityXmlSerializer();
             var services = ApplicationContext.Current.Services;
 
             if (isPreview)
             {
                 var xml = services.ContentService.GetContentPreviewXml(contentItem.Id, contentItem.Version);
                 return xml.GetXmlNode(xmlContentCopy);
-                //return d.ToPreviewXml(xmlContentCopy);
             }
             else
             {
                 var xml = services.ContentService.GetContentXml(contentItem.Id);
                 return xml.GetXmlNode(xmlContentCopy);
-                //return d.ToXml(xmlContentCopy, false);
             }
         }
 
