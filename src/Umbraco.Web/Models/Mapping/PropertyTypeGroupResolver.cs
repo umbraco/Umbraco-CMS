@@ -218,7 +218,8 @@ namespace Umbraco.Web.Models.Mapping
                     Inherited = inherited,
                     DataTypeId = p.DataTypeDefinitionId,
                     SortOrder = p.SortOrder,
-                    ContentTypeId = contentType.Id
+                    ContentTypeId = contentType.Id,
+                    ContentTypeName = contentType.Name
                 });
             }
 
