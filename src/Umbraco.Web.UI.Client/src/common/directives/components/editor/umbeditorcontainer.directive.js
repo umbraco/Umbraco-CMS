@@ -1,3 +1,42 @@
+/**
+@ngdoc directive
+@name umbraco.directives.directive:umbEditorContainer
+@restrict E
+
+@description
+Use this directive to construct a main content area inside the main editor window.
+
+<h3>Markup example</h3>
+<pre>
+    <div ng-controller="Umbraco.Controller as vm">
+
+        <umb-editor-view>
+
+            <umb-editor-header
+                // header configuration>
+            </umb-editor-header>
+
+            <umb-editor-container>
+                // main content here
+            </umb-editor-container>
+
+            <umb-editor-footer>
+                // footer content here
+            </umb-editor-footer>
+
+        </umb-editor-view>
+
+    </div>
+</pre>
+
+<h3>Use in combination with</h3>
+<ul>
+    <li>{@link umbraco.directives.directive:umbEditorView umbEditorView}</li>
+    <li>{@link umbraco.directives.directive:umbEditorHeader umbEditorHeader}</li>
+    <li>{@link umbraco.directives.directive:umbEditorFooter umbEditorFooter}</li>
+</ul>
+**/
+
 (function() {
    'use strict';
 
