@@ -58,7 +58,7 @@ namespace umbraco.controls
                 }
                 else
                 {
-                    tempTitle = (!string.IsNullOrEmpty(TreeAlias) ? ui.Text(TreeAlias) : ui.Text(AppAlias));
+                    tempTitle = (!string.IsNullOrEmpty(TreeAlias) ? ApplicationContext.Current.Services.TextService.Localize(TreeAlias) : ApplicationContext.Current.Services.TextService.Localize(AppAlias));
 
                 }
             }

@@ -4,6 +4,8 @@ using System.Web.Script.Serialization;
 using umbraco.interfaces;
 using umbraco.businesslogic.Utils;
 using System.Text;
+using Umbraco.Core;
+using Umbraco.Core.Services;
 
 namespace umbraco.controls.Tree
 {
@@ -37,7 +39,7 @@ namespace umbraco.controls.Tree
 			Dictionary<string, object> data = new Dictionary<string, object>();
 
 			data.Add("id", a.Letter);
-			data.Add("label", ui.Text(a.Alias));
+			data.Add("label", ApplicationContext.Current.Services.TextService.Localize(a.Alias));
 
 			if (a.Icon.StartsWith("."))
 			{

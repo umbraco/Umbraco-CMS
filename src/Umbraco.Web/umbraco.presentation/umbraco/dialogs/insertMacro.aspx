@@ -81,9 +81,9 @@
       </cc1:Pane>
     </div>
     <p>
-    <input type="button" value="<%=umbraco.ui.Text("general", "ok", this.getUser())%>" onclick="updateMacro()" />
+    <input type="button" value="<%=Services.TextService.Localize("general/ok")%>" onclick="updateMacro()" />
     &nbsp; <em> or </em> &nbsp;
-     <a href="#" style="color: blue"  onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>
+     <a href="#" style="color: blue"  onclick="UmbClientMgr.closeModalWindow()"><%=Services.TextService.Localize("general/cancel")%></a>
     </p>
     <%} else {%>
     
@@ -93,9 +93,9 @@
       </cc1:PropertyPanel>
     </cc1:Pane>
     <p>
-    <input type="submit" value="<%=umbraco.ui.Text("general", "ok", this.getUser())%>" />
+    <input type="submit" value="<%=Services.TextService.Localize("general/ok")%>" />
     &nbsp; <em> or </em> &nbsp;
-     <a href="#" style="color: blue"  onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>
+     <a href="#" style="color: blue"  onclick="UmbClientMgr.closeModalWindow()"><%=Services.TextService.Localize("general/cancel")%></a>
     </p>
     
     <%}%>

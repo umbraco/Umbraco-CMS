@@ -33,7 +33,7 @@ namespace umbraco.presentation.dialogs
             pp_language.Text = Services.TextService.Localize("translation/translateTo");
             pp_includeSubs.Text = Services.TextService.Localize("translation/includeSubpages");
             pp_comment.Text = Services.TextService.Localize("comment");
-            pane_form.Text = ui.Text("translation", "sendToTranslate", _currentPage.Text, Security.CurrentUser);
+            pane_form.Text = Services.TextService.Localize("translation/sendToTranslate", new[] { _currentPage.Text});
             
 
             if (!IsPostBack)
@@ -104,7 +104,7 @@ namespace umbraco.presentation.dialogs
             pane_form.Visible = false;
             pl_buttons.Visible = false;
 
-            feedback.Text = ui.Text("translation","pageHasBeenSendToTranslation", _currentPage.Text, Security.CurrentUser) + "</p><p><a href=\"#\" onclick=\"" + ClientTools.Scripts.CloseModalWindow() + "\">" + Services.TextService.Localize("defaultdialogs/closeThisWindow") + "</a></p>";
+            feedback.Text = Services.TextService.Localize("translation/pageHasBeenSendToTranslation", new[] { _currentPage.Text}) + "</p><p><a href=\"#\" onclick=\"" + ClientTools.Scripts.CloseModalWindow() + "\">" + Services.TextService.Localize("defaultdialogs/closeThisWindow") + "</a></p>";
             feedback.type = Feedback.feedbacktype.success;
         }
 
@@ -152,7 +152,7 @@ namespace umbraco.presentation.dialogs
                     MailMessage mail = new MailMessage(User.Email, Translator.Email);
 
                     // populate the message
-                    mail.Subject = ui.Text("translation", "mailSubject", subjectVars, Translator);
+                    mail.Subject = Services.TextService.Localize("translation/mailSubject", Translator.UserEntity.GetUserCulture(Services.TextService), subjectVars);
                     mail.IsBodyHtml = false;
                     mail.Body = ui.Text("translation", "mailBody", bodyVars, Translator);
                     try

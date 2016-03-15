@@ -412,7 +412,7 @@ namespace umbraco.presentation.umbraco.dialogs
                 }
             }
 
-            feedback.Text = ui.Text("publicAccess", "paIsProtected", new cms.businesslogic.CMSNode(pageId).Text) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + Services.TextService.Localize("closeThisWindow") + "</a>";
+            feedback.Text = Services.TextService.Localize("publicAccess/paIsProtected", new[] { new cms.businesslogic.CMSNode(pageId).Text}) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + Services.TextService.Localize("closeThisWindow") + "</a>";
 
             p_buttons.Visible = false;
             pane_advanced.Visible = false;
@@ -435,7 +435,7 @@ namespace umbraco.presentation.umbraco.dialogs
 
             RemoveProtection(pageId);
 
-            feedback.Text = ui.Text("publicAccess", "paIsRemoved", new cms.businesslogic.CMSNode(pageId).Text) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + Services.TextService.Localize("closeThisWindow") + "</a>";
+            feedback.Text = Services.TextService.Localize("publicAccess/paIsRemoved", new[] { new cms.businesslogic.CMSNode(pageId).Text}) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + Services.TextService.Localize("closeThisWindow") + "</a>";
 
             var content = Services.ContentService.GetById(pageId);
             //reloads the current node in the tree

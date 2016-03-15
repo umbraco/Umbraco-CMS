@@ -30,7 +30,7 @@ namespace umbraco.dialogs
         protected void Page_Load(object sender, EventArgs e)
         {
             Button1.Text = Services.TextService.Localize("update");
-            pane_form.Text = ui.Text("notifications", "editNotifications", node.Text, Security.CurrentUser);
+            pane_form.Text = Services.TextService.Localize("notifications/editNotifications", new[] { node.Text});
         }
 
         #region Web Form Designer generated code
@@ -60,7 +60,7 @@ namespace umbraco.dialogs
 
                     uicontrols.PropertyPanel pp = new umbraco.uicontrols.PropertyPanel();
                     pp.CssClass = "inline";
-                    pp.Text = ui.Text("actions", a.Alias);
+                    pp.Text = Services.TextService.Localize("actions", a.Alias);
                     pp.Controls.Add(c);
 
                     pane_form.Controls.Add(pp);

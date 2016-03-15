@@ -11,6 +11,12 @@ namespace Umbraco.Core.Services
     /// </summary>
     public static class LocalizedTextServiceExtensions
     {
+        public static string Localize(this ILocalizedTextService manager, params string[] keyParts)
+        {
+            var key = string.Join("/", keyParts);
+            return manager.Localize(key, Thread.CurrentThread.CurrentUICulture);
+        }
+
         /// <summary>
         /// Localize using the current thread culture
         /// </summary>

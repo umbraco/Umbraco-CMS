@@ -54,7 +54,7 @@ namespace umbraco.dialogs
                 var permissionRow = new HtmlTableRow();
                 var label = new HtmlTableCell
                     {
-                        InnerText = ui.Text("actions", a.Alias)
+                        InnerText = Services.TextService.Localize("actions", a.Alias)
                     };
                 permissionRow.Cells.Add(label);
                 _permissions.Add(a.Alias, permissionRow);

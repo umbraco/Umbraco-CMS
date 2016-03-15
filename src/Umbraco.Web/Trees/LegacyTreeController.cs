@@ -92,7 +92,7 @@ namespace Umbraco.Web.Trees
 
                 foreach (var menuItem in attempt.Result.Items)
                 {
-                    menuItem.Name = global::umbraco.ui.Text("actions", menuItem.Alias);
+                    menuItem.Name = Services.TextService.Localize("actions", menuItem.Alias);
                 }
                 return attempt.Result;
             }
@@ -107,7 +107,7 @@ namespace Umbraco.Web.Trees
                 }
                 foreach (var menuItem in attempt.Result.Items)
                 {
-                    menuItem.Name = global::umbraco.ui.Text("actions", menuItem.Alias);
+                    menuItem.Name = Services.TextService.Localize("actions", menuItem.Alias);
                 }
                 return attempt.Result;
             }                       

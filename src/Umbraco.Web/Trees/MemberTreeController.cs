@@ -151,7 +151,7 @@ namespace Umbraco.Web.Trees
                     menu.DefaultMenuAlias = ActionNew.Instance.Alias;
 
                     //Create the normal create action
-                    menu.Items.Add<ActionNew>(ui.Text("actions", ActionNew.Instance.Alias));
+                    menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias));
                 }
                 else
                 {
@@ -163,12 +163,12 @@ namespace Umbraco.Web.Trees
                     menu.Items.Add(createMenuItem);
                 }
                 
-                menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
+                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
                 return menu;
             }
 
             //add delete option for all members
-            menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
+            menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias));
 
             return menu;
         }

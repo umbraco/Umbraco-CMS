@@ -9,6 +9,7 @@ using System.Web.Services.Description;
 using umbraco;
 using umbraco.cms.businesslogic.template;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Web.LegacyActions;
@@ -71,13 +72,13 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.Root.ToInvariantString())
             {
                 //Create the normal create action
-                menu.Items.Add<ActionNew>(ui.Text("actions", ActionNew.Instance.Alias))
+                menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias))
                     //Since we haven't implemented anything for templates in angular, this needs to be converted to 
                     //use the legacy format
                     .ConvertLegacyMenuItem(null, "inittemplates", queryStrings.GetValue<string>("application"));
 
                 //refresh action
-                menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
+                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
 
                 return menu;
             }
@@ -87,7 +88,7 @@ namespace Umbraco.Web.Trees
             var entity = FromTemplate(template);
 
             //Create the create action for creating sub layouts
-            menu.Items.Add<ActionNew>(ui.Text("actions", ActionNew.Instance.Alias))
+            menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias))
                 //Since we haven't implemented anything for templates in angular, this needs to be converted to 
                 //use the legacy format
                 .ConvertLegacyMenuItem(entity, "templates", queryStrings.GetValue<string>("application"));
@@ -96,14 +97,14 @@ namespace Umbraco.Web.Trees
             if (template.IsMasterTemplate == false)
             {
                 //add delete option if it doesn't have children
-                menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias), true)
+                menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias), true)
                     //Since we haven't implemented anything for languages in angular, this needs to be converted to 
                     //use the legacy format
                     .ConvertLegacyMenuItem(entity, "templates", queryStrings.GetValue<string>("application"));
             }
 
             //add refresh
-            menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
+            menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
             
 
             return menu;

@@ -102,12 +102,12 @@ namespace umbraco.dialogs
 
                     if (Request.GetItemAsString("mode") == "cut")
                     {
-                        pane_form.Text = ui.Text("moveOrCopy", "moveTo", currContent.Name, UmbracoUser);
+                        pane_form.Text = Services.TextService.Localize("moveOrCopy/moveTo", new[] { currContent.Name });
                         pp_relate.Visible = false;
                     }
                     else
                     {
-                        pane_form.Text = ui.Text("moveOrCopy", "copyTo", currContent.Name, UmbracoUser);
+                        pane_form.Text = Services.TextService.Localize("moveOrCopy/copyTo", new[] { currContent.Name });
                         pp_relate.Visible = true;
                     }
 
@@ -272,7 +272,7 @@ namespace umbraco.dialogs
                     panel_buttons.Visible = false;
 
                     var newNodeCaption = parentContent == null 
-                        ? ui.Text(CurrentApp) 
+                        ? Services.TextService.Localize(CurrentApp) 
                         : parentContent.Name;
 
                     string[] nodes = { currContent.Name, newNodeCaption };
@@ -293,7 +293,7 @@ namespace umbraco.dialogs
                             Services.MediaService.Move(media, copyToId, UmbracoUser.Id);
                         }
 
-                        feedback.Text = ui.Text("moveOrCopy", "moveDone", nodes, UmbracoUser) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + Services.TextService.Localize("closeThisWindow") + "</a>";
+                        feedback.Text = Services.TextService.Localize("moveOrCopy/moveDone", nodes) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + Services.TextService.Localize("closeThisWindow") + "</a>";
                         feedback.type = uicontrols.Feedback.feedbacktype.success;
 
                         // refresh tree
@@ -306,7 +306,7 @@ namespace umbraco.dialogs
                         var newContent = (IContent)currContent;
                         Services.ContentService.Copy(newContent, Request.GetItemAs<int>("copyTo"), RelateDocuments.Checked, UmbracoUser.Id);
 
-                        feedback.Text = ui.Text("moveOrCopy", "copyDone", nodes, UmbracoUser) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + Services.TextService.Localize("closeThisWindow") + "</a>";
+                        feedback.Text = Services.TextService.Localize("moveOrCopy/copyDone", nodes) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + Services.TextService.Localize("closeThisWindow") + "</a>";
                         feedback.type = uicontrols.Feedback.feedbacktype.success;
 
                         // refresh tree

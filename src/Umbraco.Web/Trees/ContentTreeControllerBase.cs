@@ -236,7 +236,7 @@ namespace Umbraco.Web.Trees
             {
                 var menu = new MenuItemCollection();
                 menu.Items.Add<ActionEmptyTranscan>(Services.TextService.Localize("actions/emptyTrashcan"));
-                menu.Items.Add<ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
+                menu.Items.Add<ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
                 return menu;
             }
             return PerformGetMenuForNode(id, queryStrings);

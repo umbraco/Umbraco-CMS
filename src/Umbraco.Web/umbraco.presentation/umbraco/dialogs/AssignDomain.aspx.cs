@@ -40,7 +40,7 @@ namespace umbraco.dialogs
             {
                 var d = new Domain(Request.GetItemAs<int>("delDomain"));
                 FeedBackMessage.type = uicontrols.Feedback.feedbacktype.success;
-                FeedBackMessage.Text = ui.Text("assignDomain", "domainDeleted", d.Name, UmbracoUser);
+                FeedBackMessage.Text = Services.TextService.Localize("assignDomain/domainDeleted", new[] { d.Name });
                 d.Delete();
                 UpdateDomainList();
             }
@@ -122,7 +122,7 @@ namespace umbraco.dialogs
                     d.Language = new Language(int.Parse(Languages.SelectedValue));
                     d.Name = DomainName.Text.ToLower();
                     FeedBackMessage.type = uicontrols.Feedback.feedbacktype.success;
-                    FeedBackMessage.Text = ui.Text("assignDomain", "domainUpdated", DomainName.Text, UmbracoUser);
+                    FeedBackMessage.Text = Services.TextService.Localize("assignDomain/domainUpdated", new[] { DomainName.Text });
                     d.Save();
 
                     DomainName.Text = "";
@@ -141,7 +141,7 @@ namespace umbraco.dialogs
                     if (!Domain.Exists(domainName.ToLower()))
                     {
                         Domain.MakeNew(domainName, _currentId, int.Parse(Languages.SelectedValue));
-                        FeedBackMessage.Text = ui.Text("assignDomain", "domainCreated", domainName, UmbracoUser);
+                        FeedBackMessage.Text = Services.TextService.Localize("assignDomain/domainCreated", new[] { domainName });
                         FeedBackMessage.type = uicontrols.Feedback.feedbacktype.success;
 
                         DomainName.Text = "";
@@ -153,7 +153,7 @@ namespace umbraco.dialogs
                     }
                     else
                     {
-                        FeedBackMessage.Text = ui.Text("assignDomain", "domainExists", DomainName.Text.Trim(), UmbracoUser);
+                        FeedBackMessage.Text = Services.TextService.Localize("assignDomain/domainExists", new[] { DomainName.Text.Trim() });
                         FeedBackMessage.type = uicontrols.Feedback.feedbacktype.error;
                     }
                 }

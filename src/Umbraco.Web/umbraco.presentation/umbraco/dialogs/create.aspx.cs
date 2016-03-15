@@ -44,8 +44,8 @@ namespace umbraco.dialogs
             // Put user code to initialize the page here
             if (Request.GetItemAsString("nodeId") == "")
             {
-                var appType = ui.Text("sections", App).ToLower();
-                pane_chooseNode.Text = ui.Text("create", "chooseNode", appType, UmbracoUser) + "?";
+                var appType = Services.TextService.Localize("sections", App).ToLower();
+                pane_chooseNode.Text = Services.TextService.Localize("create/chooseNode", new[] { appType }) + "?";
 
                 DataBind();
             }
