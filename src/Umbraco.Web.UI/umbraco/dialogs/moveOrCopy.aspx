@@ -16,9 +16,9 @@
 				if (id > 0)
 						umbraco.presentation.webservices.CMSNode.GetNodeName('<%=umbracoUserContextID%>', id, updateName);
 				else{
-					//document.getElementById("pageNameContent").innerHTML = "'<strong><%=umbraco.ui.Text(Request.CleanForXss("app"))%></strong>' <%= Services.TextService.Localize("moveOrCopy/nodeSelected") %>";
+					//document.getElementById("pageNameContent").innerHTML = "'<strong><%=Services.TextService.Localize(Request.CleanForXss("app"))%></strong>' <%= Services.TextService.Localize("moveOrCopy/nodeSelected") %>";
 			    
-					jQuery("#pageNameContent").html("<strong><%=umbraco.ui.Text(Request.CleanForXss("app"))%></strong> <%= Services.TextService.Localize("moveOrCopy/nodeSelected") %>");
+					jQuery("#pageNameContent").html("<strong><%=Services.TextService.Localize(Request.CleanForXss("app"))%></strong> <%= Services.TextService.Localize("moveOrCopy/nodeSelected") %>");
 					jQuery("#pageNameHolder").attr("class","success");
 			  }
 			}

@@ -4,6 +4,7 @@ using umbraco.interfaces;
 using umbraco.BusinessLogic;
 using Umbraco.Web;
 using Umbraco.Web.LegacyActions;
+using Umbraco.Web.UI.Controls;
 using Action = Umbraco.Web.LegacyActions.Action;
 
 namespace umbraco.cms.presentation.user
@@ -12,7 +13,7 @@ namespace umbraco.cms.presentation.user
     /// <summary>
     /// An object to display the current permissions for a user and a node.
     /// </summary>
-    public partial class NodePermissions : System.Web.UI.UserControl
+    public partial class NodePermissions : UmbracoUserControl
     {
 
         protected override void OnInit(EventArgs e) {

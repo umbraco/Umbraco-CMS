@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using umbraco;
 using umbraco.interfaces;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Core.Logging;
 using TypeFinder = Umbraco.Core.TypeFinder;
 
@@ -115,7 +116,7 @@ namespace Umbraco.Web.LegacyActions
                             icon = "images/" + icon;
 
                         _actionJsList += string.Format(",\n\tmenuItem(\"{0}\", \"{1}\", \"{2}\", \"{3}\")",
-                            action.Letter, icon, ui.GetText("actions", action.Alias, language), action.JsFunctionName);
+                            action.Letter, icon, ApplicationContext.Current.Services.TextService.Localize("actions/"+ action.Alias, new[] { language }), action.JsFunctionName);
                     }
                     catch (Exception ee)
                     {

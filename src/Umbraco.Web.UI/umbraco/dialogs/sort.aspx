@@ -62,7 +62,7 @@
 
     </div>
     <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
-        <a id="closeWindowButton" href="#" class="btn btn-link"><%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>
+        <a id="closeWindowButton" href="#" class="btn btn-link"><%=Services.TextService.Localize("general/cancel")%></a>
         <input id="submitButton" type="button" class="btn btn-primary" value="<%=Services.TextService.Localize("save") %>" />
     </div>
 

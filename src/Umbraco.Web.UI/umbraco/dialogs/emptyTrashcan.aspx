@@ -66,7 +66,7 @@
 	  	  	  
 	  <div id="formDiv">
 	    <p><%= Services.TextService.Localize("defaultdialogs/recycleBinWarning")%></p>
-		   <input type="checkbox" id="confirmDelete" onclick="$get('ok').disabled = !this.checked;" /> <label for="confirmDelete"><%=umbraco.ui.Text("defaultdialogs", "confirmEmptyTrashcan", umbraco.cms.businesslogic.RecycleBin.Count(BinType).ToString(CultureInfo.InvariantCulture), UmbracoUser)%></label>
+		   <input type="checkbox" id="confirmDelete" onclick="$get('ok').disabled = !this.checked;" /> <label for="confirmDelete"><%=Services.TextService.Localize("defaultdialogs/confirmEmptyTrashcan", new[] { umbraco.cms.businesslogic.RecycleBin.Count(BinType).ToString(CultureInfo.InvariantCulture)})%></label>
 		</div>
 	  </cc1:PropertyPanel>
 	  </cc1:Pane>

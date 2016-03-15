@@ -45,7 +45,7 @@ namespace Umbraco.Web.Trees
             {
                 node.MenuUrl = "";
             }
-            node.Name = ui.Text("sections", Constants.Trees.Content);
+            node.Name = Services.TextService.Localize("sections/"+ Constants.Trees.Content);
             return node;
         }
 

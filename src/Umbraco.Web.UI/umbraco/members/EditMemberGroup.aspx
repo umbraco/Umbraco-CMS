@@ -10,7 +10,7 @@
       <table id="Table1" width="100%">
         <tr>
           <th width="15%">
-            <%=umbraco.ui.Text("name", base.getUser())%>
+            <%=Services.TextService.Localize("name")%>
           </th>
           <td>
             <asp:TextBox ID="NameTxt" Width="200px" runat="server"></asp:TextBox>

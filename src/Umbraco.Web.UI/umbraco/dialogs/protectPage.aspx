@@ -11,7 +11,7 @@
 	        if (treePicker > 0) {
 	            umbraco.presentation.webservices.CMSNode.GetNodeName('<%=umbraco.BasePages.BasePage.umbracoUserContextID%>', treePicker, updateLoginTitle);
 					} else
-					    document.getElementById("loginTitle").innerHTML =  "<strong><%=umbraco.ui.Text("content", base.getUser())%></strong>";
+					    document.getElementById("loginTitle").innerHTML =  "<strong><%=Services.TextService.Localize("content")%></strong>";
                 }
             }
 
@@ -26,7 +26,7 @@
 			        if (treePicker > 0) {
 			            umbraco.presentation.webservices.CMSNode.GetNodeName('<%=umbraco.BasePages.BasePage.umbracoUserContextID%>', treePicker, updateErrorTitle);
 					} else
-					    document.getElementById("errorTitle").innerHTML =  "<strong><%=umbraco.ui.Text("content", base.getUser())%></strong>";
+					    document.getElementById("errorTitle").innerHTML =  "<strong><%=Services.TextService.Localize("content")%></strong>";
                 }
             }
             function updateErrorTitle(result) {
@@ -91,8 +91,8 @@
                 <asp:RadioButton GroupName="mode" ID="rb_simple" runat="server" Checked="true" />
 
                 <label for="body_rb_simple">
-                    <h4 class="pa-access-header"><%= umbraco.ui.Text("publicAccess", "paSimple", base.getUser())%></h4>
-                    <p class="pa-access-description"><%= umbraco.ui.Text("publicAccess", "paSimpleHelp", base.getUser())%></p>
+                    <h4 class="pa-access-header"><%= Services.TextService.Localize("publicAccess/paSimple")%></h4>
+                    <p class="pa-access-description"><%= Services.TextService.Localize("publicAccess/paSimpleHelp")%></p>
                 </label>
             </div>
 
@@ -101,8 +101,8 @@
                 <asp:RadioButton GroupName="mode" ID="rb_advanced" runat="server"/>
 
                 <label for="body_rb_advanced">
-                    <h4 class="pa-access-header"><%= umbraco.ui.Text("publicAccess", "paAdvanced", base.getUser())%></h4>
-                    <p class="pa-access-description"><%= umbraco.ui.Text("publicAccess", "paAdvancedHelp", base.getUser())%></p>
+                    <h4 class="pa-access-header"><%= Services.TextService.Localize("publicAccess/paAdvanced")%></h4>
+                    <p class="pa-access-description"><%= Services.TextService.Localize("publicAccess/paAdvancedHelp")%></p>
 
                     <asp:Panel runat="server" Visible="false" ID="p_noGroupsFound" CssClass="error">
                         <p>

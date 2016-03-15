@@ -860,7 +860,6 @@
     <Content Include="Umbraco\Dialogs\exportDocumenttype.aspx" />
     <Content Include="Umbraco\Dialogs\importDocumenttype.aspx" />
     <Content Include="Umbraco\Dialogs\insertMacro.aspx" />
-    <Content Include="Umbraco\Dialogs\insertTable.aspx" />
     <Content Include="Umbraco\Dialogs\moveOrCopy.aspx" />
     <Content Include="Umbraco\Dialogs\notifications.aspx" />
     <Content Include="Umbraco\Developer\Packages\installer.aspx" />

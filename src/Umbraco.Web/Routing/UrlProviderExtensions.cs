@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using Umbraco.Core.Models;
 using umbraco;
+using Umbraco.Core;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Routing
 {
@@ -26,7 +28,7 @@ namespace Umbraco.Web.Routing
 
             if (content.HasPublishedVersion == false)
             {
-                urls.Add(ui.Text("content", "itemNotPublished", umbracoContext.Security.CurrentUser));
+                urls.Add(ApplicationContext.Current.Services.TextService.Localize("content/itemNotPublished"));
                 return urls;
             }
 
@@ -44,9 +46,9 @@ namespace Umbraco.Web.Routing
                 while (parent != null && parent.Published);
 
                 if (parent == null) // oops - internal error
-                    urls.Add(ui.Text("content", "parentNotPublishedAnomaly", umbracoContext.Security.CurrentUser));
+                    urls.Add(ApplicationContext.Current.Services.TextService.Localize("content/parentNotPublishedAnomaly"));
                 else
-                    urls.Add(ui.Text("content", "parentNotPublished", parent.Name, umbracoContext.Security.CurrentUser));
+                    urls.Add(ApplicationContext.Current.Services.TextService.Localize("content/parentNotPublished", new[] { parent.Name }));
             }
             else
             {

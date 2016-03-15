@@ -39,13 +39,13 @@
 
         <div class="propertyDiv" data-bind="visible: processStatus() == 'init'">
             <p>
-                <%= umbraco.ui.Text("publish", "publishHelp", PageName, UmbracoUser) %>
+                <%= Services.TextService.Localize("publish/publishHelp", new[] { PageName}) %>
             </p>
 
             <div>
                 <input type="checkbox" id="publishAllCheckBox" data-bind="checked: publishAll" />
                 <label for="publishAllCheckBox">
-                    <%=umbraco.ui.Text("publish", "publishAll", PageName, UmbracoUser) %>
+                    <%=Services.TextService.Localize("publish/publishAll", new[] { PageName}) %>
                 </label>
             </div>
 

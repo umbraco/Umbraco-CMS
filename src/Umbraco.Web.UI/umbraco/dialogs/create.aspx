@@ -24,7 +24,7 @@
 			    umbraco.presentation.webservices.CMSNode.GetNodeName('<%=umbracoUserContextID%>', id, updateName);
 				}
 			else			
-				pageName.html("<p><strong><%=umbraco.ui.Text(App)%></strong> <%= Services.TextService.Localize("moveOrCopy/nodeSelected") %></p>");
+				pageName.html("<p><strong><%=Services.TextService.Localize(App)%></strong> <%= Services.TextService.Localize("moveOrCopy/nodeSelected") %></p>");
 				pageNameHolder.attr("class","success");
 		}
 		

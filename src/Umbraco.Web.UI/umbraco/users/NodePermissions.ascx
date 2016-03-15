@@ -25,7 +25,7 @@
 		<li>
 			<input type="checkbox" name='<%#"chkPermission" + DataBinder.Eval(Container, "ItemIndex").ToString() %>' id='<%#"chkPermission" + DataBinder.Eval(Container, "ItemIndex").ToString() %>' value='<%#((AssignedPermission)Container.DataItem).Permission.Letter %>' <%#(((AssignedPermission)Container.DataItem).HasPermission ? "checked='true'" : "") %> />
 			<label for='<%#"chkPermission" + DataBinder.Eval(Container, "ItemIndex").ToString() %>' class='checkbox inline <%#(((AssignedPermission)Container.DataItem).HasPermission ? "activePermission" : "") %>'>
-				<%# umbraco.ui.GetText(((AssignedPermission)Container.DataItem).Permission.Alias) %>
+				<%# Services.TextService.Localize(((AssignedPermission)Container.DataItem).Permission.Alias) %>
 			</label>
 		</li>
 	</ItemTemplate>

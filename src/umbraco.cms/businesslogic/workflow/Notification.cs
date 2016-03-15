@@ -1,3 +1,5 @@
+using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -80,12 +82,12 @@ namespace umbraco.cms.businesslogic.workflow
             var pUser = ApplicationContext.Current.Services.UserService.GetUserById(performingUser.Id);
 
             nService.SendNotifications(
-                pUser, documentObject.ContentEntity, action.Letter.ToString(CultureInfo.InvariantCulture), ui.Text(action.Alias), 
+                pUser, documentObject.ContentEntity, action.Letter.ToString(CultureInfo.InvariantCulture), ApplicationContext.Current.Services.TextService.Localize(action.Alias), 
                 new HttpContextWrapper(HttpContext.Current),
-                (user, strings) => ui.Text("notifications", "mailSubject", strings, mailingUser),
+                (user, strings) => ApplicationContext.Current.Services.TextService.Localize("notifications/mailSubject", mailingUser.UserEntity.GetUserCulture(ApplicationContext.Current.Services.TextService), strings),
                 (user, strings) => UmbracoConfig.For.UmbracoSettings().Content.DisableHtmlEmail
-                    ? ui.Text("notifications", "mailBody", strings, mailingUser)
-                    : ui.Text("notifications", "mailBodyHtml", strings, mailingUser));
+                    ? ApplicationContext.Current.Services.TextService.Localize("notifications/mailBody", mailingUser.UserEntity.GetUserCulture(ApplicationContext.Current.Services.TextService), strings)
+                    : ApplicationContext.Current.Services.TextService.Localize("notifications/mailBodyHtml", mailingUser.UserEntity.GetUserCulture(ApplicationContext.Current.Services.TextService), strings));
         }
 
         /// <summary>

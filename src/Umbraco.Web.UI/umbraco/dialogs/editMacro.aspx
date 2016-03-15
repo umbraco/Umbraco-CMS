@@ -39,8 +39,8 @@
 
 
          <cc2:Pane runat="server" CssClass="btn-toolbar umb-btn-toolbar">
-             <a class="btn btn-link" data-bind="click: cancelModal" ><%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>
-             <input data-bind="click: updateMacro" class="btn btn-primary" type="button" value="<%=umbraco.ui.Text("general", "ok", this.getUser())%>" />
+             <a class="btn btn-link" data-bind="click: cancelModal" ><%=Services.TextService.Localize("general/cancel")%></a>
+             <input data-bind="click: updateMacro" class="btn btn-primary" type="button" value="<%=Services.TextService.Localize("general/ok")%>" />
         </cc2:Pane>
 
         
@@ -66,7 +66,7 @@
         </cc2:Pane>
         
         <cc2:Pane runat="server" CssClass="btn-toolbar umb-btn-toolbar">
-            <a class="btn btn-link" data-bind="click: cancelModal" ><%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>
+            <a class="btn btn-link" data-bind="click: cancelModal" ><%=Services.TextService.Localize("general/cancel")%></a>
              <asp:Button ID="bt_insert" runat="server" CssClass="btn btn-primary" Text="ok" OnClick="renderProperties"></asp:Button>
         </cc2:Pane>
     </asp:Panel>

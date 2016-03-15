@@ -4,10 +4,10 @@
 <p>
     Login Name:
     <asp:RequiredFieldValidator ID="loginRequired"
-        ErrorMessage='<%#ui.Text("errorHandling", "errorMandatoryWithoutTab", "Login Name", CurrentUser) %>'
+        ErrorMessage='<%#Services.TextService.Localize("errorHandling/errorMandatoryWithoutTab", new[] { "Login Name"}) %>'
         ControlToValidate="Login" runat="server">*</asp:RequiredFieldValidator>
     <asp:CustomValidator ID="loginExistsCheck" runat="server"
-        ErrorMessage='<%#ui.Text("errorHandling", "errorExistsWithoutTab", "Login Name", CurrentUser) %>'
+        ErrorMessage='<%#Services.TextService.Localize("errorHandling/errorExistsWithoutTab", new[] { "Login Name"}) %>'
         ControlToValidate="Login" ValidateEmptyText="false" OnServerValidate="LoginExistsCheck"></asp:CustomValidator>
     <br />
     <asp:TextBox ID="Login" runat="server" Width="350px" CssClass="bigInput"></asp:TextBox>
@@ -15,10 +15,10 @@
 <p>
     E-mail:
     <asp:RequiredFieldValidator ID="emailRequired"
-        ErrorMessage='<%#ui.Text("errorHandling", "errorMandatoryWithoutTab", "E-mail", CurrentUser) %>'
+        ErrorMessage='<%#Services.TextService.Localize("errorHandling/errorMandatoryWithoutTab", new[] { "E-mail"}) %>'
         ControlToValidate="Email" runat="server">*</asp:RequiredFieldValidator>
     <asp:CustomValidator ID="emailExistsCheck" runat="server"
-        ErrorMessage='<%#ui.Text("errorHandling", "errorExistsWithoutTab", "E-mail", CurrentUser) %>'
+        ErrorMessage='<%#Services.TextService.Localize("errorHandling/errorExistsWithoutTab", new[] { "E-mail"}) %>'
         ControlToValidate="Email" ValidateEmptyText="false" OnServerValidate="EmailExistsCheck"></asp:CustomValidator>
     <asp:CustomValidator runat="server" ID="EmailValidator" OnServerValidate="EmailValidator_OnServerValidate"
         ControlToValidate="Email"
