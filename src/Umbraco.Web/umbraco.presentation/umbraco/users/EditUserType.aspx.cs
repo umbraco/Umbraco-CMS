@@ -99,7 +99,7 @@ namespace umbraco.cms.presentation.user
 
             foreach (IAction ai in Action.GetPermissionAssignable()) {
 
-                ListItem li = new ListItem(umbraco.ui.Text(ai.Alias, Security.CurrentUser), ai.Letter.ToString());
+                ListItem li = new ListItem(Services.TextService.Localize(ai.Alias), ai.Letter.ToString());
 
                 if(CurrentUserTypeActions.Contains(ai))
                     li.Selected = true;

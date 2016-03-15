@@ -90,7 +90,7 @@ namespace umbraco.cms.presentation.user
             {
                 if (UmbracoContext.UmbracoUser.IsAdmin() || ut.Alias != "admin")
                 {
-                    ListItem li = new ListItem(ui.Text("user", ut.Name.ToLower(), UmbracoUser), ut.Id.ToString());
+                    ListItem li = new ListItem(Services.TextService.Localize("user", ut.Name.ToLower()), ut.Id.ToString());
                     if (ut.Id == u.UserType.Id)
                         li.Selected = true;
 
@@ -166,7 +166,7 @@ namespace umbraco.cms.presentation.user
             pp.addProperty(Services.TextService.Localize("user/username"), uname);
             pp.addProperty(Services.TextService.Localize("user/loginname"), lname);
             pp.addProperty(Services.TextService.Localize("user/password"), passw);
-            pp.addProperty(ui.Text("email", UmbracoUser), email);
+            pp.addProperty(Services.TextService.Localize("email"), email);
             pp.addProperty(Services.TextService.Localize("user/usertype"), userType);
             pp.addProperty(Services.TextService.Localize("user/language"), userLanguage);
 
@@ -205,7 +205,7 @@ namespace umbraco.cms.presentation.user
 
             sectionValidator.ServerValidate += new ServerValidateEventHandler(sectionValidator_ServerValidate);
             sectionValidator.ControlToValidate = lapps.ID;
-            sectionValidator.ErrorMessage = ui.Text("errorHandling", "errorMandatoryWithoutTab", Services.TextService.Localize("user/modules"), UmbracoUser);
+            sectionValidator.ErrorMessage = Services.TextService.Localize("errorHandling/errorMandatoryWithoutTab", new[] { Services.TextService.Localize("user/modules") });
             sectionValidator.CssClass = "error";
             sectionValidator.Style.Add("color", "red");
 
@@ -249,7 +249,7 @@ namespace umbraco.cms.presentation.user
                 {
                     if (UmbracoContext.UmbracoUser.IsAdmin() || currentUserApps.Contains(";" + app.alias + ";"))
                     {
-                        ListItem li = new ListItem(ui.Text("sections", app.alias), app.alias);
+                        ListItem li = new ListItem(Services.TextService.Localize("sections", app.alias), app.alias);
                         if (!IsPostBack) foreach (Application tmp in uapps) if (app.alias == tmp.alias) li.Selected = true;
                         lapps.Items.Add(li);
                     }

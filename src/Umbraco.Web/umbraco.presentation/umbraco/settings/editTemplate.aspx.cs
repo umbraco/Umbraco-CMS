@@ -101,9 +101,9 @@ namespace umbraco.cms.presentation.settings
             SaveButton.CssClass = "client-side";
 
 			Panel1.Text = Services.TextService.Localize("edittemplate");
-			pp_name.Text = ui.Text("name", UmbracoUser);
-            pp_alias.Text = ui.Text("alias", UmbracoUser);
-            pp_masterTemplate.Text = ui.Text("mastertemplate", UmbracoUser);
+			pp_name.Text = Services.TextService.Localize("name");
+            pp_alias.Text = Services.TextService.Localize("alias");
+            pp_masterTemplate.Text = Services.TextService.Localize("mastertemplate");
 
 
 			// Editing buttons

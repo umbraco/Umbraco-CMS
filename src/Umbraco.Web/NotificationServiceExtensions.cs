@@ -8,6 +8,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using umbraco;
 using umbraco.interfaces;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web
 {
@@ -71,12 +72,12 @@ namespace Umbraco.Web
                 sender,
                 entity,
                 action.Letter.ToString(CultureInfo.InvariantCulture),
-                ui.Text("actions", action.Alias),
+                applicationContext.Services.TextService.Localize("actions", action.Alias),
                 umbracoContext.HttpContext,
-                (mailingUser, strings) => ui.Text("notifications", "mailSubject", strings, mailingUser),
+                (mailingUser, strings) => applicationContext.Services.TextService.Localize("notifications/mailSubject", mailingUser.GetUserCulture(applicationContext.Services.TextService), strings),
                 (mailingUser, strings) => UmbracoConfig.For.UmbracoSettings().Content.DisableHtmlEmail
-                                              ? ui.Text("notifications", "mailBody", strings, mailingUser)
-                                              : ui.Text("notifications", "mailBodyHtml", strings, mailingUser));
+                                              ? applicationContext.Services.TextService.Localize("notifications/mailBody", mailingUser.GetUserCulture(applicationContext.Services.TextService), strings)
+                                              : applicationContext.Services.TextService.Localize("notifications/mailBodyHtml", mailingUser.GetUserCulture(applicationContext.Services.TextService), strings));
         }
     }
 }

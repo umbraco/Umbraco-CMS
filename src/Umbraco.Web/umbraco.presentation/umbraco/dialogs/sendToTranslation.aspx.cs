@@ -154,7 +154,7 @@ namespace umbraco.presentation.dialogs
                     // populate the message
                     mail.Subject = Services.TextService.Localize("translation/mailSubject", Translator.UserEntity.GetUserCulture(Services.TextService), subjectVars);
                     mail.IsBodyHtml = false;
-                    mail.Body = ui.Text("translation", "mailBody", bodyVars, Translator);
+                    mail.Body = Services.TextService.Localize("translation/mailBody", Translator.UserEntity.GetUserCulture(Services.TextService), bodyVars);
                     try
                     {
                         SmtpClient sender = new SmtpClient();

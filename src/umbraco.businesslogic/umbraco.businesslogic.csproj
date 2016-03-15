@@ -189,9 +189,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="StateHelper.cs" />
-    <Compile Include="ui.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="User.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -483,7 +483,7 @@ namespace umbraco.cms.presentation.Trees
         /// <returns></returns>
         public static string GetTreeHeader(string alias)
         {
-            string treeCaption = ui.Text(alias);
+            string treeCaption = ApplicationContext.Current.Services.TextService.Localize(alias);
             //this is a hack. the tree header title should be in the language files, however, if it is not, we're just
             //going to make it equal to what is specified in the db.
             if (treeCaption.Length > 0 && treeCaption.Substring(0, 1) == "[")

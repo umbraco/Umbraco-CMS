@@ -9,6 +9,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using Action = Umbraco.Web.LegacyActions.Action;
 
 namespace umbraco.presentation.umbraco.dialogs
@@ -42,7 +43,7 @@ namespace umbraco.presentation.umbraco.dialogs
 			ArrayList actions = Action.GetAll();
 			foreach (interfaces.IAction a in actions)
 			{
-			    return ui.Text(action);
+			    return Services.TextService.Localize(action);
             }
             return	action;		
 		}

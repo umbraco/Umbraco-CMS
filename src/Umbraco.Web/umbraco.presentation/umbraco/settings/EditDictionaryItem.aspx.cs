@@ -38,7 +38,7 @@ namespace umbraco.settings
             save.ButtonType = uicontrols.MenuButtonType.Primary;
 
             Literal txt = new Literal();
-            txt.Text = "<p>" + ui.Text("dictionaryItem", "description", currentItem.key, Security.CurrentUser) + "</p><br/>";
+            txt.Text = "<p>" + Services.TextService.Localize("dictionaryItem/description", new[] { currentItem.key }) + "</p><br/>";
             p.addProperty(txt);
 			
 			foreach (cms.businesslogic.language.Language l in cms.businesslogic.language.Language.getAll)
