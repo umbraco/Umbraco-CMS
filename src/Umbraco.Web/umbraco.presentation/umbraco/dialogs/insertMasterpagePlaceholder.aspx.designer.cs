@@ -20,5 +20,7 @@ namespace umbraco.presentation.umbraco.dialogs {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox tb_alias;
+
+        protected global::umbraco.uicontrols.PropertyPanel pp_placeholder;
     }
 }
