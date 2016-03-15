@@ -1,13 +1,29 @@
 angular.module('umbraco').controller("Umbraco.PropertyEditors.UrlListController",
 	function($rootScope, $scope, $filter) {
 
-        function formatDisplayValue() {
-            $scope.renderModel = _.map($scope.model.value.split(","), function (item) {
-                return {
-                    url: item,
-                    urlTarget: ($scope.config && $scope.config.target) ? $scope.config.target : "_blank"
-                };
-            });
+	    function formatDisplayValue() {            
+	        if (angular.isArray($scope.model.value)) {
+	            //it's the json value
+	            $scope.renderModel = _.map($scope.model.value, function (item) {
+	                return {
+	                    url: item.url,
+	                    linkText: item.linkText,
+	                    urlTarget: (item.target) ? item.target : "_blank",
+	                    icon: (item.icon) ? item.icon : "icon-out"
+	                };
+	            });
+	        }
+	        else {
+                //it's the default csv value
+	            $scope.renderModel = _.map($scope.model.value.split(","), function (item) {
+	                return {
+	                    url: item,
+	                    linkText: "",
+	                    urlTarget: ($scope.config && $scope.config.target) ? $scope.config.target : "_blank",
+	                    icon: ($scope.config && $scope.config.icon) ? $scope.config.icon : "icon-out"
+	                };
+	            });
+	        }
         }
 
 	    $scope.getUrl = function(valueUrl) {
