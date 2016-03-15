@@ -914,7 +914,7 @@ AND umbracoNode.id <> @id",
                     //check for default templates                    
                     bool? isDefaultTemplate = Convert.ToBoolean(ct.dtIsDefault);
                     int? templateId = ct.dtTemplateId;
-                    if (currDefaultTemplate == -1 && isDefaultTemplate.HasValue && templateId.HasValue)
+                    if (currDefaultTemplate == -1 && isDefaultTemplate.HasValue && isDefaultTemplate.Value && templateId.HasValue)
                     {
                         currDefaultTemplate = templateId.Value;
                     }
