@@ -194,11 +194,6 @@
     <Compile Include="UserType.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Utils\EncodedStringWriter.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Utils\JSONSerializer.cs" />
-    <Compile Include="Utils\SerializableData.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

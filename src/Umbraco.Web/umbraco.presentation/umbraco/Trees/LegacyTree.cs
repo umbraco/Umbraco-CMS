@@ -1,6 +1,6 @@
 ﻿using System.Xml;
 using umbraco.interfaces;
-using umbraco.BusinessLogic.Utils;
+using Umbraco.Web._Legacy.Utils;
 
 namespace umbraco.cms.presentation.Trees
 {

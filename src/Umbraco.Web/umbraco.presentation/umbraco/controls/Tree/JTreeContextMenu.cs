@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Web.Script.Serialization;
 using Umbraco.Core.Logging;
 using umbraco.interfaces;
-using umbraco.businesslogic.Utils;
 using Umbraco.Core;
 using Umbraco.Web.LegacyActions;
+using Umbraco.Web._Legacy.Utils;
 using Action = Umbraco.Web.LegacyActions.Action;
 
 namespace umbraco.controls.Tree

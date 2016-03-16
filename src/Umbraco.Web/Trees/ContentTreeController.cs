@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Web.Http;
 using Umbraco.Core;
@@ -13,10 +10,6 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
-using umbraco;
-using umbraco.businesslogic;
-using umbraco.cms.businesslogic.web;
-using umbraco.interfaces;
 using Umbraco.Web.LegacyActions;
 using Constants = Umbraco.Core.Constants;
 

@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Web.Script.Serialization;
 using umbraco.interfaces;
-using umbraco.businesslogic.Utils;
 using System.Text;
 using Umbraco.Core;
 using Umbraco.Core.Services;
+using Umbraco.Web._Legacy.Utils;
 
 namespace umbraco.controls.Tree
 {

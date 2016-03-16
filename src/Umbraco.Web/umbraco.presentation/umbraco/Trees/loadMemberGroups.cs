@@ -2,7 +2,7 @@
 using System;
 using System.Text;
 using System.Web;
-using umbraco.businesslogic;
+
 using umbraco.cms.businesslogic.member;
 using umbraco.cms.presentation.Trees;
 using System.Web.Security;

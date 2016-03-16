@@ -9,7 +9,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Media;
 using Umbraco.Core.ObjectResolution;
 using umbraco.BusinessLogic;
-using umbraco.BusinessLogic.Utils;
 
 namespace Umbraco.Web.Media.ThumbnailProviders
 {
